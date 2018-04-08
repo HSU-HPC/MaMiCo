@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<mamico>
+  <macroscopic-cell-configuration
+    cell-size="2.5 ; 2.5"
+    linked-cells-per-macroscopic-cell=" 1 ; 1"
+    write-every-microscopic-timestep="0"
+    microscopic-filename="MacroscopicCell_micro"
+    write-every-macroscopic-timestep="1"
+    macroscopic-filename="MacroscopicCell_macro"
+  />
+  <particle-insertion type="none" />
+  <momentum-insertion type="none"  />
+  <transfer-strategy type="direct-transfer" />
+  <parallel-topology type="xyz" />
+</mamico>
+

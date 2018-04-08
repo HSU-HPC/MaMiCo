@@ -1,0 +1,53 @@
+// Copyright (C) 2015 Technische Universitaet Muenchen
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamico
+
+template<unsigned int dim>
+tarch::utils::MultiMDService<dim>::MultiMDService(const tarch::la::Vector<dim,unsigned int> &numberProcessesPerMDSimulation, const unsigned int &totalNumberMDSimulations):
+// initialise all values, either immediately consistent for single and parallel mode, or for single mode only (and overwrite the setting afterwards in constructor body)
+_numberProcessesPerMDSimulation(numberProcessesPerMDSimulation),
+_numberLocalComms(1),
+_totalNumberMDSimulations(totalNumberMDSimulations),
+_avgNumberMDSimulationsPerLocalComm(totalNumberMDSimulations),
+_thisNumberMDSimulations(totalNumberMDSimulations),
+_globalSize(1), _globalRank(0),
+_localSize(1),_localRank(0){
+#if (TARCH_PARALLEL==TARCH_YES)
+  MPI_Comm_size(MPI_COMM_WORLD,&_globalSize);
+  MPI_Comm_rank(MPI_COMM_WORLD,&_globalRank);
+
+  // test process distribution
+  _localSize = numberProcessesPerMDSimulation[0];
+  for (unsigned int d = 1; d<dim; d++){ _localSize *= numberProcessesPerMDSimulation[d]; }
+  if (_globalSize%_localSize!=0){
+    std::cout << "ERROR MultiMDService::MultiMDService(): _globalSize mod _localSize!=0 !" << std::endl;
+    std::cout << "The number of globally available MPI processes must be filled completely with local MD simulation processes!" << std::endl; exit(EXIT_FAILURE);
+  }
+
+  // compute number of local communicators
+  _numberLocalComms = _globalSize/_localSize;
+  // initialise local communicator by splitting the whole process domain into _numberLocalComms communicators
+  MPI_Comm_split(MPI_COMM_WORLD,_globalRank/_localSize,_globalRank,&_localComm);
+  // initialise local rank
+  MPI_Comm_rank(_localComm,&_localRank);
+  // compute avg number of MD simulations per local communicator
+  _avgNumberMDSimulationsPerLocalComm = _totalNumberMDSimulations/_numberLocalComms;
+  // compute the number of MD simulations on the current communicator. This is always the same as _avgMDSimulations..., except for the last communicator which is filled up with the rest
+  if ((unsigned int)(_globalRank/_localSize+1)==_numberLocalComms){
+    _thisNumberMDSimulations = _totalNumberMDSimulations - _avgNumberMDSimulationsPerLocalComm*(_numberLocalComms-1);
+  } else {
+    _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
+  }
+#endif
+}
+
+
+template<unsigned int dim>
+tarch::utils::MultiMDService<dim>::~MultiMDService(){}
+
+
+template<unsigned int dim>
+unsigned int tarch::utils::MultiMDService<dim>::getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const {
+  return (_globalRank/_localSize)*_avgNumberMDSimulationsPerLocalComm + localMDSimulation;
+}

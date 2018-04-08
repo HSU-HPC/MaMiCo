@@ -1,0 +1,33 @@
+// Copyright (C) 2015 Technische Universitaet Muenchen
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamico
+
+This folder contains the MD simulation SimpleMD. Folder structure:
+
+./
+contains a definition file with some compile time constants and the MolecularDynamicsSimulation which puts together all algorithmic steps of a single-centered Lennard-Jones MD simulation.
+Besides, boundary treatment (currently, only periodic boundaries are supported) and plotting of density profiles is implemented here.
+
+cell-mappings/
+contains callback-classes which are used to execute linked-cell wise operations in SimpleMD. Each class in this folder implements methods
+  beginCellIteration() -> called at the beginning of a linked cell traversal
+  endCellIteration() -> called at the end of a linked cell traversal
+  handleCell(cell,index) -> called on a single linked cell
+and--in case of pairwise molecule evaluations--
+  handleCellPair(cell1,cell2,index1,index2) -> called once for each neighbouring cell pair cell1,cell2.
+Together with the traversal mechanism of the LinkedCellService (see services/ below), this allows to separate cellwise functionality from the storage and memory management.
+
+configurations/
+contains different classes to read xml-based configuration files. General structure of configuration classes can be deduced from tarch/configuration/Configuration.h.
+
+molecule-mappings/
+contains callback-classes to execute a particular functionality per molecule. Each class containts the methods
+  beginMoleculeIteration() -> called at the beginning of the molecule traversal
+  endMoleculeIteration() -> called at the end of the molecule traversal
+  handleMolecule(molecule) -> called for each molecule of the MD simulation.
+Together with the traversal mechanism provided by the MoleculeService (see services/ below), this allows to separate moleculewise functionality from storage and memory management.
+
+services/
+contains classes to provide singleton-like functionality. The MoleculeService provides access to the molecule memory management (e.g., adding/deleting molecules from the simulation), the LinkedCellService provides access to the linked-cell structure. Both services further provide traversal schemes to access the linked cells/molecules.
+Besides, the molecular properties and the distributed parallel enhancements (domain decomposition and molecule exchange across domain boundaries) are implemented here (MolecularPropertiesService and ParallelTopologyService).

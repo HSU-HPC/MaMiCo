@@ -1,0 +1,8 @@
+build/
+.sconsign.dblite
+*.csv
+*.vtk
+*.o
+*.out
+!coupling/tests/build/
+coupling/tests/build_nie/test

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- molecular-dynamics input with LJ parameters  -->
+<molecular-dynamics>
+  <molecule-configuration
+    mass="1.0"
+    temperature="2.2"
+    sigma="1.0"
+    epsilon="1.0"
+    mean-velocity="1.0 ; 0.0 "
+  ></molecule-configuration>
+
+  <mpi-configuration number-of-processes=" 4 ; 3" ></mpi-configuration>
+
+  <simulation-configuration
+     dt="0.002"
+     number-of-timesteps="1000"
+     reorganise-memory-every-timestep="10"
+     compute-macroscopic-quantities-every-timestep="5"
+     fix-seed="yes"
+  ></simulation-configuration>
+
+  <vtk-configuration filename="Molecules" write-every-timestep="10"></vtk-configuration>
+  <checkpoint-configuration filename="Checkpoint2D" write-every-timestep="33"></checkpoint-configuration>
+
+  <domain-configuration
+    molecules-per-direction="46; 47"
+    domain-size="60.0 ; 60.0 "
+    domain-offset="0.0 ; 0.0 ; 0.0"
+    cutoff-radius="2.5"
+    linked-cell-size="2.5 ; 2.5"
+    k_B="1.0"
+    block-size="100"
+
+    south-west="periodic"        south="periodic"        south-east="periodic"
+    west="periodic"                                      east="periodic"
+    north-west="periodic"        north="periodic"        north-east="periodic"
+  > </domain-configuration>
+</molecular-dynamics>

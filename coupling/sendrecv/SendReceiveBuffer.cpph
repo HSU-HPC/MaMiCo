@@ -1,0 +1,301 @@
+// Copyright (C) 2015 Technische Universitaet Muenchen
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamico
+
+template<class MacroscopicCell,unsigned int dim>
+coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::SendReceiveBuffer(){
+  deleteBuffers();
+  #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+  _requestsAllocated=false;
+  _requests=NULL;
+  #endif
+}
+
+
+
+
+template<class MacroscopicCell,unsigned int dim>
+coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::~SendReceiveBuffer(){
+  deleteBuffers();
+  #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+  if (_requests!= NULL){delete []_requests; _requests = NULL;}
+  #endif
+}
+
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::
+deleteBuffer(std::map<unsigned int,BufferWithID>& buffer){
+  for (typename std::map<unsigned int,BufferWithID>::iterator it = buffer.begin(); it != buffer.end(); it++){
+    if ( (it->second).buffer != NULL){
+      free( (it->second).buffer );
+      (it->second).buffer = NULL;
+    }
+    (it->second).bufferSize = 0;
+  }
+  buffer.clear();
+}
+
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::deleteBuffers(){
+  deleteBuffer(_sendBuffer);
+  deleteBuffer(_receiveBuffer);
+}
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::writeToSendBuffer(
+  const coupling::IndexConversion<dim>& indexConversion,
+  coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+  const MacroscopicCell& macroscopicCell,
+  tarch::la::Vector<dim,unsigned int> globalVectorIndex
+){
+  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell()+1;
+
+  const unsigned int globalIndex = indexConversion.getGlobalCellIndex(globalVectorIndex);
+
+  // determine the ranks which need to receive information of this macroscopic cell
+  const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(globalVectorIndex);
+  const unsigned int ranksSize = (unsigned int) ranks.size();
+  #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+  std::cout << "Rank " << indexConversion.getThisRank() << ": write cell " << globalVectorIndex << " to send buffer;";
+  std::cout << " associated target ranks: ";
+  for (unsigned int i = 0; i < ranksSize; i++){ std::cout << ranks[i] << " ";} std::cout << std::endl;
+  #endif
+
+  // loop over ranks
+  for (unsigned int i = 0; i < ranksSize; i++){
+
+    // get iterator to map
+    typename std::map<unsigned int,BufferWithID>::iterator thisBuffer = _sendBuffer.find(ranks[i]);
+    if (thisBuffer== _sendBuffer.end()){
+      _sendBuffer[ranks[i]] = BufferWithID();
+      thisBuffer = _sendBuffer.find(ranks[i]);
+    }
+
+    // increment buffer size and realloc buffer
+    const unsigned int firstPos = (thisBuffer->second).bufferSize*doublesPerCell;
+    (thisBuffer->second).bufferSize++;
+    (thisBuffer->second).buffer = (double *) realloc( (thisBuffer->second).buffer, sizeof(double)*(thisBuffer->second).bufferSize*doublesPerCell );
+    if ( (thisBuffer->second).buffer == NULL){
+      std::cout << "ERROR coupling::SendReceiveBuffer::writeToSendBuffer(): realloc yields NULL ptr!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    // write global cell index and call to specialised function to read from macroscopic cell and write to send buffer
+    (thisBuffer->second).buffer[firstPos] = (double) globalIndex;
+
+    dataExchange.readFromCell( &((thisBuffer->second).buffer[firstPos+1]), macroscopicCell );
+  } // rank
+}
+
+
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::readFromReceiveBuffer(
+  const coupling::IndexConversion<dim> &indexConversion,
+  coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+  MacroscopicCell &macroscopicCell,
+  tarch::la::Vector<dim,unsigned int> globalVectorIndex
+){
+  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell()+1;
+  const unsigned int globalIndex = indexConversion.getGlobalCellIndex(globalVectorIndex);
+
+  #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+  std::cout << "Rank " << indexConversion.getThisRank() << ": read cell " << globalVectorIndex << " (" << globalIndex << ") " << " from receive buffer" << std::endl;
+  #endif
+
+  // loop over all received buffers
+  for (typename std::map<unsigned int, BufferWithID>::const_iterator it = _receiveBuffer.begin(); it != _receiveBuffer.end(); it++){
+
+    // loop over all received cells of this buffer
+    const unsigned int bufferSize = (it->second).bufferSize;
+    for (unsigned int i = 0; i < bufferSize; i++){
+
+      // determine global cell index for this macroscopic cell
+      const unsigned int thisIndex = (unsigned int) (it->second).buffer[i*doublesPerCell];
+
+      // if this is the correct cell, write data into macroscopic cell and return
+      if (thisIndex == globalIndex){
+        // read receive buffer and write to macroscopic cell (use specialised function)
+        dataExchange.writeToCell( &((it->second).buffer[i*doublesPerCell+1]), macroscopicCell );
+        return;
+      }
+    } // loop over buffer
+  } // loop over all buffers
+}
+
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateReceiveBuffers(
+  const coupling::IndexConversion<dim> &indexConversion,
+  coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+  tarch::la::Vector<dim,unsigned int> globalVectorIndex
+){
+  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell()+1;
+
+  // determine the ranks from which we need to receive information of this macroscopic cell
+  const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(globalVectorIndex);
+  const unsigned int ranksSize = (unsigned int) ranks.size();
+  #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+  std::cout << "Rank " << indexConversion.getThisRank() << ": allocate receive buffers for cell " << globalVectorIndex << ";";
+  std::cout << " associated source ranks: ";
+  for (unsigned int i = 0; i < ranksSize; i++){ std::cout << ranks[i] << " ";} std::cout << std::endl;
+  #endif
+
+
+  // loop over ranks
+  for (unsigned int i = 0; i < ranksSize; i++){
+
+    // get iterator to map
+    typename std::map<unsigned int,BufferWithID>::iterator thisBuffer = _receiveBuffer.find(ranks[i]);
+    if (thisBuffer== _receiveBuffer.end()){
+      _receiveBuffer[ranks[i]] = BufferWithID();
+      thisBuffer = _receiveBuffer.find(ranks[i]);
+    }
+
+    // increment buffer size and realloc buffer
+    const unsigned int firstPos = (thisBuffer->second).bufferSize*doublesPerCell;
+    (thisBuffer->second).bufferSize++;
+    (thisBuffer->second).buffer = (double *) realloc( (thisBuffer->second).buffer, sizeof(double)*(thisBuffer->second).bufferSize*doublesPerCell );
+    if ( (thisBuffer->second).buffer == NULL){
+      std::cout << "ERROR coupling::SendReceiveBuffer::allocateReceiveBuffers(): realloc yields NULL ptr!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    // set all values to -1.0
+    for (unsigned int j = firstPos; j < firstPos+doublesPerCell; j++){
+      (thisBuffer->second).buffer[j] = -1.0;
+    }
+  } // rank
+}
+
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::
+triggerSending(const coupling::IndexConversion<dim>& indexConversion,
+coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange){
+  const unsigned int thisRank = indexConversion.getThisRank();
+  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell()+1;
+
+  // loop over all ranks
+  // counter loops over [0; _sendSize-1]
+  #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+  int counter = 0;
+  #endif
+
+  for (typename std::map<unsigned int,BufferWithID>::iterator it = _sendBuffer.begin(); it != _sendBuffer.end(); it++){
+    // if this is not the same rank, do sending
+    if ((it->first) != thisRank){
+      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+      int err = MPI_Isend( (it->second).buffer,doublesPerCell*(it->second).bufferSize,MPI_DOUBLE,(it->first),dataExchange.getTag(),MPI_COMM_WORLD, &_requests[counter]);
+      if (err != MPI_SUCCESS){
+        char *str=NULL; int len=-1;
+        MPI_Error_string(err,str,&len);
+        std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerSending(): Sending from rank " << thisRank << " to " << it->first << " failed with error: " << str << std::endl;
+        delete str;
+        exit(EXIT_FAILURE);
+      }
+      counter++;
+      #endif
+    // otherwise: copy information to _receiveBuffer
+    } else {
+
+      // determine receive-buffer for this rank and check that the buffer is available and of correct size
+      typename std::map<unsigned int,BufferWithID>::iterator itRecv = _receiveBuffer.find(thisRank);
+      if ( (itRecv==_receiveBuffer.end()) ){
+        std::cout << "ERROR coupling::SendReceiveBuffer::triggerSending(): Could not send from rank " << thisRank << " to the same rank! No receive buffer available!";
+        std::cout << " Tag (in case of MPI; not used here): " << dataExchange.getTag() << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      if ( (itRecv->second).bufferSize != (it->second).bufferSize ){
+        std::cout << "ERROR coupling::SendReceiveBuffer:triggerSending(): Send- and receive-buffer sizes do not match for information processed on same rank!" << std::endl;
+        std::cout << "Recv-buffer size=" << (itRecv->second).bufferSize << ", send-buffer size=" << (it->second).bufferSize << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      // copy information from send- to receive buffer
+      memcpy( (itRecv->second).buffer, (it->second).buffer, sizeof(double)*doublesPerCell*(it->second).bufferSize);
+    }
+  }
+}
+
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::
+triggerReceiving(const coupling::IndexConversion<dim>& indexConversion,
+coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange){
+  #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+  const unsigned int thisRank = indexConversion.getThisRank();
+
+  // loop over all ranks (which are not this rank) and trigger MPI_Irecv
+  // counter starts at _sendSize; recv-requests are in [_sendSize;_sendSize+_recvSize-1]
+  int counter = _sendSize;
+  for (typename std::map<unsigned int, BufferWithID>::iterator it = _receiveBuffer.begin(); it != _receiveBuffer.end(); it++){
+    if ( (it->first) != thisRank){
+      int err = MPI_Irecv( (it->second).buffer,(1+dataExchange.getDoublesPerCell())*(it->second).bufferSize,MPI_DOUBLE,(it->first),dataExchange.getTag(),MPI_COMM_WORLD,&_requests[counter]);
+      if (err != MPI_SUCCESS){
+        char *str=NULL; int len=-1;
+        MPI_Error_string(err,str,&len);
+        std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerReceiving(): Receiving on rank " << thisRank << " from " << it->first << " failed with error: " << str << std::endl;
+        delete str;
+        exit(EXIT_FAILURE);
+      }
+      counter++;
+    }
+  }
+  #endif
+}
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateRequests(const coupling::IndexConversion<dim>& indexConversion){
+  #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+  if (_requestsAllocated){
+    std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): allocateRequests() called although allocation already took place!" << std::endl; exit(EXIT_FAILURE);
+  }
+  if (_requests!=NULL){delete []_requests; _requests=NULL;}
+  const unsigned int thisRank = indexConversion.getThisRank();
+
+  // determine number of MPI requests; no requests for on-rank operations
+  _receiveSize=_receiveBuffer.size();
+  _sendSize   =_sendBuffer.size();
+  if (_sendBuffer.find(thisRank)!=_sendBuffer.end()){_sendSize--;}
+  if (_receiveBuffer.find(thisRank)!=_receiveBuffer.end()){_receiveSize--;}
+  // nop, that is no request allocations, if there are no MPI transfers
+  if (_receiveSize+_sendSize==0){ return;}
+
+  _requests = new MPI_Request[_receiveSize+_sendSize];
+  if (_requests==NULL){std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): _requests==NULL!" << std::endl; exit(EXIT_FAILURE);}
+
+  _requestsAllocated = true;
+  #endif
+}
+
+
+
+
+template<class MacroscopicCell,unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::
+waitAllOperations(const coupling::IndexConversion<dim>& indexConversion){
+  #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+  // if no requests have been allocated, return immediately
+  if (!_requestsAllocated && (_requests==NULL)){ return;}
+  if (_requests==NULL){std::cout << "ERROR coupling::SendReceiveBuffer::waitAllOperations(): _requests==NULL!" << std::endl; exit(EXIT_FAILURE);}
+  int err = MPI_Waitall (_sendSize+_receiveSize,_requests, MPI_STATUSES_IGNORE);
+  if (err != MPI_SUCCESS){
+    char *str=NULL; int len=-1;
+    MPI_Error_string(err,str,&len);
+    std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::waitAllOperations(): Waiting failed with error: " << str << std::endl; delete str; exit(EXIT_FAILURE);
+  }
+  delete [] _requests; _requests = NULL;
+  _requestsAllocated = false;
+  #endif
+}
