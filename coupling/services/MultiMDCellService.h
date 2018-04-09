@@ -34,6 +34,7 @@ class coupling::services::MultiMDCellService {
       const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,
       const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,
       const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
+      const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration
@@ -66,7 +67,7 @@ class coupling::services::MultiMDCellService {
       for (unsigned int i = _localNumberMDSimulations*_topologyOffset/_intNumberProcesses; i<_localNumberMDSimulations*(_topologyOffset+_intNumberProcesses)/_intNumberProcesses; i++){
         _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>(
                                         i, mdSolverInterfaces[i-_localNumberMDSimulations*_topologyOffset/_intNumberProcesses], macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,
-                                        momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration, parallelTopologyConfiguration,
+                                        momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration, noiseReductionConfiguration, parallelTopologyConfiguration,
                                         numberMDTimestepsPerCouplingCycle, macroscopicCellConfiguration, _topologyOffset
                                       );
         if (_macroscopicCellServices[i]==NULL){

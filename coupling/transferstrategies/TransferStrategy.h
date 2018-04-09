@@ -76,8 +76,9 @@ class coupling::transferstrategies::TransferStrategy {
     virtual void beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData(){}
     virtual void endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData(){}
 
-    /** is called for every macroscopic cell right before sending the macroscopicMass and -Momentum
-     *  data to the macroscopic solver. Example: Compute mass and momentum and store the results in
+    /** is called for every macroscopic cell before sending the macroscopicMass and -Momentum
+     *  data to the macroscopic solver and before noise reduction invocation. 
+     *  Example: Compute mass and momentum and store the results in
      *  macroscopicMass and -Momentum. The total mass and momentum from the MD system will then be
      *  sent to the macroscopic solver.
      *  This method is only applied to macroscopic cells that cover parts of the MD domain; it is not applied
@@ -89,8 +90,9 @@ class coupling::transferstrategies::TransferStrategy {
     virtual void beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){}
     virtual void endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){}
 
-    /** is called for every macroscopic cell right before sending the macroscopicMass and -Momentum
-     *  data to the macroscopic solver. Example: Compute mass and momentum and store the results in
+    /** is called for every macroscopic cell before sending the macroscopicMass and -Momentum
+     *  data to the macroscopic solver and before noise reduction invocation. 
+     *  Example: Compute mass and momentum and store the results in
      *  macroscopicMass and -Momentum. The total mass and momentum from the MD system will then be
      *  sent to the macroscopic solver.
      *  This method is only applied to outer macroscopic cells, that is cells that are located outside the MD domain.

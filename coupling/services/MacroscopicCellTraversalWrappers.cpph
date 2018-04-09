@@ -135,6 +135,38 @@ class Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData: public Wrapp
     }
 };
 
+/** wrapper for method processInnerMacroscopicCell of NoiseReduction */
+class Wrapper4ProcessInnerMacroscopicCell: public Wrapper {
+  public:
+    Wrapper4ProcessInnerMacroscopicCell(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+
+    void beginCellIteration(){
+      Wrapper::_thisPtr->_noiseReduction->beginProcessInnerMacroscopicCells();
+    }
+    void endCellIteration(){
+      Wrapper::_thisPtr->_noiseReduction->endProcessInnerMacroscopicCells();
+    }
+    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+      Wrapper::_thisPtr->_noiseReduction->processInnerMacroscopicCell(cell,index);
+    }
+};
+
+/** wrapper for method processOuterMacroscopicCell of NoiseReduction */
+class Wrapper4ProcessOuterMacroscopicCell: public Wrapper {
+  public:
+    Wrapper4ProcessOuterMacroscopicCell(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+
+    void beginCellIteration(){
+      Wrapper::_thisPtr->_noiseReduction->beginProcessOuterMacroscopicCells();
+    }
+    void endCellIteration(){
+      Wrapper::_thisPtr->_noiseReduction->endProcessOuterMacroscopicCells();
+    }
+    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+      Wrapper::_thisPtr->_noiseReduction->processOuterMacroscopicCell(cell,index);
+    }
+};
+
 
 /** wrapper for method processInnerMacroscopicCellAfterMDTimestep of TransferStrategy */
 class Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep: public Wrapper {

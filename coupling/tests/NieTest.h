@@ -132,7 +132,7 @@ class NieTest: public Test {
       coupling::services::MultiMDCellService<MY_LINKEDCELL,3> multiMDCellService(
             mdSolverInterface,couetteSolverInterface, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) rank, totalNumberMDSimulations,
             mamicoConfig.getParticleInsertionConfiguration(), mamicoConfig.getMomentumInsertionConfiguration(), mamicoConfig.getBoundaryForceConfiguration(),
-            mamicoConfig.getTransferStrategyConfiguration(), mamicoConfig.getParallelTopologyConfiguration(), simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+            mamicoConfig.getTransferStrategyConfiguration(), mamicoConfig.getNoiseReductionConfiguration(), mamicoConfig.getParallelTopologyConfiguration(), simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
             mamicoConfig.getMacroscopicCellConfiguration()
       );
       // set couette solver interface in MamicoInterfaceProvider
