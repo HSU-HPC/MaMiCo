@@ -130,8 +130,8 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMD2
   Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
   // noise reduction
-  Wrapper4ProcessInnerMacroscopicCell wrapper3(this);
-  Wrapper4ProcessOuterMacroscopicCell wrapper4(this);
+  Wrapper4NoiseReductionProcessInnerMacroscopicCell wrapper3(this);
+  Wrapper4NoiseReductionProcessOuterMacroscopicCell wrapper4(this);
 
   // pre-process data before sending to macroscopic solver
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);

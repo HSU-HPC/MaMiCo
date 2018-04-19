@@ -136,9 +136,9 @@ class Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData: public Wrapp
 };
 
 /** wrapper for method processInnerMacroscopicCell of NoiseReduction */
-class Wrapper4ProcessInnerMacroscopicCell: public Wrapper {
+class Wrapper4NoiseReductionProcessInnerMacroscopicCell: public Wrapper {
   public:
-    Wrapper4ProcessInnerMacroscopicCell(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+    Wrapper4NoiseReductionProcessInnerMacroscopicCell(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
 
     void beginCellIteration(){
       Wrapper::_thisPtr->_noiseReduction->beginProcessInnerMacroscopicCells();
@@ -152,9 +152,9 @@ class Wrapper4ProcessInnerMacroscopicCell: public Wrapper {
 };
 
 /** wrapper for method processOuterMacroscopicCell of NoiseReduction */
-class Wrapper4ProcessOuterMacroscopicCell: public Wrapper {
+class Wrapper4NoiseReductionProcessOuterMacroscopicCell: public Wrapper {
   public:
-    Wrapper4ProcessOuterMacroscopicCell(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+    Wrapper4NoiseReductionProcessOuterMacroscopicCell(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
 
     void beginCellIteration(){
       Wrapper::_thisPtr->_noiseReduction->beginProcessOuterMacroscopicCells();
