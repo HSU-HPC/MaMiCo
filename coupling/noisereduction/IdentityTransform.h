@@ -18,7 +18,9 @@ template<class LinkedCell,unsigned int dim>
 class coupling::noisereduction::IdentityTransform:
 public coupling::noisereduction::NoiseReduction<LinkedCell,dim> {
   public:
-    IdentityTransform(){}
+    IdentityTransform(const coupling::IndexConversion<dim> &indexConversion):
+      coupling::noisereduction::NoiseReduction<LinkedCell,dim>(indexConversion){}
+      
     virtual ~IdentityTransform(){}
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_IDENTITY_H_

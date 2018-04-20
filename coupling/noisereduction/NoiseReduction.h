@@ -2,6 +2,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_NOISEREDUCTION_H_
 
 #include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/IndexConversion.h"
 
 namespace coupling {
   namespace noisereduction {
@@ -18,7 +19,8 @@ namespace coupling {
 template<class LinkedCell,unsigned int dim>
 class coupling::noisereduction::NoiseReduction {
   public:
-    NoiseReduction(){}
+    NoiseReduction(const coupling::IndexConversion<dim> &indexConversion
+    ): _indexConversion(indexConversion){}
     virtual ~NoiseReduction(){}
 
     /** Is called for every macroscopic cell right before sending the macroscopicMass and -Momentum
@@ -43,5 +45,6 @@ class coupling::noisereduction::NoiseReduction {
     virtual void endProcessOuterMacroscopicCells(){}
 
   protected:
+    const coupling::IndexConversion<dim> &_indexConversion;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_NOISEREDUCTION_H_

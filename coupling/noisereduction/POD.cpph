@@ -1,0 +1,118 @@
+
+template<class LinkedCell,unsigned int dim>
+coupling::noisereduction::POD<LinkedCell,dim>::POD(
+  const coupling::IndexConversion<dim> &indexConversion
+):
+coupling::noisereduction::NoiseReduction<LinkedCell,dim>(indexConversion),
+_timeWindowSize(10),
+_kMax(2),
+_cycleCounter(0),
+_spatialIndex(0),
+_t(0),
+_data(NULL),
+_C(NULL),
+_A(NULL),
+_A_T(NULL)
+{
+  int spatialSize = getLocalNumberMacroscopicCells(indexConversion);
+  _data = new Eigen::MatrixXd[dim+1]; // separate data matrices for: mass, momentum0, momentum1, momentum2
+  _C = new Eigen::MatrixXd[dim+1];
+  _A = new Eigen::MatrixXd[dim+1];
+  _A_T = new Eigen::MatrixXd[dim+1];
+  for(unsigned int i=0;i<dim+1;i++){
+    _data[i] = Eigen::MatrixXd::Constant(_timeWindowSize, spatialSize, (i==0)?1:0);
+  }
+}
+
+
+template<class LinkedCell,unsigned int dim>
+coupling::noisereduction::POD<LinkedCell,dim>::~POD(){
+  if (_data!=NULL){ delete [] _data; _data=NULL;}
+  if (_C!=NULL){ delete [] _C; _C=NULL;}
+  if (_A!=NULL){ delete [] _A; _A=NULL;}
+  if (_A_T!=NULL){ delete [] _A_T; _A_T=NULL;}
+}
+
+
+template<class LinkedCell,unsigned int dim>
+void coupling::noisereduction::POD<LinkedCell,dim>::
+beginProcessInnerMacroscopicCells(){
+  _spatialIndex = 0;
+
+  for (unsigned int d = 0; d < dim+1; d++){
+    // @todo write this in more efficient iterative form, 
+    // updating just one single column instead of everything
+    // and compute only lower triangular part!
+    // @todo MPI communicate this with asynchronous ALLREDUCE
+    _C[d] = _data[d] * _data[d].transpose();  
+
+    // @todo execute in nonblocking background worker thread? 
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(_C[d]);
+
+    _A[d] = solver.eigenvectors().rightCols(_kMax);
+    _A_T[d] = _A[d].transpose();
+
+
+    //////////
+    if (d==0){
+      std::cout << "_t = " << _t << std::endl;
+      std::cout << "d = " << d << std::endl;
+      std::cout << "_data[d].leftCols(50) =" << std::endl << _data[d].leftCols(50) << std::endl;
+      std::cout << "_C[d] =" << std::endl << _C[d] << std::endl;
+      std::cout << "_A[d] =" << std::endl << _A[d] << std::endl;
+    }
+  }
+}
+
+
+template<class LinkedCell,unsigned int dim>
+void coupling::noisereduction::POD<LinkedCell,dim>::
+processInnerMacroscopicCell(
+coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+  // buffer raw cell data
+  double mass = cell.getMacroscopicMass();
+  tarch::la::Vector<dim,double> momentum = cell.getMacroscopicMomentum();
+
+  if(_spatialIndex==0) 
+    std::cout << "read " << mass << "; " << momentum[0] << ", " << momentum[1] << ", " << momentum[2] << std::endl;
+
+  // compute and store smoothed result
+  Eigen::VectorXd phi_x = _A_T[0] * _data[0].col(_spatialIndex);
+  if(_spatialIndex==0) 
+    std::cout << "phi_x =" << phi_x << std::endl;
+  cell.setMacroscopicMass((_A[0].row((_t-1+_timeWindowSize)%_timeWindowSize) * phi_x).value());
+  if(_spatialIndex==0) 
+    std::cout << "(_A[0].row((_t-1+_timeWindowSize)%_timeWindowSize) * phi_x) =" << (_A[0].row((_t-1+_timeWindowSize)%_timeWindowSize) * phi_x) << std::endl;
+  tarch::la::Vector<dim,double> mo_smooth;
+  for (unsigned int d = 0; d < dim; d++){ // (optimized compiler will unroll this loop)
+    phi_x = _A_T[d+1] * _data[d+1].col(_spatialIndex);
+    mo_smooth[d] = (_A[d+1].row((_t-1+_timeWindowSize)%_timeWindowSize) * phi_x).value();
+  }
+  cell.setMacroscopicMomentum(mo_smooth);
+
+  // save data buffer into snapshot matrix
+  _data[0](_t, _spatialIndex) = mass;
+  for (unsigned int d = 0; d < dim; d++){    // (optimized compiler will unroll this loop)
+    _data[d+1](_t, _spatialIndex) = momentum[d];
+  }
+
+  if(_spatialIndex==0) 
+    std::cout << "write " << cell.getMacroscopicMass() << "; " << mo_smooth[0] << ", " << mo_smooth[1] << ", " << mo_smooth[2] << std::endl;
+
+  _spatialIndex++;
+}
+
+
+template<class LinkedCell,unsigned int dim>
+void coupling::noisereduction::POD<LinkedCell,dim>::
+endProcessInnerMacroscopicCells(){
+  _cycleCounter++;
+  _t = _cycleCounter%_timeWindowSize;
+}
+
+template<class LinkedCell,unsigned int dim>
+unsigned int coupling::noisereduction::POD<LinkedCell,dim>::getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const{
+  const tarch::la::Vector<dim,unsigned int> localCells(indexConversion.getLocalNumberMacroscopicCells());
+  unsigned int num = localCells[0]; for (unsigned int d = 1; d < dim; d++){ num = num * localCells[d]; }
+  return num;
+}

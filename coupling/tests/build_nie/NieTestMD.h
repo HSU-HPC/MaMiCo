@@ -47,7 +47,7 @@ class NieTest: public Test {
       const double density = 0.81;         // density of particle system; DPD value: 3.0
       const double kinVisc = 2.14/density; // kinematic viscosity (cf. paper by Nie et al.); DPD value: 0.54/density
       const double temp    = 1.1;          // temperature of MD system; DPD value: 1.0
-      const int    equSteps= 100;        // number of equilibration steps (we start from a particle configuration where all molecules are placed on a grid); DPD value: 1000, MD value: 10000
+      const int    equSteps= 0;            // number of equilibration steps ; DPD value: 1000, MD value: 10000
       unsigned int mdStepCounter=0;         // time step counter for MD
 
       const double channelheight = 50.0;    // channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0)
@@ -55,10 +55,10 @@ class NieTest: public Test {
       const int plotEveryTimestep = 1;                            // only for LB couette solver: VTK plotting per time step
       tarch::la::Vector<3,unsigned int> lbNumberProcesses(1,1,1); // only for LB couette solver: number of processes 
 
-      const unsigned int couplingCycles = 10;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
-      const unsigned int totalNumberMDSimulations=10;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
-      const SolverType solverType = COUETTE_ANALYTICAL; // LB or analytical couette solver
-      const bool twoWayCoupling = false;
+      const unsigned int couplingCycles = 50;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
+      const unsigned int totalNumberMDSimulations=1;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
+      const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
+      const bool twoWayCoupling = true;
 
       // for time measurements
       timeval start;
@@ -187,7 +187,7 @@ class NieTest: public Test {
           static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver)->setMDBoundaryValues(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion());
         }
         // write data to csv-compatible file for evaluation
-        write2CSV(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),rank,cycles);
+        //write2CSV(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),rank,cycles);
         if (rank==0){std::cout << "Finish coupling cycle " << cycles << std::endl;}
       }
 

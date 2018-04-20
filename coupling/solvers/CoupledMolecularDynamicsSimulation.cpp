@@ -81,7 +81,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping,false);
 
   if (_parallelTopologyService->getProcessCoordinates()==tarch::la::Vector<MD_DIM,unsigned int>(0)){
-    std::cout <<"Finish MD timestep " << t << "..." << std::endl;
+    if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
   }
 }
 

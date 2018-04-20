@@ -21,9 +21,11 @@
 
   <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
 
-  <checkpoint-configuration filename="Checkpoint3D" write-every-timestep="0"></checkpoint-configuration>
+  <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
 
   <domain-configuration
+    init-from-sequential-checkpoint="CheckpointSimpleMD_10000"
+
     molecules-per-direction="28 ; 28 ; 28"
     domain-size="30.0 ; 30.0 ; 30.0"
     domain-offset="10.0 ; 10.0 ; 2.5"

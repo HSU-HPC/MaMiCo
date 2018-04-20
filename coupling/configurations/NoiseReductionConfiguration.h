@@ -6,6 +6,7 @@
 #include <iostream>
 #include "coupling/noisereduction/NoiseReduction.h"
 #include "coupling/noisereduction/IdentityTransform.h"
+#include "coupling/noisereduction/POD.h"
 
 namespace coupling {
   namespace configurations {
@@ -65,15 +66,16 @@ public tarch::configuration::Configuration {
 
 
     template<class LinkedCell, unsigned int dim>
-    coupling::noisereduction::NoiseReduction<LinkedCell,dim>* interpreteConfiguration() const {
+    coupling::noisereduction::NoiseReduction<LinkedCell,dim>* interpreteConfiguration(
+      const coupling::IndexConversion<dim> &indexConversion
+    ) const {
       if (_type == IdentityTransform){
-        return new coupling::noisereduction::IdentityTransform<LinkedCell,dim>();
+        return new coupling::noisereduction::IdentityTransform<LinkedCell,dim>(indexConversion);
       } else if (_type == GaussianFilter){
         std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
         exit(EXIT_FAILURE);
       } else if (_type == POD){
-        std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
-        exit(EXIT_FAILURE);
+        return new coupling::noisereduction::POD<LinkedCell,dim>(indexConversion);
       } else if (_type == AnisotropicDiffusion){
         std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
         exit(EXIT_FAILURE);
