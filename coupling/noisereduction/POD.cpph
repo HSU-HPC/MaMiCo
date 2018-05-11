@@ -107,7 +107,7 @@ unsigned int coupling::noisereduction::POD<LinkedCell,dim>::getLocalNumberMacros
 - verständnis für library untermauern
 - tests / assertions 
 - faster calculation of C, performance measurement
-- bidirektionale kopplung später einschalten! für initialisierung
+* bidirektionale kopplung später einschalten! für initialisierung
 - cluster tests
 - schon zb nach 90 / 100 MD timesteps filtern?
 - oszillierender couette

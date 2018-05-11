@@ -59,6 +59,7 @@ class NieTest: public Test {
       const unsigned int totalNumberMDSimulations=1;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
       const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
       const bool twoWayCoupling = true;
+      const int twoWayCouplingInitCycles = 15;
 
       // for time measurements
       timeval start;
@@ -183,7 +184,7 @@ class NieTest: public Test {
         // send back data from MD instances and merge it
         multiMDCellService.sendFromMD2Macro(recvBuffer,globalCellIndices4RecvBuffer);
 
-        if ( (solverType==COUETTE_LB) && twoWayCoupling){
+        if ( (solverType==COUETTE_LB) && twoWayCoupling && cycles >= twoWayCouplingInitCycles){
           static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver)->setMDBoundaryValues(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion());
         }
         // write data to csv-compatible file for evaluation
