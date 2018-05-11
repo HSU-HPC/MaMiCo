@@ -113,7 +113,9 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::AbstractCoue
       if (skipRank()){return;}
 
       // init everything with lattice weights, zero velocity, unit density; flags are set to FLUID
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++){
         for (int q = 0; q < 19; q++){ _pdf1[get(i)*19+q] = _W[q]; _pdf2[get(i)*19+q] = _W[q]; }
         for (int d = 0; d <  3; d++){ _vel[get(i)*3+d]  = 0.0;}
@@ -125,21 +127,33 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::AbstractCoue
 
       // correct boundary flags based on physical description (Couette scenario)
       // bottom - moving wall
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2); i++){ _flag[get(i)] = MOVING_WALL; }
       // top - noslip
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int i = (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+1); i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++){ _flag[get(i)] = NO_SLIP;}
       // front - periodic
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){for (int x = 0; x < _domainSizeX+2; x++){ _flag[get(x,0,z)] = PERIODIC; } }
       // back - periodic
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){for (int x = 0; x < _domainSizeX+2; x++){ _flag[get(x,_domainSizeY+1,z)] = PERIODIC; } }
       // left - periodic
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){for (int y = 1; y < _domainSizeY+1; y++){ _flag[get(0,y,z)] = PERIODIC; }}
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){for (int y = 1; y < _domainSizeY+1; y++){ _flag[get(_domainSizeX+1,y,z)] = PERIODIC; }}
 
       // correct boundary flags in case of MPI-parallel simulations (Couette scenario)
@@ -330,7 +344,9 @@ std::cout << "Process coords: " << coords << ":  GlobalCellCoords for index " <<
 
     /** collide-stream algorithm */
     void collidestream(){
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){
         for (int y = 1; y < _domainSizeY+1; y++){
           for (int x = 1; x < _domainSizeX+1; x++){
@@ -585,25 +601,37 @@ std::cout << "Process coords: " << coords << ":  GlobalCellCoords for index " <<
 
       // bottom - moving wall
       if (coords[2]!=0){
+        #if defined(_OPENMP)
         #pragma omp parallel for
+        #endif
         for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2); i++){ _flag[get(i)] = PARALLEL_BOUNDARY; }
       }
       // top - noslip
       if (coords[2]!=_processes[2]-1){
+        #if defined(_OPENMP)
         #pragma omp parallel for
+        #endif
         for (int i = (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+1); i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++){ _flag[get(i)] = PARALLEL_BOUNDARY;}
       }
       // for all other boundaries front,back,left,right, we use parallel boundaries. If we send from one processes to itself, this is still the same as periodic conditions
       // front - periodic
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){for (int x = 0; x < _domainSizeX+2; x++){ _flag[get(x,0,z)] = PARALLEL_BOUNDARY; } }
       // back - periodic
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){for (int x = 0; x < _domainSizeX+2; x++){ _flag[get(x,_domainSizeY+1,z)] = PARALLEL_BOUNDARY; } }
       // left - periodic
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){for (int y = 1; y < _domainSizeY+1; y++){ _flag[get(0,y,z)] = PARALLEL_BOUNDARY; }}
+      #if defined(_OPENMP)
       #pragma omp parallel for
+      #endif
       for (int z = 1; z < _domainSizeZ+1; z++){for (int y = 1; y < _domainSizeY+1; y++){ _flag[get(_domainSizeX+1,y,z)] = PARALLEL_BOUNDARY; }}
       #endif // COUPLING_MD_PARALLEL
     }
