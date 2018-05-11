@@ -136,8 +136,13 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMD2
   // pre-process data before sending to macroscopic solver
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
+  // run noise reduction
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
+  if(_noiseReduction->_doubleTraversal){
+    _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
+    _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
+  }
 
   // carry out send-receive steps
   _fromMD2Macro.sendFromMD2Macro( *_indexConversion,_deFromMD2Macro,_macroscopicCells.getMacroscopicCells(),

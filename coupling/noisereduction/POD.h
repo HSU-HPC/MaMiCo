@@ -42,6 +42,7 @@ public coupling::noisereduction::NoiseReduction<LinkedCell,dim> {
   	Eigen::MatrixXd *_C;  // temporal auto-correlation covariance matrix of _data
   	Eigen::MatrixXd *_A;  // POD temporal modes / eigenvectors of C
   	Eigen::MatrixXd *_A_T;  // Transpose of A
+    bool _firstTraversal;   // distinguishes between reading and writing cell traversals
 };
 #include "coupling/noisereduction/POD.cpph"
 

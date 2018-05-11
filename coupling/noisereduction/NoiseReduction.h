@@ -19,8 +19,8 @@ namespace coupling {
 template<class LinkedCell,unsigned int dim>
 class coupling::noisereduction::NoiseReduction {
   public:
-    NoiseReduction(const coupling::IndexConversion<dim> &indexConversion
-    ): _indexConversion(indexConversion){}
+    NoiseReduction(const coupling::IndexConversion<dim> &indexConversion, const bool doubleTraversal=false
+    ): _doubleTraversal(doubleTraversal), _indexConversion(indexConversion){}
     virtual ~NoiseReduction(){}
 
     /** Is called for every macroscopic cell right before sending the macroscopicMass and -Momentum
@@ -44,6 +44,7 @@ class coupling::noisereduction::NoiseReduction {
     virtual void beginProcessOuterMacroscopicCells(){}
     virtual void endProcessOuterMacroscopicCells(){}
 
+    bool _doubleTraversal;
   protected:
     const coupling::IndexConversion<dim> &_indexConversion;
 };
