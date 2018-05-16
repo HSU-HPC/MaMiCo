@@ -5,8 +5,10 @@ MPI_INCLUDE_PATH=/usr/lib/openmpi/include
 MPI_LIB_PATH=/usr/lib/openmpi/lib
 LIB_MPI=mpi
 
+LIB_EIGEN_PATH=/home/hpc/pr63so/ga68feg4/eigen
+
 ### home directory of MAMICO
-MAMICO_PATH=/home/piet/mamico_v1.1/
+MAMICO_PATH=/home/hpc/pr63so/ga68feg4/mamico-noisereduction
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
@@ -56,11 +58,12 @@ then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
     FLAGS="-D${mdSim} -DMDDim3 -std=c++0x -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
     # -DMDCoupledDebug"
-    includes="${includes} -I${MPI_INCLUDE_PATH}"
+    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
     FLAGS="-D${mdSim} -DMDDim3 -std=c++0x -pedantic -Werror -Wall -Wno-unknown-pragmas -O3"
+    includes="${includes} -I${LIB_EIGEN_PATH}"
     compiler="g++"
 fi
 
