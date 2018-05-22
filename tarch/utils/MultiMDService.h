@@ -37,11 +37,13 @@ class tarch::utils::MultiMDService {
     MPI_Comm getLocalCommunicator() const{ return _localComm;}
     #endif
     unsigned int getLocalRank() const { return _localRank; }
+    unsigned int getLocalSize() const { return _localSize; }
 
     #if (TARCH_PARALLEL==TARCH_YES)
     MPI_Comm getGlobalCommunicator() const { return MPI_COMM_WORLD;}
     #endif
     unsigned int getGlobalRank() const { return _globalRank; }
+    unsigned int getGlobalSize() const { return _globalSize; }
 
   private:
     // number of processes used for a single MD simulation. Currently, the total number of MPI processes needs to
