@@ -18,8 +18,8 @@ template<class LinkedCell,unsigned int dim>
 class coupling::noisereduction::IdentityTransform:
 public coupling::noisereduction::NoiseReduction<LinkedCell,dim> {
   public:
-    IdentityTransform(const coupling::IndexConversion<dim> &indexConversion):
-      coupling::noisereduction::NoiseReduction<LinkedCell,dim>(indexConversion){}
+    IdentityTransform(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService):
+      coupling::noisereduction::NoiseReduction<LinkedCell,dim>(indexConversion, multiMDService){}
       
     virtual ~IdentityTransform(){}
 };

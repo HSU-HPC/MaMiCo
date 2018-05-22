@@ -16,7 +16,7 @@
     number-of-timesteps="100"
     reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
-    fix-seed="no"
+    fix-seed="yes"
    ></simulation-configuration>
 
   <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>

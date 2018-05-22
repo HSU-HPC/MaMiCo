@@ -21,6 +21,8 @@ _localSize(1),_localRank(0){
   _localSize = numberProcessesPerMDSimulation[0];
   for (unsigned int d = 1; d<dim; d++){ _localSize *= numberProcessesPerMDSimulation[d]; }
   if (_globalSize%_localSize!=0){
+    std::cout << "_globalSize = " << _globalSize << std::endl;
+    std::cout << "_localSize = " << _localSize << std::endl;
     std::cout << "ERROR MultiMDService::MultiMDService(): _globalSize mod _localSize!=0 !" << std::endl;
     std::cout << "The number of globally available MPI processes must be filled completely with local MD simulation processes!" << std::endl; exit(EXIT_FAILURE);
   }

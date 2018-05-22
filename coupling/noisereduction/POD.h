@@ -21,7 +21,7 @@ template<class LinkedCell,unsigned int dim>
 class coupling::noisereduction::POD:
 public coupling::noisereduction::NoiseReduction<LinkedCell,dim> {
   public:
-    POD(const coupling::IndexConversion<dim> &indexConversion); // @todo get POD parameters from configuration
+    POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService); // @todo get POD parameters from configuration
     virtual ~POD();
 
     virtual void processInnerMacroscopicCell(

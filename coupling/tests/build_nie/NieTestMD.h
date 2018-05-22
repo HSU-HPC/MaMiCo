@@ -55,7 +55,7 @@ class NieTest: public Test {
       const int plotEveryTimestep = 1;                            // only for LB couette solver: VTK plotting per time step
       tarch::la::Vector<3,unsigned int> lbNumberProcesses(1,1,1); // only for LB couette solver: number of processes 
 
-      const unsigned int couplingCycles = 1000;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
+      const unsigned int couplingCycles = 50;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
       const unsigned int totalNumberMDSimulations=1;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
       const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
       const bool twoWayCoupling = true;
@@ -134,7 +134,7 @@ class NieTest: public Test {
             mdSolverInterface,couetteSolverInterface, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) rank, totalNumberMDSimulations,
             mamicoConfig.getParticleInsertionConfiguration(), mamicoConfig.getMomentumInsertionConfiguration(), mamicoConfig.getBoundaryForceConfiguration(),
             mamicoConfig.getTransferStrategyConfiguration(), mamicoConfig.getNoiseReductionConfiguration(), mamicoConfig.getParallelTopologyConfiguration(), simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-            mamicoConfig.getMacroscopicCellConfiguration()
+            mamicoConfig.getMacroscopicCellConfiguration(), multiMDService
       );
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);

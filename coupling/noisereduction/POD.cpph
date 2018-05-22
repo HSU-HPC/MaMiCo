@@ -1,9 +1,10 @@
 
 template<class LinkedCell,unsigned int dim>
 coupling::noisereduction::POD<LinkedCell,dim>::POD(
-  const coupling::IndexConversion<dim> &indexConversion
+  const coupling::IndexConversion<dim> &indexConversion,
+  const tarch::utils::MultiMDService<dim>& multiMDService
 ):
-coupling::noisereduction::NoiseReduction<LinkedCell,dim>(indexConversion, true),
+coupling::noisereduction::NoiseReduction<LinkedCell,dim>(indexConversion, multiMDService, true),
 _timeWindowSize(10),
 _kMax(2),
 _cycleCounter(0),
@@ -45,10 +46,18 @@ beginProcessInnerMacroscopicCells(){
       // @todo write this in more efficient iterative form, 
       // updating just one single column instead of everything
       // and compute only lower triangular part!
-      // @todo MPI communicate this with asynchronous ALLREDUCE
       _C[d] = _data[d] * _data[d].transpose();  
 
-      // @todo execute in nonblocking background worker thread? 
+      // @todo asynchronous allreduce! (but doesnt make sense currently, without interleaved computation)
+      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+      double *recv_data = new double[_timeWindowSize*_timeWindowSize];
+      MPI_Allreduce(_C[d].data(), recv_data, _timeWindowSize*_timeWindowSize, MPI_DOUBLE, MPI_SUM, 
+        coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalCommunicator());
+      Eigen::Map<Eigen::MatrixXd> map(recv_data, _timeWindowSize, _timeWindowSize);
+      _C[d] = map;  // copy assignment
+      delete [] recv_data;
+      #endif
+
       Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(_C[d]);
 
       _A[d] = solver.eigenvectors().rightCols(_kMax);
@@ -110,7 +119,41 @@ unsigned int coupling::noisereduction::POD<LinkedCell,dim>::getLocalNumberMacros
 * bidirektionale kopplung später einschalten! für initialisierung
 - cluster tests
 - schon zb nach 90 / 100 MD timesteps filtern?
+
+TODO
+
+* Entwurf Gliederung
+
+genauigkeit
+- calc spacial sigma noise, plot profil
+- one way coupling with filter results
+- compare absolute/relative error: analytic vs filter, plot. compare for several snapshots, serveral k
+- one plot per time step
+- auswirkungen konfiguration -> stabilität der two way coupling
 - oszillierender couette
+
+- csv lb output, python script, cell select, automatisiert
+
+SPÄTER
+
+performance
+- identitytransform -> no traversal
+- overhead filter?
+- scalability with / without filter, MD30 1,8,64   (possibly MD60/->MD120<-)
+
+- multi instance sampling
+
+TELKO Gliederung, Profilplots, TWC-Einschätzung, 16.05. 10:00 040-36949482
+
+----------
+
+couette wall 0
+
+TELKO OWC-Profilplot 23.05. 10:00 Uhr +49 40 460094-236
+
+s
+
+----------------------------
 
 
 */

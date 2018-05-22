@@ -25,6 +25,7 @@
 #include "coupling/MomentumController.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h"
+#include "tarch/utils/MultiMDService.h"
 
 
 namespace coupling {
@@ -118,6 +119,7 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells and respective plotting
+      const tarch::utils::MultiMDService<dim>& multiMDService,
       unsigned int topologyOffset
     );
 
@@ -134,10 +136,11 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,    // configuration for noise reduction
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
-      const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration  // configuration for macroscopic cells and respective plotting
+      const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,  // configuration for macroscopic cells and respective plotting
+      const tarch::utils::MultiMDService<dim>& multiMDService
     ): MacroscopicCellServiceImpl<LinkedCell,dim>(ID,mdSolverInterface,macroscopicSolverInterface,numberProcesses,rank,
        particleInsertionConfiguration,momentumInsertionConfiguration,boundaryForceConfiguration,transferStrategyConfiguration,noiseReductionConfiguration,
-       parallelTopologyConfiguration,numberMDTimestepsPerCouplingCycle,macroscopicCellConfiguration,0){}
+       parallelTopologyConfiguration,numberMDTimestepsPerCouplingCycle,macroscopicCellConfiguration,multiMDService,0){}
 
     /** destructor. Frees dynamically allocated memory for particle insertion, momentum insertion and the transfer
      *  strategy.

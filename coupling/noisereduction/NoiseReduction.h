@@ -3,6 +3,7 @@
 
 #include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/IndexConversion.h"
+#include "tarch/utils/MultiMDService.h"
 
 namespace coupling {
   namespace noisereduction {
@@ -19,8 +20,14 @@ namespace coupling {
 template<class LinkedCell,unsigned int dim>
 class coupling::noisereduction::NoiseReduction {
   public:
-    NoiseReduction(const coupling::IndexConversion<dim> &indexConversion, const bool doubleTraversal=false
-    ): _doubleTraversal(doubleTraversal), _indexConversion(indexConversion){}
+    NoiseReduction(const coupling::IndexConversion<dim> &indexConversion, 
+      const tarch::utils::MultiMDService<dim>& multiMDService,
+      const bool doubleTraversal=false
+    ):  
+      _doubleTraversal(doubleTraversal),
+      _indexConversion(indexConversion),
+      _multiMDService(multiMDService)
+    {}
     virtual ~NoiseReduction(){}
 
     /** Is called for every macroscopic cell right before sending the macroscopicMass and -Momentum
@@ -47,5 +54,6 @@ class coupling::noisereduction::NoiseReduction {
     bool _doubleTraversal;
   protected:
     const coupling::IndexConversion<dim> &_indexConversion;
+    const tarch::utils::MultiMDService<dim>& _multiMDService;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_NOISEREDUCTION_H_
