@@ -61,6 +61,7 @@ processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
   _excessMass[index] = cell.getMicroscopicMass();
   // reset cell-mass (would be overwritten anyway; but just to be on safe side)
   cell.setMicroscopicMass(0.0);
+
 }
 
 
@@ -80,19 +81,26 @@ processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
     #endif
   }
 
-  // for mass transfer: compute mass flux if required and add excess mass
-  const double massFlux = computeMassFlux(cell.getMicroscopicMass(),cell.getMicroscopicMomentum(),index) + _excessMass[index];
-  cell.setMicroscopicMass(massFlux);
-
   // write velocity value to new solution array and interpolate first solution (= value of old solution)
   _newSolution[index] = cell.getMicroscopicMomentum();
   cell.setMicroscopicMomentum(_oldSolution[index]);
+
+  const tarch::la::Vector<dim,double> velocity = (0.5-_shiftTimestep)*_oldSolution[index] + (_shiftTimestep+0.5)*_newSolution[index];
+
+  // for mass transfer: compute mass flux if required and add excess mass
+  const double massFlux = computeMassFlux(cell.getMicroscopicMass(),velocity,index) + _excessMass[index];
+  cell.setMicroscopicMass(massFlux);
 
   // reset macroscopic solver values (from averaging)
   cell.setMacroscopicMass(0.0);
   cell.setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
 }
 
+template<class LinkedCell,unsigned int dim>
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
+beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
+  _totalMass = 0;
+}
 
 template<class LinkedCell,unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
@@ -117,6 +125,16 @@ processInnerMacroscopicCellBeforeSendingMDSolverData(
   std::cout << "Time step counter=" << _timestepCounter << std::endl;
   std::cout <<  "processInnerMacroscopicCellBeforeSendingMDSolverData(): Data from cell " << index << "Mass: " << cell.getMacroscopicMass() << " , momentum: " << cell.getMacroscopicMomentum() << std::endl;
   #endif
+
+  // cell.iterateConstCells(_massMapping);
+  // _totalMass += _massMapping.getMass();
+  // _totalMass +=  cell.getMicroscopicMass();
+}
+
+template<class LinkedCell,unsigned int dim>
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
+endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
+  //std::cout << _timestepCounter << ", Total MD mass: " << _totalMass << std::endl;
 }
 
 

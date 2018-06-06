@@ -45,7 +45,7 @@ void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(M
   position += _dt*( molecule.getConstVelocity() + _a*molecule.getConstForce() );
   #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++){
-    if ( isnan(position[d]) || isinf(position[d]) ){
+    if ( std::isnan(position[d]) || std::isinf(position[d]) ){
       std::cout << "ERROR simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule: Position ";
       std::cout << d << " is out of range" << std::endl;
       std::cout << "Position: " << position << ", molecule: " << molecule.getID() << std::endl;
@@ -55,7 +55,7 @@ void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(M
       std::cout << "Old position: " << oldPosition << std::endl;
       exit(EXIT_FAILURE);
     }
-    if (isnan(velocity[d]) || isinf(velocity[d])){
+    if (std::isnan(velocity[d]) || std::isinf(velocity[d])){
       std::cout << "ERROR simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule: Velocity ";
       std::cout << d << " is NaN or Inf" << std::endl;
       std::cout << velocity << std::endl;

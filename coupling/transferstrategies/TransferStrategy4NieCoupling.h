@@ -47,11 +47,14 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling: public couplin
     virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
     );
+
+    virtual void beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
     /** divides accumulated mass and momentum values by time step counter.
      */
     virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
     );
+    virtual void endProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
     /** increments time step counter */
     virtual void beginProcessInnerMacroscopicCellsAfterMDTimestep();
     /** computes current velocity (linear time interpolation) in this cell and accumulates mass/momentum for sampling */
@@ -78,6 +81,7 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling: public couplin
     unsigned int _timestepCounter;        // time step counter within a coupling cycle (should run from 0 to _numberMDSteps)
     double *_excessMass;                  // mass that was transferred in an earlier coupled step
     const tarch::la::Vector<2*dim,bool> _massFluxBoundary; // true in each entry if west/east, south/north, bottom/top boundary is a mass flux boundary
+    double _totalMass;
 };
 #include "coupling/transferstrategies/TransferStrategy4NieCoupling.cpph"
 
