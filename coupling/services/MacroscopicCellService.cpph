@@ -43,7 +43,7 @@ _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<Linked
 _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
 _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
 _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface,*_indexConversion,numberMDTimestepsPerCouplingCycle)),
-_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<LinkedCell,dim>(*_indexConversion, multiMDService)),
+_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService)),
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
 _momentumController(mdSolverInterface),
@@ -356,6 +356,7 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
             macroscopicCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);
             potentialEnergy = computeMeanPotentialEnergyMapping.getPotentialEnergy();
             macroscopicCells[index].setPotentialEnergy(potentialEnergy);
+
             // insert/ delete mass
             particleInsertionAction = _particleInsertion->insertDeleteMass(
                                         macroscopicCells[index],

@@ -65,18 +65,18 @@ public tarch::configuration::Configuration {
     bool isValid() const { return _isValid;}
 
 
-    template<class LinkedCell, unsigned int dim>
-    coupling::noisereduction::NoiseReduction<LinkedCell,dim>* interpreteConfiguration(
+    template<unsigned int dim>
+    coupling::noisereduction::NoiseReduction<dim>* interpreteConfiguration(
       const coupling::IndexConversion<dim> &indexConversion,
       const tarch::utils::MultiMDService<dim>& multiMDService
     ) const {
       if (_type == IdentityTransform){
-        return new coupling::noisereduction::IdentityTransform<LinkedCell,dim>(indexConversion, multiMDService);
+        return new coupling::noisereduction::IdentityTransform<dim>(indexConversion, multiMDService);
       } else if (_type == GaussianFilter){
         std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
         exit(EXIT_FAILURE);
       } else if (_type == POD){
-        return new coupling::noisereduction::POD<LinkedCell,dim>(indexConversion, multiMDService);
+        return new coupling::noisereduction::POD<dim>(indexConversion, multiMDService);
       } else if (_type == AnisotropicDiffusion){
         std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
         exit(EXIT_FAILURE);

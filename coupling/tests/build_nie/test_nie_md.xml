@@ -9,23 +9,25 @@
     mean-velocity="0.0 ; 0.0 ; 0.0"
   ></molecule-configuration>
 
-  <mpi-configuration number-of-processes="3 ; 3 ; 3" ></mpi-configuration>
+  <mpi-configuration number-of-processes="1 ; 1 ; 1" ></mpi-configuration>
 
   <simulation-configuration
     dt="0.005"
     number-of-timesteps="100"
     reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
-    fix-seed="no"
+    fix-seed="yes"
    ></simulation-configuration>
 
   <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
 
   <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
 
-  <domain-configuration
-    init-from-sequential-checkpoint="CheckpointSimpleMD_10000"
 
+  
+  <domain-configuration
+    init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
+    
     molecules-per-direction="28 ; 28 ; 28"
     domain-size="30.0 ; 30.0 ; 30.0"
     domain-offset="10.0 ; 10.0 ; 2.5"

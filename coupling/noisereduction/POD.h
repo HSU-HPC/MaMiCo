@@ -8,7 +8,7 @@
 
 namespace coupling {
   namespace noisereduction {
-    template<class LinkedCell, unsigned int dim>
+    template<unsigned int dim>
     class POD;
   }
 }
@@ -17,15 +17,15 @@ namespace coupling {
  *
  *  @author Piet Jarmatz
  */
-template<class LinkedCell,unsigned int dim>
+template<unsigned int dim>
 class coupling::noisereduction::POD:
-public coupling::noisereduction::NoiseReduction<LinkedCell,dim> {
+public coupling::noisereduction::NoiseReduction<dim> {
   public:
     POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService); // @todo get POD parameters from configuration
     virtual ~POD();
 
     virtual void processInnerMacroscopicCell(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
+      coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index
     );
     virtual void beginProcessInnerMacroscopicCells();
     virtual void endProcessInnerMacroscopicCells();

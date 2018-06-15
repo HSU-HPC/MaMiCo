@@ -7,7 +7,7 @@
 
 namespace coupling {
   namespace noisereduction {
-    template<class LinkedCell, unsigned int dim>
+    template<unsigned int dim>
     class NoiseReduction;
   }
 }
@@ -17,7 +17,7 @@ namespace coupling {
  *  before it is sent to the macroscopic solver.
  *  @author Piet Jarmatz
  */
-template<class LinkedCell,unsigned int dim>
+template<unsigned int dim>
 class coupling::noisereduction::NoiseReduction {
   public:
     NoiseReduction(const coupling::IndexConversion<dim> &indexConversion, 
@@ -36,7 +36,7 @@ class coupling::noisereduction::NoiseReduction {
      *  in the outer macroscopic cells.
      */
     virtual void processInnerMacroscopicCell(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
+      coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index
     ){}
     virtual void beginProcessInnerMacroscopicCells(){}
     virtual void endProcessInnerMacroscopicCells(){}
@@ -46,7 +46,7 @@ class coupling::noisereduction::NoiseReduction {
      *  This method is only applied to outer macroscopic cells, that is cells that are located outside the MD domain.
      */
     virtual void processOuterMacroscopicCell(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
+      coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index
     ){}
     virtual void beginProcessOuterMacroscopicCells(){}
     virtual void endProcessOuterMacroscopicCells(){}

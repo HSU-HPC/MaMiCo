@@ -5,7 +5,7 @@
 
 namespace coupling {
   namespace noisereduction {
-    template<class LinkedCell, unsigned int dim>
+    template<unsigned int dim>
     class IdentityTransform;
   }
 }
@@ -14,12 +14,12 @@ namespace coupling {
  *
  *  @author Piet Jarmatz
  */
-template<class LinkedCell,unsigned int dim>
+template<unsigned int dim>
 class coupling::noisereduction::IdentityTransform:
-public coupling::noisereduction::NoiseReduction<LinkedCell,dim> {
+public coupling::noisereduction::NoiseReduction<dim> {
   public:
     IdentityTransform(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService):
-      coupling::noisereduction::NoiseReduction<LinkedCell,dim>(indexConversion, multiMDService){}
+      coupling::noisereduction::NoiseReduction<dim>(indexConversion, multiMDService){}
       
     virtual ~IdentityTransform(){}
 };

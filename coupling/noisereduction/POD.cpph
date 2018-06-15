@@ -1,12 +1,12 @@
 //#define POD_DEBUG
 
-template<class LinkedCell,unsigned int dim>
-coupling::noisereduction::POD<LinkedCell,dim>::POD(
+template<unsigned int dim>
+coupling::noisereduction::POD<dim>::POD(
   const coupling::IndexConversion<dim> &indexConversion,
   const tarch::utils::MultiMDService<dim>& multiMDService
 ):
-coupling::noisereduction::NoiseReduction<LinkedCell,dim>(indexConversion, multiMDService, true),
-_timeWindowSize(10),
+coupling::noisereduction::NoiseReduction<dim>(indexConversion, multiMDService, true),
+_timeWindowSize(20),
 _kMax(2),
 _cycleCounter(0),
 _spatialIndex(0),
@@ -28,8 +28,8 @@ _firstTraversal(true)
 }
 
 
-template<class LinkedCell,unsigned int dim>
-coupling::noisereduction::POD<LinkedCell,dim>::~POD(){
+template<unsigned int dim>
+coupling::noisereduction::POD<dim>::~POD(){
   if (_data!=NULL){ delete [] _data; _data=NULL;}
   if (_C!=NULL){ delete [] _C; _C=NULL;}
   if (_A!=NULL){ delete [] _A; _A=NULL;}
@@ -37,8 +37,8 @@ coupling::noisereduction::POD<LinkedCell,dim>::~POD(){
 }
 
 
-template<class LinkedCell,unsigned int dim>
-void coupling::noisereduction::POD<LinkedCell,dim>::
+template<unsigned int dim>
+void coupling::noisereduction::POD<dim>::
 beginProcessInnerMacroscopicCells(){
   _spatialIndex = 0;
 
@@ -111,10 +111,10 @@ beginProcessInnerMacroscopicCells(){
 }
 
 
-template<class LinkedCell,unsigned int dim>
-void coupling::noisereduction::POD<LinkedCell,dim>::
+template<unsigned int dim>
+void coupling::noisereduction::POD<dim>::
 processInnerMacroscopicCell(
-coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index){
   if(_firstTraversal){
     // save data into snapshot matrix
     _data[0](_t, _spatialIndex) = cell.getMacroscopicMass();
@@ -136,8 +136,8 @@ coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, 
 }
 
 
-template<class LinkedCell,unsigned int dim>
-void coupling::noisereduction::POD<LinkedCell,dim>::
+template<unsigned int dim>
+void coupling::noisereduction::POD<dim>::
 endProcessInnerMacroscopicCells(){
   if(!_firstTraversal){
     _cycleCounter++;
@@ -146,8 +146,8 @@ endProcessInnerMacroscopicCells(){
   _firstTraversal = !_firstTraversal;
 }
 
-template<class LinkedCell,unsigned int dim>
-unsigned int coupling::noisereduction::POD<LinkedCell,dim>::getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const{
+template<unsigned int dim>
+unsigned int coupling::noisereduction::POD<dim>::getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const{
   const tarch::la::Vector<dim,unsigned int> localCells(indexConversion.getLocalNumberMacroscopicCells());
   unsigned int num = localCells[0]; for (unsigned int d = 1; d < dim; d++){ num = num * localCells[d]; }
   return num;
@@ -191,13 +191,55 @@ TELKO Gliederung, Profilplots, TWC-Einschätzung, 16.05. 10:00 040-36949482
 
 ----------
 
-couette wall 0
-
 TELKO OWC-Profilplot 23.05. 10:00 Uhr +49 40 460094-236
 
-s
+
+- bis FR Plots, Fig6a
+- u_wall 0, TWC-Einschätzung
+
+TELKO 30.05. 10:00 Uhr +49 40 460094-236
 
 ----------------------------
 
+* Why don't we sample PDFs directly from MD?
+
+* couette wall 0
+* massetransfer abschalten, ränder periodic nie-transfer" mass-flux-west="yes" mass-flux-east="yes und
+* zwischendurch updates
+- massFlux Ecken surface?
+- excessmass auf zellbasis?
+- thermostat ausschalten ausprobieren
+- shiftTimestep 0.5 ??
+
+- draft kapitel  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+TELKO 06.06. 10:00 Uhr +49 40 460094-236
+************** Stability Deadline Mitte Juni *******************
+
+-----------------------------
+
+Heute: Profilplot (twc periodic) wie im paper, parameter dazu schreiben
+
+zeitpunkt usher? -> vmtl unkritsch, evtl 20 timesteps
+density mehr digits!!
+usher
+_offsetFromOuterBoundary = 0,5
+partikel energie einfüge / lösch debugg
+_offsetFromOuterBoundary = 0,0
+_tolerance = ? 1.5 
+
+periodic boundary + masstransfer - boundary force
+
+masstransfer konst factor
+
+outermost-overlap-layer="2" innermost-overlap-layer="3" ++ 
+
+TELKO 13.06. 10:00 Uhr +49 40 460094-236
+
+-----------------------------------------------
+
+TELKO 20.06. 10:00 Uhr +49 40 460094-236
+
+27.06 10? HH
 
 */

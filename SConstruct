@@ -50,8 +50,8 @@ else:
 #
 build = ARGUMENTS.get('build', 'debug')   # Read command line parameter
 if build == 'debug':
-   cppdefines.append('MDDebug')
-   cppdefines.append('TarchDebug')
+#   cppdefines.append('MDDebug')
+#   cppdefines.append('TarchDebug')
    cppdefines.append('MDError')
    
 elif build == 'release':

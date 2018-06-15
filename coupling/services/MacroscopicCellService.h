@@ -258,7 +258,7 @@ public coupling::services::MacroscopicCellService<dim> {
     /** coupling strategy */
     coupling::transferstrategies::TransferStrategy<LinkedCell,dim>* _transferStrategy;
     /** noise reduction method for data from MD */
-    coupling::noisereduction::NoiseReduction<LinkedCell,dim>* _noiseReduction;
+    coupling::noisereduction::NoiseReduction<dim>* _noiseReduction;
 
 
     /** controls the kinetic energy of the system, i.e. maintains temperature in case of changing mass/momentum. */
