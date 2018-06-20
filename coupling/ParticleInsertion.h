@@ -4,8 +4,10 @@
 // www5.in.tum.de/mamico
 #ifndef _MOLECULARDYNAMICS_COUPLING_PARTICLEINSERTION_H_
 #define _MOLECULARDYNAMICS_COUPLING_PARTICLEINSERTION_H_
+
 #include <iostream>
 #include <cstdlib>
+#include "coupling/BoundaryForceController.h"
 
 namespace coupling {
   template<class LinkedCell,unsigned int dim>
@@ -29,8 +31,9 @@ class coupling::ParticleInsertion {
       const tarch::la::Vector<dim,double>& macroscopicCellPosition,
       const tarch::la::Vector<dim,double>& macroscopicCellSize,
       const tarch::la::Vector<dim,double>& meanVelocity,
-      const double &temperature
-    ) const = 0;
+      const double &temperature,
+      const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+    )  = 0;
 
     /** returns true, if the particle insertion requires information on the potential energy landscape. The USHER
      *  algorithm requires it. Other algorithms may not require it; the trivial NoParticleInsertion-implementation

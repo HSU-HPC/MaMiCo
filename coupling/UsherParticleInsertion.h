@@ -16,6 +16,7 @@
 #include "coupling/ParticleInsertion.h"
 #include "tarch/utils/RandomNumberService.h"
 
+//#define USHER_DEBUG
 
 namespace coupling {
   template<class LinkedCell,unsigned int dim>
@@ -50,10 +51,20 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
       const tarch::la::Vector<dim,double>& macroscopicCellPosition,
       const tarch::la::Vector<dim,double>& macroscopicCellSize,
       const tarch::la::Vector<dim,double>& meanVelocity,
-      const double &temperature
-    ) const;
+      const double &temperature,
+      const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+    ) ;
 
     virtual bool requiresPotentialEnergyLandscape(){ return true; }
+
+    #ifdef USHER_DEBUG
+    double _energyInserted;
+    double _energyRemoved;
+    double _ZhouEnergyInserted;
+    double _ZhouEnergyRemoved;
+    int _particlesInserted;
+    int _particlesRemoved;
+    #endif
 
   private:
     /** inserts a particle in the respective macroscopic cell. Returns Insertion on success and NoAction otherwise. */
@@ -62,14 +73,15 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
       const tarch::la::Vector<dim,double>& macroscopicCellPosition,
       const tarch::la::Vector<dim,double>& macroscopicCellSize,
       const tarch::la::Vector<dim,double>& meanVelocity,
-      const double &temperature
-    ) const;
+      const double &temperature,
+      const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+    ) ;
 
     /** deletes a particle from the macroscopic cell. Returns Deletion on success and NoAction otherwise. */
     typename coupling::ParticleInsertion<LinkedCell,dim>::Action deleteParticle(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell
-    ) const;
-
+      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
+      const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+    ) ;
 
     /** determines the position of a new particle within the macroscopic cell thisCell and stores the result
      *  in the position entry of the molecule 'molecule'. The method returns Insertion if a position has been
@@ -80,8 +92,9 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& thisCell,
       const tarch::la::Vector<dim,double>& macroscopicCellPosition,
       const tarch::la::Vector<dim,double>& macroscopicCellSize,
-      coupling::datastructures::Molecule<dim>& molecule
-    ) const;
+      coupling::datastructures::Molecule<dim>& molecule,
+      const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+    ) ;
 
 
     class UsherParams {

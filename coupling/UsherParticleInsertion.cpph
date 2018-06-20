@@ -3,7 +3,6 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
-
 template<class LinkedCell,unsigned int dim>
 coupling::UsherParticleInsertion<LinkedCell,dim>::UsherParticleInsertion(
 unsigned int insertDeleteMassEveryTimestep,
@@ -11,6 +10,14 @@ double rSigmaCoeff, double meanPotentialEnergyFactor,double uOverlapCoeff,
 double stepRefCoeff,unsigned int iterMax,unsigned int restartMax,double tolerance,double offsetFromOuterBoundary,
 coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface
 ): coupling::ParticleInsertion<LinkedCell,dim>(insertDeleteMassEveryTimestep),
+#ifdef USHER_DEBUG
+_energyInserted(0),
+_energyRemoved(0),
+_ZhouEnergyInserted(0),
+_ZhouEnergyRemoved(0),
+_particlesInserted(0),
+_particlesRemoved(0),
+#endif
 _mdSolverInterface(mdSolverInterface),
 _usherParams(rSigmaCoeff,meanPotentialEnergyFactor,uOverlapCoeff,stepRefCoeff,iterMax,restartMax,tolerance,offsetFromOuterBoundary){}
 
@@ -23,19 +30,20 @@ coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
 const tarch::la::Vector<dim,double>& macroscopicCellPosition,
 const tarch::la::Vector<dim,double>& macroscopicCellSize,
 const tarch::la::Vector<dim,double>& meanVelocity,
-const double &temperature
-) const {
+const double &temperature,
+const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+)  {
   typename coupling::ParticleInsertion<LinkedCell,dim>::Action action = coupling::ParticleInsertion<LinkedCell,dim>::NoAction;
   const double moleculeMass(_mdSolverInterface->getMoleculeMass());
   // if we have enough mass left in the cell, try to insert a particle and remove one particle mass
   if (cell.getMicroscopicMass() >= moleculeMass){
-    action = insertParticle(cell,macroscopicCellPosition,macroscopicCellSize,meanVelocity,temperature);
+    action = insertParticle(cell,macroscopicCellPosition,macroscopicCellSize,meanVelocity,temperature,boundaryForceController);
     if (action == coupling::ParticleInsertion<LinkedCell,dim>::Insertion){
       cell.addMicroscopicMass(-moleculeMass);
     }
   // if we need to delete a particle, we try this and - in case it works - add a particle mass to the negative buffer
   } else if (cell.getMicroscopicMass() <= -moleculeMass){
-    action = deleteParticle(cell);
+    action = deleteParticle(cell,boundaryForceController);
     if (action == coupling::ParticleInsertion<LinkedCell,dim>::Deletion){
       cell.addMicroscopicMass(moleculeMass);
       #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
@@ -55,12 +63,13 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::insertParticle(
   const tarch::la::Vector<dim,double>& macroscopicCellPosition,
   const tarch::la::Vector<dim,double>& macroscopicCellSize,
   const tarch::la::Vector<dim,double>& meanVelocity,
-  const double &temperature
-) const {
+  const double &temperature,
+  const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+)  {
   coupling::datastructures::Molecule<dim> molecule;
 
   const typename coupling::ParticleInsertion<LinkedCell,dim>::Action action
-  = findParticlePosition(cell,macroscopicCellPosition,macroscopicCellSize,molecule);
+  = findParticlePosition(cell,macroscopicCellPosition,macroscopicCellSize,molecule,boundaryForceController);
 
   // if insertion was successful, initialise velocity according to temperature in macroscopic cell
   if (action == coupling::ParticleInsertion<LinkedCell,dim>::Insertion){
@@ -87,8 +96,9 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::insertParticle(
 template<class LinkedCell,unsigned int dim>
 typename coupling::ParticleInsertion<LinkedCell,dim>::Action
 coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
-  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell
-) const {
+  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
+  const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+)  {
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(_mdSolverInterface);
   cell.iterateConstCells(computeMassMapping);
@@ -103,6 +113,12 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   coupling::cellmappings::DeleteParticleMapping<LinkedCell,dim> deleteParticleMapping(randomParticle,_mdSolverInterface);
   cell.iterateCells(deleteParticleMapping);
 
+  #ifdef USHER_DEBUG
+  _energyRemoved += deleteParticleMapping.getDeletedMolecule().getPotentialEnergy();
+  _ZhouEnergyRemoved += boundaryForceController.getPotentialEnergy(deleteParticleMapping.getDeletedMolecule().getPosition());
+  _particlesRemoved++;
+  #endif
+
   return coupling::ParticleInsertion<LinkedCell,dim>::Deletion;
 }
 
@@ -114,8 +130,9 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
   coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& thisCell,
   const tarch::la::Vector<dim,double>& macroscopicCellPosition,
   const tarch::la::Vector<dim,double>& macroscopicCellSize,
-  coupling::datastructures::Molecule<dim>& molecule
-) const {
+  coupling::datastructures::Molecule<dim>& molecule,
+  const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+)  {
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(_mdSolverInterface);
   thisCell.iterateConstCells(computeMassMapping);
@@ -125,6 +142,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
   for (unsigned int d = 0; d < dim; d++){numberDensity = numberDensity/macroscopicCellSize[d];}
 
   tarch::la::Vector<dim,double> position(0.0);
+  tarch::la::Vector<dim,double> positionOld(0.0);
   tarch::la::Vector<dim,double> force(0.0);
 
   /** index of linked cell (within linked cell domain, NOT within macroscopic cell!) where molecule is placed in */
@@ -173,6 +191,10 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
     if (lowerLeftBoundaries[d]>upperRightBoundaries[d]){return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;}
   }
 
+  #ifdef USHER_DEBUG
+  std::cout << std::endl << "U_0 = " << U_0 << std::endl;
+  #endif
+
   // try at max. restartMax times to insert this particle...
   for (int i = 0; i < restartMax; i++) {
 
@@ -185,9 +207,14 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
     molecule.setPosition(position);
     _mdSolverInterface->calculateForceAndEnergy( molecule);
     energy = molecule.getPotentialEnergy();
+    energy += boundaryForceController.getPotentialEnergy(position);
     force = molecule.getForce();
+    force += boundaryForceController.getForce(position);
 
-    if (energy-U_0== 0.0){
+    if (energy-U_0 == 0.0){
+        #ifdef USHER_DEBUG
+        std::cout << "energy-U_0 == 0.0" << std::endl;
+        #endif
         return coupling::ParticleInsertion<LinkedCell,dim>::Insertion;
     }
     // determine signum
@@ -203,7 +230,9 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
 
     // do steps towards expected energy level
     double xiloc = xiMax + 1.0;
-    for ( int loci = 0; loci < intIterMax; loci++ ) {
+    int success = 0;
+    int loci = 0;
+    for ( ; loci < intIterMax && success<10; loci++ ) {
       // for checking, if a restart is required
       bool restartSearch=false;
 
@@ -212,6 +241,9 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
         molecule.setPosition(position);
         molecule.setForce(force);
         molecule.setPotentialEnergy(0.0);
+        #ifdef USHER_DEBUG
+        std::cout << "low energy hole" << std::endl;
+        #endif
         return coupling::ParticleInsertion<LinkedCell,dim>::Insertion;
       }
 
@@ -232,11 +264,11 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       }
       #endif
 
-
       // update particle position
+      positionOld = position;
       position = position + (stepSize*signAl/absForce)*force;
       molecule.setPosition(position);
-
+      
       // restart searching if the new position of the particle is outside the macroscopic cell
       for (unsigned int d = 0; d < dim; d++ ){
         restartSearch = restartSearch
@@ -252,21 +284,37 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       // determine force and energy that act on molecule
       _mdSolverInterface->calculateForceAndEnergy( molecule);
       energy = molecule.getPotentialEnergy();
+      energy += boundaryForceController.getPotentialEnergy(position);
       force = molecule.getForce();
+      force += boundaryForceController.getForce(position);
 
       absForce = std::sqrt(tarch::la::dot(force,force));
       xiloc = fabs(energy-U_0)/fabs(U_0);
 
-      if ( fabs(xiloc) < xiMax ){
-        return coupling::ParticleInsertion<LinkedCell,dim>::Insertion;
-      }
+      if ( fabs(xiloc) < xiMax ) success++; 
 
       // restart searching if the difference energy-U_0 increases
       if (signAl*(energy-U_0) > signAl*(energyOld-U_0)){
         break;
       }
     }
-  }
+    if(success>0){
+       molecule.setPosition(positionOld);
+      _mdSolverInterface->calculateForceAndEnergy( molecule);
 
+      #ifdef USHER_DEBUG
+      _energyInserted += molecule.getPotentialEnergy();
+      _ZhouEnergyInserted += boundaryForceController.getPotentialEnergy(positionOld);
+      _particlesInserted++;
+      std::cout << "Finished with energy = " << energyOld << " after " << i 
+        << " restarts and " << loci << " iterations" << std::endl;
+      #endif
+
+      return coupling::ParticleInsertion<LinkedCell,dim>::Insertion;
+    }
+  }
+  #ifdef USHER_DEBUG
+  std::cout << "Failed" << std::endl;
+  #endif
   return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;
 }

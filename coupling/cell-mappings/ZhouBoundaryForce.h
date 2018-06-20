@@ -17,7 +17,6 @@ namespace coupling {
   }
 }
 
-
 /** applies the Zhou boundary force to all molecules assuming a cut-off radius r_c=2.5.
  *  We only consider molecules in the outermost macroscopic cell. Thus, the current method will only be
  *  employed to molecules within a distance=min(r_c,size of macroscopic cell).
@@ -47,19 +46,37 @@ class coupling::cellmappings::ZhouBoundaryForce {
       const tarch::la::Vector<dim,double>& domainSize,
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface
     ): _boundary(boundary),_domainLowerLeft(domainOffset),_domainUpperRight(domainSize+domainOffset),
-       _mdSolverInterface(mdSolverInterface),
-       _p1(getP1(density,temperature)),
-       _p2(getP2(density,temperature)),
-       _p3(getP3(density,temperature)),
-       _q1(getQ1(density)),
-       _q2(getQ2(density)),
-       _q3(getQ3(density)),
-       _forceFactor(epsilon/sigma),
-       _sigma(sigma)
-    {
+      _mdSolverInterface(mdSolverInterface),
+      _p1(getP1(density,temperature)),
+      _p2(getP2(density,temperature)),
+      _p3(getP3(density,temperature)),
+      _q1(getQ1(density)),
+      _q2(getQ2(density)),
+      _q3(getQ3(density)),
+      _forceFactor(epsilon/sigma),
+      _sigma(sigma),
+      /** Fixed step width for numerical integration of boundary force term */
+      _energyResolution(1000),
+      _energyTable(new double[_energyResolution]){
+        // simple trapezoidal integration scheme
+        double force(0);
+        double energy(0);
+        double dx(2.5 * sigma / (_energyResolution-1));
+        for(unsigned int i=0;i<_energyResolution;i++){
+          force = getScalarBoundaryForce(2.5 - i*dx);
+          _energyTable[i] = energy + force/2*dx;
+          energy += force * dx;
+        }
+
+        // for(unsigned int i=0;i<_energyResolution;i++){
+        //   std::cout << "_energyTable[" << i << "] = " << _energyTable[i] << std::endl;
+        // }
+        // for(double pos = 0; pos <= 2.5; pos += .25/_energyResolution){
+        //   std::cout << "getPotentialEnergy(" << pos << ") = " << getPotentialEnergy(pos) << std::endl;
+        // }
     }
 
-    ~ZhouBoundaryForce(){}
+    ~ZhouBoundaryForce(){delete [] _energyTable;}
 
     void beginCellIteration(){}
 
@@ -84,7 +101,16 @@ class coupling::cellmappings::ZhouBoundaryForce {
       delete it;
     }
 
-  private:
+    double getPotentialEnergy(const tarch::la::Vector<dim,double>& position) const {
+      double energy(0);
+      const double distance = 2.5*_sigma;
+      for (unsigned int d = 0; d < dim; d++){
+        if (_boundary[2*d]   && (position[d]-_domainLowerLeft[d]<distance)) { energy += getPotentialEnergy((position[d]-_domainLowerLeft[d])/_sigma);}
+        if (_boundary[2*d+1] && (_domainUpperRight[d]-position[d]<distance)){ energy += getPotentialEnergy((_domainUpperRight[d]-position[d])/_sigma);}
+      }
+      return energy;
+    }
+
     /** checks the boundary flags for open boundaries. If an open boundary is encountered and this molecule is close to that boundary (distance smaller than 2.5, cf. Zhou paper),
      *  the respective force contribution in that dimension is added/subtracted.
      */
@@ -98,6 +124,17 @@ class coupling::cellmappings::ZhouBoundaryForce {
         if (_boundary[2*d+1] && (_domainUpperRight[d]-position[d]<distance)){ force[d] -= _forceFactor*getScalarBoundaryForce((_domainUpperRight[d]-position[d])/_sigma);   }
       }
       return force;
+    }
+
+  private:
+    
+    /** perform interpolation between nearest energy lookup table values */
+    double getPotentialEnergy(double rw) const {
+      double dx(2.5 * _sigma / (_energyResolution-1));
+      int upper = (int)((2.5-rw)/2.5*(_energyResolution-1)-.5);
+      int lower = (int)((2.5-rw)/2.5*(_energyResolution-1)+.5);
+      return _energyTable[lower] * ((2.5 - upper * dx - rw) / dx) 
+           + _energyTable[upper] * ((rw - 2.5 + lower * dx) / dx);
     }
 
     /** evaluates the force expression for a scalar component of the force vector. We thus add up dimensional contributions if several boundaries are located beside each other. */
@@ -168,5 +205,8 @@ class coupling::cellmappings::ZhouBoundaryForce {
 
     const double _forceFactor; // factor to scale the force according to MD units
     const double _sigma;       // factor to scale length according to MD units
+
+    const unsigned int _energyResolution;
+    double* _energyTable;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_ZHOUBOUNDARYFORCE_H_

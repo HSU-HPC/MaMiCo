@@ -29,6 +29,14 @@ class coupling::BoundaryForceController {
 
     virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell, const unsigned int &currentLocalMacroscopicCellIndex) = 0;
 
+    virtual double getPotentialEnergy(const tarch::la::Vector<dim,double>& position) const {
+      return 0;
+    }
+
+    virtual tarch::la::Vector<dim,double> getForce(const tarch::la::Vector<dim,double>& position) const {
+      return tarch::la::Vector<dim,double>(0.0);
+    }
+
   protected:
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;
 };

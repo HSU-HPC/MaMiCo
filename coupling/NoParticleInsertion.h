@@ -25,8 +25,9 @@ class coupling::NoParticleInsertion: public coupling::ParticleInsertion<LinkedCe
       const tarch::la::Vector<dim,double>& macroscopicCellPosition,
       const tarch::la::Vector<dim,double>& macroscopicCellSize,
       const tarch::la::Vector<dim,double>& meanVelocity,
-      const double &temperature
-    ) const {return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;}
+      const double &temperature,
+      const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+    ) {return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;}
 
     virtual bool requiresPotentialEnergyLandscape(){return false;}
 

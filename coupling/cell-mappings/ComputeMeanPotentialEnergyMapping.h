@@ -8,6 +8,7 @@
 #include <iostream>
 #include "coupling/interface/Molecule.h"
 #include "coupling/interface/MDSolverInterface.h"
+#include "coupling/BoundaryForceController.h"
 
 namespace coupling {
   namespace cellmappings {
@@ -24,8 +25,8 @@ namespace coupling {
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::ComputeMeanPotentialEnergyMapping {
   public:
-    ComputeMeanPotentialEnergyMapping(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
-    _mdSolverInterface(mdSolverInterface), _meanPotentialEnergy(0.0),_particleCounter(0){}
+    ComputeMeanPotentialEnergyMapping(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController):
+    _mdSolverInterface(mdSolverInterface), _meanPotentialEnergy(0.0),_particleCounter(0), _boundaryForceController(boundaryForceController){}
 
     ~ComputeMeanPotentialEnergyMapping(){}
 
@@ -46,6 +47,7 @@ class coupling::cellmappings::ComputeMeanPotentialEnergyMapping {
       while(it->continueIteration()){
         const coupling::interface::Molecule<dim> &wrapper(it->getConst());
         _meanPotentialEnergy += wrapper.getPotentialEnergy();
+        _meanPotentialEnergy += _boundaryForceController.getPotentialEnergy(wrapper.getPosition());
         _particleCounter++;
 
         it->next();
@@ -59,5 +61,6 @@ class coupling::cellmappings::ComputeMeanPotentialEnergyMapping {
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;
     double _meanPotentialEnergy;
     unsigned int _particleCounter;
+    const coupling::BoundaryForceController<LinkedCell,dim>& _boundaryForceController;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEMEANPOTENTIALENERGYMAPPING_H_

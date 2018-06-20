@@ -282,7 +282,7 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
   if (!_particleInsertion->insertDeleteMassAtTimestep(t)){return;}
 
   // compute mean potential energy over all macroscopic cells and set the value in the macroscopic cell
-  coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell,dim> computeMeanPotentialEnergyMapping(_mdSolverInterface);
+  coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell,dim> computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);
   // macroscopic cell access
   coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> * const macroscopicCells = _macroscopicCells.getMacroscopicCellsWithLinkedCells();
   // start coordinate of first (ghost) cell
@@ -363,7 +363,8 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
                                         macroscopicCellPosition,
                                         _indexConversion->getMacroscopicCellSize(),
                                         meanVelocity,
-                                        temperature
+                                        temperature,
+                                        *_boundaryForceController
                                       );
             // if insertion/ deletion was successful...
             if (particleInsertionAction != coupling::ParticleInsertion<LinkedCell,dim>::NoAction){
@@ -386,6 +387,19 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
     _mdSolverInterface->synchronizeMoleculesAfterMassModification();
 
   } // 2^dim-colour whole domain (1<<dim)
+
+  #ifdef USHER_DEBUG
+  coupling::UsherParticleInsertion<LinkedCell,dim>* p = ((coupling::UsherParticleInsertion<LinkedCell,dim>*)_particleInsertion);
+  std::cout << "_particlesInserted = " << p->_particlesInserted << std::endl;
+  std::cout << "_energyInserted     = " << p->_energyInserted << std::endl;
+  std::cout << "_ZhouEnergyInserted = " << p->_ZhouEnergyInserted << std::endl;
+  std::cout << "and" << std::endl;
+  std::cout << "_particlesRemoved  = " << p->_particlesRemoved << std::endl;
+  std::cout << "_energyRemoved      = " << p->_energyRemoved << std::endl;
+  std::cout << "_ZhouEnergyRemoved  = " << p->_ZhouEnergyRemoved << std::endl;
+  std::cout << "Energy inserted per Operation: " << ((p->_energyInserted + p->_ZhouEnergyInserted) - (p->_energyRemoved + p->_ZhouEnergyRemoved))/(p->_particlesInserted+p->_particlesRemoved) << std::endl;
+  std::cout << std::endl;
+  #endif
 }
 
 
