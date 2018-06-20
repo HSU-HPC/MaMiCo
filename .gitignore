@@ -4,5 +4,7 @@ build/
 *.vtk
 *.o
 *.out
+out/
 !coupling/tests/build/
 coupling/tests/build_nie/test
+coupling/tests/build_nie/out/

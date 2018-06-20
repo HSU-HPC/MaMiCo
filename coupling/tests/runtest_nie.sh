@@ -37,6 +37,7 @@ fi
 # build executable and break on failure
 ./buildtest.sh $1 $2 || { echo "ERROR!" ; exit -1; }
 
+echo "Buildtest successful, execute simulation"
 
 # execute coupled simulation using either 2 MPI ranks or a single process
 if [ "$1" == "parallel" ]

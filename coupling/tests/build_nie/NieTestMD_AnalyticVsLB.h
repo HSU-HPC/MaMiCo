@@ -51,15 +51,15 @@ class NieTest: public Test {
       unsigned int mdStepCounter=0;         // time step counter for MD
 
       const double channelheight = 50.0;    // channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0)
-      const tarch::la::Vector<3,double> wallVelocity(1.5,0.0,0.0);// velocity of moving wall (lower boundary moves); analytic solver only supports flow in x-direction
-      const int plotEveryTimestep = 1;                            // only for LB couette solver: VTK plotting per time step
+      const tarch::la::Vector<3,double> wallVelocity(0.5,0.0,0.0);// velocity of moving wall (lower boundary moves); analytic solver only supports flow in x-direction
+      const int plotEveryTimestep = 10;                            // only for LB couette solver: VTK plotting per time step
       tarch::la::Vector<3,unsigned int> lbNumberProcesses(1,1,1); // only for LB couette solver: number of processes 
 
-      const unsigned int couplingCycles = 2000;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
+      const unsigned int couplingCycles = 1005;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
       const unsigned int totalNumberMDSimulations=1;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
       const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
       const bool twoWayCoupling = true;
-      const int twoWayCouplingInitCycles = 0;
+      const int twoWayCouplingInitCycles = 25;
 
       // for time measurements
       timeval start;
@@ -163,7 +163,10 @@ class NieTest: public Test {
       std::vector<coupling::datastructures::MacroscopicCell<3>* > recvBuffer;
       unsigned int *globalCellIndices4RecvBuffer = allocateRecvBuffer(recvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),rank,*couetteSolverInterface);
 
-      std::default_random_engine generator(0);
+      std::default_random_engine generator(1234);
+
+      // create noise reduction for analytical solver
+      coupling::noisereduction::NoiseReduction<3>* noiseReduction(mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(multiMDCellService.getMacroscopicCellService(0).getIndexConversion(), multiMDService));
 
       // coupling
       if (rank==0){ gettimeofday(&start,NULL); }
@@ -195,6 +198,20 @@ class NieTest: public Test {
         // multiMDCellService.sendFromMD2Macro(recvBuffer,globalCellIndices4RecvBuffer);
 
         fillRecvBuffer(density,*couetteSolver2,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),recvBuffer,globalCellIndices4RecvBuffer, generator);
+
+        //call noise filter on recvBuffer
+        noiseReduction->beginProcessInnerMacroscopicCells();
+        for (unsigned int i = 0; i < recvBuffer.size(); i++){
+          noiseReduction->processInnerMacroscopicCell(*recvBuffer[i],i);
+        }
+        noiseReduction->endProcessInnerMacroscopicCells();
+        if(noiseReduction->_doubleTraversal){
+          noiseReduction->beginProcessInnerMacroscopicCells();
+          for (unsigned int i = 0; i < recvBuffer.size(); i++){
+            noiseReduction->processInnerMacroscopicCell(*recvBuffer[i],i);
+          }
+          noiseReduction->endProcessInnerMacroscopicCells();
+        }
 
         if ( (solverType==COUETTE_LB) && twoWayCoupling && cycles >= twoWayCouplingInitCycles){
           static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver)->setMDBoundaryValues(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion());
