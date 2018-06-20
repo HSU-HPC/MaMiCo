@@ -150,8 +150,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
 
   // current energy
   double energy = 0.0;
-  // energy in last step of particle insertion algorithm
-  double energyOld = 0.0;
   // absolute value of force
   double absForce = 0.0;
   // step size
@@ -218,7 +216,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
         return coupling::ParticleInsertion<LinkedCell,dim>::Insertion;
     }
     // determine signum
-    const int signAl = (int)((energy-U_0)/fabs(energy-U_0));
+    int signAl = (int)((energy-U_0)/fabs(energy-U_0));
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if ( (signAl != 1) && (signAl != -1) ){
       std::cout << "ERROR coupling::UsherParticleInsertion::findParticlePosition(): wrong sign in USHER" << std::endl;
@@ -230,6 +228,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
 
     // do steps towards expected energy level
     double xiloc = xiMax + 1.0;
+    double xiOld = xiMax + 1.0;
     int success = 0;
     int loci = 0;
     for ( ; loci < intIterMax && success<10; loci++ ) {
@@ -267,6 +266,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       // update particle position
       positionOld = position;
       position = position + (stepSize*signAl/absForce)*force;
+
       molecule.setPosition(position);
       
       // restart searching if the new position of the particle is outside the macroscopic cell
@@ -279,22 +279,24 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
         break;
       }
 
-      // save old energy and compute new forces and energy
-      energyOld = energy;
       // determine force and energy that act on molecule
       _mdSolverInterface->calculateForceAndEnergy( molecule);
       energy = molecule.getPotentialEnergy();
       energy += boundaryForceController.getPotentialEnergy(position);
       force = molecule.getForce();
       force += boundaryForceController.getForce(position);
+      signAl = (int)((energy-U_0)/fabs(energy-U_0));
 
       absForce = std::sqrt(tarch::la::dot(force,force));
+      xiOld = xiloc;
       xiloc = fabs(energy-U_0)/fabs(U_0);
 
-      if ( fabs(xiloc) < xiMax ) success++; 
+      if ( xiloc < xiMax ){ 
+        success++; 
+      }
 
       // restart searching if the difference energy-U_0 increases
-      if (signAl*(energy-U_0) > signAl*(energyOld-U_0)){
+      if (xiloc > xiOld){
         break;
       }
     }
@@ -306,7 +308,11 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       _energyInserted += molecule.getPotentialEnergy();
       _ZhouEnergyInserted += boundaryForceController.getPotentialEnergy(positionOld);
       _particlesInserted++;
-      std::cout << "Finished with energy = " << energyOld << " after " << i 
+      energy = molecule.getPotentialEnergy();
+      energy += boundaryForceController.getPotentialEnergy(positionOld);
+      if(fabs(energy-U_0)/fabs(U_0) >= xiMax )
+        std::cout << "USHER critical ERROR: fabs(energy-U_0)/fabs(U_0) >= xiMax" << std::endl;
+      std::cout << "Finished with energy = " << energy << " after " << i 
         << " restarts and " << loci << " iterations" << std::endl;
       #endif
 
