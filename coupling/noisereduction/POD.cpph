@@ -51,16 +51,16 @@ beginProcessInnerMacroscopicCells(){
 
       #ifdef POD_DEBUG
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      for(unsigned int rank = 0; rank<coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalSize(); rank++){
-        if(rank == coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalRank()){
+      for(unsigned int rank = 0; rank<coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalSize(); rank++){
+        if(rank == coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank()){
       #endif
-        std::cout << "Rank " << coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalRank()
+        std::cout << "Rank " << coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank()
           << ", _cycleCounter " << _cycleCounter << ": _data["<<d<<"] = " << _data[d] << std::endl;
-        std::cout << "Rank " << coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalRank()
+        std::cout << "Rank " << coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank()
           << ", _cycleCounter " << _cycleCounter << ": _C["<<d<<"] = " << _C[d] << std::endl;
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
         }
-        MPI_Barrier(coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalCommunicator());
+        MPI_Barrier(coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalCommunicator());
       }
       #endif
       #endif 
@@ -77,7 +77,7 @@ beginProcessInnerMacroscopicCells(){
       for(unsigned int i = 0; i < _timeWindowSize*_timeWindowSize; i++)
         send_data[index++] = _C[d].data()[i];
     MPI_Allreduce(send_data, recv_data, count, MPI_DOUBLE, MPI_SUM, 
-      coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalCommunicator());
+      coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalCommunicator());
     for (unsigned int d = 0; d < dim+1; d++){
       Eigen::Map<Eigen::MatrixXd> map(&recv_data[d*_timeWindowSize*_timeWindowSize], _timeWindowSize, _timeWindowSize);
       _C[d] = map;  // copy assignment
@@ -89,16 +89,16 @@ beginProcessInnerMacroscopicCells(){
     for (unsigned int d = 0; d < dim+1; d++){
       #ifdef POD_DEBUG
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      for(unsigned int rank = 0; rank<coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalSize(); rank++){
-        if(rank == coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalRank()){
+      for(unsigned int rank = 0; rank<coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalSize(); rank++){
+        if(rank == coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank()){
       #endif
-          std::cout << "Rank " << coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalRank()
+          std::cout << "Rank " << coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank()
             << ", _cycleCounter " << _cycleCounter << ": Communication finished" << std::endl;
-          std::cout << "Rank " << coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalRank()
+          std::cout << "Rank " << coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank()
             << ", _cycleCounter " << _cycleCounter << ": _C["<<d<<"] = " << _C[d] << std::endl;
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
         }
-        MPI_Barrier(coupling::noisereduction::NoiseReduction<LinkedCell,dim>::_multiMDService.getLocalCommunicator());
+        MPI_Barrier(coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalCommunicator());
       }
       #endif
       #endif
