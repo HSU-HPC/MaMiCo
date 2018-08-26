@@ -42,7 +42,7 @@ echo "Buildtest successful, execute simulation"
 # execute coupled simulation using either 2 MPI ranks or a single process
 if [ "$1" == "parallel" ]
 then
-  mpirun -np 2 ./test &> $2.out
+  mpirun -np 4 ./test &> $2.out
 else
   ./test &> $2.out
 fi

@@ -67,7 +67,7 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling: public couplin
     unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const;
 
     /** computes the mass flux in the outermost inner macroscopic cells. For all other cells, 0.0 is returned. */
-    double computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) const;
+    double computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) ;
 
     coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> _massMapping;
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell,dim> _momentumMapping;
@@ -81,7 +81,7 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling: public couplin
     unsigned int _timestepCounter;        // time step counter within a coupling cycle (should run from 0 to _numberMDSteps)
     double *_excessMass;                  // mass that was transferred in an earlier coupled step
     const tarch::la::Vector<2*dim,bool> _massFluxBoundary; // true in each entry if west/east, south/north, bottom/top boundary is a mass flux boundary
-    double _totalMass;
+    //double _totalMass; int _cellCount;
 };
 #include "coupling/transferstrategies/TransferStrategy4NieCoupling.cpph"
 

@@ -51,15 +51,15 @@ class NieTest: public Test {
       unsigned int mdStepCounter=0;         // time step counter for MD
 
       const double channelheight = 50.0;    // channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0)
-      const tarch::la::Vector<3,double> wallVelocity(1.5,0.0,0.0);// velocity of moving wall (lower boundary moves); analytic solver only supports flow in x-direction
+      const tarch::la::Vector<3,double> wallVelocity(0.5,0.0,0.0);// velocity of moving wall (lower boundary moves); analytic solver only supports flow in x-direction
       const int plotEveryTimestep = 1;                            // only for LB couette solver: VTK plotting per time step
       tarch::la::Vector<3,unsigned int> lbNumberProcesses(1,1,1); // only for LB couette solver: number of processes 
 
-      const unsigned int couplingCycles = 50;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
+      const unsigned int couplingCycles = 105;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
       const unsigned int totalNumberMDSimulations=1;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
       const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
       const bool twoWayCoupling = true;
-      const int twoWayCouplingInitCycles = 15;
+      const int twoWayCouplingInitCycles = 0;
 
       // for time measurements
       timeval start;
@@ -76,9 +76,15 @@ class NieTest: public Test {
       // allocate solvers
       coupling::solvers::AbstractCouetteSolver<3> *couetteSolver = NULL;
       couetteSolver = getCouetteSolver(
-                        channelheight,wallVelocity,kinVisc,mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
+                        channelheight,tarch::la::Vector<3,double>(0.0,0.0,0.0),kinVisc,mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
                         simpleMDConfig.getSimulationConfiguration().getDt()*simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
                         plotEveryTimestep,"LBCouette",lbNumberProcesses,solverType,rank);
+
+      coupling::solvers::AbstractCouetteSolver<3> *couetteSolver2 = NULL;
+      couetteSolver2 = getCouetteSolver(
+                        channelheight,wallVelocity,kinVisc,mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
+                        simpleMDConfig.getSimulationConfiguration().getDt()*simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+                        0,"Couette2",lbNumberProcesses,COUETTE_ANALYTICAL,rank);
 
       tarch::utils::MultiMDService<3> multiMDService(simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),totalNumberMDSimulations);
       const unsigned int mdInstances = multiMDService.getLocalNumberOfMDSimulations(); // local number of MD simulations
@@ -157,32 +163,55 @@ class NieTest: public Test {
       std::vector<coupling::datastructures::MacroscopicCell<3>* > recvBuffer;
       unsigned int *globalCellIndices4RecvBuffer = allocateRecvBuffer(recvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),rank,*couetteSolverInterface);
 
+      std::default_random_engine generator(1234);
+
+      // create noise reduction for analytical solver
+      coupling::noisereduction::NoiseReduction<3>* noiseReduction(mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(multiMDCellService.getMacroscopicCellService(0).getIndexConversion(), multiMDService));
+
       // coupling
       if (rank==0){ gettimeofday(&start,NULL); }
       for (unsigned int cycles = 0; cycles < couplingCycles; cycles++){
         // run one time step for couette solver
         if (couetteSolver!=NULL){
           couetteSolver->advance(simpleMDConfig.getSimulationConfiguration().getDt()*simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
-        }
-        // extract data from couette solver and send them to MD (can take any index-conversion object)
-        fillSendBuffer(density,*couetteSolver,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),sendBuffer,globalCellIndices4SendBuffer);
-        multiMDCellService.sendFromMacro2MD(sendBuffer,globalCellIndices4SendBuffer);
-        // run MD instances
-        for (unsigned int i = 0; i < mdInstances; i++){
-          // set macroscopic cell service and interfaces in MamicoInterfaceProvider
-          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(multiMDCellService.getMacroscopicCellService(i)));
-          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(mdSolverInterface[i]);
-          
-          simpleMD[i]->simulateTimesteps(simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),mdStepCounter);
-          mdStepCounter+=simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
-          // reset mdStepCounter unless this is the last MD instance
-          if (i<mdInstances-1){mdStepCounter -= simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();}
 
-          // plot macroscopic time step info in multi md service
-          multiMDCellService.getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycles);
+          couetteSolver2->advance(simpleMDConfig.getSimulationConfiguration().getDt()*simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
         }
-        // send back data from MD instances and merge it
-        multiMDCellService.sendFromMD2Macro(recvBuffer,globalCellIndices4RecvBuffer);
+        // // extract data from couette solver and send them to MD (can take any index-conversion object)
+        // fillSendBuffer(density,*couetteSolver,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),sendBuffer,globalCellIndices4SendBuffer);
+        // multiMDCellService.sendFromMacro2MD(sendBuffer,globalCellIndices4SendBuffer);
+        // // run MD instances
+        // for (unsigned int i = 0; i < mdInstances; i++){
+        //   // set macroscopic cell service and interfaces in MamicoInterfaceProvider
+        //   coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(multiMDCellService.getMacroscopicCellService(i)));
+        //   coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(mdSolverInterface[i]);
+          
+        //   simpleMD[i]->simulateTimesteps(simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),mdStepCounter);
+        //   mdStepCounter+=simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
+        //   // reset mdStepCounter unless this is the last MD instance
+        //   if (i<mdInstances-1){mdStepCounter -= simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();}
+
+        //   // plot macroscopic time step info in multi md service
+        //   multiMDCellService.getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycles);
+        // }
+        // // send back data from MD instances and merge it
+        // multiMDCellService.sendFromMD2Macro(recvBuffer,globalCellIndices4RecvBuffer);
+
+        fillRecvBuffer(density,*couetteSolver2,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),recvBuffer,globalCellIndices4RecvBuffer, generator);
+
+        //call noise filter on recvBuffer
+        noiseReduction->beginProcessInnerMacroscopicCells();
+        for (unsigned int i = 0; i < recvBuffer.size(); i++){
+          noiseReduction->processInnerMacroscopicCell(*recvBuffer[i],i);
+        }
+        noiseReduction->endProcessInnerMacroscopicCells();
+        if(noiseReduction->_doubleTraversal){
+          noiseReduction->beginProcessInnerMacroscopicCells();
+          for (unsigned int i = 0; i < recvBuffer.size(); i++){
+            noiseReduction->processInnerMacroscopicCell(*recvBuffer[i],i);
+          }
+          noiseReduction->endProcessInnerMacroscopicCells();
+        }
 
         if ( (solverType==COUETTE_LB) && twoWayCoupling && cycles >= twoWayCouplingInitCycles){
           static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver)->setMDBoundaryValues(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion());
@@ -407,6 +436,31 @@ class NieTest: public Test {
         const tarch::la::Vector<3,double> momentum(mass*couetteSolver.getVelocity(cellMidPoint));
         sendBuffer[i]->setMicroscopicMass(mass);
         sendBuffer[i]->setMicroscopicMomentum(momentum);
+      }
+    }
+
+    void fillRecvBuffer(
+      const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver, const coupling::IndexConversion<3>& indexConversion,
+      std::vector<coupling::datastructures::MacroscopicCell<3>* >& sendBuffer, const unsigned int * const globalCellIndices4SendBuffer,
+      std::default_random_engine& generator
+    ) const {
+      const unsigned int size = sendBuffer.size();
+      const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+      const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+      const double mass = density*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+
+      std::normal_distribution<double> distribution (0.0,1.0/6.0);
+      for (unsigned int i = 0; i < size; i++){
+        // get global cell index vector
+        const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(globalCellIndices4SendBuffer[i]));
+        // determine cell midpoint
+        tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
+        for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
+        // compute momentum
+        const tarch::la::Vector<3,double> noise(distribution(generator),distribution(generator),distribution(generator));
+        const tarch::la::Vector<3,double> momentum(mass*(couetteSolver.getVelocity(cellMidPoint)/*+noise*/));
+        sendBuffer[i]->setMacroscopicMass(mass);
+        sendBuffer[i]->setMacroscopicMomentum(momentum);
       }
     }
 

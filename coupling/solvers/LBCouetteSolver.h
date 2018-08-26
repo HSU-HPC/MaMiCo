@@ -195,6 +195,9 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::AbstractCoue
       }
     }
 
+    void setWallVelocity(const tarch::la::Vector<3,double> wallVelocity){
+      _wallVelocity = (_dt/_dx)*wallVelocity;
+    }
 
     /** flags the domain boundary cells. mdDomainOffset and mdDomainSize correspond to lower/left/front corner of the MD domain and the size of the domain. overlapStrip is the number of cells
      *  that the LB and MD domain shall overlap, i.e. the number of "MD cells" that lie within the LB domain but which should not be flagged (and thus be handled by both solvers).
@@ -291,6 +294,25 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::AbstractCoue
       std::cout << "Position " << pos << " corresponds to cell: " << coords << "; vel=" << vel << std::endl;
       #endif
       return vel;
+    }
+
+    /**
+     * returns density IN LB UNITS at a certain position.
+     */
+     double getDensity(tarch::la::Vector<3,double> pos) const {
+      tarch::la::Vector<3,unsigned int> coords(getProcessCoordinates());
+      const tarch::la::Vector<3,double> domainOffset(coords[0]*_dx*_avgDomainSizeX,coords[1]*_dx*_avgDomainSizeY,coords[2]*_dx*_avgDomainSizeZ);
+
+      // check pos-data for process locality (todo: put this in debug mode in future releases)
+      if (   (pos[0]<domainOffset[0]) || (pos[0]>domainOffset[0]+_domainSizeX*_dx)
+          || (pos[1]<domainOffset[1]) || (pos[1]>domainOffset[1]+_domainSizeY*_dx)
+          || (pos[2]<domainOffset[2]) || (pos[2]>domainOffset[2]+_domainSizeZ*_dx) ){
+        std::cout << "ERROR LBCouetteSolver::getDensity(): Position " << pos << " out of range!" << std::endl; exit(EXIT_FAILURE);
+      }
+      // compute index for respective cell (_dx+... for ghost cells); use coords to store local cell coordinates
+      for (unsigned int d = 0; d < 3; d++){ coords[d] = (unsigned int) ((_dx+pos[d]-domainOffset[d])/_dx);}
+      const int index = get(coords[0],coords[1],coords[2]);
+      return _density[index];
     }
 
     /** getters required by LB Couette Solver Interface */
@@ -761,7 +783,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::AbstractCoue
     }
 
     const double _omega; // relaxation frequency
-    const tarch::la::Vector<3,double> _wallVelocity; // velocity of moving wall of Couette flow
+    tarch::la::Vector<3,double> _wallVelocity; // velocity of moving wall of Couette flow
     const int _domainSizeX; // domain size in x-direction
     const int _domainSizeY; // domain size in y-direction
     const int _domainSizeZ; // domain size in z-direction

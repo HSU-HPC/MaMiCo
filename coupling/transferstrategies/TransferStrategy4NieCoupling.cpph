@@ -47,6 +47,8 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>:
 beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData(){
   // reset time counter (always counts from 0 to _numberMDSteps)
   _timestepCounter=0;
+  //_totalMass=0;
+  //_cellCount=0;
   // copy new solution to old solution
   for (unsigned int i = 0; i < _numberLocalCells; i++){ _oldSolution[i] = _newSolution[i]; }
 }
@@ -99,7 +101,6 @@ processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
 template<class LinkedCell,unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
 beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
-  _totalMass = 0;
 }
 
 template<class LinkedCell,unsigned int dim>
@@ -134,7 +135,7 @@ processInnerMacroscopicCellBeforeSendingMDSolverData(
 template<class LinkedCell,unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
 endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
-  //std::cout << _timestepCounter << ", Total MD mass: " << _totalMass << std::endl;
+  //std::cout << "Avg massFluxBoundary MD density: " << _totalMass/(_cellCount*15.625) << std::endl;
 }
 
 
@@ -153,6 +154,8 @@ processInnerMacroscopicCellAfterMDTimestep(
   // sampling: add up mass and momentum in macroscopic buffers
   cell.iterateConstCells(_massMapping);
   const double mass = _massMapping.getMass();
+  //_totalMass += mass;
+  //_cellCount++;
   cell.iterateConstCells(_momentumMapping);
   const tarch::la::Vector<dim,double> momentum(_momentumMapping.getMomentum());
   cell.addMacroscopicMass(mass);
@@ -179,7 +182,7 @@ unsigned int coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCe
 }
 
 template<class LinkedCell,unsigned int dim>
-double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) const {
+double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) {
   const tarch::la::Vector<dim,unsigned int> globalIndex(coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.convertLocalToGlobalVectorCellIndex(
     coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.getLocalVectorCellIndex(index)));
   const tarch::la::Vector<dim,unsigned int> globalNumberCells(coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.getGlobalNumberMacroscopicCells());
@@ -199,14 +202,14 @@ double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim
   tarch::la::Vector<dim,int> n(0);
   for (unsigned int d = 0; d < dim; d++){
     // compute normal vector (pointing inwards MD domain)
-    if ((globalIndex[d]==1) && _massFluxBoundary[2*d]){ n[d]=1;}
-    else if ((globalIndex[d]==globalNumberCells[d]) && _massFluxBoundary[2*d+1]){ n[d]=-1; }
+    if ((globalIndex[d]==1) && _massFluxBoundary[2*d]){ n[d]=1; /*_totalMass+=mass;_cellCount++;*/}
+    else if ((globalIndex[d]==globalNumberCells[d]) && _massFluxBoundary[2*d+1]){ n[d]=-1; /*_totalMass+=mass;_cellCount++;*/}
   }
 
   // compute mass flux for each boundary
   for (unsigned int d = 0; d < dim; d++){
     double surface = 1.0;
-    for (unsigned int e = 0; e < d; e++){surface = surface*meshsize[e];}
+    for (unsigned int e = 0; e < d; e++){surface = surface*meshsize[e]; }
     for (unsigned int e = d+1; e < dim; e++){surface =surface*meshsize[e];}
 
     massFlux += n[d]*surface*density*velocity[d]*couplingTimeInterval;

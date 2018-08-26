@@ -52,14 +52,14 @@ class NieTest: public Test {
 
       const double channelheight = 50.0;    // channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0)
       const tarch::la::Vector<3,double> wallVelocity(0.5,0.0,0.0);// velocity of moving wall (lower boundary moves); analytic solver only supports flow in x-direction
-      const int plotEveryTimestep = 10;                            // only for LB couette solver: VTK plotting per time step
+      const int plotEveryTimestep = 1;                            // only for LB couette solver: VTK plotting per time step
       tarch::la::Vector<3,unsigned int> lbNumberProcesses(1,1,1); // only for LB couette solver: number of processes 
 
-      const unsigned int couplingCycles = 1005;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
+      const unsigned int couplingCycles = 105;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
       const unsigned int totalNumberMDSimulations=1;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
       const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
       const bool twoWayCoupling = true;
-      const int twoWayCouplingInitCycles = 25;
+      const int twoWayCouplingInitCycles = 0;
 
       // for time measurements
       timeval start;
@@ -76,7 +76,7 @@ class NieTest: public Test {
       // allocate solvers
       coupling::solvers::AbstractCouetteSolver<3> *couetteSolver = NULL;
       couetteSolver = getCouetteSolver(
-                        channelheight,wallVelocity,kinVisc,mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
+                        channelheight,tarch::la::Vector<3,double>(0.0,0.0,0.0),kinVisc,mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
                         simpleMDConfig.getSimulationConfiguration().getDt()*simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
                         plotEveryTimestep,"LBCouette",lbNumberProcesses,solverType,rank);
 
@@ -458,7 +458,7 @@ class NieTest: public Test {
         for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
         // compute momentum
         const tarch::la::Vector<3,double> noise(distribution(generator),distribution(generator),distribution(generator));
-        const tarch::la::Vector<3,double> momentum(mass*(couetteSolver.getVelocity(cellMidPoint)+noise));
+        const tarch::la::Vector<3,double> momentum(mass*(couetteSolver.getVelocity(cellMidPoint)/*+noise*/));
         sendBuffer[i]->setMacroscopicMass(mass);
         sendBuffer[i]->setMacroscopicMomentum(momentum);
       }
