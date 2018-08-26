@@ -240,6 +240,36 @@ TELKO 13.06. 10:00 Uhr +49 40 460094-236
 
 TELKO 20.06. 10:00 Uhr +49 40 460094-236
 
-27.06 10? HH
+vergleich usher insertion, mit/ohne boundaryForceController.getPotentialEnergy
+
+success<10 xml konfigurierbar
+
+bis FR zwischenstand twc periodic beschleunigung 
+
+über struktur der arbeit reden
+
+27.06 10 HH
+
+unterschiede zum nie paper
+größerer overlap
+cutoff radius 2.2
+(MD domain position)
+
+thermostat innen abschalten?? thermostat seltener anwenden
+
+speed of sound
+
+Linux cluster lauffähig machen
+
+
+Analysis part
+filtering
+ - subpunkte
+consistency TWC
+ - subpunkte
+
+TELKO 13.07. 13:00
+
+TELKO 17.07. 12:00 
 
 */
