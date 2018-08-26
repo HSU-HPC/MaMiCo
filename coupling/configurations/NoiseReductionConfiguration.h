@@ -68,7 +68,8 @@ public tarch::configuration::Configuration {
     template<unsigned int dim>
     coupling::noisereduction::NoiseReduction<dim>* interpreteConfiguration(
       const coupling::IndexConversion<dim> &indexConversion,
-      const tarch::utils::MultiMDService<dim>& multiMDService
+      const tarch::utils::MultiMDService<dim>& multiMDService,
+      int tws = 20
     ) const {
       if (_type == IdentityTransform){
         return new coupling::noisereduction::IdentityTransform<dim>(indexConversion, multiMDService);
@@ -76,7 +77,7 @@ public tarch::configuration::Configuration {
         std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
         exit(EXIT_FAILURE);
       } else if (_type == POD){
-        return new coupling::noisereduction::POD<dim>(indexConversion, multiMDService);
+        return new coupling::noisereduction::POD<dim>(indexConversion, multiMDService, tws);
       } else if (_type == AnisotropicDiffusion){
         std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
         exit(EXIT_FAILURE);

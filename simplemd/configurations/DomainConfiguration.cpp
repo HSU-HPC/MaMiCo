@@ -64,9 +64,9 @@ parseSubtag( tinyxml2::XMLElement* node ){
   tarch::configuration::ParseConfiguration::readStringOptional(_checkpointFilestem, node, INIT_FROM_CHECKPOINT);
   _initFromCheckpoint = (_checkpointFilestem != "");
   if (!_initFromCheckpoint){
-    std::cout <<  INIT_FROM_CHECKPOINT << " not defined..." << std::endl;
+    //std::cout <<  INIT_FROM_CHECKPOINT << " not defined..." << std::endl;
   } else {
-    std::cout << "Initialise from checkpoint using filestem " << _checkpointFilestem << std::endl;
+    //std::cout << "Initialise from checkpoint using filestem " << _checkpointFilestem << std::endl;
   }
 
   // get checkpoint info
@@ -74,10 +74,10 @@ parseSubtag( tinyxml2::XMLElement* node ){
   tarch::configuration::ParseConfiguration::readStringOptional(strBuf,node,INIT_FROM_SEQUENTIAL_CHECKPOINT);
   _initFromSequentialCheckpoint = (strBuf != "");
   if (!_initFromSequentialCheckpoint){
-    std::cout <<  INIT_FROM_SEQUENTIAL_CHECKPOINT << " not defined..." << std::endl;
+    //std::cout <<  INIT_FROM_SEQUENTIAL_CHECKPOINT << " not defined..." << std::endl;
   } else {
     _checkpointFilestem = strBuf;
-    std::cout << "Initialise from sequential checkpoint using filestem " << _checkpointFilestem << std::endl;
+    //std::cout << "Initialise from sequential checkpoint using filestem " << _checkpointFilestem << std::endl;
   }
 
   // read molecules per direction (if no checkpoint is defined as input)

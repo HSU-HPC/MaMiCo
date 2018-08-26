@@ -58,9 +58,13 @@ class coupling::solvers::CouetteSolver: public coupling::solvers::AbstractCouett
       return v;
     }
 
+    void setWallVelocity(double vel){
+      _wallVelocity = vel;
+    }
+
   private:
     const double _channelheight; // height of couette channel
-    const double _wallVelocity;  // velocity of moving wall
+    double _wallVelocity;  // velocity of moving wall
     const double _kinVisc;       // kinematic viscosity
     double _time;  // current time
 };

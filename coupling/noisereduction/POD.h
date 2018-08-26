@@ -21,7 +21,7 @@ template<unsigned int dim>
 class coupling::noisereduction::POD:
 public coupling::noisereduction::NoiseReduction<dim> {
   public:
-    POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService); // @todo get POD parameters from configuration
+    POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService, int tws); // @todo get POD parameters from configuration
     virtual ~POD();
 
     virtual void processInnerMacroscopicCell(
@@ -33,7 +33,7 @@ public coupling::noisereduction::NoiseReduction<dim> {
   	/** returns the local number of macroscopic cells EXCL. ghost layers */
     unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const;
 
-  	const unsigned int _timeWindowSize; // number of snapshots / coupling cycles taken into consideration for noise reduction
+  	unsigned int _timeWindowSize; // number of snapshots / coupling cycles taken into consideration for noise reduction
   	const unsigned int _kMax; // number of dominant eigenvalues
   	unsigned int _cycleCounter; // coupling cycle counter, indicates how many data snapshots are available already
   	unsigned int _spatialIndex; // cell counter, should run from zero to getLocalNumberMacroscopicCells()-1 within an iteration of ProcessInnerMacroscopicCells
