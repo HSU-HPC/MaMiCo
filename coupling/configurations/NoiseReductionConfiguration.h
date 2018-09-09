@@ -37,6 +37,27 @@ public tarch::configuration::Configuration {
         _type = GaussianFilter;
       }  else if (value=="POD"){
         _type = POD;
+
+        int buf = -1;
+
+        tarch::configuration::ParseConfiguration::readIntMandatory(buf,node,"time-window-size");
+        if (buf <= 2){
+          std::cout << "ERROR coupling::configurations::ParticleInsertionConfiguration::";
+          std::cout << "parseSubtag(): " << "time-window-size" << " smaller than or equal two!" << std::endl;
+          exit(EXIT_FAILURE);
+        } else {
+          _tws = buf;
+        }
+
+        tarch::configuration::ParseConfiguration::readIntMandatory(buf,node,"kmax");
+        if (buf <= 0){
+          std::cout << "ERROR coupling::configurations::ParticleInsertionConfiguration::";
+          std::cout << "parseSubtag(): " << "kmax" << " smaller or equal zero!" << std::endl;
+          exit(EXIT_FAILURE);
+        } else {
+          _kmax = buf;
+        }
+
       } else if (value=="anisotropic-diffusion"){
         _type = AnisotropicDiffusion;
       } else {
@@ -64,12 +85,12 @@ public tarch::configuration::Configuration {
      */
     bool isValid() const { return _isValid;}
 
-
+    // tws_param can be used to override XML configuration
     template<unsigned int dim>
     coupling::noisereduction::NoiseReduction<dim>* interpreteConfiguration(
       const coupling::IndexConversion<dim> &indexConversion,
       const tarch::utils::MultiMDService<dim>& multiMDService,
-      int tws = 20
+      int tws_param = 0
     ) const {
       if (_type == IdentityTransform){
         return new coupling::noisereduction::IdentityTransform<dim>(indexConversion, multiMDService);
@@ -77,7 +98,7 @@ public tarch::configuration::Configuration {
         std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
         exit(EXIT_FAILURE);
       } else if (_type == POD){
-        return new coupling::noisereduction::POD<dim>(indexConversion, multiMDService, tws);
+        return new coupling::noisereduction::POD<dim>(indexConversion, multiMDService, tws_param==0?_tws:tws_param, _kmax);
       } else if (_type == AnisotropicDiffusion){
         std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
         exit(EXIT_FAILURE);
@@ -90,6 +111,8 @@ public tarch::configuration::Configuration {
 
   private:
     NoiseReductionType _type;
+    int _tws;
+    int _kmax;
 
     bool _isValid;
 };

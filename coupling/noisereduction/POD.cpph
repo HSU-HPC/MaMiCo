@@ -4,11 +4,11 @@ template<unsigned int dim>
 coupling::noisereduction::POD<dim>::POD(
   const coupling::IndexConversion<dim> &indexConversion,
   const tarch::utils::MultiMDService<dim>& multiMDService,
-  int tws
+  int tws, int kmax
 ):
 coupling::noisereduction::NoiseReduction<dim>(indexConversion, multiMDService, true),
 _timeWindowSize(tws),
-_kMax(1),
+_kMax(kmax),
 _cycleCounter(0),
 _spatialIndex(0),
 _t(0),
@@ -26,7 +26,7 @@ _firstTraversal(true)
   for(unsigned int i=0;i<dim+1;i++){
     _data[i] = Eigen::MatrixXd::Constant(_timeWindowSize, spatialSize, (i==0)?1:0);
   }
-  //std::cout << "POD tws = " << _timeWindowSize << std::endl;
+  //std::cout << "POD kmax = " << _kMax << ", and tws = " << _timeWindowSize << std::endl;
 }
 
 template<unsigned int dim>
