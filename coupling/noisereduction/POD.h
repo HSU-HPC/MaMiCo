@@ -2,7 +2,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_POD_H_
 
 #include "coupling/noisereduction/NoiseReduction.h"
-//#define EIGEN_NO_DEBUG
+#define EIGEN_NO_DEBUG
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 
@@ -24,6 +24,7 @@ public coupling::noisereduction::NoiseReduction<dim> {
     POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService, int tws, int kmax);
     virtual ~POD();
 
+    // TODO kommentar
     virtual void processInnerMacroscopicCell(
       coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index
     );
