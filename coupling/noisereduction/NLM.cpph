@@ -1,0 +1,85 @@
+#define NLM_DEBUG
+
+template<unsigned int dim>
+coupling::noisereduction::NLM<dim>::NLM(
+  const coupling::IndexConversion<dim> &indexConversion,
+  const tarch::utils::MultiMDService<dim>& multiMDService,
+  int tws
+):
+coupling::noisereduction::NoiseReduction<dim>(indexConversion, multiMDService, true),
+_timeWindowSize(tws),
+_d(1),
+_cycleCounter(0),
+_t(0),
+_firstTraversal(true)
+{
+  // compute total scalar number of local cells, including ghost layer
+  tarch::la::Vector<dim,unsigned int> size(indexConversion.getLocalNumberMacroscopicCells());
+  unsigned int _spatialSize = size[0] + 2 * _d; 
+  for (unsigned int d = 1; d < dim; d++){
+    _spatialSize = _spatialSize * (size[d] + 2 * _d); 
+  }
+  _data = new coupling::noisereduction::Cell<dim>[_timeWindowSize * _spatialSize];
+  
+  std::cout << "NLM _spatialSize = " << _spatialSize << ", and _timeWindowSize = " << _timeWindowSize << std::endl;
+}
+
+template<unsigned int dim>
+coupling::noisereduction::NLM<dim>::~NLM(){
+  if (_data!=NULL){ delete [] _data; _data=NULL;}
+}
+
+template<unsigned int dim>
+void coupling::noisereduction::NLM<dim>::
+beginProcessInnerMacroscopicCells(){
+
+}
+
+template<unsigned int dim>
+void coupling::noisereduction::NLM<dim>::
+processInnerMacroscopicCell(
+coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index){
+  if(_firstTraversal){
+    // save data
+    _data[_t*_spatialSize + index]._mass = cell.getMacroscopicMass();
+    _data[_t*_spatialSize + index]._momentum = cell.getMacroscopicMomentum();
+  } 
+}
+
+template<unsigned int dim>
+void coupling::noisereduction::NLM<dim>::
+endProcessInnerMacroscopicCells(){
+  
+}
+
+template<unsigned int dim>
+void coupling::noisereduction::NLM<dim>::
+processOuterMacroscopicCell(
+      coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index
+    ){
+  if(_firstTraversal){
+    // save data
+    _data[_t*_spatialSize + index]._mass = cell.getMacroscopicMass();
+    _data[_t*_spatialSize + index]._momentum = cell.getMacroscopicMomentum();
+  } 
+}
+
+template<unsigned int dim>
+void coupling::noisereduction::NLM<dim>::
+beginProcessOuterMacroscopicCells(){
+
+}
+
+    template<unsigned int dim>
+void coupling::noisereduction::NLM<dim>::
+endProcessOuterMacroscopicCells(){
+  /*if(_firstTraversal) 
+   // todo compute here _localMean and _localStandardDeviation
+   // for all cells for this _t
+  */
+  if(!_firstTraversal){
+    _cycleCounter++;
+    _t = _cycleCounter%_timeWindowSize;
+  }
+  _firstTraversal = !_firstTraversal;
+}

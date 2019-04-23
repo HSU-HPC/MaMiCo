@@ -7,6 +7,7 @@
 #include "coupling/noisereduction/NoiseReduction.h"
 #include "coupling/noisereduction/IdentityTransform.h"
 #include "coupling/noisereduction/POD.h"
+#include "coupling/noisereduction/NLM.h"
 
 namespace coupling {
   namespace configurations {
@@ -21,7 +22,7 @@ class coupling::configurations::NoiseReductionConfiguration:
 public tarch::configuration::Configuration {
   public:
     enum NoiseReductionType{
-      IdentityTransform=0, GaussianFilter=1, POD=2, AnisotropicDiffusion=3
+      IdentityTransform=0, GaussianFilter=1, POD=2, NLM=3
     };
 
     NoiseReductionConfiguration(): _type(IdentityTransform), _isValid(true){}
@@ -58,8 +59,20 @@ public tarch::configuration::Configuration {
           _kmax = buf;
         }
 
-      } else if (value=="anisotropic-diffusion"){
-        _type = AnisotropicDiffusion;
+      } else if (value=="NLM"){
+        _type = NLM;
+
+        int buf = -1;
+
+        tarch::configuration::ParseConfiguration::readIntMandatory(buf,node,"time-window-size");
+        if (buf <= 2){
+          std::cout << "ERROR coupling::configurations::ParticleInsertionConfiguration::";
+          std::cout << "parseSubtag(): " << "time-window-size" << " smaller than or equal two!" << std::endl;
+          exit(EXIT_FAILURE);
+        } else {
+          _tws = buf;
+        }
+
       } else {
         std::cout << "ERROR coupling::NoiseReductionConfiguration: Wrong noise filter type!" << std::endl;
         _isValid = false;
@@ -99,9 +112,8 @@ public tarch::configuration::Configuration {
         exit(EXIT_FAILURE);
       } else if (_type == POD){
         return new coupling::noisereduction::POD<dim>(indexConversion, multiMDService, tws_param==0?_tws:tws_param, _kmax);
-      } else if (_type == AnisotropicDiffusion){
-        std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
-        exit(EXIT_FAILURE);
+      } else if (_type == NLM){
+        return new coupling::noisereduction::NLM<dim>(indexConversion, multiMDService, _tws);
       } else {
         return NULL;
       }
