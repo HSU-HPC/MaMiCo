@@ -38,9 +38,9 @@ class coupling::services::MultiMDCellService {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
-      const tarch::utils::MultiMDService<dim>& multiMDService
+      const tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0
     ): _localNumberMDSimulations((unsigned int)mdSolverInterfaces.size()), _totalNumberMDSimulations(totalNumberMDSimulations),
-       _macroscopicCellServices(NULL), _topologyOffset(computeTopologyOffset(numberProcesses,rank)), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)){
+       _macroscopicCellServices(NULL), _topologyOffset(computeTopologyOffset(numberProcesses,rank)), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)) {
 
       const tarch::la::Vector<dim,double> mdDomainSize(mdSolverInterfaces[0]->getGlobalMDDomainSize());
       const tarch::la::Vector<dim,double> mdDomainOffset(mdSolverInterfaces[0]->getGlobalMDDomainOffset());
@@ -69,7 +69,7 @@ class coupling::services::MultiMDCellService {
         _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>(
                                         i, mdSolverInterfaces[i-_localNumberMDSimulations*_topologyOffset/_intNumberProcesses], macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,
                                         momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration, noiseReductionConfiguration, parallelTopologyConfiguration,
-                                        numberMDTimestepsPerCouplingCycle, macroscopicCellConfiguration, multiMDService, _topologyOffset
+                                        numberMDTimestepsPerCouplingCycle, macroscopicCellConfiguration, multiMDService, _topologyOffset, _tws
                                       );
         if (_macroscopicCellServices[i]==NULL){
           std::cout << "ERROR coupling::services::MultiMDCellService::MultiMDCellService(...): _macroscopicCellServices[" << i << "]==NULL!" << std::endl; exit(EXIT_FAILURE);
@@ -113,10 +113,11 @@ class coupling::services::MultiMDCellService {
     }
 
     /** collects data from MD simulations, averages over them (only macroscopic mass/momentum is considered) and writes the result back into macroscopicCellsFromMacroscopicSolver. */
-    void sendFromMD2Macro(
+    double sendFromMD2Macro(
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ){
+      double res = 0;
       // duplicate macroscopicCells
       const unsigned int size = (unsigned int) macroscopicCellsFromMacroscopicSolver.size();
       coupling::datastructures::MacroscopicCell<dim>* duplicate = new coupling::datastructures::MacroscopicCell<dim>[size];
@@ -130,7 +131,7 @@ class coupling::services::MultiMDCellService {
       // receive data from each MD simulation and accumulate information in duplicate
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
         //std::cout << "Rank " << _macroscopicCellServices[l]->getIndexConversion().getThisRank() << ": Send from MD to Macro for Simulation no. " << l << std::endl;
-        _macroscopicCellServices[l]->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver,globalCellIndicesFromMacroscopicSolver);
+        res += _macroscopicCellServices[l]->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver,globalCellIndicesFromMacroscopicSolver);
         for (unsigned int i = 0; i < size; i++){
           duplicate[i].addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
           duplicate[i].addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
@@ -144,6 +145,7 @@ class coupling::services::MultiMDCellService {
 
       // free duplicate
       delete [] duplicate;
+      return res;
     }
 
   private:
@@ -164,7 +166,7 @@ class coupling::services::MultiMDCellService {
     const unsigned int _totalNumberMDSimulations; /** total number of MD simulations */
     coupling::services::MacroscopicCellService<dim> **_macroscopicCellServices; /** pointers of MacroscopicCellService type, one for each MD simulation */
     const unsigned int _topologyOffset; /** topology offset*/
+    const int _tws;
     const unsigned int _intNumberProcesses;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_MULTIMDCELLSERVICE_H_
-

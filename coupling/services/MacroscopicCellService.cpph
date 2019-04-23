@@ -3,6 +3,8 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
+#include <sys/time.h>
+
 
 template<class LinkedCell,unsigned int dim>
 coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellServiceImpl(
@@ -20,7 +22,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellS
   unsigned int numberMDTimestepsPerCouplingCycle,
   const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
   const tarch::utils::MultiMDService<dim>& multiMDService,
-  unsigned int topologyOffset
+  unsigned int topologyOffset, int tws
 ):
 coupling::services::MacroscopicCellService<dim>(ID),
 // index conversion should be the very first thing getting initialised!
@@ -43,7 +45,7 @@ _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<Linked
 _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
 _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
 _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface,*_indexConversion,numberMDTimestepsPerCouplingCycle)),
-_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService)),
+_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService, tws)),
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
 _momentumController(mdSolverInterface),
@@ -123,7 +125,7 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMac
 
 
 template<class LinkedCell,unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMD2Macro(
+double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMD2Macro(
   const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
   const unsigned int * const globalCellIndicesFromMacroscopicSolver
 ){
@@ -137,6 +139,12 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMD2
   // pre-process data before sending to macroscopic solver
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
+
+  timeval start;
+  timeval end;
+  double runtime=0;
+  if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); } 
+
   // run noise reduction
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
@@ -145,10 +153,16 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMD2
     _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
   }
 
+  if(_indexConversion->getThisRank() == 0){
+    gettimeofday(&end,NULL);
+    runtime += (end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec);
+  }
+
   // carry out send-receive steps
   _fromMD2Macro.sendFromMD2Macro( *_indexConversion,_deFromMD2Macro,_macroscopicCells.getMacroscopicCells(),
     macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver
   );
+  return runtime;
 }
 
 

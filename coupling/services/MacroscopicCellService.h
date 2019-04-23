@@ -58,7 +58,7 @@ class coupling::services::MacroscopicCellService {
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ) = 0;
-    virtual void sendFromMD2Macro(
+    virtual double sendFromMD2Macro(
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ) = 0;
@@ -120,7 +120,7 @@ public coupling::services::MacroscopicCellService<dim> {
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells and respective plotting
       const tarch::utils::MultiMDService<dim>& multiMDService,
-      unsigned int topologyOffset
+      unsigned int topologyOffset, int tws = 0
     );
 
     MacroscopicCellServiceImpl(
@@ -163,7 +163,7 @@ public coupling::services::MacroscopicCellService<dim> {
      *  buffer macroscopicCellsFromMacroscopicSolver together with the respective global cell indices
      *  (-> globalCellIndicesFromMacroscopicSolver).
      */
-    void sendFromMD2Macro(
+    double sendFromMD2Macro(
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     );

@@ -195,7 +195,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::AbstractCoue
       }
     }
 
-    void setWallVelocity(const tarch::la::Vector<3,double> wallVelocity){
+    virtual void setWallVelocity(const tarch::la::Vector<3,double> wallVelocity){
       _wallVelocity = (_dt/_dx)*wallVelocity;
     }
 
