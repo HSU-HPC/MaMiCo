@@ -69,11 +69,12 @@ class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::ser
     ){
       _fromMacro2MD.sendFromMacro2MD( *_indexConversion,_deFromMacro2MD, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     }
-    virtual void sendFromMD2Macro(
+    virtual double sendFromMD2Macro(
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ){
       _fromMD2Macro.sendFromMD2Macro( *_indexConversion, _deFromMD2Macro, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver );
+      return 0;
     }
     virtual void processInnerMacroscopicCellAfterMDTimestep(){}
     virtual void computeAndStoreTemperature(double temperature){}
