@@ -1,0 +1,150 @@
+{
+  "project_name": "NavierStokes",
+  "paths": {
+    "peano_kernel_path": "./Peano/",
+    "exahype_path": "./ExaHyPE",
+    "output_directory": "./ApplicationExamples/CompressibleNavierStokes",
+    "plotter_subdirectory": "",
+    "log_file": ""
+  },
+  "computational_domain": {
+    "dimension": 2,
+    "end_time": 800,
+    "offset": [
+      0.0,
+      0.0
+    ],
+    "width": [
+      1000.0,
+      1000.0
+    ],
+    "max_mesh_setup_iterations": 400,
+    "outside_cells": 2,
+    "outside_cells_left": 1,
+    "one_third_of_cells_outside": false
+  },
+  "shared_memory": {
+    "cores": 16,
+    "properties_file": "sharedmemory.properties",
+    "autotuning_strategy": "dummy",
+    "background_job_processing": "job_system",
+    "background_job_consumers": 1,
+    "min_background_jobs_in_one_rush": 1,
+    "max_background_jobs_in_one_rush": 2147483647,
+    "invasion_strategy": "no_invade",
+    "manual_pinning": false
+  },
+  "distributed_memory": {
+    "ranks_per_node": 1,
+    "load_balancing_strategy": "greedy_naive",
+    "load_balancing_type": "static",
+    "node_pool_strategy": "fair",
+    "timeout": 6000,
+    "buffer_size": 1600,
+    "node_pool_timeout": 1,
+    "max_forks_at_once": -1
+  },
+  "optimisation": {
+    "fuse_algorithmic_steps": "all",
+    "fuse_algorithmic_steps_diffusion_factor": 0.99,
+    "fuse_algorithmic_steps_rerun_factor": 0.99,
+    "spawn_predictor_as_background_thread": true,
+    "spawn_amr_background_threads": true,
+    "disable_vertex_exchange_in_time_steps": true,
+    "time_step_batch_factor": 0.99,
+    "disable_metadata_exchange_in_batched_time_steps": true,
+    "double_compression": 0.0,
+    "spawn_double_compression_as_background_thread": false,
+    "limiting": "dynamic",
+    "mesh_refinement": "dynamic",
+    "spawn_update_as_background_thread": false,
+    "spawn_prolongation_as_background_thread": false,
+    "spawn_neighbour_merge_as_thread": false
+  },
+  "solvers": [
+    {
+      "type": "ADER-DG",
+      "name": "NavierStokesSolver_ADERDG",
+      "order": 4,
+      "maximum_mesh_size": 38.0,
+      "maximum_mesh_depth": 0,
+      "time_stepping": "global",
+      "halo_cells": 0,
+      "aderdg_kernel": {
+        "language": "C",
+        "nonlinear": true,
+        "terms": [
+          "flux",
+          "viscous_flux",
+          "source"
+        ],
+        "space_time_predictor": {
+          "fix_picard_iterations": false,
+          "split_ck": "disabled"
+        },
+        "optimised_terms": [],
+        "optimised_kernel_debugging": [],
+        "implementation": "generic",
+        "adjust_solution": "pointwise",
+        "allocate_temporary_arrays": "heap",
+        "basis": "Legendre"
+      },
+      "point_sources": 0,
+      "variables": [
+        {
+          "name": "rho",
+          "multiplicity": 1
+        },
+        {
+          "name": "j",
+          "multiplicity": 2
+        },
+        {
+          "name": "E",
+          "multiplicity": 1
+        }
+      ],
+      "material_parameters": [
+        {
+          "name": "height",
+          "multiplicity": 1
+        },
+        {
+          "name": "backgroundstate",
+          "multiplicity": 2
+        }
+      ],
+      "global_observables": [
+        {
+          "name": "gobs",
+          "multiplicity": 3
+        }
+      ],
+      "parameters": {
+        "use-gravity": true,
+        "use-background-state": true,
+        "viscosity": 0.1,
+        "scenario": "cosine-bubble",
+        "use-amr": true,
+        "use-tv-amr": true,
+        "use-tv-volume-correction": true,
+        "amr-indicator": "potential-temperature",
+        "amr-factor-refine": 2.5,
+        "amr-factor-erase": 0.5
+      },
+      "plotters": [
+        {
+          "type": "vtu::Cartesian::vertices::ascii",
+          "name": "Plotter",
+          "time": 1e-06,
+          "repeat": 30.0,
+          "output": "./results/solution",
+          "variables": 5
+        }
+      ]
+    }
+  ],
+  "architecture": "noarch",
+  "compiler_flags": "",
+  "linker_flags": ""
+}
