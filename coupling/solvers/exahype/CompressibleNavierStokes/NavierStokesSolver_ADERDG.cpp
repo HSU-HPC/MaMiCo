@@ -32,7 +32,7 @@
 tarch::logging::Log NavierStokes::NavierStokesSolver_ADERDG::_log( "NavierStokes::NavierStokesSolver_ADERDG" );
 
 void NavierStokes::NavierStokesSolver_ADERDG::init(const std::vector<std::string>& cmdlineargs,const exahype::parser::ParserView& constants) {
-  auto parsedConfig = parseConfig(cmdlineargs, constants, NumberOfVariables, NumberOfParameters, NumberOfGlobalObservables);
+  auto parsedConfig = parseConfig(cmdlineargs, constants, NumberOfVariables, NumberOfParameters);
   ns = std::move(parsedConfig.ns);
   scenarioName = std::move(parsedConfig.scenarioName);
   scenario = std::move(parsedConfig.scenario);
@@ -204,154 +204,13 @@ void NavierStokes::NavierStokesSolver_ADERDG::boundaryValues(const double* const
 
 }
 
-bool NavierStokes::NavierStokesSolver_ADERDG::isPhysicallyAdmissible(
-      const double* const solution,
-      const double* const observablesMin,const double* const observablesMax,
-      const bool wasTroubledInPreviousTimeStep,
-      const tarch::la::Vector<DIMENSIONS,double>& center,
-      const tarch::la::Vector<DIMENSIONS,double>& dx,
-      const double t) const {
-    // We now need to do a pointwise check for the primitive variables
-    // pressure and Z.
-    // TODO(Lukas) At least refactor this. And 3D!
-  // return false;
-#if DIMENSIONS == 2
-    constexpr auto basisSize = Order + 1;
-    kernels::idx3 idx(basisSize,basisSize,NumberOfVariables);
-    for (int i = 0; i < basisSize; ++i) {
-      for (int j = 0; j < basisSize; ++j) {
-        const double* const Q = solution + idx(i,j,0);
-        auto vars = ReadOnlyVariables{Q};
-        const auto Zrho = ns.getZ(Q);
-        const auto Z = Zrho / vars.rho();
-        const auto height = ns.getHeight(Q);
-        const auto pressure = ns.evaluatePressure(vars.E(),
-                vars.rho(),
-                vars.j(),
-                Zrho,
-                height
-                );
-        bool isAdvectionTroubled = ns.useAdvection && (Z < 0.0);
-        if (vars.rho() <= 0.0 || pressure < 0.0 || isAdvectionTroubled) {
-          return false;
-        }
-
-        // Surprisingly, this is necessary.
-        for (int v = 0; v < NumberOfVariables; v++) {
-          if (!std::isfinite(solution[v])) {
-            return false;
-          }
-        }
-      }
-    }
-#else
-    // TODO(Lukas) Limiting in 3D!
-    std::abort();
-#endif
-
-  // Now also check if TV is too high!
-  double data[NumberOfGlobalObservables];
-  GlobalObservables curObs(data);
-  mapGlobalObservables(curObs,solution, dx);
-  
-  const auto curTv = curObs.gobs(0);
-
-  ReadOnlyGlobalObservables gobs = getGlobalObservables();
-  const auto countGlobal = gobs.gobs(2);
-  const auto meanGlobal  = gobs.gobs(0);
-  // Merging computes sample variance (Bessel's correction), we need population variance.
-  const auto varianceGlobal = ((countGlobal - 1)/countGlobal) * gobs.gobs(1);
-  const auto stdGlobal = std::sqrt(varianceGlobal);
-
-  const auto factorLimit = 4.0;
-
-  const auto hi = meanGlobal + factorLimit * stdGlobal;
-
-  if (curTv > hi) {
-    return false;
-  }
-
-  return true;
-}
-
-void NavierStokes::NavierStokesSolver_ADERDG::mapDiscreteMaximumPrincipleObservables(double* observables,const double* const Q) const {
-  if (ns.useAdvection) {
-    // TODO(Lukas) Remove this.
-    std::fill_n(observables, NumberOfDMPObservables, 0.0);
-    assert(NumberOfDMPObservables >= 2);
-    observables[0] = Q[0];
-    const auto vars = ReadOnlyVariables{Q};
-    observables[1] = ns.evaluatePressure(vars.E(),
-                                         vars.rho(),
-                                         vars.j(),
-                                         ns.getZ(Q),
-                                         ns.getHeight(Q));
-    if (ns.useAdvection) {
-      observables[2] = ns.getZ(Q) / Q[0];
-    }
-  } else if (scenarioName == std::string("two-bubbles")) {
-    assert(DIMENSIONS == 2 && NumberOfDMPObservables == 2);
-    const auto vars = ReadOnlyVariables{Q};
-    const auto pressure = ns.evaluatePressure(vars.E(),
-                                         vars.rho(),
-                                         vars.j(),
-                                         ns.getZ(Q),
-                                         ns.getHeight(Q));
-    const auto temperature = ns.evaluateTemperature(vars.rho(), pressure);
-    const auto potT = ns.evaluatePotentialTemperature(temperature, pressure);
-    observables[0] = vars.rho();
-    observables[1] = pressure;
-    observables[2] = potT;
-  }
-}
-
-
 exahype::solvers::Solver::RefinementControl NavierStokes::NavierStokesSolver_ADERDG::refinementCriterion(
     const double* luh,
     const tarch::la::Vector<DIMENSIONS, double>& center,
     const tarch::la::Vector<DIMENSIONS, double>& dx,
     const double t,
     const int level) {
-  if (!amrSettings.useAMR) {
-    // Default: Delete cells.
-    // This is useful when one wants to use limiting-guided refinement
-    // without another source of AMR.
-    return exahype::solvers::Solver::RefinementControl::Erase;
-  }
-
-  if (t == 0) {
-    // Global observables are reduced after first timestep!
-    return exahype::solvers::Solver::RefinementControl::Keep;
-  }
-
-  double data[NumberOfGlobalObservables];
-  GlobalObservables curObs(data);
-  mapGlobalObservables(curObs,luh, dx);
   
-  const auto curTv = curObs.gobs(0);
-
-  ReadOnlyGlobalObservables gobs = getGlobalObservables();
-  const auto countGlobal = gobs.gobs(2);
-  const auto meanGlobal  = gobs.gobs(0);
-  // Merging computes sample variance (Bessel's correction), we need population variance.
-  const auto varianceGlobal = ((countGlobal - 1)/countGlobal) * gobs.gobs(1);
-  const auto stdGlobal = std::sqrt(varianceGlobal);
-
-  const auto factorRefine = amrSettings.factorRefine;
-  const auto factorCoarse = amrSettings.factorErase;
-
-  const auto hi = meanGlobal + factorRefine * stdGlobal;
-  const auto lo = meanGlobal + factorCoarse * stdGlobal;
-
-  if (curTv > hi) {
-    return exahype::solvers::Solver::RefinementControl::Refine;
-  }
-
-  if (curTv < lo) {
-    return exahype::solvers::Solver::RefinementControl::Erase;
-  }
-
-
   return exahype::solvers::Solver::RefinementControl::Keep;
 }
 
@@ -441,29 +300,4 @@ void NavierStokes::NavierStokesSolver_ADERDG::boundaryConditions( double* const 
   }
 
   delete[] block;
-}
-
-void NavierStokes::NavierStokesSolver_ADERDG::resetGlobalObservables(GlobalObservables& globalObservables) const  {
-  ::NavierStokes::resetGlobalObservables(globalObservables);
-}
-
-void NavierStokes::NavierStokesSolver_ADERDG::mapGlobalObservables(
-    GlobalObservables&                          globalObservables,
-    const double* const                         luh,
-    const tarch::la::Vector<DIMENSIONS,double>& cellSize) const  {
-  NavierStokes::mapGlobalObservablesDG(globalObservables,
-				       luh,
-				       cellSize,
-				       scenarioName,
-				       ns,
-				       amrSettings,
-				       Order,
-				       NumberOfVariables,
-				       NumberOfParameters);
-}
-
-void NavierStokes::NavierStokesSolver_ADERDG::mergeGlobalObservables(
-    GlobalObservables&         globalObservables,
-    ReadOnlyGlobalObservables& otherObservables) const {
-  NavierStokes::mergeGlobalObservables(globalObservables,otherObservables);
 }
