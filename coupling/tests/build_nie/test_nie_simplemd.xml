@@ -16,15 +16,13 @@
     number-of-timesteps="100"
     reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
-    fix-seed="yes"
+    fix-seed="no"
    ></simulation-configuration>
 
   <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
 
   <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
 
-
-  
   <domain-configuration
     init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
     
@@ -49,3 +47,4 @@
     top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
   > </domain-configuration>
 </molecular-dynamics>
+

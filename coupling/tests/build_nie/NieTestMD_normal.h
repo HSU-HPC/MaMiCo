@@ -51,16 +51,16 @@ class NieTest: public Test {
       unsigned int mdStepCounter=0;         // time step counter for MD
 
       const double channelheight = 50.0;    // channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0)
-      const tarch::la::Vector<3,double> wallVelocity(0.0,0.0,0.0);// velocity of moving wall (lower boundary moves); analytic solver only supports flow in x-direction
-      const int wallInitCycles=50;
+      const tarch::la::Vector<3,double> wallVelocity(0.5,0.0,0.0);// velocity of moving wall (lower boundary moves); analytic solver only supports flow in x-direction
+      const int wallInitCycles=0;
       const tarch::la::Vector<3,double> wallVelocity2(0.5,0.0,0.0);
-      const int plotEveryTimestep = 1;                            // only for LB couette solver: VTK plotting per time step
+      const int plotEveryTimestep = 50;                           // only for LB couette solver: VTK plotting per time step
       tarch::la::Vector<3,unsigned int> lbNumberProcesses(1,1,1); // only for LB couette solver: number of processes 
 
-      const unsigned int couplingCycles = 2062;         // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
+      const unsigned int couplingCycles = 401;          // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
       const unsigned int totalNumberMDSimulations=1;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
       const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
-      const bool twoWayCoupling = true;
+      const bool twoWayCoupling = false;
       const int twoWayCouplingInitCycles = 25;
 
       // for time measurements
@@ -209,7 +209,7 @@ class NieTest: public Test {
           static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver)->setMDBoundaryValues(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion());
         }
         // write data to csv-compatible file for evaluation
-        //write2CSV(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),rank,cycles);
+        write2CSV(recvBuffer,globalCellIndices4RecvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),rank,cycles);
         if (rank==0){std::cout << "Finish coupling cycle " << cycles << std::endl;}
       }
 
@@ -426,8 +426,8 @@ class NieTest: public Test {
         for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
 
         // TODO check solver type or add getDensity to AbstractCouetteSolver
-        double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2] * 
-          static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
+        double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2]
+          * static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
 
         // compute momentum
         const tarch::la::Vector<3,double> momentum(mass*couetteSolver.getVelocity(cellMidPoint));

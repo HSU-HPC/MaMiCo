@@ -26,8 +26,8 @@
 
 /*/////////////////////////////////////////
 !
-oscillating couette + gaussian noise test
-no coupling
+oscillating couette (simplified)
+coupling => real MD test
 SNR calculation
 !
 *////////////////////////////////////////////
@@ -46,7 +46,7 @@ class NieTest: public Test {
     virtual ~NieTest(){}
 
     virtual void run(){
-      for(int tws=3;tws<100;tws++){
+      //for(int tws=3;tws<100;tws++){
 
       int rank = 0;
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
@@ -67,7 +67,7 @@ class NieTest: public Test {
       tarch::la::Vector<3,unsigned int> lbNumberProcesses(1,1,1); // only for LB couette solver: number of processes 
 
       const unsigned int couplingCycles = 1100;         // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
-      const unsigned int totalNumberMDSimulations=1;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
+      const unsigned int totalNumberMDSimulations=8;    //total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD scalability), 144 (MD)
       const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
       //const bool twoWayCoupling = true;
       const int initCycles = 100;
@@ -169,10 +169,10 @@ class NieTest: public Test {
       unsigned int *globalCellIndices4RecvBuffer = allocateRecvBuffer(recvBuffer,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),rank,*couetteSolverInterface);
 
       // FIXED SEED!!
-      std::default_random_engine generator(0);
+      //std::default_random_engine generator(0);
 
       // create noise reduction for analytical solver
-      coupling::noisereduction::NoiseReduction<3>* noiseReduction(mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(multiMDCellService.getMacroscopicCellService(0).getIndexConversion(), multiMDService, tws));
+      //coupling::noisereduction::NoiseReduction<3>* noiseReduction(mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(multiMDCellService.getMacroscopicCellService(0).getIndexConversion(), multiMDService, tws));
 
       couetteSolver2->advance(5000*simpleMDConfig.getSimulationConfiguration().getDt()*simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
@@ -180,9 +180,9 @@ class NieTest: public Test {
       const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
       const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
       const double mass = density*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
-      std::normal_distribution<double> distribution (0.0,1.0/6.0);
+      //std::normal_distribution<double> distribution (0.0,1.0/6.0);
 
-      //std::cout << "t, vel_x smooth, vel_x noisy" << std::endl;
+      std::cout << "t, vel_x smooth, vel_x noisy" << std::endl;
 
       double real_vx = 0;
       double noise_x = 0;
@@ -204,54 +204,31 @@ class NieTest: public Test {
           );
         }
         // extract data from couette solver and send them to MD (can take any index-conversion object)
-        //fillSendBuffer(density,*couetteSolver,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),sendBuffer,globalCellIndices4SendBuffer);
-        //multiMDCellService.sendFromMacro2MD(sendBuffer,globalCellIndices4SendBuffer);
+        fillSendBuffer(density,*couetteSolver2,multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),sendBuffer,globalCellIndices4SendBuffer);
+        multiMDCellService.sendFromMacro2MD(sendBuffer,globalCellIndices4SendBuffer);
         //std::cout << "Finish multiMDCellService.sendFromMacro2MD " << std::endl;
         // run MD instances
-        //for (unsigned int i = 0; i < mdInstances; i++){
+        for (unsigned int i = 0; i < mdInstances; i++){
         //  // set macroscopic cell service and interfaces in MamicoInterfaceProvider
-        //  coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(multiMDCellService.getMacroscopicCellService(i)));
-        //  coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(mdSolverInterface[i]);
+          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(multiMDCellService.getMacroscopicCellService(i)));
+          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(mdSolverInterface[i]);
           
-        //  simpleMD[i]->simulateTimesteps(simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),mdStepCounter);
+          simpleMD[i]->simulateTimesteps(simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),mdStepCounter);
         //  std::cout << "Finish simpleMD[i]->simulateTimesteps " << std::endl;
-        //  mdStepCounter+=simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
+          mdStepCounter+=simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
         //  // reset mdStepCounter unless this is the last MD instance
-        //  if (i<mdInstances-1){mdStepCounter -= simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();}
+          if (i<mdInstances-1){mdStepCounter -= simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();}
 
         //  // plot macroscopic time step info in multi md service
-        //  multiMDCellService.getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycles);
-        //}
+          multiMDCellService.getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycles);
+        }
         // send back data from MD instances and merge it
-        //multiMDCellService.sendFromMD2Macro(recvBuffer,globalCellIndices4RecvBuffer);
+        multiMDCellService.sendFromMD2Macro(recvBuffer,globalCellIndices4RecvBuffer);
         //std::cout << "Finish multiMDCellService.sendFromMD2Macro " << std::endl;
 
-        //if(cycles >= initCycles) std::cout << cycles-initCycles << ", ";
+        if(cycles >= initCycles) std::cout << cycles-initCycles << ", ";
 
-        for (unsigned int i = 0; i < recvBuffer.size(); i++){
-          // get global cell index vector
-          const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(globalCellIndices4RecvBuffer[i]));
-          // determine cell midpoint
-          tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
-          for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
-          // compute momentum
-          double nx = distribution(generator);
-          const tarch::la::Vector<3,double> noise(nx,distribution(generator),distribution(generator));
-          tarch::la::Vector<3,double> v = couetteSolver2->getVelocity(cellMidPoint);
-          const tarch::la::Vector<3,double> momentum(mass*(v+noise));
-          recvBuffer[i]->setMacroscopicMass(mass);
-          recvBuffer[i]->setMacroscopicMomentum(momentum);
-
-          if(cycles >= initCycles){
-            real_vx += v[0]*v[0];
-            //noise_x += nx*nx;
-            if (i==0){
-              //std::cout << v[0] << ", ";
-              //std::cout << (1/mass * momentum)[0] << std::endl;
-            }
-          }
-        }
-
+        /*
         //call noise filter on recvBuffer
         noiseReduction->beginProcessInnerMacroscopicCells();
         for (unsigned int i = 0; i < recvBuffer.size(); i++){
@@ -265,6 +242,7 @@ class NieTest: public Test {
           }
           noiseReduction->endProcessInnerMacroscopicCells();
         }
+        */
 
         if(cycles >= initCycles){
           for (unsigned int i = 0; i < recvBuffer.size(); i++){
@@ -277,8 +255,10 @@ class NieTest: public Test {
             double vx = (1/mass * recvBuffer[i]->getMacroscopicMomentum())[0];
             
             noise_x += (vxreal-vx)*(vxreal-vx);
+            real_vx += vxreal*vxreal;
+
             if (i==0){
-              //std::cout << vx << std::endl;
+              std::cout << vxreal << ", " << vx << std::endl;
             }
           }
         }
@@ -297,7 +277,7 @@ class NieTest: public Test {
         //if (rank==0){std::cout << "Finish coupling cycle " << cycles << std::endl;}
       }
 
-      std::cout << tws << ", " << 10*log10(real_vx/noise_x) << std::endl;
+      std::cout << "SNR = " << 10*log10(real_vx/noise_x) << std::endl;
 
       /*
       // finish time measurement for coupled simulation; start time measurement for shut down of simulation
@@ -335,7 +315,7 @@ class NieTest: public Test {
       }
       */
 
-    }}
+    }//}
 
   private:
     /** computes global number of macroscopic cells from configs. Required by couette solver interface before MacroscopicCellService is initialised! */
@@ -514,8 +494,8 @@ class NieTest: public Test {
         for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
 
         // TODO check solver type or add getDensity to AbstractCouetteSolver
-        double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2] * 
-          static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
+        double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2]; 
+          //*static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
 
         // compute momentum
         const tarch::la::Vector<3,double> momentum(mass*couetteSolver.getVelocity(cellMidPoint));
