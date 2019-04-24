@@ -8,3 +8,5 @@ out/
 !coupling/tests/build/
 coupling/tests/build_nie/test
 coupling/tests/build_nie/out/
+coupling/tests/build_couette/test
+stuff/

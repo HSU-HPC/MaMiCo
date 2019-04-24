@@ -5,10 +5,10 @@ MPI_INCLUDE_PATH=/usr/lib/openmpi/include
 MPI_LIB_PATH=/usr/lib/openmpi/lib
 LIB_MPI=mpi
 
-LIB_EIGEN_PATH=/home/hpc/pr63so/ga68feg4/eigen
+LIB_EIGEN_PATH=/usr/local/include
 
 ### home directory of MAMICO
-MAMICO_PATH=/home/hpc/pr63so/ga68feg4/mamico-noisereduction
+MAMICO_PATH=/home/piet/mamico_v1.1
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
