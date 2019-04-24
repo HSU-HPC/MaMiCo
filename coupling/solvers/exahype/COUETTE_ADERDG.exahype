@@ -1,0 +1,58 @@
+/**
+ * 
+ * Euler Flow for Couette test scenario with limiting ADER-DG / Finite Volume method
+ * 
+ */
+exahype-project couette
+  peano-kernel-path const    = ./Peano
+  exahype-path const         = ./ExaHyPE
+  output-directory const     = ../mamico-noisereduction/coupling/solvers/exahype
+
+  computational-domain
+    dimension const         = 3
+    width                   = 50.0, 50.0
+    offset                  = 0.0, 0.0
+    end-time                = 25
+    /*time-steps              = 100*/
+  end computational-domain
+
+  distributed-memory
+    identifier               = static_load_balancing
+    configure                = {hotspot,fair,ranks-per-node:16}
+    buffer-size              = 64
+    timeout                  = 60
+  end distributed-memory
+
+  solver Limiting-ADER-DG EXA_COUETTE
+    variables const    = rho:1,u:3,E:1
+    order const        = 3
+    maximum-mesh-size  = 2.5
+    maximum-mesh-depth = 0
+    time-stepping      = globalfixed
+    type const         = nonlinear, Legendre
+    terms const        = flux
+    optimisation const = generic
+    language const     = C
+    limiter-type const         = godunov
+    limiter-optimisation const = generic
+    limiter-language const     = C
+    dmp-observables     const  = 5
+    dmp-relaxation-parameter   = 1e-4
+    dmp-difference-scaling     = 1e-3
+
+    plot vtu::Cartesian::vertices::limited::ascii VtkWriter_ADERDG
+      variables const = 5
+      time            = 0.0
+      repeat          = 0.5
+      output          = ./out/exahype_aderdg
+    end plot
+    
+    plot vtk::Cartesian::subcells::limited::ascii VtkWriter_FV
+      variables const = 5
+      time            = 0.0
+      repeat          = 0.5
+      output          = ./out/exahype_fv
+    end plot
+  end solver
+
+end exahype-project  
