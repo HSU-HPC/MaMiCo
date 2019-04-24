@@ -152,7 +152,8 @@ void NavierStokes::NavierStokesSolver_ADERDG::boundaryValues(const double* const
 
   if (scenario->getBoundaryType(faceIndex) == BoundaryType::movingWall) {
     // Wall speed after Riemann solve
-    const auto wallSpeed = 1.0;
+    // TODO config
+    const auto wallSpeed = 0.5;
     varsOut.j(0) = 2 * wallSpeed - varsIn.j(0);
     // TODO(Lukas) Is this gradient correct?
     for (int i = 0; i < DIMENSIONS; ++i) {

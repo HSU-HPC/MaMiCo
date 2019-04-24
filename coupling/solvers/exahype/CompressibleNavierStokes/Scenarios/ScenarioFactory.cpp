@@ -13,6 +13,7 @@
 #include "Scenarios/TaylorGreen.h"
 #include "Scenarios/LidDrivenCavity.h"
 #include "Scenarios/ABCFlow.h"
+#include "Scenarios/Couette.h"
 
 // Atmospheric Flows
 #include "Scenarios/TwoBubbles.h"
@@ -41,6 +42,8 @@ NavierStokes::ScenarioFactory::createScenario(const std::string& scenarioName) {
     return std::move(ScenarioPtr(new TaylorGreen()));
   } else if (scenarioName == "lid-driven-cavity") {
     return std::move(ScenarioPtr(new LidDrivenCavity()));
+  } else if (scenarioName == "couette") {
+    return std::move(ScenarioPtr(new Couette()));
   } else if (scenarioName == "abc-flow") {
     return std::move(ScenarioPtr(new ABCFlow()));
   } else if (scenarioName == "two-bubbles") {
