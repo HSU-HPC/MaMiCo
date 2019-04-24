@@ -12,7 +12,7 @@
 tarch::logging::Log NavierStokes::NavierStokesSolver_FV::_log( "NavierStokes::NavierStokesSolver_FV" );
 
 void NavierStokes::NavierStokesSolver_FV::init(const std::vector<std::string>& cmdlineargs,const exahype::parser::ParserView& constants) {
-  auto parsedConfig = parseConfig(cmdlineargs, constants, NumberOfVariables, NumberOfParameters, NumberOfGlobalObservables);
+  auto parsedConfig = parseConfig(cmdlineargs, constants, NumberOfVariables, NumberOfParameters);
   ns = std::move(parsedConfig.ns);
   scenarioName = std::move(parsedConfig.scenarioName);
   scenario = std::move(parsedConfig.scenario);
@@ -129,120 +129,4 @@ void NavierStokes::NavierStokesSolver_FV::viscousEigenvalues(const double* const
 void NavierStokes::NavierStokesSolver_FV::algebraicSource(const tarch::la::Vector<DIMENSIONS, double>& x, double t, const double *const Q, double *S) {
   // TODO: Actually use coordinates!
   scenario->source(x, t, ns, Q, S);
-}
-
-void NavierStokes::NavierStokesSolver_FV::resetGlobalObservables(GlobalObservables& globalObservables) const  {
-  NavierStokes::resetGlobalObservables(globalObservables);
-}
-
-void NavierStokes::NavierStokesSolver_FV::mapGlobalObservables(
-    GlobalObservables&                          globalObservables,
-    const double* const                         luh,
-    const tarch::la::Vector<DIMENSIONS,double>& cellSize)  const {
-  
-  // Ignore efficiency for now.
-  // TODO: Are derivatives correct?
-  // TODO: Is ghost layer handled correctly?
-  // TODO: Don't hardcore indicator variable.
-  assert(DIMENSIONS == 2);
-  constexpr auto numberOfData = NumberOfVariables + NumberOfParameters;
-  kernels::idx3 idx(PatchSize+2*GhostLayerWidth,PatchSize+2*GhostLayerWidth,numberOfData);
-  kernels::idx2 idx_obs(PatchSize+2*GhostLayerWidth,PatchSize+2*GhostLayerWidth);
-
-  kernels::idx3 idx_slope(PatchSize+2*GhostLayerWidth,
-                          PatchSize+2*GhostLayerWidth,
-                          DIMENSIONS);
-  const auto subcellSize = (1./PatchSize) * cellSize; 
-  assert(std::isfinite(subcellSize[0]));
-  assert(std::isfinite(subcellSize[1]));
-
-  // Compute slope by finite differences
-  constexpr auto variablesPerPatch = (PatchSize+2*GhostLayerWidth)*(PatchSize+2*GhostLayerWidth)*numberOfData;
-  constexpr int patchBegin = GhostLayerWidth; // patchBegin cell is inside domain
-  constexpr int patchEnd = patchBegin+PatchSize; // patchEnd cell is outside domain
-  double slope[variablesPerPatch*DIMENSIONS] = {0.0};
-  auto observables = std::vector<double>((PatchSize+2*GhostLayerWidth)*(PatchSize+2*GhostLayerWidth));
-
-  const size_t numberOfIndicators = 1;
-  auto computeIndicator = [&](const double *const Q) {
-    const auto vars = ReadOnlyVariables{Q};
-    const auto pressure =
-    ns.evaluatePressure(vars.E(), vars.rho(), vars.j(), ns.getZ(Q),
-                        ns.getHeight(Q));
-    const auto temperature = ns.evaluateTemperature(vars.rho(), pressure);
-    return ns.evaluatePotentialTemperature(temperature, pressure);
-  };
-
-  // Compute indicator variables
-  for (int j = patchBegin; j < patchEnd; j++) {
-    for (int k = patchBegin; k < patchEnd; k++) {
-      observables[idx_obs(j,k)] = computeIndicator(luh + idx(j,k,0));
-    }
-  }
-
-  
-  // Compute slopes    
-  // slopex
-  for (int j = patchBegin; j < patchEnd; j++) { // y
-    for (int k = patchBegin; k < patchEnd; k++) { // x
-      const auto left = observables[idx_obs(j, k-1)];
-      const auto center = observables[idx_obs(j, k+0)];
-      const auto right = observables[idx_obs(j, k+1)];
-
-      slope[idx_slope(j, k, 0)] =
-        stableDiff(left, center, right,
-                   j,
-                   subcellSize[0],
-                   GhostLayerWidth,
-                   PatchSize);
-    }
-  }
-  // slopey
-  for (int j = patchBegin; j < patchEnd; j++) { // y
-    for (int k = patchBegin; k < patchEnd; k++) { // x
-      const auto left = observables[idx_obs(j-1, k)];
-      const auto center = observables[idx_obs(j, k)];
-      const auto right = observables[idx_obs(j+1, k)];
-
-      slope[idx_slope(j, k, 0)] =
-        stableDiff(left, center, right,
-                   k,
-                   subcellSize[1],
-                   GhostLayerWidth,
-                   PatchSize);
-
-    }
-  }
-
-  double meanReduced = -1.0;
-  double varReduced = -1.0;
-  double n = 0.0;
-
-  for (int i = patchBegin - 1; i < patchEnd; ++i) {
-    for (int j = patchBegin-1; j < patchEnd; ++j) {
-      for (int d = 0; d < DIMENSIONS; ++d) {
-        const auto curTv = slope[idx_slope(i,j,d)];
-        std::tie(meanReduced, varReduced) = mergeVariance(meanReduced,
-							  curTv,
-							  varReduced,
-							  0.0,
-							  n,
-							  1);
-        n += 1;
-      }
-    }
-  }
-
-
-
-  auto *rawGlobalObservables = globalObservables.data();
-  rawGlobalObservables[0] = meanReduced;
-  rawGlobalObservables[1] = varReduced;
-  rawGlobalObservables[2] = n;
-}
-
-void NavierStokes::NavierStokesSolver_FV::mergeGlobalObservables(
-    GlobalObservables&         globalObservables,
-    ReadOnlyGlobalObservables& otherObservables) const  {
-  NavierStokes::mergeGlobalObservables(globalObservables,otherObservables);
 }

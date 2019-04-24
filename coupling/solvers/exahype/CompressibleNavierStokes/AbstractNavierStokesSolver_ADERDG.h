@@ -57,9 +57,7 @@ class NavierStokes::AbstractNavierStokesSolver_ADERDG: public exahype::solvers::
       const int maximumMeshDepth,
       const int haloCells,
       const int regularisedFineGridLevels,
-      const exahype::solvers::Solver::TimeStepping timeStepping,
-      const int DMPObservables
-);
+      const exahype::solvers::Solver::TimeStepping timeStepping);
     
     int fusedSpaceTimePredictorVolumeIntegral(double* const lduh,double* const lQhbnd, double* lGradQhbnd, double* const lFhbnd,double* const luh,const tarch::la::Vector<DIMENSIONS,double>& cellCentre,const tarch::la::Vector<DIMENSIONS,double>& cellSize,const double t,const double dt,const bool addVolumeIntegralResultToUpdate) override;
     void addUpdateToSolution(double* const luh,const double* const luhOld,const double* const lduh,const double dt) override;
@@ -82,8 +80,6 @@ class NavierStokes::AbstractNavierStokesSolver_ADERDG: public exahype::solvers::
      */
     bool isPhysicallyAdmissible(
         const double* const                         solution,
-        const double* const                         observablesMin,
-        const double* const                         observablesMax,
         const bool                                  wasTroubledInPreviousTimeStep,
         const tarch::la::Vector<DIMENSIONS,double>& cellCentre,
         const tarch::la::Vector<DIMENSIONS,double>& cellSize,

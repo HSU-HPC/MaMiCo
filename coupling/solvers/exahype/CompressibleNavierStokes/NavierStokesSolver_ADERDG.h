@@ -46,8 +46,7 @@ class NavierStokes::NavierStokesSolver_ADERDG : public NavierStokes::AbstractNav
         const int maximumMeshDepth,
         const int haloCells,
         const int regularisedFineGridLevels,
-        const exahype::solvers::Solver::TimeStepping timeStepping,
-        const int DMPObservables);
+        const exahype::solvers::Solver::TimeStepping timeStepping);
 
     /**
      * Initialise the solver.
@@ -115,16 +114,6 @@ class NavierStokes::NavierStokesSolver_ADERDG : public NavierStokes::AbstractNav
           const int direction,
           const int orientation);
 
-  void mapDiscreteMaximumPrincipleObservables(double* observables,const double* const Q) const override;
-
-  bool isPhysicallyAdmissible(
-     const double* const solution,
-     const double* const observablesMin,const double* const observablesMax,
-     const bool wasTroubledInPreviousTimeStep,
-     const tarch::la::Vector<DIMENSIONS,double>& center,
-     const tarch::la::Vector<DIMENSIONS,double>& dx,
-     const double t) const override;
-
     /**
      * Evaluate the refinement criterion within a cell.
      *
@@ -165,16 +154,6 @@ class NavierStokes::NavierStokesSolver_ADERDG : public NavierStokes::AbstractNav
 
 /* multiplyMaterialParameterMatrix() not included, as requested in the specification file */
 
-    void resetGlobalObservables(GlobalObservables& globalObservables) const final override;
-    
-    void mapGlobalObservables(
-        GlobalObservables&                          globalObservables,
-        const double* const                         luh,
-        const tarch::la::Vector<DIMENSIONS,double>& cellSize) const final override;
-
-    void mergeGlobalObservables(
-        GlobalObservables&         globalObservables,
-        ReadOnlyGlobalObservables& otherObservables) const final override;
 };
 
 #endif // __NavierStokesSolverDG_CLASS_HEADER__

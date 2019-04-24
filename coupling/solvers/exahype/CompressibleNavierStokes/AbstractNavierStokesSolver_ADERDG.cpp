@@ -22,18 +22,14 @@ NavierStokes::NavierStokesSolver_ADERDG::NavierStokesSolver_ADERDG(
   const int maximumMeshDepth,
   const int haloCells,
   const int regularisedFineGridLevels,
-  const exahype::solvers::Solver::TimeStepping timeStepping,
-  const int DMPObservables
-)
+  const exahype::solvers::Solver::TimeStepping timeStepping)
   :
   AbstractNavierStokesSolver_ADERDG::AbstractNavierStokesSolver_ADERDG(
       maximumMeshSize,
       maximumMeshDepth,
       haloCells,
       regularisedFineGridLevels,
-      timeStepping,
-      DMPObservables
-) {
+      timeStepping) {
 }
 
 
@@ -42,23 +38,18 @@ NavierStokes::AbstractNavierStokesSolver_ADERDG::AbstractNavierStokesSolver_ADER
     const int maximumMeshDepth,
     const int haloCells,
     const int regularisedFineGridLevels,
-    const exahype::solvers::Solver::TimeStepping timeStepping,
-    const int DMPObservables
-)
+    const exahype::solvers::Solver::TimeStepping timeStepping)
   :
   exahype::solvers::ADERDGSolver(
       "NavierStokesSolver_ADERDG",
       NumberOfVariables,
       NumberOfParameters,
-      NumberOfGlobalObservables,
       Order+1,
       maximumMeshSize,
       maximumMeshDepth,
       haloCells,
       regularisedFineGridLevels,
-      timeStepping,
-      DMPObservables
-) {
+      timeStepping) {
 }
 
 void NavierStokes::AbstractNavierStokesSolver_ADERDG::constantsToString(std::ostream& os) {
@@ -227,21 +218,6 @@ void NavierStokes::AbstractNavierStokesSolver_ADERDG::multiplyMaterialParameterM
 void NavierStokes::AbstractNavierStokesSolver_ADERDG::pointSource(const double* const Q,const double* const x,const double t,const double dt, double* const forceVector,int n) {
       abortWithMsg("pointSource: If this operation is entered, you have activated the corresponding guard. Then you have to re-implement this routine, too." );
 }
-
-std::vector<double> NavierStokes::AbstractNavierStokesSolver_ADERDG::mapGlobalObservables(const double* const Q, const tarch::la::Vector<DIMENSIONS, double> &cellSize) const {
-  return {};
-}
-
-std::vector<double> NavierStokes::AbstractNavierStokesSolver_ADERDG::resetGlobalObservables() const {
-  return {};
-}
-
-void NavierStokes::AbstractNavierStokesSolver_ADERDG::reduceGlobalObservables(
-	std::vector<double>& reducedGlobalObservables,
-	const std::vector<double>& curGlobalObservables) const {
-  // NOP
-}
-
 
 
 /**
