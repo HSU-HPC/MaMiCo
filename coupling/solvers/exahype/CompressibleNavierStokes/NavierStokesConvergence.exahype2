@@ -1,0 +1,97 @@
+{
+  "project_name": "NavierStokes",
+  "paths": {
+    "peano_kernel_path": "./Peano/",
+    "exahype_path": "./ExaHyPE",
+    "output_directory": "./ApplicationExamples/CompressibleNavierStokes"
+  },
+  "computational_domain": {
+    "dimension": 2,
+    "end_time": 0.15,
+    "offset": [
+      0.0,
+      0.0
+    ],
+    "width": [
+10.0, 10.0
+    ]
+  },
+ "distributed_memory": {
+      "ranks_per_node": 10,
+      "load_balancing_strategy": "hotspot",
+      "load_balancing_type": "static",
+      "node_pool_strategy": "fair",
+      "timeout": 6000,
+      "buffer_size": 1600
+  },
+  "shared_memory": {
+    "cores": 2,
+    "background_job_consumers": 1,
+    "properties_file": "sharedmemory.properties",
+    "autotuning_strategy": "dummy"
+  },
+  "optimisation": {
+    "fuse_algorithmic_steps": true,
+    "fuse_algorithmic_steps_factor": 0.99,
+    "spawn_predictor_as_background_thread": true,
+    "spawn_amr_background_threads": false,
+    "disable_vertex_exchange_in_time_steps": true,
+    "time_step_batch_factor": 1.0,
+    "disable_metadata_exchange_in_batched_time_steps": false,
+    "double_compression": 0.0,
+    "spawn_double_compression_as_background_thread": false
+  },
+  "solvers": [
+    {
+      "type": "ADER-DG",
+      "name": "NavierStokesSolver_ADERDG",
+      "order": 2,
+      "maximum_mesh_size": 0.38,
+      "maximum_mesh_depth": 0,
+      "time_stepping": "global",
+      "aderdg_kernel": {
+        "language": "C",
+        "nonlinear": true,
+        "terms": [
+          "flux",
+          "viscous_flux",
+          "source"
+        ],
+        "space_time_predictor": {},
+        "optimised_terms": [],
+        "optimised_kernel_debugging": [],
+        "implementation": "generic"
+      },
+      "point_sources": 0,
+      "variables": [
+        {
+          "name": "rho",
+          "multiplicity": 1
+        },
+        {
+          "name": "j",
+          "multiplicity": 2
+        },
+        {
+          "name": "E",
+          "multiplicity": 1
+        }
+      ],
+      "parameters": {
+        "use-amr": false,
+        "viscosity": 0.1,
+        "scenario": "convergence"
+      },
+      "plotters": [
+        {
+          "type": "user::defined ErrorWriter",
+          "name": "ErrorWriter",
+          "time": 0.1,
+          "repeat": 0.5,
+          "output": "./results/solution",
+          "variables": 4
+        }
+      ]
+    }
+  ]
+}

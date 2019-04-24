@@ -1,0 +1,85 @@
+{
+  "project_name": "NavierStokes",
+  "paths": {
+    "peano_kernel_path": "./Peano/",
+    "exahype_path": "./ExaHyPE",
+    "output_directory": "./ApplicationExamples/CompressibleNavierStokes"
+  },
+  "computational_domain": {
+    "dimension": 2,
+    "end_time": 1.0,
+    "offset": [
+      0.0,
+      0.0
+    ],
+    "width": [
+      1.0,
+      1.0
+    ]
+  },
+ "distributed_memory": {
+      "ranks_per_node": 1,
+      "load_balancing_strategy": "greedy_naive",
+      "load_balancing_type": "dynamic",
+      "node_pool_strategy": "fair",
+      "timeout": 6000,
+      "buffer_size": 1600
+  },
+  "shared_memory": {
+    "cores": 1,
+    "properties_file": "sharedmemory.properties",
+    "autotuning_strategy": "dummy"
+  },
+  "optimisation": {
+    "fuse_algorithmic_steps": true,
+    "fuse_algorithmic_steps_factor": 0.99
+  },
+  "solvers": [
+    {
+      "type": "Finite-Volumes",
+      "patch_size": 10,
+      "name": "NavierStokesSolver_FV",
+      "maximum_mesh_size": 0.11,
+      "maximum_mesh_depth": 5,
+      "time_stepping": "global",
+      "fv_kernel": {
+        "language": "C",
+        "terms": [
+          "flux",
+          "viscous_flux",
+          "source"
+        ],
+        "implementation": "generic"
+      },
+      "point_sources": 0,
+      "variables": [
+        {
+          "name": "rho",
+          "multiplicity": 1
+        },
+        {
+          "name": "j",
+          "multiplicity": 2
+        },
+        {
+          "name": "E",
+          "multiplicity": 1
+        }
+      ],
+      "parameters": {
+        "viscosity": 0.0,
+        "scenario": "sod-shock-tube"
+      },
+      "plotters": [
+        {
+          "type": "vtu::Cartesian::Cells::ascii",
+          "name": "Plotter_FV",
+          "time": 0.0,
+          "repeat": 0.025,
+          "output": "./results/solution",
+          "variables": 5
+        }
+      ]
+    }
+  ]
+}

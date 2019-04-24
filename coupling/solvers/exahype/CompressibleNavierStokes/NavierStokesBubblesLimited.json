@@ -1,0 +1,127 @@
+{
+    "project_name": "NavierStokes",
+    "paths": {
+	"peano_kernel_path": "./Peano/",
+	"exahype_path": "./ExaHyPE",
+	"output_directory": "./ApplicationExamples/CompressibleNavierStokes" },
+    "computational_domain": {
+	"dimension": 2,
+	"end_time": 601,
+	"offset": [
+	    0.0,
+	    0.0
+	],
+	"width": [
+	    1000.0,
+	    1000.0
+	]
+    },
+    "shared_memory": {
+	"cores": 12,
+	"properties_file": "sharedmemory.properties",
+	"autotuning_strategy": "dummy"
+    },
+    "optimisation": {
+	"fuse_algorithmic_steps": "all",
+	"fuse_algorithmic_steps_rerun_factor": 0.99,
+	"spawn_predictor_as_background_thread": true,
+	"spawn_amr_background_threads": true,
+	"disable_vertex_exchange_in_time_steps": false,
+	"time_step_batch_factor": 0.0,
+	"disable_metadata_exchange_in_batched_time_steps": false,
+	"double_compression": 0.0,
+	"spawn_double_compression_as_background_thread": false
+    },
+    "solvers": [
+	{
+	    "type": "Limiting-ADER-DG",
+	    "name": "NavierStokesSolver",
+	    "order": 8,
+	    "maximum_mesh_size": 41,
+	    "maximum_mesh_depth": 0,
+	    "time_stepping": "global",
+	    "aderdg_kernel": {
+		"language": "C",
+		"nonlinear": true,
+		"terms": [
+		    "flux",
+		    "viscous_flux",
+		    "source"
+		],
+		"space_time_predictor": {},
+		"optimised_terms": [],
+		"optimised_kernel_debugging": [],
+		"implementation": "generic"
+	    },
+	    "limiter": {
+		"dmp_observables": 0,
+		"dmp_relaxation_parameter": 1e-8,
+		"dmp_difference_scaling": 1e-5,
+		"helper_layers": 1
+	    },
+	    "fv_kernel": {
+		"language": "C",
+		"slope_limiter": "mclim",
+		"scheme": "musclhancock",
+		"terms": [
+		    "flux",
+		    "viscous_flux",
+		    "source"
+		],
+		"implementation": "generic"
+	    },
+	    "point_sources": 0,
+	    "variables": [
+		{
+		    "name": "rho",
+		    "multiplicity": 1
+		},
+		{
+		    "name": "j",
+		    "multiplicity": 2
+		},
+		{
+		    "name": "E",
+		    "multiplicity": 1
+		}
+	    ],
+	    "global_observables": [
+		{
+		    "name": "gobs",
+		    "multiplicity": 3
+		}
+	    ],
+	    "parameters": {
+		"viscosity": 0.0,
+		"scenario": "two-bubbles",
+		"use-gravity": false,
+		"use-background-state": false,
+		"use-amr": false,
+		"use-tv-amr": true,
+		"use-tv-volume-correction": true,
+		"amr-indicator": "potential-temperature",
+		"amr-factor-refine": 3.5,
+		"amr-factor-erase": -0.5
+	    },
+	    "plotters": [
+		{
+		    "type": "vtu::Cartesian::vertices::limited::ascii",
+		    "name": "Plotter_Limiting",
+		    "time": 0.0,
+		    "repeat": 30,
+		    "output": "/work_fast/krenz/bubble_limited/solution",
+		    "variables": 5
+		},
+		{
+		    "type": "vtk::Cartesian::subcells::limited::ascii",
+		    "name": "Plotter_Limiting",
+		    "time": 10000.0001,
+		    "repeat": 10.0,
+		    "output": "/work_fast/krenz/bubble_limited/subcell_solution",
+		    "variables": 5
+		}
+
+	    ]
+	}
+    ]
+}
