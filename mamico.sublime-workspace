@@ -1,0 +1,1464 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Data",
+				"datastructures"
+			],
+			[
+				"_",
+				"_tws"
+			],
+			[
+				"tw",
+				"twsLoopMin"
+			],
+			[
+				"t",
+				"twsLoop"
+			],
+			[
+				"adv",
+				"advance_macro"
+			],
+			[
+				"mic",
+				"micro"
+			],
+			[
+				"ini",
+				"initAdvanceCycles"
+			],
+			[
+				"_sum",
+				"_sum_noise"
+			],
+			[
+				"com",
+				"computeSNR"
+			],
+			[
+				"S",
+				"SYNTHETIC"
+			],
+			[
+				"ANA",
+				"COUETTE_ANALYTICAL"
+			],
+			[
+				"noise",
+				"noise-sigma"
+			],
+			[
+				"analy",
+				"analytical"
+			],
+			[
+				"wall",
+				"wallOscillations"
+			],
+			[
+				"sen",
+				"sendFromMacro2MD"
+			],
+			[
+				"cs",
+				"csvEveryTimestep"
+			],
+			[
+				"two",
+				"twoWayCoupling"
+			],
+			[
+				"glob",
+				"globalCellIndices4RecvBuffer"
+			],
+			[
+				"ma",
+				"maSolverType"
+			],
+			[
+				"wallI",
+				"wallInitVelocity"
+			],
+			[
+				"num",
+				"lbNumberProcesses"
+			],
+			[
+				"mac",
+				"MacroSolverType"
+			],
+			[
+				"_tw",
+				"_twsLoopMin"
+			],
+			[
+				"_wa",
+				"_wallVelocity"
+			],
+			[
+				"_ma",
+				"_maSolverType"
+			],
+			[
+				"_w",
+				"_wallOscillations"
+			],
+			[
+				"_wall",
+				"_wallInitCycles"
+			],
+			[
+				"ex",
+				"except"
+			],
+			[
+				"time",
+				"time_total"
+			],
+			[
+				"sta",
+				"start_total"
+			],
+			[
+				"_t",
+				"_timestepCounter"
+			],
+			[
+				"xilo",
+				"xiloc"
+			],
+			[
+				"sig",
+				"signAl"
+			],
+			[
+				"end",
+				"endif"
+			],
+			[
+				"su",
+				"success"
+			],
+			[
+				"_par",
+				"_particlesInserted"
+			],
+			[
+				"_Zh",
+				"_ZhouEnergyRemoved"
+			],
+			[
+				"bound",
+				"boundaryForceController"
+			],
+			[
+				"_en",
+				"_energyInserted"
+			],
+			[
+				"is",
+				"isValid"
+			],
+			[
+				"_id",
+				"_isDefinedNoiseReduction"
+			],
+			[
+				"Nois",
+				"NoiseReductionConfiguration"
+			],
+			[
+				"_isDe",
+				"_isDefinedNoiseReduction"
+			],
+			[
+				"di",
+				"diviso"
+			],
+			[
+				"e",
+				"eight"
+			],
+			[
+				"six",
+				"sixteen"
+			],
+			[
+				"fou",
+				"fourteen"
+			],
+			[
+				"fi",
+				"fifteen"
+			],
+			[
+				"fo",
+				"fourteen"
+			],
+			[
+				"th",
+				"three"
+			],
+			[
+				"br",
+				"brematura"
+			],
+			[
+				"string",
+				"stringstream"
+			],
+			[
+				"buf",
+				"buffsize"
+			],
+			[
+				"run",
+				"runtime"
+			],
+			[
+				"_set",
+				"_set_here"
+			],
+			[
+				"de",
+				"determine_z"
+			],
+			[
+				"_dig",
+				"_diagtable_src"
+			],
+			[
+				"zero",
+				"zeroes"
+			],
+			[
+				"dia",
+				"_diagtable_src"
+			],
+			[
+				"FF",
+				"0xFFFFFFFF"
+			],
+			[
+				"aw",
+				"await_pll"
+			],
+			[
+				"us",
+				"_usage_fault"
+			],
+			[
+				"sub",
+				"subscribe"
+			],
+			[
+				"auto",
+				"autodetectBaudrate"
+			],
+			[
+				"msg",
+				"msg_t"
+			],
+			[
+				"get",
+				"getHostName"
+			],
+			[
+				"int",
+				"internal"
+			],
+			[
+				"name",
+				"namespace"
+			],
+			[
+				"typ",
+				"_types"
+			],
+			[
+				"floa",
+				"float"
+			],
+			[
+				"en",
+				"encode"
+			],
+			[
+				"pack",
+				"packBool"
+			],
+			[
+				"un",
+				"unpackBool"
+			],
+			[
+				"pr",
+				"predefinedTypes"
+			],
+			[
+				"zrp",
+				"zrpcObject"
+			],
+			[
+				"pu",
+				"push_back"
+			],
+			[
+				"L",
+				"LatticeBoltzmannConfig"
+			],
+			[
+				"st",
+				"string"
+			],
+			[
+				"flag",
+				"flag_t"
+			],
+			[
+				"topV",
+				"topVel"
+			],
+			[
+				"Out",
+				"Outlet_T"
+			],
+			[
+				"Sim",
+				"SimplePAB_T"
+			],
+			[
+				"getD",
+				"getData"
+			],
+			[
+				"mdB",
+				"mdBlockInfoId"
+			],
+			[
+				"initM",
+				"initMDBlockInfo"
+			],
+			[
+				"vtk",
+				"vtkTime"
+			],
+			[
+				"V",
+				"VTK_TIMESTEPS"
+			],
+			[
+				"std",
+				"std::cout"
+			],
+			[
+				"Set",
+				"SetupBlockForest"
+			],
+			[
+				"block",
+				"blockforest"
+			],
+			[
+				"LB",
+				"LBDomainConfig"
+			],
+			[
+				"_md",
+				"_mdLevel"
+			],
+			[
+				"getN",
+				"getNumberOfProcesses"
+			],
+			[
+				"I",
+				"IBlock"
+			],
+			[
+				"Macrosc",
+				"MacroscopicSolverInterfaceImpl"
+			],
+			[
+				"Ma",
+				"MacroscopicSolverInterfaceImpl"
+			],
+			[
+				"IB",
+				"IBlockID"
+			],
+			[
+				"domain",
+				"domain_decomposition"
+			],
+			[
+				"walber",
+				"walberla::math"
+			],
+			[
+				"uin",
+				"uint_t"
+			],
+			[
+				"cell",
+				"cellSize"
+			],
+			[
+				"dom",
+				"domainAABB"
+			],
+			[
+				"Nu",
+				"NUMBER_OF_PROCESSES"
+			],
+			[
+				"NU",
+				"NUMBER_OF_PROCESSES"
+			],
+			[
+				"massMD",
+				"massMD"
+			],
+			[
+				"Vector",
+				"Vector3"
+			],
+			[
+				"fla",
+				"flag_t"
+			],
+			[
+				"mam",
+				"mamicoLB"
+			],
+			[
+				"wlaber",
+				"walberla::uint_t"
+			],
+			[
+				"For",
+				"Force_Flag"
+			],
+			[
+				"mass",
+				"massFactor"
+			],
+			[
+				"_mdVe",
+				"_mdVelocityFieldID"
+			],
+			[
+				"MD",
+				"MDVelocityField_T"
+			],
+			[
+				"Md",
+				"MDMassField_T"
+			],
+			[
+				"Mam",
+				"MaMiCoSweep"
+			],
+			[
+				"_mdM",
+				"_mdMassFieldId"
+			],
+			[
+				"descr",
+				"descriptors_scene"
+			],
+			[
+				"cou",
+				"coupling"
+			],
+			[
+				"_pd",
+				"_pdfField"
+			],
+			[
+				"for",
+				"forceModel"
+			],
+			[
+				"real",
+				"real_t"
+			],
+			[
+				"forceF",
+				"forceFieldId"
+			],
+			[
+				"Guo",
+				"GuoField"
+			],
+			[
+				"vel",
+				"velocityRelaxationFactor"
+			],
+			[
+				"getT",
+				"getTopVelocity"
+			],
+			[
+				"T",
+				"TOPVELOCITY"
+			],
+			[
+				"getV",
+				"getVelocityRelaxationFactor"
+			],
+			[
+				"con",
+				"configuration"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "coupling/noisereduction/NLM.cpph",
+			"settings":
+			{
+				"buffer_size": 8715,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "coupling/tests/build_couette/couette.xml",
+			"settings":
+			{
+				"buffer_size": 5565,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "coupling/tests/CouetteTest.h",
+			"settings":
+			{
+				"buffer_size": 44695,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "coupling/tests/build_couette/couette_mamico.xml",
+			"settings":
+			{
+				"buffer_size": 1148,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "coupling/noisereduction/POD.cpph",
+			"settings":
+			{
+				"buffer_size": 6318,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "coupling/noisereduction/NLM.h",
+			"settings":
+			{
+				"buffer_size": 2316,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "coupling/noisereduction/NoiseReduction.h",
+			"settings":
+			{
+				"buffer_size": 2492,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "coupling/noisereduction/Datastructures.h",
+			"settings":
+			{
+				"buffer_size": 7805,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "tarch/la/Vector.h",
+			"settings":
+			{
+				"buffer_size": 2679,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 184.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"Package Control: I",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			],
+			[
+				"ssy",
+				"Set Syntax: Monicelli"
+			],
+			[
+				"scope",
+				"Scope Hunter: Toggle Instant Scoper"
+			],
+			[
+				"s",
+				"Set Syntax: Monicelli"
+			],
+			[
+				"ss",
+				"Set Syntax: Monicelli"
+			],
+			[
+				"ssyxml",
+				"Set Syntax: XML"
+			],
+			[
+				"ssjs",
+				"Set Syntax: JSON"
+			],
+			[
+				"Package Control: inst",
+				"Package Control: Install Package"
+			],
+			[
+				"xml",
+				"Set Syntax: XML"
+			],
+			[
+				"ssynasm",
+				"Set Syntax: Assembly x86 (NASM)"
+			],
+			[
+				"nasm",
+				"Set Syntax: Assembly x86 (NASM)"
+			],
+			[
+				"arm",
+				"Set Syntax: ARM Assembly"
+			],
+			[
+				"ha",
+				"Set Syntax: Haskell"
+			],
+			[
+				"h",
+				"Set Syntax: Haskell"
+			],
+			[
+				"has",
+				"Set Syntax: Haskell"
+			],
+			[
+				"ssc",
+				"Set Syntax: C++"
+			],
+			[
+				"sy",
+				"Set Syntax: Haskell"
+			],
+			[
+				"ssp",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"ct",
+				"Build: ctest"
+			],
+			[
+				"para",
+				"Build: Paraview"
+			],
+			[
+				"cte",
+				"Build: ctest"
+			],
+			[
+				"pa",
+				"Build: Paraview"
+			],
+			[
+				" cte",
+				"Build: ctest"
+			],
+			[
+				"ssy:c+",
+				"Set Syntax: C++"
+			],
+			[
+				"par",
+				"Build: Paraview"
+			],
+			[
+				"ssc+",
+				"Set Syntax: C++"
+			],
+			[
+				"ctes",
+				"Build: ctest"
+			],
+			[
+				"",
+				"Build: Paraview"
+			]
+		],
+		"width": 551.0
+	},
+	"console":
+	{
+		"height": 252.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '6f4c264a24d933ce70df5dedcf1dcaee' + 'ebe013ee18cced0ef93d5f746d80ef60'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) ",
+			"help",
+			"pwd"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+	],
+	"file_history":
+	[
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/test_nie_mamico_md.xml",
+		"/home/piet/mamico_v1.1/coupling/tests/CouetteTest.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_couette/couette.xml",
+		"/home/piet/mamico_v1.1/coupling/noisereduction/POD.cpph",
+		"/home/piet/mamico_v1.1/coupling/noisereduction/NoiseReduction.h",
+		"/home/piet/mamico_v1.1/coupling/services/MacroscopicCellService.h",
+		"/home/piet/mamico_v1.1/coupling/services/MacroscopicCellService.cpph",
+		"/home/piet/mamico_v1.1/mamico.sublime-project",
+		"/home/piet/mamico_v1.1/.gitignore",
+		"/home/piet/mamico_v1.1/tarch/la/VectorOperations.cpph",
+		"/home/piet/mamico_v1.1/coupling/tests/build_couette/buildtest.sh",
+		"/home/piet/mamico_v1.1/coupling/tests/build_couette/couette_simplemd.xml",
+		"/home/piet/mamico_v1.1/coupling/tests/build_couette/couette_mamico.xml",
+		"/home/piet/mamico_v1.1/tarch/la/Vector.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/test_nie_simplemd.xml",
+		"/home/piet/Dokumente/3d/Seifendose/UM2_seifendose_oben_Monika2.gcode",
+		"/home/piet/mamico_v1.1/coupling/datastructures/MacroscopicCells.h",
+		"/home/piet/mamico_v1.1/coupling/datastructures/MacroscopicCell.h",
+		"/media/piet/STICK/UM2_seifendose_oben_Monika2.gcode",
+		"/home/piet/Dokumente/Hofa/firmware_response.txt",
+		"/home/piet/Dokumente/Hofa/firmware.txt",
+		"/home/piet/Dokumente/Hofa/deskcnc_serial.py",
+		"/home/piet/astrobo/hw/camd_allsky.py",
+		"/home/piet/mamico_v1.1/README",
+		"/home/piet/Desktop/TODO~",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/notizen.txt",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/Scenarios/Couette.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/Scenarios/Couette.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesSolver_ADERDG.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/SetupHelper.h",
+		"/home/piet/ExaHyPE-Engine/ExaHyPE/exahype/solvers/ADERDGSolver.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/AbstractNavierStokesSolver_ADERDG.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesSolver_ADERDG.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesSolver.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesSolver_FV.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesCouette.exahype2",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesSolver_FV.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/AbstractNavierStokesSolver_ADERDG.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesDetonation.exahype2",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesBubblesBench3D.exahype2",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesConvergence.exahype2",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesFV.exahype2",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesBubbles.exahype2",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/NavierStokesBubblesBench.exahype2",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/Scenarios/ScenarioFactory.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/Scenarios/Stokes.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/Scenarios/TaylorGreen.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/CouetteSolver.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/Scenarios/Atmosphere.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/CompressibleNavierStokes/Scenarios/EntropyWave.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/EXA_COUETTE_FV.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/AbstractEXA_COUETTE_ADERDG.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/EXA_COUETTE_ADERDG.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/EXA_COUETTE_ADERDG.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/COUETTE_ADERDG.exahype",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/VtkWriter_FV.cpp",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/EXA_COUETTE_ADERDG_Variables.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/exahype/EXA_COUETTE.cpp",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/EulerADERDG/EulerADERDG.exahype",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/SWE/SWE_ADERDG.exahype",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/ExaHyPE/exahype/main.cpp",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/mamico-noisereduction/coupling/solvers/exahype/COUETTE_ADERDG.exahype",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/Shallow-Water/ShallowWater.exahype",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/EulerFV/MyEulerSolver.cpp",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/EulerFV/EulerFV.readme",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/EulerFV/EulerFV.exahype",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/EulerADERDG/LogoDurhamUniversity.h",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/SWE/SWE_ADERDG_Variables.h",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/SWE/AbstractSWE_ADERDG.cpp",
+		"/home/piet/Dokumente/HSU/ExaHyPE-Workshop-2019/IvyMUC/exahype-engine/Demonstrators/SWE/AbstractSWE_ADERDG.h",
+		"/home/piet/mamico_v1.1/coupling/noisereduction/POD.h",
+		"/home/piet/mamico_v1.1/coupling/noisereduction/NLM.h",
+		"/home/piet/mamico_v1.1/coupling/configurations/NoiseReductionConfiguration.h",
+		"/home/piet/mamico_v1.1/coupling/IndexConversion.h",
+		"/home/piet/mamico_v1.1/coupling/IndexConversion.cpph",
+		"/home/piet/mamico_v1.1/coupling/sendrecv/FromMD2MacroRecvOnly.h",
+		"/home/piet/mamico_v1.1/coupling/services/MultiMDCellService.h",
+		"/home/piet/mamico_v1.1/cluster-NieTest-versions/NieTest_percent.h",
+		"/home/piet/mamico_v1.1/coupling/services/MacroscopicCellServiceMacroOnly.h",
+		"/home/piet/mamico_v1.1/cluster-home.tar.gz",
+		"/home/piet/mamico_v1.1/cluster-NieTest-versions/NieTestMD_performance.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/NieTestMD.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/NieTestMD_AnalyticVsLB.h",
+		"/home/piet/mamico_v1.1/coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h",
+		"/home/piet/mamico_v1.1/coupling/interface/MDSolverInterface.h",
+		"/home/piet/mamico_v1.1/coupling/interface/MDSimulationFactory.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/NieTestMD_oscillating.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/NieTestMD_old.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/NieTestMD_normal.h",
+		"/home/piet/mamico_v1.1/coupling/solvers/LBCouetteSolver.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_couette/couette2.xml",
+		"/home/piet/mamico_v1.1/tarch/configuration/ParseConfiguration.h",
+		"/home/piet/mamico_v1.1/coupling/tests/NieTest.h",
+		"/home/piet/mamico_v1.1/coupling/services/MacroscopicCellTraversalWrappers.cpph",
+		"/home/piet/mamico_v1.1/simplemd/configurations/DomainConfiguration.cpp",
+		"/home/piet/mamico_v1.1/simplemd/configurations/DomainConfiguration.h",
+		"/home/piet/mamico_v1.1/coupling/configurations/MaMiCoConfiguration.cpph",
+		"/home/piet/mamico_v1.1/coupling/configurations/MaMiCoConfiguration.h",
+		"/home/piet/mamico_v1.1/coupling/configurations/MomentumInsertionConfiguration.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/buildtest.sh",
+		"/home/piet/mamico_v1.1/coupling/tests/build_couette/CheckpointSimpleMD_10000_periodic_0.checkpoint",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/couette2.xml",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/couette.xml",
+		"/home/piet/mamico_v1.1/coupling/tests/CompileTest.h",
+		"/home/piet/mamico_v1.1/simplemd/configurations/MolecularDynamicsConfiguration.h",
+		"/home/piet/mamico_v1.1/coupling/tests/main_couette.cpp",
+		"/home/piet/mamico_v1.1/coupling/tests/main_nie.cpp",
+		"/home/piet/mamico_v1.1/linuxcluster/NieTest_percent.h",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/test.xml",
+		"/home/piet/mamico_v1.1/linuxcluster/NieTestMD.h",
+		"/home/piet/mamico_v1.1/linuxcluster/NieTestMD_realMDSNR.h",
+		"/home/piet/mamico_v1.1/linuxcluster/NieTestMD_performance.h",
+		"/home/piet/Dokumente/TUM/IN/Masterarbeit/ranks.py",
+		"/home/piet/astrobo/hw/allsky.py",
+		"/home/piet/mamico_v1.1/simplemd/services/MoleculeService.cpp",
+		"/home/piet/mamico_v1.1/simplemd/MolecularDynamicsSimulation.cpp",
+		"/home/piet/Dokumente/3d/Proxxon-CNC/Bubblegum_CNC_-_Proxxon_MF70_CNC_Conversion_Kit/files/10mm-wrench.stl",
+		"/home/piet/Dokumente/TUM/IN/Masterarbeit/couette.py",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/out/OWC-Startup-Multiinstance/32-POD/test_nie.xml",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/out/OWC-Startup-Multiinstance/1-none/test_nie_simplemd.xml",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/SIMPLE_MD.out",
+		"/home/piet/mamico_v1.1/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/test_nie.xml",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/test_nie_md.xml",
+		"/home/piet/mamico_v1.1/coupling/tests/build_nie/out/OWC-Startup-Multiinstance/1-none/NieTest.h",
+		"/home/piet/astrobo/config/autofocusd.ini",
+		"/home/piet/astrobo/services/autofocusd.py",
+		"/home/piet/astrobo/config/allskyd.ini"
+	],
+	"find":
+	{
+		"height": 31.0
+	},
+	"find_in_files":
+	{
+		"height": 178.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"time",
+			"exit",
+			"index",
+			"write2CSV",
+			"allocat",
+			"noise",
+			"wrapper",
+			"ulf",
+			"filament"
+		],
+		"highlight": false,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "coupling/noisereduction/NLM.cpph",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8715,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7190,
+								7190
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 266,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2420.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "coupling/tests/build_couette/couette.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5565,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2672,
+								2672
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 667,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/XML/XML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 396.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "coupling/tests/CouetteTest.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 44695,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								21628,
+								21628
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 1893,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 9621.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "coupling/tests/build_couette/couette_mamico.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1148,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								938,
+								938
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 73,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/XML/XML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "coupling/noisereduction/POD.cpph",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6318,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5648,
+								5648
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 283,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2480.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "coupling/noisereduction/NLM.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2316,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2106,
+								2106
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 182,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "coupling/noisereduction/NoiseReduction.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2492,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 180,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 242.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "coupling/noisereduction/Datastructures.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7805,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								881,
+								881
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 466,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3894.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "tarch/la/Vector.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2679,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								791,
+								791
+							]
+						],
+						"settings":
+						{
+							"WordCount":
+							{
+								"changes": 0,
+								"count": 240,
+								"modified": false,
+								"selection": false,
+								"status": -1,
+								"syntax": "plain text"
+							},
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 462.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 31.0
+	},
+	"input":
+	{
+		"height": 62.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 237.0
+	},
+	"output.find_results":
+	{
+		"height": 327.0
+	},
+	"output.scopehunter.results":
+	{
+		"height": 156.0
+	},
+	"pinned_build_system": "Make and run",
+	"project": "mamico.sublime-project",
+	"replace":
+	{
+		"height": 58.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"mcs",
+				"trunk/coupling/services/MacroscopicCellService.cpph"
+			],
+			[
+				"sbf",
+				"walberla/src/blockforest/SetupBlockForest.cpp"
+			],
+			[
+				"block",
+				"walberla/src/blockforest/BlockForest.cpp"
+			],
+			[
+				"init",
+				"walberla/src/blockforest/Initialization.cpp"
+			],
+			[
+				"cmd",
+				"trunk/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+			],
+			[
+				"cmdy",
+				"trunk/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+			],
+			[
+				"node.",
+				"tarch/parallel/Node.h"
+			],
+			[
+				"generi",
+				"walberla/src/core/math/GenericAABB.h"
+			],
+			[
+				"mcsc",
+				"trunk/coupling/services/MacroscopicCellService.cpph"
+			],
+			[
+				"cmds",
+				"trunk/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+			],
+			[
+				"smdsi",
+				"trunk/coupling/interface/impl/MD/SimpleMDSolverInterface.h"
+			],
+			[
+				"csds",
+				"trunk/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+			],
+			[
+				"bl",
+				"walberla/src/blockforest/BlockID.h"
+			],
+			[
+				"ffsb",
+				"walberla/src/lbm/sweeps/FlagFieldSweepBase.h"
+			],
+			[
+				"force",
+				"walberla/src/lbm/lattice_model/ForceModel.h"
+			],
+			[
+				"mcc",
+				"trunk/coupling/configurations/MacroscopicCellConfiguration.h"
+			],
+			[
+				"domainc",
+				"trunk/configurations/DomainConfiguration.cpp"
+			],
+			[
+				"domcon",
+				"trunk/configurations/DomainConfiguration.h"
+			],
+			[
+				"mdc",
+				"trunk/configurations/MolecularDynamicsConfiguration.h"
+			],
+			[
+				"msis",
+				"mamico/apps/mamico/MacroscopicSolverInterfaceService.cpp"
+			],
+			[
+				"msif",
+				"mamico/apps/mamico/MacroscopicSolverInterfaceService.cpp"
+			],
+			[
+				"ince",
+				"trunk/coupling/IndexConversion.cpph"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/astrobo/src/network/astrobo.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 789.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 377.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
