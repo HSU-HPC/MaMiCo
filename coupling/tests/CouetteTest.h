@@ -344,7 +344,7 @@ private:
     }
 
     if(_cfg.computeSNR){
-      std::cout << "Output for every coupling cycle, for the first cell in recvBuffer:" << std::endl;
+      std::cout << "Output for every coupling cycle, for the cell 87 in recvBuffer:" << std::endl;
       std::cout << "cycle number (after filter-init-cycles), vel_x macroscopic solver, vel_x filter output" << std::endl;
       _sum_signal = 0;
       _sum_noise = 0;
@@ -424,13 +424,13 @@ private:
       //call noise filter on recvBuffer
       _noiseReduction->beginProcessInnerMacroscopicCells();
       for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
-        _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],i);
+        _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],_buf.globalCellIndices4RecvBuffer[i]);
       }
       _noiseReduction->endProcessInnerMacroscopicCells();
       if(_noiseReduction->_doubleTraversal){
         _noiseReduction->beginProcessInnerMacroscopicCells();
         for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
-          _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],i);
+          _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],_buf.globalCellIndices4RecvBuffer[i]);
         }
         _noiseReduction->endProcessInnerMacroscopicCells();
       }
@@ -450,6 +450,10 @@ private:
       const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
       const double mass = _cfg.density*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
       for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
+
+        // TODO use more cells
+        if (i==87){
+
         // get global cell index vector
         const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
         // determine cell midpoint
@@ -459,7 +463,7 @@ private:
         double vx_filter = (1/mass * _buf.recvBuffer[i]->getMacroscopicMomentum())[0];
         _sum_noise += (vx_macro - vx_filter) * (vx_macro - vx_filter);
         _sum_signal += vx_macro * vx_macro;
-        if (i==0){
+        
           std::cout << vx_macro << ", " << vx_filter << std::endl;
         }
       }

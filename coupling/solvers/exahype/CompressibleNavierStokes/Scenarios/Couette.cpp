@@ -60,3 +60,5 @@ NavierStokes::BoundaryType NavierStokes::Couette::getBoundaryType(
     }
     return BoundaryType::analytical;
 }
+
+// outflow boundary? PASC

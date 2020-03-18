@@ -16,8 +16,8 @@
 #include "coupling/services/MacroscopicCellService.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 
-// currently, only 3D is supported!
-#define MDSIMULATIONFACTORY_DIMENSION 3
+// hacked: "currently, only 3D is supported!"
+#define MDSIMULATIONFACTORY_DIMENSION DIMENSION
 
 #if defined(SIMPLE_MD)
 #include "coupling/solvers/CoupledMolecularDynamicsSimulation.h"

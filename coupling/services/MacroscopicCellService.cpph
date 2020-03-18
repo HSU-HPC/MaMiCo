@@ -155,7 +155,7 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);
-    runtime += (end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec);
+    runtime += (double)((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
   }
 
   // carry out send-receive steps
