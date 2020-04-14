@@ -15,11 +15,11 @@ _firstTraversal(true),
 //_flowfield(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim,unsigned int>(2)*_d, tws),
 //_patchfield(indexConversion.getLocalNumberMacroscopicCells(), tws)
 
-_flowfield(tarch::la::Vector<dim,unsigned int>(6,6,6), tws),   // TODO
-_patchfield(tarch::la::Vector<dim,unsigned int>(4,4,4), tws)
+//_flowfield(tarch::la::Vector<dim,unsigned int>(6,6,6), tws),   // TODO
+//_patchfield(tarch::la::Vector<dim,unsigned int>(4,4,4), tws)
 
-//_flowfield(tarch::la::Vector<dim,unsigned int>(6,6), tws),
-//_patchfield(tarch::la::Vector<dim,unsigned int>(4,4), tws)
+_flowfield(tarch::la::Vector<dim,unsigned int>(6,6), tws),
+_patchfield(tarch::la::Vector<dim,unsigned int>(4,4), tws)
 
 {
 
@@ -27,8 +27,8 @@ _patchfield(tarch::la::Vector<dim,unsigned int>(4,4,4), tws)
     for(unsigned int x = 0; x<6; x++)
       for(unsigned int y = 0; y<6; y++)
         for(unsigned int z = 0; z<6; z++){
-          coupling::noisereduction::Quantities<dim>& q = _flowfield(tarch::la::Vector<3,unsigned int>(x,y,z), t);
-          //coupling::noisereduction::Quantities<dim>& q = _flowfield(tarch::la::Vector<2,unsigned int>(x,y), t);
+          //coupling::noisereduction::Quantities<dim>& q = _flowfield(tarch::la::Vector<3,unsigned int>(x,y,z), t);
+          coupling::noisereduction::Quantities<dim>& q = _flowfield(tarch::la::Vector<2,unsigned int>(x,y), t);
           q[0] = 1;
           q[1] = 0;
           q[2] = 0;
@@ -90,7 +90,7 @@ void coupling::noisereduction::NLM<dim>::
 beginProcessInnerMacroscopicCells(){
 }
 
-// TODO
+// TODO 
 inline unsigned int posmod(int i, int n) {
   return (i % n + n) % n;
 }
@@ -169,7 +169,7 @@ endProcessInnerMacroscopicCells(){
             tarch::la::Vector<3,unsigned int>(3,3,3), 3, _flowfield, pos + tarch::la::Vector<3,unsigned int>(1), _t);
         }*/
   }
-  _firstTraversal = !_firstTraversal;
+  _firstTraversal = !_firstTraversal;  
 }
 
 template<unsigned int dim>
@@ -181,7 +181,7 @@ processOuterMacroscopicCell(
     // save data
     //_data[_t*_spatialSize + index]._mass = cell.getMacroscopicMass();
     //_data[_t*_spatialSize + index]._momentum = cell.getMacroscopicMomentum();
-  }
+  } 
 }
 
 template<unsigned int dim>
@@ -193,7 +193,7 @@ beginProcessOuterMacroscopicCells(){
     template<unsigned int dim>
 void coupling::noisereduction::NLM<dim>::
 endProcessOuterMacroscopicCells(){
-  /*if(_firstTraversal)
+  /*if(_firstTraversal) 
    // todo compute here _localMean and _localStandardDeviation
    // for all cells for this _t
   */
