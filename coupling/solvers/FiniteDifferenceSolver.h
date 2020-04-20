@@ -29,7 +29,7 @@ public:
 		coupling::solvers::NumericalSolver(channelheight, dx, dt, plotEveryTimestep,
       filestem, processes), _omega(dt*kinVisc/(dx*dx)), _wallVelocity(wallVelocity)
 		/*#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-    _sendBufferX(NULL), _recvBufferX(NULL), _sendBufferY(NULL), _recvBufferY(NULL), _sendBufferZ(NULL), _recvBufferZ(NULL)
+    _sendBufferX(nullptr), _recvBufferX(nullptr), _sendBufferY(nullptr), _recvBufferY(nullptr), _sendBufferZ(nullptr), _recvBufferZ(nullptr)
     #endif*/
 		{
 			// return if required
@@ -49,27 +49,28 @@ public:
       }}}
       #endif
       // check pointers
-			if ( (_vel==NULL) || (_density==NULL) || (_flag==NULL) ){
-        std::cout << "ERROR FiniteDifferenceSolver: NULL ptr!" << std::endl; exit(EXIT_FAILURE);
+			if ( (_vel==nullptr) || (_density==nullptr) || (_flag==nullptr) ){
+        std::cout << "ERROR FiniteDifferenceSolver: nullptr!" << std::endl; exit(EXIT_FAILURE);
       }
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      if ( (_sendBufferX==NULL) || (_recvBufferX==NULL) || (_sendBufferY==NULL) || (_recvBufferY==NULL) || (_sendBufferZ==NULL) || (_recvBufferZ==NULL) ){
-        std::cout << "ERROR FiniteDifferenceSolver: NULL ptr in send/recv!" << std::endl; exit(EXIT_FAILURE);
+      if ( (_sendBufferX==nullptr) || (_recvBufferX==nullptr) || (_sendBufferY==nullptr) || (_recvBufferY==nullptr) || (_sendBufferZ==nullptr) || (_recvBufferZ==nullptr) ){
+        std::cout << "ERROR FiniteDifferenceSolver: nullptr in send/recv!" << std::endl; exit(EXIT_FAILURE);
       }
       #endif
     }
 
 	~FiniteDifferenceSolver(){
-		if (_vel !=NULL){delete [] _vel; _vel=NULL;}
-		if (_density!=NULL){delete [] _density; _density=NULL;}
-		if (_flag!=NULL){delete [] _flag; _flag=NULL;}
+		if (_vel !=nullptr){delete [] _vel; _vel=nullptr;}
+		if (_density!=nullptr){delete [] _density; _density=nullptr;}
+		if (_flag!=nullptr){delete [] _flag; _flag=nullptr;}
+		if (_velold!=nullptr){delete [] _flag; _flag=nullptr;}
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-		if (_sendBufferX!=NULL){delete [] _sendBufferX; _sendBufferX=NULL;}
-		if (_sendBufferY!=NULL){delete [] _sendBufferY; _sendBufferY=NULL;}
-		if (_sendBufferZ!=NULL){delete [] _sendBufferZ; _sendBufferZ=NULL;}
-		if (_recvBufferX!=NULL){delete [] _recvBufferX; _recvBufferX=NULL;}
-		if (_recvBufferY!=NULL){delete [] _recvBufferY; _recvBufferY=NULL;}
-		if (_recvBufferZ!=NULL){delete [] _recvBufferZ; _recvBufferZ=NULL;}
+		if (_sendBufferX!=nullptr){delete [] _sendBufferX; _sendBufferX=nullptr;}
+		if (_sendBufferY!=nullptr){delete [] _sendBufferY; _sendBufferY=nullptr;}
+		if (_sendBufferZ!=nullptr){delete [] _sendBufferZ; _sendBufferZ=nullptr;}
+		if (_recvBufferX!=nullptr){delete [] _recvBufferX; _recvBufferX=nullptr;}
+		if (_recvBufferY!=nullptr){delete [] _recvBufferY; _recvBufferY=nullptr;}
+		if (_recvBufferZ!=nullptr){delete [] _recvBufferZ; _recvBufferZ=nullptr;}
 		#endif
 	}
 
@@ -80,7 +81,7 @@ public:
 			setBeyondWall();
 			stream();
 			communicate(); // exchange between neighbouring MPI subdomains
-			plot();
+			plottxt();
 			_time += _dt;
 			_counter++;}
 	}
@@ -152,13 +153,15 @@ std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " <
 private:
 	void setBeyondWall(){
 		for(int i=0; i<_yO; i++){
-			_vel[3*i] = (double)2*_wallVelocity[0] - _vel[3*(i+_yO)];
+			_vel[3*i] = 2*_wallVelocity[0] - _vel[3*(i+_yO)];
 		}
 	}
 
 	// calcuation of velocity field for next timestap
 	void stream(){
+		double* swap = _velold;
 		_velold = _vel;
+		_vel = swap;
 		for(int i=_yO; i<(_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2)-_yO; i++){ // TODO: change the implementation, there shouldn't be any if in here, rather a switch
 			if (_flag[i] == FLUID){
 				_vel[3*i] = _omega*(_velold[3*(i-_yO)]-2*_velold[3*i]+_velold[3*(i+_yO)])+_velold[3*i];
