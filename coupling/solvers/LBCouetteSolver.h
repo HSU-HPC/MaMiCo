@@ -37,7 +37,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
   public:
     LBCouetteSolver(
       const double channelheight,
-      const tarch::la::Vector<3,double> wallVelocity,
+      tarch::la::Vector<3,double> wallVelocity,
       const double kinVisc,
       const double dx,
       const double dt,
@@ -174,6 +174,28 @@ std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " <
       #endif
       return vel;
     }
+
+    double getDensity(tarch::la::Vector<3,double> pos) const override{
+      tarch::la::Vector<3,unsigned int> coords;
+      const tarch::la::Vector<3,double> domainOffset(_coords[0]*_dx*_avgDomainSizeX,_coords[1]*_dx*_avgDomainSizeY,_coords[2]*_dx*_avgDomainSizeZ);
+
+      // check pos-data for process locality (todo: put this in debug mode in future releases)
+      if (   (pos[0]<domainOffset[0]) || (pos[0]>domainOffset[0]+_domainSizeX*_dx)
+         || (pos[1]<domainOffset[1]) || (pos[1]>domainOffset[1]+_domainSizeY*_dx)
+         || (pos[2]<domainOffset[2]) || (pos[2]>domainOffset[2]+_domainSizeZ*_dx) ){
+       std::cout << "ERROR LBCouetteSolver::getDensity(): Position " << pos << " out of range!" << std::endl; exit(EXIT_FAILURE);
+      }
+      // compute index for respective cell (_dx+... for ghost cells); use coords to store local cell coordinates
+      for (unsigned int d = 0; d < 3; d++){ coords[d] = (unsigned int) ((_dx+pos[d]-domainOffset[d])/_dx);}
+      const int index = get(coords[0],coords[1],coords[2]);
+      return _density[index];
+  }
+
+
+  virtual void setWallVelocity(const tarch::la::Vector<3,double> wallVelocity) override{
+      _wallVelocity = (_dt/_dx)*wallVelocity;
+    }
+
 
   private:
     /** collide-stream algorithm */
@@ -423,7 +445,7 @@ std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " <
     }
 
     const double _omega; // relaxation frequency
-    const tarch::la::Vector<3,double> _wallVelocity; // velocity of moving wall of Couette flow
+    tarch::la::Vector<3,double> _wallVelocity; // velocity of moving wall of Couette flow
     double *_pdf1{NULL}; // field 1
     double *_pdf2{NULL}; // field 2
     const int _C[19][3]{{ 0,-1,-1}, {-1, 0,-1}, { 0, 0,-1}, { 1, 0,-1}, { 0, 1,-1},

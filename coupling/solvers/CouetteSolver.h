@@ -17,7 +17,7 @@ namespace coupling {
         virtual ~AbstractCouetteSolver(){}
         virtual void advance(double dt)=0;
         virtual tarch::la::Vector<dim,double> getVelocity(tarch::la::Vector<dim,double> pos) const = 0;
-        virtual void setWallVelocity(const tarch::la::Vector<dim,double> wallVelocity);
+        virtual void setWallVelocity(tarch::la::Vector<dim,double> wallVelocity);
     };
 
     template<unsigned int dim>

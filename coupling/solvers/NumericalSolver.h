@@ -53,7 +53,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       #endif
       // zero velocity, unit density; flags are set to FLUID
       for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++){
-        for (int d = 0; d <  3; d++){ _vel[i*3+d]  = 0.0;} // three times get(i)
+        for (int d = 0; d <  3; d++){ _vel[i*3+d]  = (double)0.0;} // three times get(i)
         _density[i] = 1.0;
         _flag[i] = FLUID;
       }
@@ -118,6 +118,10 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
     tarch::la::Vector<3,unsigned int> getNumberProcesses() const { return _processes;}
 
     tarch::la::Vector<3,unsigned int> getAvgNumberLBCells() const { tarch::la::Vector<3,unsigned int> avgCells(_avgDomainSizeX,_avgDomainSizeY,_avgDomainSizeZ); return avgCells;}
+
+    virtual double getDensity(tarch::la::Vector<3,double> pos) const = 0;
+
+    virtual void setWallVelocity(const tarch::la::Vector<3,double> wallVelocity) = 0;
 
   private:
     tarch::la::Vector<3,unsigned int> getProcessCoordinates() const{
