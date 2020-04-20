@@ -33,6 +33,8 @@ fi
 
 rm ${BUILD_PATH}/test;
 rm ${BUILD_PATH}/*.o;
+rm ${BUILD_PATH}/*.txt;
+rm ${BUILD_PATH}/*.vtk;
 
 compiler=""
 libaries=""

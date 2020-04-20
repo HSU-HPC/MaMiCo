@@ -247,7 +247,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
     }
 
     /** create vtk plot if required */
-    void plot()  {
+    void plot() const {
       // only plot output if this is the correct timestep
       if (_plotEveryTimestep==-1){ return;}
       if (_counter%_plotEveryTimestep!=0){return;}
@@ -301,6 +301,30 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       flag.str("");
       file << density.str() << std::endl;
       density.str("");
+      file << velocity.str() << std::endl;
+      velocity.str("");
+      file.close();
+    }
+
+    /** create vtk plot if required */
+    void plottxt() const {
+      // only plot output if this is the correct timestep
+      if (_plotEveryTimestep==-1){ return;}
+      if (_counter%_plotEveryTimestep!=0){return;}
+
+      std::stringstream ss; ss << "velocity_" << _counter << ".txt";
+      std::ofstream file(ss.str().c_str());
+      if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+      std::stringstream velocity;
+
+      // loop over domain (incl. boundary)
+      int y=2;
+      int x=2;
+      for (int z = 0; z < _domainSizeZ+1+1+1; z++){  //CHANGE: start index used to be one
+        const int index=get(x,y,z);
+        // write information to streams
+        velocity << _vel[3*index] << std::endl;
+      }
       file << velocity.str() << std::endl;
       velocity.str("");
       file.close();
