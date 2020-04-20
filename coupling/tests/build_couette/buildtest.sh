@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=/usr/lib/openmpi/include
-MPI_LIB_PATH=/usr/lib/openmpi/lib
+MPI_INCLUDE_PATH=/usr/lib/x86_64-linux-gnu/openmpi/include
+MPI_LIB_PATH=/usr/lib/x86_64-linux-gnu/openmpi/lib
 LIB_MPI=mpi
 
-LIB_EIGEN_PATH=/usr/local/include
+LIB_EIGEN_PATH=/usr/include/eigen3/
 
 ### home directory of MAMICO
-MAMICO_PATH=/home/piet/mamico_v1.1
+MAMICO_PATH=/home/helene/Dokumente/mamico-dev
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
@@ -54,7 +54,7 @@ else
     includes="${includes} -I${LIB_EIGEN_PATH}"
     compiler="g++"
 fi
-### 
+###
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH}
@@ -79,4 +79,3 @@ ${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} 
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_couette.o"
 
 ${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/test
-
