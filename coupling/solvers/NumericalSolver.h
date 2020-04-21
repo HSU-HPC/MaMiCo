@@ -33,11 +33,12 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       const double channelheight,
       const double dx,
       const double dt,
+      const double kinVisc,
       const int plotEveryTimestep,
       const std::string filestem,
       const tarch::la::Vector<3,unsigned int> processes) :
-    coupling::solvers::AbstractCouetteSolver<3>(),
-    _channelheight(channelheight), _dx(dx), _dt(dt), _processes(processes),
+    coupling::solvers::AbstractCouetteSolver<3>(), _channelheight(channelheight),
+    _dx(dx), _dt(dt), _kinVisc(kinVisc), _processes(processes),
     _plotEveryTimestep(plotEveryTimestep), _filestem(filestem)
     {
       _vel = new double[ 3*(_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2)];
@@ -307,7 +308,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
     }
 
     /** create vtk plot if required */
-    void plottxt() const {
+    void plottxt() {
       // only plot output if this is the correct timestep
       if (_plotEveryTimestep==-1){ return;}
       if (_counter%_plotEveryTimestep!=0){return;}
@@ -315,19 +316,42 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       std::stringstream ss; ss << "velocity_" << _counter << ".txt";
       std::ofstream file(ss.str().c_str());
       if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-      std::stringstream velocity;
+      std::stringstream velocity;//, couette;
 
       // loop over domain (incl. boundary)
       int y=2;
       int x=2;
-      for (int z = 0; z < _domainSizeZ+1+1+1; z++){  //CHANGE: start index used to be one
+      double maxError = 0.0;
+      for (int z = 1; z < _domainSizeZ+1; z++){
         const int index=get(x,y,z);
         // write information to streams
         velocity << _vel[3*index] << std::endl;
+        // couette << analyticCouette((double)(z*_dx-_dx/2)) << std::endl;
+        double actualError = fabs(_vel[3*index]-analyticCouette(((double)z)*_dx-_dx/(double)2));
+        maxError = (actualError>maxError)?actualError : maxError;
       }
       file << velocity.str() << std::endl;
       velocity.str("");
       file.close();
+
+      std::stringstream tt; tt << "error.txt";
+      std::ofstream file2(tt.str().c_str(), std::ios::app);
+      if (!file2.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << tt.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+      file2 << maxError << std::endl;
+      file2.close();
+      // std::stringstream tt; tt << "couette_"<<_counter<<".txt";
+      // std::ofstream file2(tt.str().c_str());
+      // if (!file2.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << tt.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+      // file2 << couette.str() << std::endl;
+      // file2.close();
+    }
+
+    double analyticCouette(double x){
+      double sum = 0.0;
+      for(double i=1; i<31; i++){
+        sum += 1.0/i*sin(i*M_PI*x/_channelheight)*exp(-i*i*M_PI*M_PI*_kinVisc*_time/_channelheight/_channelheight);
+      }
+      return 0.5*(1.0-x/_channelheight-2.0*sum/M_PI);
     }
 
     /** returns true, if this rank is not of relevance for the LB simulation */
@@ -345,6 +369,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
     const double _channelheight; // OH
     const double _dx; // actual mesh size
     const double _dt; // actual time step size
+    const double _kinVisc;
     tarch::la::Vector<3,unsigned int> _processes; // domain decomposition on MPI rank basis /OH
     const int _plotEveryTimestep; // number of time steps between vtk plots //OH
     const std::string _filestem; // file stem for vtk plot // OH
@@ -356,7 +381,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
     const int _avgDomainSizeZ { getAvgDomainSize(_channelheight,_dx,_processes,2) }; // "" in z-direction
     const tarch::la::Vector<3,unsigned int> _coords{getProcessCoordinates()};
     int _counter{0}; // time step counter
-    double _time{0.0};
+    double _time{_dt};
     double *_vel{NULL};  // velocity field
     double *_density{NULL}; // density
     Flag *_flag{NULL}; // flag field

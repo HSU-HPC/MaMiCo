@@ -46,7 +46,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       const tarch::la::Vector<3,unsigned int> processes,
       const unsigned int numThreads=1
     ):
-    coupling::solvers::NumericalSolver(channelheight, dx, dt, plotEveryTimestep,
+    coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep,
       filestem, processes),
     _omega(1.0/(3.0*(kinVisc*dt/(dx*dx))+0.5)),
     _wallVelocity((dt/dx)*wallVelocity)
