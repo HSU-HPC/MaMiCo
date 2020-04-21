@@ -26,8 +26,9 @@ public:
 		const std::string filestem,
 		const tarch::la::Vector<3,unsigned int> processes,
 		const unsigned int numThreads=1):
-		coupling::solvers::NumericalSolver(channelheight, dx, dt, plotEveryTimestep,
-      filestem, processes), _omega(dt*kinVisc/(dx*dx)), _wallVelocity(wallVelocity)
+		coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc,
+		plotEveryTimestep, filestem, processes), _omega(dt*kinVisc/(dx*dx)),
+		_wallVelocity(wallVelocity)
 		/*#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
     _sendBufferX(nullptr), _recvBufferX(nullptr), _sendBufferY(nullptr), _recvBufferY(nullptr), _sendBufferZ(nullptr), _recvBufferZ(nullptr)
     #endif*/
@@ -162,7 +163,7 @@ private:
 		double* swap = _velold;
 		_velold = _vel;
 		_vel = swap;
-		for(int i=_yO; i<(_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2)-_yO; i++){ // TODO: change the implementation, there shouldn't be any if in here, rather a switch
+		for(int i=_yO; i<(_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2)-_yO; i++){
 			if (_flag[i] == FLUID){
 				_vel[3*i] = _omega*(_velold[3*(i-_yO)]-2*_velold[3*i]+_velold[3*(i+_yO)])+_velold[3*i];
 			}

@@ -28,7 +28,7 @@
     
     molecules-per-direction="28 ; 28 ; 28"
     domain-size="30.0 ; 30.0 ; 30.0"
-    domain-offset="10.0 ; 10.0 ; 2.5"
+    domain-offset="12.0 ; 12.0 ; 8."
     cutoff-radius="2.5"
     linked-cell-size="2.5 ; 2.5 ; 2.5"
     k_B="1.0"
