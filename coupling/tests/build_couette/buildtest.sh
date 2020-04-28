@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=/usr/lib/openmpi/include
-MPI_LIB_PATH=/usr/lib/openmpi/lib
+MPI_INCLUDE_PATH=/usr/local/include
+MPI_LIB_PATH=/usr/local/lib/openmpi
 LIB_MPI=mpi
 
-LIB_EIGEN_PATH=/usr/local/include
+LIB_EIGEN_PATH=/usr/include/eigen3
 
 ### home directory of MAMICO
-MAMICO_PATH=/home/piet/mamico_v1.1
+MAMICO_PATH=/home/piet/repos/mamico-dev
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
@@ -43,7 +43,7 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
