@@ -23,8 +23,8 @@
     channelheight="50"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
-    wall-velocity="0.574091733 ; 0.0 ; 0.0"
-    wall-oscillations="4.775"
+    wall-velocity="0.5 ; 0.0 ; 0.0"
+    wall-oscillations="0"
   />
 
   <!-- Coupled simulation general setup parameters:
@@ -44,13 +44,13 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout.
   -->
   <coupling
-    coupling-cycles="1100"
-    two-way-coupling="no"
-    send-from-md-to-macro="no"
-    filter-init-cycles="100"
-    write-csv-every-timestep="0"
-    send-from-macro-to-md="no"
-    compute-snr="yes"
+    coupling-cycles="1000"
+    two-way-coupling="yes"
+    send-from-md-to-macro="yes"
+    filter-init-cycles="0"
+    write-csv-every-timestep="10"
+    send-from-macro-to-md="yes"
+    compute-snr="no"
   />
 
   <!-- Configuration parameters for macroscopic solver:
@@ -70,11 +70,11 @@
       to skip couette startup.
   -->
   <macroscopic-solver 
-    type="analytical"
+    type="lb"
     viscosity="2.14"
     number-of-processes="1 ; 1 ; 1"
-    plot-every-timestep="1"
-    init-advance-cycles="1000000"
+    plot-every-timestep="50"
+    init-advance-cycles="0"
   />
 
   <!-- Configuration parameters for microscopic solver:
@@ -98,12 +98,11 @@
       Should be equal to molecules-per-direction[0] / domain-size[0] * molecules-per-direction[1] / domain-size[1] * molecules-per-direction[2] / domain-size[2], unless MD checkpoint is used.
   -->
   <microscopic-solver
-    type="synthetic"
+    type="md"
     temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="1"
+    number-md-simulations="12"
     density="0.813037037"
-    noise-sigma="0.1666"
   />
 
   <!-- Optional feature: tws-loop
