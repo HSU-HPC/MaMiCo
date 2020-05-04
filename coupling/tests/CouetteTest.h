@@ -477,12 +477,12 @@ private:
   }
 
   void twoWayCoupling(int cycle){
-    if ( (_cfg.maSolverType==COUETTE_LB) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
+    if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
         _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
     }
-    if ( (_cfg.maSolverType==COUETTE_LB) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
+    if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     }
     // write data to csv-compatible file for evaluation
@@ -776,6 +776,8 @@ private:
     }
     else if(_cfg.maSolverType == COUETTE_FD){
       solver = new coupling::solvers::FiniteDifferenceSolver(_cfg.channelheight,vel,_cfg.kinVisc,dx,dt,_cfg.plotEveryTimestep,"FDCouette",_cfg.lbNumberProcesses,1);
+      std::cout <<  "Channelheight " << _cfg.channelheight << " vel " << vel << " kinVisc " << _cfg.kinVisc ;
+      std::cout << " dx " << dx << " dt " <<  dt << " Processes " << _cfg.lbNumberProcesses << std::endl;
       if (solver==NULL){
         std::cout << "ERROR CouetteTest::getCouetteSolver(): FD solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);

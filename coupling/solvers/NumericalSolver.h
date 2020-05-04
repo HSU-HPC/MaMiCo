@@ -319,8 +319,8 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       std::stringstream velocity;//, couette;
 
       // loop over domain (incl. boundary)
-      int y=2;
-      int x=2;
+      int y=8;
+      int x=8;
       double maxError = 0.0;
       for (int z = 1; z < _domainSizeZ+1; z++){
         const int index=get(x,y,z);

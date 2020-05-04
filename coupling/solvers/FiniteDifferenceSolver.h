@@ -50,7 +50,7 @@ public:
       }}}
       #endif
       // check pointers
-			if ( (_vel==nullptr) || (_density==nullptr) || (_flag==nullptr) ){
+			if ( (!_vel) || (!_density) || (!_flag) ){
         std::cout << "ERROR FiniteDifferenceSolver: nullptr!" << std::endl; exit(EXIT_FAILURE);
       }
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
@@ -61,27 +61,30 @@ public:
     }
 
 	~FiniteDifferenceSolver(){
-		if (_vel !=nullptr){delete [] _vel; _vel=nullptr;}
-		if (_density!=nullptr){delete [] _density; _density=nullptr;}
-		if (_flag!=nullptr){delete [] _flag; _flag=nullptr;}
-		if (_velold!=nullptr){delete [] _flag; _flag=nullptr;}
+		if (_vel){delete [] _vel; _vel=nullptr;}
+		if (_density){delete [] _density; _density=nullptr;}
+		if (_flag){delete [] _flag; _flag=nullptr;}
+		if (_velold){delete [] _flag; _flag=nullptr;}
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-		if (_sendBufferX!=nullptr){delete [] _sendBufferX; _sendBufferX=nullptr;}
-		if (_sendBufferY!=nullptr){delete [] _sendBufferY; _sendBufferY=nullptr;}
-		if (_sendBufferZ!=nullptr){delete [] _sendBufferZ; _sendBufferZ=nullptr;}
-		if (_recvBufferX!=nullptr){delete [] _recvBufferX; _recvBufferX=nullptr;}
-		if (_recvBufferY!=nullptr){delete [] _recvBufferY; _recvBufferY=nullptr;}
-		if (_recvBufferZ!=nullptr){delete [] _recvBufferZ; _recvBufferZ=nullptr;}
+		if (_sendBufferX){delete [] _sendBufferX; _sendBufferX=nullptr;}
+		if (_sendBufferY){delete [] _sendBufferY; _sendBufferY=nullptr;}
+		if (_sendBufferZ){delete [] _sendBufferZ; _sendBufferZ=nullptr;}
+		if (_recvBufferX){delete [] _recvBufferX; _recvBufferX=nullptr;}
+		if (_recvBufferY){delete [] _recvBufferY; _recvBufferY=nullptr;}
+		if (_recvBufferZ){delete [] _recvBufferZ; _recvBufferZ=nullptr;}
 		#endif
 	}
 
-	void advance (double dt)override{ // changed: rather override than virtual
+	void advance (double dt) override {
 		const int timesteps=floor( dt/_dt+0.5 );
 		if ( fabs(timesteps*_dt-dt)/_dt > 1.0e-8 ){std::cout << "ERROR FiniteDifferenceSolver::advance(): time steps and dt do not match!" << std::endl; exit(EXIT_FAILURE);}
 		for (int i = 0; i < timesteps; i++){
 			setBeyondWall();
 			stream();
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 			communicate(); // exchange between neighbouring MPI subdomains
+			#endif
+			plot();
 			plottxt();
 			_time += _dt;
 			_counter++;}
@@ -89,19 +92,20 @@ public:
 
 	tarch::la::Vector<3,double> getVelocity (tarch::la::Vector<3,double> pos)const override{ // same as with the function above
 		const tarch::la::Vector<3,double> domainOffset(_coords[0]*_dx*_avgDomainSizeX, _coords[1]*_dx*_avgDomainSizeY, _coords[2]*_dx*_avgDomainSizeZ);
-		// check pos-data for process locality (todo: put this in debug mode in future releases)
+		#if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
 		if (   (pos[0]<domainOffset[0]) || (pos[0]>domainOffset[0]+_domainSizeX*_dx)
 				|| (pos[1]<domainOffset[1]) || (pos[1]>domainOffset[1]+_domainSizeY*_dx)
 				|| (pos[2]<domainOffset[2]) || (pos[2]>domainOffset[2]+_domainSizeZ*_dx) ){
 			std::cout << "ERROR FiniteDifferenceSolver::getVelocity(): Position " << pos << " out of range!" << std::endl; exit(EXIT_FAILURE);
 		}
+		#endif
 		// compute index for respective cell (_dx+... for ghost cells); use coords to store local cell coordinates
 		tarch::la::Vector<3,unsigned int> coords;
 		for (unsigned int d = 0; d < 3; d++){ coords[d] = (unsigned int) ((_dx+pos[d]-domainOffset[d])/_dx);}
 		const int index = get(coords[0],coords[1],coords[2]);
 		tarch::la::Vector<3,double> vel(0.0);
-		// extract and scale velocity to "real"=MD units
-		for (int d = 0; d < 3; d++){ vel[d] = _dx/_dt*_vel[3*index+d]; }
+		// extract velocity
+		for (int d = 0; d < 3; d++){ vel[d] = _vel[3*index+d]; }
 		return vel;
 	}
 
@@ -112,13 +116,13 @@ public:
 	double getDensity(tarch::la::Vector<3,double> pos) const override{
 		tarch::la::Vector<3,unsigned int> coords;
 		const tarch::la::Vector<3,double> domainOffset(_coords[0]*_dx*_avgDomainSizeX,_coords[1]*_dx*_avgDomainSizeY,_coords[2]*_dx*_avgDomainSizeZ);
-
-		// check pos-data for process locality (todo: put this in debug mode in future releases)
+		#if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
 		if (   (pos[0]<domainOffset[0]) || (pos[0]>domainOffset[0]+_domainSizeX*_dx)
 			 || (pos[1]<domainOffset[1]) || (pos[1]>domainOffset[1]+_domainSizeY*_dx)
 			 || (pos[2]<domainOffset[2]) || (pos[2]>domainOffset[2]+_domainSizeZ*_dx) ){
 		 std::cout << "ERROR FiniteDifferenceSolver::getDensity(): Position " << pos << " out of range!" << std::endl; exit(EXIT_FAILURE);
 		}
+		#endif
 		// compute index for respective cell (_dx+... for ghost cells); use coords to store local cell coordinates
 		for (unsigned int d = 0; d < 3; d++){ coords[d] = (unsigned int) ((_dx+pos[d]-domainOffset[d])/_dx);}
 		const int index = get(coords[0],coords[1],coords[2]);
@@ -129,7 +133,10 @@ public:
 		std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,const unsigned int * const recvIndices,
 		const coupling::IndexConversion<3>& indexConversion)override{
 		if (skipRank()){return ;}
-
+		// static bool initialize = true;
+		// if(initialize){
+		//
+		// }
 		// loop over all received cells
 		const unsigned int size = (unsigned int) recvBuffer.size();
 		for (unsigned int i = 0; i < size; i++){
@@ -138,17 +145,18 @@ public:
 			globalCellCoords[0] = (globalCellCoords[0]+_offset[0]) - _coords[0]*_avgDomainSizeX;
 			globalCellCoords[1] = (globalCellCoords[1]+_offset[1]) - _coords[1]*_avgDomainSizeY;
 			globalCellCoords[2] = (globalCellCoords[2]+_offset[2]) - _coords[2]*_avgDomainSizeZ;
-std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": " << globalCellCoords << std::endl;
+			std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index ";
+			std::cout << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": " << globalCellCoords << std::endl;
 			const int index = get(globalCellCoords[0],globalCellCoords[1],globalCellCoords[2]);
 			#if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
-			if (_flag[index]!=MD_BOUNDARY){std::cout << "ERROR LBCouetteSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl; exit(EXIT_FAILURE);}
+			if (_flag[index]!=MD_BOUNDARY){std::cout << "ERROR FiniteDifferenceSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl; exit(EXIT_FAILURE);}
 			#endif
-			// set velocity value and pdfs in MD boundary cell (before streaming); the boundary velocities are interpolated between the neighbouring and this cell. This interpolation is valid for
+			// set velocity value in MD boundary cell (before streaming); the boundary velocities are interpolated between the neighbouring and this cell. This interpolation is valid for
 			// FLUID-MD_BOUNDARY neighbouring relations only.
 			// determine local velocity received from MaMiCo and convert it to LB units; store the velocity in _vel
-			tarch::la::Vector<3,double> localVel( (1.0/recvBuffer[i]->getMacroscopicMass())*(_dt/_dx)*recvBuffer[i]->getMacroscopicMomentum());
-			for (unsigned int d = 0; d<3; d++){ _vel[3*index+d] = localVel[d]; }
-			}
+			tarch::la::Vector<3,double> localVel( (1.0/recvBuffer[i]->getMacroscopicMass())*recvBuffer[i]->getMacroscopicMomentum());
+				for (unsigned int d = 0; d<3; d++){ _vel[3*index+d] = localVel[d]; }
+		}
 	}
 
 private:
@@ -179,5 +187,4 @@ private:
 	tarch::la::Vector<3,double> _wallVelocity; // velocity of moving wall of Couette flow
 	double *_velold{nullptr};
 };
-
 #endif
