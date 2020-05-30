@@ -27,6 +27,7 @@
 #include "coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h"
 #include "tarch/utils/MultiMDService.h"
 
+#include "coupling/filtering/FilterPipeline.h"
 
 namespace coupling {
   namespace services {
@@ -247,6 +248,9 @@ public coupling::services::MacroscopicCellService<dim> {
 
     /** storage for macroscopic cells in coupling tool */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim> _macroscopicCells;
+
+    /** filter pipeline, used to apply filters in sendFromMD2Macro */
+    coupling::FilterPipeline<dim, coupling::services::MacroscopicCellService<dim>> _filterPipeline;
 
     /** needed for insertion of momentum */
     coupling::MomentumInsertion<LinkedCell,dim>* _momentumInsertion;

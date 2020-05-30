@@ -1,0 +1,185 @@
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamico
+
+//Implementaions of a pipeline-like approach used for chanining and branching of filters for MacrosCopicCells.
+//@Author Felix Maurer
+
+
+//Member functions of coupling::FilterSequence
+//TODO: Change to non dummy datatype in cellVector
+template<unsigned int dim, class CellService>
+void coupling::FilterSequence<dim, CellService>::initSequence(
+    std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCellVector,
+    std::vector<int> mdCellIndices
+){
+    //Reset data vectors
+    _macroscopicCells.clear();
+    _cellIndices.clear();
+
+    //If the input of a sequence is not defined, it's assumed to be the default input i.e. MD
+    if(_input == nullptr){
+        for(auto mdCell : mdCellVector){
+            _macroscopicCells.push_back(mdCell);
+        }
+        for(auto mdCellIndex : mdCellIndices){
+            _cellIndices.push_back(mdCellIndex);
+        }
+        #ifdef DEBUG_FILTER_PIPELINE
+        std::cout << "FP: Initialized sequence named " << _name << " with data from MD." << std::endl;
+        #endif
+    }
+    else{
+        for(auto mdCell : _input->getMacroscopicCells()){
+            _macroscopicCells.push_back(mdCell);
+        }
+        for(auto mdCellIndex : _input->getCellIndices()){
+            _cellIndices.push_back(mdCellIndex);
+        }
+        #ifdef DEBUG_FILTER_PIPELINE
+        std::cout << "FP: Initialized sequence named " << _name << " with data from " << _input->getName() << std::endl;
+        #endif
+    }
+}
+
+//TODO: remove this. dummy function using artifical integers as data, not from any actual service
+template<unsigned int dim, class CellService>
+void coupling::FilterPipeline<dim, CellService>::apply(CellService* cellService){
+    
+    //initialize (arbitrary) md data
+    std::vector<coupling::datastructures::MacroscopicCell<dim>* > md_cells = cellService.getMacroscopicCells().getMacroscopicCells();
+    std::vector<unsigned int> md_indices = {/*TODO*/};
+
+    //load config
+    tinyxml2::XMLElement* perInstanceNode = _config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance");
+
+    for(coupling::FilterSequence<dim, CellService>* currSequence : _piSequences){
+        currSequence->initSequence(md_cells, md_indices);
+        tinyxml2::XMLElement* currSequenceNode = perInstanceNode->FirstChildElement(currSequence->getName());
+        tinyxml2::XMLElement* currFilterNode = currSequenceNode->FirstChildElement();
+        while(currFilterNode){
+            //Filter identifiers are hardcoded (for now at least):
+            if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0)
+            {
+                //TODO: init args from XML
+                std::vector<std::string> args = {"dummyout","csv"};
+                coupling::WriteToFile<dim> wtf(args[0], args[1]);
+                wtf.apply(currSequence->getMacroscopicCells(), currSequence->getCellIndices());
+            }
+            else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
+                //TODO
+                std::cout << "ERROR: Filter-Pipeline does not yet support POD." << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
+                //TODO
+                std::cout << "ERROR: Filter-Pipeline does not yet support NLM." << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            else {
+                std::cout << "ERROR: Filter-Pipeline does not recognize Filter called " << currFilterNode->Value() << std::endl;
+                exit(EXIT_FAILURE);
+            }              
+            currFilterNode = currFilterNode->NextSiblingElement();
+        }
+    }
+    
+}
+
+
+
+
+//Private functions of coupling::FilterPipeline:
+template<unsigned int dim, class CellService>
+bool coupling::FilterPipeline<dim, CellService>::configIsValid(tinyxml2::XMLDocument& cfgfile){
+    //Check main node 
+    tinyxml2::XMLElement* node = cfgfile.FirstChildElement("filter-pipeline");
+    if (!node){
+        std::cout << "ERROR: Could not read config for Filter-Pipeline: missing element <filter-pipeline>" << std::endl;
+        return false;
+    }
+
+    if (node->NextSiblingElement()){
+        std::cout << "ERROR: Could not read config for Filter-Pipeline: should not contain more than one root element" << std::endl;
+        return false;
+    }
+
+    //check existance of per-instance subtag
+    tinyxml2::XMLElement* perInstanceTag = node->FirstChildElement("per-instance");
+    if(!perInstanceTag){
+        std::cout << "ERROR: Could not read config for Filter-Pipeline: missing element <per-instance>" << std::endl;
+        return false;
+    }
+    //check existance of multi-instance subtag
+    if(!node->FirstChildElement("post-multi-instance")){
+            std::cout << "ERROR: Could not read config for Filter-Pipeline: missing element <post-multi-instance>" << std::endl;
+            return false;
+    }
+
+        //No checks are done to determine if any more subtags of main node exist as they do not interfer with implementation of this class.
+        //Syntax checking for sequence-subnodes can be found in their respective initializer methods.
+
+    #ifdef DEBUG_FILTER_PIPELINE
+    std::cout << "FP: Config is valid!" << std:: endl;
+    #endif
+
+    return true;
+}
+
+//TODO: merge with piInitSequences
+//Initializes name and input pointer (if input is MD, that pointer is null). Does NOT initialize any data.
+template<unsigned int dim, class CellService>
+int coupling::FilterPipeline<dim, CellService>::piInitializeSequences(tinyxml2::XMLElement* perInstanceNode){
+    
+    tinyxml2::XMLElement* currSequenceNode = perInstanceNode->FirstChildElement();
+    
+    //Check if all outputs are specified before being used by sequences
+    while(currSequenceNode){
+        FilterSequence<dim, CellService>* inputFilterSequence = nullptr;
+        const char* inputName = currSequenceNode->Attribute("input");
+
+        if(!inputName) inputName = "md";
+        bool sequenceRecognized = false;
+        for(auto seq : _piSequences){
+            if(std::strcmp(seq->getName(), inputName) == 0) {
+                inputFilterSequence = seq;
+                sequenceRecognized = true;
+                break;
+            }
+        }
+
+        //"md" is the default input and is not associated to any sequence
+        if(std::strcmp(inputName,"md") == 0) sequenceRecognized = true;
+        
+        if(!sequenceRecognized){
+            std::cout << "ERROR: Filter-Pipeline: Invalid input " << inputName << " specified for sequence named " << currSequenceNode->Value() << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        //Add sequence to vector
+        if(inputFilterSequence){
+             _piSequences.push_back(new coupling::FilterSequence<dim, CellService>(currSequenceNode->Value(), inputFilterSequence)); 
+        }
+        else {
+            _piSequences.push_back(new coupling::FilterSequence<dim, CellService>(currSequenceNode->Value()));
+        }
+        currSequenceNode = currSequenceNode->NextSiblingElement();
+    }
+
+    #ifdef DEBUG_FILTER_PIPELINE
+    std::cout << "FP: PI sequences are ok!" << std:: endl;
+    #endif
+
+    return 0;
+}
+
+
+template<unsigned int dim, class CellService>
+int coupling::FilterPipeline<dim, CellService>::miInitializeSequences(tinyxml2::XMLElement* perInstanceNode){
+    //TODO
+    #ifdef DEBUG_FILTER_PIPELINE
+    std::cout << "FP: MI sequences are ok!" << std:: endl;
+    #endif
+
+    return 0; 
+}
