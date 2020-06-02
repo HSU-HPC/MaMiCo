@@ -40,7 +40,7 @@ class coupling::WriteToFile{
 
         //TODO: Change to non dummy type.
         //The argument vector is planned to be acquired by using coup.::ds.::MacroCells::getMacroscopicCells().
-        void apply(const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& cellVector, std::vector<unsigned int> cellIndices);
+        void apply(std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector, std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector, std::vector<unsigned int> cellIndices);
 
     private:
         std::string _location;

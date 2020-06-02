@@ -63,8 +63,9 @@ void coupling::FilterPipeline<dim, CellService>::apply(CellService* cellService)
             {
                 //TODO: init args from XML
                 std::vector<std::string> args = {"dummyout","csv"};
-                coupling::WriteToFile<dim> wtf(args[0], args[1]);
-                wtf.apply(currSequence->getMacroscopicCells(), currSequence->getCellIndices());
+                coupling::WriteToFile<dim> currFilter(args[0], args[1]);
+                //TODO: Remove this once below mentioned interface class "coupling::Filter<dim>" exists.
+                currFilter.apply(currSequence->getMacroscopicCells(), currSequence->getMacroscopicCells(), currSequence->getCellIndices());
             }
             else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
                 //TODO
@@ -79,7 +80,12 @@ void coupling::FilterPipeline<dim, CellService>::apply(CellService* cellService)
             else {
                 std::cout << "ERROR: Filter-Pipeline does not recognize Filter called " << currFilterNode->Value() << std::endl;
                 exit(EXIT_FAILURE);
-            }              
+            }
+            //All available filter must define a member function with signature
+            // void apply(std::vector<coupling::datastructures::MacroscopicCell<dim> *> input_vector,std::vector<coupling::datastructures::MacroscopicCell<dim> *> output_vector, std::vector<unsigned int> cell_indices)  
+            //TODO: Create interface class "coupling::Filter<dim>", so this can work regardless of which (sub)type currFilter has:
+            //currFilter.apply(currSequence->getMacroscopicCells(), currSequence->getMacroscopicCells(), currSequence->getCellIndices());
+
             currFilterNode = currFilterNode->NextSiblingElement();
         }
     }
@@ -126,10 +132,10 @@ bool coupling::FilterPipeline<dim, CellService>::configIsValid(tinyxml2::XMLDocu
     return true;
 }
 
-//TODO: merge with piInitSequences
+//TODO: Redo most of this
 //Initializes name and input pointer (if input is MD, that pointer is null). Does NOT initialize any data.
 template<unsigned int dim, class CellService>
-int coupling::FilterPipeline<dim, CellService>::piInitializeSequences(tinyxml2::XMLElement* perInstanceNode){
+int coupling::FilterPipeline<dim, CellService>::initializeSequences(tinyxml2::XMLElement* perInstanceNode){
     
     tinyxml2::XMLElement* currSequenceNode = perInstanceNode->FirstChildElement();
     
@@ -140,13 +146,26 @@ int coupling::FilterPipeline<dim, CellService>::piInitializeSequences(tinyxml2::
 
         if(!inputName) inputName = "md";
         bool sequenceRecognized = false;
+        
+        if(typeid(CellService) == typeid(coupling::services::MacroscopicCellService<dim>)){
         for(auto seq : _piSequences){
             if(std::strcmp(seq->getName(), inputName) == 0) {
                 inputFilterSequence = seq;
                 sequenceRecognized = true;
                 break;
             }
-        }
+        }}
+        else if(typeid(CellService) == typeid(coupling::services::MultiMDCellService<dim>)){
+        for(auto seq : _piSequences){
+            if(std::strcmp(seq->getName(), inputName) == 0) {
+                inputFilterSequence = seq;
+                sequenceRecognized = true;
+                break;
+            }
+        }}
+        else {
+            std::cout << "ERROR: Filter Pipeline does not recognize service of Type: " << typeid(CellService).name();
+i       }
 
         //"md" is the default input and is not associated to any sequence
         if(std::strcmp(inputName,"md") == 0) sequenceRecognized = true;
@@ -167,19 +186,8 @@ int coupling::FilterPipeline<dim, CellService>::piInitializeSequences(tinyxml2::
     }
 
     #ifdef DEBUG_FILTER_PIPELINE
-    std::cout << "FP: PI sequences are ok!" << std:: endl;
+    std::cout << "FP: Sequences are ok!" << std:: endl;
     #endif
 
     return 0;
-}
-
-
-template<unsigned int dim, class CellService>
-int coupling::FilterPipeline<dim, CellService>::miInitializeSequences(tinyxml2::XMLElement* perInstanceNode){
-    //TODO
-    #ifdef DEBUG_FILTER_PIPELINE
-    std::cout << "FP: MI sequences are ok!" << std:: endl;
-    #endif
-
-    return 0; 
 }
