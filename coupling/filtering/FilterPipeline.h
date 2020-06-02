@@ -8,6 +8,7 @@
 #include <iostream>
 #include "tarch/tinyxml2/tinyxml2.h"
 #include "coupling/filtering/WriteToFile.h"
+#include "coupling/services/MacroscopicCellService.h"
 
 //#define DEBUG_FILTER_PIPELINE
 
@@ -95,9 +96,9 @@ class coupling::FilterPipeline{
             if (!configIsValid(_config)) exit(EXIT_FAILURE);
 
             //load sequences
-            if (piInitializeSequences(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"))) exit(EXIT_FAILURE);
+            if (initializeSequences(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"))) exit(EXIT_FAILURE);
             if (postMultiInstance){
-                if(miInitializeSequences(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"))) exit(EXIT_FAILURE);
+                if(initializeSequences(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"))) exit(EXIT_FAILURE);
             }
         }
         
@@ -119,8 +120,7 @@ class coupling::FilterPipeline{
 
     private:
        bool configIsValid(tinyxml2::XMLDocument& cfgfile);
-       int piInitializeSequences(tinyxml2::XMLElement* perInstanceNode);
-       int miInitializeSequences(tinyxml2::XMLElement* multiInstanceNode);
+       int initializeSequences(tinyxml2::XMLElement* metaNode);
        
        tinyxml2::XMLDocument _config;
 

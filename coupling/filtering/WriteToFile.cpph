@@ -10,14 +10,15 @@
 //TODO:Change from dummy int vector to actual macroscopic cells
 template<unsigned int dim>
 void coupling::WriteToFile<dim>::apply( 
-    const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& cellVector,
+    std::vector<coupling::datastructures::MacroscopicCell<dim>* >& inputCellVector,
+    std::vector<coupling::datastructures::MacroscopicCell<dim>* >& outputCellVector,
     const std::vector<unsigned int> cellIndices
 ){
     #ifdef DEBUG_WRITE_TO_FILE
     std::cout << "WTF: Now writing data to: " << _location << "." << _ftype << std::endl;
     #endif 
 
-    if(cellVector.empty() || cellIndices.empty()){
+    if(inputCellVector.empty() || cellIndices.empty()){
         std::cout << "ERROR: WriteToFile could not access macroscopic cells." << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -28,31 +29,23 @@ void coupling::WriteToFile<dim>::apply(
     _file.open(_location);
 
     _file << "Index, Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Temperature, Velocity X, Velocity Y, Velocity Z" << std::endl;
-    for(auto cell : cellVector){
+    for(auto cell : inputCellVector){
         _file 
         << cellIndices[indexCounter] << ", "
-        << cell/*cell->getMicroscopicMass()*/ << ", "
-        << cell/*cell->getMicroscopicMomentum()*/ << ", "
-        << cell/*cell->getMacroscopicMass()*/ << ", "
-        << cell/*cell->getMicroscopicMomentum()*/ << ", "
-        << cell/*cell->getPotentialEnergy()*/ << ", "
-        << cell/*cell->getTemperature()*/ << ", "
-        << cell/*cell->getCurrentVelocity()*/ << std::endl;
+        << cell->getMicroscopicMass() << ", "
+        << cell->getMicroscopicMomentum() << ", "
+        << cell->getMacroscopicMass() << ", "
+        << cell->getMicroscopicMomentum() << ", "
+        << cell->getPotentialEnergy() << ", "
+        << cell->getTemperature() << ", "
+        << cell->getCurrentVelocity() << std::endl;
 
         indexCounter++;
     }
-    _file.close();
+    _file.close(); 
     
-    /**for(auto cell : cellVector){
-        if(cellCounter == cellIndices[indexCounter]){
-            //TODO: Understand how to properly print the properties of a macroscopiccell. also use an actual output file and not cout
-            std::cout << std::endl << "New cell: ";
-            indexCounter++;
-        }
-        std::cout << cell;
-        cellCounter++;
-    }*/
-    
+    outputCellVector = inputCellVector;
+
     #ifdef DEBUG_WRITE_TO_FILE
     std::cout << std::endl << "WTF: Finished  writing data to: " << _location << "." << _ftype << std::endl;
     #endif  
