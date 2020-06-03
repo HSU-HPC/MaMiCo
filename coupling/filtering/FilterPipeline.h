@@ -27,7 +27,7 @@ namespace coupling{
     class FilterSequence;
 }
 
-template<unsigned int dim, class CellService>//template für LinkedCell?
+template<unsigned int dim, class CellService>
 class coupling::FilterSequence {
 public:
     FilterSequence(const char* name):
@@ -96,10 +96,11 @@ class coupling::FilterPipeline{
             if (!configIsValid(_config)) exit(EXIT_FAILURE);
 
             //load sequences
-            if (initializeSequences(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"))) exit(EXIT_FAILURE);
             if (postMultiInstance){
-                if(initializeSequences(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"))) exit(EXIT_FAILURE);
+                if(loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"), POST_MULTI_INSTANCE_FILTERING_YES)) exit(EXIT_FAILURE);
             }
+            else if(loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"), POST_MULTI_INSTANCE_FILTERING_NO)) exit(EXIT_FAILURE);
+            
         }
         
         ~FilterPipeline() {
@@ -120,7 +121,7 @@ class coupling::FilterPipeline{
 
     private:
        bool configIsValid(tinyxml2::XMLDocument& cfgfile);
-       int initializeSequences(tinyxml2::XMLElement* metaNode);
+       int loadSequencesFromXML(tinyxml2::XMLElement* metaNode, bool postMultiInstance);
        
        tinyxml2::XMLDocument _config;
 

@@ -53,6 +53,7 @@ void coupling::FilterPipeline<dim, CellService>::apply(CellService* cellService)
     //load config
     tinyxml2::XMLElement* perInstanceNode = _config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance");
 
+    //TODO: Add a check whether this should use pi or mi
     for(coupling::FilterSequence<dim, CellService>* currSequence : _piSequences){
         currSequence->initSequence(md_cells, md_indices);
         tinyxml2::XMLElement* currSequenceNode = perInstanceNode->FirstChildElement(currSequence->getName());
@@ -135,9 +136,10 @@ bool coupling::FilterPipeline<dim, CellService>::configIsValid(tinyxml2::XMLDocu
 //TODO: Redo most of this
 //Initializes name and input pointer (if input is MD, that pointer is null). Does NOT initialize any data.
 template<unsigned int dim, class CellService>
-int coupling::FilterPipeline<dim, CellService>::initializeSequences(tinyxml2::XMLElement* perInstanceNode){
+int coupling::FilterPipeline<dim, CellService>::loadSequencesFromXML(tinyxml2::XMLElement* node, bool postMultiInstance){
     
-    tinyxml2::XMLElement* currSequenceNode = perInstanceNode->FirstChildElement();
+    tinyxml2::XMLElement* currSequenceNode = node->FirstChildElement();
+    std::vector<coupling::FilterSequence<dim, CellService> *> knownSequences;
     
     //Check if all outputs are specified before being used by sequences
     while(currSequenceNode){
@@ -147,25 +149,14 @@ int coupling::FilterPipeline<dim, CellService>::initializeSequences(tinyxml2::XM
         if(!inputName) inputName = "md";
         bool sequenceRecognized = false;
         
-        if(typeid(CellService) == typeid(coupling::services::MacroscopicCellService<dim>)){
-        for(auto seq : _piSequences){
+        //search temp vector of known sequences
+        for(auto seq : knownSequences){
             if(std::strcmp(seq->getName(), inputName) == 0) {
                 inputFilterSequence = seq;
                 sequenceRecognized = true;
                 break;
             }
-        }}
-        else if(typeid(CellService) == typeid(coupling::services::MultiMDCellService<dim>)){
-        for(auto seq : _piSequences){
-            if(std::strcmp(seq->getName(), inputName) == 0) {
-                inputFilterSequence = seq;
-                sequenceRecognized = true;
-                break;
-            }
-        }}
-        else {
-            std::cout << "ERROR: Filter Pipeline does not recognize service of Type: " << typeid(CellService).name();
-i       }
+        }
 
         //"md" is the default input and is not associated to any sequence
         if(std::strcmp(inputName,"md") == 0) sequenceRecognized = true;
@@ -175,18 +166,26 @@ i       }
             return EXIT_FAILURE;
         }
 
-        //Add sequence to vector
-        if(inputFilterSequence){
-             _piSequences.push_back(new coupling::FilterSequence<dim, CellService>(currSequenceNode->Value(), inputFilterSequence)); 
-        }
-        else {
-            _piSequences.push_back(new coupling::FilterSequence<dim, CellService>(currSequenceNode->Value()));
-        }
+        //Add sequence to temp vector
+        if(inputFilterSequence) knownSequences.push_back(new coupling::FilterSequence<dim, CellService>(currSequenceNode->Value(), inputFilterSequence));
+        else knownSequences.push_back(new coupling::FilterSequence<dim, CellService>(currSequenceNode->Value()));
+
+        //Proceed to iterate over next element
         currSequenceNode = currSequenceNode->NextSiblingElement();
     }
 
+    if(postMultiInstance){
+        _miSequences = knownSequences;
+        std::cout << "FP: Post multi-instance sequences are ok!" << std:: endl;
+    }
+    else{
+        _piSequences = knownSequences;
+        std::cout << "FP: Per-instance sequences are ok!" << std:: endl;
+    }
+
+    
+
     #ifdef DEBUG_FILTER_PIPELINE
-    std::cout << "FP: Sequences are ok!" << std:: endl;
     #endif
 
     return 0;
