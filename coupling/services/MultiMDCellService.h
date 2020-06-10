@@ -148,6 +148,29 @@ class coupling::services::MultiMDCellService {
       return res;
     }
 
+    /** removes select MD simulation */
+    void rmMDSimulation(const unsigned int & localIndex) {
+      coupling::services::MacroscopicCellService<dim> **mCSTemp = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations-1];
+
+      unsigned int i;
+      for(i = 0;i<localIndex; ++i) {
+        mCSTemp[i] = _macroscopicCellServices[i];
+      }
+      for(i = localIndex+1;i<_totalNumberMDSimulations;++i) {
+        mCSTemp[i] = _macroscopicCellServices[i];
+      }
+
+      if(_macroscopicCellServices[localIndex]!=NULL) { 
+        delete _macroscopicCellServices[localIndex];
+        _macroscopicCellServices[localIndex] = NULL;
+      }
+
+      _macroscopicCellServices = mCSTemp;
+
+      _localNumberMDSimulations -= 1;
+      _totalNumberMDSimulations -= 1;
+    }
+    
   private:
     unsigned int computeTopologyOffset(tarch::la::Vector<dim,unsigned int> numberProcesses,unsigned int rank) const {
       // determine topology offset of this rank
@@ -162,8 +185,8 @@ class coupling::services::MultiMDCellService {
       return np;
     }
 
-    const unsigned int _localNumberMDSimulations; /** number of MD simulations run on the current rank. This can differ for different blocks, i.e. different topologyOffset values. */
-    const unsigned int _totalNumberMDSimulations; /** total number of MD simulations */
+    unsigned int _localNumberMDSimulations; /** number of MD simulations run on the current rank. This can differ for different blocks, i.e. different topologyOffset values. */
+    unsigned int _totalNumberMDSimulations; /** total number of MD simulations */
     coupling::services::MacroscopicCellService<dim> **_macroscopicCellServices; /** pointers of MacroscopicCellService type, one for each MD simulation */
     const unsigned int _topologyOffset; /** topology offset*/
     const int _tws;
