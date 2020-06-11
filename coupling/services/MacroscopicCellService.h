@@ -72,7 +72,6 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
-
     unsigned int getID() const { return _id;}
 
   protected:
@@ -250,7 +249,7 @@ public coupling::services::MacroscopicCellService<dim> {
     coupling::datastructures::MacroscopicCells<LinkedCell,dim> _macroscopicCells;
 
     /** filter pipeline, used to apply filters in sendFromMD2Macro */
-    coupling::FilterPipeline<dim, coupling::services::MacroscopicCellService<dim>> _filterPipeline;
+    coupling::FilterPipeline<dim, coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>> _filterPipeline;
 
     /** needed for insertion of momentum */
     coupling::MomentumInsertion<LinkedCell,dim>* _momentumInsertion;

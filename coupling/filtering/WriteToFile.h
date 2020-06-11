@@ -10,6 +10,7 @@
 
 #define DEBUG_WRITE_TO_FILE
 #include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/filtering/FilterInterface.h"
 
 namespace coupling {
     template<unsigned int dim>
@@ -19,7 +20,7 @@ namespace coupling {
 
 //should this implement the coupling::noisereduction::NoiseReduction interface?
 template<unsigned int dim>
-class coupling::WriteToFile{
+class coupling::WriteToFile : public coupling::FilterInterface<dim>{
     public:
         WriteToFile(std::string location, std::string ftype = "csv") : _location(location), _ftype(ftype){
             if(ftype != "csv"){
@@ -38,9 +39,10 @@ class coupling::WriteToFile{
         #endif
         }
 
-        //TODO: Change to non dummy type.
-        //The argument vector is planned to be acquired by using coup.::ds.::MacroCells::getMacroscopicCells().
-        void apply(std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector, std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector, std::vector<unsigned int> cellIndices);
+     
+	    std::vector<coupling::datastructures::MacroscopicCell<dim>*  > apply(
+				std::vector<coupling::datastructures::MacroscopicCell<dim>*  > inputCellVector,
+			   	std::vector<unsigned int> cellIndices);
 
     private:
         std::string _location;
