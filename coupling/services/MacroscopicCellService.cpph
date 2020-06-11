@@ -39,7 +39,7 @@ _macroscopicSolverInterface(macroscopicSolverInterface),
 _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
 _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID),
 _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface ),
-_filterPipeline("coupling/filtering/filter_pipeline.xml"),
+_filterPipeline(false, "filter_pipeline.xml"),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
 _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
@@ -82,8 +82,6 @@ _writeEveryMacroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMacrosc
 
   // init Usher parameters
   initIndexVectors4Usher(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell());
-
-  //init filter pipeline
 }
 
 
@@ -155,6 +153,11 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
     _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
     _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
   }
+ 
+  #ifdef DEBUG_FILTER_PIPELINE
+  std::cout << "FP: Now applying per-instance filter pipeline." /*TODO:This should work: <<"for service ID: " << _ID*/ << std::endl;
+  #endif
+  _filterPipeline.apply(this);
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);

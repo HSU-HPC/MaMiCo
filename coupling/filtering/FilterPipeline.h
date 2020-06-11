@@ -10,7 +10,7 @@
 #include "coupling/filtering/WriteToFile.h"
 #include "coupling/services/MacroscopicCellService.h"
 
-//#define DEBUG_FILTER_PIPELINE
+#define DEBUG_FILTER_PIPELINE
 
 #define POST_MULTI_INSTANCE_FILTERING_YES true
 #define POST_MULTI_INSTANCE_FILTERING_NO false
@@ -37,7 +37,7 @@ public:
         #ifdef DEBUG_FILTER_PIPELINE
         std::cout << "FP: Created new sequence named " << _name << ". It will use default (md) input." << std::endl;
         #endif
-    }
+    }//TODO:
     FilterSequence(const char* name, FilterSequence* input /*, const std::vector<coupling::datastructures::MacroscopicCell<dim>* > macroscopicCells, const unsigned int * const cellIndices*/) :
     _name(name), _input(input)/*, _macroscopicCells(macroscopicCells), _cellIndices(cellIndices)*/
     {
@@ -71,7 +71,7 @@ private:
     const char* _name;
     FilterSequence* _input;
 
-    std::vector<coupling::datastructures::MacroscopicCell<dim>> _macroscopicCells;
+    std::vector<coupling::datastructures::MacroscopicCell<dim>* > _macroscopicCells;
     std::vector<unsigned int> _cellIndices;
 
 };
@@ -81,28 +81,12 @@ private:
 template<unsigned int dim, class CellService>
 class coupling::FilterPipeline{
     public:
-        FilterPipeline(const std::string cfgpath = "filter_pipeline.xml") {
-            FilterPipeline(POST_MULTI_INSTANCE_FILTERING_NO, cfgpath);
-        }
+        FilterPipeline(const std::string cfgpath = "filter_pipeline.xml");
 
-        FilterPipeline(bool postMultiInstance, const std::string cfgpath = "filter_pipeline.xml"){
-            //check if provided file is written in proper XML
-            if(_config.LoadFile(cfgpath.c_str()) != tinyxml2::XML_NO_ERROR){
-                std::cout << "ERROR: Could not read config for Filter-Pipeline: XML syntax error." << std::endl;
-                exit(EXIT_FAILURE);
-            }
-            
-            //check for structural errors in config file
-            if (!configIsValid(_config)) exit(EXIT_FAILURE);
-
-            //load sequences
-            if (postMultiInstance){
-                if(loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"), POST_MULTI_INSTANCE_FILTERING_YES)) exit(EXIT_FAILURE);
-            }
-            else if(loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"), POST_MULTI_INSTANCE_FILTERING_NO)) exit(EXIT_FAILURE);
-            
-        }
-        
+        FilterPipeline(
+			bool postMultiInstance,
+			const std::string cfgpath = "filter_pipeline.xml");
+               
         ~FilterPipeline() {
             for(auto piSequence : _piSequences) delete piSequence;
             for(auto miSequence : _miSequences) delete miSequence;
@@ -111,7 +95,6 @@ class coupling::FilterPipeline{
             #endif
         }
 
-        //apply() is overloaded to distinct being called from a single-instance or multimd purpose
 
         void apply(CellService* cellService);
 
@@ -121,9 +104,11 @@ class coupling::FilterPipeline{
 
     private:
        bool configIsValid(tinyxml2::XMLDocument& cfgfile);
-       int loadSequencesFromXML(tinyxml2::XMLElement* metaNode, bool postMultiInstance);
+       int loadSequencesFromXML(tinyxml2::XMLElement* metaNode);
        
        tinyxml2::XMLDocument _config;
+
+	   bool _postMultiInstance;
 
        std::vector<coupling::FilterSequence<dim, CellService> *> _piSequences; 
        std::vector<coupling::FilterSequence<dim, CellService> *> _miSequences;
@@ -133,15 +118,6 @@ class coupling::FilterPipeline{
 //include implementation of header
 #include "FilterPipeline.cpph"
 
-
-#ifdef DEBUG_FILTER_PIPELINE
-//this is supposed to be a header file. for debugging purposes only.
-int main (void) {
-    coupling::FilterPipeline<3> fp = coupling::FilterPipeline<3>(POST_MULTI_INSTANCE_FILTERING_NO);
-    fp.apply();
-    return 0;
-}
-#endif
 
 
 /**

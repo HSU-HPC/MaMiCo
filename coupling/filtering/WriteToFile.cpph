@@ -7,11 +7,9 @@
  */
 
 //Member functions of WriteToFile.h:
-//TODO:Change from dummy int vector to actual macroscopic cells
 template<unsigned int dim>
-void coupling::WriteToFile<dim>::apply( 
-    std::vector<coupling::datastructures::MacroscopicCell<dim>* >& inputCellVector,
-    std::vector<coupling::datastructures::MacroscopicCell<dim>* >& outputCellVector,
+std::vector<coupling::datastructures::MacroscopicCell<dim>* > coupling::WriteToFile<dim>::apply( 
+    std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector,
     const std::vector<unsigned int> cellIndices
 ){
     #ifdef DEBUG_WRITE_TO_FILE
@@ -44,10 +42,11 @@ void coupling::WriteToFile<dim>::apply(
     }
     _file.close(); 
     
-    outputCellVector = inputCellVector;
 
     #ifdef DEBUG_WRITE_TO_FILE
     std::cout << std::endl << "WTF: Finished  writing data to: " << _location << "." << _ftype << std::endl;
-    #endif  
+    #endif
+
+	return inputCellVector;  
 }
  
