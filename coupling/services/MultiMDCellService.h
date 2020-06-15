@@ -157,7 +157,7 @@ class coupling::services::MultiMDCellService {
         mCSTemp[i] = _macroscopicCellServices[i];
       }
       for(i = localIndex+1;i<_totalNumberMDSimulations;++i) {
-        mCSTemp[i] = _macroscopicCellServices[i];
+        mCSTemp[i-1] = _macroscopicCellServices[i];
       }
 
       if(_macroscopicCellServices[localIndex]!=NULL) { 
