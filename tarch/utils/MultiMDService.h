@@ -31,7 +31,10 @@ class tarch::utils::MultiMDService {
 
     unsigned int getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const;
 
+    int getLocalNumberOfGlobalMDSimulation(unsigned int globalMDSimulation) const;
+
     unsigned int getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
+    void setLocalNumberOfMDSimulations(unsigned int i) { _thisNumberMDSimulations = i; }//TODO re-compute avg 
 
     #if (TARCH_PARALLEL==TARCH_YES)
     MPI_Comm getLocalCommunicator() const{ return _localComm;}
@@ -44,6 +47,9 @@ class tarch::utils::MultiMDService {
     #endif
     unsigned int getGlobalRank() const { return _globalRank; }
     unsigned int getGlobalSize() const { return _globalSize; }
+
+    void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
+    void setThisNumberMDSimulations(unsigned int n) { _thisNumberMDSimulations = n; }
 
   private:
     // number of processes used for a single MD simulation. Currently, the total number of MPI processes needs to

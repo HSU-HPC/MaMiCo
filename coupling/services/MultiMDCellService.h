@@ -149,27 +149,30 @@ class coupling::services::MultiMDCellService {
     }
 
     /** removes select MD simulation */
-    void rmMDSimulation(const unsigned int & localIndex) {
+    void rmMDSimulation(const int & globalIndex) {
+    
       coupling::services::MacroscopicCellService<dim> **mCSTemp = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations-1];
 
-      unsigned int i;
-      for(i = 0;i<localIndex; ++i) {
+      int i;
+      for(i = 0;i<globalIndex; ++i) {
         mCSTemp[i] = _macroscopicCellServices[i];
       }
-      for(i = localIndex+1;i<_totalNumberMDSimulations;++i) {
+      for(i = globalIndex+1;i<(int)_totalNumberMDSimulations;++i) {
         mCSTemp[i-1] = _macroscopicCellServices[i];
       }
 
-      if(_macroscopicCellServices[localIndex]!=NULL) { 
-        delete _macroscopicCellServices[localIndex];
-        _macroscopicCellServices[localIndex] = NULL;
-      }
+      auto old = _macroscopicCellServices;
+      delete old[globalIndex];
+      delete [] old;
 
       _macroscopicCellServices = mCSTemp;
-
+      
+      //TODO verfify this!
       _localNumberMDSimulations -= 1;
       _totalNumberMDSimulations -= 1;
     }
+
+    unsigned int getLocalNumberOfMDSimulations() const { return _localNumberMDSimulations; }
     
   private:
     unsigned int computeTopologyOffset(tarch::la::Vector<dim,unsigned int> numberProcesses,unsigned int rank) const {
