@@ -53,3 +53,8 @@ template<unsigned int dim>
 unsigned int tarch::utils::MultiMDService<dim>::getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const {
   return (_globalRank/_localSize)*_avgNumberMDSimulationsPerLocalComm + localMDSimulation;
 }
+
+template<unsigned int dim>
+int tarch::utils::MultiMDService<dim>::getLocalNumberOfGlobalMDSimulation(unsigned int globalMDSimulation) const {
+  return globalMDSimulation - (_globalRank/_localSize) * _avgNumberMDSimulationsPerLocalComm; 
+}

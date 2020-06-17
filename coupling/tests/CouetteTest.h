@@ -47,8 +47,28 @@ public:
   virtual void run(){
     init();
     if(_cfg.twsLoop){twsLoop();return;}
-    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++)
-      runOneCouplingCycle(cycle);
+    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
+      std::cout << "Cycle " << cycle << std::endl;
+      
+      if(_localMDInstances > 0) {
+        runOneCouplingCycle(cycle);
+      }
+
+      if(cycle == 0) {
+        std::cout << "Remove md simulation 1" << std::endl;
+
+        //_multiMDCellService->rmMDSimulation(1);
+
+        int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(1);        
+        if (iSim >= 0 && iSim < (int)_multiMDService->getLocalNumberOfMDSimulations()) {
+          _simpleMD.erase(_simpleMD.begin()+iSim);
+          _localMDInstances -= 1;
+          _multiMDService->setLocalNumberOfMDSimulations(_multiMDCellService->getLocalNumberOfMDSimulations());
+        }
+      }
+
+    }
+
     shutdown();
   }
 
