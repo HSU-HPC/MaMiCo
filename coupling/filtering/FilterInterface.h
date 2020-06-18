@@ -3,6 +3,8 @@
 // www5.in.tum.de/mamico
 
 #pragma once
+#include "coupling/IndexConversion.h"
+
 
 namespace coupling{
     template<unsigned int dim>
@@ -13,8 +15,10 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterInterface{
 	public:
-		virtual std::vector<coupling::datastructures::MacroscopicCell<dim>* > apply(
-				std::vector<coupling::datastructures::MacroscopicCell<dim>*  > inputCellVector,
-			   	std::vector<unsigned int> cellIndices) = 0;
+		virtual void apply(
+				const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector,
+				std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
+			   	const std::vector<unsigned int> cellIndices, //TODO: const unsigned int * const
+				const coupling::IndexConversion<dim>& indexConversion);
 };
 

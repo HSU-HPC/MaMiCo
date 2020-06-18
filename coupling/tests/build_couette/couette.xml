@@ -46,8 +46,8 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout.
   -->
   <coupling
-    coupling-cycles="20"
-    two-way-coupling="no"
+    coupling-cycles="5"
+    two-way-coupling="yes"
     send-from-md-to-macro="yes"
     filter-init-cycles="0"
     write-csv-every-timestep="0"
@@ -100,7 +100,7 @@
       Should be equal to molecules-per-direction[0] / domain-size[0] * molecules-per-direction[1] / domain-size[1] * molecules-per-direction[2] / domain-size[2], unless MD checkpoint is used.
   -->
   <microscopic-solver
-    type="synthetic"
+    type="md"
     temperature="1.1"
     equilibration-steps="0"
     number-md-simulations="1"
