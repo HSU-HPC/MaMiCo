@@ -157,7 +157,7 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline." /*TODO:This should work: <<"for service ID: " << _ID*/ << std::endl;
   #endif
-  _filterPipeline.apply(this);
+  _filterPipeline.apply(globalCellIndicesFromMacroscopicSolver, this); //TODO: change 'this' to reference to ic only
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);

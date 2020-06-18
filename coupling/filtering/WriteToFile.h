@@ -22,14 +22,9 @@ namespace coupling {
 template<unsigned int dim>
 class coupling::WriteToFile : public coupling::FilterInterface<dim>{
     public:
-        WriteToFile(std::string location, std::string ftype = "csv") : _location(location), _ftype(ftype){
-            if(ftype != "csv"){
-                std::cout << "ERROR: WriteToFile does not support file type: " << ftype << std::endl;
-                exit(EXIT_FAILURE);
-            }
-
+        WriteToFile(std::string location) : _location(location){
         #ifdef DEBUG_WRITE_TO_FILE
-            std::cout << "WTF: Write to file instance created. Will save to: " << _location << _ftype << std::endl;
+            std::cout << "WTF: Write to file instance created. Will save to: " << _location << std::endl;
         #endif
         }
 
@@ -40,13 +35,14 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
         }
 
      
-	    std::vector<coupling::datastructures::MacroscopicCell<dim>*  > apply(
-				std::vector<coupling::datastructures::MacroscopicCell<dim>*  > inputCellVector,
-			   	std::vector<unsigned int> cellIndices);
+	    void apply(
+				const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector,
+				std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
+			   	const std::vector<unsigned int> cellIndices,
+				const coupling::IndexConversion<dim>& indexConversion);
 
     private:
         std::string _location;
-        std::string _ftype;
         std::ofstream _file;
 };
 
