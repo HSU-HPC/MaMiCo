@@ -89,9 +89,15 @@ class coupling::services::MultiMDCellService {
 
     ~MultiMDCellService(){
       for (unsigned int i = 0; i < _totalNumberMDSimulations; i++){
-        if (_macroscopicCellServices[i]!=NULL){delete _macroscopicCellServices[i]; _macroscopicCellServices[i] = NULL; }
+        if (_macroscopicCellServices[i]!=NULL){
+          delete _macroscopicCellServices[i]; 
+          _macroscopicCellServices[i] = NULL; 
+          }
       }
-      if (_macroscopicCellServices!=NULL){ delete [] _macroscopicCellServices; _macroscopicCellServices=NULL; }
+      if (_macroscopicCellServices!=NULL){ 
+        delete [] _macroscopicCellServices; 
+        _macroscopicCellServices=NULL; 
+        }
     }
 
     /** get access to macroscopic cell services. This is required potentially by each MD simulation to incorporate cell-local thermostat, mass and momentum transfer */
@@ -149,27 +155,28 @@ class coupling::services::MultiMDCellService {
     }
 
     /** removes select MD simulation */
-    void rmMDSimulation(const int & globalIndex) {
-    
-      coupling::services::MacroscopicCellService<dim> **mCSTemp = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations-1];
+    void rmMDSimulation(const int & localIndex) {
+      auto **mcsTemp = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations];
 
-      int i;
-      for(i = 0;i<globalIndex; ++i) {
-        mCSTemp[i] = _macroscopicCellServices[i];
+      delete _macroscopicCellServices[localIndex + (_localNumberMDSimulations)*_topologyOffset/_intNumberProcesses];
+      _macroscopicCellServices[localIndex + (_localNumberMDSimulations)*_topologyOffset/_intNumberProcesses] = nullptr;
+
+      int counter=0;
+      for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
+        if(_macroscopicCellServices[i] != nullptr) {
+          mcsTemp[counter] = _macroscopicCellServices[i];
+          counter += 1;
+        }
       }
-      for(i = globalIndex+1;i<(int)_totalNumberMDSimulations;++i) {
-        mCSTemp[i-1] = _macroscopicCellServices[i];
-      }
 
-      auto old = _macroscopicCellServices;
-      delete old[globalIndex];
-      delete [] old;
+      delete [] _macroscopicCellServices;
+      _macroscopicCellServices = mcsTemp;
 
-      _macroscopicCellServices = mCSTemp;
-      
-      //TODO verfify this!
-      _localNumberMDSimulations -= 1;
       _totalNumberMDSimulations -= 1;
+      if(localIndex >= 0 && localIndex < (int)_localNumberMDSimulations) {
+        _localNumberMDSimulations -= 1;
+      }
+      
     }
 
     unsigned int getLocalNumberOfMDSimulations() const { return _localNumberMDSimulations; }
