@@ -48,27 +48,17 @@ public:
     init();
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
-      std::cout << "Cycle " << cycle << std::endl;
-      
-      if(_localMDInstances > 0) {
-        runOneCouplingCycle(cycle);
-      }
+      runOneCouplingCycle(cycle);
 
       if(cycle == 0) {
-        std::cout << "Remove md simulation 1" << std::endl;
-
-        //_multiMDCellService->rmMDSimulation(1);
-
-        int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(1);        
-        if (iSim >= 0 && iSim < (int)_multiMDService->getLocalNumberOfMDSimulations()) {
-          _simpleMD.erase(_simpleMD.begin()+iSim);
-          _localMDInstances -= 1;
-          _multiMDService->setLocalNumberOfMDSimulations(_multiMDCellService->getLocalNumberOfMDSimulations());
+        int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(1);
+        if(iSim >= 0 && iSim < (int)_localMDInstances) {
+          //_simpleMD.erase(_simpleMD.begin()+1);
+          //_mdSolverInterface.erase(_mdSolverInterface.begin()+1);
+          //_localMDInstances -= 1;
         }
       }
-
     }
-
     shutdown();
   }
 
@@ -87,7 +77,7 @@ private:
     advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
-    //if(_rank==0) {std::cout << "Finish coupling cycle " << cycle << std::endl;}
+    if(_rank==0) {std::cout << "Finish coupling cycle " << cycle << std::endl;}
   }
 
   void initMPI(){

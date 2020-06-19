@@ -26,8 +26,8 @@
   <domain-configuration
     init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
     
-    molecules-per-direction="28 ; 28 ; 28"
-    domain-size="30.0 ; 30.0 ; 30.0"
+    molecules-per-direction="14 ; 14 ; 14"
+    domain-size="15.0 ; 15.0 ; 15.0"
     domain-offset="10.0 ; 10.0 ; 2.5"
     cutoff-radius="2.5"
     linked-cell-size="2.5 ; 2.5 ; 2.5"
