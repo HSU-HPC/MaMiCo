@@ -172,7 +172,6 @@ class coupling::services::MultiMDCellService {
       delete [] _macroscopicCellServices;
       _macroscopicCellServices = mcsTemp;
 
-      _totalNumberMDSimulations -= 1;
       if(localIndex >= 0 && localIndex < (int)_localNumberMDSimulations) {
         _localNumberMDSimulations -= 1;
       }

@@ -51,11 +51,14 @@ public:
       runOneCouplingCycle(cycle);
 
       if(cycle == 0) {
+        std::cout << "disabling md instance 1" << std::endl;
         int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(1);
+        //_multiMDCellService->rmMDSimulation(iSim);
         if(iSim >= 0 && iSim < (int)_localMDInstances) {
-          //_simpleMD.erase(_simpleMD.begin()+1);
-          //_mdSolverInterface.erase(_mdSolverInterface.begin()+1);
-          //_localMDInstances -= 1;
+          std::cout << "Rank " << _rank << ": deleting local MD instance " << iSim << std::endl;
+          _simpleMD.erase(_simpleMD.begin()+iSim);
+          _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
+          _localMDInstances -= 1;
         }
       }
     }
