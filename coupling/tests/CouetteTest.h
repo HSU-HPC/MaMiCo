@@ -9,6 +9,7 @@
 #include "coupling/tests/Test.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/configuration/ParseConfiguration.h"
+#include "tarch/utils/RandomNumberService.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/LBCouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
@@ -46,22 +47,65 @@ public:
 
   virtual void run(){
     init();
+
+    auto& rng = tarch::utils::RandomNumberService::getInstance();
+    rng.init();
+
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
 
-      if(cycle == 0) {
-        std::cout << "disabling md instance 1" << std::endl;
-        int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(1);
-        //_multiMDCellService->rmMDSimulation(iSim);
-        if(iSim >= 0 && iSim < (int)_localMDInstances) {
-          std::cout << "Rank " << _rank << ": deleting local MD instance " << iSim << std::endl;
-          _simpleMD.erase(_simpleMD.begin()+iSim);
-          _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
-          _localMDInstances -= 1;
+/*if(cycle==0) {
+std::cout << "Shutting down md instance 1" << std::endl;
+      int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(1);
+          _multiMDCellService->rmMDSimulation(iSim);
+          if(iSim >= 0 && iSim < (int)_localMDInstances) {
+            _simpleMD.erase(_simpleMD.begin()+iSim);
+            _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
+            _localMDInstances -= 1;
+          }
+    }
+*/
+#if defined(SUDDEN_FAIL)
+      if(cycle == 249) {
+        for(int c=0;c<50;++c) {
+          int iMD; // Global MD index to be shut down
+          if(_rank == 0) {
+            iMD = (int)(rng.getUniformRandomNumber() * _localMDInstances);
+            std::cout << "disabling global md instance " << iMD << std::endl;
+          }
+          MPI_Bcast(&iMD, 1, MPI_INT, 0, MPI_COMM_WORLD);
+          
+          int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
+          _multiMDCellService->rmMDSimulation(iSim);
+          if(iSim >= 0 && iSim < (int)_localMDInstances) {
+            _simpleMD.erase(_simpleMD.begin()+iSim);
+            _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
+            _localMDInstances -= 1;
+          }
         }
       }
+#elif defined(SUCCESSIVE_FAIL)
+    if(cycle >= 249) {
+      int iMD; // Global MD index to be shut down
+      if(_rank == 0) {
+        iMD = (int)(rng.getUniformRandomNumber() * _localMDInstances);
+        std::cout << "disabling global md instance " << iMD << std::endl;
+      }
+      MPI_Bcast(&iMD, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      
+      int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
+      _multiMDCellService->rmMDSimulation(iSim);
+      if(iSim >= 0 && iSim < (int)_localMDInstances) {
+        _simpleMD.erase(_simpleMD.begin()+iSim);
+        _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
+        _localMDInstances -= 1;
+      }
     }
+    }
+#endif
+    }
+    rng.shutdown();
     shutdown();
   }
 
@@ -77,9 +121,11 @@ private:
 
   void runOneCouplingCycle(int cycle){
     advanceMacro(cycle);
-    advanceMicro(cycle);
+    if(_localMDInstances > 0) advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
+    // write data to csv-compatible file for evaluation
+    write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getIndexConversion(),cycle);
     if(_rank==0) {std::cout << "Finish coupling cycle " << cycle << std::endl;}
   }
 
@@ -389,11 +435,11 @@ private:
     }
 
     // extract data from couette solver and send them to MD (can take any index-conversion object)
-    fillSendBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-    if(_cfg.macro2Md){
-      _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-      //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
-    }
+      fillSendBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getIndexConversion(),_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
+      if(_cfg.macro2Md){
+        _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
+        //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
+      }
   }
 
   void advanceMicro(int cycle){
@@ -492,8 +538,7 @@ private:
     if ( (_cfg.maSolverType==COUETTE_LB) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     }
-    // write data to csv-compatible file for evaluation
-    write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle);
+    
   }
 
   void shutdown(){

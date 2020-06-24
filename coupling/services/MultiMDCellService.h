@@ -106,6 +106,7 @@ class coupling::services::MultiMDCellService {
       else{ std::cout << "ERROR MultiMDCellService::getMacroscopicCellService(localIndex): localIndex >_localNumberMDSimulations-1!" << std::endl; exit(EXIT_FAILURE);}
     }
 
+
     /** broadcasts data from macroscopic solver to all MD simulations */
     void sendFromMacro2MD(
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
@@ -117,6 +118,8 @@ class coupling::services::MultiMDCellService {
         _macroscopicCellServices[i]->sendFromMacro2MD(macroscopicCellsFromMacroscopicSolver,globalCellIndicesFromMacroscopicSolver);
       }
     }
+
+    auto& getIndexConversion() { return _macroscopicCellServices[0]->getIndexConversion(); }
 
     /** collects data from MD simulations, averages over them (only macroscopic mass/momentum is considered) and writes the result back into macroscopicCellsFromMacroscopicSolver. */
     double sendFromMD2Macro(
@@ -175,6 +178,7 @@ class coupling::services::MultiMDCellService {
       if(localIndex >= 0 && localIndex < (int)_localNumberMDSimulations) {
         _localNumberMDSimulations -= 1;
       }
+      _totalNumberMDSimulations -= 1;
       
     }
 

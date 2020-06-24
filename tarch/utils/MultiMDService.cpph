@@ -41,6 +41,8 @@ _localSize(1),_localRank(0){
   } else {
     _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
   }
+
+  
 #endif
 }
 
