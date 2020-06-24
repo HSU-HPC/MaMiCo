@@ -48,9 +48,9 @@
     two-way-coupling="no"
     send-from-md-to-macro="no"
     filter-init-cycles="100"
-    write-csv-every-timestep="10"
-    send-from-macro-to-md="no"
-    compute-snr="yes"
+    write-csv-every-timestep="1"
+    send-from-macro-to-md="yes"
+    compute-snr="no"
   />
 
   <!-- Configuration parameters for macroscopic solver:
@@ -73,8 +73,8 @@
     type="analytical"
     viscosity="2.14"
     number-of-processes="1 ; 1 ; 1"
-    plot-every-timestep="0"
-    init-advance-cycles="1000000"
+    plot-every-timestep="-1"
+    init-advance-cycles="100000"
   />
 
   <!-- Configuration parameters for microscopic solver:
@@ -101,7 +101,7 @@
     type="md"
     temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="3"
+    number-md-simulations="2"
     density="0.813037037"
     noise-sigma="0.1666"
   />
