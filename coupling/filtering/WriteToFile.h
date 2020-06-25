@@ -38,8 +38,7 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 	    void apply(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector,
 				std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
-			   	const std::vector<unsigned int> cellIndices,
-				const coupling::IndexConversion<dim>& indexConversion);
+			   	const std::vector<tarch::la::Vector<dim,unsigned int>> cellIndices);
 
     private:
         std::string _location;
@@ -48,9 +47,3 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 
 //include implementation of header
 #include "WriteToFile.cpph"
-
-
-/*
- * Fragen:
- * Z.40 Warum wird der const Vector mit pass by reference übergeben?
- */

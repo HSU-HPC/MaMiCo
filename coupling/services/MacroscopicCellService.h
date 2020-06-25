@@ -209,6 +209,12 @@ public coupling::services::MacroscopicCellService<dim> {
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
 
+	/** returns all macroscopic cells located within MD domain boundaries. */
+	std::vector<coupling::datastructures::MacroscopicCell<dim> *> getInnerMacroscopicCells() {return _innerMacroscopicCells;}
+
+	/** returns those cells' index vectors */
+	std::vector<tarch::la::Vector<dim, unsigned int>> getInnerMacroscopicCellIndices() {return _innerMacroscopicCellIndices;}
+	
   private:
     /** initialises the IndexConversion object at start up. This is the very first thing to be done in the
      *  constructor since nearly all subsequent operations depend on indexing of cells.
@@ -221,11 +227,17 @@ public coupling::services::MacroscopicCellService<dim> {
 
     /** initialises the index structures for USHER scheme */
     void initIndexVectors4Usher( tarch::la::Vector<dim,unsigned int> numberLinkedCellsPerMacroscopicCell );
+	
+	/**
+	 * initializes _innerMacroscopicCells and _innerMacroscopicCellIndices
+	 */
+	void initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells/*TODO: indices*/);
 
     /** returns the position (in space) of the lower,left corner if the first local ghost cell. Needed
      *  in distributeMass().
      */
     tarch::la::Vector<dim,double> getPositionOfFirstLocalGhostCell() const;
+	
 
 
     /** needed to determine cell range, ranks etc. */
@@ -249,7 +261,7 @@ public coupling::services::MacroscopicCellService<dim> {
     coupling::datastructures::MacroscopicCells<LinkedCell,dim> _macroscopicCells;
 
     /** filter pipeline, used to apply filters in sendFromMD2Macro */
-    coupling::FilterPipeline<dim, coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>> _filterPipeline;
+    coupling::FilterPipeline<dim> _filterPipeline;
 
     /** needed for insertion of momentum */
     coupling::MomentumInsertion<LinkedCell,dim>* _momentumInsertion;
@@ -276,6 +288,10 @@ public coupling::services::MacroscopicCellService<dim> {
     const unsigned int _writeEveryMicroscopicTimestep;
     const std::string _macroscopicFilename;
     const unsigned int _writeEveryMacroscopicTimestep;
+
+	//Inner cells managed by std::vectors. Indexing starts at the bottom left inner cell.
+	std::vector<coupling::datastructures::MacroscopicCell<dim> *> _innerMacroscopicCells;
+	std::vector<tarch::la::Vector<dim, unsigned int>> _innerMacroscopicCellIndices;
 
     /** index vectors for block-usher scheme -----------------------------------------------------*/
     // start and end coordinate for block loop over macroscopic cells (with 3 entries always!)

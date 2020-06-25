@@ -15,10 +15,10 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterInterface{
 	public:
+		virtual ~FilterInterface(){/*TODO*/};
 		virtual void apply(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector,
 				std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
-			   	const std::vector<unsigned int> cellIndices, //TODO: const unsigned int * const
-				const coupling::IndexConversion<dim>& indexConversion);
+			   	const std::vector<tarch::la::Vector<dim,unsigned int>> cellIndices) = 0;	
 };
 
