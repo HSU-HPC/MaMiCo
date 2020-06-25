@@ -11,8 +11,7 @@ template<unsigned int dim>
 void coupling::WriteToFile<dim>::apply( 
     const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& inputCellVector,
 	std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
-    const std::vector<unsigned int> cellIndices,
-	const coupling::IndexConversion<dim>& indexConversion
+    const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices
 ){	
     #ifdef DEBUG_WRITE_TO_FILE
     std::cout << "WTF: Now writing data to: " << _location << std::endl;
@@ -28,7 +27,8 @@ void coupling::WriteToFile<dim>::apply(
     int indexCounter = 0;
     _file.open(_location);
 
-    _file << "Index, Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Temperature, Velocity X, Velocity Y, Velocity Z" << std::endl;
+	for(unsigned int d = 0; d<dim; d++) _file << "Index " << d << ", ";
+    _file << "Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Temperature, Velocity X, Velocity Y, Velocity Z" << std::endl;
     for(auto cell : inputCellVector){
         _file 
         << cellIndices[indexCounter] << ", "

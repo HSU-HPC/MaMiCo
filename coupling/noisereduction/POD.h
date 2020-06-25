@@ -2,6 +2,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_POD_H_
 
 #include "coupling/noisereduction/NoiseReduction.h"
+#include "coupling/filtering/FilterInterface.h"
 #define EIGEN_NO_DEBUG
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
@@ -19,7 +20,8 @@ namespace coupling {
  */
 template<unsigned int dim>
 class coupling::noisereduction::POD:
-public coupling::noisereduction::NoiseReduction<dim> {
+public coupling::noisereduction::NoiseReduction<dim>, //TODO: is this now deprecated?
+public coupling::FilterInterface<dim>{
   public:
     POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService, int tws, int kmax);
     virtual ~POD();
@@ -30,6 +32,11 @@ public coupling::noisereduction::NoiseReduction<dim> {
     );
     virtual void beginProcessInnerMacroscopicCells();
     virtual void endProcessInnerMacroscopicCells();
+	
+	void apply(
+		const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector,
+		std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
+		const std::vector<tarch::la::Vector<dim,unsigned int>> cellIndices);
   private:
   	/** returns the local number of macroscopic cells EXCL. ghost layers */
     unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const;
