@@ -10,3 +10,11 @@ coupling/tests/build_nie/test
 coupling/tests/build_nie/out/
 coupling/tests/build_couette/test
 stuff/
+.idea/.gitignore
+.idea/.name
+.idea/mamico-dev.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.vscode/c_cpp_properties.json
+.vscode/settings.json
