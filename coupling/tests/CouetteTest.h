@@ -55,17 +55,6 @@ public:
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
 
-/*if(cycle==0) {
-std::cout << "Shutting down md instance 1" << std::endl;
-      int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(1);
-          _multiMDCellService->rmMDSimulation(iSim);
-          if(iSim >= 0 && iSim < (int)_localMDInstances) {
-            _simpleMD.erase(_simpleMD.begin()+iSim);
-            _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
-            _localMDInstances -= 1;
-          }
-    }
-*/
 #if defined(SUDDEN_FAIL)
       if(cycle == 249) {
         for(int c=0;c<50;++c) {
@@ -79,7 +68,9 @@ std::cout << "Shutting down md instance 1" << std::endl;
           int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
           _multiMDCellService->rmMDSimulation(iSim);
           if(iSim >= 0 && iSim < (int)_localMDInstances) {
+            _simpleMD[iSim].shutdown();
             _simpleMD.erase(_simpleMD.begin()+iSim);
+            delete _mdSolverInterface[iSim];
             _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
             _localMDInstances -= 1;
           }
@@ -435,11 +426,12 @@ private:
     }
 
     // extract data from couette solver and send them to MD (can take any index-conversion object)
-      fillSendBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getIndexConversion(),_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-      if(_cfg.macro2Md){
-        _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-        //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
-      }
+    fillSendBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getIndexConversion(),_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
+    if(_cfg.macro2Md){
+      _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
+      //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
+    }
+    
   }
 
   void advanceMicro(int cycle){

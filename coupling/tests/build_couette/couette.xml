@@ -23,8 +23,7 @@
     channelheight="50"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
-    wall-velocity="0.574091733 ; 0.0 ; 0.0"
-    wall-oscillations="4.775"
+    wall-velocity="1.5 ; 0.0 ; 0.0"
   />
 
   <!-- Coupled simulation general setup parameters:
@@ -46,7 +45,7 @@
   <coupling
     coupling-cycles="12"
     two-way-coupling="no"
-    send-from-md-to-macro="no"
+    send-from-md-to-macro="yes"
     filter-init-cycles="100"
     write-csv-every-timestep="1"
     send-from-macro-to-md="yes"
@@ -71,7 +70,7 @@
   -->
   <macroscopic-solver 
     type="analytical"
-    viscosity="2.14"
+    viscosity="2.64"
     number-of-processes="1 ; 1 ; 1"
     plot-every-timestep="-1"
     init-advance-cycles="100000"
@@ -101,7 +100,7 @@
     type="md"
     temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="2"
+    number-md-simulations="3"
     density="0.813037037"
     noise-sigma="0.1666"
   />
