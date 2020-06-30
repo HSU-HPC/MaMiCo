@@ -9,10 +9,26 @@ template<unsigned int dim>
 int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){
 	if(!sequenceNode) return EXIT_FAILURE;
     tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
+	
+	tarch::la::Vector<dim, double> domainStart;
+	tarch::la::Vector<dim, double> domainEnd;
+	tarch::la::Vector<dim, unsigned int> domainStartCell;
+	tarch::la::Vector<dim, unsigned int> domainEndCell;
+
     while(currFilterNode){
 		#ifdef DEBUG_FILTER_PIPELINE
 		std::cout << "FP: Initializing filter objects of sequence " << _name << ": ";
 		#endif
+		
+		//TODO: implement tarch::configuration::readVectorOptional<...>(...), which returns nullptr if attribute doesnot exist
+		tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currFilterNode, "domain-start");
+		tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currFilterNode, "domain-end");
+
+		//TODO: check if not null
+		for(unsigned int d = 0; d < dim; d++){
+			domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
+			domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
+		}
 
         //Filter identifiers are hardcoded (for now at least):
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0)
@@ -21,7 +37,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			std::cout << "Write-To-File" << std::endl;
 			#endif
 
-            _filters.push_back(new coupling::WriteToFile<dim>(currFilterNode->Attribute("location")));
+            _filters.push_back(new coupling::WriteToFile<dim>(domainStartCell, domainEndCell, currFilterNode->Attribute("location")));
         }
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
        		//TODO
@@ -60,6 +76,7 @@ void coupling::FilterSequence<dim>::fillSequenceData(
         for(auto mdCellIndex : mdCellIndices){
             _cellIndices.push_back(mdCellIndex);
         }
+
         #ifdef DEBUG_FILTER_PIPELINE
         std::cout << "FP: Supplied sequence named " << _name << " with cell data from MD." << std::endl;
         #endif
@@ -71,8 +88,12 @@ void coupling::FilterSequence<dim>::fillSequenceData(
         for(auto mdCellIndex : _input->getCellIndices()){
             _cellIndices.push_back(mdCellIndex);
         }
+		
         #ifdef DEBUG_FILTER_PIPELINE
         std::cout << "FP: Supplied sequence named " << _name << " with cell data from " << _input->getName() << std::endl;
         #endif
     }
+
+	for(auto filter : _filters)
+		if(!(filter->isInitialized())) filter->initDomain(_macroscopicCells, _cellIndices);
 }

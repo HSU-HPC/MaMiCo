@@ -3,7 +3,6 @@
 // www5.in.tum.de/mamico
 
 #pragma once
-#include "coupling/IndexConversion.h"
 
 
 namespace coupling{
@@ -15,31 +14,76 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterInterface{
 	public:
-		virtual ~FilterInterface(){/*TODO*/};
 
-		//Applies the filter to all parts of outputCellVector() that are within the filter's domain.
-		virtual void apply(
-				const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector, //TODO: remove this?
-				std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
-			   	const std::vector<tarch::la::Vector<dim,unsigned int>> cellIndices) = 0;
+		//Use this in case your filter uses the entire input domain
+		//TODO: Problem: The hosting FilterSequence() does not know its cell vector (inputCellVector) or its size during initialization
+		/*FilterInterface(
+				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
+				const std::vector<tarch::la::Vector<dim, unsigned int>> inputCellIndices): //covers the entire MD domain
+				_domainCells(inputCellVector),
+				_domainCellIndices(inputCellIndices)//,
+				_domainStart(inputCellIndices[0]),
+				_domainEnd(inputCellIndices.back()),
+				_domainSize(_domainEnd - _domainStart)
+		{}*/
 
-		//Converts indices, initializes domain_* member variables. If a filter always uses the entire MD domain, you do not need to implement this.
-		//Called from coupling::FilterSequence<dim>::fillSequenceData(...)
-		//virtual void initDomain();
+		//Use this in case your filter uses a subdomain of the input domain
+		FilterInterface(
+				tarch::la::Vector<dim, unsigned int> domainStart, //unit: number of macroscopic cells
+				tarch::la::Vector<dim, unsigned int> domainEnd):
+				_domainStart(domainStart),
+				_domainEnd(domainEnd),
+				_domainSize(_domainEnd - _domainStart)
+		{}
 
-		//Wecause we don't want to call initDomain() each time coupling::FilterSequence<dim>::fillSequenceData(...) is called,
-		//we need an option to check if it's been loaded before.
-		bool isDomainLoaded() { return _domainLoaded;}
-	private:
+		virtual ~FilterInterface(){};
+
+		//Initializes domain vectors. "inputCellVector/-Indices" must cover the entire MD domain.
+		void initDomain(
+					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
+					const std::vector<tarch::la::Vector<dim, unsigned int>> inputCellIndices
+		){
+			if(inputCellVector.size() != inputCellIndices.size()){
+				std::cout << "Filter-Pipeline: Cell and index vector out of synch. Aborting.";
+				exit(EXIT_FAILURE);
+			}
+			
+			for(unsigned int d = 0; d < dim; d++) if(inputCellIndices.back()[d] < _domainEnd[d]){
+				std::cout << "Filter-Pipeline: Filter domain size larger than MD domain. Aborting." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+			bool outOfBounds;
+			for(unsigned int index = 0; index < inputCellVector.size(); index++){
+				outOfBounds = false;
+				for(unsigned int d = 0; d < dim; d++) 
+					//"index" does not reference the dim-dimensional indices stored in e.g. inputCellIndices but the inputCells' linear index.
+					if(inputCellIndices[index][d] < _domainStart[d] || inputCellIndices[index][d] > _domainEnd[d]) outOfBounds = true;
+				if(!outOfBounds){
+					_domainCells.push_back(inputCellVector[index]);
+					_domainCellIndices.push_back(inputCellIndices[index]);
+				}
+			}//index			
+		}
+
+		//Applies the filter to all cells that are within the filter's domain.
+		virtual void apply() = 0;
+
+		//TODO: As soon as loadSequenceData() is only called once (and not during FilterPipeline::apply()), we can move this boolean to FilterSequence
+		//Checks if the "initDomain(...)" function has been called before and thus can be skipped
+		bool isInitialized() { return _isInitialized; }
+
+	protected:
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCells; //use these as input cells for filtering
+		std::vector<tarch::la::Vector<dim,unsigned int>> _domainCellIndices;
+
+
 		//filter domain is determined by spanning a <dim>-dimensional space between two vectors.
 		//initiliazed within the filter's constructor, uses XML attributes of the corresponding filter node as input
 		tarch::la::Vector<dim, unsigned int> _domainStart;
 		tarch::la::Vector<dim, unsigned int> _domainEnd;
+		tarch::la::Vector<dim, unsigned int> _domainSize;
 
-		
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCells;
-		std::vector<tarch::la::Vector<dim,unsigned int>> _domainCellIndices;
-
-		bool _domainLoaded;
+	private:
+		bool _isInitialized;
 };
-

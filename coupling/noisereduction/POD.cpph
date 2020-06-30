@@ -148,18 +148,13 @@ endProcessInnerMacroscopicCells(){
 }
 
 //TODO
-template<unsigned int dim>
+/*template<unsigned int dim>
 void coupling::noisereduction::POD<dim>::
-apply(
-		const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector,
-		std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
-		const std::vector<tarch::la::Vector<dim,unsigned int>> cellIndices
-){
+apply(){
 	beginProcessInnerMacroscopicCells();
-	outputCellVector = inputCellVector;
-	for(unsigned int i = 0; i < outputCellVector.size(); i++) processInnerMacroscopicCell(*(outputCellVector[i]), i); //TODO: Change POD to use vector incides, i.e cellIndices[i].
+	for(unsigned int i = 0; i < outputCellVector.size(); i++) processInnerMacroscopicCell(*(_domainCells[i]), i); //TODO: Change POD to use vector incides, i.e _domainCellIndices[i].
 	endProcessInnerMacroscopicCells();
-}   
+} */ 
 
 
 template<unsigned int dim>

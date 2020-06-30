@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "tarch/tinyxml2/tinyxml2.h"
-#include "coupling/filtering/FilterSequence.h"
-
 #define DEBUG_FILTER_PIPELINE
-
 #define POST_MULTI_INSTANCE_FILTERING_YES true
 #define POST_MULTI_INSTANCE_FILTERING_NO false
+#include "tarch/tinyxml2/tinyxml2.h"
+#include "coupling/filtering/FilterSequence.h"
+#include "coupling/IndexConversion.h"
+
 
 //A pipeline-like approach used for chanining and branching of filters for MacrosCopicCells.
 //In genreal "pi" stands for per-istance filtering and "mi" for (post-)multi-instance filtering.
@@ -25,9 +25,10 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterPipeline{
     public:
-        FilterPipeline(const std::string cfgpath = "filter_pipeline.xml");
+        FilterPipeline(const coupling::IndexConversion<dim>* indexConversion, const std::string cfgpath = "filter_pipeline.xml");
 
         FilterPipeline(
+			const coupling::IndexConversion<dim>* indexConversion,
 			bool postMultiInstance,
 			const std::string cfgpath = "filter_pipeline.xml");
                
@@ -50,9 +51,11 @@ class coupling::FilterPipeline{
     	bool configIsValid(tinyxml2::XMLDocument& cfgfile);
        	int loadSequencesFromXML(tinyxml2::XMLElement* metaNode);
        
-      	tinyxml2::XMLDocument _config;
-
+		const coupling::IndexConversion<dim>* _indexConversion;
 	   	bool _postMultiInstance;
+      	
+
+		tinyxml2::XMLDocument _config;
 
        	std::vector<coupling::FilterSequence<dim> *> _piSequences; 
        	std::vector<coupling::FilterSequence<dim> *> _miSequences;
@@ -61,10 +64,3 @@ class coupling::FilterPipeline{
 
 //include implementation of header
 #include "FilterPipeline.cpph"
-
-
-
-/**
- * TODO:
- *
- * */
