@@ -5,6 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SERVICES_MACROSCOPICCELLSERVICE_H_
 #define _MOLECULARDYNAMICS_COUPLING_SERVICES_MACROSCOPICCELLSERVICE_H_
 
+#pragma once
 
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"

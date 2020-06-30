@@ -2,19 +2,20 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
-
+//TODO: move this to header (?)
 //constructors of coupling::FilterPipeline
 template<unsigned int dim>
-coupling::FilterPipeline<dim>::FilterPipeline(const std::string cfgpath){
-        FilterPipeline(POST_MULTI_INSTANCE_FILTERING_NO, cfgpath);
+coupling::FilterPipeline<dim>::FilterPipeline(const coupling::IndexConversion<dim>* indexConversion, const std::string cfgpath){ //TODO: default argument? (string)
+        FilterPipeline(indexConversion, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath);
 }
 
 
 template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
+	const coupling::IndexConversion<dim>* indexConversion,
 	bool postMultiInstance, 
 	const std::string cfgpath)
-	: _postMultiInstance(postMultiInstance)
+	: _indexConversion(indexConversion), _postMultiInstance(postMultiInstance)
 {
     //check if provided file is written in proper XML
     if(_config.LoadFile(cfgpath.c_str()) != tinyxml2::XML_NO_ERROR){
@@ -42,7 +43,7 @@ void coupling::FilterPipeline<dim>::apply(CellService* cellService){
     std::vector<tarch::la::Vector<dim, unsigned int>> md_indices = cellService->getInnerMacroscopicCellIndices();
 
 	//select between PI and MI
-	//TODO: dont copy all the sequences: pointers?
+	//TODO: Copying all these sequences is not optimal...
 	std::vector<coupling::FilterSequence<dim>* > sequences;
 	if(_postMultiInstance){
 		sequences = _miSequences;
@@ -62,11 +63,14 @@ void coupling::FilterPipeline<dim>::apply(CellService* cellService){
 		std::cout << "FP: Loading cell data for sequence " << currSequence->getName() << std::endl;
 		#endif
 
+
+		//TODO: copy md_cells and md_indices instead of reusing pointers
+		//TODO: as we are working with pointers, do we really need to call this more than once?
 		//md data does not neccesarily get used
         currSequence->fillSequenceData(md_cells, md_indices);
 
 		for(coupling::FilterInterface<dim>* currFilter : currSequence->getFilters())
-			currFilter->apply(currSequence->getMacroscopicCells(), currSequence->getMacroscopicCells(), currSequence->getCellIndices());
+			currFilter->apply();
 
         #ifdef DEBUG_FILTER_PIPELINE
 		std::cout << "FP: Done applying sequence " << currSequence->getName() << std::endl;
@@ -158,8 +162,10 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
         }
 
         //Add sequence to temp vector
-        if(inputFilterSequence) knownSequences.push_back(new coupling::FilterSequence<dim>(currSequenceNode->Value(), inputFilterSequence));
-        else knownSequences.push_back(new coupling::FilterSequence<dim>(currSequenceNode->Value()));
+        if(inputFilterSequence)
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, currSequenceNode->Value(), inputFilterSequence));
+        else 
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, currSequenceNode->Value()));
 
 		//Check if it's the output sequence. If none of the sequences' names match, "md" is assumed as output.
 		if(std::strcmp(knownSequences.back()->getName(),  node->Attribute("output")) == 0){
@@ -187,7 +193,7 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		#ifdef DEBUG_FILTER_PIPELINE
         std::cout << "FP: Per-instance sequences loaded!" << std:: endl;
 		#endif
-    }
+  }
 
     return 0;
 }

@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include "coupling/IndexConversion.h"
+#include "tarch/configuration/ParseConfiguration.h"
 #include "coupling/filtering/WriteToFile.h"
-
 
 //Filter Sequences are used to logically group filters that will be used in chronological order.
 //@Author Felix Maurer
@@ -18,11 +19,11 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterSequence {
 	public:
-    	FilterSequence(const char* name):
-      	FilterSequence(name, nullptr){}
+    	FilterSequence(const coupling::IndexConversion<dim>* indexConversion, const char* name):
+      	FilterSequence(indexConversion, name, nullptr){}
 
-    	FilterSequence(const char* name, FilterSequence* input) :
-    	_name(name), _input(input), _isOutput(false){
+    	FilterSequence(const coupling::IndexConversion<dim>* indexConversion, const char* name, FilterSequence* input) :
+    	_indexConversion(indexConversion), _name(name), _input(input), _isOutput(false){
         	#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << "FP: Created new sequence named " << _name << ".";
 			if(_input) std::cout << " It will use " << _input->getName() << " as input.";
@@ -63,6 +64,7 @@ class coupling::FilterSequence {
 		std::vector<coupling::FilterInterface<dim> *> getFilters() { return _filters; }	
         
 	private:
+		const coupling::IndexConversion<dim>* _indexConversion;
     	const char* _name;
     	FilterSequence* _input;
 		bool _isOutput;

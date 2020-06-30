@@ -22,9 +22,14 @@ namespace coupling {
 template<unsigned int dim>
 class coupling::WriteToFile : public coupling::FilterInterface<dim>{
     public:
-        WriteToFile(std::string location) : _location(location){
+        WriteToFile(tarch::la::Vector<dim, unsigned int> domainStart,
+					tarch::la::Vector<dim, unsigned int> domainEnd,
+					std::string location):
+					coupling::FilterInterface<dim>(domainStart, domainEnd),
+		   			_location(location)
+		{
         #ifdef DEBUG_WRITE_TO_FILE
-            std::cout << "WTF: Write to file instance created. Will save to: " << _location << std::endl;
+            std::cout << "WTF: Write to file instance created. Will save to: " << _location <<". Amount of Macroscopic Cells in domain (per dimension): ("<< coupling::FilterInterface<dim>::_domainSize << ")" << std::endl;
         #endif
         }
 
@@ -35,10 +40,7 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
         }
 
      
-	    void apply(
-				const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector,
-				std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
-			   	const std::vector<tarch::la::Vector<dim,unsigned int>> cellIndices);
+	    void apply();
 
     private:
         std::string _location;

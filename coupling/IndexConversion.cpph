@@ -94,8 +94,8 @@ unsigned int globalCellIndex) const {
 	tarch::la::Vector<dim, unsigned int> globalVectorCellIndex = getGlobalVectorCellIndex(globalCellIndex);
 	for(unsigned int d = 0; d < dim; d++) {
 		//TODO: Sind das die richtigen Grenzen?
-		if(globalVectorCellIndex[d] < 3 || globalVectorCellIndex[d] > _globalNumberMacroscopicCells[d]-1) globalVectorCellIndex[d] = INT_MAX;
-		else globalVectorCellIndex[d] -= 2;
+		if(globalVectorCellIndex[d] < 4 || globalVectorCellIndex[d] > _globalNumberMacroscopicCells[d]-3) globalVectorCellIndex[d] = INT_MAX;
+		else globalVectorCellIndex[d] -= 4;
 	}
 	return globalVectorCellIndex;
 }

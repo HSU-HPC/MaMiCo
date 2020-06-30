@@ -20,8 +20,8 @@ namespace coupling {
  */
 template<unsigned int dim>
 class coupling::noisereduction::POD:
-public coupling::noisereduction::NoiseReduction<dim>, //TODO: is this now deprecated?
-public coupling::FilterInterface<dim>{
+public coupling::noisereduction::NoiseReduction<dim> //TODO: is this now deprecated?
+/*public coupling::FilterInterface<dim>*/{
   public:
     POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService, int tws, int kmax);
     virtual ~POD();
@@ -33,10 +33,7 @@ public coupling::FilterInterface<dim>{
     virtual void beginProcessInnerMacroscopicCells();
     virtual void endProcessInnerMacroscopicCells();
 	
-	void apply(
-		const std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& inputCellVector,
-		std::vector<coupling::datastructures::MacroscopicCell<dim>*  >& outputCellVector,
-		const std::vector<tarch::la::Vector<dim,unsigned int>> cellIndices);
+	//void apply()
   private:
   	/** returns the local number of macroscopic cells EXCL. ghost layers */
     unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const;
