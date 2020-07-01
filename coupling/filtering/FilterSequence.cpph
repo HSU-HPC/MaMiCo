@@ -68,6 +68,8 @@ void coupling::FilterSequence<dim>::fillSequenceData(
     _macroscopicCells.clear();
     _cellIndices.clear();
 
+
+	//BIG TODO: This doesnt copy any data. It reuses pointers. Thus, this is all just one big sequence.
     //If the input of a sequence is not defined, it's assumed to be the default input i.e. MD
     if(_input == nullptr){
         for(auto mdCell : mdCellVector){
