@@ -4,6 +4,7 @@
 
 #pragma once
 
+#define DEBUG_FILTER
 
 namespace coupling{
     template<unsigned int dim>
@@ -33,7 +34,8 @@ class coupling::FilterInterface{
 				tarch::la::Vector<dim, unsigned int> domainEnd):
 				_domainStart(domainStart),
 				_domainEnd(domainEnd),
-				_domainSize(_domainEnd - _domainStart)
+				_domainSize(_domainEnd - _domainStart),
+				_isInitialized(false)
 		{}
 
 		virtual ~FilterInterface(){};
@@ -43,13 +45,16 @@ class coupling::FilterInterface{
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 					const std::vector<tarch::la::Vector<dim, unsigned int>> inputCellIndices
 		){
+			#ifdef DEBUG_FILTER
+			std::cout << "Filter: Initizing filter. Input vector has " << inputCellVector.size() << " cells. ";
+			#endif
 			if(inputCellVector.size() != inputCellIndices.size()){
-				std::cout << "Filter-Pipeline: Cell and index vector out of synch. Aborting.";
+				std::cout << "Cell and index vector out of synch. Aborting.";
 				exit(EXIT_FAILURE);
 			}
 			
 			for(unsigned int d = 0; d < dim; d++) if(inputCellIndices.back()[d] < _domainEnd[d]){
-				std::cout << "Filter-Pipeline: Filter domain size larger than MD domain. Aborting." << std::endl;
+				std::cout << "Filter domain size larger than MD domain. Aborting." << std::endl;
 				exit(EXIT_FAILURE);
 			}
 
@@ -64,6 +69,13 @@ class coupling::FilterInterface{
 					_domainCellIndices.push_back(inputCellIndices[index]);
 				}
 			}//index			
+
+			_isInitialized = true;
+
+			#ifdef DEBUG_FILTER
+			std::cout << "Domain vector has " << _domainCells.size() << " cells. " << std::endl;
+			#endif
+
 		}
 
 		//Applies the filter to all cells that are within the filter's domain.
