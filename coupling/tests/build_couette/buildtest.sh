@@ -31,6 +31,8 @@ else
     exit -1
 fi
 
+
+
 rm ${BUILD_PATH}/test;
 rm ${BUILD_PATH}/*.o;
 
@@ -66,6 +68,21 @@ then
 else
         scons target=libsimplemd dim=3 build=release parallel=no -j4
         libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+fi
+
+mpifail=
+if [ $# -eq 2 ]; then
+    mpifail=$2
+    if [ "${mpifail}" == "sudden" ] || [ "${mpifail}" == "successive" ]; then
+        echo "With MPI Fail test mode: ${mpifail}"
+        if [ "${mpifail}" == "sudden" ]; then
+            FLAGS="${FLAGS} -DMDCoupledMPIFailSudden"
+        else
+            FLAGS="${FLAGS} -DMDCoupledMPIFailSuccessive"
+        fi
+    else 
+        echo "ERROR! ./test parallel/sequential [sudden/successive]"
+    fi
 fi
 
 cd ${BUILD_PATH}
