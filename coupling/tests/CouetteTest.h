@@ -55,7 +55,8 @@ public:
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
 
-#if defined(SUDDEN_FAIL)
+#if defined(COUPLING_MD_FAIL_SUDDEN)
+      // Drop 50 random md instances in cycle 249
       if(cycle == 249) {
         for(int c=0;c<50;++c) {
           int iMD; // Global MD index to be shut down
@@ -66,9 +67,9 @@ public:
           MPI_Bcast(&iMD, 1, MPI_INT, 0, MPI_COMM_WORLD);
           
           int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
-          _multiMDCellService->rmMDSimulation(iSim);
+          _multiMDCellService->rmMDSimulation(iSim, iMD);
           if(iSim >= 0 && iSim < (int)_localMDInstances) {
-            _simpleMD[iSim].shutdown();
+            _simpleMD[iSim]->shutdown();
             _simpleMD.erase(_simpleMD.begin()+iSim);
             delete _mdSolverInterface[iSim];
             _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
@@ -76,24 +77,25 @@ public:
           }
         }
       }
-#elif defined(SUCCESSIVE_FAIL)
-    if(cycle >= 249) {
-      int iMD; // Global MD index to be shut down
-      if(_rank == 0) {
-        iMD = (int)(rng.getUniformRandomNumber() * _localMDInstances);
-        std::cout << "disabling global md instance " << iMD << std::endl;
+#elif defined(COUPLING_MD_FAIL_SUCCESSIVE)
+      // After cycle 249 delete one md instance per cycle
+      if(cycle >= 249) {
+        int iMD; // Global MD index to be shut down
+        if(_rank == 0) {
+          iMD = (int)(rng.getUniformRandomNumber() * _localMDInstances);
+          std::cout << "disabling global md instance " << iMD << std::endl;
+        }
+        MPI_Bcast(&iMD, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        
+        int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
+        _multiMDCellService->rmMDSimulation(iSim);
+        if(iSim >= 0 && iSim < (int)_localMDInstances) {
+          _simpleMD[iSim]->shutdown();
+          _simpleMD.erase(_simpleMD.begin()+iSim);
+          _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
+          _localMDInstances -= 1;
+        }
       }
-      MPI_Bcast(&iMD, 1, MPI_INT, 0, MPI_COMM_WORLD);
-      
-      int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
-      _multiMDCellService->rmMDSimulation(iSim);
-      if(iSim >= 0 && iSim < (int)_localMDInstances) {
-        _simpleMD.erase(_simpleMD.begin()+iSim);
-        _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
-        _localMDInstances -= 1;
-      }
-    }
-    }
 #endif
     }
     rng.shutdown();
