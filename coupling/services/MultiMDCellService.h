@@ -159,7 +159,15 @@ class coupling::services::MultiMDCellService {
       return res;
     }
 
-    auto& getIndexConversion() { return _macroscopicCellServices[0]->getIndexConversion(); }
+    auto& getIndexConversion() { 
+      for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
+        if (_macroscopicCellServices[i] != NULL) {
+          return _macroscopicCellServices[i]->getIndexConversion();
+        }
+      }
+      std::cout << "ERROR coupling::services::MultiMDCellService::getIndexConversion: No valid MacroscopicCellService found!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
     /** removes select MD simulation */
     void rmMDSimulation(const int & localIndex, const int & globalIndex) {

@@ -38,6 +38,18 @@
 #define COUPLING_MD_WITH_TEST_SOLVER COUPLING_MD_NO
 #endif
 
+#if defined(MDCoupledMPIFailSuccessive)
+#define COUPLING_MD_FAIL_SUCCESSIVE COUPLING_MD_YES
+#define COUPLING_MD_FAIL_SUDDEN COUPLING_MD_NO
+#else
+#define COUPLING_MD_FAIL_SUCCESSIVE COUPLING_MD_NO
+#if defined(MDCoupledMPIFailSudden)
+#define COUPLING_MD_FAIL_SUDDEN COUPLING_MD_YES
+#else 
+#define COUPLING_MD_FAIL_SUDDEN COUPLING_MD_NO
+#endif
+#endif
+
 #include "tarch/la/Vector.h"
 
   namespace coupling {
