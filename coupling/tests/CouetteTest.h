@@ -21,6 +21,7 @@
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
+#include <math.h>
 #include <sys/time.h>
 #include <random>
 
@@ -57,14 +58,10 @@ public:
 
 #if defined(COUPLING_MD_FAIL_SUDDEN)
       // Drop 50 random md instances in cycle 249
-      if(cycle == 249) {
-        for(int c=0;c<50;++c) {
-          int iMD; // Global MD index to be shut down
-          if(_rank == 0) {
-            iMD = (int)(rng.getUniformRandomNumber() * _localMDInstances);
-            std::cout << "disabling global md instance " << iMD << std::endl;
-          }
-          MPI_Bcast(&iMD, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      if(cycle == 0) {
+        for(int c=50;c<150;c+=2) {
+          int iMD = c; // Global MD index to be shut down
+          if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
           
           int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
           _multiMDCellService->rmMDSimulation(iSim, iMD);
