@@ -3,7 +3,7 @@
 
   <molecule-configuration
     mass="1.0"
-    temperature="1.23"
+    temperature="1.4"
     sigma="1.0"
     epsilon="1.0"
     mean-velocity="0.0 ; 0.0 ; 0.0"
@@ -18,12 +18,12 @@
     fix-seed="no"
    ></simulation-configuration>
 
-  <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
+  <vtk-configuration filename="Molecules" write-every-timestep="100"></vtk-configuration>
 
-  <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
+  <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="10000"></checkpoint-configuration>
 
   <domain-configuration
-    init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
+    
     
     molecules-per-direction="28 ; 28 ; 28"
     domain-size="30.0 ; 30.0 ; 30.0"
@@ -37,9 +37,9 @@
     bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
     bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
 
-    south-west="reflecting"        south="reflecting"        south-east="reflecting"
-    west="reflecting"                                          east="reflecting"
-    north-west="reflecting"        north="reflecting"        north-east="reflecting"
+    south-west="periodic"        south="periodic"        south-east="periodic"
+    west="periodic"                                          east="periodic"
+    north-west="periodic"        north="periodic"        north-east="periodic"
 
     top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
     top-west="reflecting"          top="reflecting"          top-east="reflecting"
