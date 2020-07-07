@@ -1,0 +1,112 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+12
+(
+    movingWall
+    {
+        type            wall;
+        inGroups        List<word> 1(wall);
+        nFaces          400;
+        startFace       22560;
+    }
+    fixedWall
+    {
+        type            wall;
+        inGroups        List<word> 1(wall);
+        nFaces          400;
+        startFace       22960;
+    }
+    front
+    {
+        type            cyclic;
+        inGroups        List<word> 1(cyclic);
+        nFaces          400;
+        startFace       23360;
+        matchTolerance  0.0001;
+        transform       unknown;
+        neighbourPatch  back;
+    }
+    back
+    {
+        type            cyclic;
+        inGroups        List<word> 1(cyclic);
+        nFaces          400;
+        startFace       23760;
+        matchTolerance  0.0001;
+        transform       unknown;
+        neighbourPatch  front;
+    }
+    left
+    {
+        type            cyclic;
+        inGroups        List<word> 1(cyclic);
+        nFaces          400;
+        startFace       24160;
+        matchTolerance  0.0001;
+        transform       unknown;
+        neighbourPatch  right;
+    }
+    right
+    {
+        type            cyclic;
+        inGroups        List<word> 1(cyclic);
+        nFaces          400;
+        startFace       24560;
+        matchTolerance  0.0001;
+        transform       unknown;
+        neighbourPatch  left;
+    }
+    fronti
+    {
+        type            patch;
+        nFaces          16;
+        startFace       24960;
+    }
+    backi
+    {
+        type            patch;
+        nFaces          16;
+        startFace       24976;
+    }
+    lefti
+    {
+        type            patch;
+        nFaces          16;
+        startFace       24992;
+    }
+    righti
+    {
+        type            patch;
+        nFaces          16;
+        startFace       25008;
+    }
+    topi
+    {
+        type            patch;
+        nFaces          16;
+        startFace       25024;
+    }
+    buttomi
+    {
+        type            patch;
+        nFaces          16;
+        startFace       25040;
+    }
+)
+
+// ************************************************************************* //

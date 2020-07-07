@@ -316,7 +316,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       std::stringstream ss; ss << "velocity_" << _counter << ".txt";
       std::ofstream file(ss.str().c_str());
       if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-      std::stringstream velocity;//, couette;
+      std::stringstream velocity;
 
       // loop over domain (incl. boundary)
       int y=8;
@@ -334,11 +334,11 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       velocity.str("");
       file.close();
 
-      std::stringstream tt; tt << "error.txt";
-      std::ofstream file2(tt.str().c_str(), std::ios::app);
-      if (!file2.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << tt.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-      file2 << maxError << std::endl;
-      file2.close();
+      // std::stringstream tt; tt << "error.txt";
+      // std::ofstream file2(tt.str().c_str(), std::ios::app);
+      // if (!file2.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << tt.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+      // file2 << maxError << std::endl;
+      // file2.close();
       // std::stringstream tt; tt << "couette_"<<_counter<<".txt";
       // std::ofstream file2(tt.str().c_str());
       // if (!file2.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << tt.str() << "!" << std::endl; exit(EXIT_FAILURE);}

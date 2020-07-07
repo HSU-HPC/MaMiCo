@@ -76,6 +76,7 @@ public:
 	}
 
 	void advance (double dt) override {
+		if (skipRank()){return;}
 		const int timesteps=floor( dt/_dt+0.5 );
 		if ( fabs(timesteps*_dt-dt)/_dt > 1.0e-8 ){std::cout << "ERROR FiniteDifferenceSolver::advance(): time steps and dt do not match!" << std::endl; exit(EXIT_FAILURE);}
 		for (int i = 0; i < timesteps; i++){
@@ -145,8 +146,10 @@ public:
 			globalCellCoords[0] = (globalCellCoords[0]+_offset[0]) - _coords[0]*_avgDomainSizeX;
 			globalCellCoords[1] = (globalCellCoords[1]+_offset[1]) - _coords[1]*_avgDomainSizeY;
 			globalCellCoords[2] = (globalCellCoords[2]+_offset[2]) - _coords[2]*_avgDomainSizeZ;
-			std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index ";
-			std::cout << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": " << globalCellCoords << std::endl;
+			#if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+			//std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index ";
+			//std::cout << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": " << globalCellCoords << std::endl;
+			#endif
 			const int index = get(globalCellCoords[0],globalCellCoords[1],globalCellCoords[2]);
 			#if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
 			if (_flag[index]!=MD_BOUNDARY){std::cout << "ERROR FiniteDifferenceSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl; exit(EXIT_FAILURE);}
