@@ -39,7 +39,7 @@ _macroscopicSolverInterface(macroscopicSolverInterface),
 _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
 _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID),
 _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface ),
-_filterPipeline(_indexConversion, false, "filter_pipeline.xml"),
+_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, false, "filter_pipeline.xml"), //TODO: seg fault because _inner[...] is not yet initialized, will be in line 87.
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
 _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
@@ -84,7 +84,7 @@ _writeEveryMacroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMacrosc
   initIndexVectors4Usher(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell());
 
   // init vector of inner (MD Domain/non-ghost) cells and their indices
-  initInnerMacroscopicCells(_macroscopicCells.getMacroscopicCells()/*TODO: indices*/);
+  //TODO: REMOVE initInnerMacroscopicCells(_macroscopicCells.getMacroscopicCells());
 }
 
 
@@ -160,7 +160,7 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
-  _filterPipeline.apply(this); 
+  _filterPipeline(); 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);
     runtime += (double)((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
@@ -282,6 +282,7 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::initIndexVe
   } // loop over all staggered versions (-> (0,0,0), (0,0,1), (0,1,0),...., (1,1,1) )
 }
 
+/* TODO: REMOVE
 template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells) {	
@@ -306,7 +307,7 @@ initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<
 	std::cout << _innerMacroscopicCells.size() << " of those cells are inner cells." << std::endl;
 	#endif
 }
-
+*/
 
 template<class LinkedCell,unsigned int dim>
 tarch::la::Vector<dim,double> coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::

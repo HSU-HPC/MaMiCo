@@ -24,7 +24,7 @@
         <sequence-3 input="sequence-1">
 			<write-to-file 
 				domain-start="0 ; 0 ; 0"
-				domain-end="1000 ; 1000 ; 1000"
+				domain-end="10 ; 10 ; 10"
 				location="file_zy"
 				/>
         </sequence-3> 
