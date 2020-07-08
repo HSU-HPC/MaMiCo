@@ -8,7 +8,7 @@
 
 //Member functions of WriteToFile.h:
 template<unsigned int dim>
-void coupling::WriteToFile<dim>::apply(){	
+void coupling::WriteToFile<dim>::operator()(){	
     #ifdef DEBUG_WRITE_TO_FILE
     std::cout << "WTF: Now writing data to: " << _location << std::endl;
     #endif 
@@ -18,7 +18,7 @@ void coupling::WriteToFile<dim>::apply(){
 
 	for(unsigned int d = 0; d<dim; d++) _file << "Index " << d << ", ";
     _file << "Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Temperature, Velocity X, Velocity Y, Velocity Z" << std::endl;
-    for(auto cell : coupling::FilterInterface<dim>::_domainCells){
+    for(auto cell : coupling::FilterInterface<dim>::_domainInputCells){
         _file 
         << coupling::FilterInterface<dim>::_domainCellIndices[indexCounter] << ", "
         << cell->getMicroscopicMass() << ", "

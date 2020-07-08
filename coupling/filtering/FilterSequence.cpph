@@ -24,20 +24,14 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 		tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currFilterNode, "domain-start");
 		tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currFilterNode, "domain-end");
 
-		//TODO: check if not null
 		for(unsigned int d = 0; d < dim; d++){
 			domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
 			domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
 		}
 
-        //Filter identifiers are hardcoded (for now at least):
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0)
         {
-			#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << "Write-To-File" << std::endl;
-			#endif
-
-            _filters.push_back(new coupling::WriteToFile<dim>(domainStartCell, domainEndCell, currFilterNode->Attribute("location")));
+            _filters.push_back(new coupling::WriteToFile<dim>(_inputCellVector, _outputCellVector, _cellIndices, domainStartCell, domainEndCell, currFilterNode->Attribute("location")));
         }
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
        		//TODO
@@ -54,48 +48,24 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             //exit(EXIT_FAILURE);
         }
 
+		_inputCellVector.swap(_outputCellVector);
+
         currFilterNode = currFilterNode->NextSiblingElement();
         }
 	return 0;
 }
 
+
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::fillSequenceData(
-    const std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCellVector,
-    const std::vector<tarch::la::Vector<dim, unsigned int>> mdCellIndices
+    const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& cellVector
 ){
-    //Reset data vectors
-    _macroscopicCells.clear();
-    _cellIndices.clear();
-
-
-	//BIG TODO: This doesnt copy any data. It reuses pointers. Thus, this is all just one big sequence.
-    //If the input of a sequence is not defined, it's assumed to be the default input i.e. MD
-    if(_input == nullptr){
-        for(auto mdCell : mdCellVector){
-            _macroscopicCells.push_back(mdCell);
-        }
-        for(auto mdCellIndex : mdCellIndices){
-            _cellIndices.push_back(mdCellIndex);
-        }
-
-        #ifdef DEBUG_FILTER_PIPELINE
-        std::cout << "FP: Supplied sequence named " << _name << " with cell data from MD." << std::endl;
-        #endif
-    }
-    else{
-        for(auto mdCell : _input->getMacroscopicCells()){
-            _macroscopicCells.push_back(mdCell);
-        }
-        for(auto mdCellIndex : _input->getCellIndices()){
-            _cellIndices.push_back(mdCellIndex);
-        }
-		
-        #ifdef DEBUG_FILTER_PIPELINE
-        std::cout << "FP: Supplied sequence named " << _name << " with cell data from " << _input->getName() << std::endl;
-        #endif
-    }
-
-	for(auto filter : _filters)
-		if(!(filter->isInitialized())) filter->initDomain(_macroscopicCells, _cellIndices);
+	//in the beginning, input and output vector contain the same cells
+	for(auto cell : cellVector){
+		_inputCellVector.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+    	_outputCellVector.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+	}
+	#ifdef DEBUG_FILTER_PIPELINE
+            std::cout << "FP: Created input and output cell vector for sequence " << _name << std::endl;
+    #endif 
 }

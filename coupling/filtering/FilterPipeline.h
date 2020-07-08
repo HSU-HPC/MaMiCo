@@ -25,9 +25,13 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterPipeline{
     public:
-        FilterPipeline(const coupling::IndexConversion<dim>* indexConversion, const std::string cfgpath = "filter_pipeline.xml");
+        FilterPipeline(
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
+			const coupling::IndexConversion<dim>* indexConversion,
+			const std::string cfgpath = "filter_pipeline.xml");
 
         FilterPipeline(
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 			const coupling::IndexConversion<dim>* indexConversion,
 			bool postMultiInstance,
 			const std::string cfgpath = "filter_pipeline.xml");
@@ -41,16 +45,20 @@ class coupling::FilterPipeline{
         }
 
 
-		template<class CellService>
-		//globalVectorCellIndices only means cells possibly relevant for filtering, that is cells in MD domain
-        void apply(CellService* cellService);
+		//applies the filter pipeline
+        void operator()();
 
 
 
     private:
     	bool configIsValid(tinyxml2::XMLDocument& cfgfile);
        	int loadSequencesFromXML(tinyxml2::XMLElement* metaNode);
-       
+		int initMd2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells);
+
+      
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _md2MacroCells;
+		std::vector<tarch::la::Vector<dim, unsigned int>> _md2MacroCellIndices;		
+
 		const coupling::IndexConversion<dim>* _indexConversion;
 	   	bool _postMultiInstance;
       	

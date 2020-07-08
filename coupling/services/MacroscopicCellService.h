@@ -211,10 +211,10 @@ public coupling::services::MacroscopicCellService<dim> {
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
 
 	/** returns all macroscopic cells located within MD domain boundaries. */
-	std::vector<coupling::datastructures::MacroscopicCell<dim> *> getInnerMacroscopicCells() {return _innerMacroscopicCells;}
+	//TODO: REMOVE std::vector<coupling::datastructures::MacroscopicCell<dim> *> getInnerMacroscopicCells() {return _innerMacroscopicCells;}
 
 	/** returns those cells' index vectors */
-	std::vector<tarch::la::Vector<dim, unsigned int>> getInnerMacroscopicCellIndices() {return _innerMacroscopicCellIndices;}
+	//TODO: REMOVE std::vector<tarch::la::Vector<dim, unsigned int>> getInnerMacroscopicCellIndices() {return _innerMacroscopicCellIndices;}
 	
   private:
     /** initialises the IndexConversion object at start up. This is the very first thing to be done in the
@@ -232,7 +232,7 @@ public coupling::services::MacroscopicCellService<dim> {
 	/**
 	 * initializes _innerMacroscopicCells and _innerMacroscopicCellIndices
 	 */
-	void initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells/*TODO: indices*/);
+	//TODO: REMOVE void initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells);
 
     /** returns the position (in space) of the lower,left corner if the first local ghost cell. Needed
      *  in distributeMass().
@@ -291,8 +291,8 @@ public coupling::services::MacroscopicCellService<dim> {
     const unsigned int _writeEveryMacroscopicTimestep;
 
 	//Inner cells managed by std::vectors. Indexing starts at the bottom left inner cell.
-	std::vector<coupling::datastructures::MacroscopicCell<dim> *> _innerMacroscopicCells;
-	std::vector<tarch::la::Vector<dim, unsigned int>> _innerMacroscopicCellIndices;
+	//TODO: REMOVE std::vector<coupling::datastructures::MacroscopicCell<dim> *> _innerMacroscopicCells;
+	//TODO: REMOVE std::vector<tarch::la::Vector<dim, unsigned int>> _innerMacroscopicCellIndices;
 
     /** index vectors for block-usher scheme -----------------------------------------------------*/
     // start and end coordinate for block loop over macroscopic cells (with 3 entries always!)
