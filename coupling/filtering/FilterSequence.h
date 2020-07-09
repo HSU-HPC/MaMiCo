@@ -43,9 +43,9 @@ class coupling::FilterSequence {
 		//TODO: move to constructor (?)
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
-    	void fillSequenceData(const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& mdMacroscopicCells);
+    	void fillSequenceData(const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& inputCellVector);
+		
 		//TODO: besprechen
-
 		void updateCellVectors(){
 			for(unsigned int index = 0; index < _inputCellVector.size(); index++){
 				*(_cellVector1[index]) = *(_inputCellVector[index]);

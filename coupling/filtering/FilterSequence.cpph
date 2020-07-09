@@ -68,10 +68,10 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::fillSequenceData(
-    const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& cellVector
+    const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& inputCellVector
 ){
 	//in the beginning, input and output vector contain the same cells
-	for(auto cell : cellVector){
+	for(auto cell : inputCellVector){
 		_inputCellVector.push_back(cell);
 		_cellVector1.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
     	_cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
