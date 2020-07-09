@@ -10,7 +10,16 @@
 				domain-start="0 ; 0 ; 0"
 				domain-end="2 ; 3 ; 4"
                 location="testwtf.csv"
+			/>
+			<write-to-file 
+				domain-start="0 ; 0 ; 0"
+				domain-end="4 ; 3 ; 10"
+                location="testwtf2.csv"
             />
+			<gauss
+				domain-start="0;0;0"
+				domain-end="10;10;10"
+			/>
         </sequence-1>
 
         <sequence-2 input="sequence-1">
