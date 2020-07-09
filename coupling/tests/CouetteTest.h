@@ -49,17 +49,14 @@ public:
   virtual void run(){
     init();
 
-    auto& rng = tarch::utils::RandomNumberService::getInstance();
-    rng.init();
-
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
 
 #if defined(COUPLING_MD_FAIL_SUDDEN)
       // Drop 50 random md instances in cycle 249
-      if(cycle == 0) {
-        for(int c=50;c<150;c+=2) {
+      if(cycle == 120) {
+        for(int c=50;c<100;c++) {
           int iMD = c; // Global MD index to be shut down
           if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
           
@@ -75,14 +72,10 @@ public:
         }
       }
 #elif defined(COUPLING_MD_FAIL_SUCCESSIVE)
-      // After cycle 249 delete one md instance per cycle
-      if(cycle >= 249) {
+      // After cycle 120 delete one md instance per cycle
+      if(cycle >= 120 && cycle < 220 && cycle % 2 == 0) {
         int iMD; // Global MD index to be shut down
-        if(_rank == 0) {
-          iMD = (int)(rng.getUniformRandomNumber() * _localMDInstances);
-          std::cout << "disabling global md instance " << iMD << std::endl;
-        }
-        MPI_Bcast(&iMD, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	iMD = 50 + cycle - 120;
         
         int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
         _multiMDCellService->rmMDSimulation(iSim);
@@ -95,7 +88,6 @@ public:
       }
 #endif
     }
-    rng.shutdown();
     shutdown();
   }
 

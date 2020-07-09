@@ -5,10 +5,10 @@ MPI_INCLUDE_PATH=/usr/lib/openmpi/include
 MPI_LIB_PATH=/usr/lib/openmpi/lib
 LIB_MPI=mpi
 
-LIB_EIGEN_PATH=/usr/include/eigen3
+LIB_EIGEN_PATH=/home/m1621/wittmern/.local/include/eigen3
 
 ### home directory of MAMICO
-MAMICO_PATH=/home/niklas/Dokumente/Git/mamico-dev
+MAMICO_PATH=/home/m1621/wittmern/mamico-dev
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
