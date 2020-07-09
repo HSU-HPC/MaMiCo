@@ -9,7 +9,6 @@
 #include <fstream>
 
 #define DEBUG_WRITE_TO_FILE
-#include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/filtering/FilterInterface.h"
 
 namespace coupling {

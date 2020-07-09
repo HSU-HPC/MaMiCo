@@ -6,7 +6,10 @@
 
 #include "coupling/IndexConversion.h"
 #include "tarch/configuration/ParseConfiguration.h"
-#include "coupling/filtering/WriteToFile.h"
+
+//INCLUDE ALL FILTERS HERE
+#include "coupling/filtering/filters/WriteToFile.h"
+#include "coupling/filtering/filters/Gauss.h"
 
 //Filter Sequences are used to logically group filters that will be used in chronological order.
 //@Author Felix Maurer
@@ -28,8 +31,8 @@ class coupling::FilterSequence {
 
 
     	~FilterSequence(){
-			for (auto i : _inputCellVector) delete i;
-			for (auto o : _outputCellVector) delete o;
+			for (auto v1 : _cellVector1) delete v1;
+			for (auto v2 : _cellVector2) delete v2;
 			for (auto f : _filters) delete f;
         	#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << "FP: Sequence named " << _name << " deconstructed." << std::endl;
@@ -37,19 +40,24 @@ class coupling::FilterSequence {
     	}
 
 
-		//TODO: move to constructor, "md" should be "input" (which in some cases is the same ofc)
+		//TODO: move to constructor (?)
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
-    	void fillSequenceData(const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& mdMacroscopicCells);
 
+    	void fillSequenceData(const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& mdMacroscopicCells);
+		//TODO: besprechen
+
+		void updateCellVectors(){
+			for(unsigned int index = 0; index < _inputCellVector.size(); index++){
+				*(_cellVector1[index]) = *(_inputCellVector[index]);
+				*(_cellVector2[index]) = *(_inputCellVector[index]);
+			}
+		}
 
     	const char* getName() { return _name; }
-    	const char* getInput() { return _input; }
 
 		bool isOutput() { return _isOutput; };
 		void setAsOutput() { _isOutput = true; };
 
-    	//void setMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim>* > macroscopicCells) { _macroscopicCells = macroscopicCells; }
-		
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getMacroscopicCells() { return _outputCellVector; } //non const
     	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getMacroscopicCells() const { return _outputCellVector; } //const
 
@@ -61,11 +69,12 @@ class coupling::FilterSequence {
 	private:
 		const coupling::IndexConversion<dim>* _indexConversion;
     	const char* _name;
-    	FilterSequence* _input;
 
-    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCellVector;
-    	std::vector<tarch::la::Vector<dim, unsigned int>> _cellIndices;
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//pointers to macro cells of this sequence's input
+    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector2;//allocated for this sequence only
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCellVector;//pointers to either _cellVector1 or _cellVector2. Use this as output if _isOutput == true and as input for other sequences
+    	std::vector<tarch::la::Vector<dim, unsigned int>> _cellIndices;//all of the above use the same indexing
 
 		bool _isOutput;
 		std::vector<coupling::FilterInterface<dim> *> _filters;

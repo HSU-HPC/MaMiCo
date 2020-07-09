@@ -61,6 +61,7 @@ void coupling::FilterPipeline<dim>::operator()(){
 	}
 
     for(coupling::FilterSequence<dim>* currSequence : sequences){
+		currSequence->updateCellVectors();
 		for(coupling::FilterInterface<dim>* currFilter : currSequence->getFilters()) (*currFilter)();
 
         #ifdef DEBUG_FILTER_PIPELINE
@@ -166,9 +167,19 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 			#endif
 		}
 	
-		//load pointer vectors 
-		if(inputFilterSequence) knownSequences.back()->fillSequenceData(inputFilterSequence->getMacroscopicCells());
-		else knownSequences.back()->fillSequenceData(_md2MacroCells);
+		//fill data vectors 
+		if(inputFilterSequence){
+			#ifdef DEBUG_FILTER_PIPELINE
+			std::cout << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
+			#endif
+			knownSequences.back()->fillSequenceData(inputFilterSequence->getMacroscopicCells());
+		}
+		else {
+			#ifdef DEBUG_FILTER_PIPELINE
+			std::cout << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
+			#endif
+			knownSequences.back()->fillSequenceData(_md2MacroCells);
+		}
 
 		//Load filters of the newly created sequence
 		if(knownSequences.back()->loadFiltersFromXML(currSequenceNode)) return EXIT_FAILURE;
