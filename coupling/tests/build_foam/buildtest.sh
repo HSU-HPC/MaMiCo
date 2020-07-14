@@ -53,9 +53,9 @@ then
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Wall -Wno-unknown-pragmas -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3 -m64 -Dlinux64 -DWM_ARCH_OPTION=64 -DWM_DP -DWM_LABEL_SIZE=32 -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -DNoRepository -ftemplate-depth-100" #-pedantic"
     # -Werror
-    includes="${includes} -I${LIB_EIGEN_PATH}"
+    includes="${includes} -I${LIB_EIGEN_PATH} -I/opt/openfoam7/src/finiteVolume/lnInclude -I/opt/openfoam7/src/meshTools/lnInclude -IlnInclude -I. -I/opt/openfoam7/src/OpenFOAM/lnInclude -I/opt/openfoam7/src/OSspecific/POSIX/lnInclude -I../../../../OpenFOAM-7/applications/solvers/incompressible/icoFoam"
     compiler="g++"
 fi
 ###
@@ -69,7 +69,7 @@ then
         FLAGS="${FLAGS} -DMDParallel"
 else
         scons target=libsimplemd dim=3 build=release parallel=no -j4
-        libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+        libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD} -fPIC -fuse-ld=bfd -Xlinker --add-needed -Xlinker --no-as-needed -L/opt/openfoam7/platforms/linux64GccDPInt32Opt/lib -L/opt/openfoam7/platforms/linux64GccDPInt32Opt/lib/dummy -lfiniteVolume -lmeshTools -lOpenFOAM -ltriSurface -lPstream -lsurfMesh -lfileFormats -ldl -lm"
 fi
 
 cd ${BUILD_PATH}

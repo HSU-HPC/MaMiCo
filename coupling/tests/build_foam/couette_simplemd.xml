@@ -3,7 +3,7 @@
 
   <molecule-configuration
     mass="1.0"
-    temperature="1.4"
+    temperature="1.23"
     sigma="1.0"
     epsilon="1.0"
     mean-velocity="0.0 ; 0.0 ; 0.0"
@@ -20,10 +20,10 @@
 
   <vtk-configuration filename="Molecules" write-every-timestep="100"></vtk-configuration>
 
-  <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="10000"></checkpoint-configuration>
+  <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
 
   <domain-configuration
-    
+    init-from-sequential-checkpoint="CheckpointSimpleMD_10000_periodic"
     
     molecules-per-direction="28 ; 28 ; 28"
     domain-size="30.0 ; 30.0 ; 30.0"
