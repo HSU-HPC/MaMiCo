@@ -45,10 +45,15 @@
 #else
 	#define COUPLING_MD_FAIL_SUCCESSIVE COUPLING_MD_NO
 #endif
+
 #if defined(MDCoupledMPIFailSudden)
 	#define COUPLING_MD_FAIL_SUDDEN COUPLING_MD_YES
 #else
 	#define COUPLING_MD_FAIL_SUDDEN COUPLING_MD_NO
+#endif
+
+#if COUPLING_MD_FAIL_SUCCESSIVE == COUPLING_MD_YES && COUPLING_MD_FAIL_SUDDEN == COUPLING_MD_YES
+#error Two MPI Shutdowns defined!
 #endif
 
 #include "tarch/la/Vector.h"
