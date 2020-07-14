@@ -47,16 +47,22 @@ public:
   virtual ~CouetteTest(){}
 
   virtual void run(){
+#if COUPLING_MD_FAIL_SUDDEN == COUPLING_MD_YES
+std::cout << "Running with MPI Shutdown test sudden." << std::endl;
+#endif
+#if COUPLING_MD_FAIL_SUCCESSIVE == COUPLING_MD_YES
+std::cout << "Running with MPI Shutdown test successive." << std::endl;
+#endif
     init();
 
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
 
-#if defined(COUPLING_MD_FAIL_SUDDEN)
+#if COUPLING_MD_FAIL_SUDDEN == COUPLING_MD_YES
       // Drop 50 random md instances in cycle 249
       if(cycle == 120) {
-        for(int c=50;c<100;c++) {
+        for(int c=50;c<150;c++) {
           int iMD = c; // Global MD index to be shut down
           if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
           
@@ -71,14 +77,15 @@ public:
           }
         }
       }
-#elif defined(COUPLING_MD_FAIL_SUCCESSIVE)
+#endif
+#if COUPLING_MD_FAIL_SUCCESSIVE == COUPLING_MD_YES
       // After cycle 120 delete one md instance per cycle
-      if(cycle >= 120 && cycle < 220 && cycle % 2 == 0) {
+      if(cycle >= 120 && cycle < 220) {
         int iMD; // Global MD index to be shut down
-	iMD = 50 + cycle - 120;
+	iMD = 30 + cycle - 120;
         
         int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
-        _multiMDCellService->rmMDSimulation(iSim);
+        _multiMDCellService->rmMDSimulation(iSim, iMD);
         if(iSim >= 0 && iSim < (int)_localMDInstances) {
           _simpleMD[iSim]->shutdown();
           _simpleMD.erase(_simpleMD.begin()+iSim);
