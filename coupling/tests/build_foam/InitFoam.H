@@ -72,7 +72,14 @@ volVectorField U
 );
 
 
-#include "createPhi.H"
+surfaceScalarField phi(IOobject(
+        "phi",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ), fvc::flux(U)
+);
 
 
 label pRefCell = 0;
