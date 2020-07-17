@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+
 # Copyright (C) 2015 Technische Universitaet Muenchen
 # This file is part of the Mamico project. For conditions of distribution
 # and use, please see the copyright notice in Mamico's main folder, or at
 # www5.in.tum.de/mamico
+
 import os;
 import sys;
 
@@ -167,6 +170,9 @@ if gprof == 'yes' or gprof == 'gprof_yes':
    buildpath = buildpath + 'gprof/'
 else:
    buildpath = buildpath + 'gprof_no/'
+
+if target=='libsimplemd':
+  ccflags.append('-fPIC')
    
 ##### Print options used to build
 #
