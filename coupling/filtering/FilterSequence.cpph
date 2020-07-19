@@ -18,7 +18,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	bool firstIteration = true;
     while(currFilterNode){
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0){
-            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, currFilterNode->Attribute("location")));
+            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _localDomainCellIndices, currFilterNode->Attribute("location")));
         }
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
             _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices));
@@ -88,7 +88,7 @@ void coupling::FilterSequence<dim>::initDomain(){
 		exit(EXIT_FAILURE);
     }
     bool outOfBounds;
-	for(unsigned int index = 0; index < _inputCellVector.capacity(); index++){
+	for(unsigned int index = 0; index < _inputCellVector.size(); index++){
 		outOfBounds = false;
 		for(unsigned int d = 0; d < dim; d++) 
 			//"index" does not reference the dim-dimensional indices stored in e.g. cellIndices but the cell vecto
@@ -98,6 +98,7 @@ void coupling::FilterSequence<dim>::initDomain(){
 			_domainCellVector1.push_back(_cellVector1[index]);
 			_domainCellVector2.push_back(_cellVector2[index]);
 			_globalDomainCellIndices.push_back(_cellIndices[index]);
+			_localDomainCellIndices.push_back(_cellIndices[index]-_domainStart);
 		}
 	}
 	

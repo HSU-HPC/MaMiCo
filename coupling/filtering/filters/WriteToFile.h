@@ -25,9 +25,11 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //covers the entire MD domain
+				const std::vector<tarch::la::Vector<dim, unsigned int>> localCellIndices, //covers the entire MD domain
 				std::string location):
 
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices),
+				_localCellIndices(localCellIndices),
 		   		_location(location)
 		{
         #ifdef DEBUG_WRITE_TO_FILE
@@ -45,6 +47,7 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 	    void operator()();
 
     private:
+		const std::vector<tarch::la::Vector<dim, unsigned int>> _localCellIndices;
         std::string _location;
         std::ofstream _file;
 };

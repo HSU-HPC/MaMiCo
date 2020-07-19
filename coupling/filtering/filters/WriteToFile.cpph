@@ -16,10 +16,12 @@ void coupling::WriteToFile<dim>::operator()(){
     int indexCounter = 0;
     _file.open(_location);
 
-	for(unsigned int d = 0; d<dim; d++) _file << "Index " << d << ", ";
+	for(unsigned int d = 0; d<dim; d++) _file << "Local Index " << d << ", ";
+	for(unsigned int d = 0; d<dim; d++) _file << "Global Index " << d << ", ";
     _file << "Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Temperature, Velocity X, Velocity Y, Velocity Z" << std::endl;
     for(auto cell : coupling::FilterInterface<dim>::_inputCells){
         _file 
+        << _localCellIndices[indexCounter] << ", "
         << coupling::FilterInterface<dim>::_cellIndices[indexCounter] << ", "
         << cell->getMicroscopicMass() << ", "
         << cell->getMicroscopicMomentum() << ", "
