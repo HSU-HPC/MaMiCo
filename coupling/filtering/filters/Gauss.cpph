@@ -14,7 +14,7 @@ void coupling::Gauss<dim>::operator()(){
     #endif 
 
 	//TODO: implement the actual filter
-	coupling::FilterInterface<dim>::_domainOutputCells = coupling::FilterInterface<dim>::_domainInputCells;
+	coupling::FilterInterface<dim>::_outputCells = coupling::FilterInterface<dim>::_inputCells;
    
     #ifdef DEBUG_GAUSS
     std::cout << "done." << std::endl;

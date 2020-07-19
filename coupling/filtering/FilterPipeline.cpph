@@ -70,7 +70,7 @@ void coupling::FilterPipeline<dim>::operator()(){
 
 		//If !isOutput for all sequences, "md" must be our output. This is equivalent to a read-only filter pipeline.
 		if(currSequence->isOutput()){
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* > sequenceOutputCells = currSequence->getMacroscopicCells(); 
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > sequenceOutputCells = currSequence->getOutputCellVector(); 
 			for(unsigned int index = 0; index < _md2MacroCells.size(); index++) *(_md2MacroCells[index]) = *(sequenceOutputCells[index]);
 		}//TODO: test correctness 
     }
@@ -133,6 +133,7 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
     
     //Check if all outputs are specified before being used by sequences
     while(currSequenceNode){
+		//FINDING INPUT
         FilterSequence<dim>* inputFilterSequence = nullptr;
         const char* inputName = currSequenceNode->Attribute("input");
 
@@ -159,9 +160,43 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
             return EXIT_FAILURE;
         }
 
-        //Add sequence to temp vector
-		knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, currSequenceNode->Value(), _md2MacroCellIndices));
+   		//DOMAIN LIMITING
+    	tarch::la::Vector<dim, double> domainStart;
+   	 	tarch::la::Vector<dim, double> domainEnd;
+		//default domain boundaries
+    	tarch::la::Vector<dim, unsigned int> domainStartCell = _md2MacroCellIndices[0];
+    	tarch::la::Vector<dim, unsigned int> domainEndCell = _md2MacroCellIndices.back();
 
+		//if custom start/end is specified use that instead
+        if(currSequenceNode->Attribute("domain-start")){ 
+			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currSequenceNode, "domain-start");
+	        for(unsigned int d = 0; d < dim; d++){
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
+  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
+        	}
+		}
+        if(currSequenceNode->Attribute("domain-end")){
+			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currSequenceNode, "domain-end");
+	        for(unsigned int d = 0; d < dim; d++){
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
+        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
+        	}
+		}
+		
+		//CREATE SEQUENCE
+		if(inputFilterSequence){
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell));
+			#ifdef DEBUG_FILTER_PIPELINE
+			std::cout << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
+			#endif
+		}
+		else {
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell));
+			#ifdef DEBUG_FILTER_PIPELINE
+			std::cout << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
+			#endif
+		}
+        //Add sequence to temp vector
 		//Check if it's the output sequence. If none of the sequences' names match, "md" is assumed as output.
 		if(std::strcmp(knownSequences.back()->getName(),  node->Attribute("output")) == 0){
 			knownSequences.back()->setAsOutput();
@@ -169,23 +204,12 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 			std::cout << "This sequence will be used as the output sequence." << std::endl;
 			#endif
 		}
-	
-		//fill data vectors 
-		if(inputFilterSequence){
-			#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
-			#endif
-			knownSequences.back()->fillSequenceData(inputFilterSequence->getMacroscopicCells());
-		}
-		else {
-			#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
-			#endif
-			knownSequences.back()->fillSequenceData(_md2MacroCells);
-		}
 
 		//Load filters of the newly created sequence
 		if(knownSequences.back()->loadFiltersFromXML(currSequenceNode)) return EXIT_FAILURE;
+
+		//TODO: remove
+		//knownSequences.back()->DEBUG_GET_VECTOR_SIZES();
 
         //Proceed to iterate over next element
         currSequenceNode = currSequenceNode->NextSiblingElement();
@@ -237,7 +261,3 @@ int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::data
 	return 0;
 }
 
-/** 
-TODO:
-CellService doch nicht ins template?
-*/
