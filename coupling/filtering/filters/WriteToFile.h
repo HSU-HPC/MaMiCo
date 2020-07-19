@@ -25,15 +25,13 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //covers the entire MD domain
-				tarch::la::Vector<dim, unsigned int> domainStart,
-				tarch::la::Vector<dim, unsigned int> domainEnd,
 				std::string location):
 
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, domainStart, domainEnd),
+				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices),
 		   		_location(location)
 		{
         #ifdef DEBUG_WRITE_TO_FILE
-            std::cout << "WTF: Write to file instance created. Will save to: " << _location << std::endl;
+            std::cout << "WTF: Write to file instance created. Will save to: " << _location << ". Last Cell Index: " << coupling::FilterInterface<dim>::_cellIndices.back() << std::endl;
         #endif
         }
 

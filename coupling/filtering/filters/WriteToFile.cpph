@@ -18,9 +18,9 @@ void coupling::WriteToFile<dim>::operator()(){
 
 	for(unsigned int d = 0; d<dim; d++) _file << "Index " << d << ", ";
     _file << "Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Temperature, Velocity X, Velocity Y, Velocity Z" << std::endl;
-    for(auto cell : coupling::FilterInterface<dim>::_domainInputCells){
+    for(auto cell : coupling::FilterInterface<dim>::_inputCells){
         _file 
-        << coupling::FilterInterface<dim>::_domainCellIndices[indexCounter] << ", "
+        << coupling::FilterInterface<dim>::_cellIndices[indexCounter] << ", "
         << cell->getMicroscopicMass() << ", "
         << cell->getMicroscopicMomentum() << ", "
         << cell->getMacroscopicMass() << ", "
@@ -32,7 +32,6 @@ void coupling::WriteToFile<dim>::operator()(){
         indexCounter++;
     }
     _file.close(); 
-   
     #ifdef DEBUG_WRITE_TO_FILE
     std::cout << "WTF: Finished  writing data to: " << _location << std::endl;
     #endif

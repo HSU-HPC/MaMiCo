@@ -1,6 +1,6 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
-// www5.in.tum.de/mamico
+// www5.in.tum.de/mamic::o
 
 
 //Member functions of coupling::FilterSequence
@@ -10,33 +10,18 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	if(!sequenceNode) return EXIT_FAILURE;
     tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
 	
-	tarch::la::Vector<dim, double> domainStart;
-	tarch::la::Vector<dim, double> domainEnd;
-	tarch::la::Vector<dim, unsigned int> domainStartCell;
-	tarch::la::Vector<dim, unsigned int> domainEndCell;
-
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector = _inputCellVector;	
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector = _cellVector2;	
-
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector = _inputDomainCellVector;	
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector = _domainCellVector2;	
+	#ifdef DEBUG_FILTER_PIPELINE
+	std::cout << "FS(" << _name << "):  Initializing filter objects." << std::endl;
+	#endif	
 	bool firstIteration = true;
     while(currFilterNode){
-		#ifdef DEBUG_FILTER_PIPELINE
-		std::cout << "FP: Initializing filter objects of sequence " << _name << ": ";
-		#endif
-		
-		//TODO: implement tarch::configuration::readVectorOptional<...>(...), which returns nullptr if attribute doesnot exist
-		tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currFilterNode, "domain-start");
-		tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currFilterNode, "domain-end");
-		for(unsigned int d = 0; d < dim; d++){
-			domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
-			domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
-		}
-
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0){
-            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _cellIndices, domainStartCell, domainEndCell, currFilterNode->Attribute("location")));
+            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, currFilterNode->Attribute("location")));
         }
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
-            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _cellIndices, domainStartCell, domainEndCell));
+            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices));
 		}
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
        		//TODO
@@ -54,29 +39,70 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
         }
 
 		if(firstIteration){
-			inputCellVector = _cellVector1;
+			inputCellVector = _domainCellVector1;
 			firstIteration = false;
 		}
 		inputCellVector.swap(outputCellVector);
         currFilterNode = currFilterNode->NextSiblingElement();
         }
-	if(_filters.size() % 2 == 1) _outputCellVector = _cellVector2;
-	else _outputCellVector = _cellVector1; 
+	#ifdef DEBUG_FILTER_PIPELINE
+	if(_filters.size() % 2 == 1) std::cout << "FS (" << _name << "): #Filters: " << _filters.size() <<". Output filter will be _cellVector1." << std::endl;
+	else std::cout << "FS (" << _name << "): #Filters: " << _filters.size() <<". Output filter will be _cellVector2." << std::endl;
+	#endif
 	return 0;
 }
 
 
 template<unsigned int dim>
-void coupling::FilterSequence<dim>::fillSequenceData(
-    const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& inputCellVector
-){
-	//in the beginning, input and output vector contain the same cells
-	for(auto cell : inputCellVector){
-		_inputCellVector.push_back(cell);
-		_cellVector1.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
-    	_cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+void coupling::FilterSequence<dim>::initCellVectors(){
+	for(auto cell: _inputCellVector){
+		_cellVector1.push_back(cell);
+    	_cellVector2.push_back(cell);
 	}
 	#ifdef DEBUG_FILTER_PIPELINE
-            std::cout << "FP: Created input and output cell vector for sequence " << _name << std::endl;
+            std::cout << "FS ("<< _name <<"): Initialized (global) cell vector." << std::endl;
     #endif 
 }
+
+template<unsigned int dim>
+void coupling::FilterSequence<dim>::initDomain(){
+	#ifdef DEBUG_FILTER_PIPELINE
+    std::cout << "FS ("<< _name <<"): Initializing domain. Input vector has " << _inputCellVector.size() << " cells. ";
+    #endif
+    //sanity check
+    if(_inputCellVector.size() != _cellIndices.size()){
+		std::cout << "Num of cell indices: " << _cellIndices.size() << std::endl;
+		std::cout << std::endl << "Cell and index vector out of synch. Aborting." << std::endl;
+		exit(EXIT_FAILURE);
+    }
+    
+    //sanity check
+    for(unsigned int d = 0; d < dim; d++) if(_cellIndices.back()[d] < _domainEnd[d]){
+		std::cout << std::endl << "Filter domain size larger than MD domain. Aborting." << std::endl;
+		exit(EXIT_FAILURE);
+    }
+
+    //sanity check
+    for(unsigned int d = 0; d < dim; d++) if(_domainStart[d] > _domainEnd[d]){
+		std::cout << std::endl << "Filter domain start > domain end. Aborting." << std::endl;
+		exit(EXIT_FAILURE);
+    }
+    bool outOfBounds;
+	for(unsigned int index = 0; index < _inputCellVector.capacity(); index++){
+		outOfBounds = false;
+		for(unsigned int d = 0; d < dim; d++) 
+			//"index" does not reference the dim-dimensional indices stored in e.g. cellIndices but the cell vecto
+			if(_cellIndices[index][d] < _domainStart[d] || _cellIndices[index][d] > _domainEnd[d]) outOfBounds = true;
+		if(!outOfBounds){
+			_inputDomainCellVector.push_back(_inputCellVector[index]);
+			_domainCellVector1.push_back(_cellVector1[index]);
+			_domainCellVector2.push_back(_cellVector2[index]);
+			_globalDomainCellIndices.push_back(_cellIndices[index]);
+		}
+	}
+	
+	#ifdef DEBUG_FILTER
+	std::cout << "Input domain vector has " << _inputDomainCellVector.size() << " cells." << std::endl;
+	#endif
+}
+
