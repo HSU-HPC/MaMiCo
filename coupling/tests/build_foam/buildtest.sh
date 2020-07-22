@@ -4,6 +4,7 @@
 MPI_INCLUDE_PATH=/usr/lib/x86_64-linux-gnu/openmpi/include
 MPI_LIB_PATH=/usr/lib/x86_64-linux-gnu/openmpi/lib
 LIB_MPI=mpi
+FOAM_PATH=/opt/openfoam7/
 
 LIB_EIGEN_PATH=/usr/include/eigen3/
 
@@ -37,6 +38,7 @@ rm ${BUILD_PATH}/test;
 rm ${BUILD_PATH}/*.o;
 rm ${BUILD_PATH}/*.txt;
 rm ${BUILD_PATH}/*.vtk;
+rm ${BUILD_PATH}/*.csv;
 
 compiler=""
 libaries=""
@@ -47,15 +49,15 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3 -m64 -Dlinux64 -DWM_ARCH_OPTION=64 -DWM_DP -DWM_LABEL_SIZE=32 -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -DNoRepository -ftemplate-depth-100"
     # -DMDCoupledDebug"
-    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
-    libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
+    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH} -I${FOAM_PATH}src/finiteVolume/lnInclude -I${FOAM_PATH}src/meshTools/lnInclude -IlnInclude -I. -I${FOAM_PATH}src/OpenFOAM/lnInclude -I${FOAM_PATH}src/OSspecific/POSIX/lnInclude"
+    libraries="-L${MPI_LIB_PATH} -l${LIB_MPI} -fPIC -fuse-ld=bfd -Xlinker --add-needed -Xlinker --no-as-needed -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib/dummy -lfiniteVolume -lmeshTools -lOpenFOAM -ltriSurface -lPstream -lsurfMesh -lfileFormats -ldl -lm"
     compiler="mpicxx"
 else
     FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3 -m64 -Dlinux64 -DWM_ARCH_OPTION=64 -DWM_DP -DWM_LABEL_SIZE=32 -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -DNoRepository -ftemplate-depth-100" #-pedantic"
     # -Werror
-    includes="${includes} -I${LIB_EIGEN_PATH} -I/opt/openfoam7/src/finiteVolume/lnInclude -I/opt/openfoam7/src/meshTools/lnInclude -IlnInclude -I. -I/opt/openfoam7/src/OpenFOAM/lnInclude -I/opt/openfoam7/src/OSspecific/POSIX/lnInclude -I../../../../OpenFOAM-7/applications/solvers/incompressible/icoFoam"
+    includes="${includes} -I${LIB_EIGEN_PATH} -I${FOAM_PATH}src/finiteVolume/lnInclude -I${FOAM_PATH}/src/meshTools/lnInclude -IlnInclude -I. -I${FOAM_PATH}src/OpenFOAM/lnInclude -I${FOAM_PATH}src/OSspecific/POSIX/lnInclude"
     compiler="g++"
 fi
 ###
@@ -64,12 +66,12 @@ fi
 cd ${MAMICO_PATH}
 if [ "${parallel}" == "parallel" ]
 then
-        scons target=libsimplemd dim=3 build=release parallel=yes -j4
+        /usr/bin/env python $(which scons) target=libsimplemd dim=3 build=release parallel=yes -j4
         libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
         FLAGS="${FLAGS} -DMDParallel"
 else
-        scons target=libsimplemd dim=3 build=release parallel=no -j4
-        libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD} -fPIC -fuse-ld=bfd -Xlinker --add-needed -Xlinker --no-as-needed -L/opt/openfoam7/platforms/linux64GccDPInt32Opt/lib -L/opt/openfoam7/platforms/linux64GccDPInt32Opt/lib/dummy -lfiniteVolume -lmeshTools -lOpenFOAM -ltriSurface -lPstream -lsurfMesh -lfileFormats -ldl -lm"
+        /usr/bin/env python $(which scons) target=libsimplemd dim=3 build=release parallel=no -j4
+        libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD} -fPIC -fuse-ld=bfd -Xlinker --add-needed -Xlinker --no-as-needed -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib/dummy -lfiniteVolume -lmeshTools -lOpenFOAM -ltriSurface -lPstream -lsurfMesh -lfileFormats -ldl -lm"
 fi
 
 cd ${BUILD_PATH}

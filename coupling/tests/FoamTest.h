@@ -79,11 +79,11 @@ private:
   }
 
   void parseConfigurations(){
-    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("couette_simplemd.xml","molecular-dynamics",_simpleMDConfig);
-    if (!_simpleMDConfig.isValid()){std::cout << "ERROR FoamTest: Invalid SimpleMD config!" << std::endl; exit(EXIT_FAILURE);}
-
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("couette_mamico.xml","mamico",_mamicoConfig);
     if (!_mamicoConfig.isValid()){ std::cout << "ERROR FoamTest: Invalid MaMiCo config!" << std::endl; exit(EXIT_FAILURE); }
+
+    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("couette_simplemd.xml","molecular-dynamics",_simpleMDConfig);
+    if (!_simpleMDConfig.isValid()){std::cout << "ERROR FoamTest: Invalid SimpleMD config!" << std::endl; exit(EXIT_FAILURE);}
 
     parseFoamTestConfiguration();
   }
