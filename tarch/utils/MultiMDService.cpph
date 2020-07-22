@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Technische Universitaet Muenchen
+  // Copyright (C) 2015 Technische Universitaet Muenchen
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
@@ -12,7 +12,9 @@ _totalNumberMDSimulations(totalNumberMDSimulations),
 _avgNumberMDSimulationsPerLocalComm(totalNumberMDSimulations),
 _thisNumberMDSimulations(totalNumberMDSimulations),
 _globalSize(1), _globalRank(0),
-_localSize(1),_localRank(0){
+_localSize(1),_localRank(0),
+_numberActiveProcesses(1), _globalActiveRank(0),
+_activeProcesses(){
 #if (TARCH_PARALLEL==TARCH_YES)
   MPI_Comm_size(MPI_COMM_WORLD,&_globalSize);
   MPI_Comm_rank(MPI_COMM_WORLD,&_globalRank);
@@ -42,6 +44,14 @@ _localSize(1),_localRank(0){
     _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
   }
 
+  _activeProcesses = std::vector<bool>(_globalSize, 1);
+
+  _numberActiveProcesses = std::accumulate(_activeProcesses.begin(), _activeProcesses.end(), 0);
+  
+  computeGlobalActiveRanks();
+
+  _avgNumberMDSimulationsPerLocalComm = _totalNumberMDSimulations/_numberLocalComms;
+
   
 #endif
 }
@@ -60,3 +70,61 @@ template<unsigned int dim>
 int tarch::utils::MultiMDService<dim>::getLocalNumberOfGlobalMDSimulation(unsigned int globalMDSimulation) const {
   return globalMDSimulation - (_globalRank/_localSize) * _avgNumberMDSimulationsPerLocalComm; 
 }
+
+template<unsigned int dim>
+void tarch::utils::MultiMDService<dim>::deactivateSimulation(const int &globalIndex) {
+    if(_thisNumberMDSimulations > 0) {
+      _thisNumberMDSimulations -= 1;
+
+      if(_thisNumberMDSimulations == 0) {
+        unsigned int iStart = globalIndex * _localSize; // Index of the first rank belonging to this simulation
+
+        int counter = 0;
+        for(unsigned int i=iStart;i<iStart + _localSize;++i) { counter += _activeProcesses[i] ? 1 : 0; }
+
+        if (counter == _localSize) {
+          for(unsigned int i=iStart;i<iStart + _localSize;++i) {
+            _activeProcesses[i] = false;
+          }
+          _numberActiveProcesses -= _localSize;
+          computeGlobalActiveRanks();
+        }
+        else if (counter == 0) { 
+          std::cout << "Simulation not active!" << std::endl;
+        }
+        else {
+          std::cout << "ERROR tarch::utils::MultiMDService::deactivateSimulation: invalid number of active processes found for simulation " 
+                    << globalIndex << ": " << counter << "!" << std::endl;
+                    exit(EXIT_FAILURE);
+        }
+      }
+    }
+  }
+
+  /* Compute the global rank considering only active processes
+   * Inactive processes retrieve global active rank -1
+   * Example: If process 0 is inactive, it is assigned -1 as rank.
+   *          If, then, process 1 is active, is gets as rank 0.
+   */
+  template<unsigned int dim>
+  void tarch::utils::MultiMDService<dim>::computeGlobalActiveRanks() {
+#if TARCH_PARALLEL == TARCH_YES
+    if(_globalRank == 0) {
+      if(_activeProcesses[0] == 0) _globalActiveRank = -1;
+      else _globalActiveRank = 0;
+    }
+    else {
+      std::vector<int> partialSum(_globalSize, 0);
+      for(int i=1;i<_globalSize;++i) {
+        partialSum[i] = partialSum[i-1] + (_activeProcesses[i] ? 1 : 0);
+      }
+      
+      if(partialSum[_globalRank] > partialSum[_globalRank-1]) {
+        _globalActiveRank = partialSum[_globalRank];
+      }
+      else _globalActiveRank = -1;
+    }
+    #endif
+  }
+
+

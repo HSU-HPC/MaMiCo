@@ -38,10 +38,15 @@ class coupling::services::MultiMDCellService {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
-      const tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0
+      tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0
     ): _localNumberMDSimulations((unsigned int)mdSolverInterfaces.size()), _totalNumberMDSimulations(totalNumberMDSimulations),
-       _macroscopicCellServices(NULL), _topologyOffset(computeTopologyOffset(numberProcesses,rank)), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)), 
-       _rank(rank) {
+       _macroscopicCellServices(NULL), 
+       _multiMDService(multiMDService), 
+       _tws(tws), 
+       _intNumberProcesses(computeScalarNumberProcesses())
+       {
+
+      _topologyOffset = computeTopologyOffset();
 
       const tarch::la::Vector<dim,double> mdDomainSize(mdSolverInterfaces[0]->getGlobalMDDomainSize());
       const tarch::la::Vector<dim,double> mdDomainOffset(mdSolverInterfaces[0]->getGlobalMDDomainOffset());
@@ -58,7 +63,7 @@ class coupling::services::MultiMDCellService {
       //    -> this yields localNumberMDSimulations*topologyOffset/intNumberProcesses MD simulations before the actual block of ranks
       for (unsigned int i = 0; i < _localNumberMDSimulations*_topologyOffset/_intNumberProcesses; i++){
         _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceMacroOnly<dim>(
-                                        i, macroscopicSolverInterface, numberProcesses, rank, mdDomainSize, mdDomainOffset,
+                                        i, macroscopicSolverInterface, numberProcesses, _multiMDService.getGlobalRank(), mdDomainSize, mdDomainOffset,
                                         parallelTopologyConfiguration, macroscopicCellConfiguration, (i/_localNumberMDSimulations)*_intNumberProcesses
                                       );
         if (_macroscopicCellServices[i]==NULL){
@@ -68,7 +73,7 @@ class coupling::services::MultiMDCellService {
       // allocate all macroscopic cell services for macro- and micro-interactions
       for (unsigned int i = _localNumberMDSimulations*_topologyOffset/_intNumberProcesses; i<_localNumberMDSimulations*(_topologyOffset+_intNumberProcesses)/_intNumberProcesses; i++){
         _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>(
-                                        i, mdSolverInterfaces[i-_localNumberMDSimulations*_topologyOffset/_intNumberProcesses], macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,
+                                        i, mdSolverInterfaces[i-_localNumberMDSimulations*_topologyOffset/_intNumberProcesses], macroscopicSolverInterface, numberProcesses, _multiMDService.getGlobalRank(), particleInsertionConfiguration,
                                         momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration, noiseReductionConfiguration, parallelTopologyConfiguration,
                                         numberMDTimestepsPerCouplingCycle, macroscopicCellConfiguration, multiMDService, _topologyOffset, _tws
                                       );
@@ -79,7 +84,7 @@ class coupling::services::MultiMDCellService {
       // allocate all macroscopic cell services for macro-only-solver AFTER topology offset
       for (unsigned int i = _localNumberMDSimulations*(_topologyOffset+_intNumberProcesses)/_intNumberProcesses; i < _totalNumberMDSimulations; i++){
         _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceMacroOnly<dim>(
-                                        i, macroscopicSolverInterface, numberProcesses, rank, mdDomainSize, mdDomainOffset,
+                                        i, macroscopicSolverInterface, numberProcesses, _multiMDService.getGlobalRank(), mdDomainSize, mdDomainOffset,
                                         parallelTopologyConfiguration, macroscopicCellConfiguration, (i/_localNumberMDSimulations)*_intNumberProcesses
                                       );
         if (_macroscopicCellServices[i]==NULL){
@@ -171,17 +176,15 @@ class coupling::services::MultiMDCellService {
 
     /** removes select MD simulation */
     void rmMDSimulation(const int & localIndex, const int & globalIndex) {
-      //auto **mcsTemp = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations];
+      // Set processes of this simulation to inactive
+      _multiMDService.deactivateSimulation(globalIndex);
+      
+      // Delete respecte macroscopic solver interface on all ranks
+      auto **mcsTemp = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations-1];
 
-      /*int deleteIndex;
-      if(localIndex >= 0) {
-        deleteIndex = localIndex + (_localNumberMDSimulations)*_topologyOffset/_intNumberProcesses;
-      } else {
-        deleteIndex = localIndex + (_localNumberMDSimulations)*(_topologyOffset+_intNumberProcesses)/_intNumberProcesses;
-      }*/
       delete _macroscopicCellServices[globalIndex];
       _macroscopicCellServices[globalIndex] = nullptr;
-/*
+
       int counter=0;
       for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
         if(_macroscopicCellServices[i] != nullptr) {
@@ -192,36 +195,47 @@ class coupling::services::MultiMDCellService {
 
       delete [] _macroscopicCellServices;
       _macroscopicCellServices = mcsTemp;
-*/
+
       if(localIndex >= 0 && localIndex < (int)_localNumberMDSimulations) {
         _localNumberMDSimulations -= 1;
       }
-      //_totalNumberMDSimulations -= 1;
-      
+      _totalNumberMDSimulations -= 1;
+
+      // Compute new topology offset
+      _topologyOffset = reComputeTopologyOffset();
     }
 
     unsigned int getLocalNumberOfMDSimulations() const { return _localNumberMDSimulations; }
     
   private:
-    unsigned int computeTopologyOffset(tarch::la::Vector<dim,unsigned int> numberProcesses,unsigned int rank) const {
+    unsigned int computeTopologyOffset() const {
       // determine topology offset of this rank
-      const unsigned int intNumberProcesses = computeScalarNumberProcesses(numberProcesses);
-      const unsigned int topologyOffset = (rank/intNumberProcesses)*intNumberProcesses;
+      const unsigned int intNumberProcesses = computeScalarNumberProcesses();
+      const unsigned int topologyOffset = (_multiMDService.getGlobalRank()/intNumberProcesses)*intNumberProcesses;
       return topologyOffset;
     }
 
-    unsigned int computeScalarNumberProcesses(tarch::la::Vector<dim,unsigned int> numberProcesses) const {
-      unsigned int np = numberProcesses[0];
-      for (unsigned int d = 1; d < dim; d++){ np = np*numberProcesses[d]; }
+    unsigned int reComputeTopologyOffset() const {
+      // determine topology offset of this rank
+      const unsigned int intNumberProcesses = computeScalarNumberProcesses();
+      const unsigned int topologyOffset = (_multiMDService.getGlobalActiveRank()/intNumberProcesses)*intNumberProcesses;
+      return topologyOffset;
+    }
+
+    unsigned int computeScalarNumberProcesses() const {
+      unsigned int np = _multiMDService.getNumberProcessesPerMDSimulation()[0];
+      for (unsigned int d = 1; d < dim; d++){ np = np*_multiMDService.getNumberProcessesPerMDSimulation()[d]; }
       return np;
     }
 
     unsigned int _localNumberMDSimulations; /** number of MD simulations run on the current rank. This can differ for different blocks, i.e. different topologyOffset values. */
     unsigned int _totalNumberMDSimulations; /** total number of MD simulations */
     coupling::services::MacroscopicCellService<dim> **_macroscopicCellServices; /** pointers of MacroscopicCellService type, one for each MD simulation */
+     tarch::utils::MultiMDService<dim>& _multiMDService;
     unsigned int _topologyOffset; /** topology offset*/
     const int _tws;
     const unsigned int _intNumberProcesses;
-    const unsigned int _rank;
+   
+
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_MULTIMDCELLSERVICE_H_

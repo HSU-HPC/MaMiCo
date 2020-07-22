@@ -8,6 +8,8 @@
 #include "tarch/TarchDefinitions.h"
 #include <cstdlib>
 #include "tarch/la/Vector.h"
+#include <numeric>
+#include <vector>
 #if (TARCH_PARALLEL==TARCH_YES)
 #include <mpi.h>
 #endif
@@ -34,7 +36,9 @@ class tarch::utils::MultiMDService {
     int getLocalNumberOfGlobalMDSimulation(unsigned int globalMDSimulation) const;
 
     unsigned int getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
-    void setLocalNumberOfMDSimulations(unsigned int i) { _thisNumberMDSimulations = i; }//TODO re-compute avg 
+    void setLocalNumberOfMDSimulations(unsigned int i) { _thisNumberMDSimulations = i; }
+
+    tarch::la::Vector<dim, unsigned int> getNumberProcessesPerMDSimulation() const { return _numberProcessesPerMDSimulation; }
 
     #if (TARCH_PARALLEL==TARCH_YES)
     MPI_Comm getLocalCommunicator() const{ return _localComm;}
@@ -51,7 +55,21 @@ class tarch::utils::MultiMDService {
     void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
     void setThisNumberMDSimulations(unsigned int n) { _thisNumberMDSimulations = n; }
 
-  private:
+    int getNumberActiveProcesses() const { return _numberActiveProcesses; }
+    int getActiveProcesses() const { return _numberActiveProcesses; }
+
+    int getGlobalActiveRank() const { return _globalActiveRank; }
+    int getRank() const { return this->_globalRank; }
+    int getSize() const { return this->_globalSize; }
+
+    void computeGlobalActiveRanks();
+    void deactivateSimulation(const int &globalIndex);
+
+
+  private: 
+    #if (TARCH_PARALLEL==TARCH_YES)
+    MPI_Comm _localComm; // communicator of "local" MD simulation
+    #endif
     // number of processes used for a single MD simulation. Currently, the total number of MPI processes needs to
     // be a multiple of the number of processes per MD simulation (=product of the vector components)
     const tarch::la::Vector<dim,unsigned int> _numberProcessesPerMDSimulation;
@@ -69,14 +87,18 @@ class tarch::utils::MultiMDService {
     // then we have 12/4=3 communicator groups, of which group 0 and 1 handle 26/3=8 MD simulations. The last group 2
     // handles 26-2*8 = 10 MD simulations.
     unsigned int _thisNumberMDSimulations;
+    
     int _globalSize; // global number of available MPI processes
     int _globalRank; // rank in global communicator MPI_COMM_WORLD
 
     int _localSize; // size of communicator _localComm
     int _localRank; // local rank in communicator _localComm
-    #if (TARCH_PARALLEL==TARCH_YES)
-    MPI_Comm _localComm; // communicator of "local" MD simulation
-    #endif
+
+    int _numberActiveProcesses;
+    int _globalActiveRank; // non-active processes shall receive rank -1
+    std::vector<bool> _activeProcesses; // Indicating whether a processes is currently in use
+    std::vector<char> _globalMDMap; // Indicating whether a md instance is active or not
+                                    // May, potentially, grow (when adding MD instances is implemented)    
 };
 
 #include "tarch/utils/MultiMDService.cpph"
