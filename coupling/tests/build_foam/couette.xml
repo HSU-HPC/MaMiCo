@@ -2,31 +2,6 @@
 
 <!-- Configuration for CouetteTest.h, a configurable Couette flow test for noise-filtered multi-instance Nie coupling -->
 <couette-test>
-  <!-- Simulation domain / scenario parameters:
-    - double channelheight: 
-      z distance between upper and lower wall (parallel plates)
-      Since the domain is cubic, this determines also the domain size in x and y directions.
-    - Vector<3,double> wall-velocity: 
-      Speed of moving wall (for all timesteps after wall-init-cycles coupling cycles)
-    - optional int wall-init-cycles: 
-      Number of coupling cycles with wall-init-velocity applied instead of wall-velocity
-      This can be used to investigate or initialize the simulation before the couette startup.
-    - optional Vector<3,double> wall-init-velocity: 
-      Speed of moving wall, for the first wall-init-cycles simulation cycles
-      Should be "0.0 ; 0.0 ; 0.0" unless e.g multi-stage startup is desired.
-    - optional double wall-oscillations: 
-      To create oscillating couette scenario, define the total number of periods during all coupling cycles here. 
-      For every CYCLE after wall-init-cycles, wall speed will equal:
-        wall-velocity * cos(2PI * wall-oscillations * CYCLE / coupling-cycles)
-  -->
-  <domain
-    channelheight="50"
-    wall-init-velocity="0.0 ; 0.0 ; 0.0"
-    wall-init-cycles="0"
-    wall-velocity="0.5 ; 0.0 ; 0.0"
-    wall-oscillations="0"
-  />
-
   <!-- Coupled simulation general setup parameters:
     - int coupling-cycles:
       Total number of coupling cycles to run. Each cycle may consist of e.g. 100 MD timesteps.
@@ -44,12 +19,12 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout.
   -->
   <coupling
-    coupling-cycles="0"
-    two-way-coupling="no"
-    send-from-md-to-macro="no"
+    coupling-cycles="50"
+    two-way-coupling="yes"
+    send-from-md-to-macro="yes"
     filter-init-cycles="0"
     write-csv-every-timestep="1"
-    send-from-macro-to-md="no"
+    send-from-macro-to-md="yes"
     compute-snr="no"
   />
 
@@ -75,11 +50,10 @@
   -->
   <microscopic-solver
     type="md"
-    temperature="1.1"
+    temperature="1.23"
     equilibration-steps="0"
-    number-md-simulations="1"
+    number-md-simulations="90"
     density="0.813037037"
-    noise-sigma="0.1666"
   />
 
   <!-- Optional feature: tws-loop
