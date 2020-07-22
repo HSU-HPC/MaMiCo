@@ -59,10 +59,10 @@ std::cout << "Running with MPI Shutdown test successive." << std::endl;
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
 
-#if COUPLING_MD_FAIL_SUDDEN == COUPLING_MD_YES
+#if defined(COUPLING_DYNAMIC_MD_SUDDEN)
       // Drop 50 random md instances in cycle 249
-      if(cycle == 120) {
-        for(int c=50;c<150;c++) {
+      if(cycle == 0) {
+        for(int c=1;c<2;c++) {
           int iMD = c; // Global MD index to be shut down
           if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
           
@@ -78,7 +78,7 @@ std::cout << "Running with MPI Shutdown test successive." << std::endl;
         }
       }
 #endif
-#if COUPLING_MD_FAIL_SUCCESSIVE == COUPLING_MD_YES
+#if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
       // After cycle 120 delete one md instance per cycle
       if(cycle >= 120 && cycle < 220) {
         int iMD; // Global MD index to be shut down
