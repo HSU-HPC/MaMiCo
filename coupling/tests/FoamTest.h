@@ -9,11 +9,7 @@
 #include "coupling/tests/Test.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/configuration/ParseConfiguration.h"
-// #include "coupling/solvers/CouetteSolver.h"
-// #include "coupling/solvers/LBCouetteSolver.h"
-// #include "coupling/solvers/FiniteDifferenceSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
-#include "coupling/solvers/LBCouetteSolverInterface.h"
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
@@ -22,14 +18,13 @@
 #include <mpi.h>
 #endif
 #include <sys/time.h>
-//#include <random>
 // Includes from OpenFOAM fdCFD.H
 // #include "parRun.H"
 #include "Time.H"
 #include "fvMesh.H"
 #include "fvc.H"
 // #include "fvMatrices.H"
-// #include "fvm.H"
+#include "fvm.H"
 // #include "linear.H"
 #include "uniformDimensionedFields.H"
 #include "calculatedFvPatchFields.H"
@@ -37,17 +32,16 @@
 #include "fixedValueFvPatchFields.H"
 #include "zeroGradientFvPatchFields.H"
 #include "fixedFluxPressureFvPatchScalarField.H"
-// #include "constrainHbyA.H"
-// #include "constrainPressure.H"
-// #include "adjustPhi.H"
+#include "constrainHbyA.H"
+#include "constrainPressure.H"
+#include "adjustPhi.H"
 #include "findRefCell.H"
 // #include "IOMRFZoneList.H"
 // #include "constants.H"
-// #include "OSspecific.H"
+#include "OSspecific.H"
 #include "argList.H"
-// #include "timeSelector.H"
+#include "timeSelector.H"
 #include "pisoControl.H"
-
 
 /**
  *
@@ -56,9 +50,6 @@
 class FoamTest: public Test {
 public:
   FoamTest(): Test("FoamTest") {
-    // using namespace Foam;
-    // #include "listOptions.H"
-    // #include "listOutput.H"
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
@@ -66,11 +57,11 @@ public:
 
   virtual void run(){
     init();
-    // for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++){
-    //   advanceMacro(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
-    //   advanceMicro(cycle);
-    //   twoWayCoupling(cycle);}
-    // shutdown();
+    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++){
+      advanceMacro();
+      advanceMicro(cycle);
+      twoWayCoupling(cycle);}
+    shutdown();
   }
 
 private:
@@ -121,7 +112,6 @@ private:
     tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.twoWayCoupling,subtag,"two-way-coupling");
     tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.md2Macro,subtag,"send-from-md-to-macro");
     tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.macro2Md,subtag,"send-from-macro-to-md");
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.filterInitCycles,subtag,"filter-init-cycles");
     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.csvEveryTimestep,subtag,"write-csv-every-timestep");
 
     subtag = node->FirstChildElement("microscopic-solver");
@@ -171,14 +161,11 @@ private:
 
     _mdStepCounter = 0;
     if (_rank == 0){ gettimeofday(&_tv.start,NULL); }
-    std::cout << _multiMDService->getGlobalNumberOfLocalMDSimulation(0) << std::endl;
-    std::cout << "31" << std::endl;
+
     for (unsigned int i = 0; i < _localMDInstances; i++){
-      std::cout << "32?" << std::endl;
       _simpleMD[i]->init(*_multiMDService,_multiMDService->getGlobalNumberOfLocalMDSimulation(i));
-      std::cout << "32!" << std::endl;
     }
-    std::cout << "32" << std::endl;
+
     // equilibrate MD
     for (unsigned int i = 0; i < _localMDInstances; i++){
       _simpleMD[i]->switchOffCoupling();
@@ -198,15 +185,12 @@ private:
       }
     }
 
-    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
-      _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-      _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
-      getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
-    );
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = new coupling::solvers::CouetteSolverInterface<3>(
+      getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     // initialise macroscopic cell service for multi-MD case and set single cell services in each MD simulation
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
-      _mdSolverInterface, couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
+      _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
       _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
       _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
       _mamicoConfig.getMacroscopicCellConfiguration(), *_multiMDService
@@ -224,7 +208,8 @@ private:
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
     allocateRecvBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
-    //_buf.foamCellIndices4SendBuffer = globalIndice2FoamIndice(_buf.globalCellIndices4SendBuffer, _buf.sendBuffer.size(), _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+    _buf.foamCellIndices4SendBuffer = globalIndices2FoamIndices(_buf.globalCellIndices4SendBuffer, _buf.sendBuffer.size(), _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+    findPointsInFoamBoundary(_buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size(), _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     // finish time measurement for initialisation
     if(_rank == 0){
       gettimeofday(&_tv.end,NULL);
@@ -236,108 +221,165 @@ private:
     std::cout << "Finish FoamTest::initSolvers() " << std::endl;
   }
 
-  // void advanceMacro(){
-  //     using namespace Foam;
-  //     Info<< "Time = " << runTime.timeName() << nl << endl;
-  //     if (_rank==0){ gettimeofday(&_tv.start,NULL); }
-  //
-  //     #include "CourantNo.H"
-  //
-  //     // Momentum predictor
-  //     fvVectorMatrix UEqn(fvm::ddt(U) + fvm::div(phi, U)-  fvm::laplacian(nu, U));
-  //
-  //     if (piso.momentumPredictor()){
-  //         solve(UEqn == -fvc::grad(p));
-  //     }
-  //
-  //     // --- PISO loop
-  //     while (piso.correct()){
-  //         volScalarField rAU(1.0/UEqn.A());
-  //         volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
-  //         surfaceScalarField phiHbyA("phiHbyA",fvc::flux(HbyA)+fvc::interpolate(rAU)*fvc::ddtCorr(U, phi));
-  //
-  //         adjustPhi(phiHbyA, U, p);
-  //
-  //         // Update the pressure BCs to ensure flux consistency
-  //         constrainPressure(p, U, phiHbyA, rAU);
-  //
-  //         // Non-orthogonal pressure corrector loop
-  //         while (piso.correctNonOrthogonal()){
-  //             // Pressure corrector
-  //             fvScalarMatrix pEqn(fvm::laplacian(rAU, p) == fvc::div(phiHbyA));
-  //
-  //             pEqn.setReference(pRefCell, pRefValue);
-  //
-  //             pEqn.solve();
-  //
-  //             if (piso.finalNonOrthogonalIter()){
-  //               phi = phiHbyA - pEqn.flux();
-  //             }
-  //         }
-  //         #include "continuityErrs.H"
-  //         U = HbyA - rAU*fvc::grad(p);
-  //         U.correctBoundaryConditions();
-  //     }
-  //     runTime.write();
-  //
-  //     Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-  //         << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-  //         << nl << endl;
-  //     std::cout << "6" << std::endl;
-  //     if (_rank==0){
-  //       gettimeofday(&_tv.end,NULL);
-  //       _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
-  //     std::cout << "7" << std::endl;
-  //     }
-  //     std::cout << "8" << std::endl;
-  //     // extract data from couette solver and send them to MD (can take any index-conversion object)
-  //     //fillSendBuffer(_cfg.density,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-  //     if(_cfg.macro2Md){
-  //       _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-  //       //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
-  //     }
-  //     std::cout << 9 << std::endl;
-  //   }
+  void advanceMacro(){
+    if (_rank==0){
+      gettimeofday(&_tv.start,NULL);
+      using namespace Foam;
+      ++runTime;
+      Info<< "Time = " << runTime.timeName() << nl << endl;
 
-  void advanceMicro(int cycle){
-    if (_rank==0){ gettimeofday(&_tv.start,NULL); }
-      // run MD instances
-      for (unsigned int i = 0; i < _localMDInstances; i++){
-        // set macroscopic cell service and interfaces in MamicoInterfaceProvider
-        coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
-        coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
+      // scalar CoNum = 0.0;
+      // scalar meanCoNum = 0.0;
+      //
+      // {
+      //     scalarField sumPhi
+      //     (
+      //         fvc::surfaceSum(mag(phi))().primitiveField()
+      //     );
+      //
+      //     CoNum = 0.5*gMax(sumPhi/mesh.V().field())*runTime.deltaTValue();
+      //
+      //     meanCoNum =
+      //         0.5*(gSum(sumPhi)/gSum(mesh.V().field()))*runTime.deltaTValue();
+      // }
+      //
+      // Info<< "Courant Number mean: " << meanCoNum
+      //     << " max: " << CoNum << endl;
 
-        _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
-        //std::cout << "Finish _simpleMD[i]->simulateTimesteps " << std::endl;
+      // Momentum predictor
+      fvVectorMatrix UEqn(fvm::ddt(U) + fvm::div(phi, U)-  fvm::laplacian(nu, U));
 
-        // plot macroscopic time step info in multi md service
-        _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);
+      if (piso.momentumPredictor()){
+          solve(UEqn == -fvc::grad(p));
       }
-      _mdStepCounter += _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
+      // --- PISO loop
+      while (piso.correct()){
+          volScalarField rAU(1.0/UEqn.A());
+          volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
+          surfaceScalarField phiHbyA("phiHbyA",fvc::flux(HbyA)+fvc::interpolate(rAU)*fvc::ddtCorr(U, phi));
+          adjustPhi(phiHbyA, U, p);
 
-      if (_rank==0){
-        gettimeofday(&_tv.end,NULL);
-        _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+          // Update the pressure BCs to ensure flux consistency
+          constrainPressure(p, U, phiHbyA, rAU);
+
+          // Non-orthogonal pressure corrector loop
+          while (piso.correctNonOrthogonal()){
+              // Pressure corrector
+              fvScalarMatrix pEqn(fvm::laplacian(rAU, p) == fvc::div(phiHbyA));
+              pEqn.setReference(pRefCell, pRefValue);
+              pEqn.solve();
+              if (piso.finalNonOrthogonalIter()){
+                phi = phiHbyA - pEqn.flux();
+              }
+          }
+          // {
+          //     volScalarField contErr(fvc::div(phi));
+          //
+          //     scalar sumLocalContErr = runTime.deltaTValue()*mag(contErr)().weightedAverage(mesh.V()).value();
+          //
+          //     scalar globalContErr = runTime.deltaTValue()*contErr.weightedAverage(mesh.V()).value();
+          //     cumulativeContErr += globalContErr;
+          //
+          //     // Info<< "time step continuity errors : sum local = " << sumLocalContErr
+          //     //     << ", global = " << globalContErr
+          //     //     << ", cumulative = " << cumulativeContErr
+          //     //     << endl;
+          // }
+          U = HbyA - rAU*fvc::grad(p);
+          U.correctBoundaryConditions();
       }
-
-      // send back data from MD instances and merge it
-      if(_cfg.md2Macro){
-        _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
-        //std::cout << "Finish _multiMDCellService->sendFromMD2Macro " << std::endl;
+      runTime.write();
+      plottxt();
+      gettimeofday(&_tv.end,NULL);
+      _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);}
+      //extract data from couette solver and send them to MD (can take any index-conversion object)
+      fillSendBuffer(_cfg.density,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.sendBuffer);
+      std::cout << "Finished MacroTimestep" << std::endl;
+    if(_cfg.macro2Md){
+      _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
+      std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
     }
   }
 
-  void twoWayCoupling(int cycle){
-    // if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
-    //   static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-    //     _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-    //     _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-    // }
-    // if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
-    //   static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
-    // } TODO
-    // write data to csv-compatible file for evaluation
+  /** create vtk plot if required */
+  void plottxt() {
+    std::stringstream ss; ss << "velocity_" << runTime.timeOutputValue()/0.25 << ".txt";
+    std::ofstream file(ss.str().c_str());
+    if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+    std::stringstream velocity;
+
+    // loop over domain (incl. boundary)
+    double y=25;
+    double x=25;
+    for (double z = 1.25; z < 50.0; z=z+2.5){
+      const int foamIndice = U.mesh().findCell(Foam::vector(x,y,z));
+      // write information to streams
+      if(foamIndice>0){
+      velocity << U[foamIndice][0] << ", " << U[foamIndice][1] << ", " << U[foamIndice][2] << std::endl;
+    }}
+    file << velocity.str() << std::endl;
+    file.close();
+  }
+
+  void advanceMicro(int cycle){
+    if (_rank==0){ gettimeofday(&_tv.start,NULL); }
+    std::cout << "Start MDTimpestep" << std::endl;
+    // run MD instances
+    for (unsigned int i = 0; i < _localMDInstances; i++){
+      // set macroscopic cell service and interfaces in MamicoInterfaceProvider
+      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
+      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
+
+      _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
+      //std::cout << "Finish _simpleMD[i]->simulateTimesteps " << std::endl;
+
+      // plot macroscopic time step info in multi md service
+      _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);
+    }
+    _mdStepCounter += _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
+
+    if (_rank==0){
+      gettimeofday(&_tv.end,NULL);
+      _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+    }
+
+    // send back data from MD instances and merge it
+    if(_cfg.md2Macro){
+      _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+      //std::cout << "Finish _multiMDCellService->sendFromMD2Macro " << std::endl;
+    }
+    std::cout << "Finished MDTimestep" << std::endl;
+  }
+
+  void twoWayCoupling(int cycle){ // Function to set the values from MD within the macro solver
+    if ( _cfg.twoWayCoupling){writeMDvalues2Foam();}
+    //write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle);
+  }
+
+  void writeMDvalues2Foam(){
+    if(_rank==0){
+      // std::stringstream ss; ss << "recvBuffer_" << runTime.timeOutputValue()/0.25 << ".txt";
+      // std::ofstream file(ss.str().c_str());
+      // if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+      // std::stringstream Buffer;
+      for(unsigned int i=0; i < _buf.numberFoamBoundaryPoints; i++){
+        unsigned int j = _buf.foam2RecvBufferIndices[i];
+        tarch::la::Vector<3,double> localVel( (1.0/_buf.recvBuffer[j]->getMacroscopicMass())*_buf.recvBuffer[j]->getMacroscopicMomentum() );
+        _buf.foamBoundaryIndices[i]->x() = localVel[0];
+        _buf.foamBoundaryIndices[i]->y() = localVel[1];
+        _buf.foamBoundaryIndices[i]->z() = localVel[2];
+        //std::cout << localVel[0] << ", " << localVel[1] << ", " << localVel[2] << ", "<< _buf.foamBoundaryIndices[i][0] << ", " << _buf.foamBoundaryIndices[i][1] << ", " << _buf.foamBoundaryIndices[i][2] << ", " << std::endl;
+      }
+      // for (unsigned int i = 6; i < 12; i++){
+      //   for (unsigned int j = 0; j < 36; j++){
+      //     Foam::vectorField FoamCoord = U.boundaryFieldRef()[i].patch().Cf()[j]+(U.boundaryFieldRef()[i].patch().nf()*1.25);
+      //     Buffer << FoamCoord[0][0] << ", " << FoamCoord[0][1] << ", " << FoamCoord[0][2] << ", " << U.boundaryFieldRef()[i][j][0] << ", " << U.boundaryFieldRef()[i][j][1] << ", " << U.boundaryFieldRef()[i][j][2] << std::endl;
+      //   }
+      // }
+      // file << Buffer.str() << std::endl;
+      // file.close();
+    }
   }
 
   void shutdown(){
@@ -507,23 +549,59 @@ private:
     _buf.globalCellIndices4RecvBuffer = indices;
   }
 
-  unsigned int* globalIndice2FoamIndice(const unsigned int* const globalIndice, unsigned int size,
+  unsigned int* globalIndices2FoamIndices(const unsigned int* const Index, unsigned int size,
     const coupling::IndexConversion<3>& indexConversion){
     unsigned int* foamIndice = new unsigned int [size];
     const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
     const tarch::la::Vector<3,double> cellSize(2.5);
-    std::cout << "The indices are ";
 
     for(unsigned int i=0; i<size;i++){
-      const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(globalIndice[i]));
+      const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(Index[i]));
       tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*cellSize);
       for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*2.5; }
       const Foam::vector foamPosition(cellMidPoint[0],cellMidPoint[1],cellMidPoint[2]);
-      //foamIndice[i] = mesh.findCell(foamPosition);
-      std::cout << foamIndice[i] << " ";
+      foamIndice[i] = U.mesh().findCell(foamPosition) > 0 ? mesh.findCell(foamPosition) : 0;
     }
-    std::cout << std::endl;
     return foamIndice;
+  }
+
+  void findPointsInFoamBoundary(const unsigned int* const globalIndice, unsigned int size,
+    const coupling::IndexConversion<3>& indexConversion){
+    _buf.numberFoamBoundaryPoints = 6*36;
+    _buf.foam2RecvBufferIndices = new unsigned int [_buf.numberFoamBoundaryPoints];
+    _buf.foamBoundaryIndices = new Foam::vector* [_buf.numberFoamBoundaryPoints];
+    unsigned int counter = 0;
+
+    // const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+    // const tarch::la::Vector<3,double> cellSize(2.5);
+
+    // std::stringstream ss; ss << "FoamCoodinates.txt";
+    // std::ofstream file(ss.str().c_str());
+    // if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+    // std::stringstream coord;
+    for (unsigned int i = 6; i < 12; i++){
+      for (unsigned int j = 0; j < 36; j++){
+        Foam::vectorField FoamCoord = U.boundaryFieldRef()[i].patch().Cf()[j]+(U.boundaryFieldRef()[i].patch().nf()*1.25);
+        _buf.foamBoundaryIndices[counter] = &(U.boundaryFieldRef()[i][j]);
+        const unsigned int globalIndex = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(tarch::la::Vector<3,double>(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2])));
+        for(unsigned int k = 0; k < size; k++){
+          if(globalIndex==globalIndice[k]){
+            _buf.foam2RecvBufferIndices[counter] = k;
+            // const tarch::la::Vector<3,unsigned int> globalIndex1(indexConversion.getGlobalVectorCellIndex(globalIndex));
+            // tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*cellSize);
+            // for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex1[d])*2.5; }
+            // coord << FoamCoord[0][0] << ", " << FoamCoord[0][1] << ", " << FoamCoord[0][2] << ", ";
+            // coord << cellMidPoint[0] << ", " << cellMidPoint[1] << ", " << cellMidPoint[2] << ", " ;
+            // coord << globalIndex << ", " << i << ", " << j << ", " << _buf.foamNumberIndices4RecvBuffer[k] << std::endl;
+            goto endloop;
+          }
+        }
+      endloop:
+      counter++;
+      }
+    }
+    // file << coord.str();
+    // file.close();
   }
 
   /** write cells that have been received from MD to csv file */
@@ -563,59 +641,38 @@ private:
   /** fills send buffer with data from couette solver */
   void fillSendBuffer(
     const double density, const coupling::IndexConversion<3>& indexConversion,
-    std::vector<coupling::datastructures::MacroscopicCell<3>* >& sendBuffer, const unsigned int * const globalCellIndices4SendBuffer
+    std::vector<coupling::datastructures::MacroscopicCell<3>* >& sendBuffer
   ) const {
-    // const unsigned int size = sendBuffer.size();
-    // const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
-    // const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
-    // double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
-    //
-    // for (unsigned int i = 0; i < size; i++){
-    //   // get global cell index vector
-    //   const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(globalCellIndices4SendBuffer[i]));
-    //   // determine cell midpoint
-    //   tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
-    //   for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
-    //
-    //   // compute momentum
-    //   const tarch::la::Vector<3,double> momentum(mass*couetteSolver.getVelocity(cellMidPoint));
-    //   sendBuffer[i]->setMicroscopicMass(mass);
-    //   sendBuffer[i]->setMicroscopicMomentum(momentum);
-    //}
-  }
+    const unsigned int size = sendBuffer.size();
+    const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+    double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
-  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(
-    tarch::la::Vector<3,double> mdOffset,
-    tarch::la::Vector<3,double> mamicoMeshsize,
-    tarch::la::Vector<3,unsigned int> globalNumberMacroscopicCells,unsigned int outerRegion
-  ){
-    coupling::interface::MacroscopicSolverInterface<3>* interface = NULL;
-    // compute number of cells of MD offset; detect any mismatches!
-    tarch::la::Vector<3,unsigned int> offsetMDDomain(0);
-    for (unsigned int d = 0; d < 3; d++){
-      if (mdOffset[d] < 0.0){std::cout << "ERROR CouetteTest::getCouetteSolverInterface(...): mdOffset[" << d << "]<0.0!" << std::endl; exit(EXIT_FAILURE);}
-      offsetMDDomain[d] = floor(mdOffset[d]/mamicoMeshsize[d] + 0.5);
-      if (fabs( (offsetMDDomain[d]*mamicoMeshsize[d] - mdOffset[d])/mamicoMeshsize[d])>1.0e-8){
-        std::cout << "ERROR CouetteTest::getCouetteSolverInterface: MD offset and mesh size mismatch!" << std::endl;
-        exit(EXIT_FAILURE);
+    // std::stringstream ss; ss << "buffer_" << runTime.timeName() << ".txt";
+    // std::ofstream file(ss.str().c_str());
+    // if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+    // std::stringstream output;
+
+    for (unsigned int i = 0; i < size; i++){
+      if(_buf.foamCellIndices4SendBuffer[i]>0){
+        const tarch::la::Vector<3,double> velocity(U[_buf.foamCellIndices4SendBuffer[i]][0], U[_buf.foamCellIndices4SendBuffer[i]][1], U[_buf.foamCellIndices4SendBuffer[i]][2]);
+        //const tarch::la::Vector<3,double> momentum(mass*U[_buf.foamCellIndices4SendBuffer[i]]);
+        sendBuffer[i]->setMicroscopicMass(mass);
+        sendBuffer[i]->setMicroscopicMomentum(mass*velocity);
+        // write information to streams
+        // output << velocity[0] << ", " << velocity[1] << ", " << velocity[2] << ", " << mass*velocity[0] << ", " << mass*velocity[1] << ", " << mass*velocity[2] << std::endl;
       }
     }
-    tarch::la::Vector<3,unsigned int> AvgNumberMacroCells(22); // hardcoded, should be changed later
-    tarch::la::Vector<3,unsigned int> NumberProcesses(1);
-    interface = new coupling::solvers::LBCouetteSolverInterface(AvgNumberMacroCells,NumberProcesses,offsetMDDomain,globalNumberMacroscopicCells,outerRegion);
-    if (interface==NULL){std::cout << "ERROR CouetteTest::getCouetteSolverInterface(...), rank=" << _rank << ": interface==NULL!" << std::endl; exit(EXIT_FAILURE);}
-    return interface;
+    // file << output.str() << std::endl;
+    // output.str("");
+    // file.close();
   }
 
     struct CouetteConfig{
     // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
     int couplingCycles;
     bool md2Macro, macro2Md, twoWayCoupling;
-    int filterInitCycles;
     int csvEveryTimestep;
-    double density, kinVisc;
-    // only for LB couette solver: number of processes
-    tarch::la::Vector<3,unsigned int> lbNumberProcesses;
+    double density;
     // only for LB couette solver: VTK plotting per time step
     int plotEveryTimestep;
     double temp;
@@ -629,6 +686,9 @@ private:
     unsigned int *foamCellIndices4SendBuffer;
     std::vector<coupling::datastructures::MacroscopicCell<3>* > recvBuffer;
     unsigned int *globalCellIndices4RecvBuffer;
+    Foam::vector** foamBoundaryIndices;
+    unsigned int *foam2RecvBufferIndices;
+    unsigned int numberFoamBoundaryPoints;
   };
 
   struct TimingValues{
@@ -638,20 +698,6 @@ private:
     double micro;
     double macro;
     double filter;
-  };
-
-  struct FoamVariables{
-    Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests", "build_foam")};
-    Foam::fvMesh mesh{Foam::fvMesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ))};
-    Foam::IOdictionary transportProperties{Foam::IOdictionary(Foam::IOobject("transportProperties",runTime.constant(),mesh, Foam::IOobject::MUST_READ_IF_MODIFIED,Foam::IOobject::NO_WRITE))};
-    Foam::dimensionedScalar nu{Foam::dimensionedScalar("nu", Foam::dimViscosity, transportProperties.lookup("nu"))};
-    Foam::volScalarField p{Foam::volScalarField(Foam::IOobject("p", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::NO_WRITE), mesh)};
-    Foam::volVectorField U{Foam::volVectorField(Foam::IOobject("U", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::NO_WRITE), mesh)};
-    Foam::surfaceScalarField phi{Foam::surfaceScalarField(Foam::IOobject("phi", runTime.timeName(), mesh, Foam::IOobject::READ_IF_PRESENT, Foam::IOobject::NO_WRITE), Foam::fvc::flux(U))};
-    Foam::label pRefCell{0};
-    Foam::scalar pRefValue{0.0};
-    Foam::pisoControl piso{Foam::pisoControl(mesh)};
-    Foam::scalar cumulativeContErr{0};
   };
 
   int _rank;
@@ -666,14 +712,13 @@ private:
   std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterface;
   std::vector<coupling::interface::MDSimulation*> _simpleMD;
   TimingValues _tv;
-  //FoamVariables _foam;
   Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests", "build_foam")};
   Foam::fvMesh mesh{Foam::fvMesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ))};
   Foam::IOdictionary transportProperties{Foam::IOdictionary(Foam::IOobject("transportProperties",runTime.constant(),mesh, Foam::IOobject::MUST_READ_IF_MODIFIED,Foam::IOobject::NO_WRITE))};
   Foam::dimensionedScalar nu{Foam::dimensionedScalar("nu", Foam::dimViscosity, transportProperties.lookup("nu"))};
-  Foam::volScalarField p{Foam::volScalarField(Foam::IOobject("p", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::NO_WRITE), mesh)};
-  Foam::volVectorField U{Foam::volVectorField(Foam::IOobject("U", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::NO_WRITE), mesh)};
-  Foam::surfaceScalarField phi{Foam::surfaceScalarField(Foam::IOobject("phi", runTime.timeName(), mesh, Foam::IOobject::READ_IF_PRESENT, Foam::IOobject::NO_WRITE), Foam::fvc::flux(U))};
+  Foam::volScalarField p{Foam::volScalarField(Foam::IOobject("p", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh)};
+  Foam::volVectorField U{Foam::volVectorField(Foam::IOobject("U", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh)};
+  Foam::surfaceScalarField phi{Foam::surfaceScalarField(Foam::IOobject("phi", runTime.timeName(), mesh, Foam::IOobject::READ_IF_PRESENT, Foam::IOobject::AUTO_WRITE), Foam::fvc::flux(U))};
   Foam::label pRefCell{0};
   Foam::scalar pRefValue{0.0};
   Foam::pisoControl piso{Foam::pisoControl(mesh)};

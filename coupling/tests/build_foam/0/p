@@ -32,22 +32,22 @@ boundaryField
 
     front
     {
-        type            cyclic;
+        type            zeroGradient;
     }
     
     back
     {
-        type            cyclic;
+        type            zeroGradient;
     }
     
     left
     {
-        type            cyclic;
+        type            zeroGradient;
     }
     
     right
     {
-        type            cyclic;
+        type            zeroGradient;
     }
     
     fronti
