@@ -33,13 +33,13 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 		   		_location(location)
 		{
         #ifdef DEBUG_WRITE_TO_FILE
-            std::cout << "WTF: Write to file instance created. Will save to: " << _location << ". Last Cell Index: " << coupling::FilterInterface<dim>::_cellIndices.back() << std::endl;
+            std::cout << "		WTF: Write to file instance created. Will save to: " << _location << ". Last Cell Index: " << coupling::FilterInterface<dim>::_cellIndices.back() << std::endl;
         #endif
         }
 
         ~WriteToFile(){
         #ifdef DEBUG_WRITE_TO_FILE
-            std::cout << "WTF: Write to file instance deconstructed." << std::endl;
+            std::cout << "		WTF: Write to file instance deconstructed." << std::endl;
         #endif
         }
 

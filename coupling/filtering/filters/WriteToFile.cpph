@@ -10,7 +10,7 @@
 template<unsigned int dim>
 void coupling::WriteToFile<dim>::operator()(){	
     #ifdef DEBUG_WRITE_TO_FILE
-    std::cout << "WTF: Now writing data to: " << _location << std::endl;
+    std::cout << "		WTF: Now writing data to: " << _location << std::endl;
     #endif 
 
     int indexCounter = 0;
@@ -18,7 +18,7 @@ void coupling::WriteToFile<dim>::operator()(){
 
 	for(unsigned int d = 0; d<dim; d++) _file << "Local Index " << d << ", ";
 	for(unsigned int d = 0; d<dim; d++) _file << "Global Index " << d << ", ";
-    _file << "Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Temperature, Velocity X, Velocity Y, Velocity Z" << std::endl;
+    _file << "Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Velocity X, Velocity Y, Velocity Z, Temperature" << std::endl;
     for(auto cell : coupling::FilterInterface<dim>::_inputCells){
         _file 
         << _localCellIndices[indexCounter] << ", "
@@ -28,14 +28,15 @@ void coupling::WriteToFile<dim>::operator()(){
         << cell->getMacroscopicMass() << ", "
         << cell->getMicroscopicMomentum() << ", "
         << cell->getPotentialEnergy() << ", "
-        << cell->getTemperature() << ", "
-        << cell->getCurrentVelocity() << std::endl;
+        << cell->getCurrentVelocity() << ", "
+        << cell->getTemperature() << std::endl;
+
 
         indexCounter++;
     }
     _file.close(); 
     #ifdef DEBUG_WRITE_TO_FILE
-    std::cout << "WTF: Finished  writing data to: " << _location << std::endl;
+    std::cout << "		WTF: Finished  writing data to: " << _location << std::endl;
     #endif
 }
  

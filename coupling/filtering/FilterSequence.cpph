@@ -13,7 +13,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector = _inputDomainCellVector;	
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector = _domainCellVector2;	
 	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << "FS(" << _name << "):  Initializing filter objects." << std::endl;
+	std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
 	#endif	
 	bool firstIteration = true;
     while(currFilterNode){
@@ -21,7 +21,19 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _localDomainCellIndices, currFilterNode->Attribute("location")));
         }
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
-            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices));
+			//TODO: Fix this
+			bool uses[7] = { false };
+			const char* useStr = currFilterNode->Attribute("use");
+			if(useStr){
+				if(strstr(useStr, "micro-mass")) uses[0] = true;
+				if(strstr(useStr, "micro-momentum")) uses[1] = true;
+				if(strstr(useStr, "macro-mass")) uses[2] = true;
+				if(strstr(useStr, "macro-momentum")) uses[3] = true;
+				if(strstr(useStr, "potential-energy")) uses[4] = true;
+				if(strstr(useStr, "velocity")) uses[5] = true;
+				if(strstr(useStr, "temperature")) uses[6] = true;
+			}
+            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, uses));
 		}
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
        		//TODO
@@ -46,8 +58,9 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
         currFilterNode = currFilterNode->NextSiblingElement();
         }
 	#ifdef DEBUG_FILTER_PIPELINE
-	if(_filters.size() % 2 == 1) std::cout << "FS (" << _name << "): #Filters: " << _filters.size() <<". Output filter will be _cellVector1." << std::endl;
-	else std::cout << "FS (" << _name << "): #Filters: " << _filters.size() <<". Output filter will be _cellVector2." << std::endl;
+	std::cout << PRINT_PREFIX() << "Number of Filters: " << _filters.size() <<". Output filter will be ";
+	if(_filters.size() % 2 == 1)  std::cout << "_cellVector1." << std::endl;
+	else std::cout << "_cellVector2." << std::endl;
 	#endif
 	return 0;
 }
@@ -60,31 +73,30 @@ void coupling::FilterSequence<dim>::initCellVectors(){
     	_cellVector2.push_back(cell);
 	}
 	#ifdef DEBUG_FILTER_PIPELINE
-            std::cout << "FS ("<< _name <<"): Initialized (global) cell vector." << std::endl;
+            std::cout << PRINT_PREFIX() << "Initialized (global) cell vector." << std::endl;
     #endif 
 }
 
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::initDomain(){
 	#ifdef DEBUG_FILTER_PIPELINE
-    std::cout << "FS ("<< _name <<"): Initializing domain. Input vector has " << _inputCellVector.size() << " cells. ";
+    std::cout << PRINT_PREFIX() << "Initializing domain. Input vector has " << _inputCellVector.size() << " cells. ";
     #endif
     //sanity check
     if(_inputCellVector.size() != _cellIndices.size()){
-		std::cout << "Num of cell indices: " << _cellIndices.size() << std::endl;
-		std::cout << std::endl << "Cell and index vector out of synch. Aborting." << std::endl;
+		std::cout << std::endl << "ERROR: Cell and index vector of sequence out of synch." << std::endl;
 		exit(EXIT_FAILURE);
     }
     
     //sanity check
     for(unsigned int d = 0; d < dim; d++) if(_cellIndices.back()[d] < _domainEnd[d]){
-		std::cout << std::endl << "Filter domain size larger than MD domain. Aborting." << std::endl;
+		std::cout << std::endl << "ERROR: Sequence domain size larger than MD domain." << std::endl;
 		exit(EXIT_FAILURE);
     }
 
     //sanity check
     for(unsigned int d = 0; d < dim; d++) if(_domainStart[d] > _domainEnd[d]){
-		std::cout << std::endl << "Filter domain start > domain end. Aborting." << std::endl;
+		std::cout << std::endl << "ERROR: Filter domain start > domain end." << std::endl;
 		exit(EXIT_FAILURE);
     }
     bool outOfBounds;
@@ -102,7 +114,7 @@ void coupling::FilterSequence<dim>::initDomain(){
 		}
 	}
 	
-	#ifdef DEBUG_FILTER
+	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << "Input domain vector has " << _inputDomainCellVector.size() << " cells." << std::endl;
 	#endif
 }
