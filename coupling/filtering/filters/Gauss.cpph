@@ -10,14 +10,85 @@
 template<unsigned int dim>
 void coupling::Gauss<dim>::operator()(){	
     #ifdef DEBUG_GAUSS
-    std::cout << "GAUSS: Applying filter...";
+    std::cout << "		GAUSS: Applying filter...";
     #endif 
 
-	//TODO: implement the actual filter
-	coupling::FilterInterface<dim>::_outputCells = coupling::FilterInterface<dim>::_inputCells;
+	for(unsigned int index = 0; index < coupling::FilterInterface<dim>::_cellIndices.size(); index++){
+		std::cout << "START INDEX " << index << std::endl;
+		//TODO: Aufteilung in Dims mit Piet besprechen
+		for(unsigned int d = 0; d < dim; d++){
+			std::cout << "	INIT DIM" << d;
+			coupling::datastructures::MacroscopicCell<dim>* lowerCell;
+			coupling::datastructures::MacroscopicCell<dim>* upperCell;
+			if(coupling::FilterInterface<dim>::_cellIndices[index][d] == 0)
+				{lowerCell = coupling::FilterInterface<dim>::_inputCells[0/*getUpperCellIndex(index, d)*/]; std::cout << " L:U " << getUpperCellIndex(index, d);}//TODO: find other means of interpolation
+			else	
+				{lowerCell = coupling::FilterInterface<dim>::_inputCells[0/*getLowerCellIndex(index, d)*/]; std::cout << " L:L " << getLowerCellIndex(index, d);}
+			if(coupling::FilterInterface<dim>::_cellIndices[index][d] == _lastIndex[d])	
+				{upperCell = coupling::FilterInterface<dim>::_inputCells[0/*getLowerCellIndex(index, d)*/]; std::cout << " U:L " << getLowerCellIndex(index, d);}//TODO: find other means of interpolation
+			else 
+				{upperCell = coupling::FilterInterface<dim>::_inputCells[0/*getUpperCellIndex(index, d)*/]; std::cout << " U:U " << getUpperCellIndex(index, d);}
+			std::cout << " PASSED INIT ";
+			std::cout << "VECTOR SIZES: IN: " << coupling::FilterInterface<dim>::_inputCells.size() << " OUT: " << coupling::FilterInterface<dim>::_outputCells.size();
+			//TODO: function pointers?
+		
+			if(_useMicroMass) 
+				coupling::FilterInterface<dim>::_outputCells[index]->setMicroscopicMass(
+					coupling::FilterInterface<dim>::_inputCells[index]->getMicroscopicMass()*GAUSS_INNER_WEIGHT
+					+lowerCell->getMicroscopicMass()*GAUSS_OUTER_WEIGHT
+					+upperCell->getMicroscopicMass()*GAUSS_OUTER_WEIGHT);
+			if(_useMicroMomentum) 
+				coupling::FilterInterface<dim>::_outputCells[index]->setMicroscopicMomentum(
+					coupling::FilterInterface<dim>::_inputCells[index]->getMicroscopicMomentum()*GAUSS_INNER_WEIGHT
+					+lowerCell->getMicroscopicMomentum()*GAUSS_OUTER_WEIGHT
+					+upperCell->getMicroscopicMomentum()*GAUSS_OUTER_WEIGHT);
+			if(_useMacroMass) 
+				coupling::FilterInterface<dim>::_outputCells[index]->setMacroscopicMass(
+					coupling::FilterInterface<dim>::_inputCells[index]->getMacroscopicMass()*GAUSS_INNER_WEIGHT
+					+lowerCell->getMacroscopicMass()*GAUSS_OUTER_WEIGHT
+					+upperCell->getMacroscopicMass()*GAUSS_OUTER_WEIGHT);
+			if(_useMacroMomentum) 
+				coupling::FilterInterface<dim>::_outputCells[index]->setMacroscopicMomentum(
+					coupling::FilterInterface<dim>::_inputCells[index]->getMacroscopicMomentum()*GAUSS_INNER_WEIGHT
+					+lowerCell->getMacroscopicMomentum()*GAUSS_OUTER_WEIGHT
+					+upperCell->getMacroscopicMomentum()*GAUSS_OUTER_WEIGHT);
+			if(_usePotEnergy) 
+				coupling::FilterInterface<dim>::_outputCells[index]->setPotentialEnergy(
+					coupling::FilterInterface<dim>::_inputCells[index]->getPotentialEnergy()*GAUSS_INNER_WEIGHT
+					+lowerCell->getPotentialEnergy()*GAUSS_OUTER_WEIGHT
+					+upperCell->getPotentialEnergy()*GAUSS_OUTER_WEIGHT);
+			if(_useVelocity) 
+				coupling::FilterInterface<dim>::_outputCells[index]->setCurrentVelocity(
+					coupling::FilterInterface<dim>::_inputCells[index]->getCurrentVelocity()*GAUSS_INNER_WEIGHT
+					+lowerCell->getCurrentVelocity()*GAUSS_OUTER_WEIGHT
+					+upperCell->getCurrentVelocity()*GAUSS_OUTER_WEIGHT);
+			if(_useTemperature) 
+				coupling::FilterInterface<dim>::_outputCells[index]->setTemperature(
+					coupling::FilterInterface<dim>::_inputCells[index]->getTemperature()*GAUSS_INNER_WEIGHT
+					+lowerCell->getTemperature()*GAUSS_OUTER_WEIGHT
+					+upperCell->getTemperature()*GAUSS_OUTER_WEIGHT); 
+			std::cout << "	PASSED APPLICATION" << std::endl; 
+		}//d
+		std::cout << "END INDEX " << index << std::endl;
+	}//index
    
     #ifdef DEBUG_GAUSS
     std::cout << "done." << std::endl;
     #endif
 }
- 
+
+template<unsigned int dim>
+unsigned int coupling::Gauss<dim>::getLowerCellIndex(unsigned int index, unsigned int d){
+	unsigned int diff = 1;
+	//iterate over all lower dimensions
+	if(d>0) for(unsigned int ld = 0; ld < d; ld++) diff *= (_lastIndex[ld]+1); //*= size in ld-Dimension
+	return index-diff;
+}
+
+template<unsigned int dim>
+unsigned int coupling::Gauss<dim>::getUpperCellIndex(unsigned int index, unsigned int d){
+	unsigned int diff = 1;
+	//iterate over all lower dimensions
+	if(d>0) for(unsigned int ld = 0; ld < d; ld++) diff *= (_lastIndex[ld]+1);
+	return index+diff;
+} 

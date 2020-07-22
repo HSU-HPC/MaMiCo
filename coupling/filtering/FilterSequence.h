@@ -37,7 +37,7 @@ class coupling::FilterSequence {
 		_isOutput(false)
 		{	
 			#ifdef DEBUG_FILTER_PIPELINE
-        	std::cout << "FS (" << _name << "): Now initializing." << std::endl;
+        	std::cout << PRINT_PREFIX() << "Now initializing." << std::endl;
         	#endif
             for(unsigned int d = 0; d < dim; d++) if(_cellIndices.back()[d] < _domainEnd[d]){
                 std::cout << "Filter domain size larger than MD domain. Aborting." << std::endl;
@@ -46,7 +46,7 @@ class coupling::FilterSequence {
 			initCellVectors();
 			initDomain();
 			#ifdef DEBUG_FILTER_PIPELINE
-        	std::cout << "FS ("<< _name <<"): Finished initialization " << std::endl;
+        	std::cout << PRINT_PREFIX() << "Finished initialization." << std::endl;
         	#endif
     	}
 
@@ -56,7 +56,7 @@ class coupling::FilterSequence {
 			for (auto v2 : _cellVector2) delete v2;
 			for (auto f : _filters) delete f;
         	#ifdef DEBUG_FILTER_PIPELINE
-        	std::cout << "FS("<< _name <<"): Deconstructed. " << std::endl;
+        	std::cout << PRINT_PREFIX() << "Deconstructed." << std::endl;
         	#endif
     	}
 
@@ -75,7 +75,7 @@ class coupling::FilterSequence {
 		void setAsOutput() { _isOutput = true; };
 
     	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const{ 
-			if(_filters.empty()) std::cout << "FS (" << _name << "): Warning: Accessing cell vectors while _filters is empty." << std::endl;
+			if(_filters.empty()) std::cout << PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
 			if(_filters.size() % 2 == 0) return _cellVector1;
 			else return _cellVector2;
 		}
@@ -87,7 +87,7 @@ class coupling::FilterSequence {
 
  		//TODO: remove
 		void DEBUG_GET_VECTOR_SIZES(){
-			std::cout << "FS (" << _name << "): Printing vector sizes, capacities" << std::endl;
+			std::cout << PRINT_PREFIX << "Printing vector sizes, capacities" << std::endl;
 			std::cout << "_cellVector1: " << _cellVector1.size() << " , " << _cellVector1.capacity() << std::endl;
 			std::cout << "_cellVector2: " << _cellVector2.size() << " , " << _cellVector2.capacity() << std::endl;
 			std::cout << "_cellIndices: " << _cellIndices.size() << " , " << _cellIndices.capacity() << std::endl;
@@ -100,6 +100,10 @@ class coupling::FilterSequence {
 		void initDomain();
 		//TODO: move to constructor (?)
 		void initCellVectors();
+
+		std::string PRINT_PREFIX() const{
+			return std::string("	FS(").std::string::append(_name).std::string::append("): ");
+		}
 
 		const coupling::IndexConversion<dim>* _indexConversion;
     	const char* _name;
