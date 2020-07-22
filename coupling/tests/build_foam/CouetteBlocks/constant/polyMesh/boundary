@@ -22,21 +22,21 @@ FoamFile
         type            wall;
         inGroups        List<word> 1(wall);
         nFaces          400;
-        startFace       22560;
+        startFace       22044;
     }
     fixedWall
     {
         type            wall;
         inGroups        List<word> 1(wall);
         nFaces          400;
-        startFace       22960;
+        startFace       22444;
     }
     front
     {
         type            cyclic;
         inGroups        List<word> 1(cyclic);
         nFaces          400;
-        startFace       23360;
+        startFace       22844;
         matchTolerance  0.0001;
         transform       unknown;
         neighbourPatch  back;
@@ -46,7 +46,7 @@ FoamFile
         type            cyclic;
         inGroups        List<word> 1(cyclic);
         nFaces          400;
-        startFace       23760;
+        startFace       23244;
         matchTolerance  0.0001;
         transform       unknown;
         neighbourPatch  front;
@@ -56,7 +56,7 @@ FoamFile
         type            cyclic;
         inGroups        List<word> 1(cyclic);
         nFaces          400;
-        startFace       24160;
+        startFace       23644;
         matchTolerance  0.0001;
         transform       unknown;
         neighbourPatch  right;
@@ -66,7 +66,7 @@ FoamFile
         type            cyclic;
         inGroups        List<word> 1(cyclic);
         nFaces          400;
-        startFace       24560;
+        startFace       24044;
         matchTolerance  0.0001;
         transform       unknown;
         neighbourPatch  left;
@@ -74,38 +74,38 @@ FoamFile
     fronti
     {
         type            patch;
-        nFaces          16;
-        startFace       24960;
+        nFaces          36;
+        startFace       24444;
     }
     backi
     {
         type            patch;
-        nFaces          16;
-        startFace       24976;
+        nFaces          36;
+        startFace       24480;
     }
     lefti
     {
         type            patch;
-        nFaces          16;
-        startFace       24992;
+        nFaces          36;
+        startFace       24516;
     }
     righti
     {
         type            patch;
-        nFaces          16;
-        startFace       25008;
+        nFaces          36;
+        startFace       24552;
     }
     topi
     {
         type            patch;
-        nFaces          16;
-        startFace       25024;
+        nFaces          36;
+        startFace       24588;
     }
     buttomi
     {
         type            patch;
-        nFaces          16;
-        startFace       25040;
+        nFaces          36;
+        startFace       24624;
     }
 )
 

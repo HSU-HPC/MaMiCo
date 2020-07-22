@@ -9,13 +9,21 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       regIOobject;
-    location    "constant/polyMesh";
-    object      cellZones;
+    class       dictionary;
+    location    "0.25/uniform";
+    object      time;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-0
-()
+value           0.25;
+
+name            "0.25";
+
+index           1;
+
+deltaT          0.25;
+
+deltaT0         0.25;
+
 
 // ************************************************************************* //

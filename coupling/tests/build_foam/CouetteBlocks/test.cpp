@@ -66,7 +66,6 @@ void runFoam(Foam::surfaceScalarField& phi, Foam::fvMesh& mesh,
       U = HbyA - rAU*fvc::grad(p);
       U.correctBoundaryConditions();
   }
-
   runTime.write();
 
   Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
@@ -96,12 +95,6 @@ int main(){
   //#include "listOutput.H"
 
   Foam::Time runTime(Foam::Time::controlDictName, args);
-  Info << "Path" << endl;
-  Info << runTime.path() << endl;
-  Info << "ControlDict" << endl;
-  Info << runTime.controlDict() << endl;
-  Info << "dbDir" << endl;
-  Info << runTime.dbDir() << endl;
 
   Foam::fvMesh mesh(Foam::IOobject(
           Foam::fvMesh::defaultRegion,
@@ -125,8 +118,6 @@ int main(){
       dimViscosity,
       transportProperties.lookup("nu")
   );
-  Info << transportProperties.lookup("nu") << endl;
-  Info << runTime.timeName() << endl;
 
   volScalarField p(IOobject(
           "p",
@@ -164,24 +155,27 @@ int main(){
   #define initContinuityErrs_H
   scalar cumulativeContErr = 0;
   #endif
+  // U.boundaryFieldRef()[7][0].y() = 0.5;
+  //U.boundaryFieldRef()[8][1].x() = 0.5;
+  Info << U.boundaryFieldRef()[8][0] << endl;
+  Foam::vector* test= &U.boundaryFieldRef()[8][0];
+  test->x() = 0.72;
+  Info << U.boundaryFieldRef()[8][0] << endl;
 
-  // U.boundaryFieldRef()[7][0].x() = 1.0;
-  // U.boundaryFieldRef()[8][1].x() = 1.0;
-  // Info << mesh.boundary()["fronti"].Cf() << endl;
-  // Info << U.mesh().C()[0] << endl;
-  // Info << U[0] << endl;
-  // Info << mesh.C()[0] << endl;
-  //
-  // std::vector<double> origPoint = {8.5, 9, 9.1};//mesh.C()[10];
-  // Foam::vector myPoint(stdVector2FoamVector(origPoint));
-  // Info << U.mesh().findCell(myPoint) << endl;
+  //Info << U.boundaryFieldRef()[11].patch().Sf()[0] << endl;
+
+  //++runTime;
+  //runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
+  // ++runTime;
+  // runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
+  //U.boundaryFieldRef()[7].initEvaluate();
 
   Info<< "\nStarting time loop\n" << endl;
 
-  while (runTime.loop())
-  {
-    runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
-  }
+  // while (runTime.loop())
+  // {
+  //   runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
+  // }
 
   Info<< "End\n" << endl;
 }
