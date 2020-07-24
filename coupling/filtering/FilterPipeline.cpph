@@ -8,7 +8,7 @@ template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 	const coupling::IndexConversion<dim>* indexConversion,
-	const std::string cfgpath): //TODO: default argument? (string)
+	const std::string cfgpath): //TODO: default argument? 
     FilterPipeline(mdCells, indexConversion, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
 {}
 

@@ -12,10 +12,13 @@
 #include "coupling/IndexConversion.h"
 
 
-//A pipeline-like approach used for chanining and branching of filters for MacrosCopicCells.
-//In genreal "pi" stands for per-istance filtering and "mi" for (post-)multi-instance filtering.
-//@Author Felix Maurer
-
+/*
+ * Manages different branches of filtering sequences.
+ * These filtering sequences may be interdependant by using another's sequences input or completely isolated.
+ * As this entire filtering process is applied during MD to Macro communication, it uses the MD simulation's output Macro-Cells as input and output.
+ * All configuration is made using an XML-config file and does not require recompilation when modified.
+ * @Author Felix Maurer
+ */
 namespace coupling{
     template<unsigned int dim>
     class FilterPipeline;
@@ -45,14 +48,32 @@ class coupling::FilterPipeline{
         }
 
 
-		//applies the filter pipeline
+		/*
+		 * Applies each FilterSequence in order of their appearance in the config file.
+		 * Ouput of the specified output-FilterSequence will be written to _md2MacroCells.
+		 */
         void operator()();
 
 
 
     private:
+		/*
+		 * Detects errors in XML-config file.
+		 */
     	bool configIsValid(tinyxml2::XMLDocument& cfgfile);
+
+		/*
+		 * Interprets configuration of sequences and intializes them. Parameters known:
+		 *   -"domain-start"/"domain-end": <dim>-Vector (optional, uses entire md2Macro-domain by default)
+		 *   -"input": Name of another FilterSequence previously defined (optional, uses MD output (i.e. _md2MacroCells) by default)
+		 * Also detects which sequence will be used as output.
+		 */
        	int loadSequencesFromXML(tinyxml2::XMLElement* metaNode);
+
+		/*
+		 * Chooses a subspace of the cell (and index) input based on what will be transfered to the macro solver.
+		 * This subspace is usually called "md2Macro-domain".
+		 * */
 		int initMd2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells);
 
       
@@ -65,6 +86,10 @@ class coupling::FilterPipeline{
 
 		tinyxml2::XMLDocument _config;
 
+		/*
+		 * pi = per instance
+		 * mi = post multi-instance
+		 */
        	std::vector<coupling::FilterSequence<dim> *> _piSequences; 
        	std::vector<coupling::FilterSequence<dim> *> _miSequences;
 };

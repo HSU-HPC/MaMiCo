@@ -5,14 +5,21 @@
 #pragma once
 
 #include "coupling/IndexConversion.h"
-#include "tarch/configuration/ParseConfiguration.h"
+#include "tarch/configuration/ParseConfiguration.h" //TODO: remove?
 
-//INCLUDE ALL FILTERS HERE
+//INCLUDE ALL FILTER HEADERS HERE
 #include "coupling/filtering/filters/WriteToFile.h"
 #include "coupling/filtering/filters/Gauss.h"
 
-//Filter Sequences are used to logically group filters that will be used in chronological order.
-//@Author Felix Maurer
+/*
+ * Filter Sequences are used to group filters that will be applied in chronological order.
+ * It is possible to customize
+ *  - sequence input
+ * 	- sequence domain
+ * 	- filter parameters
+ * per Filter Sequence.
+ * @Author Felix Maurer
+ */
 
 namespace coupling{
     template<unsigned int dim>
@@ -22,6 +29,11 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterSequence {
 	public:
+		/*
+		 * Filter Sequences are constructed in coupling::FilterPipeline::loadSequencesFromXML(...).
+		 * inputCellVector and cellIndices cover the entire md2Macro domain.
+		 * domainStart and domainEnd span a subspace of the global (md2Macro) domain.
+		 */
     	FilterSequence( const coupling::IndexConversion<dim>* indexConversion,
 						const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector,
@@ -34,7 +46,7 @@ class coupling::FilterSequence {
 		_cellIndices(cellIndices), 
 		_domainStart(domainStart),
 		_domainEnd(domainEnd),
-		_isOutput(false)
+		_isOutput(false) //potentially updated via loadSequencesFromXML calling setAsOutput()
 		{	
 			#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Now initializing." << std::endl;
@@ -60,8 +72,20 @@ class coupling::FilterSequence {
         	#endif
     	}
 
+		/*
+		 * Interprets this sequence's filters' parameters (specified in filter_pipeline.xml) and creates filter objects based on that.
+		 * Since different filters require vastly different parameters and thus different means of instanciation,
+		 * you need to add each new filter manually to this method's "if/else-chain".
+		 *
+		 * Since after all filter objects are created it is possible to determine whether _cellVector1 or _cellVector2 will be used as output,
+		 * this is also done in here.
+		 */
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
-					
+		
+		/*
+		 * Each sequence operates on their own two copies of the global domain. 
+		 * Thus, before applying the sequence, we need to update these two copies.
+		 */
 		void updateCellVectors(){
 			for(unsigned int index = 0; index < _cellIndices.size(); index++){
 				*(_cellVector1[index]) = *(_inputCellVector[index]);
@@ -71,34 +95,33 @@ class coupling::FilterSequence {
 
     	const char* getName() { return _name; }
 
-		bool isOutput() { return _isOutput; };
-		void setAsOutput() { _isOutput = true; };
+		bool isOutput() { return _isOutput; }
+		void setAsOutput() { _isOutput = true; }
 
+		/*
+		 * Which one of the two cell vectors are this sequence's output is solely dependant on the number of filters the sequence contains,
+		 * because each swap (see loadFiltersFromXML) changes what is the sequence's final filter's output.
+		 */
     	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const{ 
 			if(_filters.empty()) std::cout << PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
 			if(_filters.size() % 2 == 0) return _cellVector1;
 			else return _cellVector2;
 		}
 
-    	//void setCellIndices(const std::vector<tarch::la::Vector<dim, unsigned int>>& cellIndices) { _cellIndices = cellIndices; }
-    	//std::vector<tarch::la::Vector<dim, unsigned int>> getCellIndices() { return _cellIndices; }
-       
 		std::vector<coupling::FilterInterface<dim> *> getFilters() { return _filters; }	
-
- 		//TODO: remove
-		void DEBUG_GET_VECTOR_SIZES(){
-			std::cout << PRINT_PREFIX << "Printing vector sizes, capacities" << std::endl;
-			std::cout << "_cellVector1: " << _cellVector1.size() << " , " << _cellVector1.capacity() << std::endl;
-			std::cout << "_cellVector2: " << _cellVector2.size() << " , " << _cellVector2.capacity() << std::endl;
-			std::cout << "_cellIndices: " << _cellIndices.size() << " , " << _cellIndices.capacity() << std::endl;
-			std::cout << "_inputDomainCellVector: " << _inputDomainCellVector.size() << " , " << _inputDomainCellVector.capacity() << std::endl;
-			std::cout << "_domainCellVector1: " << _domainCellVector1.size() << " , " << _domainCellVector1.capacity() << std::endl;
-			std::cout << "_domainCellVector2: " << _domainCellVector2.size() << " , " << _domainCellVector1.capacity() << std::endl;
-		}       
+      
 	private:
 		//TODO: move to constructor (?)
+		/*
+		 * Determines based on _domainStart and _domainEnd which of the global domain's cell belong to the sequence's local domain.
+		 * This initializes all domain vector member variables (see below).
+		 */
 		void initDomain();
+
 		//TODO: move to constructor (?)
+		/*
+		 * Copies all (global) input cells to _cellVector1 and _cellVector2.
+		 */
 		void initCellVectors();
 
 		std::string PRINT_PREFIX() const{
@@ -106,22 +129,24 @@ class coupling::FilterSequence {
 		}
 
 		const coupling::IndexConversion<dim>* _indexConversion;
+
     	const char* _name;
 
-    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector
+    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector TODO: remove once init...() functions are part of constructor
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector2;//allocated for this sequence only
     	std::vector<tarch::la::Vector<dim, unsigned int>> _cellIndices;//all of the above use the same indexing
 
-        /*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputDomainCellVector;//pointers to macro cells of this sequence's input that are within domain
+        /*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputDomainCellVector;//points to macro cells of this sequence's input that are within domain
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector1;//points to cells of vector 1 that are within the domain's range
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector2;//same for vector 2
 		tarch::la::Vector<dim, unsigned int> _domainStart;
 		tarch::la::Vector<dim, unsigned int> _domainEnd;
     	std::vector<tarch::la::Vector<dim, unsigned int>> _globalDomainCellIndices; //uses _cellIndices indexing (i. e. _domainStart .... _domainEnd))
-    	std::vector<tarch::la::Vector<dim, unsigned int>> _localDomainCellIndices; //starts at (0,0,0)
+    	std::vector<tarch::la::Vector<dim, unsigned int>> _localDomainCellIndices; //starts at (0,...,0)
 		
-		bool _isOutput;
+		bool _isOutput; //true if this sequence's output vector (see above) is the Filter Pipeline's output
+		
 		std::vector<coupling::FilterInterface<dim> *> _filters;
 		
 
