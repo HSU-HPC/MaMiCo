@@ -62,11 +62,11 @@ fi
 cd ${MAMICO_PATH}
 if [ "${parallel}" == "parallel" ]
 then
-        scons target=libsimplemd dim=3 build=release parallel=yes -j4
+        /usr/bin/env python $(which scons) target=libsimplemd dim=3 build=release parallel=yes -j4
         libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
         FLAGS="${FLAGS} -DMDParallel"
 else
-        scons target=libsimplemd dim=3 build=release parallel=no -j4
+	/usr/bin/env python $(which scons) target=libsimplemd dim=3 build=release parallel=no -j4
         libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
 fi
 

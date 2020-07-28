@@ -50,9 +50,9 @@
   -->
   <microscopic-solver
     type="md"
-    temperature="1.23"
+    temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="90"
+    number-md-simulations="50"
     density="0.813037037"
   />
 

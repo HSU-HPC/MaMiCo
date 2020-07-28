@@ -33,43 +33,27 @@ FoamFile
     }
     front
     {
-        type            cyclic;
-        inGroups        List<word> 1(cyclic);
+        type            patch;
         nFaces          400;
         startFace       22844;
-        matchTolerance  0.0001;
-        transform       unknown;
-        neighbourPatch  back;
     }
     back
     {
-        type            cyclic;
-        inGroups        List<word> 1(cyclic);
+        type            patch;
         nFaces          400;
         startFace       23244;
-        matchTolerance  0.0001;
-        transform       unknown;
-        neighbourPatch  front;
     }
     left
     {
-        type            cyclic;
-        inGroups        List<word> 1(cyclic);
+        type            patch;
         nFaces          400;
         startFace       23644;
-        matchTolerance  0.0001;
-        transform       unknown;
-        neighbourPatch  right;
     }
     right
     {
-        type            cyclic;
-        inGroups        List<word> 1(cyclic);
+        type            patch;
         nFaces          400;
         startFace       24044;
-        matchTolerance  0.0001;
-        transform       unknown;
-        neighbourPatch  left;
     }
     fronti
     {
