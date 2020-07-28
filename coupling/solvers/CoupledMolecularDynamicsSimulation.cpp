@@ -21,31 +21,23 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   if (_parallelTopologyService->isIdle()){
     return;
   }
-
   _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary,*_parallelTopologyService);
-
   // call to synchronise data in cells; needs to be at this point of the coupling algorithm as the particles need to be placed inside
   // the correct sampling volumes (hence: after communication with neighbours and molecule updates);
   // do it BEFORE quantities are manipulated as we can then also do some pre-processing here.
   _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
-
   // ------------ coupling step: distribute mass ---------------------
   _macroscopicCellService->distributeMass(t);
-
   // for isothermal simulations: apply thermostat
   _macroscopicCellService->applyTemperatureToMolecules(t);
-
   // ---------- from here: go on with usual MD algorithm ------------------------------
 
   // compute forces. After this step, each molecule has received all force contributions from its neighbors.
   _linkedCellService->iterateCellPairs(*_lennardJonesForce,false);
-
   // distribute momentum -> some methods require modification of force terms, therefore we call it AFTER the force computation and before everything else
   _macroscopicCellService->distributeMomentum(t);
-
   // apply boundary forces
   _macroscopicCellService->applyBoundaryForce(t);
-
   // evaluate statistics
   evaluateStatistics(t);
 
@@ -68,20 +60,14 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
       && (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0) ){
     _moleculeService->reorganiseMemory(*_parallelTopologyService,*_linkedCellService);
   }
-
   // plot also macroscopic cell information
   _macroscopicCellService->plotEveryMicroscopicTimestep(t);
-
   _linkedCellService->iterateCells(*_emptyLinkedListsMapping,false);
-
   // time integration. After this step, the velocities and the positions of the molecules have been updated.
   _moleculeService->iterateMolecules(*_timeIntegrator,false);
-
   // sort molecules into linked cells
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping,false);
-
   if (_parallelTopologyService->getProcessCoordinates()==tarch::la::Vector<MD_DIM,unsigned int>(0)){
     //if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
   }
 }
-

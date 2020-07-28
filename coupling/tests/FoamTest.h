@@ -329,15 +329,12 @@ private:
       // set macroscopic cell service and interfaces in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
-
       _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
       //std::cout << "Finish _simpleMD[i]->simulateTimesteps " << std::endl;
-
       // plot macroscopic time step info in multi md service
       _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);
     }
     _mdStepCounter += _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
-
     if (_rank==0){
       gettimeofday(&_tv.end,NULL);
       _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
@@ -352,7 +349,7 @@ private:
   }
 
   void twoWayCoupling(int cycle){ // Function to set the values from MD within the macro solver
-    if ( _cfg.twoWayCoupling){writeMDvalues2Foam();}
+    if ( _cfg.twoWayCoupling & (cycle>10)){writeMDvalues2Foam(); std::cout << "Done" << std::endl;}
     //write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle);
   }

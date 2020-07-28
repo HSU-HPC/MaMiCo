@@ -16,9 +16,9 @@ def couette_analytic(x_c, t_c):
 
 x_step = 2.5
 x = np.arange(x_step/2,50,x_step)
-t_start = 10
-t_end = 70
-t_step = 5
+t_start = 1
+t_end = 11
+t_step = 1
 particle_start = 3
 particle_number = 6
 for number in np.arange(t_start, t_end, t_step):

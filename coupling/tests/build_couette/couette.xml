@@ -44,11 +44,11 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout.
   -->
   <coupling
-    coupling-cycles="1000"
+    coupling-cycles="0"
     two-way-coupling="no"
     send-from-md-to-macro="no"
     filter-init-cycles="0"
-    write-csv-every-timestep="100"
+    write-csv-every-timestep="0"
     send-from-macro-to-md="no"
     compute-snr="no"
   />
@@ -99,9 +99,9 @@
   -->
   <microscopic-solver
     type="md"
-    temperature="1.1"
-    equilibration-steps="0"
-    number-md-simulations="100"
+    temperature="1.25"
+    equilibration-steps="10001"
+    number-md-simulations="1"
     density="0.813037037"
     noise-sigma="0.1666"
   />

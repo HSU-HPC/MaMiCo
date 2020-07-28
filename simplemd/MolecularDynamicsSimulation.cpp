@@ -266,7 +266,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
       _moleculeService = new simplemd::services::MoleculeService(
         localDomainSize,
         localDomainOffset,
-        _configuration.getDomainConfiguration().getCheckpointFilestem(),
+        _configuration.getDomainConfiguration().getCheckpointFilestem()+'_'+std::to_string(localMDSimulation),
         _configuration.getDomainConfiguration().getBlockSize()
       );
     } else {
@@ -376,11 +376,11 @@ simulateOneTimestep(const unsigned int &t){
   // Before this step, the ghost layer contains exactly those particles, which have left the local part of the domain during the previous timestep.
   // The algorithm proceeds as follows:
   //
-  // 1. put particles from ghost cells into the correct cells again: 
-  //   + If the ghost cell is part of a parallel boundary, molecules in the cell are sent to the respective neighboring process 
+  // 1. put particles from ghost cells into the correct cells again:
+  //   + If the ghost cell is part of a parallel boundary, molecules in the cell are sent to the respective neighboring process
   //        and sorted into the corresponding inner cell upon unpacking of receive buffer.
-  //   + If the ghost cell is part of a local periodic boundary, molecules in ghost cells are replicated with adapted position with 
-  //        respect to periodic boundary conditions, and stored in the local buffer. 
+  //   + If the ghost cell is part of a local periodic boundary, molecules in ghost cells are replicated with adapted position with
+  //        respect to periodic boundary conditions, and stored in the local buffer.
   //        Upon unpacking the local buffer, molecules are resorted into the correct cells.
   //
   // 2. fill ghost cells (for periodic boundaries or parallel boundaries).
@@ -428,7 +428,6 @@ simulateOneTimestep(const unsigned int &t){
   // empty linked lists
   _linkedCellService->iterateCells(*_emptyLinkedListsMapping,false);
 
-
   // time integration. After this step, the velocities and the positions of the molecules have been updated.
   _moleculeService->iterateMolecules(*_timeIntegrator,false);
 
@@ -474,11 +473,8 @@ void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned in
     simplemd::cellmappings::ComputeTemperatureMapping computeTemperatureMapping(*_parallelTopologyService,*_molecularPropertiesService,
       computeMeanVelocityMapping.getMeanVelocity(),_localMDSimulation);
     _linkedCellService->iterateCells(computeTemperatureMapping,false);
-    
   }
 
   // trigger profile plotting
   _profilePlotter->accumulateAndPlotInformation(t);
-
 }
-
