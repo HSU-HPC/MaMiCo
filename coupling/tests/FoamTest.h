@@ -9,6 +9,7 @@
 #include "coupling/tests/Test.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/configuration/ParseConfiguration.h"
+#include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
@@ -18,6 +19,7 @@
 #include <mpi.h>
 #endif
 #include <sys/time.h>
+#include <random>
 // Includes from OpenFOAM fdCFD.H
 // #include "parRun.H"
 #include "Time.H"
@@ -49,7 +51,7 @@
  */
 class FoamTest: public Test {
 public:
-  FoamTest(): Test("FoamTest") {
+  FoamTest(): Test("FoamTest"), _generator(0) {
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
@@ -65,6 +67,8 @@ public:
   }
 
 private:
+  enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
+
   void init(){
     initMPI();
     parseConfigurations();
@@ -122,6 +126,7 @@ private:
     std::string type;
     tarch::configuration::ParseConfiguration::readStringMandatory(type,subtag,"type");
     if(type == "md"){
+      _cfg.miSolverType = SIMPLEMD;
       tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp,subtag,"temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps,subtag,"equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.totalNumberMDSimulations,subtag,"number-md-simulations");
@@ -129,12 +134,18 @@ private:
         std::cout << "Could not read input file couette.xml: number-md-simulations < 1" << std::endl;
         exit(EXIT_FAILURE);
       }
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.density,subtag,"density");
+    }
+    else if(type == "synthetic"){
+      _cfg.miSolverType = SYNTHETIC;
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.noiseSigma,subtag,"noise-sigma");
+      _cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations,subtag,"number-md-simulations");
     }
     else{
       std::cout << "Could not read input file couette.xml: Unknown microscopic solver type!" << std::endl;
       exit(EXIT_FAILURE);
     }
+    tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.density,subtag,"density");
   }
 
   void initSolvers(){
@@ -161,18 +172,17 @@ private:
 
     _mdStepCounter = 0;
     if (_rank == 0){ gettimeofday(&_tv.start,NULL); }
-
     for (unsigned int i = 0; i < _localMDInstances; i++){
       _simpleMD[i]->init(*_multiMDService,_multiMDService->getGlobalNumberOfLocalMDSimulation(i));
     }
-
+    if(_cfg.miSolverType == SIMPLEMD){
     // equilibrate MD
     for (unsigned int i = 0; i < _localMDInstances; i++){
       _simpleMD[i]->switchOffCoupling();
       _simpleMD[i]->simulateTimesteps(_cfg.equSteps,_mdStepCounter);
     }
-
     _mdStepCounter += _cfg.equSteps;
+    }
 
     // allocate coupling interfaces
     for (unsigned int i = 0; i < _localMDInstances; i++){
@@ -196,6 +206,7 @@ private:
       _mamicoConfig.getMacroscopicCellConfiguration(), *_multiMDService
     );
 
+    if(_cfg.miSolverType == SIMPLEMD){
       // set couette solver interface in MamicoInterfaceProvider
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
@@ -204,12 +215,24 @@ private:
       // compute and store temperature in macroscopic cells (temp=1.1 everywhere)
       _multiMDCellService->getMacroscopicCellService(i).computeAndStoreTemperature(_cfg.temp);
     }
+    }
 
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
     allocateRecvBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
     _buf.foamCellIndices4SendBuffer = globalIndices2FoamIndices(_buf.globalCellIndices4SendBuffer, _buf.sendBuffer.size(), _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     findPointsInFoamBoundary(_buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size(), _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+
+    // manually allocate noise reduction if necessary
+    if(_cfg.miSolverType == SYNTHETIC){
+      _noiseReduction = _mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(
+      _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_multiMDService);
+      _couetteSolver = new coupling::solvers::CouetteSolver<3>(50,1.5,2.64198);
+      if (_couetteSolver==NULL){
+        std::cout << "ERROR CouetteTest::getCouetteSolver(): Analytic solver==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
     // finish time measurement for initialisation
     if(_rank == 0){
       gettimeofday(&_tv.end,NULL);
@@ -294,10 +317,10 @@ private:
       _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);}
       //extract data from couette solver and send them to MD (can take any index-conversion object)
       fillSendBuffer(_cfg.density,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.sendBuffer);
-      std::cout << "Finished MacroTimestep" << std::endl;
+      //std::cout << "Finished MacroTimestep" << std::endl;
     if(_cfg.macro2Md){
       _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-      std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
+      //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
     }
   }
 
@@ -323,7 +346,8 @@ private:
 
   void advanceMicro(int cycle){
     if (_rank==0){ gettimeofday(&_tv.start,NULL); }
-    std::cout << "Start MDTimpestep" << std::endl;
+    //std::cout << "Start MDTimpestep" << std::endl;
+    if(_cfg.miSolverType == SIMPLEMD){
     // run MD instances
     for (unsigned int i = 0; i < _localMDInstances; i++){
       // set macroscopic cell service and interfaces in MamicoInterfaceProvider
@@ -345,11 +369,41 @@ private:
       _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
       //std::cout << "Finish _multiMDCellService->sendFromMD2Macro " << std::endl;
     }
-    std::cout << "Finished MDTimestep" << std::endl;
+  }
+
+    if(_cfg.miSolverType == SYNTHETIC){
+      fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+
+      if (_rank==0){
+        gettimeofday(&_tv.end,NULL);
+        _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+        gettimeofday(&_tv.start,NULL);
+      }
+
+      //call noise filter on recvBuffer
+      _noiseReduction->beginProcessInnerMacroscopicCells();
+      for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
+        _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],_buf.globalCellIndices4RecvBuffer[i]);
+      }
+      _noiseReduction->endProcessInnerMacroscopicCells();
+      if(_noiseReduction->_doubleTraversal){
+        _noiseReduction->beginProcessInnerMacroscopicCells();
+        for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
+          _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],_buf.globalCellIndices4RecvBuffer[i]);
+        }
+        _noiseReduction->endProcessInnerMacroscopicCells();
+      }
+
+      if (_rank==0){
+        gettimeofday(&_tv.end,NULL);
+        _tv.filter += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+      }
+    }
+    //std::cout << "Finished MDTimestep" << std::endl;
   }
 
   void twoWayCoupling(int cycle){ // Function to set the values from MD within the macro solver
-    if ( _cfg.twoWayCoupling & (cycle>10)){writeMDvalues2Foam(); std::cout << "Done" << std::endl;}
+    if ( _cfg.twoWayCoupling){writeMDvalues2Foam(); std::cout << "Done" << std::endl;}
     //write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle);
   }
@@ -664,17 +718,43 @@ private:
     // file.close();
   }
 
-    struct CouetteConfig{
+  void fillRecvBuffer(
+    const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,const coupling::IndexConversion<3>& indexConversion,
+    std::vector<coupling::datastructures::MacroscopicCell<3>* >& sendBuffer, const unsigned int * const globalCellIndices4SendBuffer
+  ) {
+    const unsigned int size = sendBuffer.size();
+    const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+    const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+    const double mass = density*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+
+    std::normal_distribution<double> distribution (0.0,_cfg.noiseSigma);
+    for (unsigned int i = 0; i < size; i++){
+      // get global cell index vector
+      const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(globalCellIndices4SendBuffer[i]));
+      // determine cell midpoint
+      tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
+      for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
+      // compute momentum
+      const tarch::la::Vector<3,double> noise(distribution(_generator),distribution(_generator),distribution(_generator));
+      const tarch::la::Vector<3,double> momentum(mass*(couetteSolver.getVelocity(cellMidPoint)+noise));
+      sendBuffer[i]->setMacroscopicMass(mass);
+      sendBuffer[i]->setMacroscopicMomentum(momentum);
+    }
+  }
+
+  struct CouetteConfig{
     // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
     int couplingCycles;
     bool md2Macro, macro2Md, twoWayCoupling;
     int csvEveryTimestep;
+    MicroSolverType miSolverType;
     double density;
     // only for LB couette solver: VTK plotting per time step
     int plotEveryTimestep;
     double temp;
     int equSteps;
     int totalNumberMDSimulations;
+    double noiseSigma;
   };
 
   struct CouplingBuffer{
@@ -702,12 +782,16 @@ private:
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
   CouetteConfig _cfg;
   unsigned int _mdStepCounter;
+  coupling::solvers::AbstractCouetteSolver<3> *_couetteSolver;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL,3> *_multiMDCellService;
   CouplingBuffer _buf;
   unsigned int _localMDInstances;
   std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterface;
   std::vector<coupling::interface::MDSimulation*> _simpleMD;
+  std::default_random_engine _generator;
+  coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
+  double _sum_signal, _sum_noise;
   TimingValues _tv;
   Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests", "build_foam")};
   Foam::fvMesh mesh{Foam::fvMesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ))};
