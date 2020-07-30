@@ -95,9 +95,9 @@ class coupling::services::MultiMDCellService {
 
     ~MultiMDCellService(){
       for (unsigned int i = 0; i < _totalNumberMDSimulations; i++){
-        if (_macroscopicCellServices[i]!=NULL){
+        if (_macroscopicCellServices[i]!=nullptr){
           delete _macroscopicCellServices[i]; 
-          _macroscopicCellServices[i] = NULL; 
+          _macroscopicCellServices[i] = nullptr; 
           }
       }
       if (_macroscopicCellServices!=NULL){ 
