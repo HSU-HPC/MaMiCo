@@ -180,10 +180,11 @@ class coupling::services::MultiMDCellService {
       delete _macroscopicCellServices[globalIndex];
       _macroscopicCellServices[globalIndex] = nullptr;
 
-      if(localIndex >= 0 && localIndex < (int)_localNumberMDSimulations) {
+
+      /*if(localIndex >= 0 && localIndex < (int)_localNumberMDSimulations) {
         _localNumberMDSimulations -= 1;
       }
-      _totalNumberMDSimulations -= 1;
+      _totalNumberMDSimulations -= 1;*/
     }
 
     unsigned int getLocalNumberOfMDSimulations() const { return _localNumberMDSimulations; }

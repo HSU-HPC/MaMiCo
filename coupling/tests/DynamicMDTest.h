@@ -61,10 +61,10 @@ public:
           _multiMDCellService->rmMDSimulation(iSim, iMD);
           if(iSim >= 0 && iSim < (int)_localMDInstances) {
             _simpleMD[iSim]->shutdown();
-            _simpleMD.erase(_simpleMD.begin()+iSim);
+            //_simpleMD.erase(_simpleMD.begin()+iSim);
             delete _mdSolverInterface[iSim];
-            _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
-            _localMDInstances -= 1;
+            //_mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
+            //_localMDInstances -= 1;
           }
         }
       }
@@ -429,6 +429,8 @@ private:
     if(_cfg.miSolverType == SIMPLEMD){
       // run MD instances
       for (unsigned int i = 0; i < _localMDInstances; i++){
+        if(&_multiMDCellService->getMacroscopicCellService(i) == nullptr) continue;
+
         // set macroscopic cell service and interfaces in MamicoInterfaceProvider
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
