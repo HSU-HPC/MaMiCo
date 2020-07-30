@@ -176,33 +176,14 @@ class coupling::services::MultiMDCellService {
 
     /** removes select MD simulation */
     void rmMDSimulation(const int & localIndex, const int & globalIndex) {
-      // Set processes of this simulation to inactive
-      _multiMDService.deactivateSimulation(globalIndex);
-      
       // Delete respecte macroscopic solver interface on all ranks
-      auto **mcsTemp = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations-1];
-
       delete _macroscopicCellServices[globalIndex];
       _macroscopicCellServices[globalIndex] = nullptr;
-
-      int counter=0;
-      for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
-        if(_macroscopicCellServices[i] != nullptr) {
-          mcsTemp[counter] = _macroscopicCellServices[i];
-          counter += 1;
-        }
-      }
-
-      delete [] _macroscopicCellServices;
-      _macroscopicCellServices = mcsTemp;
 
       if(localIndex >= 0 && localIndex < (int)_localNumberMDSimulations) {
         _localNumberMDSimulations -= 1;
       }
       _totalNumberMDSimulations -= 1;
-
-      // Compute new topology offset
-      _topologyOffset = reComputeTopologyOffset();
     }
 
     unsigned int getLocalNumberOfMDSimulations() const { return _localNumberMDSimulations; }
@@ -212,13 +193,6 @@ class coupling::services::MultiMDCellService {
       // determine topology offset of this rank
       const unsigned int intNumberProcesses = computeScalarNumberProcesses();
       const unsigned int topologyOffset = (_multiMDService.getGlobalRank()/intNumberProcesses)*intNumberProcesses;
-      return topologyOffset;
-    }
-
-    unsigned int reComputeTopologyOffset() const {
-      // determine topology offset of this rank
-      const unsigned int intNumberProcesses = computeScalarNumberProcesses();
-      const unsigned int topologyOffset = (_multiMDService.getGlobalActiveRank()/intNumberProcesses)*intNumberProcesses;
       return topologyOffset;
     }
 

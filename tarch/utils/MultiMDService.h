@@ -55,16 +55,8 @@ class tarch::utils::MultiMDService {
     void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
     void setThisNumberMDSimulations(unsigned int n) { _thisNumberMDSimulations = n; }
 
-    int getNumberActiveProcesses() const { return _numberActiveProcesses; }
-    int getActiveProcesses() const { return _numberActiveProcesses; }
-
-    int getGlobalActiveRank() const { return _globalActiveRank; }
     int getRank() const { return this->_globalRank; }
     int getSize() const { return this->_globalSize; }
-
-    void computeGlobalActiveRanks();
-    void deactivateSimulation(const int &globalIndex);
-
 
   private: 
     #if (TARCH_PARALLEL==TARCH_YES)
@@ -93,12 +85,6 @@ class tarch::utils::MultiMDService {
 
     int _localSize; // size of communicator _localComm
     int _localRank; // local rank in communicator _localComm
-
-    int _numberActiveProcesses;
-    int _globalActiveRank; // non-active processes shall receive rank -1
-    std::vector<bool> _activeProcesses; // Indicating whether a processes is currently in use
-    std::vector<char> _globalMDMap; // Indicating whether a md instance is active or not
-                                    // May, potentially, grow (when adding MD instances is implemented)    
 };
 
 #include "tarch/utils/MultiMDService.cpph"
