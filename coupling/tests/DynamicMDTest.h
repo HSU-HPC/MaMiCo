@@ -61,8 +61,11 @@ public:
           _multiMDCellService->rmMDSimulation(iSim, iMD);
           if(iSim >= 0 && iSim < (int)_localMDInstances) {
             _simpleMD[iSim]->shutdown();
+            delete _simpleMD[iSim];
+            _simpleMD[iSim] = nullptr;
             //_simpleMD.erase(_simpleMD.begin()+iSim);
             delete _mdSolverInterface[iSim];
+            _mdSolverInterface[iSim] = nullptr;
             //_mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
             //_localMDInstances -= 1;
           }
@@ -557,7 +560,7 @@ private:
     for (unsigned int i = 0; i < _localMDInstances; i++) {
       // the shutdown operation may also delete the md solver interface; therefore, we update the MD solver interface in the vector _mdSolverInteface after the shutdown is completed
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
-      _simpleMD[i]->shutdown(); delete _simpleMD[i]; _simpleMD[i] = NULL;
+      if(_simpleMD[i] != nullptr) {_simpleMD[i]->shutdown(); delete _simpleMD[i]; _simpleMD[i] = NULL; }
       _mdSolverInterface[i] = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
     }
     _simpleMD.clear();
