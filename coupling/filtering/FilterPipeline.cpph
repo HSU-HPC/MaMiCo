@@ -2,7 +2,6 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
-//TODO: move this to header (?)
 //constructors of coupling::FilterPipeline
 template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
@@ -72,7 +71,7 @@ void coupling::FilterPipeline<dim>::operator()(){
 		if(currSequence->isOutput()){
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > sequenceOutputCells = currSequence->getOutputCellVector(); 
 			for(unsigned int index = 0; index < _md2MacroCells.size(); index++) *(_md2MacroCells[index]) = *(sequenceOutputCells[index]);
-		}//TODO: test correctness 
+		}
     }
 }
 

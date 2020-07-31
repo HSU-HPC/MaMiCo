@@ -21,7 +21,12 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _localDomainCellIndices, currFilterNode->Attribute("location")));
         }
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
-			//TODO: Fix this
+			int d; //dimension of gauss filter
+			if(currFilterNode->QueryIntAttribute("dim", &d)){
+				std::cout << "ERROR: Gaussian Filter misses attribute dim in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			//"use" is not mandatory
 			bool uses[7] = { false };
 			const char* useStr = currFilterNode->Attribute("use");
 			if(useStr){
@@ -33,7 +38,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				if(strstr(useStr, "velocity")) uses[5] = true;
 				if(strstr(useStr, "temperature")) uses[6] = true;
 			}
-            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, uses));
+            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices,(unsigned int) d, uses));
 		}
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
        		//TODO
