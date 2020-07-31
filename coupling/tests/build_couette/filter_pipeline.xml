@@ -5,7 +5,7 @@
 <filter-pipeline>
 
     <per-instance output="sequence-1">
-		<sequence-1 input="md" domain-start="1;2;1" domain-end="3 ; 12 ; 3">
+		<sequence-1 input="md" domain-start="1;2;1" domain-end="3;12;3">
             <write-to-file 
                 location="testwtf.csv"
 			/>
@@ -13,6 +13,7 @@
                 location="testwtf2.csv"
             />
 			<gauss
+				dim="2"
 			/>
         </sequence-1>
 
@@ -21,7 +22,8 @@
                 location="seq2_before"
             />
 			<gauss
-				use="velocity potential-energy"
+				use="micro-momentum micro-mass"
+				dim="1" 
 			/>
 			<write-to-file 
                 location="seq2_after"

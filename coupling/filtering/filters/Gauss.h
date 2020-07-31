@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#define DEBUG_GAUSS
+//#define DEBUG_GAUSS
 #include "coupling/filtering/FilterInterface.h"
 
 namespace coupling {
@@ -29,10 +29,12 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
         Gauss(  const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //Use local indexing! (starting at (0,...,0))
+				unsigned int d,
 				const bool uses[7]):
 				
 				
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices),
+				_dim(d),
 				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back()),
 				_useMicroMass(uses[0]),
 			 	_useMicroMomentum(uses[1]),
@@ -66,6 +68,9 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
      
 	    void operator()();
 	private:
+		//on which axis this filter operates. 0 <= _dim <= dim
+		unsigned int _dim;
+
 		//returns the cell that's above the cell at index on the d-axis
 		unsigned int getLowerCellIndex(unsigned int index, unsigned int d);
 		//returns the cell that's below the cell at index on the d-axis
