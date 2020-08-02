@@ -25,10 +25,11 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //covers the entire MD domain
+				bool filteredValues[7], //TODO: will man nicht immer alles printen?
 				const std::vector<tarch::la::Vector<dim, unsigned int>> localCellIndices, //covers the entire MD domain
 				std::string location):
 
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices),
+				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
 				_localCellIndices(localCellIndices),
 		   		_location(location)
 		{

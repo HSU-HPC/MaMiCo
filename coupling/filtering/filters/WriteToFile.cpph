@@ -18,20 +18,17 @@ void coupling::WriteToFile<dim>::operator()(){
 
 	for(unsigned int d = 0; d<dim; d++) _file << "Local Index " << d << ", ";
 	for(unsigned int d = 0; d<dim; d++) _file << "Global Index " << d << ", ";
+	//TODO: only display printed columns
     _file << "Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Velocity X, Velocity Y, Velocity Z, Temperature" << std::endl;
     for(auto cell : coupling::FilterInterface<dim>::_inputCells){
         _file 
-        << _localCellIndices[indexCounter] << ", "
-        << coupling::FilterInterface<dim>::_cellIndices[indexCounter] << ", "
-        << cell->getMicroscopicMass() << ", "
-        << cell->getMicroscopicMomentum() << ", "
-        << cell->getMacroscopicMass() << ", "
-        << cell->getMicroscopicMomentum() << ", "
-        << cell->getPotentialEnergy() << ", "
-        << cell->getCurrentVelocity() << ", "
-        << cell->getTemperature() << std::endl;
-
-
+        << _localCellIndices[indexCounter] << " , "
+        << coupling::FilterInterface<dim>::_cellIndices[indexCounter];
+		for(auto sGetter : coupling::FilterInterface<dim>::_scalarGetters)
+        	_file << " , " << (cell->*sGetter)();
+		for(auto vGetter : coupling::FilterInterface<dim>::_vectorGetters)
+        	_file << " , " << (cell->*vGetter)();
+		_file << std::endl;
         indexCounter++;
     }
     _file.close(); 
