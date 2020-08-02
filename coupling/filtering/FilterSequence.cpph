@@ -17,8 +17,23 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	#endif	
 	bool firstIteration = true;
     while(currFilterNode){
+		//"use" is not mandatory, default is false
+		bool filteredValues[7] = { false };
+		const char* fvStr = currFilterNode->Attribute("filtered-values");
+		if(fvStr){
+			if(strstr(fvStr, "all")) memset(filteredValues, true, sizeof(filteredValues));
+			else{
+				if(strstr(fvStr, "micro-mass")) filteredValues[0] = true;
+				if(strstr(fvStr, "micro-momentum")) filteredValues[1] = true;
+				if(strstr(fvStr, "macro-mass")) filteredValues[2] = true;
+				if(strstr(fvStr, "macro-momentum")) filteredValues[3] = true;
+				if(strstr(fvStr, "potential-energy")) filteredValues[4] = true;
+				if(strstr(fvStr, "velocity")) filteredValues[5] = true;
+				if(strstr(fvStr, "temperature")) filteredValues[6] = true;
+			}
+		}
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0){
-            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _localDomainCellIndices, currFilterNode->Attribute("location")));
+            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location")));
         }
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
 			int d; //dimension of gauss filter
@@ -26,19 +41,11 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				std::cout << "ERROR: Gaussian Filter misses attribute dim in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}
-			//"use" is not mandatory
-			bool uses[7] = { false };
-			const char* useStr = currFilterNode->Attribute("use");
-			if(useStr){
-				if(strstr(useStr, "micro-mass")) uses[0] = true;
-				if(strstr(useStr, "micro-momentum")) uses[1] = true;
-				if(strstr(useStr, "macro-mass")) uses[2] = true;
-				if(strstr(useStr, "macro-momentum")) uses[3] = true;
-				if(strstr(useStr, "potential-energy")) uses[4] = true;
-				if(strstr(useStr, "velocity")) uses[5] = true;
-				if(strstr(useStr, "temperature")) uses[6] = true;
-			}
-            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices,(unsigned int) d, uses));
+			//"extrapolation" is not mandatory			
+			const char* extrapolation;
+			extrapolation = currFilterNode->Attribute("extrapolation");
+
+            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, filteredValues, (unsigned int) d, extrapolation));
 		}
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
        		//TODO
