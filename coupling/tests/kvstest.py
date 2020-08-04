@@ -64,8 +64,8 @@ class KVSTest():
     def initSolvers(self):
         self.macroscopicSolver = LBSolver(self.cfg)
 
-        self.multiMDService = mamico.tarch.utils.MultiMDService(self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-            self.cfg.getint("microscopic-solver","number-md-simulations"))
+        self.multiMDService = mamico.tarch.utils.MultiMDService(numberProcesses = self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+            totalNumberMDSimulations = self.cfg.getint("microscopic-solver","number-md-simulations"))
 
         self.localMDInstances = self.multiMDService.getLocalNumberOfMDSimulations()
         self.simpleMD = [getMDSimulation(self.simpleMDConfig,self.mamicoConfig, 
