@@ -105,15 +105,18 @@ class KVSTest():
             log.info("Finished initSolvers") # after ? ms
 
     def shutdown(self):
-        pass #todo
+        for i in range(self.localMDInstances):
+            self.simpleMD[i].shutdown()
 
     def advanceMacro(self,cycle):
         self.macroscopicSolver.advance(dt) #todo get dt
         pass
 
     def advanceMicro(self, cycle):
+        numT = self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
         for i in range(self.localMDInstances):
-            self.simpleMD[i].simulateTimesteps(dt,cycle)  #todo get dt here
+            self.simpleMD[i].simulateTimesteps(numT,self.mdStepCounter)
+        self.mdStepCounter = self.mdStepCounter + numT
 
     def twoWayCoupling(self, cycle):
         pass #todo

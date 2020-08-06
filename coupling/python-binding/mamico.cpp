@@ -1,3 +1,6 @@
+// This file is part of the MaMiCo project. For conditions of distribution
+// and use, please see the copyright notice in MaMiCo's main folder
+
 #include <pybind11/pybind11.h>
 #include <mpi.h>
 #include <string>
@@ -9,38 +12,49 @@
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/interface/MDSimulationFactory.h"
+#include "coupling/services/MultiMDCellService.h"
+#include "coupling/solvers/CouetteSolverInterface.h"
 
 // for debugging purposes only
 #include <iostream>
 
+/** 
+ *  Python bindings for MaMiCo framework
+ *
+ *  Features:
+ *   - Submodule hierarchy structures MaMiCo on the python side 
+ *   - Interactive runtime access to all XML configuration values
+ *   - Automatic bidirectional conversion between python tuple/list and tarch:la::Vector
+ *   - MPI parallel (MPI communication on C++ side, rank is returned to python side)
+ *   - Interactive runtime management of coupling services and interface classes
+ *       (using python wrappers around C++ objects)
+ *   - Automatic garbage collection is responsible for deleting objects that are
+ *       created / managed on the python side. (Manual memory management on C++ side.)
+ *
+ *  Limitations:
+ *   - Implemented for dim=3 only
+ *   - Openmpi version minimum required: 3.0
+ *
+ *  @author Piet Jarmatz
+ */
+
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-int initMPI(){
-	py::list argv_list = py::module::import("sys").attr("argv");
-
-	char** argv = new char * [argv_list.size()];
-	int argc = 0;
-	for (auto arg : argv_list)
-		argv[argc++] = (new std::string(PyUnicode_AsUTF8(arg.ptr())))->data();  //todo mini memleak here
-
-	// DEBUG
-	// std::cout << "argc = " << argc << std::endl;
-	// for(int i = 0; i < argc; i++)
-	// std::cout << "argv[" << i << "] = " << argv[i] << std::endl;
-
-	int rank = 0;
-	MPI_Init(&argc,&argv);
-	delete[] argv;
-	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-	return rank;
-}
-
+// Helper function for allocation of configuration object and XML parsing
 template<class T> T* makeConfiguration(const std::string filename, const std::string topleveltag){
-	T* cfg = new T{};
+	T* cfg = new T{};  // corresponding delete will be called by python, because of return_value_policy::take_ownership
 	tarch::configuration::ParseConfiguration::parseConfiguration<T>(filename,topleveltag,*cfg);
 	return cfg;
 }
+
+///////////////////////////////////////////////////////////////////////////////////
+// 
+// Type casters for automatic runtime conversion between 
+// PySequence, e.g. tuple or list, on the python side
+// tarch:la::Vector on the MaMiCo C++ side
+//
+///////////////////////////////////////////////////////////////////////////////////
 
 using Vec3ui = tarch::la::Vector<3,unsigned int>;
 namespace pybind11 { namespace detail {
@@ -108,7 +122,33 @@ namespace pybind11 { namespace detail {
     };
 }} // namespace pybind11::detail
 
+///////////////////////////////////////////////////////////////////////////////////
+//   End of type casters //////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+
+// Helper function, calls MPI_Init and returns this rank
+int initMPI(){
+	// Get argc and argv
+	py::list argv_list = py::module::import("sys").attr("argv");
+	char** argv = new char * [argv_list.size()];
+	int argc = 0;
+	for (auto arg : argv_list)
+		// (todo mini memleak here)
+		argv[argc++] = (new std::string(PyUnicode_AsUTF8(arg.ptr())))->data();  
+
+	int rank = 0;
+	MPI_Init(&argc,&argv);
+	delete[] argv;
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+	return rank;
+}
+
 PYBIND11_MODULE(mamico, mamico) {
+
+	////////////////////////////////////////////////////////////////////////////////
+	//  Module and submodule hierarchy definitions  ////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+
 	mamico.doc() = "The macro micro coupling tool";
 
 	py::module coupling = mamico.def_submodule("coupling", "Contains the coupling tool and interface implementations");
@@ -124,6 +164,10 @@ PYBIND11_MODULE(mamico, mamico) {
 
 	utils.def("initMPI", &initMPI, "Calls MPI_Init and returns rank of this process");
 	utils.def("finalizeMPI", &MPI_Finalize, "Calls MPI_Finalize");
+
+	///////////////////////////////////////////////////////////////////////////////////
+	// Bindings for all simplemd configuration classes and getter functions  //////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	py::class_<simplemd::configurations::MolecularDynamicsConfiguration>(configuration, "MolecularDynamicsConfiguration")
 		.def("__repr__",
@@ -196,16 +240,58 @@ PYBIND11_MODULE(mamico, mamico) {
 	py::class_<simplemd::configurations::ExternalForceConfiguration>(configuration, "ExternalForceConfiguration")	
 			.def("getExternalForce", &simplemd::configurations::ExternalForceConfiguration::getExternalForce);
 
+	///////////////////////////////////////////////////////////////////////////////////
+	// Bindings for all coupling configuration classes and getter functions  //////////
+	///////////////////////////////////////////////////////////////////////////////////
+
 	py::class_<coupling::configurations::MaMiCoConfiguration<3>>(configuration, "MaMiCoConfiguration")
 		.def("__repr__",
 	        [](const coupling::configurations::MaMiCoConfiguration<3> &c) {
 	            return "<MaMiCoConfiguration read from XML tag \"" + c.getTag() + "\">";
 	        }
 	    )
-	    .def("isValid", &coupling::configurations::MaMiCoConfiguration<3>::isValid);
+	    .def("isValid", &coupling::configurations::MaMiCoConfiguration<3>::isValid)
+		.def("getMacroscopicCellConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMacroscopicCellConfiguration, py::return_value_policy::reference)
+		.def("getParticleInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParticleInsertionConfiguration, py::return_value_policy::reference)
+		.def("getMomentumInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMomentumInsertionConfiguration, py::return_value_policy::reference)
+		.def("getBoundaryForceConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getBoundaryForceConfiguration, py::return_value_policy::reference)
+		.def("getTransferStrategyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getTransferStrategyConfiguration, py::return_value_policy::reference)
+		.def("getNoiseReductionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getNoiseReductionConfiguration, py::return_value_policy::reference)
+		.def("getParallelTopologyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParallelTopologyConfiguration, py::return_value_policy::reference);
+
+	py::class_<coupling::configurations::MacroscopicCellConfiguration<3>>(configuration, "MacroscopicCellConfiguration")
+		.def("getMacroscopicCellSize", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicCellSize)
+		.def("getNumberLinkedCellsPerMacroscopicCell", &coupling::configurations::MacroscopicCellConfiguration<3>::getNumberLinkedCellsPerMacroscopicCell)
+		.def("getWriteEveryMicroscopicTimestep", &coupling::configurations::MacroscopicCellConfiguration<3>::getWriteEveryMicroscopicTimestep)
+		.def("getMicroscopicFilename", &coupling::configurations::MacroscopicCellConfiguration<3>::getMicroscopicFilename)
+		.def("getWriteEveryMacroscopicTimestep", &coupling::configurations::MacroscopicCellConfiguration<3>::getWriteEveryMacroscopicTimestep)
+		.def("getMacroscopicFilename", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicFilename);
+
+	py::class_<coupling::configurations::ParticleInsertionConfiguration>(configuration, "ParticleInsertionConfiguration")
+		.def("getParticleInsertionType", &coupling::configurations::ParticleInsertionConfiguration::getParticleInsertionType);
+
+	py::class_<coupling::configurations::MomentumInsertionConfiguration>(configuration, "MomentumInsertionConfiguration")
+		.def("getMomentumInsertionType", &coupling::configurations::MomentumInsertionConfiguration::getMomentumInsertionType)
+		.def("getInnerOverlap", &coupling::configurations::MomentumInsertionConfiguration::getInnerOverlap);
+
+	py::class_<coupling::configurations::BoundaryForceConfiguration<3>>(configuration, "BoundaryForceConfiguration")
+		.def("getBoundaryForceType", &coupling::configurations::BoundaryForceConfiguration<3>::getBoundaryForceType);
+
+	py::class_<coupling::configurations::TransferStrategyConfiguration<3>>(configuration, "TransferStrategyConfiguration")
+		.def("getStrategyType", &coupling::configurations::TransferStrategyConfiguration<3>::getStrategyType);
+
+	py::class_<coupling::configurations::NoiseReductionConfiguration>(configuration, "NoiseReductionConfiguration")
+		.def("getNoiseReductionType", &coupling::configurations::NoiseReductionConfiguration::getNoiseReductionType);
+
+	py::class_<coupling::configurations::ParallelTopologyConfiguration>(configuration, "ParallelTopologyConfiguration")
+		.def("getParallelTopologyType", &coupling::configurations::ParallelTopologyConfiguration::getParallelTopologyType);
 
 	configuration.def("parseMolecularDynamicsConfiguration", &makeConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>, py::return_value_policy::take_ownership);
 	configuration.def("parseMaMiCoConfiguration", &makeConfiguration<coupling::configurations::MaMiCoConfiguration<3>>, py::return_value_policy::take_ownership);
+
+	///////////////////////////////////////////////////////////////////////////////////
+	// Bindings for coupling service and interface classes and functions //////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
     py::class_<tarch::utils::MultiMDService<3>>(utils, "MultiMDService")
         .def(py::init<const Vec3ui &, const unsigned int &>(),
@@ -220,7 +306,14 @@ PYBIND11_MODULE(mamico, mamico) {
     		&coupling::interface::MDSimulation::init)
     	.def("switchOffCoupling", &coupling::interface::MDSimulation::switchOffCoupling)
     	.def("switchOnCoupling", &coupling::interface::MDSimulation::switchOnCoupling)
-    	; 
+    	.def("simulateTimesteps", &coupling::interface::MDSimulation::simulateTimesteps, 
+    		"numberTimesteps"_a=1, "firstTimestep"_a)
+    	.def("setMacroscopicCellService", &coupling::interface::MDSimulation::setMacroscopicCellService)
+    	.def("shutdown", &coupling::interface::MDSimulation::shutdown); 
+
+    py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService");
+
+    py::class_<coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>>(services, "MultiMDCellService");
 
     coupling.def("getMDSimulation", []
     	(const simplemd::configurations::MolecularDynamicsConfiguration& c1,
@@ -228,4 +321,35 @@ PYBIND11_MODULE(mamico, mamico) {
     	 void* comm){
     		return coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(c1,c2,(MPI_Comm) comm);
     	}, "simpleMDConfig"_a, "mamicoConfig"_a, "localComm"_a, py::return_value_policy::take_ownership);
+
+    py::class_<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>>(interface, "MDSolverInterface");
+
+    coupling.def("getMDSolverInterface", []
+    	(const simplemd::configurations::MolecularDynamicsConfiguration& c1,
+    	 const coupling::configurations::MaMiCoConfiguration<3>& c2,
+    	 coupling::interface::MDSimulation* sim){
+    		return coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSolverInterface(c1,c2,sim);
+    	},  py::return_value_policy::take_ownership);
+
+    py::class_<coupling::interface::MacroscopicSolverInterface<3>> maSoIf(interface, "MacroscopicSolverInterface");
+
+    // we indicate that CouetteSolverInterface is a subclass of MacroscopicSolverInterface by passing maSoIf here
+    py::class_<coupling::solvers::CouetteSolverInterface<3>>(solvers, "CouetteSolverInterface", maSoIf)
+    	.def(py::init<tarch::la::Vector<3,unsigned int>,unsigned int>());
+
+    // expose MamicoInterfaceProvider singleton to python side
+    coupling.def("setMacroscopicSolverInterface", []
+    	(coupling::interface::MacroscopicSolverInterface<3> * iface){
+    		coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(iface);
+    	} );
+    coupling.def("getMacroscopicSolverInterface", [](){
+    		return coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMacroscopicSolverInterface();
+    	} );
+    coupling.def("setMDSolverInterface", []
+    	(coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> * iface){
+    		coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(iface);
+    	} );
+    coupling.def("getMDSolverInterface", [](){
+    		return coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
+    	} );
 }
