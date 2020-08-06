@@ -49,7 +49,7 @@ class MDSimulation {
     /** simulates numberTimesteps time steps and starts at time step no. firstTimestep*/
     virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep) = 0;
     /** simulates a single time step*/
-    virtual void simulateTimestep(const unsigned int &thisTimestep ){const unsigned int steps=1; simulateTimesteps(thisTimestep,steps);}
+    //virtual void simulateTimestep(const unsigned int &thisTimestep ){const unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
     virtual void sortMoleculesIntoCells() = 0;
 
     virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) = 0;
