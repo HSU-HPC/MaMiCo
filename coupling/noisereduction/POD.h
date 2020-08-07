@@ -2,7 +2,6 @@
 #define _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_POD_H_
 
 #include "coupling/noisereduction/NoiseReduction.h"
-#include "coupling/filtering/FilterInterface.h"
 #define EIGEN_NO_DEBUG
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
@@ -20,8 +19,8 @@ namespace coupling {
  */
 template<unsigned int dim>
 class coupling::noisereduction::POD:
-public coupling::noisereduction::NoiseReduction<dim> //TODO: is this now deprecated?
-/*public coupling::FilterInterface<dim>*/{
+public coupling::noisereduction::NoiseReduction<dim>
+{
   public:
     POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim>& multiMDService, int tws, int kmax);
     virtual ~POD();

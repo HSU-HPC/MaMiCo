@@ -186,7 +186,7 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		if(inputFilterSequence){
 			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell));
 			#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
+			std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
 			#endif
 		}
 		else {

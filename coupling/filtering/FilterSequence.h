@@ -10,6 +10,7 @@
 //INCLUDE ALL FILTER HEADERS HERE
 #include "coupling/filtering/filters/WriteToFile.h"
 #include "coupling/filtering/filters/Gauss.h"
+#include "coupling/filtering/filters/POD.h"
 
 /*
  * Filter Sequences are used to group filters that will be applied in chronological order.

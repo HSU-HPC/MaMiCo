@@ -1,0 +1,68 @@
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamico
+
+/** Implementation of POD.h
+ *  @author Piet Jarmatz, Felix Maurer
+ */
+
+//Member functions of POD.h:
+
+
+//TODO MPI parallelization
+template<unsigned int dim>
+void coupling::POD<dim>::operator()(){	
+    #ifdef DEBUG_POD
+    std::cout << "		POD: Applying filter...";
+    #endif 
+
+//beginProcess: first traversal
+	_spatialIndex = 0;
+//process: first traversal
+	//TODO
+	for(unsigned int index = 0; index < coupling::FilterInterface<dim>::_cellIndices.size(); index++){
+		// save data into snapshot matrix
+    	_data[0](_t, _spatialIndex) = coupling::FilterInterface<dim>::_inputCells[index]->getMacroscopicMass();
+    	for (unsigned int d = 0; d < dim; d++){    // (optimized compiler will unroll this loop)
+      		_data[d+1](_t, _spatialIndex) = coupling::FilterInterface<dim>::_inputCells[index]->getMacroscopicMomentum()[d];
+    	}
+		_spatialIndex++;
+	}//index
+//endProcess: first traversal
+//beginProcess: second traversal
+	_spatialIndex = 0;
+    for (unsigned int d = 0; d < dim+1; d++){
+      // TODO write this in more efficient iterative form, 
+      // updating just one single column instead of everything
+      // and compute only lower triangular part!
+      _C[d] = _data[d] * _data[d].transpose();
+    }
+  
+    for (unsigned int d = 0; d < dim+1; d++){
+      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(_C[d]);
+
+      _A[d] = solver.eigenvectors().rightCols(_kMax);
+      _A_T[d] = _A[d].transpose();
+    }
+//process: second traversal
+	for(unsigned int index = 0; index < coupling::FilterInterface<dim>::_cellIndices.size(); index++){
+		// compute and store smoothed result
+    	Eigen::VectorXd phi_x = _A_T[0] * _data[0].col(_spatialIndex);
+    	coupling::FilterInterface<dim>::_outputCells[index]->setMacroscopicMass((_A[0].row(_t) * phi_x).value());
+    	tarch::la::Vector<dim,double> mo_smooth;
+    	for (unsigned int d = 0; d < dim; d++){ // (optimized compiler will unroll this loop)
+			phi_x = _A_T[d+1] * _data[d+1].col(_spatialIndex);
+      		mo_smooth[d] = (_A[d+1].row(_t) * phi_x).value();
+    	}
+    	coupling::FilterInterface<dim>::_outputCells[index]->setMacroscopicMomentum(mo_smooth);
+		_spatialIndex++;
+	}//index
+//endProcess: second traversal
+	_cycleCounter++;
+	_t =_cycleCounter%_timeWindowSize;		
+   
+    #ifdef DEBUG_POD
+    std::cout << "done." << std::endl;
+    #endif
+}
+
