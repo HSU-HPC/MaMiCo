@@ -48,9 +48,28 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, filteredValues, (unsigned int) d, extrapolation));
 		}
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
-       		//TODO
-			std::cout << "ERROR: Filter-Pipeline does not yet support POD." << std::endl;
-            exit(EXIT_FAILURE);
+			//In earlier implementations, it used to be possible to override tws via function parameter. This feature was removed.
+			//See: coupling::noisereduction::NoiseReductionConfiguration::interpreteConfiguration<dim>(..., int tws)
+			int tws;
+			if(currFilterNode->QueryIntAttribute("time-window-size", &tws)){
+				std::cout << "ERROR: POD Filter misses attribute time-window-size in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(tws <= 2){
+				std::cout << "ERROR: POD: time-window-size must be greater than two." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			int kmax;
+			if(currFilterNode->QueryIntAttribute("kmax", &kmax)){
+				std::cout << "ERROR: POD Filter misses attribute kmax in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(kmax <= 0){
+				std::cout << "ERROR: POD: kmax must be greater than zero.";
+				exit(EXIT_FAILURE);
+			}
+
+            _filters.push_back(new coupling::POD<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, filteredValues, tws, kmax));
         }
         else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
             //TODO
@@ -70,7 +89,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
         currFilterNode = currFilterNode->NextSiblingElement();
         }
 	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << PRINT_PREFIX() << "Number of Filters: " << _filters.size() <<". Output filter will be ";
+	std::cout << PRINT_PREFIX() << "Number of Filters: " << _filters.size() <<". Output vector will be ";
 	if(_filters.size() % 2 == 1)  std::cout << "_cellVector1." << std::endl;
 	else std::cout << "_cellVector2." << std::endl;
 	#endif

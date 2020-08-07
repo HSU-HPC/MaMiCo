@@ -10,7 +10,7 @@
 template<unsigned int dim>
 void coupling::WriteToFile<dim>::operator()(){	
     #ifdef DEBUG_WRITE_TO_FILE
-    std::cout << "		WTF: Now writing data to: " << _location << std::endl;
+    std::cout << "		WTF: Now writing data to: " << _location;
     #endif 
 
     int indexCounter = 0;
@@ -33,7 +33,7 @@ void coupling::WriteToFile<dim>::operator()(){
     }
     _file.close(); 
     #ifdef DEBUG_WRITE_TO_FILE
-    std::cout << "		WTF: Finished  writing data to: " << _location << std::endl;
+    std::cout << " ... done" << std::endl;
     #endif
 }
  

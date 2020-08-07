@@ -18,33 +18,65 @@ void coupling::Gauss<dim>::operator()(){
 		unsigned int indexAbove = getIndexAbove(index, _dim);
 		unsigned int indexBelow = getIndexBelow(index, _dim);
 
+
 		//[0] = below, [1] = at index, [2] = above 
 		double weights[3] = {GAUSS_OUTER_WEIGHT, GAUSS_INNER_WEIGHT, GAUSS_OUTER_WEIGHT};
 
 		//only one of these two cases can occur at once
 		if(indexBelow == index){
 			if(_extrapolationStrategy == 0){
-				//Adjust weights so that weights[0..2] = 1
 				weights[0] = 0;
 				weights[1] *= 1.38713;
 				weights[2] *= 1.38713;
 			}
-			else{
-				std::cout << "ERROR: GAUSS: Linear extrapolation is not yet supported";
-				exit(EXIT_FAILURE);
+			else if(_extrapolationStrategy == 1){
+				weights[0] = 0;
+				//TODO: comment
+				weights[2] *= 2;
+				for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++)
+					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
+					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()
+					+
+					(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()*2
+					-
+					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))());
+				for(unsigned int vi = 0; vi < coupling::FilterInterface<dim>::_scalarSetters.size(); vi++)
+					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarSetters[vi]))(
+					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))()
+					+
+					(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))()*2
+					-
+					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))());
 			}
+			else{/*unreachable*/}
+
 		}
 		else if(indexAbove == index){
 			if(_extrapolationStrategy == 0){
-				//Adjust weights so that weights[0..2] = 1
 				weights[0] *= 1.38713;
 				weights[1] *= 1.38713;
 				weights[2] = 0;
 			}
-			else{
-				std::cout << "ERROR: GAUSS: Linear extrapolation is not yet supported";
-				exit(EXIT_FAILURE);
+			else if(_extrapolationStrategy == 1){
+				weights[0] = 0;
+				//TODO: comment
+				weights[2] *= 2;
+				for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++)
+					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
+					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()
+					+
+					(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()*2
+					-
+					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))());
+				for(unsigned int vi = 0; vi < coupling::FilterInterface<dim>::_scalarSetters.size(); vi++)
+					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarSetters[vi]))(
+					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))()
+					+
+					(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))()*2
+					-
+					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))());
 			}
+			else{/*unreachable*/}
 		}
 		//apply to scalars
 		for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++){
@@ -54,11 +86,11 @@ void coupling::Gauss<dim>::operator()(){
 			+(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))() * weights[2]);
 		}
 		//apply to vectors	
-		for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_vectorSetters.size(); si++){
-			(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_vectorSetters[si]))(
-			(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_vectorGetters[si]))() * weights[0]
-			+(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_vectorGetters[si]))() * weights[0]
-			+(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_vectorGetters[si]))() * weights[2]);
+		for(unsigned int vi = 0; vi < coupling::FilterInterface<dim>::_vectorSetters.size(); vi++){
+			(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_vectorSetters[vi]))(
+			(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[0]
+			+(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[0]
+			+(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[2]);
 		}
 	}//index
    
@@ -67,6 +99,7 @@ void coupling::Gauss<dim>::operator()(){
     #endif
 }
 
+//Private functions of Gauss.h: 
 template<unsigned int dim>
 unsigned int coupling::Gauss<dim>::getIndexAbove(unsigned int index, unsigned int d){
 	unsigned int diff = 1;
