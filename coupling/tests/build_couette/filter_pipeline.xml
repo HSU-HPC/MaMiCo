@@ -5,29 +5,43 @@
 <filter-pipeline>
 
     <per-instance output="sequence-1">
-		<sequence-1 input="md" domain-start="1;2;1" domain-end="3;12;3">
+		<test-pod input="md" domain-start="0;0;0" domain-end="5;5;5">
             <write-to-file 
 				filtered-values="all"
-                location="seq3_after"
+                location="POD_before"
+				overwrite="true"
 			/>
 			<POD
 				time-window-size="5"
-				kmax="10"
+				kmax="1"
 			/>
 			<write-to-file 
 				filtered-values="all"
-                location="seq1_after"
+				location="POD_after"
+				overwrite="false"
+            />
+        </test-pod>
+
+		<test-gauss input="md" domain-start="0;0;0" domain-end="5;5;5">
+			<write-to-file 
+				filtered-values="all"
+                location="gauss_before"
             />
 			<gauss
+				filtered-values="all"
 				extrapolation="none"
-				dim="2"
+				dim="1" 
 			/>
-        </sequence-1>
-
-        <sequence-2 input="sequence-1">
 			<write-to-file 
 				filtered-values="all"
-                location="seq2_before"
+                location="gauss_after"
+            />
+        </test-gauss>
+
+ 		<test-gausslin input="md" domain-start="0;0;0" domain-end="5;5;5">
+			<write-to-file 
+				filtered-values="all"
+                location="gausslin_before"
             />
 			<gauss
 				filtered-values="all"
@@ -36,27 +50,10 @@
 			/>
 			<write-to-file 
 				filtered-values="all"
-                location="seq2_after"
+                location="gausslin_after"
             />
-        </sequence-2>
-
-        <sequence-3 input="sequence-1" domain-start="0;0;0" domain-end="10;10;10">
-			<write-to-file 
-				filtered_values="all"
-				location="seq3_before"
-			/>
-			<gauss
-				filtered-values="all"
-				extrapolation="linear"
-				dim="1" 
-			/>
-			<write-to-file 
-				filtered_values="all"
-				location="seq3_after"
-			/>
-
-        </sequence-3> 
-
+        </test-gausslin>
+   
     </per-instance>
     
 

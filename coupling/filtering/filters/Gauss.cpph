@@ -31,8 +31,7 @@ void coupling::Gauss<dim>::operator()(){
 			}
 			else if(_extrapolationStrategy == 1){
 				weights[0] = 0;
-				//TODO: comment
-				weights[2] *= 2;
+				//TODO: test this
 				for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++)
 					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
 					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()
@@ -59,8 +58,7 @@ void coupling::Gauss<dim>::operator()(){
 			}
 			else if(_extrapolationStrategy == 1){
 				weights[0] = 0;
-				//TODO: comment
-				weights[2] *= 2;
+				//TODO: test this
 				for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++)
 					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
 					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()
@@ -78,18 +76,23 @@ void coupling::Gauss<dim>::operator()(){
 			}
 			else{/*unreachable*/}
 		}
+		#ifdef DEBUG_GAUSS
+		std::cout << "GAUSS: Weigths at index " << index << ": ";
+		for(int i = 0; i < 3; i++) std::cout << weights[i]<< " ";
+		std::cout << "Total: " << weights[0] + weights[1] + weights[2] << std::endl;
+		#endif
 		//apply to scalars
 		for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++){
 			(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
 			(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))() * weights[0]
-			+(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))() * weights[0]
+			+(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))() * weights[1]
 			+(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))() * weights[2]);
 		}
 		//apply to vectors	
 		for(unsigned int vi = 0; vi < coupling::FilterInterface<dim>::_vectorSetters.size(); vi++){
 			(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_vectorSetters[vi]))(
 			(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[0]
-			+(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[0]
+			+(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[1]
 			+(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[2]);
 		}
 	}//index

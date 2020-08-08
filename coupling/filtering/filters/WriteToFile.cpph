@@ -14,14 +14,15 @@ void coupling::WriteToFile<dim>::operator()(){
     #endif 
 
     int indexCounter = 0;
-    _file.open(_location);
-
-	for(unsigned int d = 0; d<dim; d++) _file << "Local Index " << d << ", ";
-	for(unsigned int d = 0; d<dim; d++) _file << "Global Index " << d << ", ";
-	//TODO: only display printed columns
-    _file << "Microscopic Mass, Microscopic Momentum X, Microscopic Momentum Y,  Microscopic Momentum Z, Macroscopic Mass, Macroscopic Momentum X, Macroscopic Momentum Y,  Macroscopic Momentum Z, Potential Energy, Velocity X, Velocity Y, Velocity Z, Temperature" << std::endl;
+    if(!_overwrite) _file.open(_location, std::ios_base::app);
+	else {
+		_file.open(_location);
+		_file << _header;
+	}
+	
     for(auto cell : coupling::FilterInterface<dim>::_inputCells){
         _file 
+		<< _iteration << ", "
         << _localCellIndices[indexCounter] << " , "
         << coupling::FilterInterface<dim>::_cellIndices[indexCounter];
 		for(auto sGetter : coupling::FilterInterface<dim>::_scalarGetters)
@@ -31,7 +32,10 @@ void coupling::WriteToFile<dim>::operator()(){
 		_file << std::endl;
         indexCounter++;
     }
+	_file << std::endl;
     _file.close(); 
+
+	_iteration++;
     #ifdef DEBUG_WRITE_TO_FILE
     std::cout << " ... done" << std::endl;
     #endif
