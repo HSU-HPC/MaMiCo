@@ -52,7 +52,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 			}
 
         	#ifdef DEBUG_GAUSS
-			std::cout << "		GAUSS (Dim: " << _dim << ": Created Gaussian filter." << std::endl;
+			std::cout << "		GAUSS (Dim: " << _dim << "): Created Gaussian filter." << std::endl;
 			if(_extrapolationStrategy == 0) std::cout << "		It will not use extrapolation." << std::endl;
 			if(_extrapolationStrategy == 1) std::cout << "		It will use linear extrapolation." << std::endl;
        		#endif

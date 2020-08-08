@@ -33,7 +33,11 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			}
 		}
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0){
-            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location")));
+			bool overwrite = false;
+			if(currFilterNode->Attribute("overwrite"))
+				if(std::strcmp(currFilterNode->Attribute("overwrite"), "true") == 0)
+					overwrite = true;
+            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location"), overwrite));
         }
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
 			int d; //dimension of gauss filter
