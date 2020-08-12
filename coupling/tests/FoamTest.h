@@ -208,18 +208,19 @@ private:
 
     if(_cfg.miSolverType == SIMPLEMD){
       // set couette solver interface in MamicoInterfaceProvider
-    coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
+      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
-    for (unsigned int i = 0; i < _localMDInstances; i++){
-      _simpleMD[i]->setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
-      // compute and store temperature in macroscopic cells (temp=1.1 everywhere)
-      _multiMDCellService->getMacroscopicCellService(i).computeAndStoreTemperature(_cfg.temp);
-    }
+      for (unsigned int i = 0; i < _localMDInstances; i++){
+        _simpleMD[i]->setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
+        // compute and store temperature in macroscopic cells (temp=1.1 everywhere)
+        _multiMDCellService->getMacroscopicCellService(i).computeAndStoreTemperature(_cfg.temp);
+      }
     }
 
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
     allocateRecvBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
+    // determine the necessary indices for the coupling with OpenFOAM
     _buf.foamCellIndices4SendBuffer = globalIndices2FoamIndices(_buf.globalCellIndices4SendBuffer, _buf.sendBuffer.size(), _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     findPointsInFoamBoundary(_buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size(), _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
 
@@ -311,7 +312,7 @@ private:
           U = HbyA - rAU*fvc::grad(p);
           U.correctBoundaryConditions();
       }
-      runTime.write();
+      //runTime.write();
       plottxt();
       gettimeofday(&_tv.end,NULL);
       _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);}
@@ -354,7 +355,7 @@ private:
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
       _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
-      //std::cout << "Finish _simpleMD[i]->simulateTimesteps " << std::endl;
+      //std::cout << "Finish _simpleMD[i]->Timesteps " << std::endl;
       // plot macroscopic time step info in multi md service
       _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);
     }
@@ -403,7 +404,7 @@ private:
   }
 
   void twoWayCoupling(int cycle){ // Function to set the values from MD within the macro solver
-    if ( _cfg.twoWayCoupling){writeMDvalues2Foam(); std::cout << "Done" << std::endl;}
+    if ( _cfg.twoWayCoupling){writeMDvalues2Foam();}
     //write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle);
   }
@@ -568,6 +569,7 @@ private:
         if (containsThisRank){ numCellsRecv++; }
       }
     }
+    
     // allocate array for cell indices
     unsigned int* indices = new unsigned int [numCellsRecv];
     if (indices==NULL){std::cout << "ERROR FoamTest::allocateRecvBuffer(): indices==NULL!" << std::endl; exit(EXIT_FAILURE); }
@@ -623,13 +625,6 @@ private:
     _buf.foamBoundaryIndices = new Foam::vector* [_buf.numberFoamBoundaryPoints];
     unsigned int counter = 0;
 
-    // const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
-    // const tarch::la::Vector<3,double> cellSize(2.5);
-
-    // std::stringstream ss; ss << "FoamCoodinates.txt";
-    // std::ofstream file(ss.str().c_str());
-    // if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-    // std::stringstream coord;
     for (unsigned int i = 6; i < 12; i++){
       for (unsigned int j = 0; j < 36; j++){
         Foam::vectorField FoamCoord = U.boundaryFieldRef()[i].patch().Cf()[j]+(U.boundaryFieldRef()[i].patch().nf()*1.25);
@@ -638,12 +633,6 @@ private:
         for(unsigned int k = 0; k < size; k++){
           if(globalIndex==globalIndice[k]){
             _buf.foam2RecvBufferIndices[counter] = k;
-            // const tarch::la::Vector<3,unsigned int> globalIndex1(indexConversion.getGlobalVectorCellIndex(globalIndex));
-            // tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*cellSize);
-            // for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex1[d])*2.5; }
-            // coord << FoamCoord[0][0] << ", " << FoamCoord[0][1] << ", " << FoamCoord[0][2] << ", ";
-            // coord << cellMidPoint[0] << ", " << cellMidPoint[1] << ", " << cellMidPoint[2] << ", " ;
-            // coord << globalIndex << ", " << i << ", " << j << ", " << _buf.foamNumberIndices4RecvBuffer[k] << std::endl;
             goto endloop;
           }
         }
@@ -651,8 +640,6 @@ private:
       counter++;
       }
     }
-    // file << coord.str();
-    // file.close();
   }
 
   /** write cells that have been received from MD to csv file */
@@ -698,24 +685,14 @@ private:
     const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
     double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
-    // std::stringstream ss; ss << "buffer_" << runTime.timeName() << ".txt";
-    // std::ofstream file(ss.str().c_str());
-    // if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-    // std::stringstream output;
-
     for (unsigned int i = 0; i < size; i++){
       if(_buf.foamCellIndices4SendBuffer[i]>0){
         const tarch::la::Vector<3,double> velocity(U[_buf.foamCellIndices4SendBuffer[i]][0], U[_buf.foamCellIndices4SendBuffer[i]][1], U[_buf.foamCellIndices4SendBuffer[i]][2]);
-        //const tarch::la::Vector<3,double> momentum(mass*U[_buf.foamCellIndices4SendBuffer[i]]);
+        //const tarch::la::Vector<3,double> velocity(0.5, 0.0, 0.0);
         sendBuffer[i]->setMicroscopicMass(mass);
         sendBuffer[i]->setMicroscopicMomentum(mass*velocity);
-        // write information to streams
-        // output << velocity[0] << ", " << velocity[1] << ", " << velocity[2] << ", " << mass*velocity[0] << ", " << mass*velocity[1] << ", " << mass*velocity[2] << std::endl;
       }
     }
-    // file << output.str() << std::endl;
-    // output.str("");
-    // file.close();
   }
 
   void fillRecvBuffer(

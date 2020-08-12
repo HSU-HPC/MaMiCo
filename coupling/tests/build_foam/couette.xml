@@ -19,7 +19,7 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout.
   -->
   <coupling
-    coupling-cycles="50"
+    coupling-cycles="20"
     two-way-coupling="yes"
     send-from-md-to-macro="yes"
     filter-init-cycles="0"
@@ -52,8 +52,9 @@
     type="md"
     temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="50"
-    density="0.813037037"
+    number-md-simulations="100"
+    density="0.81"
+    noise-sigma="0.1666"
   />
 
   <!-- Optional feature: tws-loop
