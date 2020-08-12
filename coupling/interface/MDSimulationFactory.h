@@ -17,7 +17,7 @@
 #include "coupling/interface/MamicoInterfaceProvider.h"
 
 // hacked: "currently, only 3D is supported!"
-#define MDSIMULATIONFACTORY_DIMENSION DIMENSION
+#define MDSIMULATIONFACTORY_DIMENSION 3
 
 #if defined(SIMPLE_MD)
 #include "coupling/solvers/CoupledMolecularDynamicsSimulation.h"
@@ -182,7 +182,7 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
 
     // nop required
     virtual void shutdown(){
-      if (_lmp!=NULL){ delete _lmp; _lmp=NULL; } 
+      if (_lmp!=NULL){ delete _lmp; _lmp=NULL; }
     }
 
 
@@ -199,7 +199,7 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
       _lmp->input->one(ss.str().c_str());
 
       // define lj atomic input
-      
+
       _lmp->input->one("units lj");
       _lmp->input->one("atom_style atomic");
       // define number of processes
@@ -383,7 +383,7 @@ class LammpsDPDSimulation: public coupling::interface::MDSimulation {
 
     // nop required
     virtual void shutdown(){
-      if (_lmp!=NULL){ delete _lmp; _lmp=NULL; } 
+      if (_lmp!=NULL){ delete _lmp; _lmp=NULL; }
     }
 
 
@@ -627,4 +627,3 @@ class SimulationAndInterfaceFactory {
 }
 }
 #endif // _MDSIMULATIONFACTORY_H_
-
