@@ -35,15 +35,17 @@ class coupling::solvers::CouetteSolverInterface: public coupling::interface::Mac
     /** receive all (inner) cells */
     virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim,unsigned int> globalCellIndex){
       bool recv=true;
-      for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>_outerRegion) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1-_outerRegion); }
+      for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>0) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1); }
       return recv;
     }
 
     /** send all macroscopic cell data within a boundary strip to MD. Only send data that are not in the ghost layer and not part of the inner region. */
     virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim,unsigned int> globalCellIndex){
       bool outer=false;
+      bool recv=true;
+      for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>_outerRegion) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1-_outerRegion); }
       for (unsigned int d = 0; d < dim; d++){ outer=outer || (globalCellIndex[d]<1) || (globalCellIndex[d]>_globalNumberMacroscopicCells[d]); }
-      return (!outer) && (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
+      return (!outer) && (!recv);
     }
 
     virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim,unsigned int> globalCellIndex){std::vector<unsigned int> ranks; ranks.push_back(0); return ranks; }
