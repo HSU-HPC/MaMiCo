@@ -73,7 +73,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            _filters.push_back(new coupling::POD<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, filteredValues, tws, kmax));
+            _filters.push_back(new coupling::POD<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, filteredValues, _multiMDService, tws, kmax));
         }
         else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
             //TODO

@@ -10,6 +10,7 @@
 
 #define DEBUG_POD
 #include "coupling/filtering/FilterInterface.h"
+#include "tarch/utils/MultiMDService.h"
 
 namespace coupling {
     template<unsigned int dim>
@@ -27,10 +28,12 @@ class coupling::POD : public coupling::FilterInterface<dim>{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 				bool filteredValues[7],
+				const tarch::utils::MultiMDService<dim>& multiMDService,
 				int tws,
 				int kmax
 				):
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				_multiMDService(multiMDService),
 				_timeWindowSize(tws),
 				_kMax(kmax),
 				_cycleCounter(0),
@@ -71,6 +74,7 @@ class coupling::POD : public coupling::FilterInterface<dim>{
      
 	    void operator()();
 	private:
+		const tarch::utils::MultiMDService<dim>& _multiMDService;
 		unsigned int _timeWindowSize; // number of snapshots / coupling cycles taken into consideration for noise reduction
     	const unsigned int _kMax; // number of dominant eigenvalues
     	unsigned int _cycleCounter; // coupling cycle counter, indicates how many data snapshots are available already
@@ -88,8 +92,3 @@ class coupling::POD : public coupling::FilterInterface<dim>{
 #include "POD.cpph"
 
 
-/**
- * TODO:
- * TWS?
- * KMAX?
- */
