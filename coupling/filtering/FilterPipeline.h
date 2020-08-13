@@ -31,11 +31,13 @@ class coupling::FilterPipeline{
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 			const coupling::IndexConversion<dim>* indexConversion,
+			const tarch::utils::MultiMDService<dim>& multiMDService,
 			const std::string cfgpath = "filter_pipeline.xml");
 
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 			const coupling::IndexConversion<dim>* indexConversion,
+			const tarch::utils::MultiMDService<dim>& multiMDService,
 			bool postMultiInstance,
 			const std::string cfgpath = "filter_pipeline.xml");
                
@@ -81,6 +83,7 @@ class coupling::FilterPipeline{
 		std::vector<tarch::la::Vector<dim, unsigned int>> _md2MacroCellIndices;		
 
 		const coupling::IndexConversion<dim>* _indexConversion;
+		const tarch::utils::MultiMDService<dim>& _multiMDService;
 	   	bool _postMultiInstance;
       	
 

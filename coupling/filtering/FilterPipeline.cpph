@@ -7,17 +7,22 @@ template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 	const coupling::IndexConversion<dim>* indexConversion,
+	const tarch::utils::MultiMDService<dim>& multiMDService,
 	const std::string cfgpath): //TODO: default argument? 
-    FilterPipeline(mdCells, indexConversion, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
+    FilterPipeline(mdCells, indexConversion, multiMDService, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
 {}
 
 template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 	const coupling::IndexConversion<dim>* indexConversion,
+	const tarch::utils::MultiMDService<dim>& multiMDService,
 	bool postMultiInstance, 
 	const std::string cfgpath):
-	 _indexConversion(indexConversion), _postMultiInstance(postMultiInstance)
+
+	_indexConversion(indexConversion), 
+	_multiMDService(multiMDService),
+	_postMultiInstance(postMultiInstance)
 {
 	
     //check if provided file is written in proper XML
@@ -185,13 +190,13 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		
 		//CREATE SEQUENCE
 		if(inputFilterSequence){
-			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell));
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell));
 			#ifdef DEBUG_FILTER_PIPELINE
 			std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
 			#endif
 		}
 		else {
-			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell));
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell));
 			#ifdef DEBUG_FILTER_PIPELINE
 			std::cout << "FP: " << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
 			#endif

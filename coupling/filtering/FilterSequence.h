@@ -36,12 +36,14 @@ class coupling::FilterSequence {
 		 * domainStart and domainEnd span a subspace of the global (md2Macro) domain.
 		 */
     	FilterSequence( const coupling::IndexConversion<dim>* indexConversion,
+						const tarch::utils::MultiMDService<dim>& multiMDService,
 						const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector,
 						std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 						tarch::la::Vector<dim, unsigned int> domainStart,
 						tarch::la::Vector<dim, unsigned int> domainEnd):
     	_indexConversion(indexConversion), 
+		_multiMDService(multiMDService),
 		_name(name), 
 		_inputCellVector(inputCellVector),
 		_cellIndices(cellIndices), 
@@ -130,6 +132,7 @@ class coupling::FilterSequence {
 		}
 
 		const coupling::IndexConversion<dim>* _indexConversion;
+		const tarch::utils::MultiMDService<dim> _multiMDService;
 
     	const char* _name;
 

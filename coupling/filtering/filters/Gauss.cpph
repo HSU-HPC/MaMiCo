@@ -26,7 +26,7 @@ void coupling::Gauss<dim>::operator()(){
 		if(indexBelow == index){
 			if(_extrapolationStrategy == 0){
 				weights[0] = 0;
-				weights[1] *= 1.38713;
+				weights[1] *= 1.38713; //TODO: This is slightly inaccurate. Total weight is 1.00011 (should be 1).
 				weights[2] *= 1.38713;
 			}
 			else if(_extrapolationStrategy == 1){
@@ -52,7 +52,7 @@ void coupling::Gauss<dim>::operator()(){
 		}
 		else if(indexAbove == index){
 			if(_extrapolationStrategy == 0){
-				weights[0] *= 1.38713;
+				weights[0] *= 1.38713; //TODO: See above.
 				weights[1] *= 1.38713;
 				weights[2] = 0;
 			}
