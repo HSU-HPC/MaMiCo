@@ -157,18 +157,13 @@ int main(){
   #endif
   // U.boundaryFieldRef()[7][0].y() = 0.5;
   //U.boundaryFieldRef()[8][1].x() = 0.5;
-  Info << U.boundaryFieldRef()[8][0] << endl;
-  Foam::vector* test= &U.boundaryFieldRef()[8][0];
-  test->x() = 0.72;
-  Info << U.boundaryFieldRef()[8][0] << endl;
+  
+  Info << U.boundaryFieldRef()[0] << endl;
 
-  //Info << U.boundaryFieldRef()[11].patch().Sf()[0] << endl;
-
-  //++runTime;
-  //runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
-  // ++runTime;
-  // runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
-  //U.boundaryFieldRef()[7].initEvaluate();
+  ++runTime;
+  runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
+  ++runTime;
+  runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
 
   Info<< "\nStarting time loop\n" << endl;
 

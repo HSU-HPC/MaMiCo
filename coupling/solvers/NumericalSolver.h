@@ -84,7 +84,8 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
 
     /** flags the domain boundary cells. mdDomainOffset and mdDomainSize correspond to lower/left/front corner of the MD domain and the size of the domain. overlapStrip is the number of cells
      *  that the LB and MD domain shall overlap, i.e. the number of "MD cells" that lie within the LB domain but which should not be flagged (and thus be handled by both solvers).*/
-    void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip){
+    void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip,
+    const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size){
       if (skipRank()){return;}
 
       for (int d = 0; d < 3; d++){
