@@ -2,9 +2,12 @@
 // and use, please see the copyright notice in MaMiCo's main folder
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 #include <mpi.h>
 #include <string>
 #include <limits>
+#include <stdexcept>
 
 #include "tarch/utils/MultiMDService.h"
 #include "coupling/CouplingMDDefinitions.h"
@@ -142,6 +145,181 @@ int initMPI(){
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 	return rank;
 }
+
+
+////////////////////////////////////////////////////////////////
+// Coupling Buffer management //////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+class CouplingBuffer{
+public:
+    CouplingBuffer(const coupling::IndexConversion<3>& indexConversion,
+        coupling::interface::MacroscopicSolverInterface<3> &macroscopicSolverInterface,
+        unsigned int rank){
+        allocateSendBuffer(indexConversion, macroscopicSolverInterface, rank);
+        allocateRecvBuffer(indexConversion, macroscopicSolverInterface, rank);
+    }
+
+    ~CouplingBuffer(){
+        // free buffers/arrays
+        deleteBuffer(_sendBuffer);
+        if (_globalCellIndices4SendBuffer != NULL){
+          delete [] _globalCellIndices4SendBuffer; 
+          _globalCellIndices4SendBuffer = NULL; 
+        }
+        deleteBuffer(_recvBuffer);
+        if (_globalCellIndices4RecvBuffer != NULL){
+          delete [] _globalCellIndices4RecvBuffer; 
+          _globalCellIndices4RecvBuffer = NULL; 
+        }
+    }
+
+    void recv2CSV( const coupling::IndexConversion<3>& idcv,
+        const std::string filename
+    ) const {
+        std::ofstream file(filename.c_str());
+        if (!file.is_open())
+            throw std::runtime_error("Could not open file " + filename);
+        // loop over received cells; read macroscopic mass+momentum buffers and write cell index, mass and velocity to one line in the csv-file
+        const unsigned int numCellsRecv = _recvBuffer.size();
+        for (unsigned int i = 0; i < numCellsRecv; i++){
+          tarch::la::Vector<3,double> vel(_recvBuffer[i]->getMacroscopicMomentum());
+          if (_recvBuffer[i]->getMacroscopicMass()!=0.0){ vel = (1.0/_recvBuffer[i]->getMacroscopicMass())*vel; }
+          const tarch::la::Vector<3,unsigned int> counter(idcv.getGlobalVectorCellIndex(_globalCellIndices4RecvBuffer[i]));
+          file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; " << _recvBuffer[i]->getMacroscopicMass() << ";";
+          file << std::endl;
+        }
+        file.close();
+    }
+
+    void store2send(const double cellmass,
+    const coupling::IndexConversion<3>& idcv,
+    py::array_t<double> velocity, 
+    py::array_t<double> density) {
+        const unsigned int size = _sendBuffer.size();
+
+        if(velocity.ndim() != 4)
+            throw std::runtime_error("velocity.ndim != 4");
+        if(density.ndim() != 3)
+            throw std::runtime_error("density.ndim != 3");
+        
+        for (unsigned int i = 0; i < size; i++){
+            const tarch::la::Vector<3,unsigned int> globalIndex(idcv.getGlobalVectorCellIndex(_globalCellIndices4SendBuffer[i]) - tarch::la::Vector<3,unsigned int>(1,1,1));
+            double mass = cellmass
+                * (*density.data(globalIndex[0],globalIndex[1],globalIndex[2]));
+
+            const tarch::la::Vector<3,double> momentum(
+            mass * (*velocity.data(globalIndex[0],globalIndex[1],globalIndex[2],0)), 
+            mass * (*velocity.data(globalIndex[0],globalIndex[1],globalIndex[2],1)),
+            mass * (*velocity.data(globalIndex[0],globalIndex[1],globalIndex[2],2)) 
+            );
+
+            _sendBuffer[i]->setMicroscopicMass(mass);
+            _sendBuffer[i]->setMicroscopicMomentum(momentum);
+        }
+    }
+
+    std::vector<coupling::datastructures::MacroscopicCell<3>* > _sendBuffer;
+    unsigned int *_globalCellIndices4SendBuffer;
+    std::vector<coupling::datastructures::MacroscopicCell<3>* > _recvBuffer;
+    unsigned int *_globalCellIndices4RecvBuffer;
+
+private:
+    void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion,
+    coupling::interface::MacroscopicSolverInterface<3> &macroscopicSolverInterface,
+    unsigned int rank) {
+      // determine global number of cells
+      const tarch::la::Vector<3,unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells()+tarch::la::Vector<3,unsigned int>(2));
+      const unsigned int num = cells[0]*cells[1]*cells[2];
+
+      // delete all potential entries of sendBuffer
+      deleteBuffer(_sendBuffer);
+
+      // count number of cells to be sent from this process; therefore, loop over all global macroscopic cells...
+      unsigned int numCellsSent=0;
+      for (unsigned int i =0; i < num; i++){
+         // ... and find out, if the current cell should be send to MD from this solver process
+         if(macroscopicSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))){
+           std::vector<unsigned int> ranks = macroscopicSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
+           bool containsThisRank=false;
+           for (unsigned int k = 0; k < ranks.size(); k++){
+             containsThisRank = containsThisRank || (ranks[k]==rank);
+           }
+           if (containsThisRank){ numCellsSent++; }
+        }
+      }
+
+      // allocate array for cell indices
+      unsigned int* indices = new unsigned int [numCellsSent];
+
+      // allocate sendBuffer and initialise all entries, incl. indices
+      for (unsigned int i = 0; i < num; i++){
+        if (macroscopicSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))){
+           std::vector<unsigned int> ranks = macroscopicSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
+           bool containsThisRank=false;
+           for (unsigned int k = 0; k < ranks.size(); k++){
+             containsThisRank = containsThisRank || (ranks[k]==rank);
+           }
+           if (containsThisRank){
+             _sendBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+             indices[_sendBuffer.size()-1] = i;
+           }
+        }
+      }
+      _globalCellIndices4SendBuffer = indices;
+    }
+
+    void allocateRecvBuffer(const coupling::IndexConversion<3>& indexConversion,
+    coupling::interface::MacroscopicSolverInterface<3> &macroscopicSolverInterface,
+    unsigned int rank) {
+
+      // determine global number of cells
+      const tarch::la::Vector<3,unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells()+tarch::la::Vector<3,unsigned int>(2));
+      const unsigned int num = cells[0]*cells[1]*cells[2];
+
+      // delete all potential entries of sendBuffer
+      deleteBuffer(_recvBuffer);
+
+      // determine number of cells that should be received
+      unsigned int numCellsRecv = 0;
+      for (unsigned int i = 0; i < num; i++){
+        if(macroscopicSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))){
+          std::vector<unsigned int> ranks = macroscopicSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
+          bool containsThisRank=false;
+          for (unsigned int k = 0; k < ranks.size(); k++){
+            containsThisRank = containsThisRank || (ranks[k]==rank);
+          }
+          if (containsThisRank){ numCellsRecv++; }
+        }
+      }
+      // allocate array for cell indices
+      unsigned int* indices = new unsigned int [numCellsRecv];
+
+      // allocate recvBuffer and initialise all entries, incl. indices
+      for (unsigned int i = 0; i < num; i++){
+        if (macroscopicSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))){
+          std::vector<unsigned int> ranks = macroscopicSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
+          bool containsThisRank=false;
+          for (unsigned int k = 0; k < ranks.size(); k++){
+            containsThisRank = containsThisRank || (ranks[k]==rank);
+          }
+          if (containsThisRank){
+            _recvBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+            // set linearized index
+            indices[_recvBuffer.size()-1] = i;
+          }
+        }
+      }
+      _globalCellIndices4RecvBuffer = indices;
+    }
+
+    /** deletes the buffer */
+    void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>* >& buffer) {
+        // delete all potential entries of buffer
+        for (unsigned int i = 0; i < buffer.size(); i++){if (buffer[i]!=NULL){ delete buffer[i]; buffer[i]=NULL;}}
+        buffer.clear();
+    }
+};
 
 PYBIND11_MODULE(mamico, mamico) {
 
@@ -311,9 +489,10 @@ PYBIND11_MODULE(mamico, mamico) {
     	.def("setMacroscopicCellService", &coupling::interface::MDSimulation::setMacroscopicCellService)
     	.def("shutdown", &coupling::interface::MDSimulation::shutdown); 
 
-    py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService");
-
-    py::class_<coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>>(services, "MultiMDCellService");
+    py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService")
+    	.def("computeAndStoreTemperature", &coupling::services::MacroscopicCellService<3>::computeAndStoreTemperature)
+    	.def("getIndexConversion", &coupling::services::MacroscopicCellService<3>::getIndexConversion, py::return_value_policy::reference)
+        .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep);
 
     coupling.def("getMDSimulation", []
     	(const simplemd::configurations::MolecularDynamicsConfiguration& c1,
@@ -344,12 +523,67 @@ PYBIND11_MODULE(mamico, mamico) {
     	} );
     coupling.def("getMacroscopicSolverInterface", [](){
     		return coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMacroscopicSolverInterface();
-    	} );
+    	}, py::return_value_policy::reference );
     coupling.def("setMDSolverInterface", []
     	(coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> * iface){
     		coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(iface);
-    	} );
-    coupling.def("getMDSolverInterface", [](){
-    		return coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
-    	} );
+    	});
+    //coupling.def("getMDSolverInterface", [](){
+    //		return coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
+    //	}, py::return_value_policy::reference );
+    coupling.def("setMacroscopicCellService", []
+        (coupling::services::MacroscopicCellService<3>* service){
+            coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(service);
+        });
+
+    py::class_<coupling::services::MultiMDCellService<MY_LINKEDCELL,3>>(services, "MultiMDCellService")
+    	.def(py::init([](
+	    		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>*> mdSolverInterfaces,
+			    coupling::interface::MacroscopicSolverInterface<3>* macroscopicSolverInterface,
+			    const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
+			    unsigned int rank,
+			    unsigned int totalNumberMDSimulations,
+			    const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig,
+			    const tarch::utils::MultiMDService<3>& multiMDService
+    			){
+    			return new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
+			        mdSolverInterfaces,
+			        macroscopicSolverInterface, 
+			        simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), 
+			        rank, 
+			        totalNumberMDSimulations,
+			        mamicoConfig.getParticleInsertionConfiguration(), 
+			        mamicoConfig.getMomentumInsertionConfiguration(), 
+			        mamicoConfig.getBoundaryForceConfiguration(),
+			        mamicoConfig.getTransferStrategyConfiguration(), 
+			        mamicoConfig.getNoiseReductionConfiguration(), 
+			        mamicoConfig.getParallelTopologyConfiguration(), 
+			        simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+			        mamicoConfig.getMacroscopicCellConfiguration(), 
+			        multiMDService
+			    ); }
+    		),
+    		"mdSolverInterfaces"_a, "macroscopicSolverInterface"_a, "simpleMDConfig"_a, 
+    		"rank"_a=0, "totalNumberMDSimulations"_a=1, "mamicoConfig"_a, 
+    		"multiMDService"_a)
+    	.def("getMacroscopicCellService", &coupling::services::MultiMDCellService<MY_LINKEDCELL,3>::getMacroscopicCellService , py::return_value_policy::reference)
+    	.def("sendFromMacro2MD", [](coupling::services::MultiMDCellService<MY_LINKEDCELL,3>& service, CouplingBuffer& buf){
+            service.sendFromMacro2MD(buf._sendBuffer, buf._globalCellIndices4SendBuffer);
+        })
+    	.def("sendFromMD2Macro", [](coupling::services::MultiMDCellService<MY_LINKEDCELL,3>& service, CouplingBuffer& buf){
+            service.sendFromMD2Macro(buf._recvBuffer, buf._globalCellIndices4RecvBuffer);
+        } )
+    ;
+
+    py::class_<coupling::IndexConversion<3>>(coupling, "IndexConversion");
+
+    py::class_<CouplingBuffer>(coupling, "Buffer")
+        .def(py::init<const coupling::IndexConversion<3>&, 
+                coupling::interface::MacroscopicSolverInterface<3> &,
+                unsigned int
+            >()
+        )
+        .def("recv2CSV", &CouplingBuffer::recv2CSV)
+        .def("store2send", &CouplingBuffer::store2send)
+    ;
 }
