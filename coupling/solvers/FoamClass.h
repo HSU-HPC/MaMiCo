@@ -49,7 +49,7 @@ public:
   virtual ~IcoFoam(){}
 
   void advance(double dt)override{
-    if(_rank==0){
+    if(skipRank()){return;}
     unsigned int number = floor(dt/0.25+0.5);
     for(unsigned int i=0; i<number; i++){
       using namespace Foam;
@@ -89,7 +89,6 @@ public:
       //runTime.write();
       plottxt();
     }
-  }
   }
 
   tarch::la::Vector<3,double> getVelocity(tarch::la::Vector<3,double> pos)const override{
@@ -135,6 +134,7 @@ public:
 
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
   const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
+    if(skipRank()){return;}
     for(unsigned int i=0; i < _numberBoundaryPoints; i++){
       unsigned int outer = _boundary2RecvBufferIndicesOuter[i];
       unsigned int inner = _boundary2RecvBufferIndicesInner[i];
@@ -148,6 +148,7 @@ public:
 
   void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip,
   const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size){
+    if(skipRank()){return;}
     _numberBoundaryPoints = 6*36;
     _boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
     _boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
@@ -197,6 +198,10 @@ private:
     }}
     file << velocity.str() << std::endl;
     file.close();
+  }
+
+  bool skipRank(){
+    return !(_rank==0);
   }
 
   Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests", "build_couette")};

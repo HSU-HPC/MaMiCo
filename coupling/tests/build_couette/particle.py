@@ -18,7 +18,7 @@ plt.figure(figsize=(12,9))
 x_step = 2.5
 x = np.arange(x_step/2,50,x_step)
 t_start = 0
-t_end = 21
+t_end = 20
 t_step = 2
 particle_start = 1
 particle_number = 12
@@ -29,8 +29,8 @@ for number in np.arange(t_start, t_end, t_step):
     # for i in np.arange(0, particle_number):
     #    c_0[i] = np.mean(c[np.int(i*help):np.int((i+1)*help)])
     # plt.plot(x[particle_start:particle_start+particle_number], c_0, color=plt.cm.hsv((number-t_start)/(t_end-t_start)), label=str(number), linestyle=':', marker='x')
-    help = np.arange(65, 1730, 144)
-    plt.plot(x[np.arange(0,12)], c[help], color=plt.cm.hsv((number-t_start)/(t_end-t_start)), label=str(number), linestyle=':', marker='x')
+    help = np.arange(28, 500, 64)
+    plt.plot(x[np.arange(2,10)], c[help], color=plt.cm.hsv((number-t_start)/(t_end-t_start)), label=str(number), linestyle=':', marker='x')
     f = np.genfromtxt("velocity_"+str(number+1)+".txt", usecols=(0), delimiter=',', dtype="float")
     x_help = [0,1,2,9,10,11,12,13,14,15,16,17,18,19]
     plt.plot(x[x_help], f, linestyle ='none', marker='o', color=plt.cm.hsv((number-t_start)/(t_end-t_start)))
