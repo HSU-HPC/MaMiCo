@@ -91,7 +91,7 @@ public:
 			_counter++;}
 	}
 
-	tarch::la::Vector<3,double> getVelocity (tarch::la::Vector<3,double> pos)const override{ // same as with the function above
+	tarch::la::Vector<3,double> getVelocity(tarch::la::Vector<3,double> pos)const override{ // same as with the function above
 		const tarch::la::Vector<3,double> domainOffset(_coords[0]*_dx*_avgDomainSizeX, _coords[1]*_dx*_avgDomainSizeY, _coords[2]*_dx*_avgDomainSizeZ);
 		#if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
 		if (   (pos[0]<domainOffset[0]) || (pos[0]>domainOffset[0]+_domainSizeX*_dx)

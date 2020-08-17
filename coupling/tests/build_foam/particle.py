@@ -17,9 +17,9 @@ def couette_analytic(x_c, t_c):
 plt.figure(figsize=(12,9))
 x_step = 2.5
 x = np.arange(x_step/2,50,x_step)
-t_start = 3
-t_end = 14
-t_step = 1
+t_start = 0
+t_end = 10
+t_step = 2
 particle_start = 1
 particle_number = 12
 for number in np.arange(t_start, t_end, t_step):
@@ -35,7 +35,7 @@ for number in np.arange(t_start, t_end, t_step):
     x_help = [0,1,2,9,10,11,12,13,14,15,16,17,18,19]
     plt.plot(x[x_help], f, linestyle ='none', marker='o', color=plt.cm.hsv((number-t_start)/(t_end-t_start)))
     a = couette_analytic(x,number/4)
-    plt.plot(x, a, color=plt.cm.hsv((number-t_start)/(t_end-t_start)))
+    plt.plot(x, a, color=plt.cm.hsv((number-t_start)/(t_end-t_start)), linewidth=0.5)
 plt.legend()
 plt.savefig('particle_'+str(x_step)+'.png', bbox_inches='tight')
 plt.show()

@@ -10,6 +10,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "coupling/solvers/CouetteSolver.h"
+#include "coupling/solvers/FoamClass.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
@@ -20,30 +21,6 @@
 #endif
 #include <sys/time.h>
 #include <random>
-// Includes from OpenFOAM fdCFD.H
-// #include "parRun.H"
-#include "Time.H"
-#include "fvMesh.H"
-#include "fvc.H"
-// #include "fvMatrices.H"
-#include "fvm.H"
-// #include "linear.H"
-#include "uniformDimensionedFields.H"
-#include "calculatedFvPatchFields.H"
-#include "extrapolatedCalculatedFvPatchFields.H"
-#include "fixedValueFvPatchFields.H"
-#include "zeroGradientFvPatchFields.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
-#include "constrainHbyA.H"
-#include "constrainPressure.H"
-#include "adjustPhi.H"
-#include "findRefCell.H"
-// #include "IOMRFZoneList.H"
-// #include "constants.H"
-#include "OSspecific.H"
-#include "argList.H"
-#include "timeSelector.H"
-#include "pisoControl.H"
 
 /**
  *
@@ -52,8 +29,6 @@
 class FoamTest: public Test {
 public:
   FoamTest(): Test("FoamTest"), _generator(0) {
-    Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
-    mesh.setFluxRequired(p.name());
   }
   virtual ~FoamTest(){}
 
@@ -67,6 +42,7 @@ public:
   }
 
 private:
+  enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void init(){
@@ -153,6 +129,8 @@ private:
     _tv.micro = 0;
     _tv.macro = 0;
     _tv.filter = 0;
+
+    _fluidSolver = new coupling::solvers::IcoFoam();
 
     _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),_cfg.totalNumberMDSimulations);
     _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
@@ -248,101 +226,17 @@ private:
   void advanceMacro(){
     if (_rank==0){
       gettimeofday(&_tv.start,NULL);
-      using namespace Foam;
-      ++runTime;
-      Info<< "Time = " << runTime.timeName() << nl << endl;
-
-      // scalar CoNum = 0.0;
-      // scalar meanCoNum = 0.0;
-      //
-      // {
-      //     scalarField sumPhi
-      //     (
-      //         fvc::surfaceSum(mag(phi))().primitiveField()
-      //     );
-      //
-      //     CoNum = 0.5*gMax(sumPhi/mesh.V().field())*runTime.deltaTValue();
-      //
-      //     meanCoNum =
-      //         0.5*(gSum(sumPhi)/gSum(mesh.V().field()))*runTime.deltaTValue();
-      // }
-      //
-      // Info<< "Courant Number mean: " << meanCoNum
-      //     << " max: " << CoNum << endl;
-
-      // Momentum predictor
-      fvVectorMatrix UEqn(fvm::ddt(U) + fvm::div(phi, U)-  fvm::laplacian(nu, U));
-
-      if (piso.momentumPredictor()){
-          solve(UEqn == -fvc::grad(p));
-      }
-      // --- PISO loop
-      while (piso.correct()){
-          volScalarField rAU(1.0/UEqn.A());
-          volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
-          surfaceScalarField phiHbyA("phiHbyA",fvc::flux(HbyA)+fvc::interpolate(rAU)*fvc::ddtCorr(U, phi));
-          adjustPhi(phiHbyA, U, p);
-
-          // Update the pressure BCs to ensure flux consistency
-          constrainPressure(p, U, phiHbyA, rAU);
-
-          // Non-orthogonal pressure corrector loop
-          while (piso.correctNonOrthogonal()){
-              // Pressure corrector
-              fvScalarMatrix pEqn(fvm::laplacian(rAU, p) == fvc::div(phiHbyA));
-              pEqn.setReference(pRefCell, pRefValue);
-              pEqn.solve();
-              if (piso.finalNonOrthogonalIter()){
-                phi = phiHbyA - pEqn.flux();
-              }
-          }
-          // {
-          //     volScalarField contErr(fvc::div(phi));
-          //
-          //     scalar sumLocalContErr = runTime.deltaTValue()*mag(contErr)().weightedAverage(mesh.V()).value();
-          //
-          //     scalar globalContErr = runTime.deltaTValue()*contErr.weightedAverage(mesh.V()).value();
-          //     cumulativeContErr += globalContErr;
-          //
-          //     // Info<< "time step continuity errors : sum local = " << sumLocalContErr
-          //     //     << ", global = " << globalContErr
-          //     //     << ", cumulative = " << cumulativeContErr
-          //     //     << endl;
-          // }
-          U = HbyA - rAU*fvc::grad(p);
-          U.correctBoundaryConditions();
-      }
-      //runTime.write();
-      plottxt();
+      _fluidSolver->advance();
       gettimeofday(&_tv.end,NULL);
-      _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);}
-      //extract data from couette solver and send them to MD (can take any index-conversion object)
-      fillSendBuffer(_cfg.density,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.sendBuffer);
-      //std::cout << "Finished MacroTimestep" << std::endl;
+      _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+    }
+    //extract data from couette solver and send them to MD (can take any index-conversion object)
+    fillSendBuffer(_cfg.density,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.sendBuffer);
+
     if(_cfg.macro2Md){
       _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
       //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
     }
-  }
-
-  /** create vtk plot if required */
-  void plottxt() {
-    std::stringstream ss; ss << "velocity_" << runTime.timeOutputValue()/0.25 << ".txt";
-    std::ofstream file(ss.str().c_str());
-    if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-    std::stringstream velocity;
-
-    // loop over domain (incl. boundary)
-    double y=25;
-    double x=25;
-    for (double z = 1.25; z < 50.0; z=z+2.5){
-      const int foamIndice = U.mesh().findCell(Foam::vector(x,y,z));
-      // write information to streams
-      if(foamIndice>0){
-      velocity << U[foamIndice][0] << ", " << U[foamIndice][1] << ", " << U[foamIndice][2] << std::endl;
-    }}
-    file << velocity.str() << std::endl;
-    file.close();
   }
 
   void advanceMicro(int cycle){
@@ -404,33 +298,22 @@ private:
   }
 
   void twoWayCoupling(int cycle){ // Function to set the values from MD within the macro solver
-    if ( _cfg.twoWayCoupling){writeMDvalues2Foam();}
+    if (_rank==0){
+        if ( _cfg.twoWayCoupling){writeMDvalues2Foam();}
+    }
     //write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle);
   }
 
-  void writeMDvalues2Foam(){
-    if(_rank==0){
-      // std::stringstream ss; ss << "recvBuffer_" << runTime.timeOutputValue()/0.25 << ".txt";
-      // std::ofstream file(ss.str().c_str());
-      // if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-      // std::stringstream Buffer;
-      for(unsigned int i=0; i < _buf.numberFoamBoundaryPoints; i++){
-        unsigned int j = _buf.foam2RecvBufferIndices[i];
-        tarch::la::Vector<3,double> localVel( (1.0/_buf.recvBuffer[j]->getMacroscopicMass())*_buf.recvBuffer[j]->getMacroscopicMomentum() );
-        _buf.foamBoundaryIndices[i]->x() = localVel[0];
-        _buf.foamBoundaryIndices[i]->y() = localVel[1];
-        _buf.foamBoundaryIndices[i]->z() = localVel[2];
-        //std::cout << localVel[0] << ", " << localVel[1] << ", " << localVel[2] << ", "<< _buf.foamBoundaryIndices[i][0] << ", " << _buf.foamBoundaryIndices[i][1] << ", " << _buf.foamBoundaryIndices[i][2] << ", " << std::endl;
-      }
-      // for (unsigned int i = 6; i < 12; i++){
-      //   for (unsigned int j = 0; j < 36; j++){
-      //     Foam::vectorField FoamCoord = U.boundaryFieldRef()[i].patch().Cf()[j]+(U.boundaryFieldRef()[i].patch().nf()*1.25);
-      //     Buffer << FoamCoord[0][0] << ", " << FoamCoord[0][1] << ", " << FoamCoord[0][2] << ", " << U.boundaryFieldRef()[i][j][0] << ", " << U.boundaryFieldRef()[i][j][1] << ", " << U.boundaryFieldRef()[i][j][2] << std::endl;
-      //   }
-      // }
-      // file << Buffer.str() << std::endl;
-      // file.close();
+  void writeMDvalues2Foam(){ //Where should this function go?
+    for(unsigned int i=0; i < _buf.numberFoamBoundaryPoints; i++){
+      unsigned int outer = _buf.foam2RecvBufferIndicesOuter[i];
+      unsigned int inner = _buf.foam2RecvBufferIndicesInner[i];
+      tarch::la::Vector<3,double> localOuterVel( (1.0/_buf.recvBuffer[outer]->getMacroscopicMass())*_buf.recvBuffer[outer]->getMacroscopicMomentum() );
+      tarch::la::Vector<3,double> localInnerVel( (1.0/_buf.recvBuffer[inner]->getMacroscopicMass())*_buf.recvBuffer[inner]->getMacroscopicMomentum() );
+      _buf.foamBoundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
+      _buf.foamBoundaryIndices[i]->y() = (localOuterVel[1]+localInnerVel[1])*0.5;
+      _buf.foamBoundaryIndices[i]->z() = (localOuterVel[2]+localInnerVel[2])*0.5;
     }
   }
 
@@ -569,7 +452,6 @@ private:
         if (containsThisRank){ numCellsRecv++; }
       }
     }
-    
     // allocate array for cell indices
     unsigned int* indices = new unsigned int [numCellsRecv];
     if (indices==NULL){std::cout << "ERROR FoamTest::allocateRecvBuffer(): indices==NULL!" << std::endl; exit(EXIT_FAILURE); }
@@ -613,7 +495,7 @@ private:
       tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*cellSize);
       for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*2.5; }
       const Foam::vector foamPosition(cellMidPoint[0],cellMidPoint[1],cellMidPoint[2]);
-      foamIndice[i] = U.mesh().findCell(foamPosition) > 0 ? mesh.findCell(foamPosition) : 0;
+      foamIndice[i] = _fluidSolver->getIndex4Vector(foamPosition);
     }
     return foamIndice;
   }
@@ -621,23 +503,31 @@ private:
   void findPointsInFoamBoundary(const unsigned int* const globalIndice, unsigned int size,
     const coupling::IndexConversion<3>& indexConversion){
     _buf.numberFoamBoundaryPoints = 6*36;
-    _buf.foam2RecvBufferIndices = new unsigned int [_buf.numberFoamBoundaryPoints];
+    _buf.foam2RecvBufferIndicesOuter = new unsigned int [_buf.numberFoamBoundaryPoints];
+    _buf.foam2RecvBufferIndicesInner = new unsigned int [_buf.numberFoamBoundaryPoints];
     _buf.foamBoundaryIndices = new Foam::vector* [_buf.numberFoamBoundaryPoints];
     unsigned int counter = 0;
 
     for (unsigned int i = 6; i < 12; i++){
       for (unsigned int j = 0; j < 36; j++){
-        Foam::vectorField FoamCoord = U.boundaryFieldRef()[i].patch().Cf()[j]+(U.boundaryFieldRef()[i].patch().nf()*1.25);
-        _buf.foamBoundaryIndices[counter] = &(U.boundaryFieldRef()[i][j]);
-        const unsigned int globalIndex = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(tarch::la::Vector<3,double>(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2])));
+        _buf.foamBoundaryIndices[counter] = _fluidSolver->getReference4BoundaryField(i, j);
+        const unsigned int globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(_fluidSolver->getOuterPointFromBoundary(i, j)));
+        const unsigned int globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(_fluidSolver->getInnerPointFromBoundary(i, j)));
         for(unsigned int k = 0; k < size; k++){
-          if(globalIndex==globalIndice[k]){
-            _buf.foam2RecvBufferIndices[counter] = k;
+          if(globalIndexOuter==globalIndice[k]){
+            _buf.foam2RecvBufferIndicesOuter[counter] = k;
             goto endloop;
           }
         }
-      endloop:
-      counter++;
+        endloop:
+        for(unsigned int k = 0; k < size; k++){
+          if(globalIndexInner==globalIndice[k]){
+            _buf.foam2RecvBufferIndicesInner[counter] = k;
+            goto endloop2;
+          }
+        }
+        endloop2:
+        counter++;
       }
     }
   }
@@ -687,8 +577,7 @@ private:
 
     for (unsigned int i = 0; i < size; i++){
       if(_buf.foamCellIndices4SendBuffer[i]>0){
-        const tarch::la::Vector<3,double> velocity(U[_buf.foamCellIndices4SendBuffer[i]][0], U[_buf.foamCellIndices4SendBuffer[i]][1], U[_buf.foamCellIndices4SendBuffer[i]][2]);
-        //const tarch::la::Vector<3,double> velocity(0.5, 0.0, 0.0);
+        const tarch::la::Vector<3,double> velocity(_fluidSolver->getVelocityByIndex(_buf.foamCellIndices4SendBuffer[i]));
         sendBuffer[i]->setMicroscopicMass(mass);
         sendBuffer[i]->setMicroscopicMomentum(mass*velocity);
       }
@@ -720,13 +609,11 @@ private:
   }
 
   struct CouetteConfig{
-    // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
-    int couplingCycles;
+    int couplingCycles; // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
     bool md2Macro, macro2Md, twoWayCoupling;
     int csvEveryTimestep;
     MicroSolverType miSolverType;
     double density;
-    // only for LB couette solver: VTK plotting per time step
     int plotEveryTimestep;
     double temp;
     int equSteps;
@@ -741,7 +628,8 @@ private:
     std::vector<coupling::datastructures::MacroscopicCell<3>* > recvBuffer;
     unsigned int *globalCellIndices4RecvBuffer;
     Foam::vector** foamBoundaryIndices;
-    unsigned int *foam2RecvBufferIndices;
+    unsigned int *foam2RecvBufferIndicesOuter;
+    unsigned int *foam2RecvBufferIndicesInner;
     unsigned int numberFoamBoundaryPoints;
   };
 
@@ -760,6 +648,7 @@ private:
   CouetteConfig _cfg;
   unsigned int _mdStepCounter;
   coupling::solvers::AbstractCouetteSolver<3> *_couetteSolver;
+  coupling::solvers::IcoFoam *_fluidSolver;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL,3> *_multiMDCellService;
   CouplingBuffer _buf;
@@ -770,16 +659,5 @@ private:
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
   TimingValues _tv;
-  Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests", "build_foam")};
-  Foam::fvMesh mesh{Foam::fvMesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ))};
-  Foam::IOdictionary transportProperties{Foam::IOdictionary(Foam::IOobject("transportProperties",runTime.constant(),mesh, Foam::IOobject::MUST_READ_IF_MODIFIED,Foam::IOobject::NO_WRITE))};
-  Foam::dimensionedScalar nu{Foam::dimensionedScalar("nu", Foam::dimViscosity, transportProperties.lookup("nu"))};
-  Foam::volScalarField p{Foam::volScalarField(Foam::IOobject("p", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh)};
-  Foam::volVectorField U{Foam::volVectorField(Foam::IOobject("U", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh)};
-  Foam::surfaceScalarField phi{Foam::surfaceScalarField(Foam::IOobject("phi", runTime.timeName(), mesh, Foam::IOobject::READ_IF_PRESENT, Foam::IOobject::AUTO_WRITE), Foam::fvc::flux(U))};
-  Foam::label pRefCell{0};
-  Foam::scalar pRefValue{0.0};
-  Foam::pisoControl piso{Foam::pisoControl(mesh)};
-  Foam::scalar cumulativeContErr{0};
 };
 #endif // _COUPLING_TESTS_FOAMTEST_H_
