@@ -782,12 +782,10 @@ private:
       }
     }
     else if(_cfg.maSolverType == COUETTE_FOAM){
-      if(_rank == 0 ){
-        solver = new coupling::solvers::IcoFoam(_rank);
-        if (solver==NULL){
-          std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
-          exit(EXIT_FAILURE);
-        }
+      solver = new coupling::solvers::IcoFoam(_rank);
+      if (solver==NULL){
+        std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
     // LB solver: active on lbNumberProcesses
