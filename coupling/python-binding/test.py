@@ -6,6 +6,7 @@ import mamico.tarch.utils
 import mamico.tarch.configuration
 import mamico.coupling 
 from mamico.coupling.solvers import CouetteSolverInterface
+from mamico.coupling.services import MultiMDCellService
 
 rank = mamico.tarch.utils.initMPI()
 print("rank = " + str(rank))
@@ -22,7 +23,9 @@ if not mamicoConfig.isValid():
     print("Invalid MaMiCo config!")
     sys.exit(1)
 
-multiMDService = mamico.tarch.utils.MultiMDService(totalNumberMDSimulations = 2, 
+numMD = 2
+
+multiMDService = mamico.tarch.utils.MultiMDService(totalNumberMDSimulations = numMD, 
 	numberProcesses = simpleMDConfig.getMPIConfiguration().getNumberOfProcesses())
 
 localMDInstances = multiMDService.getLocalNumberOfMDSimulations()
@@ -58,5 +61,15 @@ macroscopicSolverInterface = CouetteSolverInterface(globalNumberMacroscopicCells
     mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
 
 mamico.coupling.setMacroscopicSolverInterface(macroscopicSolverInterface)
+
+multiMDCellService = MultiMDCellService(mdSolverInterface, macroscopicSolverInterface, 
+    simpleMDConfig, rank, numMD, mamicoConfig, multiMDService)
+
+for i in range(localMDInstances):
+    simpleMD[i].setMacroscopicCellService(multiMDCellService.getMacroscopicCellService(i))
+    multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(1.1)
+
+buf = mamico.coupling.Buffer(multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
+    macroscopicSolverInterface, rank)
 
 mamico.tarch.utils.finalizeMPI()
