@@ -198,20 +198,40 @@ public:
     py::array_t<double> density) {
         const unsigned int size = _sendBuffer.size();
 
+        // Some sanity checks to see if dimension and shape of
+        // velocity and density numpy arrays actually match sendBuffer 
         if(velocity.ndim() != 4)
-            throw std::runtime_error("velocity.ndim != 4");
+            throw std::runtime_error("velocity.ndim() != 4");
         if(density.ndim() != 3)
-            throw std::runtime_error("density.ndim != 3");
+            throw std::runtime_error("density.ndim() != 3");
+        auto numcells = idcv.getGlobalNumberMacroscopicCells();
+        for(unsigned int d=0;d<3; d++){
+            if(velocity.shape(d) != numcells[d])
+                throw std::runtime_error("velocity.shape(" + 
+                    std::to_string(d) + ") should be " + std::to_string(numcells[d]) +
+                    " but is " + std::to_string(velocity.shape(d)));
+            if(density.shape(d) != numcells[d])
+                throw std::runtime_error("density.shape(" + 
+                    std::to_string(d) + ") should be " + std::to_string(numcells[d]) +
+                    " but is " + std::to_string(density.shape(d)));
+        }
+        if(velocity.shape(3) != 3)
+            throw std::runtime_error("velocity.shape(3) != 3");
+
+        // Create unchecked proxy objects for direct element access
+        // without internal checking of dimensions and bounds
+        auto velocity_raw = velocity.unchecked<4>();
+        auto density_raw = density.unchecked<3>();
         
         for (unsigned int i = 0; i < size; i++){
-            const tarch::la::Vector<3,unsigned int> globalIndex(idcv.getGlobalVectorCellIndex(_globalCellIndices4SendBuffer[i]) - tarch::la::Vector<3,unsigned int>(1,1,1));
+            const tarch::la::Vector<3,unsigned int> globalIndex(idcv.getGlobalVectorCellIndex(_globalCellIndices4SendBuffer[i]) - tarch::la::Vector<3,unsigned int>(1));
             double mass = cellmass
-                * (*density.data(globalIndex[0],globalIndex[1],globalIndex[2]));
+                * density_raw(globalIndex[0],globalIndex[1],globalIndex[2]);
 
             const tarch::la::Vector<3,double> momentum(
-            mass * (*velocity.data(globalIndex[0],globalIndex[1],globalIndex[2],0)), 
-            mass * (*velocity.data(globalIndex[0],globalIndex[1],globalIndex[2],1)),
-            mass * (*velocity.data(globalIndex[0],globalIndex[1],globalIndex[2],2)) 
+              mass * velocity_raw(globalIndex[0],globalIndex[1],globalIndex[2],0), 
+              mass * velocity_raw(globalIndex[0],globalIndex[1],globalIndex[2],1),
+              mass * velocity_raw(globalIndex[0],globalIndex[1],globalIndex[2],2) 
             );
 
             _sendBuffer[i]->setMicroscopicMass(mass);
