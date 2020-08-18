@@ -8,8 +8,9 @@
 
 import sys
 sys.path.append('../../python-binding')
-import logging
+import coloredlogs, logging
 import math
+import json
 import mamico.tarch.configuration
 from mamico.coupling.services import MultiMDCellService
 from mamico.coupling.solvers import CouetteSolverInterface
@@ -17,8 +18,6 @@ import mamico.coupling
 import mamico.tarch.utils
 import numpy as np
 from configparser import ConfigParser
-#import matplotlib.animation as animation
-#from matplotlib import pyplot as matpl
 
 log = logging.getLogger('KVSTest')
 
@@ -28,7 +27,6 @@ log = logging.getLogger('KVSTest')
 # -> using lbmpy for Lattice Bolzmann flow simulation with CUDA on GPU
 # -> using (multi-instance) SimpleMD or synthetic MD data (with Gaussian noise) (TODO)
 # -> using filtering subsystem with configurable coupling data analysis or noise filter sequences (TODO)
-# -> separate runtime measurements for coupled simulation components (TODO)
 class KVSTest():
     def __init__(self, cfg):
         self.cfg = cfg
@@ -62,6 +60,25 @@ class KVSTest():
     def initSolvers(self):
         if self.rank==0:
             self.macroscopicSolver = LBSolver(self.cfg)
+
+            # Compute time step size / coupling scaling 
+            # viscosity must exactly match on MD and LB side
+
+            # to track time passed so far, in Mamico Units
+            self.t = 0 
+            # kinematic viscosity of fluid, in Mamico Units
+            kinVisc = self.cfg.getfloat("macroscopic-solver", "viscosity") / self.cfg.getfloat("microscopic-solver", "density");
+            # dx LB in Mamico Units
+            self.dx = self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0]
+            # time intervall of one coupling cycle, in Mamico Units
+            self.dt = self.simpleMDConfig.getSimulationConfiguration().getDt() * \
+                self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
+            # duration of one LB timestep, in Mamico Units
+            self.dt_LB = self.dx*self.dx*(1/self.macroscopicSolver.omega-0.5)/(3*kinVisc)
+
+            log.info("MD timesteps per coupling cycle = " + 
+                str(self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()))
+            log.info("LB timesteps per coupling cycle = " + str(self.dt / self.dt_LB))
 
         numMD = self.cfg.getint("microscopic-solver","number-md-simulations")
 
@@ -106,6 +123,7 @@ class KVSTest():
             self.macroscopicSolverInterface, self.rank)
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
+        self.png = self.cfg.getint("coupling", "png-every-timestep")
     
         if self.rank==0:
             log.info("Finished initSolvers") # after ? ms
@@ -119,15 +137,35 @@ class KVSTest():
 
     def advanceMacro(self,cycle):
         if self.rank==0:
-            dt = .001 # TODO get dt
-            self.macroscopicSolver.advance(dt) 
+            to_advance = (cycle+1)*self.dt - self.t
+            steps = int(round(to_advance / self.dt_LB))
+            log.debug("Advancing " + str(steps) + " LB timesteps")
+            self.macroscopicSolver.advance(steps) 
+            self.t = self.t + steps * self.dt_LB
 
-            cellmass = (self.cfg.getfloat("microscopic-solver", "density")
+            cellmass = ( self.cfg.getfloat("microscopic-solver", "density")
                 * np.prod(self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()))
+            numcells = self.getGlobalNumberMacroscopicCells()
+            mdpos = json.loads(self.cfg.get("domain", "md-pos"))
+            # Convert center of MD domain in SI units to offset of MD domain as cell index
+            mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
+                for d in range(3)]
 
             self.buf.store2send(cellmass, self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
-                self.macroscopicSolver.scen.velocity[512:524, 58:70, 58:70, :].data,
-                self.macroscopicSolver.scen.density[512:524, 58:70, 58:70].data)
+                self.macroscopicSolver.scen.velocity[
+                    mdpos[0]:mdpos[0]+numcells[0], 
+                    mdpos[1]:mdpos[1]+numcells[1], 
+                    mdpos[2]:mdpos[2]+numcells[2], 
+                    :].data * (self.dx / self.dt_LB),
+                self.macroscopicSolver.scen.density[
+                    mdpos[0]:mdpos[0]+numcells[0], 
+                    mdpos[1]:mdpos[1]+numcells[1], 
+                    mdpos[2]:mdpos[2]+numcells[2]].data
+            )
+
+            if self.png > 0 and (cycle+1)%self.png == 0:
+                filename = "kvstest_" + str(cycle+1) + ".png"
+                self.macroscopicSolver.plot(filename)
 
         if self.cfg.getboolean("coupling", "send-from-macro-to-md"):
             self.multiMDCellService.sendFromMacro2MD(self.buf)
@@ -150,7 +188,7 @@ class KVSTest():
             self.macroscopicSolver.setMDBoundaryValues(self.buf, idcv) # TODO
         
         if self.csv > 0 and (cycle+1)%self.csv == 0 and self.rank==0:
-            filename = "KVSAvgMultiMDCells_" + str(cycle+1) + ".csv"
+            filename = "KVSMD2Macro_" + str(cycle+1) + ".csv"
             self.buf.recv2CSV(idcv,filename)
 
     def __del__(self):
@@ -178,9 +216,16 @@ class LBSolver():
         self.scaling = Scaling(physical_length=0.1, physical_velocity=2.25, kinematic_viscosity=self.vis,
              cells_per_length=0.1*cpm)
         self.omega = cfg.getfloat("macroscopic-solver", "omega")
+        if self.omega > 1.92:
+            lb_log.warning("High omega, LB may be unstable!")
         self.scaling_result = self.scaling.diffusive_scaling(self.omega)
+        lb_log.info("Scaling LB to SI units:")
         lb_log.info(self.scaling_result)
         lb_log.info("dx=" + str(self.scaling.dx))
+        if self.scaling_result.lattice_velocity > 0.05:
+            lb_log.warning("High lattice velocity, LB may be unstable!")
+        if self.scaling_result.lattice_velocity > 0.57:
+            lb_log.error("Supersonic lattice velocity!")
 
         self.timesteps_finished = 0
         self.setup_scenario()
@@ -217,8 +262,7 @@ class LBSolver():
         outflow = FixedDensity(1.0)
         self.scen.boundary_handling.set_boundary(outflow, make_slice[-1, :, :])
 
-    def advance(self, dt):
-        timesteps = int( dt / self.scaling_result.dt )
+    def advance(self, timesteps):
         self.scen.run(timesteps)
         self.timesteps_finished = self.timesteps_finished + timesteps
         #self.scen.write_vtk()
@@ -296,12 +340,24 @@ class LBSolver():
         lb_log.info("cD_max = " + str(self.cD_max))
         lb_log.info("cL_max = " + str(self.cL_max))
 
+    # write velocity slice to png file
+    def plot(self, filename):
+        plt.vector_field_magnitude(self.scen.velocity[:,:,int(self.domain_size[2]//2),0:2])
+        plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=None, hspace=None)
+        plt.axis('off')
+        plt.savefig(filename)
+
 # Read config file, create a KVSTest instance and run it
 def main():
     cfg = ConfigParser()
     cfg.read("kvstest.ini")
 
-    logging.basicConfig(level=logging.INFO)
+    coloredlogs.install(fmt=
+        '%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s'
+    , level='DEBUG')
+
+    log.setLevel(level=logging.INFO)
+    lb_log.setLevel(level=logging.INFO)
 
     test = KVSTest(cfg)
     test.run()
