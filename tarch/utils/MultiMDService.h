@@ -53,6 +53,7 @@ class tarch::utils::MultiMDService {
     unsigned int getGlobalSize() const { return _globalSize; }
 
     void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
+    unsigned int getTotalNumberOfMDSimulations() { return _totalNumberMDSimulations; }
     void setThisNumberMDSimulations(unsigned int n) { _thisNumberMDSimulations = n; }
 
     int getRank() const { return this->_globalRank; }
@@ -85,6 +86,8 @@ class tarch::utils::MultiMDService {
 
     int _localSize; // size of communicator _localComm
     int _localRank; // local rank in communicator _localComm
+
+    std::vector<bool> _listMDSimulations; // list of active / non-active MD Simulations
 };
 
 #include "tarch/utils/MultiMDService.cpph"
