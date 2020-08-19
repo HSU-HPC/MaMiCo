@@ -30,6 +30,7 @@ namespace coupling {
 template<unsigned int dim>
 class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::services::MacroscopicCellService<dim> {
   public:
+
     MacroscopicCellServiceMacroOnly(
       unsigned int ID,
       coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface,                // interface to macroscopic solver

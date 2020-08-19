@@ -43,7 +43,7 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout.
   -->
   <coupling
-    coupling-cycles="12"
+    coupling-cycles="2"
     two-way-coupling="no"
     send-from-md-to-macro="yes"
     filter-init-cycles="100"

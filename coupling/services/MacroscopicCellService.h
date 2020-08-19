@@ -14,6 +14,7 @@
 #include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
 #include "coupling/datastructures/MacroscopicCells.h"
 #include "coupling/MacroscopicCellPlotter.h"
+#include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/configurations/ParticleInsertionConfiguration.h"
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
 #include "coupling/configurations/BoundaryForceConfiguration.h"

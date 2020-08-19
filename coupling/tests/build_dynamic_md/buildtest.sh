@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=$(pkg-config --cflags-only-I mpi)
-MPI_LIB_PATH=$(pkg-config --libs-only-L mpi)
-LIB_MPI=$(pkg-config --libs-only-l mpi)
+MPI_INCLUDE_PATH=$(pkg-config --cflags-only-I ompi)
+MPI_LIB_PATH=$(pkg-config --libs-only-L ompi)
+LIB_MPI=$(pkg-config --libs-only-l ompi)
 
 LIB_EIGEN_PATH=$(pkg-config --cflags-only-I eigen3)
 

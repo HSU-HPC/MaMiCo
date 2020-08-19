@@ -332,19 +332,18 @@ private:
     if(_cfg.twsLoop){
       // initialise macroscopic cell service for multi-MD case and set single cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
-        _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
-        _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
-        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-        _mamicoConfig.getMacroscopicCellConfiguration(), *_multiMDService, _tws
+        _mdSolverInterface,couetteSolverInterface, _simpleMDConfig, 
+        _mamicoConfig,
+        *_multiMDService,
+        _tws
       );
     }
     else{
       // initialise macroscopic cell service for multi-MD case and set single cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
-        _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
-        _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
-        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-        _mamicoConfig.getMacroscopicCellConfiguration(), *_multiMDService
+        _mdSolverInterface,couetteSolverInterface, _simpleMDConfig,
+        _mamicoConfig,
+        *_multiMDService
       );
     }
 
@@ -354,9 +353,9 @@ private:
 
       for (unsigned int i = 0; i < _localMDInstances; i++){
         _simpleMD[i]->setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
-        // compute and store temperature in macroscopic cells (temp=1.1 everywhere)
-        _multiMDCellService->getMacroscopicCellService(i).computeAndStoreTemperature(_cfg.temp);
       }
+      // compute and store temperature in macroscopic cells (temp=1.1 everywhere)
+      _multiMDCellService->computeAndStoreTemperature(_cfg.temp);
     }
 
     // allocate buffers for send/recv operations
@@ -432,7 +431,7 @@ private:
     if(_cfg.miSolverType == SIMPLEMD){
       // run MD instances
       for (unsigned int i = 0; i < _localMDInstances; i++){
-        if(&_multiMDCellService->getMacroscopicCellService(i) == nullptr) continue;
+        if(_simpleMD[i] == nullptr) continue;
 
         // set macroscopic cell service and interfaces in MamicoInterfaceProvider
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
@@ -440,10 +439,11 @@ private:
 
         _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
         //std::cout << "Finish _simpleMD[i]->simulateTimesteps " << std::endl;
-
-        // plot macroscopic time step info in multi md service
-        _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);
       }
+
+      // plot macroscopic time step info in multi md service
+      _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
+
       _mdStepCounter += _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
 
       if (_rank==0){

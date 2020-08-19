@@ -17,6 +17,13 @@ _localSize(1),_localRank(0) {
   MPI_Comm_size(MPI_COMM_WORLD,&_globalSize);
   MPI_Comm_rank(MPI_COMM_WORLD,&_globalRank);
 
+  /* Resilience TODOs
+   * Allow idle processes?
+   *   - allow any number of processes or only useful numbers?
+   */ 
+    
+  
+
   // test process distribution
   _localSize = numberProcessesPerMDSimulation[0];
   for (unsigned int d = 1; d<dim; d++){ _localSize *= numberProcessesPerMDSimulation[d]; }
@@ -41,6 +48,8 @@ _localSize(1),_localRank(0) {
   } else {
     _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
   }
+
+  _listMDSimulations = std::vector<bool>(_totalNumberMDSimulations, true);
 #endif
 }
 
