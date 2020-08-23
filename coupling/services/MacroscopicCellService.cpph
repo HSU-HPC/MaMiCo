@@ -21,6 +21,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellS
   const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
   unsigned int numberMDTimestepsPerCouplingCycle,
   const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
+  const char* filterPipelineConfiguration,
   const tarch::utils::MultiMDService<dim>& multiMDService,
   unsigned int topologyOffset, int tws
 ):
@@ -39,7 +40,7 @@ _macroscopicSolverInterface(macroscopicSolverInterface),
 _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
 _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID),
 _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface ),
-_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, multiMDService, false, "filter_pipeline.xml"),
+_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, multiMDService, false, filterPipelineConfiguration),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
 _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
@@ -136,9 +137,11 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   // transfer strategy
   Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
+
+  //TODO: deprecated, moved to filter pipeline.
   // noise reduction
-  Wrapper4NoiseReductionProcessInnerMacroscopicCell wrapper3(this);
-  Wrapper4NoiseReductionProcessOuterMacroscopicCell wrapper4(this);
+  //Wrapper4NoiseReductionProcessInnerMacroscopicCell wrapper3(this);
+  //Wrapper4NoiseReductionProcessOuterMacroscopicCell wrapper4(this);
 
   // pre-process data before sending to macroscopic solver
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
@@ -149,18 +152,20 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   double runtime=0;
   if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); } 
 
+  //TODO: deprecated, moved to filter pipeline.
   // run noise reduction
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
-  if(_noiseReduction->_doubleTraversal){
-    _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-    _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
-  }
+  //_macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
+  //_macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
+  //if(_noiseReduction->_doubleTraversal){
+  //  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
+  //  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
+  //}
  
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
   _filterPipeline(); 
+
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);
     runtime += (double)((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
