@@ -87,10 +87,10 @@ private:
   }
 
   void parseConfigurations(){
-    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("couette_simplemd.xml","molecular-dynamics",_simpleMDConfig);
+    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("couette.xml","molecular-dynamics",_simpleMDConfig);
     if (!_simpleMDConfig.isValid()){std::cout << "ERROR CouetteTest: Invalid SimpleMD config!" << std::endl; exit(EXIT_FAILURE);}
     
-    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("couette_mamico.xml","mamico",_mamicoConfig);
+    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("couette.xml","mamico",_mamicoConfig);
     if (!_mamicoConfig.isValid()){ std::cout << "ERROR CouetteTest: Invalid MaMiCo config!" << std::endl; exit(EXIT_FAILURE); }
 
     parseCouetteTestConfiguration();
@@ -105,9 +105,25 @@ private:
       std::cout << "Could not read input file couette.xml: missing element <couette-test>" << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n2 = node->NextSiblingElement();
-    if(n2 != NULL){
-      std::cout << "Could not read input file couette.xml: unknown element " << n2->Name() << std::endl;
+
+    tinyxml2::XMLElement *n_mamico = node->NextSiblingElement();
+    if(n_mamico == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_md = n_mamico->NextSiblingElement();
+    if(n_md == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <molecular-dynamics>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_fp = n_md->NextSiblingElement();
+    if(n_fp == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <filter-pipeline>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
+    if(n_unexpected == NULL){
+      std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -292,7 +308,7 @@ private:
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
         _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-        _mamicoConfig.getMacroscopicCellConfiguration(), *_multiMDService, _tws
+        _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService, _tws
       );
     }
     else{
@@ -301,7 +317,7 @@ private:
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
         _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-        _mamicoConfig.getMacroscopicCellConfiguration(), *_multiMDService
+        _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }
 

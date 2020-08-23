@@ -93,11 +93,6 @@ bool coupling::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile
         return false;
     }
 
-    if (node->NextSiblingElement()){
-        std::cout << "ERROR: Could not read config for Filter-Pipeline: should not contain more than one root element" << std::endl;
-        return false;
-    }
-
     //verfiy per-instance subtag
     tinyxml2::XMLElement* perInstanceTag = node->FirstChildElement("per-instance");
     if(!perInstanceTag){

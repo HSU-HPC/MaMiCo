@@ -120,6 +120,7 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells and respective plotting
+	  const char* filterPipelineConfiguration,
       const tarch::utils::MultiMDService<dim>& multiMDService,
       unsigned int topologyOffset, int tws = 0
     );
@@ -138,6 +139,7 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,  // configuration for macroscopic cells and respective plotting
+	  const char* filterPipelineConfiguration,
       const tarch::utils::MultiMDService<dim>& multiMDService
     ): MacroscopicCellServiceImpl<LinkedCell,dim>(ID,mdSolverInterface,macroscopicSolverInterface,numberProcesses,rank,
        particleInsertionConfiguration,momentumInsertionConfiguration,boundaryForceConfiguration,transferStrategyConfiguration,noiseReductionConfiguration,

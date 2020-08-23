@@ -8,7 +8,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 
-#define DEBUG_POD
+//#define DEBUG_POD
 #include "coupling/filtering/FilterInterface.h"
 #include "tarch/utils/MultiMDService.h"
 

@@ -8,7 +8,7 @@
 #include <vector>
 #include <fstream>
 
-#define DEBUG_WRITE_TO_FILE
+//#define DEBUG_WRITE_TO_FILE
 #include "coupling/filtering/FilterInterface.h"
 
 namespace coupling {
@@ -35,37 +35,9 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 		   		_location(location),
 				_overwrite(overwrite),
 				_iteration(1)
-		{
-			if(dim == 2 or dim == 3){
-				_header += "Iteration, ";
-				if(dim == 2) _header += "Global Index X, Global Index Y, ";
-				else _header += "Global Index X, Global Index Y, Global Index Z, ";
-				if(dim == 2) _header += "Local Index X, Local Index Y, ";
-				else _header += "Local Index X, Local Index Y, Local Index Z, ";
-				if(filteredValues[0]) _header += "Microscopic Mass, ";
-				if(filteredValues[2]) _header += "Macroscopic Mass, "; 
-				if(filteredValues[4]) _header += "Potential Energy, ";
-				if(filteredValues[6]) _header += "Temperature, ";
-				if(filteredValues[1]){ 			
-					if(dim == 2) _header += "Microscopic Momentum X, Microscopic Momentum Y, ";
-					else _header += "Microscopic Momentum X, Microscopic Momentum Y, Microscopic Momentum Z, ";
-				}
-				if(filteredValues[3]){
-					if(dim == 2) _header += "Macroscopic Momentum X, Macroscopic Momentum Y, ";
-					else _header += "Macroscopic Momentum X, Macroscopic Momentum Y, Macroscopic Momentum Z, ";
-				}
-				if(filteredValues[5]){
-					if(dim == 2) _header += "Velocity X, Velocity Y, ";
-					else _header += "Velocity X, Velocity Y, Velocity Z, ";
-				}
-				_header.pop_back(); //remove the last (unwanted) ' '.
-				_header.pop_back(); //remove the last (unwanted) ','.
-			}
-			else { _header += "SINCE DIM IS NEITHER 2 NOR 3, YOU HAVE TO ADD THIS MANUALLY"; }
-
+		{	
 			if(!_overwrite){
 				_file.open(location);
-				_file << _header << std::endl;
 				_file.close();
 			}
 
@@ -90,9 +62,8 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 		bool _overwrite;
 
         std::ofstream _file;
-		std::string _header;
 		unsigned int _iteration; 
 };
 
-//include implementation of _header
+//include implementation of header
 #include "WriteToFile.cpph"

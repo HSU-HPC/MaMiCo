@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#define DEBUG_GAUSS
+//#define DEBUG_GAUSS
 #include "coupling/filtering/FilterInterface.h"
 
 namespace coupling {
@@ -37,6 +37,9 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back())
 				//TODO: function pointers
 		{
+			//TODO
+			std::cout << "WARNING: You're using a GAUSS-Filter. As this filter has not been tested thoroughly, caution is advised!" << std::endl;
+
 			if(coupling::FilterInterface<dim>::_cellIndices.back()[_dim] < 2){
 				std::cout << "ERROR: GAUSS: Invalid input domain." << std::endl;
 				exit(EXIT_FAILURE);
