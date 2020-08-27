@@ -46,11 +46,16 @@ public:
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
+  IcoFoam(int rank, int plotEveryTimestep): AbstractCouetteSolver<3>(), _rank(rank),
+    _plotEveryTimestep(plotEveryTimestep){
+    Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
+    mesh.setFluxRequired(p.name());
+  }
   virtual ~IcoFoam(){}
 
   void advance(double dt)override{
     if(skipRank()){return;}
-    unsigned int number = floor(dt/0.25+0.5);
+    unsigned int number = floor(dt/runTime.deltaTValue()+0.5);
     for(unsigned int i=0; i<number; i++){
       using namespace Foam;
       ++runTime;
@@ -58,7 +63,6 @@ public:
 
       // Momentum predictor
       fvVectorMatrix UEqn(fvm::ddt(U) + fvm::div(phi, U)-  fvm::laplacian(nu, U));
-
       if (piso.momentumPredictor()){
           solve(UEqn == -fvc::grad(p));
       }
@@ -88,6 +92,7 @@ public:
       }
       //runTime.write();
       plottxt();
+      _timestepCounter++;
     }
   }
 
@@ -135,6 +140,7 @@ public:
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
   const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
     if(skipRank()){return;}
+
     for(unsigned int i=0; i < _numberBoundaryPoints; i++){
       unsigned int outer = _boundary2RecvBufferIndicesOuter[i];
       unsigned int inner = _boundary2RecvBufferIndicesInner[i];
@@ -149,6 +155,7 @@ public:
   void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip,
   const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size){
     if(skipRank()){return;}
+    //setFixedValueBoundary();
     _numberBoundaryPoints = 6*36;
     _boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
     _boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
@@ -182,7 +189,8 @@ public:
 private:
   /** create vtk plot if required */
   void plottxt() {
-    std::stringstream ss; ss << "velocity_" << runTime.timeOutputValue()/0.25 << ".txt";
+    if(_plotEveryTimestep < 1 || _timestepCounter % _plotEveryTimestep > 0) return;
+    std::stringstream ss; ss << "velocity_" << _timestepCounter << ".txt";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
     std::stringstream velocity;
@@ -204,7 +212,17 @@ private:
     return !(_rank==0);
   }
 
-  Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests", "build_couette")};
+  void setFixedValueBoundary(){
+    //using namespace Foam;
+    new(&mesh) Foam::fvMesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ));
+    new(&U) Foam::volVectorField(Foam::IOobject("U", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh);
+    new(&p) Foam::volScalarField(Foam::IOobject("p", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh);
+    new(&phi) Foam::surfaceScalarField(Foam::surfaceScalarField(Foam::IOobject("phi", runTime.timeName(), mesh, Foam::IOobject::READ_IF_PRESENT, Foam::IOobject::AUTO_WRITE), Foam::fvc::flux(U)));
+    Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
+    mesh.setFluxRequired(p.name());
+  }
+
+  Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests/build_couette","FoamSetup")};
   Foam::fvMesh mesh{Foam::fvMesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ))};
   Foam::IOdictionary transportProperties{Foam::IOdictionary(Foam::IOobject("transportProperties",runTime.constant(),mesh, Foam::IOobject::MUST_READ_IF_MODIFIED,Foam::IOobject::NO_WRITE))};
   Foam::dimensionedScalar nu{Foam::dimensionedScalar("nu", Foam::dimViscosity, transportProperties.lookup("nu"))};
@@ -220,5 +238,7 @@ private:
   unsigned int *_boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
   Foam::vector **_boundaryIndices;
   int _rank;
+  int _timestepCounter{0};
+  int _plotEveryTimestep{1};
 };
 #endif // _COUPLING_SOLVERS_ICOFOAM_H

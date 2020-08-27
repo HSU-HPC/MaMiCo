@@ -689,6 +689,7 @@ private:
     std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,const unsigned int * const recvIndices,
     const coupling::IndexConversion<3>& indexConversion, int couplingCycle
   ) const {
+    if(!(_rank==0))return;
     if(_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0) return;
     // form file name and open file
     std::stringstream ss;
@@ -782,7 +783,7 @@ private:
       }
     }
     else if(_cfg.maSolverType == COUETTE_FOAM){
-      solver = new coupling::solvers::IcoFoam(_rank);
+      solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep);
       if (solver==NULL){
         std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
