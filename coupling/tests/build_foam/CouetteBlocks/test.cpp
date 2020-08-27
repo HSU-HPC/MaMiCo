@@ -155,15 +155,12 @@ int main(){
   #define initContinuityErrs_H
   scalar cumulativeContErr = 0;
   #endif
-  // U.boundaryFieldRef()[7][0].y() = 0.5;
-  //U.boundaryFieldRef()[8][1].x() = 0.5;
-  
-  Info << U.boundaryFieldRef()[0] << endl;
 
-  ++runTime;
-  runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
-  ++runTime;
-  runFoam(phi, mesh, U, nu, piso, p, pRefCell, pRefValue, cumulativeContErr, runTime);
+    //U.boundaryFieldRef().readField(U.internalField(), Foam::IOdictionary(Foam::IOobject("U20",runTime.timeName(),mesh, Foam::IOobject::MUST_READ_IF_MODIFIED,Foam::IOobject::NO_WRITE)));
+  auto W = U.clone();
+  //U.~volVectorField();
+  new(&U) Foam::volVectorField(Foam::IOobject("U20", runTime.timeName(), mesh, Foam::IOobject::READ_IF_PRESENT, Foam::IOobject::AUTO_WRITE),W);
+
 
   Info<< "\nStarting time loop\n" << endl;
 
