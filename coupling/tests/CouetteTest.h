@@ -868,18 +868,3 @@ private:
   TimingValues _tv;
 };
 #endif // _COUPLING_TESTS_COUETTETEST_H_
-
-/*
-
- - mehr Kommentare
- - in cpp auslagern
- - final testen
-
- - NLM impl
- - supermuc-ng scalierungstest
- - send receive rework
- ok hsu in paper
-
-
-
-*/
