@@ -35,29 +35,49 @@ class tarch::utils::MultiMDService {
 
     int getLocalNumberOfGlobalMDSimulation(unsigned int globalMDSimulation) const;
 
-    unsigned int getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
-    void setLocalNumberOfMDSimulations(unsigned int i) { _thisNumberMDSimulations = i; }
+    unsigned int & getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
 
     tarch::la::Vector<dim, unsigned int> getNumberProcessesPerMDSimulation() const { return _numberProcessesPerMDSimulation; }
 
     #if (TARCH_PARALLEL==TARCH_YES)
-    MPI_Comm getLocalCommunicator() const{ return _localComm;}
+    MPI_Comm & getLocalCommunicator() const{ return _localComm;}
     #endif
-    unsigned int getLocalRank() const { return _localRank; }
-    unsigned int getLocalSize() const { return _localSize; }
+    unsigned int & getLocalRank() const { return _localRank; }
+    unsigned int & getLocalSize() const { return _localSize; }
 
     #if (TARCH_PARALLEL==TARCH_YES)
-    MPI_Comm getGlobalCommunicator() const { return MPI_COMM_WORLD;}
+    MPI_Comm & getGlobalCommunicator() const { return MPI_COMM_WORLD;}
     #endif
-    unsigned int getGlobalRank() const { return _globalRank; }
-    unsigned int getGlobalSize() const { return _globalSize; }
+    unsigned int & getGlobalRank() const { return _globalRank; }
+    unsigned int & getGlobalSize() const { return _globalSize; }
 
     void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
     unsigned int getTotalNumberOfMDSimulations() { return _totalNumberMDSimulations; }
-    void setThisNumberMDSimulations(unsigned int n) { _thisNumberMDSimulations = n; }
+    
+    void addMDSimulationBlock() {
+      _totalNumberMDSimulations += _numberLocalComms;
+      _avgNumberMDSimulationsPerLocalComm = _totalNumberMDSimulations/_numberLocalComms;
+      if ((unsigned int)(_globalRank/_localSize+1)==_numberLocalComms){
+          _thisNumberMDSimulations = _totalNumberMDSimulations - _avgNumberMDSimulationsPerLocalComm*(_numberLocalComms-1);
+      } else {
+        _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
+      }
+    }
+
+    void removeMDSimulationBlock() {
+      _totalNumberMDSimulations -= _numberLocalComms;
+      _avgNumberMDSimulationsPerLocalComm = _totalNumberMDSimulations/_numberLocalComms;
+      if ((unsigned int)(_globalRank/_localSize+1)==_numberLocalComms){
+          _thisNumberMDSimulations = _totalNumberMDSimulations - _avgNumberMDSimulationsPerLocalComm*(_numberLocalComms-1);
+      } else {
+        _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
+      }
+    }
 
     int getRank() const { return this->_globalRank; }
     int getSize() const { return this->_globalSize; }
+
+    unsigned int getNumberLocalComms() const { return _numberLocalComms; }
 
   private: 
     #if (TARCH_PARALLEL==TARCH_YES)
@@ -86,8 +106,6 @@ class tarch::utils::MultiMDService {
 
     int _localSize; // size of communicator _localComm
     int _localRank; // local rank in communicator _localComm
-
-    std::vector<bool> _listMDSimulations; // list of active / non-active MD Simulations
 };
 
 #include "tarch/utils/MultiMDService.cpph"

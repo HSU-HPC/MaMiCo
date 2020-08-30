@@ -54,47 +54,60 @@ public:
       // Drop 50 random md instances in cycle 249
       if(cycle == 0) {
         for(int c=1;c<2;c++) {
-          int iMD = c; // Global MD index to be shut down
-          if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
-          
-          int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
-          _multiMDCellService->rmMDSimulation(iSim, iMD);
-          if(iSim >= 0 && iSim < (int)_localMDInstances) {
-            _simpleMD[iSim]->shutdown();
-            delete _simpleMD[iSim];
-            _simpleMD[iSim] = nullptr;
-            //_simpleMD.erase(_simpleMD.begin()+iSim);
-            delete _mdSolverInterface[iSim];
-            _mdSolverInterface[iSim] = nullptr;
-            //_mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
-            //_localMDInstances -= 1;
-          }
+          addMDSimulation();
         }
       }
 #endif
 #if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
       // After cycle 120 delete one md instance per cycle
       if(cycle >= 120 && cycle < 220) {
-        int iMD; // Global MD index to be shut down
-	iMD = 30 + cycle - 120;
-        
-        int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
-        _multiMDCellService->rmMDSimulation(iSim, iMD);
-        if(iSim >= 0 && iSim < (int)_localMDInstances) {
-          _simpleMD[iSim]->shutdown();
-          _simpleMD.erase(_simpleMD.begin()+iSim);
-          _mdSolverInterface.erase(_mdSolverInterface.begin()+iSim);
-          _localMDInstances -= 1;
-        }
+        removeMDSimulation();
       }
 #endif
     }
     shutdown();
   }
 
+  
+
 private:
   enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1};
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
+
+  void removeMDSimulation() {
+    //int iMD = c; // Global MD index to be shut down
+    
+    unsigned int iMD = _multiMDCellService->rmMDSimulation(_mdSolverInterface, _simpleMD);
+    int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
+
+    if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
+
+    //_multiMDCellService->rmMDSimulation(iSim, iMD);
+    if(iSim >= 0 && iSim < (int)_localMDInstances) {
+      _simpleMD[iSim]->shutdown();
+      delete _simpleMD[iSim];
+      _simpleMD[iSim] = nullptr;
+      //_simpleMD.erase(_simpleMD.begin()+iSim);
+      delete _mdSolverInterface[iSim];
+      _mdSolverInterface[iSim] = nullptr;
+    }
+
+    _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
+  }
+
+  void addMDSimulation() {
+    //TODO need to initialize solver before macro cell service can be created!!!
+    _multiMDCellService->addMDSimulation(getCouetteSolverInterface(
+                                          _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+                                          _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+                                          getGlobalNumberMacroscopicCells(_simpleMDConfig,
+                                                                          _mamicoConfig),
+                                          _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()),
+                                          _mdSolverInterface
+                                          ,_simpleMD);
+
+    _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();         
+  }
   
   void init(){
     initMPI();
@@ -263,6 +276,8 @@ private:
     }
   }
 
+
+
   void initSolvers(){
     // for timing measurements
     _tv.micro = 0;
@@ -359,18 +374,18 @@ private:
     }
 
     // allocate buffers for send/recv operations
-    allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
-    allocateRecvBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
+    allocateSendBuffer(_multiMDCellService->getIndexConversion(),*couetteSolverInterface);
+    allocateRecvBuffer(_multiMDCellService->getIndexConversion(),*couetteSolverInterface);
 
     // manually allocate noise reduction if necessary
     if(_cfg.miSolverType == SYNTHETIC){
       if(_cfg.twsLoop){
         _noiseReduction = _mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(
-          _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_multiMDService, _tws);
+          _multiMDCellService->getIndexConversion(), *_multiMDService, _tws);
       }
       else{
         _noiseReduction = _mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(
-          _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_multiMDService); 
+          _multiMDCellService->getIndexConversion(), *_multiMDService); 
       }
     }
 
@@ -438,7 +453,7 @@ private:
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
 
         _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
-        //std::cout << "Finish _simpleMD[i]->simulateTimesteps " << std::endl;
+        std::cout << "Finish _simpleMD[" << i << "]->simulateTimesteps " << std::endl;
       }
 
       // plot macroscopic time step info in multi md service
@@ -459,7 +474,7 @@ private:
     }
     
     if(_cfg.miSolverType == SYNTHETIC){
-      fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+      fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
 
       if (_rank==0){
         gettimeofday(&_tv.end,NULL);
@@ -491,7 +506,7 @@ private:
   void computeSNR(int cycle){
     if(_cfg.computeSNR && cycle >= _cfg.filterInitCycles){
       std::cout << cycle - _cfg.filterInitCycles << ", ";
-      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getIndexConversion();
       const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
       const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
       const double mass = _cfg.density*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
@@ -523,7 +538,7 @@ private:
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
     }
     if ( (_cfg.maSolverType==COUETTE_LB) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
-      static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+      static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getIndexConversion());
     }
     
   }

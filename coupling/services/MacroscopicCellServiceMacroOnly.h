@@ -87,6 +87,19 @@ class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::ser
     virtual void plotEveryMacroscopicTimestep(unsigned int t){}
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const {return *_indexConversion; }
 
+    virtual void updateIndexConversion(const unsigned int & topologyOffset) {
+      auto * newIndexConversion = initIndexConversion(_indexConversion->getMacroscopicCellSize(),
+                                                      _indexConversion->getNumberProcesses(),
+                                                      _indexConversion->getThisRank(),
+                                                      _indexConversion->getGlobalMDDomainSize(),
+                                                      _indexConversion->getGlobalMDDomainOffset(),
+                                                      _indexConversion->getParallelTopologyType(),
+                                                      topologyOffset);
+
+      delete _indexConversion;
+      _indexConversion = newIndexConversion;
+    }
+
   private:
     /** this is currently a copy-paste version of MacroscopicCellService's initIndexConversion */
     coupling::IndexConversion<dim>* initIndexConversion(

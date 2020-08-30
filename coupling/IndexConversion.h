@@ -128,6 +128,8 @@ class coupling::IndexConversion: private tarch::utils::Uncopyable {
     /** returns the vector size of each macroscopic cell. */
     tarch::la::Vector<dim,double> getMacroscopicCellSize() const;
 
+    coupling::paralleltopology::ParallelTopologyType getParallelTopologyType() const;
+
 
     // ---------------------------- GEOMETRY TO CELL INDEX ----------------------------------
 
