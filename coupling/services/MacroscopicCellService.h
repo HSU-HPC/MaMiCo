@@ -72,6 +72,7 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
+    virtual void updateIndexConversion(const unsigned int & topologyOffset) = 0;
 
     unsigned int getID() const { return _id;}
 
@@ -210,13 +211,26 @@ public coupling::services::MacroscopicCellService<dim> {
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
 
+    void updateIndexConversion(const unsigned int & topologyOffset) {
+      auto * newIndexConversion = initIndexConversion(_indexConversion->getMacroscopicCellSize(),
+                                                      _indexConversion->getNumberProcesses(),
+                                                      _indexConversion->getThisRank(),
+                                                      _indexConversion->getGlobalMDDomainSize(),
+                                                      _indexConversion->getGlobalMDDomainOffset(),
+                                                      _indexConversion->getParallelTopologyType(),
+                                                      topologyOffset);
+
+      delete _indexConversion;
+      _indexConversion = newIndexConversion;
+    }
+
   private:
     /** initialises the IndexConversion object at start up. This is the very first thing to be done in the
      *  constructor since nearly all subsequent operations depend on indexing of cells.
      */
     coupling::IndexConversion<dim>* initIndexConversion(
     tarch::la::Vector<dim,double> macroscopicCellSize, tarch::la::Vector<dim,unsigned int>numberProcesses, unsigned int rank,
-    tarch::la::Vector<dim,double> globalMDDomainSize, tarch::la::Vector<dim,double> globalMDDomainOffset,
+    tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim,double> globalMDDomainOffset,
     coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
     unsigned int topologyOffset) const;
 

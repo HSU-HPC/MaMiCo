@@ -49,7 +49,6 @@ _localSize(1),_localRank(0) {
     _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
   }
 
-  _listMDSimulations = std::vector<bool>(_totalNumberMDSimulations, true);
 #endif
 }
 

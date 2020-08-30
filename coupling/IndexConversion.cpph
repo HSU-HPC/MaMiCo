@@ -221,6 +221,9 @@ template<unsigned int dim>
 tarch::la::Vector<dim,double> coupling::IndexConversion<dim>::
 getMacroscopicCellSize() const {return _macroscopicCellSize;}
 
+template<unsigned int dim>
+coupling::paralleltopology::ParallelTopologyType coupling::IndexConversion<dim>::
+getParallelTopologyType() const { return _parallelTopologyType; }
 
 
 template<unsigned int dim>
