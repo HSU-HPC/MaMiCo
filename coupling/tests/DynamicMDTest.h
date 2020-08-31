@@ -53,9 +53,9 @@ public:
 #if defined(COUPLING_DYNAMIC_MD_SUDDEN)
       // Drop 50 random md instances in cycle 249
       if(cycle == 0) {
-        for(int c=1;c<2;c++) {
-          addMDSimulation();
-        }
+        addMDSimulation();
+        removeMDSimulation();
+        //addMDSimulation();
       }
 #endif
 #if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
@@ -78,26 +78,25 @@ private:
     //int iMD = c; // Global MD index to be shut down
     
     unsigned int iMD = _multiMDCellService->rmMDSimulation(_mdSolverInterface, _simpleMD);
-    int iSim = _multiMDService->getLocalNumberOfGlobalMDSimulation(iMD);
 
     if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
 
     //_multiMDCellService->rmMDSimulation(iSim, iMD);
-    if(iSim >= 0 && iSim < (int)_localMDInstances) {
+    /*if(iSim >= 0 && iSim < (int)_localMDInstances) {
       _simpleMD[iSim]->shutdown();
       delete _simpleMD[iSim];
       _simpleMD[iSim] = nullptr;
       //_simpleMD.erase(_simpleMD.begin()+iSim);
       delete _mdSolverInterface[iSim];
       _mdSolverInterface[iSim] = nullptr;
-    }
+    }*/
 
     _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
   }
 
   void addMDSimulation() {
     //TODO need to initialize solver before macro cell service can be created!!!
-    _multiMDCellService->addMDSimulation(getCouetteSolverInterface(
+    unsigned int iMD = _multiMDCellService->addMDSimulation(getCouetteSolverInterface(
                                           _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
                                           _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
                                           getGlobalNumberMacroscopicCells(_simpleMDConfig,
@@ -105,6 +104,8 @@ private:
                                           _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()),
                                           _mdSolverInterface
                                           ,_simpleMD);
+
+    if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
 
     _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();         
   }

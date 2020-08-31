@@ -311,21 +311,69 @@ class coupling::services::MultiMDCellService {
      */
     unsigned int rmMDSimulation(std::vector<coupling::interface::MDSolverInterface<LinkedCell,dim>* > & mdSolverInterfaces
                          , std::vector<coupling::interface::MDSimulation*> & simpleMD) {
-      unsigned int index = freeNextSlot();
+      unsigned int index = getLastReservedSlot();
 
       delete _macroscopicCellServices[index];
       _macroscopicCellServices[index] = nullptr;
 
+      
       if(index >= _blockOffset && index < _blockOffset + _localNumberMDSimulations) {
-        _simpleMD[index]->shutdown();
-        delete _simpleMD[index];
-        _simpleMD[index] = nullptr;
-        //_simpleMD.erase(_simpleMD.begin()+iSim);
-        delete _mdSolverInterface[index];
-        _mdSolverInterface[index] = nullptr;
+        unsigned int iSim = index - _blockOffset;
+        simpleMD[iSim]->shutdown();
+        delete simpleMD[iSim];
+        simpleMD[iSim] = nullptr;
+        simpleMD.erase(simpleMD.begin()+iSim);
+        delete mdSolverInterfaces[iSim];
+        mdSolverInterfaces[iSim] = nullptr;
+        mdSolverInterfaces.erase(mdSolverInterfaces.begin()+iSim);
+      }
+
+      /** Check if there is a free block of simulations,
+       *  and, if so, remove it. Then reset _nextFreeBlock.
+       * */
+      if(index == _totalNumberMDSimulations-1) {
+        removeSimulationBlock();
+        _nextFreeBlock = _multiMDService.getNumberLocalComms();
       }
 
       return index;
+    }
+
+    /** In case there is exactly one free slot available per
+     *  local comm, remove one slot per comm (that is, one block of simulations)
+     *  */
+    void removeSimulationBlock() {
+
+      unsigned int newLocalNumberMDSimulations = _localNumberMDSimulations - 1;
+      unsigned int newTotalNumberMDSimulations = _totalNumberMDSimulations - _multiMDService.getNumberLocalComms();
+      unsigned int newBlockOffset = newLocalNumberMDSimulations*_topologyOffset/_intNumberProcesses;
+
+      auto ** newMacroscopicCellServices = new MacroscopicCellService<dim> * [newTotalNumberMDSimulations];
+
+      for(unsigned int i=0;i<_multiMDService.getNumberLocalComms();++i) {
+        for(unsigned int j=0;j<newLocalNumberMDSimulations;++j) {
+          unsigned int index = i * _localNumberMDSimulations + j;
+          unsigned int newIndex = i * newLocalNumberMDSimulations + j;
+
+          newMacroscopicCellServices[newIndex] = _macroscopicCellServices[index];
+          if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
+            // Need to update topology offset in indexconversion->paralleltopology
+            newMacroscopicCellServices[newIndex]->updateIndexConversion((newIndex/newLocalNumberMDSimulations) * _intNumberProcesses);
+          }
+        }
+      }
+
+      // Update local variables
+      _localNumberMDSimulations = newLocalNumberMDSimulations;
+      _totalNumberMDSimulations = newTotalNumberMDSimulations;
+      _blockOffset = newBlockOffset;
+
+      delete [] _macroscopicCellServices;
+      _macroscopicCellServices = newMacroscopicCellServices;
+
+      _multiMDService.removeMDSimulationBlock();
+
+      _listActiveMDSimulations.pop_back();
     }
 
     /** In order to make space for new simulation slots
@@ -348,7 +396,7 @@ class coupling::services::MultiMDCellService {
           newMacroscopicCellServices[newIndex] = _macroscopicCellServices[index];
           if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
             // Need to update topologoy offset in indexconversion->paralleltopology
-            newMacroscopicCellServices[newIndex]->updateIndexConversion((newIndex/_localNumberMDSimulations) * _intNumberProcesses);
+            newMacroscopicCellServices[newIndex]->updateIndexConversion((newIndex/newLocalNumberMDSimulations) * _intNumberProcesses);
           }
         }
         newMacroscopicCellServices[(i+1)*newLocalNumberMDSimulations-1] = nullptr;
@@ -371,28 +419,39 @@ class coupling::services::MultiMDCellService {
      */
     unsigned int reserveNextSlot() {
       if(_nextFreeBlock == _multiMDService.getNumberLocalComms()-1) {
+        /** If the last communicator gets a new simulation slot,
+         *  we first have to add a new block of simulations.
+         *  That is, each communicator is appended another slot to hold
+         *  a simulation.
+         * */
         addSimulationBlock();
       }
       
       unsigned int thisFreeBlock = _nextFreeBlock;
       if(_nextFreeBlock == 0) {
-        _nextFreeBlock = _multiMDService.getNumberLocalComms();
+        /** If a simulation slot is reserved on communicator 0,
+         *  then we start again at the last one.
+         *  The next time a slot is being reserved, we first
+         *  have to add a new block of free slots (see condition above)
+         *  */
+        _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
       } else {
         _nextFreeBlock -= 1;
       }
       return thisFreeBlock * _localNumberMDSimulations + _localNumberMDSimulations -1;
     }
 
-    unsigned int freeNextSlot() {
+
+    /** Find, which slot has been reserved last */
+    unsigned int getLastReservedSlot() {
       if(_nextFreeBlock == _multiMDService.getNumberLocalComms()-1) {
-        //removeSimulationBlock(); //TODO implement
-        unsigned int thisFreeBlock = _nextFreeBlock;
-        _nextFreeBlock = 0;
-        return thisFreeBlock * _localNumberMDSimulations;        
+        /** In this case, there no actually free slots available
+         *  (we first had to add another block)
+         *  We thus want to free a slot on the first communicator.
+         */
+        return _localNumberMDSimulations - 1;       
       }
-      unsigned int thisFreeBlock = _nextFreeBlock;
-      _nextFreeBlock += 1;
-      return thisFreeBlock * _localNumberMDSimulations + _localNumberMDSimulations - 1;
+      return (_nextFreeBlock+1) * _localNumberMDSimulations + _localNumberMDSimulations - 1;
     }
 
 
@@ -400,7 +459,7 @@ class coupling::services::MultiMDCellService {
       *  @return true if this process needs another md simulation initialized
       *          false otherwise
       * */
-     void addMDSimulation(coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface,
+     unsigned int addMDSimulation(coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface,
                          std::vector<coupling::interface::MDSolverInterface<LinkedCell,dim>* > & mdSolverInterfaces
                          , std::vector<coupling::interface::MDSimulation*> & simpleMD) {
       
@@ -466,6 +525,8 @@ class coupling::services::MultiMDCellService {
           );
         simpleMD[simpleMD.size()-1]->setMacroscopicCellService((_macroscopicCellServices[slot]));
       }
+
+      return slot;
     }
 
     unsigned int getLocalNumberOfMDSimulations() const { return _localNumberMDSimulations; }
