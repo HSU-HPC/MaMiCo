@@ -17,27 +17,17 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	#endif	
 	bool firstIteration = true;
     while(currFilterNode){
-		//"use" is not mandatory, default is false
-		bool filteredValues[7] = { false };
-		const char* fvStr = currFilterNode->Attribute("filtered-values");
-		if(fvStr){
-			if(strstr(fvStr, "all")) memset(filteredValues, true, sizeof(filteredValues));
-			else{
-				if(strstr(fvStr, "micro-mass")) filteredValues[0] = true;
-				if(strstr(fvStr, "micro-momentum")) filteredValues[1] = true;
-				if(strstr(fvStr, "macro-mass")) filteredValues[2] = true;
-				if(strstr(fvStr, "macro-momentum")) filteredValues[3] = true;
-				if(strstr(fvStr, "potential-energy")) filteredValues[4] = true;
-				if(strstr(fvStr, "velocity")) filteredValues[5] = true;
-				if(strstr(fvStr, "temperature")) filteredValues[6] = true;
-			}
-		}
+		//std::cout << "INIT FILTER I/O BEFORE: " << inputCellVector[0] << " " << outputCellVector[0] << std::endl;
+
+//###############################################################
+//This is where you have to define how to handle each filter indiviually.
+
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0){
 			bool overwrite = false;
 			if(currFilterNode->Attribute("overwrite"))
 				if(std::strcmp(currFilterNode->Attribute("overwrite"), "true") == 0)
 					overwrite = true;
-            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location"), overwrite));
+            _filters.push_back(new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location"), overwrite));
         }
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
 			int d; //dimension of gauss filter
@@ -49,7 +39,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			const char* extrapolation;
 			extrapolation = currFilterNode->Attribute("extrapolation");
 
-            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, filteredValues, (unsigned int) d, extrapolation));
+            _filters.push_back(new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, (unsigned int) d, extrapolation));
 		}
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
 			//In earlier implementations, it used to be possible to override tws via function parameter. This feature was removed.
@@ -73,8 +63,22 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            _filters.push_back(new coupling::POD<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, filteredValues, _multiMDService, tws, kmax));
+            _filters.push_back(new coupling::POD<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, _multiMDService, tws, kmax));
         }
+		else if(std::strcmp(currFilterNode->Value(), "strouhal") == 0) {
+			double d;
+			if(currFilterNode->QueryDoubleAttribute("D", &d)){
+				std::cout << "ERROR: Strouhal Filter misses attribute D in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			double u;
+			if(currFilterNode->QueryDoubleAttribute("U", &u)){
+				std::cout << "ERROR: Strouhal Filter misses attribute U in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			_filters.push_back(new coupling::Strouhal<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, u , d));
+        }
+
         else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
             //TODO
             std::cout << "ERROR: Filter-Pipeline does not yet support NLM." << std::endl;
@@ -85,16 +89,22 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             exit(EXIT_FAILURE);
         }
 
+//###############################################################
+
+		//std::cout << "INIT FILTER I/O BEFORE: " << inputCellVector[0] << " " << outputCellVector[0] << std::endl;
+
 		if(firstIteration){
 			inputCellVector = _domainCellVector1;
 			firstIteration = false;
 		}
+		//std::cout << "SWAP I/O BEFORE: " << inputCellVector[0] << " " << outputCellVector[0] << std::endl;
 		inputCellVector.swap(outputCellVector);
+		//std::cout << "SWAP I/O AFTER: " << inputCellVector[0] << " " << outputCellVector[0] << std::endl;
         currFilterNode = currFilterNode->NextSiblingElement();
         }
 	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << PRINT_PREFIX() << "Number of Filters: " << _filters.size() <<". Output vector will be ";
-	if(_filters.size() % 2 == 1)  std::cout << "_cellVector1." << std::endl;
+	if(_filters.size() % 2 == 0)  std::cout << "_cellVector1." << std::endl;
 	else std::cout << "_cellVector2." << std::endl;
 	#endif
 	return 0;
@@ -104,9 +114,10 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::initCellVectors(){
 	for(auto cell: _inputCellVector){
-		_cellVector1.push_back(cell);
-    	_cellVector2.push_back(cell);
+		_cellVector1.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+    	_cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
 	}
+	std::cout << "INPUT: " << _inputCellVector[0] << std::endl;
 	#ifdef DEBUG_FILTER_PIPELINE
             std::cout << PRINT_PREFIX() << "Initialized (global) cell vector." << std::endl;
     #endif 

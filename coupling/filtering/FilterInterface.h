@@ -5,7 +5,7 @@
 #pragma once
 #include <vector>
 
-#define DEBUG_FILTER
+//#define DEBUG_FILTER
 
 namespace coupling{
     template<unsigned int dim>
@@ -15,6 +15,12 @@ namespace coupling{
 /**
  *  Generic interface for filters that are to be applied to data of coupling::MacroscopicCells before MD to Macro transfer.
  *  Examples for such filters can be found in coupling/filtering/filters.
+ *
+ *  If you wish to use a filter that does not give cell output data, i.e that is read-only, you want to use 
+ *  	coupling::FilterInterfaceReadOnly<dim>
+ *  instead (as provided in header file coupling/filtering/FilterPipelineReadOnly.h).
+ *  Examples for such filters are WriteToFile or Strouhal (in coupling/filtering/filters).
+ *
  *  @Author Felix Maurer
  */
 template<unsigned int dim>
@@ -63,6 +69,8 @@ class coupling::FilterInterface{
 				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setTemperature);
 				_scalarGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getTemperature);
 			}
+
+			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
 		}
 
 
@@ -70,6 +78,12 @@ class coupling::FilterInterface{
 
 		
 		//Applies the filter to all cells that are within the filter's sequence's domain.
+
+		//It is very important that this method provides complete output data,
+		//i.e uses all elements of _scalarSetters and _vectorSetters on all elements of _outputCells.
+		//If this is not the case, you dont want to use this interface, but rather
+		//	coupling::FilterInterfaceReadOnly
+		//and use its method copyInputToOutput().
 		virtual void operator()() = 0;
 	protected:
 		/**

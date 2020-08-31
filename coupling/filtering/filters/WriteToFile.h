@@ -3,13 +3,13 @@
 // www5.in.tum.de/mamico
 
 #pragma once
+#include "coupling/filtering/FilterInterfaceReadOnly.h"
 
 #include <string>
 #include <vector>
 #include <fstream>
 
 //#define DEBUG_WRITE_TO_FILE
-#include "coupling/filtering/FilterInterface.h"
 
 namespace coupling {
     template<unsigned int dim>
@@ -19,7 +19,7 @@ namespace coupling {
 
 //should this implement the coupling::noisereduction::NoiseReduction interface?
 template<unsigned int dim>
-class coupling::WriteToFile : public coupling::FilterInterface<dim>{
+class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
     public:
         WriteToFile(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
@@ -30,7 +30,7 @@ class coupling::WriteToFile : public coupling::FilterInterface<dim>{
 				std::string location,
 				bool overwrite):
 
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
 				_localCellIndices(localCellIndices),
 		   		_location(location),
 				_overwrite(overwrite),

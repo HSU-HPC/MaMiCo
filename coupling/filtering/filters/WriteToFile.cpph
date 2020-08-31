@@ -34,6 +34,8 @@ void coupling::WriteToFile<dim>::operator()(){
     }
 	_file << std::endl;
     _file.close(); 
+	
+	coupling::FilterInterfaceReadOnly<dim>::copyInputToOutput();
 
 	_iteration++;
     #ifdef DEBUG_WRITE_TO_FILE
