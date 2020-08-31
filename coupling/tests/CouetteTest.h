@@ -68,7 +68,9 @@ private:
     advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
-    //if(_rank==0) {std::cout << "Finish coupling cycle " << cycle << std::endl;}
+    if(_rank==0 && cycle%20==0) {
+      std::cout << "Finish coupling cycle " << cycle << std::endl;
+    }
   }
 
   void initMPI(){
@@ -485,7 +487,7 @@ private:
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     }
     // write data to csv-compatible file for evaluation
-    write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle);
+    write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle+1);
   }
 
   void shutdown(){
@@ -895,19 +897,5 @@ private:
   double _sum_signal, _sum_noise;
   TimingValues _tv;
 };
+
 #endif // _COUPLING_TESTS_COUETTETEST_H_
-
-/*
-
- - mehr Kommentare
- - in cpp auslagern
- - final testen
-
- - NLM impl
- - supermuc-ng scalierungstest
- - send receive rework
- ok hsu in paper
-
-
-
-*/
