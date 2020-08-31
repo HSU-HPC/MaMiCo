@@ -5,12 +5,12 @@
 #pragma once
 
 #include "coupling/IndexConversion.h"
-#include "tarch/configuration/ParseConfiguration.h" //TODO: remove?
 
 //INCLUDE ALL FILTER HEADERS HERE
 #include "coupling/filtering/filters/WriteToFile.h"
 #include "coupling/filtering/filters/Gauss.h"
 #include "coupling/filtering/filters/POD.h"
+#include "coupling/filtering/filters/Strouhal.h"
 
 /*
  * Filter Sequences are used to group filters that will be applied in chronological order.
@@ -41,7 +41,8 @@ class coupling::FilterSequence {
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector,
 						std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 						tarch::la::Vector<dim, unsigned int> domainStart,
-						tarch::la::Vector<dim, unsigned int> domainEnd):
+						tarch::la::Vector<dim, unsigned int> domainEnd,
+						bool filteredValues[7]):
     	_indexConversion(indexConversion), 
 		_multiMDService(multiMDService),
 		_name(name), 
@@ -49,6 +50,7 @@ class coupling::FilterSequence {
 		_cellIndices(cellIndices), 
 		_domainStart(domainStart),
 		_domainEnd(domainEnd),
+		_filteredValues(filteredValues),
 		_isOutput(false) //potentially updated via loadSequencesFromXML calling setAsOutput()
 		{	
 			#ifdef DEBUG_FILTER_PIPELINE
@@ -149,6 +151,8 @@ class coupling::FilterSequence {
     	std::vector<tarch::la::Vector<dim, unsigned int>> _globalDomainCellIndices; //uses _cellIndices indexing (i. e. _domainStart .... _domainEnd))
     	std::vector<tarch::la::Vector<dim, unsigned int>> _localDomainCellIndices; //starts at (0,...,0)
 		
+		bool *_filteredValues; //actually, bool[7]
+
 		bool _isOutput; //true if this sequence's output vector (see above) is the Filter Pipeline's output
 		
 		std::vector<coupling::FilterInterface<dim> *> _filters;

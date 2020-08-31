@@ -8,7 +8,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 	const coupling::IndexConversion<dim>* indexConversion,
 	const tarch::utils::MultiMDService<dim>& multiMDService,
-	const std::string cfgpath): //TODO: default argument? 
+	const std::string cfgpath):
     FilterPipeline(mdCells, indexConversion, multiMDService, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
 {}
 
@@ -144,7 +144,7 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
         if(!inputName) inputName = "md";
         bool sequenceRecognized = false; 
         //search temp vector of known sequences
-		//TODO: check if this sequences name is already occupied
+		//TODO: check if this sequence's name is already occupied
         for(auto seq : knownSequences){
             if(std::strcmp(seq->getName(), inputName) == 0) {
                 inputFilterSequence = seq;
@@ -182,16 +182,32 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
         	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
         	}
 		}
+
+		//"filtered-values" is not mandatory, default is false
+		bool filteredValues[7] = { false };
+		const char* fvStr = currSequenceNode->Attribute("filtered-values");
+		if(fvStr){
+			if(strstr(fvStr, "all")) memset(filteredValues, true, sizeof(filteredValues));
+			else{
+				if(strstr(fvStr, "micro-mass")) filteredValues[0] = true;
+				if(strstr(fvStr, "micro-momentum")) filteredValues[1] = true;
+				if(strstr(fvStr, "macro-mass")) filteredValues[2] = true;
+				if(strstr(fvStr, "macro-momentum")) filteredValues[3] = true;
+				if(strstr(fvStr, "potential-energy")) filteredValues[4] = true;
+				if(strstr(fvStr, "velocity")) filteredValues[5] = true;
+				if(strstr(fvStr, "temperature")) filteredValues[6] = true;
+			}
+		}
 		
 		//CREATE SEQUENCE
 		if(inputFilterSequence){
-			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell));
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 			std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
 			#endif
 		}
 		else {
-			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell));
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 			std::cout << "FP: " << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
 			#endif
@@ -207,9 +223,6 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 
 		//Load filters of the newly created sequence
 		if(knownSequences.back()->loadFiltersFromXML(currSequenceNode)) return EXIT_FAILURE;
-
-		//TODO: remove
-		//knownSequences.back()->DEBUG_GET_VECTOR_SIZES();
 
         //Proceed to iterate over next element
         currSequenceNode = currSequenceNode->NextSiblingElement();

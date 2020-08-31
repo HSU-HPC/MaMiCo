@@ -16,16 +16,16 @@ LIB_MPI=mpi
 
 LIB_EIGEN_PATH=/usr/include/eigen3
 
-LAMMPS_PATH=/home/$USER/programs/lammps/src
-LIB_LAMMPS=lammps_openmpi_mamico
+#LAMMPS_PATH=/home/$USER/programs/lammps/src
+#LIB_LAMMPS=lammps_openmpi_mamico
 
-ESPRESSO_PATH=/home/$USER/programs/espresso/espresso-git
+#ESPRESSO_PATH=/home/$USER/programs/espresso/espresso-git
 
-TCL_INLCUDE_PATH=/usr/include/tcl8.6;
-TCL_LIB_PATH=/usr/lib/tcl8.6;
-LIB_TCL=tcl8.6;
+#TCL_INLCUDE_PATH=/usr/include/tcl8.6;
+#TCL_LIB_PATH=/usr/lib/tcl8.6;
+#LIB_TCL=tcl8.6;
 
-MARDYN_PATH=/home/$USER/workspace/mardyn_mamico/src;
-MARDYN_PATH_EXTERNAL=${MARDYN_PATH}/External;
+#MARDYN_PATH=/home/$USER/workspace/mardyn_mamico/src;
+#MARDYN_PATH_EXTERNAL=${MARDYN_PATH}/External;
 
 MAMICO_PATH=/home/$USER/Documents/MaMiCo/mamico-dev

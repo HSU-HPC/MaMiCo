@@ -192,9 +192,34 @@
 <!-- XML config file used by MaMiCo's FilterPipeline -->
 
 <filter-pipeline>
-	<!-- See couette_with_filter_pipeline.xml for and example config -->
 
 	<per-instance output="md">
+		<test-strouhal-gauss filtered-values="velocity">
+			<strouhal
+				D="0.1"
+				U="2.25" 
+			/>
+			<write-to-file
+				location="strouhal_before.csv"
+				overwrite="false"
+			/>
+			<gauss
+				extrapolation="none"
+				dim="1"
+			/> 
+			<write-to-file
+				location="strouhal_after.csv"
+				overwrite="false"
+			/>
+			<write-to-file
+				location="strouhal_after2.csv"
+				overwrite="false"
+			/>
+			<strouhal
+				D="0.1"
+				U="2.25" 
+			/>
+		</test-strouhal-gauss>
     </per-instance>
 
 	<post-multi-instance output="md">
