@@ -35,21 +35,21 @@ class tarch::utils::MultiMDService {
 
     int getLocalNumberOfGlobalMDSimulation(unsigned int globalMDSimulation) const;
 
-    unsigned int & getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
+    unsigned int getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
 
     tarch::la::Vector<dim, unsigned int> getNumberProcessesPerMDSimulation() const { return _numberProcessesPerMDSimulation; }
 
     #if (TARCH_PARALLEL==TARCH_YES)
-    MPI_Comm & getLocalCommunicator() const{ return _localComm;}
+    MPI_Comm  getLocalCommunicator() const{ return _localComm;}
     #endif
-    unsigned int & getLocalRank() const { return _localRank; }
-    unsigned int & getLocalSize() const { return _localSize; }
+    unsigned int  getLocalRank() const { return _localRank; }
+    unsigned int  getLocalSize() const { return _localSize; }
 
     #if (TARCH_PARALLEL==TARCH_YES)
-    MPI_Comm & getGlobalCommunicator() const { return MPI_COMM_WORLD;}
+    MPI_Comm  getGlobalCommunicator() const { return MPI_COMM_WORLD;}
     #endif
-    unsigned int & getGlobalRank() const { return _globalRank; }
-    unsigned int & getGlobalSize() const { return _globalSize; }
+    unsigned int  getGlobalRank() const { return _globalRank; }
+    unsigned int  getGlobalSize() const { return _globalSize; }
 
     void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
     unsigned int getTotalNumberOfMDSimulations() { return _totalNumberMDSimulations; }
