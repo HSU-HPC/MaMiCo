@@ -21,6 +21,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellS
   const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
   unsigned int numberMDTimestepsPerCouplingCycle,
   const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
+  const char* filterPipelineConfiguration,
   const tarch::utils::MultiMDService<dim>& multiMDService,
   unsigned int topologyOffset, int tws
 ):
@@ -39,6 +40,7 @@ _macroscopicSolverInterface(macroscopicSolverInterface),
 _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
 _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID),
 _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface ),
+_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, multiMDService, false, filterPipelineConfiguration),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
 _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
@@ -81,6 +83,9 @@ _writeEveryMacroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMacrosc
 
   // init Usher parameters
   initIndexVectors4Usher(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell());
+
+  // init vector of inner (MD Domain/non-ghost) cells and their indices
+  //TODO: REMOVE initInnerMacroscopicCells(_macroscopicCells.getMacroscopicCells());
 }
 
 
@@ -132,9 +137,11 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   // transfer strategy
   Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
+
+  //TODO: deprecated, moved to filter pipeline.
   // noise reduction
-  Wrapper4NoiseReductionProcessInnerMacroscopicCell wrapper3(this);
-  Wrapper4NoiseReductionProcessOuterMacroscopicCell wrapper4(this);
+  //Wrapper4NoiseReductionProcessInnerMacroscopicCell wrapper3(this);
+  //Wrapper4NoiseReductionProcessOuterMacroscopicCell wrapper4(this);
 
   // pre-process data before sending to macroscopic solver
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
@@ -145,13 +152,19 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   double runtime=0;
   if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); } 
 
+  //TODO: deprecated, moved to filter pipeline.
   // run noise reduction
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
-  if(_noiseReduction->_doubleTraversal){
-    _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-    _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
-  }
+  //_macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
+  //_macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
+  //if(_noiseReduction->_doubleTraversal){
+  //  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
+  //  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
+  //}
+ 
+  #ifdef DEBUG_FILTER_PIPELINE
+  std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
+  #endif
+  _filterPipeline(); 
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);
@@ -274,6 +287,32 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::initIndexVe
   } // loop over all staggered versions (-> (0,0,0), (0,0,1), (0,1,0),...., (1,1,1) )
 }
 
+/* TODO: REMOVE
+template<class LinkedCell,unsigned int dim>
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
+initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells) {	
+	tarch::la::Vector<dim, unsigned int> convertedIndex;
+	bool outOfBounds;
+
+	#ifdef DEBUG_FILTER_PIPELINE
+	std::cout << "MacroscopicCellService [ID: " << coupling::services::MacroscopicCellService<dim>::getID() << "]: Initializing inner cells and their index vectors." << std::endl;
+	std::cout << "Total number of cells: " << cells.size() << std::endl;
+	#endif
+
+	for(unsigned int linear_index = 0; linear_index < cells.size(); linear_index++){
+		outOfBounds = false;
+		convertedIndex = _indexConversion->getGlobalInnerVectorCellIndex(linear_index);
+		for(unsigned int d = 0; d < dim; d++) if(convertedIndex[d] == INT_MAX) outOfBounds = true;
+		if(!outOfBounds){
+			_innerMacroscopicCells.push_back(cells[linear_index]);
+			_innerMacroscopicCellIndices.push_back(convertedIndex);
+		}
+	}
+	#ifdef DEBUG_FILTER_PIPELINE
+	std::cout << _innerMacroscopicCells.size() << " of those cells are inner cells." << std::endl;
+	#endif
+}
+*/
 
 template<class LinkedCell,unsigned int dim>
 tarch::la::Vector<dim,double> coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
