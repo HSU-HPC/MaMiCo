@@ -17,13 +17,15 @@
     - optional double wall-oscillations: 
       To create oscillating couette scenario, define the total number of periods during all coupling cycles here. 
       For every CYCLE after wall-init-cycles, wall speed will equal:
-        wall-velocity * cos(2PI * wall-oscillations * CYCLE / coupling-cycles)
+        wall-velocity * cos(2PI * wall-oscillations * CYCLE / coupling-cycles) 
   -->
+    
+      <!-- bu wall vel 4.775 -->
   <domain
-    channelheight="50"
+    channelheight="200"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
-    wall-velocity="0.5 ; 0.0 ; 0.0"
+    wall-velocity="0.0; 0.0 ; 0.574091733 "
     wall-oscillations="0"
   />
 
@@ -44,13 +46,13 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout.
   -->
   <coupling
-    coupling-cycles="1000"
+    coupling-cycles="5"
     two-way-coupling="yes"
     send-from-md-to-macro="yes"
     filter-init-cycles="0"
-    write-csv-every-timestep="10"
+    write-csv-every-timestep="0"
     send-from-macro-to-md="yes"
-    compute-snr="no"
+    compute-snr="yes"
   />
 
   <!-- Configuration parameters for macroscopic solver:
@@ -73,7 +75,7 @@
     type="lb"
     viscosity="2.14"
     number-of-processes="1 ; 1 ; 1"
-    plot-every-timestep="50"
+    plot-every-timestep="1"
     init-advance-cycles="0"
   />
 
@@ -101,8 +103,9 @@
     type="md"
     temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="12"
+    number-md-simulations="1"
     density="0.813037037"
+    noise-sigma="0.1666"
   />
 
   <!-- Optional feature: tws-loop
@@ -117,3 +120,111 @@
     Example <tws-loop min="3" max="100" step="5" />
   -->
 </couette-test>
+
+<!-- MaMiCo configuration for NieTest, as described in the respective paper -->
+<mamico>
+  <macroscopic-cell-configuration
+    cell-size="2.5 ; 2.5 ; 2.5"
+    linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+    write-every-microscopic-timestep="0"
+    microscopic-filename="MacroscopicCell_micro"
+    write-every-macroscopic-timestep="1000"
+    macroscopic-filename="MacroscopicCell_macro"
+  />
+  <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
+  <!--<particle-insertion type="none" />/-->
+  <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
+  <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" />
+  <noise-reduction type="NLM" time-window-size="5" kmax="1"/>
+  <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
+  <parallel-topology type="xyz" />
+</mamico>
+
+<molecular-dynamics>
+
+  <molecule-configuration
+    mass="1.0"
+    temperature="1.23"
+    sigma="1.0"
+    epsilon="1.0"
+    mean-velocity="0.0 ; 0.0 ; 0.0"
+  ></molecule-configuration>
+
+  <mpi-configuration number-of-processes="1 ; 1 ; 1" ></mpi-configuration>
+
+  <simulation-configuration
+    dt="0.005"
+    number-of-timesteps="100"
+    reorganise-memory-every-timestep="20"
+    compute-macroscopic-quantities-every-timestep="0"
+    fix-seed="no"
+   ></simulation-configuration>
+
+  <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
+
+  <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
+
+  <domain-configuration
+    init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
+    
+    molecules-per-direction="28 ; 28 ; 28"
+    domain-size="30.0 ; 30.0 ; 30.0"
+    domain-offset="10.0 ; 10.0 ; 2.5"
+    cutoff-radius="2.5"
+    linked-cell-size="2.5 ; 2.5 ; 2.5"
+    k_B="1.0"
+    block-size="100"
+
+    bottom-south-west="reflecting" bottom-south="reflecting" bottom-south-east="reflecting"
+    bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
+    bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
+
+    south-west="reflecting"        south="reflecting"        south-east="reflecting"
+    west="reflecting"                                          east="reflecting"
+    north-west="reflecting"        north="reflecting"        north-east="reflecting"
+
+    top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
+    top-west="reflecting"          top="reflecting"          top-east="reflecting"
+    top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
+  > </domain-configuration>
+</molecular-dynamics>
+
+<!-- XML config file used by MaMiCo's FilterPipeline -->
+
+<filter-pipeline>
+
+	<per-instance output="md">
+		<test-strouhal-gauss filtered-values="velocity">
+			<strouhal
+				D="0.1"
+				U="2.25" 
+			/>
+			<write-to-file
+				location="strouhal_before.csv"
+				overwrite="false"
+			/>
+			<gauss
+				extrapolation="none"
+				dim="1"
+			/> 
+			<write-to-file
+				location="strouhal_after.csv"
+				overwrite="false"
+			/>
+			<write-to-file
+				location="strouhal_after2.csv"
+				overwrite="false"
+			/>
+			<strouhal
+				D="0.1"
+				U="2.25" 
+			/>
+		</test-strouhal-gauss>
+    </per-instance>
+
+	<post-multi-instance output="md">
+    </post-multi-instance>
+
+</filter-pipeline>
+<couette>
+</couette>

@@ -1,7 +1,15 @@
 #!/bin/bash
 
-### path variables for this script
-MAMICO_PATH=/home/neumanph/workspace/mamico/mamico_cpc_v1.1;
+### local settings like path variables
+SETTINGS=../../../personal_settings
+
+if test -f "$SETTINGS"; then
+	source ../../../personal_settings
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
+
 BUILD_PATH=${MAMICO_PATH}/coupling/tests/build_lbcouettesolver
 
 rm ${BUILD_PATH}/test;
@@ -10,6 +18,6 @@ FLAGS="-std=c++11 -pedantic -Werror -Wall -O3 -fopenmp -lgomp -lmpi -DMDCoupledP
 #FLAGS="-std=c++11 -pedantic -Wall -O3 -DMDCoupledParallel"
 
 
-mpicxx ${FLAGS} ${MAMICO_PATH}/coupling/tests/main_lbcouettesolver.cpp -I${MAMICO_PATH} -I/usr/lib/openmpi/include -L/usr/lib/openmpi/lib -lpthread -lmpi -o ${BUILD_PATH}/test
+mpicxx ${FLAGS} ${MAMICO_PATH}/coupling/tests/main_lbcouettesolver.cpp -I${MAMICO_PATH} -I${MPI_INCLUDE_PATH} -L${MPI_LIB_PATH} -lpthread -lmpi -o ${BUILD_PATH}/test
 
 

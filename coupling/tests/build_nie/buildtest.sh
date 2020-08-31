@@ -1,24 +1,20 @@
 #!/bin/bash
 
-### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=/usr/lib/openmpi/include
-MPI_LIB_PATH=/usr/lib/openmpi/lib
-LIB_MPI=mpi
+### local settings like path variables
+SETTINGS=../../../personal_settings
 
-LIB_EIGEN_PATH=/usr/local/include
-
-### home directory of MAMICO
-MAMICO_PATH=/home/piet/mamico_v1.1
+if test -f "$SETTINGS"; then
+	source ../../../personal_settings
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
 SIMPLEMD_SEQUENTIAL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_no/gcc/gprof_no/
 ### name of lib for SIMPLE_MD
 LIBSIMPLEMD=simplemd
-
-### LAMMPS
-LAMMPS_PATH=/home/neumanph/programs/lammps/src/
-LIBLAMMPS=lammps_openmpi_mamico
 
 
 ### FROM HERE ON, ALL VARIABLES ARE AUTOMATICALLY DETERMINED ###
@@ -101,9 +97,9 @@ then
   make openmpi
   make makelib
   make -f Makefile.lib openmpi
-  cp liblammps_openmpi.a lib${LIBLAMMPS}.a
+  cp liblammps_openmpi.a lib${LIB_LAMMPS}.a
   includes="${includes} -I${LAMMPS_PATH}"
-  libraries="${libraries} -L${LAMMPS_PATH} -l${LIBLAMMPS}"
+  libraries="${libraries} -L${LAMMPS_PATH} -l${LIB_LAMMPS}"
   # remove Werror flag
   FLAGS=`echo ${FLAGS} | sed 's/-Werror//'`
 elif [ "${mdSim}" == "LAMMPS_DPD" ]
@@ -119,9 +115,9 @@ then
   make openmpi
   make makelib
   make -f Makefile.lib openmpi
-  cp liblammps_openmpi.a lib${LIBLAMMPS}.a
+  cp liblammps_openmpi.a lib${LIB_LAMMPS}.a
   includes="${includes} -I${LAMMPS_PATH}"
-  libraries="${libraries} -L${LAMMPS_PATH} -l${LIBLAMMPS}"
+  libraries="${libraries} -L${LAMMPS_PATH} -l${LIB_LAMMPS}"
   # remove Werror flag
   FLAGS=`echo ${FLAGS} | sed 's/-Werror//'`
 fi
