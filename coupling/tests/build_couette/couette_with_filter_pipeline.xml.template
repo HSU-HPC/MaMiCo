@@ -226,5 +226,6 @@
     </post-multi-instance>
 
 </filter-pipeline>
-<couette>
-</couette>
+
+<!-- TODO: remove this. currently, deletion of this causes a seg fault at runtime -->
+<couette/>
