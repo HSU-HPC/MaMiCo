@@ -333,7 +333,7 @@ class coupling::services::MultiMDCellService {
        * */
       if(index == _totalNumberMDSimulations-1) {
         removeSimulationBlock();
-        _nextFreeBlock = _multiMDService.getNumberLocalComms();
+        _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
       }
 
       return index;
