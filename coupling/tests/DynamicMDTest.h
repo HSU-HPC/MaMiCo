@@ -52,10 +52,8 @@ public:
 
 #if defined(COUPLING_DYNAMIC_MD_SUDDEN)
       // Drop 50 random md instances in cycle 249
-      if(cycle == 0) {
-        addMDSimulation();
+      if(_multiMDService->getTotalNumberOfMDSimulations() > 10) {
         removeMDSimulation();
-        //addMDSimulation();
       }
 #endif
 #if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
