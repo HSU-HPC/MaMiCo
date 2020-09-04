@@ -14,7 +14,7 @@
   <particle-insertion type="none" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
   <!--<particle-insertion type="none" />/-->
   <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="2"/>
-  <transfer-strategy type="nie-transfer" mass-flux-west="no" mass-flux-east="no" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
+  <transfer-strategy type="nie-transfer" mass-flux-west="no" mass-flux-east="no" mass-flux-north="yes" mass-flux-south="yes" mass-flux-bottom="yes" mass-flux-top="yes" shift-by-timesteps="0.5"/>
   <noise-reduction type="none" time-window-size="5" kmax="1"/>
   <boundary-force type="zhou-boundary-force" west="no" east="no" north="yes" south="yes" bottom="yes" top="yes" density="0.813037037" temperature="1.1" />
   <parallel-topology type="xyz" />

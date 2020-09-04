@@ -140,31 +140,44 @@ public:
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
   const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
     if(skipRank()){return;}
-
+    // std::stringstream ss; ss << "diff_" << _timestepCounter << ".txt";
+    // std::ofstream file(ss.str().c_str());
+    // if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+    // std::stringstream diff;
     for(unsigned int i=0; i < _numberBoundaryPoints; i++){
       unsigned int outer = _boundary2RecvBufferIndicesOuter[i];
       unsigned int inner = _boundary2RecvBufferIndicesInner[i];
       tarch::la::Vector<3,double> localOuterVel( (1.0/recvBuffer[outer]->getMacroscopicMass())*recvBuffer[outer]->getMacroscopicMomentum() );
       tarch::la::Vector<3,double> localInnerVel( (1.0/recvBuffer[inner]->getMacroscopicMass())*recvBuffer[inner]->getMacroscopicMomentum() );
-      _boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
+      //_boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
+      // if(!_boundarySide[i]){
+        //_boundaryIndices[i]->x() = analyticCouette(_boundaryZ[i]);}
+        _boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
+      // else{ //_boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;}
+       // _boundaryIndices[i]->x() = analyticCouette(_boundaryZ[i]);}
       _boundaryIndices[i]->y() = (localOuterVel[1]+localInnerVel[1])*0.5;
       _boundaryIndices[i]->z() = (localOuterVel[2]+localInnerVel[2])*0.5;
+      // diff << _boundaryZ[i] << ", " << analyticCouette(_boundaryZ[i]) << ", " << (localOuterVel[0]+localInnerVel[0])*0.5 << ", " << analyticCouette(_boundaryZ[i])-(localOuterVel[0]+localInnerVel[0])*0.5 << ", "<< _boundaryIndices[i]->x()<< std::endl;
     }
+    // file << diff.str() << std::endl;
+    // file.close();
   }
 
   void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip,
   const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size){
     if(skipRank()){return;}
-    //setFixedValueBoundary();
     _numberBoundaryPoints = 6*36;
     _boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
     _boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
     _boundaryIndices = new Foam::vector* [_numberBoundaryPoints];
+    _boundarySide = new bool [_numberBoundaryPoints];
     unsigned int counter = 0;
-
     for (unsigned int boundary = 6; boundary < 12; boundary++){
       for (unsigned int j = 0; j < 36; j++){
         _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
+        _boundaryZ[counter] = U.boundaryFieldRef()[boundary].patch().Cf()[j][2];
+        if(boundary==8 || boundary==9){_boundarySide[counter]=true;}
+        else{_boundarySide[counter]=false;}
         const unsigned int globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
         const unsigned int globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
         for(unsigned int k = 0; k < size; k++){
@@ -173,6 +186,7 @@ public:
             goto endloop;
           }
         }
+        std::cout << "there was an error 1" << std::endl;
         endloop:
         for(unsigned int k = 0; k < size; k++){
           if(globalIndexInner==recvIndice[k]){
@@ -180,6 +194,7 @@ public:
             goto endloop2;
           }
         }
+        std::cout << "there was an error 2" << std::endl;
         endloop2:
         counter++;
       }
@@ -212,14 +227,13 @@ private:
     return !(_rank==0);
   }
 
-  void setFixedValueBoundary(){
-    //using namespace Foam;
-    new(&mesh) Foam::fvMesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ));
-    new(&U) Foam::volVectorField(Foam::IOobject("U", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh);
-    new(&p) Foam::volScalarField(Foam::IOobject("p", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh);
-    new(&phi) Foam::surfaceScalarField(Foam::surfaceScalarField(Foam::IOobject("phi", runTime.timeName(), mesh, Foam::IOobject::READ_IF_PRESENT, Foam::IOobject::AUTO_WRITE), Foam::fvc::flux(U)));
-    Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
-    mesh.setFluxRequired(p.name());
+  double analyticCouette(double z){
+    const double visc = 2.632106414;
+    double sum = 0;
+    for(double step = 1.0; step < 31.0; step++){
+      sum = sum + 1.0/step*sin(step*M_PI*z/50.0)*exp(-step*step*M_PI*M_PI*visc*(_timestepCounter)*0.25/50.0/50.0);
+    }
+    return 1.5*(1-z/50.0) - 2*1.5/M_PI*sum;
   }
 
   Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests/build_couette","FoamSetup")};
@@ -237,6 +251,8 @@ private:
   unsigned int *_boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
   unsigned int *_boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
   Foam::vector **_boundaryIndices;
+  bool * _boundarySide;
+  double *_boundaryZ = new double [_numberBoundaryPoints];
   int _rank;
   int _timestepCounter{0};
   int _plotEveryTimestep{1};

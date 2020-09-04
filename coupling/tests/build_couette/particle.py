@@ -17,17 +17,24 @@ def couette_analytic(x_c, t_c):
 plt.figure(figsize=(12,9))
 x_step = 2.5
 x = np.arange(x_step/2,50,x_step)
-t_start = 10
-t_end = 36
-t_step = 6
-particle_start = 2
-particle_number = 8
+t_start = 20
+t_end = 38
+t_step = 4
+particle_start = 0
+particle_number = 12
 for number in np.arange(t_start, t_end, t_step):
+    x_c = np.genfromtxt("CouetteAvgMultiMDCells_0_"+str(number)+".csv", delimiter=';', usecols=(0), dtype="int")
+    y_c = np.genfromtxt("CouetteAvgMultiMDCells_0_"+str(number)+".csv", delimiter=';', usecols=(1), dtype="int")
+    z_c = np.genfromtxt("CouetteAvgMultiMDCells_0_"+str(number)+".csv", delimiter=';', usecols=(2), dtype="int")
     c = np.genfromtxt("CouetteAvgMultiMDCells_0_"+str(number)+".csv", delimiter=';', usecols=(3), dtype="float")
     c_0 = np.zeros(particle_number)
     help = particle_number*particle_number
     for i in np.arange(0, particle_number):
-       c_0[i] = np.mean(c[np.int(i*help):np.int((i+1)*help)])
+        for k in np.arange(i*help,(i+1)*help):
+            if np.logical_or(x_c[k]!=1,x_c[k]!=12):
+                if np.logical_or(y_c[k]!=1,y_c[k]!=12):
+                    c_0[i] = c_0[i]+c[k]
+    c_0=c_0/10/10
     plt.plot(x[particle_start:particle_start+particle_number], c_0, color=plt.cm.hsv((number-t_start)/(t_end-t_start)), label=str(number), linestyle=':', marker='x')
     #help = np.arange(28, 500, 64)
     #plt.plot(x[np.arange(2,10)], c[help], color=plt.cm.hsv((number-t_start)/(t_end-t_start)), label=str(number), linestyle=':', marker='x')
