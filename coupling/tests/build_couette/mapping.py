@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 t_start = 0
-t_end = 34
+t_end = 44
 t_step = 2
 rho_mean = np.zeros(np.int(t_end/t_step))
 c = 0
