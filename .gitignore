@@ -15,3 +15,5 @@ personal_settings
 *.so
 *.pyc
 *.png
+coupling/tests/kvs-lbmpy/*.xml
+coupling/tests/kvs-lbmpy/*.ini

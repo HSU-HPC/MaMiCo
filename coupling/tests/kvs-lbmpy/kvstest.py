@@ -48,11 +48,11 @@ class KVSTest():
             log.info("Finish coupling cycle " +str(cycle))
     
     def parseXMLConfigurations(self):
-        self.simpleMDConfig = mamico.tarch.configuration.parseMolecularDynamicsConfiguration("couette_simplemd.xml","molecular-dynamics")
+        self.simpleMDConfig = mamico.tarch.configuration.parseMolecularDynamicsConfiguration("kvs.xml","molecular-dynamics")
         if not self.simpleMDConfig.isValid():
             log.error("Invalid SimpleMD config!")
             sys.exit(1)
-        self.mamicoConfig = mamico.tarch.configuration.parseMaMiCoConfiguration("couette_mamico.xml","mamico")
+        self.mamicoConfig = mamico.tarch.configuration.parseMaMiCoConfiguration("kvs.xml","mamico")
         if not self.mamicoConfig.isValid():
             log.error("Invalid MaMiCo config!")
             sys.exit(1)
@@ -112,7 +112,7 @@ class KVSTest():
     
         self.multiMDCellService = MultiMDCellService(self.mdSolverInterface, self.macroscopicSolverInterface, 
             self.simpleMDConfig, self.rank, self.cfg.getint("microscopic-solver","number-md-simulations"),
-            self.mamicoConfig,self.multiMDService)
+            self.mamicoConfig, "kvs.xml", self.multiMDService)
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
