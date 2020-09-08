@@ -65,13 +65,6 @@ public coupling::MomentumInsertion<LinkedCell,dim> {
     bool isInsideImpositionLayer(const unsigned int &currentLocalMacroscopicCellIndex) const{
       const tarch::la::Vector<dim,unsigned int> globalNumberMacroscopicCells(_indexConversion.getGlobalNumberMacroscopicCells());
       const tarch::la::Vector<dim,unsigned int> globalCellIndex(_indexConversion.getGlobalVectorCellIndex(_indexConversion.convertLocalToGlobalCellIndex(currentLocalMacroscopicCellIndex)));
-      // bool isInsideLayer=false;
-      // // all directions
-      // for (unsigned int d = 0; d < dim; d++){
-      //   isInsideLayer= isInsideLayer ||  ( (globalCellIndex[d]>= _outermostLayer) && (globalCellIndex[d]<=_innermostLayer) )
-      //                 || ( (globalCellIndex[d]>= 1+globalNumberMacroscopicCells[d]-_innermostLayer) && (globalCellIndex[d] <= 1+globalNumberMacroscopicCells[d]-_outermostLayer) );
-      // }
-      // return isInsideLayer;
       bool inner = true;
       for (unsigned int d = 0; d < dim; d++)
         inner = inner && (globalCellIndex[d]>_innermostLayer && globalCellIndex[d]< 1+globalNumberMacroscopicCells[d]-_innermostLayer);

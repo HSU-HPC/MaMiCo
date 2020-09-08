@@ -711,7 +711,6 @@ private:
     file.close();
   }
 
-
   /** deletes the send buffer */
   void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>* >& sendBuffer) const {
     // delete all potential entries of sendBuffer
