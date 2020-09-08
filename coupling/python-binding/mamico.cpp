@@ -564,6 +564,7 @@ PYBIND11_MODULE(mamico, mamico) {
 			    unsigned int rank,
 			    unsigned int totalNumberMDSimulations,
 			    const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig,
+          const std::string filename,
 			    const tarch::utils::MultiMDService<3>& multiMDService
     			){
     			return new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
@@ -580,11 +581,12 @@ PYBIND11_MODULE(mamico, mamico) {
 			        mamicoConfig.getParallelTopologyConfiguration(), 
 			        simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
 			        mamicoConfig.getMacroscopicCellConfiguration(), 
+              filename.c_str(),
 			        multiMDService
 			    ); }
     		),
     		"mdSolverInterfaces"_a, "macroscopicSolverInterface"_a, "simpleMDConfig"_a, 
-    		"rank"_a=0, "totalNumberMDSimulations"_a=1, "mamicoConfig"_a, 
+    		"rank"_a=0, "totalNumberMDSimulations"_a=1, "mamicoConfig"_a, "xmlConfigFilename"_a,
     		"multiMDService"_a)
     	.def("getMacroscopicCellService", &coupling::services::MultiMDCellService<MY_LINKEDCELL,3>::getMacroscopicCellService , py::return_value_policy::reference)
     	.def("sendFromMacro2MD", [](coupling::services::MultiMDCellService<MY_LINKEDCELL,3>& service, CouplingBuffer& buf){
