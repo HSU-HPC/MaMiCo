@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
-number = 38
+number = 46
 
 def couette_analytic(x_c):
     u_w = 1.5
@@ -26,7 +26,7 @@ w = np.genfromtxt("CouetteAvgMultiMDCells_0_"+str(number)+".csv", delimiter=';',
 rho = np.genfromtxt("CouetteAvgMultiMDCells_0_"+str(number)+".csv", delimiter=';', usecols=(6), dtype="float")
 fig = plt.figure()
 ax = plt.axes(projection="3d")
-#p=ax.scatter3D(x,y,z,c=(u-couette_analytic(z)),cmap='Spectral', alpha=0.8, vmin=-0.1,vmax=0.1)
+#p=ax.scatter3D(x,y,z,c=(u-couette_analytic(z))/couette_analytic(z),cmap='Spectral', alpha=0.8, vmin=-5,vmax=5)
 #p=ax.scatter3D(x,y,z,c=u,cmap='Spectral', alpha=0.8)
 p=ax.scatter3D(x,y,z,c=rho/15.625,cmap='Spectral', alpha=0.8)
 ax.set_xlabel('x')

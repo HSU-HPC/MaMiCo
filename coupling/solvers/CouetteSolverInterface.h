@@ -36,8 +36,7 @@ class coupling::solvers::CouetteSolverInterface: public coupling::interface::Mac
     virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim,unsigned int> globalCellIndex){
       bool recv=true;
       for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>0) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1); }
-
-      //for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>_outerRegion) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1-_outerRegion); }
+      // for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>_outerRegion) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1-_outerRegion); }
       return recv;
     }
 
