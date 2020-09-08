@@ -3,7 +3,7 @@
 // www5.in.tum.de/mamico
 
 #pragma once
-#include "coupling/filtering/FilterInterfaceReadOnly.h"
+#include "coupling/filtering/interfaces/FilterInterfaceReadOnly.h"
 
 #include <string>
 #include <vector>
@@ -17,7 +17,10 @@ namespace coupling {
 }
 
 
-//should this implement the coupling::noisereduction::NoiseReduction interface?
+/*
+ * TODO: Comment
+ * @author Felix Maurer
+ */
 template<unsigned int dim>
 class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
     public:
