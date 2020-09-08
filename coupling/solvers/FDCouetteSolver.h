@@ -27,9 +27,6 @@ public:
 		coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc,
 		plotEveryTimestep, filestem, processes), _omega(dt*kinVisc/(dx*dx)),
 		_wallVelocity(wallVelocity)
-		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-    ,_sendBufferX(nullptr), _recvBufferX(nullptr), _sendBufferY(nullptr), _recvBufferY(nullptr), _sendBufferZ(nullptr), _recvBufferZ(nullptr)
-    #endif
 		{
 			// return if required
       if (skipRank()){return;}
