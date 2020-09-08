@@ -38,6 +38,7 @@ class coupling::services::MultiMDCellService {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
+	  const char* filterPipelineConfiguration,
       const tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0
     ): _localNumberMDSimulations((unsigned int)mdSolverInterfaces.size()), _totalNumberMDSimulations(totalNumberMDSimulations),
        _macroscopicCellServices(NULL), _topologyOffset(computeTopologyOffset(numberProcesses,rank)), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)) {
@@ -69,7 +70,7 @@ class coupling::services::MultiMDCellService {
         _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>(
                                         i, mdSolverInterfaces[i-_localNumberMDSimulations*_topologyOffset/_intNumberProcesses], macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,
                                         momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration, noiseReductionConfiguration, parallelTopologyConfiguration,
-                                        numberMDTimestepsPerCouplingCycle, macroscopicCellConfiguration, multiMDService, _topologyOffset, _tws
+                                        numberMDTimestepsPerCouplingCycle, macroscopicCellConfiguration, filterPipelineConfiguration, multiMDService, _topologyOffset, _tws
                                       );
         if (_macroscopicCellServices[i]==NULL){
           std::cout << "ERROR coupling::services::MultiMDCellService::MultiMDCellService(...): _macroscopicCellServices[" << i << "]==NULL!" << std::endl; exit(EXIT_FAILURE);
