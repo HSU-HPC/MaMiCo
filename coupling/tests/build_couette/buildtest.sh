@@ -1,14 +1,15 @@
 #!/bin/bash
 
-### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=/usr/local/include
-MPI_LIB_PATH=/usr/local/lib/openmpi
-LIB_MPI=mpi
 
-LIB_EIGEN_PATH=/usr/include/eigen3
+### local settings like path variables
+SETTINGS=../../../personal_settings
 
-### home directory of MAMICO
-MAMICO_PATH=/home/piet/repos/mamico-dev
+if test -f "$SETTINGS"; then
+	source ../../../personal_settings
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
@@ -27,7 +28,7 @@ if [ "${parallel}" == "parallel" ] || [ "${parallel}" == "sequential" ]
 then
     echo "Build mode: ${parallel}"
 else
-    echo "ERROR! ./test parallel/sequential"
+    echo "ERROR! ./buildtest parallel/sequential"
     exit -1
 fi
 
@@ -35,7 +36,7 @@ rm ${BUILD_PATH}/test;
 rm ${BUILD_PATH}/*.o;
 
 compiler=""
-libaries=""
+libraries=""
 objects=""
 includes="-I${MAMICO_PATH}"
 
