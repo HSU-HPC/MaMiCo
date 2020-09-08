@@ -9,7 +9,7 @@
 #include <Eigen/Eigenvalues>
 
 //#define DEBUG_POD
-#include "coupling/filtering/FilterInterface.h"
+#include "coupling/filtering/interfaces/FilterInterface.h"
 #include "tarch/utils/MultiMDService.h"
 
 namespace coupling {

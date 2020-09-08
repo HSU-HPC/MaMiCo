@@ -11,6 +11,7 @@
 #include "coupling/filtering/filters/Gauss.h"
 #include "coupling/filtering/filters/POD.h"
 #include "coupling/filtering/filters/Strouhal.h"
+#include "coupling/filtering/interfaces/FilterInterfacePython.h"
 
 /*
  * Filter Sequences are used to group filters that will be applied in chronological order.

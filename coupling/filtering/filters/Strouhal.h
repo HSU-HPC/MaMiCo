@@ -3,7 +3,7 @@
 // www5.in.tum.de/mamico
 
 #pragma once
-#include "coupling/filtering/FilterInterfaceReadOnly.h"
+#include "coupling/filtering/interfaces/FilterInterfaceReadOnly.h"
 
 #include <vector>
 
@@ -16,6 +16,7 @@ namespace coupling {
 
 /**
  * TODO: Comment
+ * @author Felix Maurer
  */
 template<unsigned int dim>
 class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{

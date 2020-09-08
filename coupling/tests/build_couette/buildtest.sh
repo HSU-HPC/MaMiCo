@@ -46,13 +46,13 @@ then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
     FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
     # -DMDCoupledDebug"
-    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
+    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH} -I${PYTHON_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
     FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Wall -Wno-unknown-pragmas -O3"
     # -Werror
-    includes="${includes} -I${LIB_EIGEN_PATH}"
+    includes="${includes} -I${LIB_EIGEN_PATH} -I${PYTHON_PATH}"
     compiler="g++"
 fi
 ### 

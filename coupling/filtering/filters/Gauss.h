@@ -8,7 +8,7 @@
 #include <vector>
 
 //#define DEBUG_GAUSS
-#include "coupling/filtering/FilterInterface.h"
+#include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling {
     template<unsigned int dim>
@@ -23,6 +23,10 @@ namespace coupling {
 #define GAUSS_OUTER_WEIGHT 0.27901
 #define GAUSS_INNER_WEIGHT (1- (GAUSS_OUTER_WEIGHT * 2))
 
+/*
+ * TODO: Comment
+ * @author Felix Maurer
+ */
 template<unsigned int dim>
 class coupling::Gauss : public coupling::FilterInterface<dim>{
     public:
