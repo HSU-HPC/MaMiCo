@@ -2,15 +2,15 @@
 
 # !!! Minimum required: openmpi version  >= 3.0 !!!
 
-### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=/usr/lib/x86_64-linux-gnu/openmpi/include
-MPI_LIB_PATH=/usr/lib/x86_64-linux-gnu/openmpi/lib
-LIB_MPI=mpi
+### local settings like path variables
+SETTINGS=../../personal_settings
 
-LIB_EIGEN_PATH=/usr/local/include/Eigen
-
-### home directory of MAMICO
-MAMICO_PATH=/home/piet/mamico_v1.1
+if test -f "$SETTINGS"; then
+	source ${SETTINGS}
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
@@ -37,7 +37,7 @@ compiler="mpicxx"
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH} || exit $?
-/usr/bin/env python $(which scons) target=libsimplemd dim=3 build=release parallel=yes -j4 || exit $?
+scons target=libsimplemd dim=3 build=release parallel=yes -j4 || exit $?
 libraries="${libraries} -L${SIMPLEMD_PATH} -l${LIBSIMPLEMD}"
 FLAGS="${FLAGS} -DMDParallel"
 
