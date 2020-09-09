@@ -21,6 +21,7 @@ _shiftTimestep(shiftTimestep),
 _numberLocalCells(getLocalNumberMacroscopicCells(indexConversion)),
 _excessMass(NULL),
 _massFluxBoundary(massFluxBoundary){
+  MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
   // allocate arrays for old and new solution (required for linear time interpolation) and init. them with zero vectors
   _oldSolution = new tarch::la::Vector<dim,double>[_numberLocalCells];
   _newSolution = new tarch::la::Vector<dim,double>[_numberLocalCells];
@@ -64,6 +65,21 @@ processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
   // reset cell-mass (would be overwritten anyway; but just to be on safe side)
   cell.setMicroscopicMass(0.0);
 
+}
+
+template<class LinkedCell,unsigned int dim>
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
+endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData(){
+  if(_rank==0){
+  static int timestepCounter = 0;
+  std::stringstream ss; ss << "excessMass_" << timestepCounter << ".txt";
+  std::ofstream file(ss.str().c_str());
+  if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+  std::stringstream outputExcessMass;
+  for (unsigned int i = 0; i < _numberLocalCells; i++) { outputExcessMass << i << "; " << _excessMass[i] << std::endl; }
+  file << outputExcessMass.str() << std::endl;
+  file.close();
+  timestepCounter++;}
 }
 
 
@@ -216,4 +232,3 @@ double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim
   }
   return massFlux;
 }
-
