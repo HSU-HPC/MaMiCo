@@ -103,7 +103,7 @@
     type="md"
     temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="100"
+    number-md-simulations="8"
     density="0.813037037"
     noise-sigma="0.1666"
   />
