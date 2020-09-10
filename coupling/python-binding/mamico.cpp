@@ -155,7 +155,10 @@ class CouplingBuffer{
 public:
     CouplingBuffer(const coupling::IndexConversion<3>& indexConversion,
         coupling::interface::MacroscopicSolverInterface<3> &macroscopicSolverInterface,
-        unsigned int rank){
+        unsigned int rank, unsigned int outerRegion):
+      _sendBuffer(), _globalCellIndices4SendBuffer(), _recvBuffer(), _globalCellIndices4RecvBuffer(),
+      _idcv(indexConversion), _outerRegion(outerRegion)
+    {
         allocateSendBuffer(indexConversion, macroscopicSolverInterface, rank);
         allocateRecvBuffer(indexConversion, macroscopicSolverInterface, rank);
     }
@@ -174,9 +177,7 @@ public:
         }
     }
 
-    void recv2CSV( const coupling::IndexConversion<3>& idcv,
-        const std::string filename
-    ) const {
+    void recv2CSV( const std::string filename) const {
         std::ofstream file(filename.c_str());
         if (!file.is_open())
             throw std::runtime_error("Could not open file " + filename);
@@ -185,7 +186,7 @@ public:
         for (unsigned int i = 0; i < numCellsRecv; i++){
           tarch::la::Vector<3,double> vel(_recvBuffer[i]->getMacroscopicMomentum());
           if (_recvBuffer[i]->getMacroscopicMass()!=0.0){ vel = (1.0/_recvBuffer[i]->getMacroscopicMass())*vel; }
-          const tarch::la::Vector<3,unsigned int> counter(idcv.getGlobalVectorCellIndex(_globalCellIndices4RecvBuffer[i]));
+          const tarch::la::Vector<3,unsigned int> counter(_idcv.getGlobalVectorCellIndex(_globalCellIndices4RecvBuffer[i]));
           file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; " << _recvBuffer[i]->getMacroscopicMass() << ";";
           file << std::endl;
         }
@@ -193,7 +194,6 @@ public:
     }
 
     void store2send(const double cellmass,
-    const coupling::IndexConversion<3>& idcv,
     py::array_t<double> velocity, 
     py::array_t<double> density) {
         const unsigned int size = _sendBuffer.size();
@@ -204,7 +204,7 @@ public:
             throw std::runtime_error("velocity.ndim() != 4");
         if(density.ndim() != 3)
             throw std::runtime_error("density.ndim() != 3");
-        auto numcells = idcv.getGlobalNumberMacroscopicCells();
+        auto numcells = _idcv.getGlobalNumberMacroscopicCells();
         for(unsigned int d=0;d<3; d++){
             if(velocity.shape(d) != numcells[d])
                 throw std::runtime_error("velocity.shape(" + 
@@ -224,7 +224,7 @@ public:
         auto density_raw = density.unchecked<3>();
         
         for (unsigned int i = 0; i < size; i++){
-            const tarch::la::Vector<3,unsigned int> globalIndex(idcv.getGlobalVectorCellIndex(_globalCellIndices4SendBuffer[i]) - tarch::la::Vector<3,unsigned int>(1));
+            const tarch::la::Vector<3,unsigned int> globalIndex(_idcv.getGlobalVectorCellIndex(_globalCellIndices4SendBuffer[i]) - tarch::la::Vector<3,unsigned int>(1));
             double mass = cellmass
                 * density_raw(globalIndex[0],globalIndex[1],globalIndex[2]);
 
@@ -239,12 +239,61 @@ public:
         }
     }
 
+    py::array_t<double>* loadRecvVelocity(){
+      auto numcells = _idcv.getGlobalNumberMacroscopicCells() - tarch::la::Vector<3,unsigned int>(2*_outerRegion);
+      std::vector<unsigned int> shape = {numcells[0],numcells[1],numcells[2], 3};
+      py::array_t<double>* res = new py::array_t<double>(shape);
+
+      const unsigned int numCellsRecv = _recvBuffer.size();
+      if(numcells[0]*numcells[1]*numcells[2] != numCellsRecv)
+        throw std::runtime_error("Unexpected _recvBuffer.size()");
+
+      auto res_raw = res->mutable_unchecked<4>();
+
+      for (unsigned int i = 0; i < numCellsRecv; i++){
+        tarch::la::Vector<3,double> vel(_recvBuffer[i]->getMacroscopicMomentum());
+        if (_recvBuffer[i]->getMacroscopicMass()!=0.0){ vel = (1.0/_recvBuffer[i]->getMacroscopicMass())*vel; }
+        const tarch::la::Vector<3,unsigned int> idx(
+          _idcv.getGlobalVectorCellIndex(_globalCellIndices4RecvBuffer[i])
+          - tarch::la::Vector<3,unsigned int>(_outerRegion + 1));
+        res_raw(idx[0], idx[1], idx[2], 0) = vel[0];
+        res_raw(idx[0], idx[1], idx[2], 1) = vel[1];
+        res_raw(idx[0], idx[1], idx[2], 2) = vel[2];
+      }
+
+      return res;
+    }
+
+    py::array_t<double>* loadRecvDensity(double cellmass){
+      auto numcells = _idcv.getGlobalNumberMacroscopicCells() - tarch::la::Vector<3,unsigned int>(2*_outerRegion);
+      std::vector<unsigned int> shape = {numcells[0],numcells[1],numcells[2]};
+      py::array_t<double>* res = new py::array_t<double>(shape);
+
+      const unsigned int numCellsRecv = _recvBuffer.size();
+      if(numcells[0]*numcells[1]*numcells[2] != numCellsRecv)
+        throw std::runtime_error("Unexpected _recvBuffer.size()");
+
+      auto res_raw = res->mutable_unchecked<3>();
+
+      for (unsigned int i = 0; i < numCellsRecv; i++){
+        const tarch::la::Vector<3,unsigned int> idx(
+          _idcv.getGlobalVectorCellIndex(_globalCellIndices4RecvBuffer[i])
+          - tarch::la::Vector<3,unsigned int>(_outerRegion + 1));
+        res_raw(idx[0], idx[1], idx[2]) = _recvBuffer[i]->getMacroscopicMass() / cellmass;
+      }
+
+      return res;
+    }
+
     std::vector<coupling::datastructures::MacroscopicCell<3>* > _sendBuffer;
     unsigned int *_globalCellIndices4SendBuffer;
     std::vector<coupling::datastructures::MacroscopicCell<3>* > _recvBuffer;
     unsigned int *_globalCellIndices4RecvBuffer;
 
 private:
+    const coupling::IndexConversion<3>& _idcv;
+    const unsigned int _outerRegion; // defines an offset of cells which is considered to be the outer region
+
     void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion,
     coupling::interface::MacroscopicSolverInterface<3> &macroscopicSolverInterface,
     unsigned int rank) {
@@ -602,10 +651,13 @@ PYBIND11_MODULE(mamico, mamico) {
     py::class_<CouplingBuffer>(coupling, "Buffer")
         .def(py::init<const coupling::IndexConversion<3>&, 
                 coupling::interface::MacroscopicSolverInterface<3> &,
+                unsigned int,
                 unsigned int
             >()
         )
         .def("recv2CSV", &CouplingBuffer::recv2CSV)
         .def("store2send", &CouplingBuffer::store2send)
+        .def("loadRecvVelocity", &CouplingBuffer::loadRecvVelocity, py::return_value_policy::take_ownership)
+        .def("loadRecvDensity", &CouplingBuffer::loadRecvDensity, py::return_value_policy::take_ownership)
     ;
 }
