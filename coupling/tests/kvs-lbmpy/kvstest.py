@@ -18,6 +18,7 @@ import mamico.coupling
 import mamico.tarch.utils
 import numpy as np
 from configparser import ConfigParser
+import matplotlib.pyplot as mplt
 
 log = logging.getLogger('KVSTest')
 
@@ -39,6 +40,7 @@ class KVSTest():
         self.initSolvers()
         for cycle in range(self.cfg.getint("coupling", "couplingCycles")):
             self.runOneCouplingCycle(cycle)
+        self.plot()
 
     def runOneCouplingCycle(self, cycle):
         self.advanceMacro(cycle)
@@ -80,6 +82,16 @@ class KVSTest():
                 str(self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()))
             log.info("LB timesteps per coupling cycle = " + str(self.dt / self.dt_LB))
 
+            isteps = self.cfg.getint("macroscopic-solver", "init-timesteps")
+            log.info("Running " + str(isteps) + " LB initialisation timesteps ...")
+            timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
+                self.macroscopicSolver.domain_size[1] * \
+                self.macroscopicSolver.domain_size[2] / \
+                (self.macroscopicSolver.mlups * 1e6)
+            log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
+            self.macroscopicSolver.advance(isteps) 
+            log.info("Finished LB init-timesteps.")
+
         numMD = self.cfg.getint("microscopic-solver","number-md-simulations")
 
         self.multiMDService = mamico.tarch.utils.MultiMDService(numberProcesses = self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
@@ -120,10 +132,15 @@ class KVSTest():
                 self.cfg.getfloat("microscopic-solver", "temperature"))
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
-            self.macroscopicSolverInterface, self.rank)
+            self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
         self.png = self.cfg.getint("coupling", "png-every-timestep")
+
+        # buffer for evaluation plot
+        if self.rank==0:
+            self.velMD = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
+            self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
     
         if self.rank==0:
             log.info("Finished initSolvers") # after ? ms
@@ -151,7 +168,7 @@ class KVSTest():
             mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
                 for d in range(3)]
 
-            self.buf.store2send(cellmass, self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
+            self.buf.store2send(cellmass,
                 self.macroscopicSolver.scen.velocity[
                     mdpos[0]:mdpos[0]+numcells[0], 
                     mdpos[1]:mdpos[1]+numcells[1], 
@@ -183,13 +200,42 @@ class KVSTest():
             self.multiMDCellService.sendFromMD2Macro(self.buf)
 
     def twoWayCoupling(self, cycle):
-        idcv = self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion()
         if self.cfg.getboolean("coupling", "two-way-coupling") and self.rank==0:
-            self.macroscopicSolver.setMDBoundaryValues(self.buf, idcv) # TODO
+            self.macroscopicSolver.setMDBoundaryValues(self.buf) # TODO
         
         if self.csv > 0 and (cycle+1)%self.csv == 0 and self.rank==0:
             filename = "KVSMD2Macro_" + str(cycle+1) + ".csv"
-            self.buf.recv2CSV(idcv,filename)
+            self.buf.recv2CSV(filename)
+
+        # extract data for eval plots
+        numcells = self.getGlobalNumberMacroscopicCells()
+        mdpos = json.loads(self.cfg.get("domain", "md-pos"))
+        # Convert center of MD domain in SI units to offset of MD domain as cell index
+        mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
+            for d in range(3)]
+        if self.rank==0:
+            for dir in range(2):
+                self.velMD[cycle, dir] = np.mean(self.buf.loadRecvVelocity()[2,2,:,dir])
+                self.velLB[cycle, dir] = np.mean(self.macroscopicSolver.scen.velocity[
+                    mdpos[0]+5, 
+                    mdpos[1]+5, 
+                    mdpos[2]:mdpos[2]+numcells[2],
+                    dir].data * (self.dx / self.dt_LB))
+
+    def plot(self):
+        if self.rank==0:
+            mplt.style.use("seaborn")
+            fig, ax = mplt.subplots(2,1)
+            t = range(len(self.velMD))
+            for dir in range(2):
+                ax[dir].plot(t, self.velLB[:,dir], "-", color="blue")
+                ax[dir].plot(t, self.velMD[:,dir], "o", color="red")
+                ax[dir].set_xlabel('coupling cycles')
+                ax[dir].grid(True)
+            ax[0].set_ylabel('velocity_x')
+            ax[1].set_ylabel('velocity_y')
+            fig.tight_layout()
+            mplt.savefig("plot.png")
 
     def __del__(self):
         self.shutdown()
@@ -233,7 +279,8 @@ class LBSolver():
         lb_log.info("Domain size = " + str(self.domain_size))
         lb_log.info("Total number of cells = " + str(self.domain_size[0]*self.domain_size[1]*self.domain_size[2]))
         lb_log.info("Running benchmark ...")
-        lb_log.info("Benchmark result = " + str(self.scen.benchmark()) + " MLUPS")
+        self.mlups = self.scen.benchmark()
+        lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
 
         self.cD_max = 0
         self.cL_max = 0
