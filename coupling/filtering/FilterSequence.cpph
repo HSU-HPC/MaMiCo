@@ -19,8 +19,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
     while(currFilterNode){
 		//std::cout << "INIT FILTER I/O BEFORE: " << inputCellVector[0] << " " << outputCellVector[0] << std::endl;
 
-//###############################################################
-//This is where you have to define how to handle each filter individually.
+	//###############################################################
+	//This is where you have to define how to handle each filter individually.
 
 		//Write To File
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0){
@@ -95,7 +95,6 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 		
 		//Python
 		else if(std::strcmp(currFilterNode->Value(), "python") == 0) {
-            _filters.push_back(new coupling::FilterInterfacePython<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, currFilterNode->Attribute("source"), currFilterNode->Attribute("args")));
         }
 
 
@@ -105,7 +104,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             exit(EXIT_FAILURE);
         }
 
-//###############################################################
+	//###############################################################
 
 		//std::cout << "INIT FILTER I/O BEFORE: " << inputCellVector[0] << " " << outputCellVector[0] << std::endl;
 
@@ -126,6 +125,20 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	return 0;
 }
 
+template<unsigned int dim>
+void coupling::FilterSequence<dim>::addFilter( 	
+				std::function<std::vector<double> (std::vector<double>, std::vector<std::array<double, dim>>)> applyScalar,
+				std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<double, dim>>)> applyVector
+){
+	if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
+	else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
+	#ifdef DEBUG_FILTER_PIPELINE
+		std::cout << PRINT_PREFIX() << "Appended new filter to sequence."
+	#endif
+}
+
+
+//Private functions of coupling::FilterSequence
 
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::initCellVectors(){
@@ -180,4 +193,5 @@ void coupling::FilterSequence<dim>::initDomain(){
 	std::cout << "Input domain vector has " << _inputDomainCellVector.size() << " cells." << std::endl;
 	#endif
 }
+
 

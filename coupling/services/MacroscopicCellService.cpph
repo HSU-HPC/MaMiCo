@@ -480,3 +480,27 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::plotEveryMa
     );
   }
 }
+
+
+template<class LinkedCell,unsigned int dim>
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::addFilterToSequence(	const char *name,
+	   						std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<double, dim>> indices)> applyScalar,
+	   						std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<double, dim>> indices)> applyVector
+){
+	bool found = false;
+	coupling::FilterSequence<dim>* sequence;
+	for(auto currSequence : coupling::services::MacroscopicCellService<dim>::_filterPipeline.getPiSequences()) {
+		if(std::strcmp(currSequence->getName(), name) == 0) {
+			sequence = currSequence; 
+			found = true; 
+		}
+	}
+	
+	if(!found) {
+		std::cout << "ERROR: Could not find Filter Sequence named " << name << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	sequence->addFilter(applyScalar, applyVector);
+}
+

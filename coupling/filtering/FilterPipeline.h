@@ -55,7 +55,10 @@ class coupling::FilterPipeline{
 		 * Ouput of the specified output-FilterSequence will be written to _md2MacroCells.
 		 */
         void operator()();
+		
 
+       	std::vector<coupling::FilterSequence<dim> *> getPiSequences() const { return _piSequences; }
+       	std::vector<coupling::FilterSequence<dim> *> getMiSequences() const { return _miSequences; }
 
 
     private:

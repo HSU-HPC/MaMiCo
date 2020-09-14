@@ -11,7 +11,7 @@
 #include "coupling/filtering/filters/Gauss.h"
 #include "coupling/filtering/filters/POD.h"
 #include "coupling/filtering/filters/Strouhal.h"
-#include "coupling/filtering/interfaces/FilterInterfacePython.h"
+#include "coupling/filtering/filters/FilterFromFunction.h"
 
 /*
  * Filter Sequences are used to group filters that will be applied in chronological order.
@@ -77,6 +77,14 @@ class coupling::FilterSequence {
         	std::cout << PRINT_PREFIX() << "Deconstructed." << std::endl;
         	#endif
     	}
+
+		/*
+		 * TODO: Comment
+		 */
+		void addFilter( 	
+				std::function<std::vector<double> (std::vector<double>, std::vector<std::array<double, dim>>)> applyScalar,
+				std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<double, dim>>)> applyVector
+		);
 
 		/*
 		 * Interprets this sequence's filters' parameters (specified in filter_pipeline.xml) and creates filter objects based on that.

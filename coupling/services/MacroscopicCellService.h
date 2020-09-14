@@ -208,6 +208,17 @@ public coupling::services::MacroscopicCellService<dim> {
      *  coupling tool.
      */
     const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
+	
+	/**
+	 * Creates a new filter from scratch and appends it to a sequence that is part of this service's filter pipelining system.
+	 * For that, the desired sequence's identifier and two functions are needed:
+	 *  - applyScalar What to do with scalar properties of the sequence's Macroscopic Cells.
+	 *  - applyVector: What to do with properties stored as vectors of the sequence's of Macroscopic Cells.
+	 */
+	void addFilterToSequence(	const char *name,
+		   						std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<double, dim>> indices)> applyScalar,
+		   						std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<double, dim>> indices)> applyVector
+	);
 
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
