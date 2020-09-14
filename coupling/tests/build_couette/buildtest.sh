@@ -76,7 +76,7 @@ objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
 ### builds, linking, objects for coupled simulation with MaMiCo
 cd ${BUILD_PATH}
 ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
-${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_couette.o
+${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_couette.o -L/usr/lib/python3.8/site-packages/pybind11 #$(python3.8-config --ldflags --embed)
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_couette.o"
 
 ${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/test
