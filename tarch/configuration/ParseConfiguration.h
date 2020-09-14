@@ -84,7 +84,7 @@ static void readIntOptional(int & storage, tinyxml2::XMLElement *node, std::stri
 /** see readDoubleMandatory */
 static void readBoolMandatory(bool &storage, tinyxml2::XMLElement *node, std::string tag){
     const char * myTextChar = node->Attribute(tag.c_str());
-    if (myTextChar == NULL){ std::cout << "Error: mandatory bool value could not be found!" << std::endl; exit(EXIT_FAILURE);}
+    if (myTextChar == NULL){ std::cout << "Error: mandatory bool " << tag << " could not be found!" << std::endl; exit(EXIT_FAILURE);}
     std::string myText(myTextChar);
     if (myText=="yes"){ storage = true; }
     else if (myText=="no"){ storage = false;}
