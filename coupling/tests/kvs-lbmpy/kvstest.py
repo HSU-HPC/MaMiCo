@@ -207,13 +207,13 @@ class KVSTest():
             filename = "KVSMD2Macro_" + str(cycle+1) + ".csv"
             self.buf.recv2CSV(filename)
 
-        # extract data for eval plots
-        numcells = self.getGlobalNumberMacroscopicCells()
-        mdpos = json.loads(self.cfg.get("domain", "md-pos"))
-        # Convert center of MD domain in SI units to offset of MD domain as cell index
-        mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
-            for d in range(3)]
         if self.rank==0:
+            # extract data for eval plots
+            numcells = self.getGlobalNumberMacroscopicCells()
+            mdpos = json.loads(self.cfg.get("domain", "md-pos"))
+            # Convert center of MD domain in SI units to offset of MD domain as cell index
+            mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
+                for d in range(3)]
             for dir in range(2):
                 self.velMD[cycle, dir] = np.mean(self.buf.loadRecvVelocity()[2,2,:,dir])
                 self.velLB[cycle, dir] = np.mean(self.macroscopicSolver.scen.velocity[
