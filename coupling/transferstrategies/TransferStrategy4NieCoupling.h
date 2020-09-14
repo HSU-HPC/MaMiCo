@@ -82,7 +82,6 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling: public couplin
     unsigned int _timestepCounter;        // time step counter within a coupling cycle (should run from 0 to _numberMDSteps)
     double *_excessMass;                  // mass that was transferred in an earlier coupled step
     const tarch::la::Vector<2*dim,bool> _massFluxBoundary; // true in each entry if west/east, south/north, bottom/top boundary is a mass flux boundary
-    int _rank;
     //double _totalMass; int _cellCount;
 };
 #include "coupling/transferstrategies/TransferStrategy4NieCoupling.cpph"

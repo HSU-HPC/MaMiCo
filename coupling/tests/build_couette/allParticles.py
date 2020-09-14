@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
-number = 46
+number = 40
 
 def couette_analytic(x_c):
     u_w = 1.5
