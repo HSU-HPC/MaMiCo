@@ -16,7 +16,7 @@
 #include "coupling/ParticleInsertion.h"
 #include "tarch/utils/RandomNumberService.h"
 
-#define USHER_DEBUG
+// #define USHER_DEBUG
 
 namespace coupling {
   template<class LinkedCell,unsigned int dim>

@@ -3,8 +3,7 @@
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
     \\  /    A nd           | Version:  7
-     \\/     M anipulation  |
-\*---------------------------------------------------------------------------*/
+     \\/     M anipulation  |\*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
@@ -16,75 +15,81 @@ FoamFile
 
 convertToMeters 1.0;
 
+outer 100.0;
+lowerX 35;
+lowerZ 35;
+higherX 65;
+higherZ 65;
+
 vertices
 (
     (0.0 0.0 0.0) // 0
-    (17.5 0.0 0.0)
-    (32.5 0.0 0.0)
-    (50.0 0.0 0.0)
-    (50.0 50.0 0.0) // 4
-    (32.5 50.0 0.0)
-    (17.5 50.0 0.0)
-    (0.0 50.0 0.0)
-    (0.0 17.5 0.0) // 8
-    (17.5 17.5 0.0)
-    (32.5 17.5 0.0)
-    (50.0 17.5 0.0)
-    (50.0 32.5 0.0) // 12
-    (32.5 32.5 0.0)
-    (17.5 32.5 0.0)
-    (0.0 32.5 0.0)
+    ($lowerX 0.0 0.0)
+    ($higherX 0.0 0.0)
+    ($outer 0.0 0.0)
+    ($outer $outer 0.0) // 4
+    ($higherX $outer 0.0)
+    ($lowerX $outer 0.0)
+    (0.0 $outer 0.0)
+    (0.0 $lowerX 0.0) // 8
+    ($lowerX $lowerX 0.0)
+    ($higherX $lowerX 0.0)
+    ($outer $lowerX 0.0)
+    ($outer $higherX 0.0) // 12
+    ($higherX $higherX 0.0)
+    ($lowerX $higherX 0.0)
+    (0.0 $higherX 0.0)
     
-    (0.0 0.0 7.5) // 16
-    (17.5 0.0 7.5) 
-    (32.5 0.0 7.5)
-    (50.0 0.0 7.5)
-    (50.0 50.0 7.5) // 20
-    (32.5 50.0 7.5)
-    (17.5 50.0 7.5)
-    (0.0 50.0 7.5)
-    (0.0 17.5 7.5) // 24
-    (17.5 17.5 7.5)
-    (32.5 17.5 7.5)
-    (50.0 17.5 7.5)
-    (50.0 32.5 7.5) // 28
-    (32.5 32.5 7.5)
-    (17.5 32.5 7.5)
-    (0.0 32.5 7.5)
+    (0.0 0.0 $lowerZ) // 16
+    ($lowerX 0.0 $lowerZ) 
+    ($higherX 0.0 $lowerZ)
+    ($outer 0.0 $lowerZ)
+    ($outer $outer $lowerZ) // 20
+    ($higherX $outer $lowerZ)
+    ($lowerX $outer $lowerZ)
+    (0.0 $outer $lowerZ)
+    (0.0 $lowerX $lowerZ) // 24
+    ($lowerX $lowerX $lowerZ)
+    ($higherX $lowerX $lowerZ)
+    ($outer $lowerX $lowerZ)
+    ($outer $higherX $lowerZ) // 28
+    ($higherX $higherX $lowerZ)
+    ($lowerX $higherX $lowerZ)
+    (0.0 $higherX $lowerZ)
     
-    (0.0 0.0 22.5) // 32
-    (17.5 0.0 22.5)
-    (32.5 0.0 22.5)
-    (50.0 0.0 22.5)
-    (50.0 50.0 22.5) // 36
-    (32.5 50.0 22.5)
-    (17.5 50.0 22.5)
-    (0.0 50.0 22.5)
-    (0.0 17.5 22.5) // 40
-    (17.5 17.5 22.5)
-    (32.5 17.5 22.5)
-    (50.0 17.5 22.5)
-    (50.0 32.5 22.5) // 44
-    (32.5 32.5 22.5)
-    (17.5 32.5 22.5)
-    (0.0 32.5 22.5)
+    (0.0 0.0 $higherZ) // 32
+    ($lowerX 0.0 $higherZ)
+    ($higherX 0.0 $higherZ)
+    ($outer 0.0 $higherZ)
+    ($outer $outer $higherZ) // 36
+    ($higherX $outer $higherZ)
+    ($lowerX $outer $higherZ)
+    (0.0 $outer $higherZ)
+    (0.0 $lowerX $higherZ) // 40
+    ($lowerX $lowerX $higherZ)
+    ($higherX $lowerX $higherZ)
+    ($outer $lowerX $higherZ)
+    ($outer $higherX $higherZ) // 44
+    ($higherX $higherX $higherZ)
+    ($lowerX $higherX $higherZ)
+    (0.0 $higherX $higherZ)
     
-    (0.0 0.0 50.0) // 48
-    (17.5 0.0 50.0)
-    (32.5 0.0 50.0)
-    (50.0 0.0 50.0)
-    (50.0 50.0 50.0) // 52
-    (32.5 50.0 50.0)
-    (17.5 50.0 50.0)
-    (0.0 50.0 50.0)
-    (0.0 17.5 50.0) // 56
-    (17.5 17.5 50.0)
-    (32.5 17.5 50.0)
-    (50.0 17.5 50.0)
-    (50.0 32.5 50.0) // 60
-    (32.5 32.5 50.0)
-    (17.5 32.5 50.0)
-    (0.0 32.5 50.0)
+    (0.0 0.0 $outer) // 48
+    ($lowerX 0.0 $outer)
+    ($higherX 0.0 $outer)
+    ($outer 0.0 $outer)
+    ($outer $outer $outer) // 52
+    ($higherX $outer $outer)
+    ($lowerX $outer $outer)
+    (0.0 $outer $outer)
+    (0.0 $lowerX $outer) // 56
+    ($lowerX $lowerX $outer)
+    ($higherX $lowerX $outer)
+    ($outer $lowerX $outer)
+    ($outer $higherX $outer) // 60
+    ($higherX $higherX $outer)
+    ($lowerX $higherX $outer)
+    (0.0 $higherX $outer)
 );
 
 blocks
@@ -154,8 +159,6 @@ boundary
     front
     {
         type patch;
-        //type cyclic;
-        //neighbourPatch  back;
         faces ((0 1 17 16)
         	(1 2 18 17)
         	(2 3 19 18)
@@ -170,8 +173,6 @@ boundary
     back
     {
         type patch;
-        //type cyclic;
-        //neighbourPatch  front;
         faces ((5 21 20 4)
         	(6 22 21 5)
         	(7 23 22 6)
@@ -186,8 +187,6 @@ boundary
     left
     {
         type patch;
-        //type cyclic;
-        //neighbourPatch  right;
         faces ((0 16 24 8)
         	(8 24 31 15)
         	(15 31 23 7)
@@ -202,8 +201,6 @@ boundary
     right
     {
         type patch;
-        //type cyclic;
-        //neighbourPatch  left;
         faces ((3 11 27 19)
         	(11 12 28 27)
         	(12 4 20 28)
@@ -218,7 +215,7 @@ boundary
     fronti
     {
     	type patch;
-    	faces ((25 26 42 41)); // 25 42 41 26
+    	faces ((25 26 42 41));
     }
     
     backi
