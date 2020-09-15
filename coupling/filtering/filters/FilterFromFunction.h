@@ -47,9 +47,9 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 			for(auto cell : coupling::FilterInterface<dim>::_inputCells){
 				//vector
 				tarch::la::Vector<dim, double> mamico_vec = cell->getMacroscopicMomentum();
-				std::vector<double> vec;
-				for(unsigned int d = 0; d < dim; d++) vec.push_back(mamico_vec[d]); 
-				input_v.push_back(vec);
+				std::array<double, dim> array_vec;
+				for(unsigned int d = 0; d < dim; d++) array_vec[d] = mamico_vec[d];
+				input_v.push_back(array_vec);
 
 				//scalar
 				input_s.push_back(cell->getMacroscopicMass());

@@ -28,6 +28,13 @@ log = logging.getLogger('KVSTest')
 # -> using lbmpy for Lattice Bolzmann flow simulation with CUDA on GPU
 # -> using (multi-instance) SimpleMD or synthetic MD data (with Gaussian noise) (TODO)
 # -> using filtering subsystem with configurable coupling data analysis or noise filter sequences (TODO)
+
+def filterScalarTest(cellData, indices):
+    return cellData
+
+def filterVectorTest(cellData, indices):
+    return cellData
+
 class KVSTest():
     def __init__(self, cfg):
         self.cfg = cfg
@@ -130,6 +137,8 @@ class KVSTest():
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
                 self.cfg.getfloat("microscopic-solver", "temperature"))
+            #Testing adding python functions as filters: 
+            self.multiMDCellService.getMacroscopicCellService(i).addFilterToSequence("test-strouhal", filterScalarTest, filterVectorTest)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
