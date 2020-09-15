@@ -10,7 +10,7 @@ LIB_MPI=mpi
 LIB_EIGEN_PATH=/usr/local/include/Eigen
 
 ### home directory of MAMICO
-MAMICO_PATH=/home/piet/mamico_v1.1
+MAMICO_PATH=/home/$USER/Documents/MaMiCo/mamico-dev
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
