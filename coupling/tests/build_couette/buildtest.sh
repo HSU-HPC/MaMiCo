@@ -5,7 +5,7 @@
 SETTINGS=../../../personal_settings
 
 if test -f "$SETTINGS"; then
-	source ../../../personal_settings
+	source ${SETTINGS}
 else
 	echo "ERROR! No personal settings file found at $SETTINGS ."
 	exit -1

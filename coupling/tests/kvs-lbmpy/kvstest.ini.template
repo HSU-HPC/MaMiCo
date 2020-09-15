@@ -23,6 +23,7 @@ double-precision = on
 viscosity = 2.14       
 cells-per-meter = 312
 omega = 1.9
+init-timesteps = 1000
 
 [microscopic-solver]
 type = md
