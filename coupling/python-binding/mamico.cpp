@@ -512,10 +512,9 @@ PYBIND11_MODULE(mamico, mamico) {
     py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService")
     	.def("computeAndStoreTemperature", &coupling::services::MacroscopicCellService<3>::computeAndStoreTemperature)
     	.def("getIndexConversion", &coupling::services::MacroscopicCellService<3>::getIndexConversion, py::return_value_policy::reference)
-        .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep);
+        .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep)
+		.def("addFilterToSequence", &coupling::services::MacroscopicCellService<3>::addFilterToSequence/*return value policy?*/);
 		//TODO: test this. I suspect that while py::function -> std::function works, you might have to cast its return type manually from py::object to std::vector<...>
-		.def("addFilterToSequence",
-			coupling::services::MacroscopicCellService<3>::addFilter/*return value policy?*/;
 
     coupling.def("getMDSimulation", []
     	(const simplemd::configurations::MolecularDynamicsConfiguration& c1,

@@ -73,6 +73,11 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
+	virtual void addFilterToSequence(	
+		const char *name,
+		std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<double, dim>> indices)> applyScalar,
+		std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<double, dim>> indices)> applyVector
+	) = 0;
     unsigned int getID() const { return _id;}
 
   protected:
