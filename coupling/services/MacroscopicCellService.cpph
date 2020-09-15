@@ -488,11 +488,11 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::addFilterTo
 	   						std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<double, dim>> indices)> applyVector
 ){
 	bool found = false;
-	coupling::FilterSequence<dim>* sequence;
-	for(auto currSequence : coupling::services::MacroscopicCellService<dim>::_filterPipeline.getPiSequences()) {
+	for(auto currSequence : coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::_filterPipeline.getPiSequences()) {
 		if(std::strcmp(currSequence->getName(), name) == 0) {
-			sequence = currSequence; 
-			found = true; 
+			currSequence->addFilter(applyScalar, applyVector);
+			found = true;
+			break; 
 		}
 	}
 	
@@ -501,6 +501,5 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::addFilterTo
 		exit(EXIT_FAILURE);
 	}
 	
-	sequence->addFilter(applyScalar, applyVector);
 }
 
