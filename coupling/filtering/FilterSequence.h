@@ -43,7 +43,7 @@ class coupling::FilterSequence {
 						std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 						tarch::la::Vector<dim, unsigned int> domainStart,
 						tarch::la::Vector<dim, unsigned int> domainEnd,
-						bool filteredValues[7]):
+						std::array<bool, 7> filteredValues):
     	_indexConversion(indexConversion), 
 		_multiMDService(multiMDService),
 		_name(name), 
@@ -57,12 +57,18 @@ class coupling::FilterSequence {
 			#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Now initializing." << std::endl;
         	#endif
+
             for(unsigned int d = 0; d < dim; d++) if(_cellIndices.back()[d] < _domainEnd[d]){
                 std::cout << "Filter domain size larger than MD domain. Aborting." << std::endl;
                 exit(EXIT_FAILURE);
             }
+
 			initCellVectors();
 			initDomain();
+
+			bool filtersAnything = false;
+			for(unsigned int i = 0; i < 7; i++) if(_filteredValues[i]) filtersAnything = true;
+			if(!filtersAnything) std::cout << PRINT_PREFIX() << "Warning: Filter sequence " << _name << " does not filter any values. Add 'filtered-values' attribute to XML element to change this." << std::endl;
 			#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Finished initialization." << std::endl;
         	#endif
@@ -160,7 +166,7 @@ class coupling::FilterSequence {
     	std::vector<tarch::la::Vector<dim, unsigned int>> _globalDomainCellIndices; //uses _cellIndices indexing (i. e. _domainStart .... _domainEnd))
     	std::vector<tarch::la::Vector<dim, unsigned int>> _localDomainCellIndices; //starts at (0,...,0)
 		
-		bool *_filteredValues; //actually, bool[7]
+		std::array<bool, 7> _filteredValues;
 
 		bool _isOutput; //true if this sequence's output vector (see above) is the Filter Pipeline's output
 		

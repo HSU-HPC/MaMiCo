@@ -184,10 +184,10 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		}
 
 		//"filtered-values" is not mandatory, default is false
-		bool filteredValues[7] = { false };
+		std::array<bool, 7> filteredValues = {false};
 		const char* fvStr = currSequenceNode->Attribute("filtered-values");
 		if(fvStr){
-			if(strstr(fvStr, "all")) memset(filteredValues, true, sizeof(filteredValues));
+			if(strstr(fvStr, "all")) for(unsigned int i = 0; i < 7; i++) filteredValues[i] = true;
 			else{
 				if(strstr(fvStr, "micro-mass")) filteredValues[0] = true;
 				if(strstr(fvStr, "micro-momentum")) filteredValues[1] = true;

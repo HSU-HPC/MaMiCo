@@ -133,7 +133,7 @@ void coupling::FilterSequence<dim>::addFilter(
 	if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
 	else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
 	#ifdef DEBUG_FILTER_PIPELINE
-		std::cout << PRINT_PREFIX() << "Appended new filter to sequence."
+		std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
 	#endif
 }
 
@@ -146,7 +146,6 @@ void coupling::FilterSequence<dim>::initCellVectors(){
 		_cellVector1.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
     	_cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
 	}
-	std::cout << "INPUT: " << _inputCellVector[0] << std::endl;
 	#ifdef DEBUG_FILTER_PIPELINE
             std::cout << PRINT_PREFIX() << "Initialized (global) cell vector." << std::endl;
     #endif 

@@ -28,7 +28,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //covers the entire MD domain
-				bool filteredValues[7], 
+				const std::array<bool, 7> filteredValues, 
 				const std::vector<tarch::la::Vector<dim, unsigned int>> localCellIndices, //covers the entire MD domain
 				std::string location,
 				bool overwrite):

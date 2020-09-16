@@ -33,7 +33,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
         Gauss(  const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //Use local indexing! (starting at (0,...,0))
-				bool filteredValues[7],
+				const std::array<bool, 7> filteredValues,
 				unsigned int dimension,
 				const char* extrapolationStrategy):
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
