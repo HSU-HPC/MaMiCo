@@ -7,7 +7,7 @@
 
 #include <vector>
 
-//#define DEBUG_STROUHAL
+#define DEBUG_STROUHAL
 
 namespace coupling {
     template<unsigned int dim>
@@ -24,8 +24,8 @@ class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{
         Strouhal(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-				bool filteredValues[7],
+	  			const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
+				std::array<bool, 7> filteredValues,
 				double u,
 				double d):
 				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),

@@ -24,8 +24,9 @@ void coupling::Strouhal<dim>::operator()(){
     #endif
 }
 
-#define ACCEPTED_STARTING_APPROXIMATE 0.1
-#define ACCEPTED_APPROXIMATE 0.1
+//TODO: move to xml
+#define ACCEPTED_STARTING_APPROXIMATE 0.01
+#define ACCEPTED_APPROXIMATE 0.01
 #define AMP_LOWER_LIMIT 0.5
 
 //Private functions of Strouhal.h:
@@ -69,6 +70,7 @@ double coupling::Strouhal<dim>::calculateStrouhalNumber(){
 				#endif
 			}
 		}
+		//TODO: this is a phase, not the frequency
 		if(intersects == 2) { f = i - firstIntersect; break;}
 	}
 	#ifdef DEBUG_STROUHAL

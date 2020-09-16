@@ -8,6 +8,7 @@
 
 import sys
 sys.path.append('../../python-binding')
+sys.path.append('../../filtering/filters')
 import coloredlogs, logging
 import math
 import json
@@ -16,6 +17,7 @@ from mamico.coupling.services import MultiMDCellService
 from mamico.coupling.solvers import CouetteSolverInterface
 import mamico.coupling
 import mamico.tarch.utils
+import pythonfilters as pf
 import numpy as np
 from configparser import ConfigParser
 import matplotlib.pyplot as mplt
@@ -29,11 +31,6 @@ log = logging.getLogger('KVSTest')
 # -> using (multi-instance) SimpleMD or synthetic MD data (with Gaussian noise) (TODO)
 # -> using filtering subsystem with configurable coupling data analysis or noise filter sequences (TODO)
 
-def filterScalarTest(cellData, indices):
-    return cellData
-
-def filterVectorTest(cellData, indices):
-    return cellData
 
 class KVSTest():
     def __init__(self, cfg):
@@ -137,8 +134,10 @@ class KVSTest():
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
                 self.cfg.getfloat("microscopic-solver", "temperature"))
-            #Testing adding python functions as filters: 
-            self.multiMDCellService.getMacroscopicCellService(i).addFilterToSequence("test-strouhal", filterScalarTest, filterVectorTest)
+
+        #Testing adding python functions as filters: 
+        self.sf = pf.StrouhalPython(0.2, 2.25)
+        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("test-strouhal", pf.returnCellData, self.sf.addDataPoint)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
@@ -157,6 +156,10 @@ class KVSTest():
     def shutdown(self):
         if self.rank==0:
             log.info("Finished " + str(self.mdStepCounter) + " MD timesteps")
+
+        #Analyse data gathered by StrouhalPython filter
+        self.sf.calculateStrouhalNumber()
+
         for i in range(self.localMDInstances):
             self.simpleMD[i].shutdown()
         # TODO something else to do here??

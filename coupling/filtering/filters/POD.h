@@ -27,7 +27,7 @@ class coupling::POD : public coupling::FilterInterface<dim>{
         POD(  	const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-				bool filteredValues[7],
+				const std::array<bool, 7> filteredValues,	
 				const tarch::utils::MultiMDService<dim>& multiMDService,
 				int tws,
 				int kmax
