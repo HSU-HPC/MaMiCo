@@ -215,12 +215,12 @@ class KVSTest():
             mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
                 for d in range(3)]
             for dir in range(2):
-                self.velMD[cycle, dir] = np.mean(self.buf.loadRecvVelocity()[2,2,:,dir])
-                self.velLB[cycle, dir] = np.mean(self.macroscopicSolver.scen.velocity[
+                self.velMD[cycle, dir] = self.buf.loadRecvVelocity()[2,2,2,dir]
+                self.velLB[cycle, dir] = self.macroscopicSolver.scen.velocity[
                     mdpos[0]+5, 
                     mdpos[1]+5, 
-                    mdpos[2]:mdpos[2]+numcells[2],
-                    dir].data * (self.dx / self.dt_LB))
+                    mdpos[2]+5,
+                    dir].data * (self.dx / self.dt_LB)
 
     def plot(self):
         if self.rank==0:
@@ -229,7 +229,7 @@ class KVSTest():
             t = range(len(self.velMD))
             for dir in range(2):
                 ax[dir].plot(t, self.velLB[:,dir], "-", color="blue")
-                ax[dir].plot(t, self.velMD[:,dir], "o", color="red")
+                ax[dir].plot(t, self.velMD[:,dir], "-", color="red")
                 ax[dir].set_xlabel('coupling cycles')
                 ax[dir].grid(True)
             ax[0].set_ylabel('velocity_x')
@@ -399,12 +399,21 @@ def main():
     cfg = ConfigParser()
     cfg.read("kvstest.ini")
 
-    coloredlogs.install(fmt=
-        '%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s'
-    , level='DEBUG')
-
-    log.setLevel(level=logging.INFO)
-    lb_log.setLevel(level=logging.INFO)
+    # console mode, colored log to stdout
+    if len(sys.argv) == 1:
+        coloredlogs.install(fmt=
+            '%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s'
+        , level='DEBUG')
+        log.setLevel(level=logging.INFO)
+        lb_log.setLevel(level=logging.INFO)
+    # job mode, log to file
+    elif len(sys.argv) == 2:
+        logging.basicConfig(filename=sys.argv[1],level=logging.INFO)
+    else:
+        print("Usage:")
+        print("[1] " + str(sys.argv[0]))
+        print("[2] " + str(sys.argv[0]) + " logfile")
+        sys.exit(1)
 
     test = KVSTest(cfg)
     test.run()
