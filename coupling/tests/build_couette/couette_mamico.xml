@@ -4,8 +4,8 @@
 <!-- MaMiCo configuration for NieTest, as described in the respective paper -->
 <mamico>
   <macroscopic-cell-configuration
-    cell-size="2.5 ; 2.5 ; 2.5"
-    linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+    cell-size="5 ; 5 ; 5"
+    linked-cells-per-macroscopic-cell="2 ; 2 ; 2"
     write-every-microscopic-timestep="0"
     microscopic-filename="MacroscopicCell_micro"
     write-every-macroscopic-timestep="0"

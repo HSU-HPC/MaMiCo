@@ -415,7 +415,6 @@ private:
         gettimeofday(&_tv.end,NULL);
         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
       }
-
       // send back data from MD instances and merge it
       if(_cfg.md2Macro){
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
@@ -486,7 +485,6 @@ private:
       static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
       _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
       _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),  _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
-
     }
     else if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),

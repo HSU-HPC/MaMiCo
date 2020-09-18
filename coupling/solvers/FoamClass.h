@@ -114,53 +114,29 @@ public:
   };
 
   const tarch::la::Vector<3,double> getOuterPointFromBoundary(const int layer, const int index){
-     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*1.25);
+     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*2.5);
      const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
      return FoamCoordVector;
   }
 
   const tarch::la::Vector<3,double> getInnerPointFromBoundary(const int layer, const int index){
-     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*1.25);
+     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*2.5);
      const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
      return FoamCoordVector;
   }
 
-  // Foam::vector* getReference4BoundaryField(const int layer, const int index){
-  //   return &(U.boundaryFieldRef()[layer][index]);
-  // } // can be deleted for couettetest
-
-  // unsigned int getIndex4Vector(const Foam::vector Vector)const{
-  //   return U.mesh().findCell(Vector) > 0 ? mesh.findCell(Vector) : 0;
-  // }
-
-  // tarch::la::Vector<3,double> getVelocityByIndex(const unsigned int index){
-  //   return tarch::la::Vector<3,double>(U[index][0], U[index][1], U[index][2]);
-  // }
-
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
   const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
     if(skipRank()){return;}
-    // std::stringstream ss; ss << "diff_" << _timestepCounter << ".txt";
-    // std::ofstream file(ss.str().c_str());
-    // if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-    // std::stringstream diff;
     for(unsigned int i=0; i < _numberBoundaryPoints; i++){
       unsigned int outer = _boundary2RecvBufferIndicesOuter[i];
       unsigned int inner = _boundary2RecvBufferIndicesInner[i];
       tarch::la::Vector<3,double> localOuterVel( (1.0/recvBuffer[outer]->getMacroscopicMass())*recvBuffer[outer]->getMacroscopicMomentum() );
       tarch::la::Vector<3,double> localInnerVel( (1.0/recvBuffer[inner]->getMacroscopicMass())*recvBuffer[inner]->getMacroscopicMomentum() );
-      //_boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
-      // if(!_boundarySide[i]){
-        //_boundaryIndices[i]->x() = analyticCouette(_boundaryZ[i]);}
-        _boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
-      // else{ //_boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;}
-       // _boundaryIndices[i]->x() = analyticCouette(_boundaryZ[i]);}
+      _boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
       _boundaryIndices[i]->y() = (localOuterVel[1]+localInnerVel[1])*0.5;
       _boundaryIndices[i]->z() = (localOuterVel[2]+localInnerVel[2])*0.5;
-      // diff << _boundaryZ[i] << ", " << analyticCouette(_boundaryZ[i]) << ", " << (localOuterVel[0]+localInnerVel[0])*0.5 << ", " << analyticCouette(_boundaryZ[i])-(localOuterVel[0]+localInnerVel[0])*0.5 << ", "<< _boundaryIndices[i]->x()<< std::endl;
     }
-    // file << diff.str() << std::endl;
-    // file.close();
   }
 
   void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip,
@@ -211,9 +187,9 @@ private:
     std::stringstream velocity;
 
     // loop over domain (incl. boundary)
-    double y=25;
-    double x=25;
-    for (double z = 1.25; z < 50.0; z=z+2.5){
+    double y=50;
+    double x=50;
+    for (double z = 2.5; z < 100.0; z=z+5.0){
       const int foamIndice = U.mesh().findCell(Foam::vector(x,y,z));
       // write information to streams
       if(foamIndice>0){
