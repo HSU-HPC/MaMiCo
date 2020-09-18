@@ -24,11 +24,11 @@
   
   <!--init-from-sequential-checkpoint="CheckpointSimpleMD_10000_periodic"-->
   <domain-configuration
-    init-from-sequential-checkpoint="Checkpoints2/CheckpointSimpleMD_10000_periodic"
+    init-from-sequential-checkpoint="CheckpointSimpleMD_10000_periodic"
     
-    molecules-per-direction="28 ; 28 ; 28"
-    domain-size="30.0 ; 30.0 ; 30.0"
-    domain-offset="10.0 ; 10.0 ; 0."
+    molecules-per-direction="56 ; 56 ; 56"
+    domain-size="60.0 ; 60.0 ; 60.0"
+    domain-offset="20.0 ; 20.0 ; 5.0"
     cutoff-radius="2.2"
     linked-cell-size="2.5 ; 2.5 ; 2.5"
     k_B="1.0"

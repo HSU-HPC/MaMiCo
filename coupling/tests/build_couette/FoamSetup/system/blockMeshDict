@@ -17,9 +17,9 @@ convertToMeters 1.0;
 
 outer 100.0;
 lowerX 35;
-lowerZ 35;
+lowerZ 20;
 higherX 65;
-higherZ 65;
+higherZ 50;
 
 vertices
 (
@@ -94,15 +94,15 @@ vertices
 
 blocks
 (
-    hex (0 1 9 8 16 17 25 24) (7 7 3) simpleGrading (1 1 1) // 0
-    hex (1 2 10 9 17 18 26 25) (6 7 3) simpleGrading (1 1 1)
-    hex (2 3 11 10 18 19 27 26) (7 7 3) simpleGrading (1 1 1)
-    hex (8 9 14 15 24 25 30 31) (7 6 3) simpleGrading (1 1 1)
-    hex (9 10 13 14 25 26 29 30) (6 6 3) simpleGrading (1 1 1)
-    hex (10 11 12 13 26 27 28 29) (7 6 3) simpleGrading (1 1 1)
-    hex (15 14 6 7 31 30 22 23) (7 7 3) simpleGrading (1 1 1)
-    hex (14 13 5 6 30 29 21 22) (6 7 3) simpleGrading (1 1 1)
-    hex (13 12 4 5 29 28 20 21) (7 7 3) simpleGrading (1 1 1)
+    hex (0 1 9 8 16 17 25 24) (7 7 4) simpleGrading (1 1 1) // 0
+    hex (1 2 10 9 17 18 26 25) (6 7 4) simpleGrading (1 1 1)
+    hex (2 3 11 10 18 19 27 26) (7 7 4) simpleGrading (1 1 1)
+    hex (8 9 14 15 24 25 30 31) (7 6 4) simpleGrading (1 1 1)
+    hex (9 10 13 14 25 26 29 30) (6 6 4) simpleGrading (1 1 1)
+    hex (10 11 12 13 26 27 28 29) (7 6 4) simpleGrading (1 1 1)
+    hex (15 14 6 7 31 30 22 23) (7 7 4) simpleGrading (1 1 1)
+    hex (14 13 5 6 30 29 21 22) (6 7 4) simpleGrading (1 1 1)
+    hex (13 12 4 5 29 28 20 21) (7 7 4) simpleGrading (1 1 1)
     hex (16 17 25 24 32 33 41 40) (7 7 6) simpleGrading (1 1 1) // 9
     hex (17 18 26 25 33 34 42 41) (6 7 6) simpleGrading (1 1 1)
     hex (18 19 27 26 34 35 43 42) (7 7 6) simpleGrading (1 1 1)
@@ -111,15 +111,15 @@ blocks
     hex (31 30 22 23 47 46 38 39) (7 7 6) simpleGrading (1 1 1)
     hex (30 29 21 22 46 45 37 38) (6 7 6) simpleGrading (1 1 1)
     hex (29 28 20 21 45 44 36 37) (7 7 6) simpleGrading (1 1 1)
-    hex (32 33 41 40 48 49 57 56) (7 7 11) simpleGrading (1 1 1) // 18
-    hex (33 34 42 41 49 50 58 57) (6 7 11) simpleGrading (1 1 1)
-    hex (34 35 43 42 50 51 59 58) (7 7 11) simpleGrading (1 1 1)
-    hex (40 41 46 47 56 57 62 63) (7 6 11) simpleGrading (1 1 1)
-    hex (41 42 45 46 57 58 61 62) (6 6 11) simpleGrading (1 1 1)
-    hex (42 43 44 45 58 59 60 61) (7 6 11) simpleGrading (1 1 1)
-    hex (47 46 38 39 63 62 54 55) (7 7 11) simpleGrading (1 1 1)
-    hex (46 45 37 38 62 61 53 54) (6 7 11) simpleGrading (1 1 1)
-    hex (45 44 36 37 61 60 52 53) (7 7 11) simpleGrading (1 1 1)
+    hex (32 33 41 40 48 49 57 56) (7 7 10) simpleGrading (1 1 1) // 18
+    hex (33 34 42 41 49 50 58 57) (6 7 10) simpleGrading (1 1 1)
+    hex (34 35 43 42 50 51 59 58) (7 7 10) simpleGrading (1 1 1)
+    hex (40 41 46 47 56 57 62 63) (7 6 10) simpleGrading (1 1 1)
+    hex (41 42 45 46 57 58 61 62) (6 6 10) simpleGrading (1 1 1)
+    hex (42 43 44 45 58 59 60 61) (7 6 10) simpleGrading (1 1 1)
+    hex (47 46 38 39 63 62 54 55) (7 7 10) simpleGrading (1 1 1)
+    hex (46 45 37 38 62 61 53 54) (6 7 10) simpleGrading (1 1 1)
+    hex (45 44 36 37 61 60 52 53) (7 7 10) simpleGrading (1 1 1)
 );
 
 edges
