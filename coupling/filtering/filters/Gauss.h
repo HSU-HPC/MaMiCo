@@ -36,7 +36,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				const std::array<bool, 7> filteredValues,
 				unsigned int dimension,
 				const char* extrapolationStrategy):
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "GAUSS"),
 				_dim(dimension),
 				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back())
 				//TODO: function pointers

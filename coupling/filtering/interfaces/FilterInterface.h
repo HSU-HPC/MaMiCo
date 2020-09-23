@@ -35,11 +35,13 @@ class coupling::FilterInterface{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-				const std::array<bool, 7> filteredValues):
+				const std::array<bool, 7> filteredValues,
+				const char* type):
 				
 				_inputCells(inputCellVector),
 				_outputCells(outputCellVector),
-				_cellIndices(cellIndices)
+				_cellIndices(cellIndices),
+				_type(type)
 		{
 			if(filteredValues[0]){
 				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setMicroscopicMass);
@@ -85,6 +87,9 @@ class coupling::FilterInterface{
 		//	coupling::FilterInterfaceReadOnly
 		//and use its method copyInputToOutput().
 		virtual void operator()() = 0;
+
+
+		const char* getType() { return _type; }
 	protected:
 		/**
 		 *  Filters should read from input vector and write to output vector.
@@ -103,5 +108,6 @@ class coupling::FilterInterface{
 		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const tarch::la::Vector<dim, double>&)> _vectorSetters;
 		std::vector<const tarch::la::Vector<dim, double>& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _vectorGetters;
 
-
+		//unique identifier per filter class
+		const char* _type;
 };

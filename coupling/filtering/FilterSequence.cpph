@@ -2,6 +2,7 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamic::o
 
+#include <typeinfo>
 
 //Member functions of coupling::FilterSequence
 
@@ -122,19 +123,53 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	if(_filters.size() % 2 == 0)  std::cout << "_cellVector1." << std::endl;
 	else std::cout << "_cellVector2." << std::endl;
 	#endif
+	
 	return 0;
 }
 
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::addFilter( 	
-				std::function<std::vector<double> (std::vector<double>, std::vector<std::array<double, dim>>)> applyScalar,
-				std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<double, dim>>)> applyVector
+				std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)> applyScalar,
+				std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> applyVector,
+				int filterIndex //counting starts at 0, -1 is equivalent to EOL
 ){
-	if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
-	else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
-	#ifdef DEBUG_FILTER_PIPELINE
-		std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
-	#endif
+	if(_isModifiable) {
+		unsigned int index;
+		if(filterIndex == -1) index = _filters.size();
+		else index = filterIndex;
+
+		//case: appending	
+		if(index ==  _filters.size()) {
+			if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
+			else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
+			#endif
+		}
+		//case: inserting
+		//TODO: testing
+		else {
+			if(index % 2 == 0) { 
+				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
+
+				// add copy if no copy after index exists, else remove that copy
+				if(std::strcmp(_filters[index + 1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + index +1);
+				else _filters.insert(_filters.begin() + index + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues));
+			}
+			else {
+				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));	
+
+				// add copy if no copy after index exists, else remove that copy
+				if(std::strcmp(_filters[index + 1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + index +1);
+				else _filters.insert(_filters.begin() + index + 1, new coupling::Copy<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues));
+			}
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << PRINT_PREFIX() << "Inserted new filter at index " << index << std::endl;
+			#endif
+
+		}
+	}
+	else std::cout << "WARNING: Trying to add filter at runtime to non-modifiable filter sequence " << _name << ". Refused." << std::endl; //exit()?
 }
 
 

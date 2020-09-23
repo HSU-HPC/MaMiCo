@@ -12,6 +12,7 @@
 #include "coupling/filtering/filters/POD.h"
 #include "coupling/filtering/filters/Strouhal.h"
 #include "coupling/filtering/filters/FilterFromFunction.h"
+#include "coupling/filtering/filters/Copy.h"
 
 /*
  * Filter Sequences are used to group filters that will be applied in chronological order.
@@ -19,6 +20,7 @@
  *  - sequence input
  * 	- sequence domain
  * 	- filter parameters
+ * 	- TODO: modifiablitiy of filter list
  * per Filter Sequence.
  * @Author Felix Maurer
  */
@@ -52,7 +54,8 @@ class coupling::FilterSequence {
 		_domainStart(domainStart),
 		_domainEnd(domainEnd),
 		_filteredValues(filteredValues),
-		_isOutput(false) //potentially updated via loadSequencesFromXML calling setAsOutput()
+		_isOutput(false), //potentially updated via loadSequencesFromXML calling setAsOutput()
+		_isModifiable(true) //TODO: allow const sequences via XML attribute
 		{	
 			#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Now initializing." << std::endl;
@@ -68,7 +71,7 @@ class coupling::FilterSequence {
 
 			bool filtersAnything = false;
 			for(unsigned int i = 0; i < 7; i++) if(_filteredValues[i]) filtersAnything = true;
-			if(!filtersAnything) std::cout << PRINT_PREFIX() << "Warning: Filter sequence " << _name << " does not filter any values. Add 'filtered-values' attribute to XML element to change this." << std::endl;
+			if(!filtersAnything) std::cout << "Warning: Filter sequence " << _name << " does not filter any values. Add 'filtered-values' attribute to XML element to change this." << std::endl;
 			#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Finished initialization." << std::endl;
         	#endif
@@ -88,8 +91,9 @@ class coupling::FilterSequence {
 		 * TODO: Comment
 		 */
 		void addFilter( 	
-				std::function<std::vector<double> (std::vector<double>, std::vector<std::array<double, dim>>)> applyScalar,
-				std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<double, dim>>)> applyVector
+				std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)> applyScalar,
+				std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> applyVector,
+				int filterIndex = -1
 		);
 
 		/*
@@ -118,6 +122,9 @@ class coupling::FilterSequence {
 		bool isOutput() { return _isOutput; }
 		void setAsOutput() { _isOutput = true; }
 
+		bool isModifiable() { return _isModifiable; }
+		void makeUnmodifiable() { _isModifiable = false; }
+
 		/*
 		 * Which one of the two cell vectors are this sequence's output is solely dependant on the number of filters the sequence contains,
 		 * because each swap (see loadFiltersFromXML) changes what is the sequence's final filter's output.
@@ -129,6 +136,12 @@ class coupling::FilterSequence {
 		}
 
 		std::vector<coupling::FilterInterface<dim> *> getFilters() { return _filters; }	
+		
+		void printFilters() {
+			std::cout << "Filters in sequence " << _name << ": ";
+			for(auto f : _filters) std::cout << f->getType() << " ";
+			std::cout << std::endl;
+		}
       
 	private:
 		//TODO: move to constructor (?)
@@ -169,6 +182,7 @@ class coupling::FilterSequence {
 		std::array<bool, 7> _filteredValues;
 
 		bool _isOutput; //true if this sequence's output vector (see above) is the Filter Pipeline's output
+		bool _isModifiable; //true while filters can be added to sequence
 		
 		std::vector<coupling::FilterInterface<dim> *> _filters;
 		

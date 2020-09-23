@@ -27,10 +27,10 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 					const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 					std::array<bool, 7> filteredValues,
-					std::function<std::vector<double> (std::vector<double>, std::vector<std::array<double, dim>>)> applyScalar,
-					std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<double, dim>>)> applyVector
+					std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)> applyScalar,
+					std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> applyVector
 					):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "FFF"),
 			_applyScalar(applyScalar),
 			_applyVector(applyVector)
 		{}
@@ -41,7 +41,7 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 			
 			std::vector<double> input_s;
 			std::vector<std::array<double, dim>> input_v;
-			std::vector<std::array<double, dim>> indices;
+			std::vector<std::array<unsigned int, dim>> indices;
 
 			//SCALAR
 			for(unsigned int s = 0; s < coupling::FilterInterface<dim>::_scalarSetters.size(); s++) {
@@ -83,6 +83,6 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 
 	private:
 		//this encodes what filter to use
-		std::function<std::vector<double> (std::vector<double>, std::vector<std::array<double, dim>>)> _applyScalar;
-		std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<double, dim>>)> _applyVector;
+		std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)> _applyScalar;
+		std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> _applyVector;
 };

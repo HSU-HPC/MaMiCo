@@ -28,7 +28,7 @@ class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{
 				std::array<bool, 7> filteredValues,
 				double u,
 				double d):
-				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "STROUHALCPP"),
 				_U(u),
 				_D(d)
 		{	

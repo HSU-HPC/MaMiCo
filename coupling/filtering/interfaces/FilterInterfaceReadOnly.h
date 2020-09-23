@@ -22,8 +22,10 @@ class coupling::FilterInterfaceReadOnly : public coupling::FilterInterface<dim>{
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 					const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-					const std::array<bool, 7> filteredValues):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues)
+					const std::array<bool, 7> filteredValues,
+					const char* type
+		):
+			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, type)
 		{}
 	protected:
 		/*
