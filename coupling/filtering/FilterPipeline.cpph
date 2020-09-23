@@ -49,7 +49,6 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 template<unsigned int dim>
 void coupling::FilterPipeline<dim>::operator()(){
     //select between PI and MI
-	//TODO: Copying all these sequences is not optimal...
 	std::vector<coupling::FilterSequence<dim>* > sequences;
 	if(_postMultiInstance){
 		sequences = _miSequences;
@@ -65,7 +64,16 @@ void coupling::FilterPipeline<dim>::operator()(){
 	}
 
     for(coupling::FilterSequence<dim>* currSequence : sequences){
+		//finalize FS's filter vector
+		if(currSequence->isModifiable() == true){
+			//output of only rank 1
+			currSequence->printFilters();
+			currSequence->makeUnmodifiable();
+		}
+		
+		//update cell vector contents	
 		currSequence->updateCellVectors();
+		//apply all filters of sequence
 		for(coupling::FilterInterface<dim>* currFilter : currSequence->getFilters()) (*currFilter)();
 
         #ifdef DEBUG_FILTER_PIPELINE

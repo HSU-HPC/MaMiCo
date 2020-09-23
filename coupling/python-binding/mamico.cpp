@@ -45,6 +45,9 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
+// custom pybind11 headers
+#include "coupling/python-binding/conversion.h"
+
 // Helper function for allocation of configuration object and XML parsing
 template<class T> T* makeConfiguration(const std::string filename, const std::string topleveltag){
 	T* cfg = new T{};  // corresponding delete will be called by python, because of return_value_policy::take_ownership
@@ -563,8 +566,18 @@ PYBIND11_MODULE(mamico, mamico) {
     	.def("computeAndStoreTemperature", &coupling::services::MacroscopicCellService<3>::computeAndStoreTemperature)
     	.def("getIndexConversion", &coupling::services::MacroscopicCellService<3>::getIndexConversion, py::return_value_policy::reference)
         .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep)
-		.def("addFilterToSequence", &coupling::services::MacroscopicCellService<3>::addFilterToSequence/*return value policy?*/);
-		//TODO: test this. I suspect that while py::function -> std::function works, you might have to cast its return type manually from py::object to std::vector<...>
+		.def("addFilterToSequence", &coupling::services::MacroscopicCellService<3>::addFilterToSequence);/*[]
+				(const char* name,
+				 std::function<py::array_t<double> (py::array_t<double>)> applyScalar,
+				 std::function<py::array_t<double> (py::array_t<double>)> applyVector,
+				 int filterIndex)
+				{
+					coupling::services::MacroscopicCellService<3>::addFilterToSequence(
+							name, 
+							coupling::conversion...
+							coupling::conversion...
+							filterIndex);
+				});*/
 
     coupling.def("getMDSimulation", []
     	(const simplemd::configurations::MolecularDynamicsConfiguration& c1,

@@ -33,7 +33,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 				std::string location,
 				bool overwrite):
 
-				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "WTF"),
 				_localCellIndices(localCellIndices),
 		   		_location(location),
 				_overwrite(overwrite),

@@ -23,6 +23,7 @@ from configparser import ConfigParser
 import matplotlib.pyplot as mplt
 
 log = logging.getLogger('KVSTest')
+logging.getLogger('matplotlib.font_manager').disabled = True
 
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
@@ -137,7 +138,7 @@ class KVSTest():
 
         #Testing adding python functions as filters: 
         self.sf = pf.StrouhalPython(0.2, 2.25)
-        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("test-strouhal", pf.returnCellData, self.sf.addDataPoint)
+        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("test-strouhal", pf.returnCellData, self.sf.addDataPoint, -1)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())

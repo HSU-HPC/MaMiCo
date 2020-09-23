@@ -32,7 +32,7 @@ class coupling::POD : public coupling::FilterInterface<dim>{
 				int tws,
 				int kmax
 				):
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "POD"),
 				_multiMDService(multiMDService),
 				_timeWindowSize(tws),
 				_kMax(kmax),
