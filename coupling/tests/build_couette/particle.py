@@ -18,8 +18,8 @@ plt.figure(figsize=(12,9))
 x_step = 5
 x = np.arange(x_step/2,100,x_step)
 t_start = 4
-t_end = 86
-t_step = 8
+t_end = 98
+t_step = 10
 particle_start = 1
 particle_number = 12
 for number in np.arange(t_start, t_end, t_step):
