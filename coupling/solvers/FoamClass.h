@@ -51,7 +51,11 @@ public:
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
-  virtual ~IcoFoam(){}
+  virtual ~IcoFoam(){
+    if(_boundary2RecvBufferIndicesOuter){ delete [] _boundary2RecvBufferIndicesOuter; _boundary2RecvBufferIndicesOuter=NULL;}
+    if(_boundary2RecvBufferIndicesInner){ delete [] _boundary2RecvBufferIndicesInner; _boundary2RecvBufferIndicesInner=NULL;}
+    if(_boundaryIndices){ delete [] _boundaryIndices; _boundaryIndices=NULL;}
+  }
 
   void advance(double dt)override{
     if(skipRank()){return;}
@@ -142,18 +146,11 @@ public:
   void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip,
   const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size){
     if(skipRank()){return;}
-    _numberBoundaryPoints = 6*36;
-    _boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
-    _boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
     _boundaryIndices = new Foam::vector* [_numberBoundaryPoints];
-    _boundarySide = new bool [_numberBoundaryPoints];
     unsigned int counter = 0;
     for (unsigned int boundary = 6; boundary < 12; boundary++){
-      for (unsigned int j = 0; j < 36; j++){
+      for (unsigned int j = 0; j < 36 j++){
         _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
-        _boundaryZ[counter] = U.boundaryFieldRef()[boundary].patch().Cf()[j][2];
-        if(boundary==8 || boundary==9){_boundarySide[counter]=true;}
-        else{_boundarySide[counter]=false;}
         const unsigned int globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
         const unsigned int globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
         for(unsigned int k = 0; k < size; k++){
@@ -162,7 +159,7 @@ public:
             goto endloop;
           }
         }
-        std::cout << "there was an error 1" << std::endl;
+        std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
         endloop:
         for(unsigned int k = 0; k < size; k++){
           if(globalIndexInner==recvIndice[k]){
@@ -170,7 +167,7 @@ public:
             goto endloop2;
           }
         }
-        std::cout << "there was an error 2" << std::endl;
+        std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
         endloop2:
         counter++;
       }
@@ -203,14 +200,14 @@ private:
     return !(_rank==0);
   }
 
-  double analyticCouette(double z){
-    const double visc = 2.632106414;
-    double sum = 0;
-    for(double step = 1.0; step < 31.0; step++){
-      sum = sum + 1.0/step*sin(step*M_PI*z/50.0)*exp(-step*step*M_PI*M_PI*visc*(_timestepCounter)*0.25/50.0/50.0);
-    }
-    return 1.5*(1-z/50.0) - 2*1.5/M_PI*sum;
-  }
+  // double analyticCouette(double z){
+  //   const double visc = 2.632106414;
+  //   double sum = 0;
+  //   for(double step = 1.0; step < 31.0; step++){
+  //     sum = sum + 1.0/step*sin(step*M_PI*z/50.0)*exp(-step*step*M_PI*M_PI*visc*(_timestepCounter)*0.25/50.0/50.0);
+  //   }
+  //   return 1.5*(1-z/50.0) - 2*1.5/M_PI*sum;
+  // }
 
   Foam::Time runTime{Foam::Time(Foam::Time::controlDictName, "/home/helene/Dokumente/mamico-dev/coupling/tests/build_couette","FoamSetup")};
   Foam::fvMesh mesh{Foam::fvMesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ))};
@@ -227,8 +224,6 @@ private:
   unsigned int *_boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
   unsigned int *_boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
   Foam::vector **_boundaryIndices;
-  bool * _boundarySide;
-  double *_boundaryZ = new double [_numberBoundaryPoints];
   int _rank;
   int _timestepCounter{0};
   int _plotEveryTimestep{1};

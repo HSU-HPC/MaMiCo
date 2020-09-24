@@ -90,9 +90,10 @@ processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
 
   // write velocity value to new solution array and interpolate first solution (= value of old solution)
   _newSolution[index] = cell.getMicroscopicMomentum();
-  cell.setMicroscopicMomentum(_oldSolution[index]);
+  cell.setMicroscopicMomentum(_oldSolution[index]); //wrotn TODO correct
 
   const tarch::la::Vector<dim,double> velocity = (0.5-_shiftTimestep)*_oldSolution[index] + (_shiftTimestep+0.5)*_newSolution[index];
+  cell.setMicroscopicMomentum(velocity); //wrotn TODO correct
 
   // for mass transfer: compute mass flux if required and add excess mass
   const double massFlux = computeMassFlux(cell.getMicroscopicMass(),velocity,index) + _excessMass[index];
