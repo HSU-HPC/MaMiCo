@@ -149,7 +149,7 @@ public:
     _boundaryIndices = new Foam::vector* [_numberBoundaryPoints];
     unsigned int counter = 0;
     for (unsigned int boundary = 6; boundary < 12; boundary++){
-      for (unsigned int j = 0; j < 36 j++){
+      for (unsigned int j = 0; j < 36; j++){
         _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
         const unsigned int globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
         const unsigned int globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
