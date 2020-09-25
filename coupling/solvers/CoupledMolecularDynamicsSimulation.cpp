@@ -27,6 +27,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   // do it BEFORE quantities are manipulated as we can then also do some pre-processing here.
   _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
   // ------------ coupling step: distribute mass ---------------------
+  _macroscopicCellService->plotEveryMicroscopicTimestep(t);
   _macroscopicCellService->distributeMass(t);
   // for isothermal simulations: apply thermostat
   _macroscopicCellService->applyTemperatureToMolecules(t);
@@ -61,7 +62,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
     _moleculeService->reorganiseMemory(*_parallelTopologyService,*_linkedCellService);
   }
   // plot also macroscopic cell information
-  _macroscopicCellService->plotEveryMicroscopicTimestep(t);
+  //_macroscopicCellService->plotEveryMicroscopicTimestep(t);
   _linkedCellService->iterateCells(*_emptyLinkedListsMapping,false);
   // time integration. After this step, the velocities and the positions of the molecules have been updated.
   _moleculeService->iterateMolecules(*_timeIntegrator,false);
