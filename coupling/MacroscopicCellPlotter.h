@@ -35,7 +35,7 @@ class coupling::MacroscopicCellPlotter {
       coupling::datastructures::MacroscopicCells<LinkedCell,dim> &cells,
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface
     ){
-      plotMoleculeFile(ID,filename,rank,t,cells,mdSolverInterface);
+      //plotMoleculeFile(ID,filename,rank,t,cells,mdSolverInterface);
       plotMacroscopicCellFile(ID,filename,rank,t,indexConversion,cells,mdSolverInterface);
     }
     ~MacroscopicCellPlotter(){}
