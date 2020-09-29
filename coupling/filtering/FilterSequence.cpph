@@ -135,8 +135,7 @@ void coupling::FilterSequence<dim>::addFilter(
 ){
 	if(_isModifiable) {
 		unsigned int index;
-		if(filterIndex == -1) index = _filters.size();
-		else index = filterIndex;
+		(filterIndex == -1 || filterIndex > (int) _filters.size()) ? index = _filters.size() : index = filterIndex;
 
 		//case: appending	
 		if(index ==  _filters.size()) {

@@ -43,6 +43,10 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 			std::vector<std::array<double, dim>> input_v;
 			std::vector<std::array<unsigned int, dim>> indices;
 
+			input_s.reserve(coupling::FilterInterface<dim>::_inputCells.size());
+			input_v.reserve(coupling::FilterInterface<dim>::_inputCells.size());
+			indices.reserve(coupling::FilterInterface<dim>::_inputCells.size());
+
 			//SCALAR
 			for(unsigned int s = 0; s < coupling::FilterInterface<dim>::_scalarSetters.size(); s++) {
 				//PACK
@@ -52,6 +56,7 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 
 				//APPLY
 				std::vector<double> output_s = _applyScalar(input_s, indices);
+				input_s.clear();
 
 				//UNPACK
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++){
@@ -71,6 +76,7 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 
 				//APPLY
 				std::vector<std::array<double, dim>> output_v = _applyVector(input_v, indices);
+				input_v.clear();
 
 				//UNPACK
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++){
