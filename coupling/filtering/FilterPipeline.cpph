@@ -134,7 +134,13 @@ bool coupling::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile
 
 template<unsigned int dim>
 int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* node){
-    
+
+	//sanity check
+	if(_md2MacroCells.empty()) {
+		std::cout << "Warning: Empty md2Macro-Domain in Filter Pipeline. Disabling filtering." << std::endl;
+		return 0;
+	}
+	
     tinyxml2::XMLElement* currSequenceNode = node->FirstChildElement();
     std::vector<coupling::FilterSequence<dim> *> knownSequences;
     
@@ -172,7 +178,7 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
     	tarch::la::Vector<dim, double> domainStart;
    	 	tarch::la::Vector<dim, double> domainEnd;
 		//default domain boundaries
-    	tarch::la::Vector<dim, unsigned int> domainStartCell = _md2MacroCellIndices[0];
+    	tarch::la::Vector<dim, unsigned int> domainStartCell = _md2MacroCellIndices.front();
     	tarch::la::Vector<dim, unsigned int> domainEndCell = _md2MacroCellIndices.back();
 
 		//if custom start/end is specified use that instead
@@ -269,8 +275,10 @@ int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::data
 
 	for(unsigned int linearIndex = 0; linearIndex < cells.size(); linearIndex++){
 		outOfBounds = false;
-		convertedIndex = _indexConversion->getGlobalInnerVectorCellIndex(linearIndex);
-		for(unsigned int d = 0; d < dim; d++) if(convertedIndex[d] == INT_MAX) outOfBounds = true;
+		convertedIndex = _indexConversion->getLocalInnerVectorCellIndex(linearIndex);
+		for(unsigned int d = 0; d < dim; d++) {
+			if(convertedIndex[d] == INT_MAX) outOfBounds = true;
+		}
 		if(!outOfBounds){
 			_md2MacroCells.push_back(cells[linearIndex]);
 			_md2MacroCellIndices.push_back(convertedIndex);
@@ -279,6 +287,8 @@ int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::data
 	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << _md2MacroCells.size() << " of those cells are within md2Macro-domain boundaries." << std::endl;
 	#endif
+
+	MPI_Barrier(MPI_COMM_WORLD);
 	return 0;
 }
 
