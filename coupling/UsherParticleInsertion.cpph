@@ -99,6 +99,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
   const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
 )  {
+  std::cout << "start deletion" << std::endl;
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(_mdSolverInterface);
   cell.iterateConstCells(computeMassMapping);
@@ -112,6 +113,18 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   // delete this random particle
   coupling::cellmappings::DeleteParticleMapping<LinkedCell,dim> deleteParticleMapping(randomParticle,_mdSolverInterface);
   cell.iterateCells(deleteParticleMapping);
+  while(deleteParticleMapping.getState() == 1){
+    deleteParticleMapping.~DeleteParticleMapping();
+    // take a random particle
+    const unsigned int randomParticle2 = static_cast<unsigned int>(
+                                    tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber()
+                                    *computeMassMapping.getNumberOfParticles()
+                                  );
+
+    // delete this random particle
+    coupling::cellmappings::DeleteParticleMapping<LinkedCell,dim> deleteParticleMapping(randomParticle2,_mdSolverInterface);
+    cell.iterateCells(deleteParticleMapping);
+  }
 
   #ifdef USHER_DEBUG
   _energyRemoved += deleteParticleMapping.getDeletedMolecule().getPotentialEnergy();
@@ -119,7 +132,9 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   _particlesRemoved++;
   #endif
 
+  std::cout << "end deletion" << std::endl;
   return coupling::ParticleInsertion<LinkedCell,dim>::Deletion;
+
 }
 
 
@@ -133,6 +148,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
   coupling::datastructures::Molecule<dim>& molecule,
   const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
 )  {
+  std::cout << "start find position" << std::endl;
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(_mdSolverInterface);
   thisCell.iterateConstCells(computeMassMapping);
@@ -196,8 +212,14 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
   // try at max. restartMax times to insert this particle...
   for (int i = 0; i < restartMax; i++) {
 
+    if(position[0]==20){
+    position[0] = macroscopicCellPosition[0] +0.3 + 0.5 + 0.5*tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();}
+    else if(position[0]==75){
+    position[0] = macroscopicCellPosition[0] +  5.0 - 0.3 - 0.5 +0.5*tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();}
+    else {position[0] = macroscopicCellPosition[0] +  macroscopicCellSize[0]*tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();}
     // generate random start position
-    for (unsigned int d = 0; d < dim; d++ ) {
+    for (unsigned int d = 1; d < dim; d++ ) {
+      //position[d] = macroscopicCellPosition[d] +  macroscopicCellSize[d]*tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();
       position[d] = macroscopicCellPosition[d] +  macroscopicCellSize[d]*tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();
     }
 
@@ -268,7 +290,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       position = position + (stepSize*signAl/absForce)*force;
 
       molecule.setPosition(position);
-      
+
       // restart searching if the new position of the particle is outside the macroscopic cell
       for (unsigned int d = 0; d < dim; d++ ){
         restartSearch = restartSearch
@@ -291,8 +313,8 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       xiOld = xiloc;
       xiloc = fabs(energy-U_0)/fabs(U_0);
 
-      if ( xiloc < xiMax ){ 
-        success++; 
+      if ( xiloc < xiMax ){
+        success++;
       }
 
       // restart searching if the difference energy-U_0 increases
@@ -312,10 +334,10 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       energy += boundaryForceController.getPotentialEnergy(positionOld);
       if(fabs(energy-U_0)/fabs(U_0) >= xiMax )
         std::cout << "USHER critical ERROR: fabs(energy-U_0)/fabs(U_0) >= xiMax" << std::endl;
-      std::cout << "Finished with energy = " << energy << " after " << i 
+      std::cout << "Finished with energy = " << energy << " after " << i
         << " restarts and " << loci << " iterations" << std::endl;
       #endif
-
+      std::cout << "end find position" << std::endl;
       return coupling::ParticleInsertion<LinkedCell,dim>::Insertion;
     }
   }
