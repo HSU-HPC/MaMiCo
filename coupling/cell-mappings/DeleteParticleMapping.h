@@ -41,7 +41,7 @@ class coupling::cellmappings::DeleteParticleMapping {
     void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       // return, if we already deleted the respective particle
       if (_particleCounter > _particle){
-        return;
+        return ;
       }
 
       // otherwise: loop over particles
@@ -54,6 +54,13 @@ class coupling::cellmappings::DeleteParticleMapping {
 
           // save copy of particle
           const tarch::la::Vector<dim,double> position = myMolecule.getPosition();
+          if(position[0] >= 75.0 && position[0] <= 80.0){
+            if(position[0] >= 77.0 && position[0] <= 80.0){
+              _state=0;
+              //std::cout << position[0] << " " << position[1] << " " << position[2] << " " << std::endl;
+            }
+            else{_state=1; std::cout << position[0] << " " << position[1] << " " << position[2] << " " << "new try deletion" << std::endl;return;}
+          }
           const tarch::la::Vector<dim,double> velocity = myMolecule.getVelocity();
           const tarch::la::Vector<dim,double> force = myMolecule.getForce();
           const double potentialEnergy = myMolecule.getPotentialEnergy();
@@ -71,6 +78,8 @@ class coupling::cellmappings::DeleteParticleMapping {
       delete it;
     }
 
+    int getState(){return _state;}
+
     coupling::datastructures::Molecule<dim> getDeletedMolecule() const { return _deletedMoleculeCopy; }
 
   private:
@@ -78,5 +87,6 @@ class coupling::cellmappings::DeleteParticleMapping {
     const unsigned int _particle;
     unsigned int _particleCounter;
     coupling::datastructures::Molecule<dim> _deletedMoleculeCopy;
+    int _state{0};
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_DELETEPARTICLEMAPPING_H_

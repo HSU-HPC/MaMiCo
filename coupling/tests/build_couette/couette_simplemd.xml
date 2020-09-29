@@ -39,7 +39,7 @@
     bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
 
     south-west="reflecting"        south="reflecting"        south-east="reflecting"
-    west="periodic"                                          east="periodic"
+    west="reflecting"                                          east="reflecting"
     north-west="reflecting"        north="reflecting"        north-east="reflecting"
 
     top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
