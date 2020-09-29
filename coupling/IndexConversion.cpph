@@ -89,23 +89,20 @@ unsigned int globalCellIndex) const {
 
 //index of INT_MAX means "not within MD bounds"
 template<unsigned int dim>
-tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getGlobalInnerVectorCellIndex(
-unsigned int globalCellIndex) const {
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getGlobalInnerVectorCellIndex(unsigned int globalCellIndex) const {
 	tarch::la::Vector<dim, unsigned int> globalVectorCellIndex = getGlobalVectorCellIndex(globalCellIndex);
+	if(_rank == 0){
+		std::cout << "Global: " << globalCellIndex << " GlobalVector: " << globalVectorCellIndex;
+	}
+
 	for(unsigned int d = 0; d < dim; d++) {
-		//TODO: Sind das die richtigen Grenzen?
 		if(globalVectorCellIndex[d] < 4 || globalVectorCellIndex[d] > _globalNumberMacroscopicCells[d]-3) globalVectorCellIndex[d] = INT_MAX;
 		else globalVectorCellIndex[d] -= 4;
 	}
+	if(_rank == 0){
+		std::cout <<  " Converted: " << globalVectorCellIndex << std::endl;
+	}
 	return globalVectorCellIndex;
-}
-
-template<unsigned int dim>
-tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::convertInnerVectorCellIndexToGlobal(
-tarch::la::Vector<dim,unsigned int> cellIndexVectorMDContext) const {
-	tarch::la::Vector<dim,unsigned int> converted = cellIndexVectorMDContext;
-	for(unsigned int d = 0; d < dim; d++) converted[d] += 2;
-	return converted;
 }
 
 template<unsigned int dim>
@@ -118,6 +115,24 @@ unsigned int localCellIndex) const {
   }
   #endif
   return coupling::getVectorCellIndex<dim>(localCellIndex,_divisionFactor4LocalNumberMacroscopicCells);
+}
+
+//index of INT_MAX means "not within MD bounds"
+template<unsigned int dim>
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getLocalInnerVectorCellIndex(unsigned int localCellIndex) const {
+	tarch::la::Vector<dim, unsigned int> localVectorCellIndex = getLocalVectorCellIndex(localCellIndex);
+	if(_rank == 0){
+		std::cout << "Local: " << localCellIndex << " Local Vector: " << localVectorCellIndex;
+	}
+
+	for(unsigned int d = 0; d < dim; d++) {
+		if(localVectorCellIndex[d] < 4 || localVectorCellIndex[d] > _localNumberMacroscopicCells[d]-3) localVectorCellIndex[d] = INT_MAX;
+		else localVectorCellIndex[d] -= 4;
+	}
+	if(_rank == 0){
+		std::cout <<  " Converted: " << localVectorCellIndex << std::endl;
+	}
+	return localVectorCellIndex;
 }
 
 
