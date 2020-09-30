@@ -59,7 +59,7 @@ class coupling::cellmappings::DeleteParticleMapping {
               _state=0;
               //std::cout << position[0] << " " << position[1] << " " << position[2] << " " << std::endl;
             }
-            else{_state=1; std::cout << position[0] << " " << position[1] << " " << position[2] << " " << "new try deletion" << std::endl;return;}
+            else{_state=1; return;}
           }
           const tarch::la::Vector<dim,double> velocity = myMolecule.getVelocity();
           const tarch::la::Vector<dim,double> force = myMolecule.getForce();
