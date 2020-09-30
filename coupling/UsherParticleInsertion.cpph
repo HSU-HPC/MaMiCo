@@ -99,7 +99,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
   const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
 )  {
-  std::cout << "start deletion" << std::endl;
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(_mdSolverInterface);
   cell.iterateConstCells(computeMassMapping);
@@ -132,7 +131,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   _particlesRemoved++;
   #endif
 
-  std::cout << "end deletion" << std::endl;
   return coupling::ParticleInsertion<LinkedCell,dim>::Deletion;
 
 }
@@ -148,7 +146,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
   coupling::datastructures::Molecule<dim>& molecule,
   const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
 )  {
-  std::cout << "start find position" << std::endl;
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(_mdSolverInterface);
   thisCell.iterateConstCells(computeMassMapping);
@@ -337,7 +334,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       std::cout << "Finished with energy = " << energy << " after " << i
         << " restarts and " << loci << " iterations" << std::endl;
       #endif
-      std::cout << "end find position" << std::endl;
       return coupling::ParticleInsertion<LinkedCell,dim>::Insertion;
     }
   }
