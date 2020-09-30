@@ -51,8 +51,8 @@ class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::ser
         parallelTopologyConfiguration.getParallelTopologyType(), topologyOffset)
       ),
       _macroscopicSolverInterface(macroscopicSolverInterface),
-      _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
-      _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID){
+      _deFromMacro2MD(_macroscopicSolverInterface,_indexConversion,ID),
+      _deFromMD2Macro(_macroscopicSolverInterface,_indexConversion,ID){
       if (_macroscopicSolverInterface==NULL){
         std::cout << "ERROR coupling::services::MacroscopicCellServiceMacroOnly::MacroscopicCellServiceMacroOnly(): _macroscopicSolverInterface==NULL!" << std::endl; exit(EXIT_FAILURE);
       }
@@ -98,6 +98,10 @@ class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::ser
 
       delete _indexConversion;
       _indexConversion = newIndexConversion;
+
+      _deFromMacro2MD.setIndexConversion(_indexConversion);
+      _deFromMD2Macro.setIndexConversion(_indexConversion);
+      
     }
 
   private:
