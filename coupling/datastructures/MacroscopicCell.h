@@ -72,6 +72,9 @@ class coupling::datastructures::MacroscopicCell {
     void setTemperature(const double& temperature){ _temperature = temperature;}
     const double& getTemperature() const { return _temperature;}
 
+    void setMassFlux(const double& massFlux){_massFlux = massFlux;}
+    const double& getMassFlux() const {return _massFlux;}
+
 
     /** buffers for macroscopic quantities of mass, momentum that need to be transferred
      *  from the macroscopic to the microscopic simulation */
@@ -93,6 +96,8 @@ class coupling::datastructures::MacroscopicCell {
 
     /** buffer for current mean velocity in the cell. */
     tarch::la::Vector<dim,double> _currentVelocity;
+
+    double _massFlux{0.0};
 };
 
 
