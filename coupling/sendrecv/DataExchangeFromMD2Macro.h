@@ -33,10 +33,12 @@ public coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCel
   public:
     DataExchangeFromMD2Macro(
       coupling::interface::MacroscopicSolverInterface<dim>* interface,
-      const coupling::IndexConversion<dim> &indexConversion,
+      coupling::IndexConversion<dim> * indexConversion,
       unsigned int tagoffset=0
     ):
-    coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>,dim>(TAG_FROM_MD2MACRO+tagoffset),_interface(interface), _indexConversion(indexConversion)
+    coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>,dim>(TAG_FROM_MD2MACRO+tagoffset),
+    _interface(interface), 
+    _indexConversion(indexConversion)
     {
       #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
       std::cout << "DataExchangeFromMD2Macro initialised..." << std::endl;
@@ -61,7 +63,7 @@ public coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCel
     virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim,unsigned int> globalCellIndex){
       std::vector<unsigned int> sourceRanks;
       if (_interface->receiveMacroscopicQuantityFromMDSolver(globalCellIndex)){
-        sourceRanks.push_back(_indexConversion.getUniqueRankForMacroscopicCell(globalCellIndex));
+        sourceRanks.push_back(_indexConversion->getUniqueRankForMacroscopicCell(globalCellIndex));
       }
       return sourceRanks;
     }
@@ -91,8 +93,12 @@ public coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCel
       return 1+dim;
     }
 
+    void setIndexConversion(coupling::IndexConversion<dim> * indexConversion) {
+      _indexConversion = indexConversion;
+    }
+
   private:
     coupling::interface::MacroscopicSolverInterface<dim> *_interface;
-    const coupling::IndexConversion<dim> &_indexConversion;
+    coupling::IndexConversion<dim> * _indexConversion;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGEFROMMD2MACRO_H_

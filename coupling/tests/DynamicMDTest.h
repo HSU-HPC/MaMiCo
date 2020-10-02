@@ -52,6 +52,7 @@ public:
 
 #if defined(COUPLING_DYNAMIC_MD_SUDDEN)
       // Drop 50 random md instances in cycle 249
+<<<<<<< HEAD
       if(cycle == 150) {
         for(int a=0;a<50) {
           addMDSimulation();
@@ -61,6 +62,16 @@ public:
         for(int a=0;a<50) {
           removeMDSimulation();
         }
+=======
+      if(cycle == 0) {
+        addMDSimulation();
+        removeMDSimulation();
+        for(int a=0;a<5;++a) {
+          addMDSimulation();
+        }
+        removeMDSimulation();
+        addMDSimulation();
+>>>>>>> 7dac344e08ac2b098feb07bea72e6c0a178da216
       }
 #endif
 #if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
@@ -96,7 +107,7 @@ private:
       _mdSolverInterface[iSim] = nullptr;
     }*/
 
-    _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
+    _localMDInstances = _simpleMD.size();
   }
 
   void addMDSimulation() {
@@ -112,7 +123,7 @@ private:
 
     if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
 
-    _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();         
+    _localMDInstances = _simpleMD.size();         
   }
   
   void init(){

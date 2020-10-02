@@ -299,14 +299,8 @@ class coupling::services::MultiMDCellService {
     }
     */
 
-    /** removes select MD simulation */
-    void rmMDSimulation(const int & localIndex, const int & globalIndex) {
-      // Delete respecte macroscopic solver interface on all ranks
-      delete _macroscopicCellServices[globalIndex];
-      _macroscopicCellServices[globalIndex] = nullptr;
-    }
 
-    /** removes arbitry MD simulation 
+    /** removes the last simulation which has been added.
      *  
      */
     unsigned int rmMDSimulation(std::vector<coupling::interface::MDSolverInterface<LinkedCell,dim>* > & mdSolverInterfaces
@@ -333,7 +327,7 @@ class coupling::services::MultiMDCellService {
        * */
       if(index == _totalNumberMDSimulations-1) {
         removeSimulationBlock();
-        _nextFreeBlock = _multiMDService.getNumberLocalComms();
+        _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
       }
 
       return index;
