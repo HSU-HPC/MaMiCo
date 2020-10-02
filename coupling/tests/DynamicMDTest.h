@@ -52,10 +52,15 @@ public:
 
 #if defined(COUPLING_DYNAMIC_MD_SUDDEN)
       // Drop 50 random md instances in cycle 249
-      if(cycle == 0) {
-        addMDSimulation();
-        removeMDSimulation();
-        //addMDSimulation();
+      if(cycle == 150) {
+        for(int a=0;a<50) {
+          addMDSimulation();
+        }
+      }
+      if(cycle == 180) {
+        for(int a=0;a<50) {
+          removeMDSimulation();
+        }
       }
 #endif
 #if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
