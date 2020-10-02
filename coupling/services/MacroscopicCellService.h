@@ -244,7 +244,7 @@ public coupling::services::MacroscopicCellService<dim> {
 
 
     /** needed to determine cell range, ranks etc. */
-    const coupling::IndexConversion<dim> *_indexConversion;
+    coupling::IndexConversion<dim> *_indexConversion;
     /** number of MD time steps in each coupling cycle */
     const unsigned int _numberMDTimestepsPerCouplingCycle;
 
