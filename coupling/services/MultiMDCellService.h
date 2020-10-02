@@ -328,7 +328,7 @@ class coupling::services::MultiMDCellService {
       if(index == _totalNumberMDSimulations-1) {
         removeSimulationBlock();
         _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
-      }
+      } // TODO set _nextfreeblock correctly after removal of md simulation
 
       return index;
     }
@@ -443,9 +443,12 @@ class coupling::services::MultiMDCellService {
          *  (we first had to add another block)
          *  We thus want to free a slot on the first communicator.
          */
+        _nextFreeBlock = 0;
         return _localNumberMDSimulations - 1;       
       }
-      return (_nextFreeBlock+1) * _localNumberMDSimulations + _localNumberMDSimulations - 1;
+      unsigned int _thisFreeBlock = _nextFreeBlock;
+      _nextFreeBlock += 1;
+      return (_thisFreeBlock+1) * _localNumberMDSimulations + _localNumberMDSimulations - 1;
     }
 
 
