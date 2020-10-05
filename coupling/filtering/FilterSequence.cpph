@@ -129,8 +129,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::addFilter( 	
-				std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)> applyScalar,
-				std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> applyVector,
+				const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
+				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
 				int filterIndex //counting starts at 0, -1 is equivalent to EOL
 ){
 	if(_isModifiable) {
@@ -185,6 +185,8 @@ void coupling::FilterSequence<dim>::initCellVectors(){
     #endif 
 }
 
+
+//TODO: since domains are now determined at FP-level, this looks deprecated. Especially the out-of-bounds check
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::initDomain(){
 	#ifdef DEBUG_FILTER_PIPELINE

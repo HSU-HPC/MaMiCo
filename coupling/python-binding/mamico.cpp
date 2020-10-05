@@ -63,6 +63,7 @@ template<class T> T* makeConfiguration(const std::string filename, const std::st
 //
 ///////////////////////////////////////////////////////////////////////////////////
 
+
 using Vec3ui = tarch::la::Vector<3,unsigned int>;
 namespace pybind11 { namespace detail {
     template <> struct type_caster<Vec3ui> {
@@ -566,18 +567,19 @@ PYBIND11_MODULE(mamico, mamico) {
     	.def("computeAndStoreTemperature", &coupling::services::MacroscopicCellService<3>::computeAndStoreTemperature)
     	.def("getIndexConversion", &coupling::services::MacroscopicCellService<3>::getIndexConversion, py::return_value_policy::reference)
         .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep)
-		.def("addFilterToSequence", &coupling::services::MacroscopicCellService<3>::addFilterToSequence);/*[]
-				(const char* name,
+		.def("addFilterToSequence", []
+				(coupling::services::MacroscopicCellService<3>* service,
+				 const char* name,
 				 std::function<py::array_t<double> (py::array_t<double>)> applyScalar,
 				 std::function<py::array_t<double> (py::array_t<double>)> applyVector,
 				 int filterIndex)
 				{
-					coupling::services::MacroscopicCellService<3>::addFilterToSequence(
+					service->addFilterToSequence( //TODO: member functions requires instance
 							name, 
-							coupling::conversion...
-							coupling::conversion...
+							coupling::conversion::functionWrapper_Scalar(applyScalar),
+							coupling::conversion::functionWrapper_Vector(applyVector),
 							filterIndex);
-				});*/
+				});
 
     coupling.def("getMDSimulation", []
     	(const simplemd::configurations::MolecularDynamicsConfiguration& c1,

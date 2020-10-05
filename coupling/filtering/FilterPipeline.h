@@ -31,12 +31,14 @@ class coupling::FilterPipeline{
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 			const coupling::IndexConversion<dim>* indexConversion,
+			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
-			const std::string cfgpath = "filter_pipeline.xml");
+			const std::string cfgpath = "filter_pipeline.xml"); //TODO: is this deprecated?
 
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
 			const coupling::IndexConversion<dim>* indexConversion,
+			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
 			bool postMultiInstance,
 			const std::string cfgpath = "filter_pipeline.xml");
@@ -86,6 +88,7 @@ class coupling::FilterPipeline{
 		std::vector<tarch::la::Vector<dim, unsigned int>> _md2MacroCellIndices;		
 
 		const coupling::IndexConversion<dim>* _indexConversion;
+		coupling::interface::MacroscopicSolverInterface<dim>* _msi; //not const because essential member functions are non-const
 		const tarch::utils::MultiMDService<dim>& _multiMDService;
 	   	bool _postMultiInstance;
       	

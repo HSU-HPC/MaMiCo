@@ -76,8 +76,8 @@ class coupling::services::MacroscopicCellService {
 	//TODO: This shouldn't be part of this interface. Currently, MCSImpl is not ported to python-bindings.
 	virtual void addFilterToSequence(	
 		const char *name,
-		std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)> applyScalar,
-		std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)> applyVector,
+		const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
+		const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 		int filterIndex = -1
 	){std::cout << "Non-filtering MacroscopicCellService tried to invoke a filtering method. Aborting." << std::endl; exit(EXIT_FAILURE);}
     unsigned int getID() const { return _id;}
@@ -223,8 +223,8 @@ public coupling::services::MacroscopicCellService<dim> {
 	 *  - applyVector: What to do with properties stored as vectors of the sequence's of Macroscopic Cells.
 	 */
 	void addFilterToSequence(	const char *name,
-		   						std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)> applyScalar,
-		   						std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)> applyVector,
+		   						const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
+		   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 								int filterIndex = -1
 	);
 
