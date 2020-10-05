@@ -40,7 +40,7 @@ _macroscopicSolverInterface(macroscopicSolverInterface),
 _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
 _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID),
 _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface ),
-_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, multiMDService, false, filterPipelineConfiguration),
+_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, _macroscopicSolverInterface, multiMDService, false, filterPipelineConfiguration),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
 _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
@@ -287,32 +287,6 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::initIndexVe
   } // loop over all staggered versions (-> (0,0,0), (0,0,1), (0,1,0),...., (1,1,1) )
 }
 
-/* TODO: REMOVE
-template<class LinkedCell,unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
-initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells) {	
-	tarch::la::Vector<dim, unsigned int> convertedIndex;
-	bool outOfBounds;
-
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << "MacroscopicCellService [ID: " << coupling::services::MacroscopicCellService<dim>::getID() << "]: Initializing inner cells and their index vectors." << std::endl;
-	std::cout << "Total number of cells: " << cells.size() << std::endl;
-	#endif
-
-	for(unsigned int linear_index = 0; linear_index < cells.size(); linear_index++){
-		outOfBounds = false;
-		convertedIndex = _indexConversion->getGlobalInnerVectorCellIndex(linear_index);
-		for(unsigned int d = 0; d < dim; d++) if(convertedIndex[d] == INT_MAX) outOfBounds = true;
-		if(!outOfBounds){
-			_innerMacroscopicCells.push_back(cells[linear_index]);
-			_innerMacroscopicCellIndices.push_back(convertedIndex);
-		}
-	}
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << _innerMacroscopicCells.size() << " of those cells are inner cells." << std::endl;
-	#endif
-}
-*/
 
 template<class LinkedCell,unsigned int dim>
 tarch::la::Vector<dim,double> coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
@@ -486,8 +460,8 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::plotEveryMa
 template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::addFilterToSequence(
 							const char *name,
-	   						std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)> applyScalar,
-	   						std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)> applyVector,
+	   						const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
+	   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 							int filterIndex
 ){
 	bool found = false;

@@ -91,8 +91,8 @@ class coupling::FilterSequence {
 		 * TODO: Comment
 		 */
 		void addFilter( 	
-				std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)> applyScalar,
-				std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> applyVector,
+				const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
+				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
 				int filterIndex = -1
 		);
 

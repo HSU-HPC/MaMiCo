@@ -25,49 +25,59 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 		FilterFromFunction(
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-					const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
+					const std::vector<tarch::la::Vector<dim, unsigned int>>& cellIndices,
 					std::array<bool, 7> filteredValues,
-					std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)> applyScalar,
-					std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> applyVector
+					const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
+					const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector
 					):
 			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "FFF"),
 			_applyScalar(applyScalar),
 			_applyVector(applyVector)
-		{}
+		{
+			//cast tarch::la indexing to std::array
+			std::array<unsigned int, dim> stlIndex;
+			for(auto mamicoIndex : cellIndices) {
+				for(unsigned int d = 0; d < dim; d++) stlIndex[d] = mamicoIndex[d];
+				_stlIndices.push_back(stlIndex);
+			}
+		}
 
-		~FilterFromFunction(){}
+		~FilterFromFunction(){
+			delete _applyScalar;
+			delete _applyVector;
+		}
 
 		void operator()(){	
 			
 			std::vector<double> input_s;
 			std::vector<std::array<double, dim>> input_v;
-			std::vector<std::array<unsigned int, dim>> indices;
 
 			input_s.reserve(coupling::FilterInterface<dim>::_inputCells.size());
 			input_v.reserve(coupling::FilterInterface<dim>::_inputCells.size());
-			indices.reserve(coupling::FilterInterface<dim>::_inputCells.size());
+			
 
 			//SCALAR
 			for(unsigned int s = 0; s < coupling::FilterInterface<dim>::_scalarSetters.size(); s++) {
 				//PACK
-				for(auto cell : coupling::FilterInterface<dim>::_inputCells){
+				for(auto cell : coupling::FilterInterface<dim>::_inputCells) {
 					input_s.push_back((cell->*(coupling::FilterInterface<dim>::_scalarGetters[s]))());
 				}
 
 				//APPLY
-				std::vector<double> output_s = _applyScalar(input_s, indices);
+				std::vector<double> output_s = (*_applyScalar)(input_s, _stlIndices);
 				input_s.clear();
 
 				//UNPACK
-				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++){
+				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
 					(coupling::FilterInterface<dim>::_outputCells[i]->*(coupling::FilterInterface<dim>::_scalarSetters[s]))(output_s[i]);
 				}	
 			}
 
+
 			//VECTOR
 			for(unsigned int v = 0; v < coupling::FilterInterface<dim>::_vectorSetters.size(); v++) {
 				//PACK
-				for(auto cell : coupling::FilterInterface<dim>::_inputCells){
+				for(auto cell : coupling::FilterInterface<dim>::_inputCells) {
 					tarch::la::Vector<dim, double> mamico_vec = (cell->*(coupling::FilterInterface<dim>::_vectorGetters[v]))();
 					std::array<double, dim> array_vec;
 					for(unsigned int d = 0; d < dim; d++) array_vec[d] = mamico_vec[d];
@@ -75,11 +85,11 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 				}
 
 				//APPLY
-				std::vector<std::array<double, dim>> output_v = _applyVector(input_v, indices);
+				std::vector<std::array<double, dim>> output_v = (*_applyVector)(input_v, _stlIndices);
 				input_v.clear();
 
 				//UNPACK
-				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++){
+				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
 					tarch::la::Vector<dim, double> mamico_vec(-1.0);
 					for(unsigned int d = 0; d < dim; d++) mamico_vec[d] = output_v[i][d];
 					(coupling::FilterInterface<dim>::_outputCells[i]->*(coupling::FilterInterface<dim>::_vectorSetters[v]))(mamico_vec);
@@ -88,7 +98,10 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 		}
 
 	private:
+		//FFFs use slightly different datastructures for index/cell storage than other filters
+		std::vector<std::array<unsigned int, dim>> _stlIndices;
+
 		//this encodes what filter to use
-		std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)> _applyScalar;
-		std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> _applyVector;
+		const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* _applyScalar;
+		const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* _applyVector;
 };

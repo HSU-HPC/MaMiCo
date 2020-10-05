@@ -117,21 +117,16 @@ unsigned int localCellIndex) const {
   return coupling::getVectorCellIndex<dim>(localCellIndex,_divisionFactor4LocalNumberMacroscopicCells);
 }
 
-//index of INT_MAX means "not within MD bounds"
+//Same as getLocalVectorCellIndex but sets all ghost layer indices to INT_MAX
 template<unsigned int dim>
 tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getLocalInnerVectorCellIndex(unsigned int localCellIndex) const {
 	tarch::la::Vector<dim, unsigned int> localVectorCellIndex = getLocalVectorCellIndex(localCellIndex);
-	if(_rank == 0){
-		std::cout << "Local: " << localCellIndex << " Local Vector: " << localVectorCellIndex;
-	}
 
 	for(unsigned int d = 0; d < dim; d++) {
-		if(localVectorCellIndex[d] < 4 || localVectorCellIndex[d] > _localNumberMacroscopicCells[d]-3) localVectorCellIndex[d] = INT_MAX;
-		else localVectorCellIndex[d] -= 4;
+		if(localVectorCellIndex[d] < 1 || localVectorCellIndex[d] > _localNumberMacroscopicCells[d]) localVectorCellIndex[d] = INT_MAX; //TODO: verify correctness
+		else localVectorCellIndex[d] -= 1;
 	}
-	if(_rank == 0){
-		std::cout <<  " Converted: " << localVectorCellIndex << std::endl;
-	}
+
 	return localVectorCellIndex;
 }
 
