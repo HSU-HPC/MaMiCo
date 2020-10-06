@@ -77,7 +77,7 @@ void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(M
     if (_boundary[2*d+1] && (position[d]>_domainOffset[d]+_domainSize[d]) ){
       //std::cout << "Reflect particle " << position << " d=" << d << ", " << 2*d+1 << std::endl;
       position[d] = position[d] + 2.0*(_domainOffset[d]+_domainSize[d]-position[d]);
-      velocity[d] = -velocity[d];
+      velocity[d] = velocity[d]; //dirty hack
     }
   }
 
