@@ -497,7 +497,7 @@ class coupling::services::MultiMDCellService {
           std::cout << "ERROR! coupling::tests::DynamicMDTest::addMDSimulation(): mdSim == NULL!" << std::endl;
           std::exit(EXIT_FAILURE);
         }
-        mdSim->init(_multiMDService, slot ); // TODO verify second parameter an update variables in multimdservice!!!
+        mdSim->init(_multiMDService, slot ); // TODO update variables in multimdservice!!!
 
         simpleMD.push_back(mdSim);
 

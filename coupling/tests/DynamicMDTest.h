@@ -53,13 +53,7 @@ public:
 #if defined(COUPLING_DYNAMIC_MD_SUDDEN)
       // Drop 50 random md instances in cycle 249
       if(cycle == 0) {
-        addMDSimulation();
         removeMDSimulation();
-        for(int a=0;a<5;++a) {
-          addMDSimulation();
-        }
-        removeMDSimulation();
-        addMDSimulation();
       }
 #endif
 #if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
@@ -85,21 +79,10 @@ private:
 
     if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
 
-    //_multiMDCellService->rmMDSimulation(iSim, iMD);
-    /*if(iSim >= 0 && iSim < (int)_localMDInstances) {
-      _simpleMD[iSim]->shutdown();
-      delete _simpleMD[iSim];
-      _simpleMD[iSim] = nullptr;
-      //_simpleMD.erase(_simpleMD.begin()+iSim);
-      delete _mdSolverInterface[iSim];
-      _mdSolverInterface[iSim] = nullptr;
-    }*/
-
     _localMDInstances = _simpleMD.size();
   }
 
   void addMDSimulation() {
-    //TODO need to initialize solver before macro cell service can be created!!!
     unsigned int iMD = _multiMDCellService->addMDSimulation(getCouetteSolverInterface(
                                           _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
                                           _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
@@ -122,7 +105,7 @@ private:
 
   void runOneCouplingCycle(int cycle){
     advanceMacro(cycle);
-    if(_localMDInstances > 0) advanceMicro(cycle);
+    /*if(_localMDInstances > 0)*/ advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
     // write data to csv-compatible file for evaluation
