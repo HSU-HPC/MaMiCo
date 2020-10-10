@@ -18,3 +18,5 @@ stuff/
 .idea/vcs.xml
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+cmake*/
+compile_commands.json
