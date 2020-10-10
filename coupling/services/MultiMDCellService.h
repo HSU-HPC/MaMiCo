@@ -487,10 +487,10 @@ class coupling::services::MultiMDCellService {
       }
       else {
         auto * mdSim = coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
-        _mdConfiguration,_mamicoConfiguration
-        #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-        , _multiMDService.getLocalCommunicator()
-        #endif
+          _mdConfiguration,_mamicoConfiguration
+          #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+          , _multiMDService.getLocalCommunicator()
+          #endif
         );
 
         if(mdSim == NULL) {
