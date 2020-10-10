@@ -20,3 +20,11 @@ stuff/
 .vscode/settings.json
 cmake*/
 compile_commands.json
+coupling/tests/build_couette/*.xml
+stuff/
+personal_settings
+*.so
+*.pyc
+*.png
+coupling/tests/kvs-lbmpy/*.xml
+coupling/tests/kvs-lbmpy/*.ini

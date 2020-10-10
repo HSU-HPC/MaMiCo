@@ -1,14 +1,18 @@
 #!/bin/bash
 
+### local settings like path variables
+SETTINGS=../../../personal_settings
+
+if test -f "$SETTINGS"; then
+	source ../../../personal_settings
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
+
 ### path variables for this script
 DEFINES="-DMDCoupledDebug -DMDCoupledParallel -std=c++11 -DTarchDebug";
-MPI_PATH_INCLUDE=/usr/lib/openmpi/include;
-MPI_PATH_LIB=/usr/lib/openmpi/lib;
-LIB_MPI=mpi;
-MAMICO_PATH=/home/neumanph/workspace/mamico/mamico_cpc_v1.1;
 BUILD_PATH=${MAMICO_PATH}/coupling/tests/build_lammps;
-LAMMPS_PATH=/home/neumanph/programs/lammps/src;
-LIB_LAMMPS=lammps_openmpi_mamico;
 COMPILER=mpic++;
 
 rm ${BUILD_PATH}/test_lammps;

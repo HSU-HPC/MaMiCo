@@ -1,8 +1,15 @@
 #!/bin/bash
 
-### path variables for this script
-MPI_PATH=/usr/lib/openmpi/include;
-MAMICO_PATH=/home/neumanph/workspace/mamico/mamico_cpc_v1.1
+### local settings like path variables
+SETTINGS=../../../personal_settings
+
+if test -f "$SETTINGS"; then
+	source ../../../personal_settings
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
+
 BUILD_PATH=${MAMICO_PATH}/coupling/tests/build
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
 SIMPLEMD_SEQUENTIAL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_no/gcc/gprof_no/
