@@ -22,7 +22,9 @@ namespace tarch {
 }
 
 
-/** maps a number of MD simulations onto the total number of available ranks. For each MD simulation, a regular domain decomposition into n0 x n1 x ... x nD processes is assumed. We further assume that the total number of processes can be divided by the number of processes required by each MD simulation.
+/** maps a number of MD simulations onto the total number of available ranks.
+ *  For each MD simulation, a regular domain decomposition into n0 x n1 x ... x nD processes is assumed. 
+ *  We further assume that the total number of processes can be divided by the number of processes required by each MD simulation.
  *  @author Philipp Neumann
  */
 template<unsigned int dim>

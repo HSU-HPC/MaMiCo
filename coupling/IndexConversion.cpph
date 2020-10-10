@@ -87,6 +87,27 @@ unsigned int globalCellIndex) const {
 }
 
 
+//index of INT_MAX means "not within MD bounds"
+template<unsigned int dim>
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getGlobalInnerVectorCellIndex(
+unsigned int globalCellIndex) const {
+	tarch::la::Vector<dim, unsigned int> globalVectorCellIndex = getGlobalVectorCellIndex(globalCellIndex);
+	for(unsigned int d = 0; d < dim; d++) {
+		//TODO: Sind das die richtigen Grenzen?
+		if(globalVectorCellIndex[d] < 4 || globalVectorCellIndex[d] > _globalNumberMacroscopicCells[d]-3) globalVectorCellIndex[d] = INT_MAX;
+		else globalVectorCellIndex[d] -= 4;
+	}
+	return globalVectorCellIndex;
+}
+
+template<unsigned int dim>
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::convertInnerVectorCellIndexToGlobal(
+tarch::la::Vector<dim,unsigned int> cellIndexVectorMDContext) const {
+	tarch::la::Vector<dim,unsigned int> converted = cellIndexVectorMDContext;
+	for(unsigned int d = 0; d < dim; d++) converted[d] += 2;
+	return converted;
+}
+
 template<unsigned int dim>
 tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getLocalVectorCellIndex(
 unsigned int localCellIndex) const {

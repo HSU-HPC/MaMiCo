@@ -1,0 +1,31 @@
+# Copyright (C) 2015 Technische Universitaet Muenchen
+# This file is part of the Mamico project. For conditions of distribution
+# and use, please see the copyright notice in Mamico's main folder, or at
+# www5.in.tum.de/mamico
+
+### This is a template. To use it, fill out all placeholders neccessary for your personal use
+### and copy its contents to ./personal_settings
+
+
+### This file is meant to be sourced by installation scripts to gain independance 
+### of e.g. local installation paths or software version preferences within those scripts.
+
+MPI_INCLUDE_PATH=/usr/lib/openmpi/include
+MPI_LIB_PATH=/usr/lib/openmpi/lib
+LIB_MPI=mpi
+
+LIB_EIGEN_PATH=/usr/include/eigen3
+
+#LAMMPS_PATH=/home/$USER/programs/lammps/src
+#LIB_LAMMPS=lammps_openmpi_mamico
+
+#ESPRESSO_PATH=/home/$USER/programs/espresso/espresso-git
+
+#TCL_INLCUDE_PATH=/usr/include/tcl8.6;
+#TCL_LIB_PATH=/usr/lib/tcl8.6;
+#LIB_TCL=tcl8.6;
+
+#MARDYN_PATH=/home/$USER/workspace/mardyn_mamico/src;
+#MARDYN_PATH_EXTERNAL=${MARDYN_PATH}/External;
+
+MAMICO_PATH=/home/$USER/Documents/MaMiCo/mamico-dev
