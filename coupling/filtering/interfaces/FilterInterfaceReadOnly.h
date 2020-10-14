@@ -13,6 +13,8 @@ namespace coupling{
 /*
  * Extension of FilterInterface.h for cases in which the filter itself does not produce any output data.
  * For such filters, you want to make use of copyInputToOutput() (see below) in every filter step.
+ *
+ * @Author Felix Maurer
  */
 
 template <unsigned int dim>

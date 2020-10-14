@@ -137,8 +137,7 @@ class KVSTest():
                 self.cfg.getfloat("microscopic-solver", "temperature"))
 
         #Testing adding python functions as filters: 
-        self.sf = pf.StrouhalPython(0.2, 2.25)
-        #TODO: segfault
+        #self.sf = pf.StrouhalPython(0.2, 2.25)
         #self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("test-strouhal", pf.returnCellData, pf.returnCellData, -1)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
@@ -160,7 +159,7 @@ class KVSTest():
             log.info("Finished " + str(self.mdStepCounter) + " MD timesteps")
 
         #Analyse data gathered by StrouhalPython filter
-        self.sf.calculateStrouhalNumber()
+        #self.sf.calculateStrouhalNumber()
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].shutdown()
