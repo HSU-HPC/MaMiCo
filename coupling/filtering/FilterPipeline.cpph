@@ -274,10 +274,10 @@ int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::data
 	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << "Filter-Pipeline: Initializing md2Macro-domain cells and their index vectors." << std::endl;
 	std::cout << "Total number of cells: " << cells.size() << std::endl;
-	std::cout << "Now Looking at slice (6,...)" << std::endl;
+	//std::cout << "Now Looking at slice (3,...)" << std::endl;
+	//unsigned int i1 = 0;
 	#endif
 
-	unsigned int i1 = 0;
 	for(unsigned int linearIndex = 0; linearIndex < cells.size(); linearIndex++){
 		outOfBounds = false;
 				
@@ -286,7 +286,7 @@ int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::data
 
 		//removal of cells lying in outer layer not meant for transfer to macro solver
 		//Assuming: dim > 0, INT_MAX at any position in index vector implies MSI function returns false
-		if(!(_msi->receiveMacroscopicQuantityFromMDSolver(_indexConversion->convertLocalToGlobalVectorCellIndex(convertedIndex)))) {
+		if(!(_msi->receiveMacroscopicQuantityFromMDSolver(_indexConversion->getGlobalVectorCellIndex(_indexConversion->convertLocalToGlobalCellIndex(linearIndex))))) {
 			outOfBounds = true; 
 		}
 
@@ -295,11 +295,11 @@ int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::data
 		}
 
 		#ifdef DEBUG_FILTER_PIPELINE
-		if(_indexConversion->getThisRank() == 0 && convertedIndex[0] == 6){
-			(outOfBounds) ? std::cout << "x" : std::cout << "o";
-			if (i1 <= _indexConversion->getLocalNumberMacroscopicCells()[1]) i1++;
-			else { std::cout << std::endl; i1 = 0; }
-		}
+		//if(_indexConversion->getThisRank() == 0 && convertedIndex[0] == 3){
+		//	(outOfBounds) ? std::cout << "x" : std::cout << "o";
+		//	if (i1 <= _indexConversion->getLocalNumberMacroscopicCells()[1]) i1++;
+		//	else { std::cout << std::endl; i1 = 0; }
+		//}
 		#endif
 
 		if(!outOfBounds){

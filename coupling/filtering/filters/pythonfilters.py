@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 DEBUG_STROUHAL_PYTHON = True
 
 #Global filter functions that can find application regardless of filter in use:
-def returnCellData(cellData, indices):
+def returnCellData(cellData):
     print("Copying cell data.")
     return cellData
 

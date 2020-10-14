@@ -75,6 +75,8 @@ class coupling::FilterInterface{
 			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
 		}
 
+		FilterInterface(const char* type) : _type(type) {/* Used by incomplete implementations of FilterInterface. Should be redesigned via meta class. TODO*/}
+
 
 		virtual ~FilterInterface(){};
 
@@ -88,8 +90,26 @@ class coupling::FilterInterface{
 		//and use its method copyInputToOutput().
 		virtual void operator()() = 0;
 
+		void updateCellData(
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > new_inputCells,
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > new_outputCells,
+			std::vector<tarch::la::Vector<dim,unsigned int>> new_cellIndices
+		) {
+			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size()) throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
+			_inputCells = new_inputCells;
+			_outputCells = new_outputCells;
+			_cellIndices = new_cellIndices;
+		}
 
-		const char* getType() { return _type; }
+		const char* getType() const { return _type; }
+
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getInputCells() const { return _inputCells; }
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getOutputCells() const { return _outputCells; }
+		std::vector<tarch::la::Vector<dim,unsigned int>> getCellIndices() const { return _cellIndices; }
+
+		//Size = number of cells in this filter.
+		int getSize() const { return _cellIndices.size(); }
+		
 	protected:
 		/**
 		 *  Filters should read from input vector and write to output vector.
