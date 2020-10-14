@@ -118,11 +118,11 @@ namespace coupling { namespace conversion {
 	{
 		return new std::function<std::vector<double> (std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
  			{
-				[&py_func]
+				[py_func]
 				(std::vector<double> stl_vector, std::vector<std::array<unsigned int, 3>> indices)
 				{
-					auto np_input = conversion::stlVectorToNumpyArray_Scalar(stl_vector, indices);
-					auto np_output = py_func(np_input);
+					py::array_t<double> np_input = conversion::stlVectorToNumpyArray_Scalar(stl_vector, indices);
+					py::array_t<double> np_output = py_func(np_input);
 					return conversion::numpyArrayToStlVector_Scalar(np_output);
 				}
 			};
@@ -138,7 +138,7 @@ namespace coupling { namespace conversion {
 	{
 		return new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double, 3>> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
 			{
-				[&py_func] 
+				[py_func] 
 				(std::vector<std::array<double, 3>> stl_vector, std::vector<std::array<unsigned int, 3>> indices)
 				{
 					auto np_input = conversion::stlVectorToNumpyArray_Vector(stl_vector, indices);

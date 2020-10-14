@@ -574,7 +574,7 @@ PYBIND11_MODULE(mamico, mamico) {
 				 std::function<py::array_t<double> (py::array_t<double>)> applyVector,
 				 int filterIndex)
 				{
-					service->addFilterToSequence( //TODO: member functions requires instance
+					service->addFilterToSequence( 
 							name, 
 							coupling::conversion::functionWrapper_Scalar(applyScalar),
 							coupling::conversion::functionWrapper_Vector(applyVector),
