@@ -13,6 +13,7 @@
 #include "coupling/filtering/filters/Strouhal.h"
 #include "coupling/filtering/filters/FilterFromFunction.h"
 #include "coupling/filtering/filters/Copy.h"
+#include "coupling/filtering/SequentialFilter.h"
 
 /*
  * Filter Sequences are used to group filters that will be applied in chronological order.
