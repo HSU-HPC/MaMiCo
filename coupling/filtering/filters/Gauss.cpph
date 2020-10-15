@@ -29,8 +29,9 @@ void coupling::Gauss<dim>::operator()(){
 		//only one of these two cases can occur at once
 		if(indexBelow == index){
 			if(_extrapolationStrategy == 0){
+				//This is slightly inaccurate. Total weight is 1.00011 (should be 1).
 				weights[0] = 0;
-				weights[1] *= 1.38713; //TODO: This is slightly inaccurate. Total weight is 1.00011 (should be 1).
+				weights[1] *= 1.38713; 
 				weights[2] *= 1.38713;
 			}
 			else if(_extrapolationStrategy == 1){
@@ -56,7 +57,8 @@ void coupling::Gauss<dim>::operator()(){
 		}
 		else if(indexAbove == index){
 			if(_extrapolationStrategy == 0){
-				weights[0] *= 1.38713; //TODO: See above.
+				//This is slightly inaccurate. Total weight is 1.00011 (should be 1).
+				weights[0] *= 1.38713;
 				weights[1] *= 1.38713;
 				weights[2] = 0;
 			}
@@ -80,11 +82,6 @@ void coupling::Gauss<dim>::operator()(){
 			}
 			else{/*unreachable*/}
 		}
-		#ifdef DEBUG_GAUSS
-		//std::cout << "GAUSS: Weigths at index " << index << ": ";
-		//for(int i = 0; i < 3; i++) std::cout << weights[i]<< " ";
-		//std::cout << "Total: " << weights[0] + weights[1] + weights[2] << std::endl;
-		#endif
 		//apply to scalars
 		for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++){
 			(coupling::FilterInterface<dim>::_outputCells[index]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(

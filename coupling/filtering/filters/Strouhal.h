@@ -15,7 +15,9 @@ namespace coupling {
 }
 
 /**
- * TODO: Comment
+ * Implements a read-only filter evaluating given input velocity data to approximate a Strouhal number in y-direction.
+ * As an alternative to this, Numpy-compatible implementations of FFT can be linked into a FS using FilterFromFunction.
+ * Fourier transformations are expected to yield more accurate results.
  * @author Felix Maurer
  */
 template<unsigned int dim>

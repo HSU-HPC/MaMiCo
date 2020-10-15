@@ -123,9 +123,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	}
 
 	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << PRINT_PREFIX() << "Number of Filters: " << _filters.size() <<". Output vector will be ";
-	if(_filters.size() % 2 == 0)  std::cout << "_cellVector1." << std::endl;
-	else std::cout << "_cellVector2." << std::endl;
+	printOutputCellVector();
 	#endif
 	
 	return 0;
@@ -150,7 +148,6 @@ void coupling::FilterSequence<dim>::addFilter(
 			#endif
 		}
 		//case: inserting
-		//TODO: testing
 		else {
 			if(index % 2 == 0) { 
 				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
@@ -171,6 +168,9 @@ void coupling::FilterSequence<dim>::addFilter(
 			#endif
 
 		}
+		#ifdef DEBUG_FILTER_PIPELINE
+		printOutputCellVector();
+		#endif
 	}
 	else std::cout << "WARNING: Trying to add filter at runtime to non-modifiable filter sequence " << _name << ". Refused." << std::endl; //exit()?
 }

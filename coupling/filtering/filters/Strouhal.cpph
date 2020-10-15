@@ -24,7 +24,7 @@ void coupling::Strouhal<dim>::operator()(){
     #endif
 }
 
-//TODO: move to xml
+//TODO: move to xml when done testing
 #define ACCEPTED_STARTING_APPROXIMATE 0.01
 #define ACCEPTED_APPROXIMATE 0.01
 #define AMP_LOWER_LIMIT 0.5
