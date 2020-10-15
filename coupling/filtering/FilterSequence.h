@@ -89,7 +89,7 @@ class coupling::FilterSequence {
     	}
 
 		/*
-		 * TODO: Comment
+		 * This member function allows appendance and insertion of filters defined by two processing functions to a modifiable sequence at runtime. Index -1 implies appending. 
 		 */
 		void addFilter( 	
 				const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
@@ -136,6 +136,11 @@ class coupling::FilterSequence {
 			else return _cellVector2;
 		}
 
+		void printOutputCellVector() const {
+			(getOutputCellVector() == _cellVector1) ? std::cout << "Cell vector 1 " : std::cout << "Cell vector 2 ";
+			std::cout << "will be used as output." << std::endl;
+		}
+
 		std::vector<coupling::FilterInterface<dim> *> getFilters() { return _filters; }	
 		
 		void printFilters() {
@@ -158,7 +163,13 @@ class coupling::FilterSequence {
 		 */
 		void initCellVectors();
 
-		std::string PRINT_PREFIX() const{
+		void pintOutputVector() const {
+			std::cout << PRINT_PREFIX() << "Number of Filters: " << _filters.size() <<". Output vector will be ";
+			if(_filters.size() % 2 == 0)  std::cout << "_cellVector1." << std::endl;
+			else std::cout << "_cellVector2." << std::endl;
+		}
+
+		std::string PRINT_PREFIX() const {
 			return std::string("	FS(").std::string::append(_name).std::string::append("): ");
 		}
 

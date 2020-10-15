@@ -20,15 +20,13 @@ void coupling::WriteToFile<dim>::operator()(){
 	}
 	
     for(auto cell : coupling::FilterInterface<dim>::_inputCells){
-        _file 
-		//TODO: Semicolons as seperators?
-		<< _iteration << " , "
-        << _localCellIndices[indexCounter] << " , "
-        << coupling::FilterInterface<dim>::_cellIndices[indexCounter] << " , ";
+        _file << _iteration << " ; ";
+        for(unsigned int d = 0; d < dim; d++) _file << _localCellIndices[indexCounter][d] << " ; ";
+     	for(unsigned int d = 0; d < dim; d++) _file << coupling::FilterInterface<dim>::_cellIndices[indexCounter][d] << " ; ";
 		for(auto sGetter : coupling::FilterInterface<dim>::_scalarGetters)
-        	_file << (cell->*sGetter)() << " , ";
+        	_file << (cell->*sGetter)() << " ; ";
 		for(auto vGetter : coupling::FilterInterface<dim>::_vectorGetters)
-        	_file << (cell->*vGetter)() << " , ";
+        	for(unsigned int d = 0; d < dim; d++) _file << (cell->*vGetter)()[d] << " ; ";
 		_file << std::endl;
         indexCounter++;
     }

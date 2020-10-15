@@ -18,8 +18,18 @@ namespace coupling {
 
 
 /*
- * TODO: Comment
+ * Read-only filter that writes cell data to a specified file in .csv format.
  * @author Felix Maurer
+ *
+ * Output format will be compliant to the usual MaMiCo CSV format (using ';' as separator).
+ * Output order will be:
+ * - current iteration
+ * - local indexing
+ * - global indexing
+ * - scalars
+ * - vectors
+ *
+ * The output file will either contain data of all or just the final coupling iteration. Boolean parameter 'overwrite' is used for that.
  */
 template<unsigned int dim>
 class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{

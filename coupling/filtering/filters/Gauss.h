@@ -24,7 +24,9 @@ namespace coupling {
 #define GAUSS_INNER_WEIGHT (1- (GAUSS_OUTER_WEIGHT * 2))
 
 /*
- * TODO: Comment
+ * Implements a gaussian filter. Limited to what is listed in the disclaimer above. 
+ * Only specified in one dimension: If you wish to use a multidimensional gaussian filter, simply chain multiple instances of this filter in one FilterSequence.
+ *
  * @author Felix Maurer
  */
 template<unsigned int dim>
@@ -39,7 +41,6 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "GAUSS"),
 				_dim(dimension),
 				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back())
-				//TODO: function pointers
 		{
 			//TODO
 			std::cout << "WARNING: You're using a GAUSS-Filter. As this filter has not been tested thoroughly, caution is advised!" << std::endl;
@@ -80,7 +81,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		/**
 		 * Determines how to apply filter to border cells:
 		 * 0 = only use existing cells and increase their weight accordingly
-		 * 1 = linear extrapolation //TODO
+		 * 1 = linear extrapolation
 		 */
 		unsigned int _extrapolationStrategy;
 
@@ -89,7 +90,6 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		//returns the cell that's below the cell at index on the d-axis
 		unsigned int getIndexAbove(unsigned int index, unsigned int d);
 
-		//TODO: Move to interface?
 		tarch::la::Vector<dim, unsigned int> _lastIndex;
 };
 

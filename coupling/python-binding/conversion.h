@@ -16,13 +16,6 @@
  */
 
 namespace py = pybind11;
-/*
-//template <class TT>
-void dummyC() {
-py::array_t<double>* res = new py::array_t<double>({1});
-auto res_unchecked = res->mutable_unchecked<1>();
-//std::cout << res_unchecked << std::endl;
-}*/
 
 /*TODO:
  *  template for dim

@@ -84,9 +84,13 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 					input_v.push_back(array_vec);
 				}
 
+				std::cout << "FFF: BEFORE: " << input_v[0][0] << ", " << input_v[0][1] << ", " << input_v[0][2] << std::endl;
+
 				//APPLY
 				std::vector<std::array<double, dim>> output_v = (*_applyVector)(input_v, _stlIndices);
 				input_v.clear();
+
+				std::cout << "FFF: AFTER: " << input_v[0][0] << ", " << input_v[0][1] << ", " << input_v[0][2] << std::endl;
 
 				//UNPACK
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {

@@ -33,7 +33,7 @@ class coupling::FilterPipeline{
 			const coupling::IndexConversion<dim>* indexConversion,
 			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
-			const std::string cfgpath = "filter_pipeline.xml"); //TODO: is this deprecated?
+			const std::string cfgpath);
 
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
@@ -41,7 +41,7 @@ class coupling::FilterPipeline{
 			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
 			bool postMultiInstance,
-			const std::string cfgpath = "filter_pipeline.xml");
+			const std::string cfgpath);
                
         ~FilterPipeline() {
             for(auto piSequence : _piSequences) delete piSequence;
