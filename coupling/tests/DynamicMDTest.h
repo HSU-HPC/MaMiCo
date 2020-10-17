@@ -110,6 +110,7 @@ private:
     twoWayCoupling(cycle);
     // write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getIndexConversion(),cycle);
+    _multiMDCellService->finishCycle();
     if(_rank==0) {std::cout << "Finish coupling cycle " << cycle << std::endl;}
   }
 
@@ -337,6 +338,7 @@ private:
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig, 
         _mamicoConfig,
+        "couette.xml",
         *_multiMDService,
         _tws
       );
@@ -346,6 +348,7 @@ private:
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig,
         _mamicoConfig,
+        "couette.xml",
         *_multiMDService
       );
     }
