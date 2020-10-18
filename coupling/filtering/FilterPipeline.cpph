@@ -66,6 +66,8 @@ void coupling::FilterPipeline<dim>::operator()(){
 		#endif
 	}
 
+	std::cout << "FP: BEFORE: " << _md2MacroCells[10]->getCurrentVelocity() << std::endl;
+
     for(coupling::FilterSequence<dim>* currSequence : sequences){
 		//finalize FS's filter vector
 		if(currSequence->isModifiable() == true){
@@ -88,6 +90,7 @@ void coupling::FilterPipeline<dim>::operator()(){
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > sequenceOutputCells = currSequence->getOutputCellVector(); 
 			for(unsigned int index = 0; index < _md2MacroCells.size(); index++) *(_md2MacroCells[index]) = *(sequenceOutputCells[index]);
 		}
+		std::cout << "FP: AFTER: " << _md2MacroCells[10]->getCurrentVelocity() << std::endl;
     }
 }
 
@@ -233,9 +236,6 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		//Check if it's the output sequence. If none of the sequences' names match, "md" is assumed as output.
 		if(std::strcmp(knownSequences.back()->getName(),  node->Attribute("output")) == 0){
 			knownSequences.back()->setAsOutput();
-			#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << "This sequence will be used as the output sequence." << std::endl;
-			#endif
 		}
 
 		//Load filters of the newly created sequence
@@ -268,6 +268,8 @@ int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::data
 		std::cout << "ERROR: Filter-Pipeline: Input vector is emtpy." << std::endl;
 		return EXIT_FAILURE; 
 	}
+	std::cout << "FP: LOCATION OF FIRST CELL " << cells[0] << std::endl;
+
 	tarch::la::Vector<dim, unsigned int> convertedIndex;
 	bool outOfBounds;
 
