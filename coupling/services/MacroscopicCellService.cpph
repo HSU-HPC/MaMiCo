@@ -164,7 +164,9 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
+  std::cout << "MCS: BEFORE: "<<_macroscopicCells.getMacroscopicCells()[2325]->getCurrentVelocity() << std::endl;
   _filterPipeline(); 
+  std::cout << "MCS: AFTER: "<<_macroscopicCells.getMacroscopicCells()[2325]->getCurrentVelocity() << std::endl;
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);

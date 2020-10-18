@@ -121,7 +121,10 @@ class coupling::FilterSequence {
     	const char* getName() { return _name; }
 
 		bool isOutput() { return _isOutput; }
-		void setAsOutput() { _isOutput = true; }
+		void setAsOutput() { 
+			std::cout << PRINT_PREFIX() << " Setting as pipeline to macro solver output." << std::endl;
+			_isOutput = true; 
+		}
 
 		bool isModifiable() { return _isModifiable; }
 		void makeUnmodifiable() { _isModifiable = false; }

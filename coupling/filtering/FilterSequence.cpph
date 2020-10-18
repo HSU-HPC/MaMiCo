@@ -123,7 +123,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	}
 
 	#ifdef DEBUG_FILTER_PIPELINE
-	printOutputCellVector();
+	std::cout << PRINT_PREFIX(); printOutputCellVector();
 	#endif
 	
 	return 0;
@@ -169,7 +169,7 @@ void coupling::FilterSequence<dim>::addFilter(
 
 		}
 		#ifdef DEBUG_FILTER_PIPELINE
-		printOutputCellVector();
+		std::cout << PRINT_PREFIX(); printOutputCellVector();
 		#endif
 	}
 	else std::cout << "WARNING: Trying to add filter at runtime to non-modifiable filter sequence " << _name << ". Refused." << std::endl; //exit()?

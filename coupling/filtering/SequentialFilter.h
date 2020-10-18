@@ -116,10 +116,10 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 			#endif
 
 			//allocate on processing rank
-			if(_processingRank == (int) _ic->getThisRank()) _recvbuf.reserve(_sendbuf.size()*_commSize);
+			if(_processingRank == (int) _ic->getThisRank()) _recvbuf.resize(_sendbuf.size()*_commSize);
 	
 			//send to processing rank 
-			MPI_Gather(_sendbuf.data(), _cellsPerRank, MPI_DOUBLE, _recvbuf.data(), _cellsPerRank * _commSize, MPI_DOUBLE, _processingRank, _comm); 
+			MPI_Gather(_sendbuf.data(), _sendbuf.size(), MPI_DOUBLE, _recvbuf.data(), _sendbuf.size() * _commSize, MPI_DOUBLE, _processingRank, _comm); 
 
 			#ifdef DEBUG_SEQ_FILTER
 			if(_processingRank == (int) _ic->getThisRank()) std::cout << "		SEQFILTER: Receiving buffer of size: " << _recvbuf.size() << std::endl;
@@ -173,7 +173,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		void applyBufferToMacroscopicCells(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells) {
 
 			std::cout << "		SEQFILTER: ABTMC: Buffer size: " << buf.size() << " Cell vector size: " << cells.size() << std::endl;
-			if(buf.size() != cells.size()) throw std::runtime_error("Buffer and cell vector size must be the same!");
+			if(buf.size() != cells.size() * (4+3*dim) ) throw std::runtime_error("Buffer and cell vector size must be the same!"); //TODO
 
 			//copy buffer data to cells
 			tarch::la::Vector<dim, double> mvec_buf;

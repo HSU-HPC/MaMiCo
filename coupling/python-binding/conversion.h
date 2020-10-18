@@ -32,33 +32,34 @@ namespace coupling { namespace conversion {
 		py::array_t<double> res = py::array_t<double>(shape);
 		auto res_unchecked = res.mutable_unchecked<3>();
 
-		unsigned int i = 0, j = 0, k = 0;
-		for(auto element : stl_vector){
-			res_unchecked(i, j, k) = element;
-			(i < shape[0]-1) ? i++ : i = 0;
-			(j < shape[1]-1) ? j++ : j = 0;
-			(k < shape[2]-1) ? k++ : k = 0;
+		unsigned int c = 0;
+		for(unsigned int i = 0; i < shape[0]; i++)
+		for(unsigned int j = 0; j < shape[1]; j++)
+		for(unsigned int k = 0; k < shape[2]; k++) {
+			res_unchecked(i, j, k) = stl_vector[c];
+			c++;
 		}
+
 
 		return res;
 	}
 	
-	template<class T>
-	py::array_t<double> stlVectorToNumpyArray_Vector(const std::vector<std::array<T, 3>>& stl_vector, const std::vector<std::array<unsigned int, 3>>& indices) {
+	//template<class T>
+	py::array_t<double> stlVectorToNumpyArray_Vector(const std::vector<std::array<double, 3>>& stl_vector, const std::vector<std::array<unsigned int, 3>>& indices) {
 		if(indices.empty() || stl_vector.empty()) throw std::runtime_error("One or more input vector is empty");
 
 		std::vector<unsigned int> shape({indices.back()[0]+1, indices.back()[1]+1, indices.back()[2]+1, 3});
 		py::array_t<double> res = py::array_t<double>(shape);
 		auto res_unchecked = res.mutable_unchecked<4>();
 
-		unsigned int i = 0, j = 0, k = 0;
-		for(auto element : stl_vector){
-			res_unchecked(i, j, k, 0) = element[0];
-			res_unchecked(i, j, k, 1) = element[1];
-			res_unchecked(i, j, k, 2) = element[2];
-			(i < shape[0]-1) ? i++ : i = 0;
-			(j < shape[1]-1) ? j++ : j = 0;
-			(k < shape[2]-1) ? k++ : k = 0;
+		unsigned int c = 0;
+		for(unsigned int i = 0; i < shape[0]; i++)
+		for(unsigned int j = 0; j < shape[1]; j++)
+		for(unsigned int k = 0; k < shape[2]; k++) {
+			res_unchecked(i, j, k, 0) = stl_vector[c][0];
+			res_unchecked(i, j, k, 1) = stl_vector[c][1];
+			res_unchecked(i, j, k, 2) = stl_vector[c][2];
+			c++;
 		}
 
 		return res;

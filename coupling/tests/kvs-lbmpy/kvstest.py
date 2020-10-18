@@ -89,11 +89,11 @@ class KVSTest():
 
             isteps = self.cfg.getint("macroscopic-solver", "init-timesteps")
             log.info("Running " + str(isteps) + " LB initialisation timesteps ...")
-            timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
-                self.macroscopicSolver.domain_size[1] * \
-                self.macroscopicSolver.domain_size[2] / \
-                (self.macroscopicSolver.mlups * 1e6)
-            log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
+            #timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
+            #    self.macroscopicSolver.domain_size[1] * \
+            #    self.macroscopicSolver.domain_size[2] / \
+            #    (self.macroscopicSolver.mlups * 1e6)
+            #log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
             self.macroscopicSolver.advance(isteps) 
             log.info("Finished LB init-timesteps.")
 
@@ -136,9 +136,28 @@ class KVSTest():
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
                 self.cfg.getfloat("microscopic-solver", "temperature"))
 
-        #Testing adding python functions as filters: 
+        #Add Strouhal filter
         #self.sf = pf.StrouhalPython(0.2, 2.25)
-        #self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("test-strouhal", pf.returnCellData, pf.returnCellData, -1)
+        #self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("test-strouhal", pf.returnCellData, self.sf.addDataPoint, 3)
+
+
+        from scipy.ndimage import gaussian_filter
+        #Add Gauss filter
+        def gauss_sigma1(data):
+            print("Applying gauss. sigma = 1.")
+            return gaussian_filter(data, 1)
+        def gauss_sigma2(data):
+            print("Applying gauss. sigma = 2.")
+            return gaussian_filter(data, 2)
+        def gauss_sigma3(data):
+            print("Applying gauss. sigma = 3.")
+            return gaussian_filter(data, 3)
+
+
+
+        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("gauss-1", pf.returnCellData, gauss_sigma1, 0)
+        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("gauss-2", pf.returnCellData, gauss_sigma2, 0)
+        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("gauss-3", pf.returnCellData, gauss_sigma3, 0)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
@@ -292,8 +311,8 @@ class LBSolver():
         lb_log.info("Domain size = " + str(self.domain_size))
         lb_log.info("Total number of cells = " + str(self.domain_size[0]*self.domain_size[1]*self.domain_size[2]))
         lb_log.info("Running benchmark ...")
-        self.mlups = self.scen.benchmark()
-        lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
+        #self.mlups = self.scen.benchmark()
+        #lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
 
         self.cD_max = 0
         self.cL_max = 0
