@@ -61,7 +61,7 @@ class simplemd::configurations::DomainConfiguration: public tarch::configuration
     const bool& initFromCheckpoint() const { return _initFromCheckpoint;}
     const bool& initFromSequentialCheckpoint() const { return _initFromSequentialCheckpoint;}
 
-    void setCheckpointFilestem(const string & filestem) {
+    void setCheckpointFilestem(const std::string & filestem) {
       _checkpointFilestem = filestem;
     }
     void setInitFromCheckpoint(const bool & initFromCheckpoint) {
