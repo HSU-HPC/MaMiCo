@@ -128,13 +128,13 @@ class coupling::services::MultiMDCellService {
         }
       }
 
-      _mdConfiguration.getDomainConfiguration().setInitFromCheckpoint(true);
-      _mdConfiguration.getDomainConfiguration().setCheckpointFilestem("AddSimulationCheckpoint/checkpoint");
-      if(_multiMDService->getLocalSize() > 1) {
-        _mdConfiguration.getDomainConfiguration().setInitFromSequentialCheckpoint(false);
+      _mdConfiguration.getDomainConfigurationNonConst().setInitFromCheckpoint(true);
+      _mdConfiguration.getDomainConfigurationNonConst().setCheckpointFilestem("AddSimulationCheckpoint/checkpoint");
+      if(_multiMDService.getLocalSize() > 1) {
+        _mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(false);
       }
       else {
-        _mdConfiguration.getDomainConfiguration().setInitFromSequentialCheckpoint(true);
+        _mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(true);
       }
       
 
@@ -287,7 +287,7 @@ class coupling::services::MultiMDCellService {
       // receive data from each MD simulation and accumulate information in duplicate
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
           //std::cout << "Rank " << _macroscopicCellServices[l]->getIndexConversion().getThisRank() << ": Send from MD to Macro for Simulation no. " << l << std::endl;
-          if (_macroscopicCellServices[l] != nullptr &&  _warmupPhase[l} > 0])  {
+          if (_macroscopicCellServices[l] != nullptr &&  _warmupPhase[l] > 0)  {
           res += _macroscopicCellServices[l]->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver,globalCellIndicesFromMacroscopicSolver);
           for (unsigned int i = 0; i < size; i++){
             duplicate[i].addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
@@ -417,7 +417,7 @@ class coupling::services::MultiMDCellService {
         newMacroscopicCellServices[(i+1)*newLocalNumberMDSimulations-1] = nullptr;
 
         auto pos = _warmupPhase.begin() + ((i+1) * newLocalNumberMDSimulations - 1);
-        _warmupPhase.insert(pos, 0)
+        _warmupPhase.insert(pos, 0);
       }
 
       // Update local variables
