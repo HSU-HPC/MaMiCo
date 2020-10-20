@@ -18,6 +18,8 @@ void coupling::WriteToFile<dim>::operator()(){
 	else {
 		_file.open(_location);
 	}
+
+	//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("WTF");	
 	
     for(auto cell : coupling::FilterInterface<dim>::_inputCells){
         _file << _iteration << " ; ";
