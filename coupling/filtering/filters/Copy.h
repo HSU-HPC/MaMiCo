@@ -30,5 +30,6 @@ class coupling::Copy : public coupling::FilterInterfaceReadOnly<dim>{
 
 		void operator()() {
 			coupling::FilterInterfaceReadOnly<dim>::copyInputToOutput();
+			//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("COPY");
 		}
 };

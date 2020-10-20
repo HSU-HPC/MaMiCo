@@ -135,6 +135,9 @@ void coupling::FilterSequence<dim>::addFilter(
 				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
 				int filterIndex //counting starts at 0, -1 is equivalent to EOL
 ){
+	std::cout << PRINT_PREFIX() << "First element of _cellVector1 after add: " << _cellVector1[0] << std::endl;
+	std::cout << PRINT_PREFIX() << "First element of _cellVector2 after add: " << _cellVector2[0] << std::endl;
+
 	if(_isModifiable) {
 		unsigned int index;
 		(filterIndex == -1 || filterIndex > (int) _filters.size()) ? index = _filters.size() : index = filterIndex;
@@ -146,6 +149,18 @@ void coupling::FilterSequence<dim>::addFilter(
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
 			#endif
+		}
+		else {
+		//case: index 0
+		if (index  == 0) {
+			//previous filter at index 0 won't use _inputDomainCellVector any longer
+			if(!_filters.empty()) _filters[0]->setInputCells(_cellVector1);
+
+			_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_inputDomainCellVector, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
+
+			// add copy if no copy after index exists, else remove that copy
+			if(std::strcmp(_filters[1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + 1);
+			else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues));
 		}
 		//case: inserting
 		else {
@@ -167,7 +182,7 @@ void coupling::FilterSequence<dim>::addFilter(
 				std::cout << PRINT_PREFIX() << "Inserted new filter at index " << index << std::endl;
 			#endif
 
-		}
+		}}
 		#ifdef DEBUG_FILTER_PIPELINE
 		std::cout << PRINT_PREFIX(); printOutputCellVector();
 		#endif
@@ -185,7 +200,10 @@ void coupling::FilterSequence<dim>::initCellVectors(){
     	_cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
 	}
 	#ifdef DEBUG_FILTER_PIPELINE
-            std::cout << PRINT_PREFIX() << "Initialized (global) cell vector." << std::endl;
+		std::cout << PRINT_PREFIX() << "Initialized (global) cell vector." << std::endl;
+		std::cout << PRINT_PREFIX() << "First element of _cellVector1 after init: " << _cellVector1[0] << std::endl;
+		std::cout << PRINT_PREFIX() << "First element of _cellVector2 after init: " << _cellVector2[0] << std::endl;
+
     #endif 
 }
 
