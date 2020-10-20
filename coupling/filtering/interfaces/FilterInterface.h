@@ -81,13 +81,15 @@ class coupling::FilterInterface{
 		virtual ~FilterInterface(){};
 
 		
-		//Applies the filter to all cells that are within the filter's sequence's domain.
 
-		//It is very important that this method provides complete output data,
-		//i.e uses all elements of _scalarSetters and _vectorSetters on all elements of _outputCells.
-		//If this is not the case, you dont want to use this interface, but rather
-		//	coupling::FilterInterfaceReadOnly
-		//and use its method copyInputToOutput().
+		/*
+		 * Applies the filter to all cells that are within the filter's sequence's domain.
+		 *
+		 * It is very important that this method provides complete output data,
+		 * i.e uses all elements of _scalarSetters and _vectorSetters on all elements of _outputCells.
+		 * If this is not the case, you dont want to use this interface, but rather coupling::FilterInterfaceReadOnly
+		 * and use its method copyInputToOutput().
+		 */
 		virtual void operator()() = 0;
 
 		void updateCellData(
@@ -107,10 +109,24 @@ class coupling::FilterInterface{
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getOutputCells() const { return _outputCells; }
 		std::vector<tarch::la::Vector<dim,unsigned int>> getCellIndices() const { return _cellIndices; }
 
+		/*
+		 * Only used in one scenario:
+		 *  - this is at index 0 in FS
+		 *  - new filter gets dynamically linked into FS at index 0
+		 * In that case, this was previously getting input from MD but won't any longer.
+		 * The newly added filter will provide input for this one instead.
+		 */
+		void setInputCells(const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& newInputCells) { _inputCells = newInputCells; }
+
 		//Size = number of cells in this filter.
 		int getSize() const { return _cellIndices.size(); }
 		
 	protected:
+		void DEBUG_PRINT_CELL_VELOCITY(const char* caller, unsigned int index = 0) {
+			std::cout << "		" << caller << " IN ("<< (_inputCells[index]) <<"): " << _inputCells[index]->getCurrentVelocity() << std::endl;
+			std::cout << "		" << caller << " OUT ("<< (_outputCells[index]) <<"): " << _outputCells[index]->getCurrentVelocity() << std::endl;
+		}
+
 		/**
 		 *  Filters should read from input vector and write to output vector.
 		 *  Both vectors use the same indexing by default. 
