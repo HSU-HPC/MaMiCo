@@ -18,17 +18,17 @@
     fix-seed="no"
    ></simulation-configuration>
 
-  <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
+  <vtk-configuration filename="Molecules" write-every-timestep="1"></vtk-configuration>
 
   <checkpoint-configuration filename="CheckpointSimpleMD_10000_periodic_0_0" write-every-timestep="0"></checkpoint-configuration>
   
   <!--init-from-sequential-checkpoint="CheckpointSimpleMD_10000_periodic"-->
   <domain-configuration
-    init-from-sequential-checkpoint="Checkpoints2/CheckpointSimpleMD_10000_periodic"
+    init-from-sequential-checkpoint="Checkpoints/CheckpointSimpleMD_10000_periodic"
     
-    molecules-per-direction="56 ; 56 ; 56"
-    domain-size="60.0 ; 60.0 ; 60.0"
-    domain-offset="20.0 ; 20.0 ; 5.0"
+    molecules-per-direction="28 ; 28 ; 28"
+    domain-size="30.0 ; 30.0 ; 30.0"
+    domain-offset="10.0 ; 10.0 ; 0.0"
     cutoff-radius="2.2"
     linked-cell-size="2.5 ; 2.5 ; 2.5"
     k_B="1.0"
@@ -39,7 +39,7 @@
     bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
 
     south-west="reflecting"        south="reflecting"        south-east="reflecting"
-    west="reflecting"                                          east="reflecting"
+    west="periodic"                                          east="periodic"
     north-west="reflecting"        north="reflecting"        north-east="reflecting"
 
     top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"

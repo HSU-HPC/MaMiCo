@@ -59,7 +59,9 @@ class simplemd::moleculemappings::VTKMoleculeWriter {
 
     /** stores the information whether a particle is fixed in space */
     std::stringstream _fix;
+
+    // stores the particleID
+    std::stringstream _id;
 };
 
 #endif // _MOLECULARDYNAMICS_MOLECULEMAPPINGS_VTKMOLECULEWRITER_H_
-

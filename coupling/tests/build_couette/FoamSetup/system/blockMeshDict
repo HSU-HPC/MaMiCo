@@ -15,11 +15,11 @@ FoamFile
 
 convertToMeters 1.0;
 
-outer 100.0;
-lowerX 35;
-lowerZ 20;
-higherX 65;
-higherZ 50;
+outer 50.0;
+lowerX 17.5;
+lowerZ 10.0;
+higherX 32.5;
+higherZ 25;
 
 vertices
 (
