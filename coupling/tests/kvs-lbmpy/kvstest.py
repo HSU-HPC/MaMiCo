@@ -25,6 +25,8 @@ import matplotlib.pyplot as mplt
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
 
+BENCH_BEFORE_RUN = True
+
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
 # -> one-way or two-way coupling
@@ -89,11 +91,14 @@ class KVSTest():
 
             isteps = self.cfg.getint("macroscopic-solver", "init-timesteps")
             log.info("Running " + str(isteps) + " LB initialisation timesteps ...")
-            #timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
-            #    self.macroscopicSolver.domain_size[1] * \
-            #    self.macroscopicSolver.domain_size[2] / \
-            #    (self.macroscopicSolver.mlups * 1e6)
-            #log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
+            
+            if BENCH_BEFORE_RUN == True:
+                timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
+                    self.macroscopicSolver.domain_size[1] * \
+                    self.macroscopicSolver.domain_size[2] / \
+                    (self.macroscopicSolver.mlups * 1e6)
+                log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
+
             self.macroscopicSolver.advance(isteps) 
             log.info("Finished LB init-timesteps.")
 
@@ -310,9 +315,11 @@ class LBSolver():
         lb_log.info("Successfully created scenario")
         lb_log.info("Domain size = " + str(self.domain_size))
         lb_log.info("Total number of cells = " + str(self.domain_size[0]*self.domain_size[1]*self.domain_size[2]))
-        lb_log.info("Running benchmark ...")
-        #self.mlups = self.scen.benchmark()
-        #lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
+
+        if BENCH_BEFORE_RUN == True:
+            lb_log.info("Running benchmark ...")
+            self.mlups = self.scen.benchmark()
+       	    lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
 
         self.cD_max = 0
         self.cL_max = 0
