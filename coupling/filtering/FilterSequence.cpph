@@ -31,7 +31,15 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			if(currFilterNode->Attribute("overwrite"))
 				if(std::strcmp(currFilterNode->Attribute("overwrite"), "true") == 0)
 					overwrite = true;
-            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location"), overwrite);
+
+			int oco = -1;
+			tarch::configuration::ParseConfiguration::readIntOptional(oco, currFilterNode, "one-cell-only");
+			if(oco < -1 || oco >= (int) inputCellVector.size()) {
+				std::cout << "ERROR: XML config file references undefined cell index " << oco << " for write-to-file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location"), overwrite, oco);
         }
 
 		//Gauss
@@ -129,6 +137,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	return 0;
 }
 
+//TODO: restructure code: reduce code duplication
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::addFilter( 	
 				const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,

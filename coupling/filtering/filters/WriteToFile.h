@@ -41,12 +41,14 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 				const std::array<bool, 7> filteredValues, 
 				const std::vector<tarch::la::Vector<dim, unsigned int>> localCellIndices, //covers the entire MD domain
 				std::string location,
-				bool overwrite):
+				bool overwrite = false,
+				int oneCellOnly = -1):
 
 				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "WTF"),
 				_localCellIndices(localCellIndices),
-		   		_location(location),
+		   		_location(location), //TODO: add time/date to output file name
 				_overwrite(overwrite),
+				_oneCellOnly(oneCellOnly),
 				_iteration(1)
 		{	
 			if(!_overwrite){
@@ -57,6 +59,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
         	#ifdef DEBUG_WRITE_TO_FILE
             std::cout << "		WTF: Write to file instance created. Will save to: " << _location << ". Last Cell Index: " << coupling::FilterInterface<dim>::_cellIndices.back() << std::endl;
 			if(_overwrite) std::cout << "		It will only print output of the last iteration." << std::endl;
+			if(_oneCellOnly != -1) std::cout << "		It will only print data of cell with linear md2Macro domain index " << _oneCellOnly << std::endl;
         	#endif
         }
 
@@ -72,7 +75,12 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
     private:
 		const std::vector<tarch::la::Vector<dim, unsigned int>> _localCellIndices;
         std::string _location;
+
+		//true of only the last iteration should be in file output
 		bool _overwrite;
+
+		//-1 if all cells should be in file output, holds index of the only cell to be outputted otherwise
+		int _oneCellOnly;
 
         std::ofstream _file;
 		unsigned int _iteration; 
