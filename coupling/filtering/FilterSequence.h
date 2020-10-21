@@ -5,6 +5,7 @@
 #pragma once
 
 #include "coupling/IndexConversion.h"
+#include "tarch/configuration/ParseConfiguration.h"
 
 //INCLUDE ALL FILTER HEADERS HERE
 #include "coupling/filtering/filters/WriteToFile.h"
