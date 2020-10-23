@@ -7,6 +7,7 @@ build/
 *.o
 *.out
 *.h.gch
+*.xml 
 out/
 !coupling/tests/build/
 coupling/tests/build_nie/test
