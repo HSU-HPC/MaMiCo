@@ -102,6 +102,9 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(_mdSolverInterface);
   cell.iterateConstCells(computeMassMapping);
+  if(computeMassMapping.getNumberOfParticles()<1){
+    return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;
+  }
 
   // take a random particle
   const unsigned int randomParticle = static_cast<unsigned int>(
