@@ -56,6 +56,7 @@ class MDSimulation {
     virtual void init() = 0;
     virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) = 0;
     virtual void shutdown() = 0;
+    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t) = 0;
 };
 
 
@@ -87,6 +88,10 @@ class SimpleMDSimulation: public coupling::interface::MDSimulation {
     virtual void init(){ _molecularDynamicsSimulation.initServices(); }
     virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation){ _molecularDynamicsSimulation.initServices(multiMDService,localMDSimulation); }
     virtual void shutdown(){ _molecularDynamicsSimulation.shutdownServices(); }
+
+    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t) {
+      getMoleculeService().writeCheckPoint(getParallelTopologyService(), filestem, t);
+    }
 
     // function particularly needed to init MD solver interface -> should only be called from factory
     simplemd::BoundaryTreatment& getBoundaryTreatment(){ return _molecularDynamicsSimulation.getBoundaryTreatment(); }
@@ -122,6 +127,8 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
     _lmp(new LAMMPS_NS::LAMMPS(0,NULL,localComm)),
     _configuration(configuration),_mamicoConfiguration(mamicoConfiguration),
     _tolerance(1.0e-8){}
+
+    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t){} //TODO
 
     // switch off coupling in simulation -> we assume the mamico fix to have ID=2
     virtual void switchOffCoupling(){

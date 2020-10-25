@@ -129,12 +129,15 @@ class coupling::services::MultiMDCellService {
       }
 
       _mdConfiguration.getDomainConfigurationNonConst().setInitFromCheckpoint(true);
-      _mdConfiguration.getDomainConfigurationNonConst().setCheckpointFilestem("AddSimulationCheckpoint/checkpoint");
+      std::stringstream filestem;
+      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()+1) / _multiMDService.getNumberLocalComms() << "_0";
+      _mdConfiguration.getDomainConfigurationNonConst().setCheckpointFilestem(filestem.str());
+      _mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(false);
       if(_multiMDService.getLocalSize() > 1) {
-        _mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(false);
+        //_mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(false);
       }
       else {
-        _mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(true);
+        //_mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(true);
       }
       
 
@@ -346,7 +349,7 @@ class coupling::services::MultiMDCellService {
       if(index == _totalNumberMDSimulations-1) {
         removeSimulationBlock();
         _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
-      } // TODO set _nextfreeblock correctly after removal of md simulation
+      } 
 
       return index;
     }
@@ -557,9 +560,19 @@ class coupling::services::MultiMDCellService {
 
     coupling::IndexConversion<dim> & getIndexConversion() const { return *_indexConversion; }
 
-    void finishCycle() {
+    void finishCycle(const unsigned int & cycle, const std::vector<coupling::interface::MDSimulation*> simpleMD) {
       for(auto& phaseI : _warmupPhase) {
         if(phaseI > 0) phaseI -= 1;
+      }
+      writeCheckpoint(cycle, simpleMD);
+    }
+
+    void writeCheckpoint(const unsigned int & cycle, 
+                          const std::vector<coupling::interface::MDSimulation*> simpleMD) {
+      for(auto  md : simpleMD) {
+        std::stringstream filestem;
+        filestem << "restart_checkpoint_" << (1+_multiMDService.getGlobalRank()) / _multiMDService.getNumberLocalComms();
+        md->writeCheckpoint(filestem.str().c_str(), 0);
       }
     }
     
