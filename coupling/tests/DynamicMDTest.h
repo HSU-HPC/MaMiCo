@@ -52,8 +52,8 @@ public:
 
 #if defined(COUPLING_DYNAMIC_MD_SUDDEN)
       // Drop 50 random md instances in cycle 249
-      if(cycle == 0) {
-        removeMDSimulation();
+      if(cycle == 4) {
+        addMDSimulation();
       }
 #endif
 #if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
@@ -69,7 +69,7 @@ public:
   
 
 private:
-  enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1};
+  enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void removeMDSimulation() {
@@ -110,7 +110,7 @@ private:
     twoWayCoupling(cycle);
     // write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getIndexConversion(),cycle);
-    _multiMDCellService->finishCycle();
+    _multiMDCellService->finishCycle(cycle, _simpleMD);
     if(_rank==0) {std::cout << "Finish coupling cycle " << cycle << std::endl;}
   }
 
@@ -149,9 +149,25 @@ private:
       std::cout << "Could not read input file couette.xml: missing element <couette-test>" << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n2 = node->NextSiblingElement();
-    if(n2 != NULL){
-      std::cout << "Could not read input file couette.xml: unknown element " << n2->Name() << std::endl;
+
+    tinyxml2::XMLElement *n_mamico = node->NextSiblingElement();
+    if(n_mamico == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_md = n_mamico->NextSiblingElement();
+    if(n_md == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <molecular-dynamics>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_fp = n_md->NextSiblingElement();
+    if(n_fp == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <filter-pipeline>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
+    if(n_unexpected == NULL){
+      std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -189,7 +205,7 @@ private:
     }
     std::string type;
     tarch::configuration::ParseConfiguration::readStringMandatory(type,subtag,"type");
-    if(type == "md"){ 
+    if(type == "md"){
       _cfg.miSolverType = SIMPLEMD;
       tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp,subtag,"temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps,subtag,"equilibration-steps");
@@ -218,8 +234,13 @@ private:
     }
     _cfg.lbNumberProcesses = tarch::la::Vector<3,unsigned int>(1);
     tarch::configuration::ParseConfiguration::readStringMandatory(type,subtag,"type");
-    if(type == "lb"){ 
+    if(type == "lb"){
       _cfg.maSolverType = COUETTE_LB;
+      tarch::configuration::ParseConfiguration::readVector<3,unsigned int>(_cfg.lbNumberProcesses,subtag,"number-of-processes");
+      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep,subtag,"plot-every-timestep");
+    }
+    else if(type == "fd"){
+      _cfg.maSolverType = COUETTE_FD;
       tarch::configuration::ParseConfiguration::readVector<3,unsigned int>(_cfg.lbNumberProcesses,subtag,"number-of-processes");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep,subtag,"plot-every-timestep");
     }
@@ -237,7 +258,7 @@ private:
     double vis;
     tarch::configuration::ParseConfiguration::readDoubleMandatory(vis, subtag, "viscosity");
     _cfg.kinVisc = vis / _cfg.density;
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.initAdvanceCycles,subtag,"init-advance-cycles"); 
+    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.initAdvanceCycles,subtag,"init-advance-cycles");
 
     subtag = node->FirstChildElement("tws-loop");
     if (subtag == NULL) _cfg.twsLoop = false;
@@ -250,7 +271,7 @@ private:
     }
 
     if(_cfg.miSolverType == SYNTHETIC){
-      if(_cfg.md2Macro || _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 || 
+      if(_cfg.md2Macro || _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
         _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1){
         std::cout << "Invalid configuration: Synthetic MD runs sequentially on rank 0 only. "
           << "It does neither support parallel communication nor multi-instance sampling" << std::endl;
