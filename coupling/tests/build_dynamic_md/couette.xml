@@ -11,19 +11,21 @@
     - optional int wall-init-cycles: 
       Number of coupling cycles with wall-init-velocity applied instead of wall-velocity
       This can be used to investigate or initialize the simulation before the couette startup.
+      There is no interpolation between wall-init-velocity and wall-velocity.
     - optional Vector<3,double> wall-init-velocity: 
       Speed of moving wall, for the first wall-init-cycles simulation cycles
       Should be "0.0 ; 0.0 ; 0.0" unless e.g multi-stage startup is desired.
     - optional double wall-oscillations: 
       To create oscillating couette scenario, define the total number of periods during all coupling cycles here. 
       For every CYCLE after wall-init-cycles, wall speed will equal:
-        wall-velocity * cos(2PI * wall-oscillations * CYCLE / coupling-cycles)
+        wall-velocity * cos(2PI * wall-oscillations * CYCLE / coupling-cycles) 
   -->
   <domain
     channelheight="50"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
-    wall-velocity="1.5 ; 0.0 ; 0.0"
+    wall-velocity="0.5 ; 0.0 ; 0.0"
+    wall-oscillations="0"
   />
 
   <!-- Coupled simulation general setup parameters:
@@ -36,18 +38,19 @@
     - bool send-from-macro-to-md:
       Enables / disables data extraction from couette solver and communication to MD ranks.
     - int filter-init-cycles:
-      Number of cycles with two-way-coupling and compute-snr disabled at simulation startup, used for initialisation of noise filter.
+      Number of cycles with two-way-coupling and compute-snr disabled at simulation startup, used for initialisation of noise filter. TODO rename?
     - int write-csv-every-timestep:
       Writes data collected by sendFromMD2Macro, i.e. noise filter output, to CSV file; for evaluation.
+      timestep means coupling cycle here.
     - bool compute-snr:
-      Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout.
+      Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout. Only for sequential tests.
   -->
   <coupling
-    coupling-cycles="12"
+    coupling-cycles="1000"
     two-way-coupling="no"
     send-from-md-to-macro="yes"
-    filter-init-cycles="100"
-    write-csv-every-timestep="1"
+    filter-init-cycles="0"
+    write-csv-every-timestep="10"
     send-from-macro-to-md="yes"
     compute-snr="no"
   />
@@ -69,11 +72,11 @@
       to skip couette startup.
   -->
   <macroscopic-solver 
-    type="analytical"
+    type="lb"
     viscosity="2.14"
     number-of-processes="1 ; 1 ; 1"
-    plot-every-timestep="-1"
-    init-advance-cycles="100000"
+    plot-every-timestep="50"
+    init-advance-cycles="0"
   />
 
   <!-- Configuration parameters for microscopic solver:
@@ -102,7 +105,6 @@
     equilibration-steps="0"
     number-md-simulations="2"
     density="0.813037037"
-    noise-sigma="0.1666"
   />
 
   <!-- Optional feature: tws-loop
@@ -117,3 +119,100 @@
     Example <tws-loop min="3" max="100" step="5" />
   -->
 </couette-test>
+
+<!-- MaMiCo configuration for NieTest, as described in the respective paper -->
+<mamico>
+  <!-- "write-every-macroscopic-timestep" means CFD time step /-->
+  <macroscopic-cell-configuration
+    cell-size="2.5 ; 2.5 ; 2.5"
+    linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+    write-every-microscopic-timestep="0"
+    microscopic-filename="MacroscopicCell_micro"
+    write-every-macroscopic-timestep="0"
+    macroscopic-filename="MacroscopicCell_macro"
+  />
+  <!-- particle-insertion type="usher" enables removal of particles  /-->
+  <!-- TODO choose insert-every-timestep automatically /-->
+  <!-- TODO check tolerance criterium /-->
+  <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
+  <!--<particle-insertion type="none" />/-->
+  <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
+  <!-- TODO inconsistent mass flux evaluation? /-->
+  <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" />
+  <!-- time-window-size means number of coupling cycles/-->
+  <noise-reduction type="none"/>
+  <!-- TODO try to use local density for boundary force /--> 
+  <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
+  <parallel-topology type="xyz" />
+</mamico>
+
+<molecular-dynamics>
+
+  <!-- initial temperature should be 1.27 to reach 1.1 after equilibration /-->
+  <molecule-configuration
+    mass="1.0"
+    temperature="1.27"
+    sigma="1.0"
+    epsilon="1.0"
+    mean-velocity="0.0 ; 0.0 ; 0.0"
+  ></molecule-configuration>
+
+  <!-- number of linked cells must be divisible by number-of-processes /-->
+  <!-- number of mpi ranks must be total number-of-processes /-->
+  <mpi-configuration number-of-processes="1 ; 1 ; 1" ></mpi-configuration>
+
+  <!-- TODO check fix-seed for mamico / USHER /-->
+  <simulation-configuration
+    dt="0.005"
+    number-of-timesteps="100"
+    reorganise-memory-every-timestep="20"
+    compute-macroscopic-quantities-every-timestep="0"
+    fix-seed="no"
+   ></simulation-configuration>
+
+  <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
+
+  <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
+
+  <!-- max density using molecules-per-direction ca. 0.9  /-->
+  <!-- cutoff-radius should be 2.2 to be consistent with Nie et. al paper /-->
+  <domain-configuration
+    init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
+    
+    molecules-per-direction="28 ; 28 ; 28"
+    domain-size="30.0 ; 30.0 ; 30.0"
+    domain-offset="10.0 ; 10.0 ; 2.5"
+    cutoff-radius="2.2"
+    linked-cell-size="2.5 ; 2.5 ; 2.5"
+    k_B="1.0"
+    block-size="100"
+
+    bottom-south-west="reflecting" bottom-south="reflecting" bottom-south-east="reflecting"
+    bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
+    bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
+
+    south-west="reflecting"        south="reflecting"        south-east="reflecting"
+    west="reflecting"                                          east="reflecting"
+    north-west="reflecting"        north="reflecting"        north-east="reflecting"
+
+    top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
+    top-west="reflecting"          top="reflecting"          top-east="reflecting"
+    top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
+  > </domain-configuration>
+
+</molecular-dynamics>
+
+<!-- XML config file used by MaMiCo's FilterPipeline -->
+
+<filter-pipeline>
+
+	<per-instance output="md">
+    </per-instance>
+
+	<post-multi-instance output="md">
+    </post-multi-instance>
+
+</filter-pipeline>
+
+<!-- TODO: remove this. currently, deletion of this gives a seg fault at runtime -->
+<couette/>

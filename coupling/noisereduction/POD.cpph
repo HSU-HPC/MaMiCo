@@ -147,6 +147,16 @@ endProcessInnerMacroscopicCells(){
   _firstTraversal = !_firstTraversal;
 }
 
+//TODO
+/*template<unsigned int dim>
+void coupling::noisereduction::POD<dim>::
+apply(){
+	beginProcessInnerMacroscopicCells();
+	for(unsigned int i = 0; i < outputCellVector.size(); i++) processInnerMacroscopicCell(*(_domainCells[i]), i); //TODO: Change POD to use vector incides, i.e _domainCellIndices[i].
+	endProcessInnerMacroscopicCells();
+} */ 
+
+
 template<unsigned int dim>
 unsigned int coupling::noisereduction::POD<dim>::getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const{
   const tarch::la::Vector<dim,unsigned int> localCells(indexConversion.getLocalNumberMacroscopicCells());
