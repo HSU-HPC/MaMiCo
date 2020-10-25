@@ -157,7 +157,7 @@ class Sorting {
       for (int n = 0; n < nLocalAtoms; n++){
         // extract atom position
         tarch::la::Vector<dim,double> position(0.0);
-        for (int d = 0; d < dim; d++){ position[d] = _lmp->atom->x[n][d]; }
+        for (unsigned int d = 0; d < dim; d++){ position[d] = _lmp->atom->x[n][d]; }
 
         // determine global cell index for this atom; convert global to local vector index
         if (isInLocalDomain(position,localOffset,localSize)){
@@ -166,7 +166,7 @@ class Sorting {
           std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index " << vectorIndex << std::endl;
           // check if this is a global non-ghost cell and throw error otherwise
           bool isInnerCell=true;
-          for (int d = 0; d < dim; d++){
+          for (unsigned int d = 0; d < dim; d++){
             isInnerCell = isInnerCell && (vectorIndex[d]>0) && (vectorIndex[d]<indexConversion.getGlobalNumberMacroscopicCells()[d]+1);
           }
           if (!isInnerCell){ std::cout << "ERROR Sorting::updateNonGhostCells: Molecule is not sorted into an inner cell!" << std::endl;exit(EXIT_FAILURE);}
@@ -200,7 +200,7 @@ class Sorting {
       for (loop[0] = 0; loop[0] < end[0]; loop[0]++){
         // determine ghost flag of cell
         bool isInnerCell=true;
-        for (int d = 0; d < dim; d++){ isInnerCell = isInnerCell && (loop[d]>0) && (loop[d] < end[d]-1); }
+        for (unsigned int d = 0; d < dim; d++){ isInnerCell = isInnerCell && (loop[d]>0) && (loop[d] < end[d]-1); }
         #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
         std::cout << "Flag cell " << loop << " to be ghost cell: " << isInnerCell << std::endl;
         #endif
@@ -230,7 +230,7 @@ class Sorting {
       for (int n = 0; n < nghost; n++){
         // extract atom position
         tarch::la::Vector<dim,double> position(0.0);
-        for (int d = 0; d < dim; d++){ position[d] = ghostX[n][d]; }
+        for (unsigned int d = 0; d < dim; d++){ position[d] = ghostX[n][d]; }
 
         // if the current position is in the region of interest, compute cell index and add it to mamico cell
         if (isInLocalDomain(position,localOffset,localSize)){

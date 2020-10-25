@@ -85,7 +85,7 @@ processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
 
   // write velocity value to new solution array and interpolate first solution (= value of old solution)
   _newSolution[index] = cell.getMicroscopicMomentum();
-  cell.setMicroscopicMomentum(_oldSolution[index]);
+  cell.setMicroscopicMomentum((1.0-_shiftTimestep)*_oldSolution[index] + _shiftTimestep*_newSolution[index]);
 
   const tarch::la::Vector<dim,double> velocity = (0.5-_shiftTimestep)*_oldSolution[index] + (_shiftTimestep+0.5)*_newSolution[index];
 
@@ -216,4 +216,3 @@ double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim
   }
   return massFlux;
 }
-

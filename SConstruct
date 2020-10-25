@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+
 # Copyright (C) 2015 Technische Universitaet Muenchen
 # This file is part of the Mamico project. For conditions of distribution
 # and use, please see the copyright notice in Mamico's main folder, or at
 # www5.in.tum.de/mamico
+
 import os;
 import sys;
 
@@ -9,10 +12,10 @@ import sys;
 ##### Prints out the available options for command line parameter "target"
 #
 def printTargets():   
-   print
-   print "       Possible target-names: "
-   print "         simplemd       : simple molecular dynamics simulation"
-   print "         libsimplemd    : SimpleMD built as library"
+   print()
+   print("       Possible target-names: ")
+   print("         simplemd       : simple molecular dynamics simulation")
+   print("         libsimplemd    : SimpleMD built as library")
 
 
 #########################################################################
@@ -41,7 +44,7 @@ if int(dim) == 2:
 elif int(dim) == 3:
    cppdefines.append('MDDim3')
 else:
-   print "ERROR: dim must be either '2' or '3'!"
+   print("ERROR: dim must be either '2' or '3'!")
    sys.exit(1)
 
 ##### Add build parameter specific build variable settings:
@@ -57,7 +60,7 @@ if build == 'debug':
 elif build == 'release':
    pass
 else:
-   print "ERROR: build must be 'debug' or 'release'!"
+   print("ERROR: build must be 'debug' or 'release'!")
    sys.exit(1)
    
 ##### Determine Machine
@@ -87,7 +90,7 @@ if parallel == 'yes' or parallel == 'parallel_yes':
 elif parallel == 'no' or parallel == 'parallel_no':
    pass
 else:
-   print "ERROR: parallel must be = 'yes', 'parallel_yes', 'no' or 'parallel_no'!"
+   print("ERROR: parallel must be = 'yes', 'parallel_yes', 'no' or 'parallel_no'!")
    sys.exit(1)
    
 ##### Determine GProf usage
@@ -101,7 +104,7 @@ elif gprof == 'yes' or gprof == 'gprof_yes':
    linkerflags.append('-p')
    linkerflags.append('-pg')
 else:
-   print "ERROR: gprof must be = 'yes', 'gprof_yes', 'no' or 'gprof_no'!"
+   print("ERROR: gprof must be = 'yes', 'gprof_yes', 'no' or 'gprof_no'!")
    sys.exit(1)
    
 ##### Switch Compiler
@@ -147,7 +150,7 @@ elif compiler == 'icc':
       ccflags.append('-align')
       ccflags.append('-ansi-alias')
 else:
-   print "ERROR: compiler must be = 'gcc' or 'icc'!"
+   print("ERROR: compiler must be = 'gcc' or 'icc'!")
    sys.exit(1)
       
 ##### Determine build path
@@ -167,12 +170,15 @@ if gprof == 'yes' or gprof == 'gprof_yes':
    buildpath = buildpath + 'gprof/'
 else:
    buildpath = buildpath + 'gprof_no/'
+
+if target=='libsimplemd':
+  ccflags.append('-fPIC')
    
 ##### Print options used to build
 #
-print "Target: " + target
-print "Options: build = " + str(build) + ", dim = " + str(dim) + ", build-offset = " + str(build_offset) + ", parallel = " + str(parallel) + ", gprof = " + str(gprof) + ", compiler = " + str(compiler)
-print "Buildpath: " + buildpath
+print("Target: " + target)
+print("Options: build = " + str(build) + ", dim = " + str(dim) + ", build-offset = " + str(build_offset) + ", parallel = " + str(parallel) + ", gprof = " + str(gprof) + ", compiler = " + str(compiler))
+print("Buildpath: " + buildpath)
 
 
 VariantDir (buildpath, './', duplicate=0)  # Change build directory
@@ -226,6 +232,6 @@ elif target=='multi-simplemd':
 elif target=='libsimplemd':
   env.Library(target= buildpath+'libsimplemd', source = [sourcesMolecularDynamics])
 else:
-  print "ERROR: Target", target, "is invalid!"
+  print("ERROR: Target", target, "is invalid!")
   printTargets ()
   sys.exit(1)

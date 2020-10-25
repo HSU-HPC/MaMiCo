@@ -1,14 +1,15 @@
 #!/bin/bash
 
-### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=/usr/lib/openmpi/include
-MPI_LIB_PATH=/usr/lib/openmpi/lib
-LIB_MPI=mpi
 
-LIB_EIGEN_PATH=/usr/include/eigen3
+### local settings like path variables
+SETTINGS=../../../personal_settings
 
-### home directory of MAMICO
-MAMICO_PATH=/home/niklas/Dokumente/Git/mamico-dev
+if test -f "$SETTINGS"; then
+	source ${SETTINGS}
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
@@ -27,7 +28,7 @@ if [ "${parallel}" == "parallel" ] || [ "${parallel}" == "sequential" ]
 then
     echo "Build mode: ${parallel}"
 else
-    echo "ERROR! ./test parallel/sequential"
+    echo "ERROR! ./buildtest parallel/sequential"
     exit -1
 fi
 
@@ -37,7 +38,7 @@ rm ${BUILD_PATH}/test;
 rm ${BUILD_PATH}/*.o;
 
 compiler=""
-libaries=""
+libraries=""
 objects=""
 includes="-I${MAMICO_PATH}"
 
@@ -45,7 +46,7 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O0 -g3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
