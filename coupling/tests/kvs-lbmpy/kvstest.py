@@ -156,14 +156,16 @@ class KVSTest():
             return gaussian_filter(data, sigma = (1,1,1,0))
 
         def median(data):
-            print("Applying median filter. size = 1.")
+            print("Applying median filter. size = 3*3*3.")
             #TODO: get size parameter right
-            return median_filter(data, size = (1,1,1,0))
+            return median_filter(data, size = (3,3,3,1))
+
+
 
         self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("gauss", pf.returnCellData, gauss, 0)
         self.csvs_for_plotting.append("gauss.csv")
-        #self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("median", pf.returnCellData, median, 0)
-        #self.csvs_for_plotting.append("median.csv")
+        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("median", pf.returnCellData, median, 0)
+        self.csvs_for_plotting.append("median.csv")
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
