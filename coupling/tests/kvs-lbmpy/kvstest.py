@@ -268,15 +268,16 @@ class KVSTest():
             fig, ax = mplt.subplots(2,1)
             t = range(len(self.velMD))
             for dir in range(2):
-                ax[dir].plot(t, self.velLB[:,dir], "-", color="blue")
-                ax[dir].plot(t, self.velMD[:,dir], ".", color="red")
+                ax[dir].plot(t, self.velLB[:,dir], "-", color="blue", label = "CS")
+                ax[dir].plot(t, self.velMD[:,dir], ".", color="red", label = "MD")
                 for csv in self.csvs_for_plotting:
                     #using pandas
                     df = read_csv(csv, delimiter=";", usecols=[0,7,8], names=["Iteration", "VelX", "VelY"], index_col=None)
                     #df["Iteration"] == t
-                    ax[dir].plot(df["Iteration"], df.iloc[:,dir+1], ".")
+                    ax[dir].plot(df["Iteration"], df.iloc[:,dir+1], ".", label = csv)
                 ax[dir].set_xlabel('coupling cycles')
                 ax[dir].grid(True)
+                ax[dir].legend()
             ax[0].set_ylabel('velocity_x')
             ax[1].set_ylabel('velocity_y')
             fig.tight_layout()
