@@ -19,9 +19,9 @@ import mamico.coupling
 import mamico.tarch.utils
 import pythonfilters as pf
 import numpy as np
+import pandas as pd
 from configparser import ConfigParser
 import matplotlib.pyplot as mplt
-from pandas import read_csv
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -49,7 +49,8 @@ class KVSTest():
         self.initSolvers()
         for cycle in range(self.cfg.getint("coupling", "couplingCycles")):
             self.runOneCouplingCycle(cycle)
-        self.plot()
+        pd.DataFrame(self.velLB).to_csv("lbm.csv", sep = ";", header = False)
+
 
     def runOneCouplingCycle(self, cycle):
         self.advanceMacro(cycle)
@@ -147,8 +148,6 @@ class KVSTest():
         #self.sf = pf.StrouhalPython(0.2, 2.25)
         #self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("test-strouhal", pf.returnCellData, self.sf.addDataPoint, 3)
 
-        self.csvs_for_plotting= []
-
         from scipy.ndimage import gaussian_filter, median_filter
         #Add Gauss filter
         def gauss(data):
@@ -163,9 +162,7 @@ class KVSTest():
 
 
         self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("gauss", pf.returnCellData, gauss, 0)
-        self.csvs_for_plotting.append("gauss.csv")
         self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("median", pf.returnCellData, median, 0)
-        self.csvs_for_plotting.append("median.csv")
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
@@ -175,7 +172,6 @@ class KVSTest():
 
         # buffer for evaluation plot
         if self.rank==0:
-            self.velMD = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
     
         if self.rank==0:
@@ -255,34 +251,12 @@ class KVSTest():
             for d in range(3)]
         if self.rank==0:
             for dir in range(2):
-                self.velMD[cycle, dir] = np.mean(self.buf.loadRecvVelocity()[2,2,:,dir])
+                #TODO: single cell
                 self.velLB[cycle, dir] = np.mean(self.macroscopicSolver.scen.velocity[
                     mdpos[0]+5, 
                     mdpos[1]+5, 
                     mdpos[2]:mdpos[2]+numcells[2],
                     dir].data * (self.dx / self.dt_LB))
-
-    def plot(self):
-        if self.rank==0:
-            mplt.style.use("seaborn")
-            fig, ax = mplt.subplots(2,1)
-            t = range(len(self.velMD))
-            for dir in range(2):
-                ax[dir].plot(t, self.velLB[:,dir], "-", color="blue", label = "CS")
-                ax[dir].plot(t, self.velMD[:,dir], ".", color="red", label = "MD")
-                for csv in self.csvs_for_plotting:
-                    #using pandas
-                    df = read_csv(csv, delimiter=";", usecols=[0,7,8], names=["Iteration", "VelX", "VelY"], index_col=None)
-                    #df["Iteration"] == t
-                    ax[dir].plot(df["Iteration"], df.iloc[:,dir+1], ".", label = csv)
-                ax[dir].set_xlabel('coupling cycles')
-                ax[dir].grid(True)
-                ax[dir].legend()
-            ax[0].set_ylabel('velocity_x')
-            ax[1].set_ylabel('velocity_y')
-            fig.tight_layout()
-            #TODO: legend
-            mplt.savefig("plot.png")
 
     def __del__(self):
         self.shutdown()
