@@ -128,7 +128,11 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
     _configuration(configuration),_mamicoConfiguration(mamicoConfiguration),
     _tolerance(1.0e-8){}
 
-    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t){} //TODO
+    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t){
+      std::stringstream command;
+      command << "write_dump all atom restart_checkpoint.dump";
+      _lmp->input->one(command.str().c_str());
+    } //TODO
 
     // switch off coupling in simulation -> we assume the mamico fix to have ID=2
     virtual void switchOffCoupling(){
@@ -237,13 +241,17 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
       // create atoms based on input configuration; currently, only creation of molecules on a lattice is supported -------------------
       tarch::la::Vector<3,double> domainOffset(0.0); for (int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){ domainOffset[d] = _configuration.getDomainConfiguration().getGlobalDomainOffset()[d];}
       tarch::la::Vector<3,double> domainSize  (1.0); for (int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){ domainSize[d]   = _configuration.getDomainConfiguration().getGlobalDomainSize()[d];}
-      double particleDensity=1.0;
-      for (int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){
-        particleDensity = particleDensity*_configuration.getDomainConfiguration().getMoleculesPerDirection()[d]/domainSize[d];
+      if (!_configuration.getDomainConfiguration().initFromCheckpoint() 
+        && !_configuration.getDomainConfiguration().initFromSequentialCheckpoint() ) {
+        tarch::la::Vector<3,unsigned int> moleculesPerDirection(0); for(int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){ moleculesPerDirection[d] = _configuration.getDomainConfiguration().getMoleculesPerDirection()[d];}
+        double particleDensity=1.0;
+        for (int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){
+          particleDensity = particleDensity*_configuration.getDomainConfiguration().getMoleculesPerDirection()[d]/domainSize[d];
+        }
+        ss.str("");
+        ss << "lattice sc " << particleDensity << " origin 0.5 0.5 0.5";
+        _lmp->input->one(ss.str().c_str());
       }
-      ss.str("");
-      ss << "lattice sc " << particleDensity << " origin 0.5 0.5 0.5";
-      _lmp->input->one(ss.str().c_str());
 
 
       // define simulation region
@@ -252,16 +260,23 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
       ss << domainOffset[2] << " " << (domainOffset[2]+domainSize[2]) << " units box";
       _lmp->input->one(ss.str().c_str());
 
+      
 
-      _lmp->input->one("create_box 1 box");
-
-      _lmp->input->one("create_atoms 1 box");
-      // set mass and correct temperature
-      ss.str(""); ss << "mass 1 " << _configuration.getMoleculeConfiguration().getMass();
-      _lmp->input->one(ss.str().c_str());
-      // initialise velocities on molecules; for parallel simulations, we do this according to global MD simulation number (we add 1 as 0 is not a valid seed)
-      ss.str(""); ss << "velocity all create " << _configuration.getMoleculeConfiguration().getTemperature() << " " << localMDSimulation+1 << " loop geom";
-      _lmp->input->one(ss.str().c_str());
+      if(_configuration.getDomainConfiguration().initFromCheckpoint() || 
+          _configuration.getDomainConfiguration().initFromSequentialCheckpoint() ) {
+        std::stringstream command;
+        command << "read_restart " << _configuration.getDomainConfiguration().getCheckpointFilestem() << ".restart";
+        _lmp->input->one(command.str().c_str());
+      } else {
+        _lmp->input->one("create_box 1 box");
+        _lmp->input->one("create_atoms 1 box");
+        // set mass and correct temperature
+        ss.str(""); ss << "mass 1 " << _configuration.getMoleculeConfiguration().getMass();
+        _lmp->input->one(ss.str().c_str());
+        // initialise velocities on molecules; for parallel simulations, we do this according to global MD simulation number (we add 1 as 0 is not a valid seed)
+        ss.str(""); ss << "velocity all create " << _configuration.getMoleculeConfiguration().getTemperature() << " " << localMDSimulation+1 << " loop geom";
+        _lmp->input->one(ss.str().c_str());
+      }
 
       // incorporate reflecting boundaries, pt.2 (this needs to be done after the box was created); to be extended to 2D
       if (MDSIMULATIONFACTORY_DIMENSION==3){
@@ -299,7 +314,7 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
       // write checkpointing
       if (_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0){
         ss.str(""); ss << "restart " << _configuration.getCheckpointConfiguration().getWriteEveryTimestep() << " ";
-        ss << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_" << "1 " << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_" << "2";
+        ss << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_" << "1.restart " << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_" << "2.restart";
         _lmp->input->one(ss.str().c_str());
       }
       // set nve ensemble
