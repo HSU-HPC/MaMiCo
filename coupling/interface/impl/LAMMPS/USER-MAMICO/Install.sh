@@ -26,9 +26,8 @@ action () {
 # only a few files have dependencies
 
 for file in *.cpp *.h; do
-    action $file
+  test -f ${file} && action $file
 done
-
 
 # add include directory for MAMICO to PKG_INC; currently, this path
 # needs to exist in form of env.variable MAMICO_PATH, pointing to
@@ -36,14 +35,14 @@ done
 if (test $mode = 1) then
 
   if (test -e ../Makefile.package) then
-    sed -i 's/-I${MAMICO_PATH} -std=c++11 -DMDCoupledParallel -DTarchParallel//g' ../Makefile.package
-    sed -i 's/^PKG_INC =*/& -I${MAMICO_PATH} -std=c++11 -DMDCoupledParallel -DTarchParallel/' ../Makefile.package
+    sed -i 's|-I${MAMICO_PATH} ${LIB_EIGEN_PATH} -std=c++11 -DMDCoupledParallel -DTarchParallel||g' ../Makefile.package
+    sed -i 's|^PKG_INC =*|& -I${MAMICO_PATH} ${LIB_EIGEN_PATH} -std=c++11 -DMDCoupledParallel -DTarchParallel|' ../Makefile.package
     #sed -i -e 's|^PKG_INC =[ \t]*|&-I${MAMICO_PATH} -std=c++11 -DMDCoupledParallel |' ../Makefile.package
   fi
 elif (test $mode = 0) then
 
   if (test -e ../Makefile.package) then
-    sed -i -e 's/[^ \t]*-I${MAMICO_PATH} -std=c++11 -DMDCoupledParallel -DTarchParallel[^ \t]* //' ../Makefile.package
+    sed -i -e 's|[^ \t]*-I${MAMICO_PATH} ${LIB_EIGEN_PATH} -std=c++11 -DMDCoupledParallel -DTarchParallel[^ \t]* ||' ../Makefile.package
   fi
 
 fi
