@@ -1,2 +1,5 @@
 test
 .gdbinit
+*checkpoint*
+*Checkpoint*
+log.lammps*
