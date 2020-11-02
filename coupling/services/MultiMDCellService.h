@@ -130,7 +130,7 @@ class coupling::services::MultiMDCellService {
 
       _mdConfiguration.getDomainConfigurationNonConst().setInitFromCheckpoint(true);
       std::stringstream filestem;
-      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()+1) / _multiMDService.getNumberLocalComms() << "_0";
+      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()) / _multiMDService.getNumberLocalComms() << "_0";
       _mdConfiguration.getDomainConfigurationNonConst().setCheckpointFilestem(filestem.str());
       _mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(false);
       if(_multiMDService.getLocalSize() > 1) {
