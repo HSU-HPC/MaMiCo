@@ -24,14 +24,22 @@ class coupling::solvers::CoupledMolecularDynamicsSimulation:
 public simplemd::MolecularDynamicsSimulation {
   public:
     CoupledMolecularDynamicsSimulation(
-      const simplemd::configurations::MolecularDynamicsConfiguration& configuration
+      simplemd::configurations::MolecularDynamicsConfiguration& configuration
     );
     virtual ~CoupledMolecularDynamicsSimulation(){}
 
     void simulateOneCouplingTimestep(const unsigned int& t);
 
-    void switchOnCoupling(){ _couplingSwitchedOn = true;}
-    void switchOffCoupling(){ _couplingSwitchedOn = false;}
+    void switchOnCoupling(){ _couplingSwitchedOn = true;
+      if(_configuration.getDomainConfiguration().getPeriodicEqulibration()){
+        _configuration.getDomainConfiguration().setPeriodicBoundaries();
+      }
+    }
+    void switchOffCoupling(){ _couplingSwitchedOn = false;
+      if(_configuration.getDomainConfiguration().getPeriodicEqulibration()){
+        _configuration.getDomainConfiguration().setReflectingBoundaries();
+      }
+    }
 
     void setMacroscopicCellService(coupling::services::MacroscopicCellService<MD_DIM> *macroscopicCellService){_macroscopicCellService = macroscopicCellService;}
 

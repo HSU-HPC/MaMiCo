@@ -62,6 +62,17 @@ class simplemd::configurations::DomainConfiguration: public tarch::configuration
     const bool& initFromSequentialCheckpoint() const { return _initFromSequentialCheckpoint;}
 
     unsigned int getNumberOfMolecules() const;
+    const bool getPeriodicEqulibration() const{return _periodicEquilibration;}
+    void setPeriodicBoundaries(){
+      for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS; i++){
+        _boundary[i] = simplemd::PERIODIC_BOUNDARY;
+      }
+    }
+    void setReflectingBoundaries(){
+      for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS; i++){
+        _boundary[i] = simplemd::REFLECTING_BOUNDARY;
+      }
+    }
 
   private:
     static const std::string MOLECULES_PER_DIRECTION;
@@ -81,6 +92,7 @@ class simplemd::configurations::DomainConfiguration: public tarch::configuration
     static const std::string INIT_FROM_CHECKPOINT;
     static const std::string INIT_FROM_SEQUENTIAL_CHECKPOINT;
     static const std::string LINKED_CELLS_PER_NUMBER_DENSITY_EVALUATION;
+    static const std::string PERIODIC_EQUILIBRATION;
 
     /** number of molecules in each direction */
     tarch::la::Vector<MD_DIM,unsigned int> _moleculesPerDirection;
@@ -112,5 +124,7 @@ class simplemd::configurations::DomainConfiguration: public tarch::configuration
 
     /** isValid flag */
     bool _isValid;
+
+    bool _periodicEquilibration{false};
 };
 #endif // _MOLECULARDYNAMICS_CONFIGURATIONS_DOMAINCONFIGURATION_H_
