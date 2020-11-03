@@ -38,6 +38,7 @@ const std::string simplemd::configurations::DomainConfiguration::CELLS_PER_LINKE
 const std::string simplemd::configurations::DomainConfiguration::INIT_FROM_CHECKPOINT("init-from-checkpoint");
 const std::string simplemd::configurations::DomainConfiguration::INIT_FROM_SEQUENTIAL_CHECKPOINT("init-from-sequential-checkpoint");
 const std::string simplemd::configurations::DomainConfiguration::LINKED_CELLS_PER_NUMBER_DENSITY_EVALUATION("linked-cells-per-number-density-evaluation");
+const std::string simplemd::configurations::DomainConfiguration::PERIODIC_EQUILIBRATION("periodic-equilibration");
 
 simplemd::configurations::DomainConfiguration::DomainConfiguration():
 _moleculesPerDirection(0),
@@ -58,7 +59,8 @@ void simplemd::configurations::DomainConfiguration::
 parseSubtag( tinyxml2::XMLElement* node ){
   std::string strBuf = "";
   int intBuf = -1;
-
+  tarch::configuration::ParseConfiguration::readBoolOptional(_periodicEquilibration, node, PERIODIC_EQUILIBRATION);
+  
   // get checkpoint info
   _initFromCheckpoint = false; _checkpointFilestem="";
   tarch::configuration::ParseConfiguration::readStringOptional(_checkpointFilestem, node, INIT_FROM_CHECKPOINT);
@@ -195,4 +197,3 @@ std::string simplemd::configurations::DomainConfiguration::getTag() const {
 bool simplemd::configurations::DomainConfiguration::isValid() const {
   return _isValid;
 }
-

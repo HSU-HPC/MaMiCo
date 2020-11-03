@@ -40,7 +40,7 @@ namespace simplemd {
  */
 class simplemd::MolecularDynamicsSimulation {
   public:
-    MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration);
+    MolecularDynamicsSimulation(simplemd::configurations::MolecularDynamicsConfiguration& configuration);
     virtual ~MolecularDynamicsSimulation(){
     }
 
@@ -72,7 +72,7 @@ class simplemd::MolecularDynamicsSimulation {
     ) const;
 
   protected:
-    const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
+    simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
 
     // molecule mappings
     simplemd::moleculemappings::VelocityStoermerVerletMapping *_timeIntegrator;

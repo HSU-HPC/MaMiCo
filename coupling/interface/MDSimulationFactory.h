@@ -63,7 +63,7 @@ class MDSimulation {
 #if defined(SIMPLE_MD)
 class SimpleMDSimulation: public coupling::interface::MDSimulation {
   public:
-    SimpleMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration):
+    SimpleMDSimulation(simplemd::configurations::MolecularDynamicsConfiguration& configuration):
     coupling::interface::MDSimulation(), _molecularDynamicsSimulation(configuration){}
     virtual ~SimpleMDSimulation(){}
 
@@ -540,7 +540,7 @@ class SimulationAndInterfaceFactory {
 
     /** returns a pointer to the md simulation. This will create a new simulation which needs to be deleted at the end */
     coupling::interface::MDSimulation* getMDSimulation(
-      const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
+      simplemd::configurations::MolecularDynamicsConfiguration& configuration,
       const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>&  mamicoConfiguration
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
       ,MPI_Comm localComm

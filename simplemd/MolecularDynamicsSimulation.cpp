@@ -5,7 +5,7 @@
 #include "simplemd/MolecularDynamicsSimulation.h"
 
 simplemd::MolecularDynamicsSimulation::
-MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration):
+MolecularDynamicsSimulation(simplemd::configurations::MolecularDynamicsConfiguration& configuration):
 _configuration(configuration),
 _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL),
 _lennardJonesForce(NULL), _emptyLinkedListsMapping(NULL), _rdfMapping(NULL),

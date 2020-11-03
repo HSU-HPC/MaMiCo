@@ -53,7 +53,7 @@ class simplemd::configurations::MolecularDynamicsConfiguration: public tarch::co
      */
     bool isValid() const;
 
-    const simplemd::configurations::DomainConfiguration& getDomainConfiguration() const { return _domainConfiguration; }
+    simplemd::configurations::DomainConfiguration& getDomainConfiguration()  { return _domainConfiguration; }
 
     const simplemd::configurations::MoleculeConfiguration& getMoleculeConfiguration() const { return _moleculeConfiguration; }
 
