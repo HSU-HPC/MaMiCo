@@ -94,7 +94,7 @@ public:
         U = HbyA - rAU*fvc::grad(p);
         U.correctBoundaryConditions();
       }
-      // runTime.write();
+      runTime.write();
       plottxt();
       _timestepCounter++;
     }

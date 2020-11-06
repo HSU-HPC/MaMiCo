@@ -560,7 +560,7 @@ private:
 
   /** computes global number of macroscopic cells from configs. Required by couette solver interface before MacroscopicCellService is initialised! */
   tarch::la::Vector<3,unsigned int> getGlobalNumberMacroscopicCells(
-  simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig, const coupling::configurations::MaMiCoConfiguration<3> &mamicoConfig) const {
+  const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig, const coupling::configurations::MaMiCoConfiguration<3> &mamicoConfig) const {
     tarch::la::Vector<3,double> domainSize(simpleMDConfig.getDomainConfiguration().getGlobalDomainSize());
     tarch::la::Vector<3,double> dx(mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
     tarch::la::Vector<3,unsigned int> globalNumberMacroscopicCells(0);
