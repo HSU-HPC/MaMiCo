@@ -6,7 +6,7 @@
 
 coupling::solvers::CoupledMolecularDynamicsSimulation::
 CoupledMolecularDynamicsSimulation(
-simplemd::configurations::MolecularDynamicsConfiguration& configuration):
+const simplemd::configurations::MolecularDynamicsConfiguration& configuration):
 simplemd::MolecularDynamicsSimulation(configuration),
 _macroscopicCellService(NULL),
 _couplingSwitchedOn(true){}
@@ -27,6 +27,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   // do it BEFORE quantities are manipulated as we can then also do some pre-processing here.
   _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
   // ------------ coupling step: distribute mass ---------------------
+  _macroscopicCellService->plotEveryMicroscopicTimestep(t);
   _macroscopicCellService->distributeMass(t);
   // for isothermal simulations: apply thermostat
   _macroscopicCellService->applyTemperatureToMolecules(t);
@@ -40,7 +41,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   _macroscopicCellService->applyBoundaryForce(t);
   // evaluate statistics
   evaluateStatistics(t);
-  _macroscopicCellService->plotEveryMicroscopicTimestep(t);
+
   _boundaryTreatment->emptyGhostBoundaryCells();
 
   // plot VTK output

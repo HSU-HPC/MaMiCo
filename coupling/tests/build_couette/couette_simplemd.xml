@@ -33,7 +33,6 @@
     linked-cell-size="2.5 ; 2.5 ; 2.5"
     k_B="1.0"
     block-size="100"
-    periodic-equilibration="yes"
 
     bottom-south-west="reflecting" bottom-south="reflecting" bottom-south-east="reflecting"
     bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
