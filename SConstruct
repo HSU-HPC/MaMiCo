@@ -75,6 +75,10 @@ if machine== 'mac-cluster':
    mpiLibrary=''
    mpiIncludePath=''
    mpiLibraryPath=''
+if machine== 'hsu-cluster':
+   mpiLibrary='mpi'
+   mpiIncludePath='/cluster/mpi/openmpi/3.0.0/include'
+   mpiLibraryPath='/cluster/mpi/openmpi/3.0.0/lib'
 
 ##### Determine MPI-Parallelization
 #
