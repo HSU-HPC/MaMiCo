@@ -10,6 +10,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/RandomNumberService.h"
+#include "coupling/InstanceHandling.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/LBCouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
@@ -70,14 +71,11 @@ private:
   }
 
   void addMDSimulation() {
-    unsigned int iMD = _multiMDCellService->addMDSimulation(getCouetteSolverInterface(
-                                          _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-                                          _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
-                                          getGlobalNumberMacroscopicCells(_simpleMDConfig,
-                                                                          _mamicoConfig),
-                                          _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()),
-                                          _mdSolverInterface
-                                          ,_simpleMD);
+    unsigned int iMD = _multiMDCellService->addMDSimulation(
+                          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMacroscopicSolverInterface(),
+                          _mdSolverInterface,
+                          _simpleMD
+                        );
 
     if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
 
@@ -151,42 +149,21 @@ private:
                                                             _cfg.totalNumberMDSimulations);
     _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
 
-    for (unsigned int i = 0; i < _localMDInstances; i++){
-      _simpleMD.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
-        _simpleMDConfig,_mamicoConfig
-        #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-        , _multiMDService->getLocalCommunicator()
-        #endif
-      ));
-      if (_simpleMD[i]==NULL){
-        std::cout << "ERROR CouetteTest: _simpleMD[" << i << "]==NULL!" << std::endl; 
-        exit(EXIT_FAILURE);
-      }
+    _instanceHandling = new coupling::InstanceHandling<3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
+    if(_instanceHandling == nullptr) {
+      std::cout << "ERROR DynamicMDTest::initSolvers() : _instanceHandling == NULL!" << std::endl;
+      std::exit(EXIT_FAILURE);
     }
+
+    _simpleMD = _instanceHandling->getSimpleMD();
+    _mdSolverInterface = _instanceHandling->getMDSolverInterface();
 
     _mdStepCounter = 0;
     if (_rank == 0){ gettimeofday(&_tv.start,NULL); }
-    for (unsigned int i = 0; i < _localMDInstances; i++){
-      _simpleMD[i]->init(*_multiMDService,_multiMDService->getGlobalNumberOfLocalMDSimulation(i));
-    }
     if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // equilibrate MD
-      for (unsigned int i = 0; i < _localMDInstances; i++){
-        _simpleMD[i]->switchOffCoupling();
-        _simpleMD[i]->simulateTimesteps(_cfg.equSteps,_mdStepCounter);
-      }
+      _instanceHandling->equilibrate(_cfg.equSteps, _mdStepCounter);
       _mdStepCounter += _cfg.equSteps;
-    }
-
-    // allocate coupling interfaces
-    for (unsigned int i = 0; i < _localMDInstances; i++){
-      _simpleMD[i]->switchOnCoupling();
-      _mdSolverInterface.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().
-        getMDSolverInterface(_simpleMDConfig, _mamicoConfig, _simpleMD[i]));
-      if (_mdSolverInterface[i] == NULL){
-        std::cout << "ERROR CouetteTest: mdSolverInterface[" << i << "] == NULL!" << std::endl; 
-        exit(EXIT_FAILURE);
-      }
     }
     
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
@@ -746,6 +723,7 @@ private:
   unsigned int _localMDInstances;
   std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterface;
   std::vector<coupling::interface::MDSimulation*> _simpleMD;
+  coupling::InstanceHandling<3>* _instanceHandling;
   std::default_random_engine _generator;
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
