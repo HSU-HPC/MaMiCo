@@ -61,7 +61,6 @@ libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
 FLAGS="${FLAGS} -DMDParallel"
 
 
-
 # specific built for SIMPLE_MD
 if [ "${mdSim}" == "SIMPLE_MD" ]
 then
