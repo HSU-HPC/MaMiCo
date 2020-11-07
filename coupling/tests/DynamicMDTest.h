@@ -18,6 +18,7 @@
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/services/MultiMDCellService.h"
+#include "coupling/configurations/CouetteConfiguration.h"
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -38,30 +39,16 @@ public:
   virtual ~DynamicMDTest(){}
 
   virtual void run(){
-  #if defined(COUPLING_DYNAMIC_MD_SUDDEN )
-  std::cout << "Running with MPI Shutdown test sudden." << std::endl;
-  #endif
-  #if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
-  std::cout << "Running with MPI Shutdown test successive." << std::endl;
-  #endif
+
     init();
 
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
 
-#if defined(COUPLING_DYNAMIC_MD_SUDDEN)
-      // Drop 50 random md instances in cycle 249
-      if(cycle == 4) {
+      if(cycle > 0 && cycle < 50 && cycle % 2 == 0) {
         addMDSimulation();
       }
-#endif
-#if defined(COUPLING_DYNAMIC_MD_SUCCESSIVE)
-      // After cycle 120 delete one md instance per cycle
-      if(cycle >= 120 && cycle < 220) {
-        removeMDSimulation();
-      }
-#endif
     }
     shutdown();
   }
@@ -69,8 +56,8 @@ public:
   
 
 private:
-  enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
-  enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
+  //enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
+  //enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void removeMDSimulation() {
     //int iMD = c; // Global MD index to be shut down
@@ -105,7 +92,7 @@ private:
 
   void runOneCouplingCycle(int cycle){
     advanceMacro(cycle);
-    /*if(_localMDInstances > 0)*/ advanceMicro(cycle);
+    advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
     // write data to csv-compatible file for evaluation
@@ -137,153 +124,7 @@ private:
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("couette.xml","mamico",_mamicoConfig);
     if (!_mamicoConfig.isValid()){ std::cout << "ERROR CouetteTest: Invalid MaMiCo config!" << std::endl; exit(EXIT_FAILURE); }
 
-    parseCouetteTestConfiguration();
-  }
-
-  void parseCouetteTestConfiguration(){
-    tinyxml2::XMLDocument conffile;
-    tinyxml2::XMLElement *node = NULL;
-    conffile.LoadFile("couette.xml");
-    node = conffile.FirstChildElement("couette-test");
-    if (node == NULL){
-      std::cout << "Could not read input file couette.xml: missing element <couette-test>" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-
-    tinyxml2::XMLElement *n_mamico = node->NextSiblingElement();
-    if(n_mamico == NULL){
-      std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-	tinyxml2::XMLElement *n_md = n_mamico->NextSiblingElement();
-    if(n_md == NULL){
-      std::cout << "Could not read input file couette.xml: missing element <molecular-dynamics>" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-	tinyxml2::XMLElement *n_fp = n_md->NextSiblingElement();
-    if(n_fp == NULL){
-      std::cout << "Could not read input file couette.xml: missing element <filter-pipeline>" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-	tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
-    if(n_unexpected == NULL){
-      std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
-      exit(EXIT_FAILURE);
-    }
-
-    tinyxml2::XMLElement* subtag = node->FirstChildElement("domain");
-    if (subtag == NULL){
-      std::cout << "Could not read input file couette.xml: Missing subtag: domain" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.channelheight,subtag,"channelheight");
-    tarch::configuration::ParseConfiguration::readVector<3,double>(_cfg.wallVelocity,subtag,"wall-velocity");
-    _cfg.wallInitCycles = 0;
-    tarch::configuration::ParseConfiguration::readIntOptional(_cfg.wallInitCycles,subtag,"wall-init-cycles");
-    if(_cfg.wallInitCycles > 0)
-      tarch::configuration::ParseConfiguration::readVector<3,double>(_cfg.wallInitVelocity,subtag,"wall-init-velocity");
-    _cfg.wallOscillations = 0;
-    tarch::configuration::ParseConfiguration::readDoubleOptional(_cfg.wallOscillations,subtag,"wall-oscillations");
-
-    subtag = node->FirstChildElement("coupling");
-    if (subtag == NULL){
-      std::cout << "Could not read input file couette.xml: Missing subtag: coupling" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.couplingCycles,subtag,"coupling-cycles");
-    tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.twoWayCoupling,subtag,"two-way-coupling");
-    tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.md2Macro,subtag,"send-from-md-to-macro");
-    tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.macro2Md,subtag,"send-from-macro-to-md");
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.filterInitCycles,subtag,"filter-init-cycles");
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.csvEveryTimestep,subtag,"write-csv-every-timestep");
-    tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.computeSNR,subtag,"compute-snr");
-
-    subtag = node->FirstChildElement("microscopic-solver");
-    if (subtag == NULL){
-      std::cout << "Could not read input file couette.xml: Missing subtag: microscopic-solver" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    std::string type;
-    tarch::configuration::ParseConfiguration::readStringMandatory(type,subtag,"type");
-    if(type == "md"){
-      _cfg.miSolverType = SIMPLEMD;
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp,subtag,"temperature");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps,subtag,"equilibration-steps");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.totalNumberMDSimulations,subtag,"number-md-simulations");
-      if(_cfg.totalNumberMDSimulations < 1){
-        std::cout << "Could not read input file couette.xml: number-md-simulations < 1" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
-    else if(type == "synthetic"){
-      _cfg.miSolverType = SYNTHETIC;
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.noiseSigma,subtag,"noise-sigma");
-      _cfg.totalNumberMDSimulations = 1;
-      tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations,subtag,"number-md-simulations");
-    }
-    else{
-      std::cout << "Could not read input file couette.xml: Unknown microscopic solver type!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.density,subtag,"density");
-
-    subtag = node->FirstChildElement("macroscopic-solver");
-    if (subtag == NULL){
-      std::cout << "Could not read input file couette.xml: Missing subtag: macroscopic-solver" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    _cfg.lbNumberProcesses = tarch::la::Vector<3,unsigned int>(1);
-    tarch::configuration::ParseConfiguration::readStringMandatory(type,subtag,"type");
-    if(type == "lb"){
-      _cfg.maSolverType = COUETTE_LB;
-      tarch::configuration::ParseConfiguration::readVector<3,unsigned int>(_cfg.lbNumberProcesses,subtag,"number-of-processes");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep,subtag,"plot-every-timestep");
-    }
-    else if(type == "fd"){
-      _cfg.maSolverType = COUETTE_FD;
-      tarch::configuration::ParseConfiguration::readVector<3,unsigned int>(_cfg.lbNumberProcesses,subtag,"number-of-processes");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep,subtag,"plot-every-timestep");
-    }
-    else if(type == "analytical"){
-      _cfg.maSolverType = COUETTE_ANALYTICAL;
-      if(!(_cfg.wallVelocity[1] == 0.0 && _cfg.wallVelocity[2] == 0.0)){
-        std::cout << "analytic solver only supports flow in x-direction" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
-    else{
-      std::cout << "Could not read input file couette.xml: Unknown macroscopic solver type!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    double vis;
-    tarch::configuration::ParseConfiguration::readDoubleMandatory(vis, subtag, "viscosity");
-    _cfg.kinVisc = vis / _cfg.density;
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.initAdvanceCycles,subtag,"init-advance-cycles");
-
-    subtag = node->FirstChildElement("tws-loop");
-    if (subtag == NULL) _cfg.twsLoop = false;
-    else{
-      _cfg.twsLoop = true;
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.twsLoopMin,subtag,"min");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.twsLoopMax,subtag,"max");
-      _cfg.twsLoopStep = 1;
-      tarch::configuration::ParseConfiguration::readIntOptional(_cfg.twsLoopStep,subtag,"step");
-    }
-
-    if(_cfg.miSolverType == SYNTHETIC){
-      if(_cfg.md2Macro || _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
-        _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1){
-        std::cout << "Invalid configuration: Synthetic MD runs sequentially on rank 0 only. "
-          << "It does neither support parallel communication nor multi-instance sampling" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
-    if(_cfg.maSolverType == COUETTE_ANALYTICAL){
-      if(_cfg.twoWayCoupling){
-        std::cout << "Invalid configuration: COUETTE_ANALYTICAL does not support twoWayCoupling" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
+    _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration("couette.xml");
   }
 
 
@@ -328,7 +169,7 @@ private:
     for (unsigned int i = 0; i < _localMDInstances; i++){
       _simpleMD[i]->init(*_multiMDService,_multiMDService->getGlobalNumberOfLocalMDSimulation(i));
     }
-    if(_cfg.miSolverType == SIMPLEMD){
+    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // equilibrate MD
       for (unsigned int i = 0; i < _localMDInstances; i++){
         _simpleMD[i]->switchOffCoupling();
@@ -374,7 +215,7 @@ private:
       );
     }
 
-    if(_cfg.miSolverType == SIMPLEMD){
+    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
@@ -390,7 +231,7 @@ private:
     allocateRecvBuffer(_multiMDCellService->getIndexConversion(),*couetteSolverInterface);
 
     // manually allocate noise reduction if necessary
-    if(_cfg.miSolverType == SYNTHETIC){
+    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SYNTHETIC){
       if(_cfg.twsLoop){
         _noiseReduction = _mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(
           _multiMDCellService->getIndexConversion(), *_multiMDService, _tws);
@@ -455,7 +296,7 @@ private:
 
   void advanceMicro(int cycle){
     if (_rank==0){ gettimeofday(&_tv.start,NULL); }
-    if(_cfg.miSolverType == SIMPLEMD){
+    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // run MD instances
       for (unsigned int i = 0; i < _localMDInstances; i++){
         if(_simpleMD[i] == nullptr) continue;
@@ -485,7 +326,7 @@ private:
       }
     }
     
-    if(_cfg.miSolverType == SYNTHETIC){
+    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SYNTHETIC){
       fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
 
       if (_rank==0){
@@ -544,12 +385,14 @@ private:
   }
 
   void twoWayCoupling(int cycle){
-    if ( (_cfg.maSolverType==COUETTE_LB) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
+    if ( (_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_LB) 
+        && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
         _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
     }
-    if ( (_cfg.maSolverType==COUETTE_LB) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
+    if ( (_cfg.maSolverType==coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_LB) 
+        && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getIndexConversion());
     }
     
@@ -786,7 +629,7 @@ private:
       for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
 
       double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
-      if(_cfg.maSolverType == COUETTE_LB)
+      if(_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_LB)
         mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
 
       // compute momentum
@@ -824,7 +667,7 @@ private:
     coupling::solvers::AbstractCouetteSolver<3>* solver = NULL;
     tarch::la::Vector<3,double> vel = _cfg.wallInitCycles > 0 ? _cfg.wallInitVelocity : _cfg.wallVelocity;
     // analytical solver: is only active on rank 0
-    if (_cfg.maSolverType == COUETTE_ANALYTICAL){
+    if (_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_ANALYTICAL){
       if (_rank == 0){
         solver = new coupling::solvers::CouetteSolver<3>(_cfg.channelheight,vel[0],_cfg.kinVisc);
         if (solver==NULL){
@@ -833,7 +676,7 @@ private:
         }
       }
     // LB solver: active on lbNumberProcesses
-    } else if(_cfg.maSolverType == COUETTE_LB){
+    } else if(_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_LB){
       solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight,vel,_cfg.kinVisc,dx,dt,_cfg.plotEveryTimestep,"LBCouette",_cfg.lbNumberProcesses,1);
       if (solver==NULL){
         std::cout << "ERROR CouetteTest::getCouetteSolver(): LB solver==NULL!" << std::endl;
@@ -854,9 +697,9 @@ private:
     tarch::la::Vector<3,unsigned int> globalNumberMacroscopicCells,unsigned int outerRegion
   ){
     coupling::interface::MacroscopicSolverInterface<3>* interface = NULL;
-    if (_cfg.maSolverType == COUETTE_ANALYTICAL){
+    if (_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_ANALYTICAL){
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells,outerRegion);
-    } else if (_cfg.maSolverType == COUETTE_LB){
+    } else if (_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_LB){
       coupling::solvers::LBCouetteSolver *lbSolver = static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver);
       if (lbSolver==NULL){std::cout << "ERROR CouetteTest::getCouetteSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl; exit(EXIT_FAILURE);}
       // compute number of cells of MD offset; detect any mismatches!
@@ -874,35 +717,6 @@ private:
     if (interface==NULL){std::cout << "ERROR CouetteTest::getCouetteSolverInterface(...), rank=" << _rank << ": interface==NULL!" << std::endl; exit(EXIT_FAILURE);}
     return interface;
   }
-
-  struct CouetteConfig{
-    // channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0)
-    double channelheight;   
-    // velocity of moving wall (lower boundary moves)
-    tarch::la::Vector<3,double> wallVelocity;
-    int wallInitCycles;
-    tarch::la::Vector<3,double> wallInitVelocity;
-    double wallOscillations;
-    // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
-    int couplingCycles;
-    bool md2Macro, macro2Md, computeSNR, twoWayCoupling;   
-    int filterInitCycles;
-    int csvEveryTimestep;    
-    MacroSolverType maSolverType;
-    MicroSolverType miSolverType;
-    double density, kinVisc;
-    // only for LB couette solver: number of processes 
-    tarch::la::Vector<3,unsigned int> lbNumberProcesses; 
-    // only for LB couette solver: VTK plotting per time step
-    int plotEveryTimestep;
-    int initAdvanceCycles;                           
-    double temp;
-    int equSteps;
-    int totalNumberMDSimulations;
-    double noiseSigma;
-    bool twsLoop;
-    int twsLoopMin,twsLoopMax,twsLoopStep;
-  };
 
   struct CouplingBuffer{
     std::vector<coupling::datastructures::MacroscopicCell<3>* > sendBuffer;
@@ -923,7 +737,7 @@ private:
   int _rank, _tws;
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
-  CouetteConfig _cfg;
+  coupling::configurations::CouetteConfig _cfg;
   unsigned int _mdStepCounter;
   coupling::solvers::AbstractCouetteSolver<3> *_couetteSolver;
   tarch::utils::MultiMDService<3>* _multiMDService;
