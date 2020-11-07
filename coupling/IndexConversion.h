@@ -74,24 +74,11 @@ class coupling::IndexConversion: private tarch::utils::Uncopyable {
      */
     tarch::la::Vector<dim,unsigned int> getGlobalVectorCellIndex(unsigned int globalCellIndex) const;
 
-    /** Does the same as getGlobalVectorCellIndex() but 
-	 * 		* non-inner cells (i.e. outside of the MD domain) are converted to MAX_INT
-	 * 		* (0, ... , 0) is the first cell in the MD domain etc.
-     */
-    tarch::la::Vector<dim,unsigned int> getGlobalInnerVectorCellIndex(unsigned int globalCellIndex) const;
-
     /** returns the local vector cell index from a linearised index. This function just performs the inverse operation to
      *  getLocalCellIndex(vectorIndex), i.e. getLocalVectorCellIndex(getLocalCellIndex(somevector) ) should again return
      *  somevector.
      */
     tarch::la::Vector<dim,unsigned int> getLocalVectorCellIndex(unsigned int localCellIndex) const;
-
-	/** Does the same as getLocalVectorCellIndex() but 
-	 * 		* non-inner cells (i.e. outside of the MD domain) are converted to MAX_INT
-	 * 		* (0, ... , 0) is the first cell in the MD domain etc.
-     */
-    tarch::la::Vector<dim,unsigned int> getLocalInnerVectorCellIndex(unsigned int localCellIndex) const;
-
 
     /** converts a local vector cell index into a global vector cell index */
     tarch::la::Vector<dim,unsigned int> convertLocalToGlobalVectorCellIndex(

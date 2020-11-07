@@ -5,28 +5,27 @@
 //constructors of coupling::FilterPipeline
 template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 	const coupling::IndexConversion<dim>* indexConversion,
 	coupling::interface::MacroscopicSolverInterface<dim>* msi,
 	const tarch::utils::MultiMDService<dim>& multiMDService,
 	const std::string cfgpath):
-    FilterPipeline(mdCells, indexConversion, msi, multiMDService, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
+    FilterPipeline(inputCells, indexConversion, msi, multiMDService, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
 {}
 
 template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 	const coupling::IndexConversion<dim>* indexConversion,
 	coupling::interface::MacroscopicSolverInterface<dim>* msi,
 	const tarch::utils::MultiMDService<dim>& multiMDService,
 	bool postMultiInstance, 
 	const std::string cfgpath):
 
-	_indexConversion(indexConversion), 
-	_msi(msi),
 	_multiMDService(multiMDService),
 	_postMultiInstance(postMultiInstance)
 {
+	_ic = new coupling::IndexConversionMD2Macro<dim>(indexConversion, msi);
 	
     //check if provided file is written in proper XML
     if(_config.LoadFile(cfgpath.c_str()) != tinyxml2::XML_NO_ERROR){
@@ -38,7 +37,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
 	
 	//load domain vectors
-	if (initMd2MacroDomain(mdCells)) exit(EXIT_FAILURE);
+	_ic->initMD2MacroDomain(inputCells, _md2MacroCells, _md2MacroCellIndices);
 
     //load sequences
     if (_postMultiInstance){
@@ -139,6 +138,7 @@ bool coupling::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile
     return true;
 }
 
+//TODO: refactor/rework?
 template<unsigned int dim>
 int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* node){
 
@@ -192,15 +192,15 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
         if(currSequenceNode->Attribute("domain-start")){ 
 			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currSequenceNode, "domain-start");
 	        for(unsigned int d = 0; d < dim; d++){
-    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
-  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / (*_ic)()->getMacroscopicCellSize()[d]);
+  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / (*_ic)()->getMacroscopicCellSize()[d]);
         	}
 		}
         if(currSequenceNode->Attribute("domain-end")){
 			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currSequenceNode, "domain-end");
 	        for(unsigned int d = 0; d < dim; d++){
-    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
-        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / (*_ic)()->getMacroscopicCellSize()[d]);
+        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / (*_ic)()->getMacroscopicCellSize()[d]);
         	}
 		}
 
@@ -222,13 +222,13 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		
 		//CREATE SEQUENCE
 		if(inputFilterSequence){
-			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
+			knownSequences.push_back(new coupling::FilterSequence<dim>((*_ic)(), _multiMDService, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 			std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
 			#endif
 		}
 		else {
-			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
+			knownSequences.push_back(new coupling::FilterSequence<dim>((*_ic)(), _multiMDService, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 			std::cout << "FP: " << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
 			#endif
@@ -261,60 +261,3 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 
     return 0;
 }
-
-template<unsigned int dim>
-int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells) {	
-
-	if(cells.empty()){
-		std::cout << "ERROR: Filter-Pipeline: Input vector is emtpy." << std::endl;
-		return EXIT_FAILURE; 
-	}
-
-	tarch::la::Vector<dim, unsigned int> convertedIndex;
-	bool outOfBounds;
-
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << "FP: Initializing md2Macro-domain cells and their index vectors." << std::endl;
-	std::cout << "FP: Total number of cells/md2Macro domain cells: " << cells.size();
-	//std::cout << "Now Looking at slice (3,...)" << std::endl;
-	//unsigned int i1 = 0;
-	#endif
-
-	for(unsigned int linearIndex = 0; linearIndex < cells.size(); linearIndex++){
-		outOfBounds = false;
-				
-		//removal of ghost layer
-		convertedIndex = _indexConversion->getLocalInnerVectorCellIndex(linearIndex);
-
-		//removal of cells lying in outer layer not meant for transfer to macro solver
-		//Assuming: dim > 0, INT_MAX at any position in index vector implies MSI function returns false
-		if(!(_msi->receiveMacroscopicQuantityFromMDSolver(_indexConversion->getGlobalVectorCellIndex(_indexConversion->convertLocalToGlobalCellIndex(linearIndex))))) {
-			outOfBounds = true; 
-		}
-
-		for(unsigned int d = 0; d < dim; d++) {
-			if(convertedIndex[d] == INT_MAX) outOfBounds = true;
-		}
-
-		#ifdef DEBUG_FILTER_PIPELINE
-		//Visualisation of slice (3,...)
-		//if(_indexConversion->getThisRank() == 0 && convertedIndex[0] == 3){
-		//	(outOfBounds) ? std::cout << "x" : std::cout << "o";
-		//	if (i1 <= _indexConversion->getLocalNumberMacroscopicCells()[1]) i1++;
-		//	else { std::cout << std::endl; i1 = 0; }
-		//}
-		#endif
-
-		if(!outOfBounds){
-			_md2MacroCells.push_back(cells[linearIndex]);
-			_md2MacroCellIndices.push_back(convertedIndex);
-		}
-	}
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << "/" << _md2MacroCells.size() << std::endl;
-	//std::cout << "FP: First element of _md2MacroCells: " << _md2MacroCells[0] << std::endl;;
-	#endif
-
-	return 0;
-}
-
