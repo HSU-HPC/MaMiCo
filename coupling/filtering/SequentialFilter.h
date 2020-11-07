@@ -48,7 +48,8 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 			_ic(ic),
 			_comm(comm),
 			_processingRank(0), //TODO: case: multimd
-			_cellsPerRank(_filter->getSize())
+			_cellsPerRank(_filter->getSize()),
+			_firstIteration(true)
 		{
 			#ifdef DEBUG_SEQ_FILTER
 			std::cout << "		SEQFILTER: Now initializing sequentialized Filter of type: " << _filter->getType() <<std::endl;
@@ -56,10 +57,12 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 
 			//case: sequential
 			if(_ic) {
-				MPI_Comm_size(comm, &_commSize);
+				MPI_Comm_size(comm, &_commSize);	
+
 				//allocate global cell data structures for processing rank only
 				if( _processingRank == (int) _ic->getThisRank()) {
 					_outputCells_Local = _filter->getOutputCells(); //filter's output cell pointers will be overwritten, but we need this information in operator()
+
 					for(int c = 0; c < _cellsPerRank * _commSize; c++) {
 						_inputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 						_outputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
@@ -108,6 +111,32 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		 * When sequentialized, all ranks call this function.
 		 */
 		virtual void contribute() {
+			//communicate indices during first iteration
+			if(_firstIteration == true) {
+				std::vector<unsigned int> indexbuf;
+				std::vector<unsigned int> indexrecvbuf; //accessed only by processing rank
+
+				//TODO: performance can be improved
+				for(int i_local = 0; i_local < _cellsPerRank; i_local++){
+					//we dont actually use global cell indices, this is just a way to compress data
+					indexbuf.push_back(_ic->getGlobalCellIndex(_filter->getCellIndices()[i_local]));
+				}
+				if( _processingRank == (int) _ic->getThisRank()) indexrecvbuf.resize(_cellsPerRank * _commSize);
+
+				//gather all linear indices at processing rank
+				MPI_Gather(indexbuf.data(), _cellsPerRank, MPI_UNSIGNED, indexrecvbuf.data(), _cellsPerRank * _commSize, MPI_UNSIGNED, _processingRank, _comm); 
+
+				//Parse to _cellIndices_Global
+				if( _processingRank == (int) _ic->getThisRank())
+				for(int i_global = 0; i_global < (int) indexrecvbuf.size(); i_global++)
+					//revert compression to linear index
+					_cellIndices_Global.push_back(_ic->getGlobalVectorCellIndex(indexrecvbuf[i_global]));
+				
+				//for(auto index : _cellIndices_Global) std::cout << index << std::endl;
+
+				_firstIteration = false;
+			}
+
 			//construct MacroscopicCell buffer from input cell vector
 			macroscopicCellsToBuffer(_sendbuf, _filter->getInputCells());
 
@@ -115,6 +144,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 			std::cout << "		SEQFILTER: Sending buffer of size: " << _sendbuf.size() << std::endl;
 			#endif
 
+			//TODO: unneccesary to do this in each iteration
 			//allocate on processing rank
 			if(_processingRank == (int) _ic->getThisRank()) _recvbuf.resize(_sendbuf.size()*_commSize);
 	
@@ -124,7 +154,6 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 			#ifdef DEBUG_SEQ_FILTER
 			if(_processingRank == (int) _ic->getThisRank()) std::cout << "		SEQFILTER: Receiving buffer of size: " << _recvbuf.size() << std::endl;
 			#endif
-
 		}
 
 
@@ -140,7 +169,6 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 
 				//Get global indexing right
 				//TODO for _commSize > 1
-				_cellIndices_Global = _filter->getCellIndices();
 
 				//Apply _filter
 				_filter->updateCellData(_inputCells_Global, _outputCells_Global, _cellIndices_Global);
@@ -173,6 +201,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		void applyBufferToMacroscopicCells(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells) {
 
 			std::cout << "		SEQFILTER: ABTMC: Buffer size: " << buf.size() << " Cell vector size: " << cells.size() << std::endl;
+			//TODO
 			if(buf.size() != cells.size() * (4+3*dim) ) throw std::runtime_error("Buffer and cell vector size must be the same!"); //TODO
 
 			//copy buffer data to cells
@@ -212,10 +241,13 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 
 		//only used by processing rank to keep track where to write output data for next filter in sequence
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Local;	
+
+		bool _firstIteration;
 };
 
 
 /*
  * TODO
+ * what if not all ranks have exactly the same amounts of cell
  * testing
  */

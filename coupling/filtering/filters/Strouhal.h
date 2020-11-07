@@ -63,3 +63,8 @@ class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{
 
 //include implementation of header
 #include "Strouhal.cpph"
+
+/*
+ * TODO:
+ * allow offset (e.g. start measuring after 500 coupling cycles)
+ */
