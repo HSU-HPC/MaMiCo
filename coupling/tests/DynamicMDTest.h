@@ -296,7 +296,7 @@ private:
 
   void advanceMicro(int cycle){
     if (_rank==0){ gettimeofday(&_tv.start,NULL); }
-    if(_cfg.miSolverType == SIMPLEMD){
+    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // run MD instances
       for (unsigned int i = 0; i < _localMDInstances; i++){
         if(_simpleMD[i] == nullptr) continue;
@@ -676,7 +676,7 @@ private:
         }
       }
     // LB solver: active on lbNumberProcesses
-    } else if(_cfg.maSolverType == COUETTE_LB){
+    } else if(_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_LB){
       solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight,vel,_cfg.kinVisc,dx,dt,_cfg.plotEveryTimestep,"LBCouette",_cfg.lbNumberProcesses,1);
       if (solver==NULL){
         std::cout << "ERROR CouetteTest::getCouetteSolver(): LB solver==NULL!" << std::endl;
@@ -697,9 +697,9 @@ private:
     tarch::la::Vector<3,unsigned int> globalNumberMacroscopicCells,unsigned int outerRegion
   ){
     coupling::interface::MacroscopicSolverInterface<3>* interface = NULL;
-    if (_cfg.maSolverType == COUETTE_ANALYTICAL){
+    if (_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_ANALYTICAL){
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells,outerRegion);
-    } else if (_cfg.maSolverType == COUETTE_LB){
+    } else if (_cfg.maSolverType == coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_LB){
       coupling::solvers::LBCouetteSolver *lbSolver = static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver);
       if (lbSolver==NULL){std::cout << "ERROR CouetteTest::getCouetteSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl; exit(EXIT_FAILURE);}
       // compute number of cells of MD offset; detect any mismatches!
