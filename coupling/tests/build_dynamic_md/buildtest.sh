@@ -27,7 +27,7 @@ then
     echo "Build mode: ${dynamic}"
 else
     echo "ERROR! ./test sudden/successive"
-    exit -1
+    exit 1
 fi
 
 
@@ -51,7 +51,7 @@ compiler="mpicxx"
 ### 
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
-cd ${MAMICO_PATH}
+cd ${MAMICO_PATH} || exit
 scons target=libsimplemd dim=3 build=release parallel=yes -j4
 libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
 FLAGS="${FLAGS} -DMDParallel"
@@ -63,12 +63,12 @@ else
     FLAGS="${FLAGS} -DCOUPLING_DYNAMIC_MD_SUCCESSIVE"
 fi
 
-cd ${BUILD_PATH}
+cd ${BUILD_PATH} || exit
 ${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
 objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
 
 ### builds, linking, objects for coupled simulation with MaMiCo
-cd ${BUILD_PATH}
+cd ${BUILD_PATH} || exit
 ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
 ${compiler} ${MAMICO_PATH}/coupling/tests/main_dynamic_md.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_dynamic_md.o
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_dynamic_md.o"
