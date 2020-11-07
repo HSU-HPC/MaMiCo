@@ -9,6 +9,10 @@ LIB_EIGEN_PATH=$(pkg-config --cflags-only-I eigen3)
 
 ### home directory of MAMICO
 MAMICO_PATH=/home/niklas/Dokumente/Git/mamico-dev
+### PATH to lammps sources
+LAMMPS_PATH=/home/niklas/Dokumente/Git/lammps
+LIB_LAMMPS=lammps_openmpi_mamico
+
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
@@ -20,14 +24,14 @@ LIBSIMPLEMD=simplemd
 ### build path for DynamicMDTest
 BUILD_PATH=${MAMICO_PATH}/coupling/tests/build_dynamic_md;
 
-dynamic=$1;
+mdSim=$1;
 
-if [ "${dynamic}" == "sudden" ] || [ "${dynamic}" == "successive" ]
+if [ "${mdSim}" == "SIMPLE_MD" ] || [ "${mdSim}" == "LAMMPS_MD" ] || [ "${mdSim}" == "LAMMPS_DPD" ]
 then
-    echo "Build mode: ${dynamic}"
+    echo "MD Simulation: ${mdSim}"
 else
-    echo "ERROR! ./test sudden/successive"
-    exit 1
+    echo "ERROR! ./test parallel/sequential SIMPLE_MD/LAMMPS_MD/LAMMPS_DPD"
+    exit -1
 fi
 
 
@@ -42,7 +46,7 @@ includes="-I${MAMICO_PATH}"
 
 ### specify flags, includes, libraries,compiler for parallel build
 # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O0 -g3"
+FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O0 -g3"
 # -DMDCoupledDebug"
 includes="${includes} ${MPI_INCLUDE_PATH} ${LIB_EIGEN_PATH}"
 libraries="${MPI_LIB_PATH} ${LIB_MPI}"
@@ -57,15 +61,55 @@ libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
 FLAGS="${FLAGS} -DMDParallel"
 
 
-if [ "${dynamic}" == "sudden" ]; then
-    FLAGS="${FLAGS} -DCOUPLING_DYNAMIC_MD_SUDDEN"
-else
-    FLAGS="${FLAGS} -DCOUPLING_DYNAMIC_MD_SUCCESSIVE"
-fi
+# specific built for SIMPLE_MD
+if [ "${mdSim}" == "SIMPLE_MD" ]
+then
+  cd ${BUILD_PATH} || exit 
+    ${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
+    objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
+elif [ "${mdSim}" == "LAMMPS_MD" ]
+then
+  if [ "${parallel}" == "sequential" ]
+  then
+    echo "ERROR: LAMMPS only works for option 'parallel'"
+    exit -1
+  fi
+  
+  cp -a ${MAMICO_PATH}/coupling/interface/impl/LAMMPS/USER-MAMICO ${LAMMPS_PATH}/src/
 
-cd ${BUILD_PATH} || exit
-${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
-objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
+  export MAMICO_PATH
+  export LIB_EIGEN_PATH
+
+  # build lammps
+  cd ${LAMMPS_PATH}/src || exit
+  make yes-user-mamico
+  make g++_openmpi || exit
+  #make makelib
+  #make -f Makefile.lib openmpi
+  ln -s liblammps_g++_openmpi.a lib${LIB_LAMMPS}.a
+  includes="${includes} -I${LAMMPS_PATH}/src"
+  libraries="${libraries} -L${LAMMPS_PATH}/src -l${LIB_LAMMPS}"
+  # remove Werror flag
+  FLAGS=`echo ${FLAGS} | sed 's/-Werror//'`
+elif [ "${mdSim}" == "LAMMPS_DPD" ]
+then
+  if [ "${parallel}" == "sequential" ]
+  then
+    echo "ERROR: LAMMPS only works for option 'parallel'"
+    exit -1
+  fi
+  # build lammps
+  cd ${LAMMPS_PATH} || exit
+  make yes-user-mamico
+  make openmpi
+  make makelib
+  make -f Makefile.lib openmpi
+  ln -s liblammps_g++_openmpi.a lib${LIB_LAMMPS}.a
+  includes="${includes} -I${LAMMPS_PATH}/src"
+  libraries="${libraries} -L${LAMMPS_PATH}/src -Wl,-Bstatic -l${LIB_LAMMPS} -Wl,-Ddynamic"
+  # remove Werror flag
+  FLAGS=`echo ${FLAGS} | sed 's/-Werror//'`
+fi
 
 ### builds, linking, objects for coupled simulation with MaMiCo
 cd ${BUILD_PATH} || exit

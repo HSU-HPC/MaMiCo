@@ -130,7 +130,7 @@ class coupling::services::MultiMDCellService {
 
       _mdConfiguration.getDomainConfigurationNonConst().setInitFromCheckpoint(true);
       std::stringstream filestem;
-      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()+1) / _multiMDService.getNumberLocalComms() << "_0";
+      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()) / _multiMDService.getNumberLocalComms() << "_0";
       _mdConfiguration.getDomainConfigurationNonConst().setCheckpointFilestem(filestem.str());
       _mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(false);
       if(_multiMDService.getLocalSize() > 1) {
@@ -326,6 +326,10 @@ class coupling::services::MultiMDCellService {
      */
     unsigned int rmMDSimulation(std::vector<coupling::interface::MDSolverInterface<LinkedCell,dim>* > & mdSolverInterfaces
                          , std::vector<coupling::interface::MDSimulation*> & simpleMD) {
+      if(_localNumberMDSimulations < 2) {
+        std::cout << "INFO MultiMDCellService::rmMDSimulation() : Cannot remove MD simulation, only one is left!" << std::endl;
+        return 0;
+      }
       unsigned int index = getLastReservedSlot();
 
       delete _macroscopicCellServices[index];
@@ -569,11 +573,9 @@ class coupling::services::MultiMDCellService {
 
     void writeCheckpoint(const unsigned int & cycle, 
                           const std::vector<coupling::interface::MDSimulation*> simpleMD) {
-      for(auto  md : simpleMD) {
-        std::stringstream filestem;
-        filestem << "restart_checkpoint_" << (1+_multiMDService.getGlobalRank()) / _multiMDService.getNumberLocalComms();
-        md->writeCheckpoint(filestem.str().c_str(), 0);
-      }
+      std::stringstream filestem;
+      filestem << "restart_checkpoint_" << _multiMDService.getGlobalRank() / _multiMDService.getNumberLocalComms();
+      simpleMD[0]->writeCheckpoint(filestem.str().c_str(), 0);
     }
     
   private:
