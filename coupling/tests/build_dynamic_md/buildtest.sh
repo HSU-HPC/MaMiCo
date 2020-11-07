@@ -1,14 +1,7 @@
 #!/bin/bash
 
-### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=$(pkg-config --cflags-only-I ompi)
-MPI_LIB_PATH=$(pkg-config --libs-only-L ompi)
-LIB_MPI=$(pkg-config --libs-only-l ompi)
+source personal_settings
 
-LIB_EIGEN_PATH=$(pkg-config --cflags-only-I eigen3)
-
-### home directory of MAMICO
-MAMICO_PATH=/home/niklas/Dokumente/Git/mamico-dev
 ### PATH to lammps sources
 LAMMPS_PATH=/home/niklas/Dokumente/Git/lammps
 LIB_LAMMPS=lammps_openmpi_mamico
@@ -48,8 +41,8 @@ includes="-I${MAMICO_PATH}"
 # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
 FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O0 -g3"
 # -DMDCoupledDebug"
-includes="${includes} ${MPI_INCLUDE_PATH} ${LIB_EIGEN_PATH}"
-libraries="${MPI_LIB_PATH} ${LIB_MPI}"
+includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
+libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
 compiler="mpicxx"
 
 ### 
@@ -117,6 +110,6 @@ ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguratio
 ${compiler} ${MAMICO_PATH}/coupling/tests/main_dynamic_md.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_dynamic_md.o
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_dynamic_md.o"
 
-echo "${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/test" 
-${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/test
+echo "${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest" 
+${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest
 
