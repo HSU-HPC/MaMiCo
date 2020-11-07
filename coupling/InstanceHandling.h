@@ -95,11 +95,11 @@ public:
     // Same as above
     // but additionally uses MamicoInterfaceProvider for interfacing MD to FD
     void simulateTimesteps(const unsigned int & t, unsigned int & T, 
-                            coupling::services::MultiMDCellService<MY_LINKEDCELL,3> & multiMDCellService) {
+                            coupling::services::MultiMDCellService<MY_LINKEDCELL,dim> & multiMDCellService) {
         for(unsigned int i =0;i<_simpleMD.size();++i) {
-          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>
+          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,dim>
             ::getInstance().setMacroscopicCellService(&multiMDCellService.getMacroscopicCellService(i));
-          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>
+          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,dim>
             ::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
 
           _simpleMD[i]->simulateTimesteps(t,T);
@@ -111,8 +111,37 @@ public:
         _simpleMD[i]->simulateTimesteps(t,T);
     }
 
-    void addMDSimulation() {
-      multiMDCellService->addMDSimulation()
+    coupling::interface::MDSolverInterface<MY_LINKEDCELL,dim>* addMDSimulation(unsigned int slot) {
+      auto * mdSim = coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
+        _mdConfig, _mamicoConfig
+        #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+        , _multiMDService.getLocalCommunicator()
+        #endif
+      );
+      if(mdSim == NULL) {
+          std::cout << "ERROR! coupling::InstanceHandling::addMDSimulation(): mdSim == NULL!" << std::endl;
+          std::exit(EXIT_FAILURE);
+      }
+
+      mdSim->init(_multiMDService, slot);
+
+      _simpleMD.push_back(mdSim);
+
+      _mdSolverInterface.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance()
+                                    .getMDSolverInterface(_mdConfig, _mamicoConfig, _simpleMD[_simpleMD.size()-1]));
+
+      return _mdSolverInterface[_mdSolverInterface.size()-1];
+    }
+
+    void rmMDSimulation(const unsigned int & index) {
+      _simpleMD[index]->shutdown();
+      delete _simpleMD[index];
+      _simpleMD[index] = nullptr;
+      _simpleMD.erase(_simpleMD.begin()+index);
+
+      delete _mdSolverInterface[index];
+      _mdSolverInterface[index] = nullptr;
+      _mdSolverInterface.erase(_mdSolverInterface.begin()+index);
     }
 
 private:

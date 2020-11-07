@@ -63,7 +63,7 @@ private:
   void removeMDSimulation() {
     //int iMD = c; // Global MD index to be shut down
     
-    unsigned int iMD = _multiMDCellService->rmMDSimulation(_mdSolverInterface, _simpleMD);
+    unsigned int iMD = _multiMDCellService->rmMDSimulation(*_instanceHandling);
 
     if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
 
@@ -71,10 +71,12 @@ private:
   }
 
   void addMDSimulation() {
-    unsigned int iMD = _multiMDCellService->addMDSimulation(
-                          coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMacroscopicSolverInterface(),
-                          _mdSolverInterface,
-                          _simpleMD
+    unsigned int iMD = _multiMDCellService->addMDSimulation(*_instanceHandling, 
+                          getCouetteSolverInterface(
+                            _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+                            _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+                            getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
+                          )
                         );
 
     if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
