@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "coupling/IndexConversion.h"
+#include "coupling/IndexConversionMD2Macro.h"
 #include "tarch/configuration/ParseConfiguration.h"
 
 //INCLUDE ALL FILTER HEADERS HERE
@@ -40,7 +40,7 @@ class coupling::FilterSequence {
 		 * inputCellVector and cellIndices cover the entire md2Macro domain.
 		 * domainStart and domainEnd span a subspace of the global (md2Macro) domain.
 		 */
-    	FilterSequence( const coupling::IndexConversion<dim>* indexConversion,
+    	FilterSequence( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
 						const tarch::utils::MultiMDService<dim>& multiMDService,
 						const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector,
@@ -48,7 +48,7 @@ class coupling::FilterSequence {
 						tarch::la::Vector<dim, unsigned int> domainStart,
 						tarch::la::Vector<dim, unsigned int> domainEnd,
 						std::array<bool, 7> filteredValues):
-    	_indexConversion(indexConversion), 
+    	_ic(indexConversion), 
 		_multiMDService(multiMDService),
 		_name(name), 
 		_inputCellVector(inputCellVector),
@@ -177,7 +177,7 @@ class coupling::FilterSequence {
 			return std::string("	FS(").std::string::append(_name).std::string::append("): ");
 		}
 
-		const coupling::IndexConversion<dim>* _indexConversion;
+		const coupling::IndexConversionMD2Macro<dim>* _ic;
 		const tarch::utils::MultiMDService<dim> _multiMDService;
 
     	const char* _name;

@@ -43,6 +43,7 @@ class coupling::IndexConversionMD2Macro {
 				std::cout << "ICM2M: Created new instance at location " << this << " using IC at " << _ic << " and MSI at " << _msi << std::endl;
 				#endif
 			}
+
 		~IndexConversionMD2Macro() {
 			delete _globalLowerBoundaries;
 			delete _globalUpperBoundaries;
@@ -54,6 +55,7 @@ class coupling::IndexConversionMD2Macro {
 			#endif
 
 		}
+
 		/*
 		 * Chooses a subspace of the cell (and index) input based on what will be transfered to the macro solver.
 		 * This subspace is referred to as "md2Macro-domain" (or sometimes (m2m-domain).
@@ -63,6 +65,7 @@ class coupling::IndexConversionMD2Macro {
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& m2mDomainCells,
 				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices
 				);
+
 		/*
 		 * Writes two limiting boundary vectors to the arguments passed.
 		 *
@@ -72,7 +75,7 @@ class coupling::IndexConversionMD2Macro {
 		 */
 		void getGlobalMD2MacroDomainBoundaries(
 				tarch::la::Vector<dim, unsigned int>& lowerBoundaries,
-				tarch::la::Vector<dim, unsigned int>& upperBoundaries) { 
+				tarch::la::Vector<dim, unsigned int>& upperBoundaries) const { 
 			if(_globalLowerBoundaries != _globalUpperBoundaries) {
 					lowerBoundaries = *_globalLowerBoundaries;
 					upperBoundaries = *_globalUpperBoundaries;
@@ -81,12 +84,20 @@ class coupling::IndexConversionMD2Macro {
 		}
 		void getLocalMD2MacroDomainBoundaries(
 				tarch::la::Vector<dim, unsigned int>& lowerBoundaries,
-				tarch::la::Vector<dim, unsigned int>& upperBoundaries) { 
+				tarch::la::Vector<dim, unsigned int>& upperBoundaries) const { 
 			if(_localLowerBoundaries != _localUpperBoundaries) {
 					lowerBoundaries = *_localLowerBoundaries;
 					upperBoundaries = *_localUpperBoundaries;
 			}
 			else {/*TODO: Warning. See above.*/}
+		}
+
+		//assumes lower boundary to be lower than upper 
+		tarch::la::Vector<dim, unsigned int> getGlobalMD2MacroDomainSize() const {
+			return *_globalUpperBoundaries - *_globalLowerBoundaries;
+		}
+		tarch::la::Vector<dim, unsigned int> getLocalMD2MacroDomainSize() const {
+			return *_localUpperBoundaries - *_localLowerBoundaries;
 		}
 
 

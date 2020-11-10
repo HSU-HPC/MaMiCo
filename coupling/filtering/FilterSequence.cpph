@@ -116,7 +116,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
 		//global/local filtering
 		if(currFilterNode->Attribute("sequential")) {
-			if(std::strcmp(currFilterNode->Attribute("sequential"), "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _indexConversion));
+			if(std::strcmp(currFilterNode->Attribute("sequential"), "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _ic));
 			else _filters.push_back(newfilter);
 		}
 		else _filters.push_back(newfilter);
