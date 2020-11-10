@@ -222,13 +222,13 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		
 		//CREATE SEQUENCE
 		if(inputFilterSequence){
-			knownSequences.push_back(new coupling::FilterSequence<dim>((*_ic)(), _multiMDService, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_ic, _multiMDService, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 			std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
 			#endif
 		}
 		else {
-			knownSequences.push_back(new coupling::FilterSequence<dim>((*_ic)(), _multiMDService, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_ic, _multiMDService, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 			std::cout << "FP: " << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
 			#endif

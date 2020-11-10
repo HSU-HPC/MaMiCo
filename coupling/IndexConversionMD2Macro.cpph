@@ -92,7 +92,9 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 	(*_globalUpperBoundaries) = _ic->getGlobalVectorCellIndex(linearGlobalUpperBoundaries);
 
 	#ifdef DEBUG_ICM2M
-	std::cout << "ICM2M: Total number of cells/md2Macro domain cells: " << inputCells.size() << "/" << m2mDomainCells.size() << std::endl;
+	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Total number of cells/md2Macro domain cells: " << inputCells.size() << "/" << m2mDomainCells.size() << std::endl;
+	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Local lowest/highest index in M2M domain: " << *_localLowerBoundaries << "/" << *_localUpperBoundaries << std::endl;
+	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Global lowest/highest index in M2M domain: " << *_globalLowerBoundaries << "/" << *_globalUpperBoundaries << std::endl;
 	#endif
 }
 
