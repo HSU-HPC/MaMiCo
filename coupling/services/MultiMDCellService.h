@@ -323,12 +323,8 @@ class coupling::services::MultiMDCellService {
     /** removes the last simulation which has been added.
      *  
      */
-    unsigned int rmMDSimulation(coupling::InstanceHandling<dim>& instanceHandling) {
-      if(_localNumberMDSimulations < 2) {
-        std::cout << "INFO MultiMDCellService::rmMDSimulation() : Cannot remove MD simulation, only one is left!" << std::endl;
-        return 0;
-      }
-      unsigned int index = getLastReservedSlot();
+    unsigned int rmMDSimulation(coupling::InstanceHandling<dim>& instanceHandling,
+                                const unsigned int & index) {
 
       delete _macroscopicCellServices[index];
       _macroscopicCellServices[index] = nullptr;
@@ -338,14 +334,6 @@ class coupling::services::MultiMDCellService {
         unsigned int iSim = index - _blockOffset;
         instanceHandling.rmMDSimulation(iSim);
       }
-
-      /** Check if there is a free block of simulations,
-       *  and, if so, remove it. Then reset _nextFreeBlock.
-       * */
-      if(index == _totalNumberMDSimulations-1) {
-        removeSimulationBlock();
-        _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
-      } 
 
       return index;
     }
@@ -386,9 +374,9 @@ class coupling::services::MultiMDCellService {
       delete [] _macroscopicCellServices;
       _macroscopicCellServices = newMacroscopicCellServices;
 
-      _multiMDService.removeMDSimulationBlock();
+      //_multiMDService.removeMDSimulationBlock();
 
-      _listActiveMDSimulations.pop_back();
+      //_listActiveMDSimulations.pop_back();
     }
 
     /** In order to make space for new simulation slots
@@ -428,9 +416,9 @@ class coupling::services::MultiMDCellService {
       delete [] _macroscopicCellServices;
       _macroscopicCellServices = newMacroscopicCellServices;
 
-      _multiMDService.addMDSimulationBlock();
+      //_multiMDService.addMDSimulationBlock();
 
-      _listActiveMDSimulations.push_back(false);
+      //_listActiveMDSimulations.push_back(false);
     }
 
     /** Find and reserve the next available slot
@@ -462,19 +450,18 @@ class coupling::services::MultiMDCellService {
 
 
     /** Find, which slot has been reserved last */
-    unsigned int getLastReservedSlot() {
+    /*unsigned int getLastReservedSlot() {
       if(_nextFreeBlock == _multiMDService.getNumberLocalComms()-1) {
-        /** In this case, there no actually free slots available
-         *  (we first had to add another block)
-         *  We thus want to free a slot on the first communicator.
-         */
+        // In this case, there no actually free slots available
+        //  (we first had to add another block)
+        //  We thus want to free a slot on the first communicator.
         _nextFreeBlock = 0;
         return _localNumberMDSimulations - 1;       
       }
       unsigned int _thisFreeBlock = _nextFreeBlock;
       _nextFreeBlock += 1;
       return (_thisFreeBlock+1) * _localNumberMDSimulations + _localNumberMDSimulations - 1;
-    }
+    }*/
 
 
      /** Adds MacroscopicCellService at appropriate slot
@@ -482,17 +469,18 @@ class coupling::services::MultiMDCellService {
       *          false otherwise
       * */
      unsigned int addMDSimulation(coupling::InstanceHandling<dim>& instanceHandling,
-                                  coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface) 
+                                  coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,
+                                  const unsigned int & slot) 
     {
       
-      unsigned int slot = reserveNextSlot();
+      //unsigned int slot = reserveNextSlot();
 
       if(_macroscopicCellServices[slot] != nullptr) {
         std::cout << "ERROR! coupling::services::MultiMDCellService::addMDSimulation(): Simulation at " << slot << " already exists!" << std::endl;
         std::exit(EXIT_FAILURE);
       }
 
-      _listActiveMDSimulations[slot] = true;
+      //_listActiveMDSimulations[slot] = true;
 
       if(slot < _blockOffset || slot >= _blockOffset + _localNumberMDSimulations) {
 
@@ -531,10 +519,9 @@ class coupling::services::MultiMDCellService {
           );
         instanceHandling.getSimpleMD()[_localNumberMDSimulations-1]
           ->setMacroscopicCellService((_macroscopicCellServices[slot]));
-        //simpleMD[simpleMD.size()-1]->setMacroscopicCellService((_macroscopicCellServices[slot]));
       }
 
-      _warmupPhase[slot] = 2;
+      _warmupPhase[slot] = 10;
 
       return slot;
     }

@@ -20,6 +20,7 @@
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/configurations/CouetteConfiguration.h"
+#include "coupling/MultiMDMediator.h"
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -63,15 +64,15 @@ private:
   void removeMDSimulation() {
     //int iMD = c; // Global MD index to be shut down
     
-    unsigned int iMD = _multiMDCellService->rmMDSimulation(*_instanceHandling);
+    /*unsigned int iMD =*/ _multiMDMediator->rmMDSimulation();
 
-    if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
+    /*if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;*/
 
     _localMDInstances = _simpleMD.size();
   }
 
   void addMDSimulation() {
-    unsigned int iMD = _multiMDCellService->addMDSimulation(*_instanceHandling, 
+    /*unsigned int iMD = */_multiMDMediator->addMDSimulation(
                           getCouetteSolverInterface(
                             _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
                             _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
@@ -79,7 +80,7 @@ private:
                           )
                         );
 
-    if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
+    //if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
 
     _localMDInstances = _simpleMD.size();         
   }
@@ -193,6 +194,8 @@ private:
         *_multiMDService
       );
     }
+
+    _multiMDMediator = new coupling::MultiMDMediator<MY_LINKEDCELL, 3>(*_multiMDCellService, *_instanceHandling, *_multiMDService);
 
     if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // set couette solver interface in MamicoInterfaceProvider
@@ -730,5 +733,6 @@ private:
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
   TimingValues _tv;
+  coupling::MultiMDMediator<MY_LINKEDCELL,3> * _multiMDMediator;
 };
 #endif // _COUPLING_TESTS_COUETTETEST_H_
