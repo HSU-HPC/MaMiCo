@@ -61,7 +61,7 @@ void coupling::FilterPipeline<dim>::operator()(){
 	else{
 		sequences = _piSequences;
 		#ifdef DEBUG_FILTER_PIPELINE
-		std::cout << "FP: Starting to apply per instance filters." << std::endl;
+		std::cout << "FP: Starting to apply per-instance filters." << std::endl;
 		#endif
 	}
 
@@ -138,7 +138,6 @@ bool coupling::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile
     return true;
 }
 
-//TODO: refactor/rework?
 template<unsigned int dim>
 int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* node){
 
@@ -150,6 +149,12 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 	
     tinyxml2::XMLElement* currSequenceNode = node->FirstChildElement();
     std::vector<coupling::FilterSequence<dim> *> knownSequences;
+
+	//true once specified output sequence has been found
+	bool outputDefined = false; 
+
+	//Special case: MD values (i.e. FP input) is also used as output.
+	if(std::strcmp(node->Attribute("output"), "md") == 0) outputDefined = true;
     
     //Check if all outputs are specified before being used by sequences
     while(currSequenceNode){
@@ -163,15 +168,20 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		}
 
         if(!inputName) inputName = "md";
-        bool sequenceRecognized = false; 
+        bool sequenceRecognized = false; //true if sequence with name of specified input sequence is found
         //search temp vector of known sequences
-		//TODO: check if this sequence's name is already occupied
         for(auto seq : knownSequences){
+			//Search for input sequence
             if(std::strcmp(seq->getName(), inputName) == 0) {
                 inputFilterSequence = seq;
                 sequenceRecognized = true;
-                break;
+				break;
             }
+			//Check for name duplicates
+			if(std::strcmp(seq->getName(),currSequenceNode->Value()) == 0) {
+				std::cout << "ERROR: Filter-Pipeline: Two or more sequences of identical name " << currSequenceNode->Value() << std::endl;
+				exit(EXIT_FAILURE);
+			}
         }
         //"md" is the default input and is not associated to any sequence
         if(std::strcmp(inputName,"md") == 0) sequenceRecognized = true;
@@ -192,15 +202,15 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
         if(currSequenceNode->Attribute("domain-start")){ 
 			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currSequenceNode, "domain-start");
 	        for(unsigned int d = 0; d < dim; d++){
-    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / (*_ic)()->getMacroscopicCellSize()[d]);
-  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / (*_ic)()->getMacroscopicCellSize()[d]);
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
+  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
         	}
 		}
         if(currSequenceNode->Attribute("domain-end")){
 			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currSequenceNode, "domain-end");
 	        for(unsigned int d = 0; d < dim; d++){
-    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / (*_ic)()->getMacroscopicCellSize()[d]);
-        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / (*_ic)()->getMacroscopicCellSize()[d]);
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
+        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
         	}
 		}
 
@@ -236,6 +246,7 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
         //Add sequence to temp vector
 		//Check if it's the output sequence. If none of the sequences' names match, "md" is assumed as output.
 		if(std::strcmp(knownSequences.back()->getName(),  node->Attribute("output")) == 0){
+			outputDefined = true;
 			knownSequences.back()->setAsOutput();
 		}
 
@@ -245,6 +256,11 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
         //Proceed to iterate over next element
         currSequenceNode = currSequenceNode->NextSiblingElement();
     }
+
+	if(!outputDefined) {
+		std::cout << "ERROR: Output sequence not specified or unknown." << std::endl;
+        exit(EXIT_FAILURE);
+	}
 
     if(_postMultiInstance){
         _miSequences = knownSequences;

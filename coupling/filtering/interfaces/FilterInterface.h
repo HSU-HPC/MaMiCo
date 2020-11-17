@@ -75,7 +75,7 @@ class coupling::FilterInterface{
 			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
 		}
 
-		FilterInterface(const char* type) : _type(type) {/* Used by incomplete implementations of FilterInterface. Should be redesigned via meta class. TODO*/}
+		FilterInterface(const char* type) : _type(type) {/* Used by incomplete implementations of FilterInterface. Should be redesigned via meta class.*/}
 
 
 		virtual ~FilterInterface(){};
@@ -92,15 +92,19 @@ class coupling::FilterInterface{
 		 */
 		virtual void operator()() = 0;
 
+		//TODO: changed this to pass by reference. not sure if thats safe
 		void updateCellData(
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* > new_inputCells,
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* > new_outputCells,
-			std::vector<tarch::la::Vector<dim,unsigned int>> new_cellIndices
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
+			std::vector<tarch::la::Vector<dim,unsigned int>>& new_cellIndices
 		) {
-			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size()) throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
+			std::cout << "		FI: Updating cell data. Now filters " << _inputCells.size() << " cells." << std::endl;
+			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size())
+			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
 			_inputCells = new_inputCells;
 			_outputCells = new_outputCells;
 			_cellIndices = new_cellIndices;
+
 		}
 
 		const char* getType() const { return _type; }

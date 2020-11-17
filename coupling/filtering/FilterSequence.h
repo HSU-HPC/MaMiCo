@@ -22,7 +22,7 @@
  *  - sequence input
  * 	- sequence domain
  * 	- filter parameters
- * 	- TODO: modifiablitiy of filter list
+ * 	- modifiablitiy of filter list
  * per Filter Sequence.
  * @Author Felix Maurer
  */
@@ -105,6 +105,8 @@ class coupling::FilterSequence {
 		 *
 		 * Since after all filter objects are created it is possible to determine whether _cellVector1 or _cellVector2 will be used as output,
 		 * this is also done in here.
+		 *
+		 * In addition to that, if this sequence is declared as unmodifibale, this gets also detected in here
 		 */
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 		
@@ -154,16 +156,18 @@ class coupling::FilterSequence {
 		}
       
 	private:
-		//TODO: move to constructor (?)
 		/*
 		 * Determines based on _domainStart and _domainEnd which of the global domain's cell belong to the sequence's local domain.
 		 * This initializes all domain vector member variables (see below).
+		 *
+		 * Used in constructor.
 		 */
 		void initDomain();
 
-		//TODO: move to constructor (?)
 		/*
 		 * Copies all (global) input cells to _cellVector1 and _cellVector2.
+		 *
+		 * Used in consctructor.
 		 */
 		void initCellVectors();
 
@@ -182,18 +186,25 @@ class coupling::FilterSequence {
 
     	const char* _name;
 
-    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector TODO: remove once init...() functions are part of constructor
-    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
+    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector 
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector2;//allocated for this sequence only
     	std::vector<tarch::la::Vector<dim, unsigned int>> _cellIndices;//all of the above use the same indexing
 
-        /*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputDomainCellVector;//points to macro cells of this sequence's input that are within domain
-    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector1;//points to cells of vector 1 that are within the domain's range
-    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector2;//same for vector 2
+		//points to macro cells of this sequence's input that are within domain
+        /*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputDomainCellVector;
+		//points to cells of vector 1 that are within the domain's range
+    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector1;
+		//same for vector 2
+    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector2;
+
 		tarch::la::Vector<dim, unsigned int> _domainStart;
 		tarch::la::Vector<dim, unsigned int> _domainEnd;
-    	std::vector<tarch::la::Vector<dim, unsigned int>> _globalDomainCellIndices; //uses _cellIndices indexing (i. e. _domainStart .... _domainEnd))
-    	std::vector<tarch::la::Vector<dim, unsigned int>> _localDomainCellIndices; //starts at (0,...,0)
+
+		//uses _cellIndices indexing (i. e. _domainStart .... _domainEnd))
+    	std::vector<tarch::la::Vector<dim, unsigned int>> _globalDomainCellIndices;     	
+		//starts at (0,...,0)
+		std::vector<tarch::la::Vector<dim, unsigned int>> _localDomainCellIndices; 
 		
 		std::array<bool, 7> _filteredValues;
 
