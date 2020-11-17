@@ -5,6 +5,7 @@
 #pragma once
 #include "coupling/filtering/interfaces/FilterInterface.h"
 #include "coupling/IndexConversionMD2Macro.h"
+#include "coupling/CouplingMDDefinitions.h"
 #include <mpi.h>
 
 
@@ -20,7 +21,6 @@ namespace coupling{
 
 
 /*
- * TODO: update
  * Implementation of FilterInterface.h for filters which operate (optionally or mandatorily) in a sequential manner, i.e. process data on one master rank.
  * For such filters, operator()() will
  * 		- contribute to one dedicated processing rank: by calling contribute()
@@ -31,8 +31,7 @@ namespace coupling{
  *
  * Disclaimer: 
  * 	1. In this context 'globalized' is equivalent to 'sequentialized' and 'local' to 'parallel'.
- * 	2. Only via XML can globalized filters be added to a sequence. This implies FFF with e.g. a python function is not serializable.
- * 	3. In cases in which sequentializing is optional, a correspoding bool should be a member variable of the implementing class. All ranks should then call process(true).
+ * 	2. Only via XML can globalized filters be added to a sequence. This implies FFF with e.g. a python function is not compatible.
  *
  * @Author Felix Maurer
  */
@@ -57,10 +56,11 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		 * Implements FilterInterface's requirement of having a ()-operand defined.
 		 */
 		virtual void operator()(){
-			if((*_ic)()) {
-				if(_processingRank == (int) (*_ic)()->getThisRank()) {
+			if(_ic) {
+				if(_processingRank == _myRank) {
 					contribute();
 					process(FILTER_SEQUENTIAL); 				
+					std::cout << " (" << _myRank << ")POST MASTER PROCESSING" << std::endl;
 				}
 				else contribute();
 
@@ -68,8 +68,11 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 				MPI_Scatter(_sendbuf.data(), _cellsPerRank, MPI_DOUBLE, _recvbuf.data(), _cellsPerRank * _commSize, MPI_DOUBLE, _processingRank, _comm); 
 
 				//Read output data from buffer
-				if(_processingRank == (int) (*_ic)()->getThisRank()) applyBufferToMacroscopicCells(_recvbuf, _outputCells_Local);
-				else applyBufferToMacroscopicCells(_recvbuf, _filter->getOutputCells());
+				if(_processingRank == _myRank) applyBufferToMacroscopicCells(_recvbuf, _outputCells_Local);
+				else {
+					std::cout << "PRE APPLY BUFFER FOR OTHER RANK" << std::endl;
+					applyBufferToMacroscopicCells(_recvbuf, _filter->getOutputCells());
+				}
 			}
 			else process(FILTER_PARALLEL);
 		}
@@ -90,10 +93,19 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 
 				//write all gathered cells to inputCells_Global.
 				applyBufferToMacroscopicCells(_recvbuf, _inputCells_Global);
+				
+				std::cout << " (" << _myRank << ")POST ABTMC" << std::endl;
+				std::cout << " (" << _myRank << ")GLOBAL INPUT CELLS SIZE: " << _inputCells_Global.size() << std::endl;
+				std::cout << " (" << _myRank << ")GLOBAL OUTPUT CELLS SIZE: " << _outputCells_Global.size() << std::endl;
 
 				//Apply _filter
 				_filter->updateCellData(_inputCells_Global, _outputCells_Global, _cellIndices_Global);
+
+				std::cout << " (" << _myRank << ")POST UPDATE" << std::endl;
+
 				(*_filter)();
+
+				std::cout << " (" << _myRank << ")POST FILTER" << std::endl;
 				
 				macroscopicCellsToBuffer(_sendbuf, _outputCells_Global);	
 				//Now ready to scatter...
@@ -117,6 +129,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		const MPI_Comm _comm;
 		int _commSize;
 		const int _processingRank;
+		const int _myRank;
 		const int _cellsPerRank;
 
 		//Globalized variants of cell and indexing data structures (i.e spanning across all cells of the global domain). Only the master rank uses these.
@@ -139,7 +152,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 
 /*
  * TODO
- * what if not all ranks have exactly the same amounts of cell
  * testing
- * divite into header and implementation
+ * 	- inconsistencies in data
+ * 	- segfaults if run on more than 1 rank
  */

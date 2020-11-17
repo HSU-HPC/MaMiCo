@@ -6,7 +6,6 @@
 
 //Member functions of coupling::FilterSequence
 
-//TODO: this is a mess
 template<unsigned int dim>
 int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){
 	if(!sequenceNode) return EXIT_FAILURE;
@@ -130,6 +129,11 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
         currFilterNode = currFilterNode->NextSiblingElement();
 	}
 
+	//Check for modfiability. By default true.
+	if(sequenceNode->Attribute("modifiable")) {
+		if(std::strcmp(currFilterNode->Attribute("modifable"), "false") == 0) _isModifiable = false;
+	}
+
 	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << PRINT_PREFIX(); printOutputCellVector();
 	#endif
@@ -144,8 +148,8 @@ void coupling::FilterSequence<dim>::addFilter(
 				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
 				int filterIndex //counting starts at 0, -1 is equivalent to EOL
 ){
-	std::cout << PRINT_PREFIX() << "First element of _cellVector1 after add: " << _cellVector1[0] << std::endl;
-	std::cout << PRINT_PREFIX() << "First element of _cellVector2 after add: " << _cellVector2[0] << std::endl;
+	//std::cout << PRINT_PREFIX() << "First element of _cellVector1 after add: " << _cellVector1[0] << std::endl;
+	//std::cout << PRINT_PREFIX() << "First element of _cellVector2 after add: " << _cellVector2[0] << std::endl;
 
 	if(_isModifiable) {
 		unsigned int index;
@@ -217,7 +221,6 @@ void coupling::FilterSequence<dim>::initCellVectors(){
 }
 
 
-//TODO: since domains are now determined at FP-level, this looks deprecated. Especially the out-of-bounds check
 template<unsigned int dim>
 void coupling::FilterSequence<dim>::initDomain(){
 	#ifdef DEBUG_FILTER_PIPELINE
@@ -231,7 +234,7 @@ void coupling::FilterSequence<dim>::initDomain(){
     
     //sanity check
     for(unsigned int d = 0; d < dim; d++) if(_cellIndices.back()[d] < _domainEnd[d]){
-		std::cout << std::endl << "ERROR: Sequence domain size larger than MD domain." << std::endl;
+		std::cout << std::endl << "ERROR: Sequence domain size larger input domain." << std::endl;
 		exit(EXIT_FAILURE);
     }
 
@@ -244,12 +247,13 @@ void coupling::FilterSequence<dim>::initDomain(){
 	for(unsigned int index = 0; index < _inputCellVector.size(); index++){
 		outOfBounds = false;
 		for(unsigned int d = 0; d < dim; d++) 
-			//"index" does not reference the dim-dimensional indices stored in e.g. cellIndices but the cell vecto
+			//"index" does not reference the dim-dimensional indices stored in e.g. cellIndices but the cell vector's linear index
 			if(_cellIndices[index][d] < _domainStart[d] || _cellIndices[index][d] > _domainEnd[d]) outOfBounds = true;
 		if(!outOfBounds){
 			_inputDomainCellVector.push_back(_inputCellVector[index]);
 			_domainCellVector1.push_back(_cellVector1[index]);
 			_domainCellVector2.push_back(_cellVector2[index]);
+			//cf. global/local definitions in header
 			_globalDomainCellIndices.push_back(_cellIndices[index]);
 			_localDomainCellIndices.push_back(_cellIndices[index]-_domainStart);
 		}

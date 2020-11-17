@@ -12,7 +12,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 ) {
 	if(inputCells.empty()){
 		std::cout << "ERROR: ICM2M: Input cell vector is emtpy." << std::endl;
-		//TODO: throw exeption
+		//TODO: throw exception
 		return; 
 	}
 
@@ -74,7 +74,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 	if(_ic->getThisRank() ==  _lowestRank) {
 		//sanity check
 		if(_localLowerBoundaries == nullptr) {/*TODO: throw error*/}
-		else _globalLowerBoundaries = _localLowerBoundaries; //should be the same as _ic->convertLocalToGlobalVectorCellIndex(_localLowerBoundaries)
+		else _globalLowerBoundaries = new tarch::la::Vector<dim, unsigned int>(*_localLowerBoundaries); //should be the same as _ic->convertLocalToGlobalVectorCellIndex(_localLowerBoundaries)
 	} else _globalLowerBoundaries = new tarch::la::Vector<dim, unsigned int>(0);
 
 	if(_ic->getThisRank() ==  nprocs-1) { //last process 

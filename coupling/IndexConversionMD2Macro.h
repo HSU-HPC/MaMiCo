@@ -47,7 +47,7 @@ class coupling::IndexConversionMD2Macro {
 		~IndexConversionMD2Macro() {
 			delete _globalLowerBoundaries;
 			delete _globalUpperBoundaries;
-			delete _localLowerBoundaries;
+			delete _localLowerBoundaries; 
 			delete _localUpperBoundaries;
 
 			#ifdef DEBUG_ICM2M
@@ -94,10 +94,13 @@ class coupling::IndexConversionMD2Macro {
 
 		//assumes lower boundary to be lower than upper 
 		tarch::la::Vector<dim, unsigned int> getGlobalMD2MacroDomainSize() const {
-			return *_globalUpperBoundaries - *_globalLowerBoundaries;
+			//Since both lower and upper boundaries are inclusive, we need to add one. operator+(int) in tarch::la:Vector would be great here...
+			auto plus_one = tarch::la::Vector<dim, unsigned int>(1);
+			return *_globalUpperBoundaries - *_globalLowerBoundaries + plus_one;
 		}
 		tarch::la::Vector<dim, unsigned int> getLocalMD2MacroDomainSize() const {
-			return *_localUpperBoundaries - *_localLowerBoundaries;
+			auto plus_one = tarch::la::Vector<dim, unsigned int>(1);
+			return *_localUpperBoundaries - *_localLowerBoundaries + plus_one;
 		}
 
 
@@ -113,7 +116,7 @@ class coupling::IndexConversionMD2Macro {
 		 * In a lot of cases, you want instances of this to be indentical to a coupling::IndexConversion.
 		 * This way you can access this class' underlying IC element with ease.
 		 */
-		const coupling::IndexConversion<dim>* operator()() const { return _ic;}	
+		const coupling::IndexConversion<dim>* getBaseIC() const { return _ic;}	
 
 		
 	private:
