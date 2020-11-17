@@ -17,11 +17,14 @@ namespace coupling {
 }
 
 /**
- * TODO: Extensive comments
+ * Wrapper class for coupling::IndexConversion for cases in which you need to know boundaries of the
+ *		-- MD2Macro domain -- ,
+ * that is the domain of cells that are transfered from MD to CS.
+ * To do so, it makes use of coupling::services::MacroscopicCellService and MPI communcation between processes.
+ *
  * @Author Felix Maurer
  */
 template<unsigned int dim>
-//TODO: Is this really supposed to inherit from IC?
 class coupling::IndexConversionMD2Macro {
 	public:
 		IndexConversionMD2Macro(
@@ -37,7 +40,8 @@ class coupling::IndexConversionMD2Macro {
 				_localLowerBoundaries(nullptr),
 				_localUpperBoundaries(nullptr),
 				_comm(comm),
-				_lowestRank(lowestRankInComm)
+				_lowestRank((int)lowestRankInComm),
+				_myRank((int)_ic->getThisRank())
 			{
 				#ifdef DEBUG_ICM2M
 				std::cout << "ICM2M: Created new instance at location " << this << " using IC at " << _ic << " and MSI at " << _msi << std::endl;
@@ -80,7 +84,7 @@ class coupling::IndexConversionMD2Macro {
 					lowerBoundaries = *_globalLowerBoundaries;
 					upperBoundaries = *_globalUpperBoundaries;
 			}
-			else {/*TODO: Warning. This is only the case if both are NULL.*/}
+			else std::cout << "WARNING: ICM2M (" << _myRank << "): getGlobalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
 		}
 		void getLocalMD2MacroDomainBoundaries(
 				tarch::la::Vector<dim, unsigned int>& lowerBoundaries,
@@ -89,7 +93,7 @@ class coupling::IndexConversionMD2Macro {
 					lowerBoundaries = *_localLowerBoundaries;
 					upperBoundaries = *_localUpperBoundaries;
 			}
-			else {/*TODO: Warning. See above.*/}
+			else std::cout << "WARNING: ICM2M (" << _myRank << "): getLocalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
 		}
 
 		//assumes lower boundary to be lower than upper 
@@ -134,7 +138,10 @@ class coupling::IndexConversionMD2Macro {
 		const MPI_Comm _comm;
 
 		//This rank is assumed to manage cell (0,...,0) both in global and in M2M terms.
-		const unsigned int _lowestRank;
+		const int _lowestRank;
+
+		//This ICM2M instance's rank
+		const int _myRank;
 };
 
 #include "IndexConversionMD2Macro.cpph"
