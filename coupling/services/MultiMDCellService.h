@@ -12,7 +12,7 @@
 #include "coupling/InstanceHandling.h"
 
 namespace coupling{
-  template<unsigned int dim> class InstanceHandling;
+  template<class LinkedCell, unsigned int dim> class InstanceHandling;
   namespace services {
     template<class LinkedCell,unsigned int dim>
     class MultiMDCellService;
@@ -48,7 +48,7 @@ class coupling::services::MultiMDCellService {
       _indexConversion(initIndexConversion(
         _mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
         _multiMDService.getNumberProcessesPerMDSimulation(),
-        _multiMDService.getRank(),
+        _multiMDService.getGlobalRank(),
         _mdConfiguration.getDomainConfiguration().getGlobalDomainSize(),
         _mdConfiguration.getDomainConfiguration().getGlobalDomainOffset(),
         _mamicoConfiguration.getParallelTopologyConfiguration().getParallelTopologyType(), 
@@ -292,7 +292,7 @@ class coupling::services::MultiMDCellService {
       // receive data from each MD simulation and accumulate information in duplicate
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
           //std::cout << "Rank " << _macroscopicCellServices[l]->getIndexConversion().getThisRank() << ": Send from MD to Macro for Simulation no. " << l << std::endl;
-          if (_macroscopicCellServices[l] != nullptr &&  _warmupPhase[l] > 0)  {
+          if (_macroscopicCellServices[l] != nullptr &&  _warmupPhase[l] == 0)  {
           res += _macroscopicCellServices[l]
                   ->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver,globalCellIndicesFromMacroscopicSolver);
           for (unsigned int i = 0; i < size; i++){
@@ -302,10 +302,11 @@ class coupling::services::MultiMDCellService {
         }
       }
       // average data and store it in macroscopicCellsFromMacroscopicSolver
-      const unsigned int totalNumberEquilibratedMDSimulations = 
-        std::count_if(_warmupPhase.begin(), _warmupPhase.end(), [](unsigned int & x) {
-          return x > 0;
-        });
+      unsigned int totalNumberEquilibratedMDSimulations = 0;
+      for(auto & phaseI : _warmupPhase) {
+        // get number of equilibrated simulations 
+        totalNumberEquilibratedMDSimulations += phaseI > 0 ? 0 : 1;
+      }
       for (unsigned int i = 0; i < size; i++){
         //TODO replace _totalnumbermdsimulations by total number of equilibrated md simulations!!!
         macroscopicCellsFromMacroscopicSolver[i]
@@ -323,7 +324,7 @@ class coupling::services::MultiMDCellService {
     /** removes the last simulation which has been added.
      *  
      */
-    unsigned int rmMDSimulation(coupling::InstanceHandling<dim>& instanceHandling,
+    unsigned int rmMDSimulation(coupling::InstanceHandling<LinkedCell, dim>& instanceHandling,
                                 const unsigned int & index) {
 
       delete _macroscopicCellServices[index];
@@ -468,7 +469,7 @@ class coupling::services::MultiMDCellService {
       *  @return true if this process needs another md simulation initialized
       *          false otherwise
       * */
-     unsigned int addMDSimulation(coupling::InstanceHandling<dim>& instanceHandling,
+     unsigned int addMDSimulation(coupling::InstanceHandling<LinkedCell, dim>& instanceHandling,
                                   coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,
                                   const unsigned int & slot) 
     {
@@ -528,20 +529,22 @@ class coupling::services::MultiMDCellService {
 
     unsigned int getLocalNumberOfMDSimulations() const { return _localNumberMDSimulations; }
 
-    coupling::IndexConversion<dim> & getIndexConversion() const { return *_indexConversion; }
+    const coupling::IndexConversion<dim> & getIndexConversion() const { return _macroscopicCellServices[0]->getIndexConversion(); }
 
-    void finishCycle(const unsigned int & cycle, const std::vector<coupling::interface::MDSimulation*> simpleMD) {
+    void finishCycle(const unsigned int & cycle, const coupling::InstanceHandling<LinkedCell, dim> & instanceHandling) {
       for(auto& phaseI : _warmupPhase) {
         if(phaseI > 0) phaseI -= 1;
       }
-      writeCheckpoint(cycle, simpleMD);
+      //TODO switchon coupling!!  
+      writeCheckpoint(cycle, instanceHandling);
+      //TODO call directly instanceHandling.writeCheckpoint();
     }
 
     void writeCheckpoint(const unsigned int & cycle, 
-                          const std::vector<coupling::interface::MDSimulation*> simpleMD) {
+                          const coupling::InstanceHandling<LinkedCell, dim> & instanceHandling) const {
       std::stringstream filestem;
-      filestem << "restart_checkpoint_" << _multiMDService.getGlobalRank() / _multiMDService.getNumberLocalComms();
-      simpleMD[0]->writeCheckpoint(filestem.str().c_str(), 0);
+      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()+1) / _multiMDService.getNumberLocalComms();
+      instanceHandling.writeCheckpoint(filestem.str().c_str(), 0);
     }
     
   private:

@@ -5,17 +5,59 @@
 
 template<class LinkedCell, unsigned int dim>
 void 
-coupling
-::MultiMDMediator<LinkedCell, dim>
+coupling::MultiMDMediator<LinkedCell, dim>
 ::addMDSimulation(coupling::interface::MacroscopicSolverInterface<dim> * macroscopicSolverInterface) 
 {
   unsigned int slot = reserveNextFreeSlot();
 
   _multiMDCellService.addMDSimulation(_instanceHandling, macroscopicSolverInterface, slot);
 
-  unsigned int comm = slot / _multiMDService.getNumberLocalComms();
-  unsigned int index = slot % _multiMDService.getNumberLocalComms();
+  unsigned int comm = slot / _multiMDService.getLocalNumberOfMDSimulations();
+  unsigned int index = slot % _multiMDService.getLocalNumberOfMDSimulations();
   _listActiveMDSimulations[comm][index] = true;
+}
+
+
+template<class LinkedCell, unsigned int dim>
+void
+coupling::MultiMDMediator<LinkedCell, dim>
+::addMDSimulation(coupling::interface::MacroscopicSolverInterface<dim> * macroscopicSolverInterface, const unsigned int & communicator)
+{
+  unsigned int counter = 0;
+  for(auto & comm : _listActiveMDSimulations[communicator]) {
+    counter += comm ? 1 : 0;
+  }
+  if(counter == _multiMDService.getLocalNumberOfMDSimulations()) { addMDSimulationBlock(); }
+
+  for(unsigned int i=0;i<_listActiveMDSimulations[communicator].size();++i) {
+    if(!_listActiveMDSimulations[communicator][i]) {
+      unsigned int slot = communicator * _multiMDService.getLocalNumberOfMDSimulations() + i;
+      _multiMDCellService.addMDSimulation(_instanceHandling, macroscopicSolverInterface, slot);
+      _listActiveMDSimulations[communicator][i] = true;
+      return;
+    }
+  }
+}
+
+
+template<class LinkedCell, unsigned int dim>
+void
+coupling::MultiMDMediator<LinkedCell, dim>
+::addNMDSimulations(coupling::interface::MacroscopicSolverInterface<dim> * macroscopicSolverInterface, const unsigned int & n) {
+ for(unsigned int i=0;i<n;++i) {
+   addMDSimulation(macroscopicSolverInterface);
+ }
+}
+
+
+template<class LinkedCell, unsigned int dim>
+void
+coupling::MultiMDMediator<LinkedCell, dim>
+::addNMDSimulations(coupling::interface::MacroscopicSolverInterface<dim> * macroscopicSolverInterface, 
+                      const unsigned int & n, const unsigned int & communicator) {
+  for(unsigned int i=0;i<n;++i) {
+    addMDSimulation(macroscopicSolverInterface, communicator);
+  }
 }
 
 
@@ -36,7 +78,7 @@ coupling::MultiMDMediator<LinkedCell, dim>::rmMDSimulation()
   unsigned int index = slot % _multiMDService.getLocalNumberOfMDSimulations();
   do {
 
-    if(!_listActiveMDSimulations[comm][index] /*==true*/) {   
+    if(!_listActiveMDSimulations[comm][index]) {   
       //TODO find another simulation to be removed!!
       continue; 
     }
@@ -70,8 +112,7 @@ coupling::MultiMDMediator<LinkedCell, dim>
     return;
   }
 
-  unsigned int slot = communicator * _multiMDService.getLocalNumberOfMDSimulations()
-                      + _multiMDService.getLocalNumberOfMDSimulations()-1;
+  unsigned int slot = communicator * _multiMDService.getLocalNumberOfMDSimulations() + localIndex;
 
   if (slot >= _multiMDService.getTotalNumberOfMDSimulations()) {
     std::cout << "WARNING MultiMDMediator::rmMDSimulation() : Invalid md slot!" << std::endl;
@@ -81,6 +122,32 @@ coupling::MultiMDMediator<LinkedCell, dim>
   _multiMDCellService.rmMDSimulation(_instanceHandling, slot);
 
   _listActiveMDSimulations[communicator][localIndex] = false;
+}
+
+
+template<class LinkedCell, unsigned int dim>
+void
+coupling::MultiMDMediator<LinkedCell, dim>
+::rmMDSimulation(const unsigned int & communicator)
+{
+  if(_multiMDService.getLocalNumberOfMDSimulations() < 2) {
+    // We need each communicator to have at least one active simulation running
+    // otherwise all processes on this communicator would quickly run into shutdown
+    // and thus would not be accessible to the simulation anymore.
+    std::cout << "INFO MultiMDCellService::rmMDSimulation() : Cannot remove MD simulation, only one is left!" << std::endl;
+    return;
+  }
+  if(communicator >= _multiMDService.getNumberLocalComms()) {
+    std::cout << "WARNING MultiMDMediator::rmMDSimulation() : Invalid communicator " << communicator << "!" << std::endl;
+    return;
+  }
+
+  unsigned int slot = communicator * _multiMDService.getLocalNumberOfMDSimulations()
+                    + _multiMDService.getLocalNumberOfMDSimulations()-1;
+
+  _multiMDCellService.rmMDSimulation(_instanceHandling, slot);
+
+  _listActiveMDSimulations[communicator][_multiMDCellService.getLocalNumberOfMDSimulations()-1] = false;
 }
 
 
@@ -135,11 +202,6 @@ coupling::MultiMDMediator<LinkedCell,dim>::addMDSimulationBlock()
 
   _multiMDService.addMDSimulationBlock();
 
-  /*for(unsigned int i=0;i<_multiMDService.getNumberLocalComms();++i) {
-    auto pos = _listActiveMDSimulations.begin() + ((i+1) * _multiMDService.getLocalNumberOfMDSimulations() -1);
-    _listActiveMDSimulations.insert(pos, false);
-  }*/
-
   for(auto & group : _listActiveMDSimulations) {
     group.push_back(false);
   }
@@ -151,13 +213,9 @@ coupling::MultiMDMediator<LinkedCell,dim>::rmMDSimulationBlock()
 {
   _multiMDCellService.removeSimulationBlock();
 
-  /*for(unsigned int i=0;i<_multiMDService.getNumberLocalComms();++i) {
-    auto pos = _listActiveMDSimulations.begin() + _multiMDService.getNumberLocalComms() * i - 1;
-    _listActiveMDSimulations.erase(pos);
-  }*/
   for(auto & group : _listActiveMDSimulations) {
     group.pop_back();
   }
 
-  _multiMDService.addMDSimulationBlock();
+  _multiMDService.removeMDSimulationBlock();
 }
