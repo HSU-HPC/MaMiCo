@@ -12,21 +12,24 @@ namespace coupling {
   template<class LinkedCell, unsigned int> class MultiMDMediator;
 }
 
+/** Class to handle interaction between MultiMDCellService and InstanceHandling
+ * This is currently mainly used for activating/deactivating and addtion/removal of md simulations
+ */
 template<class LinkedCell, unsigned int dim>
 class coupling::MultiMDMediator {
 public:
 
   MultiMDMediator(coupling::services::MultiMDCellService<LinkedCell, dim> & multiMDCellService, 
-                  coupling::InstanceHandling<dim> & instanceHandling, 
+                  coupling::InstanceHandling<LinkedCell, dim> & instanceHandling, 
                   tarch::utils::MultiMDService<dim> & multiMDService) 
     : _multiMDCellService(multiMDCellService), _instanceHandling(instanceHandling), _multiMDService(multiMDService),
       _listActiveMDSimulations(_multiMDService.getNumberLocalComms(), std::vector<bool>()),
-      _nextFreeBlock(_multiMDService.getNumberLocalComms())
-    {
-      for(auto & group : _listActiveMDSimulations) {
-        group = std::vector<bool>(_multiMDService.getNumberLocalComms(), true);
-      }
+      _nextFreeBlock(_multiMDService.getNumberLocalComms()-1)
+  {
+    for(auto & group : _listActiveMDSimulations) {
+      group = std::vector<bool>(_multiMDService.getLocalNumberOfMDSimulations(), true);
     }
+  }
 
 
   /** Autmatically add another MDSimulation trying to keep the number of MD simulation across communicators balanced.
@@ -40,6 +43,14 @@ public:
   void addMDSimulation(coupling::interface::MacroscopicSolverInterface<dim> *, const unsigned int &);
 
 
+  /** Add n MD simulations **/ //TODO
+  void addNMDSimulations(coupling::interface::MacroscopicSolverInterface<dim> *, const unsigned int &);
+
+
+  /** ADD n MD Simulations to specified communicator */ //TODO
+  void addNMDSimulations(coupling::interface::MacroscopicSolverInterface<dim> *, const unsigned int &, const unsigned int &);
+
+
   /** Automatically remove MD simulation trying to keep the number of MD simulations across communicator balanced.
    */
   void rmMDSimulation();
@@ -49,6 +60,11 @@ public:
    * TODO How to handle removal of empty places??
    */
   void rmMDSimulation(const unsigned int &, const unsigned int &);
+
+
+  /** Remove MD Simulation on specific communicator
+   */
+  void rmMDSimulation(const unsigned int &);
 
 
   /** Add one block of free simulations which is evenly sliced over communicator groups. */
@@ -72,7 +88,7 @@ public:
 
 private:
   coupling::services::MultiMDCellService<LinkedCell, dim> & _multiMDCellService;
-  coupling::InstanceHandling<dim> & _instanceHandling;
+  coupling::InstanceHandling<LinkedCell, dim> & _instanceHandling;
   tarch::utils::MultiMDService<dim> & _multiMDService;
   std::vector<std::vector<bool> > _listActiveMDSimulations; // global list of active (true) and inactive (false) simulations
   unsigned int _nextFreeBlock;
