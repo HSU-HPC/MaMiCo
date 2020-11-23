@@ -20,6 +20,7 @@
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/configurations/CouetteConfiguration.h"
+#include "coupling/MultiMDMediator.h"
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -50,6 +51,9 @@ public:
       if(cycle > 0 && cycle < 50 && cycle % 2 == 0) {
         addMDSimulation();
       }
+      if(cycle > 0 && cycle < 50 && cycle % 3 == 0) {
+        removeMDSimulation();
+      }
     }
     shutdown();
   }
@@ -63,25 +67,25 @@ private:
   void removeMDSimulation() {
     //int iMD = c; // Global MD index to be shut down
     
-    unsigned int iMD = _multiMDCellService->rmMDSimulation(*_instanceHandling);
+    /*unsigned int iMD =*/ _multiMDMediator->rmMDSimulation();
 
-    if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;
+    /*if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;*/
 
-    _localMDInstances = _simpleMD.size();
+    _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
   }
 
   void addMDSimulation() {
-    unsigned int iMD = _multiMDCellService->addMDSimulation(*_instanceHandling, 
-                          getCouetteSolverInterface(
-                            _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-                            _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
-                            getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
-                          )
-                        );
+    _multiMDMediator->addMDSimulation(
+      getCouetteSolverInterface(
+        _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+        getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
+      )
+    );
 
-    if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
+    //if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
 
-    _localMDInstances = _simpleMD.size();         
+    _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();      
   }
   
   void init(){
@@ -97,7 +101,7 @@ private:
     twoWayCoupling(cycle);
     // write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getIndexConversion(),cycle);
-    _multiMDCellService->finishCycle(cycle, _simpleMD);
+    _multiMDCellService->finishCycle(cycle, *_instanceHandling);
     if(_rank==0) {std::cout << "Finish coupling cycle " << cycle << std::endl;}
   }
 
@@ -151,13 +155,13 @@ private:
                                                             _cfg.totalNumberMDSimulations);
     _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
 
-    _instanceHandling = new coupling::InstanceHandling<3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
+    _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
     if(_instanceHandling == nullptr) {
       std::cout << "ERROR DynamicMDTest::initSolvers() : _instanceHandling == NULL!" << std::endl;
       std::exit(EXIT_FAILURE);
     }
 
-    _simpleMD = _instanceHandling->getSimpleMD();
+    //_simpleMD = _instanceHandling->getSimpleMD();
     _mdSolverInterface = _instanceHandling->getMDSolverInterface();
 
     _mdStepCounter = 0;
@@ -165,6 +169,7 @@ private:
     if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // equilibrate MD
       _instanceHandling->equilibrate(_cfg.equSteps, _mdStepCounter);
+      _instanceHandling->switchOnCoupling();
       _mdStepCounter += _cfg.equSteps;
     }
     
@@ -194,13 +199,16 @@ private:
       );
     }
 
+    _multiMDMediator = new coupling::MultiMDMediator<MY_LINKEDCELL, 3>(*_multiMDCellService, *_instanceHandling, *_multiMDService);
+
     if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
-      for (unsigned int i = 0; i < _localMDInstances; i++){
+      /*for (unsigned int i = 0; i < _localMDInstances; i++){
         _simpleMD[i]->setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
-      }
+      }*/
+      _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
       // compute and store temperature in macroscopic cells (temp=1.1 everywhere)
       _multiMDCellService->computeAndStoreTemperature(_cfg.temp);
     }
@@ -277,7 +285,7 @@ private:
     if (_rank==0){ gettimeofday(&_tv.start,NULL); }
     if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // run MD instances
-      for (unsigned int i = 0; i < _localMDInstances; i++){
+      /*for (unsigned int i = 0; i < _localMDInstances; i++){
         if(_simpleMD[i] == nullptr) continue;
 
         // set macroscopic cell service and interfaces in MamicoInterfaceProvider
@@ -286,7 +294,10 @@ private:
 
         _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
         std::cout << "Finish _simpleMD[" << i << "]->simulateTimesteps " << std::endl;
-      }
+      }*/
+      _instanceHandling->simulateTimesteps(
+        _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter,
+        *_multiMDCellService);
 
       // plot macroscopic time step info in multi md service
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
@@ -406,20 +417,24 @@ private:
     }
 
     // shutdown MD simulation 
-    for (unsigned int i = 0; i < _localMDInstances; i++) {
+    /*for (unsigned int i = 0; i < _localMDInstances; i++) {
       // the shutdown operation may also delete the md solver interface; therefore, we update the MD solver interface in the vector _mdSolverInteface after the shutdown is completed
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
-      if(_simpleMD[i] != nullptr) {_simpleMD[i]->shutdown(); delete _simpleMD[i]; _simpleMD[i] = NULL; }
+      //if(_simpleMD[i] != nullptr) {_simpleMD[i]->shutdown(); delete _simpleMD[i]; _simpleMD[i] = NULL; }
       _mdSolverInterface[i] = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
     }
-    _simpleMD.clear();
+    //_simpleMD.clear();
     for (unsigned int i = 0; i < _localMDInstances; i++) {
       if (_mdSolverInterface[i] != NULL){
         delete _mdSolverInterface[i]; 
         _mdSolverInterface[i] = NULL;
       }
     }
-    _mdSolverInterface.clear();
+    _mdSolverInterface.clear();*/
+
+    if(_instanceHandling != nullptr) {
+      delete _instanceHandling;
+    }
 
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = 
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMacroscopicSolverInterface();
@@ -724,11 +739,12 @@ private:
   CouplingBuffer _buf;
   unsigned int _localMDInstances;
   std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterface;
-  std::vector<coupling::interface::MDSimulation*> _simpleMD;
-  coupling::InstanceHandling<3>* _instanceHandling;
+  //std::vector<coupling::interface::MDSimulation*> * _simpleMD;
+  coupling::InstanceHandling<MY_LINKEDCELL,3>* _instanceHandling;
   std::default_random_engine _generator;
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
   TimingValues _tv;
+  coupling::MultiMDMediator<MY_LINKEDCELL,3> * _multiMDMediator;
 };
 #endif // _COUPLING_TESTS_COUETTETEST_H_
