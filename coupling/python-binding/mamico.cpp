@@ -3,6 +3,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 #include <pybind11/numpy.h>
 #include <mpi.h>
 #include <string>
@@ -44,6 +45,9 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
+// custom pybind11 headers
+#include "coupling/python-binding/conversion.h"
+
 // Helper function for allocation of configuration object and XML parsing
 template<class T> T* makeConfiguration(const std::string filename, const std::string topleveltag){
 	T* cfg = new T{};  // corresponding delete will be called by python, because of return_value_policy::take_ownership
@@ -58,6 +62,7 @@ template<class T> T* makeConfiguration(const std::string filename, const std::st
 // tarch:la::Vector on the MaMiCo C++ side
 //
 ///////////////////////////////////////////////////////////////////////////////////
+
 
 using Vec3ui = tarch::la::Vector<3,unsigned int>;
 namespace pybind11 { namespace detail {
@@ -561,7 +566,20 @@ PYBIND11_MODULE(mamico, mamico) {
     py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService")
     	.def("computeAndStoreTemperature", &coupling::services::MacroscopicCellService<3>::computeAndStoreTemperature)
     	.def("getIndexConversion", &coupling::services::MacroscopicCellService<3>::getIndexConversion, py::return_value_policy::reference)
-        .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep);
+        .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep)
+		.def("addFilterToSequence", []
+				(coupling::services::MacroscopicCellService<3>* service,
+				 const char* name,
+				 std::function<py::array_t<double> (py::array_t<double>)> applyScalar,
+				 std::function<py::array_t<double> (py::array_t<double>)> applyVector,
+				 int filterIndex)
+				{
+					service->addFilterToSequence( 
+							name, 
+							coupling::conversion::functionWrapper_Scalar(applyScalar),
+							coupling::conversion::functionWrapper_Vector(applyVector),
+							filterIndex);
+				});
 
     coupling.def("getMDSimulation", []
     	(const simplemd::configurations::MolecularDynamicsConfiguration& c1,

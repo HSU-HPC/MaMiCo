@@ -4,12 +4,13 @@
 
 #pragma once
 
-//#define DEBUG_FILTER_PIPELINE
+#define DEBUG_FILTER_PIPELINE
 #define POST_MULTI_INSTANCE_FILTERING_YES true
 #define POST_MULTI_INSTANCE_FILTERING_NO false
+
 #include "tarch/tinyxml2/tinyxml2.h"
 #include "coupling/filtering/FilterSequence.h"
-#include "coupling/IndexConversion.h"
+#include "coupling/IndexConversionMD2Macro.h"
 
 
 /*
@@ -29,21 +30,26 @@ template<unsigned int dim>
 class coupling::FilterPipeline{
     public:
         FilterPipeline(
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 			const coupling::IndexConversion<dim>* indexConversion,
+			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
-			const std::string cfgpath = "filter_pipeline.xml");
+			const std::string cfgpath);
 
         FilterPipeline(
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 			const coupling::IndexConversion<dim>* indexConversion,
+			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
 			bool postMultiInstance,
-			const std::string cfgpath = "filter_pipeline.xml");
+			const std::string cfgpath);
                
         ~FilterPipeline() {
             for(auto piSequence : _piSequences) delete piSequence;
             for(auto miSequence : _miSequences) delete miSequence;
+			
+			delete _ic;
+
             #ifdef DEBUG_FILTER_PIPELINE
             std::cout << "FP: FilterPipeline deconstructed." << std::endl;
             #endif
@@ -55,7 +61,10 @@ class coupling::FilterPipeline{
 		 * Ouput of the specified output-FilterSequence will be written to _md2MacroCells.
 		 */
         void operator()();
+		
 
+       	std::vector<coupling::FilterSequence<dim> *> getPiSequences() const { return _piSequences; }
+       	std::vector<coupling::FilterSequence<dim> *> getMiSequences() const { return _miSequences; }
 
 
     private:
@@ -72,20 +81,13 @@ class coupling::FilterPipeline{
 		 */
        	int loadSequencesFromXML(tinyxml2::XMLElement* metaNode);
 
-		/*
-		 * Chooses a subspace of the cell (and index) input based on what will be transfered to the macro solver.
-		 * This subspace is usually called "md2Macro-domain".
-		 * */
-		int initMd2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells);
-
-      
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _md2MacroCells;
 		std::vector<tarch::la::Vector<dim, unsigned int>> _md2MacroCellIndices;		
 
-		const coupling::IndexConversion<dim>* _indexConversion;
+		coupling::IndexConversionMD2Macro<dim>* _ic;
 		const tarch::utils::MultiMDService<dim>& _multiMDService;
-	   	bool _postMultiInstance;
-      	
+
+	   	bool _postMultiInstance;	
 
 		tinyxml2::XMLDocument _config;
 
