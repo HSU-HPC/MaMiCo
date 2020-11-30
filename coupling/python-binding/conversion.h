@@ -101,25 +101,41 @@ namespace coupling { namespace conversion {
 		return res;
 	}
 
-
+	
 	//template<class T>
 	std::function
 	<
 		std::vector<double>
 	   	(std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)
 	>*
-	functionWrapper_Scalar(std::function<py::array_t<double> (py::array_t<double>)> py_func)
+	functionWrapper_Scalar(std::function<py::array_t<double> (py::array_t<double>)>* py_func_ptr)
 	{
-		return new std::function<std::vector<double> (std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
- 			{
-				[py_func]
-				(std::vector<double> stl_vector, std::vector<std::array<unsigned int, 3>> indices)
+		//case: py_func exists
+		if(py_func_ptr)
+		{
+			//create copy at current scope
+			auto py_func = *py_func_ptr;
+			return new std::function<std::vector<double> (std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
+ 				{
+					[py_func]
+					(std::vector<double> stl_vector, std::vector<std::array<unsigned int, 3>> indices)
+					{
+						py::array_t<double> np_input = conversion::stlVectorToNumpyArray_Scalar(stl_vector, indices);
+						py::array_t<double> np_output = py_func(np_input);
+						return conversion::numpyArrayToStlVector_Scalar(np_output);
+					}
+				};
+		}
+		//case: py_func is "None"
+		else
+			return new std::function<std::vector<double> (std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
 				{
-					py::array_t<double> np_input = conversion::stlVectorToNumpyArray_Scalar(stl_vector, indices);
-					py::array_t<double> np_output = py_func(np_input);
-					return conversion::numpyArrayToStlVector_Scalar(np_output);
-				}
-			};
+					[]
+					(std::vector<double> stl_vector, std::vector<std::array<unsigned int, 3>> indices)
+					{
+						return stl_vector;
+					}
+				};
 	}
 
 	//template<class T>
@@ -128,18 +144,33 @@ namespace coupling { namespace conversion {
 		std::vector<std::array<double, 3>>
 	   	(std::vector<std::array<double, 3>> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)
 	>*
-	functionWrapper_Vector(std::function<py::array_t<double> (py::array_t<double>)> py_func)
+	functionWrapper_Vector(std::function<py::array_t<double> (py::array_t<double>)>* py_func_ptr)
 	{
-		return new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double, 3>> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
+		//case: py_func exists
+		if(py_func_ptr) 
+		{
+			//create copy at current scope
+			auto py_func = *py_func_ptr;
+			return new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double, 3>> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
+				{
+					[py_func] 
+					(std::vector<std::array<double, 3>> stl_vector, std::vector<std::array<unsigned int, 3>> indices)
+					{
+						auto np_input = conversion::stlVectorToNumpyArray_Vector(stl_vector, indices);
+						auto np_output = py_func(np_input);
+						return conversion::numpyArrayToStlVector_Vector(np_output);
+					}
+				};
+		}
+		//case: py_func is "None"
+		else
+			return new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double, 3>> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
 			{
-				[py_func] 
+				[] 
 				(std::vector<std::array<double, 3>> stl_vector, std::vector<std::array<unsigned int, 3>> indices)
 				{
-					auto np_input = conversion::stlVectorToNumpyArray_Vector(stl_vector, indices);
-					auto np_output = py_func(np_input);
-					return conversion::numpyArrayToStlVector_Vector(np_output);
+					return stl_vector;
 				}
 			};
 	}
-
 }}
