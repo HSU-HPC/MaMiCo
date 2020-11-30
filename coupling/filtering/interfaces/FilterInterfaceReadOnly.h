@@ -13,6 +13,8 @@ namespace coupling{
 /*
  * Extension of FilterInterface.h for cases in which the filter itself does not produce any output data.
  * For such filters, you want to make use of copyInputToOutput() (see below) in every filter step.
+ *
+ * @Author Felix Maurer
  */
 
 template <unsigned int dim>
@@ -22,8 +24,10 @@ class coupling::FilterInterfaceReadOnly : public coupling::FilterInterface<dim>{
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 					const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-					bool filteredValues[7]):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues)
+					const std::array<bool, 7> filteredValues,
+					const char* type
+		):
+			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, type)
 		{}
 	protected:
 		/*

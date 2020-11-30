@@ -8,7 +8,7 @@
 #include <vector>
 
 //#define DEBUG_GAUSS
-#include "coupling/filtering/FilterInterface.h"
+#include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling {
     template<unsigned int dim>
@@ -23,19 +23,24 @@ namespace coupling {
 #define GAUSS_OUTER_WEIGHT 0.27901
 #define GAUSS_INNER_WEIGHT (1- (GAUSS_OUTER_WEIGHT * 2))
 
+/*
+ * Implements a gaussian filter. Limited to what is listed in the disclaimer above. 
+ * Only specified in one dimension: If you wish to use a multidimensional gaussian filter, simply chain multiple instances of this filter in one FilterSequence.
+ *
+ * @author Felix Maurer
+ */
 template<unsigned int dim>
 class coupling::Gauss : public coupling::FilterInterface<dim>{
     public:
         Gauss(  const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //Use local indexing! (starting at (0,...,0))
-				bool filteredValues[7],
+				const std::array<bool, 7> filteredValues,
 				unsigned int dimension,
 				const char* extrapolationStrategy):
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "GAUSS"),
 				_dim(dimension),
 				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back())
-				//TODO: function pointers
 		{
 			//TODO
 			std::cout << "WARNING: You're using a GAUSS-Filter. As this filter has not been tested thoroughly, caution is advised!" << std::endl;
@@ -76,7 +81,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		/**
 		 * Determines how to apply filter to border cells:
 		 * 0 = only use existing cells and increase their weight accordingly
-		 * 1 = linear extrapolation //TODO
+		 * 1 = linear extrapolation
 		 */
 		unsigned int _extrapolationStrategy;
 
@@ -85,7 +90,6 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		//returns the cell that's below the cell at index on the d-axis
 		unsigned int getIndexAbove(unsigned int index, unsigned int d);
 
-		//TODO: Move to interface?
 		tarch::la::Vector<dim, unsigned int> _lastIndex;
 };
 

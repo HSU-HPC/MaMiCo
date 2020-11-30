@@ -35,11 +35,13 @@ class coupling::FilterInterface{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-				bool filteredValues[7]):
+				const std::array<bool, 7> filteredValues,
+				const char* type):
 				
 				_inputCells(inputCellVector),
 				_outputCells(outputCellVector),
-				_cellIndices(cellIndices)
+				_cellIndices(cellIndices),
+				_type(type)
 		{
 			if(filteredValues[0]){
 				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setMicroscopicMass);
@@ -73,19 +75,62 @@ class coupling::FilterInterface{
 			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
 		}
 
+		FilterInterface(const char* type) : _type(type) {/* Used by incomplete implementations of FilterInterface. Should be redesigned via meta class.*/}
+
 
 		virtual ~FilterInterface(){};
 
 		
-		//Applies the filter to all cells that are within the filter's sequence's domain.
 
-		//It is very important that this method provides complete output data,
-		//i.e uses all elements of _scalarSetters and _vectorSetters on all elements of _outputCells.
-		//If this is not the case, you dont want to use this interface, but rather
-		//	coupling::FilterInterfaceReadOnly
-		//and use its method copyInputToOutput().
+		/*
+		 * Applies the filter to all cells that are within the filter's sequence's domain.
+		 *
+		 * It is very important that this method provides complete output data,
+		 * i.e uses all elements of _scalarSetters and _vectorSetters on all elements of _outputCells.
+		 * If this is not the case, you dont want to use this interface, but rather coupling::FilterInterfaceReadOnly
+		 * and use its method copyInputToOutput().
+		 */
 		virtual void operator()() = 0;
+
+		//TODO: changed this to pass by reference. not sure if thats safe
+		void updateCellData(
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
+			std::vector<tarch::la::Vector<dim,unsigned int>>& new_cellIndices
+		) {
+			std::cout << "		FI: Updating cell data. Now filters " << _inputCells.size() << " cells." << std::endl;
+			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size())
+			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
+			_inputCells = new_inputCells;
+			_outputCells = new_outputCells;
+			_cellIndices = new_cellIndices;
+
+		}
+
+		const char* getType() const { return _type; }
+
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getInputCells() const { return _inputCells; }
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getOutputCells() const { return _outputCells; }
+		std::vector<tarch::la::Vector<dim,unsigned int>> getCellIndices() const { return _cellIndices; }
+
+		/*
+		 * Only used in one scenario:
+		 *  - this is at index 0 in FS
+		 *  - new filter gets dynamically linked into FS at index 0
+		 * In that case, this was previously getting input from MD but won't any longer.
+		 * The newly added filter will provide input for this one instead.
+		 */
+		void setInputCells(const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& newInputCells) { _inputCells = newInputCells; }
+
+		//Size = number of cells in this filter.
+		int getSize() const { return _cellIndices.size(); }
+		
 	protected:
+		void DEBUG_PRINT_CELL_VELOCITY(const char* caller, unsigned int index = 0) {
+			std::cout << "		" << caller << " IN ("<< (_inputCells[index]) <<"): " << _inputCells[index]->getCurrentVelocity() << std::endl;
+			std::cout << "		" << caller << " OUT ("<< (_outputCells[index]) <<"): " << _outputCells[index]->getCurrentVelocity() << std::endl;
+		}
+
 		/**
 		 *  Filters should read from input vector and write to output vector.
 		 *  Both vectors use the same indexing by default. 
@@ -103,5 +148,6 @@ class coupling::FilterInterface{
 		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const tarch::la::Vector<dim, double>&)> _vectorSetters;
 		std::vector<const tarch::la::Vector<dim, double>& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _vectorGetters;
 
-
+		//unique identifier per filter class
+		const char* _type;
 };

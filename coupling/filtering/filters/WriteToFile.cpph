@@ -13,25 +13,34 @@ void coupling::WriteToFile<dim>::operator()(){
     std::cout << "		WTF: Now writing data to: " << _location;
     #endif 
 
-    int indexCounter = 0;
     if(!_overwrite) _file.open(_location, std::ios_base::app);
 	else {
 		_file.open(_location);
 	}
+
+	//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("WTF");	
 	
-    for(auto cell : coupling::FilterInterface<dim>::_inputCells){
-        _file 
-		//TODO: Semicolons as seperators?
-		<< _iteration << " , "
-        << _localCellIndices[indexCounter] << " , "
-        << coupling::FilterInterface<dim>::_cellIndices[indexCounter] << " , ";
+    for(unsigned int ic_index = 0; ic_index < coupling::FilterInterface<dim>::_inputCells.size(); ic_index++) {
+		//case: only one cell
+		if(_oneCellOnly != -1) ic_index = (unsigned int) _oneCellOnly;
+
+        _file << _iteration << " ; ";
+        for(unsigned int d = 0; d < dim; d++) _file << _localCellIndices[ic_index][d] << " ; ";
+     	for(unsigned int d = 0; d < dim; d++) _file << coupling::FilterInterface<dim>::_cellIndices[ic_index][d] << " ; ";
+
+		//printing all scalar values
 		for(auto sGetter : coupling::FilterInterface<dim>::_scalarGetters)
-        	_file << (cell->*sGetter)() << " , ";
+        	_file << (coupling::FilterInterface<dim>::_inputCells[ic_index]->*sGetter)() << " ; ";
+
+		//printing all vectorized values
 		for(auto vGetter : coupling::FilterInterface<dim>::_vectorGetters)
-        	_file << (cell->*vGetter)() << " , ";
-		_file << std::endl;
-        indexCounter++;
+        	for(unsigned int d = 0; d < dim; d++) _file << (coupling::FilterInterface<dim>::_inputCells[ic_index]->*vGetter)()[d] << " ; ";
+
+		//case: only one cell
+		if(_oneCellOnly != -1) break;
+		else _file << std::endl; //spatial distinction between iteration in output file. Unneccesary if OCO. 
     }
+
 	_file << std::endl;
     _file.close(); 
 	
