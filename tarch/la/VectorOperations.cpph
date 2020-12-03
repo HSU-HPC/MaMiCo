@@ -51,6 +51,15 @@ tarch::la::Vector<size,T> operator*(
   for (int i = 0; i < size; i++){ result[i] = v[i]*s; }
   return result;
 }
+template<int size, class T>
+tarch::la::Vector<size,T> operator/(
+  const tarch::la::Vector<size,T>& v,
+  const T& s
+) {
+  tarch::la::Vector<size,T> result;
+  for (int i = 0; i< size; i++) { result[i] = v[i]/s;}
+  return result;
+}
 
 
 // computes the inner product of two vectors
