@@ -161,8 +161,9 @@ class KVSTest():
 
 
 
-        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("gauss", pf.returnCellData, gauss, 0)
-        self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("median", pf.returnCellData, median, 0)
+        mcs = self.multiMDCellService.getMacroscopicCellService(0)
+        #mcs.addFilterToSequence(filter_sequence="testNoneFFF", filter_index="1", scalar_filter_func = None, vector_filter_func=None)
+        #self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence(filter_sequence="median", filter_index=0, scalar_filter_func = pf.returnCellData, vector_filter_func=median)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
