@@ -48,10 +48,10 @@ public:
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
 
-      if(cycle > 0 && cycle < 50 && cycle % 2 == 0) {
+      if(cycle == 1) {
         addMDSimulation();
       }
-      if(cycle > 0 && cycle < 50 && cycle % 3 == 0) {
+      if(cycle == 3) {
         removeMDSimulation();
       }
     }
@@ -64,24 +64,18 @@ private:
   //enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
   //enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
-  void removeMDSimulation() {
+  void removeMDSimulation(const unsigned int N=1) {
     //int iMD = c; // Global MD index to be shut down
     
-    /*unsigned int iMD =*/ _multiMDMediator->rmMDSimulation();
+    /*unsigned int iMD =*/ _multiMDMediator->rmNMDSimulations(N);
 
     /*if(_rank == 0) std::cout << "Delete global md simulation " << iMD << std::endl;*/
 
     _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
   }
 
-  void addMDSimulation() {
-    _multiMDMediator->addMDSimulation(
-      getCouetteSolverInterface(
-        _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
-        getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
-      )
-    );
+  void addMDSimulation(const unsigned int N=1) {
+    _multiMDMediator->addNMDSimulations(N);
 
     //if(_rank == 0) std::cout << "Adding global md simulation " << iMD << std::endl;
 
@@ -199,7 +193,9 @@ private:
       );
     }
 
-    _multiMDMediator = new coupling::MultiMDMediator<MY_LINKEDCELL, 3>(*_multiMDCellService, *_instanceHandling, *_multiMDService);
+    _multiMDMediator = new coupling::MultiMDMediator<MY_LINKEDCELL, 3>(
+      *_multiMDCellService, *_instanceHandling, *_multiMDService, couetteSolverInterface
+    );
 
     if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // set couette solver interface in MamicoInterfaceProvider
