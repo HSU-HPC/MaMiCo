@@ -450,21 +450,6 @@ class coupling::services::MultiMDCellService {
     }
 
 
-    /** Find, which slot has been reserved last */
-    /*unsigned int getLastReservedSlot() {
-      if(_nextFreeBlock == _multiMDService.getNumberLocalComms()-1) {
-        // In this case, there no actually free slots available
-        //  (we first had to add another block)
-        //  We thus want to free a slot on the first communicator.
-        _nextFreeBlock = 0;
-        return _localNumberMDSimulations - 1;       
-      }
-      unsigned int _thisFreeBlock = _nextFreeBlock;
-      _nextFreeBlock += 1;
-      return (_thisFreeBlock+1) * _localNumberMDSimulations + _localNumberMDSimulations - 1;
-    }*/
-
-
      /** Adds MacroscopicCellService at appropriate slot
       *  @return true if this process needs another md simulation initialized
       *          false otherwise
@@ -473,15 +458,11 @@ class coupling::services::MultiMDCellService {
                                   coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,
                                   const unsigned int & slot) 
     {
-      
-      //unsigned int slot = reserveNextSlot();
 
       if(_macroscopicCellServices[slot] != nullptr) {
         std::cout << "ERROR! coupling::services::MultiMDCellService::addMDSimulation(): Simulation at " << slot << " already exists!" << std::endl;
         std::exit(EXIT_FAILURE);
       }
-
-      //_listActiveMDSimulations[slot] = true;
 
       if(slot < _blockOffset || slot >= _blockOffset + _localNumberMDSimulations) {
 
