@@ -193,49 +193,6 @@ void coupling::MultiMDMediator<LinkedCell, dim>
 
 
 template<class LinkedCell, unsigned int dim>
-unsigned int
-coupling::MultiMDMediator<LinkedCell, dim>::reserveNextFreeSlot() 
-{
-    if(_nextFreeBlock == _multiMDService.getNumberLocalComms()-1) {
-      /** If the next slot to be reserved would be on the last communicator,
-       * this means that all communicators are full. We thus have to add
-       * another sliced block of simulations slots
-       */
-      addMDSimulationBlock();
-    }
-
-    unsigned int thisFreeBlock = _nextFreeBlock;
-    if(_nextFreeBlock == 0) {
-      /** If a simulation slot has been reserved on communicator 0,
-       * we start again at the last communicator.
-       */
-      _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
-    } else {
-      _nextFreeBlock -= 1;
-    }
-    
-    return thisFreeBlock * _multiMDService.getLocalNumberOfMDSimulations() 
-        + _multiMDService.getLocalNumberOfMDSimulations() - 1;
-}
-
-
-template<class LinkedCell, unsigned int dim>
-unsigned int
-coupling::MultiMDMediator<LinkedCell,dim>::getLastReservedSlot() 
-{
-  if(_nextFreeBlock == _multiMDService.getNumberLocalComms()-1) {
-
-    _nextFreeBlock = 0;
-    return _multiMDService.getLocalNumberOfMDSimulations()-1;
-  }
-  unsigned int thisFreeBlock = _nextFreeBlock;
-  _nextFreeBlock += 1;
-  return (thisFreeBlock+1) * _multiMDService.getLocalNumberOfMDSimulations() + 
-        + _multiMDService.getLocalNumberOfMDSimulations()-1;
-}
-
-
-template<class LinkedCell, unsigned int dim>
 void
 coupling::MultiMDMediator<LinkedCell,dim>::addMDSimulationBlock() 
 {
