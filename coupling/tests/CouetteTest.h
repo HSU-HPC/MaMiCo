@@ -68,9 +68,9 @@ private:
     advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
-    if(_rank==0 && cycle%20==0) {
-      std::cout << "Finish coupling cycle " << cycle << std::endl;
-    }
+    // if(_rank==0 && cycle%20==0) {
+      // std::cout << "Finish coupling cycle " << cycle << std::endl;
+    // }
   }
 
   void initMPI(){
@@ -792,8 +792,6 @@ private:
     }
     else if(_cfg.maSolverType == COUETTE_FD){
       solver = new coupling::solvers::FiniteDifferenceSolver(_cfg.channelheight,vel,_cfg.kinVisc,dx,dt,_cfg.plotEveryTimestep,"FDCouette",_cfg.lbNumberProcesses,1);
-      std::cout <<  "Channelheight " << _cfg.channelheight << " vel " << vel << " kinVisc " << _cfg.kinVisc ;
-      std::cout << " dx " << dx << " dt " <<  dt << " Processes " << _cfg.lbNumberProcesses << std::endl;
       if (solver==NULL){
         std::cout << "ERROR CouetteTest::getCouetteSolver(): FD solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -914,4 +912,3 @@ private:
 };
 
 #endif // _COUPLING_TESTS_COUETTETEST_H_
-

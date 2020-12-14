@@ -24,7 +24,8 @@ namespace coupling {
   }
 }
 
-/** implements the basic functions for a numerical flow solver.
+/** It implements the basic functions for a numerical Couette flow solver.
+  * For impelmenting a Couette flow solver, you can use it in the hierachy.
   *  @author Philipp Neumann & Helene Wittenberg
  */
 class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCouetteSolver<3> {
@@ -54,7 +55,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       #endif
       // zero velocity, unit density; flags are set to FLUID
       for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++){
-        for (int d = 0; d <  3; d++){ _vel[i*3+d]  = (double)0.0;} // three times get(i)
+        for (int d = 0; d <  3; d++){ _vel[i*3+d]  = (double)0.0;}
         _density[i] = 1.0;
         _flag[i] = FLUID;
       }
@@ -64,9 +65,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       // correct boundary flags based on physical description (Couette scenario)
       // bottom - moving wall
       for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2); i++){ _flag[i] = MOVING_WALL; }
-      //for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2); i++){ _flag[get(i)] = MOVING_WALL; }
       // top - noslip
-      //for (int i = (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+1); i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++){ _flag[get(i)] = NO_SLIP;}
       for (int i = (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+1); i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++){ _flag[i] = NO_SLIP;}
       // front - periodic
       for (int z = 1; z < _domainSizeZ+1; z++){for (int x = 0; x < _domainSizeX+2; x++){ _flag[get(x,0,z)] = PERIODIC; } }
@@ -80,7 +79,19 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       setParallelBoundaryFlags();
     }
 
-    virtual ~NumericalSolver(){} // TODO if any pointer is created within, it should be removed here
+    virtual ~NumericalSolver(){
+      if (_vel !=NULL){delete [] _vel; _vel=NULL;}
+      if (_density!=NULL){delete [] _density; _density=NULL;}
+      if (_flag!=NULL){delete [] _flag; _flag=NULL;}
+      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+      if (_sendBufferX!=NULL){delete [] _sendBufferX; _sendBufferX=NULL;}
+      if (_sendBufferY!=NULL){delete [] _sendBufferY; _sendBufferY=NULL;}
+      if (_sendBufferZ!=NULL){delete [] _sendBufferZ; _sendBufferZ=NULL;}
+      if (_recvBufferX!=NULL){delete [] _recvBufferX; _recvBufferX=NULL;}
+      if (_recvBufferY!=NULL){delete [] _recvBufferY; _recvBufferY=NULL;}
+      if (_recvBufferZ!=NULL){delete [] _recvBufferZ; _recvBufferZ=NULL;}
+      #endif
+    }
 
     /** flags the domain boundary cells. mdDomainOffset and mdDomainSize correspond to lower/left/front corner of the MD domain and the size of the domain. overlapStrip is the number of cells
      *  that the LB and MD domain shall overlap, i.e. the number of "MD cells" that lie within the LB domain but which should not be flagged (and thus be handled by both solvers).*/
@@ -112,6 +123,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       }
     }
 
+    /** Function applies the values received from the MD-solver within the conntinuum solver */
     virtual void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,const unsigned int * const recvIndices,
     const coupling::IndexConversion<3>& indexConversion)=0;
 
@@ -159,15 +171,13 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       if (_coords[2]==_processes[2]-1){ _parallelNeighbours[TOP] = MPI_PROC_NULL; } else { _parallelNeighbours[TOP] = _coords[0]+_processes[0]*(_coords[1]+_processes[1]*(_coords[2]+1)); }
       // bottom either neighbour or MPI_PROC_NULL
       if (_coords[2]==0)              { _parallelNeighbours[BOTTOM]=MPI_PROC_NULL;} else { _parallelNeighbours[BOTTOM]=_coords[0]+_processes[0]*(_coords[1]+_processes[1]*(_coords[2]-1));}
-      std::cout << "Parallel neighbours for rank " << rank << ": " << _parallelNeighbours << std::endl;
+      // std::cout << "Parallel neighbours for rank " << rank << ": " << _parallelNeighbours << std::endl;
       #endif
     }
 
     /** sets parallel boundary flags according to Couette scenario */
     void setParallelBoundaryFlags(){
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      //const tarch::la::Vector<3,unsigned int> coords(getProcessCoordinates());
-
       // bottom - moving wall
       if (_coords[2]!=0){
         for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2); i++){ _flag[i] = PARALLEL_BOUNDARY; }
@@ -307,30 +317,6 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       file.close();
     }
 
-    /** plot txt file if required */
-    void plottxt() {
-      // only plot output if this is the correct timestep
-      if (_plotEveryTimestep==-1){ return;}
-      if (_counter%_plotEveryTimestep!=0){return;}
-
-      std::stringstream ss; ss << "velocity_" << _counter << ".txt";
-      std::ofstream file(ss.str().c_str());
-      if (!file.is_open()){std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-      std::stringstream velocity;//, couette;
-
-      // loop over domain (incl. boundary)
-      int y=8;
-      int x=8;
-      for (int z = 1; z < _domainSizeZ+1; z++){
-        const int index=get(x,y,z);
-        // write information to streams
-        velocity << _vel[3*index] << std::endl;
-      }
-      file << velocity.str() << std::endl;
-      velocity.str("");
-      file.close();
-    }
-
     /** returns true, if this rank is not of relevance for the LB simulation */
     bool skipRank() const {
       int rank = 0;
@@ -343,7 +329,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
     enum Flag{FLUID=0,NO_SLIP=1,MOVING_WALL=2,PERIODIC=3,MD_BOUNDARY=4,PARALLEL_BOUNDARY=5};
     enum NbFlag{LEFT=0,RIGHT=1,BACK=2,FRONT=3,BOTTOM=4,TOP=5};
 
-    const double _channelheight;
+    const double _channelheight; //
     const double _dx; // actual mesh size
     const double _dt; // actual time step size
     const double _kinVisc;
@@ -358,7 +344,6 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
     const int _avgDomainSizeZ { getAvgDomainSize(_channelheight,_dx,_processes,2) }; // "" in z-direction
     const tarch::la::Vector<3,unsigned int> _coords{getProcessCoordinates()};
     int _counter{0}; // time step counter
-    double _time{_dt};
     double *_vel{NULL};  // velocity field
     double *_density{NULL}; // density
     Flag *_flag{NULL}; // flag field
