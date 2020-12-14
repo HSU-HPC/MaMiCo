@@ -132,16 +132,9 @@ class coupling::services::MultiMDCellService {
 
       _mdConfiguration.getDomainConfigurationNonConst().setInitFromCheckpoint(true);
       std::stringstream filestem;
-      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()) / _multiMDService.getNumberLocalComms() << "_0";
+      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()) / computeScalarNumberProcesses() << "_0";
       _mdConfiguration.getDomainConfigurationNonConst().setCheckpointFilestem(filestem.str());
       _mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(false);
-      if(_multiMDService.getLocalSize() > 1) {
-        //_mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(false);
-      }
-      else {
-        //_mdConfiguration.getDomainConfigurationNonConst().setInitFromSequentialCheckpoint(true);
-      }
-      
 
     }
 
@@ -417,9 +410,6 @@ class coupling::services::MultiMDCellService {
       delete [] _macroscopicCellServices;
       _macroscopicCellServices = newMacroscopicCellServices;
 
-      //_multiMDService.addMDSimulationBlock();
-
-      //_listActiveMDSimulations.push_back(false);
     }
 
     /** Find and reserve the next available slot
@@ -501,6 +491,7 @@ class coupling::services::MultiMDCellService {
           );
         instanceHandling.getSimpleMD()[_localNumberMDSimulations-1]
           ->setMacroscopicCellService((_macroscopicCellServices[slot]));
+
       }
 
       _warmupPhase[slot] = 10;
@@ -524,7 +515,7 @@ class coupling::services::MultiMDCellService {
     void writeCheckpoint(const unsigned int & cycle, 
                           const coupling::InstanceHandling<LinkedCell, dim> & instanceHandling) const {
       std::stringstream filestem;
-      filestem << "restart_checkpoint_" << (_multiMDService.getGlobalRank()+1) / _multiMDService.getNumberLocalComms();
+      filestem << "restart_checkpoint_" << _multiMDService.getGlobalRank() / computeScalarNumberProcesses();
       instanceHandling.writeCheckpoint(filestem.str().c_str(), 0);
     }
     
