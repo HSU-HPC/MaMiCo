@@ -17,7 +17,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellS
   const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,
   const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,
   const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
-  const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,
+  //const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,
   const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
   unsigned int numberMDTimestepsPerCouplingCycle,
   const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
@@ -47,7 +47,7 @@ _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<Linked
 _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
 _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
 _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface,*_indexConversion,numberMDTimestepsPerCouplingCycle)),
-_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService, tws)),
+//_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService, tws)),
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
 _momentumController(mdSolverInterface),
@@ -69,10 +69,10 @@ _writeEveryMacroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMacrosc
     std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _transferStrategy==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
-  if (_noiseReduction==NULL){
+  /*if (_noiseReduction==NULL){
     std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _noiseReduction==NULL!" << std::endl;
     exit(EXIT_FAILURE);
-  }
+  }*/
   if (_boundaryForceController==NULL){
     std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _boundaryForceController==NULL!" << std::endl;
   }
@@ -96,7 +96,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::~MacroscopicCell
   if (_particleInsertion != NULL){ delete    _particleInsertion; _particleInsertion = NULL; }
   if (_momentumInsertion != NULL){ delete    _momentumInsertion; _momentumInsertion = NULL; }
   if (_transferStrategy  != NULL){ delete    _transferStrategy;  _transferStrategy  = NULL; }
-  if (_noiseReduction  != NULL){ delete    _noiseReduction;  _noiseReduction  = NULL; }
+  //if (_noiseReduction  != NULL){ delete    _noiseReduction;  _noiseReduction  = NULL; }
   if (_boundaryForceController!=NULL){ delete _boundaryForceController; _boundaryForceController=NULL;}
   if (_indexConversion   != NULL){ delete    _indexConversion;   _indexConversion   = NULL; }
 }
