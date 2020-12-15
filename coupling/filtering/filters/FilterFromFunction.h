@@ -5,6 +5,8 @@
 #pragma once
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
+//TODO: add debug macro + debug output
+
 namespace coupling{
 	template<unsigned int dim>
 	class FilterFromFunction;
