@@ -508,7 +508,7 @@ PYBIND11_MODULE(mamico, mamico) {
 		.def("getMomentumInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMomentumInsertionConfiguration, py::return_value_policy::reference)
 		.def("getBoundaryForceConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getBoundaryForceConfiguration, py::return_value_policy::reference)
 		.def("getTransferStrategyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getTransferStrategyConfiguration, py::return_value_policy::reference)
-		.def("getNoiseReductionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getNoiseReductionConfiguration, py::return_value_policy::reference)
+		//.def("getNoiseReductionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getNoiseReductionConfiguration, py::return_value_policy::reference)
 		.def("getParallelTopologyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParallelTopologyConfiguration, py::return_value_policy::reference);
 
 	py::class_<coupling::configurations::MacroscopicCellConfiguration<3>>(configuration, "MacroscopicCellConfiguration")
@@ -532,8 +532,8 @@ PYBIND11_MODULE(mamico, mamico) {
 	py::class_<coupling::configurations::TransferStrategyConfiguration<3>>(configuration, "TransferStrategyConfiguration")
 		.def("getStrategyType", &coupling::configurations::TransferStrategyConfiguration<3>::getStrategyType);
 
-	py::class_<coupling::configurations::NoiseReductionConfiguration>(configuration, "NoiseReductionConfiguration")
-		.def("getNoiseReductionType", &coupling::configurations::NoiseReductionConfiguration::getNoiseReductionType);
+	//py::class_<coupling::configurations::NoiseReductionConfiguration>(configuration, "NoiseReductionConfiguration")
+	//	.def("getNoiseReductionType", &coupling::configurations::NoiseReductionConfiguration::getNoiseReductionType);
 
 	py::class_<coupling::configurations::ParallelTopologyConfiguration>(configuration, "ParallelTopologyConfiguration")
 		.def("getParallelTopologyType", &coupling::configurations::ParallelTopologyConfiguration::getParallelTopologyType);
@@ -644,7 +644,7 @@ PYBIND11_MODULE(mamico, mamico) {
 			        mamicoConfig.getMomentumInsertionConfiguration(), 
 			        mamicoConfig.getBoundaryForceConfiguration(),
 			        mamicoConfig.getTransferStrategyConfiguration(), 
-			        mamicoConfig.getNoiseReductionConfiguration(), 
+			        //mamicoConfig.getNoiseReductionConfiguration(), 
 			        mamicoConfig.getParallelTopologyConfiguration(), 
 			        simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
 			        mamicoConfig.getMacroscopicCellConfiguration(), 

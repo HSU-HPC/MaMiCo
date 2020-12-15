@@ -19,7 +19,7 @@
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
 #include "coupling/configurations/BoundaryForceConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
-#include "coupling/configurations/NoiseReductionConfiguration.h"
+//#include "coupling/configurations/NoiseReductionConfiguration.h"
 #include "coupling/configurations/ParallelTopologyConfiguration.h"
 #include "coupling/configurations/MacroscopicCellConfiguration.h"
 #include "coupling/KineticEnergyController.h"
@@ -123,7 +123,7 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,  // configuration for momentum insertion
       const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,     // configuration for boundary forces
       const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,    // configuration for transfer strategy
-      const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,    // configuration for noise reduction
+      //const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,    // configuration for noise reduction
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells and respective plotting
@@ -142,14 +142,14 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,  // configuration for momentum insertion
       const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,     // configuration for boundary forces
       const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,    // configuration for transfer strategy
-      const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,    // configuration for noise reduction
+      //const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,    // configuration for noise reduction
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,  // configuration for macroscopic cells and respective plotting
 	  const char* filterPipelineConfiguration,
       const tarch::utils::MultiMDService<dim>& multiMDService
     ): MacroscopicCellServiceImpl<LinkedCell,dim>(ID,mdSolverInterface,macroscopicSolverInterface,numberProcesses,rank,
-       particleInsertionConfiguration,momentumInsertionConfiguration,boundaryForceConfiguration,transferStrategyConfiguration,noiseReductionConfiguration,
+       particleInsertionConfiguration,momentumInsertionConfiguration,boundaryForceConfiguration,transferStrategyConfiguration,//noiseReductionConfiguration,
        parallelTopologyConfiguration,numberMDTimestepsPerCouplingCycle,macroscopicCellConfiguration,multiMDService,0){}
 
     /** destructor. Frees dynamically allocated memory for particle insertion, momentum insertion and the transfer
@@ -295,7 +295,7 @@ public coupling::services::MacroscopicCellService<dim> {
     /** coupling strategy */
     coupling::transferstrategies::TransferStrategy<LinkedCell,dim>* _transferStrategy;
     /** noise reduction method for data from MD */
-    coupling::noisereduction::NoiseReduction<dim>* _noiseReduction;
+    //coupling::noisereduction::NoiseReduction<dim>* _noiseReduction;
 
 
     /** controls the kinetic energy of the system, i.e. maintains temperature in case of changing mass/momentum. */
