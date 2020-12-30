@@ -491,7 +491,7 @@ class coupling::services::MultiMDCellService {
             _filterPipelineConfiguration, 
             _multiMDService, _topologyOffset, _tws
           );
-        instanceHandling.getSimpleMD()[_localNumberMDSimulations-1]
+        instanceHandling.getSimpleMD()[instanceHandling.getSimpleMD().size()-1]
           ->setMacroscopicCellService((_macroscopicCellServices[slot]));
 
       }
