@@ -257,7 +257,7 @@ coupling::MultiMDMediator<LinkedCell, dim>
       result += entry ? 1 : 0;
     }
   }
-  // Round result to the nearest integer
+  // Round up
   return (result + _multiMDService.getNumberLocalComms() / 2) / _multiMDService.getNumberLocalComms();
 }
 
@@ -268,7 +268,7 @@ coupling::MultiMDMediator<LinkedCell, dim>
 ::findFirstCommWithLowLoad() {
   // Starting at the end
   unsigned int avg = getAvgNumberOfActiveMDSimulations();
-  for(unsigned int i=_listActiveMDSimulations.size()-1;i>=0;++i) {
+  for(unsigned int i=_listActiveMDSimulations.size()-1;i>=0;--i) {
     if (getNumberOfActiveMDSimulations(i) <= avg) return i;
   }
   throw noIndexException;
