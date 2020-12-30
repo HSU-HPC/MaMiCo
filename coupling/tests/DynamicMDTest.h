@@ -60,6 +60,12 @@ public:
       if(cycle == 4) {
         _multiMDMediator->addMDSimulation(0);
       }
+      if(cycle == 5) {
+        _multiMDMediator->rmMDSimulation(1);
+      }
+      if(cycle == 6) {
+        _multiMDMediator->addMDSimulation(0);
+      }
     }
     shutdown();
   }

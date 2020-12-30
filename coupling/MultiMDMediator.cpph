@@ -147,7 +147,7 @@ coupling::MultiMDMediator<LinkedCell, dim>
   }
 
   try {
-    unsigned int index = findActiveLocalIndex();
+    unsigned int index = findActiveLocalIndex(communicator);
     if(index == 0) {
       std::cout << "WARNING MultiMDMediator::rmMDSimulation(comm) : Trying to remove last remaining simulation!" << std::endl;
       return;

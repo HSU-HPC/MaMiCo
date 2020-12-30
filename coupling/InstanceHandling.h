@@ -53,7 +53,7 @@ public:
     }
 
     ~InstanceHandling() {
-      for(unsigned int i=0;i<_multiMDService.getLocalNumberOfMDSimulations();++i) {
+      for(unsigned int i=0;i<_simpleMD.size();++i) {
         coupling::interface::MamicoInterfaceProvider<LinkedCell,dim>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
         if(_simpleMD[i] != nullptr) {
           _simpleMD[i]->shutdown();
