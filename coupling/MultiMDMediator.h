@@ -79,7 +79,7 @@ public:
   /** Remove N MD Simulations **/
   void rmNMDSimulations(const unsigned int &);
 
-  /** Remove AL simulations on this communicator. 
+  /** Remove ALL simulations on this communicator. 
    * This is the only way to do so!
   */
   void shutdownCommunicator(const unsigned int &);
