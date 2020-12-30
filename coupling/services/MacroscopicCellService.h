@@ -27,6 +27,7 @@
 #include "coupling/MomentumController.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h"
+#include "coupling/cell-mappings/PerturbateVelocityMapping.h"
 #include "tarch/utils/MultiMDService.h"
 
 #include "coupling/filtering/FilterPipeline.h"
@@ -71,10 +72,12 @@ class coupling::services::MacroscopicCellService {
     virtual void distributeMass(unsigned int t) = 0;
     virtual void distributeMomentum(unsigned int t) = 0;
     virtual void applyBoundaryForce(unsigned int t) = 0;
+    virtual void perturbateVelocity() = 0;
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
     virtual void updateIndexConversion(const unsigned int & topologyOffset) = 0;
+    
 
 
     unsigned int getID() const { return _id;}
@@ -200,6 +203,9 @@ public coupling::services::MacroscopicCellService<dim> {
 
     /** distributes momentum in MD. Should typically be called after force accumulation since momentum distribution may depend on current forces. */
     void distributeMomentum(unsigned int t);
+
+    /** applies a new velocity to each particle according to its cell's mean velocity. */
+    void perturbateVelocity();
 
     /** plots macroscopic cell and molecule information at some time step t. The correct triggering of plotting needs
      *  to be established from the main coupling loop which is outside the coupling tool (not included in this function).

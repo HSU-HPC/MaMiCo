@@ -211,6 +211,14 @@ computeAndStoreTemperature(double temperature){
 }
 
 
+template<class LinkedCell, unsigned int dim>
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
+perturbateVelocity() {
+  Wrapper4PerturbateVelocity wrapper(this);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+}
+
+
 
 template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
