@@ -6,6 +6,9 @@
 #include <exception>
 
 
+/** We need an exception for methods which return vector indices
+ * in order to identify invalid method returns 
+ */
 class NoIndexException: public std::exception {
   virtual const char* what() const throw() {
     return "No valid index found";
@@ -18,22 +21,13 @@ void
 coupling::MultiMDMediator<LinkedCell, dim>
 ::addMDSimulation() 
 {
-  
+  // Check if there is any inactive md simulation
+  // and, if not, add another block of simulation slots
   if(getNumberOfActiveMDSimulations() == _multiMDService.getTotalNumberOfMDSimulations()) {
     addMDSimulationBlock();
   }
-  try {
-    unsigned int comm = findFirstCommWithLowLoad();
-    unsigned int index = findInactiveLocalIndex(comm);
-
-    unsigned int slot = comm * _multiMDService.getLocalNumberOfMDSimulations() + index;
-
-    _multiMDCellService.addMDSimulation(_instanceHandling, _macroscopicSolverInterface, slot);
-
-    _listActiveMDSimulations[comm][index] = true;
-  } catch (NoIndexException& e) {
-    std::cout << "ERROR coupling::MultiMDMediator::addMDSimulation() : Unable to find valid md index!";
-  }
+  unsigned int comm = findFirstCommWithLowLoad();
+  addMDSimulation(comm);
 }
 
 
@@ -42,6 +36,10 @@ void
 coupling::MultiMDMediator<LinkedCell, dim>
 ::addMDSimulation(const unsigned int & communicator)
 {
+  if(communicator >= _multiMDService.getNumberLocalComms()) {
+    std::cout << "ERROR Invalid communicator group id " << communicator << "!" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
   // May have to add another block if communicator is full
   if(getNumberOfActiveMDSimulations(communicator) == _listActiveMDSimulations[communicator].size()) { addMDSimulationBlock(); }
 
@@ -49,6 +47,7 @@ coupling::MultiMDMediator<LinkedCell, dim>
     unsigned int index = findInactiveLocalIndex(communicator);
     unsigned int slot = communicator * _multiMDService.getLocalNumberOfMDSimulations() + index;
     _multiMDCellService.addMDSimulation(_instanceHandling, _macroscopicSolverInterface, slot);
+    _listActiveMDSimulations[communicator][index] = true;
   } catch (NoIndexException& e) {
     std::cout << "ERROR coupling::MultiMDMediator::addMDSimulation() : Unable to find valid md index!";
   }
@@ -194,7 +193,8 @@ void coupling::MultiMDMediator<LinkedCell, dim>
 
 template<class LinkedCell, unsigned int dim>
 void
-coupling::MultiMDMediator<LinkedCell,dim>::addMDSimulationBlock() 
+coupling::MultiMDMediator<LinkedCell,dim>
+::addMDSimulationBlock() 
 {
   _multiMDCellService.addSimulationBlock();
 
@@ -207,7 +207,8 @@ coupling::MultiMDMediator<LinkedCell,dim>::addMDSimulationBlock()
 
 template<class LinkedCell, unsigned int dim>
 void
-coupling::MultiMDMediator<LinkedCell,dim>::rmMDSimulationBlock() 
+coupling::MultiMDMediator<LinkedCell,dim>
+::rmMDSimulationBlock() 
 {
   _multiMDCellService.removeSimulationBlock();
 
@@ -221,7 +222,8 @@ coupling::MultiMDMediator<LinkedCell,dim>::rmMDSimulationBlock()
 
 template<class LinkedCell, unsigned int dim>
 unsigned int
-coupling::MultiMDMediator<LinkedCell, dim>::getNumberOfActiveMDSimulations() {
+coupling::MultiMDMediator<LinkedCell, dim>
+::getNumberOfActiveMDSimulations() {
   unsigned int result = 0;
   for(auto & commList : _listActiveMDSimulations) {
     for(bool entry : commList) {
@@ -235,7 +237,8 @@ coupling::MultiMDMediator<LinkedCell, dim>::getNumberOfActiveMDSimulations() {
 
 template<class LinkedCell, unsigned int dim>
 unsigned int
-coupling::MultiMDMediator<LinkedCell, dim>::getNumberOfActiveMDSimulations(const unsigned int communicator) {
+coupling::MultiMDMediator<LinkedCell, dim>
+::getNumberOfActiveMDSimulations(const unsigned int communicator) {
   unsigned int result = 0;
   for(bool entry : _listActiveMDSimulations[communicator]) {
     result += entry ? 1 : 0;
@@ -246,20 +249,24 @@ coupling::MultiMDMediator<LinkedCell, dim>::getNumberOfActiveMDSimulations(const
 
 template<class LinkedCell, unsigned int dim>
 unsigned int
-coupling::MultiMDMediator<LinkedCell, dim>::getAvgNumberOfActiveMDSimulations() {
+coupling::MultiMDMediator<LinkedCell, dim>
+::getAvgNumberOfActiveMDSimulations() {
   unsigned int result = 0;
   for(auto & commList : _listActiveMDSimulations) {
     for(bool entry : commList) {
       result += entry ? 1 : 0;
     }
   }
-  return result / _multiMDService.getNumberLocalComms();
+  // Round result to the nearest integer
+  return (result + _multiMDService.getNumberLocalComms() / 2) / _multiMDService.getNumberLocalComms();
 }
 
 
 template<class LinkedCell, unsigned int dim>
 unsigned int
-coupling::MultiMDMediator<LinkedCell, dim>::findFirstCommWithLowLoad() {
+coupling::MultiMDMediator<LinkedCell, dim>
+::findFirstCommWithLowLoad() {
+  // Starting at the end
   unsigned int avg = getAvgNumberOfActiveMDSimulations();
   for(unsigned int i=_listActiveMDSimulations.size()-1;i>=0;++i) {
     if (getNumberOfActiveMDSimulations(i) <= avg) return i;
@@ -270,7 +277,8 @@ coupling::MultiMDMediator<LinkedCell, dim>::findFirstCommWithLowLoad() {
 
 template<class LinkedCell, unsigned int dim>
 unsigned int
-coupling::MultiMDMediator<LinkedCell, dim>::findFirstCommWithHighLoad() {
+coupling::MultiMDMediator<LinkedCell, dim>
+::findFirstCommWithHighLoad() {
   unsigned int avg = getAvgNumberOfActiveMDSimulations();
   for(unsigned int i=0;i<_listActiveMDSimulations.size();++i) {
     if (getNumberOfActiveMDSimulations(i) >= avg) return i;
@@ -281,7 +289,8 @@ coupling::MultiMDMediator<LinkedCell, dim>::findFirstCommWithHighLoad() {
 
 template<class LinkedCell, unsigned int dim>
 unsigned int
-coupling::MultiMDMediator<LinkedCell, dim>::findInactiveLocalIndex(const unsigned int & communicator) {
+coupling::MultiMDMediator<LinkedCell, dim>
+::findInactiveLocalIndex(const unsigned int & communicator) {
   for(unsigned int i=0;i<_listActiveMDSimulations[communicator].size();++i) {
     if(!_listActiveMDSimulations[communicator][i]) return i;
   }
@@ -291,7 +300,8 @@ coupling::MultiMDMediator<LinkedCell, dim>::findInactiveLocalIndex(const unsigne
 
 template<class LinkedCell, unsigned int dim>
 unsigned int
-coupling::MultiMDMediator<LinkedCell, dim>::findActiveLocalIndex(const unsigned int & communicator) {
+coupling::MultiMDMediator<LinkedCell, dim>
+::findActiveLocalIndex(const unsigned int & communicator) {
   for(unsigned int i=_listActiveMDSimulations[communicator].size()-1;i>=0;++i) {
     if(_listActiveMDSimulations[communicator][i]) return i;
   }

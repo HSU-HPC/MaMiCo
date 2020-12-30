@@ -25,8 +25,7 @@ public:
                   coupling::interface::MacroscopicSolverInterface<dim> * macroscopicSolverInterface) 
     : _multiMDCellService(multiMDCellService), _instanceHandling(instanceHandling), _multiMDService(multiMDService),
       _listActiveMDSimulations(_multiMDService.getNumberLocalComms(), std::vector<bool>()),
-      _macroscopicSolverInterface(macroscopicSolverInterface),
-      _nextFreeBlock(_multiMDService.getNumberLocalComms()-1)
+      _macroscopicSolverInterface(macroscopicSolverInterface)
   {
     for(auto & group : _listActiveMDSimulations) {
       group = std::vector<bool>(_multiMDService.getLocalNumberOfMDSimulations(), true);
@@ -42,18 +41,18 @@ public:
   }
 
 
-  /** Autmatically add another MDSimulation trying to keep the number of MD simulation across communicators balanced.
+  /** Autmatically add another MDSimulation trying to keep the number of MD simulation across communicators balanced
+   * by computing the average number of active simulations on communicators.
    */ 
   void addMDSimulation();
 
 
   /** Add MD simulation on specified communicator.
-   * TODO How to handle already occupied locations??
    */
   void addMDSimulation(const unsigned int &);
 
 
-  /** Add n MD simulations **/ //TODO
+  /** Add n MD simulations **/
   void addNMDSimulations(const unsigned int &);
 
 
@@ -96,17 +95,6 @@ private:
   void rmMDSimulationBlock();
 
 
-  /** Reserve one slot in order to add a MD simulation.
-   * This method reserves slots in a round robin fashion, starting at the communicator with the highest ID.
-   */
-  unsigned int reserveNextFreeSlot();
-
-
-  /** Determine slot which has to be freed next in order to keep distribution of simulation as even as possible.
-   */
-  unsigned int getLastReservedSlot();
-
-
   /** Find global number of active simulations */
   unsigned int getNumberOfActiveMDSimulations();
 
@@ -115,13 +103,17 @@ private:
   unsigned int getNumberOfActiveMDSimulations(const unsigned int);
 
 
+  /** Get the average number of active simulations running on the
+   * communicator groups. The result will be correctly rounded to 
+   * the nearest integer.
+   */
   unsigned int getAvgNumberOfActiveMDSimulations();
 
 
   /** Try to find a communicator that has a relatively low number
-   * of active MD simulations
-   * This would be a communicator with a number of active simulations
-   * lower than average. 
+   * of active MD simulations. This will be a communicator having
+   * an average or below-average number of active simulations.
+   * This method starts searching at the last communicator.
    * */
   unsigned int findFirstCommWithLowLoad();
 
@@ -133,6 +125,7 @@ private:
   unsigned int findInactiveLocalIndex(const unsigned int &);
 
 
+  /** On a given communicator find a local index of an inactive md simulation */
   unsigned int findActiveLocalIndex(const unsigned int &);
 
 
@@ -141,7 +134,6 @@ private:
   tarch::utils::MultiMDService<dim> & _multiMDService;
   std::vector<std::vector<bool> > _listActiveMDSimulations; // global list of active (true) and inactive (false) simulations
   coupling::interface::MacroscopicSolverInterface<dim> * _macroscopicSolverInterface;
-  unsigned int _nextFreeBlock;
 };
 
 #include "coupling/MultiMDMediator.cpph"

@@ -393,8 +393,10 @@ class coupling::services::MultiMDCellService {
           newMacroscopicCellServices[newIndex] = _macroscopicCellServices[index];
           if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
             // Need to update topologoy offset in indexconversion->paralleltopology
-            newMacroscopicCellServices[newIndex]
-              ->updateIndexConversion((newIndex/newLocalNumberMDSimulations) * _intNumberProcesses);
+            if(newMacroscopicCellServices[newIndex] != nullptr) {
+              newMacroscopicCellServices[newIndex]
+                ->updateIndexConversion((newIndex/newLocalNumberMDSimulations) * _intNumberProcesses);
+            }
           }
         }
         newMacroscopicCellServices[(i+1)*newLocalNumberMDSimulations-1] = nullptr;
