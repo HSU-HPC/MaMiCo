@@ -196,6 +196,8 @@ void
 coupling::MultiMDMediator<LinkedCell,dim>
 ::addMDSimulationBlock() 
 {
+  _instanceHandling.addSimulationBlock();
+
   _multiMDCellService.addSimulationBlock();
 
   _multiMDService.addMDSimulationBlock();
@@ -210,6 +212,8 @@ void
 coupling::MultiMDMediator<LinkedCell,dim>
 ::rmMDSimulationBlock() 
 {
+  _instanceHandling.rmSimulationBlock();
+
   _multiMDCellService.removeSimulationBlock();
 
   for(auto & group : _listActiveMDSimulations) {

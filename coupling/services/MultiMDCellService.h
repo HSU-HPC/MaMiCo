@@ -63,7 +63,7 @@ class coupling::services::MultiMDCellService {
 
         _listActiveMDSimulations = std::vector<bool>(_totalNumberMDSimulations, true);
         _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
-        _warmupPhase = std::vector<unsigned int>(_totalNumberMDSimulations, 0);
+        _warmupPhase = std::vector<int>(_totalNumberMDSimulations, 0);
 
         const tarch::la::Vector<dim,double> mdDomainSize(mdSolverInterfaces[0]->getGlobalMDDomainSize());
         const tarch::la::Vector<dim,double> mdDomainOffset(mdSolverInterfaces[0]->getGlobalMDDomainOffset());
@@ -286,8 +286,10 @@ class coupling::services::MultiMDCellService {
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
           //std::cout << "Rank " << _macroscopicCellServices[l]->getIndexConversion().getThisRank() << ": Send from MD to Macro for Simulation no. " << l << std::endl;
           if (_macroscopicCellServices[l] != nullptr &&  _warmupPhase[l] == 0)  {
-          res += _macroscopicCellServices[l]
-                  ->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver,globalCellIndicesFromMacroscopicSolver);
+          res += _macroscopicCellServices[l]->sendFromMD2Macro(
+            macroscopicCellsFromMacroscopicSolver,
+            globalCellIndicesFromMacroscopicSolver
+          );
           for (unsigned int i = 0; i < size; i++){
             duplicate[i].addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
             duplicate[i].addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
@@ -298,14 +300,13 @@ class coupling::services::MultiMDCellService {
       unsigned int totalNumberEquilibratedMDSimulations = 0;
       for(auto & phaseI : _warmupPhase) {
         // get number of equilibrated simulations 
-        totalNumberEquilibratedMDSimulations += phaseI > 0 ? 0 : 1;
+        totalNumberEquilibratedMDSimulations += phaseI != 0 ? 0 : 1;
       }
       for (unsigned int i = 0; i < size; i++){
-        //TODO replace _totalnumbermdsimulations by total number of equilibrated md simulations!!!
         macroscopicCellsFromMacroscopicSolver[i]
-          ->setMacroscopicMass(duplicate[i].getMacroscopicMass()/totalNumberEquilibratedMDSimulations);
+          ->setMacroscopicMass(duplicate[i].getMacroscopicMass()/(double)totalNumberEquilibratedMDSimulations);
         macroscopicCellsFromMacroscopicSolver[i]
-          ->setMacroscopicMomentum((1.0/totalNumberEquilibratedMDSimulations)*duplicate[i].getMacroscopicMomentum());
+          ->setMacroscopicMomentum((1.0/(double)totalNumberEquilibratedMDSimulations)*duplicate[i].getMacroscopicMomentum());
       }
 
       // free duplicate
@@ -328,6 +329,8 @@ class coupling::services::MultiMDCellService {
         unsigned int iSim = index - _blockOffset;
         instanceHandling.rmMDSimulation(iSim);
       }
+
+      _warmupPhase[index] = -1;
 
       return index;
     }
@@ -472,7 +475,8 @@ class coupling::services::MultiMDCellService {
       }
       else {
         
-        auto * mdSolverInterface = instanceHandling.addMDSimulation(slot);
+        unsigned localIndex = slot - _blockOffset;
+        auto * mdSolverInterface = instanceHandling.addMDSimulation(slot, localIndex);
 
         _macroscopicCellServices[slot] = 
           new coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>(
@@ -491,7 +495,7 @@ class coupling::services::MultiMDCellService {
             _filterPipelineConfiguration, 
             _multiMDService, _topologyOffset, _tws
           );
-        instanceHandling.getSimpleMD()[instanceHandling.getSimpleMD().size()-1]
+        instanceHandling.getSimpleMD()[localIndex]
           ->setMacroscopicCellService((_macroscopicCellServices[slot]));
 
       }
@@ -505,9 +509,14 @@ class coupling::services::MultiMDCellService {
 
     const coupling::IndexConversion<dim> & getIndexConversion() const { return _macroscopicCellServices[0]->getIndexConversion(); }
 
-    void finishCycle(const unsigned int & cycle, const coupling::InstanceHandling<LinkedCell, dim> & instanceHandling) {
-      for(auto& phaseI : _warmupPhase) {
-        if(phaseI > 0) phaseI -= 1;
+    void finishCycle(const unsigned int & cycle, coupling::InstanceHandling<LinkedCell, dim> & instanceHandling) {
+      for(unsigned int i=0;i<_warmupPhase.size();++i) {
+        if(_warmupPhase[i] > 0) {
+          _warmupPhase[i] -= 1;
+          if(_warmupPhase[i] == 0 && i >= _blockOffset && i < _blockOffset+_localNumberMDSimulations) {
+              instanceHandling.switchOnCoupling(i-_blockOffset);
+          }
+        }
       }
       //TODO switchon coupling!!  
       writeCheckpoint(cycle, instanceHandling);
@@ -575,7 +584,7 @@ class coupling::services::MultiMDCellService {
     unsigned int _blockOffset;
     std::vector<bool> _listActiveMDSimulations; /** One entry per (in-)active md simulation, totals to _totalNumberMDSimulations */
     unsigned int _nextFreeBlock; /** Points to the next block, to which a simulation should be added. */ 
-    std::vector<unsigned int> _warmupPhase; /** Counts the number of remaining warmup cycles after this simulation has been added.
+    std::vector<int> _warmupPhase; /** Counts the number of remaining warmup cycles after this simulation has been added.
                                                 This is only relevent for simulations added during the simulation.
                                             */
 
