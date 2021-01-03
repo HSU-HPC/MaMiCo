@@ -47,25 +47,6 @@ public:
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
-
-      if(cycle == 1) {
-        _multiMDMediator->addMDSimulation();
-      }
-      if(cycle == 2) {
-        _multiMDMediator->addMDSimulation();
-      }
-      if(cycle == 3) {
-        _multiMDMediator->rmMDSimulation(1,0);
-      }
-      if(cycle == 4) {
-        _multiMDMediator->addMDSimulation(0);
-      }
-      if(cycle == 5) {
-        _multiMDMediator->rmMDSimulation(1);
-      }
-      if(cycle == 6) {
-        _multiMDMediator->addMDSimulation(0);
-      }
     }
     shutdown();
   }
@@ -538,7 +519,7 @@ private:
     std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,const unsigned int * const recvIndices,
     const coupling::IndexConversion<3>& indexConversion, int couplingCycle
   ) const {
-    if(_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0) return;
+    if(_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0 || recvBuffer.size() == 0) return;
     // form file name and open file
     std::stringstream ss;
     ss << "CouetteAvgMultiMDCells_" << _rank << "_" << couplingCycle << ".csv";
