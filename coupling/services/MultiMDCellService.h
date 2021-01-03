@@ -283,6 +283,7 @@ class coupling::services::MultiMDCellService {
       }
 
       // receive data from each MD simulation and accumulate information in duplicate
+      unsigned int totalNumberEquilibratedMDSimulations = 0;
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
           //std::cout << "Rank " << _macroscopicCellServices[l]->getIndexConversion().getThisRank() << ": Send from MD to Macro for Simulation no. " << l << std::endl;
           if (_macroscopicCellServices[l] != nullptr &&  _warmupPhase[l] == 0)  {
@@ -294,14 +295,10 @@ class coupling::services::MultiMDCellService {
             duplicate[i].addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
             duplicate[i].addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
           }
+          totalNumberEquilibratedMDSimulations += 1;
         }
       }
       // average data and store it in macroscopicCellsFromMacroscopicSolver
-      unsigned int totalNumberEquilibratedMDSimulations = 0;
-      for(auto & phaseI : _warmupPhase) {
-        // get number of equilibrated simulations 
-        totalNumberEquilibratedMDSimulations += phaseI != 0 ? 0 : 1;
-      }
       for (unsigned int i = 0; i < size; i++){
         macroscopicCellsFromMacroscopicSolver[i]
           ->setMacroscopicMass(duplicate[i].getMacroscopicMass()/(double)totalNumberEquilibratedMDSimulations);
