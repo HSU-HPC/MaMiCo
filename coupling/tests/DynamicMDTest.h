@@ -27,6 +27,7 @@
 #include <math.h>
 #include <sys/time.h>
 #include <random>
+#include <chrono>
 
 /** 
  * This is a copy of the CouetteTest.h (2020-07-17)
@@ -47,6 +48,16 @@ public:
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
+      if(cycle == 0) {
+        if(_rank == 0) { gettimeofday(&_tv.rmStart, NULL);}
+        if(_multiMDService->getNumberLocalComms() >= 8) {
+          _multiMDMediator->shutdownCommunicator(4);
+        }
+        if(_rank == 0) { 
+          gettimeofday(&_tv.rmEnd, NULL);
+          std::cout << "Removal of Node has taken " << (_tv.rmEnd.tv_sec - _tv.rmStart.tv_sec) + (_tv.rmEnd.tv_usec - _tv.rmStart.tv_usec) / 1000000 << " s" << std::endl;
+        }
+      }
     }
     shutdown();
   }
@@ -360,6 +371,7 @@ private:
       std::cout << "Time percentages Micro, Macro, Filter, Other: " << std::endl;
       std::cout << _tv.micro/time_total*100 << ", " << _tv.macro/time_total*100 << ",  "
                 << _tv.filter/time_total*100 << ", " << (1-(_tv.micro+_tv.macro+_tv.filter)/time_total)*100 << std::endl;
+      std::cout << "Time taken for MD removel: " << (_tv.rmEnd.tv_sec - _tv.rmStart.tv_sec) + (_tv.rmEnd.tv_usec - _tv.rmStart.tv_usec) / 1000000 << " s" << std::endl;
     }
 
     // free buffers/arrays
@@ -665,6 +677,8 @@ private:
     timeval start_total;
     timeval start;
     timeval end;
+    timeval rmStart;
+    timeval rmEnd;
     double micro;
     double macro;
     double filter;
