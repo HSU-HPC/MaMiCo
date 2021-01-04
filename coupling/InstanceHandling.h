@@ -131,7 +131,6 @@ public:
 
           if(_simpleMD[i] != nullptr) {
             _simpleMD[i]->simulateTimesteps(t,T);
-            std::cout << "Finish _simpleMD[" << i << "]->simulateTimesteps" << std::endl;
           }
 
         }
