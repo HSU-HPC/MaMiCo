@@ -45,7 +45,7 @@ compiler="mpicxx"
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH} || exit
-scons target=libsimplemd dim=3 build=release parallel=yes -j4
+scons target=libsimplemd dim=3 build=release parallel=yes compiler=gcc machine=hww-cluster -j4
 libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
 FLAGS="${FLAGS} -DMDParallel"
 
