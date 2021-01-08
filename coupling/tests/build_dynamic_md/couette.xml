@@ -176,7 +176,9 @@
 
   <!-- max density using molecules-per-direction ca. 0.9  /-->
   <!-- cutoff-radius should be 2.2 to be consistent with Nie et. al paper /-->
+  <!-- init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"-->
   <domain-configuration
+    
     init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
     
     molecules-per-direction="28 ; 28 ; 28"

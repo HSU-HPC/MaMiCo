@@ -53,7 +53,7 @@ public:
     }
 
     ~InstanceHandling() {
-      for(unsigned int i=0;i<_multiMDService.getLocalNumberOfMDSimulations();++i) {
+      for(unsigned int i=0;i<_simpleMD.size();++i) {
         coupling::interface::MamicoInterfaceProvider<LinkedCell,dim>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
         if(_simpleMD[i] != nullptr) {
           _simpleMD[i]->shutdown();
@@ -129,9 +129,10 @@ public:
           coupling::interface::MamicoInterfaceProvider<LinkedCell,dim>
             ::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
 
-          _simpleMD[i]->simulateTimesteps(t,T);
+          if(_simpleMD[i] != nullptr) {
+            _simpleMD[i]->simulateTimesteps(t,T);
+          }
 
-          std::cout << "Finish _simpleMD[" << i << "]->simulateTimesteps" << std::endl;
         }
     }
 
@@ -140,7 +141,17 @@ public:
         _simpleMD[i]->simulateTimesteps(t,T);
     }
 
-    coupling::interface::MDSolverInterface<LinkedCell,dim>* addMDSimulation(unsigned int slot) {
+    void addSimulationBlock() {
+      _simpleMD.push_back(nullptr);
+      _mdSolverInterface.push_back(nullptr);
+    }
+
+    void rmSimulationBlock() {
+      _simpleMD.pop_back();
+      _mdSolverInterface.pop_back();
+    }
+
+    coupling::interface::MDSolverInterface<LinkedCell,dim>* addMDSimulation(unsigned int slot, unsigned int localIndex) {
       auto * mdSim = coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
         _mdConfig, _mamicoConfig
         #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
@@ -154,23 +165,23 @@ public:
 
       mdSim->init(_multiMDService, slot);
 
-      _simpleMD.push_back(mdSim);
+      _simpleMD[localIndex] = mdSim;
 
-      _mdSolverInterface.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance()
-                                    .getMDSolverInterface(_mdConfig, _mamicoConfig, _simpleMD[_simpleMD.size()-1]));
+      _mdSolverInterface[localIndex] = coupling::interface::SimulationAndInterfaceFactory::getInstance()
+                                        .getMDSolverInterface(_mdConfig, _mamicoConfig, _simpleMD[localIndex]);
 
-      return _mdSolverInterface[_mdSolverInterface.size()-1];
+      return _mdSolverInterface[localIndex];
     }
 
     void rmMDSimulation(const unsigned int & index) {
       _simpleMD[index]->shutdown();
       delete _simpleMD[index];
       _simpleMD[index] = nullptr;
-      _simpleMD.erase(_simpleMD.begin()+index);
+      //_simpleMD.erase(_simpleMD.begin()+index);
 
       delete _mdSolverInterface[index];
       _mdSolverInterface[index] = nullptr;
-      _mdSolverInterface.erase(_mdSolverInterface.begin()+index);
+      //_mdSolverInterface.erase(_mdSolverInterface.begin()+index);
     }
 
     void setMacroscopicCellServices(coupling::services::MultiMDCellService<LinkedCell, dim> & multiMDCellService) {
@@ -187,6 +198,7 @@ private:
     coupling::configurations::MaMiCoConfiguration<dim>& _mamicoConfig;
 
     const tarch::utils::MultiMDService<dim>& _multiMDService;
+    
 
 };
 

@@ -1,10 +1,13 @@
 #!/bin/bash
 
 source personal_settings
+<<<<<<< HEAD
 
 ### PATH to lammps sources
 LAMMPS_PATH=/home/niklas/Dokumente/Git/lammps
 LIB_LAMMPS=lammps_openmpi_mamico
+=======
+>>>>>>> 97b30dc6a30c0c23d7e54e923dae5c3d1a081742
 
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
@@ -49,7 +52,7 @@ compiler="mpicxx"
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH} || exit
-scons target=libsimplemd dim=3 build=release parallel=yes -j4
+scons target=libsimplemd dim=3 build=release parallel=yes compiler=gcc machine=hww-cluster -j4
 libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
 FLAGS="${FLAGS} -DMDParallel"
 
