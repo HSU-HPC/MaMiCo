@@ -91,7 +91,11 @@ private:
     } else if(_varyMDStyle == RANDOM) {
       if(cycle < 100 || cycle % 10 != 0) return;
       //else:
-      int target = std::uniform_int_distribution(-50, 50)(_generator);
+      int target;
+      if(_rank == 0) {
+        target = std::uniform_int_distribution(-50, 50)(_generator);
+      }
+      MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
       std::cout << "Trying to add " << target << " simulations.." << std::endl;
       if(target < 0) {
         _multiMDMediator->rmNMDSimulations(-target);
