@@ -34,7 +34,7 @@ libs = []
 sourcesMolecularDynamics = []
 
 libs.append('rt')
-ccflags.append('-std=c++0x')
+ccflags.append('-std=c++1z')
 
 ##### Determine dimension for which to build
 #
@@ -70,6 +70,11 @@ mpiLibrary='mpi'
 mpiIncludePath='/usr/lib/openmpi/include'
 mpiLibraryPath='/usr/lib/openmpi/lib'
 pthreadLibrary='pthread'
+
+if machine== 'hww-cluster':
+   mpiLibrary='mpi'
+   mpiIncludePath='/opt/hlrs/non-spack/mpi/openmpi/4.0.5-gcc-9.2.0/include'
+   mpiLibraryPath='/opt/hlrs/non-spack/mpi/openmpi/4.0.5-gcc-9.2.0/lib'
 
 if machine== 'mac-cluster':
    mpiLibrary=''
@@ -235,3 +240,4 @@ else:
   print("ERROR: Target", target, "is invalid!")
   printTargets ()
   sys.exit(1)
+
