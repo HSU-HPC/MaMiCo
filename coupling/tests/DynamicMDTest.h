@@ -38,7 +38,22 @@
  */
 class DynamicMDTest: public Test {
 public:
-  DynamicMDTest(): Test("DynamicMDTest"), _generator(0){}
+  DynamicMDTest(int argc, char ** argv): Test("DynamicMDTest"), _generator(0){
+    if(argc == 1) {
+      if (std::string(argv[0]) == "removal") {
+        _varyMDStyle = REMOVAL;
+      }
+      else if(std::string(argv[0]) == "insertion") {
+        _varyMDStyle = INSERTION;
+      }
+      else if(std::string(argv[0]) == "random") {
+        _varyMDStyle = RANDOM;
+      }
+      else {
+        _varyMDStyle = NONE;
+      }
+    }
+  }
   virtual ~DynamicMDTest(){}
 
   virtual void run(){
@@ -48,16 +63,7 @@ public:
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
-      if(cycle == 0) {
-        if(_rank == 0) { gettimeofday(&_tv.rmStart, NULL);}
-        if(_multiMDService->getNumberLocalComms() >= 8) {
-          _multiMDMediator->shutdownCommunicator(4);
-        }
-        if(_rank == 0) { 
-          gettimeofday(&_tv.rmEnd, NULL);
-          std::cout << "Removal of Node has taken " << (_tv.rmEnd.tv_sec - _tv.rmStart.tv_sec) + (_tv.rmEnd.tv_usec - _tv.rmStart.tv_usec) / 1000000 << " s" << std::endl;
-        }
-      }
+      varyMD(cycle);
     }
     shutdown();
   }
@@ -65,8 +71,34 @@ public:
   
 
 private:
+  enum VaryMDStyle{REMOVAL, INSERTION, RANDOM, FIX_SCHED, NONE};
+  VaryMDStyle _varyMDStyle;
   //enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
   //enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
+
+  void varyMD(int cycle) {
+    if(_varyMDStyle == REMOVAL) {
+      if(cycle == 100) {
+        for(unsigned int i=127;i>27;--i) {
+          _multiMDMediator->shutdownCommunicator(i);
+        }
+      }
+    } else if(_varyMDStyle == INSERTION) {
+      if(cycle == 100) {
+        _multiMDMediator->addNMDSimulations(100);
+      }
+    } else if(_varyMDStyle == RANDOM) {
+      if(cycle < 100 || cycle % 10 != 0) return;
+      //else:
+      int target = std::uniform_int_distribution(-50, 50)(_generator);
+      if(target < 0) {
+        _multiMDMediator->rmNMDSimulations(-target);
+      }
+      else if(target > 0) {
+        _multiMDMediator->addNMDSimulations(target);
+      }
+    }
+  }
   
   void init(){
     initMPI();

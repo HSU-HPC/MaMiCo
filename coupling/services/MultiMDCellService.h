@@ -494,7 +494,7 @@ class coupling::services::MultiMDCellService {
           );
         instanceHandling.getSimpleMD()[localIndex]
           ->setMacroscopicCellService((_macroscopicCellServices[slot]));
-
+        _macroscopicCellServices[slot]->perturbateVelocity();
       }
 
       _warmupPhase[slot] = 10;
