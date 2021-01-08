@@ -88,6 +88,13 @@ coupling::MultiMDMediator<LinkedCell, dim>::rmMDSimulation()
 
   try {
     unsigned int comm = findFirstCommWithHighLoad();
+    if(getNumberOfActiveMDSimulations(comm) < 2) {
+      // We need each communicator to have at least one active simulation running
+      // otherwise all processes on this communicator would quickly run into shutdown
+      // and thus would not be accessible to the simulation anymore.
+      std::cout << "INFO MultiMDCellService::rmMDSimulation() : Cannot remove MD simulation, only one is left!" << std::endl;
+      return;
+    } 
     unsigned int index = findActiveLocalIndex(comm);
 
     // get next logical simulation which would be removed
@@ -97,8 +104,7 @@ coupling::MultiMDMediator<LinkedCell, dim>::rmMDSimulation()
 
     _listActiveMDSimulations[comm][index] = false;
   } catch (NoIndexException& e) {
-    std::cout << "NoIndexEsception!" << std::endl;
-    std::exit(EXIT_FAILURE);
+    std::cout << "Cannot delete any simulations!" << std::endl;
   }
 }
 
@@ -108,13 +114,13 @@ void
 coupling::MultiMDMediator<LinkedCell, dim>
 ::rmMDSimulation(const unsigned int & communicator, const unsigned int & localIndex) 
 {
-  if(_multiMDService.getLocalNumberOfMDSimulations() < 2) {
-    // We need each communicator to have at least one active simulation running
-    // otherwise all processes on this communicator would quickly run into shutdown
-    // and thus would not be accessible to the simulation anymore.
-    std::cout << "INFO MultiMDCellService::rmMDSimulation() : Cannot remove MD simulation, only one is left!" << std::endl;
-    return;
-  }
+  if(getNumberOfActiveMDSimulations(communicator) < 2) {
+      // We need each communicator to have at least one active simulation running
+      // otherwise all processes on this communicator would quickly run into shutdown
+      // and thus would not be accessible to the simulation anymore.
+      std::cout << "INFO MultiMDCellService::rmMDSimulation(unsigned int, unsigned int) : Cannot remove MD simulation, only one is left!" << std::endl;
+      return;
+  } 
 
   unsigned int slot = communicator * _multiMDService.getLocalNumberOfMDSimulations() + localIndex;
 
@@ -142,7 +148,7 @@ coupling::MultiMDMediator<LinkedCell, dim>
     // We need each communicator to have at least one active simulation running
     // otherwise all processes on this communicator would quickly run into shutdown
     // and thus would not be accessible to the simulation anymore.
-    std::cout << "INFO MultiMDCellService::rmMDSimulation() : Cannot remove MD simulation, only one is left!" << std::endl;
+    std::cout << "INFO MultiMDCellService::rmMDSimulation(unsigned int) : Cannot remove MD simulation, only one is left!" << std::endl;
     return;
   }
 
@@ -285,6 +291,10 @@ coupling::MultiMDMediator<LinkedCell, dim>
 ::findFirstCommWithHighLoad() {
   unsigned int avg = getAvgNumberOfActiveMDSimulations();
   for(unsigned int i=0;i<_listActiveMDSimulations.size();++i) {
+    if(getNumberOfActiveMDSimulations(i) < 2) {
+      // Cannot remove as only one md simulation is left!
+      continue;
+    }
     if (getNumberOfActiveMDSimulations(i) >= avg) return i;
   }
   throw noIndexException;
