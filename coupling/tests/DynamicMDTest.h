@@ -42,11 +42,14 @@ public:
     if(argc == 1) {
       if (std::string(argv[0]) == "removal") {
         _varyMDStyle = REMOVAL;
+        std::cout << "Running removal test" << std::endl;
       }
       else if(std::string(argv[0]) == "insertion") {
         _varyMDStyle = INSERTION;
+        std::cout << "Running insertion test" << std::endl;
       }
       else if(std::string(argv[0]) == "random") {
+        std::cout << "Running random test" << std::endl;
         _varyMDStyle = RANDOM;
       }
       else {
@@ -71,17 +74,15 @@ public:
   
 
 private:
-  enum VaryMDStyle{REMOVAL, INSERTION, RANDOM, FIX_SCHED, NONE};
-  VaryMDStyle _varyMDStyle;
+  enum VaryMDStyle{REMOVAL=0, INSERTION=1, RANDOM=2, FIX_SCHED=3, NONE=4};
+  VaryMDStyle _varyMDStyle = NONE;
   //enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
   //enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void varyMD(int cycle) {
     if(_varyMDStyle == REMOVAL) {
-      if(cycle == 100) {
-        for(unsigned int i=127;i>27;--i) {
-          _multiMDMediator->shutdownCommunicator(i);
-        }
+      if(cycle == 0) {
+        _multiMDMediator->rmNMDSimulations(100);
       }
     } else if(_varyMDStyle == INSERTION) {
       if(cycle == 100) {
@@ -91,6 +92,7 @@ private:
       if(cycle < 100 || cycle % 10 != 0) return;
       //else:
       int target = std::uniform_int_distribution(-50, 50)(_generator);
+      std::cout << "Trying to add " << target << " simulations.." << std::endl;
       if(target < 0) {
         _multiMDMediator->rmNMDSimulations(-target);
       }
