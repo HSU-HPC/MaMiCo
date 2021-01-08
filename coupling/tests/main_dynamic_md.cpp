@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
   #endif
 
   // run tests
-  runTest(new DynamicMDTest(argc, argv));
+  runTest(new DynamicMDTest(argc-1, argv+1));
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
   MPI_Finalize();
