@@ -122,6 +122,13 @@ class coupling::IndexConversionMD2Macro {
 		 */
 		const coupling::IndexConversion<dim>* getBaseIC() const { return _ic;}	
 
+		unsigned int getLocalCellIndex(tarch::la::Vector<dim,unsigned int> localCellIndex) const{
+			auto numberCells = getLocalMD2MacroDomainSize();
+			unsigned int index = localCellIndex[dim-1];
+			for (int d = dim-2; d >-1; d--)
+				index = numberCells[d]*index + localCellIndex[d];
+			return index;
+		}
 		
 	private:
 		//used to determine which cells are neither withing GL or M2M domain
