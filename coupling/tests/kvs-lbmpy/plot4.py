@@ -22,21 +22,21 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
     #reformat .csv file name
     l = csvs_for_plotting[0].replace("_", " ")
     l = l.replace(".csv", "")
-    ax[0,1].plot(df["Iteration"], df.iloc[:,dir], ".", label = l)
+    ax[0,1].plot(df["Iteration"], df.iloc[:,dir], ".", color="green", label = l)
     
     #second
     df = read_csv(csvs_for_plotting[1], delimiter=";", usecols=[0,7,8], names=["Iteration", "VelX", "VelY"], index_col=None)
     #reformat .csv file name
     l = csvs_for_plotting[1].replace("_", " ")
     l = l.replace(".csv", "")
-    ax[1,0].plot(df["Iteration"], df.iloc[:,dir], ".", label = l)
+    ax[1,0].plot(df["Iteration"], df.iloc[:,dir], ".", color="orange", label = l)
 
     #third
     df = read_csv(csvs_for_plotting[2], delimiter=";", usecols=[0,7,8], names=["Iteration", "VelX", "VelY"], index_col=None)
     #reformat .csv file name
     l = csvs_for_plotting[2].replace("_", " ")
     l = l.replace(".csv", "")
-    ax[1,1].plot(df["Iteration"], df.iloc[:,dir], ".", label = l)
+    ax[1,1].plot(df["Iteration"], df.iloc[:,dir], ".", color="purple", label = l)
 
 
     #CS data
@@ -46,7 +46,7 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
         for y in range(2):
 
             #Add CS data to each plot
-            ax[x,y].plot(cs["Iteration"], cs.iloc[:,dir], "-", color="blue", label = "CS")
+            ax[x,y].plot(cs["Iteration"], cs.iloc[:,dir], "-", color="blue", label = "Macro solver")
 
             #get labeling right
             ax[x,y].set_xlabel('coupling cycles')
@@ -59,7 +59,7 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
     mplt.savefig(plot_file_location)
 
 #YOU HAVE TO CUSTOMIZE THIS
-csvs = ["median.csv", "median.csv", "median.csv"]
+csvs = ["POD.csv", "Gaussian.csv", "NLM.csv"]
 
 #plot for dims 0,1,2 (i.e. x,y,z)
 #plot4(0,csvs, "kvs_velx.png")
