@@ -397,7 +397,6 @@ void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>* >& b
 
 PYBIND11_MODULE(mamico, mamico) {
 
-<<<<<<< HEAD
 ////////////////////////////////////////////////////////////////////////////////
 //  Module and submodule hierarchy definitions  ////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -509,7 +508,6 @@ py::class_<coupling::configurations::MaMiCoConfiguration<3>>(configuration, "MaM
 	.def("getMomentumInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMomentumInsertionConfiguration, py::return_value_policy::reference)
 	.def("getBoundaryForceConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getBoundaryForceConfiguration, py::return_value_policy::reference)
 	.def("getTransferStrategyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getTransferStrategyConfiguration, py::return_value_policy::reference)
-	.def("getNoiseReductionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getNoiseReductionConfiguration, py::return_value_policy::reference)
 	.def("getParallelTopologyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParallelTopologyConfiguration, py::return_value_policy::reference);
 
 py::class_<coupling::configurations::MacroscopicCellConfiguration<3>>(configuration, "MacroscopicCellConfiguration")
@@ -532,9 +530,6 @@ py::class_<coupling::configurations::BoundaryForceConfiguration<3>>(configuratio
 
 py::class_<coupling::configurations::TransferStrategyConfiguration<3>>(configuration, "TransferStrategyConfiguration")
 	.def("getStrategyType", &coupling::configurations::TransferStrategyConfiguration<3>::getStrategyType);
-
-py::class_<coupling::configurations::NoiseReductionConfiguration>(configuration, "NoiseReductionConfiguration")
-	.def("getNoiseReductionType", &coupling::configurations::NoiseReductionConfiguration::getNoiseReductionType);
 
 py::class_<coupling::configurations::ParallelTopologyConfiguration>(configuration, "ParallelTopologyConfiguration")
 	.def("getParallelTopologyType", &coupling::configurations::ParallelTopologyConfiguration::getParallelTopologyType);
@@ -579,190 +574,11 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 			)
 			{
 				//each coupling::conversion:functionWrapper checks for nullptrs, i.e "None" args
-=======
-	////////////////////////////////////////////////////////////////////////////////
-	//  Module and submodule hierarchy definitions  ////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////
-
-	mamico.doc() = "The macro micro coupling tool";
-
-	py::module coupling = mamico.def_submodule("coupling", "Contains the coupling tool and interface implementations");
-	py::module tarch = mamico.def_submodule("tarch", "Contains helper classes and files, e.g. for XML parsing");
-	py::module simplemd = mamico.def_submodule("simplemd", "Contains the MD simulation SimpleMD");
-
-	py::module configuration = tarch.def_submodule("configuration", "XML configuration utils");
-	py::module utils = tarch.def_submodule("utils", "");
-
-	py::module services = coupling.def_submodule("services", "");
-	py::module solvers = coupling.def_submodule("solvers", "");
-	py::module interface = coupling.def_submodule("interface", "");
-
-	utils.def("initMPI", &initMPI, "Calls MPI_Init and returns rank of this process");
-	utils.def("finalizeMPI", &MPI_Finalize, "Calls MPI_Finalize");
-
-	///////////////////////////////////////////////////////////////////////////////////
-	// Bindings for all simplemd configuration classes and getter functions  //////////
-	///////////////////////////////////////////////////////////////////////////////////
-
-	py::class_<simplemd::configurations::MolecularDynamicsConfiguration>(configuration, "MolecularDynamicsConfiguration")
-		.def("__repr__",
-	        [](const simplemd::configurations::MolecularDynamicsConfiguration &c) {
-	            return "<MolecularDynamicsConfiguration read from XML tag \"" + c.getTag() + "\">";
-	        }
-	    )
-	    .def("isValid", &simplemd::configurations::MolecularDynamicsConfiguration::isValid)
-	    .def("getDomainConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getDomainConfiguration, py::return_value_policy::reference)
-	    .def("getMoleculeConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getMoleculeConfiguration, py::return_value_policy::reference)
-	    .def("getMPIConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getMPIConfiguration, py::return_value_policy::reference)
-	    .def("getVTKConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getVTKConfiguration, py::return_value_policy::reference)
-	    .def("getSimulationConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getSimulationConfiguration, py::return_value_policy::reference)
-	    .def("getRDFConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getRDFConfiguration, py::return_value_policy::reference)
-	    .def("getCheckpointConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getCheckpointConfiguration, py::return_value_policy::reference)
-	    .def("getProfilePlotterConfigurations", &simplemd::configurations::MolecularDynamicsConfiguration::getProfilePlotterConfigurations, py::return_value_policy::reference)
-	    .def("getExternalForceConfigurations", &simplemd::configurations::MolecularDynamicsConfiguration::getExternalForceConfigurations, py::return_value_policy::reference);
-
-	py::class_<simplemd::configurations::DomainConfiguration>(configuration, "DomainConfiguration")
-		.def("getMoleculesPerDirection", &simplemd::configurations::DomainConfiguration::getMoleculesPerDirection)
-		.def("getGlobalDomainSize", &simplemd::configurations::DomainConfiguration::getGlobalDomainSize)
-		.def("getGlobalDomainOffset", &simplemd::configurations::DomainConfiguration::getGlobalDomainOffset)
-		.def("getCutoffRadius", &simplemd::configurations::DomainConfiguration::getCutoffRadius)
-		.def("getMeshWidth", &simplemd::configurations::DomainConfiguration::getMeshWidth)
-		.def("getKB", &simplemd::configurations::DomainConfiguration::getKB)
-		.def("getBlockSize", &simplemd::configurations::DomainConfiguration::getBlockSize)
-		.def("getBoundary", &simplemd::configurations::DomainConfiguration::getBoundary)
-		.def("getCheckpointFilestem", &simplemd::configurations::DomainConfiguration::getCheckpointFilestem)
-		.def("initFromCheckpoint", &simplemd::configurations::DomainConfiguration::initFromCheckpoint)
-		.def("initFromSequentialCheckpoint", &simplemd::configurations::DomainConfiguration::initFromSequentialCheckpoint);
-
-	py::class_<simplemd::configurations::MoleculeConfiguration>(configuration, "MoleculeConfiguration")
-		.def("getMeanVelocity", &simplemd::configurations::MoleculeConfiguration::getMeanVelocity)
-		.def("getTemperature", &simplemd::configurations::MoleculeConfiguration::getTemperature)
-		.def("getMass", &simplemd::configurations::MoleculeConfiguration::getMass)
-		.def("getEpsilon", &simplemd::configurations::MoleculeConfiguration::getEpsilon)
-		.def("getSigma", &simplemd::configurations::MoleculeConfiguration::getSigma);
-
-	py::class_<simplemd::configurations::MPIConfiguration>(configuration, "MPIConfiguration")
-		.def("getNumberOfProcesses", &simplemd::configurations::MPIConfiguration::getNumberOfProcesses);
-
-	py::class_<simplemd::configurations::VTKConfiguration>(configuration, "VTKConfiguration")	
-		.def("getFilename", &simplemd::configurations::VTKConfiguration::getFilename)
-		.def("getWriteEveryTimestep", &simplemd::configurations::VTKConfiguration::getWriteEveryTimestep);
-
-	py::class_<simplemd::configurations::SimulationConfiguration>(configuration, "SimulationConfiguration")	
-		.def("getDt", &simplemd::configurations::SimulationConfiguration::getDt)
-		.def("getNumberOfTimesteps", &simplemd::configurations::SimulationConfiguration::getNumberOfTimesteps)
-		.def("getReorganiseMemoryEveryTimestep", &simplemd::configurations::SimulationConfiguration::getReorganiseMemoryEveryTimestep)
-		.def("computeMacroscopicQuantitiesEveryTimestep", &simplemd::configurations::SimulationConfiguration::computeMacroscopicQuantitiesEveryTimestep)
-		.def("fixSeed", &simplemd::configurations::SimulationConfiguration::fixSeed)
-		.def("useOverlappingCommunicationWithForceComputation", &simplemd::configurations::SimulationConfiguration::useOverlappingCommunicationWithForceComputation);
-
-	py::class_<simplemd::configurations::RDFConfiguration>(configuration, "RDFConfiguration")	
-		.def("isDefined", &simplemd::configurations::RDFConfiguration::isDefined)
-		.def("getStartAtTimestep", &simplemd::configurations::RDFConfiguration::getStartAtTimestep)
-		.def("getEvaluateEveryTimestep", &simplemd::configurations::RDFConfiguration::getEvaluateEveryTimestep)
-		.def("getWriteEveryTimestep", &simplemd::configurations::RDFConfiguration::getWriteEveryTimestep)
-		.def("getNumberOfPoints", &simplemd::configurations::RDFConfiguration::getNumberOfPoints);
-
-	py::class_<simplemd::configurations::CheckpointConfiguration>(configuration, "CheckpointConfiguration");
-
-	py::class_<simplemd::configurations::ProfilePlotterConfiguration>(configuration, "ProfilePlotterConfiguration")	
-		.def("getStartCell", &simplemd::configurations::ProfilePlotterConfiguration::getStartCell)
-		.def("getRange", &simplemd::configurations::ProfilePlotterConfiguration::getRange)
-		.def("getWriteEveryTimestep", &simplemd::configurations::ProfilePlotterConfiguration::getWriteEveryTimestep)
-		.def("getSampleEveryTimestep", &simplemd::configurations::ProfilePlotterConfiguration::getSampleEveryTimestep)
-		.def("getStartAtTimestep", &simplemd::configurations::ProfilePlotterConfiguration::getStartAtTimestep);
-
-	py::class_<simplemd::configurations::ExternalForceConfiguration>(configuration, "ExternalForceConfiguration")	
-			.def("getExternalForce", &simplemd::configurations::ExternalForceConfiguration::getExternalForce);
-
-	///////////////////////////////////////////////////////////////////////////////////
-	// Bindings for all coupling configuration classes and getter functions  //////////
-	///////////////////////////////////////////////////////////////////////////////////
-
-	py::class_<coupling::configurations::MaMiCoConfiguration<3>>(configuration, "MaMiCoConfiguration")
-		.def("__repr__",
-	        [](const coupling::configurations::MaMiCoConfiguration<3> &c) {
-	            return "<MaMiCoConfiguration read from XML tag \"" + c.getTag() + "\">";
-	        }
-	    )
-	    .def("isValid", &coupling::configurations::MaMiCoConfiguration<3>::isValid)
-		.def("getMacroscopicCellConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMacroscopicCellConfiguration, py::return_value_policy::reference)
-		.def("getParticleInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParticleInsertionConfiguration, py::return_value_policy::reference)
-		.def("getMomentumInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMomentumInsertionConfiguration, py::return_value_policy::reference)
-		.def("getBoundaryForceConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getBoundaryForceConfiguration, py::return_value_policy::reference)
-		.def("getTransferStrategyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getTransferStrategyConfiguration, py::return_value_policy::reference)
-		//.def("getNoiseReductionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getNoiseReductionConfiguration, py::return_value_policy::reference)
-		.def("getParallelTopologyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParallelTopologyConfiguration, py::return_value_policy::reference);
-
-	py::class_<coupling::configurations::MacroscopicCellConfiguration<3>>(configuration, "MacroscopicCellConfiguration")
-		.def("getMacroscopicCellSize", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicCellSize)
-		.def("getNumberLinkedCellsPerMacroscopicCell", &coupling::configurations::MacroscopicCellConfiguration<3>::getNumberLinkedCellsPerMacroscopicCell)
-		.def("getWriteEveryMicroscopicTimestep", &coupling::configurations::MacroscopicCellConfiguration<3>::getWriteEveryMicroscopicTimestep)
-		.def("getMicroscopicFilename", &coupling::configurations::MacroscopicCellConfiguration<3>::getMicroscopicFilename)
-		.def("getWriteEveryMacroscopicTimestep", &coupling::configurations::MacroscopicCellConfiguration<3>::getWriteEveryMacroscopicTimestep)
-		.def("getMacroscopicFilename", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicFilename);
-
-	py::class_<coupling::configurations::ParticleInsertionConfiguration>(configuration, "ParticleInsertionConfiguration")
-		.def("getParticleInsertionType", &coupling::configurations::ParticleInsertionConfiguration::getParticleInsertionType);
-
-	py::class_<coupling::configurations::MomentumInsertionConfiguration>(configuration, "MomentumInsertionConfiguration")
-		.def("getMomentumInsertionType", &coupling::configurations::MomentumInsertionConfiguration::getMomentumInsertionType)
-		.def("getInnerOverlap", &coupling::configurations::MomentumInsertionConfiguration::getInnerOverlap);
-
-	py::class_<coupling::configurations::BoundaryForceConfiguration<3>>(configuration, "BoundaryForceConfiguration")
-		.def("getBoundaryForceType", &coupling::configurations::BoundaryForceConfiguration<3>::getBoundaryForceType);
-
-	py::class_<coupling::configurations::TransferStrategyConfiguration<3>>(configuration, "TransferStrategyConfiguration")
-		.def("getStrategyType", &coupling::configurations::TransferStrategyConfiguration<3>::getStrategyType);
-
-	//py::class_<coupling::configurations::NoiseReductionConfiguration>(configuration, "NoiseReductionConfiguration")
-	//	.def("getNoiseReductionType", &coupling::configurations::NoiseReductionConfiguration::getNoiseReductionType);
-
-	py::class_<coupling::configurations::ParallelTopologyConfiguration>(configuration, "ParallelTopologyConfiguration")
-		.def("getParallelTopologyType", &coupling::configurations::ParallelTopologyConfiguration::getParallelTopologyType);
-
-	configuration.def("parseMolecularDynamicsConfiguration", &makeConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>, py::return_value_policy::take_ownership);
-	configuration.def("parseMaMiCoConfiguration", &makeConfiguration<coupling::configurations::MaMiCoConfiguration<3>>, py::return_value_policy::take_ownership);
-
-	///////////////////////////////////////////////////////////////////////////////////
-	// Bindings for coupling service and interface classes and functions //////////////
-	///////////////////////////////////////////////////////////////////////////////////
-
-    py::class_<tarch::utils::MultiMDService<3>>(utils, "MultiMDService")
-        .def(py::init<const Vec3ui &, const unsigned int &>(),
-        	"numberProcesses"_a=Vec3ui(1,1,1), 
-        	"totalNumberMDSimulations"_a=1)
-        .def("getLocalNumberOfMDSimulations", &tarch::utils::MultiMDService<3>::getLocalNumberOfMDSimulations)
-        .def("getGlobalNumberOfLocalMDSimulation", &tarch::utils::MultiMDService<3>::getGlobalNumberOfLocalMDSimulation)
-        .def("getLocalCommunicator", [](const tarch::utils::MultiMDService<3>& s){return (void*)(s.getLocalCommunicator());} );
-
-    py::class_<coupling::interface::MDSimulation>(coupling, "MDSimulation")
-    	.def("init", (void (coupling::interface::MDSimulation::*)(const tarch::utils::MultiMDService<3>&,unsigned int))
-    		&coupling::interface::MDSimulation::init)
-    	.def("switchOffCoupling", &coupling::interface::MDSimulation::switchOffCoupling)
-    	.def("switchOnCoupling", &coupling::interface::MDSimulation::switchOnCoupling)
-    	.def("simulateTimesteps", &coupling::interface::MDSimulation::simulateTimesteps, 
-    		"numberTimesteps"_a=1, "firstTimestep"_a)
-    	.def("setMacroscopicCellService", &coupling::interface::MDSimulation::setMacroscopicCellService)
-    	.def("shutdown", &coupling::interface::MDSimulation::shutdown); 
-
-    py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService")
-    	.def("computeAndStoreTemperature", &coupling::services::MacroscopicCellService<3>::computeAndStoreTemperature)
-    	.def("getIndexConversion", &coupling::services::MacroscopicCellService<3>::getIndexConversion, py::return_value_policy::reference)
-        .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep)
-		.def("addFilterToSequence", []
-				(coupling::services::MacroscopicCellService<3>* service,
-				 const char* name,
-				 std::function<py::array_t<double> (py::array_t<double>)> applyScalar,
-				 std::function<py::array_t<double> (py::array_t<double>)> applyVector,
-				 int filterIndex)
-				{
->>>>>>> piet
-					service->addFilterToSequence( 
-							filter_sequence, 
-							coupling::conversion::functionWrapper_Scalar(scalar_filter_func),
-							coupling::conversion::functionWrapper_Vector(vector_filter_func),
-							filter_index);
+				service->addFilterToSequence( 
+						filter_sequence, 
+						coupling::conversion::functionWrapper_Scalar(scalar_filter_func),
+						coupling::conversion::functionWrapper_Vector(vector_filter_func),
+						filter_index);
 			}, 
 			"filter_sequence"_a,
 			"filter_index"_a,
