@@ -252,27 +252,11 @@ class KVSTest():
             mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
                 for d in range(3)]
             for dir in range(2):
-                self.velMD[cycle, dir] = self.buf.loadRecvVelocity()[2,2,2,dir]
                 self.velLB[cycle, dir] = self.macroscopicSolver.scen.velocity[
                     mdpos[0]+5, 
                     mdpos[1]+5, 
                     mdpos[2]+5,
                     dir].data * (self.dx / self.dt_LB)
-
-    def plot(self):
-        if self.rank==0:
-            mplt.style.use("seaborn")
-            fig, ax = mplt.subplots(2,1)
-            t = range(len(self.velMD))
-            for dir in range(2):
-                ax[dir].plot(t, self.velLB[:,dir], "-", color="blue")
-                ax[dir].plot(t, self.velMD[:,dir], "-", color="red")
-                ax[dir].set_xlabel('coupling cycles')
-                ax[dir].grid(True)
-            ax[0].set_ylabel('velocity_x')
-            ax[1].set_ylabel('velocity_y')
-            fig.tight_layout()
-            mplt.savefig("plot.png")
 
     def __del__(self):
         self.shutdown()
