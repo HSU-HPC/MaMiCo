@@ -144,10 +144,6 @@ class KVSTest():
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
                 self.cfg.getfloat("microscopic-solver", "temperature"))
 
-        #Add Strouhal filter
-        #self.sf = pf.StrouhalPython(0.2, 2.25)
-        #self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence("test-strouhal", pf.returnCellData, self.sf.addDataPoint, 3)
-
         from scipy.ndimage import gaussian_filter, median_filter
         #Add Gauss filter
         def gauss(data):
@@ -160,10 +156,9 @@ class KVSTest():
             return median_filter(data, size = (3,3,3,1))
 
 
-
         mcs = self.multiMDCellService.getMacroscopicCellService(0)
-        #mcs.addFilterToSequence(filter_sequence="testNoneFFF", filter_index="1", scalar_filter_func = None, vector_filter_func=None)
-        #self.multiMDCellService.getMacroscopicCellService(0).addFilterToSequence(filter_sequence="median", filter_index=0, scalar_filter_func = pf.returnCellData, vector_filter_func=median)
+        #mcs.addFilterToSequence(filter_sequence="testNoneFFF", filter_index=1, vector_filter_func = None)
+        #mcs.addFilterToSequence(filter_sequence="median", filter_index=0, scalar_filter_func = None, vector_filter_func=median)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
