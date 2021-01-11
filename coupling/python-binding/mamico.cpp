@@ -569,21 +569,26 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 				 coupling::services::MacroscopicCellService<3>* service,
 				 const char* filter_sequence,
 				 int filter_index,
-				 std::function<py::array_t<double> (py::array_t<double>)>* scalar_filter_func,
-				 std::function<py::array_t<double> (py::array_t<double>)>* vector_filter_func
+				 //use of std::optional is neccessary because pybind11 doesnt support implicit None conversion for STL datatypes
+				 std::optional<std::function<py::array_t<double> (py::array_t<double>)>* > scalar_filter_func,
+				 std::optional<std::function<py::array_t<double> (py::array_t<double>)>* > vector_filter_func
 			)
 			{
+				//"unwrap" std::optional
+				if(!scalar_filter_func.has_value()) scalar_filter_func = nullptr;
+				if(!vector_filter_func.has_value()) vector_filter_func = nullptr;
+
 				//each coupling::conversion:functionWrapper checks for nullptrs, i.e "None" args
 				service->addFilterToSequence( 
 						filter_sequence, 
-						coupling::conversion::functionWrapper_Scalar(scalar_filter_func),
-						coupling::conversion::functionWrapper_Vector(vector_filter_func),
+						coupling::conversion::functionWrapper_Scalar(scalar_filter_func.value()),
+						coupling::conversion::functionWrapper_Vector(vector_filter_func.value()),
 						filter_index);
 			}, 
 			"filter_sequence"_a,
 			"filter_index"_a,
-			py::arg("scalar_filter_func").none(true),
-			py::arg("vector_filter_func").none(true)
+			py::arg("scalar_filter_func") = py::none(),
+			py::arg("vector_filter_func") = py::none()
 			);
 
     coupling.def("getMDSimulation", []
