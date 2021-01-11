@@ -13,39 +13,45 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
     mplt.style.use("seaborn")
     fig, ax = mplt.subplots(2,2)
     #unfiltered MD data
-    md = read_csv("unfiltered.csv", delimiter=";", usecols=[0,7,8], names=["Iteration", "VelX", "VelY"], index_col=None)
-    ax[0,0].plot(md["Iteration"], md.iloc[:,dir], ".", color="red", label = "MD")
+    p_md = read_csv("unfiltered.csv", delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_md = read_csv("unfiltered.csv", delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
+    ax[0,0].plot(p_md["Iteration"], (p_md.iloc[:,dir]) / (m_md.iloc[:,1]), ".", color="red", label = "MD")
 
     #all filtered csvs
     #first
-    df = read_csv(csvs_for_plotting[0], delimiter=";", usecols=[0,7,8], names=["Iteration", "VelX", "VelY"], index_col=None)
+    p_fst = read_csv(csvs_for_plotting[0], delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_fst = read_csv(csvs_for_plotting[0], delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
     #reformat .csv file name
     l = csvs_for_plotting[0].replace("_", " ")
     l = l.replace(".csv", "")
-    ax[0,1].plot(df["Iteration"], df.iloc[:,dir], ".", color="green", label = l)
+    ax[0,1].plot(p_fst["Iteration"], (p_fst.iloc[:,dir]) / (m_fst.iloc[:,1]), ".", color="green", label = l)
     
     #second
-    df = read_csv(csvs_for_plotting[1], delimiter=";", usecols=[0,7,8], names=["Iteration", "VelX", "VelY"], index_col=None)
+    p_snd = read_csv(csvs_for_plotting[1], delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_snd = read_csv(csvs_for_plotting[1], delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
     #reformat .csv file name
     l = csvs_for_plotting[1].replace("_", " ")
     l = l.replace(".csv", "")
-    ax[1,0].plot(df["Iteration"], df.iloc[:,dir], ".", color="orange", label = l)
+    ax[1,0].plot(p_snd["Iteration"], (p_snd.iloc[:,dir]) / (m_snd.iloc[:,1]), ".", color="orange", label = l)
 
     #third
-    df = read_csv(csvs_for_plotting[2], delimiter=";", usecols=[0,7,8], names=["Iteration", "VelX", "VelY"], index_col=None)
+    p_thrd = read_csv(csvs_for_plotting[2], delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_thrd = read_csv(csvs_for_plotting[2], delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
     #reformat .csv file name
     l = csvs_for_plotting[2].replace("_", " ")
     l = l.replace(".csv", "")
-    ax[1,1].plot(df["Iteration"], df.iloc[:,dir], ".", color="purple", label = l)
+    ax[1,1].plot(p_thrd["Iteration"], (p_thrd.iloc[:,dir]) / (m_thrd.iloc[:,1]), ".", color="purple", label = l)
 
 
     #CS data
     #TODO +3
-    cs = read_csv("lbm.csv", delimiter=";", usecols = [0,1,2], names=["Iteration", "VelX", "VelY"])
+	#TODO: currently outputs vel, not momentum	
+	#TOOD: doesnt work for x-dir
+    cs = read_csv("lbm.csv", delimiter=";", usecols = [0,1,2], names=["Iteration", "VelY", "VelZ"])
     for x in range(2):
         for y in range(2):
 
-            #Add CS data to each plot
+            #Add CS data to each plot. dir-1 because we dont sample x-vel in 'cs'
             ax[x,y].plot(cs["Iteration"], cs.iloc[:,dir], "-", color="blue", label = "Macro solver")
 
             #get labeling right
@@ -54,6 +60,7 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
             ax[x,y].legend()
             #TODO: DIRECTION OF VEL
             ax[x,y].set_ylabel('velocity')
+
     fig.tight_layout()
     #TODO: CUSTOM NAME
     mplt.savefig(plot_file_location)
@@ -61,7 +68,7 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
 #YOU HAVE TO CUSTOMIZE THIS
 csvs = ["POD.csv", "Gaussian.csv", "NLM.csv"]
 
-#plot for dims 0,1,2 (i.e. x,y,z)
-#plot4(0,csvs, "kvs_velx.png")
-plot4(1,csvs, "kvs_vely.png")
-plot4(2,csvs, "kvs_velz.png")
+#plot for dims 1,2,3 (i.e. x,y,z)
+plot4(1,csvs, "kvs_velx.png")
+plot4(2,csvs, "kvs_vely.png")
+#plot4(3,csvs, "kvs_velz.png")
