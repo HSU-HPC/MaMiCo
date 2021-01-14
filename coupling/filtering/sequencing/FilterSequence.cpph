@@ -112,13 +112,6 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			}
 			newfilter = new coupling::Strouhal<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, u , d);
         }
-
-		//NLM
-        else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
-            //TODO
-            std::cout << "ERROR: Filter-Pipeline does not yet support NLM." << std::endl;
-            exit(EXIT_FAILURE);
-        }
 		
 	//###############################################################
 

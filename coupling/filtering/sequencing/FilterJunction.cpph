@@ -1,0 +1,76 @@
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamic::o
+
+//Member functions of coupling::FilterSequence
+
+//TODO: port this
+template<unsigned int dim>
+int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){
+	if(!sequenceNode) return EXIT_FAILURE;
+    tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
+	
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector = _inputDomainCellVector;	
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector = _domainCellVector2;	
+	#ifdef DEBUG_FILTER_PIPELINE
+	std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
+	#endif	
+	bool firstIteration = true;
+
+    while(currFilterNode){
+		coupling::FilterInterface<dim>* newfilter = nullptr;
+		
+	//###############################################################
+	//This is where you have to define how to handle each filter individually.
+
+        //NLM
+        else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
+			int tws;
+			if(currFilterNode->QueryIntAttribute("time-window-size", &tws)){
+				std::cout << "ERROR: NLM filter misses attribute time-window-size in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(tws <= 2){
+				std::cout << "ERROR: NLM: time-window-size must be greater than two." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+            newfilter = new coupling::NLM<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, _ic, tws);
+        }		
+	//###############################################################
+
+		//Unknown filter identifier
+        else {
+			std::cout << "ERROR: Filter-Pipeline does not recognize junctor called " << currFilterNode->Value() << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+		//global/local filtering
+		if(currFilterNode->Attribute("sequential")) {
+			if(std::strcmp(currFilterNode->Attribute("sequential"), "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _ic));
+			else _filters.push_back(newfilter);
+		}
+		else _filters.push_back(newfilter);
+
+		if(firstIteration){
+			inputCellVector = _domainCellVector1;
+			firstIteration = false;
+		}
+
+		inputCellVector.swap(outputCellVector);
+        currFilterNode = currFilterNode->NextSiblingElement();
+	}
+
+	//Check for modfiability. By default true.
+	if(sequenceNode->Attribute("modifiable")) {
+		if(std::strcmp(currFilterNode->Attribute("modifable"), "false") == 0) _isModifiable = false;
+	}
+
+	#ifdef DEBUG_FILTER_PIPELINE
+	std::cout << PRINT_PREFIX(); printOutputCellVector();
+	#endif
+	
+	return 0;
+}
+
+

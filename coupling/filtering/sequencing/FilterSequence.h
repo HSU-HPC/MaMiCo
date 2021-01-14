@@ -25,6 +25,8 @@
  * 	- filter parameters
  * 	- modifiablitiy of filter list
  * per Filter Sequence.
+ *
+ * A generalized version of this concept is FilterJunction.
  * @Author Felix Maurer
  */
 
@@ -81,7 +83,7 @@ class coupling::FilterSequence {
     	}
 
 
-    	~FilterSequence(){
+    	virtual ~FilterSequence(){
 			for (auto v1 : _cellVector1) delete v1;
 			for (auto v2 : _cellVector2) delete v2;
 			for (auto f : _filters) delete f;
@@ -89,28 +91,7 @@ class coupling::FilterSequence {
         	std::cout << PRINT_PREFIX() << "Deconstructed." << std::endl;
         	#endif
     	}
-
-		/*
-		 * This member function allows appendance and insertion of filters defined by two processing functions to a modifiable sequence at runtime. Index -1 implies appending. 
-		 */
-		void addFilter( 	
-				const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
-				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
-				int filterIndex = -1
-		);
-
-		/*
-		 * Interprets this sequence's filters' parameters (specified in filter_pipeline.xml) and creates filter objects based on that.
-		 * Since different filters require vastly different parameters and thus different means of instanciation,
-		 * you need to add each new filter manually to this method's "if/else-chain".
-		 *
-		 * Since after all filter objects are created it is possible to determine whether _cellVector1 or _cellVector2 will be used as output,
-		 * this is also done in here.
-		 *
-		 * In addition to that, if this sequence is declared as unmodifibale, this gets also detected in here
-		 */
-		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
-		
+	
 		/*
 		 * Each sequence operates on their own two copies of the global domain. 
 		 * Thus, before applying the sequence, we need to update these two copies.
@@ -122,9 +103,14 @@ class coupling::FilterSequence {
 			}
 		}
 
+		/*
+		 * GETTER/SETTER SECTION
+		 */
+
     	const char* getName() { return _name; }
 
 		bool isOutput() { return _isOutput; }
+		//TODO: is this used?
 		void setAsOutput() { 
 			std::cout << PRINT_PREFIX() << " Setting as pipeline to macro solver output." << std::endl;
 			_isOutput = true; 
@@ -133,44 +119,68 @@ class coupling::FilterSequence {
 		bool isModifiable() { return _isModifiable; }
 		void makeUnmodifiable() { _isModifiable = false; }
 
+		std::vector<coupling::FilterInterface<dim> *> getFilters() { return _filters; }	
+
+		/*
+		 * All virtual functions below are redefined in case this sequence is actually a FilterJunction.
+		 * Read FilterJunction.h carefully.
+		 */
+
+		/*
+		 * Interprets this sequence's filters' parameters (specified in filter_pipeline.xml) and creates filter objects based on that.
+		 * Since different filters require vastly different parameters and thus different means of instanciation,
+		 * you need to add each new filter manually to this method's "if/else-chain".
+		 *
+		 * Since after all filter objects are created it is possible to determine whether _cellVector1 or _cellVector2 will be used as output,
+		 * this is also done in here.
+		 *
+		 * In addition to that, if this sequence is declared as unmodifibale, this gets also detected in here
+		 */
+		virtual int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
+
+		/*
+		 * This member function allows appendance and insertion of filters defined by two processing functions to a modifiable sequence at runtime. Index -1 implies appending. 
+		 */
+		virtual void addFilter( 	
+				const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
+				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
+				int filterIndex = -1
+		);
+
 		/*
 		 * Which one of the two cell vectors are this sequence's output is solely dependant on the number of filters the sequence contains,
 		 * because each swap (see loadFiltersFromXML) changes what is the sequence's final filter's output.
+		 *
+		 * Some sequences have more than one output, thus the optional parameter. Has no effect on a basic FilterSequence.
 		 */
-    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const{ 
+    	virtual const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex = 0) const{ 
 			if(_filters.empty()) std::cout << PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
 			if(_filters.size() % 2 == 0) return _cellVector1;
 			else return _cellVector2;
 		}
 
-		void printOutputCellVector() const {
+		virtual void printOutputCellVector() const {
 			(getOutputCellVector() == _cellVector1) ? std::cout << "Cell vector 1 " : std::cout << "Cell vector 2 ";
 			std::cout << "will be used as output." << std::endl;
 		}
-
-		std::vector<coupling::FilterInterface<dim> *> getFilters() { return _filters; }	
 		
+		/*
+		 * This is trivial for the traditional sequence, i.e. non-Junction-case.
+		 */
+		virtual unsigned int getNumInputs() { return 1; }
+		virtual unsigned int getNumOutputs() { return 1; }
+
+
+
+		/*
+		 * DUMMY HELPER FUNCTIONS
+		 */
+
 		void printFilters() {
 			std::cout << "Filters in sequence " << _name << ": ";
 			for(auto f : _filters) std::cout << f->getType() << " ";
 			std::cout << std::endl;
 		}
-      
-	private:
-		/*
-		 * Determines based on _domainStart and _domainEnd which of the global domain's cell belong to the sequence's local domain.
-		 * This initializes all domain vector member variables (see below).
-		 *
-		 * Used in constructor.
-		 */
-		void initDomain();
-
-		/*
-		 * Copies all (global) input cells to _cellVector1 and _cellVector2.
-		 *
-		 * Used in consctructor.
-		 */
-		void initCellVectors();
 
 		void pintOutputVector() const {
 			std::cout << PRINT_PREFIX() << "Number of Filters: " << _filters.size() <<". Output vector will be ";
@@ -178,9 +188,28 @@ class coupling::FilterSequence {
 			else std::cout << "_cellVector2." << std::endl;
 		}
 
-		std::string PRINT_PREFIX() const {
+		virtual std::string PRINT_PREFIX() const {
 			return std::string("	FS(").std::string::append(_name).std::string::append("): ");
 		}
+
+      
+	private:
+		/*
+		 * Determines based on _domainStart and _domainEnd which of the global domain's cell belong to the sequence's local domain.
+		 * This initializes all domain vector member variables (see below).
+		 *
+		 * Used in constructor. TODO: i like to move it
+		 */
+		void initDomain();
+
+		/*
+		 * Copies all (global) input cells to _cellVector1 and _cellVector2.
+		 *
+		 * Used in consctructor. //TODO: move it
+		 */
+		void initCellVectors();
+	
+	protected:
 
 		const coupling::IndexConversionMD2Macro<dim>* _ic;
 		const tarch::utils::MultiMDService<dim> _multiMDService;
@@ -213,10 +242,7 @@ class coupling::FilterSequence {
 		bool _isModifiable; //true while filters can be added to sequence
 		
 		std::vector<coupling::FilterInterface<dim> *> _filters;
-		
-
-
 };
 
 //inlcude implementation
-#include "coupling/filtering/FilterSequence.cpph"
+#include "coupling/filtering/sequencing/FilterSequence.cpph"
