@@ -10,6 +10,7 @@
 
 //INCLUDE ALL JUNCTOR HEADERS HERE
 #include "coupling/filtering/filters/NLM.h"
+#include "coupling/filtering/interfaces/JunctorInterface.h" //this will be redundant in the future
 
 /*
  * WORK IN PROGRESS. USE WITH CAUTION
@@ -128,7 +129,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		}
 
 		std::string PRINT_PREFIX() const {
-			return std::string("	FJ(").std::string::append(_name).std::string::append("): ");
+			return std::string("	FJ(").std::string::append(coupling::FilterInterface<dim>::_name).std::string::append("): ");
 		}
 
 
