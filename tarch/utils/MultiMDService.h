@@ -39,6 +39,8 @@ class tarch::utils::MultiMDService {
 
     unsigned int getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
 
+    unsigned int getAvgNumberOfMDSimulations() const { return _avgNumberMDSimulationsPerLocalComm; }
+
     tarch::la::Vector<dim, unsigned int> getNumberProcessesPerMDSimulation() const { return _numberProcessesPerMDSimulation; }
 
     #if (TARCH_PARALLEL==TARCH_YES)

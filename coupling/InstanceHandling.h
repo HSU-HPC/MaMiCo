@@ -174,13 +174,21 @@ public:
     }
 
     void rmMDSimulation(const unsigned int & index) {
-      _simpleMD[index]->shutdown();
-      delete _simpleMD[index];
-      _simpleMD[index] = nullptr;
+      if(_simpleMD[index] != nullptr) {
+        _simpleMD[index]->shutdown();
+        delete _simpleMD[index];
+        _simpleMD[index] = nullptr;
+      } else {
+        std::cout << "WARNING coupling::InstanceHandling::rmMDSimulation() : _simpleMD at index " << index << " == null!" << std::endl;
+      }
       //_simpleMD.erase(_simpleMD.begin()+index);
 
-      delete _mdSolverInterface[index];
-      _mdSolverInterface[index] = nullptr;
+      if(_mdSolverInterface[index] != nullptr) {
+        delete _mdSolverInterface[index];
+        _mdSolverInterface[index] = nullptr;
+      } else {
+        std::cout << "WARNING coupling::InstanceHandling::rmMDSimulation() : _mdSolverInterface at index " << index << " == null!" << std::endl;
+      }
       //_mdSolverInterface.erase(_mdSolverInterface.begin()+index);
     }
 
