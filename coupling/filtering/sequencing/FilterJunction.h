@@ -20,15 +20,16 @@
  * TODO: 
  *  - Support multiple outputs. ("X-Junctions")
  *  - Support dynamically linked filters.
+ *  - Support custom selection i/o partitions per junctor.
  * @Author Felix Maurer
  */
 
 namespace coupling{
-    template<unsigned int dim>
+	template<unsigned int dim, std::size_t inputc, std::size_t outputc>
     class FilterJunction;
 }
 
-template<unsigned int dim>
+template<unsigned int dim, std::size_t inputc, std::size_t outputc>
 class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 	public:
     	FilterJunction( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
@@ -38,31 +39,27 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 						std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //dont concat indices! TODO: check this in constructor
 						tarch::la::Vector<dim, unsigned int> domainStart,
 						tarch::la::Vector<dim, unsigned int> domainEnd,
-						std::array<bool, 7> filteredValues,
-						unsigned int numberInputs
-						/*unsigned int numberOutputs = 1 TODO*/ ):
-		coupling::FilterSequence<dim>
-		(indexConversion, multiMDService, name, inputCellVector, cellIndices, domainStart, domainEnd, filteredValues),
-		_noInputs(numberInputs),
-		_noOutputs(1)/*TODO*/
+						std::array<bool, 7> filteredValues
+		):
+		coupling::FilterSequence<dim>(indexConversion, multiMDService, name, inputCellVector, cellIndices, domainStart, domainEnd, filteredValues)
 		{	
 			#ifdef DEBUG_FILTER_JUNCTION
-        	std::cout << coupling::FilterSequence<dim>::PRINT_PREFIX() << "This is a FilterJunction. Number of inputs:" << numberInputs << std::endl;
+        	std::cout << coupling::FilterSequence<dim>::PRINT_PREFIX() << "This is a FilterJunction. Number of inputs:" << inputc << std::endl;
         	#endif
 
 			//Partition input vector
 			//TODO: testing (a lot of it)
 			
 			//Used for partitioning domain vectors. TODO: check for redundancy with some field of FilterSequence (?)
-			unsigned int totalSize = coupling::FilterSequence<dim>::_inputDomainCellVector.size() / numberInputs;
-			unsigned int domainSize = coupling::FilterSequence<dim>::_inputDomainCellVector.size() / numberInputs;
+			unsigned int totalSize = coupling::FilterSequence<dim>::_inputDomainCellVector.size() / inputc;
+			unsigned int domainSize = coupling::FilterSequence<dim>::_inputDomainCellVector.size() / inputc;
 
-			for( unsigned int p = 0; p < numberInputs; p++) {
+			for( unsigned int p = 0; p < inputc; p++) {
 				//_inputCellVector 
 				//TODO Do i need this?
 
 				//_cellVector1
-				_cellVector1_parted.push_back(
+				_cellVector1_parted[p] = (
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
 					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p * totalSize)), 
 					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p+1 * totalSize))
@@ -117,17 +114,21 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		}
 
 		/*
-		 * TODO: comment, impl
+		 * This function is very similar to the interface's. Check coupling::FilterSequence for more details.
 		 */
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
 		/*
-		 * The first partition of _cellVector1/2 is the main partition. A junction's output is always a main partition. TODO: Multiple outputs.
+		 * The first partition of _cellVector1/2 is the main partition. A junction's output is always its main partition. TODO: Multiple outputs.
 		 */
     	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const{ 
 			if(coupling::FilterSequence<dim>::_filters.empty()) std::cout << coupling::FilterSequence<dim>::PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
 			if(coupling::FilterSequence<dim>::_filters.size() % 2 == 0) return _cellVector1_parted[0];
 			else return _cellVector2_parted[0];
+		}
+
+		std::string PRINT_PREFIX() const {
+			return std::string("	FJ(").std::string::append(_name).std::string::append("): ");
 		}
 
 
@@ -138,20 +139,13 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		//Do I ever need instances of this?
 		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _inputCellVector_parted;
 		//These must be parted for junction output.
-		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _cellVector1_parted;
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1_parted[inputc];
 		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _cellVector2_parted;
 
 		//Partitions are given to junctors. Goal: Arbitrary number of input/output partitions.
 		std::vector</*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _inputDomainCellVector_parted;
 		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _domainCellVector1_parted;
 		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _domainCellVector2_parted;
-
-		//Number of in/outputs. This is what makes this different to an ordinary FilterSequence.
-		const unsigned int _noInputs;
-		const unsigned int _noOutputs;
-		
-
-
 };
 
 //inlcude implementation

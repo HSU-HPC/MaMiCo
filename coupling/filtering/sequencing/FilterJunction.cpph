@@ -4,29 +4,43 @@
 
 //Member functions of coupling::FilterSequence
 
-//TODO: port this
-template<unsigned int dim>
-int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){
+//TODO: Change return to what _filters is.
+template<unsigned int dim, std::size_t inputc, std::size_t outputc>
+int coupling::FilterJunction<dim, inputc, outputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){ //in our case "junctionNode" would be more precise
 	if(!sequenceNode) return EXIT_FAILURE;
-    tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
-	
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector = _inputDomainCellVector;	
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector = _domainCellVector2;	
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
-	#endif	
-	bool firstIteration = true;
 
-    while(currFilterNode){
-		coupling::FilterInterface<dim>* newfilter = nullptr;
+	//null if junction is empty
+    tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
+	
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector[inputc] = _inputDomainCellVector_parted;
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector[inputc] = _domainCellVector2_parted;
+	#ifdef DEBUG_FILTER_PIPELINE
+	std::cout << PRINT_PREFIX() << "Initializing junctor objects." << std::endl;
+	#endif	
+
+	//Keep track of this for each indivial input partition.
+	bool firstIteration[inputc] = { true };
+
+    while(currJunctorNode){
+
+		//All Junctors must implement one of the {X,Y}-Junctor interfaces, each of which implement FilterInterface.
+		coupling::FilterInterface<dim>* newjunctor = nullptr;
 		
+	//TODO: reduce per-junctor customization: generalize!
 	//###############################################################
-	//This is where you have to define how to handle each filter individually.
+	//This is where you have to define how to handle each junctor individually.
 
         //NLM
-        else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
+        if(std::strcmp(currJunctorNode->Value(), "NLM") == 0) {
+
+			//Parameters
 			int tws;
-			if(currFilterNode->QueryIntAttribute("time-window-size", &tws)){
+			//TODO: make the following customizable via XML.
+			unsigned int inputlp_unfiltered = 0;
+			unsigned int inputlp_prefiltered = 1;
+			unsigned int outputp = 0;
+	
+			if(currJunctorNode->QueryIntAttribute("time-window-size", &tws)){
 				std::cout << "ERROR: NLM filter misses attribute time-window-size in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}
@@ -35,38 +49,38 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::NLM<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, _ic, tws);
+			//Instanciation
+            coupling::FilterSequence<dim>::_filters.push_back(
+				 new coupling::NLM<dim>(
+					inputCellVector[inputlp_prefiltered],
+					outputCellVector[outputp], 
+					coupling::FilterSequence<dim>::_localDomainCellIndices,
+					coupling::FilterSequence<dim>::_filteredValues, 
+					coupling::FilterSequence<dim>::_ic, 
+					tws)
+			);
+
+
+			//Swapping for output partition
+			if(firstIteration[outputp]){
+				inputCellVector[outputp] = _domainCellVector1_parted[outputp];
+				firstIteration[outputp] = false;
+			}
+			inputCellVector[outputp].swap(outputCellVector[outputp]);
+
         }		
 	//###############################################################
 
-		//Unknown filter identifier
+		//Unknown junctor identifier
         else {
-			std::cout << "ERROR: Filter-Pipeline does not recognize junctor called " << currFilterNode->Value() << std::endl;
+			std::cout << "ERROR: Filter-Pipeline does not recognize junctor called " << currJunctorNode->Value() << std::endl;
             exit(EXIT_FAILURE);
         }
 
-		//global/local filtering
-		if(currFilterNode->Attribute("sequential")) {
-			if(std::strcmp(currFilterNode->Attribute("sequential"), "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _ic));
-			else _filters.push_back(newfilter);
-		}
-		else _filters.push_back(newfilter);
-
-		if(firstIteration){
-			inputCellVector = _domainCellVector1;
-			firstIteration = false;
-		}
-
-		inputCellVector.swap(outputCellVector);
-        currFilterNode = currFilterNode->NextSiblingElement();
+		currJunctorNode = currJunctorNode->NextSiblingElement();
 	}
 
-	//Check for modfiability. By default true.
-	if(sequenceNode->Attribute("modifiable")) {
-		if(std::strcmp(currFilterNode->Attribute("modifable"), "false") == 0) _isModifiable = false;
-	}
-
-	#ifdef DEBUG_FILTER_PIPELINE
+	#ifdef DEBUG_FILTER_JUNCTIONS
 	std::cout << PRINT_PREFIX(); printOutputCellVector();
 	#endif
 	
