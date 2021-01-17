@@ -38,7 +38,7 @@
  */
 class DynamicMDTest: public Test {
 public:
-  DynamicMDTest(int argc, char ** argv): Test("DynamicMDTest"), _generator(0){
+  DynamicMDTest(int argc, char ** argv): Test("DynamicMDTest"), _generator(std::chrono::system_clock::now().time_since_epoch().count()){
     if(argc == 1) {
       if (std::string(argv[0]) == "removal") {
         _varyMDStyle = REMOVAL;

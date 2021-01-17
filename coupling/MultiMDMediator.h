@@ -65,6 +65,9 @@ public:
   void rmMDSimulation();
 
 
+  void forceRmMDSimulation(); 
+
+
   /** Remove MD simulation with specified global identifier.
    * TODO How to handle removal of empty places??
    */
@@ -78,6 +81,10 @@ public:
 
   /** Remove N MD Simulations **/
   void rmNMDSimulations(const unsigned int &);
+
+
+  void forceRmNMDSimulations(const unsigned int &);
+
 
   /** Remove ALL simulations on this communicator. 
    * This is the only way to do so!
