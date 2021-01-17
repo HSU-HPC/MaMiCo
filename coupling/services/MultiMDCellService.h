@@ -286,7 +286,7 @@ class coupling::services::MultiMDCellService {
       unsigned int totalNumberEquilibratedMDSimulations = 0;
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
           //std::cout << "Rank " << _macroscopicCellServices[l]->getIndexConversion().getThisRank() << ": Send from MD to Macro for Simulation no. " << l << std::endl;
-          if (_macroscopicCellServices[l] != nullptr &&  _warmupPhase[l] == 0)  {
+        if (_macroscopicCellServices[l] != nullptr &&  _warmupPhase[l] == 0)  {
           res += _macroscopicCellServices[l]->sendFromMD2Macro(
             macroscopicCellsFromMacroscopicSolver,
             globalCellIndicesFromMacroscopicSolver
@@ -522,6 +522,7 @@ class coupling::services::MultiMDCellService {
 
     void writeCheckpoint(const unsigned int & cycle, 
                           const coupling::InstanceHandling<LinkedCell, dim> & instanceHandling) const {
+      if(cycle % 10 != 0) return;
       std::stringstream filestem;
       filestem << "restart_checkpoint_" << _multiMDService.getGlobalRank() / computeScalarNumberProcesses();
       instanceHandling.writeCheckpoint(filestem.str().c_str(), 0);
