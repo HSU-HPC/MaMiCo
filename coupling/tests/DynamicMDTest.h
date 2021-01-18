@@ -91,7 +91,7 @@ private:
         _multiMDMediator->addNMDSimulations(100);
       }
     } else if(_varyMDStyle == RANDOM) {
-      if(cycle < 100 || cycle % 10 != 0) return;
+      if(cycle < 1 || cycle % 1 != 0) return;
       //else:
       int target;
       if(_rank == 0) {
