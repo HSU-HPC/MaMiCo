@@ -9,7 +9,8 @@
 #define POST_MULTI_INSTANCE_FILTERING_NO false
 
 #include "tarch/tinyxml2/tinyxml2.h"
-#include "coupling/filtering/FilterSequence.h"
+#include "coupling/filtering/sequencing/FilterSequence.h"
+#include "coupling/filtering/sequencing/FilterJunction.h"
 #include "coupling/IndexConversionMD2Macro.h"
 
 

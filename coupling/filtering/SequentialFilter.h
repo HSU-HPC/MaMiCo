@@ -24,7 +24,7 @@ namespace coupling{
  * Implementation of FilterInterface.h for filters which operate (optionally or mandatorily) in a sequential manner, i.e. process data on one master rank.
  * For such filters, operator()() will
  * 		- contribute to one dedicated processing rank: by calling contribute()
- * 		- process and then scatter data correctly: by calling process()
+ * 		- process on master rank only and then scatter data correctly: by calling process()
  *
  * Meant to be used as a wrapper class, i.e. take a pointer to a filter object and then sequentualizes it. 
  * Used in coupling::FilterSequence<dim>::loadFiltersFromXML.
@@ -73,6 +73,10 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 					std::cout << "PRE APPLY BUFFER FOR OTHER RANK" << std::endl;
 					applyBufferToMacroscopicCells(_recvbuf, _filter->getOutputCells());
 				}
+
+				//reset buffers TODO: is this neccessary? 
+				_sendbuf.clear();
+				_recvbuf.clear();
 			}
 			else process(FILTER_PARALLEL);
 		}
@@ -153,6 +157,6 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 /*
  * TODO
  * testing
- * 	- inconsistencies in data
+ * 	- inconsistencies in data -> always outputs data from step 0??
  * 	- segfaults if run on more than 1 rank
  */
