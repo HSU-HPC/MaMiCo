@@ -180,7 +180,6 @@ processInnerMacroscopicCellAfterMDTimestep(
   #endif
   const tarch::la::Vector<dim,double> velocity = (1.0-factor)*_oldSolution[index] + factor*_newSolution[index];
   cell.setMicroscopicMomentum(velocity);
-
   cell.addMicroscopicMass(cell.getMassFlux());
 }
 

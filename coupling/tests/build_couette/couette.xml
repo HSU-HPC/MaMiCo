@@ -23,7 +23,7 @@
     channelheight="50"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
-    wall-velocity="1.5 ; 0.0 ; 0.0"
+    wall-velocity="0.5 ; 0.0 ; 0.0"
     wall-oscillations="0"
   />
 
@@ -72,7 +72,7 @@
   <macroscopic-solver 
     type="foam"
     viscosity="2.14"
-    number-of-processes="1 ; 1 ; 1"
+    number-of-processes="2 ; 1 ; 1"
     plot-every-timestep="2"
     init-advance-cycles="0"
     foam-case-directory=""
