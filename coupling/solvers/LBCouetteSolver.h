@@ -88,17 +88,6 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
     virtual ~LBCouetteSolver(){
       if (_pdf1!=NULL){delete [] _pdf1; _pdf1=NULL;}
       if (_pdf2!=NULL){delete [] _pdf2; _pdf2=NULL;}
-      if (_vel !=NULL){delete [] _vel; _vel=NULL;}
-      if (_density!=NULL){delete [] _density; _density=NULL;}
-      if (_flag!=NULL){delete [] _flag; _flag=NULL;}
-      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      if (_sendBufferX!=NULL){delete [] _sendBufferX; _sendBufferX=NULL;}
-      if (_sendBufferY!=NULL){delete [] _sendBufferY; _sendBufferY=NULL;}
-      if (_sendBufferZ!=NULL){delete [] _sendBufferZ; _sendBufferZ=NULL;}
-      if (_recvBufferX!=NULL){delete [] _recvBufferX; _recvBufferX=NULL;}
-      if (_recvBufferY!=NULL){delete [] _recvBufferY; _recvBufferY=NULL;}
-      if (_recvBufferZ!=NULL){delete [] _recvBufferZ; _recvBufferZ=NULL;}
-      #endif
     }
 
     /** advances one time step dt in time and triggers vtk plot if required */
@@ -110,7 +99,6 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
         plot();
         collidestream();
         communicate(); // exchange between neighbouring MPI subdomains
-        _time += _dt;
         _counter++;
       }
     }
