@@ -11,12 +11,12 @@
     write-every-macroscopic-timestep="0"
     macroscopic-filename="MacroscopicCell_macro"
   />
-  <particle-insertion type="none" maximum-number-of-iterations="500" maximum-number-of-restarts="500" insert-every-timestep="5" tolerance="0.5" />
+  <particle-insertion type="usher" maximum-number-of-iterations="8000" maximum-number-of-restarts="8000" insert-every-timestep="2" tolerance="0.5" />
   <!--<particle-insertion type="none" />/-->
-  <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="1" innermost-overlap-layer="2"/>
-  <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="yes" mass-flux-south="yes" mass-flux-bottom="yes" mass-flux-top="yes" shift-by-timesteps="0.5"/>
+  <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3"/>
+  <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
   <noise-reduction type="none" time-window-size="5" kmax="1"/>
-  <boundary-force type="zhou-boundary-force" west="no" east="no" north="yes" south="yes" bottom="yes" top="yes" density="0.813037037" temperature="1.1" />
+  <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.813037037" temperature="1.1" />
   <parallel-topology type="xyz" />
 </mamico>
 
