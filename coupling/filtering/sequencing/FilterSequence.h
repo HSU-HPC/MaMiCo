@@ -176,7 +176,7 @@ class coupling::FilterSequence {
 		 * DUMMY HELPER FUNCTIONS
 		 */
 
-		void printFilters() {
+		virtual void printFilters() {
 			std::cout << "Filters in sequence " << _name << ": ";
 			for(auto f : _filters) std::cout << f->getType() << " ";
 			std::cout << std::endl;
