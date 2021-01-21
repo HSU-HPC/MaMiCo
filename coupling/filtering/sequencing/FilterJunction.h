@@ -63,35 +63,35 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 				_cellVector1_parted[p] = (
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
 					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p * totalSize)), 
-					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p+1 * totalSize))
+					(coupling::FilterSequence<dim>::_cellVector1.begin() + ((p+1) * totalSize))
 				);
 
 				//_cellVector2
 				_cellVector2_parted.push_back(
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
 					(coupling::FilterSequence<dim>::_cellVector2.begin() + (p * totalSize)), 
-					(coupling::FilterSequence<dim>::_cellVector2.begin() + (p+1 * totalSize))
+					(coupling::FilterSequence<dim>::_cellVector2.begin() + ((p+1) * totalSize))
 				);
 
 				//_inputDomainCellVector
 				_inputDomainCellVector_parted.push_back(
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
 					(coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + (p * domainSize)), 
-					(coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + (p+1 * domainSize))
+					(coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + ((p+1) * domainSize))
 				);
 
 				//_domaincellVector1
 				_domainCellVector1_parted.push_back(
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
 					(coupling::FilterSequence<dim>::_domainCellVector1.begin() + (p * domainSize)), 
-					(coupling::FilterSequence<dim>::_domainCellVector1.begin() + (p+1 * domainSize))
+					(coupling::FilterSequence<dim>::_domainCellVector1.begin() + ((p+1) * domainSize))
 				);
 
 				//_domainCellVector2
 				_domainCellVector2_parted.push_back(
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
 					(coupling::FilterSequence<dim>::_domainCellVector2.begin() + (p * domainSize)), 
-					(coupling::FilterSequence<dim>::_domainCellVector2.begin() + (p+1 * domainSize))
+					(coupling::FilterSequence<dim>::_domainCellVector2.begin() + ((p+1) * domainSize))
 				);
 			}
 
@@ -126,6 +126,13 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 			if(coupling::FilterSequence<dim>::_filters.empty()) std::cout << coupling::FilterSequence<dim>::PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
 			if(coupling::FilterSequence<dim>::_filters.size() % 2 == 0) return _cellVector1_parted[0];
 			else return _cellVector2_parted[0];
+		}
+
+
+		virtual void printFilters() {
+			std::cout << "Junctors in junction " << coupling::FilterSequence<dim>::_name << ": ";
+			for(auto f : coupling::FilterSequence<dim>::_filters) std::cout << f->getType() << " ";
+			std::cout << std::endl;
 		}
 
 		std::string PRINT_PREFIX() const {
