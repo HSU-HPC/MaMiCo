@@ -36,6 +36,7 @@ class coupling::paralleltopology::XYZTopology: public coupling::paralleltopology
       #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
       unsigned int intNumberProcesses = _numberProcesses[0]; for (unsigned int d = 1 ; d < dim; d++){ intNumberProcesses = intNumberProcesses*_numberProcesses[d]; }
       if ( (rank<_topologyOffset) || (rank>_topologyOffset+intNumberProcesses-1)){
+        // TODO will be thrown on macroOnly services
         std::cout << "Warning coupling::paralleltopology::XYZTopology::getProcessCoordinates(): rank out of range!" << std::endl;
         std::cout << "Offset=" << _topologyOffset << ", rank=" << rank << std::endl;
       }
