@@ -4,9 +4,8 @@
 
 //Member functions of coupling::FilterSequence
 
-//TODO: Change return to what _filters is.
-template<unsigned int dim, std::size_t inputc, std::size_t outputc>
-int coupling::FilterJunction<dim, inputc, outputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){ //in our case "junctionNode" would be more precise
+template<unsigned int dim, std::size_t inputc>
+int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){ //in our case "junctionNode" would be more precise
 	if(!sequenceNode) return EXIT_FAILURE;
 
 	//null if junction is empty
@@ -33,13 +32,28 @@ int coupling::FilterJunction<dim, inputc, outputc>::loadFiltersFromXML(tinyxml2:
         //NLM
         if(std::strcmp(currJunctorNode->Value(), "NLM") == 0) {
 
-			//Parameters
-			int tws;
-			//TODO: make the following customizable via XML.
-			unsigned int inputlp_unfiltered = 0;
-			unsigned int inputlp_prefiltered = 1;
-			unsigned int outputp = 0;
+			//Optional parameters
+			int inputp_unfiltered = 0; //default
+			tarch::configuration::ParseConfiguration::readIntOptional(inputp_unfiltered, currJunctorNode, "input-unfiltered");
+			int inputp_prefiltered = 1; //default
+			tarch::configuration::ParseConfiguration::readIntOptional(inputp_prefiltered, currJunctorNode, "input-filtered");
+			int outputp = 0; //default
+			tarch::configuration::ParseConfiguration::readIntOptional(outputp, currJunctorNode, "output");
+
+			//check for invalid partition indexes
+			for(auto p : { inputp_unfiltered, inputp_prefiltered, outputp }) {
+				if(p < 0) {
+					std::cout << PRINT_PREFIX() << "ERROR: Negative input or output lane index specified in XML:" << p << std::endl;
+					return EXIT_FAILURE;	
+				}
+				if(p >=inputc) {
+					std::cout << PRINT_PREFIX() << "ERROR: Input or output lane index specified in XML (" << p << ") is too large!" << std::endl;
+					return EXIT_FAILURE;	
+				}
+			}
 	
+			//Mandatory parameters
+			int tws;
 			if(currJunctorNode->QueryIntAttribute("time-window-size", &tws)){
 				std::cout << "ERROR: NLM filter misses attribute time-window-size in config file." << std::endl;
 				exit(EXIT_FAILURE);
@@ -52,7 +66,8 @@ int coupling::FilterJunction<dim, inputc, outputc>::loadFiltersFromXML(tinyxml2:
 			//Instanciation
             coupling::FilterSequence<dim>::_filters.push_back(
 				 new coupling::NLM<dim>(
-					inputCellVector[inputlp_prefiltered],
+					//inputCellVector[inputp_unfiltered],
+					inputCellVector[inputp_prefiltered],
 					outputCellVector[outputp], 
 					coupling::FilterSequence<dim>::_localDomainCellIndices,
 					coupling::FilterSequence<dim>::_filteredValues, 
@@ -74,7 +89,7 @@ int coupling::FilterJunction<dim, inputc, outputc>::loadFiltersFromXML(tinyxml2:
 		//Unknown junctor identifier
         else {
 			std::cout << "ERROR: Filter-Pipeline does not recognize junctor called " << currJunctorNode->Value() << std::endl;
-            exit(EXIT_FAILURE);
+            return EXIT_FAILURE;
         }
 
 		currJunctorNode = currJunctorNode->NextSiblingElement();

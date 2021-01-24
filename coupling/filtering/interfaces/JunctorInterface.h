@@ -13,8 +13,12 @@ namespace coupling{
 }
 
 /**
+ * Junctors are a generalization of Filters, in the sense that they can harbour multi in- and/or outputs.
+ * This allows for filters needing multiple sets of input data (e.g. unfiltered/prefiltered) or comparing read-only-filters. //TODO: implement FilterJunctorReadOnly?
+ * Junctors are stored in FilterJunctions, which generalize FilterSequences in a similar way.
+ * You can currently not add Junctors dynamically via FFF.
+ *
  * Implemenents FI. The underlying FI has the junctor's main partition's input/output data. (cf. 30, 55f.)
- * TODO: Further comments.
  *  @Author Felix Maurer
  */
 template<unsigned int dim, std::size_t inputc, std::size_t outputc>
