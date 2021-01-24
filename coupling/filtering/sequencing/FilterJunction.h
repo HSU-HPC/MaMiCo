@@ -15,29 +15,29 @@
 /*
  * WORK IN PROGRESS. USE WITH CAUTION
  *
- * TODO: very big comment
- *
+ * Generalizes the concept of FilterSequences: A FilterJunction can have more than a single input.
+ * The numbers of in- in output must always the equal. You can, however request only a subset of all output partitions.
+ * This allows for seemless integration of FilterJunctions into a net of FilterSequences.
  *
  * TODO: 
  *  - Support multiple outputs. ("X-Junctions")
  *  - Support dynamically linked filters.
- *  - Support custom selection i/o partitions per junctor.
  * @Author Felix Maurer
  */
 
 namespace coupling{
-	template<unsigned int dim, std::size_t inputc, std::size_t outputc>
+	template<unsigned int dim, std::size_t inputc>
     class FilterJunction;
 }
 
-template<unsigned int dim, std::size_t inputc, std::size_t outputc>
+template<unsigned int dim, std::size_t inputc>
 class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 	public:
     	FilterJunction( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
 						const tarch::utils::MultiMDService<dim>& multiMDService,
 						const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector, //concatenation of numberImput input cell vectors
-						std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //dont concat indices! TODO: check this in constructor
+						std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, 
 						tarch::la::Vector<dim, unsigned int> domainStart,
 						tarch::la::Vector<dim, unsigned int> domainEnd,
 						std::array<bool, 7> filteredValues
@@ -45,7 +45,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		coupling::FilterSequence<dim>(indexConversion, multiMDService, name, inputCellVector, cellIndices, domainStart, domainEnd, filteredValues)
 		{	
 			#ifdef DEBUG_FILTER_JUNCTION
-        	std::cout << coupling::FilterSequence<dim>::PRINT_PREFIX() << "This is a FilterJunction. Number of inputs:" << inputc << std::endl;
+        	std::cout << PRINT_PREFIX() << "This is a FilterJunction. Number of inputs:" << inputc << std::endl;
         	#endif
 
 			//Partition input vector
@@ -57,7 +57,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 
 			for( unsigned int p = 0; p < inputc; p++) {
 				//_inputCellVector 
-				//TODO Do i need this?
+				//TODO Do i need to have a partitioned version of this?
 
 				//_cellVector1
 				_cellVector1_parted[p] = (
@@ -110,7 +110,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		){
 			//Do nothing, not yet supported. TODO
 			#ifdef DEBUG_FILTER_JUNCTION
-			std::cout << coupling::FilterSequence<dim>::PRINT_PREFIX() << "This is a FilterJunction. addFilter(...) is not supported and has no effect." << std::endl;
+			std::cout << PRINT_PREFIX() << "This is a FilterJunction. addFilter(...) is not supported and has no effect." << std::endl;
 			#endif
 		}
 
@@ -120,10 +120,18 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
 		/*
-		 * The first partition of _cellVector1/2 is the main partition. A junction's output is always its main partition. TODO: Multiple outputs.
+		 * The first partition of _cellVector1/2 is the main partition. A junction's default output is always its main partition.
 		 */
-    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const{ 
-			if(coupling::FilterSequence<dim>::_filters.empty()) std::cout << coupling::FilterSequence<dim>::PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
+    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const{
+			return getOutputCellVector(0);
+		}	
+    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex) const{ 
+			if(outputIndex >= inputc) {
+				std::cout << PRINT_PREFIX() << "ERROR: getOutputCellVector: Requested output index(" << outputIndex << ") too high. (partitions: )" << inputc << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+			if(coupling::FilterSequence<dim>::_filters.empty()) std::cout << PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
 			if(coupling::FilterSequence<dim>::_filters.size() % 2 == 0) return _cellVector1_parted[0];
 			else return _cellVector2_parted[0];
 		}
@@ -142,7 +150,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 
 	private:
 
-		//TODO: maybe use arrays instead of std::vectors for partitioning?
+		//TODO: maybe use arrays instead of std::vectors for partitioning? FilterJunctors use c-style arrays...
 
 		//Do I ever need instances of this?
 		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _inputCellVector_parted;
