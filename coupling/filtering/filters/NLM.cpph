@@ -13,10 +13,13 @@ void coupling::NLM<dim>::operator()(){
   // Save data
   for(unsigned int i = 0; i < this->_inputCells.size(); ++i){ 
     coupling::filtering::Quantities<dim>& q = _flowfield(this->_cellIndices[i], _t);
-    q[0] = this->_inputCells[i]->getMacroscopicMass();
+    coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(this->_cellIndices[i], _t);
+    q[0] = this->_inputCellVectors[0][i]->getMacroscopicMass();
+    qp[0] = this->_inputCellVectors[1][i]->getMacroscopicMass();
     for (unsigned int d = 0; d < dim; d++){  
-      q[d+1] = this->_inputCells[i]->getMacroscopicMomentum()[d];
-    }     
+      q[d+1] = this->_inputCellVectors[0][i]->getMacroscopicMomentum()[d];
+      qp[d+1] = this->_inputCellVectors[1][i]->getMacroscopicMomentum()[d];
+    } 
   }
  
   // Update patchfield
@@ -24,7 +27,7 @@ void coupling::NLM<dim>::operator()(){
     auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
     if(_cycleCounter > _t) _patchfield.destroy(idx_inner,_t);
     _patchfield.construct(idx_inner, _t,
-      tarch::la::Vector<dim,unsigned int>(2*_d+1), 2*_d+1, _flowfield, 
+      tarch::la::Vector<dim,unsigned int>(2*_d+1), 2*_d+1, _flowfield_prefiltered, 
       idx, _t);
   }
 

@@ -66,9 +66,8 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 			//Instanciation
             coupling::FilterSequence<dim>::_filters.push_back(
 				 new coupling::NLM<dim>(
-					//inputCellVector[inputp_unfiltered],
-					inputCellVector[inputp_prefiltered],
-					outputCellVector[outputp], 
+					inputCellVector,
+					outputCellVector, 
 					coupling::FilterSequence<dim>::_localDomainCellIndices,
 					coupling::FilterSequence<dim>::_filteredValues, 
 					coupling::FilterSequence<dim>::_ic, 
