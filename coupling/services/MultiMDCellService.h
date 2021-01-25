@@ -320,7 +320,7 @@ class coupling::services::MultiMDCellService {
     ) {
       #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
         if(_macroscopicCellServices[index] == nullptr) {
-          std::cout << "Rank " _multiMDService.getGlobalRank() << ": _macroscopicCellService at " << index << " == NULL" << std::endl;
+          std::cout << "Rank " << _multiMDService.getGlobalRank() << ": _macroscopicCellService at " << index << " == NULL" << std::endl;
         }
       #endif
 

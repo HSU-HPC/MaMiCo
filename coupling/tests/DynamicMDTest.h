@@ -81,10 +81,8 @@ private:
 
   void varyMD(int cycle) {
     if(_varyMDStyle == REMOVAL) {
-      if(cycle == 100) {
-        for(unsigned int i=127;i>27;--i) {
-          _multiMDMediator->shutdownCommunicator(i);
-        }
+      if(cycle >= 100 && cycle % 10 == 0) {
+        _multiMDMediator->rmMDSimulation();
       }
     } else if(_varyMDStyle == INSERTION) {
       if(cycle == 100) {
