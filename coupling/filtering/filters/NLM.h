@@ -23,8 +23,9 @@ namespace coupling {
 template<unsigned int dim>
 class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
   public:
-    NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector[2],
-        const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector[1],
+    NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_unfiltered,
+		const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_prefiltered,
+        const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector,
         const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
         const std::array<bool, 7> filteredValues, 
         const coupling::IndexConversionMD2Macro<dim>* indexConversion,
@@ -32,7 +33,12 @@ class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
         int M = 2,
         int d = 1
         ):
-    coupling::JunctorInterface<dim,2,1>(inputCellVector, outputCellVector, cellIndices, filteredValues, "NLM"),
+    coupling::JunctorInterface<dim,2,1>( 
+			{ inputCellVector_unfiltered, inputCellVector_prefiltered },
+		   	{ outputCellVector }, 
+			cellIndices, 
+			filteredValues,
+		   	"NLM"),
     _timeWindowSize(tws),
     _M(M),
     _d(d),

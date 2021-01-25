@@ -1,4 +1,4 @@
-// This file is part of the Mamico project. For conditions of distribution
+// This file is part of the Mamico proJunctionn conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamic::o
 
@@ -11,8 +11,8 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 	//null if junction is empty
     tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
 	
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector[inputc] = _inputDomainCellVector_parted;
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector[inputc] = _domainCellVector2_parted;
+	std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> inputCellVector = _inputDomainCellVector_parted;
+	std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc>  outputCellVector = _domainCellVector2_parted;
 	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << PRINT_PREFIX() << "Initializing junctor objects." << std::endl;
 	#endif	
@@ -46,7 +46,7 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 					std::cout << PRINT_PREFIX() << "ERROR: Negative input or output lane index specified in XML:" << p << std::endl;
 					return EXIT_FAILURE;	
 				}
-				if(p >=inputc) {
+				if(p >= (int) inputc) {
 					std::cout << PRINT_PREFIX() << "ERROR: Input or output lane index specified in XML (" << p << ") is too large!" << std::endl;
 					return EXIT_FAILURE;	
 				}
@@ -64,17 +64,16 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 			}
 
 			//Instanciation
-            coupling::FilterSequence<dim>::_filters.push_back(
-				 new coupling::NLM<dim>(
-					inputCellVector,
-					outputCellVector, 
+			newjunctor = new coupling::NLM<dim>(
+					inputCellVector[inputp_unfiltered],
+					inputCellVector[inputp_prefiltered],
+					outputCellVector[outputp], 
 					coupling::FilterSequence<dim>::_localDomainCellIndices,
 					coupling::FilterSequence<dim>::_filteredValues, 
 					coupling::FilterSequence<dim>::_ic, 
-					tws)
-			);
+					tws);
 
-
+			//TODO: generalize this for arbitrary junctors?
 			//Swapping for output partition
 			if(firstIteration[outputp]){
 				inputCellVector[outputp] = _domainCellVector1_parted[outputp];
@@ -87,10 +86,11 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 
 		//Unknown junctor identifier
         else {
-			std::cout << "ERROR: Filter-Pipeline does not recognize junctor called " << currJunctorNode->Value() << std::endl;
+			std::cout << "ERROR: Filter-Junction does not recognize junctor called " << currJunctorNode->Value() << std::endl;
             return EXIT_FAILURE;
         }
 
+        coupling::FilterSequence<dim>::_filters.push_back(newjunctor);
 		currJunctorNode = currJunctorNode->NextSiblingElement();
 	}
 
