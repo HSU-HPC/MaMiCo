@@ -44,6 +44,7 @@ coupling::MultiMDMediator<LinkedCell, dim>
   if(getNumberOfActiveMDSimulations(communicator) == _listActiveMDSimulations[communicator].size()) { 
     #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
     if(_multiMDService.getGlobalRank() == 0) std::cout << "No free simulation slots. Adding new Block..." << std::endl;
+    #endif
     addMDSimulationBlock(); 
   }
 
