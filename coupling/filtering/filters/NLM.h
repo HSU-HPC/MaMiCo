@@ -5,7 +5,7 @@
 
 #define NLM_DEBUG
 
-#include "coupling/filtering/interfaces/FilterInterface.h"
+#include "coupling/filtering/interfaces/JunctorInterface.h"
 #include "coupling/filtering/filters/Datastructures.h"
 
 namespace coupling {
@@ -21,10 +21,10 @@ namespace coupling {
  * 
  */
 template<unsigned int dim>
-class coupling::NLM : public coupling::FilterInterface<dim> {
+class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
   public:
-    NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
-        const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
+    NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector[2],
+        const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector[1],
         const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
         const std::array<bool, 7> filteredValues, 
         const coupling::IndexConversionMD2Macro<dim>* indexConversion,
@@ -32,7 +32,7 @@ class coupling::NLM : public coupling::FilterInterface<dim> {
         int M = 2,
         int d = 1
         ):
-    coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "NLM"),
+    coupling::JunctorInterface<dim,2,1>(inputCellVector, outputCellVector, cellIndices, filteredValues, "NLM"),
     _timeWindowSize(tws),
     _M(M),
     _d(d),
@@ -40,6 +40,7 @@ class coupling::NLM : public coupling::FilterInterface<dim> {
     _t(0),
     _ic(indexConversion),
     _flowfield(_ic->getLocalMD2MacroDomainSize(), tws),
+    _flowfield_prefiltered(_ic->getLocalMD2MacroDomainSize(), tws),
     _patchfield(_ic->getLocalMD2MacroDomainSize() - tarch::la::Vector<dim,unsigned int>(2), tws),
     _innerCellIndices()
     {
@@ -49,6 +50,9 @@ class coupling::NLM : public coupling::FilterInterface<dim> {
           coupling::filtering::Quantities<dim>& q = _flowfield(idx, t);
           q[0] = 1;
           for(unsigned int d = 1; d <= dim; ++d) q[d] = 0;
+          coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(idx, t);
+          qp[0] = 1;
+          for(unsigned int d = 1; d <= dim; ++d) qp[d] = 0;
         }
 
       // Initialize innerCellIndices
@@ -83,6 +87,7 @@ class coupling::NLM : public coupling::FilterInterface<dim> {
     unsigned int _t; // active temporal index, iterates cyclic between zero and _timeWindowSize
     const coupling::IndexConversionMD2Macro<dim>* _ic;
     coupling::filtering::Flowfield<dim> _flowfield;
+    coupling::filtering::Flowfield<dim> _flowfield_prefiltered;
     coupling::filtering::Patchfield<dim> _patchfield;
     std::vector<tarch::la::Vector<dim, unsigned int>> _innerCellIndices;
 };

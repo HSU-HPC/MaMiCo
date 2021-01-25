@@ -83,7 +83,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             newfilter = new coupling::POD<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, _multiMDService, tws, kmax);
         }
 
-        //NLM
+        /*//NLM
         else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
 			int tws;
 			if(currFilterNode->QueryIntAttribute("time-window-size", &tws)){
@@ -96,7 +96,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			}
 
             newfilter = new coupling::NLM<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, _ic, tws);
-        }
+        }*/
 
 		//Strouhal
 		else if(std::strcmp(currFilterNode->Value(), "strouhal") == 0) {

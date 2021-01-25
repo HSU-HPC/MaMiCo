@@ -107,7 +107,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 				const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
 				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
 				int filterIndex = -1
-		){
+		) override {
 			//Do nothing, not yet supported. TODO
 			#ifdef DEBUG_FILTER_JUNCTION
 			std::cout << PRINT_PREFIX() << "This is a FilterJunction. addFilter(...) is not supported and has no effect." << std::endl;
@@ -117,15 +117,15 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		/*
 		 * This function is very similar to the interface's. Check coupling::FilterSequence for more details.
 		 */
-		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
+		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) override;
 
 		/*
 		 * The first partition of _cellVector1/2 is the main partition. A junction's default output is always its main partition.
 		 */
-    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const{
+    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const override {
 			return getOutputCellVector(0);
 		}	
-    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex) const{ 
+    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex) const override{ 
 			if(outputIndex >= inputc) {
 				std::cout << PRINT_PREFIX() << "ERROR: getOutputCellVector: Requested output index(" << outputIndex << ") too high. (partitions: )" << inputc << std::endl;
 				exit(EXIT_FAILURE);
@@ -137,13 +137,13 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		}
 
 
-		virtual void printFilters() {
+		void printFilters() override {
 			std::cout << "Junctors in junction " << coupling::FilterSequence<dim>::_name << ": ";
 			for(auto f : coupling::FilterSequence<dim>::_filters) std::cout << f->getType() << " ";
 			std::cout << std::endl;
 		}
 
-		std::string PRINT_PREFIX() const {
+		std::string PRINT_PREFIX() const override {
 			return std::string("	FJ(").std::string::append(coupling::FilterInterface<dim>::_name).std::string::append("): ");
 		}
 
