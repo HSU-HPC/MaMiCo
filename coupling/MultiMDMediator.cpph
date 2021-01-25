@@ -41,11 +41,19 @@ coupling::MultiMDMediator<LinkedCell, dim>
     std::exit(EXIT_FAILURE);
   }
   // May have to add another block if communicator is full
-  if(getNumberOfActiveMDSimulations(communicator) == _listActiveMDSimulations[communicator].size()) { addMDSimulationBlock(); }
+  if(getNumberOfActiveMDSimulations(communicator) == _listActiveMDSimulations[communicator].size()) { 
+    #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+    if(_multiMDService.getGlobalRank() == 0) std::cout << "No free simulation slots. Adding new Block..." << std::endl;
+    addMDSimulationBlock(); 
+  }
 
   try {
     unsigned int index = findInactiveLocalIndex(communicator);
     unsigned int slot = communicator * _multiMDService.getAvgNumberOfMDSimulations() + index;
+    #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+    if(_multiMDService.getGlobalRank() == 0) std::cout << "Adding MD Simulation to comm " << communicator 
+                                                       << ", index " << index << " (slot " << slot << ")" << std::endl;
+    #endif
     _multiMDCellService.addMDSimulation(_instanceHandling, _macroscopicSolverInterface, slot);
     _listActiveMDSimulations[communicator][index] = true;
     if(_multiMDService.getGlobalRank() == 0) std::cout << "Added simulation on comm " << communicator << ", index " << index << std::endl;
@@ -140,6 +148,10 @@ coupling::MultiMDMediator<LinkedCell, dim>
 
   unsigned int slot = communicator * _multiMDService.getAvgNumberOfMDSimulations() + localIndex;
 
+  #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+  if(_multiMDService.getGlobalRank() == 0) std::cout << "Removing from comm " << communicator 
+                                                       << ", index " << localIndex << " (slot " << slot << ")" << std::endl;
+  #endif
   if (slot >= _multiMDService.getTotalNumberOfMDSimulations()) {
     std::cout << "WARNING MultiMDMediator::rmMDSimulation(unsigned int, unsigned int) : Invalid md slot " << slot << std::endl;
     return;
