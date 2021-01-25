@@ -316,7 +316,13 @@ class coupling::services::MultiMDCellService {
      *  
      */
     unsigned int rmMDSimulation(coupling::InstanceHandling<LinkedCell, dim>& instanceHandling,
-                                const unsigned int & index) {
+                                const unsigned int & index
+    ) {
+      #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+        if(_macroscopicCellServices[index] == nullptr) {
+          std::cout << "Rank " _multiMDService.getGlobalRank() << ": _macroscopicCellService at " << index << " == NULL" << std::endl;
+        }
+      #endif
 
       delete _macroscopicCellServices[index];
       _macroscopicCellServices[index] = nullptr;
@@ -324,6 +330,9 @@ class coupling::services::MultiMDCellService {
       
       if(index >= _blockOffset && index < _blockOffset + _localNumberMDSimulations) {
         unsigned int iSim = index - _blockOffset;
+        #if (COUPLING_MD_DEBUG==COUPLING_MD_YES) 
+          if(_multiMDService.getGlobalRank() == 0) std::cout << "MultiMDCellService: removing instance " << iSim << "..." <<std::endl; 
+        #endif
         instanceHandling.rmMDSimulation(iSim);
       }
 
@@ -414,33 +423,6 @@ class coupling::services::MultiMDCellService {
 
     }
 
-    /** Find and reserve the next available slot
-     *  in a round robin fashion.
-     */
-    unsigned int reserveNextSlot() {
-      if(_nextFreeBlock == _multiMDService.getNumberLocalComms()-1) {
-        /** If the last communicator gets a new simulation slot,
-         *  we first have to add a new block of simulations.
-         *  That is, each communicator is appended another slot to hold
-         *  a simulation.
-         * */
-        addSimulationBlock();
-      }
-      
-      unsigned int thisFreeBlock = _nextFreeBlock;
-      if(_nextFreeBlock == 0) {
-        /** If a simulation slot is reserved on communicator 0,
-         *  then we start again at the last one.
-         *  The next time a slot is being reserved, we first
-         *  have to add a new block of free slots (see condition above)
-         *  */
-        _nextFreeBlock = _multiMDService.getNumberLocalComms()-1;
-      } else {
-        _nextFreeBlock -= 1;
-      }
-      return thisFreeBlock * _localNumberMDSimulations + _localNumberMDSimulations -1;
-    }
-
 
      /** Adds MacroscopicCellService at appropriate slot
       *  @return true if this process needs another md simulation initialized
@@ -451,6 +433,10 @@ class coupling::services::MultiMDCellService {
                                   const unsigned int & slot) 
     {
 
+      if(slot >= _totalNumberMDSimulations) {
+        std::cout << "ERROR coupling::services::MultiMDCellService::addMDSimulation(): Invalid slot " << slot << "!" << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
       if(_macroscopicCellServices[slot] != nullptr) {
         std::cout << "ERROR! coupling::services::MultiMDCellService::addMDSimulation(): Simulation at " << slot << " already exists!" << std::endl;
         std::exit(EXIT_FAILURE);
@@ -507,7 +493,8 @@ class coupling::services::MultiMDCellService {
     const coupling::IndexConversion<dim> & getIndexConversion() const { return _macroscopicCellServices[0]->getIndexConversion(); }
 
     void finishCycle(const unsigned int & cycle, coupling::InstanceHandling<LinkedCell, dim> & instanceHandling) {
-      for(unsigned int i=0;i<_warmupPhase.size();++i) {
+      //TODO this should be move to somewhere else (MDMediator?)
+      for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
         if(_warmupPhase[i] > 0) {
           _warmupPhase[i] -= 1;
           if(_warmupPhase[i] == 0 && i >= _blockOffset && i < _blockOffset+_localNumberMDSimulations) {
@@ -515,7 +502,6 @@ class coupling::services::MultiMDCellService {
           }
         }
       }
-      //TODO switchon coupling!!  
       writeCheckpoint(cycle, instanceHandling);
       //TODO call directly instanceHandling.writeCheckpoint();
     }
