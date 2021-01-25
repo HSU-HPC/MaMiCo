@@ -23,8 +23,8 @@ namespace coupling {
 template<unsigned int dim>
 class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
   public:
-    NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector[2],
-        const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector[1],
+    NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector[2],
+        const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector[1],
         const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
         const std::array<bool, 7> filteredValues, 
         const coupling::IndexConversionMD2Macro<dim>* indexConversion,
