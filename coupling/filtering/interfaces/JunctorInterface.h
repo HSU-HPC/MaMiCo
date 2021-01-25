@@ -25,8 +25,8 @@ template<unsigned int dim, std::size_t inputc, std::size_t outputc>
 class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 	public:
 		JunctorInterface(
-				const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVectors[inputc],
-				const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVectors[outputc],
+				const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> inputCellVectors,
+				const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, outputc> outputCellVectors,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 				const std::array<bool, 7> filteredValues,
 				const char* type):
@@ -66,6 +66,6 @@ class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 		 * Unlike regular filters, junctors allow for multiple input- and output-sets
 		 */
 		//TODO: is it a good idea for this to be a c-style array? cf. updateCellData. perhaps std::array instead?
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVectors[inputc]; 	
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCellVectors[outputc];
+		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _inputCellVectors; 	
+		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, outputc> _outputCellVectors;
 };

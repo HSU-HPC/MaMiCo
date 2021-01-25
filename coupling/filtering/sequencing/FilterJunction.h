@@ -60,39 +60,38 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 				//TODO Do i need to have a partitioned version of this?
 
 				//_cellVector1
-				_cellVector1_parted[p] = (
+				_cellVector1_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p * totalSize)), 
-					(coupling::FilterSequence<dim>::_cellVector1.begin() + ((p+1) * totalSize))
-				);
+					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p * totalSize), 
+					coupling::FilterSequence<dim>::_cellVector1.begin() + ((p+1) * totalSize));
 
 				//_cellVector2
-				_cellVector2_parted.push_back(
+				_cellVector2_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_cellVector2.begin() + (p * totalSize)), 
-					(coupling::FilterSequence<dim>::_cellVector2.begin() + ((p+1) * totalSize))
-				);
+					(coupling::FilterSequence<dim>::_cellVector2.begin() + (p * totalSize), 
+					coupling::FilterSequence<dim>::_cellVector2.begin() + ((p+1) * totalSize));
+
 
 				//_inputDomainCellVector
-				_inputDomainCellVector_parted.push_back(
+				_inputDomainCellVector_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + (p * domainSize)), 
-					(coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + ((p+1) * domainSize))
-				);
+					(coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + (p * domainSize), 
+					coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + ((p+1) * domainSize));
+
 
 				//_domaincellVector1
-				_domainCellVector1_parted.push_back(
+				_domainCellVector1_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_domainCellVector1.begin() + (p * domainSize)), 
-					(coupling::FilterSequence<dim>::_domainCellVector1.begin() + ((p+1) * domainSize))
-				);
+					(coupling::FilterSequence<dim>::_domainCellVector1.begin() + (p * domainSize), 
+					coupling::FilterSequence<dim>::_domainCellVector1.begin() + ((p+1) * domainSize));
+
 
 				//_domainCellVector2
-				_domainCellVector2_parted.push_back(
+				_domainCellVector2_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_domainCellVector2.begin() + (p * domainSize)), 
-					(coupling::FilterSequence<dim>::_domainCellVector2.begin() + ((p+1) * domainSize))
-				);
+					(coupling::FilterSequence<dim>::_domainCellVector2.begin() + (p * domainSize), 
+					coupling::FilterSequence<dim>::_domainCellVector2.begin() + ((p+1) * domainSize));
+
 			}
 
 			coupling::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported. TODO
@@ -122,10 +121,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		/*
 		 * The first partition of _cellVector1/2 is the main partition. A junction's default output is always its main partition.
 		 */
-    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector() const override {
-			return getOutputCellVector(0);
-		}	
-    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex) const override{ 
+    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex = 0) const override{ 
 			if(outputIndex >= inputc) {
 				std::cout << PRINT_PREFIX() << "ERROR: getOutputCellVector: Requested output index(" << outputIndex << ") too high. (partitions: )" << inputc << std::endl;
 				exit(EXIT_FAILURE);
@@ -144,24 +140,21 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		}
 
 		std::string PRINT_PREFIX() const override {
-			return std::string("	FJ(").std::string::append(coupling::FilterInterface<dim>::_name).std::string::append("): ");
+			return std::string("	FJ(").std::string::append(coupling::FilterSequence<dim>::_name).std::string::append("): ");
 		}
 
 
 	private:
-
-		//TODO: maybe use arrays instead of std::vectors for partitioning? FilterJunctors use c-style arrays...
-
-		//Do I ever need instances of this?
-		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _inputCellVector_parted;
+		//Do I ever need instances of this? (currently not initialized)
+		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _inputCellVector_parted;
 		//These must be parted for junction output.
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1_parted[inputc];
-		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _cellVector2_parted;
+		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _cellVector1_parted;
+		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _cellVector2_parted;
 
 		//Partitions are given to junctors. Goal: Arbitrary number of input/output partitions.
-		std::vector</*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _inputDomainCellVector_parted;
-		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _domainCellVector1_parted;
-		std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>* >> _domainCellVector2_parted;
+		std::array</*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _inputDomainCellVector_parted;
+		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _domainCellVector1_parted;
+		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _domainCellVector2_parted;
 };
 
 //inlcude implementation
