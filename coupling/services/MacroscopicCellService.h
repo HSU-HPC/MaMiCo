@@ -5,6 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SERVICES_MACROSCOPICCELLSERVICE_H_
 #define _MOLECULARDYNAMICS_COUPLING_SERVICES_MACROSCOPICCELLSERVICE_H_
 
+#pragma once
 
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
@@ -27,6 +28,7 @@
 #include "coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h"
 #include "tarch/utils/MultiMDService.h"
 
+#include "coupling/filtering/FilterPipeline.h"
 
 namespace coupling {
   namespace services {
@@ -71,7 +73,6 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
-
     unsigned int getID() const { return _id;}
 
   protected:
@@ -119,6 +120,7 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells and respective plotting
+	  const char* filterPipelineConfiguration,
       const tarch::utils::MultiMDService<dim>& multiMDService,
       unsigned int topologyOffset, int tws = 0
     );
@@ -137,6 +139,7 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,  // configuration for macroscopic cells and respective plotting
+	  const char* filterPipelineConfiguration,
       const tarch::utils::MultiMDService<dim>& multiMDService
     ): MacroscopicCellServiceImpl<LinkedCell,dim>(ID,mdSolverInterface,macroscopicSolverInterface,numberProcesses,rank,
        particleInsertionConfiguration,momentumInsertionConfiguration,boundaryForceConfiguration,transferStrategyConfiguration,noiseReductionConfiguration,
@@ -209,6 +212,12 @@ public coupling::services::MacroscopicCellService<dim> {
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
 
+	/** returns all macroscopic cells located within MD domain boundaries. */
+	//TODO: REMOVE std::vector<coupling::datastructures::MacroscopicCell<dim> *> getInnerMacroscopicCells() {return _innerMacroscopicCells;}
+
+	/** returns those cells' index vectors */
+	//TODO: REMOVE std::vector<tarch::la::Vector<dim, unsigned int>> getInnerMacroscopicCellIndices() {return _innerMacroscopicCellIndices;}
+
   private:
     /** initialises the IndexConversion object at start up. This is the very first thing to be done in the
      *  constructor since nearly all subsequent operations depend on indexing of cells.
@@ -222,10 +231,16 @@ public coupling::services::MacroscopicCellService<dim> {
     /** initialises the index structures for USHER scheme */
     void initIndexVectors4Usher( tarch::la::Vector<dim,unsigned int> numberLinkedCellsPerMacroscopicCell );
 
+	/**
+	 * initializes _innerMacroscopicCells and _innerMacroscopicCellIndices
+	 */
+	//TODO: REMOVE void initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells);
+
     /** returns the position (in space) of the lower,left corner if the first local ghost cell. Needed
      *  in distributeMass().
      */
     tarch::la::Vector<dim,double> getPositionOfFirstLocalGhostCell() const;
+
 
 
     /** needed to determine cell range, ranks etc. */
@@ -247,6 +262,9 @@ public coupling::services::MacroscopicCellService<dim> {
 
     /** storage for macroscopic cells in coupling tool */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim> _macroscopicCells;
+
+    /** filter pipeline, used to apply filters in sendFromMD2Macro */
+    coupling::FilterPipeline<dim> _filterPipeline;
 
     /** needed for insertion of momentum */
     coupling::MomentumInsertion<LinkedCell,dim>* _momentumInsertion;
@@ -273,6 +291,10 @@ public coupling::services::MacroscopicCellService<dim> {
     const unsigned int _writeEveryMicroscopicTimestep;
     const std::string _macroscopicFilename;
     const unsigned int _writeEveryMacroscopicTimestep;
+
+	//Inner cells managed by std::vectors. Indexing starts at the bottom left inner cell.
+	//TODO: REMOVE std::vector<coupling::datastructures::MacroscopicCell<dim> *> _innerMacroscopicCells;
+	//TODO: REMOVE std::vector<tarch::la::Vector<dim, unsigned int>> _innerMacroscopicCellIndices;
 
     /** index vectors for block-usher scheme -----------------------------------------------------*/
     // start and end coordinate for block loop over macroscopic cells (with 3 entries always!)

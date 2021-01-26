@@ -14,6 +14,7 @@
 #include "coupling/solvers/FoamClass.h"
 #include "coupling/solvers/FiniteDifferenceSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
+#include "coupling/solvers/FoamSolverInterface.h"
 #include "coupling/solvers/LBCouetteSolverInterface.h"
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
@@ -69,7 +70,9 @@ private:
     advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
-    //if(_rank==0) {std::cout << "Finish coupling cycle " << cycle << std::endl;}
+    // if(_rank==0 && cycle%20==0) {
+      // std::cout << "Finish coupling cycle " << cycle << std::endl;
+    // }
   }
 
   void initMPI(){
@@ -89,10 +92,9 @@ private:
   }
 
   void parseConfigurations(){
-    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("couette_simplemd.xml","molecular-dynamics",_simpleMDConfig);
+    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("couette.xml","molecular-dynamics",_simpleMDConfig);
     if (!_simpleMDConfig.isValid()){std::cout << "ERROR CouetteTest: Invalid SimpleMD config!" << std::endl; exit(EXIT_FAILURE);}
-
-    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("couette_mamico.xml","mamico",_mamicoConfig);
+    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("couette.xml","mamico",_mamicoConfig);
     if (!_mamicoConfig.isValid()){ std::cout << "ERROR CouetteTest: Invalid MaMiCo config!" << std::endl; exit(EXIT_FAILURE); }
 
     parseCouetteTestConfiguration();
@@ -107,9 +109,24 @@ private:
       std::cout << "Could not read input file couette.xml: missing element <couette-test>" << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n2 = node->NextSiblingElement();
-    if(n2 != NULL){
-      std::cout << "Could not read input file couette.xml: unknown element " << n2->Name() << std::endl;
+    tinyxml2::XMLElement *n_mamico = node->NextSiblingElement();
+    if(n_mamico == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_md = n_mamico->NextSiblingElement();
+    if(n_md == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <molecular-dynamics>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_fp = n_md->NextSiblingElement();
+    if(n_fp == NULL){
+      std::cout << "Could not read input file couette.xml: missing element <filter-pipeline>" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+	tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
+    if(n_unexpected == NULL){
+      std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -189,6 +206,10 @@ private:
     else if(type == "foam"){
       _cfg.maSolverType = COUETTE_FOAM;
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep,subtag,"plot-every-timestep");
+      tarch::configuration::ParseConfiguration::readStringMandatory(_foam.directory,subtag,"foam-setup-directory");
+      tarch::configuration::ParseConfiguration::readStringMandatory(_foam.folder,subtag,"foam-setup-folder");
+      tarch::configuration::ParseConfiguration::readVector<12,unsigned int>(_foam.boundariesWithMD,subtag,"boundaries-with-MD");
+
     }
     else if(type == "analytical"){
       _cfg.maSolverType = COUETTE_ANALYTICAL;
@@ -303,7 +324,7 @@ private:
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
         _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-        _mamicoConfig.getMacroscopicCellConfiguration(), *_multiMDService, _tws
+        _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService, _tws
       );
     }
     else{
@@ -312,7 +333,7 @@ private:
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
         _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-        _mamicoConfig.getMacroscopicCellConfiguration(), *_multiMDService
+        _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }
 
@@ -415,6 +436,7 @@ private:
         gettimeofday(&_tv.end,NULL);
         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
       }
+
       // send back data from MD instances and merge it
       if(_cfg.md2Macro){
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
@@ -780,7 +802,7 @@ private:
       }
     }
     else if(_cfg.maSolverType == COUETTE_FOAM){
-      solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep);
+      solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD);
       if (solver==NULL){
         std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -815,7 +837,7 @@ private:
     tarch::la::Vector<3,unsigned int> globalNumberMacroscopicCells,unsigned int outerRegion
   ){
     coupling::interface::MacroscopicSolverInterface<3>* interface = NULL;
-    if (_cfg.maSolverType == COUETTE_ANALYTICAL || _cfg.maSolverType == COUETTE_FOAM){
+    if (_cfg.maSolverType == COUETTE_ANALYTICAL){
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells,outerRegion);
     } else if (_cfg.maSolverType == COUETTE_LB){
       coupling::solvers::LBCouetteSolver *lbSolver = static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver);
@@ -831,6 +853,9 @@ private:
         }
       }
       interface = new coupling::solvers::LBCouetteSolverInterface(lbSolver->getAvgNumberLBCells(),lbSolver->getNumberProcesses(),offsetMDDomain,globalNumberMacroscopicCells,outerRegion);
+    }
+    if (_cfg.maSolverType == COUETTE_FOAM){
+      interface = new coupling::solvers::FoamSolverInterface<3>(globalNumberMacroscopicCells,outerRegion);
     }
     else if (_cfg.maSolverType == COUETTE_FD){
       coupling::solvers::FiniteDifferenceSolver *fdSolver = static_cast<coupling::solvers::FiniteDifferenceSolver*>(couetteSolver);
@@ -896,6 +921,12 @@ private:
     double filter;
   };
 
+  struct FoamConfig{
+    std::string directory;
+    std::string folder;
+    tarch::la::Vector<12,unsigned int> boundariesWithMD;
+  };
+
   int _rank, _tws;
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
@@ -912,20 +943,6 @@ private:
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
   TimingValues _tv;
+  FoamConfig _foam;
 };
 #endif // _COUPLING_TESTS_COUETTETEST_H_
-
-/*
-
- - mehr Kommentare
- - in cpp auslagern
- - final testen
-
- - NLM impl
- - supermuc-ng scalierungstest
- - send receive rework
- ok hsu in paper
-
-
-
-*/
