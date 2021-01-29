@@ -111,7 +111,7 @@ public tarch::configuration::Configuration {
 
     /** getters */
     const MomentumInsertionType& getMomentumInsertionType() const {return _insertionType;}
-    const unsigned int getInnerOverlap() const {return _innerOverlap;}
+    unsigned int getInnerOverlap() const {return _innerOverlap;}
 
     template<class LinkedCell,unsigned int dim>
     MomentumInsertion<LinkedCell,dim>* interpreteConfiguration(
