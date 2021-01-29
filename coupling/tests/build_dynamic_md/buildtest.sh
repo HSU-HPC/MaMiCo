@@ -1,5 +1,6 @@
 #!/bin/bash
 
+<<<<<<< HEAD
 source personal_settings
 <<<<<<< HEAD
 
@@ -8,10 +9,13 @@ LAMMPS_PATH=/home/niklas/Dokumente/Git/lammps
 LIB_LAMMPS=lammps_openmpi_mamico
 =======
 >>>>>>> 97b30dc6a30c0c23d7e54e923dae5c3d1a081742
+=======
+source ../../../personal_settings
+>>>>>>> cc593031d9e61e9f9c73382b67ec09ab01421414
 
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
-SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
+SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/debug/dim3/parallel_yes/gcc/gprof_no/
 ### name of lib for SIMPLE_MD
 LIBSIMPLEMD=simplemd
 
@@ -42,8 +46,7 @@ includes="-I${MAMICO_PATH}"
 
 ### specify flags, includes, libraries,compiler for parallel build
 # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O0 -g3"
-# -DMDCoupledDebug"
+FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O0 -g3 -DMDCoupledDebug"
 includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
 libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
 compiler="mpicxx"
@@ -52,7 +55,7 @@ compiler="mpicxx"
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH} || exit
-scons target=libsimplemd dim=3 build=release parallel=yes compiler=gcc machine=hww-cluster -j4
+scons target=libsimplemd dim=3 build=debug parallel=yes compiler=gcc machine=hww-cluster -j4
 libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
 FLAGS="${FLAGS} -DMDParallel"
 

@@ -81,17 +81,15 @@ private:
 
   void varyMD(int cycle) {
     if(_varyMDStyle == REMOVAL) {
-      if(cycle == 100) {
-        for(unsigned int i=127;i>27;--i) {
-          _multiMDMediator->shutdownCommunicator(i);
-        }
+      if(cycle >= 100 && cycle % 10 == 0) {
+        _multiMDMediator->rmMDSimulation();
       }
     } else if(_varyMDStyle == INSERTION) {
       if(cycle == 100) {
         _multiMDMediator->addNMDSimulations(100);
       }
     } else if(_varyMDStyle == RANDOM) {
-      if(cycle < 100 || cycle % 10 != 0) return;
+      if(cycle < 1 || cycle % 1 != 0) return;
       //else:
       int target;
       if(_rank == 0) {
@@ -100,10 +98,18 @@ private:
       MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
       std::cout << "Trying to add " << target << " simulations.." << std::endl;
       if(target < 0) {
+        MPI_Barrier(MPI_COMM_WORLD);
+        std::cout << "Rank " << _multiMDService->getGlobalRank() << ": start removal" << std::endl;
         _multiMDMediator->rmNMDSimulations(-target);
+        std::cout << "Rank " << _multiMDService->getGlobalRank() << ": end removal" << std::endl;
+        MPI_Barrier(MPI_COMM_WORLD);
       }
       else if(target > 0) {
+        MPI_Barrier(MPI_COMM_WORLD);
+        std::cout << "Rank " << _multiMDService->getGlobalRank() << ": start insertion" << std::endl;
         _multiMDMediator->addNMDSimulations(target);
+        std::cout << "Rank " << _multiMDService->getGlobalRank() << ": end insertion" << std::endl;
+        MPI_Barrier(MPI_COMM_WORLD);
       }
     }
   }
@@ -438,6 +444,7 @@ private:
     if (_couetteSolver != NULL){delete _couetteSolver; _couetteSolver=NULL;}
     if(_multiMDCellService != NULL){delete _multiMDCellService; _multiMDCellService=NULL;}
     if(_noiseReduction != NULL){delete _noiseReduction; _noiseReduction=NULL;}
+    if(_multiMDMediator != nullptr){delete _multiMDMediator; _multiMDMediator=nullptr;}
 
     std::cout << "Finish CouetteTest::shutdown() " << std::endl;
   }
