@@ -101,4 +101,32 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 	return 0;
 }
 
+//Disclaimer: All uses of "this->" in this function reference members of FilterSequence.
+template<unsigned int dim, std::size_t inputc>
+void coupling::FilterJunction<dim, inputc>::initDomain(){
+	#ifdef DEBUG_FILTER_PIPELINE
+    std::cout << PRINT_PREFIX() << "Initializing partitioned domains." << std::endl;
+    #endif
+
+	//sanity check
+	if(_inputCellVector_parted[0].size() != this->_cellIndices.size()) { //assumes _inputCellVector.size > 0, which is checked in constrcutor.
+		//TODO: exception
+		std::cout << "ERROR: FilterJunction: initDomain(): Mismatching partition sizes." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+    bool outOfBounds;
+	for(unsigned int p = 0; p < inputc; p++) {
+		for(unsigned int index = 0; index < _inputCellVector_parted[p].size(); index++){
+			outOfBounds = false;
+			for(unsigned int d = 0; d < dim; d++) 
+				if(this->_cellIndices[index][d] < this->_domainStart[d] || this->_cellIndices[index][d] > this->_domainEnd[d]) outOfBounds = true;
+			if(!outOfBounds){
+				_inputDomainCellVector_parted[p].push_back(_inputCellVector_parted[p][index]);
+				_domainCellVector1_parted[p].push_back(_cellVector1_parted[p][index]);
+				_domainCellVector2_parted[p].push_back(_cellVector2_parted[p][index]);
+			}
+		}
+	}
+}
 

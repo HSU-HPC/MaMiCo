@@ -159,8 +159,9 @@ class KVSTest():
             #TODO: get size parameter right
             return median_filter(data, size = (3,3,3,1))
 
-        mcs = self.multiMDCellService.getMacroscopicCellService(0)
-        mcs.addFilterToSequence(filter_sequence="gaussseq", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
+        #TODO: FM: fix segfault
+        #mcs = self.multiMDCellService.getMacroscopicCellService(0)
+        #mcs.addFilterToSequence(filter_sequence="gaussseq", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
@@ -251,9 +252,9 @@ class KVSTest():
             for dir in range(2):
                 self.velLB[cycle, dir] = self.macroscopicSolver.scen.velocity[
 					#TODO: exact cell index in md2macro
-                    mdpos[0],
-                    mdpos[1], 
-                    mdpos[2],
+                    mdpos[0]+6,
+                    mdpos[1]+6, 
+                    mdpos[2]+6,
                     dir].data * (self.dx / self.dt_LB)
 
     def __del__(self):

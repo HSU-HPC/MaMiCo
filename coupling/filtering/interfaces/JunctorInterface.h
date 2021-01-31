@@ -5,7 +5,7 @@
 #pragma once
 #include <vector>
 
-//#define DEBUG_FILTER
+#define DEBUG_JUNCTOR_INTERFACE
 
 namespace coupling{
     template<unsigned int dim, std::size_t inputc, std::size_t outputc>
@@ -30,11 +30,20 @@ class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 				const std::array<bool, 7> filteredValues,
 				const char* type):
-			//This assumes the vector of cell vectors to be nonempty. Suboptimal
+			//This assumes the vector of cell vectors to be nonempty. Suboptimal.
+			//NOTE: Avoid using FI's cell vectors. Use _inputCellVectors/_outputCellVectors instead.
 			coupling::FilterInterface<dim>(inputCellVectors[0], outputCellVectors[0], cellIndices, filteredValues, type),
 			_inputCellVectors(inputCellVectors),
 			_outputCellVectors(outputCellVectors)
 		{
+			#ifdef DEBUG_JUNCTOR_INTERFACE
+				//check input partition sizes
+				for(unsigned int i = 0; i < inputc; i++)
+					std::cout << "			FJ: Size of input cell vector at index " << i << ": " << inputCellVectors[i].size() << std::endl;
+				for(unsigned int i = 0; i < outputc; i++)
+					std::cout << "			FJ: Size of output cell vector at index " << i << ": " << outputCellVectors[i].size() << std::endl;
+
+			#endif	
 		}
 
 		//TODO: do i need this constructor here as well?

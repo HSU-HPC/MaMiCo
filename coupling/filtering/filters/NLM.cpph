@@ -54,13 +54,17 @@ void coupling::NLM<dim>::operator()(){
         C += weight;
       }
     }
+
     res = res * (1/C);
     unsigned int i = _ic->getLocalCellIndex(idx);
-    this->_outputCells[i]->setMacroscopicMass(res[0]);
+
+    coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][i]->setMacroscopicMass(res[0]);
     tarch::la::Vector<dim,double> momentum;
     for (unsigned int d = 0; d < dim; d++)  momentum[d] = res[d+1];
-    this->_outputCells[i]->setMacroscopicMomentum(momentum);
+    coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][i]->setMacroscopicMomentum(momentum);
   }
+
+	std::cout << "NLM POST OPERATOR()" << std::endl;
 
   // Increment time
   _cycleCounter++;

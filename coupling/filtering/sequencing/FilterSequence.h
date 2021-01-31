@@ -139,6 +139,16 @@ class coupling::FilterSequence {
 		virtual int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
 		/*
+		 * Determines based on _domainStart and _domainEnd which of the global domain's cell belong to the sequence's local domain.
+		 * This initializes all domain vector member variables (see below).
+		 *
+		 * Used in constructor. TODO: i like to move it
+		 *
+		 * Implemented by FilterJunction to init domain partitions.
+		 */
+		virtual void initDomain();
+
+		/*
 		 * This member function allows appendance and insertion of filters defined by two processing functions to a modifiable sequence at runtime. Index -1 implies appending. 
 		 */
 		virtual void addFilter( 	
@@ -195,17 +205,11 @@ class coupling::FilterSequence {
       
 	private:
 		/*
-		 * Determines based on _domainStart and _domainEnd which of the global domain's cell belong to the sequence's local domain.
-		 * This initializes all domain vector member variables (see below).
-		 *
-		 * Used in constructor. TODO: i like to move it
-		 */
-		void initDomain();
-
-		/*
 		 * Copies all (global) input cells to _cellVector1 and _cellVector2.
 		 *
 		 * Used in consctructor. //TODO: move it
+		 *
+		 * Not implemented by FilterJunction: Equivalent procedure can be found in that class' constructor.
 		 */
 		void initCellVectors();
 	
