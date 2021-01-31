@@ -2,6 +2,7 @@ build/
 .sconsign.dblite
 *.csv
 *.vtk
+*.vti
 *.o
 *.out
 out/
