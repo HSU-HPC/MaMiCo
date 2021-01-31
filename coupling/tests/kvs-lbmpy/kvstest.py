@@ -8,6 +8,7 @@
 
 import sys
 sys.path.append('../../python-binding')
+sys.path.append('../../filtering/filters')
 import coloredlogs, logging
 import math
 import json
@@ -16,11 +17,17 @@ from mamico.coupling.services import MultiMDCellService
 from mamico.coupling.solvers import CouetteSolverInterface
 import mamico.coupling
 import mamico.tarch.utils
+import pythonfilters as pf
 import numpy as np
+import pandas as pd
 from configparser import ConfigParser
 import matplotlib.pyplot as mplt
 
 log = logging.getLogger('KVSTest')
+logging.getLogger('matplotlib.font_manager').disabled = True
+
+
+BENCH_BEFORE_RUN = False
 
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
@@ -28,6 +35,8 @@ log = logging.getLogger('KVSTest')
 # -> using lbmpy for Lattice Bolzmann flow simulation with CUDA on GPU
 # -> using (multi-instance) SimpleMD or synthetic MD data (with Gaussian noise) (TODO)
 # -> using filtering subsystem with configurable coupling data analysis or noise filter sequences (TODO)
+
+
 class KVSTest():
     def __init__(self, cfg):
         self.cfg = cfg
@@ -40,7 +49,8 @@ class KVSTest():
         self.initSolvers()
         for cycle in range(self.cfg.getint("coupling", "couplingCycles")):
             self.runOneCouplingCycle(cycle)
-        self.plot()
+        pd.DataFrame(self.velLB).to_csv("lbm.csv", sep = ";", header = False)
+
 
     def runOneCouplingCycle(self, cycle):
         self.advanceMacro(cycle)
@@ -84,11 +94,14 @@ class KVSTest():
 
             isteps = self.cfg.getint("macroscopic-solver", "init-timesteps")
             log.info("Running " + str(isteps) + " LB initialisation timesteps ...")
-            timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
-                self.macroscopicSolver.domain_size[1] * \
-                self.macroscopicSolver.domain_size[2] / \
-                (self.macroscopicSolver.mlups * 1e6)
-            log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
+            
+            if BENCH_BEFORE_RUN == True:
+                timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
+                    self.macroscopicSolver.domain_size[1] * \
+                    self.macroscopicSolver.domain_size[2] / \
+                    (self.macroscopicSolver.mlups * 1e6)
+                log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
+
             self.macroscopicSolver.advance(isteps) 
             log.info("Finished LB init-timesteps.")
 
@@ -130,6 +143,24 @@ class KVSTest():
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
                 self.cfg.getfloat("microscopic-solver", "temperature"))
+
+        from scipy.ndimage import gaussian_filter, median_filter
+        #Add Gauss filter
+        def gauss_sca(data):
+            print("Applying gaussian filter on a vector. sigma = 1.")
+            return gaussian_filter(data, sigma = (1,1,1))
+
+        def gauss_vec(data):
+            print("Applying gaussian filter on a scalar. sigma = 1.")
+            return gaussian_filter(data, sigma = (1,1,1,0))
+
+        def median(data):
+            print("Applying median filter. size = 3*3*3.")
+            #TODO: get size parameter right
+            return median_filter(data, size = (3,3,3,1))
+
+        mcs = self.multiMDCellService.getMacroscopicCellService(0)
+        mcs.addFilterToSequence(filter_sequence="gaussseq", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
@@ -139,7 +170,6 @@ class KVSTest():
 
         # buffer for evaluation plot
         if self.rank==0:
-            self.velMD = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
     
         if self.rank==0:
@@ -148,6 +178,10 @@ class KVSTest():
     def shutdown(self):
         if self.rank==0:
             log.info("Finished " + str(self.mdStepCounter) + " MD timesteps")
+
+        #Analyse data gathered by StrouhalPython filter
+        #self.sf.calculateStrouhalNumber()
+
         for i in range(self.localMDInstances):
             self.simpleMD[i].shutdown()
         # TODO something else to do here??
@@ -215,27 +249,12 @@ class KVSTest():
             mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
                 for d in range(3)]
             for dir in range(2):
-                self.velMD[cycle, dir] = self.buf.loadRecvVelocity()[2,2,2,dir]
                 self.velLB[cycle, dir] = self.macroscopicSolver.scen.velocity[
-                    mdpos[0]+5, 
-                    mdpos[1]+5, 
-                    mdpos[2]+5,
+					#TODO: exact cell index in md2macro
+                    mdpos[0],
+                    mdpos[1], 
+                    mdpos[2],
                     dir].data * (self.dx / self.dt_LB)
-
-    def plot(self):
-        if self.rank==0:
-            mplt.style.use("seaborn")
-            fig, ax = mplt.subplots(2,1)
-            t = range(len(self.velMD))
-            for dir in range(2):
-                ax[dir].plot(t, self.velLB[:,dir], "-", color="blue")
-                ax[dir].plot(t, self.velMD[:,dir], "-", color="red")
-                ax[dir].set_xlabel('coupling cycles')
-                ax[dir].grid(True)
-            ax[0].set_ylabel('velocity_x')
-            ax[1].set_ylabel('velocity_y')
-            fig.tight_layout()
-            mplt.savefig("plot.png")
 
     def __del__(self):
         self.shutdown()
@@ -278,9 +297,11 @@ class LBSolver():
         lb_log.info("Successfully created scenario")
         lb_log.info("Domain size = " + str(self.domain_size))
         lb_log.info("Total number of cells = " + str(self.domain_size[0]*self.domain_size[1]*self.domain_size[2]))
-        lb_log.info("Running benchmark ...")
-        self.mlups = self.scen.benchmark()
-        lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
+
+        if BENCH_BEFORE_RUN == True:
+            lb_log.info("Running benchmark ...")
+            self.mlups = self.scen.benchmark()
+       	    lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
 
         self.cD_max = 0
         self.cL_max = 0
