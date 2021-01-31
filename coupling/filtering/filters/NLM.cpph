@@ -64,8 +64,6 @@ void coupling::NLM<dim>::operator()(){
     coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][i]->setMacroscopicMomentum(momentum);
   }
 
-	std::cout << "NLM POST OPERATOR()" << std::endl;
-
   // Increment time
   _cycleCounter++;
   _t = _cycleCounter%_timeWindowSize;
