@@ -279,7 +279,7 @@ class LBSolver():
         self.cpm = cpm = cfg.getint("macroscopic-solver", "cells-per-meter")
         self.domain_size = (int(2.5*cpm), int(0.41*cpm), int(0.41*cpm))
         self.vis = 1e-3
-        self.scaling = Scaling(physical_length=0.1, physical_velocity=2.25, kinematic_viscosity=self.vis,
+        self.scaling = Scaling(physical_length=0.1, physical_velocity=1.25, kinematic_viscosity=self.vis,
              cells_per_length=0.1*cpm)
         self.omega = cfg.getfloat("macroscopic-solver", "omega")
         if self.omega > 1.92:
@@ -332,9 +332,17 @@ class LBSolver():
         self.scen.boundary_handling.set_boundary(outflow, make_slice[-1, :, :])
 
     def advance(self, timesteps):
-        self.scen.run(timesteps)
-        self.timesteps_finished = self.timesteps_finished + timesteps
-        #self.scen.write_vtk()
+        vtk_every_ts = 100
+       	ts_goal = self.timesteps_finished + timesteps
+        while self.timesteps_finished < ts_goal:
+            if ts_goal - self.timesteps_finished < vtk_every_ts:
+                steps = ts_goal - self.timesteps_finished
+                self.scen.run(steps)
+            else:
+                steps = vtk_every_ts
+                self.scen.run(steps)
+                self.scen.write_vtk()
+            self.timesteps_finished = self.timesteps_finished + steps
         self.compute_drag_lift()
 
     def compute_drag_lift(self):
