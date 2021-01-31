@@ -5,25 +5,27 @@
 //constructors of coupling::FilterPipeline
 template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 	const coupling::IndexConversion<dim>* indexConversion,
+	coupling::interface::MacroscopicSolverInterface<dim>* msi,
 	const tarch::utils::MultiMDService<dim>& multiMDService,
 	const std::string cfgpath):
-    FilterPipeline(mdCells, indexConversion, multiMDService, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
+    FilterPipeline(inputCells, indexConversion, msi, multiMDService, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
 {}
 
 template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > mdCells,
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 	const coupling::IndexConversion<dim>* indexConversion,
+	coupling::interface::MacroscopicSolverInterface<dim>* msi,
 	const tarch::utils::MultiMDService<dim>& multiMDService,
 	bool postMultiInstance, 
 	const std::string cfgpath):
 
-	_indexConversion(indexConversion), 
 	_multiMDService(multiMDService),
 	_postMultiInstance(postMultiInstance)
 {
+	_ic = new coupling::IndexConversionMD2Macro<dim>(indexConversion, msi);
 	
     //check if provided file is written in proper XML
     if(_config.LoadFile(cfgpath.c_str()) != tinyxml2::XML_NO_ERROR){
@@ -35,7 +37,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
 	
 	//load domain vectors
-	if (initMd2MacroDomain(mdCells)) exit(EXIT_FAILURE);
+	_ic->initMD2MacroDomain(inputCells, _md2MacroCells, _md2MacroCellIndices);
 
     //load sequences
     if (_postMultiInstance){
@@ -49,7 +51,6 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 template<unsigned int dim>
 void coupling::FilterPipeline<dim>::operator()(){
     //select between PI and MI
-	//TODO: Copying all these sequences is not optimal...
 	std::vector<coupling::FilterSequence<dim>* > sequences;
 	if(_postMultiInstance){
 		sequences = _miSequences;
@@ -60,12 +61,24 @@ void coupling::FilterPipeline<dim>::operator()(){
 	else{
 		sequences = _piSequences;
 		#ifdef DEBUG_FILTER_PIPELINE
-		std::cout << "FP: Starting to apply per instance filters." << std::endl;
+		std::cout << "FP: Starting to apply per-instance filters." << std::endl;
 		#endif
 	}
 
+	//std::cout << "FP: BEFORE: " << _md2MacroCells[10]->getCurrentVelocity() << std::endl << std::endl;
+
     for(coupling::FilterSequence<dim>* currSequence : sequences){
+		//TODO: This always uses implementations of the *base* FS. Fatal for FilterJunctions.
+		//finalize FS's filter vector
+		if(currSequence->isModifiable() == true){
+			//output of only rank 1
+			currSequence->printFilters();
+			currSequence->makeUnmodifiable();
+		}
+		
+		//update cell vector contents	
 		currSequence->updateCellVectors();
+		//apply all filters of sequence
 		for(coupling::FilterInterface<dim>* currFilter : currSequence->getFilters()) (*currFilter)();
 
         #ifdef DEBUG_FILTER_PIPELINE
@@ -78,6 +91,8 @@ void coupling::FilterPipeline<dim>::operator()(){
 			for(unsigned int index = 0; index < _md2MacroCells.size(); index++) *(_md2MacroCells[index]) = *(sequenceOutputCells[index]);
 		}
     }
+
+	//std::cout << std::endl << "FP: AFTER: " << _md2MacroCells[10]->getCurrentVelocity() << std::endl;
 }
 
 
@@ -126,99 +141,179 @@ bool coupling::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile
 
 template<unsigned int dim>
 int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* node){
-    
+
+	//TODO: is this the right time to check for this?
+	//sanity check
+	if(_md2MacroCells.empty()) {
+		std::cout << "Warning: Empty md2Macro-Domain in Filter Pipeline. Disabling filtering." << std::endl;
+		return 0;
+	}
+	
     tinyxml2::XMLElement* currSequenceNode = node->FirstChildElement();
     std::vector<coupling::FilterSequence<dim> *> knownSequences;
+
+	//true once specified output sequence has been found
+	bool outputDefined = false; 
+
+	//Special case: MD values (i.e. FP input) is also used as output.
+	if(std::strcmp(node->Attribute("output"), "md") == 0) outputDefined = true;
     
     //Check if all outputs are specified before being used by sequences
     while(currSequenceNode){
-		//FINDING INPUT
-        FilterSequence<dim>* inputFilterSequence = nullptr;
-        const char* inputName = currSequenceNode->Attribute("input");
+		//NAME
 
+		//Check for illegal sequence names
+		//"md" is reserved
 		if(std::strcmp(currSequenceNode->Value(), "md") == 0){
+			//TODO: exception
 			std::cout << "ERROR: Filter-Pipeline: Sequence name may not be 'md'." << std::endl;
 			exit(EXIT_FAILURE);
 		}
+		//Duplicate names are not permitted
+		for(auto seq: knownSequences)
+			if(std::strcmp(seq->getName(),currSequenceNode->Value()) == 0) {
+				//TODO: exception
+				std::cout << "ERROR: Filter-Pipeline: Two or more sequences of identical name " << currSequenceNode->Value() << std::endl;
+				exit(EXIT_FAILURE);
+			}
 
-        if(!inputName) inputName = "md";
-        bool sequenceRecognized = false; 
-        //search temp vector of known sequences
-		//TODO: check if this sequence's name is already occupied
-        for(auto seq : knownSequences){
-            if(std::strcmp(seq->getName(), inputName) == 0) {
-                inputFilterSequence = seq;
-                sequenceRecognized = true;
-                break;
-            }
-        }
-        //"md" is the default input and is not associated to any sequence
-        if(std::strcmp(inputName,"md") == 0) sequenceRecognized = true;
+		//INPUT
+		//TODO: test this. im not 100% familiar with std::stringstream
+		std::stringstream  inputStringStream;
+        if(currSequenceNode->Attribute("input")) 
+			inputStringStream = std::stringstream(currSequenceNode->Attribute("input"));
+		else
+			inputStringStream = std::stringstream("");
+
+		//TODO: DEBUG REMOVE
+		std::cout << "ISS: " << inputStringStream.str() << std::endl;
+
+		//Split into input names, seperated by " ".
+		std::vector<std::string> inputNames;
+		std::string namebuf;
+		while (inputStringStream >> namebuf) {
+			inputNames.push_back(namebuf);//Does this really add a new "word" or just a used pointer?
+		}
+
+		//Default input if none is specified
+        if(inputNames.empty()) { 
+			inputNames.push_back("md");
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << "FP: Choosing default (md) input for sequence " << currSequenceNode->Value() << std::endl;
+			#endif
+		}
+
+		//For regular sequences, this holds just one element.
+		std::vector<FilterSequence<dim> *> inputSeqs;
+
+		//Holds all input cells for this sequence
+		std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector;
+
+		//Iterate over all inputs specified in input string.
+		//Note: If there are non-matching names in input String, they are ignored. //TODO: don't allow that? exception?
+		unsigned int input_count = 0;
+		for(auto inputName : inputNames) {
+        	//"md" is the default input and is not associated to any sequence
+			
+			//TODO: DEBUG REMOVE
+			std::cout << "Looking for input sequence named " << inputName << std::endl;
+
+        	if(inputName == "md") { 
+				for(auto cell : _md2MacroCells) inputCellVector.push_back(cell);
+				input_count++;
+			}
+
+        	//search temp vector of known sequences
+        	for(auto seq : knownSequences){
+				//Search for input sequence
+            	if(seq->getName() == inputName){
+					inputSeqs.push_back(seq);
+					input_count++;
+				}
+			}
+		}
+
+		//TODO: DEBUG REMOVE
+		std::cout << "IN: Size:" << input_count << std::endl;
         
-        if(!sequenceRecognized){
-            std::cout << "ERROR: Filter-Pipeline: Invalid input " << inputName << " specified for sequence named " << currSequenceNode->Value() << std::endl;
+        if(input_count == 0){
+			//TODO: exception
+            std::cout << "ERROR: Filter-Pipeline: Invalid input " << inputStringStream.str() << " specified for sequence named " << currSequenceNode->Value() << std::endl;
             return EXIT_FAILURE;
         }
+
+		//TODO: DEBUG REMOVE
+		std::cout << "Valid input seqs!" << std::endl;
 
    		//DOMAIN LIMITING
     	tarch::la::Vector<dim, double> domainStart;
    	 	tarch::la::Vector<dim, double> domainEnd;
 		//default domain boundaries
-    	tarch::la::Vector<dim, unsigned int> domainStartCell = _md2MacroCellIndices[0];
+    	tarch::la::Vector<dim, unsigned int> domainStartCell = _md2MacroCellIndices.front();
     	tarch::la::Vector<dim, unsigned int> domainEndCell = _md2MacroCellIndices.back();
 
 		//if custom start/end is specified use that instead
         if(currSequenceNode->Attribute("domain-start")){ 
 			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currSequenceNode, "domain-start");
 	        for(unsigned int d = 0; d < dim; d++){
-    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
-  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
+  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
         	}
 		}
         if(currSequenceNode->Attribute("domain-end")){
 			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currSequenceNode, "domain-end");
 	        for(unsigned int d = 0; d < dim; d++){
-    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _indexConversion->getMacroscopicCellSize()[d]);
-        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _indexConversion->getMacroscopicCellSize()[d]);
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
+        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
         	}
 		}
 
 		//"filtered-values" is not mandatory, default is false
-		bool filteredValues[7] = { false };
+		std::array<bool, 7> filteredValues = {false};
 		const char* fvStr = currSequenceNode->Attribute("filtered-values");
 		if(fvStr){
-			if(strstr(fvStr, "all")) memset(filteredValues, true, sizeof(filteredValues));
+			if(strstr(fvStr, "all")) for(unsigned int i = 0; i < 7; i++) filteredValues[i] = true;
 			else{
-				if(strstr(fvStr, "micro-mass")) filteredValues[0] = true;
-				if(strstr(fvStr, "micro-momentum")) filteredValues[1] = true;
-				if(strstr(fvStr, "macro-mass")) filteredValues[2] = true;
-				if(strstr(fvStr, "macro-momentum")) filteredValues[3] = true;
-				if(strstr(fvStr, "potential-energy")) filteredValues[4] = true;
-				if(strstr(fvStr, "velocity")) filteredValues[5] = true;
-				if(strstr(fvStr, "temperature")) filteredValues[6] = true;
+				if(strstr(fvStr, "micro-mass")) 		filteredValues[0] = true;
+				if(strstr(fvStr, "micro-momentum")) 	filteredValues[1] = true;
+				if(strstr(fvStr, "macro-mass")) 		filteredValues[2] = true;
+				if(strstr(fvStr, "macro-momentum")) 	filteredValues[3] = true;
+				if(strstr(fvStr, "potential-energy")) 	filteredValues[4] = true;
+				if(strstr(fvStr, "velocity")) 			filteredValues[5] = true;
+				if(strstr(fvStr, "temperature")) 		filteredValues[6] = true;
 			}
 		}
+
+		//concat output vectors of the new sequence's input(s) (singular for non-Junction sequences)
+		//Can this be done more efficiently? I dont think so. std::move is not an option, std::insert does the same...
+		for(auto seq : inputSeqs) for (auto cell : seq->getOutputCellVector()) inputCellVector.push_back(cell);
 		
-		//CREATE SEQUENCE
-		if(inputFilterSequence){
-			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), inputFilterSequence->getOutputCellVector(), _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
+		//CREATE SEQUENCE/JUNCTION
+		if(input_count == 1) {
+			//TODO: DEBUG REMOVE
+			std::cout << "CREATING SEQUENCE" << std::endl;
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_ic, _multiMDService, currSequenceNode->Value(), inputCellVector, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputFilterSequence->getName() << " as input." << std::endl;
+				if(inputSeqs.size() == 1) std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputSeqs[0]->getName() << " as input." << std::endl;
+				else std::cout << "FP: " << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
 			#endif
-		}
-		else {
-			knownSequences.push_back(new coupling::FilterSequence<dim>(_indexConversion, _multiMDService, currSequenceNode->Value(), _md2MacroCells, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
+		} 
+		else { //Junction = Sequence with 2 or more inputs
+			//TODO: DEBUG REMOVE
+			std::cout << "CREATING JUNCTION" << std::endl;
+			//TODO: move template inputc
+			knownSequences.push_back(new coupling::FilterJunction<dim, 2>(_ic, _multiMDService, currSequenceNode->Value(), inputCellVector, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << "FP: " << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
+				std::cout << "FP: " << knownSequences.back()->getName() << " will use TODO: INPUT STR as input." << std::endl;
 			#endif
+
 		}
+
         //Add sequence to temp vector
-		//Check if it's the output sequence. If none of the sequences' names match, "md" is assumed as output.
+		//Check if it's the output sequence.
 		if(std::strcmp(knownSequences.back()->getName(),  node->Attribute("output")) == 0){
+			outputDefined = true;
 			knownSequences.back()->setAsOutput();
-			#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << "This sequence will be used as the output sequence." << std::endl;
-			#endif
 		}
 
 		//Load filters of the newly created sequence
@@ -227,6 +322,11 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
         //Proceed to iterate over next element
         currSequenceNode = currSequenceNode->NextSiblingElement();
     }
+
+	if(!outputDefined) {
+		std::cout << "ERROR: Output sequence not specified or unknown." << std::endl;
+        exit(EXIT_FAILURE);
+	}
 
     if(_postMultiInstance){
         _miSequences = knownSequences;
@@ -243,34 +343,3 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 
     return 0;
 }
-
-template<unsigned int dim>
-int coupling::FilterPipeline<dim>::initMd2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells) {	
-
-	if(cells.empty()){
-		std::cout << "ERROR: Filter-Pipeline: Input vector is emtpy." << std::endl;
-		return EXIT_FAILURE; 
-	}
-	tarch::la::Vector<dim, unsigned int> convertedIndex;
-	bool outOfBounds;
-
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << "Filter-Pipeline: Initializing md2Macro-domain cells and their index vectors." << std::endl;
-	std::cout << "Total number of cells: " << cells.size() << std::endl;
-	#endif
-
-	for(unsigned int linearIndex = 0; linearIndex < cells.size(); linearIndex++){
-		outOfBounds = false;
-		convertedIndex = _indexConversion->getGlobalInnerVectorCellIndex(linearIndex);
-		for(unsigned int d = 0; d < dim; d++) if(convertedIndex[d] == INT_MAX) outOfBounds = true;
-		if(!outOfBounds){
-			_md2MacroCells.push_back(cells[linearIndex]);
-			_md2MacroCellIndices.push_back(convertedIndex);
-		}
-	}
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << _md2MacroCells.size() << " of those cells are within md2Macro-domain boundaries." << std::endl;
-	#endif
-	return 0;
-}
-
