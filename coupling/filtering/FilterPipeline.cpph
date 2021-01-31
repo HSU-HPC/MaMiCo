@@ -185,9 +185,6 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		else
 			inputStringStream = std::stringstream("");
 
-		//TODO: DEBUG REMOVE
-		std::cout << "ISS: " << inputStringStream.str() << std::endl;
-
 		//Split into input names, seperated by " ".
 		std::vector<std::string> inputNames;
 		std::string namebuf;
@@ -214,10 +211,6 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		unsigned int input_count = 0;
 		for(auto inputName : inputNames) {
         	//"md" is the default input and is not associated to any sequence
-			
-			//TODO: DEBUG REMOVE
-			std::cout << "Looking for input sequence named " << inputName << std::endl;
-
         	if(inputName == "md") { 
 				for(auto cell : _md2MacroCells) inputCellVector.push_back(cell);
 				input_count++;
@@ -234,16 +227,15 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		}
 
 		//TODO: DEBUG REMOVE
-		std::cout << "IN: Size:" << input_count << std::endl;
+		#ifdef DEBUG_FILTER_PIPELINE
+			std::cout << "FP: Creating new sequence or junction: Number of inputs found:" << input_count << std::endl;
+		#endif
         
         if(input_count == 0){
 			//TODO: exception
             std::cout << "ERROR: Filter-Pipeline: Invalid input " << inputStringStream.str() << " specified for sequence named " << currSequenceNode->Value() << std::endl;
             return EXIT_FAILURE;
         }
-
-		//TODO: DEBUG REMOVE
-		std::cout << "Valid input seqs!" << std::endl;
 
    		//DOMAIN LIMITING
     	tarch::la::Vector<dim, double> domainStart;
@@ -284,14 +276,21 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 			}
 		}
 
-		//concat output vectors of the new sequence's input(s) (singular for non-Junction sequences)
-		//Can this be done more efficiently? I dont think so. std::move is not an option, std::insert does the same...
+		/*
+		*	Concat output vectors of the new sequence's input(s) (singular for non-Junction sequences)
+		*	NOTE: If MD is (possibly among others) chosen as input, it will always occupy the first cells of inputCellVector,
+		*		  i.e. be in cell partition one in the context of FilterJunctions.
+		*/
+		//TODO: If a junction has multiple partitions, this only gets the first output partition.
 		for(auto seq : inputSeqs) for (auto cell : seq->getOutputCellVector()) inputCellVector.push_back(cell);
+		//Can this be done more efficiently? I dont think so. std::move is not an option, std::insert does the same...	
+
+		#ifdef DEBUG_FILTER_PIPELINE
+			std::cout << "FP: Creating new sequence or junction: Size of inputCellVector: " << inputCellVector.size() << std::endl;
+		#endif
 		
 		//CREATE SEQUENCE/JUNCTION
 		if(input_count == 1) {
-			//TODO: DEBUG REMOVE
-			std::cout << "CREATING SEQUENCE" << std::endl;
 			knownSequences.push_back(new coupling::FilterSequence<dim>(_ic, _multiMDService, currSequenceNode->Value(), inputCellVector, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 				if(inputSeqs.size() == 1) std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputSeqs[0]->getName() << " as input." << std::endl;
@@ -299,12 +298,10 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 			#endif
 		} 
 		else { //Junction = Sequence with 2 or more inputs
-			//TODO: DEBUG REMOVE
-			std::cout << "CREATING JUNCTION" << std::endl;
-			//TODO: move template inputc
+			//TODO: move template inputc: currently has 2 hardcoded
 			knownSequences.push_back(new coupling::FilterJunction<dim, 2>(_ic, _multiMDService, currSequenceNode->Value(), inputCellVector, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
-				std::cout << "FP: " << knownSequences.back()->getName() << " will use TODO: INPUT STR as input." << std::endl;
+				std::cout << "FP: " << knownSequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
 			#endif
 
 		}

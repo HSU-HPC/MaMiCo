@@ -44,55 +44,50 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		):
 		coupling::FilterSequence<dim>(indexConversion, multiMDService, name, inputCellVector, cellIndices, domainStart, domainEnd, filteredValues)
 		{	
+			if(inputc == 0) {
+				//TODO: exception
+				std::cout << "ERROR: Creating FilterJunction with inputc = 0." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
 			#ifdef DEBUG_FILTER_JUNCTION
         	std::cout << PRINT_PREFIX() << "This is a FilterJunction. Number of inputs:" << inputc << std::endl;
         	#endif
 
 			//Partition input vector
-			//TODO: testing (a lot of it)
-			
-			//Used for partitioning domain vectors. TODO: check for redundancy with some field of FilterSequence (?)
-			unsigned int totalSize = coupling::FilterSequence<dim>::_inputDomainCellVector.size() / inputc;
-			unsigned int domainSize = coupling::FilterSequence<dim>::_inputDomainCellVector.size() / inputc;
+			unsigned int partitionSize = coupling::FilterSequence<dim>::_inputCellVector.size() / inputc;
 
 			for( unsigned int p = 0; p < inputc; p++) {
 				//_inputCellVector 
-				//TODO Do i need to have a partitioned version of this?
+				_inputCellVector_parted[p] =
+					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
+					(coupling::FilterSequence<dim>::_inputCellVector.begin() + (p * partitionSize), 
+					coupling::FilterSequence<dim>::_inputCellVector.begin() + ((p+1) * partitionSize));
+				#ifdef DEBUG_FILTER_JUNCTION
+					std::cout << PRINT_PREFIX() << "Size of _inputCellVector_parted[" << p << "]: " << _inputCellVector_parted[p].size() << std::endl;
+				#endif
+
 
 				//_cellVector1
 				_cellVector1_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p * totalSize), 
-					coupling::FilterSequence<dim>::_cellVector1.begin() + ((p+1) * totalSize));
+					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p * partitionSize), 
+					coupling::FilterSequence<dim>::_cellVector1.begin() + ((p+1) * partitionSize));
+				#ifdef DEBUG_FILTER_JUNCTION
+					std::cout << PRINT_PREFIX() << "Size of _cellVector1_parted[" << p << "]: " << _cellVector1_parted[p].size() << std::endl;
+				#endif
 
 				//_cellVector2
 				_cellVector2_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_cellVector2.begin() + (p * totalSize), 
-					coupling::FilterSequence<dim>::_cellVector2.begin() + ((p+1) * totalSize));
-
-
-				//_inputDomainCellVector
-				_inputDomainCellVector_parted[p] =
-					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + (p * domainSize), 
-					coupling::FilterSequence<dim>::_inputDomainCellVector.begin() + ((p+1) * domainSize));
-
-
-				//_domaincellVector1
-				_domainCellVector1_parted[p] =
-					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_domainCellVector1.begin() + (p * domainSize), 
-					coupling::FilterSequence<dim>::_domainCellVector1.begin() + ((p+1) * domainSize));
-
-
-				//_domainCellVector2
-				_domainCellVector2_parted[p] =
-					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_domainCellVector2.begin() + (p * domainSize), 
-					coupling::FilterSequence<dim>::_domainCellVector2.begin() + ((p+1) * domainSize));
-
+					(coupling::FilterSequence<dim>::_cellVector2.begin() + (p * partitionSize), 
+					coupling::FilterSequence<dim>::_cellVector2.begin() + ((p+1) * partitionSize));
+				#ifdef DEBUG_FILTER_JUNCTION
+					std::cout << PRINT_PREFIX() << "Size of _cellVector2_parted[" << p << "]: " << _cellVector2_parted[p].size() << std::endl;
+				#endif
 			}
+
+			initDomain();
 
 			coupling::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported. TODO
     	}
@@ -117,6 +112,12 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		 * This function is very similar to the interface's. Check coupling::FilterSequence for more details.
 		 */
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) override;
+
+		/*
+		 * This function is very similar to the interface's. Check coupling::FilterSequence for more details.
+		 * TODO: Move to constructor once FS moves initDomain() to constructor as well.
+		 */
+		void initDomain();
 
 		/*
 		 * The first partition of _cellVector1/2 is the main partition. A junction's default output is always its main partition.

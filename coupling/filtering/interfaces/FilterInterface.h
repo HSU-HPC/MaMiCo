@@ -137,7 +137,7 @@ class coupling::FilterInterface{
 		 *	All unmodified cells of the output vector are implicitly copied from their respective input counterpart,
 		 *	i.e it is not mandatory to have any output.
 		 */
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells; 	
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells;
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells;
 		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices;
 
