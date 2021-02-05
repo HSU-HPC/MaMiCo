@@ -314,7 +314,7 @@ private:
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
-        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService, _tws
       );
     }
@@ -323,7 +323,7 @@ private:
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
-        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }
@@ -342,18 +342,6 @@ private:
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
     allocateRecvBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
-
-    // manually allocate noise reduction if necessary
-    if(_cfg.miSolverType == SYNTHETIC){
-      if(_cfg.twsLoop){
-        _noiseReduction = _mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(
-          _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_multiMDService, _tws);
-      }
-      else{
-        _noiseReduction = _mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(
-          _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_multiMDService);
-      }
-    }
 
     if(_cfg.initAdvanceCycles > 0 && _couetteSolver != NULL)
       _couetteSolver->advance(_cfg.initAdvanceCycles * _simpleMDConfig.getSimulationConfiguration().getDt()
@@ -444,20 +432,9 @@ private:
         gettimeofday(&_tv.start,NULL);
       }
 
-      //call noise filter on recvBuffer
-      _noiseReduction->beginProcessInnerMacroscopicCells();
-      for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
-        _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],_buf.globalCellIndices4RecvBuffer[i]);
-      }
-      _noiseReduction->endProcessInnerMacroscopicCells();
-      if(_noiseReduction->_doubleTraversal){
-        _noiseReduction->beginProcessInnerMacroscopicCells();
-        for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
-          _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],_buf.globalCellIndices4RecvBuffer[i]);
-        }
-        _noiseReduction->endProcessInnerMacroscopicCells();
-      }
-
+      // TODO call filtering on recvBuffer here
+      std::cout << "WARNING filtering with SYNTHETIC solver currently not implemented" << std::endl;
+      
       if (_rank==0){
         gettimeofday(&_tv.end,NULL);
         _tv.filter += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
@@ -556,7 +533,6 @@ private:
     if (couetteSolverInterface != NULL){delete couetteSolverInterface; couetteSolverInterface = NULL;}
     if (_couetteSolver != NULL){delete _couetteSolver; _couetteSolver=NULL;}
     if(_multiMDCellService != NULL){delete _multiMDCellService; _multiMDCellService=NULL;}
-    if(_noiseReduction != NULL){delete _noiseReduction; _noiseReduction=NULL;}
 
     std::cout << "Finish CouetteTest::shutdown() " << std::endl;
   }
@@ -908,7 +884,6 @@ private:
   std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterface;
   std::vector<coupling::interface::MDSimulation*> _simpleMD;
   std::default_random_engine _generator;
-  coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
   TimingValues _tv;
 };

@@ -654,7 +654,6 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 			        mamicoConfig.getMomentumInsertionConfiguration(), 
 			        mamicoConfig.getBoundaryForceConfiguration(),
 			        mamicoConfig.getTransferStrategyConfiguration(), 
-			        //mamicoConfig.getNoiseReductionConfiguration(), 
 			        mamicoConfig.getParallelTopologyConfiguration(), 
 			        simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
 			        mamicoConfig.getMacroscopicCellConfiguration(), 
