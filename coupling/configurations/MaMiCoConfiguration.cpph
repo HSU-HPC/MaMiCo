@@ -19,10 +19,7 @@ void coupling::configurations::MaMiCoConfiguration<dim>::parseSubtag( tinyxml2::
     } else if (nodename == _transferStrategyConfiguration.getTag()){
       _transferStrategyConfiguration.parseSubtag(child);
       _isDefinedTransferStrategy = true;
-    } /*else if (nodename == _noiseReductionConfiguration.getTag()){
-      _noiseReductionConfiguration.parseSubtag(child);
-      _isDefinedNoiseReduction = true;
-    }*/ else if ( nodename == _parallelTopologyConfiguration.getTag() ) {
+    } else if ( nodename == _parallelTopologyConfiguration.getTag() ) {
       _parallelTopologyConfiguration.parseSubtag(child);
       _isDefinedParallelTopology = true;
     } else if ( nodename == _boundaryForceConfiguration.getTag() ){
@@ -36,7 +33,7 @@ void coupling::configurations::MaMiCoConfiguration<dim>::parseSubtag( tinyxml2::
   
   _isValid = _momentumInsertionConfiguration.isValid() && _particleInsertionConfiguration.isValid()
     && _macroscopicCellConfiguration.isValid() && _transferStrategyConfiguration.isValid()
-    && /*_noiseReductionConfiguration.isValid() &&*/ _boundaryForceConfiguration.isValid()
+    && _boundaryForceConfiguration.isValid()
     && _parallelTopologyConfiguration.isValid();
 }
 

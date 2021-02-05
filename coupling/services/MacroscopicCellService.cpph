@@ -17,7 +17,6 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellS
   const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,
   const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,
   const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
-  //const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,
   const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
   unsigned int numberMDTimestepsPerCouplingCycle,
   const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
@@ -47,7 +46,6 @@ _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<Linked
 _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
 _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
 _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface,*_indexConversion,numberMDTimestepsPerCouplingCycle)),
-//_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService, tws)),
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
 _momentumController(mdSolverInterface),
@@ -69,10 +67,6 @@ _writeEveryMacroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMacrosc
     std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _transferStrategy==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
-  /*if (_noiseReduction==NULL){
-    std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _noiseReduction==NULL!" << std::endl;
-    exit(EXIT_FAILURE);
-  }*/
   if (_boundaryForceController==NULL){
     std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _boundaryForceController==NULL!" << std::endl;
   }
@@ -96,7 +90,6 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::~MacroscopicCell
   if (_particleInsertion != NULL){ delete    _particleInsertion; _particleInsertion = NULL; }
   if (_momentumInsertion != NULL){ delete    _momentumInsertion; _momentumInsertion = NULL; }
   if (_transferStrategy  != NULL){ delete    _transferStrategy;  _transferStrategy  = NULL; }
-  //if (_noiseReduction  != NULL){ delete    _noiseReduction;  _noiseReduction  = NULL; }
   if (_boundaryForceController!=NULL){ delete _boundaryForceController; _boundaryForceController=NULL;}
   if (_indexConversion   != NULL){ delete    _indexConversion;   _indexConversion   = NULL; }
 }
@@ -138,11 +131,6 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
 
-  //TODO: deprecated, moved to filter pipeline.
-  // noise reduction
-  //Wrapper4NoiseReductionProcessInnerMacroscopicCell wrapper3(this);
-  //Wrapper4NoiseReductionProcessOuterMacroscopicCell wrapper4(this);
-
   // pre-process data before sending to macroscopic solver
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
@@ -151,22 +139,11 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   timeval end;
   double runtime=0;
   if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); } 
-
-  //TODO: deprecated, moved to filter pipeline.
-  // run noise reduction
-  //_macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-  //_macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
-  //if(_noiseReduction->_doubleTraversal){
-  //  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-  //  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
-  //}
  
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
-  //std::cout << "MCS: BEFORE: "<<_macroscopicCells.getMacroscopicCells()[2325]->getCurrentVelocity() << std::endl;
   _filterPipeline(); 
-  //std::cout << "MCS: AFTER: "<<_macroscopicCells.getMacroscopicCells()[2325]->getCurrentVelocity() << std::endl;
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);
