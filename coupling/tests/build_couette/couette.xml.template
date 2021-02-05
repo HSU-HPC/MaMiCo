@@ -46,18 +46,18 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout. Only for sequential tests.
   -->
   <coupling
-    coupling-cycles="1000"
-    two-way-coupling="no"
+    coupling-cycles="50"
+    two-way-coupling="yes"
     send-from-md-to-macro="yes"
     filter-init-cycles="0"
-    write-csv-every-timestep="10"
+    write-csv-every-timestep="2"
     send-from-macro-to-md="yes"
     compute-snr="no"
   />
 
   <!-- Configuration parameters for macroscopic solver:
     - string type:
-      Supports "lb" (Lattice Boltzmann solver) or "analytical".
+      Supports "lb" (Lattice Boltzmann solver), "fd" (simple, sequential finite difference solver), "foam" (sequential, finite difference solver icoFoam from OpenFOAM) or "analytical".
       Note that analytic solver only supports flow in x-direction, is only active on rank 0, 
       and that it does not model viscous shear forces in the oscillating wall case (i.e. changes of wall-velocity are propagated through the whole domain instantaneously).
       The LB solver does not impose these limitations and can be parallelized.
@@ -70,13 +70,22 @@
     - int init-advance-cycles:
       Advances the macroscopic-solver before starting the coupling. Can be used for analytic solver and oscillating wall, 
       to skip couette startup.
+    - foam: string foam-setup-directory:
+      path to the OpenFOAM setup directory
+    - foam: string foam-setup-folder:
+      name of the OpenFOAM folder
+    - foam: Vector<12,unsigned int> boundaries-with-MD:
+      vector of '0' and '1', '1' for a boundary OpenFOAM when it shall be coupled with MaMiCo, uses the order according to the blockMesh order, '0' when the boundary shall not be coupled
   -->
   <macroscopic-solver 
-    type="lb"
+    type="fd"
     viscosity="2.14"
     number-of-processes="1 ; 1 ; 1"
-    plot-every-timestep="50"
+    plot-every-timestep="2"
     init-advance-cycles="0"
+    foam-setup-directory="/home/helene/Dokumente/mamico-dev/coupling/tests/build_couette"
+    foam-setup-folder="FoamSetup"
+    boundaries-with-MD="0; 0; 0; 0; 0; 0; 1; 1; 1; 1; 1; 1"
   />
 
   <!-- Configuration parameters for microscopic solver:
@@ -103,7 +112,7 @@
     type="md"
     temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="12"
+    number-md-simulations="4"
     density="0.813037037"
   />
 
@@ -134,11 +143,11 @@
   <!-- particle-insertion type="usher" enables removal of particles  /-->
   <!-- TODO choose insert-every-timestep automatically /-->
   <!-- TODO check tolerance criterium /-->
-  <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
+  <particle-insertion type="none" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
   <!--<particle-insertion type="none" />/-->
   <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
   <!-- TODO inconsistent mass flux evaluation? /-->
-  <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" />
+  <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
   <!-- time-window-size means number of coupling cycles/-->
   <!-- TODO try to use local density for boundary force /--> 
   <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
@@ -163,7 +172,7 @@
   <!-- TODO check fix-seed for mamico / USHER /-->
   <simulation-configuration
     dt="0.005"
-    number-of-timesteps="100"
+    number-of-timesteps="50"
     reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
     fix-seed="no"
