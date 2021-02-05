@@ -1,10 +1,10 @@
-This software Mamico (except tinyxml2) was developed at Technical University of Munich, who is the owner of the software. 
+This software Mamico (except tinyxml2) was developed at Technical University of Munich and Helmut Schmidt University Hamburg, who is the owner of this software.  
 
 According to good scientific practice, publications on results achieved in whole or in part due to Mamico should cite at least one paper presenting the Mamico software.
 
 The owner wishes to make the software available to all users to use, reproduce, modify, distribute and redistribute also for commercial purposes under the following conditions of the original BSD license. Linking the Mamico module statically or dynamically with other modules is making a combined work based on Mamico. Thus, the terms and conditions of this license cover the whole combination. As a special exception, the copyright holders of Mamico give you permission to link it with independent modules or to instantiate templates and macros from Mamico's source files to produce an executable, regardless of the license terms of these independent modules, and to copy and distribute the resulting executable under terms of your choice, provided that you also meet, for each linked independent module, the terms and conditions of this license of that module.
 
-Copyright (c) 2015, Technical University of Munich 
+Copyright (c) 2021, Helmut Schmidt University
 
 All rights reserved.
 
