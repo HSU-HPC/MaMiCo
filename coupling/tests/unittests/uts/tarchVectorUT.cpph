@@ -1,0 +1,60 @@
+#pragma once
+
+#include <iostream>
+
+#include "tarch/la/Vector.h"
+#include "coupling/tests/unittests/UnitTestInterface.h"
+#include "coupling/tests/unittests/MockService.cpph"
+#include "coupling/tests/unittests/UnitTestingService.h"
+
+#define DEBUG_UT_VECTOR
+
+
+//Maybe namespace "testing::ut::[...]"?
+namespace tarch { namespace la {
+	template<int size, class T>
+	class VectorUT;
+}}
+
+template<int size, class T> 
+class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
+	public:
+		VectorUT(testing::ut::UnitTestingService *uts):
+		testing::ut::UnitTestInterface(typeid(this).name())
+		{
+			//Request MockService of T
+			if(uts->getMockService<T>().has_value()) _TMS = uts->getMockService<T>().value();
+			else exit(EXIT_FAILURE); //TODO: EXCEPTION
+
+			//Initialize Mocks of this
+			std::vector<tarch::la::Vector<size, T> *> tarchlavectorMocks;
+			for(auto Tmock : _TMS->getMocksCopy<T>())
+				tarchlavectorMocks.push_back(new tarch::la::Vector<size, T>(Tmock));
+
+			//Create new MockService for this using dummy values generated above
+			testing::ut::UnitTestInterface::_thisMs = uts->addMockService<tarch::la::Vector<size, T>>(tarchlavectorMocks);
+
+			#ifdef DEBUG_UT_VECTOR
+				std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "Finished generating mocks " << std::endl;
+			#endif
+			
+			//Add test functions to UTI::_testFuncs
+			//TODO: Fix this. Pointers to member functions are a bit tricky...
+			//testing::ut::UnitTestInterface::_testFuncs.push_back(&(testTrivialSuccess));
+			//testing::ut::UnitTestInterface::_testFuncs.push_back(&(testTrivialFailure));
+		}
+		
+		~VectorUT() {}
+
+		/*void testTrivialSuccess() {
+		}
+		void testTrivialFailure() {
+			throw(std::runtime_error("TRIVIAL FAILURE"));
+		}*/
+
+		
+		
+	private:
+		//Used mock service of class T
+		testing::ut::MockService* _TMS;
+};

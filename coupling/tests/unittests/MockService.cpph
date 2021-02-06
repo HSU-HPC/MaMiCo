@@ -1,0 +1,93 @@
+#pragma once
+
+#include <any>
+#include <algorithm>
+#include <vector>
+
+#define DEBUG_MS
+
+namespace testing { namespace ut {
+	class MockService;
+}};
+
+/*
+ * A mock service stores and provides mock objects of a single type.
+ * This limitation is not strict, due to the neccessary use of std::any. (cf. constructor, addMocks)
+ * If you break that limitation however, you make the MockService unusable. (cf. getMocks[...])
+ *
+ * @Author Leonard Hannen, Felix Maurer
+ */
+
+
+class testing::ut::MockService{
+	public:
+		MockService(){
+			_mocks = std::vector<std::any>();
+		}
+
+		//TODO: Use move instead?
+		//Takes ownership of all passed mocks (cf. destructor).
+		//DO NOT ADD MOCKS OF DIFFERENT TYPES TO A SINGULAR MOCK SERVICE
+		MockService(std::vector<std::any> mocks):
+		_mocks(mocks)
+		{}
+
+		~MockService(){
+			//Destructs the object the std::any instance holds.
+			for(auto mock: _mocks) mock.reset();
+		}
+		
+		//DO NOT ADD MOCKS OF DIFFERENT TYPES TO A SINGULAR MOCK SERVICE
+		void addMock(std::any mock) {
+			_mocks.push_back(mock);
+		}
+
+		//TODO: allow selection of certain Mocks.
+		template<class T>
+		std::vector<T> getMocksCopy(){
+			std::vector<T> copies;
+			for (auto m : _mocks) {
+				try {
+					//Cast to T pointer to then derefence and pass by value.
+					copies.push_back(*(std::any_cast<T*>(m))); 
+					#ifdef DEBUG_MS
+						std::cout << "MS::getMocksCopy<" << typeid(T).name() << ">: Copied mock of type " << typeid(copies.back()).name() << std::endl;
+					#endif
+				}
+				catch(const std::bad_any_cast&) {
+					std::cout << "MS::getMocksCopy<" << typeid(T).name() << ">: FAULTY MOCK TYPES! WILL RETURN NO MOCKS." << std::endl;
+					/*TODO: Proper exception handling*/
+
+					copies.clear();
+					break;
+				}
+			}
+	
+			//Returns empty vector if above exception is thrown
+			return copies;
+		}
+		
+		template<class T>
+		std::vector<T const *> getMocksReference() {
+			try {
+				std::vector<T const*> mocksCastedT;
+				std::transform(_mocks.begin(), _mocks.end(), mocksCastedT.begin(), std::any_cast<T const*>);
+				#ifdef DEBUG_MS
+					std::cout << "MS::getMocksReference<" << typeid(T).name() << ">: Created reference to mocks of type " << typeid(mocksCastedT.back()).name() << std::endl;
+				#endif
+
+				return mocksCastedT;
+			}
+			catch(const std::bad_any_cast& ) {
+				std::cout << "MS::getMocksReference<" << typeid(T).name() << ">: FAULTY MOCK TYPES! WILL RETURN NO MOCKS." << std::endl;
+				/*TODO: Proper exception handling*/
+			}
+
+			//Returns empty vector if above exception is thrown
+			return std::vector<T*>();
+		}
+
+	private:
+		//contains pointers to objects of a singular class (denoted as 'T' above)
+		std::vector<std::any> _mocks;
+};
