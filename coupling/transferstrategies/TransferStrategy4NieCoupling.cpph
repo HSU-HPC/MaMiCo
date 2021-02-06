@@ -62,8 +62,8 @@ processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
   // backup old mass that could not be inserted into cells
   _excessMass[index] = cell.getMicroscopicMass();
 
-  //TODO: remove temporaray debug output
-  std::cout << "TransferStrategy4NieCoupling: _excessMass[" << index << "]: " << _excessMass[index] << std::endl;
+  //TODO: remove temporary debug output
+  if(_excessMass[index] > 0) std::cout << "TransferStrategy4NieCoupling: _excessMass[" << index << "]: " << _excessMass[index] << std::endl;
   //TODO: make threshold customizable
   const unsigned int threshold = 3;
   if(_excessMass[index] > threshold) {
