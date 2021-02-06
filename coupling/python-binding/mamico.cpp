@@ -565,31 +565,33 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 	.def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep)
 	.def("addFilterToSequence", []
 			(
-			 //TODO: Use std::optional to allow for optional arguments; resolved by none(true)?
 				 coupling::services::MacroscopicCellService<3>* service,
 				 const char* filter_sequence,
 				 int filter_index,
 				 //use of std::optional is neccessary because pybind11 doesnt support implicit None conversion for STL datatypes
-				 std::optional<std::function<py::array_t<double> (py::array_t<double>)>* > scalar_filter_func,
-				 std::optional<std::function<py::array_t<double> (py::array_t<double>)>* > vector_filter_func
+				 std::optional<std::function<py::array_t<double> (py::array_t<double>)>> scalar_filter_func,
+				 std::optional<std::function<py::array_t<double> (py::array_t<double>)>> vector_filter_func
 			)
 			{
-				//"unwrap" std::optional
-				if(!scalar_filter_func.has_value()) scalar_filter_func = nullptr;
-				if(!vector_filter_func.has_value()) vector_filter_func = nullptr;
+				std::function<py::array_t<double> (py::array_t<double>)> * sf_ptr = nullptr;
+				if(scalar_filter_func.has_value()) sf_ptr = &(scalar_filter_func.value());
+
+				std::function<py::array_t<double> (py::array_t<double>)> * vf_ptr = nullptr;
+				if(vector_filter_func.has_value()) vf_ptr = &(vector_filter_func.value());
 
 				//each coupling::conversion:functionWrapper checks for nullptrs, i.e "None" args
 				service->addFilterToSequence( 
 						filter_sequence, 
-						coupling::conversion::functionWrapper_Scalar(scalar_filter_func.value()),
-						coupling::conversion::functionWrapper_Vector(vector_filter_func.value()),
+						coupling::conversion::functionWrapper_Scalar(sf_ptr),
+						coupling::conversion::functionWrapper_Vector(vf_ptr),
 						filter_index);
 			}, 
 			"filter_sequence"_a,
 			"filter_index"_a,
-			py::arg("scalar_filter_func") = py::none(),
-			py::arg("vector_filter_func") = py::none()
+			"scalar_filter_func"_a = py::none(),
+			"vector_filter_func"_a = py::none()
 			);
+
 
     coupling.def("getMDSimulation", []
     	(const simplemd::configurations::MolecularDynamicsConfiguration& c1,
