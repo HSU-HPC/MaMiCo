@@ -88,18 +88,18 @@ class coupling::FilterSequence {
 
 
     	virtual ~FilterSequence(){
+			//Output average application times for all filters
+			std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
+			for(auto filter : _filters){
+				std::cout << "	" << filter->getType() << ": " << (double) std::accumulate(_filterTimes[filter].begin(),_filterTimes[filter].end(),0) / (double) _timestepsElapsed << std::endl;
+			}
+
 			for (auto v1 : _cellVector1) delete v1;
 			for (auto v2 : _cellVector2) delete v2;
 			for (auto f : _filters) delete f;
         	#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Deconstructed." << std::endl;
         	#endif
-
-			//Output average application times for all filters
-			std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
-			for(auto filter : _filters){
-				std::cout << "	" << filter->getType() << ": " << (double) std::accumulate(_filterTimes[filter].begin(),_filterTimes[filter].end(),0) / (double) _timestepsElapsed << std::endl;
-			}
     	}
 	
 		/*
