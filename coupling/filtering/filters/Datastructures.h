@@ -30,11 +30,18 @@ namespace coupling {
     */
     template<unsigned int dim> class Patch;
 
+    /*** 
+    *   similar to patch, but
+    *   does not store local flowfield, but accesses basefield for distance computation
+    */
+    template<unsigned int dim> class PatchView;
+
     /***
     *	Spacetime window of patches
     */
     template<unsigned int dim>
-    using Patchfield = Field<dim, Patch<dim>>;
+    //using Patchfield = Field<dim, Patch<dim>>;
+    using Patchfield = Field<dim, PatchView<dim>>;
   }
 }
 
@@ -240,4 +247,56 @@ private:
 	Flowfield<dim> _flowfield;
 	Quantities<dim> _localMean;
 	double _localStandardDeviation;
+};
+
+/*** 
+*   similar to patch, but does not store local flowfield,
+*   accesses basefield for distance computation
+*/
+template<unsigned int dim> 
+class coupling::filtering::PatchView{
+public:
+	PatchView(const tarch::la::Vector<dim,unsigned int> &spatialSize, const unsigned int &temporalSize,
+	const Flowfield<dim> &basefield, const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t):
+	_spatialSize(spatialSize), _temporalSize(temporalSize), _basefield(basefield), _pos(pos), _t(t){}
+
+	double distance(const coupling::filtering::PatchView<dim>& other) const{
+		double res = 0;
+
+		tarch::la::Vector<dim,unsigned int> base_pos(0);
+		unsigned int base_t(0);
+
+		for(int offset_t = 0; offset_t > -(int)_temporalSize; offset_t--){
+			base_t = posmod(_t + offset_t, _basefield.getTemporalSize());
+			for(int offset_x = -(int)(_spatialSize[0])/2; offset_x <= (int)(_spatialSize[0])/2; offset_x++){
+				base_pos[0] = _pos[0] + offset_x;
+				for(int offset_y = -(int)(_spatialSize[1])/2; offset_y <= (int)(_spatialSize[1])/2; offset_y++){
+					base_pos[1] = _pos[1] + offset_y;
+					if constexpr (dim == 3){
+						for(int offset_z = -(int)(_spatialSize[2])/2; offset_z <= (int)(_spatialSize[2])/2; offset_z++){
+							base_pos[2] = _pos[2] + offset_z;
+							auto diff(_basefield(base_pos, base_t) - other._basefield(base_pos, base_t));
+							res += tarch::la::dot(diff,diff);
+						}
+					}
+					else{
+						auto diff(_basefield(base_pos, base_t) - other._basefield(base_pos, base_t));
+						res += tarch::la::dot(diff,diff);
+					}
+				}
+			}
+		}
+		return res;
+	}
+	
+private:
+	inline unsigned int posmod(int i, int n) const{
+    	return (i % n + n) % n;
+	}
+
+	const tarch::la::Vector<dim,unsigned int> _spatialSize;
+	const unsigned int _temporalSize;
+	const Flowfield<dim>& _basefield;
+	const tarch::la::Vector<dim,unsigned int> _pos;
+	const unsigned int _t;
 };

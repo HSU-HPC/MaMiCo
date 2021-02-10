@@ -34,7 +34,7 @@ void coupling::NLM<dim>::operator()(){
   // Main denoising
   for(auto idx : _innerCellIndices){
     auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
-    coupling::filtering::Patch<dim>& me = _patchfield(idx_inner, _t);
+    auto& me = _patchfield(idx_inner, _t);
     double C = 0;
     coupling::filtering::Quantities<dim> res(0);
     int tdist = std::min((int)_timeWindowSize,(int)_cycleCounter+1);
@@ -44,7 +44,7 @@ void coupling::NLM<dim>::operator()(){
       unsigned int t = ((_t + offset_t ) % _timeWindowSize + _timeWindowSize) % _timeWindowSize;
       for(auto idx2 : _innerCellIndices){
         auto idx2_inner = idx2 - tarch::la::Vector<dim,unsigned int>(1);
-        coupling::filtering::Patch<dim>& other = _patchfield(idx2_inner, t);
+        auto& other = _patchfield(idx2_inner, t);
         double dist = me.distance(other);
 #ifdef NLM_DEBUG
         //std::cout << "dist = " << dist << std::endl;
