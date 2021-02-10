@@ -16,12 +16,6 @@ namespace tarch { namespace la {
 	class VectorUT;
 }}
 
-void testTrivialSuccess() {
-	std::cout << "TRIVIAL DUMMY TEST PASSED" << std::endl;
-}
-void testTrivialFailure() {
-	throw(std::runtime_error("TRIVIAL FAILURE"));
-}
 
 template<int size, class T> 
 class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
@@ -46,12 +40,47 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 			#endif
 			
 			//Add test functions to UTI::_testFuncs
-			//TODO: Add lambdas to vector which capture "this" and call member functions?
-			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>(&testTrivialSuccess));
-			//testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>(&testTrivialFailure));
+			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>
+				{ [this] () { testVectorAddition(); } }
+			);
 		}
 		
 		~VectorUT() {}	
+
+		//Verify correctness of operator+=
+		void testVectorAddition() {
+			for(auto vector1 : testing::ut::UnitTestInterface::_thisMs->getMocksCopy<tarch::la::Vector<size, T>>()) {
+				for(auto vector2 : testing::ut::UnitTestInterface::_thisMs->getMocksCopy<tarch::la::Vector<size, T>>()) {
+					auto addedVector = vector1;
+					addedVector += vector2;
+					for(int i = 0; i < size; i++)
+						//TODO: Does this typecast make sense?
+						if(addedVector[i] != vector1[i] + vector2[i])
+							{ 
+								#ifdef DEBUG_UT_VECTOR
+									std::cout << "vector1[" << i << "]: " << vector1[i] << std::endl;
+									std::cout << "vector2[" << i << "]: " << vector2[i] << std::endl;
+									std::cout << "addedVector[" << i << "]: " << addedVector[i] << std::endl;
+								#endif
+								
+								throw(std::runtime_error("testVectorAddition failed!"));
+								break;
+							}
+				}
+			}
+			#ifdef DEBUG_UT_VECTOR
+				std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "testVectorAddition: Success!" << std::endl;
+			#endif
+		}
+
+		//TODO: remove dummy tests
+		/*void testTrivialSuccess() {
+			std::cout << "TRIVIAL DUMMY TEST PASSED" << std::endl;
+		}
+		void testTrivialFailure() {
+			throw(std::runtime_error("TRIVIAL FAILURE"));
+		}*/
+
 		
 		
 	private:

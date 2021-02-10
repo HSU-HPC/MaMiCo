@@ -31,7 +31,7 @@ testing::ut::UnitTestingService::UnitTestingService()
 
 	//Initialize UT instances of MaMiCo classes that have Unit Tests
 	_uts.push_back(new tarch::la::VectorUT<2, int>(this));
-	_uts.push_back(new tarch::la::VectorUT<0, std::string>(this));
+	_uts.push_back(new tarch::la::VectorUT<2, std::string>(this));
 	_uts.push_back(new tarch::la::VectorUT<30, bool>(this));
 
 	_uts.push_back(new tarch::la::VectorUT<3, tarch::la::Vector<2, int> >(this));
