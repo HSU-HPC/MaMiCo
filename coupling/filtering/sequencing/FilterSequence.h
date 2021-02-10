@@ -131,7 +131,7 @@ class coupling::FilterSequence {
 				gettimeofday(&after, NULL);
 
 				//store time difference in usec in map
-				_filterTimes[filter].push_back(after.tv_sec*1000000+after.tv_usec - before.tv_sec*1000000+before.tv_usec);
+				_filterTimes[filter].push_back((after.tv_sec*1000000+after.tv_usec) - (before.tv_sec*1000000+before.tv_usec));
 
 				#ifdef DEBUG_FILTER_PIPELINE
 					std::cout 
