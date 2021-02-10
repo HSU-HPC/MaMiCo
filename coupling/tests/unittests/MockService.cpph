@@ -51,7 +51,7 @@ class testing::ut::MockService{
 					//Cast to T pointer to then derefence and pass by value.
 					copies.push_back(*(std::any_cast<T*>(m))); 
 					#ifdef DEBUG_MS
-						std::cout << "MS::getMocksCopy<" << typeid(T).name() << ">: Copied mock of type " << typeid(copies.back()).name() << std::endl;
+						//std::cout << "MS::getMocksCopy<" << typeid(T).name() << ">: Copied mock of type " << typeid(copies.back()).name() << std::endl;
 					#endif
 				}
 				catch(const std::bad_any_cast&) {
