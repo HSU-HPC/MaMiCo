@@ -16,6 +16,13 @@ namespace tarch { namespace la {
 	class VectorUT;
 }}
 
+void testTrivialSuccess() {
+	std::cout << "TRIVIAL DUMMY TEST PASSED" << std::endl;
+}
+void testTrivialFailure() {
+	throw(std::runtime_error("TRIVIAL FAILURE"));
+}
+
 template<int size, class T> 
 class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 	public:
@@ -39,19 +46,12 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 			#endif
 			
 			//Add test functions to UTI::_testFuncs
-			//TODO: Fix this. Pointers to member functions are a bit tricky...
-			//testing::ut::UnitTestInterface::_testFuncs.push_back(&(testTrivialSuccess));
-			//testing::ut::UnitTestInterface::_testFuncs.push_back(&(testTrivialFailure));
+			//TODO: Add lambdas to vector which capture "this" and call member functions?
+			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>(&testTrivialSuccess));
+			//testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>(&testTrivialFailure));
 		}
 		
-		~VectorUT() {}
-
-		/*void testTrivialSuccess() {
-		}
-		void testTrivialFailure() {
-			throw(std::runtime_error("TRIVIAL FAILURE"));
-		}*/
-
+		~VectorUT() {}	
 		
 		
 	private:

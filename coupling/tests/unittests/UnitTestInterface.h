@@ -33,6 +33,7 @@ class testing::ut::UnitTestInterface {
 
 
 		virtual ~UnitTestInterface() {
+			for(auto func : _testFuncs) delete func;
 			#ifdef DEBUG_UT
 				std::cout << PRINT_PREFIX() << "Deconstructed." << std::endl;
 			#endif
