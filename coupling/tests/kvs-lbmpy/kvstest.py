@@ -160,8 +160,8 @@ class KVSTest():
             return median_filter(data, size = (3,3,3,1))
 
         #TODO: FM: fix segfault
-        #mcs = self.multiMDCellService.getMacroscopicCellService(0)
-        #mcs.addFilterToSequence(filter_sequence="gaussseq", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
+        mcs = self.multiMDCellService.getMacroscopicCellService(0)
+        mcs.addFilterToSequence(filter_sequence="gauss-seq", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
