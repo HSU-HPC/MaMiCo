@@ -8,6 +8,7 @@
 #include <vector>
 #include <array>
 #include <stdexcept>
+#include <optional>
 
 /*
  * Functions of this namespace provide conversion bewtween popular C++ and Python data structures.
@@ -108,13 +109,13 @@ namespace coupling { namespace conversion {
 		std::vector<double>
 	   	(std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)
 	>*
-	functionWrapper_Scalar(std::function<py::array_t<double> (py::array_t<double>)>* py_func_ptr)
+	functionWrapper_Scalar(std::function<py::array_t<double> (py::array_t<double>)> *  py_func_ptr)
 	{
 		//case: py_func exists
 		if(py_func_ptr)
 		{
 			//create copy at current scope
-			auto py_func = *py_func_ptr;
+			auto py_func =  *py_func_ptr;
 			return new std::function<std::vector<double> (std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>
  				{
 					[py_func]
