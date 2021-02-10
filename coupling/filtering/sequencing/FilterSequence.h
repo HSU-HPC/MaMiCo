@@ -3,6 +3,9 @@
 // www5.in.tum.de/mamico
 
 #pragma once
+#include<map>
+#include<numeric>
+#include<sys/time.h>
 
 #include "coupling/IndexConversionMD2Macro.h"
 #include "tarch/configuration/ParseConfiguration.h"
@@ -60,7 +63,8 @@ class coupling::FilterSequence {
 		_domainEnd(domainEnd),
 		_filteredValues(filteredValues),
 		_isOutput(false), //potentially updated via loadSequencesFromXML calling setAsOutput()
-		_isModifiable(true) //TODO: allow const sequences via XML attribute
+		_isModifiable(true), //TODO: allow const sequences via XML attribute
+		_timestepsElapsed(0)
 		{	
 			#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Now initializing." << std::endl;
@@ -90,6 +94,12 @@ class coupling::FilterSequence {
         	#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Deconstructed." << std::endl;
         	#endif
+
+			//Output average application times for all filters
+			std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
+			for(auto filter : _filters){
+				std::cout << "	" << filter->getType() << ": " << (double) std::accumulate(_filterTimes[filter].begin(),_filterTimes[filter].end(),0) / (double) _timestepsElapsed << std::endl;
+			}
     	}
 	
 		/*
@@ -101,6 +111,35 @@ class coupling::FilterSequence {
 				*(_cellVector1[index]) = *(_inputCellVector[index]);
 				*(_cellVector2[index]) = *(_inputCellVector[index]);
 			}
+		}
+
+		/*
+		 * Applies all filters stored in _filters. Also measures performance times.
+		 */
+		void operator()() {
+			for(auto filter : _filters){
+				//TODO: isnt there a C++ way to do this?
+				//measure time before application
+				timeval before;
+				gettimeofday(&before, NULL);
+
+				//Apply the filter's operator()
+				(*filter)();
+
+				//measure time after application
+				timeval after;
+				gettimeofday(&after, NULL);
+
+				//store time difference in usec in map
+				_filterTimes[filter].push_back((after.tv_sec*1000000+after.tv_usec) - (before.tv_sec*1000000+before.tv_usec));
+
+				#ifdef DEBUG_FILTER_PIPELINE
+					std::cout 
+						<< PRINT_PREFIX() << "Applied filter " << filter->getType() 
+						<< ". Application time: " << _filterTimes[filter].back() << "\u03BCs" << std::endl;
+				#endif
+			}
+			_timestepsElapsed++;
 		}
 
 		/*
@@ -246,6 +285,12 @@ class coupling::FilterSequence {
 		bool _isModifiable; //true while filters can be added to sequence
 		
 		std::vector<coupling::FilterInterface<dim> *> _filters;
+
+		//stores application times for all filters
+		std::map<coupling::FilterInterface<dim> *, std::vector<unsigned int>> _filterTimes;
+
+		//there must be some other place to get this from
+		unsigned int _timestepsElapsed;
 };
 
 //inlcude implementation

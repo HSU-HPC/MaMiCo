@@ -78,8 +78,9 @@ void coupling::FilterPipeline<dim>::operator()(){
 		
 		//update cell vector contents	
 		currSequence->updateCellVectors();
+
 		//apply all filters of sequence
-		for(coupling::FilterInterface<dim>* currFilter : currSequence->getFilters()) (*currFilter)();
+		(*currSequence)();
 
         #ifdef DEBUG_FILTER_PIPELINE
 		std::cout << "FP: Done applying sequence " << currSequence->getName() << std::endl;
