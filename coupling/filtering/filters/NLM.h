@@ -15,7 +15,8 @@ namespace coupling {
 
 /** 
  *  Noise reduction algorithm using non-local means (NLM) method
- *  See 'Fast Non Local Means Denoising for 3D MR Images' by Coupé et al. 2006.
+ *  See 'Fast Non Local Means Denoising for 3D MR Images' by Coupé et al. 2006
+ *   and 'Non-Local Means Denoising' by Buades et al. 2011. 
  *
  *  @author Piet Jarmatz
  * 
