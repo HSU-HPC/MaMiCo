@@ -43,6 +43,14 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>
 				{ [this] () { testVectorAddition(); } }
 			);
+			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>
+				{ [this] () { testTrivialSuccess(); } }
+			);
+			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>
+				{ [this] () { testTrivialFailure(); } }
+			);
+
+
 		}
 		
 		~VectorUT() {}	
@@ -53,19 +61,18 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 				for(auto vector2 : testing::ut::UnitTestInterface::_thisMs->getMocksCopy<tarch::la::Vector<size, T>>()) {
 					auto addedVector = vector1;
 					addedVector += vector2;
-					for(int i = 0; i < size; i++)
-						//TODO: Does this typecast make sense?
-						if(addedVector[i] != vector1[i] + vector2[i])
-							{ 
-								#ifdef DEBUG_UT_VECTOR
-									std::cout << "vector1[" << i << "]: " << vector1[i] << std::endl;
-									std::cout << "vector2[" << i << "]: " << vector2[i] << std::endl;
-									std::cout << "addedVector[" << i << "]: " << addedVector[i] << std::endl;
-								#endif
-								
-								throw(std::runtime_error("testVectorAddition failed!"));
-								break;
-							}
+						#ifdef DEBUG_UT_VECTOR
+							std::cout 
+							<< " vector1: " << vector1
+							<< ", vector2: " << vector2
+							<< ", addedVector: " << addedVector << std::endl;
+						#endif
+						
+					for(int i = 0; i < size; i++){
+						if(addedVector[i] != vector1[i] + vector2[i]) { 								
+							throw(std::runtime_error("failure of testVectorAddition"));
+						}
+					}
 				}
 			}
 			#ifdef DEBUG_UT_VECTOR
@@ -74,12 +81,12 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 		}
 
 		//TODO: remove dummy tests
-		/*void testTrivialSuccess() {
+		void testTrivialSuccess() {
 			std::cout << "TRIVIAL DUMMY TEST PASSED" << std::endl;
 		}
 		void testTrivialFailure() {
 			throw(std::runtime_error("TRIVIAL FAILURE"));
-		}*/
+		}
 
 		
 		

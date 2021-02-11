@@ -10,7 +10,7 @@ testing::ut::UnitTestingService::UnitTestingService()
 	
 	//INT
 	std::vector<int *> intMocks;
-	for(int i = 0; i < 100; i++)
+	for(int i = -10; i < 10; i++)
 		intMocks.push_back( new int(i));
 	addMockService<int>(intMocks);
 
@@ -25,15 +25,14 @@ testing::ut::UnitTestingService::UnitTestingService()
 	stdstringMocks.push_back(new std::string(""));
 	stdstringMocks.push_back(new std::string("Testing"));
 	stdstringMocks.push_back(new std::string(" "));
-	stdstringMocks.push_back(new std::string("\n"));
+	stdstringMocks.push_back(new std::string("\u03BC"));
 	stdstringMocks.push_back(new std::string("äöü"));
 	addMockService<std::string>(stdstringMocks);
 
 	//Initialize UT instances of MaMiCo classes that have Unit Tests
 	_uts.push_back(new tarch::la::VectorUT<2, int>(this));
 	_uts.push_back(new tarch::la::VectorUT<2, std::string>(this));
-	_uts.push_back(new tarch::la::VectorUT<30, bool>(this));
-
+	_uts.push_back(new tarch::la::VectorUT<5, bool>(this));
 	_uts.push_back(new tarch::la::VectorUT<3, tarch::la::Vector<2, int> >(this));
 	//...
 }
@@ -42,14 +41,14 @@ testing::ut::UnitTestingService::UnitTestingService()
 //member functions of testing::ut::UnitTestingService
 void testing::ut::UnitTestingService::runAllUnitTests() {
 	#ifdef DEBUG_UTS
-		std::cout << "UnitTestingService: Now running tests for all classes... ";
+		std::cout << "UnitTestingService: Now running tests for all classes... " << std::endl;
 	#endif
 	for(auto ut : _uts) {
 		try {
 			ut->runAllTests();
 		}
 		catch(const std::exception& e) {
-			std::cout << std::endl << "UnitTestingService: Caught " << e.what() << " while testing " << ut->getClassIdentifier() << std::endl;
+			std::cout << "UnitTestingService: Caught " << e.what() << " while testing " << ut->getClassIdentifier() << std::endl;
 			//TODO: Handle this case somehow. Aborting? Git revert? 
 		}
 	}
@@ -62,13 +61,13 @@ void testing::ut::UnitTestingService::runAllUnitTests() {
 //Assumes uts_index to not be out-of-bounds.
 void testing::ut::UnitTestingService::runUnitTest(unsigned int uts_index) {
 	#ifdef DEBUG_UTS
-		std::cout << "UnitTestingService: Now running tests for class "<< _uts[uts_index]->getClassIdentifier() << "... ";
+		std::cout << "UnitTestingService: Now running tests for class "<< _uts[uts_index]->getClassIdentifier() << "... " << std::endl;
 	#endif
 	try {
 		_uts[uts_index]->runAllTests();
 	}
 	catch(const std::exception& e){
-		std::cout << std::endl << "UnitTestingService: Caught " << e.what() << " while testing " << _uts[uts_index]->getClassIdentifier() << std::endl;
+		std::cout << "UnitTestingService: Caught " << e.what() << " while testing " << _uts[uts_index]->getClassIdentifier() << std::endl;
 		//TODO: Handle this case somehow. Aborting? Git revert? 
 	}
 	#ifdef DEBUG_UTS
