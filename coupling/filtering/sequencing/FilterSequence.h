@@ -12,6 +12,7 @@
 
 //INCLUDE ALL FILTER HEADERS HERE
 #include "coupling/filtering/filters/WriteToFile.h"
+#include "coupling/filtering/filters/ReadFromFile.h"
 #include "coupling/filtering/filters/Gauss.h"
 #include "coupling/filtering/filters/POD.h"
 #include "coupling/filtering/filters/NLM.h"
