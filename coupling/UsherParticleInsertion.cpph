@@ -38,12 +38,14 @@ const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
   // if we have enough mass left in the cell, try to insert a particle and remove one particle mass
   if (cell.getMicroscopicMass() >= 0.6*moleculeMass){
     action = insertParticle(cell,macroscopicCellPosition,macroscopicCellSize,meanVelocity,temperature,boundaryForceController);
+    // std::cout << "inserte: "<<macroscopicCellPosition[0] << " " << macroscopicCellPosition[1] << " " <<  macroscopicCellPosition[2] << " " << std::endl;
     if (action == coupling::ParticleInsertion<LinkedCell,dim>::Insertion){
       cell.addMicroscopicMass(-moleculeMass);
     }
   // if we need to delete a particle, we try this and - in case it works - add a particle mass to the negative buffer
 } else if (cell.getMicroscopicMass() <= -0.6*moleculeMass){
     action = deleteParticle(cell,boundaryForceController);
+    // std::cout << "delete: "<< macroscopicCellPosition[0] << " " << macroscopicCellPosition[1] << " " <<  macroscopicCellPosition[2] << " " << std::endl;
     if (action == coupling::ParticleInsertion<LinkedCell,dim>::Deletion){
       cell.addMicroscopicMass(moleculeMass);
       #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
@@ -207,16 +209,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
     lowerLeftBoundaries[d]  = fmax(lowerLeftBoundaries[d], domainLower[d]+_usherParams._offsetFromOuterBoundary);
     // if the offset yields, that we cannot insert any particle: return
     if (lowerLeftBoundaries[d]>upperRightBoundaries[d]){return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;}
-    // if (macroscopicCellSize[d] > 2.5){
-    //   // that means we are at the left, lower, or front boundary
-    //   if(lowerLeftBoundaries[d]==domainLower[d]+_usherParams._offsetFromOuterBoundary){
-    //     upperRightBoundaries[d] = upperRightBoundaries[d]-macroscopicCellSize[d]*0.4;
-    //   }
-    //   // that mean we are at the right, upper, or back boundary
-    //   else if(upperRightBoundaries[d]==domainUpper[d]-_usherParams._offsetFromOuterBoundary){
-    //     lowerLeftBoundaries[d] = lowerLeftBoundaries[d]+macroscopicCellSize[d]*0.4;
-    //   }
-    // }
   }
   #ifdef USHER_DEBUG
   std::cout << std::endl << "U_0 = " << U_0 << std::endl;
@@ -256,7 +248,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
     absForce = std::sqrt(tarch::la::dot(force,force));
 
     // do steps towards expected energy level
-    double xiloc = xiMax + 1.0;
+    double xiloc = xiMax + 10000.0;
     double xiOld = xiMax + 1.0;
     int success = 0;
     int loci = 0;
@@ -278,7 +270,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       // control step size
       if ( energy > U_overlap ){
         stepSize = rSigma - sigma*pow(epsilon_times_4/energy, (1.0/12.0));
-
       } else {
         stepSize = fabs(energy - U_0)/absForce;
         if ( stepSize > stepRef ){
@@ -295,8 +286,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       // update particle position
       positionOld = position;
       position = position + (stepSize*signAl/absForce)*force;
-      // std::cout << positionOld[0] <<" " << positionOld[1] << " " << positionOld[2] << " ";
-      // std::cout << position[0] <<" " << position[1] << " " << position[2] << std::endl;
 
       molecule.setPosition(position);
 
@@ -322,7 +311,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       absForce = std::sqrt(tarch::la::dot(force,force));
       xiOld = xiloc;
       xiloc = fabs(energy-U_0)/fabs(U_0);
-
+      // std::cout << " old " << xiOld << " new " << xiloc << std::endl;
       if ( xiloc < xiMax ){
         success++;
       }
@@ -348,13 +337,13 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       std::cout << "Finished with energy = " << energy << " after " << i
         << " restarts and " << loci << " iterations" << std::endl;
       #endif
-      std::cout << "Molecule inserted at " << position[0] << " " << position[1] << " " << position[2] << std::endl;
+      // std::cout << "Molecule inserted at " << position[0] << " " << position[1] << " " << position[2] << std::endl;
       return coupling::ParticleInsertion<LinkedCell,dim>::Insertion;
     }
   }
   #ifdef USHER_DEBUG
   std::cout << "Failed" << std::endl;
   #endif
-  std::cout << "Failed energy " << energyFail << " pos " << posFail<< std::endl;
+  // std::cout << "Failed energy " << energyFail << " pos " << posFail<< std::endl;
   return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;
 }

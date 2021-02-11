@@ -106,7 +106,7 @@
     type="md"
     temperature="1.1"
     equilibration-steps="0"
-    number-md-simulations="4"
+    number-md-simulations="1"
     density="0.813037037"
   />
 
@@ -127,17 +127,17 @@
 <mamico>
   <!-- "write-every-macroscopic-timestep" means CFD time step /-->
   <macroscopic-cell-configuration
-    cell-size="5 ; 5 ; 5"
-    linked-cells-per-macroscopic-cell="2 ; 2 ; 2"
+    cell-size="2.5 ; 2.5 ; 2.5"
+    linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
     write-every-microscopic-timestep="0"
     microscopic-filename="MacroscopicCell_micro"
-    write-every-macroscopic-timestep="0"
+    write-every-macroscopic-timestep="1"
     macroscopic-filename="MacroscopicCell_macro"
   />
   <!-- particle-insertion type="usher" enables removal of particles  /-->
   <!-- TODO choose insert-every-timestep automatically /-->
   <!-- TODO check tolerance criterium /-->
-  <particle-insertion type="usher" maximum-number-of-iterations="500" maximum-number-of-restarts="1000" insert-every-timestep="2" tolerance="0.25" />
+  <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="5" tolerance="0.5" u_0-factor="1."/>
   <!--<particle-insertion type="none" />/-->
   <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
   <!-- TODO inconsistent mass flux evaluation? /-->
@@ -162,7 +162,7 @@
 
   <!-- number of linked cells must be divisible by number-of-processes /-->
   <!-- number of mpi ranks must be total number-of-processes /-->
-  <mpi-configuration number-of-processes="1 ; 1 ; 1" ></mpi-configuration>
+  <mpi-configuration number-of-processes="2 ; 2 ; 1" ></mpi-configuration>
 
   <!-- TODO check fix-seed for mamico / USHER /-->
   <simulation-configuration
@@ -182,9 +182,9 @@
   <domain-configuration
     pinit-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
     
-    molecules-per-direction="56 ; 56 ; 56"
-    domain-size="60.0 ; 60.0 ; 60.0"
-    domain-offset="20.0 ; 20.0 ; 5"
+    molecules-per-direction="30 ; 28 ; 28"
+    domain-size="30.0 ; 30.0 ; 30.0"
+    domain-offset="10.0 ; 10.0 ; 2.5"
     cutoff-radius="2.2"
     linked-cell-size="2.5 ; 2.5 ; 2.5"
     k_B="1.0"

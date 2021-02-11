@@ -54,13 +54,7 @@ class coupling::cellmappings::DeleteParticleMapping {
 
           // save copy of particle
           const tarch::la::Vector<dim,double> position = myMolecule.getPosition();
-          // if(position[0] >= 75.0 && position[0] <= 80.0){
-            // if(position[0] >= 77.0 && position[0] <= 80.0){
               _state=0;
-              std::cout << position[0] << " " << position[1] << " " << position[2] << " " << std::endl;
-            // }
-            // else{_state=1; return;}
-          // }
           const tarch::la::Vector<dim,double> velocity = myMolecule.getVelocity();
           const tarch::la::Vector<dim,double> force = myMolecule.getForce();
           const double potentialEnergy = myMolecule.getPotentialEnergy();
