@@ -42,7 +42,8 @@ class coupling::ReadFromFile : public coupling::FilterInterface<dim>{
 				std::string location):
 
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "RFF"),
-		   		_location(location)
+		   		_location(location),
+				_iteration(0)
 		{	
         	#ifdef DEBUG_READ_FROM_FILE
             std::cout << "		RFF: Read from file instance created. Will read from: " << _location << "." << std::endl;
@@ -59,6 +60,7 @@ class coupling::ReadFromFile : public coupling::FilterInterface<dim>{
 
     private:
         std::string _location;
+		unsigned int _iteration;
 
         std::ifstream _file;
 };

@@ -15,6 +15,10 @@ void coupling::ReadFromFile<dim>::operator()(){
 
 	_file.open(_location);
 
+	//TODO: cleaner solution: skipp all lines of previous iterations
+	std::string skipstr;
+	for(unsigned int s = 0; s < _iteration * ((coupling::FilterInterface<dim>::_inputCells.size())+1); s++) std::getline(_file, skipstr);
+
 	//TODO: check if number of lines match number of cells
 	
     for(unsigned int ic_index = 0; ic_index < coupling::FilterInterface<dim>::_inputCells.size(); ic_index++) {
@@ -63,6 +67,7 @@ void coupling::ReadFromFile<dim>::operator()(){
     }
 
     _file.close(); 
+	_iteration++;
 
     #ifdef DEBUG_READ_FROM_FILE
     std::cout << " ... done" << std::endl;
