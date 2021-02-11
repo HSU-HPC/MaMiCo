@@ -40,6 +40,12 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
             newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location"), overwrite, oco);
         }
+	
+		//Read From File
+        else if(std::strcmp(currFilterNode->Value(), "read-from-file") == 0){
+			
+            newfilter = new coupling::ReadFromFile<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"));
+		}
 
 		//Gauss
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
