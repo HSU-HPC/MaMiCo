@@ -178,7 +178,7 @@ public:
 		double* const other_data = reinterpret_cast<double* const>(other._flowfield._data);
 
 		double res = 0;
-		for(unsigned int i = 0; i < size; i++){
+		for(unsigned int i = 0; i < size; i += 4){
 			double diff(my_data[i] - other_data[i]);
 			res += diff*diff;
 		}
@@ -275,8 +275,9 @@ public:
 					if constexpr (dim == 3){
 						for(int offset_z = -(int)(_spatialSize[2])/2; offset_z <= (int)(_spatialSize[2])/2; offset_z++){
 							base_pos[2] = _pos[2] + offset_z;
-							auto diff(_basefield(base_pos, base_t) - other._basefield(base_pos, base_t));
-							res += tarch::la::dot(diff,diff);
+							//TODO: this is not correct. fix me
+							auto diff(_basefield(base_pos, base_t) - _basefield(base_pos + other._pos - _pos, posmod(base_t + other._t - _t, _basefield.getTemporalSize())));
+							res += diff[0]*diff[0];
 						}
 					}
 					else{

@@ -7,8 +7,8 @@ void coupling::NLM<dim>::operator()(){
     std::cout << "    NLM: called operator()" << std::endl;
   #endif
 
-  const double sigsq = 5000;  // TODO configure
-  const double hsq = 5000;    // TODO configure
+  const double sigsq = 3;  // TODO configure
+  const double hsq = 3;    // TODO configure
 
   // Save data
   for(unsigned int i = 0; i < this->_inputCells.size(); ++i){ 
@@ -47,11 +47,11 @@ void coupling::NLM<dim>::operator()(){
         auto& other = _patchfield(idx2_inner, t);
         double dist = me.distance(other);
 #ifdef NLM_DEBUG
-        //std::cout << "dist = " << dist << std::endl;
+        std::cout << "dist = " << dist << std::endl;
 #endif
         double weight = std::exp(-  std::max(dist - sigsq ,0.0) / hsq) * 1/(-offset_t +1);
 #ifdef NLM_DEBUG        
-       //std::cout << "weight = " << weight << std::endl;
+       std::cout << "weight = " << weight << std::endl;
 #endif
         coupling::filtering::Quantities<dim>&  q = _flowfield(idx2, t);
         res += q * weight;
