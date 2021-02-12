@@ -29,7 +29,7 @@ for i in range(5):
 	ax[i].set_yticks([0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5])
 	ax[i].set_yticklabels(['0','1','2','3','4','5','6','7'])
 
-fig.subplots_adjust(right=0.88, wspace=0.32)
+fig.subplots_adjust(right=0.88, wspace=0.45)
 cbar_ax = fig.add_axes([0.90, 0.15, 0.01, 0.7]) #left, bottom, width, height
 cbar = fig.colorbar(pc, cax=cbar_ax)
 cbar.set_label("density")
