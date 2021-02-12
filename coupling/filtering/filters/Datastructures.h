@@ -40,8 +40,8 @@ namespace coupling {
     *	Spacetime window of patches
     */
     template<unsigned int dim>
-    //using Patchfield = Field<dim, Patch<dim>>;
-    using Patchfield = Field<dim, PatchView<dim>>;
+    using Patchfield = Field<dim, Patch<dim>>;
+    //using Patchfield = Field<dim, PatchView<dim>>;
   }
 }
 
@@ -109,6 +109,12 @@ public:
 
 	unsigned int getTemporalSize() const{
 		return _temporalSize;
+	}
+
+	void print(){
+		for(unsigned int i=0; i < _scalarSize;i++){
+			std::cout << "Field elem " << i << " = " << _data[i] << std::endl;
+		}
 	}
 
 private:
@@ -186,6 +192,10 @@ public:
 	}
 
 	~Patch(){
+	}
+
+	void print(){
+		_flowfield.print();
 	}
 	
 private:

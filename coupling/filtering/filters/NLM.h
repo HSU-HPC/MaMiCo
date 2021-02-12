@@ -97,6 +97,10 @@ class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
     coupling::filtering::Flowfield<dim> _flowfield_prefiltered;
     coupling::filtering::Patchfield<dim> _patchfield;
     std::vector<tarch::la::Vector<dim, unsigned int>> _innerCellIndices;
+
+    inline unsigned int posmod(int i, int n) const{
+      return (i % n + n) % n;
+    }
 };
 
 //include implementation of header
