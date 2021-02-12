@@ -13,8 +13,8 @@ open('noisy_signal.csv', 'w', newline='') as f2:
 		for z in range(6):
 			for y in range(6):
 				for x in range(6):
-					signal = (x+t)%2
-					noisy = signal + random.normal(scale=2)
+					signal = 1 + ((x+t)%2 - 0.5) / 10
+					noisy = signal + random.normal(scale=0.2)
 					csv_signal.writerow([t+1,x,y,z,x+3,y+3,z+3, "%.5f" % signal,\
 					    "%.5f" % random.normal(),"%.5f" % random.normal(),"%.5f" % random.normal()])
 					csv_noisy.writerow([t+1,x,y,z,x+3,y+3,z+3, "%.5f" % noisy, \

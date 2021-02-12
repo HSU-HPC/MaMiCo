@@ -5,45 +5,30 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as clrs 
 from pandas import read_csv
 
-fig, (ax0, ax1, ax2, ax3, ax4) = plt.subplots(1, 5)
+fig, ax = plt.subplots(1, 5)
+fig.set_size_inches(12,5)
 
-dataCS = np.random.rand(8, 4) #TODO
-dataMD = read_csv("testPlotCmaps.csv", delimiter=";", usecols=[0,1,7], names=["Iteration", "X", "Mass"], index_col=None)
-dataPOD = read_csv("testPlotCmaps.csv", delimiter=";", usecols=[0,1,7], names=["Iteration", "X", "Mass"], index_col=None)
-dataGAUSS = read_csv("testPlotCmaps.csv", delimiter=";", usecols=[0,1,7], names=["Iteration", "X", "Mass"], index_col=None)
-dataNLM = read_csv("testPlotCmaps.csv", delimiter=";", usecols=[0,1,7], names=["Iteration", "X", "Mass"], index_col=None)
+files = ['original_signal', 'noisy_signal', 'POD', 'Gaussian', 'NLM_junction']
+data = [read_csv(file+".csv", delimiter=";", usecols=[0,1,2,3,7], \
+	names=["t","x","y","z","m"], index_col=None) for file in files]
+
+titles = ['Original Signal', 'Noisy Data', 'POD', 'Gaussian', 'NLM']
 
 #Plot all pcolor plots
+for i in range(5):
+	timeslice = data[i].loc[data[i]['t'].isin(range(50,58))]
+	xslice = timeslice.loc[(timeslice['y'] == 1) & (timeslice['z'] == 1)]
+	a = np.array(xslice.loc[xslice['x'].isin(range(1,5))]['m'])
+	a.shape = (a.size//4, 4)
+	pc = ax[i].pcolor(a, vmin=0.85, vmax=1.15)
+	ax[i].set_title(titles[i])
+	ax[i].set_xlabel('cell x')
+	ax[i].set_ylabel('time t')
 
-#CS
-ax0.pcolor(dataCS)
-ax0.set_title('Macro Solver')
+fig.subplots_adjust(right=0.88, wspace=0.32)
+cbar_ax = fig.add_axes([0.90, 0.15, 0.01, 0.7]) #left, bottom, width, height
+cbar = fig.colorbar(pc, cax=cbar_ax)
+cbar.set_label("density")
 
-#MD
-a = np.array(dataMD["Mass"])
-a.shape = (a.size//4, 4)
-ax1.pcolor(a)
-ax1.set_title('MD')
-
-#POD
-a = np.array(dataPOD["Mass"])
-a.shape = (a.size//4, 4)
-ax2.pcolor(a)
-ax2.set_title('POD')
-
-#GAUSS
-a = np.array(dataGAUSS["Mass"])
-a.shape = (a.size//4, 4)
-ax3.pcolor(a)
-ax3.set_title('Gaussian')
-
-#NLM
-a = np.array(dataNLM["Mass"])
-a.shape = (a.size//4, 4)
-ax4.pcolor(a)
-ax4.set_title('NLM')
-
-
-
-fig.tight_layout()
+#fig.tight_layout()
 plt.show()
