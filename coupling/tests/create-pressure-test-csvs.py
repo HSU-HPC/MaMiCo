@@ -9,7 +9,7 @@ open('noisy_signal.csv', 'w', newline='') as f2:
 	csv_signal = csv.writer(f1, delimiter=';', quotechar=' ', quoting=csv.QUOTE_ALL)
 	csv_noisy = csv.writer(f2, delimiter=';', quotechar=' ', quoting=csv.QUOTE_ALL)
 
-	for t in range(60):
+	for t in range(105):
 		for z in range(6):
 			for y in range(6):
 				for x in range(6):
