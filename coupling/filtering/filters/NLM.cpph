@@ -7,8 +7,8 @@ void coupling::NLM<dim>::operator()(){
     std::cout << "    NLM: called operator()" << std::endl;
   #endif
 
-  const double sigsq = 0;  // TODO configure
-  const double hsq = .45;    // TODO configure
+  //const double sigsq = 0;  // TODO configure
+  //const double hsq = .45;    // TODO configure
 
   // Save data
   for(unsigned int i = 0; i < this->_inputCells.size(); ++i){ 
@@ -49,7 +49,7 @@ void coupling::NLM<dim>::operator()(){
 #ifdef NLM_DEBUG
         //std::cout << "dist = " << dist << std::endl;
 #endif
-        double weight = std::exp(-  std::max(dist - sigsq ,0.0) / hsq) * 1/(-offset_t +1);
+        double weight = std::exp(-  std::max(dist - _sigsq ,0.0) / _hsq) * 1/(-offset_t +1);
 #ifdef NLM_DEBUG        
        //std::cout << "weight = " << weight << std::endl;
 #endif

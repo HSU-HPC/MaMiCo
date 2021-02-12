@@ -62,6 +62,26 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 				std::cout << "ERROR: NLM: time-window-size must be greater than two." << std::endl;
 				exit(EXIT_FAILURE);
 			}
+			double sigsq;
+			if(currJunctorNode->QueryDoubleAttribute("sigsq", &sigsq)){
+				std::cout << "ERROR: NLM filter misses attribute sigsq in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(tws < 0){
+				std::cout << "ERROR: NLM: sigsq must be greater than zero." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			double hsq;
+			if(currJunctorNode->QueryDoubleAttribute("hsq", &hsq)){
+				std::cout << "ERROR: NLM filter misses attribute hsq in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(hsq < 0){
+				std::cout << "ERROR: NLM: hsq must be greater than zero." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+
 
 			//Instanciation
 			newjunctor = new coupling::NLM<dim>(
@@ -71,7 +91,9 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 					coupling::FilterSequence<dim>::_localDomainCellIndices,
 					coupling::FilterSequence<dim>::_filteredValues, 
 					coupling::FilterSequence<dim>::_ic, 
-					tws);
+					tws,
+					sigsq,
+					hsq);
 
 			//TODO: generalize this for arbitrary junctors?
 			//Swapping for output partition
