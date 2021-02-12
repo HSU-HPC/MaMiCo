@@ -90,6 +90,8 @@
 		<nlm-junction input = "md POD-seq" filtered-values="macro-mass macro-momentum">
 			<NLM
 				time-window-size="5"	
+				sigsq="0.0"
+				hsq="0.45"
 			/>
 		</nlm-junction>
 
