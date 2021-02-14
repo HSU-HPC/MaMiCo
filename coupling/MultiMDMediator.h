@@ -82,6 +82,12 @@ public:
   */
   void shutdownCommunicator(const unsigned int &);
 
+  /** Find number of active simulations local to communicator */
+  unsigned int getNumberOfActiveMDSimulations(const unsigned int);
+
+  /** Find global number of active simulations */
+  unsigned int getNumberOfActiveMDSimulations();
+
 private:
 
 
@@ -91,14 +97,6 @@ private:
 
   /** Remove one sliced block of simulations if all of them are freed. */
   void rmMDSimulationBlock();
-
-
-  /** Find global number of active simulations */
-  unsigned int getNumberOfActiveMDSimulations();
-
-
-  /** Find number of active simulations local to communicator */
-  unsigned int getNumberOfActiveMDSimulations(const unsigned int);
 
 
   /** Get the average number of active simulations running on the

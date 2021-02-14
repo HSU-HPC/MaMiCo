@@ -65,8 +65,16 @@ public:
 
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
+      unsigned int N_instances = _multiMDMediator->getNumberOfActiveMDSimulations();
+      auto start = std::chrono::system_clock::now();
       runOneCouplingCycle(cycle);
       varyMD(cycle);
+      auto end = std::chrono::system_clock::now();
+      std::chrono::duration<double> diff = (end-start);
+      if(_rank == 0) std::cout << "Cycle " << cycle << ", MD instances before " << N_instances 
+        << ", MD instances after " << _multiMDMediator->getNumberOfActiveMDSimulations() 
+        << ", time " << diff.count()
+      << std::endl;  
     }
     shutdown();
   }
