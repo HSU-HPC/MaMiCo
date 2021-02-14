@@ -32,15 +32,6 @@ public:
     }
   }
 
-
-  ~MultiMDMediator() {
-    if(_macroscopicSolverInterface != nullptr) {
-      delete _macroscopicSolverInterface;
-      _macroscopicSolverInterface = nullptr;
-    }
-  }
-
-
   /** Autmatically add another MDSimulation trying to keep the number of MD simulation across communicators balanced
    * by computing the average number of active simulations on communicators.
    */ 
