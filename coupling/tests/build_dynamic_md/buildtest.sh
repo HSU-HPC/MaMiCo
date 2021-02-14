@@ -1,18 +1,11 @@
 #!/bin/bash
 
-<<<<<<< HEAD
-source personal_settings
-<<<<<<< HEAD
 
 ### PATH to lammps sources
 LAMMPS_PATH=/home/niklas/Dokumente/Git/lammps
 LIB_LAMMPS=lammps_openmpi_mamico
-=======
->>>>>>> 97b30dc6a30c0c23d7e54e923dae5c3d1a081742
-=======
-source ../../../personal_settings
->>>>>>> cc593031d9e61e9f9c73382b67ec09ab01421414
 
+source ../../../personal_settings
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/debug/dim3/parallel_yes/gcc/gprof_no/
