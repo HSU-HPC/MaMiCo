@@ -104,20 +104,12 @@ private:
         target = std::uniform_int_distribution(-50, 50)(_generator);
       }
       MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
-      std::cout << "Trying to add " << target << " simulations.." << std::endl;
+      if(_rank == 0) std::cout << "Trying to add " << target << " simulations.." << std::endl;
       if(target < 0) {
-        MPI_Barrier(MPI_COMM_WORLD);
-        std::cout << "Rank " << _multiMDService->getGlobalRank() << ": start removal" << std::endl;
         _multiMDMediator->rmNMDSimulations(-target);
-        std::cout << "Rank " << _multiMDService->getGlobalRank() << ": end removal" << std::endl;
-        MPI_Barrier(MPI_COMM_WORLD);
       }
       else if(target > 0) {
-        MPI_Barrier(MPI_COMM_WORLD);
-        std::cout << "Rank " << _multiMDService->getGlobalRank() << ": start insertion" << std::endl;
         _multiMDMediator->addNMDSimulations(target);
-        std::cout << "Rank " << _multiMDService->getGlobalRank() << ": end insertion" << std::endl;
-        MPI_Barrier(MPI_COMM_WORLD);
       }
     }
   }
