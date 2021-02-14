@@ -1,6 +1,17 @@
 #!/bin/bash
 
+<<<<<<< HEAD
+source personal_settings
+<<<<<<< HEAD
+
+### PATH to lammps sources
+LAMMPS_PATH=/home/niklas/Dokumente/Git/lammps
+LIB_LAMMPS=lammps_openmpi_mamico
+=======
+>>>>>>> 97b30dc6a30c0c23d7e54e923dae5c3d1a081742
+=======
 source ../../../personal_settings
+>>>>>>> cc593031d9e61e9f9c73382b67ec09ab01421414
 
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
@@ -105,6 +116,6 @@ ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguratio
 ${compiler} ${MAMICO_PATH}/coupling/tests/main_dynamic_md.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_dynamic_md.o
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_dynamic_md.o"
 
-echo "${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/test" 
-${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/test
+echo "${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest" 
+${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest
 
