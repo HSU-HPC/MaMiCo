@@ -42,15 +42,15 @@ public:
   _boundariesWithMD(boundariesWithMD),
   _dx(std::cbrt(Foam::max(mesh.cellVolumes()))),
   _channelheight(channelheight),
-  _boundary2RecvBufferIndicesOuter(new unsigned int [_numberBoundaryPoints]),
-  _boundary2RecvBufferIndicesInner(new unsigned int [_numberBoundaryPoints]),
-  _boundaryIndices(new Foam::vector* [_numberBoundaryPoints]),
   _rank(rank),
     _plotEveryTimestep(plotEveryTimestep){
     if(skipRank()){return;}
     unsigned int innerMDBoundaryIndex=0;
     while (_boundariesWithMD[innerMDBoundaryIndex] == 0){innerMDBoundaryIndex++;}
     _numberBoundaryPoints = 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
+    _boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
+    _boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
+    _boundaryIndices = new Foam::vector* [_numberBoundaryPoints];
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
