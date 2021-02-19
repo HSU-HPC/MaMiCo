@@ -40,15 +40,15 @@ public:
 
   /** Add MD simulation on specified communicator.
    */
-  void addMDSimulation(const unsigned int &);
+  void addMDSimulation(const unsigned int & communicator);
 
 
   /** Add n MD simulations **/
-  void addNMDSimulations(const unsigned int &);
+  void addNMDSimulations(const unsigned int & N);
 
 
   /** ADD n MD Simulations to specified communicator */ //TODO
-  void addNMDSimulations(const unsigned int &, const unsigned int &);
+  void addNMDSimulations(const unsigned int & communicator, const unsigned int & N);
 
 
   /** Automatically remove MD simulation trying to keep the number of MD simulations across communicator balanced.
@@ -56,37 +56,34 @@ public:
   void rmMDSimulation();
 
 
-  void forceRmMDSimulation(); 
-
-
   /** Remove MD simulation with specified global identifier.
    * TODO How to handle removal of empty places??
    */
-  void rmMDSimulation(const unsigned int &, const unsigned int &);
+  void rmMDSimulation(const unsigned int & communicator, const unsigned int & index);
 
 
   /** Remove MD Simulation on specific communicator
    */
-  void rmMDSimulation(const unsigned int &);
+  void rmMDSimulation(const unsigned int & communicator);
 
 
   /** Remove N MD Simulations **/
-  void rmNMDSimulations(const unsigned int &);
-
-
-  void forceRmNMDSimulations(const unsigned int &);
+  void rmNMDSimulations(const unsigned int & N);
 
 
   /** Remove ALL simulations on this communicator. 
    * This is the only way to do so!
-  */
-  void shutdownCommunicator(const unsigned int &);
+   */
+  void shutdownCommunicator(const unsigned int & communicator);
+
 
   /** Find number of active simulations local to communicator */
-  unsigned int getNumberOfActiveMDSimulations(const unsigned int);
+  unsigned int getNumberOfActiveMDSimulations(const unsigned int communicator);
+
 
   /** Find global number of active simulations */
   unsigned int getNumberOfActiveMDSimulations();
+
 
 private:
 
@@ -113,16 +110,20 @@ private:
    * */
   unsigned int findFirstCommWithLowLoad();
 
-
+  /** Try to find a communicator that has a relatively high number
+   * of active MD simulations. The average ov this communicator should
+   * should have an average or higher-than-average number of active simulations.
+   * This method begins lookup at the first communicator.
+   */
   unsigned int findFirstCommWithHighLoad();
 
 
   /** On given communicator find an inactive index */
-  unsigned int findInactiveLocalIndex(const unsigned int &);
+  unsigned int findInactiveLocalIndex(const unsigned int & communicator);
 
 
   /** On a given communicator find a local index of an inactive md simulation */
-  unsigned int findActiveLocalIndex(const unsigned int &);
+  unsigned int findActiveLocalIndex(const unsigned int & communicator);
 
 
   coupling::services::MultiMDCellService<LinkedCell, dim> & _multiMDCellService;
