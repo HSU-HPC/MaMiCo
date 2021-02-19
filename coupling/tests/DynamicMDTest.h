@@ -101,7 +101,7 @@ private:
       //else:
       int target;
       if(_rank == 0) {
-        target = std::uniform_int_distribution(-50, 50)(_generator);
+        target = std::uniform_int_distribution(-65, 35)(_generator);
       }
       MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
       if(_rank == 0) std::cout << "Trying to add " << target << " simulations.." << std::endl;
