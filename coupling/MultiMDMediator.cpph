@@ -102,27 +102,6 @@ coupling::MultiMDMediator<LinkedCell, dim>::rmMDSimulation()
 
 template<class LinkedCell, unsigned int dim>
 void
-coupling::MultiMDMediator<LinkedCell, dim>::forceRmMDSimulation() 
-{
-  //tries to force RM simulations, this will potentially shutdown communicators!
-  try {
-    unsigned int comm = findFirstCommWithHighLoad();
-    unsigned int index = findActiveLocalIndex(comm);
-
-    // get next logical simulation which would be removed
-    unsigned int slot = comm * _multiMDService.getAvgNumberOfMDSimulations() + index;  
-
-    _multiMDCellService.rmMDSimulation(_instanceHandling, slot);
-
-    _listActiveMDSimulations[comm][index] = false;
-  } catch (NoIndexException& e) {
-    std::cout << "Cannot delete any simulations!" << std::endl;
-  }
-}
-
-
-template<class LinkedCell, unsigned int dim>
-void
 coupling::MultiMDMediator<LinkedCell, dim>
 ::rmMDSimulation(const unsigned int & communicator)
 {
@@ -170,16 +149,6 @@ coupling::MultiMDMediator<LinkedCell, dim>
 ::rmNMDSimulations(const unsigned int & N) {
   for(unsigned int i=0;i<N;++i) {
     rmMDSimulation();
-  }
-}
-
-
-template<class LinkedCell, unsigned int dim>
-void
-coupling::MultiMDMediator<LinkedCell, dim>
-::forceRmNMDSimulations(const unsigned int & N) {
-  for(unsigned int i=0;i<N;++i) {
-    forceRmMDSimulation();
   }
 }
 
