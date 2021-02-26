@@ -63,7 +63,7 @@ public:
       
       if (argc == 2) {
         try {
-          _lowerBoundForVaryMD = std::stoi(argv[0]);
+          _lowerBoundForVaryMD = std::stoi(argv[1]);
         } catch (std::exception const & e) {
           std::cout << "ERROR DynamicMDTest::DynamicMDTest() : cannot parse " << argv[1] << " into an integer." << std::endl;
           std::exit(EXIT_FAILURE);
