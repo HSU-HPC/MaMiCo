@@ -44,7 +44,7 @@ public:
       _distributionForVaryMD(-65,50)
 
   {
-    if(argc == 1) {
+    if(argc >= 1) {
       if (std::string(argv[0]) == "removal") {
         _varyMDStyle = REMOVAL;
         std::cout << "Running removal test" << std::endl;
@@ -59,6 +59,17 @@ public:
       }
       else {
         _varyMDStyle = NONE;
+      }
+      
+      if (argc == 2) {
+        try {
+          _lowerBoundForVaryMD = std::stoi(argv[0]);
+        } catch (std::exception const & e) {
+          std::cout << "ERROR DynamicMDTest::DynamicMDTest() : cannot parse " << argv[1] << " into an integer." << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+      } else {
+        _lowerBoundForVaryMD = std::numeric_limits<int>::max();
       }
     }
   }
@@ -109,7 +120,13 @@ private:
         target = _distributionForVaryMD(_generator);
       }
       MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
-      if(_rank == 0) std::cout << "Trying to add " << target << " simulations.." << std::endl;
+      if (target < 0) {
+        if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() - target < _lowerBoundForVaryMD) {
+          target = (target - (int)_multiMDMediator->getNumberOfActiveMDSimulations() - target);
+        }
+      } else {
+        if(_rank == 0) std::cout << "Trying to add " << target << " simulations.." << std::endl;
+      }
       if(target < 0) {
         _multiMDMediator->rmNMDSimulations(-target);
       }
@@ -751,6 +768,7 @@ private:
   coupling::InstanceHandling<MY_LINKEDCELL,3>* _instanceHandling;
   std::default_random_engine _generator;
   std::default_random_engine _generatorForVaryMD;
+  int _lowerBoundForVaryMD;
   std::uniform_int_distribution<int> _distributionForVaryMD;
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
