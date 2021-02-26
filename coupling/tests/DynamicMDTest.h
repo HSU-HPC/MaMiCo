@@ -81,16 +81,16 @@ public:
 
     if(_cfg.twsLoop){twsLoop();return;}
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
-      unsigned int N_instances = _multiMDMediator->getNumberOfActiveMDSimulations();
-      auto start = std::chrono::system_clock::now();
+      //unsigned int N_instances = _multiMDMediator->getNumberOfActiveMDSimulations();
+      //auto start = std::chrono::system_clock::now();
       runOneCouplingCycle(cycle);
       varyMD(cycle);
-      auto end = std::chrono::system_clock::now();
-      std::chrono::duration<double> diff = (end-start);
-      if(_rank == 0) std::cout << "Cycle " << cycle << ", MD instances before " << N_instances 
-        << ", MD instances after " << _multiMDMediator->getNumberOfActiveMDSimulations() 
-        << ", time " << diff.count()
-      << std::endl;  
+      //auto end = std::chrono::system_clock::now();
+      //std::chrono::duration<double> diff = (end-start);
+      //if(_rank == 0) std::cout << "Cycle " << cycle << ", MD instances before " << N_instances 
+      //  << ", MD instances after " << _multiMDMediator->getNumberOfActiveMDSimulations() 
+      //  << ", time " << diff.count()
+      //<< std::endl;  
     }
     shutdown();
   }
@@ -113,13 +113,15 @@ private:
         _multiMDMediator->addNMDSimulations(100);
       }
     } else if(_varyMDStyle == RANDOM) {
-      if(cycle < 1 || cycle % 1 != 0) return;
+      if(cycle < 99 || (cycle+1) % 20 != 0) return;
       //else:
       int target;
       if(_rank == 0) {
         target = _distributionForVaryMD(_generator);
       }
+      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
       MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      #endif
       if (target < 0) {
         if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() - target < _lowerBoundForVaryMD) {
           target = (target - (int)_multiMDMediator->getNumberOfActiveMDSimulations() - target);
