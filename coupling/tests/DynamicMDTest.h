@@ -38,7 +38,12 @@
  */
 class DynamicMDTest: public Test {
 public:
-  DynamicMDTest(int argc, char ** argv): Test("DynamicMDTest"), _generator(std::chrono::system_clock::now().time_since_epoch().count()){
+  DynamicMDTest(int argc, char ** argv) 
+    : Test("DynamicMDTest"), _generator(std::chrono::system_clock::now().time_since_epoch().count()),
+      _generatorForVaryMD(0),
+      _distributionForVaryMD(-65,50)
+
+  {
     if(argc == 1) {
       if (std::string(argv[0]) == "removal") {
         _varyMDStyle = REMOVAL;
@@ -101,7 +106,7 @@ private:
       //else:
       int target;
       if(_rank == 0) {
-        target = std::uniform_int_distribution(-65, 35)(_generator);
+        target = _distributionForVaryMD(_generator);
       }
       MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
       if(_rank == 0) std::cout << "Trying to add " << target << " simulations.." << std::endl;
@@ -745,6 +750,8 @@ private:
   //std::vector<coupling::interface::MDSimulation*> * _simpleMD;
   coupling::InstanceHandling<MY_LINKEDCELL,3>* _instanceHandling;
   std::default_random_engine _generator;
+  std::default_random_engine _generatorForVaryMD;
+  std::uniform_int_distribution<int> _distributionForVaryMD;
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
   TimingValues _tv;
