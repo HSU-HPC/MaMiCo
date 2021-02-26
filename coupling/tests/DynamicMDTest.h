@@ -115,7 +115,7 @@ private:
     } else if(_varyMDStyle == RANDOM) {
       if(cycle < 99 || (cycle+1) % 20 != 0) return;
       //else:
-      int target;
+      int target = 0;
       if(_rank == 0) {
         target = _distributionForVaryMD(_generator);
       }

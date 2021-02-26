@@ -1,14 +1,19 @@
 #!/bin/bash
 
 
-### PATH to lammps sources
-LAMMPS_PATH=/home/niklas/Dokumente/Git/lammps
-LIB_LAMMPS=lammps_openmpi_mamico
+### local settings like path variables
+SETTINGS=../../../personal_settings
 
-source ../../../personal_settings
+if test -f "$SETTINGS"; then
+	source ${SETTINGS}
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
-SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/debug/dim3/parallel_yes/gcc/gprof_no/
+SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
+SIMPLEMD_SEQUENTIAL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_no/gcc/gprof_no/
 ### name of lib for SIMPLE_MD
 LIBSIMPLEMD=simplemd
 
@@ -17,7 +22,16 @@ LIBSIMPLEMD=simplemd
 ### build path for DynamicMDTest
 BUILD_PATH=${MAMICO_PATH}/coupling/tests/build_dynamic_md;
 
-mdSim=$1;
+parallel=$1;
+mdSim=$2;
+
+if [ "${parallel}" == "parallel" ] || [ "${parallel}" == "sequential" ]
+then
+    echo "Build mode: ${parallel}"
+else
+    echo "ERROR! ./buildtest parallel/sequential SIMPLE_MD/LAMMPS_MD/LAMMPS_DPD"
+    exit -1
+fi
 
 if [ "${mdSim}" == "SIMPLE_MD" ] || [ "${mdSim}" == "LAMMPS_MD" ] || [ "${mdSim}" == "LAMMPS_DPD" ]
 then
@@ -33,24 +47,39 @@ rm ${BUILD_PATH}/test;
 rm ${BUILD_PATH}/*.o;
 
 compiler=""
-libaries=""
+libraries=""
 objects=""
 includes="-I${MAMICO_PATH}"
 
-### specify flags, includes, libraries,compiler for parallel build
-# note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O0 -g3 -DMDCoupledDebug"
-includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
-libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
-compiler="mpicxx"
-
+### specify flags, includes, libraries,compiler for parallel or sequential build
+if [ "${parallel}" == "parallel" ]
+then
+    # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
+    FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
+    # -DMDCoupledDebug"
+    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
+    libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
+    compiler="mpicxx"
+else
+    FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Wall -Wno-unknown-pragmas -O3"
+    # -Werror
+    includes="${includes} -I${LIB_EIGEN_PATH}"
+    compiler="g++"
+fi
 ### 
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH} || exit
-scons target=libsimplemd dim=3 build=debug parallel=yes compiler=gcc machine=hww-cluster -j4
-libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
-FLAGS="${FLAGS} -DMDParallel"
+if [ "${parallel}" == "parallel" ]
+then
+    scons target=libsimplemd dim=3 build=release parallel=yes compiler=gcc machine=hww-cluster -j4
+    libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
+    FLAGS="${FLAGS} -DMDParallel"
+else
+    scons target=libsimplemd dim=3 build=release parallel=no -j4
+    libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+fi
+
 
 
 # specific built for SIMPLE_MD
