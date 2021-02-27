@@ -57,7 +57,9 @@ coupling::MultiMDMediator<LinkedCell, dim>
     #endif
     _multiMDCellService.addMDSimulation(_instanceHandling, _macroscopicSolverInterface, slot);
     _listActiveMDSimulations[communicator][index] = true;
+    #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
     if(_multiMDService.getGlobalRank() == 0) std::cout << "Added simulation on comm " << communicator << ", index " << index << std::endl;
+    #endif
   } catch (NoIndexException& e) {
     std::cout << "ERROR coupling::MultiMDMediator::addMDSimulation() : Unable to find valid md index!";
   }
