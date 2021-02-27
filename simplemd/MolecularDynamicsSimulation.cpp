@@ -254,17 +254,12 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     );
     if (_molecularPropertiesService==NULL){std::cout << "ERROR MolecularDynamicsSimulation::initServices(): _molecularPropertiesService==NULL!" << std::endl;exit(EXIT_FAILURE);}
 
-    std::stringstream ss;
-    ss << _configuration.getDomainConfiguration().getCheckpointFilestem();
-    ss << "_" << (_localMDSimulation);
-    const std::string checkpointFilestem = ss.str();
-
     // either initialise from checkpoint data or via a certain number of molecules per direction
     if (_configuration.getDomainConfiguration().initFromCheckpoint()){
       _moleculeService = new simplemd::services::MoleculeService(
         localDomainSize,
         localDomainOffset,
-        checkpointFilestem,
+        _configuration.getDomainConfiguration().getCheckpointFilestem(),
         _configuration.getDomainConfiguration().getBlockSize(),
         *_parallelTopologyService
       );
