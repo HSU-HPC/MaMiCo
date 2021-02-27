@@ -122,10 +122,9 @@ private:
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
         MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
       #endif
-      std::cout << target << std::endl;
       if (target < 0) {
         if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() + target < _lowerBoundForVaryMD) {
-          target = ((int)_multiMDMediator->getNumberOfActiveMDSimulations() - _lowerBoundForVaryMD);
+          target = (_lowerBoundForVaryMD - (int)_multiMDMediator->getNumberOfActiveMDSimulations());
         }
       }
       if(_rank == 0) std::cout << "Insert/Remove Simulations : " << target << std::endl;
