@@ -139,5 +139,5 @@ ${compiler} ${MAMICO_PATH}/coupling/tests/main_dynamic_md.cpp ${FLAGS} ${include
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_dynamic_md.o"
 
 echo "${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest" 
-${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest_${mdSim}
+${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest_${parallel}
 

@@ -113,18 +113,19 @@ private:
         _multiMDMediator->addNMDSimulations(100);
       }
     } else if(_varyMDStyle == RANDOM) {
-      if(cycle < 9 || (cycle+1) % 20 != 0) return;
+      if(cycle < 9 || (cycle+1) % 10 != 0) return;
       //else:
       int target = 0;
       if(_rank == 0) {
-        target = _distributionForVaryMD(_generator);
+        target = _distributionForVaryMD(_generatorForVaryMD);
       }
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
         MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
       #endif
+      std::cout << target << std::endl;
       if (target < 0) {
-        if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() - target < _lowerBoundForVaryMD) {
-          target = (target - (int)_multiMDMediator->getNumberOfActiveMDSimulations() - target);
+        if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() + target < _lowerBoundForVaryMD) {
+          target = ((int)_multiMDMediator->getNumberOfActiveMDSimulations() - _lowerBoundForVaryMD);
         }
       }
       if(_rank == 0) std::cout << "Insert/Remove Simulations : " << target << std::endl;
