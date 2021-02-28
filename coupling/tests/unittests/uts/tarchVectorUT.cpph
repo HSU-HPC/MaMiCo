@@ -61,7 +61,7 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 				for(auto vector2 : testing::ut::UnitTestInterface::_thisMs->getMocksCopy<tarch::la::Vector<size, T>>()) {
 					auto addedVector = vector1;
 					addedVector += vector2;
-						#ifdef DEBUG_UT_VECTOR
+						#if 0//def DEBUG_UT_VECTOR
 							std::cout 
 							<< " vector1: " << vector1
 							<< ", vector2: " << vector2
@@ -70,22 +70,22 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 						
 					for(int i = 0; i < size; i++){
 						if(addedVector[i] != vector1[i] + vector2[i]) { 								
-							throw(std::runtime_error("failure of testVectorAddition"));
+							throw(std::runtime_error("\x1B[41m failure of testVectorAddition \x1B[0m"));
 						}
 					}
 				}
 			}
 			#ifdef DEBUG_UT_VECTOR
-				std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "testVectorAddition: Success!" << std::endl;
+				std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "testVectorAddition: \x1B[032m Success! \x1B[0m" << std::endl;
 			#endif
 		}
 
 		//TODO: remove dummy tests
 		void testTrivialSuccess() {
-			std::cout << "TRIVIAL DUMMY TEST PASSED" << std::endl;
+			std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "testTrivialSuccess: \x1B[032m Success! \x1B[0m" << std::endl;
 		}
 		void testTrivialFailure() {
-			throw(std::runtime_error("TRIVIAL FAILURE"));
+			throw(std::runtime_error("\x1B[41m trivial failure test failed \x1B[0m"));
 		}
 
 		

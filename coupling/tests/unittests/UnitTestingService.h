@@ -35,7 +35,7 @@ class testing::ut::UnitTestingService {
 			for (auto ms_tuple : _mockServices)delete ms_tuple.second;
 
 			#ifdef DEBUG_UTS
-				std::cout << "UnitTestingService: Deconstructed." << std::endl;
+				std::cout << "\x1B[1mUnitTestingService:\x1B[0m Deconstructed." << std::endl;
 			#endif
 		}
 
@@ -69,6 +69,7 @@ class testing::ut::UnitTestingService {
 
 //INCLUDE ALL INDIVIDUAL UNIT TESTS HERE
 #include"uts/tarchVectorUT.cpph"
+#include"uts/couplingMacroscopicCellUT.cpph"
 
 //Include implementation
 #include"UnitTestingService.cpp"

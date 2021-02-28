@@ -10,7 +10,7 @@ testing::ut::UnitTestingService::UnitTestingService()
 	
 	//INT
 	std::vector<int *> intMocks;
-	for(int i = -10; i < 10; i++)
+	for(int i = -1000; i < 1000; i++)
 		intMocks.push_back( new int(i));
 	addMockService<int>(intMocks);
 
@@ -19,6 +19,13 @@ testing::ut::UnitTestingService::UnitTestingService()
 	boolMocks.push_back(new bool(false));
 	boolMocks.push_back(new bool(true));
 	addMockService<bool>(boolMocks);
+
+	//DOUBLE
+	std::vector<double *> doubleMocks;
+	for(double d = -500.0; d < 500.0; d += 0.1)
+		doubleMocks.push_back( new double(d));
+	addMockService<double>(doubleMocks);
+	
 
 	//STD::STRING
 	std::vector<std::string *> stdstringMocks;
@@ -34,21 +41,31 @@ testing::ut::UnitTestingService::UnitTestingService()
 	_uts.push_back(new tarch::la::VectorUT<2, std::string>(this));
 	_uts.push_back(new tarch::la::VectorUT<5, bool>(this));
 	_uts.push_back(new tarch::la::VectorUT<3, tarch::la::Vector<2, int> >(this));
+	_uts.push_back(new tarch::la::VectorUT<2, double>(this));
+	_uts.push_back(new tarch::la::VectorUT<3, double>(this));
+
+	_uts.push_back(new coupling::datastructures::MacroscopicCellUT<2>(this));
+	_uts.push_back(new coupling::datastructures::MacroscopicCellUT<3>(this));
 	//...
+	//
+	#ifdef DEBUG_UTS
+		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Constructed." << std::endl;
+	#endif
 }
 
 
+//TODO: reduce duplication here
 //member functions of testing::ut::UnitTestingService
 void testing::ut::UnitTestingService::runAllUnitTests() {
 	#ifdef DEBUG_UTS
-		std::cout << "UnitTestingService: Now running tests for all classes... " << std::endl;
+		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Now running tests for all classes... " << std::endl;
 	#endif
 	for(auto ut : _uts) {
 		try {
 			ut->runAllTests();
 		}
 		catch(const std::exception& e) {
-			std::cout << "UnitTestingService: Caught " << e.what() << " while testing " << ut->getClassIdentifier() << std::endl;
+			std::cout << "\x1B[1mUnitTestingService:\x1B[0m Caught " << e.what() << " while testing \x1B[41m" << ut->getClassIdentifier() << "\x1B[0m" << std::endl;
 			//TODO: Handle this case somehow. Aborting? Git revert? 
 		}
 	}
@@ -61,13 +78,13 @@ void testing::ut::UnitTestingService::runAllUnitTests() {
 //Assumes uts_index to not be out-of-bounds.
 void testing::ut::UnitTestingService::runUnitTest(unsigned int uts_index) {
 	#ifdef DEBUG_UTS
-		std::cout << "UnitTestingService: Now running tests for class "<< _uts[uts_index]->getClassIdentifier() << "... " << std::endl;
+		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Now running tests for class "<< _uts[uts_index]->getClassIdentifier() << "... " << std::endl;
 	#endif
 	try {
 		_uts[uts_index]->runAllTests();
 	}
 	catch(const std::exception& e){
-		std::cout << "UnitTestingService: Caught " << e.what() << " while testing " << _uts[uts_index]->getClassIdentifier() << std::endl;
+		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Caught " << e.what() << " while testing \x1B[41m" << _uts[uts_index]->getClassIdentifier() << "\x1B[0m" << std::endl;
 		//TODO: Handle this case somehow. Aborting? Git revert? 
 	}
 	#ifdef DEBUG_UTS
