@@ -10,7 +10,7 @@
 #include<exception>
 #include<stdexcept>
 
-#define DEBUG_UT
+//#define DEBUG_UT
 
 /*
  *TODO: explanatory interface comment
@@ -24,12 +24,17 @@ namespace testing { namespace ut {
 		class UnitTestImpl;
 }}
 
-//TODO: A LOT OF COMMENTS
+//TODO: Split into two source files
 
 //EVERYTHING NOT TEMPLATE DEPENDANT
 class testing::ut::UnitTestInterface {
 	public:
-		UnitTestInterface(std::string classIdentifier): _classIdentifier(classIdentifier) {}
+		UnitTestInterface(std::string classIdentifier, int rank = 0, int comm_size = 0): 
+			_classIdentifier(classIdentifier),
+			_rank(rank),
+			_comm_size(comm_size)
+		{}
+
 		virtual void runAllTests() {}
 		virtual void runTest() {}
 
@@ -42,7 +47,7 @@ class testing::ut::UnitTestInterface {
 	protected:
 		//prefix for all output of classes deriving this
 		virtual std::string PRINT_PREFIX() const {
-			return std::string("UnitTest(").append(getClassIdentifier_pretty()).append("): ");
+			return std::string("|Rank: ").append(std::to_string(_rank)).append("| ").append("UnitTest(").append(getClassIdentifier_pretty()).append("): ");
 		}
 
 		/*
@@ -56,14 +61,20 @@ class testing::ut::UnitTestInterface {
 		 */
 		std::string _classIdentifier;
 
+		/*
+		 * Used for MPI communication
+		 */
+		int _rank;
+		int _comm_size;
+
 };
 
 //EVERYTHING TEMPLATE DEPENDANT
 template<class T>
 class testing::ut::UnitTestImpl : public testing::ut::UnitTestInterface {
 	public:
-		UnitTestImpl():
-		UnitTestInterface(typeid(T).name())
+		UnitTestImpl(int rank = 0, int comm_size = 0):
+		UnitTestInterface(typeid(T).name(), rank, comm_size)
 		{	
 			#ifdef DEBUG_UT
 				std::cout << this->PRINT_PREFIX() << "Constructed." << std::endl;
@@ -104,9 +115,8 @@ class testing::ut::UnitTestImpl : public testing::ut::UnitTestInterface {
 					(*testFunctionPtr)(mock);
 				}
 
-				#ifdef DEBUG_UT
-					std::cout << this->PRINT_PREFIX() << std::get<1>(_testFuncs[testFunc_index]) << ": \x1B[032m Success! \x1B[0m" << std::endl;
-				#endif
+				//TODO: MPI Barrier here. Output only on master rank.
+				std::cout << this->PRINT_PREFIX() << std::get<1>(_testFuncs[testFunc_index]) << ": \x1B[032m Success! \x1B[0m" << std::endl;
 			}
 			catch (std::exception& e) {
 				//Enrich exception info with idenfier of failed function (i.e second part of testFunc tuple)

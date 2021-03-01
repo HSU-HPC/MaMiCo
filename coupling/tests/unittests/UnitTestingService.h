@@ -7,11 +7,13 @@
 #include<map>
 #include<any>
 #include<optional>
-#include<iostream> 
+#include<iostream>
+#include<mpi.h>
 #include"MockService.cpph"
 #include"UnitTestInterface.h"
 
-#define DEBUG_UTS
+//#define DEBUG_UTS
+
 
 /*
  *TODO: explanatory interface comment
@@ -27,7 +29,7 @@ namespace testing { namespace ut {
 //Make this static?
 class testing::ut::UnitTestingService {
 	public:
-		UnitTestingService();
+		UnitTestingService(MPI_Comm comm = MPI_COMM_WORLD);
 
 		~UnitTestingService() {
 			for (auto ut : _uts) delete ut;
@@ -58,7 +60,16 @@ class testing::ut::UnitTestingService {
 		template<class T>
 		testing::ut::MockService* addMockService(std::vector<T *> mockValues);
 
+		//Referring to MPI ranks
+		int getRank() { return _rank; }
+		int getCommSize() { return _comm_size; }
+
 	private:
+
+		//used for MPI communication
+		int _rank;
+		int _comm_size;
+
 		//list of UT pointers
 		std::vector<testing::ut::UnitTestInterface *> _uts;
 

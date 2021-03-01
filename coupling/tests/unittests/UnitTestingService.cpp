@@ -2,8 +2,11 @@
 // and use, please see the copyright notice in MaMiCo's main folder
 
 //constructors of testing::ut::UnitTestingService
-testing::ut::UnitTestingService::UnitTestingService()
+testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm)
 {
+	MPI_Comm_size(comm, &_comm_size);
+	MPI_Comm_rank(comm, &_rank);
+
 	//init MS instances for non-Mamico (e.g. built-in or STL) types
 	//TODO: other primitives
 	//TODO: confused about const-correctness. should double check
@@ -77,7 +80,7 @@ void testing::ut::UnitTestingService::runUnitTest(unsigned int uts_index) {
 		_uts[uts_index]->runAllTests();
 	}
 	catch(const std::exception& e){
-		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Caught error in function " << e.what() << " while testing " << _uts[uts_index]->getClassIdentifier_pretty() << std::endl;
+		std::cout << "|Rank: " << _rank << "| \x1B[1mUnitTestingService:\x1B[0m Caught error in function " << e.what() << " while testing " << _uts[uts_index]->getClassIdentifier_pretty() << std::endl;
 		//TODO: Handle this case somehow. Aborting? Git revert? 
 	}
 	#ifdef DEBUG_UTS

@@ -7,7 +7,7 @@
 #include "coupling/tests/unittests/MockService.cpph"
 #include "coupling/tests/unittests/UnitTestingService.h"
 
-#define DEBUG_UT_VECTOR
+//#define DEBUG_UT_VECTOR
 
 
 //Maybe namespace "testing::ut::[...]"?
@@ -22,7 +22,7 @@ template<int size, class T>
 class tarch::la::VectorUT : public testing::ut::UnitTestImpl<tarch::la::Vector<size, T>> {
 	public:
 		VectorUT(testing::ut::UnitTestingService *uts):
-		testing::ut::UnitTestImpl<tarch::la::Vector<size, T>>()
+		testing::ut::UnitTestImpl<tarch::la::Vector<size, T>>(uts->getRank(), uts->getCommSize())
 		{
 			//Request MockService of T
 			if(uts->getMockService<T>().has_value()) _TMS = uts->getMockService<T>().value();
@@ -41,25 +41,26 @@ class tarch::la::VectorUT : public testing::ut::UnitTestImpl<tarch::la::Vector<s
 			#endif
 			
 			//Add test functions to UTI::_testFuncs
-			/*this->_testFuncs.push_back(std::make_tuple(new 
+			this->_testFuncs.push_back(std::make_tuple(new 
 				std::function<void (tarch::la::Vector<size, T>&)>
 				{ [this] (tarch::la::Vector<size, T>& mock) { testVectorAddition(mock); } }, "testVectorAddition"
-			));*/
+			));
 		}
 		
 		~VectorUT() {}	
 
 		//TODO: DEBUG
 		//Verify correctness of operator+=
-		/*void testVectorAddition(tarch::la::Vector<size, T>& mock) {
-			for(auto vector2 : this->_mockService->getMocksCopy<tarch::la::Vector<size, T>>()) {
+		void testVectorAddition(tarch::la::Vector<size, T>& mock) {
+			for(auto vector2 : testing::ut::UnitTestInterface::_mockService->getMocksCopy<tarch::la::Vector<size, T>>()) 
+			{
 				//actual test
-				auto addedVector = mock;
-				addedVector += vector2;
+				auto addedVector = vector2;
+				addedVector += mock;
 				//error checking
-				for(int i = 0; i < size; i++) if(addedVector[i] != mock[i] + vector2[i]) throw(std::runtime_error("Addition yielded incorrect value."));
+				for(int i = 0; i < size; i++) if(addedVector[i] != mock[i] + vector2[i] || testing::ut::UnitTestInterface::_rank == 3) throw(std::runtime_error("Addition yielded incorrect value."));
 			}
-		}*/
+		}
 		
 	private:
 		//Used mock service of class T

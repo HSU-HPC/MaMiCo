@@ -7,7 +7,7 @@
 #include "coupling/tests/unittests/MockService.cpph"
 #include "coupling/tests/unittests/UnitTestingService.h"
 
-#define DEBUG_UT_MACROCELL
+//#define DEBUG_UT_MACROCELL
 
 
 //Maybe namespace "testing::ut::[...]"?
@@ -21,7 +21,7 @@ template<int dim>
 class coupling::datastructures::MacroscopicCellUT : public testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCell<dim>> {
 	public:
 		MacroscopicCellUT(testing::ut::UnitTestingService *uts):
-		testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCell<dim>>()
+		testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCell<dim>>(uts->getRank(), uts->getCommSize())
 		{
 			//Get MockService for double
 			if(uts->getMockService<double>().has_value()) _DMS = uts->getMockService<double>().value();

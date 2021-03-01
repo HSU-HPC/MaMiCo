@@ -2,7 +2,12 @@
 
 //temporary entry point
 int main(int argc, char *argv[]){
-	//create object of (TODO: do we want OO here?) UnitTestingService	
+
+	MPI_Init(&argc, &argv);
+
+	//create object of UnitTestingService	
 	testing::ut::UnitTestingService utService;
 	utService.runAllUnitTests();
+
+	MPI_Finalize();
 }
