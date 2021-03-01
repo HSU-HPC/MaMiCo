@@ -54,23 +54,16 @@ testing::ut::UnitTestingService::UnitTestingService()
 }
 
 
-//TODO: reduce duplication here
 //member functions of testing::ut::UnitTestingService
 void testing::ut::UnitTestingService::runAllUnitTests() {
 	#ifdef DEBUG_UTS
 		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Now running tests for all classes... " << std::endl;
 	#endif
-	for(auto ut : _uts) {
-		try {
-			ut->runAllTests();
-		}
-		catch(const std::exception& e) {
-			std::cout << "\x1B[1mUnitTestingService:\x1B[0m Caught " << e.what() << " while testing \x1B[41m" << ut->getClassIdentifier() << "\x1B[0m" << std::endl;
-			//TODO: Handle this case somehow. Aborting? Git revert? 
-		}
+	for(unsigned int uts_index = 0; uts_index < _uts.size() ;uts_index++) {
+		runUnitTest(uts_index);
 	}
 	#ifdef DEBUG_UTS
-		std::cout << "Done!" << std::endl;
+		std::cout << "Done testing all classes!" << std::endl;
 	#endif
 
 }
@@ -78,17 +71,17 @@ void testing::ut::UnitTestingService::runAllUnitTests() {
 //Assumes uts_index to not be out-of-bounds.
 void testing::ut::UnitTestingService::runUnitTest(unsigned int uts_index) {
 	#ifdef DEBUG_UTS
-		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Now running tests for class "<< _uts[uts_index]->getClassIdentifier() << "... " << std::endl;
+		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Now running tests for class "<< _uts[uts_index]->getClassIdentifier_pretty() << "... " << std::endl;
 	#endif
 	try {
 		_uts[uts_index]->runAllTests();
 	}
 	catch(const std::exception& e){
-		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Caught " << e.what() << " while testing \x1B[41m" << _uts[uts_index]->getClassIdentifier() << "\x1B[0m" << std::endl;
+		std::cout << "\x1B[1mUnitTestingService:\x1B[0m Caught error in function " << e.what() << " while testing " << _uts[uts_index]->getClassIdentifier_pretty() << std::endl;
 		//TODO: Handle this case somehow. Aborting? Git revert? 
 	}
 	#ifdef DEBUG_UTS
-		std::cout << "Done!" << std::endl;
+		std::cout << "Done running all unit tests for class " << _uts[uts_index]->getClassIdentifier_pretty() << "!" << std::endl;
 	#endif
 
 }

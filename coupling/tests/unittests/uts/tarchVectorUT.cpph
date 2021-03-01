@@ -16,6 +16,7 @@ namespace tarch { namespace la {
 	class VectorUT;
 }}
 
+//TODO: Comment? Make this an examplary UT?
 
 template<int size, class T> 
 class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
@@ -33,44 +34,29 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 				tarchlavectorMocks.push_back(new tarch::la::Vector<size, T>(Tmock));
 
 			//Create new MockService for this using dummy values generated above
-			testing::ut::UnitTestInterface::_thisMs = uts->addMockService<tarch::la::Vector<size, T>>(tarchlavectorMocks);
+			this->_mockService = uts->addMockService<tarch::la::Vector<size, T>>(tarchlavectorMocks);
 
 			#ifdef DEBUG_UT_VECTOR
 				std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "Finished generating mocks " << std::endl;
 			#endif
 			
 			//Add test functions to UTI::_testFuncs
-			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>
-				{ [this] () { testVectorAddition(); } }
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void ()>
+				{ [this] () { testVectorAddition(); } }, "testVectorAddition")
 			);
-			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>
-				{ [this] () { testTrivialSuccess(); } }
-			);
-			testing::ut::UnitTestInterface::_testFuncs.push_back(new std::function<void ()>
-				{ [this] () { testTrivialFailure(); } }
-			);
-
-
 		}
 		
 		~VectorUT() {}	
 
 		//Verify correctness of operator+=
 		void testVectorAddition() {
-			for(auto vector1 : testing::ut::UnitTestInterface::_thisMs->getMocksCopy<tarch::la::Vector<size, T>>()) {
-				for(auto vector2 : testing::ut::UnitTestInterface::_thisMs->getMocksCopy<tarch::la::Vector<size, T>>()) {
+			for(auto vector1 : (this->_mockService)->getMocksCopy<tarch::la::Vector<size, T>>()) {
+				for(auto vector2 : (this->_mockService)->getMocksCopy<tarch::la::Vector<size, T>>()) {
 					auto addedVector = vector1;
 					addedVector += vector2;
-						#if 0//def DEBUG_UT_VECTOR
-							std::cout 
-							<< " vector1: " << vector1
-							<< ", vector2: " << vector2
-							<< ", addedVector: " << addedVector << std::endl;
-						#endif
-						
 					for(int i = 0; i < size; i++){
 						if(addedVector[i] != vector1[i] + vector2[i]) { 								
-							throw(std::runtime_error("\x1B[41m failure of testVectorAddition \x1B[0m"));
+							throw(std::runtime_error("FAILURE! PANIC!"));
 						}
 					}
 				}
@@ -79,16 +65,6 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 				std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "testVectorAddition: \x1B[032m Success! \x1B[0m" << std::endl;
 			#endif
 		}
-
-		//TODO: remove dummy tests
-		void testTrivialSuccess() {
-			std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "testTrivialSuccess: \x1B[032m Success! \x1B[0m" << std::endl;
-		}
-		void testTrivialFailure() {
-			throw(std::runtime_error("\x1B[41m trivial failure test failed \x1B[0m"));
-		}
-
-		
 		
 	private:
 		//Used mock service of class T
