@@ -19,10 +19,10 @@ namespace tarch { namespace la {
 //TODO: Comment? Make this an examplary UT?
 
 template<int size, class T> 
-class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
+class tarch::la::VectorUT : public testing::ut::UnitTestImpl<tarch::la::Vector<size, T>> {
 	public:
 		VectorUT(testing::ut::UnitTestingService *uts):
-		testing::ut::UnitTestInterface(typeid(this).name())
+		testing::ut::UnitTestImpl<tarch::la::Vector<size, T>>()
 		{
 			//Request MockService of T
 			if(uts->getMockService<T>().has_value()) _TMS = uts->getMockService<T>().value();
@@ -37,34 +37,29 @@ class tarch::la::VectorUT : public testing::ut::UnitTestInterface {
 			this->_mockService = uts->addMockService<tarch::la::Vector<size, T>>(tarchlavectorMocks);
 
 			#ifdef DEBUG_UT_VECTOR
-				std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "Finished generating mocks " << std::endl;
+				std::cout << this->PRINT_PREFIX() << "Finished generating mocks " << std::endl;
 			#endif
 			
 			//Add test functions to UTI::_testFuncs
-			this->_testFuncs.push_back(std::make_tuple(new std::function<void ()>
-				{ [this] () { testVectorAddition(); } }, "testVectorAddition")
-			);
+			/*this->_testFuncs.push_back(std::make_tuple(new 
+				std::function<void (tarch::la::Vector<size, T>&)>
+				{ [this] (tarch::la::Vector<size, T>& mock) { testVectorAddition(mock); } }, "testVectorAddition"
+			));*/
 		}
 		
 		~VectorUT() {}	
 
+		//TODO: DEBUG
 		//Verify correctness of operator+=
-		void testVectorAddition() {
-			for(auto vector1 : (this->_mockService)->getMocksCopy<tarch::la::Vector<size, T>>()) {
-				for(auto vector2 : (this->_mockService)->getMocksCopy<tarch::la::Vector<size, T>>()) {
-					auto addedVector = vector1;
-					addedVector += vector2;
-					for(int i = 0; i < size; i++){
-						if(addedVector[i] != vector1[i] + vector2[i]) { 								
-							throw(std::runtime_error("FAILURE! PANIC!"));
-						}
-					}
-				}
+		/*void testVectorAddition(tarch::la::Vector<size, T>& mock) {
+			for(auto vector2 : this->_mockService->getMocksCopy<tarch::la::Vector<size, T>>()) {
+				//actual test
+				auto addedVector = mock;
+				addedVector += vector2;
+				//error checking
+				for(int i = 0; i < size; i++) if(addedVector[i] != mock[i] + vector2[i]) throw(std::runtime_error("Addition yielded incorrect value."));
 			}
-			#ifdef DEBUG_UT_VECTOR
-				std::cout << testing::ut::UnitTestInterface::PRINT_PREFIX() << "testVectorAddition: \x1B[032m Success! \x1B[0m" << std::endl;
-			#endif
-		}
+		}*/
 		
 	private:
 		//Used mock service of class T

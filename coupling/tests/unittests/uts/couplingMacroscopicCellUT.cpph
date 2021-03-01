@@ -18,10 +18,10 @@ namespace coupling { namespace datastructures {
 
 
 template<int dim> 
-class coupling::datastructures::MacroscopicCellUT : public testing::ut::UnitTestInterface {
+class coupling::datastructures::MacroscopicCellUT : public testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCell<dim>> {
 	public:
 		MacroscopicCellUT(testing::ut::UnitTestingService *uts):
-		testing::ut::UnitTestInterface(typeid(this).name())
+		testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCell<dim>>()
 		{
 			//Get MockService for double
 			if(uts->getMockService<double>().has_value()) _DMS = uts->getMockService<double>().value();
@@ -38,77 +38,49 @@ class coupling::datastructures::MacroscopicCellUT : public testing::ut::UnitTest
 			#endif
 			
 			//Add test functions to UTI::_testFuncs
-			this->_testFuncs.push_back(std::make_tuple(new std::function<void ()>
-				{ [this] () { testSetGetMicroscopicMass(); } }, "testSetGetMicroscopicMass")
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void (coupling::datastructures::MacroscopicCell<dim>&)>
+				{ [this] (coupling::datastructures::MacroscopicCell<dim>& mock) { testSetGetMicroscopicMass(mock); } }, "testSetGetMicroscopicMass")
 			);
-			this->_testFuncs.push_back(std::make_tuple(new std::function<void ()>
-				{ [this] () { testSetGetMacroscopicMass(); } }, "testSetGetMacroscopicMass")
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void (coupling::datastructures::MacroscopicCell<dim>&)>
+				{ [this] (coupling::datastructures::MacroscopicCell<dim>& mock) { testSetGetMacroscopicMass(mock); } }, "testSetGetMacroscopicMass")
 			);
-			this->_testFuncs.push_back(std::make_tuple(new std::function<void ()>
-				{ [this] () { testSetGetPotentialEnergy(); } }, "testSetGetPotentialEnergy")
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void (coupling::datastructures::MacroscopicCell<dim>&)>
+				{ [this] (coupling::datastructures::MacroscopicCell<dim>& mock) { testSetGetPotentialEnergy(mock); } }, "testSetGetPotentialEnergy")
 			);
-			this->_testFuncs.push_back(std::make_tuple(new std::function<void ()>
-				{ [this] () { testSetGetTemperature(); } }, "testSetGetTemperature")
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void (coupling::datastructures::MacroscopicCell<dim>&)>
+				{ [this] (coupling::datastructures::MacroscopicCell<dim>& mock) { testSetGetTemperature(mock); } }, "testSetGetTemperature")
 			);
 		}
 		
 		~MacroscopicCellUT() {}	
 
-		//TODO: reduce code redundancy
 		//TODO: print which mock caused failure in exeption
 
 		//Verify correctness of getter/setter methods
-		void testSetGetMicroscopicMass() {
-			unsigned int cases = 0;
-			for(auto mock : this->_mockService->getMocksCopy<coupling::datastructures::MacroscopicCell<dim>>()) {
-				for(double d : _DMS->getMocksCopy<double>()) {
-					mock.setMicroscopicMass(d);
-					if (mock.getMicroscopicMass() != d) throw(std::runtime_error("Failure!"));
-					cases++;
-				}
+		void testSetGetMicroscopicMass(coupling::datastructures::MacroscopicCell<dim>& mock) {
+			for(double d : _DMS->getMocksCopy<double>()) {
+				mock.setMicroscopicMass(d);
+				if (mock.getMicroscopicMass() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
 			}
-			#ifdef DEBUG_UT_MACROCELL
-				std::cout << this->PRINT_PREFIX() << "testSetGetMicroscopicMass: \x1B[32mSuccess!\x1B[0m (" <<  cases <<" cases)" << std::endl;
-			#endif
 		}
-		void testSetGetMacroscopicMass() {
-			unsigned int cases = 0;
-			for(auto mock : this->_mockService->getMocksCopy<coupling::datastructures::MacroscopicCell<dim>>()) {
-				for(double d : _DMS->getMocksCopy<double>()) {
-					mock.setPotentialEnergy(d);
-					if (mock.getPotentialEnergy() != d) throw(std::runtime_error("Failure!"));
-					cases++;
-				}
+
+		void testSetGetMacroscopicMass(coupling::datastructures::MacroscopicCell<dim>& mock) {
+			for(double d : _DMS->getMocksCopy<double>()) {
+				mock.setPotentialEnergy(d);
+				if (mock.getPotentialEnergy() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
 			}
-			#ifdef DEBUG_UT_MACROCELL
-				std::cout << this->PRINT_PREFIX() << "testSetGetMicroscopicMass: \x1B[32mSuccess!\x1B[0m (" <<  cases <<" cases)" << std::endl;
-			#endif
 		}
-		void testSetGetPotentialEnergy() {
-			unsigned int cases = 0;
-			for(auto mock : this->_mockService->getMocksCopy<coupling::datastructures::MacroscopicCell<dim>>()) {
-				for(double d : _DMS->getMocksCopy<double>()) {
-					mock.setPotentialEnergy(d);
-					if (mock.getPotentialEnergy() != d) throw(std::runtime_error("Failure!"));
-					cases++;
-				}
+		void testSetGetPotentialEnergy(coupling::datastructures::MacroscopicCell<dim>& mock) {
+			for(double d : _DMS->getMocksCopy<double>()) {
+				mock.setPotentialEnergy(d);
+				if (mock.getPotentialEnergy() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
 			}
-			#ifdef DEBUG_UT_MACROCELL
-				std::cout << this->PRINT_PREFIX() << "testSetGetPotentialEnergy: \x1B[32mSuccess!\x1B[0m (" <<  cases <<" cases)" << std::endl;
-			#endif
 		}
-		void testSetGetTemperature() {
-			unsigned int cases = 0;
-			for(auto mock : this->_mockService->getMocksCopy<coupling::datastructures::MacroscopicCell<dim>>()) {
-				for(double d : _DMS->getMocksCopy<double>()) {
-					mock.setTemperature(d);
-					if (mock.getTemperature() != d) throw(std::runtime_error("Failure!"));
-					cases++;
-				}
+		void testSetGetTemperature(coupling::datastructures::MacroscopicCell<dim>& mock) {
+			for(double d : _DMS->getMocksCopy<double>()) {
+				mock.setTemperature(d);
+				if (mock.getTemperature() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
 			}
-			#ifdef DEBUG_UT_MACROCELL
-				std::cout << this->PRINT_PREFIX() << "testSetGetTemperature: \x1B[32mSuccess!\x1B[0m (" <<  cases <<" cases)" << std::endl;
-			#endif
 		}
 
 
