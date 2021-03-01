@@ -4,6 +4,7 @@
 #pragma once
 
 #include<vector>
+#include<tuple>
 #include<iostream> 
 #include<functional>
 #include<exception>
@@ -33,7 +34,8 @@ class testing::ut::UnitTestInterface {
 
 
 		virtual ~UnitTestInterface() {
-			for(auto func : _testFuncs) delete func;
+			//delete all functions pointers stored in testFuncs
+			for(auto func : _testFuncs) delete get<0>(func);
 			#ifdef DEBUG_UT
 				std::cout << PRINT_PREFIX() << "Deconstructed." << std::endl;
 			#endif
@@ -41,9 +43,9 @@ class testing::ut::UnitTestInterface {
 
 		//Executes all unit test functions of this UT
 		virtual void runAllTests() {
-			for(auto tf : _testFuncs) 
+			for(unsigned int tf_i = 0; tf_i < _testFuncs.size(); tf_i++) 
 				try {
-					(*tf)();
+					runTest(tf_i);
 				}
 				catch (...) {
 					std::rethrow_exception(std::current_exception());
@@ -53,35 +55,45 @@ class testing::ut::UnitTestInterface {
 		//Executes a single test.
 		virtual void runTest(unsigned int testFunc_index) {
 			try {
-				(*_testFuncs[testFunc_index])();
+				//TODO: time measurement
+				//Gets the first part of the testFunc tuple, i.e. a function pointer, and then dereferences it
+				(*std::get<0>(_testFuncs[testFunc_index]))();
 			}
-			catch (...) {
-				std::rethrow_exception(std::current_exception());
+			catch (std::exception& e) {
+				//Enrich exception info with idenfier of failed function (i.e second part of testFunc tuple)
+				throw std::runtime_error(std::string("\x1B[31m").append(std::get<1>(_testFuncs[testFunc_index])).append(": ").append(e.what()).append("\x1B[0m"));
 			}
 		}
 
+		//used when handling strings
 		std::string getClassIdentifier() const { return _classIdentifier; }
 
-	protected:
+		//used when outputting identifer
+		std::string getClassIdentifier_pretty() const { return std::string("\x1B[36m").append(_classIdentifier).append("\x1B[0m"); }
 
+	protected:
+		
+		//prefix for all output of classes deriving this
 		virtual std::string PRINT_PREFIX() const {
-			return std::string("UnitTest( ").std::string::append(_classIdentifier).std::string::append(" ): ");
+			return std::string("UnitTest(").append(getClassIdentifier_pretty()).append("): ");
 		}
 
 		/*
-		 * List of function pointers matching the following interface:
-		 * (void) -> void
+		 * List of tuples: 
+		 * (0) 	function pointers matching the following interface:
+		 * 		(void) -> void
 		 *
-		 * Expected to throw exception if assertions fail.
-		 * That exception then gets passed to the UTS, cf. this->run(All)Tests()
+		 * 		Expected to throw exception if assertions fail.
+		 * 		That exception then gets passed to the UTS, cf. this->run(All)Tests()
+		 * (1)	Identifer string for that function. Usually its source code name.
 		 */
-		std::vector<std::function<void ()>*> _testFuncs;
+		std::vector<std::tuple<std::function<void ()>*, std::string>> _testFuncs;
 
 		/*
 		 * Each UnitTest must provide a MockService of the class it is testing.
 		 * This should be done during instanciation of the UnitTest.
 		 */
-		testing::ut::MockService* _thisMs;
+		testing::ut::MockService* _mockService;
 
 		/*
 		 * This should be typeid(T).name() where T is the tested class
