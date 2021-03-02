@@ -1,0 +1,34 @@
+#pragma once
+
+#include //TODO: Source file of tested class "myClass".
+#include "coupling/tests/unittests/UnitTestInterface.h"
+#include "coupling/tests/unittests/MockService.cpph"
+#include "coupling/tests/unittests/UnitTestingService.h"
+
+//This is a very general template used for creating new UnitTests. To see examples for fully implemented UnitTests, confer this files directory (e.g. tarchVectorUT.cpph)
+
+class myClassUT : public testing::ut::UnitTestImpl<myClass> {
+	public:
+		VectorUT(testing::ut::UnitTestingService *uts):
+		testing::ut::UnitTestImpl<myClass>(uts->getRank(), uts->getCommSize())
+		{
+			//TODO: Generate vector containing mocks of myClass
+			//...
+
+			//TODO: Create new MockService for myClass using mocks generated above:
+			this->_mockService = uts->addMockService<myClass>(/*std::vector of mocks of myClass*/);
+			
+			//Add test functions to UTI::_testFuncs. Note that EXAMPLARYTESTFUNCTION is just an example. Replace it with actual function name.
+			this->_testFuncs.push_back(std::make_tuple(new 
+				std::function<void (myClass&)>
+				{ [this] (myClass& mock) { EXAMPLARYTESTFUNCTION(mock); } }, "EXAMPLARYTESTFUNCTION"
+			));
+		}
+
+		//Here you define all your test functions
+		void EXEMPLARYTESTFUNCTION(myClass mock) {
+
+		//Verify correctness of some behaviour of "mock", our mock object of type <Tested class>
+		//In case the test fails, throw an std::runtime_error explaining what failed exactly.
+		}
+};
