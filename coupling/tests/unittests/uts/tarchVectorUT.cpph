@@ -49,7 +49,6 @@ class tarch::la::VectorUT : public testing::ut::UnitTestImpl<tarch::la::Vector<s
 		
 		~VectorUT() {}	
 
-		//TODO: DEBUG
 		//Verify correctness of operator+=
 		void testVectorAddition(tarch::la::Vector<size, T>& mock) {
 			for(auto vector2 : testing::ut::UnitTestInterface::_mockService->getMocksCopy<tarch::la::Vector<size, T>>()) 
