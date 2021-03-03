@@ -6,25 +6,29 @@ set -e
 #TODO: 
 #-Support more compilers
 #-In case of failure, act accordingly. e.g. write error output to file
+#-Support parallel/sequential for CouetteTest
 
 #TODO: Add more compilers
-for compiler in g++ clang++ mpicxx icc; do
+for compiler in g++ clang++ mpicxx; do
 
+	#COUETTE
 	cmake .. -D CMAKE_CXX_COMPILER=${compiler} || #try/catch
-	echo "MaMiCo: CompileTest: Makefile generation failed for compiler: ${compiler}"
+	echo "MaMiCo: CompileTest: Makefile generation of CouetteTest failed for compiler: ${compiler}"
 
 	make clean
 
-	#TODO: build target parametrization?
 	make || #try/catch
-	echo "MaMiCo: CompileTest: Compilation failed for compiler: ${compiler}"
+	echo "MaMiCo: CompileTest: Compilation of CouetteTest failed for compiler: ${compiler}"
+
+	#PYBIND11
+	cmake .. -D CMAKE_CXX_COMPILER=${compiler} -D USE_PYBIND11=True || #try/catch
+	echo "MaMiCo: CompileTest: Makefile generation for pybind11 library failed for compiler: ${compiler}"
+
+	make clean
+
+	make || #try/catch
+	echo "MaMiCo: CompileTest: Compilation of pybind11 library failed for compiler: ${compiler}"
 
 done
 
 make clean
-
-
-#Fragen:
-# -eigene build dir für jeden compiler oder make clean nach jedem build?
-# -alternative: nicht immer neue makefiles generieren, sondern separat speichern und erneut make clean && make
-# 	-problem: wenn sich ordner-/filestruktur ändert
