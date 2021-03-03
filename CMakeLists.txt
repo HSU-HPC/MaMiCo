@@ -9,20 +9,32 @@ include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 #--- Define target ---
 
-#Case: standard C++ executable
-#add_library(mamico_ctest
-#	${CMAKE_CURRENT_SOURCE_DIR}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp
-#	${CMAKE_CURRENT_SOURCE_DIR}/coupling/configurations/ParticleInsertionConfiguration.cpp
-#	[...]main.cpp
-#	Add Simplemd to libraries?
-#)
+#NOTE: You are expected to pass USE_PYBIND11=True when executing this cmake script to compile a pybind11 library.
+#	   The default is a standard Couette scenario (C++).
 
-#Case: pybind11
-pybind11_add_module( mamico_ctest
+if(USE_PYBIND11)
+	#Case: pybind11
+	message("Now compiling pybind11 library...")
+	pybind11_add_module( mamico_ctest
 	${CMAKE_CURRENT_SOURCE_DIR}/coupling/python-binding/mamico.cpp
-)
+	)
+	#Currently, KVS is not supported in non-parallel mode
+	set(MAMICO_PARALLEL TRUE)
+else()
+	#Case: Couette
+	message("Now compiling CouetteTest...")
+	add_library(mamico_ctest
+		${CMAKE_CURRENT_SOURCE_DIR}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/coupling/configurations/ParticleInsertionConfiguration.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/coupling/tests/main_couette.cpp
+	)
+	#If you wish to compile a parallelized version of Couette, define this upon calling Cmake
+	if(PARALLEL)
+		set(MAMICO_PARALLEL TRUE)
+	endif()
+endif()
 
-#enforce c++17 in order to support the use of constexpr
+#enforce c++17 in order to support the use of modern C++ features
 target_compile_features(mamico_ctest PRIVATE cxx_std_17)
 
 #Add SimpleMD's scons build script to target ---
@@ -38,8 +50,6 @@ set_property(
 	PROPERTY COMPILE_DEFINITIONS MDDim3 MDError SIMPLE_MD
 	)
 
-#For pybind, this is always true TODO: Support standard C++ versions, e.g. Couette
-set(MAMICO_PARALLEL TRUE)
 if(MAMICO_PARALLEL)
 	set_property(
 		TARGET mamico_ctest
