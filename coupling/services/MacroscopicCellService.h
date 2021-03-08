@@ -73,13 +73,22 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
 	//TODO: This shouldn't be part of this interface. Currently, MCSImpl is not ported to python-bindings.
+	//version 1: taking function ptrs
 	virtual void addFilterToSequence(	
 		const char *name,
 		const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
 		const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 		int filterIndex = -1
 	){std::cout << "Non-filtering MacroscopicCellService tried to invoke a filtering method. Aborting." << std::endl; exit(EXIT_FAILURE);}
+	//version 2: taking functions
+	virtual void addFilterToSequence(	
+		const char *name,
+		const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)> applyScalar,
+		const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)> applyVector,
+		int filterIndex = -1
+	){std::cout << "Non-filtering MacroscopicCellService tried to invoke a filtering method. Aborting." << std::endl; exit(EXIT_FAILURE);}
     unsigned int getID() const { return _id;}
+
 
   protected:
     const unsigned int _id; /** (unique) identifier of this macroscopic cell service */
@@ -223,6 +232,12 @@ public coupling::services::MacroscopicCellService<dim> {
 		   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 								int filterIndex = -1
 	);
+	void addFilterToSequence(	const char *name,
+		   						const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)> applyScalar,
+		   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)> applyVector,
+								int filterIndex = -1
+	);
+
 
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
