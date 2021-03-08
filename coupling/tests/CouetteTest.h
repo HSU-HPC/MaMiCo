@@ -28,6 +28,9 @@
 #include <sys/time.h>
 #include <random>
 
+//TODO: Explanatory comment
+#define SYNTHETICMD_SEQUENCE "SYNTHETIC-MD"
+
 /**
  * Versatile configurable Couette flow test for noise-filtered multi-instance Nie coupling.
  *
@@ -52,8 +55,10 @@ public:
   virtual void run(){
     init();
     if(_cfg.twsLoop){twsLoop();return;}
+	std::cout << "total coupling cycles: " << _cfg.couplingCycles << std::endl;
     for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++)
       runOneCouplingCycle(cycle);
+	  std::cout << "ran one cc" << std::endl;
     shutdown();
   }
 
@@ -242,7 +247,7 @@ private:
     }
 
     if(_cfg.miSolverType == SYNTHETIC){
-      if(_cfg.md2Macro || _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
+      if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
         _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1){
         std::cout << "Invalid configuration: Synthetic MD runs sequentially on rank 0 only. "
           << "It does neither support parallel communication nor multi-instance sampling" << std::endl;
@@ -352,6 +357,85 @@ private:
       }
     }
 
+	/*
+	 * A synthethic solver is modeled by a dynamically linked filter,
+	 * i.e. a lambda function producing artifical data in every filter step.
+	 *
+	 * This is how to properly instanciate and use a synthethic solver:
+	 * - empty sequence named SYNTHETICMD_SEQUENCE
+	 * - filtered-values = "macro-mass macro-momentum"
+	 * - set as output sequence to CS and input to all other sequences
+	 *
+	 * TODO
+	 * - remove the new overloaded versions of addFilterToSequence in MCS (?)
+	 * - proper explanatory comment
+	 */
+	else if(_cfg.miSolverType == SYNTHETIC)	{
+		try {
+			for(unsigned int i = 0; i < _localMDInstances; i++) 
+				_multiMDCellService->getMacroscopicCellService(i).addFilterToSequence(
+				SYNTHETICMD_SEQUENCE,//sequence name
+				new std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, 3>>)>{ //applyScalar
+				[this] (
+   	 				std::vector<double> inputScalars, //doesnt get used
+					std::vector<std::array<unsigned int, 3>> cellIndices //doesnt get used either: fitting the signature of addFilterToSequence
+  				) {
+					std::cout << "Entering synthetic MD scalar." << std::endl;
+
+					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+    				const unsigned int size = _buf.recvBuffer.size();
+    				const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+    				const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+
+					std::vector<double> syntheticMasses;
+    				for (unsigned int i = 0; i < size; i++){
+      					syntheticMasses[i] = mass;
+    				}
+					return syntheticMasses;
+
+  				}},
+				new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double,3>>, std::vector<std::array<unsigned int, 3>>)> { //applyVector
+				[this] (	
+    				std::vector<std::array<double, 3>> inputVectors, //same for these 2
+					std::vector<std::array<unsigned int, 3>> cellIndices
+  				) {
+					std::cout << "Entering synthetic MD vector." << std::endl;
+
+					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+    				const unsigned int size = _buf.recvBuffer.size();
+    				const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+   					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+    				const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+
+    				std::normal_distribution<double> distribution (0.0,_cfg.noiseSigma);
+					std::vector<std::array<double, 3>> syntheticMomenta;
+    				for (unsigned int i = 0; i < size; i++){
+     					// determine cell midpoint
+						const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
+      					tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
+
+      					for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
+      					// compute momentum
+      					const tarch::la::Vector<3,double> noise(distribution(_generator),distribution(_generator),distribution(_generator));
+      					const tarch::la::Vector<3,double> momentum(mass*((*_couetteSolver).getVelocity(cellMidPoint)+noise));
+						//conversion from tarch::la::Vector to std::array
+      					syntheticMomenta[i] = {momentum[0], momentum[1], momentum[2]};
+    				}
+					return syntheticMomenta;
+  				}},
+			   	0 //filterIndex
+				);
+		}
+		catch(std::runtime_error& e) {
+			auto expectedError = std::string("ERROR: Could not find Filter Sequence named ").append(SYNTHETICMD_SEQUENCE);
+			if(expectedError.compare(e.what()) == 0)  {
+				std::cout << "ERROR: Synthetic MD solver selected without providing filter sequence '" << SYNTHETICMD_SEQUENCE <<"' in config." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			else throw e;
+		}
+	}
+
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
     allocateRecvBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
@@ -436,23 +520,22 @@ private:
       }
     }
 
-    if(_cfg.miSolverType == SYNTHETIC){
-      fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+	//TODO: Synthetic solver
+	//This is replaced by modelling Synthetic MD as a filter. See above.
+    /*if(_cfg.miSolverType == SYNTHETIC){
+      //fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
 
       if (_rank==0){
         gettimeofday(&_tv.end,NULL);
         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
         gettimeofday(&_tv.start,NULL);
       }
-
-      // TODO call filtering on recvBuffer here
-      std::cout << "WARNING filtering with SYNTHETIC solver currently not implemented" << std::endl;
       
       if (_rank==0){
         gettimeofday(&_tv.end,NULL);
         _tv.filter += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
       }
-    }
+    }*/
   }
 
   void computeSNR(int cycle){
