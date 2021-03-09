@@ -19,7 +19,10 @@
 #include "coupling/filtering/filters/Strouhal.h"
 #include "coupling/filtering/filters/FilterFromFunction.h"
 #include "coupling/filtering/filters/Copy.h"
+
+#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include "coupling/filtering/SequentialFilter.h"
+#endif
 
 /*
  * Filter Sequences are used to group filters that will be applied in chronological order.
