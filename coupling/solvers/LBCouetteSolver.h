@@ -98,7 +98,6 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
         plot();
         collidestream();
         communicate(); // exchange between neighbouring MPI subdomains
-        _time += _dt;
         _counter++;
       }
     }

@@ -16,6 +16,9 @@ LIB_MPI=mpi
 
 LIB_EIGEN_PATH=/usr/include/eigen3
 
+### Include general OpenFOAM path
+#FOAM_PATH=/opt/openfoam7/
+
 #LAMMPS_PATH=/home/$USER/programs/lammps/src
 #LIB_LAMMPS=lammps_openmpi_mamico
 

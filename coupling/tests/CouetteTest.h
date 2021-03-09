@@ -12,8 +12,10 @@
 #include "tarch/utils/RandomNumberService.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/LBCouetteSolver.h"
+#include "coupling/solvers/FoamClass.h"
 #include "coupling/solvers/FDCouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
+#include "coupling/solvers/FoamSolverInterface.h"
 #include "coupling/solvers/LBCouetteSolverInterface.h"
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
@@ -100,7 +102,7 @@ std::cout << "Running with MPI Shutdown test successive." << std::endl;
   }
 
 private:
-  enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
+  enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2, COUETTE_FOAM=3};
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void init(){
@@ -114,9 +116,9 @@ private:
     if(_localMDInstances > 0) advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
-    if(_rank==0 && cycle%20==0) {
-      std::cout << "Finish coupling cycle " << cycle << std::endl;
-    }
+    // if(_rank==0 && cycle%20==0) {
+      // std::cout << "Finish coupling cycle " << cycle << std::endl;
+    // }
   }
 
   void initMPI(){
@@ -247,6 +249,14 @@ private:
       _cfg.maSolverType = COUETTE_FD;
       tarch::configuration::ParseConfiguration::readVector<3,unsigned int>(_cfg.lbNumberProcesses,subtag,"number-of-processes");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep,subtag,"plot-every-timestep");
+    }
+    else if(type == "foam"){
+      _cfg.maSolverType = COUETTE_FOAM;
+      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep,subtag,"plot-every-timestep");
+      tarch::configuration::ParseConfiguration::readStringMandatory(_foam.directory,subtag,"foam-setup-directory");
+      tarch::configuration::ParseConfiguration::readStringMandatory(_foam.folder,subtag,"foam-setup-folder");
+      tarch::configuration::ParseConfiguration::readVector<12,unsigned int>(_foam.boundariesWithMD,subtag,"boundaries-with-MD");
+
     }
     else if(type == "analytical"){
       _cfg.maSolverType = COUETTE_ANALYTICAL;
@@ -540,12 +550,21 @@ private:
   }
 
   void twoWayCoupling(int cycle){
-    if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
+    if ( (_cfg.maSolverType==COUETTE_FOAM) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
+      static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+      _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+      _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),  _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
+    }
+    else if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
         _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+        _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),  _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
     }
-    if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
+    if (_cfg.maSolverType==COUETTE_FOAM && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
+      static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+    }
+    else if ( (!_cfg.maSolverType==COUETTE_ANALYTICAL) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     }
     // write data to csv-compatible file for evaluation
@@ -783,11 +802,11 @@ private:
       for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
 
       double mass = density * macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
-      if(!_cfg.maSolverType == COUETTE_ANALYTICAL)
+      if(_cfg.maSolverType == COUETTE_LB || _cfg.maSolverType == COUETTE_FD)
         mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
 
       // compute momentum
-      const tarch::la::Vector<3,double> momentum(mass*couetteSolver.getVelocity(cellMidPoint));
+      tarch::la::Vector<3,double> momentum(mass*couetteSolver.getVelocity(cellMidPoint));
       sendBuffer[i]->setMicroscopicMass(mass);
       sendBuffer[i]->setMicroscopicMomentum(momentum);
     }
@@ -829,8 +848,16 @@ private:
           exit(EXIT_FAILURE);
         }
       }
+    }
+    else if(_cfg.maSolverType == COUETTE_FOAM){
+      solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD);
+      if (solver==NULL){
+        std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
     // LB solver: active on lbNumberProcesses
-    } else if(_cfg.maSolverType == COUETTE_LB){
+    else if(_cfg.maSolverType == COUETTE_LB){
       solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight,vel,_cfg.kinVisc,dx,dt,_cfg.plotEveryTimestep,"LBCouette",_cfg.lbNumberProcesses,1);
       if (solver==NULL){
         std::cout << "ERROR CouetteTest::getCouetteSolver(): LB solver==NULL!" << std::endl;
@@ -839,8 +866,6 @@ private:
     }
     else if(_cfg.maSolverType == COUETTE_FD){
       solver = new coupling::solvers::FiniteDifferenceSolver(_cfg.channelheight,vel,_cfg.kinVisc,dx,dt,_cfg.plotEveryTimestep,"FDCouette",_cfg.lbNumberProcesses,1);
-      std::cout <<  "Channelheight " << _cfg.channelheight << " vel " << vel << " kinVisc " << _cfg.kinVisc ;
-      std::cout << " dx " << dx << " dt " <<  dt << " Processes " << _cfg.lbNumberProcesses << std::endl;
       if (solver==NULL){
         std::cout << "ERROR CouetteTest::getCouetteSolver(): FD solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -876,6 +901,9 @@ private:
         }
       }
       interface = new coupling::solvers::LBCouetteSolverInterface(lbSolver->getAvgNumberLBCells(),lbSolver->getNumberProcesses(),offsetMDDomain,globalNumberMacroscopicCells,outerRegion);
+    }
+    if (_cfg.maSolverType == COUETTE_FOAM){
+      interface = new coupling::solvers::FoamSolverInterface<3>(globalNumberMacroscopicCells,outerRegion);
     }
     else if (_cfg.maSolverType == COUETTE_FD){
       coupling::solvers::FiniteDifferenceSolver *fdSolver = static_cast<coupling::solvers::FiniteDifferenceSolver*>(couetteSolver);
@@ -942,6 +970,12 @@ private:
     double filter;
   };
 
+  struct FoamConfig{
+    std::string directory;
+    std::string folder;
+    tarch::la::Vector<12,unsigned int> boundariesWithMD;
+  };
+
   int _rank, _tws;
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
@@ -958,7 +992,7 @@ private:
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
   TimingValues _tv;
+  FoamConfig _foam;
 };
 
 #endif // _COUPLING_TESTS_COUETTETEST_H_
-
