@@ -72,7 +72,7 @@ fi
 cd ${MAMICO_PATH} || exit
 if [ "${parallel}" == "parallel" ]
 then
-    scons target=libsimplemd dim=3 build=release parallel=yes compiler=gcc machine=hww-cluster -j4
+    scons target=libsimplemd dim=3 build=release parallel=yes compiler=gcc -j4
     libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
     FLAGS="${FLAGS} -DMDParallel"
 else
