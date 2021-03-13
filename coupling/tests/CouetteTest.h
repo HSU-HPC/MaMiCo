@@ -28,7 +28,7 @@
 #include <sys/time.h>
 #include <random>
 
-//TODO: Explanatory comment
+//This is ignored if you dont use synthetic MD. For further instructions cf. SYNTHETIC part of initSolvers().
 #define SYNTHETICMD_SEQUENCE "SYNTHETIC-MD"
 
 /**
@@ -362,17 +362,16 @@ private:
 	 * i.e. a lambda function producing artifical data in every filter step.
 	 *
 	 * This is how to properly instanciate and use a synthethic solver:
-	 * - empty sequence named SYNTHETICMD_SEQUENCE
-	 * - filtered-values = "macro-mass macro-momentum"
-	 * - set as output sequence to CS and input to all other sequences
+	 * - Create a sequence named SYNTHETICMD_SEQUENCE in xml. Use whatever input, but make sure the filter system's output is set to this SYNTETHIC_MD sequence.
+	 * - Set filtered-values = "macro-mass macro-momentum" for that sequence.
+	 * - Use that sequence as input for all sequences that want (unfiltered) MD input.
 	 *
 	 * TODO
 	 * - test with more than 1 process
-	 * - major bug when there is ONLY a FFF in a sequence (what the f...???)
-	 * - _tv.micro does not get measured correctly
-	 *
-	 * - proper explanatory comment
+	 * - major bug when there is ONLY a FFF in a sequence (???)
 	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
+	 * - some indentation is probably off because of copy+pasting...
+	 *
 	 * - calculate correct offset using ICM2M
 	 */
 	else if(_cfg.miSolverType == SYNTHETIC)	{
@@ -385,6 +384,8 @@ private:
    	 				std::vector<double> inputScalars, //doesnt get used: matching MCS's addFilterToSequence(...) signature
 					std::vector<std::array<unsigned int, 3>> cellIndices //only gets used to determine "size" (see below)
   				) {
+					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
+
 					//std::cout << "Entering synthetic MD scalar..." << std::endl;
 
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
@@ -397,6 +398,12 @@ private:
       					syntheticMasses.push_back(mass);
     				}
 					//std::cout << "Generated masses!" << std::endl;
+					
+					if (_rank==0){
+						gettimeofday(&_tv.end,NULL);
+						_tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+					}
+
 					return syntheticMasses;
 
   				}},
@@ -405,11 +412,13 @@ private:
     				std::vector<std::array<double, 3>> inputVectors, //same for these 2
 					std::vector<std::array<unsigned int, 3>> cellIndices
   				) {
+					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
+
 					//std::cout << "Entering synthetic MD vector." << std::endl;
 
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
     				const unsigned int size = cellIndices.size();
-    				const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+    				const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset()); //TODO: use ICM2M instead of IC here
    					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
     				const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
@@ -429,6 +438,12 @@ private:
       					syntheticMomenta.push_back({momentum[0], momentum[1], momentum[2]});
     				}
 					//std::cout << "Generated momenta!" << std::endl;
+					
+					if (_rank==0){
+						gettimeofday(&_tv.end,NULL);
+						_tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+					}
+
 					return syntheticMomenta;
   				}},
 			   	0 //filterIndex
