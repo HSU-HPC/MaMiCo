@@ -55,10 +55,9 @@ public:
   virtual void run(){
     init();
     if(_cfg.twsLoop){twsLoop();return;}
-	std::cout << "total coupling cycles: " << _cfg.couplingCycles << std::endl;
-    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++)
+    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
-	  std::cout << "ran one cc" << std::endl;
+	 }
     shutdown();
   }
 
@@ -273,6 +272,7 @@ private:
     _couetteSolver = getCouetteSolver( _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
       _simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
       );
+	if (_couetteSolver != NULL) std::cout << "Couette solver not null on rank: " << _rank << std::endl; //TODO: remove debug
 
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized anyway,
@@ -367,8 +367,13 @@ private:
 	 * - set as output sequence to CS and input to all other sequences
 	 *
 	 * TODO
-	 * - remove the new overloaded versions of addFilterToSequence in MCS (?)
+	 * - test with more than 1 process
+	 * - major bug when there is ONLY a FFF in a sequence (what the f...???)
+	 * - _tv.micro does not get measured correctly
+	 *
 	 * - proper explanatory comment
+	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
+	 * - calculate correct offset using ICM2M
 	 */
 	else if(_cfg.miSolverType == SYNTHETIC)	{
 		try {
@@ -377,20 +382,21 @@ private:
 				SYNTHETICMD_SEQUENCE,//sequence name
 				new std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, 3>>)>{ //applyScalar
 				[this] (
-   	 				std::vector<double> inputScalars, //doesnt get used
-					std::vector<std::array<unsigned int, 3>> cellIndices //doesnt get used either: fitting the signature of addFilterToSequence
+   	 				std::vector<double> inputScalars, //doesnt get used: matching MCS's addFilterToSequence(...) signature
+					std::vector<std::array<unsigned int, 3>> cellIndices //only gets used to determine "size" (see below)
   				) {
-					std::cout << "Entering synthetic MD scalar." << std::endl;
+					//std::cout << "Entering synthetic MD scalar..." << std::endl;
 
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
-    				const unsigned int size = _buf.recvBuffer.size();
+    				const unsigned int size = cellIndices.size();
     				const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
     				const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
 					std::vector<double> syntheticMasses;
     				for (unsigned int i = 0; i < size; i++){
-      					syntheticMasses[i] = mass;
+      					syntheticMasses.push_back(mass);
     				}
+					//std::cout << "Generated masses!" << std::endl;
 					return syntheticMasses;
 
   				}},
@@ -399,10 +405,10 @@ private:
     				std::vector<std::array<double, 3>> inputVectors, //same for these 2
 					std::vector<std::array<unsigned int, 3>> cellIndices
   				) {
-					std::cout << "Entering synthetic MD vector." << std::endl;
+					//std::cout << "Entering synthetic MD vector." << std::endl;
 
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
-    				const unsigned int size = _buf.recvBuffer.size();
+    				const unsigned int size = cellIndices.size();
     				const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
    					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
     				const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
@@ -413,14 +419,16 @@ private:
      					// determine cell midpoint
 						const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
       					tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
-
       					for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
-      					// compute momentum
+
+      					//compute momentum
       					const tarch::la::Vector<3,double> noise(distribution(_generator),distribution(_generator),distribution(_generator));
       					const tarch::la::Vector<3,double> momentum(mass*((*_couetteSolver).getVelocity(cellMidPoint)+noise));
+
 						//conversion from tarch::la::Vector to std::array
-      					syntheticMomenta[i] = {momentum[0], momentum[1], momentum[2]};
+      					syntheticMomenta.push_back({momentum[0], momentum[1], momentum[2]});
     				}
+					//std::cout << "Generated momenta!" << std::endl;
 					return syntheticMomenta;
   				}},
 			   	0 //filterIndex
@@ -469,6 +477,7 @@ private:
       // run one time step for macroscopic couette solver
       if( _cfg.wallInitCycles > 0 && cycle == _cfg.wallInitCycles){
         _couetteSolver->setWallVelocity(_cfg.wallVelocity);
+		//When using Synthetic MD, 
       }
       if(_cfg.wallOscillations != 0){
         tarch::la::Vector<3,double> vel = cycle < _cfg.wallInitCycles ? _cfg.wallInitVelocity : _cfg.wallVelocity;
@@ -520,22 +529,28 @@ private:
       }
     }
 
-	//TODO: Synthetic solver
-	//This is replaced by modelling Synthetic MD as a filter. See above.
-    /*if(_cfg.miSolverType == SYNTHETIC){
+	//Now that synthetic filters are modelled as filters, this looks very similar to the SimpleMD case above...
+    if(_cfg.miSolverType == SYNTHETIC){
       //fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+	  for (unsigned int i = 0; i < _localMDInstances; i++){
+        // set macroscopic cell service and interfaces in MamicoInterfaceProvider
+        coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
+        coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
+      }
 
-      if (_rank==0){
-        gettimeofday(&_tv.end,NULL);
-        _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
-        gettimeofday(&_tv.start,NULL);
+      // send back data from MD instances and merge it
+      if(_cfg.md2Macro){
+		//_buf does not get used here: Instead, the synthetic MD in the SYNTHETICMD_SEQUENCE generates values. To prevent segfaults, it has to be nonempty, though.
+		/*std::cout << "RECV BUF ADRESSES:" << std::endl;
+		for (auto cell : _buf.recvBuffer) {
+			std::cout << cell << ", ";
+		}
+		std::cout << std::endl;*/
+        _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+        //std::cout << "Finish _multiMDCellService->sendFromMD2Macro " << std::endl;
       }
-      
-      if (_rank==0){
-        gettimeofday(&_tv.end,NULL);
-        _tv.filter += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
-      }
-    }*/
+
+    }
   }
 
   void computeSNR(int cycle){
@@ -867,6 +882,18 @@ private:
           exit(EXIT_FAILURE);
         }
       }
+	//In case of synthetic MD, each rank needs access to the analytical solution. In that case we thus initialize analytical solvers on each rank other than 0
+	else if( _cfg.miSolverType == SYNTHETIC){ //rank != 0
+      if (_rank == 0){
+        solver = new coupling::solvers::CouetteSolver<3>(_cfg.channelheight,vel[0],_cfg.kinVisc);
+        if (solver==NULL){ //How is this even reachable? Copied it from above...
+          std::cout << "ERROR CouetteTest::getCouetteSolver(): Analytic solver==NULL!" << std::endl;
+          exit(EXIT_FAILURE);
+        }
+      }
+
+
+	  }
     }
     #if(BUILD_WITH_OPENFOAM)
     else if(_cfg.maSolverType == COUETTE_FOAM){
