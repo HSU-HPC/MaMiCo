@@ -387,16 +387,15 @@ private:
 					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
 
 					//std::cout << "Entering synthetic MD scalar..." << std::endl;
-
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
-    				const unsigned int size = cellIndices.size();
-    				const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
-    				const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+					const unsigned int size = cellIndices.size();
+					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
 					std::vector<double> syntheticMasses;
-    				for (unsigned int i = 0; i < size; i++){
-      					syntheticMasses.push_back(mass);
-    				}
+					for (unsigned int i = 0; i < size; i++){
+						syntheticMasses.push_back(mass);
+					}
 					//std::cout << "Generated masses!" << std::endl;
 					
 					if (_rank==0){
@@ -409,7 +408,7 @@ private:
   				}},
 				new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double,3>>, std::vector<std::array<unsigned int, 3>>)> { //applyVector
 				[this] (	
-    				std::vector<std::array<double, 3>> inputVectors, //same for these 2
+					std::vector<std::array<double, 3>> inputVectors, //same for these 2
 					std::vector<std::array<unsigned int, 3>> cellIndices
   				) {
 					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
@@ -417,26 +416,26 @@ private:
 					//std::cout << "Entering synthetic MD vector." << std::endl;
 
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
-    				const unsigned int size = cellIndices.size();
-    				const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset()); //TODO: use ICM2M instead of IC here
-   					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
-    				const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+					const unsigned int size = cellIndices.size();
+					const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset()); //TODO: use ICM2M instead of IC here
+					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
-    				std::normal_distribution<double> distribution (0.0,_cfg.noiseSigma);
+					std::normal_distribution<double> distribution (0.0,_cfg.noiseSigma);
 					std::vector<std::array<double, 3>> syntheticMomenta;
-    				for (unsigned int i = 0; i < size; i++){
-     					// determine cell midpoint
+					for (unsigned int i = 0; i < size; i++){
+						// determine cell midpoint
 						const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
-      					tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
-      					for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
+						tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
+						for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
 
-      					//compute momentum
-      					const tarch::la::Vector<3,double> noise(distribution(_generator),distribution(_generator),distribution(_generator));
-      					const tarch::la::Vector<3,double> momentum(mass*((*_couetteSolver).getVelocity(cellMidPoint)+noise));
+						//compute momentum
+						const tarch::la::Vector<3,double> noise(distribution(_generator),distribution(_generator),distribution(_generator));
+						const tarch::la::Vector<3,double> momentum(mass*((*_couetteSolver).getVelocity(cellMidPoint)+noise));
 
 						//conversion from tarch::la::Vector to std::array
-      					syntheticMomenta.push_back({momentum[0], momentum[1], momentum[2]});
-    				}
+						syntheticMomenta.push_back({momentum[0], momentum[1], momentum[2]});
+					}
 					//std::cout << "Generated momenta!" << std::endl;
 					
 					if (_rank==0){
