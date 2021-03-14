@@ -72,7 +72,8 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
-	//TODO: This shouldn't be part of this interface. Currently, MCSImpl is not ported to python-bindings.
+	virtual const coupling::FilterPipeline<dim>* getFilterPipeline() const { return nullptr; }  /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
+	//TODO: The following shouldn't be part of this interface. Currently, MCSImpl is not ported to python-bindings.
 	virtual void addFilterToSequence(	
 		const char *name,
 		const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
@@ -213,6 +214,8 @@ public coupling::services::MacroscopicCellService<dim> {
      */
     const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 	
+	const coupling::FilterPipeline<dim>* getFilterPipeline() const { return &_filterPipeline; }
+
 	/**
 	 * Creates a new filter from scratch and appends it to a sequence that is part of this service's filter pipelining system.
 	 * For that, the desired sequence's identifier and two functions are needed:
@@ -227,12 +230,6 @@ public coupling::services::MacroscopicCellService<dim> {
 	
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
-
-	/** returns all macroscopic cells located within MD domain boundaries. */
-	//TODO: REMOVE std::vector<coupling::datastructures::MacroscopicCell<dim> *> getInnerMacroscopicCells() {return _innerMacroscopicCells;}
-
-	/** returns those cells' index vectors */
-	//TODO: REMOVE std::vector<tarch::la::Vector<dim, unsigned int>> getInnerMacroscopicCellIndices() {return _innerMacroscopicCellIndices;}
 	
   private:
     /** initialises the IndexConversion object at start up. This is the very first thing to be done in the
@@ -247,14 +244,6 @@ public coupling::services::MacroscopicCellService<dim> {
     /** initialises the index structures for USHER scheme */
     void initIndexVectors4Usher( tarch::la::Vector<dim,unsigned int> numberLinkedCellsPerMacroscopicCell );
 	
-	/**
-	 * initializes _innerMacroscopicCells and _innerMacroscopicCellIndices
-	 */
-	//TODO: REMOVE void initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells);
-
-    /** returns the position (in space) of the lower,left corner if the first local ghost cell. Needed
-     *  in distributeMass().
-     */
     tarch::la::Vector<dim,double> getPositionOfFirstLocalGhostCell() const;
 	
 
