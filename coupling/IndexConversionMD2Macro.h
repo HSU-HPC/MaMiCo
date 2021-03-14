@@ -107,6 +107,17 @@ class coupling::IndexConversionMD2Macro {
 			return *_localUpperBoundaries - *_localLowerBoundaries + plus_one;
 		}
 
+		tarch::la::Vector<dim, double> getGlobalMD2MacroDomainOffset() const {
+			auto offset = _ic->getGlobalMDDomainOffset(); //standard MD offset
+
+			//offset of md2macro domain relative to MD domain
+			for(unsigned int d = 0; d < dim; d++) 
+				offset[d] += _ic->getMacroscopicCellSize()[d] * (*_globalLowerBoundaries)[d]; //offset of md2macro domain relative to MD domain
+
+			//std::cout << offset << std::endl << std::endl;
+			return offset;
+		}
+
 
 		//TODO: move both of these to regular IC?
 		/*

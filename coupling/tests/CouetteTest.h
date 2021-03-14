@@ -370,7 +370,6 @@ private:
 	 * - test with more than 1 process
 	 * - major bug when there is ONLY a FFF in a sequence (???)
 	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
-	 * - some indentation is probably off because of copy+pasting...
 	 *
 	 * - calculate correct offset using ICM2M
 	 */
@@ -415,18 +414,20 @@ private:
 
 					//std::cout << "Entering synthetic MD vector." << std::endl;
 
-					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+					//unlike for the scalar case, we need the MD2Macro version of IC to calculate correct offsets
+					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro =
+						_multiMDCellService->getMacroscopicCellService(0).getFilterPipeline()->getICM2M();
 					const unsigned int size = cellIndices.size();
-					const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset()); //TODO: use ICM2M instead of IC here
-					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+					const tarch::la::Vector<3,double> md2MacroDomainOffset(indexConversionMD2Macro->getGlobalMD2MacroDomainOffset()); //TODO: use ICM2M instead of IC here
+					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversionMD2Macro->getBaseIC()->getMacroscopicCellSize());
 					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
 					std::normal_distribution<double> distribution (0.0,_cfg.noiseSigma);
 					std::vector<std::array<double, 3>> syntheticMomenta;
 					for (unsigned int i = 0; i < size; i++){
 						// determine cell midpoint
-						const tarch::la::Vector<3,unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
-						tarch::la::Vector<3,double> cellMidPoint(domainOffset-0.5*macroscopicCellSize);
+						const tarch::la::Vector<3,unsigned int> globalIndex(indexConversionMD2Macro->getBaseIC()->getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
+						tarch::la::Vector<3,double> cellMidPoint(md2MacroDomainOffset-0.5*macroscopicCellSize);
 						for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
 
 						//compute momentum

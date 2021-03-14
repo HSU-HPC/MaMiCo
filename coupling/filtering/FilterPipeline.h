@@ -68,6 +68,10 @@ class coupling::FilterPipeline{
        	std::vector<coupling::FilterSequence<dim> *> getMiSequences() const { return _miSequences; }
 
 
+		//Returns the md2macro-IC this instance uses. Used to access MD2Macro-domain properties from outside the FilterPipeline.
+		const coupling::IndexConversionMD2Macro<dim>* getICM2M() const { return _ic; }
+
+
     private:
 		/*
 		 * Detects errors in XML-config file.
