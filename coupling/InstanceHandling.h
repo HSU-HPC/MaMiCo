@@ -108,7 +108,7 @@ public:
 
     void switchOffCoupling() {
         for(auto & simpleMD : _simpleMD) {
-            simpleMD->switchOnCoupling();
+            simpleMD->switchOffCoupling();
         }
     }
     void switchOffCoupling(const unsigned int & i) {

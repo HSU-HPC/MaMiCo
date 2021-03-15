@@ -217,6 +217,7 @@ private:
     if (_rank == 0){ gettimeofday(&_tv.start,NULL); }
     if(_cfg.miSolverType == coupling::configurations::CouetteConfig::MicroSolverType::SIMPLEMD){
       // equilibrate MD
+      _instanceHandling->switchOffCoupling();
       _instanceHandling->equilibrate(_cfg.equSteps, _mdStepCounter);
       _instanceHandling->switchOnCoupling();
       _mdStepCounter += _cfg.equSteps;
