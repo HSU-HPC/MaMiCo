@@ -303,7 +303,7 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
 
       // set some verlet-specific values; currently hard-coded
       _lmp->input->one("neighbor 0.5 bin");
-      _lmp->input->one("neigh_modify delay 0 every 20 check no");
+      _lmp->input->one("neigh_modify delay 0 every 1 check no");
 
       // write output; though this is not vtk format, we use this config for that purpose
       if (_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0){
