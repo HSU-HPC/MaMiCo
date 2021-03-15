@@ -55,7 +55,7 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
+    FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DMDCoupledDebug -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3 -g3"
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
@@ -70,21 +70,21 @@ fi
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH} || exit
-if [ "${parallel}" == "parallel" ]
-then
-    scons target=libsimplemd dim=3 build=release parallel=yes compiler=gcc machine=hww-cluster -j4
-    libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
-    FLAGS="${FLAGS} -DMDParallel"
-else
-    scons target=libsimplemd dim=3 build=release parallel=no -j4
-    libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
-fi
 
 
 
 # specific built for SIMPLE_MD
 if [ "${mdSim}" == "SIMPLE_MD" ]
 then
+  if [ "${parallel}" == "parallel" ]
+  then
+    scons target=libsimplemd dim=3 build=release parallel=yes compiler=gcc machine=hww-cluster -j4
+    libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
+    FLAGS="${FLAGS} -DMDParallel"
+  else
+    scons target=libsimplemd dim=3 build=release parallel=no compiler=gcc machine=hww-cluster -j4
+    libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+  fi
   cd ${BUILD_PATH} || exit 
     ${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
     objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
@@ -98,18 +98,18 @@ then
   
   cp -a ${MAMICO_PATH}/coupling/interface/impl/LAMMPS/USER-MAMICO ${LAMMPS_PATH}/src/
 
-  export MAMICO_PATH
   export LIB_EIGEN_PATH
+  export MAMICO_PATH
 
   # build lammps
   cd ${LAMMPS_PATH}/src || exit
-  make yes-user-mamico
-  make g++_openmpi || exit
-  #make makelib
-  #make -f Makefile.lib openmpi
+  make yes-user-mamico -j4 || exit
+  make g++_openmpi -j4 || exit
+  make makelib
+  make -f Makefile.lib openmpi
   ln -s liblammps_g++_openmpi.a lib${LIB_LAMMPS}.a
   includes="${includes} -I${LAMMPS_PATH}/src"
-  libraries="${libraries} -L${LAMMPS_PATH}/src -l${LIB_LAMMPS}"
+  libraries="${libraries} -L${LAMMPS_PATH}/src -Wl,-Bstatic -l${LIB_LAMMPS} -Wl,-Bdynamic"
   # remove Werror flag
   FLAGS=`echo ${FLAGS} | sed 's/-Werror//'`
 elif [ "${mdSim}" == "LAMMPS_DPD" ]
@@ -121,9 +121,9 @@ then
   fi
   # build lammps
   cd ${LAMMPS_PATH} || exit
-  make yes-user-mamico
-  make openmpi
-  make makelib
+  make yes-user-mamico -j4
+  make openmpi -j4
+  make makelib -j4
   make -f Makefile.lib openmpi
   ln -s liblammps_g++_openmpi.a lib${LIB_LAMMPS}.a
   includes="${includes} -I${LAMMPS_PATH}/src"
@@ -134,9 +134,20 @@ fi
 
 ### builds, linking, objects for coupled simulation with MaMiCo
 cd ${BUILD_PATH} || exit
+${compiler} ${MAMICO_PATH}/tarch/tinyxml2/tinyxml2.cpp ${includes} ${libraries} -c -o ${BUILD_PATH}/tinyxml2.o
+${compiler} ${MAMICO_PATH}/tarch/utils/RandomNumberService.cpp ${includes} ${libraries} -c -o ${BUILD_PATH}/RandomNumberService.o
 ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/VTKConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/VTKConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/MolecularDynamicsConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/MolecularDynamicsConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/DomainConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/DomainConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/ExternalForceConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ExternalForceConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/MoleculeConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/MoleculeConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/MPIConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/MPIConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/ProfilePlotterConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ProfilePlotterConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/RDFConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/RDFConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/SimulationConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/SimulationConfiguration.o
 ${compiler} ${MAMICO_PATH}/coupling/tests/main_dynamic_md.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_dynamic_md.o
-objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_dynamic_md.o"
+objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_dynamic_md.o ${BUILD_PATH}/tinyxml2.o ${BUILD_PATH}/RandomNumberService.o ${BUILD_PATH}/VTKConfiguration.o ${BUILD_PATH}/MolecularDynamicsConfiguration.o ${BUILD_PATH}/DomainConfiguration.o ${BUILD_PATH}/ExternalForceConfiguration.o ${BUILD_PATH}/MoleculeConfiguration.o ${BUILD_PATH}/MPIConfiguration.o ${BUILD_PATH}/ProfilePlotterConfiguration.o ${BUILD_PATH}/RDFConfiguration.o ${BUILD_PATH}/SimulationConfiguration.o"
 
 echo "${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest" 
 ${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/dynamicMDTest_${parallel}
