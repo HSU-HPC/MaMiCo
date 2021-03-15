@@ -64,9 +64,9 @@ class Sorting {
           case PRINT_ALL_CELLS:
             decide=true; break;
           case PRINT_INNER_CELLS:
-            decide=true; for (int d = 0; d < dim; d++){decide=decide&&(loop[d]>0)&&(loop[d]<end[d]-1);} break;
+            decide=true; for (unsigned int d = 0; d < dim; d++){decide=decide&&(loop[d]>0)&&(loop[d]<end[d]-1);} break;
           case PRINT_GHOST_CELLS:
-            decide=true; for (int d = 0; d < dim; d++){decide=decide&&(loop[d]>0)&&(loop[d]<end[d]-1);} decide=!decide; break;
+            decide=true; for (unsigned int d = 0; d < dim; d++){decide=decide&&(loop[d]>0)&&(loop[d]<end[d]-1);} decide=!decide; break;
           default:
             std::cout << "ERROR printMolecules(): This case should never be reached!" << std::endl; exit(EXIT_FAILURE); break;
         }
@@ -240,7 +240,7 @@ class Sorting {
           std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index " << indexConversion.convertLocalToGlobalVectorCellIndex(vectorIndex) << std::endl;
           // further check if this is a ghost cell and throw and error otherwise
           bool isGhostCell=false;
-          for (int d = 0; d < dim; d++){
+          for (unsigned int d = 0; d < dim; d++){
             isGhostCell = isGhostCell || (vectorIndex[d]==0) || (vectorIndex[d]==indexConversion.getLocalNumberMacroscopicCells()[d]+1);
           }
           if (!isGhostCell){ std::cout << "ERROR Sorting::updateGhostCells: Molecule is not sorted into a ghost cell!" << std::endl; exit(EXIT_FAILURE);}

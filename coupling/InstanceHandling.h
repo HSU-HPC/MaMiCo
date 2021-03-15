@@ -40,15 +40,7 @@ public:
 
         _simpleMD[i]->init(_multiMDService,_multiMDService.getGlobalNumberOfLocalMDSimulation(i));
 
-        // Allocate coupling interfaces
-        _mdSolverInterface.push_back(
-          coupling::interface::SimulationAndInterfaceFactory::getInstance()
-            .getMDSolverInterface(_mdConfig, _mamicoConfig, _simpleMD[i])
-        );
-        if (_mdSolverInterface[i] == NULL){
-          std::cout << "ERROR InstanceHandling: mdSolverInterface[" << i << "] == NULL!" << std::endl; 
-          exit(EXIT_FAILURE);
-        }
+        
       } 
     }
 
@@ -82,6 +74,23 @@ public:
 
     auto & getSimpleMD() const {
       return _simpleMD;
+    }
+
+    /** Allocate Coupling interfaces
+     * This method has to be called after switchOnCoupling()
+     */
+    void setMDSolverInterface() {
+        
+        for(unsigned int i=0;i<_simpleMD.size();++i) {
+          _mdSolverInterface.push_back(
+            coupling::interface::SimulationAndInterfaceFactory::getInstance()
+              .getMDSolverInterface(_mdConfig, _mamicoConfig, _simpleMD[i])
+          );
+          if (_mdSolverInterface[i] == NULL){
+            std::cout << "ERROR InstanceHandling: mdSolverInterface[" << i << "] == NULL!" << std::endl; 
+            exit(EXIT_FAILURE);
+          }
+        }
     }
 
     auto & getMDSolverInterface() const {

@@ -211,7 +211,7 @@ private:
     }
 
     //_simpleMD = _instanceHandling->getSimpleMD();
-    _mdSolverInterface = _instanceHandling->getMDSolverInterface();
+    
 
     _mdStepCounter = 0;
     if (_rank == 0){ gettimeofday(&_tv.start,NULL); }
@@ -221,6 +221,10 @@ private:
       _instanceHandling->switchOnCoupling();
       _mdStepCounter += _cfg.equSteps;
     }
+
+    // Allocate coupling interfaces
+    _instanceHandling->setMDSolverInterface();
+    _mdSolverInterface = _instanceHandling->getMDSolverInterface();
     
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
       _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
@@ -417,7 +421,8 @@ private:
         && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
         _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+        _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),  _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
     }
     if ( (_cfg.maSolverType==coupling::configurations::CouetteConfig::MacroSolverType::COUETTE_LB) 
         && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
