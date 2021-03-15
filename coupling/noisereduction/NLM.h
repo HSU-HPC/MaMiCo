@@ -51,12 +51,3 @@ public coupling::noisereduction::NoiseReduction<dim> {
 #include "coupling/noisereduction/NLM.cpph"
 
 #endif // _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_NLM_H_
-
-/*
-
-- write ulf
-- implement gaussian filter
-- test with karman vortex street (Re = 100, vis_LB = 0.1) => Walberla
-- add data / pattern analysis
-
-*/

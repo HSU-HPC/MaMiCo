@@ -16,10 +16,11 @@ namespace coupling {
 }
 
 
-/** interface to the Foam solver. We only receive data from MD in the inner region, and we only send data for the outer region to MD. What "outer" means is specified by the arguments of the interface;
- *  moreover, we do not send the ghost layer data from Couette to MD.
+/** interface to the Foam solver. It's almost the same as the CouetteSolverInterface. That means, data from MD is received in the inner region plus one cell layer from the outer region.
+ *  Plus one is necessary cause the Foam solver needs the boundary condition on the boundary. So it is interpolated between the two cells beside. The Foam solver sends data in tha outerRegion
+ *  region, as defined by the parameters of the interface. .
  *  By default, the argument outerRegion is set to 1: this yields that only the first non-ghost layer of macroscopic cells shall be sent to MD, and all other inner macroscopic cells are received from MD.
- *  The couette solver is expected to only run on rank 0.
+ *  The Foam solver is expected to only run on rank 0.
  *  @author Philipp Neumann & Helene Wittenberg
  */
 template<unsigned int dim>
