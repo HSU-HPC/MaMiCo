@@ -55,7 +55,7 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DMDCoupledDebug -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3 -g3"
+    FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3 -g3"
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
@@ -142,7 +142,7 @@ ${compiler} ${MAMICO_PATH}/simplemd/configurations/MolecularDynamicsConfiguratio
 ${compiler} ${MAMICO_PATH}/simplemd/configurations/DomainConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/DomainConfiguration.o
 ${compiler} ${MAMICO_PATH}/simplemd/configurations/ExternalForceConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ExternalForceConfiguration.o
 ${compiler} ${MAMICO_PATH}/simplemd/configurations/MoleculeConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/MoleculeConfiguration.o
-${compiler} ${MAMICO_PATH}/simplemd/configurations/MPIConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/MPIConfiguration.o
+${compiler} ${MAMICO_PATH}/simplemd/configurations/MPIConfiguration.cpp ${FLAGS} -DMDParallel ${includes} -c -o ${BUILD_PATH}/MPIConfiguration.o
 ${compiler} ${MAMICO_PATH}/simplemd/configurations/ProfilePlotterConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ProfilePlotterConfiguration.o
 ${compiler} ${MAMICO_PATH}/simplemd/configurations/RDFConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/RDFConfiguration.o
 ${compiler} ${MAMICO_PATH}/simplemd/configurations/SimulationConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/SimulationConfiguration.o

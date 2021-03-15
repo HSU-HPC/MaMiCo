@@ -55,7 +55,7 @@ class GhostAtoms {
       for (int i = nlocal; i < nall; i++){
         for (unsigned int d = 0; d < dim; d++){ _ghostX[i-nlocal][d] = _lmp->atom->x[i][d]; }
         #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
-        std::cout << "Rank " << rank << ": Ghost particle "; for (int d = 0; d < dim; d++){ std::cout << _ghostX[i-nlocal][d] << " ";}std::cout << std::endl;
+        std::cout << "Rank " << rank << ": Ghost particle "; for (unsigned int d = 0; d < dim; d++){ std::cout << _ghostX[i-nlocal][d] << " ";}std::cout << std::endl;
         #endif
       }
     }
