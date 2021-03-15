@@ -27,33 +27,33 @@ public:
 
   void handleCell(LinkedCell &cell,const unsigned int &cellIndex) {
     
-    double stdDeviation = std::sqrt(MD_DIM * _kB * _temperature / _molecularMass);
+    double stdDeviation = std::sqrt(dim * _kB * _temperature / _molecularMass);
     
-    tarch::la::Vector<MD_DIM, double> randomNumbers(0.0);
+    tarch::la::Vector<dim, double> randomNumbers(0.0);
 
     coupling::interface::MoleculeIterator<LinkedCell,dim> *molecule = _mdSolverInterface->getMoleculeIterator(cell);
     molecule->begin();
     while(molecule->continueIteration()) {
       coupling::interface::Molecule<dim> &wrapper(molecule->get());
       randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
-      for(unsigned int d=1;d<MD_DIM;++d) {
+      for(unsigned int d=1;d<dim;++d) {
         randomNumbers[d] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
       }
 
-      tarch::la::Vector<MD_DIM, double> mVelocity = wrapper.getVelocity();
-#if (MD_DIM==1)
-      mVelocity = _velocity + stdDeviation*randomNumbers;
-#elif (MD_DIM==2)
-      mVelocity[0] = _velocity[0] + stdDeviation*(randomNumbers[0]*std::cos(randomNumbers[1]));
-      mVelocity[1] = _velocity[1] + stdDeviation*(randomNumbers[0]*std::sin(randomNumbers[1]));
-#elif (MD_DIM==3)
-      mVelocity[0] = _velocity[0] + stdDeviation*(randomNumbers[0]*std::sin(randomNumbers[1])*std::cos(randomNumbers[2]));
-      mVelocity[1] = _velocity[1] + stdDeviation*(randomNumbers[0]*std::sin(randomNumbers[1])*std::sin(randomNumbers[2]));
-      mVelocity[2] = _velocity[2] + stdDeviation*(randomNumbers[0]*std::cos(randomNumbers[1]));
-#endif
-    wrapper.setVelocity(mVelocity);
+      tarch::la::Vector<dim, double> mVelocity = wrapper.getVelocity();
+      if(dim==3) {
+        mVelocity[0] = _velocity[0] + stdDeviation*(randomNumbers[0]*std::sin(randomNumbers[1])*std::cos(randomNumbers[2]));
+        mVelocity[1] = _velocity[1] + stdDeviation*(randomNumbers[0]*std::sin(randomNumbers[1])*std::sin(randomNumbers[2]));
+        mVelocity[2] = _velocity[2] + stdDeviation*(randomNumbers[0]*std::cos(randomNumbers[1]));
+      } else if(dim==1) { 
+        mVelocity = _velocity + stdDeviation*randomNumbers;
+      } else if(dim==2) {
+        mVelocity[0] = _velocity[0] + stdDeviation*(randomNumbers[0]*std::cos(randomNumbers[1]));
+        mVelocity[1] = _velocity[1] + stdDeviation*(randomNumbers[0]*std::sin(randomNumbers[1]));
+      }
+      wrapper.setVelocity(mVelocity);
 
-    molecule->next();
+      molecule->next();
     } 
     delete molecule;
   }
