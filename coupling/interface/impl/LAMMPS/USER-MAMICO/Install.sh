@@ -35,14 +35,14 @@ done
 if (test $mode = 1) then
   
   if (test -e ../Makefile.package) then
-    sed -i 's|-I${MAMICO_PATH} -I${LIB_EIGEN_PATH} -std=c++1z -DLAMMPS_MD -DMDDim3 -DMDCoupledParallel -DTarchParallel||g' ../Makefile.package
-    sed -i 's|^PKG_INC =*|& -I${MAMICO_PATH} -I${LIB_EIGEN_PATH} -std=c++1z -DLAMMPS_MD -DMDDim3 -DMDCoupledParallel -DTarchParallel|' ../Makefile.package
+    sed -i 's|-I${MAMICO_PATH} -I${LIB_EIGEN_PATH} -std=c++1z -DLAMMPS_MD -O3 -g3 -DMDDim3 -DMDCoupledParallel -DTarchParallel||g' ../Makefile.package
+    sed -i 's|^PKG_INC =*|& -I${MAMICO_PATH} -I${LIB_EIGEN_PATH} -std=c++1z -DLAMMPS_MD -O3 -g3 -DMDDim3 -DMDCoupledParallel -DTarchParallel|' ../Makefile.package
     #sed -i -e 's|^PKG_INC =[ \t]*|&-I${MAMICO_PATH} -std=c++11 -DMDCoupledParallel |' ../Makefile.package
   fi
 elif (test $mode = 0) then
 
   if (test -e ../Makefile.package) then
-    sed -i -e 's|[^ \t]*-I${MAMICO_PATH} -I${LIB_EIGEN_PATH} -std=c++1z -DLAMMPS_MD -DMDDim3 -DMDCoupledParallel -DTarchParallel[^ \t]* ||' ../Makefile.package
+    sed -i -e 's|[^ \t]*-I${MAMICO_PATH} -I${LIB_EIGEN_PATH} -std=c++1z -DLAMMPS_MD -O3 -g3 -DMDDim3 -DMDCoupledParallel -DTarchParallel[^ \t]* ||' ../Makefile.package
   fi
 
 fi
