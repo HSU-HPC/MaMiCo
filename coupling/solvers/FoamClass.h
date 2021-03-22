@@ -21,9 +21,12 @@ namespace coupling{
 }
 
 /**
- * The code is an evolution of the solver icoFoam in OpenFOAM(R) 7,
+ * The code is an evolution of the solver IcoFoam in OpenFOAM(R) 7,
  * where additional functionality for MaMiCO coupling is added.
  * It is an incompressible CFD solver for the Couette scenario.
+ * The implementation is for a equidistant mesh.
+ * Due to the Couette szenario 12 boundaries for the continuum are assumed,
+ * 6 of them to be boundaries with the MD.
  * @author Helene Wittenberg
  */
 class coupling::solvers::IcoFoam: public coupling::solvers::AbstractCouetteSolver<3> {
@@ -53,6 +56,7 @@ public:
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
+
   virtual ~IcoFoam(){
     if(_boundary2RecvBufferIndicesOuter){ delete [] _boundary2RecvBufferIndicesOuter; _boundary2RecvBufferIndicesOuter=NULL;}
     if(_boundary2RecvBufferIndicesInner){ delete [] _boundary2RecvBufferIndicesInner; _boundary2RecvBufferIndicesInner=NULL;}
@@ -97,7 +101,7 @@ public:
         U = HbyA - rAU*fvc::grad(p);
         U.correctBoundaryConditions();
       }
-      // runTime.write();
+      // runTime.write(); // writes the original OpenFOAM output
       plottxt();
       _timestepCounter++;
     }
@@ -112,6 +116,7 @@ public:
     else{return tarch::la::Vector<3,double>(0, 0, 0);}
   };
 
+  // Changes the velocity on the moving wall (refers to Couette szenario)
   void setWallVelocity(tarch::la::Vector<3,double> wallVelocity)override{
     const unsigned int pointsInBoundary = U.boundaryFieldRef()[0].size();
     for(unsigned int i=0; i<pointsInBoundary; i++){
@@ -121,18 +126,21 @@ public:
     }
   };
 
+  // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
   const tarch::la::Vector<3,double> getOuterPointFromBoundary(const int layer, const int index){
      const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
      const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
      return FoamCoordVector;
   }
 
+  // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
   const tarch::la::Vector<3,double> getInnerPointFromBoundary(const int layer, const int index){
      const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
      const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
      return FoamCoordVector;
   }
 
+  // Applies the MD data (just velocities) as boundary condition, the mapping between the conntinuum and the MD is provided by the setMDBoundary()
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
   const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
     if(skipRank()){return;}
@@ -147,6 +155,8 @@ public:
     }
   }
 
+  // Settup for the mapping from MD to continuum data. Velocity values are necessary directly on the boundary. Therefore the MD values from the two cells beside
+  // the boundary are interpolated. The function looks for the index of every cell that data is necessary from. This indices will be stored in two arrays.
   void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip,
   const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size){
     if(skipRank()){return;}
@@ -202,6 +212,43 @@ private:
     file.close();
   }
 
+  // /** create vtk plot if required */
+  // void plot() const {
+  //   // only plot output if this is the correct timestep
+  //   if (_plotEveryTimestep==-1){ return;}
+  //   if (_timestepCounter%_plotEveryTimestep!=0){return;}
+  //
+  //   std::stringstream ss; ss << "Continuum_Velocity_IcoFoam_" << _rank << "_" << _timestepCounter << ".vtk";
+  //   std::ofstream file(ss.str().c_str());
+  //   if (!file.is_open()){std::cout << "ERROR NumericalSolver::plot(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+  //   std::stringstream velocity;
+  //
+  //   file << "# vtk DataFile Version 2.0" << std::endl;
+  //   file << "MaMiCo FoamSolver" << std::endl;
+  //   file << "ASCII" << std::endl << std::endl;
+  //   file << "DATASET STRUCTURED_GRID" << std::endl; It is not a structured grid, the md domain in the middle is missing. ToDo check which other type is fitting
+  //   int pointsPerDimension = _channelheight/_dx+2;
+  //   file << "DIMENSIONS " << pointsPerDimension << " " << pointsPerDimension << " " << pointsPerDimension << std::endl; // everything +1 cause of change in index
+  //   file << "POINTS " << (pointsPerDimension)*(pointsPerDimension)*(pointsPerDimension) << " float" << std::endl;
+  //
+  //   velocity << std::setprecision(12);
+  //   velocity << "VECTORS velocity float" << std::endl;
+  //
+  //   // // loop over domain (incl. boundary)
+  //   // int size = U.size();
+  //   // for (int i = 0; i < size; i++){
+  //   //   // write information to streams;
+  //   //   file << U.mesh()[i][0] << ", " << U.mesh()[i][1] << ", " << U.mesh()[i][2] << std::endl; // boundary is missing, how to include? Just not do?
+  //   //   velocity << U[i][0] << ", " << U[i][1] << ", " << U[i][2] << std::endl;
+  //   // }
+  //
+  //   file << std::endl;
+  //   file << velocity.str() << std::endl;
+  //   velocity.str("");
+  //   file.close();
+  // }
+
+  // The solver runs sequentially on rank 0. Therefore the function checks if the acutal rank is zero.
   bool skipRank(){
     return !(_rank==0);
   }
@@ -216,19 +263,21 @@ private:
   Foam::surfaceScalarField phi;
   Foam::pisoControl piso;
   // this are additional variables, they can be changed
+  // the entries define which boundaries are for coupling with MD
+  // 0 means no MD boundary and 1 means MD boundary
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
-  float _dx;
-  double _channelheight;
+  float _dx; // mesh size
+  double _channelheight; // overall height of the Couette channel
   unsigned int *_boundary2RecvBufferIndicesOuter; // pointer to an array with data for communication
   unsigned int *_boundary2RecvBufferIndicesInner; // pointer to an array with data for communication
   Foam::vector **_boundaryIndices; // pointer to OpenFOAM data for communication
   int _rank; // rank of the actual process
   int _plotEveryTimestep; // every n-th time step should be plotted
+  unsigned int _numberBoundaryPoints; // the number of CFD boundary points which need data from the MD
   int _timestepCounter{0}; // actual time step number
   // the following are original OpenFOAM variables, their names shall not be changed
   Foam::label pRefCell{0};
   Foam::scalar pRefValue{0.0};
   Foam::scalar cumulativeContErr{0};
-  unsigned int _numberBoundaryPoints; // the number of CFD boundary points which need data from the MD
 };
 #endif // _COUPLING_SOLVERS_ICOFOAM_H
