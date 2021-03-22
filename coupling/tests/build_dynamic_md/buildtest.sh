@@ -55,7 +55,7 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3 -g3"
+    FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O0"
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
@@ -103,10 +103,10 @@ then
 
   # build lammps
   cd ${LAMMPS_PATH}/src || exit
-  make yes-user-mamico -j4 || exit
-  make g++_openmpi -j4 || exit
-  make makelib
-  make -f Makefile.lib openmpi
+  make yes-user-mamico CCFLAGS="-g -O0" -j4 || exit
+  make g++_openmpi CCFLAGS="-g -O0" -j4 || exit
+  make CCFLAGS="-g -O0" makelib
+  #make -f Makefile.lib openmpi
   ln -s liblammps_g++_openmpi.a lib${LIB_LAMMPS}.a
   includes="${includes} -I${LAMMPS_PATH}/src"
   libraries="${libraries} -L${LAMMPS_PATH}/src -Wl,-Bstatic -l${LIB_LAMMPS} -Wl,-Bdynamic"
