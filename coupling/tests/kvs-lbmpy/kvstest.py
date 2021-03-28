@@ -156,23 +156,103 @@ class KVSTest():
 
         from scipy.ndimage import gaussian_filter, median_filter
         #Add Gauss filter
-        def gauss_sca(data):
+        def gauss_sca05(data):
+            print("Applying gaussian filter to a scalar property. sigma = 0.5.")
+            return gaussian_filter(data, sigma = (0.5,0.5,0.5))
+
+        def gauss_vec05(data):
+            print("Applying gaussian filter to a 3d property. sigma = 0.5.")
+            return gaussian_filter(data, sigma = (0.5,0.5,0.5,0))
+
+        def gauss_sca1(data):
             print("Applying gaussian filter to a scalar property. sigma = 1.")
             return gaussian_filter(data, sigma = (1,1,1))
 
-        def gauss_vec(data):
+        def gauss_vec1(data):
             print("Applying gaussian filter to a 3d property. sigma = 1.")
             return gaussian_filter(data, sigma = (1,1,1,0))
 
-        def median(data):
-            print("Applying median filter. size = 3*3*3.")
-            #TODO: get size parameter right
-            return median_filter(data, size = (3,3,3,1))
+        def gauss_sca15(data):
+            print("Applying gaussian filter to a scalar property. sigma = 1.5.")
+            return gaussian_filter(data, sigma = (1.5,1.5,1.5))
 
-        #TODO: FM: fix segfault
+        def gauss_vec15(data):
+            print("Applying gaussian filter to a 3d property. sigma = 1.5.")
+            return gaussian_filter(data, sigma = (1.5,1.5,1.5,0))
+
+        def gauss_sca2(data):
+            print("Applying gaussian filter to a scalar property. sigma = 2.")
+            return gaussian_filter(data, sigma = (2,2,2))
+
+        def gauss_vec2(data):
+            print("Applying gaussian filter to a 3d property. sigma = 2.")
+            return gaussian_filter(data, sigma = (2,2,2,0))
+
+        def gauss_sca25(data):
+            print("Applying gaussian filter to a scalar property. sigma = 2.5.")
+            return gaussian_filter(data, sigma = (2.5,2.5,2.5))
+
+        def gauss_vec25(data):
+            print("Applying gaussian filter to a 3d property. sigma = 2.5.")
+            return gaussian_filter(data, sigma = (2.5,2.5,2.5,0))
+
+        def gauss_sca3(data):
+            print("Applying gaussian filter to a scalar property. sigma = 3.")
+            return gaussian_filter(data, sigma = (3,3,3))
+
+        def gauss_vec3(data):
+            print("Applying gaussian filter to a 3d property. sigma = 3.")
+            return gaussian_filter(data, sigma = (3,3,3,0))
+
+        def gauss_sca35(data):
+            print("Applying gaussian filter to a scalar property. sigma = 3.5.")
+            return gaussian_filter(data, sigma = (3.5,3.5,3.5))
+
+        def gauss_vec35(data):
+            print("Applying gaussian filter to a 3d property. sigma = 3.5.")
+            return gaussian_filter(data, sigma = (3.5,3.5,3.5,0))
+
+        def gauss_sca4(data):
+            print("Applying gaussian filter to a scalar property. sigma = 4.")
+            return gaussian_filter(data, sigma = (4,4,4))
+
+        def gauss_vec4(data):
+            print("Applying gaussian filter to a 3d property. sigma = 4.")
+            return gaussian_filter(data, sigma = (4,4,4,0))
+
+        def gauss_sca45(data):
+            print("Applying gaussian filter to a scalar property. sigma = 4.5.")
+            return gaussian_filter(data, sigma = (4.5,4.5,4.5))
+
+        def gauss_vec45(data):
+            print("Applying gaussian filter to a 3d property. sigma = 4.5.")
+            return gaussian_filter(data, sigma = (4.5,4.5,4.5,0))
+
+        def gauss_sca5(data):
+            print("Applying gaussian filter to a scalar property. sigma = 5.")
+            return gaussian_filter(data, sigma = (5,5,5))
+
+        def gauss_vec5(data):
+            print("Applying gaussian filter to a 3d property. sigma = 5.")
+            return gaussian_filter(data, sigma = (5,5,5,0))
+
+
+
+
         mcs = self.multiMDCellService.getMacroscopicCellService(0)
-        #mcs.addFilterToSequence(filter_sequence="wtf-seq", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
-        #mcs.addFilterToSequence(filter_sequence="wtf", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
+        #mcs.addFilterToSequence(filter_sequence="wtf-seq", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+        #mcs.addFilterToSequence(filter_sequence="wtf", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+
+        #mcs.addFilterToSequence(filter_sequence="gauss-05", filter_index=0, scalar_filter_func = gauss_sca05, vector_filter_func=gauss_vec05)
+        #mcs.addFilterToSequence(filter_sequence="gauss-1", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+        #mcs.addFilterToSequence(filter_sequence="gauss-15", filter_index=0, scalar_filter_func = gauss_sca15, vector_filter_func=gauss_vec15)
+        #mcs.addFilterToSequence(filter_sequence="gauss-2", filter_index=0, scalar_filter_func = gauss_sca2, vector_filter_func=gauss_vec2)
+        #mcs.addFilterToSequence(filter_sequence="gauss-25", filter_index=0, scalar_filter_func = gauss_sca25, vector_filter_func=gauss_vec25)
+        #mcs.addFilterToSequence(filter_sequence="gauss-3", filter_index=0, scalar_filter_func = gauss_sca3, vector_filter_func=gauss_vec3)
+        #mcs.addFilterToSequence(filter_sequence="gauss-35", filter_index=0, scalar_filter_func = gauss_sca35, vector_filter_func=gauss_vec35)
+        #mcs.addFilterToSequence(filter_sequence="gauss-4", filter_index=0, scalar_filter_func = gauss_sca4, vector_filter_func=gauss_vec4)
+        #mcs.addFilterToSequence(filter_sequence="gauss-45", filter_index=0, scalar_filter_func = gauss_sca45, vector_filter_func=gauss_vec45)
+        #mcs.addFilterToSequence(filter_sequence="gauss-5", filter_index=0, scalar_filter_func = gauss_sca5, vector_filter_func=gauss_vec5)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
@@ -290,7 +370,7 @@ class LBSolver():
         self.cpm = cpm = cfg.getint("macroscopic-solver", "cells-per-meter")
         self.domain_size = (int(2.5*cpm), int(0.41*cpm), int(0.41*cpm))
         self.vis = 1e-3
-        self.scaling = Scaling(physical_length=0.1, physical_velocity=2.25, kinematic_viscosity=self.vis,
+        self.scaling = Scaling(physical_length=0.1, physical_velocity=1, kinematic_viscosity=self.vis,
              cells_per_length=0.1*cpm)
         self.omega = cfg.getfloat("macroscopic-solver", "omega")
         if self.omega > 1.92:

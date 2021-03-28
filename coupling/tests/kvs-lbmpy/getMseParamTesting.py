@@ -7,10 +7,10 @@ import matplotlib.pyplot as mplt
 
 original_file = 'lbm'
 filtered_files = [ ["Gaussian-0.5", "Gaussian-1", "Gaussian-1.5", "Gaussian-2", "Gaussian-2.5", "Gaussian-3", "Gaussian-3.5", "Gaussian-4", "Gaussian-4.5", "Gaussian-5"], \
-	['POD-5-1', 'POD-20-1', 'POD-35-1', 'POD-50-1', 'POD-65-1', 'POD-80-1'],\
-	['POD-5-2', 'POD-20-2', 'POD-35-2', 'POD-50-2', 'POD-65-2', 'POD-80-2'],\
-	['POD-5-3', 'POD-20-3', 'POD-35-3', 'POD-50-3', 'POD-65-3', 'POD-80-3'],\
-	['NLM_0.1', 'NLM_1', 'NLM_10', 'NLM_100', 'NLM_1000', 'NLM_10000'] ]
+	['POD-20-1', 'POD-35-1', 'POD-50-1', 'POD-65-1', 'POD-80-1'],\
+	['POD-20-2', 'POD-35-2', 'POD-50-2', 'POD-65-2', 'POD-80-2'],\
+	['POD-20-3', 'POD-35-3', 'POD-50-3', 'POD-65-3', 'POD-80-3'],\
+	['NLM_0.1', 'NLM_1', 'NLM_10', 'NLM_100'] ]
 
 original_data = read_csv(original_file+".csv", delimiter=";", usecols=[0,1,2], names=["t", "x", "y"], index_col=None)
 
@@ -75,7 +75,7 @@ def plot_mses(file_location, tested_parameter, x_axis, f_index):
 	mplt.savefig(file_location)
 
 plot_mses("Gaussian", "sigma", [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5], 0)
-plot_mses("POD-1", "tws", [5, 20, 35, 50, 65, 80], 1)
-plot_mses("POD-2", "tws", [5, 20, 35, 50, 65, 80], 2)
-plot_mses("POD-3", "tws", [5, 20, 35, 50, 65, 80], 3)
-plot_mses("NLM", "h² = sigma²", ["0.1", "1", "10", "100", "1000", "10000"], 4)
+plot_mses("POD-1", "tws", [20, 35, 50, 65, 80], 1)
+plot_mses("POD-2", "tws", [20, 35, 50, 65, 80], 2)
+plot_mses("POD-3", "tws", [20, 35, 50, 65, 80], 3)
+plot_mses("NLM", "sigma²", ["0.1", "1", "10", "100"], 4)
