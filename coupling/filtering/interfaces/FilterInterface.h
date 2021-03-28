@@ -98,13 +98,67 @@ class coupling::FilterInterface{
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
 			std::vector<tarch::la::Vector<dim,unsigned int>>& new_cellIndices
 		) {
-			std::cout << "		FI: Updating cell data. Now filters " << _inputCells.size() << " cells." << std::endl;
+			//std::cout << "old cell vector size: " << _inputCells.size() << std::endl;
+			//std::cout << "new cell vector size: " << new_inputCells.size() << std::endl;
+
 			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size())
 			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
+			
+			//Alternative 1:
+			//This resizing assumes the "old" _inputCells, _outputCells and _cellIndices vectors to be of identical size.
+			/*if(new_inputCells.size() != _inputCells.size()) {
+				std::cout << "		FI: Detected change in cell vector size. ";
+
+				//Alternative 1.1: This would be more desireable, but segfaults. TODO
+				
+				_inputCells.resize(new_inputCells.size(), nullptr);
+				_outputCells.resize(new_outputCells.size(), nullptr);
+				_cellIndices.resize(new_cellIndices.size(), tarch::la::Vector<dim,unsigned int>(0));
+				
+
+				//Alternative 1.2: This is slightly worse imo, but also segfaults.
+				int size_diff = new_inputCells.size() - _inputCells.size();
+				if(size_diff > 0) { 
+					for(unsigned int i = 0; i < std::abs(size_diff); i++) {
+						//append dummy value size_diff times
+						_inputCells.push_back(nullptr);
+						_outputCells.push_back(nullptr);
+						_cellIndices.push_back(tarch::la::Vector<dim,unsigned int>(0));
+					}
+				}
+				else {
+					for(unsigned int i = 0; i < std::abs(size_diff); i++) {
+						_inputCells.pop_back();
+						_outputCells.pop_back();
+						_cellIndices.pop_back();
+					}
+				}
+
+				std::cout << "Now filters " << _inputCells.size() << " cells." << std::endl;
+
+			}
+
 			_inputCells = new_inputCells;
 			_outputCells = new_outputCells;
-			_cellIndices = new_cellIndices;
+			_cellIndices = new_cellIndices;*/
 
+			//Alternative 2: Unclean alternative solution: TODO: Fix above approach
+			_inputCells.clear();
+			_outputCells.clear();
+			_cellIndices.clear();
+
+			//int i = 0;
+			for(auto newicell : new_inputCells) { _inputCells.push_back(newicell);
+			/*std::cout << newicell << ": " << i << std::endl; i++; */}
+			//std::cout << "POST ICELLS" << std::endl;
+			for(auto newocell : new_outputCells) { _outputCells.push_back(newocell);
+			/*std::cout << newocell << std::endl; */}
+			//std::cout << "POST OCELLS" << std::endl;
+			for(auto newindex : new_cellIndices) { _cellIndices.push_back(newindex);
+			/*std::cout << newindex << std::endl; */}
+			//std::cout << "POST INSERT" << std::endl;
+
+			std::cout << "		FI: Updated cell data." << std::endl;
 		}
 
 		const char* getType() const { return _type; }
