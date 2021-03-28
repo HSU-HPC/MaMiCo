@@ -107,19 +107,23 @@ class KVSTest():
 
         numMD = self.cfg.getint("microscopic-solver","number-md-simulations")
 
+
         self.multiMDService = mamico.tarch.utils.MultiMDService(numberProcesses = self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
             totalNumberMDSimulations = numMD)
 
         self.localMDInstances = self.multiMDService.getLocalNumberOfMDSimulations()
-        if self.rank==0:
+        
+        if self.rank == 0:
             log.info("totalNumberMDSimulations = " + str(numMD))
             log.info("localMDInstances on rank 0 = " + str(self.localMDInstances))
 
         self.simpleMD = [mamico.coupling.getMDSimulation(self.simpleMDConfig,self.mamicoConfig, 
             self.multiMDService.getLocalCommunicator()) for i in range(self.localMDInstances)]
+        
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].init(self.multiMDService, self.multiMDService.getGlobalNumberOfLocalMDSimulation(i))
+
         
         equSteps = self.cfg.getint("microscopic-solver", "equilibration-steps")
         for i in range(self.localMDInstances):
@@ -128,30 +132,36 @@ class KVSTest():
             self.simpleMD[i].switchOnCoupling()
         self.mdStepCounter = equSteps
     
+
+        #Warning: If instances < ranks, this is empty for rank 0. In that case, the MultiMDCellService intialisation below segfaults. FIXME
         self.mdSolverInterface = [mamico.coupling.getMDSolverInterface(self.simpleMDConfig, self.mamicoConfig,
             self.simpleMD[i]) for i in range(self.localMDInstances)]
+
 
         self.macroscopicSolverInterface = CouetteSolverInterface(self.getGlobalNumberMacroscopicCells(),
             self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
         mamico.coupling.setMacroscopicSolverInterface(self.macroscopicSolverInterface)
-    
+
+
         self.multiMDCellService = MultiMDCellService(self.mdSolverInterface, self.macroscopicSolverInterface, 
             self.simpleMDConfig, self.rank, self.cfg.getint("microscopic-solver","number-md-simulations"),
             self.mamicoConfig, "kvs.xml", self.multiMDService)
+
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
                 self.cfg.getfloat("microscopic-solver", "temperature"))
 
+
         from scipy.ndimage import gaussian_filter, median_filter
         #Add Gauss filter
         def gauss_sca(data):
-            print("Applying gaussian filter on a vector. sigma = 1.")
+            print("Applying gaussian filter to a scalar property. sigma = 1.")
             return gaussian_filter(data, sigma = (1,1,1))
 
         def gauss_vec(data):
-            print("Applying gaussian filter on a scalar. sigma = 1.")
+            print("Applying gaussian filter to a 3d property. sigma = 1.")
             return gaussian_filter(data, sigma = (1,1,1,0))
 
         def median(data):
@@ -161,7 +171,8 @@ class KVSTest():
 
         #TODO: FM: fix segfault
         mcs = self.multiMDCellService.getMacroscopicCellService(0)
-        mcs.addFilterToSequence(filter_sequence="gauss-seq", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
+        #mcs.addFilterToSequence(filter_sequence="wtf-seq", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
+        #mcs.addFilterToSequence(filter_sequence="wtf", filter_index=0, scalar_filter_func = gauss_sca, vector_filter_func=gauss_vec)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
