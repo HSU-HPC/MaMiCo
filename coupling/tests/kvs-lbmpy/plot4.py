@@ -105,7 +105,7 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
     mplt.savefig(plot_file_location)
 
 #YOU HAVE TO CUSTOMIZE THIS
-csvs = ["POD.csv", "Gaussian.csv", "NLM.csv"]
+csvs = ["POD.csv", "Gaussian.csv", "NLM_junction.csv"]
 
 #plot for dims 1,2,3 (i.e. x,y,z)
 plot4(1,csvs, "kvs_velx.png")

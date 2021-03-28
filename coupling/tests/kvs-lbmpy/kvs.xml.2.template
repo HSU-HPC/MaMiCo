@@ -28,7 +28,7 @@
     mean-velocity="0.0 ; 0.0 ; 0.0"
   ></molecule-configuration>
 
-  <mpi-configuration number-of-processes="2 ; 2 ; 2" ></mpi-configuration>
+  <mpi-configuration number-of-processes="1 ; 1 ; 1" ></mpi-configuration>
 
   <simulation-configuration
     dt="0.005"
