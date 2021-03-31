@@ -9,7 +9,7 @@
 
 class myClassUT : public testing::ut::UnitTestImpl<myClass> {
 	public:
-		VectorUT(testing::ut::UnitTestingService *uts):
+		myClassUT(testing::ut::UnitTestingService *uts):
 		testing::ut::UnitTestImpl<myClass>(uts->getRank(), uts->getCommSize())
 		{
 			//TODO: Generate vector containing mocks of myClass
