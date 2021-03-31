@@ -17,6 +17,13 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm)
 		intMocks.push_back( new int(i));
 	addMockService<int>(intMocks);
 
+	//UNSIGNED INT
+	std::vector<unsigned int *> uintMocks;
+	for(int i = 0; i < 1000; i++)
+		uintMocks.push_back( new unsigned int(i));
+	addMockService<unsigned int>(uintMocks);
+
+
 	//BOOL
 	std::vector<bool *> boolMocks;
 	boolMocks.push_back(new bool(false));
@@ -41,6 +48,8 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm)
 
 	//Initialize UT instances of MaMiCo classes that have Unit Tests
 	_uts.push_back(new tarch::la::VectorUT<2, int>(this));
+	_uts.push_back(new tarch::la::VectorUT<2, unsigned int>(this));
+	_uts.push_back(new tarch::la::VectorUT<3, unsigned int>(this));
 	_uts.push_back(new tarch::la::VectorUT<2, std::string>(this));
 	_uts.push_back(new tarch::la::VectorUT<5, bool>(this));
 	_uts.push_back(new tarch::la::VectorUT<3, tarch::la::Vector<2, int> >(this));
@@ -49,6 +58,9 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm)
 
 	_uts.push_back(new coupling::datastructures::MacroscopicCellUT<2>(this));
 	_uts.push_back(new coupling::datastructures::MacroscopicCellUT<3>(this));
+
+	_uts.push_back(new coupling::paralleltopology::XYZTopologyUT<2>(this));
+	_uts.push_back(new coupling::paralleltopology::XYZTopologyUT<3>(this));
 	//...
 	//
 	#ifdef DEBUG_UTS
