@@ -10,7 +10,6 @@
 //#define DEBUG_UT_MACROCELL
 
 
-//Maybe namespace "testing::ut::[...]"?
 namespace coupling { namespace datastructures {
 	template<int dim> 
 	class MacroscopicCellUT;
@@ -58,26 +57,26 @@ class coupling::datastructures::MacroscopicCellUT : public testing::ut::UnitTest
 
 		//Verify correctness of getter/setter methods
 		void testSetGetMicroscopicMass(coupling::datastructures::MacroscopicCell<dim>& mock) {
-			for(double d : _DMS->getMocksCopy<double>()) {
+			for(double d : _DMS->getMocksCopy<double>(500)) {
 				mock.setMicroscopicMass(d);
 				if (mock.getMicroscopicMass() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
 			}
 		}
 
 		void testSetGetMacroscopicMass(coupling::datastructures::MacroscopicCell<dim>& mock) {
-			for(double d : _DMS->getMocksCopy<double>()) {
+			for(double d : _DMS->getMocksCopy<double>(1000)) {
 				mock.setPotentialEnergy(d);
 				if (mock.getPotentialEnergy() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
 			}
 		}
 		void testSetGetPotentialEnergy(coupling::datastructures::MacroscopicCell<dim>& mock) {
-			for(double d : _DMS->getMocksCopy<double>()) {
+			for(double d : _DMS->getMocksCopy<double>(20000)) {
 				mock.setPotentialEnergy(d);
 				if (mock.getPotentialEnergy() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
 			}
 		}
 		void testSetGetTemperature(coupling::datastructures::MacroscopicCell<dim>& mock) {
-			for(double d : _DMS->getMocksCopy<double>()) {
+			for(double d : _DMS->getMocksCopy<double>(0)) {
 				mock.setTemperature(d);
 				if (mock.getTemperature() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
 			}
