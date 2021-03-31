@@ -52,10 +52,11 @@ class testing::ut::UnitTestingService {
 		template<class T>
 		std::optional<testing::ut::MockService*> getMockService();
 
-		//TODO: Takes ownership -> std::move?
 		/*
 		 * Takes a set of mock values and creates a corresponding MockService.
 		 * This service is then added to _mockServices and returned.
+		 *
+		 * The MockService gets freed during this's deconstruction.
 		 */
 		template<class T>
 		testing::ut::MockService* addMockService(std::vector<T *> mockValues);
@@ -79,8 +80,9 @@ class testing::ut::UnitTestingService {
 };
 
 //INCLUDE ALL INDIVIDUAL UNIT TESTS HERE
-#include"uts/tarchVectorUT.cpph"
-#include"uts/couplingMacroscopicCellUT.cpph"
+#include"uts/tarch/la/VectorUT.cpph"
+#include"uts/coupling/datastructures/MacroscopicCellUT.cpph"
+#include"uts/coupling/paralleltopology/XYZTopologyUT.cpph"
 
 //Include implementation
 #include"UnitTestingService.cpp"

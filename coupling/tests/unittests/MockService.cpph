@@ -25,7 +25,6 @@ class testing::ut::MockService{
 			_mocks = std::vector<std::any>();
 		}
 
-		//TODO: Use move instead?
 		//Takes ownership of all passed mocks (cf. destructor).
 		//DO NOT ADD MOCKS OF DIFFERENT TYPES TO A SINGULAR MOCK SERVICE
 		MockService(std::vector<std::any> mocks):
@@ -42,21 +41,49 @@ class testing::ut::MockService{
 			_mocks.push_back(mock);
 		}
 
-		//TODO: allow selection of certain Mocks.
+
+		/*
+		*	Returns a vector containing copies of Mocks of type T.
+		*	
+		*	You can optionally define a limit on the amount of mox you want to receive.
+		*	Additionally, you can provide a function F of signature T -> Bool which is used to select mocks m for which F(m) = True only.
+		*/
 		template<class T>
-		std::vector<T> getMocksCopy(){
+		std::vector<T> getMocksCopy(
+			std::optional<unsigned int> max_number_of_mocks = {},
+			std::optional<std::function< bool (const T&)>> filter_predicate = {}
+		){
+			//Check if T is copyable
+			if(std::is_copy_constructible<T>::value == false) {
+				throw std::runtime_error(std::string("Requested copies of Mocks of non-copyable type ").append(typeid(T).name()));
+			}
+
 			std::vector<T> copies;
 			for (auto m : _mocks) {
 				try {
-					//Cast to T pointer to then derefence and pass by value.
-					copies.push_back(*(std::any_cast<T*>(m))); 
+					//Cast to T pointer to then derefence and call copy constructor.
+					auto m_T = *(std::any_cast<T*>(m));
+
+					//Check if we fulfil our filter condition (if there is one)
+					if(filter_predicate) {
+						if(filter_predicate.value()(m_T))
+							copies.push_back(m_T); 
+					} 
+					else //trivial case: there is no filter
+						copies.push_back(m_T);
+
+					//Check if we reached the maximum size of Mock vector (if there is one)
+					if(max_number_of_mocks) 
+						if(max_number_of_mocks.value() == copies.size()) 
+							return copies;
+
 					#ifdef DEBUG_MS
 						//std::cout << "MS::getMocksCopy<" << typeid(T).name() << ">: Copied mock of type " << typeid(copies.back()).name() << std::endl;
 					#endif
 				}
 				catch(const std::bad_any_cast&) {
 					std::cout << "MS::getMocksCopy<" << typeid(T).name() << ">: FAULTY MOCK TYPES! WILL RETURN NO MOCKS." << std::endl;
-					/*TODO: Proper exception handling*/
+					/*TODO: Proper exception handling?*/
 
 					copies.clear();
 					break;
@@ -67,8 +94,16 @@ class testing::ut::MockService{
 			return copies;
 		}
 		
+		/*
+		*	Works identically as the copying version above, except it returns a vector of pointers.
+		*	Intended to reduce copying of const Mocks to increase runtime performance.
+		*/
+		//TODO: debug this
 		template<class T>
-		std::vector<T const *> getMocksReference() {
+		std::vector<T const *> getMocksReference(
+			std::optional<unsigned int> max_number_of_mocks = {},
+			std::optional<std::function< bool (const T&)>> filter_predicate = {}
+		) {
 			try {
 				std::vector<T const*> mocksCastedT;
 				std::transform(_mocks.begin(), _mocks.end(), mocksCastedT.begin(), std::any_cast<T const*>);
@@ -76,11 +111,23 @@ class testing::ut::MockService{
 					std::cout << "MS::getMocksReference<" << typeid(T).name() << ">: Created reference to mocks of type " << typeid(mocksCastedT.back()).name() << std::endl;
 				#endif
 
+				//Check if there are too many mocks in our vector (if we set a maximum)
+				if(max_number_of_mocks)
+					if(max_number_of_mocks.value() < mocksCastedT.size()) 
+						mocksCastedT.resize(max_number_of_mocks);
+				
+				//Filter out any Mocks not fulfilling our predicate (if we set one)
+				if(filter_predicate)
+					for (auto it = mocksCastedT.begin(); it != mocksCastedT.end(); ) {
+						if (filter_predicate.value()(*it) == false) it = mocksCastedT.erase(it);
+						else it++;
+					}
+
 				return mocksCastedT;
 			}
 			catch(const std::bad_any_cast& ) {
 				std::cout << "MS::getMocksReference<" << typeid(T).name() << ">: FAULTY MOCK TYPES! WILL RETURN NO MOCKS." << std::endl;
-				/*TODO: Proper exception handling*/
+				/*TODO: Proper exception handling?*/
 			}
 
 			//Returns empty vector if above exception is thrown

@@ -30,9 +30,8 @@ class testing::ut::UnitTestInterface {
 		 * These two functions are implemented by the expanded interface UnitTestImpl.
 		 * All unit tests should implement not only UnitTestInterface, but also UnitTestImpl.
 		 */
-		//TODO: Exception when these unimplemented functions get called.
-		virtual void runAllTests() {}
-		virtual void runTest() {}
+		virtual void runAllTests(){ throw std::runtime_error("UnitTestInterface: Tried to execute unimplemented version of runAllTests!"); }
+		virtual void runTest(){ throw std::runtime_error("UnitTestInterface: Tried to execute unimplemented version of runTest!"); }
 
 		//used when handling strings
 		std::string getClassIdentifier() const { return _classIdentifier; }

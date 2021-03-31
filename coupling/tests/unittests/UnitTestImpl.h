@@ -44,7 +44,6 @@ class testing::ut::UnitTestImpl : public testing::ut::UnitTestInterface {
 			#endif
 		}
 
-		//TODO: move to UTInterface?
 		//Executes all unit test functions of this UT
 		virtual void runAllTests() {
 			for(unsigned int tf_i = 0; tf_i < _testFuncs.size(); tf_i++) 
