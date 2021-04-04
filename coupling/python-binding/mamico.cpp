@@ -22,6 +22,9 @@
 // for debugging purposes only
 #include <iostream>
 
+// used for memory debugging
+//#include "dmalloc.h"
+
 /** 
  *  Python bindings for MaMiCo framework
  *

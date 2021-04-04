@@ -17,7 +17,7 @@ coupling::SequentialFilter<dim>::SequentialFilter(
 	_comm(comm),
 	_processingRank(0), //TODO: case: multimd
 	_myRank((int) _ic->getBaseIC()->getThisRank()),
-	_cellsPerRank(_filter->getSize()),
+	_cellsPerRank(_filter->getSize()), //TODO: unequal amounts of cells on different ranks
 	_firstIteration(true)
 {
 	#ifdef DEBUG_SEQ_FILTER

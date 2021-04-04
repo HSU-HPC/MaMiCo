@@ -73,6 +73,25 @@ class coupling::FilterInterface{
 			}
 
 			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
+			
+			std::cout << "CONSTRUCTOR: printing all cells again:" << std::endl;
+			for(auto cell : _inputCells) std::cout << cell << std::endl;
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells2 = _inputCells;
+			std::cout << "post copy" << std::endl;
+
+			std::cout << "original capacity: " << _inputCells.capacity() << std::endl;
+			std::cout << "copy capacity: " << inputCells2.capacity() << std::endl;
+
+			std::cout << "original data: " << _inputCells.data() << std::endl;
+			std::cout << "copy data: " << inputCells2.data() << std::endl;
+
+			inputCells2.reserve(216);
+			std::cout << "post reserve copy" << std::endl;
+			_inputCells.reserve(216);
+			std::cout << "post reserve original" << std::endl;
+
+			//exit(0);
+
 		}
 
 		FilterInterface(const char* type) : _type(type) {/* Used by incomplete implementations of FilterInterface. Should be redesigned via meta class.*/}
@@ -143,22 +162,61 @@ class coupling::FilterInterface{
 			_cellIndices = new_cellIndices;*/
 
 			//Alternative 2: Unclean alternative solution: TODO: Fix above approach
+			std::cout << "all cells:" << std::endl;
+			for(auto cell : _inputCells) std::cout << cell << std::endl;
+
 			_inputCells.clear();
 			_outputCells.clear();
 			_cellIndices.clear();
 
-			//int i = 0;
-			for(auto newicell : new_inputCells) { _inputCells.push_back(newicell);
-			/*std::cout << newicell << ": " << i << std::endl; i++; */}
-			//std::cout << "POST ICELLS" << std::endl;
-			for(auto newocell : new_outputCells) { _outputCells.push_back(newocell);
-			/*std::cout << newocell << std::endl; */}
-			//std::cout << "POST OCELLS" << std::endl;
-			for(auto newindex : new_cellIndices) { _cellIndices.push_back(newindex);
-			/*std::cout << newindex << std::endl; */}
-			//std::cout << "POST INSERT" << std::endl;
+			/*std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells2 = _inputCells;
+			std::cout << "post copy" << std::endl;
+
+			std::cout << "original capacity: " << _inputCells.capacity() << std::endl;
+			std::cout << "copy capacity: " << inputCells2.capacity() << std::endl;
+
+			std::cout << "original data: " << _inputCells.data() << std::endl;
+			std::cout << "copy data: " << inputCells2.data() << std::endl;
+
+			_inputCells.reserve(216);
+			std::cout << "post reserve original" << std::endl;
+			inputCells2.reserve(216);
+			std::cout << "post reserve copy" << std::endl;*/
+			
+			int i = 0;
+			for(auto newicell : new_inputCells) { 
+				std::cout << newicell << " I: BEFORE: " << i << std::endl; 
+				_inputCells.push_back(newicell);
+				std::cout << newicell << " I: AFTER: " << i << std::endl;
+			   	i++;
+		   	}
+			std::cout << "POST ICELLS" << std::endl;
+
+			i = 0;
+			for(auto newocell : new_outputCells) { 
+				std::cout << newocell << " O: BEFORE: " << i << std::endl; 
+				_outputCells.push_back(newocell);
+				std::cout << newocell << " O: AFTER: " << i << std::endl;
+			   	i++;
+		   	}
+			std::cout << "POST OCELLS" << std::endl;
+
+
+			//for(auto newicell : new_inputCells) _inputCells.push_back(newicell);
+			//for(auto newocell : new_outputCells) _outputCells.push_back(newocell);
+			for(auto newindex : new_cellIndices) _cellIndices.push_back(newindex);
 
 			std::cout << "		FI: Updated cell data." << std::endl;
+		}
+
+		void DEBUG_RESERVE(unsigned int len) {
+			std::cout << "DEBUG_RESERVE (len=" << len << "): PRE RESERVE..." << std::endl;
+			_inputCells.reserve(len); 
+			std::cout << "POST INPUT RESERVE." << std::endl;
+			_outputCells.reserve(len); 
+			std::cout << "POST OUTPUT RESERVE." << std::endl;
+			_cellIndices.reserve(len); 
+			std::cout << "POST INDICES RESERVE." << std::endl;
 		}
 
 		const char* getType() const { return _type; }
