@@ -32,3 +32,5 @@ class myClassUT : public testing::ut::UnitTestImpl<myClass> {
 		//In case the test fails, throw an std::runtime_error explaining what failed exactly.
 		}
 };
+
+//NOTE: After implementing this test, make sure to instanciate instance(s) in UnitTestingService's Constructor. Cf. UnitTestingService.cpph
