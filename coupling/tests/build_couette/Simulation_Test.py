@@ -20,10 +20,14 @@ for f in fileList:
     ret_code = os.system("./test")
     print("Simulation exit code: " + str(ret_code))
     
-    df_test = pd.read_csv('.csv', delimiter=';')
+    df_test = pd.read_csv('md-sample.csv', delimiter=';')
     df_values = pd.read_csv('md-comparison-data.csv', delimiter=';')
     df_comparison = pd.concat([df_values, df_test],axis='columns', keys=['Comparative values','Test results'])
-    errorSumM, errorSumX, errorSumY, errorSumZ, i = 0
+    errorSumM = 0
+    errorSumX = 0
+    errorSumY = 0
+    errorSumZ = 0
+    i = 0
 
     for index1,row1 in df_comparison.iterrows(): 
         #get iteration of sample
