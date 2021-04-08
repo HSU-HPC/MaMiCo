@@ -3,14 +3,49 @@
 
 #pragma once
 
+#define MDDim3
+#define SIMPLE_MD
+
+//external headers
 #include<vector>
 #include<map>
 #include<any>
 #include<optional>
 #include<iostream>
 #include<mpi.h>
+
+//General Mamico includes
+#include "tarch/configuration/ParseConfiguration.h"
+#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+#include "coupling/interface/MDSimulationFactory.h"
+#include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
+#include "coupling/configurations/MaMiCoConfiguration.h"
+
+/*
+#include "tarch/utils/MultiMDService.h"
+#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+#include "coupling/tests/Test.h"
+#include "coupling/CouplingMDDefinitions.h"
+#include "tarch/configuration/ParseConfiguration.h"
+#include "coupling/solvers/CouetteSolver.h"
+#include "coupling/solvers/LBCouetteSolver.h"
+#if(BUILD_WITH_OPENFOAM)
+#include "coupling/solvers/FoamClass.h"
+#include "coupling/solvers/FoamSolverInterface.h"
+#endif
+#include "coupling/solvers/FDCouetteSolver.h"
+#include "coupling/solvers/CouetteSolverInterface.h"
+#include "coupling/solvers/LBCouetteSolverInterface.h"
+#include "coupling/interface/MDSimulationFactory.h"
+#include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
+#include "coupling/configurations/MaMiCoConfiguration.h"
+#include "coupling/services/MultiMDCellService.h"
+*/
+
+//Unit Testing includes
 #include"MockService.cpph"
 #include"UnitTestInterface.h"
+
 
 //#define DEBUG_UTS
 
@@ -18,6 +53,9 @@
 /*
  *TODO: explanatory interface comment
  *
+ * TODO:
+ * - simpleMD dummy instances with dim != 3
+ * - CS dummy instances
  * @Author Leonard Hannen, Felix Maurer
  */
 
@@ -29,7 +67,10 @@ namespace testing { namespace ut {
 //Make this static?
 class testing::ut::UnitTestingService {
 	public:
-		UnitTestingService(MPI_Comm comm = MPI_COMM_WORLD);
+		UnitTestingService(
+			std::vector<std::pair<std::string, std::string>> simplemd_xmls,
+			MPI_Comm comm = MPI_COMM_WORLD
+		);
 
 		~UnitTestingService() {
 			for (auto ut : _uts) delete ut;
@@ -76,7 +117,12 @@ class testing::ut::UnitTestingService {
 
 		//map of "Type"->MockService<Type>
 		std::map<std::string, testing::ut::MockService *> _mockServices;
-		
+
+		//dummy instances of simpleMD
+  		std::vector<coupling::interface::MDSimulation*> _simpleMDs;
+  		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterfaces;
+
+		//dummy instances of CS	
 };
 
 //INCLUDE ALL INDIVIDUAL UNIT TESTS HERE

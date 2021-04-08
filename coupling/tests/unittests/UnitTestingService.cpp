@@ -2,14 +2,15 @@
 // and use, please see the copyright notice in MaMiCo's main folder
 
 //constructors of testing::ut::UnitTestingService
-testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm)
-{
+testing::ut::UnitTestingService::UnitTestingService(
+	   	std::vector<std::pair<std::string, std::string>> simplemd_xmls,
+		MPI_Comm comm
+) {
 	MPI_Comm_size(comm, &_comm_size);
 	MPI_Comm_rank(comm, &_rank);
 
-	//init MS instances for non-Mamico (e.g. built-in or STL) types
+	//Initialize MS instances for non-Mamico (e.g. built-in or STL) types
 	//TODO: other primitives
-	//TODO: confused about const-correctness. should double check
 	
 	//INT
 	std::vector<int *> intMocks;
@@ -45,6 +46,43 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm)
 	stdstringMocks.push_back(new std::string("\u03BC"));
 	stdstringMocks.push_back(new std::string("äöü"));
 	addMockService<std::string>(stdstringMocks);
+
+	
+		
+	//Initialize Instances of (Simple)MD
+	simplemd::configurations::MolecularDynamicsConfiguration simpleMDConfig;
+  	coupling::configurations::MaMiCoConfiguration<3> mamicoConfig; //TODO: other dims
+
+    //First entry: simplemd xml, second entry: mamico xml
+	for(auto xml_pair : simplemd_xmls) {
+		
+		tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(std::get<0>(xml_pair),"molecular-dynamics",simpleMDConfig);
+    	if (!simpleMDConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid SimpleMD config in: " << std::get<0>(xml_pair) << std::endl; exit(EXIT_FAILURE);}
+
+		tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >(std::get<1>(xml_pair),"mamico",mamicoConfig);
+    	if (!mamicoConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid Mamico config (for SimpleMD) in: " << std::get<1>(xml_pair) << std::endl; exit(EXIT_FAILURE);}
+
+		//Init new SimpleMD
+		_simpleMDs.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
+        	simpleMDConfig,mamicoConfig
+      	));
+
+		//Init new MDSolverInterface
+		_mdSolverInterfaces.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().
+        getMDSolverInterface(simpleMDConfig, mamicoConfig, _simpleMDs.back()
+		));
+
+      	if (_simpleMDs.back() == nullptr or _mdSolverInterfaces.back() == nullptr){
+			//TODO: More verbose error message
+        	std::cout << "ERROR UnitTesting: SimpleMD or MDSolverInterface factory returned nullptr." << std::endl;
+        	exit(EXIT_FAILURE);
+      	}
+
+	}
+	
+
+	//Initialize instances of CS
+	//TODO: Currently not required by any Unit Test already implemented. Will need this in the future.
 
 	//Initialize UT instances of MaMiCo classes that have Unit Tests
 	_uts.push_back(new tarch::la::VectorUT<2, int>(this));
@@ -93,7 +131,6 @@ void testing::ut::UnitTestingService::runUnitTest(unsigned int uts_index) {
 	}
 	catch(const std::exception& e){
 		std::cout << "|Rank: " << _rank << "| \x1B[1mUnitTestingService:\x1B[0m Caught error in function " << e.what() << " while testing " << _uts[uts_index]->getClassIdentifier_pretty() << std::endl;
-		//TODO: Handle this case somehow. Aborting? Git revert? 
 	}
 	#ifdef DEBUG_UTS
 		std::cout << "Done running all unit tests for class " << _uts[uts_index]->getClassIdentifier_pretty() << "!" << std::endl;
