@@ -3,9 +3,6 @@
 
 #pragma once
 
-#define MDDim3
-#define SIMPLE_MD
-
 //external headers
 #include<vector>
 #include<map>
@@ -13,6 +10,7 @@
 #include<optional>
 #include<iostream>
 #include<mpi.h>
+#include"tarch/tinyxml2/tinyxml2.h"
 
 //General Mamico includes
 #include "tarch/configuration/ParseConfiguration.h"
