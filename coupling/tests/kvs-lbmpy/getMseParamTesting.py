@@ -74,7 +74,7 @@ for f in filtered_files:
 def plot_mses(file_location, tested_parameter, x_axis, f_index):
 	mplt.style.use('seaborn')
 	print(MSE_y[f_index])
-	fig, ax = mplt.subplots(2)
+	fig, ax = mplt.subplots(1,2, figsize=(10,15))
 
 	ax[0].plot(x_axis, MSE_x[f_index], '-', label = file_location, color='blue')
 	ax[0].plot(x_axis, [MSE_x_unfiltered] * len(x_axis), '-', label = 'unfiltered', color='red')
@@ -89,8 +89,8 @@ def plot_mses(file_location, tested_parameter, x_axis, f_index):
 	ax[1].set_xlabel(tested_parameter)
 
 	fig.tight_layout()
-	ax[0].set_yscale('log')#,basey=2)
-	ax[1].set_yscale('log')#,basey=2)
+	ax[0].set_yscale('log', basey=2)
+	ax[1].set_yscale('log', basey=2)
 	
 	#ax[1].set_yticks([0.002,0.003,0.004,0.005])
 
