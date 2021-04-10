@@ -91,6 +91,10 @@ class testing::ut::UnitTestingService {
 		template<class T>
 		std::optional<testing::ut::MockService*> getMockService();
 
+		//Special case: SimpleMD "mocks"
+		std::vector<coupling::interface::MDSimulation*> getSimpleMDs() { return _simpleMDs; }
+		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> *> getMDInterfaces() { return _mdSolverInterfaces; }
+
 		/*
 		 * Takes a set of mock values and creates a corresponding MockService.
 		 * This service is then added to _mockServices and returned.
@@ -118,15 +122,17 @@ class testing::ut::UnitTestingService {
 
 		//dummy instances of simpleMD
   		std::vector<coupling::interface::MDSimulation*> _simpleMDs;
-  		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterfaces;
+  		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> *> _mdSolverInterfaces;
 
 		//dummy instances of CS	
+		//TODO
 };
 
 //INCLUDE ALL INDIVIDUAL UNIT TESTS HERE
 #include"uts/tarch/la/VectorUT.cpph"
 #include"uts/coupling/datastructures/MacroscopicCellUT.cpph"
 #include"uts/coupling/paralleltopology/XYZTopologyUT.cpph"
+#include"uts/coupling/cell-mappings/ComputeMassMappingUT.cpph"
 
 //Include implementation
 #include"UnitTestingService.cpp"
