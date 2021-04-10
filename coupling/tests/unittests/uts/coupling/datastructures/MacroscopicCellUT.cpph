@@ -11,12 +11,12 @@
 
 
 namespace coupling { namespace datastructures {
-	template<int dim> 
+	template<unsigned int dim> 
 	class MacroscopicCellUT;
 }}
 
 
-template<int dim> 
+template<unsigned int dim> 
 class coupling::datastructures::MacroscopicCellUT : public testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCell<dim>> {
 	public:
 		MacroscopicCellUT(testing::ut::UnitTestingService *uts):
