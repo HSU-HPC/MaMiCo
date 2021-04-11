@@ -55,31 +55,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		/*
 		 * Implements FilterInterface's requirement of having a ()-operand defined.
 		 */
-		virtual void operator()(){
-			if(_ic) {
-				if(_processingRank == _myRank) {
-					contribute();
-					process(FILTER_SEQUENTIAL); 				
-					std::cout << " (" << _myRank << ")POST MASTER PROCESSING" << std::endl;
-				}
-				else contribute();
-
-				//Distribute output data
-				MPI_Scatter(_sendbuf.data(), _cellsPerRank, MPI_DOUBLE, _recvbuf.data(), _cellsPerRank * _commSize, MPI_DOUBLE, _processingRank, _comm); 
-
-				//Read output data from buffer
-				if(_processingRank == _myRank) applyBufferToMacroscopicCells(_recvbuf, _outputCells_Local);
-				else {
-					std::cout << "PRE APPLY BUFFER FOR OTHER RANK" << std::endl;
-					applyBufferToMacroscopicCells(_recvbuf, _filter->getOutputCells());
-				}
-
-				//reset buffers TODO: is this neccessary? 
-				_sendbuf.clear();
-				_recvbuf.clear();
-			}
-			else process(FILTER_PARALLEL);
-		}
+		virtual void operator()();
 
 	private:
 
@@ -91,34 +67,11 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		/*
 		 * When sequentialized, only the processing rank calls this function. It acts as a wrapper of _filter's operator() member function.
 		 */
-		virtual void process(bool sequential) {
-			//these are either local or global
-			if(sequential) {
+		virtual void process(bool sequential);
 
-				//write all gathered cells to inputCells_Global.
-				applyBufferToMacroscopicCells(_recvbuf, _inputCells_Global);
-				
-				std::cout << " (" << _myRank << ")POST ABTMC" << std::endl;
-				std::cout << " (" << _myRank << ")GLOBAL INPUT CELLS SIZE: " << _inputCells_Global.size() << std::endl;
-				std::cout << " (" << _myRank << ")GLOBAL OUTPUT CELLS SIZE: " << _outputCells_Global.size() << std::endl;
-
-				//Apply _filter
-				_filter->updateCellData(_inputCells_Global, _outputCells_Global, _cellIndices_Global);
-
-				std::cout << " (" << _myRank << ")POST UPDATE" << std::endl;
-
-				(*_filter)();
-
-				std::cout << " (" << _myRank << ")POST FILTER" << std::endl;
-				
-				macroscopicCellsToBuffer(_sendbuf, _outputCells_Global);	
-				//Now ready to scatter...
-			}
-			else {
-				(*_filter)();
-			}
-		}
-
+		/*
+		 * Auxialliary functions providing an interface between low-level double buffers used by MPI and Macro Cells.
+		 */
 		void macroscopicCellsToBuffer(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells);
 
 		void applyBufferToMacroscopicCells(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells);
@@ -145,10 +98,11 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		std::vector<double> _sendbuf;
 		std::vector<double> _recvbuf;
 
-		//only used by processing rank to keep track where to write output data for next filter in sequence
+		//only used by processing rank to keep track what to contribute/where to write output data for next filter in sequence
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Local;	
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Local;	
 
-		bool _firstIteration;
+		bool _firstIteration; //TODO: what is this for??
 };
 
 #include "SequentialFilter.cpph"
