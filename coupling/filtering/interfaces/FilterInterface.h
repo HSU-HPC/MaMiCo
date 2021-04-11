@@ -74,6 +74,7 @@ class coupling::FilterInterface{
 
 			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
 			
+			//TODO: remove
 			/*std::cout << "CONSTRUCTOR: printing all cells again:" << std::endl;
 			for(auto cell : _inputCells) std::cout << cell << std::endl;
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells2 = _inputCells;
@@ -86,9 +87,9 @@ class coupling::FilterInterface{
 			std::cout << "copy data: " << inputCells2.data() << std::endl;
 
 			inputCells2.reserve(216);
-			std::cout << "post reserve copy" << std::endl;*/
+			std::cout << "post reserve copy" << std::endl;
 			_inputCells.reserve(216);
-			/*std::cout << "post reserve original" << std::endl;*/
+			std::cout << "post reserve original" << std::endl;*/
 
 			//exit(0);
 
@@ -113,22 +114,39 @@ class coupling::FilterInterface{
 
 		//TODO: changed this to pass by reference. not sure if thats safe
 		void updateCellData(
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
-			std::vector<tarch::la::Vector<dim,unsigned int>>& new_cellIndices
+			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
+			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
+			const std::vector<tarch::la::Vector<dim,unsigned int>>& new_cellIndices
 		) {
+			//TODO: remove 
 			//std::cout << "old cell vector size: " << _inputCells.size() << std::endl;
 			//std::cout << "new cell vector size: " << new_inputCells.size() << std::endl;
 
 			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size())
 			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
+			std::cout << "post size check" << std::endl;
+
+			//Note: I reverted this back to the original version. The cause for the malloc: invalid size bug most probably isnt here.
+			_inputCells = new_inputCells;
+			_outputCells = new_outputCells;
+			_cellIndices = new_cellIndices;
+
+			//Small chance that this is more correct. Probably the same constructor as the one implicitly called above.
+			/*
+			_inputCells = std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_inputCells);
+			_outputCells = std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_outputCells);
+			_cellIndices = std::vector<tarch::la::Vector<dim,unsigned int>>(new_cellIndices);
+			*/
+
+
+			//TODO: This is old code from tryint to debug the malloc: invalid size bug. remove as soon as thats fixed.
 			
 			//Alternative 1:
 			//This resizing assumes the "old" _inputCells, _outputCells and _cellIndices vectors to be of identical size.
 			/*if(new_inputCells.size() != _inputCells.size()) {
 				std::cout << "		FI: Detected change in cell vector size. ";
 
-				//Alternative 1.1: This would be more desireable, but segfaults. TODO
+				//Alternative 1.1: This would be more desireable, but segfaults. 
 				
 				_inputCells.resize(new_inputCells.size(), nullptr);
 				_outputCells.resize(new_outputCells.size(), nullptr);
@@ -157,17 +175,26 @@ class coupling::FilterInterface{
 
 			}
 
-			_inputCells = new_inputCells;
-			_outputCells = new_outputCells;
-			_cellIndices = new_cellIndices;*/
+			*/
+			//_inputCells = new_inputCells;
+			//_outputCells = new_outputCells;
+			//_cellIndices = new_cellIndices;
+			/*auto inputCellsPTR = new std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_inputCells);
+			std::cout << "post icells 1: " << inputCellsPTR << std::endl;
+			delete inputCellsPTR;
+			_inputCells = std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_inputCells);
+			std::cout << "post icells 2" << std::endl;
+			_outputCells = std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_outputCells);
+			_cellIndices = std::vector<tarch::la::Vector<dim,unsigned int>>(new_cellIndices);
+			*/
 
-			//Alternative 2: Unclean alternative solution: TODO: Fix above approach
+			//Alternative 2: Unclean alternative solution:
 			//std::cout << "all cells:" << std::endl;
 			//for(auto cell : _inputCells) std::cout << cell << std::endl;
 
-			_inputCells.clear();
-			_outputCells.clear();
-			_cellIndices.clear();
+			//_inputCells.clear();
+			//_outputCells.clear();
+			//_cellIndices.clear();
 
 			/*std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells2 = _inputCells;
 			std::cout << "post copy" << std::endl;
@@ -183,7 +210,7 @@ class coupling::FilterInterface{
 			inputCells2.reserve(216);
 			std::cout << "post reserve copy" << std::endl;*/
 			
-			int i = 0;
+			/*int i = 0;
 			for(auto newicell : new_inputCells) { 
 				//std::cout << newicell << " I: BEFORE: " << i << std::endl; 
 				_inputCells.push_back(newicell);
@@ -200,15 +227,18 @@ class coupling::FilterInterface{
 			   	i++;
 		   	}
 			std::cout << "POST OCELLS" << std::endl;
-
+			
 
 			//for(auto newicell : new_inputCells) _inputCells.push_back(newicell);
 			//for(auto newocell : new_outputCells) _outputCells.push_back(newocell);
 			for(auto newindex : new_cellIndices) _cellIndices.push_back(newindex);
+			*/
 
 			std::cout << "		FI: Updated cell data." << std::endl;
 		}
 
+		//TODO: remove this after debugging
+		/*
 		void DEBUG_RESERVE(unsigned int len) {
 			std::cout << "DEBUG_RESERVE (len=" << len << "): PRE RESERVE..." << std::endl;
 			_inputCells.reserve(len); 
@@ -217,7 +247,7 @@ class coupling::FilterInterface{
 			std::cout << "POST OUTPUT RESERVE." << std::endl;
 			_cellIndices.reserve(len); 
 			std::cout << "POST INDICES RESERVE." << std::endl;
-		}
+		}*/
 
 		const char* getType() const { return _type; }
 

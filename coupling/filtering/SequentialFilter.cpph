@@ -26,6 +26,10 @@ coupling::SequentialFilter<dim>::SequentialFilter(
 	std::cout << "		SEQFILTER (" << _myRank << "): Now initializing sequentialized Filter of type: " << _filter->getType() <<std::endl;
 	#endif
 
+	//init buffers to prevent later segfaults when calling data() on them
+	_sendbuf = {};
+	_recvbuf = {};
+
 	//case: sequential
 	if(_ic) {
 		MPI_Comm_size(comm, &_commSize);	
@@ -76,7 +80,7 @@ void coupling::SequentialFilter<dim>::operator()(){
 		if(_processingRank == _myRank) {
 			contribute();
 			process(FILTER_SEQUENTIAL);
-										std::cout << " (" << _myRank << ")POST MASTER PROCESSING" << std::endl;
+										//std::cout << " (" << _myRank << ")POST MASTER PROCESSING" << std::endl;
 		}
 		else contribute();
 
@@ -89,8 +93,6 @@ void coupling::SequentialFilter<dim>::operator()(){
 					MPI_DOUBLE, 
 					_processingRank, 
 					_comm); 
-
-										std::cout << "POST SCATTER: 6th DOUBLE IN SENDBUF/RECVBUF: " << _sendbuf[5] << "/" << _recvbuf[5] << std::endl;
 
 		//Read output data from buffer
 		if(_processingRank == _myRank) 
@@ -122,10 +124,8 @@ void coupling::SequentialFilter<dim>::contribute() {
 	//TODO: unneccesary to do this in each iteration
 	//allocate on processing rank
 	if(_processingRank == _myRank and _recvbuf.capacity() < _sendbuf.size() * _commSize) 
-		_recvbuf.reserve(_sendbuf.size() * _commSize);
+		_recvbuf.resize(_sendbuf.size() * _commSize);
 	
-									std::cout << "PRE GATHER: 6th DOUBLE IN SENDBUF/RECVBUF: " << _sendbuf[5] << "/" << _recvbuf[5] << std::endl;
-
 	//send to processing rank 
 	MPI_Gather(	_sendbuf.data(), 
 				_sendbuf.size(), 
@@ -135,8 +135,6 @@ void coupling::SequentialFilter<dim>::contribute() {
 				MPI_DOUBLE, 
 				_processingRank, 
 				_comm); 
-
-									std::cout << "POST GATHER: 6th DOUBLE IN SENDBUF/RECVBUF: " << _sendbuf[5] << "/" << _recvbuf[5] << std::endl;
 
 	#ifdef DEBUG_SEQ_FILTER
 	if(_processingRank == _myRank) 
@@ -149,7 +147,6 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 			//these are either local or global
 			if(sequential) {
 
-									std::cout << "PRE PROCESS: 6th DOUBLE IN SENDBUF/RECVBUF: " << _sendbuf[5] << "/" << _recvbuf[5] << std::endl;
 				//write all gathered cells to inputCells_Global.
 				applyBufferToMacroscopicCells(_recvbuf, _inputCells_Global);
 				
@@ -160,7 +157,7 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 				
 				if(_firstIteration) {
 					//Update filter's original cell data
-					_filter->updateCellData(_inputCells_Global, _outputCells_Global, _cellIndices_Global);
+					_filter->updateCellData({},{},{}/*_inputCells_Global, _outputCells_Global, _cellIndices_Global*/);
 					_firstIteration = false;
 				}
 
@@ -175,7 +172,6 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 				
 				macroscopicCellsToBuffer(_sendbuf, _outputCells_Global);
 
-									std::cout << "POST PROCESS: 6th DOUBLE IN SENDBUF/RECVBUF: " << _sendbuf[5] << "/" << _recvbuf[5] << std::endl;
 				//Now ready to scatter...
 			}
 			else {
@@ -215,9 +211,19 @@ void coupling::SequentialFilter<dim>::macroscopicCellsToBuffer(std::vector<doubl
 
 template<unsigned int dim>
 void coupling::SequentialFilter<dim>::applyBufferToMacroscopicCells(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells) {
-									std::cout << "PRE PROCESS: 6th DOUBLE IN SENDBUF/RECVBUF/buf: " << _sendbuf[5] << "/" << _recvbuf[5] << "/" << buf[5] << std::endl;
 	std::cout << "		SEQFILTER (" << _myRank << "): ABTMC: Buffer size: " << buf.size() << " Cell vector size: " << cells.size() << std::endl;
 	if(buf.capacity() < cells.size() * (4+3*dim) ) throw std::runtime_error("Buffer too small for cell vector!");
+
+			//TODO: What the..?
+			std::cout << "ABTMC: PRE UINT" << std::endl;
+			auto uint = new unsigned int();
+			delete uint;
+
+			std::cout << "ABTMC: PRE VECTOR" << std::endl;
+			auto copyCellsPTR = new std::vector<coupling::datastructures::MacroscopicCell<dim>* >();
+			std::cout << "ABTMC: VECTOR: " << copyCellsPTR << std::endl;
+			delete copyCellsPTR;
+
 
 	tarch::la::Vector<dim, double> mvec_buf;
 	unsigned int i = 0;
@@ -230,5 +236,7 @@ void coupling::SequentialFilter<dim>::applyBufferToMacroscopicCells(std::vector<
 		/*pot energy*/		cells[c]->setPotentialEnergy(buf[i]); i++;
 		/*velocity*/		for(unsigned int d = 0; d < dim; d++) { mvec_buf[d] = buf[i]; i++; } cells[c]->setCurrentVelocity(mvec_buf);
 		/*temperature*/		cells[c]->setTemperature(buf[i]); i++;
+		//std::cout << c << ": " << cells[c] << std::endl;
+		//copyCellsPTR->push_back(cells[c]);
 	}
 }
