@@ -74,7 +74,7 @@ class coupling::FilterInterface{
 
 			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
 			
-			std::cout << "CONSTRUCTOR: printing all cells again:" << std::endl;
+			/*std::cout << "CONSTRUCTOR: printing all cells again:" << std::endl;
 			for(auto cell : _inputCells) std::cout << cell << std::endl;
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells2 = _inputCells;
 			std::cout << "post copy" << std::endl;
@@ -86,9 +86,9 @@ class coupling::FilterInterface{
 			std::cout << "copy data: " << inputCells2.data() << std::endl;
 
 			inputCells2.reserve(216);
-			std::cout << "post reserve copy" << std::endl;
+			std::cout << "post reserve copy" << std::endl;*/
 			_inputCells.reserve(216);
-			std::cout << "post reserve original" << std::endl;
+			/*std::cout << "post reserve original" << std::endl;*/
 
 			//exit(0);
 
@@ -162,8 +162,8 @@ class coupling::FilterInterface{
 			_cellIndices = new_cellIndices;*/
 
 			//Alternative 2: Unclean alternative solution: TODO: Fix above approach
-			std::cout << "all cells:" << std::endl;
-			for(auto cell : _inputCells) std::cout << cell << std::endl;
+			//std::cout << "all cells:" << std::endl;
+			//for(auto cell : _inputCells) std::cout << cell << std::endl;
 
 			_inputCells.clear();
 			_outputCells.clear();
@@ -185,18 +185,18 @@ class coupling::FilterInterface{
 			
 			int i = 0;
 			for(auto newicell : new_inputCells) { 
-				std::cout << newicell << " I: BEFORE: " << i << std::endl; 
+				//std::cout << newicell << " I: BEFORE: " << i << std::endl; 
 				_inputCells.push_back(newicell);
-				std::cout << newicell << " I: AFTER: " << i << std::endl;
+				//std::cout << newicell << " I: AFTER: " << i << std::endl;
 			   	i++;
 		   	}
 			std::cout << "POST ICELLS" << std::endl;
 
 			i = 0;
 			for(auto newocell : new_outputCells) { 
-				std::cout << newocell << " O: BEFORE: " << i << std::endl; 
+				//std::cout << newocell << " O: BEFORE: " << i << std::endl; 
 				_outputCells.push_back(newocell);
-				std::cout << newocell << " O: AFTER: " << i << std::endl;
+				//std::cout << newocell << " O: AFTER: " << i << std::endl;
 			   	i++;
 		   	}
 			std::cout << "POST OCELLS" << std::endl;
