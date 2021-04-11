@@ -10,7 +10,7 @@ testing::ut::UnitTestingService::UnitTestingService(
 	MPI_Comm_rank(comm, &_rank);
 
 	//Initialize MS instances for non-Mamico (e.g. built-in or STL) types
-	//TODO: other primitives
+	//TODO: other primitives, STL types like vector
 	
 	//INT
 	std::vector<int *> intMocks;
