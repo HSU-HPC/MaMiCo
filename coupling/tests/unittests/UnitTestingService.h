@@ -19,27 +19,6 @@
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 
-/*
-#include "tarch/utils/MultiMDService.h"
-#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
-#include "coupling/tests/Test.h"
-#include "coupling/CouplingMDDefinitions.h"
-#include "tarch/configuration/ParseConfiguration.h"
-#include "coupling/solvers/CouetteSolver.h"
-#include "coupling/solvers/LBCouetteSolver.h"
-#if(BUILD_WITH_OPENFOAM)
-#include "coupling/solvers/FoamClass.h"
-#include "coupling/solvers/FoamSolverInterface.h"
-#endif
-#include "coupling/solvers/FDCouetteSolver.h"
-#include "coupling/solvers/CouetteSolverInterface.h"
-#include "coupling/solvers/LBCouetteSolverInterface.h"
-#include "coupling/interface/MDSimulationFactory.h"
-#include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
-#include "coupling/configurations/MaMiCoConfiguration.h"
-#include "coupling/services/MultiMDCellService.h"
-*/
-
 //Unit Testing includes
 #include"MockService.cpph"
 #include"UnitTestInterface.h"
@@ -49,11 +28,22 @@
 
 
 /*
- *TODO: explanatory interface comment
  *
- * TODO:
+ * Service class managing Unit Test objects and their corresponding MockServices.
+ * This is the top-level user interface: To run tests, call runUnitTest(...).
+ *
+ * All Unit Test instances are created during instanciation of this (cf. .cpp file).
+ * Mocks of some types that don't have a MockService are initialized there as well.
+ * Currently, those are:
+ * 	- primitive C++ types
+ * 	- STL types
+ * 	- SimpleMD
+ *
+ * Features currently missing:
  * - simpleMD dummy instances with dim != 3
  * - CS dummy instances
+ * - some primitive + a lot of STL types
+ *
  * @Author Leonard Hannen, Felix Maurer
  */
 
