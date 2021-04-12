@@ -51,15 +51,28 @@ coupling::SequentialFilter<dim>::SequentialFilter(
 				//TODO: remove debug output
 				//std::cout << "Cells in M2MDomain: " << linearGlobalDomainSize << std::endl;
 				//std::cout << "cells/rank * #ranks: " << _cellsPerRank *_commSize << std::endl;
-				throw std::runtime_error("Assertion: Global number of cells in MD2Macro-domain != cells/rank * #ranks");
+				throw std::runtime_error("Assertion failed: Global number of cells in MD2Macro-domain != cells/rank * #ranks");
 			}
 			
-			//Fill global indexing vector using generic funcions found in CouplingMDDefinions.h.
-			tarch::la::Vector<dim, unsigned int> divisionFactor = coupling::initDivisionFactor<dim>(_ic->getGlobalMD2MacroDomainSize());
+			//Fill global indexing vector using generic funcions found in CouplingMDDefinions.h and IndexConversionMD2Macro.h
+			auto divisionFactor = coupling::initDivisionFactor<dim>(_ic->getGlobalMD2MacroDomainSize());
+			tarch::la::Vector<dim, unsigned int> md2MacroLowerBoundary(0), md2MacroUpperBoundary(0);
+			_ic->getGlobalMD2MacroDomainBoundaries(md2MacroLowerBoundary, md2MacroUpperBoundary);
+
 			for(int c = 0; c < _cellsPerRank * _commSize; c++) {
-				_cellIndices_Global.push_back(coupling::getVectorCellIndex<dim>(c, divisionFactor));
+				_cellIndices_Global.push_back(coupling::getVectorCellIndex<dim>(c, divisionFactor)+md2MacroLowerBoundary);
 				//std::cout << "		SEQFILTER: New global index at master rank: " << _cellIndices_Global.back() << std::endl;
 			}			
+
+			//sanity check, should be unreachable:
+			if(_cellIndices_Global.back() != md2MacroUpperBoundary) { 
+				std::cout 	<< "ERROR: "
+							<< "_cellIndices_Global.back() = " << _cellIndices_Global.back() 
+							<< ", md2MacroUpperCellBoundary = " << md2MacroUpperBoundary 
+				<< std::endl;
+				throw std::runtime_error("Assertion failed: Last index in _cellIndices_Global is not last index in global M2M-Domain.");
+			}
+
 
 		}//if rank processing rank
 	}//if sequential
@@ -101,10 +114,6 @@ void coupling::SequentialFilter<dim>::operator()(){
 										std::cout << "PRE APPLY BUFFER FOR OTHER RANK" << std::endl;
 			applyBufferToMacroscopicCells(_recvbuf, _filter->getOutputCells());
 		}
-
-		//reset buffers TODO: is this neccessary? 
-		//_sendbuf.clear();
-		//_recvbuf.clear();
 	}
 	else process(FILTER_PARALLEL);
 }
@@ -121,7 +130,6 @@ void coupling::SequentialFilter<dim>::contribute() {
 	std::cout << "		SEQFILTER (" << _myRank << "): Sending buffer of size: " << _sendbuf.size() << std::endl;
 	#endif
 
-	//TODO: unneccesary to do this in each iteration
 	//allocate on processing rank
 	if(_processingRank == _myRank and _recvbuf.capacity() < _sendbuf.size() * _commSize) 
 		_recvbuf.resize(_sendbuf.size() * _commSize);
@@ -157,7 +165,7 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 				
 				if(_firstIteration) {
 					//Update filter's original cell data
-					_filter->updateCellData({},{},{}/*_inputCells_Global, _outputCells_Global, _cellIndices_Global*/);
+					_filter->updateCellData(/*{},{},{}*/_inputCells_Global, _outputCells_Global, _cellIndices_Global);
 					_firstIteration = false;
 				}
 
