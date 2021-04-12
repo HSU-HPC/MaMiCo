@@ -27,6 +27,8 @@ class testing::ut::UnitTestInterface {
 			_comm_size(comm_size)
 		{}
 
+		virtual ~UnitTestInterface() {}
+
 		/*
 		 * These two functions are implemented by the expanded interface UnitTestImpl.
 		 * All unit tests should implement not only UnitTestInterface, but also UnitTestImpl.

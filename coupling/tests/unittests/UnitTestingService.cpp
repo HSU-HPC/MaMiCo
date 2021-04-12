@@ -4,8 +4,10 @@
 //constructors of testing::ut::UnitTestingService
 testing::ut::UnitTestingService::UnitTestingService(
 	   	std::vector<std::pair<std::string, std::string>> simplemd_xmls,
-		MPI_Comm comm
-) {
+		MPI_Comm comm): 
+
+		_comm(comm)
+{
 	MPI_Comm_size(comm, &_comm_size);
 	MPI_Comm_rank(comm, &_rank);
 
@@ -64,7 +66,7 @@ testing::ut::UnitTestingService::UnitTestingService(
 
 		//Init new SimpleMD
 		_simpleMDs.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
-        	simpleMDConfig,mamicoConfig
+        	simpleMDConfig,mamicoConfig, MPI_COMM_WORLD
       	));
 
 		//Init new MDSolverInterface
