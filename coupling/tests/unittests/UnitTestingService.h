@@ -10,7 +10,6 @@
 #include<optional>
 #include<iostream>
 #include<mpi.h>
-#include"tarch/tinyxml2/tinyxml2.h"
 
 //General Mamico includes
 #include "tarch/configuration/ParseConfiguration.h"
@@ -102,6 +101,7 @@ class testing::ut::UnitTestingService {
 
 		//used for MPI communication
 		int _rank;
+		MPI_Comm _comm;
 		int _comm_size;
 
 		//list of UT pointers
