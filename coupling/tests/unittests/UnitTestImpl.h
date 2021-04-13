@@ -14,7 +14,9 @@
 //#define DEBUG_UT
 
 /*
- *TODO: explanatory interface comment
+ *	Expansion of the UnitTestInterface interface.
+ *	Contains all a unit test class testing T should have that depends on the type T.
+ *	Split from the other non-template-dependant half to make sure all UTs share a (non-generic) type.
  *
  * @Author Leonard Hannen, Felix Maurer
  */
@@ -58,7 +60,6 @@ class testing::ut::UnitTestImpl : public testing::ut::UnitTestInterface {
 		//Executes a single test.
 		virtual void runTest(unsigned int testFunc_index) {
 			try {
-				//TODO: time measurement
 				//Gets the first part of the testFunc tuple, i.e. a function pointer, and then dereferences it
 				auto testFunctionPtr = std::get<0>(_testFuncs[testFunc_index]);
 
@@ -77,7 +78,6 @@ class testing::ut::UnitTestImpl : public testing::ut::UnitTestInterface {
 					mockCount++;
 				}
 
-				//TODO: MPI Barrier here. Output only on master rank.
 				std::cout 
 				<< this->PRINT_PREFIX() //usual prefix
 				<< std::get<1>(_testFuncs[testFunc_index]) //function name
