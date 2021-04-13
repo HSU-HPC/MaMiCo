@@ -54,10 +54,7 @@ namespace testing { namespace ut {
 //Make this static?
 class testing::ut::UnitTestingService {
 	public:
-		UnitTestingService(
-			std::vector<std::pair<std::string, std::string>> simplemd_xmls,
-			MPI_Comm comm = MPI_COMM_WORLD
-		);
+		UnitTestingService(MPI_Comm comm = MPI_COMM_WORLD);
 
 		~UnitTestingService() {
 			for (auto ut : _uts) delete ut;
