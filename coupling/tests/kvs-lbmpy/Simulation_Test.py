@@ -4,43 +4,58 @@
 
 import os
 import pandas as pd
-import kvstest
 import smtplib
 from shutil import copyfile
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-#creates backup of the original .ini and .xml files
-fileList = ["file1","file2","file3"]
-copyfile("kvstest.ini", "kvstest_bu.ini")
-copyfile("kvs.xml", "kvs_bu.xml")    
+#######################################
+
+#Accepted mean squared error for mass
+ACCEPTED_MSE_M = 1
+
+#Accepted mean squared error for momentum in x, y and z direction
+ACCEPTED_MSE_X = 0
+ACCEPTED_MSE_Y = 1
+ACCEPTED_MSE_Z = 1
 
 #sets up the email
-msg = MIMEMultipart()
 sender = 'sender@example.com'
 recievers = ["person1@example.com", "person2@example.com", "person3@example.com"]
-body = "While running the kvs test, following errors occurred:\n"
 
+#######################################
+
+msg = MIMEMultipart()
+body = "While running the couette test, following errors occurred:\n"
 msg['Subject'] = 'Simulation Test error report'
 msg['From'] = sender
 msg['To'] = ','.join(recievers)
 
-errorCheck = false
+#creates backup of the original .xml file
+fileList = ["kvs1", "kvs2"]
+copyfile("kvs.xml", "kvs_bu.xml")
+copyfile("kvstest.ini", "kvstest_bu.ini")
+
+errorCheck = False
 
 for f in fileList:
     #copys the templates into the right folder
-    copyfile("simulation-test-templates/" + f + ".ini", "kvstest.ini")
-    copyfile("simulation-test-templates/" + f + ".xml", "kvstest.xml")
+    copyfile("simulation-test-templates/" + f + ".xml", "kvs.xml")
+    copyfile("simulation-test-templates/" + f + ".ini", "kvs.ini")
+    copyfile("simulation-test-templates/" + f + ".csv", "md-comparison-data.csv")
 
     #starts the test
-    try:
-        os.run("kvstest.py")
-    except:
-        print("Simulation test crashed.")
+    ret_code = os.system("python3 kvstest.py")
+    print("Simulation exit code: " + str(ret_code))
+
+    if(ret_code != 0):
+        body += "Simulation with config " + f + " exited with nonzero exit code: " + str(ret_code) + "\n"
+        errorCheck = True
+        continue
     
     #reads in the .csv files
-    df_test = pd.read_csv('unfiltered1.csv', delimiter=';')
-    df_values = pd.read_csv('unfiltered2.csv', delimiter=';')
+    df_test = pd.read_csv('md-sample.csv', delimiter=';')
+    df_values = pd.read_csv('md-comparison-data.csv', delimiter=';')
 
     #adds the data from both files into one dataframe
     df_comparison = pd.concat([df_values, df_test],axis='columns', keys=['Comparative values','Test results'])
@@ -63,28 +78,28 @@ for f in fileList:
         y1 = row[2]
         z1 = row[3]
 
-        #get mass and impulse of sample
+        #get mass and momentum of sample
         mass1 = row[7]
-        impulseX1 = row[8]
-        impulseY1 = row[9]
-        impulseZ1 = row[10]
+        momentumX1 = row[8]
+        momentumY1 = row[9]
+        momentumZ1 = row[10]
 
         #get cellIndex of comparison
         x2 = row[13]
         y2 = row[14]
         z2 = row[15]
 
-        #get mass and impulse of comparison
+        #get mass and momentum of comparison
         mass2 = row[19]
-        impulseX2 = row[20]
-        impulseY2 = row[21]
-        impulseZ2 = row[22]
+        momentumX2 = row[20]
+        momentumY2 = row[21]
+        momentumZ2 = row[22]
         
         #gets the differences between sample and comparison
         errorM = float(mass1) - float(mass2)
-        errorX = float(impulseX1) - float(impulseX2)
-        errorY = float(impulseY1) - float(impulseY2)
-        errorZ = float(impulseZ1) - float(impulseZ2)
+        errorX = float(momentumX1) - float(momentumX2)
+        errorY = float(momentumY1) - float(momentumY2)
+        errorZ = float(momentumZ1) - float(momentumZ2)
     
         #squares the differences
         errorSqM = errorM * errorM
@@ -111,27 +126,29 @@ for f in fileList:
     fStr = str(f)
     compStr = str(comp)
     mseMStr = str(mseM)
-    mseMStr = str(mseM)
-    mseMStr = str(mseM)
-    mseMStr = str(mseM)
+    mseXStr = str(mseX)
+    mseYStr = str(mseY)
+    mseZStr = str(mseZ)
 
     #the value that determines the success or failure of a simulation can be changed here
-    if abs(mseM) > 1:        
-        body += "Using configuration "+fStr+ ", the MSE of the mass was to high.\nmseM:"+mseMStr+ " mseX:"+mseXStr+" mseY:"+mseYStr+" mseZ:"+mseZStr+ ".There were "+compStr+ " comparisons made.\n\n"
-        errorCheck = true
-    if abs(mseX) > 1:           
-        body += "Using configuration "+fStr+", the MSE of the impulse in x-direction was to high.\nmseM:" +mseMStr+ " mseX:"+mseXStr+" mseY:"+mseYStr+" mseZ:"+mseZStr+ ".There were "+compStr+ " comparisons made.\n\n"
-        errorCheck = true
-    if abs(mseY) > 1:           
-        body += "Using configuration "+fStr+ ", the MSE of the impulse in y-direction was to high.\nmseM:" +mseMStr+ " mseX:"+mseXStr+" mseY:"+mseYStr+" mseZ:"+mseZStr+ ".There were "+compStr+ " comparisons made.\n\n"
-        errorCheck = true
-    if abs(mseZ) > 1:           
-        body += "Using configuration "+fStr+ ", the MSE of the impulse in z-direction was to high.\nmseM:" +mseMStr+ " mseX:"+mseXStr+" mseY:"+mseYStr+" mseZ:"+mseZStr+ ".There were "+compStr+ " comparisons made.\n\n"
-        errorCheck = true
-    if abs(mseM) <= 1 and abs(mseX) <= 1 and abs(mseY) <= 1 and abs(mseZ) <= 1:
+    if abs(mseM) > ACCEPTED_MSE_M:        
+        body += "Using configuration "+fStr+ ", the MSE of the mass was too high.\nmseM:"+mseMStr+ " mseX:"+mseXStr+" mseY:"+mseYStr+" mseZ:"+mseZStr+ ".There were "+compStr+ " comparisons made.\n\n"
+        errorCheck = True
+    if abs(mseX) > ACCEPTED_MSE_X:           
+        body += "Using configuration "+fStr+", the MSE of the momentum in x-direction was too high.\nmseM:" +mseMStr+ " mseX:"+mseXStr+" mseY:"+mseYStr+" mseZ:"+mseZStr+ ".There were "+compStr+ " comparisons made.\n\n"
+        errorCheck = True
+    if abs(mseY) > ACCEPTED_MSE_Y:           
+        body += "Using configuration "+fStr+ ", the MSE of the momentum in y-direction was too high.\nmseM:" +mseMStr+ " mseX:"+mseXStr+" mseY:"+mseYStr+" mseZ:"+mseZStr+ ".There were "+compStr+ " comparisons made.\n\n"
+        errorCheck = True
+    if abs(mseZ) > ACCEPTED_MSE_Z:           
+        body += "Using configuration "+fStr+ ", the MSE of the momentum in z-direction was too high.\nmseM:" +mseMStr+ " mseX:"+mseXStr+" mseY:"+mseYStr+" mseZ:"+mseZStr+ ".There were "+compStr+ " comparisons made.\n\n"
+        errorCheck = True
+    if abs(mseM) <= ACCEPTED_MSE_M and abs(mseX) <= ACCEPTED_MSE_X and abs(mseY) <= ACCEPTED_MSE_Y and abs(mseZ) <= ACCEPTED_MSE_Z:
         print ("Simulation successful.")
 
-msg.attach(MIMEText(body, 'plain‘))
+print(body)
+
+msg.attach(MIMEText(body, 'plain'))
 msgText = msg.as_string()
 
 #sends the email
