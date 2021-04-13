@@ -9,7 +9,8 @@
 //#define DEBUG_UT
 
 /*
- *TODO: explanatory interface comment
+ * An abstraction of the interface of a Unit Test should to make UTs managable in data structures.
+ * All Unit Tests should implement not only this, but also testing::ut::UnitTestImpl.
  *
  * @Author Leonard Hannen, Felix Maurer
  */
@@ -25,6 +26,8 @@ class testing::ut::UnitTestInterface {
 			_rank(rank),
 			_comm_size(comm_size)
 		{}
+
+		virtual ~UnitTestInterface() {}
 
 		/*
 		 * These two functions are implemented by the expanded interface UnitTestImpl.

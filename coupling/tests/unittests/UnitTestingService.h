@@ -3,20 +3,45 @@
 
 #pragma once
 
+//external headers
 #include<vector>
 #include<map>
 #include<any>
 #include<optional>
 #include<iostream>
 #include<mpi.h>
+
+//General Mamico includes
+#include "tarch/configuration/ParseConfiguration.h"
+#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+#include "coupling/interface/MDSimulationFactory.h"
+#include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
+#include "coupling/configurations/MaMiCoConfiguration.h"
+
+//Unit Testing includes
 #include"MockService.cpph"
 #include"UnitTestInterface.h"
+
 
 //#define DEBUG_UTS
 
 
 /*
- *TODO: explanatory interface comment
+ *
+ * Service class managing Unit Test objects and their corresponding MockServices.
+ * This is the top-level user interface: To run tests, call runUnitTest(...).
+ *
+ * All Unit Test instances are created during instanciation of this (cf. .cpp file).
+ * Mocks of some types that don't have a MockService are initialized there as well.
+ * Currently, those are:
+ * 	- primitive C++ types
+ * 	- STL types
+ * 	- SimpleMD
+ *
+ * Features currently missing:
+ * - simpleMD dummy instances with dim != 3
+ * - CS dummy instances
+ * - some primitive + a lot of STL types
  *
  * @Author Leonard Hannen, Felix Maurer
  */
@@ -29,7 +54,10 @@ namespace testing { namespace ut {
 //Make this static?
 class testing::ut::UnitTestingService {
 	public:
-		UnitTestingService(MPI_Comm comm = MPI_COMM_WORLD);
+		UnitTestingService(
+			std::vector<std::pair<std::string, std::string>> simplemd_xmls,
+			MPI_Comm comm = MPI_COMM_WORLD
+		);
 
 		~UnitTestingService() {
 			for (auto ut : _uts) delete ut;
@@ -52,6 +80,10 @@ class testing::ut::UnitTestingService {
 		template<class T>
 		std::optional<testing::ut::MockService*> getMockService();
 
+		//Special case: SimpleMD "mocks"
+		std::vector<coupling::interface::MDSimulation*> getSimpleMDs() { return _simpleMDs; }
+		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> *> getMDInterfaces() { return _mdSolverInterfaces; }
+
 		/*
 		 * Takes a set of mock values and creates a corresponding MockService.
 		 * This service is then added to _mockServices and returned.
@@ -69,6 +101,7 @@ class testing::ut::UnitTestingService {
 
 		//used for MPI communication
 		int _rank;
+		MPI_Comm _comm;
 		int _comm_size;
 
 		//list of UT pointers
@@ -76,13 +109,20 @@ class testing::ut::UnitTestingService {
 
 		//map of "Type"->MockService<Type>
 		std::map<std::string, testing::ut::MockService *> _mockServices;
-		
+
+		//dummy instances of simpleMD
+  		std::vector<coupling::interface::MDSimulation*> _simpleMDs;
+  		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> *> _mdSolverInterfaces;
+
+		//dummy instances of CS	
+		//TODO
 };
 
 //INCLUDE ALL INDIVIDUAL UNIT TESTS HERE
 #include"uts/tarch/la/VectorUT.cpph"
 #include"uts/coupling/datastructures/MacroscopicCellUT.cpph"
 #include"uts/coupling/paralleltopology/XYZTopologyUT.cpph"
+#include"uts/coupling/cell-mappings/ComputeMassMappingUT.cpph"
 
 //Include implementation
 #include"UnitTestingService.cpp"
