@@ -2,12 +2,8 @@
 // and use, please see the copyright notice in MaMiCo's main folder
 
 //constructors of testing::ut::UnitTestingService
-testing::ut::UnitTestingService::UnitTestingService(
-	   	std::vector<std::pair<std::string, std::string>> simplemd_xmls,
-		MPI_Comm comm): 
+testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) {
 
-		_comm(comm)
-{
 	MPI_Comm_size(comm, &_comm_size);
 	MPI_Comm_rank(comm, &_rank);
 
@@ -55,24 +51,29 @@ testing::ut::UnitTestingService::UnitTestingService(
 	simplemd::configurations::MolecularDynamicsConfiguration simpleMDConfig;
   	coupling::configurations::MaMiCoConfiguration<3> mamicoConfig; //TODO: other dims
 
-    //First entry: simplemd xml, second entry: mamico xml
-	for(auto xml_pair : simplemd_xmls) {
-		
-		tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(std::get<0>(xml_pair),"molecular-dynamics",simpleMDConfig);
-    	if (!simpleMDConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid SimpleMD config in: " << std::get<0>(xml_pair) << std::endl; exit(EXIT_FAILURE);}
 
-		tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >(std::get<1>(xml_pair),"mamico",mamicoConfig);
-    	if (!mamicoConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid Mamico config (for SimpleMD) in: " << std::get<1>(xml_pair) << std::endl; exit(EXIT_FAILURE);}
+	//Add all .xmls to this initializer list
+	for(auto xml : { "test.xml" }) {
+		
+		tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("test.xml","molecular-dynamics",simpleMDConfig);
+    	if (!simpleMDConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid SimpleMD config in: " << xml << std::endl; exit(EXIT_FAILURE);}
+
+		tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("test.xml","mamico",mamicoConfig);
+    	if (!mamicoConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid Mamico config (for SimpleMD) in: " << xml << std::endl; exit(EXIT_FAILURE);}
 
 		//Init new SimpleMD
-		_simpleMDs.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
+		auto newSimpleMDInstance = coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
         	simpleMDConfig,mamicoConfig, MPI_COMM_WORLD
-      	));
+      	);
+		newSimpleMDInstance->init();
 
 		//Init new MDSolverInterface
-		_mdSolverInterfaces.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().
-        getMDSolverInterface(simpleMDConfig, mamicoConfig, _simpleMDs.back()
-		));
+		_simpleMDs.push_back(newSimpleMDInstance);
+
+		auto newMDInterface = coupling::interface::SimulationAndInterfaceFactory::getInstance().
+        getMDSolverInterface(simpleMDConfig, mamicoConfig, newSimpleMDInstance);
+
+		_mdSolverInterfaces.push_back(newMDInterface);
 
       	if (_simpleMDs.back() == nullptr or _mdSolverInterfaces.back() == nullptr){
 			//TODO: More verbose error message
@@ -81,6 +82,8 @@ testing::ut::UnitTestingService::UnitTestingService(
       	}
 
 	}
+
+	std::cout << "POST FOR LOOP" << std::endl;
 	
 
 	//Initialize instances of CS

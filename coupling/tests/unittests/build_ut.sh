@@ -15,7 +15,7 @@ LIBSIMPLEMD=simplemd
 
 BUILD_PATH=${MAMICO_PATH}/coupling/tests/unittests/build
 
-rm ${BUILD_PATH}/main;
+rm main;
 rm ${BUILD_PATH}/*.o;
 
 #set flags, includes, libraries
@@ -30,9 +30,9 @@ scons target=libsimplemd dim=3 build=release parallel=yes -j4
 libraries="${libraries} -L${SIMPLEMD_PATH} -l${LIBSIMPLEMD}"
 cd ${BUILD_PATH}
 
+${compiler} ${MAMICO_PATH}/coupling/tests/unittests/main.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_ut.o -L/usr/lib/python3.8/site-packages/pybind11 #$(python3.8-config --ldflags --embed)
 ${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
 ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
-${compiler} ${MAMICO_PATH}/coupling/tests/unittests/main.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_ut.o -L/usr/lib/python3.8/site-packages/pybind11 #$(python3.8-config --ldflags --embed)
 
 cd ..
 objects="${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_ut.o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
