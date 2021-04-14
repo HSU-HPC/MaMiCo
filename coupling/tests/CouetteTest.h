@@ -364,9 +364,16 @@ private:
       }
     }
 
-    if(_cfg.initAdvanceCycles > 0 && _couetteSolver != NULL)
+    if(_cfg.initAdvanceCycles > 0 && _couetteSolver != NULL){
+      for (unsigned int i = 0; i < _localMDInstances; i++){
+        static_cast<coupling::services::MacroscopicCellServiceImpl<MY_LINKEDCELL,3>&>(_multiMDCellService->getMacroscopicCellService(i)).setParticleInsertionType(coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION);
+      }
       _couetteSolver->advance(_cfg.initAdvanceCycles * _simpleMDConfig.getSimulationConfiguration().getDt()
         * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
+      for (unsigned int i = 0; i < _localMDInstances; i++){
+        static_cast<coupling::services::MacroscopicCellServiceImpl<MY_LINKEDCELL,3>&>(_multiMDCellService->getMacroscopicCellService(i)).setParticleInsertionType(coupling::configurations::ParticleInsertionConfiguration::PUSH);
+      }
+    }
 
     // finish time measurement for initialisation
     if(_rank == 0){
@@ -404,6 +411,14 @@ private:
         gettimeofday(&_tv.end,NULL);
         _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
         //std::cout << "Finish _couetteSolver->advance " << std::endl;
+        if(cycle%1 == 0){
+          // std::string filename = "couetteError_CFD.txt";
+          // std::ofstream file(filename, std::ios_base::app );
+          // if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
+          // file << cycle << "; " << _couetteSolver->getError() << std::endl;
+          // file.close();
+          _couetteSolver->getError();
+        }
       }
     }
 
@@ -435,6 +450,44 @@ private:
       if (_rank==0){
         gettimeofday(&_tv.end,NULL);
         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+        if(cycle%1==0){
+          // form file name and open file
+          std::string filename = "couetteError_MD.txt";
+          std::ofstream file(filename, std::ios_base::app );
+          if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
+
+          // loop over received cells; read macroscopic mass+momentum buffers and write cell index, mass and velocity to one line in the csv-file
+          double actualError = 0.0;
+          double error = 0.0;
+          double errorRMS = 0.0;
+          double maxError = 0.0;
+          const double pi = 3.141592653589793238;
+          int elements = 0;
+          const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+          const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+          const unsigned int numCellsRecv = _buf.recvBuffer.size();
+          for (unsigned int i = 0; i < numCellsRecv; i++){
+            const tarch::la::Vector<3,unsigned int> counter(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
+            if((counter[0]>3) & (counter[1]>3) & (counter[2]>3) & (counter[0]<10) & (counter[1]<10) & (counter[2]<10) ){
+              const double velSim =_buf.recvBuffer[i]->getMacroscopicMass()!=0.0? _buf.recvBuffer[i]->getMacroscopicMomentum()[0]/_buf.recvBuffer[i]->getMacroscopicMass() : 0.0;
+              double velAna = 0.0;
+              const double pos = domainOffset[2]+(counter[2]-1)*2.5+1.25;
+              for (int k = 1; k < 30; k++){
+                velAna += 1.0/k * sin(k*pi*pos/_cfg.channelheight) * exp(-k*k * pi*pi/(_cfg.channelheight*_cfg.channelheight) * _cfg.kinVisc * cycle *_simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
+              }
+              velAna = _cfg.wallVelocity[0]*(1.0-pos/_cfg.channelheight - 2.0/pi * velAna);
+              actualError = std::abs(velAna-velSim);
+              error += actualError;
+              errorRMS += actualError*actualError;
+              maxError = actualError>maxError? actualError: maxError;
+              elements++;
+            }
+          }
+          error /= elements;
+          errorRMS = std::sqrt(errorRMS/elements);
+          file << cycle << " " << error << " "<< errorRMS << " " << maxError<< std::endl;
+          file.close();
+        }
       }
 
       // send back data from MD instances and merge it

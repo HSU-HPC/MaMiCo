@@ -98,7 +98,7 @@ processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
   // for mass transfer: compute mass flux if required and add excess mass
   //const double massFlux = computeMassFlux(cell.getMicroscopicMass(),velocity,index) + _excessMass[index];
   //cell.setMicroscopicMass(massFlux);
-  const double massFlux = computeMassFlux(cell.getMicroscopicMass(),velocity,index);
+  const tarch::la::Vector<dim,double> massFlux = computeMassFlux(cell.getMicroscopicMass(),velocity,index);
   cell.setMicroscopicMass(_excessMass[index]);
   cell.setMassFlux(massFlux);
 
@@ -192,7 +192,7 @@ unsigned int coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCe
 }
 
 template<class LinkedCell,unsigned int dim>
-double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) {
+tarch::la::Vector<dim,double> coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) {
   const tarch::la::Vector<dim,unsigned int> globalIndex(coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.convertLocalToGlobalVectorCellIndex(
     coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.getLocalVectorCellIndex(index)));
   const tarch::la::Vector<dim,unsigned int> globalNumberCells(coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.getGlobalNumberMacroscopicCells());
@@ -207,7 +207,7 @@ double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim
   //const double couplingTimeInterval = coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_mdSolverInterface->getDt()*_numberMDSteps;
   const double couplingTimeInterval = coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_mdSolverInterface->getDt();
 
-  double massFlux = 0.0;
+  tarch::la::Vector<dim,double> massFlux = 0.0;
 
   // compute normal vector for this cell, checking whether there is mass flux or not
   tarch::la::Vector<dim,int> n(0);
@@ -223,7 +223,7 @@ double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim
     for (unsigned int e = 0; e < d; e++){surface = surface*meshsize[e]; }
     for (unsigned int e = d+1; e < dim; e++){surface =surface*meshsize[e];}
 
-    massFlux += n[d]*surface*density*velocity[d]*couplingTimeInterval;
+    massFlux[d] = n[d]*surface*density*velocity[d]*couplingTimeInterval;
   }
   return massFlux;
 }

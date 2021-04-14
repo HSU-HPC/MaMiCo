@@ -43,6 +43,8 @@ class simplemd::services::LinkedCellService {
     void addMoleculeToLinkedCell(Molecule &molecule, const tarch::la::Vector<MD_DIM,unsigned int> &localCellIndex);
     /** puts the molecule into the cell defined by the local index (scalar) coordinates localCellIndex */
     void addMoleculeToLinkedCell(Molecule &molecule, const unsigned int &localCellIndex);
+    /** puts the ghost molecule into the cell defined by the local index (vector) coordinates localCellIndex */
+    void addGhostMoleculeToLinkedCell(Molecule &molecule, const tarch::la::Vector<MD_DIM,unsigned int> &localCellIndex, const tarch::la::Vector<MD_DIM, double> &moveTo, const unsigned int ghostIteratorIndex);
 
     void deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM,unsigned int> &localCellIndex);
 
@@ -499,4 +501,3 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A &a,const bool& us
 }
 
 #endif // _MOLECULARDYNAMICS_SERVICES_LINKEDCELLSERVICE_H_
-

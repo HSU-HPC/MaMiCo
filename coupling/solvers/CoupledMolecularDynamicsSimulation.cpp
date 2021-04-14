@@ -27,7 +27,6 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   // do it BEFORE quantities are manipulated as we can then also do some pre-processing here.
   _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
   // ------------ coupling step: distribute mass ---------------------
-  _macroscopicCellService->plotEveryMicroscopicTimestep(t);
   _macroscopicCellService->distributeMass(t);
   // for isothermal simulations: apply thermostat
   _macroscopicCellService->applyTemperatureToMolecules(t);
@@ -55,20 +54,25 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
       && (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0) ){
     _moleculeService->writeCheckPoint(*_parallelTopologyService,_configuration.getCheckpointConfiguration().getFilename(),t);
   }
-
   // reorganise memory if needed
   if (   (_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0)
       && (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0) ){
     _moleculeService->reorganiseMemory(*_parallelTopologyService,*_linkedCellService);
   }
+  // std::cout << " 9 " << std::endl;
+  _macroscopicCellService->limitForceInOuterCells();
   // plot also macroscopic cell information
-  //_macroscopicCellService->plotEveryMicroscopicTimestep(t);
+  // std::cout << " 10 " << std::endl;
+  _macroscopicCellService->plotEveryMicroscopicTimestep(t);
   _linkedCellService->iterateCells(*_emptyLinkedListsMapping,false);
   // time integration. After this step, the velocities and the positions of the molecules have been updated.
+  // std::cout << " 11 " << std::endl;
   _moleculeService->iterateMolecules(*_timeIntegrator,false);
   // sort molecules into linked cells
+  // std::cout << " 12 " << std::endl;
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping,false);
   if (_parallelTopologyService->getProcessCoordinates()==tarch::la::Vector<MD_DIM,unsigned int>(0)){
     //if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
   }
+  // std::cout << "13" << std::endl;
 }

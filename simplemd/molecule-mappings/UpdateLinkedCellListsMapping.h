@@ -57,4 +57,3 @@ class simplemd::moleculemappings::UpdateLinkedCellListsMapping {
 };
 
 #endif // _MOLECULARDYNAMICS_MOLECULEMAPPINGS_UPDATELINKEDCELLLISTSMAPPING_H_
-

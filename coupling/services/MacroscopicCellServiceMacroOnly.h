@@ -82,6 +82,7 @@ class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::ser
     virtual void distributeMass(unsigned int t){}
     virtual void distributeMomentum(unsigned int t){}
     virtual void applyBoundaryForce(unsigned int t){}
+    virtual void limitForceInOuterCells(){}
     virtual void plotEveryMicroscopicTimestep(unsigned int t){}
     virtual void plotEveryMacroscopicTimestep(unsigned int t){}
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const {return *_indexConversion; }
