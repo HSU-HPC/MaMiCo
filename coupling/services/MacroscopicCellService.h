@@ -24,6 +24,7 @@
 #include "coupling/configurations/MacroscopicCellConfiguration.h"
 #include "coupling/KineticEnergyController.h"
 #include "coupling/MomentumController.h"
+#include "coupling/ForceController.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h"
 #include "tarch/utils/MultiMDService.h"
@@ -70,6 +71,7 @@ class coupling::services::MacroscopicCellService {
     virtual void distributeMass(unsigned int t) = 0;
     virtual void distributeMomentum(unsigned int t) = 0;
     virtual void applyBoundaryForce(unsigned int t) = 0;
+    virtual void limitForceInOuterCells()=0;
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
@@ -191,6 +193,8 @@ public coupling::services::MacroscopicCellService<dim> {
     /** applies a boundary force to molecules which are close to an open boundary. */
     void applyBoundaryForce(unsigned int t);
 
+    void limitForceInOuterCells();
+
     /** distributes mass in the system. */
     void distributeMass(unsigned int t);
 
@@ -211,6 +215,8 @@ public coupling::services::MacroscopicCellService<dim> {
 
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
+
+    void setParticleInsertionType(coupling::configurations::ParticleInsertionConfiguration::ParticleInsertionType ParticleInsertionType){_particleInsertionType=ParticleInsertionType;}
 
 	/** returns all macroscopic cells located within MD domain boundaries. */
 	//TODO: REMOVE std::vector<coupling::datastructures::MacroscopicCell<dim> *> getInnerMacroscopicCells() {return _innerMacroscopicCells;}
@@ -272,7 +278,7 @@ public coupling::services::MacroscopicCellService<dim> {
     /** needed for insertion of particles, e.g. USHER */
     coupling::ParticleInsertion<LinkedCell,dim>* _particleInsertion;
     const tarch::la::Vector<dim,unsigned int> _numberLinkedCellsPerMacroscopicCell;
-    const coupling::configurations::ParticleInsertionConfiguration::ParticleInsertionType _particleInsertionType;
+    coupling::configurations::ParticleInsertionConfiguration::ParticleInsertionType _particleInsertionType;
     /** coupling strategy */
     coupling::transferstrategies::TransferStrategy<LinkedCell,dim>* _transferStrategy;
     /** noise reduction method for data from MD */
@@ -283,6 +289,7 @@ public coupling::services::MacroscopicCellService<dim> {
     coupling::KineticEnergyController<LinkedCell,dim> _kineticEnergyController;
     /** controls and apply boundary forces to molecules close to open boundaries.*/
     coupling::BoundaryForceController<LinkedCell,dim> *_boundaryForceController;
+    coupling::ForceController<LinkedCell,dim> *_forceController;
     /** controls/ maintains momentum, e.g. after particle insertion */
     coupling::MomentumController<LinkedCell,dim> _momentumController;
 

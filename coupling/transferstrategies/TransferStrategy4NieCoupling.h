@@ -68,7 +68,7 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling: public couplin
     unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const;
 
     /** computes the mass flux in the outermost inner macroscopic cells. For all other cells, 0.0 is returned. */
-    double computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) ;
+    tarch::la::Vector<dim,double> computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) ;
 
     coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> _massMapping;
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell,dim> _momentumMapping;

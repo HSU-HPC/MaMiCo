@@ -13,6 +13,7 @@
 #include "adjustPhi.H"
 #include "findRefCell.H"
 #include "pisoControl.H"
+#include <cmath>
 
 namespace coupling{
   namespace solvers{
@@ -104,6 +105,35 @@ public:
     }
   }
 
+  const double getError()const override{
+    double actualError;
+    double error = 0.0;
+    double errorRMS = 0.0;
+    double maxError = 0.0;
+    const double pi = 3.141592653589793238;
+    const unsigned int s = static_cast<unsigned int>(U.mesh().nCells());
+    for(unsigned int i = 0; i< s; i++){
+      double u_analytical = 0.0;
+      const double pos = U.mesh().C()[i][2];
+      for (int k = 1; k < 30; k++){
+        u_analytical += 1.0/k * std::sin(k*pi*pos/_channelheight) * std::exp(-k*k * pi*pi/(_channelheight*_channelheight) * nu.value() * runTime.timeOutputValue());
+      }
+      u_analytical = 0.5*(1.0-pos/_channelheight - 2.0/pi * u_analytical); // hardcoded value of 0.5 is the wallVelocity, should be variable
+      actualError = std::abs(u_analytical-static_cast<double>(U[i][0]));
+      error += actualError;
+      errorRMS += actualError*actualError;
+      maxError = actualError>maxError? actualError: maxError;
+    }
+    error /= s;
+    errorRMS = std::sqrt(errorRMS/s);
+    std::string filename = "couetteError_CFD.txt";
+    std::ofstream file(filename, std::ios_base::app );
+    if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
+    file << _timestepCounter << " " << error << " "<< errorRMS << " " << maxError<< std::endl;
+    file.close();
+    return error;
+  }
+
   tarch::la::Vector<3,double> getVelocity(tarch::la::Vector<3,double> pos)const override{
     const Foam::vector foamPosition(pos[0],pos[1],pos[2]);
     int foamIndice = U.mesh().findCell(foamPosition);
@@ -156,29 +186,29 @@ public:
       if(_boundariesWithMD[boundary]==1){
         unsigned int MDPointsPerBoundary=_numberBoundaryPoints/6;
         for (unsigned int j = 0; j < MDPointsPerBoundary; j++){
-        _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
-        const unsigned int globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
-        const unsigned int globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
-        for(unsigned int k = 0; k < size; k++){
-          if(globalIndexOuter==recvIndice[k]){
-            _boundary2RecvBufferIndicesOuter[counter] = k;
-            goto endloop;
+          _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
+          const unsigned int globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
+          const unsigned int globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
+          for(unsigned int k = 0; k < size; k++){
+            if(globalIndexOuter==recvIndice[k]){
+              _boundary2RecvBufferIndicesOuter[counter] = k;
+              goto endloop;
+            }
           }
-        }
-        std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
-        endloop:
-        for(unsigned int k = 0; k < size; k++){
-          if(globalIndexInner==recvIndice[k]){
-            _boundary2RecvBufferIndicesInner[counter] = k;
-            goto endloop2;
+          std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
+          endloop:
+          for(unsigned int k = 0; k < size; k++){
+            if(globalIndexInner==recvIndice[k]){
+              _boundary2RecvBufferIndicesInner[counter] = k;
+              goto endloop2;
+            }
           }
+          std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
+          endloop2:
+          counter++;
         }
-        std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
-        endloop2:
-        counter++;
       }
     }
-  }
   }
 
 private:

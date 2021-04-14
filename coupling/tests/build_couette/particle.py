@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 def couette_analytic(x_c, t_c):
-    u_w = 1.5
-    H = 100.0
+    u_w = 0.5
+    H = 50.0
     visc = 2.632106414
     sum = 0
     for step in np.arange(1,31):
@@ -15,16 +15,16 @@ def couette_analytic(x_c, t_c):
     return u_c
 
 plt.figure(figsize=(12,9))
-x_step = 5
-x = np.arange(x_step/2,100,x_step)
-t_start = 4
-t_end = 98
-t_step = 10
-particle_start = 1
+x_step = 2.5
+x = np.arange(x_step/2,50,x_step)
+t_start = 6
+t_end = 300
+t_step = 30
+particle_start = 0
 particle_number = 12
 for number in np.arange(t_start, t_end, t_step):
     f = np.genfromtxt("velocity_"+str(number)+".txt", usecols=(0), delimiter=',', dtype="float")
-    x_help = [0,1,2,3,10,11,12,13,14,15,16,17,18,19]
+    x_help = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, 19]
     plt.plot(x[x_help], f, linestyle ='none', marker='o', color=plt.cm.hsv((number-t_start)/(t_end-t_start)))
     x_c = np.genfromtxt("CouetteAvgMultiMDCells_0_"+str(number)+".csv", delimiter=';', usecols=(0), dtype="int")
     y_c = np.genfromtxt("CouetteAvgMultiMDCells_0_"+str(number)+".csv", delimiter=';', usecols=(1), dtype="int")

@@ -43,13 +43,14 @@ _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscop
 _filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, multiMDService, false, filterPipelineConfiguration),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
-_particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
+_particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion)),
 _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
 _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
 _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface,*_indexConversion,numberMDTimestepsPerCouplingCycle)),
 _noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService, tws)),
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
+_forceController(particleInsertionConfiguration.interpreteConfigurationForceController(mdSolverInterface)),
 _momentumController(mdSolverInterface),
 _microscopicFilename(macroscopicCellConfiguration.getMicroscopicFilename()),
 _writeEveryMicroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMicroscopicTimestep()),
@@ -150,7 +151,7 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   timeval start;
   timeval end;
   double runtime=0;
-  if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); } 
+  if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); }
 
   //TODO: deprecated, moved to filter pipeline.
   // run noise reduction
@@ -160,11 +161,11 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   //  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
   //  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
   //}
- 
+
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
-  _filterPipeline(); 
+  _filterPipeline();
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);
@@ -224,6 +225,14 @@ template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 applyBoundaryForce(unsigned int t){
   Wrapper4ApplyBoundaryForce wrapper(this);
+  _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);
+}
+
+template<class LinkedCell,unsigned int dim>
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
+limitForceInOuterCells(){
+  // only do if particle insertion = push
+  Wrapper4LimitForce wrapper(this);
   _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);
 }
 
@@ -290,7 +299,7 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::initIndexVe
 /* TODO: REMOVE
 template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
-initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells) {	
+initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells) {
 	tarch::la::Vector<dim, unsigned int> convertedIndex;
 	bool outOfBounds;
 

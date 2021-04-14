@@ -46,6 +46,14 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
 
       m2++;
     }
+    if(cell.hasGhostMolecules()){
+      const std::list<Molecule*>::const_iterator endGhost = cell.constEndGhost();
+      const std::list<Molecule*>::const_iterator beginGhost = cell.constBeginGhost();
+      for(std::list<Molecule*>::const_iterator mG = beginGhost; mG != endGhost; mG++){
+        forceBuffer = getLennardJonesForce(position1, (*mG)->getConstPosition());
+        force1 += forceBuffer;
+      }
+    }
   }
 }
 
@@ -73,6 +81,14 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
       forceBuffer = getLennardJonesForce(position1,(*m2)->getConstPosition());
       force1 += forceBuffer;
       force2 -= forceBuffer;
+    }
+    if(cell2.hasGhostMolecules() && cell1.hasGhostMolecules()){
+      const std::list<Molecule*>::const_iterator endGhost = cell2.constEndGhost();
+      const std::list<Molecule*>::const_iterator beginGhost = cell2.constBeginGhost();
+      for(std::list<Molecule*>::const_iterator mG = beginGhost; mG != endGhost; mG++){
+        forceBuffer = getLennardJonesForce(position1, (*mG)->getConstPosition());
+        force1 += forceBuffer;
+      }
     }
   }
 }

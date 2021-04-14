@@ -271,4 +271,15 @@ public:
       Wrapper::_thisPtr->_boundaryForceController->applyBoundaryForce(cell,index);
   }
 };
+
+class Wrapper4LimitForce: public Wrapper {
+public:
+  Wrapper4LimitForce(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+
+  void beginCellIteration(){}
+  void endCellIteration(){}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+    Wrapper::_thisPtr->_forceController->limitForce(cell,index);
+  }
+};
 #endif // _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLTRAVERSALWRAPPERS_H_
