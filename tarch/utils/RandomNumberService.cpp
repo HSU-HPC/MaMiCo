@@ -35,7 +35,7 @@ void tarch::utils::RandomNumberService::shutdown(){}
 
 
 double tarch::utils::RandomNumberService::getUniformRandomNumber() const{
-  return ((double) rand())/((double) RAND_MAX);
+  return (0.5 * (double) rand())/(0.5 * (double) RAND_MAX + 1);
 }
 
 
