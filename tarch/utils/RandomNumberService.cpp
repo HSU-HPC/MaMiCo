@@ -35,7 +35,11 @@ void tarch::utils::RandomNumberService::shutdown(){}
 
 
 double tarch::utils::RandomNumberService::getUniformRandomNumber() const{
-  return ((double) rand())/((double) RAND_MAX);
+  // We do not want this method to return 1.0, as this can lead to invalid behaviour
+  // in some situations. E.g., the Usher particle insertion relies on this method
+  // in order to generate valid positions within the local subdomain, which only
+  // the lower edge is part of, but not the upper edge.
+  return (0.5 * (double) rand())/(0.5 * (double) RAND_MAX + 1.0);
 }
 
 
