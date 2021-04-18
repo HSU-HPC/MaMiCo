@@ -29,19 +29,23 @@ class coupling::IndexConversionMD2Macro {
 	public:
 		IndexConversionMD2Macro(
 				const coupling::IndexConversion<dim>* indexConversion,
-				coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,
-				const MPI_Comm comm = MPI_COMM_WORLD, //TODO: case multimd
-				const int lowestRankInComm = 0 //TODO: case multimd
+				coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface
+				#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
+					,const MPI_Comm comm = MPI_COMM_WORLD, //TODO: case multimd
+					const int lowestRankInComm = 0 //TODO: case multimd
+				#endif
 			):
 				_ic(indexConversion),
 				_msi(macroscopicSolverInterface),
 				_globalLowerBoundaries(nullptr),
 				_globalUpperBoundaries(nullptr),
 				_localLowerBoundaries(nullptr),
-				_localUpperBoundaries(nullptr),
-				_comm(comm),
-				_lowestRank((int)lowestRankInComm),
-				_myRank((int)_ic->getThisRank())
+				_localUpperBoundaries(nullptr)
+				#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
+					,_comm(comm),
+					_lowestRank((int)lowestRankInComm),
+					_myRank((int)_ic->getThisRank())
+				#endif
 			{
 				#ifdef DEBUG_ICM2M
 				std::cout << "ICM2M: Created new instance at location " << this << " using IC at " << _ic << " and MSI at " << _msi << std::endl;
@@ -84,7 +88,11 @@ class coupling::IndexConversionMD2Macro {
 					lowerBoundaries = *_globalLowerBoundaries;
 					upperBoundaries = *_globalUpperBoundaries;
 			}
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 			else std::cout << "WARNING: ICM2M (" << _myRank << "): getGlobalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
+			#else
+			else std::cout << "WARNING: ICM2M: getGlobalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
+			#endif
 		}
 		void getLocalMD2MacroDomainBoundaries(
 				tarch::la::Vector<dim, unsigned int>& lowerBoundaries,
@@ -93,7 +101,11 @@ class coupling::IndexConversionMD2Macro {
 					lowerBoundaries = *_localLowerBoundaries;
 					upperBoundaries = *_localUpperBoundaries;
 			}
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 			else std::cout << "WARNING: ICM2M (" << _myRank << "): getLocalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
+			#else
+			else std::cout << "WARNING: ICM2M: getLocalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
+			#endif
 		}
 
 		//assumes lower boundary to be lower than upper 
@@ -153,13 +165,15 @@ class coupling::IndexConversionMD2Macro {
 		tarch::la::Vector<dim, unsigned int>* _localLowerBoundaries;
 		tarch::la::Vector<dim, unsigned int>* _localUpperBoundaries;
 
-		const MPI_Comm _comm;
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
+			const MPI_Comm _comm;
 
-		//This rank is assumed to manage cell (0,...,0) both in global and in M2M terms.
-		const int _lowestRank;
+			//This rank is assumed to manage cell (0,...,0) both in global and in M2M terms.
+			const int _lowestRank;
 
-		//This ICM2M instance's rank
-		const int _myRank;
+			//This ICM2M instance's rank
+			const int _myRank;
+		#endif
 };
 
 #include "IndexConversionMD2Macro.cpph"
