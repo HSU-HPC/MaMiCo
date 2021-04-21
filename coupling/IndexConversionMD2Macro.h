@@ -69,11 +69,14 @@ class coupling::IndexConversionMD2Macro {
 		/*
 		 * Chooses a subspace of the cell (and index) input based on what will be transfered to the macro solver.
 		 * This subspace is referred to as "md2Macro-domain" (or sometimes (m2m-domain).
+		 * All other cells will be placed into the "outer" domain.
 		 */
 		void initMD2MacroDomain(
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& m2mDomainCells,
-				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices
+				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outerCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices
 				);
 
 		/*
