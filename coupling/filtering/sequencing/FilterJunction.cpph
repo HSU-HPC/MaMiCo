@@ -2,10 +2,10 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamic::o
 
-//Member functions of coupling::FilterSequence
+//Member functions of coupling::FilterJunction
 
 template<unsigned int dim, std::size_t inputc>
-int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){ //in our case "junctionNode" would be more precise
+int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) { //in our case "junctionNode" would be more precise
 	if(!sequenceNode) return EXIT_FAILURE;
 
 	//null if junction is empty
@@ -20,7 +20,7 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 	//Keep track of this for each indivial input partition.
 	bool firstIteration[inputc] = { true };
 
-    while(currJunctorNode){
+    while(currJunctorNode) {
 
 		//All Junctors must implement one of the {X,Y}-Junctor interfaces, each of which implement FilterInterface.
 		coupling::FilterInterface<dim>* newjunctor = nullptr;

@@ -11,6 +11,7 @@
 #include "tarch/tinyxml2/tinyxml2.h"
 #include "coupling/filtering/sequencing/FilterSequence.h"
 #include "coupling/filtering/sequencing/FilterJunction.h"
+#include "coupling/filtering/sequencing/AsymmetricalFilterJunction.h"
 #include "coupling/IndexConversionMD2Macro.h"
 
 
@@ -88,6 +89,10 @@ class coupling::FilterPipeline{
 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _md2MacroCells;
 		std::vector<tarch::la::Vector<dim, unsigned int>> _md2MacroCellIndices;		
+
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outerMacroCells;
+		std::vector<tarch::la::Vector<dim, unsigned int>> _outerMacroCellIndices;		
+
 
 		coupling::IndexConversionMD2Macro<dim>* _ic;
 		const tarch::utils::MultiMDService<dim>& _multiMDService;

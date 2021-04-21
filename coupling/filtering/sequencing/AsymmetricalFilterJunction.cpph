@@ -1,0 +1,64 @@
+// This file is part of the Mamico proJunctionn conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamic::o
+
+//Member functions of coupling::AsymmetricalFilterJunction
+
+template<unsigned int dim>
+int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) { //in our case "junctionNode" would be more precise
+	if(!sequenceNode) return EXIT_FAILURE;
+
+	//null if junction is empty
+    tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
+	
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_primary = coupling::FilterSequence<dim>::_inputDomainCellVector;
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_primary = coupling::FilterSequence<dim>::_domainCellVector2;
+
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_secondary = _inputCellVector_secondary;
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_secondary = _cellVector2_secondary;
+
+	#ifdef DEBUG_FILTER_PIPELINE
+	std::cout << PRINT_PREFIX() << "Initializing junctor objects of asymmetrical junction." << std::endl;
+	#endif	
+
+	//Keep track of this for each indivial input partition.
+	bool firstIteration = { true };
+
+    while(currJunctorNode) {
+
+		//All Junctors must implement one of the {X,Y}-Junctor interfaces, each of which implement FilterInterface.
+		coupling::FilterInterface<dim>* newjunctor = nullptr;
+		
+	//###############################################################
+	//This is where you have to define how to handle each junctor individually.
+		
+		if(false) {} //TODO: implement asymmetrical junctors. init them here using primary and secondary input
+
+    //###############################################################
+
+		//Unknown junctor identifier
+        else {
+			std::cout << "ERROR: Asymmetrical Filter-Junction does not recognize junctor called " << currJunctorNode->Value() << std::endl;
+            return EXIT_FAILURE;
+        }
+
+		if(firstIteration){
+			inputCellVector_primary = coupling::FilterSequence<dim>::_domainCellVector1;
+			inputCellVector_secondary = _cellVector1_secondary;
+			firstIteration = false;
+		}
+
+		inputCellVector_primary.swap(outputCellVector_primary);
+		inputCellVector_secondary.swap(outputCellVector_secondary);
+
+
+        coupling::FilterSequence<dim>::_filters.push_back(newjunctor);
+		currJunctorNode = currJunctorNode->NextSiblingElement();
+	}
+
+	#ifdef DEBUG_FILTER_JUNCTION_ASYM
+	std::cout << PRINT_PREFIX(); this->printOutputCellVector();
+	#endif
+	
+	return 0;
+}
