@@ -54,7 +54,6 @@ class coupling::cellmappings::DeleteParticleMapping {
 
           // save copy of particle
           const tarch::la::Vector<dim,double> position = myMolecule.getPosition();
-              _state=0;
           const tarch::la::Vector<dim,double> velocity = myMolecule.getVelocity();
           const tarch::la::Vector<dim,double> force = myMolecule.getForce();
           const double potentialEnergy = myMolecule.getPotentialEnergy();
@@ -72,8 +71,6 @@ class coupling::cellmappings::DeleteParticleMapping {
       delete it;
     }
 
-    int getState(){return _state;}
-
     coupling::datastructures::Molecule<dim> getDeletedMolecule() const { return _deletedMoleculeCopy; }
 
   private:
@@ -81,6 +78,5 @@ class coupling::cellmappings::DeleteParticleMapping {
     const unsigned int _particle;
     unsigned int _particleCounter;
     coupling::datastructures::Molecule<dim> _deletedMoleculeCopy;
-    int _state{0};
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_DELETEPARTICLEMAPPING_H_

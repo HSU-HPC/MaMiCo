@@ -113,26 +113,9 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
                                   tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber()
                                   *computeMassMapping.getNumberOfParticles()
                                 );
-  int counter = 0;
   // delete this random particle
   coupling::cellmappings::DeleteParticleMapping<LinkedCell,dim> deleteParticleMapping(randomParticle,_mdSolverInterface);
   cell.iterateCells(deleteParticleMapping);
-  while(deleteParticleMapping.getState() == 1){
-    if(counter==30){
-      return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;
-    }
-    counter++;
-    deleteParticleMapping.~DeleteParticleMapping();
-    // take a random particle
-    const unsigned int randomParticle2 = static_cast<unsigned int>(
-                                    tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber()
-                                    *computeMassMapping.getNumberOfParticles()
-                                  );
-
-    // delete this random particle
-    coupling::cellmappings::DeleteParticleMapping<LinkedCell,dim> deleteParticleMapping(randomParticle2,_mdSolverInterface);
-    cell.iterateCells(deleteParticleMapping);
-  }
 
   #ifdef USHER_DEBUG
   _energyRemoved += deleteParticleMapping.getDeletedMolecule().getPotentialEnergy();
