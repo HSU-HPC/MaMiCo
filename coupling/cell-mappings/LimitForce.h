@@ -62,6 +62,6 @@ class coupling::cellmappings::LimitForce {
 
   private:
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;
-    const double _maxForce{1000.0};
+    const double _maxForce{500.0};
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_LIMITFORCE_H_
