@@ -9,7 +9,7 @@
 #include "coupling/filtering/sequencing/FilterSequence.h"
 
 //INCLUDE ALL RELEVANT JUNCTOR HEADERS HERE
-//TODO: implement (asymmetrical) junctors
+#include "coupling/filtering/filters/WriteToFileJunctor.h"
 
 /*
  * WORK IN PROGRESS. USE WITH CAUTION
