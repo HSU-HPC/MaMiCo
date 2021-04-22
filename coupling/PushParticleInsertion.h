@@ -27,9 +27,9 @@ public:
   Pusher(coupling::interface::MDSolverInterface<LinkedCell, dim> * const mdSolverInterface,
     const tarch::la::Vector<dim,double>& lowerLeftFront, const tarch::la::Vector<dim,double>& upperRightBack,
     const tarch::la::Vector<dim,double>& toMove, const unsigned int& indexOfDirection, const tarch::la::Vector<dim,double>& meanVelocity,
-    const double& temperature): _mdSolverInterface(mdSolverInterface),
+    const double& temperature, const int rank): _mdSolverInterface(mdSolverInterface),
      _lowerLeftFront(lowerLeftFront), _upperRightBack(upperRightBack), _toMove(toMove), _indexOfDirection(indexOfDirection),
-     _meanVelocity(meanVelocity), _temperature(temperature){}
+     _meanVelocity(meanVelocity), _temperature(temperature), _rank(rank){}
 
   void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
     if(cell.hasGhostMolecules()){
@@ -49,8 +49,15 @@ public:
           _mdSolverInterface->calculateForceAndEnergy(molecule);
           // add molecule to MD simulation and linked cell structures
           _mdSolverInterface->addMoleculeToMDSimulation(molecule);
-          position[_indexOfDirection] -= 2.5;
           _insertedParticles++;
+          if(_rank==0){
+          std::string filename = "insertedParticles.txt";
+          std::ofstream file(filename, std::ios_base::app );
+          if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
+          file << position << std::endl;
+          file.close();
+        }
+        position[_indexOfDirection] -= 2.5;
         }
         wrapper.setPosition(position);
         it->next();
@@ -73,6 +80,7 @@ private:
   const unsigned int _indexOfDirection;
   const tarch::la::Vector<dim,double> _meanVelocity;
   const double _temperature;
+  const int _rank;
   unsigned int _insertedParticles{0};
 };
 
@@ -81,8 +89,8 @@ class DeleteOutestParticle {
   public:
     DeleteOutestParticle(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,
     const tarch::la::Vector<dim,double> lowerLeftFront, const tarch::la::Vector<dim,double> upperRightBack,
-    const unsigned int indexOfDirection): _mdSolverInterface(mdSolverInterface), _lowerLeftFront(lowerLeftFront),
-    _upperRightBack(upperRightBack), _indexOfDirection(indexOfDirection){}
+    const unsigned int indexOfDirection, int rank): _mdSolverInterface(mdSolverInterface), _lowerLeftFront(lowerLeftFront),
+    _upperRightBack(upperRightBack), _indexOfDirection(indexOfDirection), _rank(rank){}
     ~DeleteOutestParticle(){}
 
     void beginCellIteration(){}
@@ -91,33 +99,34 @@ class DeleteOutestParticle {
 
     void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
-      // std::cout << "4 ";
       it->begin();
       coupling::interface::Molecule<dim>& deleteMolecule(it->get());
       const tarch::la::Vector<dim,double> position = deleteMolecule.getPosition();
       double closestWallPosition;
       double actualPosition = position[_indexOfDirection];
-      // std::cout << "5 ";
       if( (_lowerLeftFront[_indexOfDirection]-actualPosition) < (actualPosition-_upperRightBack[_indexOfDirection]) ){
         closestWallPosition = _lowerLeftFront[_indexOfDirection];}
       else{ closestWallPosition = _upperRightBack[_indexOfDirection];}
       it->next();
       // find most outer particle in flow direction
       while(it->continueIteration()){
-        // std::cout << "7 ";
         const coupling::interface::Molecule<dim> &myMolecule(it->getConst());
         const tarch::la::Vector<dim,double> position = myMolecule.getPosition();
         if(abs(position[_indexOfDirection]-closestWallPosition) < abs(actualPosition-closestWallPosition) ){
           actualPosition = position[_indexOfDirection];
           deleteMolecule = it->get();
         }
-        // std::cout << "8 ";
         it->next();
       }
-      // std::cout << "9 ";
       // delete molecule from MD simulation
       _mdSolverInterface->deleteMoleculeFromMDSimulation(deleteMolecule, cell);
-      // std::cout << "particle was deleted " << std::endl;
+      if(_rank==0){
+      std::string filename = "deletedParticles.txt";
+      std::ofstream file(filename, std::ios_base::app );
+      if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
+      file << deleteMolecule.getPosition() << std::endl;
+      file.close();
+    }
       delete it;
     }
 
@@ -126,6 +135,7 @@ class DeleteOutestParticle {
     const tarch::la::Vector<dim,double> _lowerLeftFront;
     const tarch::la::Vector<dim,double> _upperRightBack;
     const unsigned int _indexOfDirection;
+    const int _rank;
 };
 
 /** An alternative insertion strategy: Particles will be pushed into the domain.
@@ -138,7 +148,8 @@ class coupling::PushParticleInsertion: public coupling::ParticleInsertion<Linked
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface, const coupling::IndexConversion<dim> &indexConversion):
     ParticleInsertion<LinkedCell, dim>(deleteMassEveryTimestep),
     _mdSolverInterface(mdSolverInterface), _lowerLeftFront(indexConversion.getGlobalMDDomainOffset()),
-    _upperRightBack(indexConversion.getGlobalMDDomainSize()+_lowerLeftFront), _moleculeMass(_mdSolverInterface->getMoleculeMass())
+    _upperRightBack(indexConversion.getGlobalMDDomainSize()+_lowerLeftFront), _moleculeMass(_mdSolverInterface->getMoleculeMass()),
+    _rank(indexConversion.getThisRank())
     {
       tarch::la::Vector<dim,double> linkedCellSize(2.5, 2.5, 2.5); // get information from somewhere (not indexConversion or mdSolverInterface)
 
@@ -240,7 +251,7 @@ class coupling::PushParticleInsertion: public coupling::ParticleInsertion<Linked
           cell.addMicroscopicMass(-static_cast<float>(insertions)*_moleculeMass);
         }
       }
-      else if(cell.getMicroscopicMass()<-0.6*_moleculeMass){
+      else if(cell.getMicroscopicMass()<-_moleculeMass){
         resultAction = deleteMass(cell);
         if(resultAction==coupling::ParticleInsertion<LinkedCell, dim>::Deletion){
           cell.addMicroscopicMass(_moleculeMass);
@@ -252,14 +263,19 @@ class coupling::PushParticleInsertion: public coupling::ParticleInsertion<Linked
     const unsigned int moveGhostParticles(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell, const tarch::la::Vector<dim,double>& meanVelocity, const double &temperature){
       // calculate the push length
       const tarch::la::Vector<dim,double> toMove = cell.getMassFluxVector()*_densityFactor;
+      unsigned int insertedParticles = 0;
       // get the direction (dimension) for the mass insertion
-      unsigned int indexOfDirection = 0;
-      while(toMove[indexOfDirection]==0)
-        indexOfDirection++;
-      // push the particles into the domain
-      Pusher<LinkedCell,dim> pusher(_mdSolverInterface, _lowerLeftFront, _upperRightBack, toMove, indexOfDirection, meanVelocity, temperature);
-      cell.iterateCells(pusher);
-      return pusher.getInsertedParticles();
+      for(unsigned int d=0; d<dim; d++){
+        if(toMove[d]>0.0){
+          tarch::la::Vector<dim,double> moveNow(0);
+          moveNow[d]=toMove[d];
+          // push the particles into the domain
+          Pusher<LinkedCell,dim> pusher(_mdSolverInterface, _lowerLeftFront, _upperRightBack, moveNow, d, meanVelocity, temperature, _rank);
+          cell.iterateCells(pusher);
+          insertedParticles += pusher.getInsertedParticles();
+        }
+      }
+      return insertedParticles;
     }
 
     typename coupling::ParticleInsertion<LinkedCell,dim>::Action deleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell){
@@ -270,10 +286,12 @@ class coupling::PushParticleInsertion: public coupling::ParticleInsertion<Linked
         return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;
       }
       const tarch::la::Vector<dim,double> massFlux = cell.getMassFluxVector();
+      double min = 0.0;
       unsigned int indexOfDirection = 0;
-      while(massFlux[indexOfDirection]==0)
-        indexOfDirection++;
-      DeleteOutestParticle<LinkedCell,dim> deleteOutestParticle(_mdSolverInterface, _lowerLeftFront, _upperRightBack, indexOfDirection);
+      for(unsigned int d=0; d<dim; d++){
+        indexOfDirection = massFlux[d]<min? d: indexOfDirection;
+      }
+      DeleteOutestParticle<LinkedCell,dim> deleteOutestParticle(_mdSolverInterface, _lowerLeftFront, _upperRightBack, indexOfDirection, _rank);
       cell.iterateCells(deleteOutestParticle);
       return coupling::ParticleInsertion<LinkedCell,dim>::Deletion;
     }
@@ -286,6 +304,7 @@ class coupling::PushParticleInsertion: public coupling::ParticleInsertion<Linked
     const tarch::la::Vector<dim,double> _lowerLeftFront;
     const tarch::la::Vector<dim,double> _upperRightBack;
     const double _moleculeMass;
+    const int _rank;
     const double _densityFactor{1/2.5/2.5/0.768}; // density of the cells with the ghost molecules
 
 };
