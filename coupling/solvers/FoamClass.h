@@ -46,12 +46,6 @@ public:
   _rank(rank),
     _plotEveryTimestep(plotEveryTimestep){
     if(skipRank()){return;}
-    unsigned int innerMDBoundaryIndex=0;
-    while (_boundariesWithMD[innerMDBoundaryIndex] == 0){innerMDBoundaryIndex++;}
-    _numberBoundaryPoints = 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
-    _boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
-    _boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
-    _boundaryIndices = new Foam::vector* [_numberBoundaryPoints];
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
@@ -167,6 +161,12 @@ public:
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
   const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
     if(skipRank()){return;}
+    unsigned int innerMDBoundaryIndex=0;
+    while (_boundariesWithMD[innerMDBoundaryIndex] == 0){innerMDBoundaryIndex++;}
+    _numberBoundaryPoints = 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
+    _boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
+    _boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
+    _boundaryIndices = new Foam::vector* [_numberBoundaryPoints];
     for(unsigned int i=0; i < _numberBoundaryPoints; i++){
       unsigned int outer = _boundary2RecvBufferIndicesOuter[i];
       unsigned int inner = _boundary2RecvBufferIndicesInner[i];
