@@ -137,12 +137,13 @@ class coupling::IndexConversionMD2Macro {
 
 
 		//TODO: move both of these to regular IC?
+		//TODO: update documentation
 		/*
 		 * Same as getGlobalVectorCellIndex but sets all ghost layer indices to INT_MAX
 		 * E.g.: Ghost layer at x = 0. Then requesting vector index (x,y,z,..) will return (INT_MAX, y, z,...).
 		 */
-		tarch::la::Vector<dim,unsigned int> getGlobalVectorCellIndex_NoGL(unsigned int globalCellIndex) const;
-		tarch::la::Vector<dim,unsigned int> getLocalVectorCellIndex_NoGL(unsigned int localCellIndex) const;
+		tarch::la::Vector<dim,unsigned int> getGlobalVectorCellIndex(unsigned int globalCellIndex, bool noGL = true) const;
+		tarch::la::Vector<dim,unsigned int> getLocalVectorCellIndex(unsigned int localCellIndex, bool noGL = true) const;
 
 		/*
 		 * In a lot of cases, you want instances of this to be indentical to a coupling::IndexConversion.
