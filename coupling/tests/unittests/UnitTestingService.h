@@ -118,6 +118,7 @@ class testing::ut::UnitTestingService {
 //INCLUDE ALL INDIVIDUAL UNIT TESTS HERE
 #include"uts/tarch/la/VectorUT.cpph"
 #include"uts/coupling/datastructures/MacroscopicCellUT.cpph"
+#include"uts/coupling/datastructures/MacroscopicCellWithLinkedCellsUT.cpph"
 #include"uts/coupling/paralleltopology/XYZTopologyUT.cpph"
 #include"uts/coupling/cell-mappings/ComputeMassMappingUT.cpph"
 

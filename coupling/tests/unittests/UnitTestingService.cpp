@@ -82,8 +82,6 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
       	}
 
 	}
-
-	std::cout << "POST FOR LOOP" << std::endl;
 	
 
 	//Initialize instances of CS
@@ -101,6 +99,9 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 
 	_uts.push_back(new coupling::datastructures::MacroscopicCellUT<2>(this));
 	_uts.push_back(new coupling::datastructures::MacroscopicCellUT<3>(this));
+
+	_uts.push_back(new coupling::datastructures::MacroscopicCellWithLinkedCellsUT<MY_LINKEDCELL,2>(this));
+	_uts.push_back(new coupling::datastructures::MacroscopicCellWithLinkedCellsUT<MY_LINKEDCELL,3>(this));
 
 	_uts.push_back(new coupling::paralleltopology::XYZTopologyUT<2>(this));
 	_uts.push_back(new coupling::paralleltopology::XYZTopologyUT<3>(this));
