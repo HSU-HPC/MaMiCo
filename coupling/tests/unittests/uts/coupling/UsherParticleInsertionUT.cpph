@@ -1,0 +1,88 @@
+#pragma once
+
+#include "coupling/UsherParticleInsertion.h"
+#include "coupling/tests/unittests/UnitTestInterface.h"
+#include "coupling/tests/unittests/MockService.cpph"
+#include "coupling/tests/unittests/UnitTestingService.h"
+
+#include "tarch/configuration/ParseConfiguration.h"
+#include "coupling/configurations/MaMiCoConfiguration.h"
+#include "coupling/configurations/BoundaryForceConfiguration.h"
+
+
+//some hardcoded definitions
+inline const std::string BOUNDARY_FORCE_CONFIG = "boundary-force-controller.xml";
+inline const double USHER_UT_INSERTION_TEMPERATURE = -42.0; //this should not matter for our testing purposes
+template<unsigned int dim>
+inline const tarch::la::Vector<dim,double> USHER_UT_INSERTION_VELOCITY = tarch::la::Vector<dim,double>(0.0);
+
+namespace coupling {
+	template<class LinkedCell, unsigned int dim>
+	class UsherParticleInsertionUT;
+}
+
+
+//note: this has only been tested with LinkedCell=MY_LINKEDCELL and dim=3
+template<class LinkedCell,unsigned int dim>
+class coupling::UsherParticleInsertionUT : public testing::ut::UnitTestImpl<coupling::UsherParticleInsertion<LinkedCell,dim>> {
+	public:
+
+		//Used when testing Usher's most important function: insertDeleteMass
+		struct insertDeleteParametrisation {
+
+			//all of these cells are trying to be inserted
+			//TODO: get all linked cells from MD interface, then build macro cell with linkedcells
+			//std::vector<coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& > cells;
+
+			//all of the following are constant per testing instance
+			//TODO: get these somehow from an md config
+			/*const tarch::la::Vector<dim,double>& macroscopicCellPosition;
+			const tarch::la::Vector<dim,double>& macroscopicCellSize;*/
+			const tarch::la::Vector<dim,double>& meanVelocity;
+			const double& temperature;
+			const coupling::BoundaryForceController<LinkedCell,dim>* boundaryForceController;
+		};
+		
+		UsherParticleInsertionUT(testing::ut::UnitTestingService *uts):
+		testing::ut::UnitTestImpl<coupling::UsherParticleInsertion<LinkedCell,dim>>(uts->getRank(), uts->getCommSize())
+		{
+			//Get mamico config that is later used to construct boundary force controllers
+			coupling::configurations::MaMiCoConfiguration<dim> mamicoConfig;
+			tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<dim> >(BOUNDARY_FORCE_CONFIG,"mamico",mamicoConfig);
+    		if (!mamicoConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid Mamico config (for BoundaryForceController in Usher UT) in: " << BOUNDARY_FORCE_CONFIG << std::endl; exit(EXIT_FAILURE);}
+
+			//Generate vector containing mocks of coupling::UsherParticleInsertion<LinkedCell,dim>
+			std::vector<coupling::UsherParticleInsertion<LinkedCell,dim> *> this_mocks;
+			for(auto simpleMDInstance : uts->getMDInterfaces()) {
+				
+				//Generate insertDeleteParametrisation struct
+				_insertDeleteParametrisations.push_back({
+					USHER_UT_INSERTION_VELOCITY<dim>,
+					USHER_UT_INSERTION_TEMPERATURE,
+					mamicoConfig.getBoundaryForceConfiguration().interpreteConfiguration(simpleMDInstance)
+				});
+
+
+				//TODO: proper mocks for the first nine parameters
+				this_mocks.push_back(new coupling::UsherParticleInsertion<LinkedCell,dim>(0,0,0,0,0,0,0,0,0,simpleMDInstance));
+			}
+
+			//Create new MockService for coupling::UsherParticleInsertion<LinkedCell,dim> using mocks generated above:
+			this->_mockService = uts->addMockService<coupling::UsherParticleInsertion<LinkedCell,dim>>(this_mocks);
+			
+			//Add test functions
+			this->_testFuncs.push_back(std::make_tuple(new 
+				std::function<void (coupling::UsherParticleInsertion<LinkedCell,dim>&)>
+				{ [this] (coupling::UsherParticleInsertion<LinkedCell,dim>& mock) { testInsertDeleteMass(mock); } }, "insertDeleteMass"
+			));
+		}
+
+		void testInsertDeleteMass(coupling::UsherParticleInsertion<LinkedCell,dim>& mock) {
+			//TODO
+		}
+
+	private:
+		//The nth entry in this vector corresponds to the nth MD Interface returned by uts->getMDInterfaces
+		std::vector<struct insertDeleteParametrisation> _insertDeleteParametrisations;
+};
+

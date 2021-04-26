@@ -107,6 +107,8 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 	_uts.push_back(new coupling::paralleltopology::XYZTopologyUT<3>(this));
 
 	_uts.push_back(new coupling::cellmappings::ComputeMassMappingUT<MY_LINKEDCELL,3>(this));
+
+	_uts.push_back(new coupling::UsherParticleInsertionUT<MY_LINKEDCELL,3>(this));
 	//...
 	//
 	#ifdef DEBUG_UTS
