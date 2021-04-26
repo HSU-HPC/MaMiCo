@@ -48,6 +48,11 @@ class testing::ut::UnitTestImpl : public testing::ut::UnitTestInterface {
 
 		//Executes all unit test functions of this UT
 		virtual void runAllTests() {
+
+			#ifdef DEBUG_UT
+			std::cout << this->PRINT_PREFIX() << ": Now running all test functions..." << std::endl;
+			#endif
+
 			for(unsigned int tf_i = 0; tf_i < _testFuncs.size(); tf_i++) 
 				try {
 					runTest(tf_i);
@@ -55,6 +60,10 @@ class testing::ut::UnitTestImpl : public testing::ut::UnitTestInterface {
 				catch (...) {
 					std::rethrow_exception(std::current_exception());
 				}
+
+			#ifdef DEBUG_UT
+			std::cout << this->PRINT_PREFIX() << ": ...done running all test functions!" << std::endl;
+			#endif
 		}
 
 		//Executes a single test.
