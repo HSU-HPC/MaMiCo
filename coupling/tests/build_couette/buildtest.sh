@@ -12,6 +12,15 @@ FOAM_PATH=/opt/openfoam7/
 
 ### home directory of MAMICO
 MAMICO_PATH=/home/helene/Dokumente/mamico-dev
+### local settings like path variables
+SETTINGS=../../../personal_settings
+
+if test -f "$SETTINGS"; then
+	source ${SETTINGS}
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
 SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
@@ -30,7 +39,7 @@ if [ "${parallel}" == "parallel" ] || [ "${parallel}" == "sequential" ]
 then
     echo "Build mode: ${parallel}"
 else
-    echo "ERROR! ./test parallel/sequential"
+    echo "ERROR! ./buildtest parallel/sequential"
     exit -1
 fi
 
@@ -66,7 +75,7 @@ fi
 if [ -v FOAM_PATH ]
 then
   echo "MaMiCo is compiled including OpenFOAM library"
-  FLAGS="${FLAGS}  -m64 -Dlinux64 -DWM_ARCH_OPTION=64 -DWM_DP -DWM_LABEL_SIZE=32 -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -DNoRepository -ftemplate-depth-100 -g -pg"
+  FLAGS="${FLAGS} -DBUILD_WITH_OPENFOAM -m64 -Dlinux64 -DWM_ARCH_OPTION=64 -DWM_DP -DWM_LABEL_SIZE=32 -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -DNoRepository -ftemplate-depth-100 -g -pg"
   includes="${includes} -I${FOAM_PATH}src/finiteVolume/lnInclude -I${FOAM_PATH}src/meshTools/lnInclude -IlnInclude -I. -I${FOAM_PATH}src/OpenFOAM/lnInclude -I${FOAM_PATH}src/OSspecific/POSIX/lnInclude"
   libraries="${libraries} -fPIC -fuse-ld=bfd -Xlinker --add-needed -Xlinker --no-as-needed -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib/dummy -lfiniteVolume -lmeshTools -lOpenFOAM -ltriSurface -lPstream -lsurfMesh -lfileFormats -ldl -lm"
 else

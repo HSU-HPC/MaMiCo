@@ -1,12 +1,14 @@
 #!/bin/bash
 
-### path variables; adapt these to your installation
-MARDYN_PATH=/home/neumanph/workspace/mardyn_mamico/src;
-MARDYN_PATH_EXTERNAL=${MARDYN_PATH}/External;
-MPI_PATH_INCLUDE=/usr/lib/openmpi/include;
-MPI_PATH_LIB=/usr/lib/openmpi/lib;
-MPI_LIB=mpi;
-MAMICO_PATH=/home/neumanph/workspace/mamico/mamico_cpc_v1.1;
+### local settings like path variables
+SETTINGS=../../../personal_settings
+
+if test -f "$SETTINGS"; then
+	source ../../../personal_settings
+else
+	echo "ERROR! No personal settings file found at $SETTINGS ."
+	exit -1
+fi
 
 
 # further variables; leave those unchanged (except for the compiler)

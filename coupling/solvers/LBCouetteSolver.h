@@ -5,22 +5,10 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
 #define _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
 
-#include "coupling/CouplingMDDefinitions.h"
-#include "tarch/la/Vector.h"
-#include <cmath>
-#include <sstream>
-#include <fstream>
-#include <iomanip>
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
-#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-#include <mpi.h>
-#endif
-//#include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/NumericalSolver.h"
-#include "coupling/datastructures/MacroscopicCell.h"
-#include "coupling/IndexConversion.h"
 
 namespace coupling {
   namespace solvers{
@@ -120,7 +108,9 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
         globalCellCoords[0] = (globalCellCoords[0]+_offset[0]) - _coords[0]*_avgDomainSizeX;
         globalCellCoords[1] = (globalCellCoords[1]+_offset[1]) - _coords[1]*_avgDomainSizeY;
         globalCellCoords[2] = (globalCellCoords[2]+_offset[2]) - _coords[2]*_avgDomainSizeZ;
-std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": " << globalCellCoords << std::endl;
+        #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
+        std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": " << globalCellCoords << std::endl;
+        #endif
         const int index = get(globalCellCoords[0],globalCellCoords[1],globalCellCoords[2]);
         #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
         if (_flag[index]!=MD_BOUNDARY){std::cout << "ERROR LBCouetteSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl; exit(EXIT_FAILURE);}
