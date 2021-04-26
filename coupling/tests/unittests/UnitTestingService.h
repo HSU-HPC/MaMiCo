@@ -58,8 +58,9 @@ class testing::ut::UnitTestingService {
 
 		~UnitTestingService() {
 			for (auto ut : _uts) delete ut;
-
-			for (auto ms_tuple : _mockServices)delete ms_tuple.second;
+			for (auto ms_tuple : _mockServices) delete ms_tuple.second;
+			for (auto ic : _indexConversions) delete ic;
+			//TODO: do i have to delete all MDs and their interfaces?
 
 			#ifdef DEBUG_UTS
 				std::cout << "\x1B[1mUnitTestingService:\x1B[0m Deconstructed." << std::endl;
@@ -80,6 +81,7 @@ class testing::ut::UnitTestingService {
 		//Special case: SimpleMD "mocks"
 		std::vector<coupling::interface::MDSimulation*> getSimpleMDs() { return _simpleMDs; }
 		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> *> getMDInterfaces() { return _mdSolverInterfaces; }
+		std::vector<coupling::IndexConversion<3> *> getIndexConversions() { return _indexConversions; }
 
 		/*
 		 * Takes a set of mock values and creates a corresponding MockService.
@@ -107,9 +109,10 @@ class testing::ut::UnitTestingService {
 		//map of "Type"->MockService<Type>
 		std::map<std::string, testing::ut::MockService *> _mockServices;
 
-		//dummy instances of simpleMD
+		//dummy instances of simpleMD. the following two map 1:1:1, i.e the nth index conversion belongs to the nth MD
   		std::vector<coupling::interface::MDSimulation*> _simpleMDs;
   		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> *> _mdSolverInterfaces;
+  		std::vector<coupling::IndexConversion<3> *> _indexConversions;
 
 		//dummy instances of CS	
 		//TODO

@@ -81,6 +81,21 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
         	exit(EXIT_FAILURE);
       	}
 
+		//Init new IndexConversion. This part is largely inspired by MacroscopicCellService::initIndexConversion
+		auto globalMDDomainSize = newMDInterface->getGlobalMDDomainSize(); 
+		auto globalMDDomainOffset = newMDInterface->getGlobalMDDomainOffset();
+		auto macroscopicCellSize = mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize();
+		auto parallelTopologyType = mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(); 
+
+		tarch::la::Vector<3,unsigned int> globalNumberMacroscopicCells(0);
+  		for (unsigned int d = 0; d < 3; d++) {
+    		globalNumberMacroscopicCells[d] = (unsigned int) floor( globalMDDomainSize[d]/macroscopicCellSize[d] + 0.5 );
+    		if ( fabs(globalNumberMacroscopicCells[d]*macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13 ){
+      			std::cout << "WARNING UnitTesting: Deviation of domain size MD vs macro cells > 1e-13!" << std::endl;
+    		}
+  		}
+
+  		_indexConversions.push_back(new coupling::IndexConversion<3>(globalNumberMacroscopicCells,1,1,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType));
 	}
 	
 
@@ -108,7 +123,7 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 
 	_uts.push_back(new coupling::cellmappings::ComputeMassMappingUT<MY_LINKEDCELL,3>(this));
 
-	_uts.push_back(new coupling::UsherParticleInsertionUT<MY_LINKEDCELL,3>(this));
+	//_uts.push_back(new coupling::UsherParticleInsertionUT<MY_LINKEDCELL,3>(this));
 	//...
 	//
 	#ifdef DEBUG_UTS
