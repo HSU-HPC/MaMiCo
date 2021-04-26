@@ -35,7 +35,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 		outOfBounds = false;
 				
 		//removal of ghost layer
-		convertedIndex = getLocalVectorCellIndex_NoGL(linearIndex);
+		convertedIndex = getLocalVectorCellIndex(linearIndex, false);
 
 		//removal of cells lying in outer layer not meant for transfer to macro solver
 		//Assuming: dim > 0, INT_MAX at any position in index vector implies MSI function returns false
@@ -58,7 +58,8 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 
 		if(outOfBounds) {
 			outerCells.push_back(inputCells[linearIndex]);
-			outerIndices.push_back(convertedIndex);
+			outerIndices.push_back(_ic->getLocalVectorCellIndex(linearIndex));
+			std::cout << "ADDED OUTER CELL TO OUTER DOMAIN" << std::endl;
 		}
 		else {
 			if(_localLowerBoundaries == nullptr) _localLowerBoundaries = new tarch::la::Vector<dim, unsigned int>(convertedIndex);
@@ -108,14 +109,14 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 }
 
 template<unsigned int dim>
-tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getGlobalVectorCellIndex_NoGL(unsigned int globalCellIndex) const {
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getGlobalVectorCellIndex(unsigned int globalCellIndex, bool noGL) const {
 	tarch::la::Vector<dim, unsigned int> globalVectorCellIndex = _ic->getGlobalVectorCellIndex(globalCellIndex);
 	//if(_rank == 0){
 	//	std::cout << "Global: " << globalCellIndex << " GlobalVector: " << globalVectorCellIndex;
 	//}
 	for(unsigned int d = 0; d < dim; d++) {
 		if(globalVectorCellIndex[d] < 1 || globalVectorCellIndex[d] > _ic->getGlobalNumberMacroscopicCells()[d]-3) globalVectorCellIndex[d] = INT_MAX;
-		else globalVectorCellIndex[d] -= 1;
+		else if(noGL) globalVectorCellIndex[d] -= 1;
 	}
 	//if(_rank == 0){
 	//	std::cout <<  " Converted: " << globalVectorCellIndex << std::endl;
@@ -124,11 +125,11 @@ tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getG
 }
 
 template<unsigned int dim>
-tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getLocalVectorCellIndex_NoGL(unsigned int localCellIndex) const {
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getLocalVectorCellIndex(unsigned int localCellIndex, bool noGL) const {
 	tarch::la::Vector<dim, unsigned int> localVectorCellIndex = _ic->getLocalVectorCellIndex(localCellIndex);
 	for(unsigned int d = 0; d < dim; d++) {
 		if(localVectorCellIndex[d] < 1 || localVectorCellIndex[d] > _ic->getLocalNumberMacroscopicCells()[d]) localVectorCellIndex[d] = INT_MAX;
-		else localVectorCellIndex[d] -= 1;
+		else if(noGL) localVectorCellIndex[d] -= 1;
 	}
 	return localVectorCellIndex;
 }
