@@ -1,17 +1,5 @@
 #!/bin/bash
 
-### include and library paths for MPI and name of MPI library
-MPI_INCLUDE_PATH=/usr/lib/x86_64-linux-gnu/openmpi/include
-MPI_LIB_PATH=/usr/lib/x86_64-linux-gnu/openmpi/lib
-LIB_MPI=mpi
-
-LIB_EIGEN_PATH=/usr/include/eigen3/
-
-### Include OpenFOAMpath
-FOAM_PATH=/opt/openfoam7/
-
-### home directory of MAMICO
-MAMICO_PATH=/home/helene/Dokumente/mamico-dev
 ### local settings like path variables
 SETTINGS=../../../personal_settings
 
