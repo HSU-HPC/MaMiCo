@@ -31,11 +31,11 @@ class coupling::UsherParticleInsertionUT : public testing::ut::UnitTestImpl<coup
 		struct insertDeleteParametrisation {
 
 			//all of these cells are trying to be inserted
-			//TODO: get all linked cells from MD interface, then build macro cell with linkedcells
+			//TODO: get all linked cells from MD interface using indexconversion and mamico config, then build macro cell with linkedcells
 			//std::vector<coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& > cells;
 
 			//all of the following are constant per testing instance
-			//TODO: get these somehow from an md config
+			//TODO: get these somehow from mamico config
 			/*const tarch::la::Vector<dim,double>& macroscopicCellPosition;
 			const tarch::la::Vector<dim,double>& macroscopicCellSize;*/
 			const tarch::la::Vector<dim,double>& meanVelocity;
