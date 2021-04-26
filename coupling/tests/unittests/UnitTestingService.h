@@ -121,6 +121,7 @@ class testing::ut::UnitTestingService {
 #include"uts/coupling/datastructures/MacroscopicCellWithLinkedCellsUT.cpph"
 #include"uts/coupling/paralleltopology/XYZTopologyUT.cpph"
 #include"uts/coupling/cell-mappings/ComputeMassMappingUT.cpph"
+#include"uts/coupling/UsherParticleInsertionUT.cpph"
 
 //Include implementation
 #include"UnitTestingService.cpp"
