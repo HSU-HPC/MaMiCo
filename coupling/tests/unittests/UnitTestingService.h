@@ -82,6 +82,7 @@ class testing::ut::UnitTestingService {
 		std::vector<coupling::interface::MDSimulation*> getSimpleMDs() { return _simpleMDs; }
 		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> *> getMDInterfaces() { return _mdSolverInterfaces; }
 		std::vector<coupling::IndexConversion<3> *> getIndexConversions() { return _indexConversions; }
+		std::vector<coupling::configurations::MaMiCoConfiguration<3> *> getMamicoConfigs() { return _mamicoConfigs; }
 
 		/*
 		 * Takes a set of mock values and creates a corresponding MockService.
@@ -113,6 +114,7 @@ class testing::ut::UnitTestingService {
   		std::vector<coupling::interface::MDSimulation*> _simpleMDs;
   		std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3> *> _mdSolverInterfaces;
   		std::vector<coupling::IndexConversion<3> *> _indexConversions;
+  		std::vector<coupling::configurations::MaMiCoConfiguration<3> *> _mamicoConfigs;
 
 		//dummy instances of CS	
 		//TODO

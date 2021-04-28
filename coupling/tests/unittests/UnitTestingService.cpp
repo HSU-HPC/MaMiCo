@@ -47,23 +47,33 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 
 	
 		
-	//Initialize Instances of (Simple)MD
+	//Initialize Instances of (Simple)MD (& MD interface & IndexConversion & Mamico-Config)
 	simplemd::configurations::MolecularDynamicsConfiguration simpleMDConfig;
-  	coupling::configurations::MaMiCoConfiguration<3> mamicoConfig; //TODO: other dims
-
-
 	//Add all .xmls to this initializer list
 	for(auto xml : { "test.xml" }) {
-		
-		tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("test.xml","molecular-dynamics",simpleMDConfig);
-    	if (!simpleMDConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid SimpleMD config in: " << xml << std::endl; exit(EXIT_FAILURE);}
 
-		tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("test.xml","mamico",mamicoConfig);
-    	if (!mamicoConfig.isValid()){std::cout << "ERROR UnitTesting: Invalid Mamico config (for SimpleMD) in: " << xml << std::endl; exit(EXIT_FAILURE);}
+		//Init SimpleMD config. We won't use this later, so we don't allocate it on heap.
+		tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("test.xml","molecular-dynamics",simpleMDConfig);
+    	if (!simpleMDConfig.isValid()) {
+			std::cout << "ERROR UnitTesting: Invalid SimpleMD config in: " << xml << std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+		//Init new MamicoConfiguration 
+		auto newMamicoConfig = new coupling::configurations::MaMiCoConfiguration<3>(); //TODO: other dims
+		tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >("test.xml","mamico",*newMamicoConfig);
+    	if (!newMamicoConfig->isValid()) {
+			std::cout << "ERROR UnitTesting: Invalid Mamico config (for SimpleMD) in: " << xml << std::endl; 
+			delete newMamicoConfig;
+			exit(EXIT_FAILURE);
+		}
+
+		_mamicoConfigs.push_back(newMamicoConfig);
+
 
 		//Init new SimpleMD
 		auto newSimpleMDInstance = coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
-        	simpleMDConfig,mamicoConfig, MPI_COMM_WORLD
+        	simpleMDConfig,*newMamicoConfig, MPI_COMM_WORLD
       	);
 		newSimpleMDInstance->init();
 
@@ -71,7 +81,7 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 		_simpleMDs.push_back(newSimpleMDInstance);
 
 		auto newMDInterface = coupling::interface::SimulationAndInterfaceFactory::getInstance().
-        getMDSolverInterface(simpleMDConfig, mamicoConfig, newSimpleMDInstance);
+        getMDSolverInterface(simpleMDConfig, *newMamicoConfig, newSimpleMDInstance);
 
 		_mdSolverInterfaces.push_back(newMDInterface);
 
@@ -84,8 +94,8 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 		//Init new IndexConversion. This part is largely inspired by MacroscopicCellService::initIndexConversion
 		auto globalMDDomainSize = newMDInterface->getGlobalMDDomainSize(); 
 		auto globalMDDomainOffset = newMDInterface->getGlobalMDDomainOffset();
-		auto macroscopicCellSize = mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize();
-		auto parallelTopologyType = mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(); 
+		auto macroscopicCellSize = newMamicoConfig->getMacroscopicCellConfiguration().getMacroscopicCellSize();
+		auto parallelTopologyType = newMamicoConfig->getParallelTopologyConfiguration().getParallelTopologyType(); 
 
 		tarch::la::Vector<3,unsigned int> globalNumberMacroscopicCells(0);
   		for (unsigned int d = 0; d < 3; d++) {
