@@ -469,13 +469,14 @@ private:
           int elements = 0;
           const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
           const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+          const double cellSize(indexConversion.getMacroscopicCellSize()[2]);
           const unsigned int numCellsRecv = _buf.recvBuffer.size();
           for (unsigned int i = 0; i < numCellsRecv; i++){
             const tarch::la::Vector<3,unsigned int> counter(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
             if((counter[0]>3) & (counter[1]>3) & (counter[2]>3) & (counter[0]<10) & (counter[1]<10) & (counter[2]<10) ){
               const double velSim =_buf.recvBuffer[i]->getMacroscopicMass()!=0.0? _buf.recvBuffer[i]->getMacroscopicMomentum()[0]/_buf.recvBuffer[i]->getMacroscopicMass() : 0.0;
               double velAna = 0.0;
-              const double pos = domainOffset[2]+(counter[2]-1)*2.5+1.25;
+              const double pos = domainOffset[2]+(counter[2]-1)*cellSize+0.5*cellSize;
               for (int k = 1; k < 30; k++){
                 velAna += 1.0/k * sin(k*pi*pos/_cfg.channelheight) * exp(-k*k * pi*pi/(_cfg.channelheight*_cfg.channelheight) * _cfg.kinVisc * cycle *_simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
               }
