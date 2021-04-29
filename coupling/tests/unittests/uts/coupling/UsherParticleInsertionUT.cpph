@@ -76,9 +76,15 @@ class coupling::UsherParticleInsertionUT : public testing::ut::UnitTestImpl<coup
 				//We need to convert this to linear to iterate over all cells, independant of dim
 				//Since each of the MD instances runs sequentially, local == global.
 				unsigned int linearGlobalNumberMacroscopicCells = indexConversion->getGlobalCellIndex(indexConversion->getGlobalNumberMacroscopicCells());
-				for(unsigned int cell_index = 100; cell_index < linearGlobalNumberMacroscopicCells; cell_index++) {
+				for(unsigned int cell_index = 0; cell_index < linearGlobalNumberMacroscopicCells; cell_index++) {
 					//...and now we convert the index back to a vector.
 					auto vectorCell_index = indexConversion->getGlobalVectorCellIndex(cell_index);
+
+					//exclude cells in ghost layer
+					bool gl = false;
+					for(unsigned int d = 0; d<dim; d++) if(vectorCell_index[d] == 0) gl = true;
+					if(gl) { /*std::cout <<  "SKIP" << std::endl;*/ continue; }
+
 
 					//Fill list of LinkedCells
 					linkedCellsFromMD.push_back(mdInterface->getLinkedCell(
@@ -87,16 +93,26 @@ class coupling::UsherParticleInsertionUT : public testing::ut::UnitTestImpl<coup
 						linkedCellsPerMacroscopicCell,																//linkedCellsPerMacroscopicCell
 						*indexConversion																			//indexConversion
 					));
+					//std::cout << "ADDED CELL" << std::endl;
 				}
+
+				std::cout << "0" << std::endl;
 
 				//Construct MacroscopicCellWithLinkedCells for each of these LinkedCells
 				std::vector<coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>> macroCellsWithLinkedCells = {};
+				std::cout << "LINKED CELLS VECTOR SIZE: " << linkedCellsFromMD.size() << std::endl;
 				for(auto linkedCell : linkedCellsFromMD) {
 					//Construct new MacroscopicCellWithLinkedCells
+					std::cout << "0.0" << std::endl;	
 					auto newMacroCell = coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>(linkedCellsPerMacroscopicCell/*blockSize*/);
+					std::cout << "0.1" << std::endl;	
 					newMacroCell.addLinkedCell(linkedCell, USHER_UT_LINKEDCELL_INDEX_TO_MACROCELLS);
+					std::cout << "0.2" << std::endl;	
 					macroCellsWithLinkedCells.push_back(newMacroCell);
+					std::cout << "0.3" << std::endl;	
 				}
+
+				std::cout << "1" << std::endl;
 				
 				//Generate insertDeleteParametrisation struct
 				_insertDeleteParametrisations.push_back({
@@ -108,10 +124,13 @@ class coupling::UsherParticleInsertionUT : public testing::ut::UnitTestImpl<coup
 					*(mamicoConfig->getBoundaryForceConfiguration().interpreteConfiguration(mdInterface))
 				});
 
+				std::cout << "2" << std::endl;
+
 
 				//TODO: fix: ParticleInsertion <=> UsherParticleInsertion clash
 				//this_mocks.push_back(mamicoConfig->getParticleInsertionConfiguration().interpreteConfiguration(mdInterface));
  				this_mocks.push_back(new coupling::UsherParticleInsertion<LinkedCell,dim>(0,0,0,0,0,0,0,0,0,mdInterface));
+				std::cout << "3" << std::endl;
 
 			}
 
