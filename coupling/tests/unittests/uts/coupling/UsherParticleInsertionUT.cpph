@@ -98,7 +98,6 @@ class coupling::UsherParticleInsertionUT : public testing::ut::UnitTestImpl<coup
 
 				//Construct MacroscopicCellWithLinkedCells for each of these LinkedCells
 				std::vector<coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> *> macroCellsWithLinkedCells = {};
-				//TODO: remove: std::cout << "LINKED CELLS VECTOR SIZE: " << linkedCellsFromMD.size() << std::endl;
 				for(LinkedCell* linkedCell : linkedCellsFromMD) {
 					//Construct new MacroscopicCellWithLinkedCells
 					auto newMacroCell = new coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>(blockSize);
@@ -109,16 +108,18 @@ class coupling::UsherParticleInsertionUT : public testing::ut::UnitTestImpl<coup
 				//Generate insertDeleteParametrisation struct
 				_insertDeleteParametrisations.push_back({
 					macroCellsWithLinkedCells,
-					tarch::la::Vector<dim,double>(0), //TODO: fill macroscopicCellPosition with some actual values from config 
+					tarch::la::Vector<dim,double>(0), //Currently, we always insert at the exact same location. Future TODO
 					macroscopicCellSize,
 					USHER_UT_INSERTION_VELOCITY<dim>,
 					USHER_UT_INSERTION_TEMPERATURE,
 					*(mamicoConfig->getBoundaryForceConfiguration().interpreteConfiguration(mdInterface))
 				});
 
-				//TODO: fix: ParticleInsertion <=> UsherParticleInsertion clash
-				//this_mocks.push_back(mamicoConfig->getParticleInsertionConfiguration().interpreteConfiguration(mdInterface));
- 				this_mocks.push_back(new coupling::UsherParticleInsertion<LinkedCell,dim>(0,0,0,0,0,0,0,0,0,mdInterface));
+				auto newParticleInsertion = mamicoConfig->getParticleInsertionConfiguration().interpreteConfiguration(mdInterface);
+				//Check if this new ParticleInsertion is in fact USHER
+				if (dynamic_cast<coupling::UsherParticleInsertion<LinkedCell,dim> *>(newParticleInsertion) != nullptr)
+					this_mocks.push_back(static_cast<coupling::UsherParticleInsertion<LinkedCell,dim> *>(newParticleInsertion));
+				else throw std::runtime_error("ERROR: Trying to add non-USHER Particle Insertion to mock list for USHER Unit Test!");
 			}
 
 			//Create new MockService for coupling::UsherParticleInsertion<LinkedCell,dim> using mocks generated above:
@@ -151,6 +152,7 @@ class coupling::UsherParticleInsertionUT : public testing::ut::UnitTestImpl<coup
 							parametrisation.temperature,
 							parametrisation.boundaryForceController
 						);
+						//TODO: some fancy debug output
 					}
 					catch (std::runtime_error& e) {
 						throw std::runtime_error(std::string("insertDeleteMass threw exception: ").append(e.what()));
