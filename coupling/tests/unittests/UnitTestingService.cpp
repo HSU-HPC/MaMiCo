@@ -46,8 +46,21 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 	addMockService<std::string>(stdstringMocks);
 
 	
-		
-	//Initialize Instances of (Simple)MD (& MD interface & IndexConversion & Mamico-Config)
+	/*
+	 * Create MPI Communicator with just this rank. 
+	 * This way, we can run MD "sequentially", even though MPI_COMM_WORLD has more than one rank.
+	 */
+	MPI_Comm MPI_COMM_THIS_RANK_ONLY;
+	MPI_Comm_split(/*global*/comm, _rank, _rank, &MPI_COMM_THIS_RANK_ONLY);
+
+	/**
+	 * Initialize mock instances of
+	 * - (Simple)MD 
+	 * - MD interface 
+	 * - IndexConversion
+	 * - Mamico-Config
+	 * based on .xmls in initializer list below.
+	 */
 	simplemd::configurations::MolecularDynamicsConfiguration simpleMDConfig;
 	//Add all .xmls to this initializer list
 	for(auto xml : { "test.xml" }) {
@@ -73,7 +86,7 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 
 		//Init new SimpleMD
 		auto newSimpleMDInstance = coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
-        	simpleMDConfig,*newMamicoConfig, MPI_COMM_WORLD
+        	simpleMDConfig,*newMamicoConfig, MPI_COMM_THIS_RANK_ONLY
       	);
 		newSimpleMDInstance->init();
 
@@ -86,7 +99,6 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 		_mdSolverInterfaces.push_back(newMDInterface);
 
       	if (_simpleMDs.back() == nullptr or _mdSolverInterfaces.back() == nullptr){
-			//TODO: More verbose error message
         	std::cout << "ERROR UnitTesting: SimpleMD or MDSolverInterface factory returned nullptr." << std::endl;
         	exit(EXIT_FAILURE);
       	}
