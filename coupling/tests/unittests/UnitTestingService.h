@@ -27,6 +27,14 @@
 
 
 /*
+ * If this is defined, mock MD instances including several dependant mock types will be initialized. 
+ * Currently, this disables the option to run the UT system on more than one rank TODO
+ */
+#define UT_ENABLE_MD_MOCKS
+
+
+
+/*
  *
  * Service class managing Unit Test objects and their corresponding MockServices.
  * This is the top-level user interface: To run tests, call runUnitTest(...).
@@ -60,7 +68,9 @@ class testing::ut::UnitTestingService {
 			for (auto ut : _uts) delete ut;
 			for (auto ms_tuple : _mockServices) delete ms_tuple.second;
 			for (auto ic : _indexConversions) delete ic;
-			//TODO: do i have to delete all MDs and their interfaces?
+			for (auto md : _simpleMDs) delete md;
+			for (auto md : _mdSolverInterfaces) delete md;
+			for (auto cfg : _mamicoConfigs) delete cfg;
 
 			#ifdef DEBUG_UTS
 				std::cout << "\x1B[1mUnitTestingService:\x1B[0m Deconstructed." << std::endl;

@@ -46,6 +46,8 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 	addMockService<std::string>(stdstringMocks);
 
 	
+	#ifdef UT_ENABLE_MD_MOCKS
+
 	/*
 	 * Create MPI Communicator with just this rank. 
 	 * This way, we can run MD "sequentially", even though MPI_COMM_WORLD has more than one rank.
@@ -119,6 +121,8 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 
   		_indexConversions.push_back(new coupling::IndexConversion<3>(globalNumberMacroscopicCells,1,1,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType));
 	}
+
+	#endif
 	
 
 	//Initialize instances of CS
@@ -137,6 +141,8 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 	_uts.push_back(new coupling::datastructures::MacroscopicCellUT<2>(this));
 	_uts.push_back(new coupling::datastructures::MacroscopicCellUT<3>(this));
 
+	//Initialize UT instances of MaMiCo classes that require any of the MD-related classes
+	#ifdef UT_ENABLE_MD_MOCKS
 	_uts.push_back(new coupling::datastructures::MacroscopicCellWithLinkedCellsUT<MY_LINKEDCELL,2>(this));
 	_uts.push_back(new coupling::datastructures::MacroscopicCellWithLinkedCellsUT<MY_LINKEDCELL,3>(this));
 
@@ -147,6 +153,7 @@ testing::ut::UnitTestingService::UnitTestingService(MPI_Comm comm): _comm(comm) 
 
 	//Note: Creating Usher UTs with other template parameters is currently not supported.
 	_uts.push_back(new coupling::UsherParticleInsertionUT<MY_LINKEDCELL,3>(this));
+	#endif
 
 	//...
 	//
