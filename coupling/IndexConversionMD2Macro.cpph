@@ -59,7 +59,6 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 		if(outOfBounds) {
 			outerCells.push_back(inputCells[linearIndex]);
 			outerIndices.push_back(_ic->getLocalVectorCellIndex(linearIndex));
-			std::cout << "ADDED OUTER CELL TO OUTER DOMAIN" << std::endl;
 		}
 		else {
 			if(_localLowerBoundaries == nullptr) _localLowerBoundaries = new tarch::la::Vector<dim, unsigned int>(convertedIndex);

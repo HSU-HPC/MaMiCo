@@ -41,7 +41,7 @@ void coupling::ReadFromFile<dim>::operator()(){
 
 		//TODO: check if number of doubles match dim*_vectorSetters.size() + _scalarSetters.size()
 		
-		//iteration, local indices, global indices
+		//iteration, both types of indices
 		const unsigned int const_offset = 1 + dim + dim;
 
 		//increases for each double read from line
