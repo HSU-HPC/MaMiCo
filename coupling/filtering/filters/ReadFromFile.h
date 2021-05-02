@@ -24,8 +24,8 @@ namespace coupling {
  * Input format must be compliant to the usual MaMiCo CSV format (using ';' as separator).
  * The following order is assumed:
  * - current iteration
- * - local indexing
- * - global indexing
+ * - md-to-macro indexing
+ * - mamico indexing
  * - scalars
  * - vectors
  *

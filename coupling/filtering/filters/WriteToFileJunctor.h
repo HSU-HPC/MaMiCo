@@ -28,7 +28,8 @@ class coupling::WriteToFileJunctor : public coupling::JunctorInterface<dim,2,2> 
 		WriteToFileJunctor(//first cell data set
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector1,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector2,
-			const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices1,
+			const std::vector<tarch::la::Vector<dim, unsigned int>> mamicoCellIndices1,
+			const std::vector<tarch::la::Vector<dim, unsigned int>> sequenceCellIndices1,
 			//second cell data set
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector1,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector2,
@@ -44,23 +45,23 @@ class coupling::WriteToFileJunctor : public coupling::JunctorInterface<dim,2,2> 
 			coupling::JunctorInterface<dim,2,2>( 
 				{ inputCellVector1, inputCellVector2 },
 		   		{ outputCellVector1, outputCellVector2 }, 
-				cellIndices1,//TODO We dont really ever need either of the two cellIndices later. This is rather unclean, but JunctorInterface asks for a set of indices.
+				{},//We dont really ever need either of the two cellIndices later. This is rather unclean, but JunctorInterface asks for a set of indices.
 				filteredValues,
 		   		"WTF-J")
 		{
 			_writeToFile1 = new coupling::WriteToFile<dim>(	inputCellVector1,
 															outputCellVector1,
-															cellIndices1,
+															mamicoCellIndices1,
+															sequenceCellIndices1,
 															filteredValues,
-															cellIndices1, //TODO: proper local indexing
 															location[0],
 															overwrite[0],
 															oneCellOnly[0]);
 			_writeToFile2 = new coupling::WriteToFile<dim>(	inputCellVector2,
 															outputCellVector2,
 															cellIndices2,
+															{},
 															filteredValues,
-															cellIndices2, //TODO: proper local indexing
 															location[1],
 															overwrite[1],
 															oneCellOnly[1]);

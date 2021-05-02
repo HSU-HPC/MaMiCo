@@ -48,7 +48,7 @@ class coupling::FilterSequence {
 		/*
 		 * Filter Sequences are constructed in coupling::FilterPipeline::loadSequencesFromXML(...).
 		 * inputCellVector and cellIndices cover the entire md2Macro domain.
-		 * domainStart and domainEnd span a subspace of the global (md2Macro) domain.
+		 * domainStart and domainEnd span a subspace of the md-to-macro) domain.
 		 */
     	FilterSequence( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
 						const tarch::utils::MultiMDService<dim>& multiMDService,
@@ -107,7 +107,7 @@ class coupling::FilterSequence {
     	}
 	
 		/*
-		 * Each sequence operates on their own two copies of the global domain. 
+		 * Each sequence operates on their own two copies of the md-to-macro domain. 
 		 * Thus, before applying the sequence, we need to update these two copies.
 		 */
 		void updateCellVectors(){
@@ -182,10 +182,10 @@ class coupling::FilterSequence {
 		virtual int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
 		/*
-		 * Determines based on _domainStart and _domainEnd which of the global domain's cell belong to the sequence's local domain.
+		 * Determines based on _domainStart and _domainEnd which of the md-to-macro domain's cell belong to the sequence's domain.
 		 * This initializes all domain vector member variables (see below).
 		 *
-		 * Used in constructor. TODO: i like to move it
+		 * Used in constructor.
 		 *
 		 * Implemented by FilterJunction to init domain partitions.
 		 */
@@ -248,9 +248,9 @@ class coupling::FilterSequence {
       
 	private:
 		/*
-		 * Copies all (global) input cells to _cellVector1 and _cellVector2.
+		 * Copies all input cells to _cellVector1 and _cellVector2.
 		 *
-		 * Used in consctructor. //TODO: move it
+		 * Used in consctructor.
 		 *
 		 * Not implemented by FilterJunction: Equivalent procedure can be found in that class' constructor.
 		 */
@@ -279,9 +279,9 @@ class coupling::FilterSequence {
 		tarch::la::Vector<dim, unsigned int> _domainEnd;
 
 		//uses _cellIndices indexing (i. e. _domainStart .... _domainEnd))
-    	std::vector<tarch::la::Vector<dim, unsigned int>> _globalDomainCellIndices;     	
+    	std::vector<tarch::la::Vector<dim, unsigned int>> _mamicoDomainCellIndices;     	
 		//starts at (0,...,0)
-		std::vector<tarch::la::Vector<dim, unsigned int>> _localDomainCellIndices; 
+		std::vector<tarch::la::Vector<dim, unsigned int>> _sequenceDomainCellIndices; 
 		
 		std::array<bool, 7> _filteredValues;
 
