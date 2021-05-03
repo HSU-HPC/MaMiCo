@@ -90,8 +90,8 @@ class coupling::FilterPipeline{
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _md2MacroCells;
 		std::vector<tarch::la::Vector<dim, unsigned int>> _md2MacroCellIndices;		
 
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outerMacroCells;
-		std::vector<tarch::la::Vector<dim, unsigned int>> _outerMacroCellIndices;		
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outerCells;
+		std::vector<tarch::la::Vector<dim, unsigned int>> _outerCellIndices;		
 
 
 		coupling::IndexConversionMD2Macro<dim>* _ic;

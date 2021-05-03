@@ -27,11 +27,11 @@ class coupling::WriteToFileJunctor : public coupling::JunctorInterface<dim,2,2> 
 	public:
 		WriteToFileJunctor(//first cell data set
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector1,
-			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector2,
+			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector1,
 			const std::vector<tarch::la::Vector<dim, unsigned int>> mamicoCellIndices1,
 			const std::vector<tarch::la::Vector<dim, unsigned int>> sequenceCellIndices1,
 			//second cell data set
-			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector1,
+			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector2,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector2,
 			const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices2,
 			//"global" parameters for both WriteToFile instances

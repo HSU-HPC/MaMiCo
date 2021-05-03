@@ -48,7 +48,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 
 			//Check "one-cell-only" property for both underlying WriteToFile instances.
 			//TODO: replace std::couts with proper exceptions
-			std::array<int,2> oco = { -1 };
+			std::array<int,2> oco = { -1, -1 };
 			tarch::configuration::ParseConfiguration::readIntOptional(oco[0], currJunctorNode, "wtf1-one-cell-only");
 			if(oco[0] < -1 || oco[0] >= (int) inputCellVector_primary.size()) {
 				std::cout << "ERROR: XML config file references undefined cell index " << oco[0] << " for primary write-to-file in write-to-file-junctor." << std::endl;
@@ -65,8 +65,8 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 																this->_mamicoDomainCellIndices,
 																this->_sequenceDomainCellIndices,
 
-																inputCellVector_primary,
-																outputCellVector_primary,
+																inputCellVector_secondary,
+																outputCellVector_secondary,
 																_cellIndices_secondary,
 
 																this->_filteredValues,

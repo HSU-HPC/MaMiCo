@@ -37,7 +37,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
 	
 	//load domain vectors
-	_ic->initMD2MacroDomain(inputCells, _md2MacroCells, _md2MacroCellIndices, _outerMacroCells, _outerMacroCellIndices);
+	_ic->initMD2MacroDomain(inputCells, _md2MacroCells, _md2MacroCellIndices, _outerCells, _outerCellIndices);
 
     //load sequences
     if (_postMultiInstance){
@@ -329,8 +329,8 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 																					currSequenceNode->Value(), 
 																					inputCellVector, 
 																					_md2MacroCellIndices, 
-																					_outerMacroCells, 
-																					_outerMacroCellIndices, 
+																					_outerCells, 
+																					_outerCellIndices, 
 																					domainStartCell, 
 																					domainEndCell, 
 																					filteredValues));
