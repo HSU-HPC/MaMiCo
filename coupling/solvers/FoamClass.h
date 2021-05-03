@@ -31,7 +31,8 @@ namespace coupling{
  */
 class coupling::solvers::IcoFoam: public coupling::solvers::AbstractCouetteSolver<3> {
 public:
-  IcoFoam(int rank, int plotEveryTimestep, double channelheight, std::string dict, std::string folder, tarch::la::Vector<12, unsigned int> boundariesWithMD):
+  IcoFoam(int rank, int plotEveryTimestep, double channelheight, std::string dict, std::string folder, tarch::la::Vector<12,
+    unsigned int> boundariesWithMD, tarch::la::Vector<3,double> uWall):
   AbstractCouetteSolver<3>(),
   runTime(Foam::Time::controlDictName, dict,folder),
   mesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ)),
@@ -45,7 +46,8 @@ public:
   _dx(std::cbrt(Foam::max(mesh.cellVolumes()))),
   _channelheight(channelheight),
   _rank(rank),
-    _plotEveryTimestep(plotEveryTimestep){
+  _plotEveryTimestep(plotEveryTimestep),
+  _uWall(uWall){
     if(skipRank()){return;}
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
@@ -113,7 +115,7 @@ public:
       for (int k = 1; k < 30; k++){
         u_analytical += 1.0/k * std::sin(k*pi*pos/_channelheight) * std::exp(-k*k * pi*pi/(_channelheight*_channelheight) * nu.value() * runTime.timeOutputValue());
       }
-      u_analytical = 0.5*(1.0-pos/_channelheight - 2.0/pi * u_analytical); // hardcoded value of 0.5 is the wallVelocity, should be variable
+      u_analytical = _uWall[0]*(1.0-pos/_channelheight - 2.0/pi * u_analytical);
       actualError = std::abs(u_analytical-static_cast<double>(U[i][0]));
       error += actualError;
       errorRMS += actualError*actualError;
@@ -307,5 +309,6 @@ private:
   Foam::scalar pRefValue{0.0};
   Foam::scalar cumulativeContErr{0};
   unsigned int _numberBoundaryPoints; // the number of CFD boundary points which need data from the MD
+  tarch::la::Vector<3,double> _uWall;
 };
 #endif // _COUPLING_SOLVERS_ICOFOAM_H
