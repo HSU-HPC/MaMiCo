@@ -16,7 +16,9 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_primary = coupling::FilterSequence<dim>::_domainCellVector2;
 
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_secondary = _inputCellVector_secondary;
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_secondary = _cellVector2_secondary;
+	//Note: To prevent counter intuitive design, secondary output has been disabled, i.e. all junctors in an AFJ take the same secondary input.
+	//		There is a chance that this will be re-enabled in the future, if it is needed for a certain junctor to work.
+	//std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_secondary = _cellVector2_secondary;
 
 	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << PRINT_PREFIX() << "Initializing junctor objects of asymmetrical junction." << std::endl;
@@ -66,7 +68,6 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 																this->_sequenceDomainCellIndices,
 
 																inputCellVector_secondary,
-																outputCellVector_secondary,
 																_cellIndices_secondary,
 
 																this->_filteredValues,
@@ -91,7 +92,9 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 		}
 
 		inputCellVector_primary.swap(outputCellVector_primary);
-		inputCellVector_secondary.swap(outputCellVector_secondary);
+
+		//See comment above regarding secondary output of junctors.
+		//inputCellVector_secondary.swap(outputCellVector_secondary);
 
 
         coupling::FilterSequence<dim>::_filters.push_back(newjunctor);
