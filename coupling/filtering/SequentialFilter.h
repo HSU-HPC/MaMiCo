@@ -43,7 +43,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		SequentialFilter(
 					coupling::FilterInterface<dim>* filter,
 					const coupling::IndexConversionMD2Macro<dim>* ic = nullptr, //null if run locally i.e. parallel
-					const MPI_Comm comm = MPI_COMM_WORLD //null if run locally i.e. parallel TODO: in case of multimd, this goes very wrong
+					const MPI_Comm comm = MPI_COMM_WORLD //null if run locally i.e. parallel TODO: remove default parameter, pass communicator
 		);
 
 		~SequentialFilter() {
@@ -70,11 +70,15 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		virtual void process(bool sequential);
 
 		/*
-		 * Auxialliary functions providing an interface between low-level double buffers used by MPI and Macro Cells.
+		 * Auxilliary functions providing an interface between low-level double buffers used by MPI and Macro Cells.
 		 */
-		void macroscopicCellsToBuffer(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells);
+		void macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell);
 
-		void applyBufferToMacroscopicCells(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells);
+		void applyBufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell);
+
+		void cellIndexToBuffer(std::vector<unsigned int>& buf, const tarch::la::Vector<dim, unsigned int>* index);
+
+		void bufferToCellIndex(const std::vector<unsigned int>& buf, tarch::la::Vector<dim, unsigned int>* index);
 
 		//The sequentialized Filter
 		coupling::FilterInterface<dim>* _filter;
@@ -87,30 +91,21 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		int _commSize;
 		const int _processingRank;
 		const int _myRank;
-		const int _cellsPerRank;
 
 		//Globalized variants of cell and indexing data structures (i.e spanning across all cells of the global domain). Only the master rank uses these.
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Global; 	
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Global;
 		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices_Global;
 
-		//Buffers macro cells for MPI communication
-		std::vector<double> _sendbuf;
-		std::vector<double> _recvbuf;
+		//Buffers macro cells and indices for MPI communication
+		std::vector<double> _cellbuf;
+		std::vector<unsigned int> _indexbuf;
 
 		//only used by processing rank to keep track what to contribute/where to write output data for next filter in sequence
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Local;	
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Local;	
 
-		bool _firstIteration; //TODO: what is this for??
+		bool _firstIteration;
 };
 
 #include "SequentialFilter.cpph"
-
-
-/*
- * TODO
- * testing
- * 	- inconsistencies in data -> always outputs data from step 0??
- * 	- segfaults if run on more than 1 rank
- */
