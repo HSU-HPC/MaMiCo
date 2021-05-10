@@ -71,28 +71,6 @@ class coupling::FilterInterface{
 				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setTemperature);
 				_scalarGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getTemperature);
 			}
-
-			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
-			
-			//TODO: remove
-			/*std::cout << "CONSTRUCTOR: printing all cells again:" << std::endl;
-			for(auto cell : _inputCells) std::cout << cell << std::endl;
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells2 = _inputCells;
-			std::cout << "post copy" << std::endl;
-
-			std::cout << "original capacity: " << _inputCells.capacity() << std::endl;
-			std::cout << "copy capacity: " << inputCells2.capacity() << std::endl;
-
-			std::cout << "original data: " << _inputCells.data() << std::endl;
-			std::cout << "copy data: " << inputCells2.data() << std::endl;
-
-			inputCells2.reserve(216);
-			std::cout << "post reserve copy" << std::endl;
-			_inputCells.reserve(216);
-			std::cout << "post reserve original" << std::endl;*/
-
-			//exit(0);
-
 		}
 
 		FilterInterface(const char* type) : _type(type) {/* Used by incomplete implementations of FilterInterface. Should be redesigned via meta class.*/}
@@ -118,10 +96,6 @@ class coupling::FilterInterface{
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
 			const std::vector<tarch::la::Vector<dim,unsigned int>>& new_cellIndices
 		) {
-			//TODO: remove 
-			//std::cout << "old cell vector size: " << _inputCells.size() << std::endl;
-			//std::cout << "new cell vector size: " << new_inputCells.size() << std::endl;
-
 			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size())
 			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
 			std::cout << "post size check" << std::endl;
@@ -130,130 +104,34 @@ class coupling::FilterInterface{
 			_inputCells = new_inputCells;
 			_outputCells = new_outputCells;
 			_cellIndices = new_cellIndices;
-
-			//Small chance that this is more correct. Probably the same constructor as the one implicitly called above.
-			/*
-			_inputCells = std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_inputCells);
-			_outputCells = std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_outputCells);
-			_cellIndices = std::vector<tarch::la::Vector<dim,unsigned int>>(new_cellIndices);
-			*/
-
-
-			//TODO: This is old code from tryint to debug the malloc: invalid size bug. remove as soon as thats fixed.
-			
-			//Alternative 1:
-			//This resizing assumes the "old" _inputCells, _outputCells and _cellIndices vectors to be of identical size.
-			/*if(new_inputCells.size() != _inputCells.size()) {
-				std::cout << "		FI: Detected change in cell vector size. ";
-
-				//Alternative 1.1: This would be more desireable, but segfaults. 
-				
-				_inputCells.resize(new_inputCells.size(), nullptr);
-				_outputCells.resize(new_outputCells.size(), nullptr);
-				_cellIndices.resize(new_cellIndices.size(), tarch::la::Vector<dim,unsigned int>(0));
-				
-
-				//Alternative 1.2: This is slightly worse imo, but also segfaults.
-				int size_diff = new_inputCells.size() - _inputCells.size();
-				if(size_diff > 0) { 
-					for(unsigned int i = 0; i < std::abs(size_diff); i++) {
-						//append dummy value size_diff times
-						_inputCells.push_back(nullptr);
-						_outputCells.push_back(nullptr);
-						_cellIndices.push_back(tarch::la::Vector<dim,unsigned int>(0));
-					}
-				}
-				else {
-					for(unsigned int i = 0; i < std::abs(size_diff); i++) {
-						_inputCells.pop_back();
-						_outputCells.pop_back();
-						_cellIndices.pop_back();
-					}
-				}
-
-				std::cout << "Now filters " << _inputCells.size() << " cells." << std::endl;
-
-			}
-
-			*/
-			//_inputCells = new_inputCells;
-			//_outputCells = new_outputCells;
-			//_cellIndices = new_cellIndices;
-			/*auto inputCellsPTR = new std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_inputCells);
-			std::cout << "post icells 1: " << inputCellsPTR << std::endl;
-			delete inputCellsPTR;
-			_inputCells = std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_inputCells);
-			std::cout << "post icells 2" << std::endl;
-			_outputCells = std::vector<coupling::datastructures::MacroscopicCell<dim>* >(new_outputCells);
-			_cellIndices = std::vector<tarch::la::Vector<dim,unsigned int>>(new_cellIndices);
-			*/
-
-			//Alternative 2: Unclean alternative solution:
-			//std::cout << "all cells:" << std::endl;
-			//for(auto cell : _inputCells) std::cout << cell << std::endl;
-
-			//_inputCells.clear();
-			//_outputCells.clear();
-			//_cellIndices.clear();
-
-			/*std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells2 = _inputCells;
-			std::cout << "post copy" << std::endl;
-
-			std::cout << "original capacity: " << _inputCells.capacity() << std::endl;
-			std::cout << "copy capacity: " << inputCells2.capacity() << std::endl;
-
-			std::cout << "original data: " << _inputCells.data() << std::endl;
-			std::cout << "copy data: " << inputCells2.data() << std::endl;
-
-			_inputCells.reserve(216);
-			std::cout << "post reserve original" << std::endl;
-			inputCells2.reserve(216);
-			std::cout << "post reserve copy" << std::endl;*/
-			
-			/*int i = 0;
-			for(auto newicell : new_inputCells) { 
-				//std::cout << newicell << " I: BEFORE: " << i << std::endl; 
-				_inputCells.push_back(newicell);
-				//std::cout << newicell << " I: AFTER: " << i << std::endl;
-			   	i++;
-		   	}
-			std::cout << "POST ICELLS" << std::endl;
-
-			i = 0;
-			for(auto newocell : new_outputCells) { 
-				//std::cout << newocell << " O: BEFORE: " << i << std::endl; 
-				_outputCells.push_back(newocell);
-				//std::cout << newocell << " O: AFTER: " << i << std::endl;
-			   	i++;
-		   	}
-			std::cout << "POST OCELLS" << std::endl;
-			
-
-			//for(auto newicell : new_inputCells) _inputCells.push_back(newicell);
-			//for(auto newocell : new_outputCells) _outputCells.push_back(newocell);
-			for(auto newindex : new_cellIndices) _cellIndices.push_back(newindex);
-			*/
-
+		
 			std::cout << "		FI: Updated cell data." << std::endl;
 		}
 
-		//TODO: remove this after debugging
 		/*
-		void DEBUG_RESERVE(unsigned int len) {
-			std::cout << "DEBUG_RESERVE (len=" << len << "): PRE RESERVE..." << std::endl;
-			_inputCells.reserve(len); 
-			std::cout << "POST INPUT RESERVE." << std::endl;
-			_outputCells.reserve(len); 
-			std::cout << "POST OUTPUT RESERVE." << std::endl;
-			_cellIndices.reserve(len); 
-			std::cout << "POST INDICES RESERVE." << std::endl;
-		}*/
-
+		 * Basic Getters/Setters
+		 */
 		const char* getType() const { return _type; }
-
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getInputCells() const { return _inputCells; }
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getOutputCells() const { return _outputCells; }
 		std::vector<tarch::la::Vector<dim,unsigned int>> getCellIndices() const { return _cellIndices; }
+
+		/*
+		 * Advanced Getters/Setters
+		 */
+		coupling::datastructures::MacroscopicCell<dim>* getInputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
+			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
+				if(_cellIndices[i] == index) return _inputCells[i];
+			}
+			throw std::runtime_error(std::string("FilterInterface: getInputCellofIndex(): Could not find index ").append(std::string(index)));
+		}
+		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
+			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
+				if(_cellIndices[i] == index) return _outputCells[i];
+			}
+			throw std::runtime_error(std::string("FilterInterface: getOutputCellofIndex(): Could not find index ").append(std::string(index)));
+		}
+
 
 		/*
 		 * Only used in one scenario:

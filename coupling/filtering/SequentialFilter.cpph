@@ -5,7 +5,6 @@
 
 //Implementation of SequentialFilter.h
 
-//TODO: implement getOutputCellOfIndex() function in FI!
 
 //CONSTRUCTOR
 template <unsigned int dim>
@@ -39,10 +38,8 @@ coupling::SequentialFilter<dim>::SequentialFilter(
 			_inputCells_Local = _filter->getInputCells(); //filter's input cell pointers will be overwritten, but we need this information in contribute()
 			_outputCells_Local = _filter->getOutputCells(); //filter's output cell pointers will be overwritten, but we need this information in process()
 
-			//Update filter's original cell data
-
-			//TODO: do this using IC, not all cells with have same amount
-			for(int c = 0; c < _outputCells_Local.size() * _commSize; c++) {
+			//TODO: Make this work with domain subselection.
+			for(int c = 0; c < _ic->getGlobalMD2MacroDomainSize() ; c++) { //TODO: double check if this is the correct function. "global" ambiguity fixed?
 				_inputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 				_outputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 			}
@@ -83,22 +80,36 @@ void coupling::SequentialFilter<dim>::contribute() {
 	std::cout << "		SEQFILTER (" << _myRank << "): Sending cells and indices." << std::endl;
 	#endif
 
-	//TODO
-
-	if(_firstIteration) {
-		_filter->updateCellData(_inputCells_Global, _outputCells_Global, _cellIndices_Global);
-		_firstIteration = false;
-	}
-
-
-	#ifdef DEBUG_SEQ_FILTER
 	if(_processingRank == _myRank) {
-		std::cout << "		SEQFILTER (" << _myRank << "): Received cells and indices." << std::endl;
-	}
-	#endif
+		//RECEIVE
+		//TODO: can you even do this using synchronous MPI calls?
 
-	//Receive output data
-	if(_processingRank != myRank) {
+		if(_firstIteration) {
+			_filter->updateCellData(_inputCells_Global, _outputCells_Global, _cellIndices_Global);
+			_firstIteration = false;
+		}
+
+		#ifdef DEBUG_SEQ_FILTER
+		std::cout << "		SEQFILTER (" << _myRank << "): Received cells and indices." << std::endl;
+		#endif
+
+		//This rank now processes...
+	}
+	else /* contributing rank */{
+		for(unsigned int c = 0; c < _filter->getInputCells.size(); c++) {
+			//fill buffers
+			macroscopicCellToBuffer(_cellbuf, _filter->getInputCells()[c]);
+			cellIndexToBuffer(_indexbuf, _filter->getCellIndices()[c]);
+
+			//send cell
+			MPI_Send(_cellbuf.data(), _cellbuf.size(), MPI_DOUBLE, _processingRank, 0, _comm);
+			//send corresponding index
+			MPI_Send(_indexbuf.data(), _indexbuf.size(), MPI_UNSIGNED, _processingRank, 0, _comm);
+		}
+
+		//The processing rank now processes...
+
+		//Receive output data
 		for(unsigned int cell_count = 0; cell_count < _filter->getOutputCells().size(); cell_count++) {
 			//receive cell
 			MPI_Receive(_cellbuf.data(), _cellbuf.size(), MPI_DOUBLE, _processingRank, 0, _comm, MPI_STATUS_IGNORE);
@@ -123,11 +134,12 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 
 				//Now ready to distribute data back to the data's original ranks...
 				for(unsigned int c = 0; c < _outputCells_Global.size(); c++) {
-					//fill buffer with cell data
+					//fill buffers with cell data
 					macroscopicCellToBuffer(_cellbuf, _outputCells_Global[c]);
+					cellIndexToBuffer(_indexbuf, _cellIndices_Global[c]);
 
 					//get rank of cell
-					int target_rank = 0 //TODO use IC or something
+					int target_rank = _ic->getBaseIC()->getUniqueRankForMacroscopicCell(_cellIndices_Global[c]);
 				
 					//Case: cell belongs to this rank, no communication needed	
 					if(target_rank == _processingRank) {
