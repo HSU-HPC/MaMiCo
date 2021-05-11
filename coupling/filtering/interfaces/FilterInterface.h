@@ -123,13 +123,13 @@ class coupling::FilterInterface{
 			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
 				if(_cellIndices[i] == index) return _inputCells[i];
 			}
-			throw std::runtime_error(std::string("FilterInterface: getInputCellofIndex(): Could not find index ").append(std::string(index)));
+			throw std::runtime_error("FilterInterface: getInputCellofIndex(): Could not find index.");
 		}
 		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
 			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
 				if(_cellIndices[i] == index) return _outputCells[i];
 			}
-			throw std::runtime_error(std::string("FilterInterface: getOutputCellofIndex(): Could not find index ").append(std::string(index)));
+			throw std::runtime_error("FilterInterface: getOutputCellofIndex(): Could not find index.");
 		}
 
 
