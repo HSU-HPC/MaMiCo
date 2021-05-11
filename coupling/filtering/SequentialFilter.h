@@ -57,6 +57,12 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		 */
 		virtual void operator()();
 
+		/*
+		 * These work in a very similar fashion to FilterInterface's advanced getter/setter methods.
+		 */
+		coupling::datastructures::MacroscopicCell<dim>* getLocalInputCellOfIndex(tarch::la::Vector<dim,unsigned int> index);
+		coupling::datastructures::MacroscopicCell<dim>* getLocalOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index);
+
 	private:
 
 		/*
@@ -68,17 +74,17 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		 * When sequentialized, only the processing rank calls this function. It acts as a wrapper of _filter's operator() member function.
 		 */
 		virtual void process(bool sequential);
-
+		
 		/*
 		 * Auxilliary functions providing an interface between low-level double buffers used by MPI and Macro Cells.
 		 */
 		void macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell);
 
-		void applyBufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell);
+		void bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell);
 
-		void cellIndexToBuffer(std::vector<unsigned int>& buf, const tarch::la::Vector<dim, unsigned int>* index);
+		void cellIndexToBuffer(std::vector<unsigned int>& buf, const tarch::la::Vector<dim, unsigned int>& index);
 
-		void bufferToCellIndex(const std::vector<unsigned int>& buf, tarch::la::Vector<dim, unsigned int>* index);
+		void bufferToCellIndex(const std::vector<unsigned int>& buf, tarch::la::Vector<dim, unsigned int>& index);
 
 		//The sequentialized Filter
 		coupling::FilterInterface<dim>* _filter;
@@ -86,7 +92,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		//Null if run locally.
 		const coupling::IndexConversionMD2Macro<dim>* _ic;	
 
-		//Possibility: Individual MPI communicator per globalized filter. Probably either nullptr or MPI_COMM_WORLD for now.
+		//MPI related stuff
 		const MPI_Comm _comm;
 		int _commSize;
 		const int _processingRank;
@@ -101,9 +107,10 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		std::vector<double> _cellbuf;
 		std::vector<unsigned int> _indexbuf;
 
-		//only used by processing rank to keep track what to contribute/where to write output data for next filter in sequence
+		//Used by the processing rank to remember its local domain
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Local;	
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Local;	
+		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices_Local;
 
 		bool _firstIteration;
 };
