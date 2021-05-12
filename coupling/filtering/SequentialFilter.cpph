@@ -80,6 +80,9 @@ void coupling::SequentialFilter<dim>::operator()(){
 
 template<unsigned int dim>
 coupling::datastructures::MacroscopicCell<dim>* coupling::SequentialFilter<dim>::getLocalInputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
+	#ifdef DEBUG_SEQ_FILTER
+	std::cout << "		SEQFILTER (" << _myRank << "): getLocalInputCellofIndex(): Now looking for index " << index << std::endl;
+	#endif
 	for(unsigned int i = 0; i < _cellIndices_Local.size(); i++) {
 		if(_cellIndices_Local[i] == index) return _inputCells_Local[i];
 	}
@@ -89,6 +92,10 @@ coupling::datastructures::MacroscopicCell<dim>* coupling::SequentialFilter<dim>:
 
 template<unsigned int dim>
 coupling::datastructures::MacroscopicCell<dim>* coupling::SequentialFilter<dim>::getLocalOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
+	#ifdef DEBUG_SEQ_FILTER
+	std::cout << "		SEQFILTER (" << _myRank << "): getLocalOutputCellofIndex(): Now looking for index " << index << std::endl;
+	#endif
+
 	for(unsigned int i = 0; i < _cellIndices_Local.size(); i++) {
 		if(_cellIndices_Local[i] == index) return _outputCells_Local[i];
 	}
@@ -116,11 +123,24 @@ void coupling::SequentialFilter<dim>::contribute() {
 		for(int rank = 0; rank < _commSize; rank++) { //TODO: allow arbitrary comms: with ranks < _commSize that are not in _comm
 			//Case: The contributing rank is the processing rank. In this case, we only need to copy cell data.
 			if(rank == _myRank) {
-				//Copy all cell data to global data structures.
-				for(auto cell : _inputCells_Local) *_inputCells_Global[cellsUpdated] = *cell;
-				for(auto index : _cellIndices_Local) _cellIndices_Local[cellsUpdated] = index;
+				#ifdef DEBUG_SEQ_FILTER
+					std::cout << "		SEQFILTER (" << _myRank << "): Copying " << _inputCells_Local.size() << " cells from local on processing rank " << rank << std::endl;
+				#endif
 
-				cellsUpdated++;
+				std::cout << "FIRST INDEX IN LOCAL: " << _cellIndices_Local[0] << std::endl;
+
+				//Copy all cell data to global data structures.
+				for(auto cell : _inputCells_Local) *(_inputCells_Global[cellsUpdated]) = *cell;
+				for(auto index : _cellIndices_Local) {
+					_cellIndices_Global[cellsUpdated] = index;
+					cellsUpdated++;
+				}
+
+				std::cout << "FIRST INDEX IN GLOBAL: " << _cellIndices_Global[0] << std::endl;
+
+				#ifdef DEBUG_SEQ_FILTER
+					std::cout << "		SEQFILTER (" << _myRank << "): Copied a total of " << cellsUpdated << " cells." << std::endl;
+				#endif
 			}
 			//Case: the contributing rank is not the processing rank. We need to communicate cell data using MPI.
 			else {
@@ -191,8 +211,17 @@ void coupling::SequentialFilter<dim>::contribute() {
 
 template<unsigned int dim>
 void coupling::SequentialFilter<dim>::process(bool sequential) {
+	#ifdef DEBUG_SEQ_FILTER
+		std::cout << "		SEQFILTER (" << _myRank << "): Now applying filter..." << std::endl;
+	#endif
+
 	//Apply _filter
 	(*_filter)();
+
+	#ifdef DEBUG_SEQ_FILTER
+		std::cout << "		SEQFILTER (" << _myRank << "): ...done applying filter." << std::endl;
+	#endif
+
 
 	if(sequential) {
 		//Now ready to distribute data back to the data's original ranks...
@@ -204,9 +233,18 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 			//get rank of cell
 			int target_rank = _ic->getBaseIC()->getUniqueRankForMacroscopicCell(_cellIndices_Global[c]);
 				
+			#ifdef DEBUG_SEQ_FILTER
+				std::cout << "		SEQFILTER (" << _myRank << "): Sending cell of index " << _cellIndices_Global[c] << " to rank " << target_rank << std::endl;
+			#endif
+
 			//Case: cell belongs to this rank, no communication needed	
-			if(target_rank == _processingRank)
-				bufferToMacroscopicCell(_cellbuf, getLocalOutputCellOfIndex(_cellIndices_Global[c])); //TODO: this is the wrong target 
+			if(target_rank == _processingRank) {
+				bufferToMacroscopicCell(_cellbuf, getLocalOutputCellOfIndex(_cellIndices_Global[c]));
+
+				#ifdef DEBUG_SEQ_FILTER
+					std::cout << "		SEQFILTER (" << _myRank << "): Wrote cell of index " << _cellIndices_Global[c] << " to local cell at " << getLocalOutputCellOfIndex(_cellIndices_Global[c]) << std::endl;
+				#endif
+			}
 			//Case: other rank, we need to send cell and index
 			else {
 				//send cell
