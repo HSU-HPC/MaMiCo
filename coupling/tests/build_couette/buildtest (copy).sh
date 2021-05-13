@@ -36,8 +36,9 @@ rm ${BUILD_PATH}/*.o;
 
 compiler=""
 libraries=""
+#libraries="-ldmalloc -ldmallocxx" uncomment this if you use dmalloc for debugging purposes
 objects=""
-includes="-I${MAMICO_PATH} -Iusr/local/include/tensorflow/bazel-bin/tensorflow/include/"
+includes="-I${MAMICO_PATH}"
 
 ### specify flags, includes, libraries,compiler for parallel or sequential build
 if [ "${parallel}" == "parallel" ]
@@ -45,13 +46,13 @@ then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
     FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
     # -DMDCoupledDebug"
-    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
+    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH} -I${PYTHON_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3" #-std=c++1z
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wno-unknown-pragmas -O3 " #-Wall 
     # -Werror
-    includes="${includes} -I${LIB_EIGEN_PATH}"
+    includes="${includes} -I${LIB_EIGEN_PATH} -I${PYTHON_PATH}"
     compiler="g++"
 fi
 ###
@@ -64,11 +65,9 @@ then
   includes="${includes} -I${FOAM_PATH}src/finiteVolume/lnInclude -I${FOAM_PATH}src/meshTools/lnInclude -IlnInclude -I. -I${FOAM_PATH}src/OpenFOAM/lnInclude -I${FOAM_PATH}src/OSspecific/POSIX/lnInclude"
   libraries="${libraries} -fPIC -fuse-ld=bfd -Xlinker --add-needed -Xlinker --no-as-needed -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib/dummy -lfiniteVolume -lmeshTools -lOpenFOAM -ltriSurface -lPstream -lsurfMesh -lfileFormats -ldl -lm"
 else
-  FLAGS="${FLAGS}" # -pedantic
+  FLAGS="${FLAGS}" #-pedantic
 fi
 ###
-
-libraries="${libraries}  -ltensorflow_cc -lprotobuf"
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH}
@@ -89,10 +88,7 @@ objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
 ### builds, linking, objects for coupled simulation with MaMiCo
 cd ${BUILD_PATH}
 ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
-${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_couette.o
+${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_couette.o -L/usr/lib/python3.8/site-packages/pybind11 #$(python3.8-config --ldflags --embed)
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_couette.o"
 
-cpps="${MAMICO_PATH}/tensorflow/TensorCalc.cpp ${MAMICO_PATH}/tensorflow/ReadCSV.cpp ${MAMICO_PATH}/tensorflow/ConsoleOutput.cpp ${MAMICO_PATH}/tensorflow/NN.cpp"
-
-${compiler} ${objects} ${cpps} ${FLAGS} ${includes} ${libraries} -o ${BUILD_PATH}/test
-
+${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/test

@@ -16,9 +16,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_primary = coupling::FilterSequence<dim>::_domainCellVector2;
 
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_secondary = _inputCellVector_secondary;
-	//Note: To prevent counter intuitive design, secondary output has been disabled, i.e. all junctors in an AFJ take the same secondary input.
-	//		There is a chance that this will be re-enabled in the future, if it is needed for a certain junctor to work.
-	//std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_secondary = _cellVector2_secondary;
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_secondary = _cellVector2_secondary;
 
 	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << PRINT_PREFIX() << "Initializing junctor objects of asymmetrical junction." << std::endl;
@@ -50,7 +48,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 
 			//Check "one-cell-only" property for both underlying WriteToFile instances.
 			//TODO: replace std::couts with proper exceptions
-			std::array<int,2> oco = { -1, -1 };
+			std::array<int,2> oco = { -1 };
 			tarch::configuration::ParseConfiguration::readIntOptional(oco[0], currJunctorNode, "wtf1-one-cell-only");
 			if(oco[0] < -1 || oco[0] >= (int) inputCellVector_primary.size()) {
 				std::cout << "ERROR: XML config file references undefined cell index " << oco[0] << " for primary write-to-file in write-to-file-junctor." << std::endl;
@@ -61,28 +59,19 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 				std::cout << "ERROR: XML config file references undefined cell index " << oco[1] << " for secondary write-to-file in write-to-file-junctor." << std::endl;
 				exit(EXIT_FAILURE);
 			}
-		
-            newjunctor = new coupling::WriteToFileJunctor<dim>(	inputCellVector_primary,
-																outputCellVector_primary,
-																this->_mamicoDomainCellIndices,
-																this->_sequenceDomainCellIndices,
 
-																inputCellVector_secondary,
-																_cellIndices_secondary,
-
-																this->_filteredValues,
-																{ currJunctorNode->Attribute("wtf1-location"), currJunctorNode->Attribute("wtf2-location") },
-																overwrite, 
-																oco);
+            newjunctor = new coupling::WriteToFileJunctor<dim>(	inputCellVector_primary, outputCellVector_primary, this->_globalDomainCellIndices, inputCellVector_primary,
+								outputCellVector_primary, _cellIndices_secondary, this->_filteredValues,
+								{ currJunctorNode->Attribute("wtf1-location"), currJunctorNode->Attribute("wtf2-location") },
+								overwrite, oco);
         }
 
-		
-		else if(std::strcmp(currJunctorNode->Value(), "neuralnet") == 0){
+	if(std::strcmp(currJunctorNode->Value(), "neuralnet") == 0){
 
-            newjunctor = new coupling::NeuralNet<dim>(	inputCellVector_primary, outputCellVector_primary, this->_mamicoDomainCellIndices, this->_sequenceDomainCellIndices,
-								inputCellVector_secondary, _cellIndices_secondary, this->_filteredValues);
+            newjunctor = new coupling::NeuralNet<dim>(	inputCellVector_primary, outputCellVector_primary, this->_globalDomainCellIndices, inputCellVector_primary,
+								outputCellVector_primary, _cellIndices_secondary, this->_filteredValues);
         }
-		
+
     //###############################################################
 
 		//Unknown junctor identifier
@@ -98,9 +87,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 		}
 
 		inputCellVector_primary.swap(outputCellVector_primary);
-
-		//See comment above regarding secondary output of junctors.
-		//inputCellVector_secondary.swap(outputCellVector_secondary);
+		inputCellVector_secondary.swap(outputCellVector_secondary);
 
 
         coupling::FilterSequence<dim>::_filters.push_back(newjunctor);
