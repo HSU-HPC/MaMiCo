@@ -98,7 +98,6 @@ class coupling::FilterInterface{
 		) {
 			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size())
 			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
-			std::cout << "post size check" << std::endl;
 
 			//Note: I reverted this back to the original version. The cause for the malloc: invalid size bug most probably isnt here.
 			_inputCells = new_inputCells;
