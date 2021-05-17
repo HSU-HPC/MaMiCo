@@ -10,7 +10,7 @@
 
 //INCLUDE ALL RELEVANT JUNCTOR HEADERS HERE
 #include "coupling/filtering/filters/WriteToFileJunctor.h"
-#include "coupling/filtering/filters/NeuralNet.h"
+#include "coupling/filtering/filters/NeuralNetFilter.h"
 
 /*
  * WORK IN PROGRESS. USE WITH CAUTION

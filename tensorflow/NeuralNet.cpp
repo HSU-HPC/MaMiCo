@@ -1,5 +1,5 @@
 
-#include "NN.h"
+#include "NeuralNet.h"
 
 
 using namespace std;
@@ -50,7 +50,7 @@ Input NeuralNet::AddDenseLayer(string idx, Scope scope, int in_units, int out_un
 /*
 Status NeuralNet::FreezeSave(string& file_name)
 {
-    vector<Tensor> out_tensors;
+    std::vector<Tensor> out_tensors;
     //Extract: current weights and biases current values
     TF_CHECK_OK(t_session->Run(v_weights_biases , &out_tensors));
     unordered_map<string, Tensor> variable_to_value_map;
@@ -113,7 +113,7 @@ Status NeuralNet::CreateOptimizationGraph(float learning_rate)
     TF_CHECK_OK(scope_loss.status());
     for(pair<string, Output> i: m_vars)
         v_weights_biases.push_back(i.second);
-    vector<Output> grad_outputs;
+    std::vector<Output> grad_outputs;
     TF_CHECK_OK(AddSymbolicGradients(t_root, {out_loss_var}, v_weights_biases, &grad_outputs));
     int index = 0;
     for(pair<string, Output> i: m_vars)
@@ -137,10 +137,10 @@ Status NeuralNet::Initialize()
     if(!t_root.ok())
         return t_root.status();
     
-    vector<Output> ops_to_run;
+    std::vector<Output> ops_to_run;
     for(pair<string, Output> i: m_assigns)
         ops_to_run.push_back(i.second);
-    t_session = unique_ptr<ClientSession>(new ClientSession(t_root));
+    t_session = std::unique_ptr<ClientSession>(new ClientSession(t_root));
     TF_CHECK_OK(t_session->Run(ops_to_run, nullptr));
     /* uncomment if you want visualization of the model graph
     GraphDef graph;
@@ -157,7 +157,7 @@ Status NeuralNet::TrainNN(Tensor& image_batch, Tensor& label_batch, std::vector<
     if(!t_root.ok())
         return t_root.status();
     
-    vector<Tensor> out_tensors;
+    std::vector<Tensor> out_tensors;
 
 	
     TF_CHECK_OK(t_session->Run({{input_batch_var, image_batch}, {input_labels_var, label_batch}}, {out_loss_var, out_classification}, v_out_grads, &out_tensors));
@@ -179,7 +179,7 @@ Status NeuralNet::Predict(Tensor& image, std::vector<float>& result)
     if(!t_root.ok())
         return t_root.status();
     
-    vector<Tensor> out_tensors;
+    std::vector<Tensor> out_tensors;
     //Inputs: image, drop rate 1 and skip drop.
     TF_CHECK_OK(t_session->Run({{input_batch_var, image}}, {out_classification}, &out_tensors));
     result=TensorToVec(out_tensors[0])[0];

@@ -20,4 +20,7 @@ coupling/tests/kvs-lbmpy/*.xml
 coupling/tests/kvs-lbmpy/*.ini
 *.old
 /usr/local/include/tensorflow/bazel-bin/tensorflow/include/
+/usr/local/include/tensorflow/bazel-bin/tensorflow/
+/usr/local/include/
 ~/opt/
+

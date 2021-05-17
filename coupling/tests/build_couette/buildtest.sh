@@ -92,7 +92,7 @@ ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguratio
 ${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_couette.o
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_couette.o"
 
-cpps="${MAMICO_PATH}/tensorflow/TensorCalc.cpp ${MAMICO_PATH}/tensorflow/ReadCSV.cpp ${MAMICO_PATH}/tensorflow/ConsoleOutput.cpp ${MAMICO_PATH}/tensorflow/NN.cpp"
+cpps="${MAMICO_PATH}/tensorflow/TensorCalc.cpp ${MAMICO_PATH}/tensorflow/ReadCSV.cpp ${MAMICO_PATH}/tensorflow/NeuralNet.cpp"
 
 ${compiler} ${objects} ${cpps} ${FLAGS} ${includes} ${libraries} -o ${BUILD_PATH}/test
 

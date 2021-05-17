@@ -79,7 +79,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 		
 		else if(std::strcmp(currJunctorNode->Value(), "neuralnet") == 0){
 
-            newjunctor = new coupling::NeuralNet<dim>(	inputCellVector_primary, outputCellVector_primary, this->_mamicoDomainCellIndices, this->_sequenceDomainCellIndices,
+            newjunctor = new coupling::NeuralNetFilter<dim>(	inputCellVector_primary, outputCellVector_primary, this->_mamicoDomainCellIndices, this->_sequenceDomainCellIndices,
 								inputCellVector_secondary, _cellIndices_secondary, this->_filteredValues);
         }
 		

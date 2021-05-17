@@ -21,7 +21,7 @@
 #include "tensorflow/cc/framework/scope.h"
 #include "TensorCalc.h"
 
-using namespace std;
+//using namespace std;
 using namespace tensorflow;
 using namespace tensorflow::ops;
 
@@ -38,8 +38,8 @@ private:
     Output aug_tensor_input;
     Output aug_tensor_output;
     Scope t_root;
-    unique_ptr<ClientSession> t_session;
-    unique_ptr<Session> f_session;
+    std::unique_ptr<ClientSession> t_session;
+    std::unique_ptr<Session> f_session;
     Output input_batch_var;
     string input_name = "input";
     Output input_labels_var;
@@ -51,12 +51,12 @@ private:
     string out_name = "output_classes";
     Output logits;
     //Network maps
-    map<string, Output> m_vars;
-    map<string, TensorShape> m_shapes;
-    map<string, Output> m_assigns;
+    std::map<string, Output> m_vars;
+    std::map<string, TensorShape> m_shapes;
+    std::map<string, Output> m_assigns;
     //Loss variables
-    vector<Output> v_weights_biases;
-    vector<Operation> v_out_grads;
+    std::vector<Output> v_weights_biases;
+    std::vector<Operation> v_out_grads;
     Output out_loss_var;
     InputList MakeTransforms(int batch_size, Input a0, Input a1, Input a2, Input b0, Input b1, Input b2);
 public:
@@ -67,7 +67,7 @@ public:
     Status CreateOptimizationGraph(float learning_rate);
     Status Initialize();
     Status TrainNN(Tensor& image_batch, Tensor& label_batch, std::vector<std::vector<float>>& results, float& loss);
-    Status ValidateNN(Tensor& image_batch, Tensor& label_batch, vector<float>& results);
+    Status ValidateNN(Tensor& image_batch, Tensor& label_batch, std::vector<float>& results);
     Status Predict(Tensor& image, std::vector<float>& result);
     Status FreezeSave(string& file_name);
     Status LoadSavedModel(string& file_name);
