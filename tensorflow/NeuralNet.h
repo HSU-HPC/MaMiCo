@@ -30,7 +30,7 @@ auto tf_tensor_to_vector(tensorflow::Tensor tensor, int32_t tensorSize);
 class NeuralNet
 {
 private:
-	const int input_size, middle_size, output_size;
+	int input_size, middle_size, output_size;
     Scope i_root;
     Output file_name_var;
     Output image_tensor_var;
@@ -60,7 +60,9 @@ private:
     Output out_loss_var;
     InputList MakeTransforms(int batch_size, Input a0, Input a1, Input a2, Input b0, Input b1, Input b2);
 public:
+	NeuralNet():input_size(0), middle_size(0), output_size(0), i_root(Scope::NewRootScope()), a_root(Scope::NewRootScope()), t_root(Scope::NewRootScope()){}
     NeuralNet(int in, int middle, int out): input_size(in), middle_size(middle), output_size(out), i_root(Scope::NewRootScope()), a_root(Scope::NewRootScope()), t_root(Scope::NewRootScope()) {} 
+	void CreateNN(int in, int middle, int out);
     Input XavierInit(Scope scope, int in_chan, int out_chan);
     Input AddDenseLayer(string idx, Scope scope, int in_units, int out_units, bool bActivation, Input input);
     Status CreateGraphForNN();

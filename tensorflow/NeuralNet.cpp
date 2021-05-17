@@ -12,6 +12,12 @@ auto tf_tensor_to_vector(tensorflow::Tensor tensor, int32_t tensorSize) {
   return v;
 }
 
+void NeuralNet::CreateNN(int in, int middle, int out){
+	input_size=in;
+	middle_size=middle;
+	output_size=out;
+}
+
 Input NeuralNet::XavierInit(Scope scope, int in_chan, int out_chan)
 {
     float std;

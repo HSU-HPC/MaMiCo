@@ -95,7 +95,9 @@ class coupling::NeuralNetFilter : public coupling::AsymmetricalJunctorInterface<
 			std::vector<float> res;
 			
 			//init NN
-			NeuralNet NN(input.dim_size(1), input.dim_size(1), label.dim_size(1));
+			//NeuralNet 
+			NN.CreateNN((int)input.dim_size(1), (int)input.dim_size(1), (int)label.dim_size(1));
+			//NN=NeuralNet(input.dim_size(1), input.dim_size(1), label.dim_size(1));
 			NN.CreateGraphForNN();
 			NN.CreateOptimizationGraph((float)config[0][0]);
 			NN.Initialize();
@@ -121,16 +123,21 @@ class coupling::NeuralNetFilter : public coupling::AsymmetricalJunctorInterface<
 				std::cout << "    NeuralNet: Now calling operator() on NeuralNet instance." << std::endl;
 		#endif
 		
-		//enters all x velocity values from the outer domain into input_vec
+		//enters all x velocity values from the outer domain into input_vec and enter that into input_pred Tensor
 		std::vector<float> input_vec;
 		for(unsigned int index = 0; index < coupling::AsymmetricalJunctorInterface<dim>::_inputCellVector2.size(); index++) input_vec.push_back((coupling::AsymmetricalJunctorInterface<dim>::_inputCellVector2[index]->coupling::datastructures::MacroscopicCell<dim>::getCurrentVelocity)()[0]);
-		std::cout<<"\n"<<input_vec.size()<<std::endl;
-		
 		auto input_pred=VecToTensor(input_vec);
+		
+		std::vector<float> result_vec;
+		
+		//generate prediction for give input
+		NN.Predict(input_pred, result_vec);
+		auto result=VecToTensor(result_vec);
 		std::cout<<input_pred.DebugString()<<std::endl;
+		std::cout<<result.DebugString()<<std::endl;
 	}
 
   private:
-	
+	NeuralNet NN;
 };
 
