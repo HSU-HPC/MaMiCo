@@ -1,9 +1,6 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.19) 
 PROJECT (MAMICO_CTEST LANGUAGES CXX)
 
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
-find_package(pybind11 REQUIRED)
-
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
 
@@ -13,6 +10,9 @@ include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
 #	   The default is a standard Couette scenario (C++).
 
 if(USE_PYBIND11)
+	find_package(Python COMPONENTS Interpreter Development REQUIRED)
+	find_package(pybind11 REQUIRED)
+
 	#Case: pybind11
 	message("Now compiling pybind11 library...")
 	pybind11_add_module( mamico_ctest
@@ -60,5 +60,3 @@ endif()
 #If thesee include directories do not suffice, you can add more manually via -DCMAKE_CXX_FLAGS
 target_include_directories (mamico_ctest PUBLIC /usr/include/ )
 target_include_directories (mamico_ctest PUBLIC /usr/lib/ )
-
-
