@@ -20,7 +20,7 @@ rm ${BUILD_PATH}/*.o;
 
 #set flags, includes, libraries
 FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++20 -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDParallel -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
-includes="-I${MAMICO_PATH} -I${MPI_INCLUDE_PATH}"
+includes="-I${MAMICO_PATH} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
 libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
 compiler="mpicxx"
 
