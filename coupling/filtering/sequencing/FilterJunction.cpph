@@ -2,10 +2,10 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamic::o
 
-//Member functions of coupling::FilterSequence
+//Member functions of coupling::FilterJunction
 
 template<unsigned int dim, std::size_t inputc>
-int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){ //in our case "junctionNode" would be more precise
+int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) { //in our case "junctionNode" would be more precise
 	if(!sequenceNode) return EXIT_FAILURE;
 
 	//null if junction is empty
@@ -20,7 +20,7 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 	//Keep track of this for each indivial input partition.
 	bool firstIteration[inputc] = { true };
 
-    while(currJunctorNode){
+    while(currJunctorNode) {
 
 		//All Junctors must implement one of the {X,Y}-Junctor interfaces, each of which implement FilterInterface.
 		coupling::FilterInterface<dim>* newjunctor = nullptr;
@@ -62,16 +62,38 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 				std::cout << "ERROR: NLM: time-window-size must be greater than two." << std::endl;
 				exit(EXIT_FAILURE);
 			}
+			double sigsq;
+			if(currJunctorNode->QueryDoubleAttribute("sigsq", &sigsq)){
+				std::cout << "ERROR: NLM filter misses attribute sigsq in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(tws < 0){
+				std::cout << "ERROR: NLM: sigsq must be greater than zero." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			double hsq;
+			if(currJunctorNode->QueryDoubleAttribute("hsq", &hsq)){
+				std::cout << "ERROR: NLM filter misses attribute hsq in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(hsq < 0){
+				std::cout << "ERROR: NLM: hsq must be greater than zero." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+
 
 			//Instanciation
 			newjunctor = new coupling::NLM<dim>(
 					inputCellVector[inputp_unfiltered],
 					inputCellVector[inputp_prefiltered],
 					outputCellVector[outputp], 
-					coupling::FilterSequence<dim>::_localDomainCellIndices,
+					coupling::FilterSequence<dim>::_sequenceDomainCellIndices,
 					coupling::FilterSequence<dim>::_filteredValues, 
 					coupling::FilterSequence<dim>::_ic, 
-					tws);
+					tws,
+					sigsq,
+					hsq);
 
 			//TODO: generalize this for arbitrary junctors?
 			//Swapping for output partition

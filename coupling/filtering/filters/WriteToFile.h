@@ -9,7 +9,7 @@
 #include <vector>
 #include <fstream>
 
-#define DEBUG_WRITE_TO_FILE
+//#define DEBUG_WRITE_TO_FILE
 
 namespace coupling {
     template<unsigned int dim>
@@ -21,11 +21,13 @@ namespace coupling {
  * Read-only filter that writes cell data to a specified file in .csv format.
  * @author Felix Maurer
  *
+ * Information regarding the terms "mamico"/"sequence" indices, confer ../sequencing/FilterSequence.h
+ *
  * Output format will be compliant to the usual MaMiCo CSV format (using ';' as separator).
  * Output order will be:
  * - current iteration
- * - local indexing
- * - global indexing
+ * - sequence indexing
+ * - mamico indexing
  * - scalars
  * - vectors
  *
@@ -37,16 +39,16 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
         WriteToFile(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //covers the entire MD domain
+				const std::vector<tarch::la::Vector<dim, unsigned int>> mamicoCellIndices,
+				const std::vector<tarch::la::Vector<dim, unsigned int>> sequenceCellIndices, //This is optional: You may pass {} if you don't wish to print any additional indices.
 				const std::array<bool, 7> filteredValues, 
-				const std::vector<tarch::la::Vector<dim, unsigned int>> localCellIndices, //covers the entire MD domain
 				std::string location,
 				bool overwrite = false,
 				int oneCellOnly = -1):
 
-				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "WTF"),
-				_localCellIndices(localCellIndices),
-		   		_location(location), //TODO: add time/date to output file name
+				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, mamicoCellIndices, filteredValues, "WTF"),
+				_sequenceCellIndices(sequenceCellIndices),
+		   		_location(location),
 				_overwrite(overwrite),
 				_oneCellOnly(oneCellOnly),
 				_iteration(1)
@@ -59,7 +61,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
         	#ifdef DEBUG_WRITE_TO_FILE
             std::cout << "		WTF: Write to file instance created. Will save to: " << _location << ". Last Cell Index: " << coupling::FilterInterface<dim>::_cellIndices.back() << std::endl;
 			if(_overwrite) std::cout << "		It will only print output of the last iteration." << std::endl;
-			if(_oneCellOnly != -1) std::cout << "		It will only print data of cell with linear md2Macro domain index " << _oneCellOnly << std::endl;
+			if(_oneCellOnly != -1) std::cout << "		It will only print data of cell with linear sequence domain index " << _oneCellOnly << std::endl;
         	#endif
         }
 
@@ -73,7 +75,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 	    void operator()();
 
     private:
-		const std::vector<tarch::la::Vector<dim, unsigned int>> _localCellIndices;
+		const std::vector<tarch::la::Vector<dim, unsigned int>> _sequenceCellIndices;
         std::string _location;
 
 		//true of only the last iteration should be in file output

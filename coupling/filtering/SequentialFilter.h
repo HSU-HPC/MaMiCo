@@ -21,6 +21,8 @@ namespace coupling{
 
 
 /*
+ * WARNING: EXPERIMENTAL. TODO: output this as well during construction
+ *
  * Implementation of FilterInterface.h for filters which operate (optionally or mandatorily) in a sequential manner, i.e. process data on one master rank.
  * For such filters, operator()() will
  * 		- contribute to one dedicated processing rank: by calling contribute()
@@ -43,7 +45,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		SequentialFilter(
 					coupling::FilterInterface<dim>* filter,
 					const coupling::IndexConversionMD2Macro<dim>* ic = nullptr, //null if run locally i.e. parallel
-					const MPI_Comm comm = MPI_COMM_WORLD //null if run locally i.e. parallel TODO: in case of multimd, this goes very wrong
+					const MPI_Comm comm = MPI_COMM_WORLD //null if run locally i.e. parallel TODO: remove default parameter, pass communicator
 		);
 
 		~SequentialFilter() {
@@ -55,31 +57,13 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		/*
 		 * Implements FilterInterface's requirement of having a ()-operand defined.
 		 */
-		virtual void operator()(){
-			if(_ic) {
-				if(_processingRank == _myRank) {
-					contribute();
-					process(FILTER_SEQUENTIAL); 				
-					std::cout << " (" << _myRank << ")POST MASTER PROCESSING" << std::endl;
-				}
-				else contribute();
+		virtual void operator()();
 
-				//Distribute output data
-				MPI_Scatter(_sendbuf.data(), _cellsPerRank, MPI_DOUBLE, _recvbuf.data(), _cellsPerRank * _commSize, MPI_DOUBLE, _processingRank, _comm); 
-
-				//Read output data from buffer
-				if(_processingRank == _myRank) applyBufferToMacroscopicCells(_recvbuf, _outputCells_Local);
-				else {
-					std::cout << "PRE APPLY BUFFER FOR OTHER RANK" << std::endl;
-					applyBufferToMacroscopicCells(_recvbuf, _filter->getOutputCells());
-				}
-
-				//reset buffers TODO: is this neccessary? 
-				_sendbuf.clear();
-				_recvbuf.clear();
-			}
-			else process(FILTER_PARALLEL);
-		}
+		/*
+		 * These work in a very similar fashion to FilterInterface's advanced getter/setter methods.
+		 */
+		coupling::datastructures::MacroscopicCell<dim>* getLocalInputCellOfIndex(tarch::la::Vector<dim,unsigned int> index);
+		coupling::datastructures::MacroscopicCell<dim>* getLocalOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index);
 
 	private:
 
@@ -91,37 +75,18 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		/*
 		 * When sequentialized, only the processing rank calls this function. It acts as a wrapper of _filter's operator() member function.
 		 */
-		virtual void process(bool sequential) {
-			//these are either local or global
-			if(sequential) {
+		virtual void process(bool sequential);
+		
+		/*
+		 * Auxilliary functions providing an interface between low-level double buffers used by MPI and Macro Cells.
+		 */
+		void macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell);
 
-				//write all gathered cells to inputCells_Global.
-				applyBufferToMacroscopicCells(_recvbuf, _inputCells_Global);
-				
-				std::cout << " (" << _myRank << ")POST ABTMC" << std::endl;
-				std::cout << " (" << _myRank << ")GLOBAL INPUT CELLS SIZE: " << _inputCells_Global.size() << std::endl;
-				std::cout << " (" << _myRank << ")GLOBAL OUTPUT CELLS SIZE: " << _outputCells_Global.size() << std::endl;
+		void bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell);
 
-				//Apply _filter
-				_filter->updateCellData(_inputCells_Global, _outputCells_Global, _cellIndices_Global);
+		void cellIndexToBuffer(std::vector<unsigned int>& buf, const tarch::la::Vector<dim, unsigned int>& index);
 
-				std::cout << " (" << _myRank << ")POST UPDATE" << std::endl;
-
-				(*_filter)();
-
-				std::cout << " (" << _myRank << ")POST FILTER" << std::endl;
-				
-				macroscopicCellsToBuffer(_sendbuf, _outputCells_Global);	
-				//Now ready to scatter...
-			}
-			else {
-				(*_filter)();
-			}
-		}
-
-		void macroscopicCellsToBuffer(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells);
-
-		void applyBufferToMacroscopicCells(std::vector<double>& buf, const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& cells);
+		void bufferToCellIndex(const std::vector<unsigned int>& buf, tarch::la::Vector<dim, unsigned int>& index);
 
 		//The sequentialized Filter
 		coupling::FilterInterface<dim>* _filter;
@@ -129,34 +94,25 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		//Null if run locally.
 		const coupling::IndexConversionMD2Macro<dim>* _ic;	
 
-		//Possibility: Individual MPI communicator per globalized filter. Probably either nullptr or MPI_COMM_WORLD for now.
+		//MPI related stuff
 		const MPI_Comm _comm;
 		int _commSize;
 		const int _processingRank;
 		const int _myRank;
-		const int _cellsPerRank;
 
 		//Globalized variants of cell and indexing data structures (i.e spanning across all cells of the global domain). Only the master rank uses these.
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Global; 	
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Global;
 		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices_Global;
 
-		//Buffers macro cells for MPI communication
-		std::vector<double> _sendbuf;
-		std::vector<double> _recvbuf;
+		//Buffers macro cells and indices for MPI communication
+		std::vector<double> _cellbuf;
+		std::vector<unsigned int> _indexbuf;
 
-		//only used by processing rank to keep track where to write output data for next filter in sequence
+		//Used by the processing rank to remember its local domain
+		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Local;	
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Local;	
-
-		bool _firstIteration;
+		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices_Local;
 };
 
 #include "SequentialFilter.cpph"
-
-
-/*
- * TODO
- * testing
- * 	- inconsistencies in data -> always outputs data from step 0??
- * 	- segfaults if run on more than 1 rank
- */
