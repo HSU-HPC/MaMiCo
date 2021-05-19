@@ -237,9 +237,20 @@ class KVSTest():
             return gaussian_filter(data, sigma = (5,5,5,0))
 
 
+        def gauss_x_sca1(data):
+            print("Applying gaussian filter to a scalar property. Filtering on X-axis only. sigma = 1.")
+            return gaussian_filter(data, sigma = (1,0,0))
+
+        def gauss_x_vec1(data):
+            print("Applying gaussian filter to a 3d property. Filtering on X-axis only. sigma = 1.")
+            return gaussian_filter(data, sigma = (1,0,0,0))
+
+
 
 
         mcs = self.multiMDCellService.getMacroscopicCellService(0)
+        #mcs.addFilterToSequence(filter_sequence="gauss-python", filter_index=1, scalar_filter_func = gauss_x_sca1, vector_filter_func=gauss_x_vec1)
+
         #mcs.addFilterToSequence(filter_sequence="wtf-seq", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
         #mcs.addFilterToSequence(filter_sequence="wtf", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
 
