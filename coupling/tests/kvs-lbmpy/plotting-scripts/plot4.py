@@ -21,8 +21,8 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
     mplt.style.use("seaborn")
     fig, ax = mplt.subplots(2,2)
     #unfiltered MD data
-    p_md = read_csv("unfiltered.csv", delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
-    m_md = read_csv("unfiltered.csv", delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
+    p_md = read_csv(unfiltered_csv, delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_md = read_csv(unfiltered_csv, delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
     ax[0,0].plot(p_md["Iteration"], (p_md.iloc[:,dir]) / (m_md.iloc[:,1]), ".", color="red", label = "MD")
     #noise and signal of MD
     for i in range(len(cs.iloc[:,dir])): #aka range 1000
@@ -101,11 +101,11 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
                 ax[x,y].set_ylim(-1,1)
 
     fig.tight_layout()
-    #TODO: CUSTOM NAME
     mplt.savefig(plot_file_location)
 
 #YOU HAVE TO CUSTOMIZE THIS
-csvs = ["POD.csv", "Gaussian.csv", "NLM_junction.csv"]
+unfiltered_csv = "../unfiltered_csv"
+csvs = ["../POD.csv", "../Gaussian.csv", "../NLM_junction.csv"]
 
 #plot for dims 1,2,3 (i.e. x,y,z)
 plot4(1,csvs, "kvs_velx.png")
