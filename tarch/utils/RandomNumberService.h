@@ -42,6 +42,6 @@ class tarch::utils::RandomNumberService {
     tarch::la::Vector<2,double> _randomNumbers;
 
     bool _isFirstRandomNumber;
+    bool _isInitialized{false};
 };
 #endif // _MOLECULARDYNAMICS_SERVICES_RANDOMNUMBERSERVICE_H_
-

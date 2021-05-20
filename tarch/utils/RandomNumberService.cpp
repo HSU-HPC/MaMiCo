@@ -15,6 +15,8 @@ tarch::utils::RandomNumberService& tarch::utils::RandomNumberService::getInstanc
 
 
 void tarch::utils::RandomNumberService::init(bool fixSeed){
+  if(_isInitialized)
+    return;
   // for testing purpose: fix seed to a certain number
   if (fixSeed){
     srand(10000);
@@ -27,6 +29,7 @@ void tarch::utils::RandomNumberService::init(bool fixSeed){
   }
   _randomNumbers.assign(0.0);
   _isFirstRandomNumber = true;
+  _isInitialized = true;
 }
 
 
@@ -72,4 +75,3 @@ double tarch::utils::RandomNumberService::getGaussianRandomNumber(){
     return _randomNumbers[1];
   }
 }
-

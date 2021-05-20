@@ -53,6 +53,7 @@ public:
     mesh.setFluxRequired(p.name());
   }
   virtual ~IcoFoam(){
+    if(skipRank()){return;}
     if(_boundary2RecvBufferIndicesOuter){ delete [] _boundary2RecvBufferIndicesOuter; _boundary2RecvBufferIndicesOuter=NULL;}
     if(_boundary2RecvBufferIndicesInner){ delete [] _boundary2RecvBufferIndicesInner; _boundary2RecvBufferIndicesInner=NULL;}
     if(_boundaryIndices){ delete [] _boundaryIndices; _boundaryIndices=NULL;}
@@ -298,9 +299,9 @@ private:
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
   float _dx; // mesh size
   double _channelheight; // overall height of the Couette channel
-  unsigned int *_boundary2RecvBufferIndicesOuter; // pointer to an array with data for communication
-  unsigned int *_boundary2RecvBufferIndicesInner; // pointer to an array with data for communication
-  Foam::vector **_boundaryIndices; // pointer to OpenFOAM data for communication
+  unsigned int *_boundary2RecvBufferIndicesOuter{nullptr}; // pointer to an array with data for communication
+  unsigned int *_boundary2RecvBufferIndicesInner{nullptr}; // pointer to an array with data for communication
+  Foam::vector **_boundaryIndices{nullptr}; // pointer to OpenFOAM data for communication
   int _rank; // rank of the actual process
   int _plotEveryTimestep; // every n-th time step should be plotted
   int _timestepCounter{0}; // actual time step number
