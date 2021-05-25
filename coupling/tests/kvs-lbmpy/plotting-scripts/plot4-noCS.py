@@ -67,8 +67,8 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
     mplt.savefig(plot_file_location)
 
 #YOU HAVE TO CUSTOMIZE THIS
-unfiltered_csv = "../unfiltered-python.csv"
-csvs = ["../unfiltered-python.csv", "../gaussian-python.csv", "../gaussian-cpp.csv"]
+unfiltered_csv = "../unfiltered.csv"
+csvs = ["../unfiltered.csv", "../gaussX-python.csv", "../gaussX-cpp.csv"]
 
 #plot for dims 1,2,3 (i.e. x,y,z)
 plot4(1,csvs, "kvs_velx.png")
