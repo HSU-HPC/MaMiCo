@@ -14,6 +14,9 @@
 namespace coupling {
     template<unsigned int dim>
     class Gauss;
+
+	//cf. member variable in coupling::Gauss for more details
+	enum GaussExtrapolationStrategy {NONE, LINEAR};
 }
 
 //Define kernel radius. e.g. radius = 1 means kernel size of 3
@@ -66,8 +69,8 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 			if(coupling::FilterInterface<dim>::_cellIndices.back()[_dim] < 2)
 				throw std::runtime_error("ERROR: GAUSS: Invalid input domain.");
 
-			if(extrapolationStrategy == nullptr || std::strcmp(extrapolationStrategy, "none") == 0) _extrapolationStrategy = 0;
-			else if(std::strcmp(extrapolationStrategy, "linear") == 0) _extrapolationStrategy = 1;
+			if(extrapolationStrategy == nullptr || std::strcmp(extrapolationStrategy, "none") == 0) _extrapolationStrategy = NONE;
+			else if(std::strcmp(extrapolationStrategy, "linear") == 0) _extrapolationStrategy = LINEAR;
 			else {
 				std::cout << "Extrapolation strategy: " << extrapolationStrategy << std::endl;
 				throw std::runtime_error("ERROR: GAUSS: Unknown extrapolation strategy.");
@@ -110,11 +113,10 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		
 		/**
 		 * Determines how to apply filter to border cells:
-		 * 0 = only use existing cells and increase their weight accordingly
-		 * 1 = linear extrapolation
-		 * TODO: use enum
+		 * NONE = only use existing cells and increase their weight accordingly
+		 * LINEAR = linear extrapolation
 		 */
-		unsigned int _extrapolationStrategy;
+		coupling::GaussExtrapolationStrategy _extrapolationStrategy;
 
 
 };
