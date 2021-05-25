@@ -44,7 +44,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //Use local indexing! (starting at (0,...,0))
 				const std::array<bool, 7> filteredValues,
 				unsigned int dimension,
-				unsigned int sigma,
+				int sigma,
 				const char* extrapolationStrategy):
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "GAUSS"),
 				_dim(dimension),
@@ -105,7 +105,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		unsigned int _dim;
 
 		//standard deviation used
-		unsigned int _sigma;
+		int _sigma;
 
 		tarch::la::Vector<dim, unsigned int> _lastIndex;
 
