@@ -6,7 +6,6 @@
  *  @author Felix Maurer
  */
 
-
 //Member functions of Gauss.h:
 template<unsigned int dim>
 //TODO: This is very much hardcoded for kernel radius = 1
@@ -25,7 +24,7 @@ void coupling::Gauss<dim>::operator()(){
 
 		//only one of these two cases can occur at once
 		if(indexBelow == index){
-			if(_extrapolationStrategy == 0){
+			if(_extrapolationStrategy == NONE){
 				//set weight of out of bounds index to zero
 				weights[0] = 0;
 				//normalize the other two weights
@@ -33,7 +32,7 @@ void coupling::Gauss<dim>::operator()(){
 				weights[1] /= weightsSum;
 				weights[2] /= weightsSum;
 			}
-			else if(_extrapolationStrategy == 1){
+			else if(_extrapolationStrategy == LINEAR){
 				weights[0] = 0;
 				//TODO: test this
 				for(unsigned int si = 0; si < _scalarSetters.size(); si++)
@@ -64,7 +63,7 @@ void coupling::Gauss<dim>::operator()(){
 
 		}
 		else if(indexAbove == index){
-			if(_extrapolationStrategy == 0){
+			if(_extrapolationStrategy == NONE){
 				//set weight of out of bounds index to zero
 				weights[2] = 0;
 				//normalize the other two weights
@@ -73,7 +72,7 @@ void coupling::Gauss<dim>::operator()(){
 				weights[1] /= weightsSum;
 
 			}
-			else if(_extrapolationStrategy == 1){
+			else if(_extrapolationStrategy == LINEAR){
 				weights[0] = 0;
 				//TODO: test this
 				for(unsigned int si = 0; si < _scalarSetters.size(); si++)
@@ -133,7 +132,7 @@ void coupling::Gauss<dim>::operator()(){
 //Private functions of Gauss.h: 
 template<unsigned int dim>
 std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel() {
-	std::cout << "gauss: kernel radius: " << GAUSS_KERNEL_RADIUS << std::endl;	
+	//std::cout << "gauss: kernel radius: " << GAUSS_KERNEL_RADIUS << std::endl;	
 
 	std::array<double, 1+2*GAUSS_KERNEL_RADIUS> kernel;
 	unsigned int i = 0; //index in kernel
@@ -142,28 +141,33 @@ std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel
 	//fill kernel using Gaussian error function
 	for(int x = -GAUSS_KERNEL_RADIUS; x <= GAUSS_KERNEL_RADIUS; x++) {
 		kernel[i] = gaussianDensityFunction(x);
-		std::cout << "gauss: kernel entry: " << kernel[i] << std::endl;
 		sum += kernel[i];
 		i++;
 	}
 	
-	std::cout << "gauss: kernel sum: " << sum << std::endl;
+	//std::cout << "gauss: kernel sum: " << sum << std::endl;
 
 	//normalize kernel. by definition, sum cannot be 0.
-	for(auto k : kernel) { k *= 1/sum; std::cout << "gauss: normalized kernel entry: " << k << std::endl; }
+	for(auto k : kernel) { 
+		k *= 1/sum; 
+
+		#ifdef DEBUG_GAUSS
+    	std::cout << "		GAUSS(Dim: " << _dim << "): Add kernel entry: " << k;
+    	#endif 
+	}
 
 	return kernel;
 }
 
 template<unsigned int dim>
 double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
-	//TODO fix this
-	double ans = 0.5 * erf(x / (M_SQRT2*_sigma));
-	std::cout << "gauss: error function at x =" << x << ": " << ans << std::endl; 
+	double ans = ( 1 / ( _sigma * sqrt(2*M_PI) ) ) * exp(-0.5 * (x/_sigma) * (x/_sigma));
+	//std::cout << "gauss: error function at x = " << x << ": " << ans << std::endl; 
 	return ans;
 }
 
 
+//TODO: double check these two
 template<unsigned int dim>
 unsigned int coupling::Gauss<dim>::getIndexAbove(unsigned int index, unsigned int d){
 	unsigned int diff = 1;
