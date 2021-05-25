@@ -49,10 +49,17 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
 		//Gauss
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
-			//dimension of gauss filter
+			//dimension the gauss filter operates on
 			int d;
 			if(currFilterNode->QueryIntAttribute("dim", &d)){
 				std::cout << "ERROR: Gaussian filter misses attribute dim in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+			//standard deviation of the gauss filter
+			int sigma;
+			if(currFilterNode->QueryIntAttribute("sigma", &sigma)){
+				std::cout << "ERROR: Gaussian filter misses attribute sigma in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}
 				
@@ -60,7 +67,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			const char* extrapolation;
 			extrapolation = currFilterNode->Attribute("extrapolation");
 
-			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, (unsigned int) d, extrapolation);
+			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, (unsigned int) d, (unsigned int) sigma, extrapolation);
 		}
 
 		//POD
