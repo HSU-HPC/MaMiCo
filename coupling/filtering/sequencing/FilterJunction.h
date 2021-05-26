@@ -146,9 +146,8 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 
 
 	private:
-		//Do I ever need instances of this? (currently not initialized)
+		//These must be parted for junction output and junctor in/output.
 		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _inputCellVector_parted;
-		//These must be parted for junction output.
 		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _cellVector1_parted;
 		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _cellVector2_parted;
 

@@ -90,11 +90,10 @@
 		<nlm-junction input = "md POD-seq" filtered-values="macro-mass macro-momentum">
 			<NLM
 				time-window-size="5"	
+				sigsq="0.0"
+				hsq="0.45"
 			/>
 		</nlm-junction>
-
-		<empty-junction input = "md POD-seq" filtered-values="macro-mass macro-momentum">
-		</empty-junction>
 
 		<post-nlm-junction input = "nlm-junction" filtered-values="macro-mass macro-momentum">
 			<write-to-file
@@ -102,13 +101,6 @@
 				overwrite="false"
 			/>
 		</post-nlm-junction>
-
-		<post-empty-junction input = "empty-junction" filtered-values="macro-mass macro-momentum">
-			<write-to-file
-				location="empty_junction.csv"
-				overwrite="false"
-			/>
-		</post-empty-junction>
 	</per-instance>
 
 	<post-multi-instance output="md">

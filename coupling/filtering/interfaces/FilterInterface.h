@@ -71,8 +71,6 @@ class coupling::FilterInterface{
 				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setTemperature);
 				_scalarGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getTemperature);
 			}
-
-			//std::cout << "		First memory adresses (I/O): " << inputCellVector[0] << " "<< outputCellVector[0] << std::endl;
 		}
 
 		FilterInterface(const char* type) : _type(type) {/* Used by incomplete implementations of FilterInterface. Should be redesigned via meta class.*/}
@@ -94,24 +92,45 @@ class coupling::FilterInterface{
 
 		//TODO: changed this to pass by reference. not sure if thats safe
 		void updateCellData(
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
-			std::vector<tarch::la::Vector<dim,unsigned int>>& new_cellIndices
+			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
+			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
+			const std::vector<tarch::la::Vector<dim,unsigned int>>& new_cellIndices
 		) {
-			std::cout << "		FI: Updating cell data. Now filters " << _inputCells.size() << " cells." << std::endl;
 			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size())
 			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
+
+			//Note: I reverted this back to the original version. The cause for the malloc: invalid size bug most probably isnt here.
 			_inputCells = new_inputCells;
 			_outputCells = new_outputCells;
 			_cellIndices = new_cellIndices;
-
+		
+			std::cout << "		FI: Updated cell data." << std::endl;
 		}
 
+		/*
+		 * Basic Getters/Setters
+		 */
 		const char* getType() const { return _type; }
-
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getInputCells() const { return _inputCells; }
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getOutputCells() const { return _outputCells; }
 		std::vector<tarch::la::Vector<dim,unsigned int>> getCellIndices() const { return _cellIndices; }
+
+		/*
+		 * Advanced Getters/Setters
+		 */
+		coupling::datastructures::MacroscopicCell<dim>* getInputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
+			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
+				if(_cellIndices[i] == index) return _inputCells[i];
+			}
+			throw std::runtime_error("FilterInterface: getInputCellofIndex(): Could not find index.");
+		}
+		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
+			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
+				if(_cellIndices[i] == index) return _outputCells[i];
+			}
+			throw std::runtime_error("FilterInterface: getOutputCellofIndex(): Could not find index.");
+		}
+
 
 		/*
 		 * Only used in one scenario:
