@@ -12,17 +12,13 @@
 
 //INCLUDE ALL FILTER HEADERS HERE
 #include "coupling/filtering/filters/WriteToFile.h"
-#include "coupling/filtering/filters/ReadFromFile.h"
 #include "coupling/filtering/filters/Gauss.h"
 #include "coupling/filtering/filters/POD.h"
 #include "coupling/filtering/filters/NLM.h"
 #include "coupling/filtering/filters/Strouhal.h"
 #include "coupling/filtering/filters/FilterFromFunction.h"
 #include "coupling/filtering/filters/Copy.h"
-
-#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include "coupling/filtering/SequentialFilter.h"
-#endif
 
 /*
  * Filter Sequences are used to group filters that will be applied in chronological order.
@@ -48,7 +44,7 @@ class coupling::FilterSequence {
 		/*
 		 * Filter Sequences are constructed in coupling::FilterPipeline::loadSequencesFromXML(...).
 		 * inputCellVector and cellIndices cover the entire md2Macro domain.
-		 * domainStart and domainEnd span a subspace of the md-to-macro) domain.
+		 * domainStart and domainEnd span a subspace of the global (md2Macro) domain.
 		 */
     	FilterSequence( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
 						const tarch::utils::MultiMDService<dim>& multiMDService,
@@ -92,22 +88,22 @@ class coupling::FilterSequence {
 
 
     	virtual ~FilterSequence(){
-			//Output average application times for all filters
-			std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
-			for(auto filter : _filters){
-				std::cout << "	" << filter->getType() << ": " << (double) std::accumulate(_filterTimes[filter].begin(),_filterTimes[filter].end(),0) / (double) _timestepsElapsed << std::endl;
-			}
-
 			for (auto v1 : _cellVector1) delete v1;
 			for (auto v2 : _cellVector2) delete v2;
 			for (auto f : _filters) delete f;
         	#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Deconstructed." << std::endl;
         	#endif
+
+			//Output average application times for all filters
+			std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
+			for(auto filter : _filters){
+				std::cout << "	" << filter->getType() << ": " << (double) std::accumulate(_filterTimes[filter].begin(),_filterTimes[filter].end(),0) / (double) _timestepsElapsed << std::endl;
+			}
     	}
 	
 		/*
-		 * Each sequence operates on their own two copies of the md-to-macro domain. 
+		 * Each sequence operates on their own two copies of the global domain. 
 		 * Thus, before applying the sequence, we need to update these two copies.
 		 */
 		void updateCellVectors(){
@@ -135,7 +131,7 @@ class coupling::FilterSequence {
 				gettimeofday(&after, NULL);
 
 				//store time difference in usec in map
-				_filterTimes[filter].push_back((after.tv_sec*1000000+after.tv_usec) - (before.tv_sec*1000000+before.tv_usec));
+				_filterTimes[filter].push_back(after.tv_sec*1000000+after.tv_usec - before.tv_sec*1000000+before.tv_usec);
 
 				#ifdef DEBUG_FILTER_PIPELINE
 					std::cout 
@@ -182,10 +178,10 @@ class coupling::FilterSequence {
 		virtual int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
 		/*
-		 * Determines based on _domainStart and _domainEnd which of the md-to-macro domain's cell belong to the sequence's domain.
+		 * Determines based on _domainStart and _domainEnd which of the global domain's cell belong to the sequence's local domain.
 		 * This initializes all domain vector member variables (see below).
 		 *
-		 * Used in constructor.
+		 * Used in constructor. TODO: i like to move it
 		 *
 		 * Implemented by FilterJunction to init domain partitions.
 		 */
@@ -248,9 +244,9 @@ class coupling::FilterSequence {
       
 	private:
 		/*
-		 * Copies all input cells to _cellVector1 and _cellVector2.
+		 * Copies all (global) input cells to _cellVector1 and _cellVector2.
 		 *
-		 * Used in consctructor.
+		 * Used in consctructor. //TODO: move it
 		 *
 		 * Not implemented by FilterJunction: Equivalent procedure can be found in that class' constructor.
 		 */
@@ -279,9 +275,9 @@ class coupling::FilterSequence {
 		tarch::la::Vector<dim, unsigned int> _domainEnd;
 
 		//uses _cellIndices indexing (i. e. _domainStart .... _domainEnd))
-    	std::vector<tarch::la::Vector<dim, unsigned int>> _mamicoDomainCellIndices;     	
+    	std::vector<tarch::la::Vector<dim, unsigned int>> _globalDomainCellIndices;     	
 		//starts at (0,...,0)
-		std::vector<tarch::la::Vector<dim, unsigned int>> _sequenceDomainCellIndices; 
+		std::vector<tarch::la::Vector<dim, unsigned int>> _localDomainCellIndices; 
 		
 		std::array<bool, 7> _filteredValues;
 

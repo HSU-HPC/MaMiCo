@@ -37,7 +37,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
 	
 	//load domain vectors
-	_ic->initMD2MacroDomain(inputCells, _md2MacroCells, _md2MacroCellIndices, _outerCells, _outerCellIndices);
+	_ic->initMD2MacroDomain(inputCells, _md2MacroCells, _md2MacroCellIndices);
 
     //load sequences
     if (_postMultiInstance){
@@ -170,13 +170,6 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 			std::cout << "ERROR: Filter-Pipeline: Sequence name may not be 'md'." << std::endl;
 			exit(EXIT_FAILURE);
 		}
-		//"outer" is reserved as well
-		if(std::strcmp(currSequenceNode->Value(), "outer") == 0){
-			//TODO: exception
-			std::cout << "ERROR: Filter-Pipeline: Sequence name may not be 'outer'." << std::endl;
-			exit(EXIT_FAILURE);
-		}
-
 		//Duplicate names are not permitted
 		for(auto seq: knownSequences)
 			if(std::strcmp(seq->getName(),currSequenceNode->Value()) == 0) {
@@ -216,21 +209,12 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 
 		//Iterate over all inputs specified in input string.
 		//Note: If there are non-matching names in input String, they are ignored. //TODO: don't allow that? exception?
-		bool asymmetrical = false; //true if we need to build an asymmetrical junction
 		unsigned int input_count = 0;
 		for(auto inputName : inputNames) {
         	//"md" is the default input and is not associated to any sequence
         	if(inputName == "md") { 
 				for(auto cell : _md2MacroCells) inputCellVector.push_back(cell);
-				input_count++;	
-				continue;
-			}
-
-			//"outer" refers to all cells lying outside the md2macro domain. only used by asymmetrical junctions
-			if(inputName == "outer") {
-				asymmetrical = true;
 				input_count++;
-				continue;
 			}
 
         	//search temp vector of known sequences
@@ -308,47 +292,15 @@ int coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* no
 		
 		//CREATE SEQUENCE/JUNCTION
 		if(input_count == 1) {
-			knownSequences.push_back(new coupling::FilterSequence<dim>(	_ic,
-																		_multiMDService, 
-																		currSequenceNode->Value(), 
-																		inputCellVector, 
-																		_md2MacroCellIndices, 
-																		domainStartCell, 
-																		domainEndCell, 
-																		filteredValues));
+			knownSequences.push_back(new coupling::FilterSequence<dim>(_ic, _multiMDService, currSequenceNode->Value(), inputCellVector, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 				if(inputSeqs.size() == 1) std::cout << "FP: " << knownSequences.back()->getName() << " will use " << inputSeqs[0]->getName() << " as input." << std::endl;
 				else std::cout << "FP: " << knownSequences.back()->getName() << " will use MD data as input." << std::endl;
 			#endif
 		} 
-		else if(asymmetrical) {
-			if(input_count != 2) throw std::runtime_error("ERROR: Currently, asymmetrical junctions are only allowed for exactly two inputs!");
-			//TODO: currently, the only support asymmetrical junction is one that uses outer cells as secondary input
-			knownSequences.push_back(new coupling::AsymmetricalFilterJunction<dim>(	_ic, 
-																					_multiMDService, 
-																					currSequenceNode->Value(), 
-																					inputCellVector, 
-																					_md2MacroCellIndices, 
-																					_outerCells, 
-																					_outerCellIndices, 
-																					domainStartCell, 
-																					domainEndCell, 
-																					filteredValues));
-			#ifdef DEBUG_FILTER_PIPELINE
-				std::cout << "FP: " << knownSequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
-			#endif
-
-		}
 		else { //Junction = Sequence with 2 or more inputs
 			//TODO: move template inputc: currently has 2 hardcoded
-			knownSequences.push_back(new coupling::FilterJunction<dim, 2>(	_ic, 
-																			_multiMDService, 
-																			currSequenceNode->Value(), 
-																			inputCellVector, 
-																			_md2MacroCellIndices, 
-																			domainStartCell, 
-																			domainEndCell, 
-																			filteredValues));
+			knownSequences.push_back(new coupling::FilterJunction<dim, 2>(_ic, _multiMDService, currSequenceNode->Value(), inputCellVector, _md2MacroCellIndices, domainStartCell, domainEndCell, filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << "FP: " << knownSequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
 			#endif
