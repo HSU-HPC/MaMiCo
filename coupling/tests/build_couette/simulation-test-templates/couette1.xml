@@ -46,12 +46,12 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout. Only for sequential tests.
   -->
   <coupling
-    coupling-cycles="50"
+    coupling-cycles="10"
     two-way-coupling="yes"
     send-from-md-to-macro="yes"
     filter-init-cycles="0"
     write-csv-every-timestep="2"
-    send-from-macro-to-md="no"
+    send-from-macro-to-md="yes"
     compute-snr="no"
   />
 
@@ -109,9 +109,10 @@
       Should be equal to molecules-per-direction[0] / domain-size[0] * molecules-per-direction[1] / domain-size[1] * molecules-per-direction[2] / domain-size[2], unless MD checkpoint is used.
   -->
   <microscopic-solver
-    type="synthetic"
-	noise-sigma="1"
-    number-md-simulations="1"
+    type="md"
+    temperature="1.1"
+    equilibration-steps="0"
+    number-md-simulations="4"
     density="0.813037037"
   />
 
@@ -213,19 +214,13 @@
 
 <filter-pipeline>
 
-	<per-instance output="SYNTHETIC-MD">
-		<SYNTHETIC-MD filtered-values="macro-mass macro-momentum">
+	<per-instance output="md">
+		<wtf-sequence filtered-values="macro-mass macro-momentum">
 			<write-to-file
-				location="post-synth.csv"
+				location="md-sample.csv"
 				overwrite="false"
 			/>
-		</SYNTHETIC-MD>
-		<unfiltered filtered-values="all" input="SYNTHETIC-MD">
-			<write-to-file
-				location="unfiltered.csv"
-				overwrite="false"
-			/>
-		</unfiltered>
+		</wtf-sequence>
     </per-instance>
 
 	<post-multi-instance output="md">

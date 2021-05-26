@@ -18,4 +18,3 @@ personal_settings
 *.png
 coupling/tests/kvs-lbmpy/*.xml
 coupling/tests/kvs-lbmpy/*.ini
-*.old

@@ -4,7 +4,6 @@
 // www5.in.tum.de/mamico
 
 #include <sys/time.h>
-#include <stdexcept>
 
 
 template<class LinkedCell,unsigned int dim>
@@ -460,7 +459,6 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::plotEveryMa
 
 
 //TODO: make indices uint
-//TODO: make functions take references of vectors, not copies thereof
 template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::addFilterToSequence(
 							const char *name,
@@ -468,11 +466,18 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::addFilterTo
 	   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 							int filterIndex
 ){
+	bool found = false;
 	for(coupling::FilterSequence<dim>* currSequence : coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::_filterPipeline.getPiSequences()) {
 		if(std::strcmp(currSequence->getName(), name) == 0) {
 			currSequence->addFilter(applyScalar, applyVector, filterIndex);
-			return; 
+			found = true;
+			break; 
 		}
 	}
-	throw std::runtime_error(std::string("ERROR: Could not find Filter Sequence named ").append(name).append(" when trying to add filter."));
+	
+	if(!found) {
+		std::cout << "ERROR: Could not find Filter Sequence named " << name << " when trying to add filter." << std::endl;
+		exit(EXIT_FAILURE);
+	}
 }
+

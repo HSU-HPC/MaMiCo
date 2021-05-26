@@ -22,12 +22,6 @@
 // for debugging purposes only
 #include <iostream>
 
-//#define PYBIND_USE_DMALLOC
-// used for memory debugging
-#ifdef PYBIND_USE_DMALLOC
-	#include "dmalloc.h"
-#endif
-
 /** 
  *  Python bindings for MaMiCo framework
  *

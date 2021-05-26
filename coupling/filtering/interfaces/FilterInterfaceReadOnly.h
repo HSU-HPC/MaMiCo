@@ -37,12 +37,6 @@ class coupling::FilterInterfaceReadOnly : public coupling::FilterInterface<dim>{
 		 * 	If you would not do that, the successors of the implementing filter in a sequence would get faulty input data.
 		 */
 		void copyInputToOutput(){
-			/*
-			 * In certain cases, e.g. read-only filters that operate on secondary cells of an AsymmetricalFilterJunction, we don't want the filter to produce any output.
-			 * Then, and only then, the output cells vector will be empty.
-			 */
-			if(coupling::FilterInterface<dim>::_outputCells.empty()) return;
-
 			for(unsigned int ci = 0; ci < coupling::FilterInterface<dim>::_outputCells.size(); ci++){
 				for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++){
 					(coupling::FilterInterface<dim>::_outputCells[ci]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
