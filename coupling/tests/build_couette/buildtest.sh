@@ -36,7 +36,6 @@ rm ${BUILD_PATH}/*.o;
 
 compiler=""
 libraries=""
-#libraries="-ldmalloc -ldmallocxx" uncomment this if you use dmalloc for debugging purposes
 objects=""
 includes="-I${MAMICO_PATH}"
 

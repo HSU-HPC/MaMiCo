@@ -15,8 +15,7 @@ namespace coupling {
 
 /** 
  *  Noise reduction algorithm using non-local means (NLM) method
- *  See 'Fast Non Local Means Denoising for 3D MR Images' by Coupé et al. 2006
- *   and 'Non-Local Means Denoising' by Buades et al. 2011. 
+ *  See 'Fast Non Local Means Denoising for 3D MR Images' by Coupé et al. 2006.
  *
  *  @author Piet Jarmatz
  * 
@@ -31,8 +30,6 @@ class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
         const std::array<bool, 7> filteredValues, 
         const coupling::IndexConversionMD2Macro<dim>* indexConversion,
         int tws,
-		double sigsq,
-		double hsq,
         int M = 2,
         int d = 1
         ):
@@ -45,8 +42,6 @@ class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
     _timeWindowSize(tws),
     _M(M),
     _d(d),
-	_sigsq(sigsq),
-	_hsq(hsq),
     _cycleCounter(0),
     _t(0),
     _ic(indexConversion),
@@ -94,10 +89,6 @@ class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
     //unsigned int _timeModulo; // e.g. 2,4,8 ....
   	const unsigned int _M; // search volume has size (2M+1)^3
   	const unsigned int _d; // patches have size (2d+1)^4; this makes at least _d ghost layer necessary
-
-	const double _sigsq;
-	const double _hsq;
-
     unsigned int _cycleCounter; // coupling cycle counter, indicates how many data snapshots are available already
     unsigned int _t; // active temporal index, iterates cyclic between zero and _timeWindowSize
     const coupling::IndexConversionMD2Macro<dim>* _ic;
@@ -105,10 +96,6 @@ class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
     coupling::filtering::Flowfield<dim> _flowfield_prefiltered;
     coupling::filtering::Patchfield<dim> _patchfield;
     std::vector<tarch::la::Vector<dim, unsigned int>> _innerCellIndices;
-
-    inline unsigned int posmod(int i, int n) const{
-      return (i % n + n) % n;
-    }
 };
 
 //include implementation of header

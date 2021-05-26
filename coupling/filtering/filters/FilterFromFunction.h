@@ -5,6 +5,8 @@
 #pragma once
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
+//TODO: add debug macro + debug output
+
 namespace coupling{
 	template<unsigned int dim>
 	class FilterFromFunction;
@@ -34,9 +36,6 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 			_applyScalar(applyScalar),
 			_applyVector(applyVector)
 		{
-			if(applyScalar == nullptr or applyVector == nullptr) 
-				throw std::runtime_error("ERROR: FilterFromFunction received nullptr as function pointer!");
-
 			//cast tarch::la indexing to std::array
 			std::array<unsigned int, dim> stlIndex;
 			for(auto mamicoIndex : cellIndices) {
@@ -67,7 +66,6 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 				}
 
 				//APPLY
-				//std::cout << "Now applying scalar func at: " << _applyScalar << std::endl;
 				std::vector<double> output_s = (*_applyScalar)(input_s, _stlIndices);
 				input_s.clear();
 
@@ -92,7 +90,6 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 				}
 
 				//APPLY
-				//std::cout << "Now applying vector func at: " << _applyVector << std::endl;
 				std::vector<std::array<double, dim>> output_v = (*_applyVector)(input_v, _stlIndices);
 				input_v.clear();
 

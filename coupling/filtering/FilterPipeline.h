@@ -4,14 +4,13 @@
 
 #pragma once
 
-//#define DEBUG_FILTER_PIPELINE
+#define DEBUG_FILTER_PIPELINE
 #define POST_MULTI_INSTANCE_FILTERING_YES true
 #define POST_MULTI_INSTANCE_FILTERING_NO false
 
 #include "tarch/tinyxml2/tinyxml2.h"
 #include "coupling/filtering/sequencing/FilterSequence.h"
 #include "coupling/filtering/sequencing/FilterJunction.h"
-#include "coupling/filtering/sequencing/AsymmetricalFilterJunction.h"
 #include "coupling/IndexConversionMD2Macro.h"
 
 
@@ -69,10 +68,6 @@ class coupling::FilterPipeline{
        	std::vector<coupling::FilterSequence<dim> *> getMiSequences() const { return _miSequences; }
 
 
-		//Returns the md2macro-IC this instance uses. Used to access MD2Macro-domain properties from outside the FilterPipeline.
-		const coupling::IndexConversionMD2Macro<dim>* getICM2M() const { return _ic; }
-
-
     private:
 		/*
 		 * Detects errors in XML-config file.
@@ -89,10 +84,6 @@ class coupling::FilterPipeline{
 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _md2MacroCells;
 		std::vector<tarch::la::Vector<dim, unsigned int>> _md2MacroCellIndices;		
-
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outerCells;
-		std::vector<tarch::la::Vector<dim, unsigned int>> _outerCellIndices;		
-
 
 		coupling::IndexConversionMD2Macro<dim>* _ic;
 		const tarch::utils::MultiMDService<dim>& _multiMDService;

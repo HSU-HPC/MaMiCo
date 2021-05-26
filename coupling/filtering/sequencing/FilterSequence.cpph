@@ -38,14 +38,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _mamicoDomainCellIndices, _sequenceDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
+            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _globalDomainCellIndices, _filteredValues, _localDomainCellIndices, currFilterNode->Attribute("location"), overwrite, oco);
         }
-	
-		//Read From File
-        else if(std::strcmp(currFilterNode->Value(), "read-from-file") == 0){
-			
-            newfilter = new coupling::ReadFromFile<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"));
-		}
 
 		//Gauss
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
@@ -60,7 +54,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			const char* extrapolation;
 			extrapolation = currFilterNode->Attribute("extrapolation");
 
-			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, (unsigned int) d, extrapolation);
+			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, (unsigned int) d, extrapolation);
 		}
 
 		//POD
@@ -86,7 +80,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::POD<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _multiMDService, tws, kmax);
+            newfilter = new coupling::POD<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, _multiMDService, tws, kmax);
         }
 
         /*//NLM
@@ -101,7 +95,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::NLM<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _ic, tws);
+            newfilter = new coupling::NLM<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, _ic, tws);
         }*/
 
 		//Strouhal
@@ -116,7 +110,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				std::cout << "ERROR: Strouhal filter misses attribute U in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}
-			newfilter = new coupling::Strouhal<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, u , d);
+			newfilter = new coupling::Strouhal<dim>(inputCellVector, outputCellVector, _localDomainCellIndices, _filteredValues, u , d);
         }
 		
 	//###############################################################
@@ -127,15 +121,12 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             exit(EXIT_FAILURE);
         }
 
-		//sequential filtering
-		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+		//global/local filtering
 		if(currFilterNode->Attribute("sequential")) {
 			if(std::strcmp(currFilterNode->Attribute("sequential"), "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _ic));
 			else _filters.push_back(newfilter);
 		}
-		else
-		#endif 
-		_filters.push_back(newfilter);
+		else _filters.push_back(newfilter);
 
 		if(firstIteration){
 			inputCellVector = _domainCellVector1;
@@ -174,8 +165,8 @@ void coupling::FilterSequence<dim>::addFilter(
 
 		//case: appending	
 		if(index ==  _filters.size()) {
-			if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
-			else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
+			if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
+			else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
 			#endif
@@ -186,27 +177,27 @@ void coupling::FilterSequence<dim>::addFilter(
 			//previous filter at index 0 won't use _inputDomainCellVector any longer
 			if(!_filters.empty()) _filters[0]->setInputCells(_cellVector1);
 
-			_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_inputDomainCellVector, _cellVector2 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
+			_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_inputDomainCellVector, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
 
 			// add copy if no copy after index exists, else remove that copy
 			if(std::strcmp(_filters[1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + 1);
-			else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues));
+			else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues));
 		}
 		//case: inserting
 		else {
 			if(index % 2 == 0) { 
-				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
+				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));
 
 				// add copy if no copy after index exists, else remove that copy
 				if(std::strcmp(_filters[index + 1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + index +1);
-				else _filters.insert(_filters.begin() + index + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues));
+				else _filters.insert(_filters.begin() + index + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues));
 			}
 			else {
-				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));	
+				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _localDomainCellIndices, _filteredValues, applyScalar, applyVector));	
 
 				// add copy if no copy after index exists, else remove that copy
 				if(std::strcmp(_filters[index + 1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + index +1);
-				else _filters.insert(_filters.begin() + index + 1, new coupling::Copy<dim>(_cellVector1, _cellVector2 , _sequenceDomainCellIndices, _filteredValues));
+				else _filters.insert(_filters.begin() + index + 1, new coupling::Copy<dim>(_cellVector1, _cellVector2 , _localDomainCellIndices, _filteredValues));
 			}
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << PRINT_PREFIX() << "Inserted new filter at index " << index << std::endl;
@@ -230,7 +221,7 @@ void coupling::FilterSequence<dim>::initCellVectors(){
     	_cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
 	}
 	#ifdef DEBUG_FILTER_PIPELINE
-		std::cout << PRINT_PREFIX() << "Initialized cell vectors." << std::endl;
+		std::cout << PRINT_PREFIX() << "Initialized (global) cell vector." << std::endl;
 		std::cout << PRINT_PREFIX() << "First element of _cellVector1 after init: " << _cellVector1[0] << std::endl;
 		std::cout << PRINT_PREFIX() << "First element of _cellVector2 after init: " << _cellVector2[0] << std::endl;
 
@@ -244,7 +235,7 @@ void coupling::FilterSequence<dim>::initDomain(){
     std::cout << PRINT_PREFIX() << "Initializing domain. Input vector has " << _inputCellVector.size() << " cells. ";
     #endif
     //sanity check
-    if(_inputCellVector.size() % _cellIndices.size() != 0){ //equal unless this is a FilterJunction TODO: check for equality if not FJ
+    if(_inputCellVector.size() % _cellIndices.size() != 0){ //equal unless this is a FilterJunction
 		std::cout << std::endl << "ERROR: Cell and index vector of sequence out of synch." << std::endl;
 		exit(EXIT_FAILURE);
     }
@@ -270,9 +261,9 @@ void coupling::FilterSequence<dim>::initDomain(){
 			_inputDomainCellVector.push_back(_inputCellVector[index]);
 			_domainCellVector1.push_back(_cellVector1[index]);
 			_domainCellVector2.push_back(_cellVector2[index]);
-			//cf. definitions in header
-			_mamicoDomainCellIndices.push_back(_cellIndices[index]);
-			_sequenceDomainCellIndices.push_back(_cellIndices[index]-_domainStart);
+			//cf. global/local definitions in header
+			_globalDomainCellIndices.push_back(_cellIndices[index]);
+			_localDomainCellIndices.push_back(_cellIndices[index]-_domainStart);
 		}
 	}
 	
