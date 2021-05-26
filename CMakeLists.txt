@@ -1,58 +1,62 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.19) 
-PROJECT ( mamico ) 
+PROJECT (MAMICO_CTEST LANGUAGES CXX)
 
-set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${mamico_SOURCE_DIR})
-
-if ( NOT CMAKE_BUILD_TYPE )
-    set ( CMAKE_BUILD_TYPE Release CACHE STRING "Build Types: Debug Release"  FORCE )
-endif()
-SET_PROPERTY( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release)
-
-#TODO: move to CompilerTest.sh
-#Set compiler
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-
-
-#Compile SimpleMD using scons script
-add_custom_target(
-	TARGET MAMICO_PYBIND
-	#TODO: make this customizable? (dim, parallel...)
-	COMMAND cd ${mamico_SOURCE_DIR} && scons target=libsimplemd dim=3 build=release parallel=yes -j4 || exit $?
-	)
-#TODO: Add simplemd to libraries (add_libraries?)
-
-#TODO: fix this
+set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
 
-#TODO: use personal_settings or rather CMakeCache
-include_directories ( /usr/include/python3.8 )
-include_directories ( /usr/lib/openmpi/include )
-include_directories ( /usr/include/eigen3 )
-                 
-#define target
-add_library(MAMICO_PYBIND 
-	${mamico_SOURCE_DIR}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp
-	${mamico_SOURCE_DIR}/coupling/configurations/ParticleInsertionConfiguration.cpp
-	${mamico_SOURCE_DIR}/coupling/python-binding/mamico.cpp
+#--- Define target ---
+
+#NOTE: You are expected to pass USE_PYBIND11=True when executing this cmake script to compile a pybind11 library.
+#	   The default is a standard Couette scenario (C++).
+
+if(USE_PYBIND11)
+	find_package(Python COMPONENTS Interpreter Development REQUIRED)
+	find_package(pybind11 REQUIRED)
+
+	#Case: pybind11
+	message("Now compiling pybind11 library...")
+	pybind11_add_module( mamico_ctest
+	${CMAKE_CURRENT_SOURCE_DIR}/coupling/python-binding/mamico.cpp
+	)
+	#Currently, KVS is not supported in non-parallel mode
+	set(MAMICO_PARALLEL TRUE)
+else()
+	#Case: Couette
+	message("Now compiling CouetteTest...")
+	add_library(mamico_ctest
+		${CMAKE_CURRENT_SOURCE_DIR}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/coupling/configurations/ParticleInsertionConfiguration.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/coupling/tests/main_couette.cpp
+	)
+	#If you wish to compile a parallelized version of Couette, define this upon calling Cmake
+	if(PARALLEL)
+		set(MAMICO_PARALLEL TRUE)
+	endif()
+endif()
+
+#enforce c++17 in order to support the use of modern C++ features
+target_compile_features(mamico_ctest PRIVATE cxx_std_17)
+
+#Add SimpleMD's scons build script to target ---
+add_custom_target(
+	TARGET mamico_ctest
+	#TODO: make this customizable? (dim, parallel...)
+	COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && scons target=libsimplemd dim=3 build=release parallel=yes -j4 || exit $?
 )
 
+#set simplemd macros
 set_property(
-	TARGET MAMICO_PYBIND
+	TARGET mamico_ctest
 	PROPERTY COMPILE_DEFINITIONS MDDim3 MDError SIMPLE_MD
 	)
 
-#enforce c++17 in order to support the use of constexxr
-target_compile_features(MAMICO_PYBIND PRIVATE cxx_std_17)
-
-#if(MAMICO_PARALLEL)
+if(MAMICO_PARALLEL)
 	set_property(
-		TARGET MAMICO_PYBIND
+		TARGET mamico_ctest
    		APPEND PROPERTY COMPILE_DEFINITIONS MDParallel Parallel MDCoupledParallel TarchParallel
    	)
-#endif()
+endif()
 
-
-#add_subdirectory( coupling )
-#add_subdirectory( tarch )
-#add_subdirectory( simplemd )
-
+#If thesee include directories do not suffice, you can add more manually via -DCMAKE_CXX_FLAGS
+target_include_directories (mamico_ctest PUBLIC /usr/include/ )
+target_include_directories (mamico_ctest PUBLIC /usr/lib/ )
