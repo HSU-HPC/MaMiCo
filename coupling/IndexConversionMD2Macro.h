@@ -9,7 +9,9 @@
 
 #include "IndexConversion.h"
 #include "interface/MacroscopicSolverInterface.h"
+#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 #include <mpi.h>
+#endif
 
 namespace coupling {
 	template<unsigned int dim>
@@ -29,19 +31,23 @@ class coupling::IndexConversionMD2Macro {
 	public:
 		IndexConversionMD2Macro(
 				const coupling::IndexConversion<dim>* indexConversion,
-				coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,
-				const MPI_Comm comm = MPI_COMM_WORLD, //TODO: case multimd
-				const int lowestRankInComm = 0 //TODO: case multimd
+				coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface
+				#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
+					,const MPI_Comm comm = MPI_COMM_WORLD, //TODO: case multimd
+					const int lowestRankInComm = 0 //TODO: case multimd
+				#endif
 			):
 				_ic(indexConversion),
 				_msi(macroscopicSolverInterface),
 				_globalLowerBoundaries(nullptr),
 				_globalUpperBoundaries(nullptr),
 				_localLowerBoundaries(nullptr),
-				_localUpperBoundaries(nullptr),
-				_comm(comm),
-				_lowestRank((int)lowestRankInComm),
-				_myRank((int)_ic->getThisRank())
+				_localUpperBoundaries(nullptr)
+				#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
+					,_comm(comm),
+					_lowestRank((int)lowestRankInComm),
+					_myRank((int)_ic->getThisRank())
+				#endif
 			{
 				#ifdef DEBUG_ICM2M
 				std::cout << "ICM2M: Created new instance at location " << this << " using IC at " << _ic << " and MSI at " << _msi << std::endl;
@@ -63,11 +69,14 @@ class coupling::IndexConversionMD2Macro {
 		/*
 		 * Chooses a subspace of the cell (and index) input based on what will be transfered to the macro solver.
 		 * This subspace is referred to as "md2Macro-domain" (or sometimes (m2m-domain).
+		 * All other cells will be placed into the "outer" domain.
 		 */
 		void initMD2MacroDomain(
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& m2mDomainCells,
-				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices
+				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outerCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices
 				);
 
 		/*
@@ -84,7 +93,11 @@ class coupling::IndexConversionMD2Macro {
 					lowerBoundaries = *_globalLowerBoundaries;
 					upperBoundaries = *_globalUpperBoundaries;
 			}
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 			else std::cout << "WARNING: ICM2M (" << _myRank << "): getGlobalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
+			#else
+			else std::cout << "WARNING: ICM2M: getGlobalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
+			#endif
 		}
 		void getLocalMD2MacroDomainBoundaries(
 				tarch::la::Vector<dim, unsigned int>& lowerBoundaries,
@@ -93,7 +106,11 @@ class coupling::IndexConversionMD2Macro {
 					lowerBoundaries = *_localLowerBoundaries;
 					upperBoundaries = *_localUpperBoundaries;
 			}
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 			else std::cout << "WARNING: ICM2M (" << _myRank << "): getLocalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
+			#else
+			else std::cout << "WARNING: ICM2M: getLocalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
+			#endif
 		}
 
 		//assumes lower boundary to be lower than upper 
@@ -107,14 +124,26 @@ class coupling::IndexConversionMD2Macro {
 			return *_localUpperBoundaries - *_localLowerBoundaries + plus_one;
 		}
 
+		tarch::la::Vector<dim, double> getGlobalMD2MacroDomainOffset() const {
+			auto offset = _ic->getGlobalMDDomainOffset(); //standard MD offset
+
+			//offset of md2macro domain relative to MD domain
+			for(unsigned int d = 0; d < dim; d++) 
+				offset[d] += _ic->getMacroscopicCellSize()[d] * (*_globalLowerBoundaries)[d]; //offset of md2macro domain relative to MD domain
+
+			//std::cout << offset << std::endl << std::endl;
+			return offset;
+		}
+
 
 		//TODO: move both of these to regular IC?
+		//TODO: update documentation
 		/*
 		 * Same as getGlobalVectorCellIndex but sets all ghost layer indices to INT_MAX
 		 * E.g.: Ghost layer at x = 0. Then requesting vector index (x,y,z,..) will return (INT_MAX, y, z,...).
 		 */
-		tarch::la::Vector<dim,unsigned int> getGlobalVectorCellIndex_NoGL(unsigned int globalCellIndex) const;
-		tarch::la::Vector<dim,unsigned int> getLocalVectorCellIndex_NoGL(unsigned int localCellIndex) const;
+		tarch::la::Vector<dim,unsigned int> getGlobalVectorCellIndex(unsigned int globalCellIndex, bool noGL = true) const;
+		tarch::la::Vector<dim,unsigned int> getLocalVectorCellIndex(unsigned int localCellIndex, bool noGL = true) const;
 
 		/*
 		 * In a lot of cases, you want instances of this to be indentical to a coupling::IndexConversion.
@@ -142,13 +171,15 @@ class coupling::IndexConversionMD2Macro {
 		tarch::la::Vector<dim, unsigned int>* _localLowerBoundaries;
 		tarch::la::Vector<dim, unsigned int>* _localUpperBoundaries;
 
-		const MPI_Comm _comm;
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
+			const MPI_Comm _comm;
 
-		//This rank is assumed to manage cell (0,...,0) both in global and in M2M terms.
-		const int _lowestRank;
+			//This rank is assumed to manage cell (0,...,0) both in global and in M2M terms.
+			const int _lowestRank;
 
-		//This ICM2M instance's rank
-		const int _myRank;
+			//This ICM2M instance's rank
+			const int _myRank;
+		#endif
 };
 
 #include "IndexConversionMD2Macro.cpph"

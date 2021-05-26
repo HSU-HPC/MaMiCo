@@ -18,7 +18,7 @@ namespace coupling{
  * Junctors are stored in FilterJunctions, which generalize FilterSequences in a similar way.
  * You can currently not add Junctors dynamically via FFF.
  *
- * Implemenents FI. The underlying FI has the junctor's main partition's input/output data. (cf. 30, 55f.)
+ * Implemenents FI. The underlying FI has the junctor's main partition's (i.e [0] of the corresponding std::array) input/output data. (cf. lines 35, 67.)
  *  @Author Felix Maurer
  */
 template<unsigned int dim, std::size_t inputc, std::size_t outputc>
@@ -30,7 +30,7 @@ class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 				const std::array<bool, 7> filteredValues,
 				const char* type):
-			//This assumes the vector of cell vectors to be nonempty. Suboptimal.
+			//This assumes the array of cell vectors to be nonempty. Suboptimal.
 			//NOTE: Avoid using FI's cell vectors. Use _inputCellVectors/_outputCellVectors instead.
 			coupling::FilterInterface<dim>(inputCellVectors[0], outputCellVectors[0], cellIndices, filteredValues, type),
 			_inputCellVectors(inputCellVectors),
@@ -74,7 +74,6 @@ class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 		/**
 		 * Unlike regular filters, junctors allow for multiple input- and output-sets
 		 */
-		//TODO: is it a good idea for this to be a c-style array? cf. updateCellData. perhaps std::array instead?
 		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _inputCellVectors; 	
 		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, outputc> _outputCellVectors;
 };
