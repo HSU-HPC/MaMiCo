@@ -39,10 +39,10 @@ class coupling::IndexConversionMD2Macro {
 			):
 				_ic(indexConversion),
 				_msi(macroscopicSolverInterface),
-				_globalLowerBoundaries(nullptr),
-				_globalUpperBoundaries(nullptr),
-				_localLowerBoundaries(nullptr),
-				_localUpperBoundaries(nullptr)
+				_lowerBoundaryAllRanks(nullptr),
+				_upperBoundaryAllRanks(nullptr),
+				_lowerBoundaryThisRank(nullptr),
+				_upperBoundaryThisRank(nullptr)
 				#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 					,_comm(comm),
 					_lowestRank((int)lowestRankInComm),
@@ -55,10 +55,10 @@ class coupling::IndexConversionMD2Macro {
 			}
 
 		~IndexConversionMD2Macro() {
-			delete _globalLowerBoundaries;
-			delete _globalUpperBoundaries;
-			delete _localLowerBoundaries; 
-			delete _localUpperBoundaries;
+			delete _lowerBoundaryAllRanks;
+			delete _upperBoundaryAllRanks;
+			delete _lowerBoundaryThisRank; 
+			delete _upperBoundaryThisRank;
 
 			#ifdef DEBUG_ICM2M
 			std::cout << "ICM2M: Deconstructed." << std::endl;
@@ -86,12 +86,12 @@ class coupling::IndexConversionMD2Macro {
 		 * 
 		 * If M2M-domain is not yet defined, this does nothing.
 		 */
-		void getGlobalMD2MacroDomainBoundaries(
+		void getMD2MacroDomainBoundariesAllRanks(
 				tarch::la::Vector<dim, unsigned int>& lowerBoundaries,
 				tarch::la::Vector<dim, unsigned int>& upperBoundaries) const { 
-			if(_globalLowerBoundaries != _globalUpperBoundaries) {
-					lowerBoundaries = *_globalLowerBoundaries;
-					upperBoundaries = *_globalUpperBoundaries;
+			if(_lowerBoundaryAllRanks != _upperBoundaryAllRanks) {
+					lowerBoundaries = *_lowerBoundaryAllRanks;
+					upperBoundaries = *_upperBoundaryAllRanks;
 			}
 			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 			else std::cout << "WARNING: ICM2M (" << _myRank << "): getGlobalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
@@ -99,12 +99,12 @@ class coupling::IndexConversionMD2Macro {
 			else std::cout << "WARNING: ICM2M: getGlobalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
 			#endif
 		}
-		void getLocalMD2MacroDomainBoundaries(
+		void getMD2MacroDomainBoundariesThisRank(
 				tarch::la::Vector<dim, unsigned int>& lowerBoundaries,
 				tarch::la::Vector<dim, unsigned int>& upperBoundaries) const { 
-			if(_localLowerBoundaries != _localUpperBoundaries) {
-					lowerBoundaries = *_localLowerBoundaries;
-					upperBoundaries = *_localUpperBoundaries;
+			if(_lowerBoundaryThisRank != _upperBoundaryThisRank) {
+					lowerBoundaries = *_lowerBoundaryThisRank;
+					upperBoundaries = *_upperBoundaryThisRank;
 			}
 			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 			else std::cout << "WARNING: ICM2M (" << _myRank << "): getLocalMD2MacroDomainBoundaries while domain boundaries are unitialized!" << std::endl; 
@@ -117,11 +117,11 @@ class coupling::IndexConversionMD2Macro {
 		tarch::la::Vector<dim, unsigned int> getGlobalMD2MacroDomainSize() const {
 			//Since both lower and upper boundaries are inclusive, we need to add one. operator+(int) in tarch::la:Vector would be great here...
 			auto plus_one = tarch::la::Vector<dim, unsigned int>(1);
-			return *_globalUpperBoundaries - *_globalLowerBoundaries + plus_one;
+			return *_upperBoundaryAllRanks - *_lowerBoundaryAllRanks + plus_one;
 		}
 		tarch::la::Vector<dim, unsigned int> getLocalMD2MacroDomainSize() const {
 			auto plus_one = tarch::la::Vector<dim, unsigned int>(1);
-			return *_localUpperBoundaries - *_localLowerBoundaries + plus_one;
+			return *_upperBoundaryThisRank - *_lowerBoundaryThisRank + plus_one;
 		}
 
 		tarch::la::Vector<dim, double> getGlobalMD2MacroDomainOffset() const {
@@ -129,7 +129,7 @@ class coupling::IndexConversionMD2Macro {
 
 			//offset of md2macro domain relative to MD domain
 			for(unsigned int d = 0; d < dim; d++) 
-				offset[d] += _ic->getMacroscopicCellSize()[d] * (*_globalLowerBoundaries)[d]; //offset of md2macro domain relative to MD domain
+				offset[d] += _ic->getMacroscopicCellSize()[d] * (*_lowerBoundaryAllRanks)[d]; //offset of md2macro domain relative to MD domain
 
 			//std::cout << offset << std::endl << std::endl;
 			return offset;
@@ -164,12 +164,15 @@ class coupling::IndexConversionMD2Macro {
 		const coupling::IndexConversion<dim>* _ic;
 		coupling::interface::MacroscopicSolverInterface<dim>* _msi;
 
-		//initialised during first call of getMD2MacroDomainBoundaries
-		tarch::la::Vector<dim, unsigned int>* _globalLowerBoundaries;
-		tarch::la::Vector<dim, unsigned int>* _globalUpperBoundaries;
+		/*
+		 * initialised during first call of getMD2MacroDomainBoundaries
+		 * these all use global indexing.
+		*/
+		tarch::la::Vector<dim, unsigned int>* _lowerBoundaryAllRanks;
+		tarch::la::Vector<dim, unsigned int>* _upperBoundaryAllRanks;
 
-		tarch::la::Vector<dim, unsigned int>* _localLowerBoundaries;
-		tarch::la::Vector<dim, unsigned int>* _localUpperBoundaries;
+		tarch::la::Vector<dim, unsigned int>* _lowerBoundaryThisRank;
+		tarch::la::Vector<dim, unsigned int>* _upperBoundaryThisRank;
 
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
 			const MPI_Comm _comm;
