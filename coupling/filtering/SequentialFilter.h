@@ -13,6 +13,7 @@
 #define FILTER_PARALLEL false
 
 #define DEBUG_SEQ_FILTER
+//#define DEBUG_SEQ_FILTER_VERBOSE
 
 namespace coupling{
 	template<unsigned int dim>

@@ -5,7 +5,7 @@
 #pragma once
 #include <vector>
 
-//#define DEBUG_FILTER
+//#define DEBUG_FILTER_INTERFACE
 
 namespace coupling{
     template<unsigned int dim>
@@ -104,7 +104,9 @@ class coupling::FilterInterface{
 			_outputCells = new_outputCells;
 			_cellIndices = new_cellIndices;
 		
+			#ifdef DEBUG_FILTER_INTERFACE
 			std::cout << "		FI: Updated cell data." << std::endl;
+			#endif
 		}
 
 		/*
@@ -122,15 +124,16 @@ class coupling::FilterInterface{
 			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
 				if(_cellIndices[i] == index) return _inputCells[i];
 			}
+			std::cout << "Index not found: " << index << std::endl;
 			throw std::runtime_error("FilterInterface: getInputCellofIndex(): Could not find index.");
 		}
 		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
 			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
 				if(_cellIndices[i] == index) return _outputCells[i];
 			}
+			std::cout << "Index not found: " << index << std::endl;
 			throw std::runtime_error("FilterInterface: getOutputCellofIndex(): Could not find index.");
 		}
-
 
 		/*
 		 * Only used in one scenario:
