@@ -14,7 +14,7 @@
 #include "coupling/filtering/filters/WriteToFile.h"
 #include "coupling/filtering/filters/ReadFromFile.h"
 #include "coupling/filtering/filters/Gauss.h"
-#include "coupling/filtering/filters/POD.h"
+//#include "coupling/filtering/filters/POD.h" TODO: fix eigen error
 #include "coupling/filtering/filters/NLM.h"
 #include "coupling/filtering/filters/Strouhal.h"
 #include "coupling/filtering/filters/FilterFromFunction.h"

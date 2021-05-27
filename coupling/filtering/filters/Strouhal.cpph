@@ -35,8 +35,8 @@ double coupling::Strouhal<dim>::calculateStrouhalNumber(){
 	double f = 0; 	
 
 	//TODO: BIG COMMENT GOES HERE
-	double min = *min_element(_v_y.begin(), _v_y.end());
-	double max = *max_element(_v_y.begin(), _v_y.end());
+	double min = *std::min_element(_v_y.begin(), _v_y.end());
+	double max = *std::max_element(_v_y.begin(), _v_y.end());
 	double eq = (min+max)/2;
 
 	#ifdef DEBUG_STROUHAL
