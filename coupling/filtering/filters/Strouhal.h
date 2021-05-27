@@ -4,8 +4,8 @@
 
 #pragma once
 #include "coupling/filtering/interfaces/FilterInterfaceReadOnly.h"
-
 #include <vector>
+#include <algorithm>
 
 #define DEBUG_STROUHAL
 

@@ -70,8 +70,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, (unsigned int) d, sigma, extrapolation);
 		}
 
-		//POD
-        else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
+		//POD: Currently disabled. TODO: fix eigen error
+        /*else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
 			//In earlier implementations, it used to be possible to override tws via function parameter. This feature was removed.
 			//See: coupling::noisereduction::NoiseReductionConfiguration::interpreteConfiguration<dim>(..., int tws)
 			int tws;
@@ -94,21 +94,6 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			}
 
             newfilter = new coupling::POD<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _multiMDService, tws, kmax);
-        }
-
-        /*//NLM
-        else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
-			int tws;
-			if(currFilterNode->QueryIntAttribute("time-window-size", &tws)){
-				std::cout << "ERROR: NLM filter misses attribute time-window-size in config file." << std::endl;
-				exit(EXIT_FAILURE);
-			}
-			if(tws <= 2){
-				std::cout << "ERROR: NLM: time-window-size must be greater than two." << std::endl;
-				exit(EXIT_FAILURE);
-			}
-
-            newfilter = new coupling::NLM<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _ic, tws);
         }*/
 
 		//Strouhal
@@ -136,8 +121,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
 		//sequential filtering
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-		if(currFilterNode->Attribute("sequential")) {
-			if(std::strcmp(currFilterNode->Attribute("sequential"), "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _ic));
+		if(const char* sequential = currFilterNode->Attribute("sequential")) {
+			if(std::strcmp(sequential, "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _ic));
 			else _filters.push_back(newfilter);
 		}
 		else
@@ -154,8 +139,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	}
 
 	//Check for modfiability. By default true.
-	if(sequenceNode->Attribute("modifiable")) {
-		if(std::strcmp(currFilterNode->Attribute("modifable"), "false") == 0) _isModifiable = false;
+	if(const char* modifiable = sequenceNode->Attribute("modifiable")) {
+		if(std::strcmp(modifiable, "false") == 0) _isModifiable = false;
 	}
 
 	#ifdef DEBUG_FILTER_PIPELINE

@@ -3,6 +3,7 @@
 // www5.in.tum.de/mamico
 
 #pragma once
+#include <functional>
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling{
