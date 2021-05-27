@@ -13,7 +13,6 @@
   <!--<particle-insertion type="none" />/-->
   <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
   <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" />
-  <noise-reduction type="none" time-window-size="5" kmax="1"/>
   <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
   <parallel-topology type="xyz" />
 </mamico>
@@ -32,7 +31,7 @@
 
   <simulation-configuration
     dt="0.005"
-    number-of-timesteps="5"
+    number-of-timesteps="1"
     reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
     fix-seed="no"
@@ -69,58 +68,67 @@
 
 <filter-pipeline>
 
-	<per-instance output="gauss-before">
-		<!-- CURRENTLY DISABLED
-		<test-strouhal filtered-values="velocity">
+	<per-instance output="md">
+		<unfiltered filtered-values="macro-mass macro-momentum">
 			<write-to-file
-				location="parallel.csv"
+				location="unfiltered.csv"
 				overwrite="false"
+				one-cell-only="129"
 			/>
-			<strouhal
-				D="0.2"
-				U="2.25"
-			/>
-			<write-to-file
-				location="sequential.csv"
-				overwrite="false"
-			/>
-			<write-to-file
-				location="parallel2.csv"
-				overwrite="false"
-			/>
-		</test-strouhal>
-		-->
-		<gauss-before filtered-values="velocity">
-			<write-to-file
-				location="gauss_before.csv"
-				overwrite="false"
-			/>
-		</gauss-before>
+		</unfiltered>
 
-		<gauss-1 filtered-values="velocity" input="gauss-before">
-			<!-- PYTHON GAUSS FILTER GETS LINKED IN HERE-->
+		<gaussX-python filtered-values="macro-mass macro-momentum">
 			<write-to-file
-				location="gauss_1.csv"
+				location="gaussX-python.csv"
 				overwrite="false"
+				one-cell-only="129"
 			/>
-		</gauss-1>
+		</gaussX-python>
 
-		<gauss-2 filtered-values="velocity" input="gauss-before">
-			<!-- PYTHON GAUSS FILTER GETS LINKED IN HERE-->
+		<gaussXYZ-python filtered-values="macro-mass macro-momentum">
 			<write-to-file
-				location="gauss_2.csv"
+				location="gaussXYZ-python.csv"
 				overwrite="false"
+				one-cell-only="129"
 			/>
-		</gauss-2>
+		</gaussXYZ-python>
+		
+		<gaussX-cpp filtered-values="macro-mass macro-momentum">
+			<gauss
+				dim="0"
+				sigma="1"
+			/>
 
-		<gauss-3 filtered-values="velocity" input="gauss-before">
-			<!-- PYTHON GAUSS FILTER GETS LINKED IN HERE-->
 			<write-to-file
-				location="gauss_3.csv"
+				location="gaussX-cpp.csv"
 				overwrite="false"
+				one-cell-only="129"
 			/>
-		</gauss-3>
-    </per-instance>
+		</gaussX-cpp>
+		
+		<gaussXYZ-cpp filtered-values="macro-mass macro-momentum">
+			<gauss
+				dim="0"
+				sigma="1"
+			/>
+			<gauss
+				dim="1"
+				sigma="1"
+			/>
+			<gauss
+				dim="2"
+				sigma="1"
+			/>
+
+
+
+			<write-to-file
+				location="gaussXYZ-cpp.csv"
+				overwrite="false"
+				one-cell-only="129"
+			/>
+		</gaussXYZ-cpp>
+	</per-instance>
 
 	<post-multi-instance output="md">
     </post-multi-instance>
