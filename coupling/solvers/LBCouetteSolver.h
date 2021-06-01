@@ -91,8 +91,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       }
     }
 
-    const double getError()const override{
-      return 0.0;
+    void writeError()const override{
     }
 
     void setMDBoundaryValues(

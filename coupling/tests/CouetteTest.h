@@ -416,12 +416,7 @@ private:
         _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
         //std::cout << "Finish _couetteSolver->advance " << std::endl;
         if(cycle%1 == 0){
-          // std::string filename = "couetteError_CFD.txt";
-          // std::ofstream file(filename, std::ios_base::app );
-          // if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
-          // file << cycle << "; " << _couetteSolver->getError() << std::endl;
-          // file.close();
-          _couetteSolver->getError();
+          _couetteSolver->writeError();
         }
       }
     }
