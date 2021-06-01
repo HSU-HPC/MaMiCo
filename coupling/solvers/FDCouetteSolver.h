@@ -110,8 +110,7 @@ public:
 		return _density[index];
 	}
 
-	const double getError()const override{
-		return 0.0;
+	void writeError()const override{
 	}
 
 	void setMDBoundaryValues(

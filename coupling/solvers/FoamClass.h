@@ -31,8 +31,8 @@ namespace coupling{
  */
 class coupling::solvers::IcoFoam: public coupling::solvers::AbstractCouetteSolver<3> {
 public:
-  IcoFoam(int rank, int plotEveryTimestep, double channelheight, std::string dict, std::string folder, tarch::la::Vector<12,
-    unsigned int> boundariesWithMD, tarch::la::Vector<3,double> uWall):
+  IcoFoam(int rank, int plotEveryTimestep, double channelheight, std::string dict, std::string folder,
+    tarch::la::Vector<12, unsigned int> boundariesWithMD, tarch::la::Vector<3,double> uWall):
   AbstractCouetteSolver<3>(),
   runTime(Foam::Time::controlDictName, dict,folder),
   mesh(Foam::IOobject(Foam::fvMesh::defaultRegion,runTime.timeName(),runTime,Foam::IOobject::MUST_READ)),
@@ -52,6 +52,7 @@ public:
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
+
   virtual ~IcoFoam(){
     if(skipRank()){return;}
     if(_boundary2RecvBufferIndicesOuter){ delete [] _boundary2RecvBufferIndicesOuter; _boundary2RecvBufferIndicesOuter=NULL;}
@@ -63,8 +64,8 @@ public:
   // the sequence is based on the OpenFOAM IcoFoam solver
   void advance(double dt)override{
     if(skipRank()){return;}
-    unsigned int number = floor(dt/runTime.deltaTValue()+0.5);
-    for(unsigned int i=0; i<number; i++){
+    size_t number = floor(dt/runTime.deltaTValue()+0.5);
+    for(size_t i=0; i<number; i++){
       using namespace Foam;
       ++runTime;
       Info<< "Time = " << runTime.timeName() << nl << endl;
@@ -98,26 +99,21 @@ public:
         U.correctBoundaryConditions();
       }
       // runTime.write(); // writes the original OpenFOAM output
-      plottxt();
+      // plottxt();
+      plot();
       _timestepCounter++;
     }
   }
 
-  const double getError()const override{
-    double actualError;
+  // write the difference between the calculated and the analytical solution to the couetteError_CFD.txt file
+  void writeError()const override{
     double error = 0.0;
     double errorRMS = 0.0;
     double maxError = 0.0;
-    const double pi = 3.141592653589793238;
-    const unsigned int s = static_cast<unsigned int>(U.mesh().nCells());
-    for(unsigned int i = 0; i< s; i++){
-      double u_analytical = 0.0;
+    const size_t s = static_cast<size_t>(U.mesh().nCells());
+    for(size_t i = 0; i< s; i++){
       const double pos = U.mesh().C()[i][2];
-      for (int k = 1; k < 30; k++){
-        u_analytical += 1.0/k * std::sin(k*pi*pos/_channelheight) * std::exp(-k*k * pi*pi/(_channelheight*_channelheight) * nu.value() * runTime.timeOutputValue());
-      }
-      u_analytical = _uWall[0]*(1.0-pos/_channelheight - 2.0/pi * u_analytical);
-      actualError = std::abs(u_analytical-static_cast<double>(U[i][0]));
+      const double actualError = std::abs(getAnalyticalCouetteU(pos)-static_cast<double>(U[i][0]));
       error += actualError;
       errorRMS += actualError*actualError;
       maxError = actualError>maxError? actualError: maxError;
@@ -129,12 +125,13 @@ public:
     if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
     file << _timestepCounter << " " << error << " "<< errorRMS << " " << maxError<< std::endl;
     file.close();
-    return error;
   }
 
+
+  // Get the velocity at position pos for the current time step
   tarch::la::Vector<3,double> getVelocity(tarch::la::Vector<3,double> pos)const override{
     const Foam::vector foamPosition(pos[0],pos[1],pos[2]);
-    int foamIndice = U.mesh().findCell(foamPosition);
+    const int foamIndice = U.mesh().findCell(foamPosition);
     if (foamIndice > 0){
       return tarch::la::Vector<3,double>(U[foamIndice][0], U[foamIndice][1], U[foamIndice][2]);
     }
@@ -143,40 +140,41 @@ public:
 
   // Changes the velocity on the moving wall (refers to Couette szenario)
   void setWallVelocity(tarch::la::Vector<3,double> wallVelocity)override{
-    const unsigned int pointsInBoundary = U.boundaryFieldRef()[0].size();
-    for(unsigned int i=0; i<pointsInBoundary; i++){
+    const size_t pointsInBoundary = U.boundaryFieldRef()[0].size();
+    for(size_t i=0; i<pointsInBoundary; i++){
       U.boundaryFieldRef()[0][i].x()=wallVelocity[0];
       U.boundaryFieldRef()[0][i].y()=wallVelocity[1];
       U.boundaryFieldRef()[0][i].z()=wallVelocity[2];
     }
   };
 
-  // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
-  const tarch::la::Vector<3,double> getOuterPointFromBoundary(const int layer, const int index){
-     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
-     const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
-     return FoamCoordVector;
-  }
-
-  // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
-  const tarch::la::Vector<3,double> getInnerPointFromBoundary(const int layer, const int index){
-     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
-     const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
-     return FoamCoordVector;
-  }
+  // // Applies the MD data (just velocities) as boundary condition, the mapping between the conntinuum and the MD is provided by the setMDBoundary()
+  // void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
+  // const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
+  //   if(skipRank()){return;}
+  //   for(size_t i=0; i < _numberBoundaryPoints; i++){
+  //     size_t outer = _boundary2RecvBufferIndicesOuter[i];
+  //     size_t inner = _boundary2RecvBufferIndicesInner[i];
+  //     tarch::la::Vector<3,double> localOuterVel( (1.0/recvBuffer[outer]->getMacroscopicMass())*recvBuffer[outer]->getMacroscopicMomentum() );
+  //     tarch::la::Vector<3,double> localInnerVel( (1.0/recvBuffer[inner]->getMacroscopicMass())*recvBuffer[inner]->getMacroscopicMomentum() );
+  //     _boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
+  //     _boundaryIndices[i]->y() = (localOuterVel[1]+localInnerVel[1])*0.5;
+  //     _boundaryIndices[i]->z() = (localOuterVel[2]+localInnerVel[2])*0.5;
+  //   }
+  // }
 
   // Applies the MD data (just velocities) as boundary condition, the mapping between the conntinuum and the MD is provided by the setMDBoundary()
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
   const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
     if(skipRank()){return;}
-    for(unsigned int i=0; i < _numberBoundaryPoints; i++){
-      unsigned int outer = _boundary2RecvBufferIndicesOuter[i];
-      unsigned int inner = _boundary2RecvBufferIndicesInner[i];
+    for(size_t i=0; i < _numberBoundaryPoints; i++){
+      size_t outer = _boundary2RecvBufferIndicesOuter[i];
+      size_t inner = _boundary2RecvBufferIndicesInner[i];
       tarch::la::Vector<3,double> localOuterVel( (1.0/recvBuffer[outer]->getMacroscopicMass())*recvBuffer[outer]->getMacroscopicMomentum() );
       tarch::la::Vector<3,double> localInnerVel( (1.0/recvBuffer[inner]->getMacroscopicMass())*recvBuffer[inner]->getMacroscopicMomentum() );
-      _boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
-      _boundaryIndices[i]->y() = (localOuterVel[1]+localInnerVel[1])*0.5;
-      _boundaryIndices[i]->z() = (localOuterVel[2]+localInnerVel[2])*0.5;
+      _boundaryIndices[i]->x() = 1.5*localOuterVel[0]+localInnerVel[0]*0.5;
+      _boundaryIndices[i]->y() = 1.5*localOuterVel[1]+localInnerVel[1]*0.5;
+      _boundaryIndices[i]->z() = 1.5*localOuterVel[2]+localInnerVel[2]*0.5;
     }
   }
 
@@ -185,21 +183,22 @@ public:
   void setMDBoundary(tarch::la::Vector<3,double> mdDomainOffset,tarch::la::Vector<3,double> mdDomainSize,unsigned int overlapStrip,
   const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size){
     if(skipRank()){return;}
-    unsigned int innerMDBoundaryIndex=0;
+    size_t innerMDBoundaryIndex=0;
     while (_boundariesWithMD[innerMDBoundaryIndex] == 0){innerMDBoundaryIndex++;}
     _numberBoundaryPoints = 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
-    _boundary2RecvBufferIndicesOuter = new unsigned int [_numberBoundaryPoints];
-    _boundary2RecvBufferIndicesInner = new unsigned int [_numberBoundaryPoints];
+    _boundary2RecvBufferIndicesOuter = new size_t [_numberBoundaryPoints];
+    _boundary2RecvBufferIndicesInner = new size_t [_numberBoundaryPoints];
     _boundaryIndices = new Foam::vector* [_numberBoundaryPoints];
-    unsigned int counter = 0;
-    for (unsigned int boundary=0; boundary < 12; boundary++){
+    size_t counter = 0;
+    for (size_t boundary=0; boundary < 12; boundary++){
       if(_boundariesWithMD[boundary]==1){
-        unsigned int MDPointsPerBoundary=_numberBoundaryPoints/6;
-        for (unsigned int j = 0; j < MDPointsPerBoundary; j++){
+        size_t MDPointsPerBoundary=_numberBoundaryPoints/6;
+        for (size_t j = 0; j < MDPointsPerBoundary; j++){
           _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
-          const unsigned int globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
-          const unsigned int globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
-          for(unsigned int k = 0; k < size; k++){
+          const size_t globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
+          const size_t globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getSecondOuterPointFromBoundary(boundary, j)));
+          // const size_t globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
+          for(size_t k = 0; k < size; k++){
             if(globalIndexOuter==recvIndice[k]){
               _boundary2RecvBufferIndicesOuter[counter] = k;
               goto endloop;
@@ -207,7 +206,7 @@ public:
           }
           std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
           endloop:
-          for(unsigned int k = 0; k < size; k++){
+          for(size_t k = 0; k < size; k++){
             if(globalIndexInner==recvIndice[k]){
               _boundary2RecvBufferIndicesInner[counter] = k;
               goto endloop2;
@@ -222,6 +221,37 @@ public:
   }
 
 private:
+  // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
+  const tarch::la::Vector<3,double> getOuterPointFromBoundary(const int layer, const int index){
+     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
+     const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
+     return FoamCoordVector;
+  }
+
+  // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
+  const tarch::la::Vector<3,double> getInnerPointFromBoundary(const int layer, const int index){
+     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
+     const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
+     return FoamCoordVector;
+  }
+
+  // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
+  const tarch::la::Vector<3,double> getSecondOuterPointFromBoundary(const int layer, const int index){
+     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*_dx*1.5);
+     const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
+     return FoamCoordVector;
+  }
+
+  // Calculates the analytical solution for U for z=pos for the current time step
+  const double getAnalyticalCouetteU(const double& pos)const{
+    const double pi = 3.141592653589793238;
+    double u_analytical = 0.0;
+    for (int k = 1; k < 30; k++){
+      u_analytical += 1.0/k * std::sin(k*pi*pos/_channelheight) * std::exp(-k*k * pi*pi/(_channelheight*_channelheight) * nu.value() * runTime.timeOutputValue());
+    }
+    return _uWall[0]*(1.0-pos/_channelheight - 2.0/pi * u_analytical);
+  }
+
   /** create txt plot if required */
   void plottxt() {
     if(_plotEveryTimestep < 1 || _timestepCounter % _plotEveryTimestep > 0) return;
@@ -243,41 +273,43 @@ private:
     file.close();
   }
 
-  // /** create vtk plot if required */
-  // void plot() const {
-  //   // only plot output if this is the correct timestep
-  //   if (_plotEveryTimestep==-1){ return;}
-  //   if (_timestepCounter%_plotEveryTimestep!=0){return;}
-  //
-  //   std::stringstream ss; ss << "Continuum_Velocity_IcoFoam_" << _rank << "_" << _timestepCounter << ".vtk";
-  //   std::ofstream file(ss.str().c_str());
-  //   if (!file.is_open()){std::cout << "ERROR NumericalSolver::plot(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-  //   std::stringstream velocity;
-  //
-  //   file << "# vtk DataFile Version 2.0" << std::endl;
-  //   file << "MaMiCo FoamSolver" << std::endl;
-  //   file << "ASCII" << std::endl << std::endl;
-  //   file << "DATASET STRUCTURED_GRID" << std::endl; It is not a structured grid, the md domain in the middle is missing. ToDo check which other type is fitting
-  //   int pointsPerDimension = _channelheight/_dx+2;
-  //   file << "DIMENSIONS " << pointsPerDimension << " " << pointsPerDimension << " " << pointsPerDimension << std::endl; // everything +1 cause of change in index
-  //   file << "POINTS " << (pointsPerDimension)*(pointsPerDimension)*(pointsPerDimension) << " float" << std::endl;
-  //
-  //   velocity << std::setprecision(12);
-  //   velocity << "VECTORS velocity float" << std::endl;
-  //
-  //   // // loop over domain (incl. boundary)
-  //   // int size = U.size();
-  //   // for (int i = 0; i < size; i++){
-  //   //   // write information to streams;
-  //   //   file << U.mesh()[i][0] << ", " << U.mesh()[i][1] << ", " << U.mesh()[i][2] << std::endl; // boundary is missing, how to include? Just not do?
-  //   //   velocity << U[i][0] << ", " << U[i][1] << ", " << U[i][2] << std::endl;
-  //   // }
-  //
-  //   file << std::endl;
-  //   file << velocity.str() << std::endl;
-  //   velocity.str("");
-  //   file.close();
-  // }
+  /** create vtk plot if required */
+  void plot() const {
+    // only plot output if this is the correct timestep
+    if (_plotEveryTimestep==-1){ return;}
+    if (_timestepCounter%_plotEveryTimestep!=0){return;}
+
+    std::stringstream ss; ss << "Continuum_Velocity_IcoFoam_" << _rank << "_" << _timestepCounter << ".vtk";
+    std::ofstream file(ss.str().c_str());
+    if (!file.is_open()){std::cout << "ERROR NumericalSolver::plot(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+    std::stringstream velocity;
+
+    file << "# vtk DataFile Version 2.0" << std::endl;
+    file << "MaMiCo FoamSolver" << std::endl;
+    file << "ASCII" << std::endl << std::endl;
+    file << "DATASET UNSTRUCTURED_GRID" << std::endl;
+    // file << "DATASET STRUCTURED_GRID" << std::endl;
+    // int pointsPerDimension = 20;//U.mesh().nCells();
+    // file << "DIMENSIONS " << pointsPerDimension << " " << pointsPerDimension << " " << pointsPerDimension << std::endl; // everything +1 cause of change in index
+    file << "POINTS " << U.mesh().nCells() << " float" << std::endl;
+
+    velocity << std::setprecision(12);
+    velocity << "POINT_DATA " << U.mesh().nCells() << std::endl;
+    velocity << "VECTORS velocity float" << std::endl;
+
+    // loop over domain (incl. boundary)
+    int size = U.size();
+    for (int i = 0; i < size; i++){
+      // write information to streams;
+      file << U.mesh().C()[i][0] << " " << U.mesh().C()[i][1] << " " << U.mesh().C()[i][2] << std::endl; // boundary is missing, how to include? Just not do?
+      velocity << U[i][0] << " " << U[i][1] << " " << U[i][2] << std::endl;
+    }
+
+    file << std::endl;
+    file << velocity.str() << std::endl;
+    velocity.str("");
+    file.close();
+  }
 
   // The solver runs sequentially on rank 0. Therefore the function checks if the acutal rank is zero.
   bool skipRank(){
@@ -299,8 +331,8 @@ private:
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
   float _dx; // mesh size
   double _channelheight; // overall height of the Couette channel
-  unsigned int *_boundary2RecvBufferIndicesOuter{nullptr}; // pointer to an array with data for communication
-  unsigned int *_boundary2RecvBufferIndicesInner{nullptr}; // pointer to an array with data for communication
+  size_t *_boundary2RecvBufferIndicesOuter{nullptr}; // pointer to an array with data for communication
+  size_t *_boundary2RecvBufferIndicesInner{nullptr}; // pointer to an array with data for communication
   Foam::vector **_boundaryIndices{nullptr}; // pointer to OpenFOAM data for communication
   int _rank; // rank of the actual process
   int _plotEveryTimestep; // every n-th time step should be plotted
@@ -309,7 +341,7 @@ private:
   Foam::label pRefCell{0};
   Foam::scalar pRefValue{0.0};
   Foam::scalar cumulativeContErr{0};
-  unsigned int _numberBoundaryPoints; // the number of CFD boundary points which need data from the MD
+  size_t _numberBoundaryPoints{0}; // the number of CFD boundary points which need data from the MD
   tarch::la::Vector<3,double> _uWall;
 };
 #endif // _COUPLING_SOLVERS_ICOFOAM_H
