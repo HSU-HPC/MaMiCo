@@ -236,7 +236,7 @@ void coupling::FilterSequence<dim>::initDomain(){
     std::cout << PRINT_PREFIX() << "Initializing domain. Input vector has " << _inputCellVector.size() << " cells. ";
     #endif
     //sanity check
-    if(_inputCellVector.size() % _cellIndices.size() != 0){ //equal unless this is a FilterJunction TODO: check for equality if not FJ
+    if(_inputCellVector.size() % _cellIndices.size() != 0){ 
 		std::cout << std::endl << "ERROR: Cell and index vector of sequence out of synch." << std::endl;
 		exit(EXIT_FAILURE);
     }
