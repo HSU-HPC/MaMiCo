@@ -64,8 +64,8 @@ coupling::SequentialFilter<dim>::SequentialFilter(
 			#endif
 		}
 		//Resize if buffer is too small to contain all cell data
-		if(_indexbuf.capacity() < 4+3*dim) {
-			_indexbuf.resize(4+3*dim); 
+		if(_indexbuf.capacity() < dim) {
+			_indexbuf.resize(dim); 
 			#ifdef DEBUG_SEQ_FILTER
 			std::cout << "		SEQFILTER (" << _myRank << "): Index buffer resized to: " << _indexbuf.size() << std::endl;
 			#endif
@@ -169,6 +169,8 @@ void coupling::SequentialFilter<dim>::contribute() {
 					//receive corresponding index
 					MPI_Recv(_indexbuf.data(), dim, MPI_UNSIGNED, rank, 0, _comm, MPI_STATUS_IGNORE);
 
+					//std::cout << "Seqfilter 172:" << c << ": " << _indexbuf[0] << ", " << _indexbuf[1] << ", " << _indexbuf[2] << std::endl;
+
 					//Insert data received into global cell data structures
 					bufferToMacroscopicCell(_cellbuf, _inputCells_Global[cellsUpdated]);
 					bufferToCellIndex(_indexbuf, _cellIndices_Global[cellsUpdated]);
@@ -187,6 +189,7 @@ void coupling::SequentialFilter<dim>::contribute() {
 			#endif
 		}	
 
+
 		//TODO: Assert cellsUpdated == inputCells_Global.size()
 
 		//This rank now processes...
@@ -202,11 +205,12 @@ void coupling::SequentialFilter<dim>::contribute() {
 			//fill buffers
 			macroscopicCellToBuffer(_cellbuf, _filter->getInputCells()[c]);
 			cellIndexToBuffer(_indexbuf, _ic->getBaseIC()->convertLocalToGlobalVectorCellIndex(_filter->getCellIndices()[c]));
+			//std::cout << "Seqfilter 205:" << c << ": " << _indexbuf[0] << ", " << _indexbuf[1] << ", " << _indexbuf[2] << std::endl;
 
 			//send cell
 			MPI_Send(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, _processingRank, 0, _comm);
 			//send corresponding index
-			MPI_Send(_indexbuf.data(), 3, MPI_UNSIGNED, _processingRank, 0, _comm);
+			MPI_Send(_indexbuf.data(), dim, MPI_UNSIGNED, _processingRank, 0, _comm);
 		}
 
 		//The processing rank now processes...

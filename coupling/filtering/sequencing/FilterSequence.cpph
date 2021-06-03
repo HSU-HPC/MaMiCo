@@ -38,7 +38,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _mamicoDomainCellIndices, _sequenceDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
+            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _mamicoDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
         }
 	
 		//Read From File

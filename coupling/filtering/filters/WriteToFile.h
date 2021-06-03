@@ -40,14 +40,13 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> mamicoCellIndices,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> sequenceCellIndices, //This is optional: You may pass {} if you don't wish to print any additional indices.
 				const std::array<bool, 7> filteredValues, 
 				std::string location,
 				bool overwrite = false,
 				int oneCellOnly = -1):
 
 				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, mamicoCellIndices, filteredValues, "WTF"),
-				_sequenceCellIndices(sequenceCellIndices),
+				_sequenceCellIndices({}), //TODO: pass ic to this filter
 		   		_location(location),
 				_overwrite(overwrite),
 				_oneCellOnly(oneCellOnly),
@@ -70,8 +69,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
             std::cout << "		WTF: Write to file instance deconstructed." << std::endl;
         	#endif
         }
-
-     
+		
 	    void operator()();
 
     private:
