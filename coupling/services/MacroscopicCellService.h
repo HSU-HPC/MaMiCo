@@ -73,13 +73,6 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
 	virtual const coupling::FilterPipeline<dim>& getFilterPipeline() const { throw std::runtime_error("MacroscopicCellService: Error: Called getFilterPipeline() in instance without FilterPipeline."); }  /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
-	//TODO: The following shouldn't be part of this interface. Currently, MCSImpl is not ported to python-bindings.
-	virtual void addFilterToSequence(	
-		const char *sequenceIdentifier,
-		const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
-		const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
-		int filterIndex = -1
-	){std::cout << "Non-filtering MacroscopicCellService tried to invoke a filtering method. Aborting." << std::endl; exit(EXIT_FAILURE);}
 	unsigned int getID() const { return _id;}
 
 
@@ -222,11 +215,13 @@ public coupling::services::MacroscopicCellService<dim> {
 	 *  - applyScalar What to do with scalar properties of the sequence's Macroscopic Cells.
 	 *  - applyVector: What to do with properties stored as vectors of the sequence's of Macroscopic Cells.
 	 */
+	/*
+	 * TODO: MOVE COMMENT
 	void addFilterToSequence(	const char *sequenceIdentifier,
 		   						const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
 		   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 								int filterIndex = -1
-	);
+	);*/
 	
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}

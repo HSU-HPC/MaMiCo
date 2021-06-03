@@ -376,8 +376,7 @@ private:
 	else if(_cfg.miSolverType == SYNTHETIC)	{
 		try {
 			for(unsigned int i = 0; i < _localMDInstances; i++) 
-				_multiMDCellService->getMacroscopicCellService(i).addFilterToSequence(
-				SYNTHETICMD_SEQUENCE,//sequence name
+				_multiMDCellService->getMacroscopicCellService(i).getFilterPipeline().getSequence(SYNTHETICMD_SEQUENCE)->addFilter(
 				new std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, 3>>)>{ //applyScalar
 				[this] (
    	 				std::vector<double> inputScalars, //doesnt get used: matching MCS's addFilterToSequence(...) signature
@@ -416,7 +415,7 @@ private:
 
 					//unlike for the scalar case, we need the MD2Macro version of IC to calculate correct offsets
 					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro =
-						_multiMDCellService->getMacroscopicCellService(0).getFilterPipeline()->getICM2M();
+						_multiMDCellService->getMacroscopicCellService(0).getFilterPipeline().getICM2M();
 					const unsigned int size = cellIndices.size();
 					const tarch::la::Vector<3,double> md2MacroDomainOffset(indexConversionMD2Macro->getGlobalMD2MacroDomainOffset()); //TODO: use ICM2M instead of IC here
 					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversionMD2Macro->getBaseIC()->getMacroscopicCellSize());
