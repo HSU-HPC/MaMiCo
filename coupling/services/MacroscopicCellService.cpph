@@ -41,7 +41,7 @@ _macroscopicSolverInterface(macroscopicSolverInterface),
 _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
 _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID),
 _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface ),
-_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, _macroscopicSolverInterface, multiMDService, false, filterPipelineConfiguration),
+_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, _macroscopicSolverInterface, multiMDService, coupling::Scope::perInstance, filterPipelineConfiguration),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
 _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
@@ -165,9 +165,7 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
-  //std::cout << "MCS: BEFORE: "<<_macroscopicCells.getMacroscopicCells()[2325]->getCurrentVelocity() << std::endl;
   _filterPipeline(); 
-  //std::cout << "MCS: AFTER: "<<_macroscopicCells.getMacroscopicCells()[2325]->getCurrentVelocity() << std::endl;
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);
@@ -456,23 +454,4 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::plotEveryMa
       _macroscopicCells, _mdSolverInterface
     );
   }
-}
-
-
-//TODO: make indices uint
-//TODO: make functions take references of vectors, not copies thereof
-template<class LinkedCell,unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::addFilterToSequence(
-							const char *name,
-	   						const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
-	   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
-							int filterIndex
-){
-	for(coupling::FilterSequence<dim>* currSequence : coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::_filterPipeline.getPiSequences()) {
-		if(std::strcmp(currSequence->getName(), name) == 0) {
-			currSequence->addFilter(applyScalar, applyVector, filterIndex);
-			return; 
-		}
-	}
-	throw std::runtime_error(std::string("ERROR: Could not find Filter Sequence named ").append(name).append(" when trying to add filter."));
 }

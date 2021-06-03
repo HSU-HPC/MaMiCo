@@ -72,10 +72,10 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
-	virtual const coupling::FilterPipeline<dim>* getFilterPipeline() const { return nullptr; }  /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
+	virtual const coupling::FilterPipeline<dim>& getFilterPipeline() const { throw std::runtime_error("MacroscopicCellService: Error: Called getFilterPipeline() in instance without FilterPipeline."); }  /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
 	//TODO: The following shouldn't be part of this interface. Currently, MCSImpl is not ported to python-bindings.
 	virtual void addFilterToSequence(	
-		const char *name,
+		const char *sequenceIdentifier,
 		const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
 		const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 		int filterIndex = -1
@@ -214,7 +214,7 @@ public coupling::services::MacroscopicCellService<dim> {
      */
     const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 	
-	const coupling::FilterPipeline<dim>* getFilterPipeline() const { return &_filterPipeline; }
+	const coupling::FilterPipeline<dim>& getFilterPipeline() const { return _filterPipeline; }
 
 	/**
 	 * Creates a new filter from scratch and appends it to a sequence that is part of this service's filter pipelining system.
@@ -222,7 +222,7 @@ public coupling::services::MacroscopicCellService<dim> {
 	 *  - applyScalar What to do with scalar properties of the sequence's Macroscopic Cells.
 	 *  - applyVector: What to do with properties stored as vectors of the sequence's of Macroscopic Cells.
 	 */
-	void addFilterToSequence(	const char *name,
+	void addFilterToSequence(	const char *sequenceIdentifier,
 		   						const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
 		   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
 								int filterIndex = -1

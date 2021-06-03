@@ -131,11 +131,8 @@ void coupling::FilterJunction<dim, inputc>::initDomain(){
     #endif
 
 	//sanity check
-	if(_inputCellVector_parted[0].size() != this->_cellIndices.size()) { //assumes _inputCellVector.size > 0, which is checked in constrcutor.
-		//TODO: exception
-		std::cout << "ERROR: FilterJunction: initDomain(): Mismatching partition sizes." << std::endl;
-		exit(EXIT_FAILURE);
-	}
+	if(_inputCellVector_parted[0].size() != this->_cellIndices.size()) //assumes _inputCellVector.size > 0, which is checked in constrcutor.
+		throw std::runtime_error("ERROR: FilterJunction: initDomain(): Mismatching partition sizes.");
 
     bool outOfBounds;
 	for(unsigned int p = 0; p < inputc; p++) {
