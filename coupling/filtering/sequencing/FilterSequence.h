@@ -152,9 +152,8 @@ class coupling::FilterSequence {
 
     	const char* getName() { return _name; }
 
-		bool isOutput() { return _isOutput; }
-		//TODO: is this used?
-		void setAsOutput() { 
+		bool isOutputToMacro() { return _isOutput; }
+		void setAsOutputToMacro() { 
 			std::cout << PRINT_PREFIX() << " Setting as pipeline to macro solver output." << std::endl;
 			_isOutput = true; 
 		}
