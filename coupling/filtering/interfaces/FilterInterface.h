@@ -90,7 +90,6 @@ class coupling::FilterInterface{
 		 */
 		virtual void operator()() = 0;
 
-		//TODO: changed this to pass by reference. not sure if thats safe
 		void updateCellData(
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
