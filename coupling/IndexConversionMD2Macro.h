@@ -22,7 +22,6 @@ namespace coupling {
  * Wrapper class for coupling::IndexConversion for cases in which you need to know boundaries of the
  *		-- MD2Macro domain -- ,
  * that is the domain of cells that are transfered from MD to CS.
- * To do so, it makes use of coupling::services::MacroscopicCellService and MPI communcation between processes.
  *
  * @Author Felix Maurer
  */
@@ -33,8 +32,8 @@ class coupling::IndexConversionMD2Macro {
 				const coupling::IndexConversion<dim>* indexConversion,
 				coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface
 				#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
-					,const MPI_Comm comm = MPI_COMM_WORLD, //TODO: case multimd
-					const int lowestRankInComm = 0 //TODO: case multimd
+				,const MPI_Comm comm = MPI_COMM_WORLD, //TODO: case multimd
+				const int lowestRankInComm = 0 //TODO: case multimd
 				#endif
 			):
 				_ic(indexConversion),
@@ -44,11 +43,17 @@ class coupling::IndexConversionMD2Macro {
 				_lowerBoundaryThisRank(nullptr),
 				_upperBoundaryThisRank(nullptr)
 				#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
-					,_comm(comm),
-					_lowestRank((int)lowestRankInComm),
-					_myRank((int)_ic->getThisRank())
+				,_comm(comm),
+				_lowestRank((int)lowestRankInComm),
+				_myRank(_ic != nullptr ? _ic->getThisRank() : -1)
 				#endif
 			{
+				if(_ic == nullptr)
+					throw std::runtime_error("IndexConversionMD2Macro: Constructor called with nullptr as base IndexConversion.");
+				if(_msi == nullptr)
+					throw std::runtime_error("IndexConversionMD2Macro: Constructor called with nullptr as MacroscopicSolverInterface.");
+
+
 				#ifdef DEBUG_ICM2M
 				std::cout << "ICM2M: Created new instance at location " << this << " using IC at " << _ic << " and MSI at " << _msi << std::endl;
 				#endif
@@ -135,11 +140,8 @@ class coupling::IndexConversionMD2Macro {
 			return offset;
 		}
 
-
-		//TODO: move both of these to regular IC?
-		//TODO: update documentation
 		/*
-		 * Same as getGlobalVectorCellIndex but sets all ghost layer indices to INT_MAX
+		 * Same as getGlobalVectorCellIndex but has the option to "ignore" Ghost Layer cells, i.e. return INT_MAX for all indices in Ghost Layer.
 		 * E.g.: Ghost layer at x = 0. Then requesting vector index (x,y,z,..) will return (INT_MAX, y, z,...).
 		 */
 		tarch::la::Vector<dim,unsigned int> getGlobalVectorCellIndex(unsigned int globalCellIndex, bool noGL = true) const;
@@ -175,13 +177,13 @@ class coupling::IndexConversionMD2Macro {
 		tarch::la::Vector<dim, unsigned int>* _upperBoundaryThisRank;
 
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
-			const MPI_Comm _comm;
+		const MPI_Comm _comm;
 
-			//This rank is assumed to manage cell (0,...,0) both in global and in M2M terms.
-			const int _lowestRank;
+		//This rank is assumed to manage cell (0,...,0) both in global and in M2M terms.
+		const int _lowestRank;
 
-			//This ICM2M instance's rank
-			const int _myRank;
+		//This ICM2M instance's rank
+		const int _myRank;
 		#endif
 };
 
