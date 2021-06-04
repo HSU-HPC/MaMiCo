@@ -148,21 +148,6 @@ public:
     }
   };
 
-  // // Applies the MD data (just velocities) as boundary condition, the mapping between the conntinuum and the MD is provided by the setMDBoundary()
-  // void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
-  // const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
-  //   if(skipRank()){return;}
-  //   for(size_t i=0; i < _numberBoundaryPoints; i++){
-  //     size_t outer = _boundary2RecvBufferIndicesOuter[i];
-  //     size_t inner = _boundary2RecvBufferIndicesInner[i];
-  //     tarch::la::Vector<3,double> localOuterVel( (1.0/recvBuffer[outer]->getMacroscopicMass())*recvBuffer[outer]->getMacroscopicMomentum() );
-  //     tarch::la::Vector<3,double> localInnerVel( (1.0/recvBuffer[inner]->getMacroscopicMass())*recvBuffer[inner]->getMacroscopicMomentum() );
-  //     _boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
-  //     _boundaryIndices[i]->y() = (localOuterVel[1]+localInnerVel[1])*0.5;
-  //     _boundaryIndices[i]->z() = (localOuterVel[2]+localInnerVel[2])*0.5;
-  //   }
-  // }
-
   // Applies the MD data (just velocities) as boundary condition, the mapping between the conntinuum and the MD is provided by the setMDBoundary()
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,
   const unsigned int * const recvIndices, const coupling::IndexConversion<3>& indexConversion){
@@ -172,9 +157,9 @@ public:
       size_t inner = _boundary2RecvBufferIndicesInner[i];
       tarch::la::Vector<3,double> localOuterVel( (1.0/recvBuffer[outer]->getMacroscopicMass())*recvBuffer[outer]->getMacroscopicMomentum() );
       tarch::la::Vector<3,double> localInnerVel( (1.0/recvBuffer[inner]->getMacroscopicMass())*recvBuffer[inner]->getMacroscopicMomentum() );
-      _boundaryIndices[i]->x() = 1.5*localOuterVel[0]+localInnerVel[0]*0.5;
-      _boundaryIndices[i]->y() = 1.5*localOuterVel[1]+localInnerVel[1]*0.5;
-      _boundaryIndices[i]->z() = 1.5*localOuterVel[2]+localInnerVel[2]*0.5;
+      _boundaryIndices[i]->x() = (localOuterVel[0]+localInnerVel[0])*0.5;
+      _boundaryIndices[i]->y() = (localOuterVel[1]+localInnerVel[1])*0.5;
+      _boundaryIndices[i]->z() = (localOuterVel[2]+localInnerVel[2])*0.5;
     }
   }
 
@@ -196,7 +181,7 @@ public:
         for (size_t j = 0; j < MDPointsPerBoundary; j++){
           _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
           const size_t globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
-          const size_t globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getSecondOuterPointFromBoundary(boundary, j)));
+          const size_t globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
           // const size_t globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
           for(size_t k = 0; k < size; k++){
             if(globalIndexOuter==recvIndice[k]){
@@ -253,7 +238,7 @@ private:
   }
 
   /** create txt plot if required */
-  void plottxt() {
+  void plottxt() const{
     if(_plotEveryTimestep < 1 || _timestepCounter % _plotEveryTimestep > 0) return;
     std::stringstream ss; ss << "velocity_" << _timestepCounter << ".txt";
     std::ofstream file(ss.str().c_str());
@@ -312,7 +297,7 @@ private:
   }
 
   // The solver runs sequentially on rank 0. Therefore the function checks if the acutal rank is zero.
-  bool skipRank(){
+  bool skipRank()const{
     return !(_rank==0);
   }
 
