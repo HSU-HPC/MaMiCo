@@ -52,7 +52,7 @@ template<unsigned int dim>
 void coupling::FilterPipeline<dim>::operator()(){
     for(coupling::FilterSequence<dim>* sequence : _sequences){
 		//finalize FS's filter vector
-		if(sequence->isModifiable() == true){
+		if(sequence->isModifiable()){
 			#ifdef DEBUF_FILTER_PIPELINE
 			sequence->printFilters();
 			#endif
