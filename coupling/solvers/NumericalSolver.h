@@ -300,7 +300,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
       }}}
 
       // loop over domain (incl. boundary)
-      for (int z = 0; z < _domainSizeZ+1+1; z++){ for (int y = 0; y < _domainSizeY+1+1; y++){ for (int x = 0; x < _domainSizeX+1+1; x++){ //CHANGE: start index used to be one
+      for (int z = 1; z < _domainSizeZ+1; z++){ for (int y = 1; y < _domainSizeY+1; y++){ for (int x = 1; x < _domainSizeX+1; x++){ //CHANGE: start index used to be one
         const int index=get(x,y,z);
         // write information to streams
         flag << _flag[index] << std::endl;

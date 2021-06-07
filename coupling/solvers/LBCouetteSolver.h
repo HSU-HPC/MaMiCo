@@ -91,7 +91,40 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       }
     }
 
+    // Calculates the analytical solution for U for z=pos for the current time step
+    const double getAnalyticalCouetteU(const double& pos)const{
+      const double pi = 3.141592653589793238;
+      double u_analytical = 0.0;
+      for (int k = 1; k < 30; k++){
+        u_analytical += 1.0/k * std::sin(k*pi*pos/_channelheight) * std::exp(-k*k * pi*pi/(_channelheight*_channelheight) * _kinVisc * _counter * _dt);
+      }
+      return _wallVelocity[0]*(1.0-pos/_channelheight - 2.0/pi * u_analytical);
+    }
+
     void writeError()const override{
+      double error = 0.0;
+      double errorRMS = 0.0;
+      double maxError = 0.0;
+      double uAna = 0.0;
+      // loop over domain (incl. boundary)
+      for (int z = 1; z < _domainSizeZ+1; z++){
+        auto pos = ((int)(_coords[2]*_avgDomainSizeZ)+z)*_dx;
+        uAna = getAnalyticalCouetteU(pos);
+        for (int y = 1; y < _domainSizeY+1; y++){
+          for (int x = 1; x < _domainSizeX+1; x++){ //CHANGE: start index used to be one
+            const int index=get(x,y,z);
+            const double actualError = _dx/_dt*std::abs(uAna-_vel[3*index]);
+            error += actualError;
+            errorRMS += actualError*actualError;
+            maxError = actualError>maxError? actualError: maxError;
+      }}}
+      error /= _domainSizeX*_domainSizeY*_domainSizeZ;
+      errorRMS = std::sqrt(errorRMS/(_domainSizeX*_domainSizeY*_domainSizeZ));
+      std::string filename = "couetteError_lb.txt";
+      std::ofstream file(filename, std::ios_base::app );
+      if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
+      file << _counter << " " << error << " "<< errorRMS << " " << maxError<< std::endl;
+      file.close();
     }
 
     void setMDBoundaryValues(
