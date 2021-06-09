@@ -7,6 +7,7 @@
 
 #include <string.h>
 #include <map>
+#include <set>
 #include "tarch/la/Vector.h"
 #include "coupling/IndexConversion.h"
 #include "coupling/sendrecv/DataExchange.h"
@@ -48,6 +49,14 @@ class coupling::sendrecv::SendReceiveBuffer {
     );
 
 
+    void writeToSendBufferCollective(
+      const coupling::IndexConversion<dim>& indexConversion,
+      coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+      const MacroscopicCell& cell,
+      tarch::la::Vector<dim, unsigned  int> globalVectorIndex
+    );
+
+
     /** reads the information from the receive-buffer and fills it into a macroscopic cell. */
     void readFromReceiveBuffer(
       const coupling::IndexConversion<dim> &indexConversion,
@@ -65,9 +74,20 @@ class coupling::sendrecv::SendReceiveBuffer {
       tarch::la::Vector<dim,unsigned int> globalVectorIndex
     );
 
+    void allocateReceiveBuffersCollective(
+      const coupling::IndexConversion<dim> &indexConversion,
+      coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+      tarch::la::Vector<dim,unsigned int> globalVectorIndex
+    );
+
 
     /** triggers the MPI-sending on the respective buffers. No sending for information transfer from/ to this rank. */
     void triggerSending(
+      const coupling::IndexConversion<dim>& indexConversion,
+      coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
+    );
+
+    void triggerSendingCollective(
       const coupling::IndexConversion<dim>& indexConversion,
       coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
     );
@@ -78,11 +98,18 @@ class coupling::sendrecv::SendReceiveBuffer {
       coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
     );
 
+    void triggerReceivingCollective(
+      const coupling::IndexConversion<dim>& indexConversion,
+      coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
+    );
+
     /** wait for all send and receive operations to complete. */
     void waitAllOperations(const coupling::IndexConversion<dim>& indexConversion);
 
     /** allocates send and receive requests */
     void allocateRequests(const coupling::IndexConversion<dim>& indexConversion);
+
+    void allocateRequestsCollective(const coupling::IndexConversion<dim>& indexConversion);
 
   private:
     /** data structure for send- and receive-buffer. */
@@ -94,17 +121,34 @@ class coupling::sendrecv::SendReceiveBuffer {
     };
 
 
+    struct BufferCollective {
+        std::vector<double> buffer;
+        std::set<unsigned int> targetRanks;
+        unsigned int sourceRank;
+    };
+
+
     /** deletes everything inside a given buffer */
     void deleteBuffer(std::map<unsigned int,BufferWithID>& buffer);
 
     /** buffer for storing all received messages from MD. Each map entry is identified by a respective rank. */
     std::map<unsigned int,BufferWithID > _receiveBuffer;
     std::map<unsigned int,BufferWithID > _sendBuffer;
+
+
+    /** members for collective communication */
+    std::map<unsigned int,BufferCollective> _sendRecvBuffer;
+
+
     #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
     bool _requestsAllocated;  /** flag that will always be reset after every send operation. Triggers instantiation of requests */
     MPI_Request *_requests;
     int _receiveSize;  /** number of receive requests */
     int _sendSize;     /** number of send requests */
+
+    std::vector<MPI_Comm> _subComms;
+    std::vector<MPI_Group> _subGroups;
+    int _bcastSize;
     #endif
 };
 

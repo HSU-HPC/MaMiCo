@@ -41,7 +41,8 @@ class coupling::services::MultiMDCellService {
 	  const char* filterPipelineConfiguration,
       const tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0
     ): _localNumberMDSimulations((unsigned int)mdSolverInterfaces.size()), _totalNumberMDSimulations(totalNumberMDSimulations),
-       _macroscopicCellServices(NULL), _topologyOffset(computeTopologyOffset(numberProcesses,rank)), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)) {
+       _macroscopicCellServices(NULL), _topologyOffset(computeTopologyOffset(numberProcesses,rank)), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)), 
+       _macroscopicSolverInterface(macroscopicSolverInterface) {
 
       const tarch::la::Vector<dim,double> mdDomainSize(mdSolverInterfaces[0]->getGlobalMDDomainSize());
       const tarch::la::Vector<dim,double> mdDomainOffset(mdSolverInterfaces[0]->getGlobalMDDomainOffset());
@@ -113,6 +114,18 @@ class coupling::services::MultiMDCellService {
       }
     }
 
+    void sendFromMacro2MDCollective(
+      const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
+      const unsigned int * const globalCellIndicesFromMacroscopicSolver
+    ){
+      coupling::sendrecv::FromMacro2MD<coupling::datastructures::MacroscopicCell<dim>, dim > fromMacro2MD;
+      coupling::sendrecv::DataExchangeFromMacro2MD<dim> deFromMacro2MD(_macroscopicSolverInterface, _macroscopicCellServices[0]->getIndexConversion());
+      fromMacro2MD.sendFromMacro2MDCollective(
+        _macroscopicCellServices[0]->getIndexConversion(), deFromMacro2MD,
+        macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver
+      );
+    }
+
     /** collects data from MD simulations, averages over them (only macroscopic mass/momentum is considered) and writes the result back into macroscopicCellsFromMacroscopicSolver. */
     double sendFromMD2Macro(
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
@@ -169,5 +182,7 @@ class coupling::services::MultiMDCellService {
     const unsigned int _topologyOffset; /** topology offset*/
     const int _tws;
     const unsigned int _intNumberProcesses;
+
+    coupling::interface::MacroscopicSolverInterface<dim> *_macroscopicSolverInterface;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_MULTIMDCELLSERVICE_H_

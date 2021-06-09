@@ -25,6 +25,7 @@ int main(int argc, char *argv[]){
 
   #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
   MPI_Init(&argc,&argv);
+  MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
   #endif
 
   // run tests
