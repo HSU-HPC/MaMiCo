@@ -415,6 +415,7 @@ private:
     fillSendBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
     if(_cfg.macro2Md){
       _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
+      _multiMDCellService->sendFromMacro2MDCollective(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
       //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
     }
   }
