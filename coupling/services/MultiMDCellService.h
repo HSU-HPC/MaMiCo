@@ -37,21 +37,15 @@ class coupling::services::MultiMDCellService {
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
-	  const char* filterPipelineConfiguration, //location of the .xml file containing the static filter pipeline config
+      const char* filterPipelineConfiguration, //location of the .xml file containing the static filter pipeline config
       const tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0
     ): 
-       _indexConversion(nullptr
-		//TODO
-       	/*initIndexConversion( macroscopicCellConfiguration.getMacroscopicCellSize(),
-        	numberProcesses,rank,
-       		mdSolverInterfaces[0]->getGlobalMDDomainSize(), mdSolverInterfaces[0]->getGlobalMDDomainOffset(),
-       		parallelTopologyConfiguration.getParallelTopologyType(), computeTopologyOffset(numberProcesses,rank))*/
-       ),
-	   //_macroscopicCells(...), TODO
        _localNumberMDSimulations((unsigned int)mdSolverInterfaces.size()), _totalNumberMDSimulations(totalNumberMDSimulations),
        _macroscopicCellServices(NULL), _topologyOffset(computeTopologyOffset(numberProcesses,rank)), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)),
-	   _postMultiInstanceFilterPipeline({/*TODO*/}, _indexConversion, macroscopicSolverInterface, multiMDService, coupling::Scope::postMultiInstance, filterPipelineConfiguration) { 
-
+	   _macroscopicSolverInterface(macroscopicSolverInterface),
+	   _filterPipelineConfiguration(filterPipelineConfiguration),
+	   _multiMDService(multiMDService),
+       _postMultiInstanceFilterPipeline(nullptr) {
 
       const tarch::la::Vector<dim,double> mdDomainSize(mdSolverInterfaces[0]->getGlobalMDDomainSize());
       const tarch::la::Vector<dim,double> mdDomainOffset(mdSolverInterfaces[0]->getGlobalMDDomainOffset());
@@ -105,6 +99,10 @@ class coupling::services::MultiMDCellService {
         if (_macroscopicCellServices[i]!=NULL){delete _macroscopicCellServices[i]; _macroscopicCellServices[i] = NULL; }
       }
       if (_macroscopicCellServices!=NULL){ delete [] _macroscopicCellServices; _macroscopicCellServices=NULL; }
+
+	  //TODO: fix free bug/possible memory leak here
+	  //delete [] _macroscopicCells.data();
+	  if (_postMultiInstanceFilterPipeline!=nullptr) delete _postMultiInstanceFilterPipeline;
     }
 
     /** get access to macroscopic cell services. This is required potentially by each MD simulation to incorporate cell-local thermostat, mass and momentum transfer */
@@ -125,7 +123,6 @@ class coupling::services::MultiMDCellService {
         //std::cout << "Rank " << _macroscopicCellServices[i]->getIndexConversion().getThisRank() << ": Send from macro to MD for Simulation no. " << i << std::endl;
         _macroscopicCellServices[i]->sendFromMacro2MD(macroscopicCellsFromMacroscopicSolver,globalCellIndicesFromMacroscopicSolver);
       }
-	  _postMultiInstanceFilterPipeline();
     }
 
     /** collects data from MD simulations, averages over them (only macroscopic mass/momentum is considered) and writes the result back into macroscopicCellsFromMacroscopicSolver. */
@@ -134,43 +131,55 @@ class coupling::services::MultiMDCellService {
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ){
       double res = 0;
-      // duplicate macroscopicCells
-      const unsigned int size = (unsigned int) macroscopicCellsFromMacroscopicSolver.size();
-      coupling::datastructures::MacroscopicCell<dim>* duplicate = new coupling::datastructures::MacroscopicCell<dim>[size];
-      if (duplicate==NULL){std::cout << "ERROR coupling::services::MultiMDCellService::sendFromMD2Macro(...): duplicate==NULL!" << std::endl; exit(EXIT_FAILURE);}
+      auto size = macroscopicCellsFromMacroscopicSolver.size();
 
-      // reset macroscopic data (only those should be used by macroscopic solver anyway) in duplicate
+	  /*
+	   * If this is the first coupling step, we must init the post multi instance filter pipeline operating on averaged cell data.
+	   * The ENABLE_POST_MULTI_INSTANCE_FILTERING flag is used for debugging purposes and shall be removed later.
+	   * If you wish to not use post multi-instance filtering in deployment, you can simply leave the corresponding XML-Subtag empty.
+	   */
+	  #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
+	  if(_postMultiInstanceFilterPipeline == nullptr) {
+          //Init _macroscopicCells
+          _macroscopicCells = { new coupling::datastructures::MacroscopicCell<dim>[size] };
+
+          //Init filter pipeline
+          _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, &(_macroscopicCellServices[0]->getIndexConversion()), _macroscopicSolverInterface, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
+	  }
+	  #endif
+
+      // reset macroscopic data (only those should be used by macroscopic solver anyway) in cells
       for (unsigned int i = 0; i < size; i++){
-        duplicate[i].setMacroscopicMass(0.0); duplicate[i].setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
+        _macroscopicCells[i]->setMacroscopicMass(0.0); _macroscopicCells[i]->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
       }
 
-      // receive data from each MD simulation and accumulate information in duplicate
+      // receive data from each MD simulation and accumulate information in cells
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
         //std::cout << "Rank " << _macroscopicCellServices[l]->getIndexConversion().getThisRank() << ": Send from MD to Macro for Simulation no. " << l << std::endl;
         res += _macroscopicCellServices[l]->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver,globalCellIndicesFromMacroscopicSolver);
         for (unsigned int i = 0; i < size; i++){
-          duplicate[i].addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
-          duplicate[i].addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
+          _macroscopicCells[i]->addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
+          _macroscopicCells[i]->addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
         }
       }
 
       // average data
-	  for (unsigned int i = 0; i < size; i++) {
-		  duplicate[i].setMacroscopicMass(duplicate[i].getMacroscopicMass()/_totalNumberMDSimulations);
-		  duplicate[i].setMacroscopicMomentum(1.0/_totalNumberMDSimulations * duplicate[i].getMacroscopicMomentum());
-	  }
+  	  for (unsigned int i = 0; i < size; i++) {
+	  	_macroscopicCells[i]->setMacroscopicMass(_macroscopicCells[i]->getMacroscopicMass()/_totalNumberMDSimulations);
+	  	_macroscopicCells[i]->setMacroscopicMomentum(1.0/_totalNumberMDSimulations * _macroscopicCells[i]->getMacroscopicMomentum());
+  	  }
 
-	  // apply post multi instance FilterPipeline on duplicate data
-	  // TODO
+      // apply post multi instance FilterPipeline on cell data
+      #ifdef ENABLE_POST_MULTI_INSTANCE_FILTER
+      (*_postMultiInstanceFilterPipeline)();
+      #endif
 
-	  // store data in macroscopicCellsFromMacroscopicSolver
+      // store data in macroscopicCellsFromMacroscopicSolver
       for (unsigned int i = 0; i < size; i++){
-        macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMass(duplicate[i].getMacroscopicMass());
-        macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(duplicate[i].getMacroscopicMomentum());
+        macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMass(_macroscopicCells[i]->getMacroscopicMass());
+        macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(_macroscopicCells[i]->getMacroscopicMomentum());
       }
 
-      // free duplicate
-      delete [] duplicate;
       return res;
     }
 
@@ -188,12 +197,7 @@ class coupling::services::MultiMDCellService {
       for (unsigned int d = 1; d < dim; d++){ np = np*numberProcesses[d]; }
       return np;
     }
-
-	coupling::IndexConversion<dim>* _indexConversion;
-	/** storage for macroscopic cells in coupling tool TODO*/
-    //coupling::datastructures::MacroscopicCells<LinkedCell,dim> _macroscopicCells; 
-
-
+    
     const unsigned int _localNumberMDSimulations; /** number of MD simulations run on the current rank. This can differ for different blocks, i.e. different topologyOffset values. */
     const unsigned int _totalNumberMDSimulations; /** total number of MD simulations */
     coupling::services::MacroscopicCellService<dim> **_macroscopicCellServices; /** pointers of MacroscopicCellService type, one for each MD simulation */
@@ -201,10 +205,23 @@ class coupling::services::MultiMDCellService {
     const int _tws;
     const unsigned int _intNumberProcesses;
 
-	/*
-	 * Analogon to MacroscopicCellService's FilterPipeline. 
-	 * Is applied during this->sendFromMD2Macro.
-	 */
-	coupling::FilterPipeline<dim> _postMultiInstanceFilterPipeline;
+    //const coupling::IndexConversion<dim> _indexConversion; /* Used for index conversions during filtering TODO after merge with dynamic-md*/
+    std::vector<coupling::datastructures::MacroscopicCell<dim>* > _macroscopicCells; /** used to store in MD data in sendFromMDtoMacro */
+
+
+    /*
+     * These are currently only stored in order to properly init the
+     * post multi-instance FilterPipeline in sendFromMDToMacro's first invocation.
+    */
+    coupling::interface::MacroscopicSolverInterface<dim> *_macroscopicSolverInterface;
+	const std::string _filterPipelineConfiguration;
+    const tarch::utils::MultiMDService<dim>& _multiMDService;
+
+
+    /*
+     * Analogon to MacroscopicCellService's FilterPipeline. 
+     * Is applied during this->sendFromMD2Macro.
+    */
+    coupling::FilterPipeline<dim> *_postMultiInstanceFilterPipeline;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_MULTIMDCELLSERVICE_H_
