@@ -5,7 +5,7 @@
 
 #pragma once
 
-#define DEBUG_ICM2M
+//#define DEBUG_ICM2M
 
 #include "IndexConversion.h"
 #include "interface/MacroscopicSolverInterface.h"
@@ -139,6 +139,8 @@ class coupling::IndexConversionMD2Macro {
 			//std::cout << offset << std::endl << std::endl;
 			return offset;
 		}
+
+		//TODO: refactor? get -> convert
 
 		/*
 		 * Same as getGlobalVectorCellIndex but has the option to "ignore" Ghost Layer cells, i.e. return INT_MAX for all indices in Ghost Layer.

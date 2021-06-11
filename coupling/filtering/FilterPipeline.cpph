@@ -41,7 +41,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 
     //load sequences
 	switch(scope) {
-		case coupling::Scope::perInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")); break;
+		case coupling::Scope::perInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance")); break;
 		case coupling::Scope::postMultiInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")); break;
 	}
 }
