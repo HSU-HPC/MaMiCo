@@ -33,34 +33,53 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 
 	for(unsigned int linearIndex = 0; linearIndex < inputCells.size(); linearIndex++){
 		outOfBounds = false;
-				
-		//removal of ghost layer
-		convertedIndex = getLocalVectorCellIndex(linearIndex, false);
-
+					
 		//removal of cells lying in outer layer not meant for transfer to macro solver
 		//Assuming: dim > 0, INT_MAX at any position in index vector implies MSI function returns false
 		if(!(_msi->receiveMacroscopicQuantityFromMDSolver(_ic->getGlobalVectorCellIndex(_ic->convertLocalToGlobalCellIndex(linearIndex))))) {
+			#ifdef DEBUG_ICM2M
+			std::cout << "ICM2M: initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " not in MD domain." << std::endl;
+			#endif
+
 			outOfBounds = true; 
 		}
 
+		//removal of ghost layer
+		convertedIndex = getLocalVectorCellIndex(linearIndex, false);
+
 		for(unsigned int d = 0; d < dim; d++) {
-			if(convertedIndex[d] == INT_MAX) outOfBounds = true;
+			if(outOfBounds) continue; //No further checking needed in this case.
+
+			if(convertedIndex[d] == INT_MAX) {
+				#ifdef DEBUG_ICM2M
+				std::cout << "ICM2M: initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in ghost layer." << std::endl;
+				#endif
+
+				outOfBounds = true;
+			}
 		}
 
+		/*
 		#ifdef DEBUG_ICM2M
 		//Visualisation of slice (3,...)
-		//if(_ic->getThisRank() == 0 && convertedIndex[0] == 3){
-		//	(outOfBounds) ? std::cout << "x" : std::cout << "o";
-		//	if (i1 <= _ic->getLocalNumberMacroscopicCells()[1]) i1++;
-		//	else { std::cout << std::endl; i1 = 0; }
-		//}
+		if(_ic->getThisRank() == 0 && convertedIndex[0] == 3){
+			(outOfBounds) ? std::cout << "x" : std::cout << "o";
+			if (i1 <= _ic->getLocalNumberMacroscopicCells()[1]) i1++;
+			else { std::cout << std::endl; i1 = 0; }
+		}
 		#endif
+		*/
 
+		
 		if(outOfBounds) {
 			outerCells.push_back(inputCells[linearIndex]);
 			outerIndices.push_back(_ic->getLocalVectorCellIndex(linearIndex));
 		}
 		else {
+			#ifdef DEBUG_ICM2M
+			std::cout << "ICM2M: initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in MD2Macro-domain." << std::endl;
+			#endif
+
 			if(_lowerBoundaryThisRank == nullptr) _lowerBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(_ic->convertLocalToGlobalVectorCellIndex(convertedIndex));
 			lastMD2MacroIndex = convertedIndex;
 			m2mDomainCells.push_back(inputCells[linearIndex]);

@@ -648,7 +648,7 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 			    unsigned int rank,
 			    unsigned int totalNumberMDSimulations,
 			    const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig,
-          const std::string filename,
+			    const std::string filterPipelineConfiguration,
 			    const tarch::utils::MultiMDService<3>& multiMDService
     			){
     			return new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
@@ -664,7 +664,7 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 			        mamicoConfig.getParallelTopologyConfiguration(), 
 			        simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
 			        mamicoConfig.getMacroscopicCellConfiguration(), 
-              filename.c_str(),
+			        filterPipelineConfiguration.c_str(),
 			        multiMDService
 			    ); }
     		),

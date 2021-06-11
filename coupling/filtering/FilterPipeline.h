@@ -41,7 +41,7 @@ class coupling::FilterPipeline{
 			const coupling::IndexConversion<dim>* indexConversion,
 			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
-			const std::string cfgpath);
+			const char* cfgpath);
 
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
@@ -49,7 +49,7 @@ class coupling::FilterPipeline{
 			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
 			const coupling::Scope scope,
-			const std::string cfgpath);
+			const char* cfgpath);
                
         ~FilterPipeline() {
             for(auto sequence : _sequences) delete sequence;

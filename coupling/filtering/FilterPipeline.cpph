@@ -9,7 +9,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 	const coupling::IndexConversion<dim>* indexConversion,
 	coupling::interface::MacroscopicSolverInterface<dim>* msi,
 	const tarch::utils::MultiMDService<dim>& multiMDService,
-	const std::string cfgpath):
+	const char* cfgpath):
     FilterPipeline(inputCells, indexConversion, msi, multiMDService, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
 {}
 
@@ -20,7 +20,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 	coupling::interface::MacroscopicSolverInterface<dim>* msi,
 	const tarch::utils::MultiMDService<dim>& multiMDService,
 	coupling::Scope scope, 
-	const std::string cfgpath):
+	const char* cfgpath):
 
 	_multiMDService(multiMDService),
 	_scope(scope)
@@ -28,9 +28,9 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 	_ic = new coupling::IndexConversionMD2Macro<dim>(indexConversion, msi);
 	
     //check if provided file is written in proper XML
-    if(_config.LoadFile(cfgpath.c_str()) != tinyxml2::XML_NO_ERROR){
-        std::cout << "ERROR: Could not read config for Filter-Pipeline: XML syntax error." << std::endl;
-        exit(EXIT_FAILURE);
+    if(_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR){
+		std::cout << "Filter Pipeline config path: " << cfgpath << std::endl;
+        throw std::runtime_error("Could not read config for Filter-Pipeline: XML syntax error.");
     }
             
     //check for structural errors in config file
