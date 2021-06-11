@@ -133,6 +133,14 @@ class coupling::services::MultiMDCellService {
       double res = 0;
       auto size = macroscopicCellsFromMacroscopicSolver.size();
 
+	  /*
+	   * If this is first coupling step, we must allocate space for the macroscopic cells we filter and determine averages with.
+	   */
+	  if(_macroscopicCells.empty()) {
+          //Allocate & init _macroscopicCells
+          for(unsigned int c = _macroscopicCells.size(); c < size; c++) _macroscopicCells.push_back(new coupling::datastructures::MacroscopicCell<dim>());
+	  }
+
       /*
        * If this is the first coupling step, we must init the post multi instance filter pipeline operating on averaged cell data.
        * The ENABLE_POST_MULTI_INSTANCE_FILTERING flag is used for debugging purposes and shall be removed later.
@@ -140,9 +148,6 @@ class coupling::services::MultiMDCellService {
        */
       #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
       if(_postMultiInstanceFilterPipeline == nullptr) {
-          //Init _macroscopicCells
-          _macroscopicCells = { new coupling::datastructures::MacroscopicCell<dim>[size] };
-
           //Init filter pipeline
           _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, &(_macroscopicCellServices[0]->getIndexConversion()), _macroscopicSolverInterface, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
       }
