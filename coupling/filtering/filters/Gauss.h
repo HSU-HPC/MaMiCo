@@ -43,10 +43,12 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //Use local indexing! (starting at (0,...,0))
 				const std::array<bool, 7> filteredValues,
+				const coupling::IndexConversionMD2Macro<dim>* indexConversion,
 				unsigned int dimension,
 				int sigma,
 				const char* extrapolationStrategy):
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "GAUSS"),
+				_ic(indexConversion),
 				_dim(dimension),
 				_sigma(sigma),
 				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back()),
@@ -95,11 +97,19 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 
 		double gaussianDensityFunction(int x);
 
-		//returns the cell that's above the cell at index on the d-axis
-		unsigned int getIndexBelow(unsigned int index, unsigned int d);
-		//returns the cell that's below the cell at index on the d-axis
-		unsigned int getIndexAbove(unsigned int index, unsigned int d);
+		/*
+		 * Returns the index of te cell cell that's above the cell at index on the d-axis
+		 * If no such index exists, index (the first parameter) is returned.
+		 */
+		tarch::la::Vector<dim, unsigned int> getIndexBelow(const tarch::la::Vector<dim, unsigned int> index, unsigned int d);
 
+		/*
+		 * Returns the index of the cell that's below the cell at index on the d-axis
+		 * If no such index exists, index (the first parameter) is returned.
+		 */
+		tarch::la::Vector<dim, unsigned int> getIndexAbove(const tarch::la::Vector<dim, unsigned int> index, unsigned int d);
+
+		const coupling::IndexConversionMD2Macro<dim>* _ic;
 
 		//on which axis this filter operates. 0 <= _dim <= dim
 		unsigned int _dim;
