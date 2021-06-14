@@ -220,7 +220,8 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 
         	//Default case: search for sequence
 			else try {
-				inputSeqs.push_back(getSequence(inputName.c_str()));
+				inputSeqs.push_back(getSequence(inputName.c_str())); //this may throw: if inputName is not recognized.
+				inputCount++; //if above didnt throw, we can safely increase the input count by one
 			}
 			catch(...) {
 				std::cout << "Warning: Input identifier " << inputName << " for sequence " << currSequenceNode->Value() << " not recognized." << std::endl;
