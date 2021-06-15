@@ -46,7 +46,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 			std::cout << "WARNING: You're using a GAUSS-Filter. As this filter has not been tested thoroughly, caution is advised!" << std::endl;
 
 			if(coupling::FilterInterface<dim>::_cellIndices.back()[_dim] < 2){
-				std::cout << "ERROR: GAUSS: Invalid input domain." << std::endl;
+				std::cout << "ERROR: GAUSS: Invalid input domain: " <<_dim<< std::endl;
 				exit(EXIT_FAILURE);
 			}
 

@@ -88,11 +88,13 @@ objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
 
 ### builds, linking, objects for coupled simulation with MaMiCo
 cd ${BUILD_PATH}
+${compiler} ${MAMICO_PATH}/tensorflow/TensorCalc.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/TensorCalc.o
+${compiler} ${MAMICO_PATH}/tensorflow/ReadCSV.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ReadCSV.o
+${compiler} ${MAMICO_PATH}/tensorflow/NeuralNet.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/NeuralNet.o
 ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
 ${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_couette.o
-objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_couette.o"
 
-cpps="${MAMICO_PATH}/tensorflow/TensorCalc.cpp ${MAMICO_PATH}/tensorflow/ReadCSV.cpp ${MAMICO_PATH}/tensorflow/NeuralNet.cpp"
+objects="${objects} ${BUILD_PATH}/TensorCalc.o ${BUILD_PATH}/ReadCSV.o ${BUILD_PATH}/NeuralNet.o ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_couette.o"
 
-${compiler} ${objects} ${cpps} ${FLAGS} ${includes} ${libraries} -o ${BUILD_PATH}/test
+${compiler} ${objects} ${FLAGS} ${includes} ${libraries} -o ${BUILD_PATH}/test
 

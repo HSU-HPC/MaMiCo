@@ -24,16 +24,16 @@ if(csv_type=="md"):
     lower=4
     upper=10
     z_column=6
-    velocity_column=7
-    plot_lower=11.25
-    plot_upper=23.75
+    velocity_column=14
+    plot_lower=18.75*2
+    plot_upper=31.25*2
 elif(csv_type=="macro"):
-    lower=0
-    upper=14
+    lower=1
+    upper=13
     z_column=3
-    velocity_column=4
-    plot_lower=0
-    plot_upper=50
+    velocity_column=8
+    plot_lower=100/14*1.5
+    plot_upper=100/14*12.5
 else:
     print("not a valid type")
     exit(3)
@@ -43,12 +43,22 @@ else:
 
 # load data in pandas DataFrame
 data = pd.read_csv(csv_file, sep=";", header=None)
+if(csv_type=="md"):
+    data[8].replace({0 : 1}, inplace=True)
+if(csv_type=="macro"):
+    data = data[data[1] != 0]
+    data = data[data[1] != 13]
+    data = data[data[2] != 0]
+    data = data[data[2] != 13]
+    data = data[data[3] != 0]
+    data = data[data[3] != 13]
+
 
 def couette_analytic(z, t):
     """ Analytic Couette startup equation
     """
     u_w = 1.5
-    H = 50.
+    H = 100.
     v = 2.14/ .813037037
 
     k_sum = 0
@@ -73,10 +83,15 @@ def loadAvgDataFromNodeCsv(t):
     for i in range(lower, upper):
         avg = 0
         mass = 0
-        for _, row in df[df[z_column] == i].iterrows():
-            avg += (row[velocity_column])
+        if(csv_type=="md"):
+            for _, row in df[df[z_column] == i].iterrows():
+                avg += (row[velocity_column])/(row[8])
+        else:
+            for _, row in df[df[z_column] == i].iterrows():
+                avg += (row[velocity_column])
         if df[df[z_column] == i].shape[0] > 0:
             avgVelocities.append(avg / df[df[z_column] == i].shape[0])
+    print(avgVelocities)
     return avgVelocities
 
 
@@ -90,8 +105,8 @@ def plot_one_timestep(t, color, ax):
     """
     results = loadAvgDataFromNodeCsv(t)
     #print(results)
-    z = np.linspace(0, 50, num=21)
-    y = couette_analytic(z, t / 2)
+    z = np.linspace(0, 100, num=21)
+    y = couette_analytic(z, t )
     ax.plot(z, y, "-", color=color)
     ax.plot(np.linspace(plot_lower, plot_upper, num=upper-lower), results, "o", color=color)
 
@@ -106,13 +121,13 @@ fig, ax = plt.subplots()
 
 n_plots=5
 plot_steps=40
-cmap=get_cmap(steps)
+cmap=get_cmap(steps+1)
 for i in range(1, steps+1):
     plot_one_timestep(i*stepsize, cmap(i), ax)
 
 #plot_one_timestep(30, "green", ax)
 #plot_one_timestep(50, "yellow", ax)
-plt.savefig("test.png")
+plt.savefig(csv_file+".png")
 
 
 exit(0)

@@ -13,6 +13,7 @@
   <!--<particle-insertion type="none" />/-->
   <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
   <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" />
+  <noise-reduction type="none" time-window-size="5" kmax="1"/>
   <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
   <parallel-topology type="xyz" />
 </mamico>
@@ -31,7 +32,7 @@
 
   <simulation-configuration
     dt="0.005"
-    number-of-timesteps="10"
+    number-of-timesteps="100"
     reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
     fix-seed="no"
@@ -69,39 +70,7 @@
 <filter-pipeline>
 
 	<per-instance output="md">
-		<unfiltered filtered-values="macro-mass macro-momentum">
-			<write-to-file
-				location="unfiltered.csv"
-				overwrite="false"
-			/>
-		</unfiltered>
-
-		<POD-seq filtered-values="macro-mass macro-momentum">
-			<POD
-				time-window-size="40"
-				kmax="1"
-			/>
-			<write-to-file
-				location="POD.csv"
-				overwrite="false"
-			/>
-		</POD-seq>
-
-		<nlm-junction input = "md POD-seq" filtered-values="macro-mass macro-momentum">
-			<NLM
-				time-window-size="5"	
-				sigsq="0.0"
-				hsq="0.45"
-			/>
-		</nlm-junction>
-
-		<post-nlm-junction input = "nlm-junction" filtered-values="macro-mass macro-momentum">
-			<write-to-file
-				location="NLM_junction.csv"
-				overwrite="false"
-			/>
-		</post-nlm-junction>
-	</per-instance>
+    </per-instance>
 
 	<post-multi-instance output="md">
     </post-multi-instance>

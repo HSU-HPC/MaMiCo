@@ -110,7 +110,9 @@ unsigned int coupling::Gauss<dim>::getIndexAbove(unsigned int index, unsigned in
 	//iterate over all lower dimensions
 	for(unsigned int ld = 0; ld < d; ld++) diff *= (_lastIndex[ld]+1); //*= size in ld-Dimension
 	if(index + diff < coupling::FilterInterface<dim>::_inputCells.size()) return index+diff;
-	else return index; //in this case, the lower cell is nonexistant and should have weight 0
+	else{
+		return index; //in this case, the lower cell is nonexistant and should have weight 0
+	}
 
 	}
 
@@ -120,5 +122,7 @@ unsigned int coupling::Gauss<dim>::getIndexBelow(unsigned int index, unsigned in
 	//iterate over all lower dimensions
 	for(unsigned int ld = 0; ld < d; ld++) diff *= (_lastIndex[ld]+1);
 	if(index > diff) return index-diff;
-	else return index; //in this case, the upper cell is nonexistant and should have weight 0
+	else{
+		return index; //in this case, the upper cell is nonexistant and should have weight 0
+	}
 } 

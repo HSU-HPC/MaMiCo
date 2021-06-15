@@ -33,16 +33,16 @@ rm -f ${BUILD_PATH}/*.o;
 
 ### specify flags, includes, libraries,compiler for parallel or sequential build
 # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-FLAGS="-fPIC -DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -fPIC -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
+FLAGS="-fPIC -DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3" #-pedantic 
 # -DMDCoupledDebug"
-includes="${includes} -I${MAMICO_PATH} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH} `python3 -m pybind11 --includes`"
+includes="${includes} -I${MAMICO_PATH} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH} -Iusr/local/include/tensorflow/bazel-bin/tensorflow/include/ `python3 -m pybind11 --includes`"
 libraries="${libraries} -L${MPI_LIB_PATH} -l${LIB_MPI}"
 compiler="mpicxx"
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH} || exit $?
 scons target=libsimplemd dim=3 build=release parallel=yes -j4 || exit $?
-libraries="${libraries} -L${SIMPLEMD_PATH} -l${LIBSIMPLEMD}"
+libraries="${libraries} -L${SIMPLEMD_PATH} -l${LIBSIMPLEMD}   -ltensorflow_cc -lprotobuf"
 FLAGS="${FLAGS} -DMDParallel"
 
 cd ${BUILD_PATH} || exit $?
@@ -50,9 +50,13 @@ ${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.c
 objects="${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
 
 ### builds, linking, objects for coupled simulation with MaMiCo
+${compiler} ${MAMICO_PATH}/tensorflow/TensorCalc.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/TensorCalc.o
+${compiler} ${MAMICO_PATH}/tensorflow/ReadCSV.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ReadCSV.o
+${compiler} ${MAMICO_PATH}/tensorflow/NeuralNet.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/NeuralNet.o
 ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o || exit $?
 ${compiler} ${MAMICO_PATH}/coupling/python-binding/mamico.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/mamico.o || exit $?
-objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/mamico.o"
+
+objects="${objects} ${BUILD_PATH}/TensorCalc.o ${BUILD_PATH}/ReadCSV.o ${BUILD_PATH}/NeuralNet.o ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/mamico.o"
 
 ${compiler} ${objects} ${libraries} -shared -o ${TARGET} || exit $?
 
