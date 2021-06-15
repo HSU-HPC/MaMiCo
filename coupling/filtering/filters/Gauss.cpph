@@ -9,8 +9,6 @@
 //Member functions of Gauss.h:
 template<unsigned int dim>
 //TODO: This is very much hardcoded for kernel radius = 1
-
-//TODO: linear extrapolation makes no sense in its current implementation. check & fix
 void coupling::Gauss<dim>::operator()(){	
     #ifdef DEBUG_GAUSS
     std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter...";
@@ -32,109 +30,71 @@ void coupling::Gauss<dim>::operator()(){
 
 		//only one of these two cases can occur at once
 		if(indexBelow == index){
-			if(_extrapolationStrategy == NONE){
-				//set weight of out of bounds index to zero
-				weights[0] = 0;
-				//normalize the other two weights
-				double weightsSum = weights[1] + weights[2];
-				weights[1] /= weightsSum;
-				weights[2] /= weightsSum;
-			}
-			else if(_extrapolationStrategy == LINEAR){
-				//set weight of out of bounds index to zero
-				weights[0] = 0;
-				//TODO: fix this: the arithmetic (+,...,-) makes no sense
-				//double weight of upper index
-				for(unsigned int si = 0; si < _scalarSetters.size(); si++)
-					(_outputCells[indexAboveLinear]
-						->*(_scalarSetters[si]))
-							(
-								(_inputCells[indexAboveLinear]->*(_scalarGetters[si]))()
-								+
-								(_inputCells[indexLinear]->*(_scalarGetters[si]))() * 2
-								-
-								(_inputCells[indexAboveLinear]->*(_scalarGetters[si]))()
-							);
-				for(unsigned int vi = 0; vi < _vectorSetters.size(); vi++)
-					(_outputCells[indexAboveLinear]
-						->*(_vectorSetters[vi]))
-							(
-								(_inputCells[indexAboveLinear]->*(_vectorGetters[vi]))()
-								+
-								(_inputCells[indexLinear]->*(_vectorGetters[vi]))()
-								+
-								(_inputCells[indexLinear]->*(_vectorGetters[vi]))()
-								-
-								(_inputCells[indexAboveLinear]->*(_vectorGetters[vi]))());
-			}
-			else{/*unreachable*/}
+			//set weight of out of bounds index to zero
+			weights[0] = 0;
 
+			switch(_extrapolationStrategy){
+				case NONE : 
+					break;
+				case MIRROR : 
+					weights[2] *= 2;
+					break;
+				case REFLECT:
+					weights[1] *= 2;
+					break;
+			}
+
+			//normalize the other two weights
+			double weightsSum = weights[1] + weights[2];
+			weights[1] /= weightsSum;
+			weights[2] /= weightsSum;
 		}
+
+		//Since the domain has to be larger than one unit in all directions, not both the index above and below can be illegal at the same time.
 		else if(indexAbove == index){
-			if(_extrapolationStrategy == NONE){
-				//set weight of out of bounds index to zero
-				weights[2] = 0;
-				//normalize the other two weights
-				double weightsSum = weights[0] + weights[1];
-				weights[0] /= weightsSum;
-				weights[1] /= weightsSum;
+			//set weight of out of bounds index to zero
+			weights[2] = 0;
 
+			switch(_extrapolationStrategy){
+				case NONE : 
+					break;
+				case MIRROR : 
+					weights[0] *= 2;
+					break;
+				case REFLECT:
+					weights[1] *= 2;
+					break;
 			}
-			else if(_extrapolationStrategy == LINEAR){
-				//set weight of out of bounds index to zero
-				weights[0] = 0;
-				//TODO: fix this: the arithmetic (+,...,-) makes no sense
-				//double weight of upper index
-				for(unsigned int si = 0; si < _scalarSetters.size(); si++)
-					(_outputCells[indexBelowLinear]
-						->*(_scalarSetters[si]))
-							(
-								(_inputCells[indexBelowLinear]->*(_scalarGetters[si]))()
-								+
-								(_inputCells[indexLinear]->*(_scalarGetters[si]))()*2
-								-
-								(_inputCells[indexBelowLinear]->*(_scalarGetters[si]))()
-							);
-				for(unsigned int vi = 0; vi < _vectorSetters.size(); vi++)
-					(_outputCells[indexBelowLinear]
-						->*(_vectorSetters[vi]))
-							(
-								(_inputCells[indexBelowLinear]->*(_vectorGetters[vi]))()
-								+
-								(_inputCells[indexLinear]->*(_vectorGetters[vi]))()
-								+
-								(_inputCells[indexLinear]->*(_vectorGetters[vi]))()
-								-
-								(_inputCells[indexBelowLinear]->*(_vectorGetters[vi]))()
-							);
-			}
-			else{/*unreachable*/}
+
+			//normalize the other two weights
+			double weightsSum = weights[0] + weights[1];
+			weights[0] /= weightsSum;
+			weights[1] /= weightsSum;
 		}
-		else { //index != indexBelow != indexAbove
-			//apply to scalars
-			for(unsigned int si = 0; si < _scalarSetters.size(); si++){
-				(_outputCells[indexLinear] //get cell at index i...
-					->*(_scalarSetters[si])) //call scalar setter at index si
-						(
-							(_inputCells[indexBelowLinear]->*(_scalarGetters[si]))() * weights[0]
-							+
-							(_inputCells[indexLinear]->*(_scalarGetters[si]))() * weights[1]
-							+
-							(_inputCells[indexAboveLinear]->*(_scalarGetters[si]))() * weights[2]
-						);
-			}
-			//apply to vectors	
-			for(unsigned int vi = 0; vi < _vectorSetters.size(); vi++){
-				(_outputCells[indexLinear]
-					->*(_vectorSetters[vi]))
-						(
-							(_inputCells[indexBelowLinear]->*(_vectorGetters[vi]))() * weights[0]
-							+
-							(_inputCells[indexLinear]->*(_vectorGetters[vi]))() * weights[1]
-							+
-							(_inputCells[indexAboveLinear]->*(_vectorGetters[vi]))() * weights[2]
-						);
-			}
+
+		//apply to scalars
+		for(unsigned int si = 0; si < _scalarSetters.size(); si++){
+			(_outputCells[indexLinear]
+				->*(_scalarSetters[si]))
+					(
+						(_inputCells[indexBelowLinear]->*(_scalarGetters[si]))() * weights[0]
+						+
+						(_inputCells[indexLinear]->*(_scalarGetters[si]))() * weights[1]
+						+
+						(_inputCells[indexAboveLinear]->*(_scalarGetters[si]))() * weights[2]
+					);
+		}
+		//apply to vectors	
+		for(unsigned int vi = 0; vi < _vectorSetters.size(); vi++){
+			(_outputCells[indexLinear]
+				->*(_vectorSetters[vi]))
+					(		
+						(_inputCells[indexBelowLinear]->*(_vectorGetters[vi]))() * weights[0]
+						+
+						(_inputCells[indexLinear]->*(_vectorGetters[vi]))() * weights[1]
+						+
+						(_inputCells[indexAboveLinear]->*(_vectorGetters[vi]))() * weights[2]
+					);
 		}
 	}//index
    
@@ -184,7 +144,7 @@ double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
 template<unsigned int dim>
 tarch::la::Vector<dim, unsigned int> coupling::Gauss<dim>::getIndexAbove(const tarch::la::Vector<dim, unsigned int> index, unsigned int d){
 	//check for border indices
-	if(index[d] == _lastIndex[d]) return index;
+	if(index[d] >= _lastIndex[d]) return index;
 
 	//copy input index
 	auto ans = tarch::la::Vector<dim, unsigned int>(index);

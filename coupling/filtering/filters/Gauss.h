@@ -16,7 +16,7 @@ namespace coupling {
     class Gauss;
 
 	//cf. member variable in coupling::Gauss for more details
-	enum GaussExtrapolationStrategy {NONE, LINEAR};
+	enum GaussExtrapolationStrategy {NONE, MIRROR, REFLECT};
 }
 
 //Define kernel radius. e.g. radius = 1 means kernel size of 3
@@ -72,7 +72,8 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				throw std::runtime_error("ERROR: GAUSS: Invalid input domain.");
 
 			if(extrapolationStrategy == nullptr || std::strcmp(extrapolationStrategy, "none") == 0) _extrapolationStrategy = NONE;
-			else if(std::strcmp(extrapolationStrategy, "linear") == 0) _extrapolationStrategy = LINEAR;
+			else if(std::strcmp(extrapolationStrategy, "mirror") == 0) _extrapolationStrategy = MIRROR;
+			else if(std::strcmp(extrapolationStrategy, "reflect") == 0) _extrapolationStrategy = REFLECT;
 			else {
 				std::cout << "Extrapolation strategy: " << extrapolationStrategy << std::endl;
 				throw std::runtime_error("ERROR: GAUSS: Unknown extrapolation strategy.");
@@ -80,8 +81,9 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 
         	#ifdef DEBUG_GAUSS
 			std::cout << "		GAUSS (Dim: " << _dim << "): Created Gaussian filter." << std::endl;
-			if(_extrapolationStrategy == 0) std::cout << "		It will not use extrapolation." << std::endl;
-			if(_extrapolationStrategy == 1) std::cout << "		It will use linear extrapolation." << std::endl;
+			if(_extrapolationStrategy == NONE) std::cout << "		It will not use extrapolation." << std::endl;
+			if(_extrapolationStrategy == MIRROR) std::cout << "		It will use mirroring extrapolation." << std::endl;
+			if(_extrapolationStrategy == REFLECT) std::cout << "		It will use reflecting extrapolation." << std::endl;
        		#endif
         }
 
@@ -100,12 +102,16 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		/*
 		 * Returns the index of te cell cell that's above the cell at index on the d-axis
 		 * If no such index exists, index (the first parameter) is returned.
+		 *
+		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
 		tarch::la::Vector<dim, unsigned int> getIndexBelow(const tarch::la::Vector<dim, unsigned int> index, unsigned int d);
 
 		/*
 		 * Returns the index of the cell that's below the cell at index on the d-axis
 		 * If no such index exists, index (the first parameter) is returned.
+		 *
+		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
 		tarch::la::Vector<dim, unsigned int> getIndexAbove(const tarch::la::Vector<dim, unsigned int> index, unsigned int d);
 
@@ -123,8 +129,11 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		
 		/**
 		 * Determines how to apply filter to border cells:
-		 * NONE = only use existing cells and increase their weight accordingly
-		 * LINEAR = linear extrapolation
+		 * NONE = only use existing cells and normalize their weight accordingly
+		 * MIRROR = b | a b c d | c
+		 * REFLECT = a | a b c d | d
+		 *
+		 * The last two are congruent to SciPy's gaussian filter's respective extrapolation modes
 		 */
 		coupling::GaussExtrapolationStrategy _extrapolationStrategy;
 
