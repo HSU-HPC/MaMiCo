@@ -1,0 +1,67 @@
+#pragma once
+
+#include <iostream>
+
+#include "tarch/la/Vector.h"
+#include "coupling/tests/unittests/UnitTestInterface.h"
+#include "coupling/tests/unittests/MockService.cpph"
+#include "coupling/tests/unittests/UnitTestingService.h"
+
+//#define DEBUG_UT_VECTOR
+
+
+//Maybe namespace "testing::ut::[...]"?
+namespace tarch { namespace la {
+	template<int size, class T>
+	class VectorUT;
+}}
+
+//TODO: Comment? Make this an examplary UT?
+
+template<int size, class T> 
+class tarch::la::VectorUT : public testing::ut::UnitTestImpl<tarch::la::Vector<size, T>> {
+	public:
+		VectorUT(testing::ut::UnitTestingService *uts):
+		testing::ut::UnitTestImpl<tarch::la::Vector<size, T>>(uts->getRank(), uts->getCommSize())
+		{
+			//Request MockService of T
+			if(uts->getMockService<T>().has_value()) _TMS = uts->getMockService<T>().value();
+			else exit(EXIT_FAILURE); //TODO: EXCEPTION
+
+			//Initialize Mocks of this
+			std::vector<tarch::la::Vector<size, T> *> tarchlavectorMocks;
+			for(auto Tmock : _TMS->getMocksCopy<T>())
+				tarchlavectorMocks.push_back(new tarch::la::Vector<size, T>(Tmock));
+
+			//Create new MockService for this using dummy values generated above
+			this->_mockService = uts->addMockService<tarch::la::Vector<size, T>>(tarchlavectorMocks);
+
+			#ifdef DEBUG_UT_VECTOR
+				std::cout << this->PRINT_PREFIX() << "Finished generating mocks " << std::endl;
+			#endif
+			
+			//Add test functions to UTI::_testFuncs
+			this->_testFuncs.push_back(std::make_tuple(new 
+				std::function<void (tarch::la::Vector<size, T>&)>
+				{ [this] (tarch::la::Vector<size, T>& mock) { testVectorAddition(mock); } }, "testVectorAddition"
+			));
+		}
+		
+		~VectorUT() {}	
+
+		//Verify correctness of operator+=
+		void testVectorAddition(tarch::la::Vector<size, T>& mock) {
+			for(auto vector2 : testing::ut::UnitTestInterface::_mockService->getMocksCopy<tarch::la::Vector<size, T>>()) 
+			{
+				//actual test
+				auto addedVector = vector2;
+				addedVector += mock;
+				//error checking
+				for(int i = 0; i < size; i++) if(addedVector[i] != mock[i] + vector2[i] || testing::ut::UnitTestInterface::_rank == 3) throw(std::runtime_error("Addition yielded incorrect value."));
+			}
+		}
+		
+	private:
+		//Used mock service of class T
+		testing::ut::MockService* _TMS;
+};

@@ -33,7 +33,11 @@ rm -f ${BUILD_PATH}/*.o;
 
 ### specify flags, includes, libraries,compiler for parallel or sequential build
 # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
+<<<<<<< HEAD
 FLAGS="-fPIC -DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3" #-pedantic 
+=======
+FLAGS="-fPIC -DSIMPLE_MD -DMDDim3 -std=c++1z -pedantic -Werror -Wno-unknown-pragmas -Wall -DMDCoupledParallel -fPIC -DTarchParallel -DMPICH_IGNORE_CXX_SEEK" #-DENABLE_POST_MULTI_INSTANCE_FILTERING"
+>>>>>>> origin/piet
 # -DMDCoupledDebug"
 includes="${includes} -I${MAMICO_PATH} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH} -Iusr/local/include/tensorflow/bazel-bin/tensorflow/include/ `python3 -m pybind11 --includes`"
 libraries="${libraries} -L${MPI_LIB_PATH} -l${LIB_MPI}"

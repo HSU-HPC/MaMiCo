@@ -29,7 +29,7 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector1,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector1,
 			const std::vector<tarch::la::Vector<dim, unsigned int>> mamicoCellIndices1,
-			const std::vector<tarch::la::Vector<dim, unsigned int>> sequenceCellIndices1,
+			const std::vector<tarch::la::Vector<dim, unsigned int>> sequenceCellIndices1, //TODO: remove this parameter: write to file no longer takes two sets of indices
 
 			//second cell data set
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector2,
@@ -60,7 +60,6 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 				= new coupling::WriteToFile<dim>(	inputCellVector1,
 													outputCellVector1,
 													mamicoCellIndices1,
-													sequenceCellIndices1,
 													filteredValues,
 													location[0],
 													overwrite[0],
@@ -71,7 +70,6 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 				= new coupling::WriteToFile<dim>(	inputCellVector2,
 													{}, //no output
 													mamicoCellIndices2,
-													{}, //no sequence indexing
 													filteredValues,
 													location[1],
 													overwrite[1],

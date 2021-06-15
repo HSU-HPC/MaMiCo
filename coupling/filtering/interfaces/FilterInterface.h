@@ -5,7 +5,7 @@
 #pragma once
 #include <vector>
 
-//#define DEBUG_FILTER
+//#define DEBUG_FILTER_INTERFACE
 
 namespace coupling{
     template<unsigned int dim>
@@ -90,7 +90,6 @@ class coupling::FilterInterface{
 		 */
 		virtual void operator()() = 0;
 
-		//TODO: changed this to pass by reference. not sure if thats safe
 		void updateCellData(
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
@@ -98,14 +97,15 @@ class coupling::FilterInterface{
 		) {
 			if(new_inputCells.size() != new_outputCells.size() || new_outputCells.size() != new_cellIndices.size())
 			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
-			std::cout << "post size check" << std::endl;
 
 			//Note: I reverted this back to the original version. The cause for the malloc: invalid size bug most probably isnt here.
 			_inputCells = new_inputCells;
 			_outputCells = new_outputCells;
 			_cellIndices = new_cellIndices;
 		
+			#ifdef DEBUG_FILTER_INTERFACE
 			std::cout << "		FI: Updated cell data." << std::endl;
+			#endif
 		}
 
 		/*
@@ -123,15 +123,16 @@ class coupling::FilterInterface{
 			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
 				if(_cellIndices[i] == index) return _inputCells[i];
 			}
+			std::cout << "Index not found: " << index << std::endl;
 			throw std::runtime_error("FilterInterface: getInputCellofIndex(): Could not find index.");
 		}
 		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index) {
 			for(unsigned int i = 0; i < _cellIndices.size(); i++) {
 				if(_cellIndices[i] == index) return _outputCells[i];
 			}
+			std::cout << "Index not found: " << index << std::endl;
 			throw std::runtime_error("FilterInterface: getOutputCellofIndex(): Could not find index.");
 		}
-
 
 		/*
 		 * Only used in one scenario:

@@ -13,6 +13,7 @@
 #define FILTER_PARALLEL false
 
 #define DEBUG_SEQ_FILTER
+//#define DEBUG_SEQ_FILTER_VERBOSE
 
 namespace coupling{
 	template<unsigned int dim>
@@ -21,6 +22,8 @@ namespace coupling{
 
 
 /*
+ * WARNING: EXPERIMENTAL. TODO: output this as well during construction
+ *
  * Implementation of FilterInterface.h for filters which operate (optionally or mandatorily) in a sequential manner, i.e. process data on one master rank.
  * For such filters, operator()() will
  * 		- contribute to one dedicated processing rank: by calling contribute()
@@ -111,8 +114,6 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Local;	
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Local;	
 		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices_Local;
-
-		bool _firstIteration;
 };
 
 #include "SequentialFilter.cpph"

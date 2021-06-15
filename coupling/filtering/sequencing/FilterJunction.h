@@ -44,11 +44,8 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		):
 		coupling::FilterSequence<dim>(indexConversion, multiMDService, name, inputCellVector, cellIndices, domainStart, domainEnd, filteredValues)
 		{	
-			if(inputc == 0) {
-				//TODO: exception
-				std::cout << "ERROR: Creating FilterJunction with inputc = 0." << std::endl;
-				exit(EXIT_FAILURE);
-			}
+			if(inputc == 0)
+				throw std::runtime_error("ERROR: Creating FilterJunction with inputc = 0.");
 
 			#ifdef DEBUG_FILTER_JUNCTION
         	std::cout << PRINT_PREFIX() << "This is a FilterJunction. Number of inputs:" << inputc << std::endl;
@@ -89,7 +86,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 
 			initDomain();
 
-			coupling::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported. TODO
+			coupling::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported.
     	}
 
     	~FilterJunction(){}
@@ -102,7 +99,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
 				int filterIndex = -1
 		) override {
-			//Do nothing, not yet supported. TODO
+			//Do nothing, not yet supported.
 			#ifdef DEBUG_FILTER_JUNCTION
 			std::cout << PRINT_PREFIX() << "This is a FilterJunction. addFilter(...) is not supported and has no effect." << std::endl;
 			#endif
@@ -115,7 +112,6 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 
 		/*
 		 * This function is very similar to the interface's. Check coupling::FilterSequence for more details.
-		 * TODO: Move to constructor once FS moves initDomain() to constructor as well.
 		 */
 		void initDomain();
 

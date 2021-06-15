@@ -586,8 +586,7 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 				if(vector_filter_func.has_value()) vf_ptr = &(vector_filter_func.value());
 
 				//each coupling::conversion:functionWrapper checks for nullptrs, i.e "None" args
-				service->addFilterToSequence( 
-						filter_sequence, 
+				service->getFilterPipeline().getSequence(filter_sequence)->addFilter( 
 						coupling::conversion::functionWrapper_Scalar(sf_ptr),
 						coupling::conversion::functionWrapper_Vector(vf_ptr),
 						filter_index);
@@ -649,7 +648,7 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 			    unsigned int rank,
 			    unsigned int totalNumberMDSimulations,
 			    const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig,
-          const std::string filename,
+			    const std::string filterPipelineConfiguration,
 			    const tarch::utils::MultiMDService<3>& multiMDService
     			){
     			return new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
@@ -665,7 +664,7 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 			        mamicoConfig.getParallelTopologyConfiguration(), 
 			        simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
 			        mamicoConfig.getMacroscopicCellConfiguration(), 
-              filename.c_str(),
+			        filterPipelineConfiguration.c_str(),
 			        multiMDService
 			    ); }
     		),

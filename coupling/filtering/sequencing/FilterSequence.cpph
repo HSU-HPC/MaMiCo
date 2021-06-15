@@ -38,7 +38,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _mamicoDomainCellIndices, _sequenceDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
+            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _mamicoDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
         }
 	
 		//Read From File
@@ -49,10 +49,17 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
 		//Gauss
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
-			//dimension of gauss filter
+			//dimension the gauss filter operates on
 			int d;
 			if(currFilterNode->QueryIntAttribute("dim", &d)){
 				std::cout << "ERROR: Gaussian filter misses attribute dim in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+			//standard deviation of the gauss filter
+			int sigma;
+			if(currFilterNode->QueryIntAttribute("sigma", &sigma)){
+				std::cout << "ERROR: Gaussian filter misses attribute sigma in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}
 				
@@ -60,11 +67,11 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			const char* extrapolation;
 			extrapolation = currFilterNode->Attribute("extrapolation");
 
-			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, (unsigned int) d, extrapolation);
+			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _ic, (unsigned int) d, sigma, extrapolation);
 		}
 
-		//POD
-        else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
+		//POD: Currently disabled. TODO: fix eigen error
+        /*else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
 			//In earlier implementations, it used to be possible to override tws via function parameter. This feature was removed.
 			//See: coupling::noisereduction::NoiseReductionConfiguration::interpreteConfiguration<dim>(..., int tws)
 			int tws;
@@ -87,21 +94,6 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			}
 
             newfilter = new coupling::POD<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _multiMDService, tws, kmax);
-        }
-
-        /*//NLM
-        else if(std::strcmp(currFilterNode->Value(), "NLM") == 0) {
-			int tws;
-			if(currFilterNode->QueryIntAttribute("time-window-size", &tws)){
-				std::cout << "ERROR: NLM filter misses attribute time-window-size in config file." << std::endl;
-				exit(EXIT_FAILURE);
-			}
-			if(tws <= 2){
-				std::cout << "ERROR: NLM: time-window-size must be greater than two." << std::endl;
-				exit(EXIT_FAILURE);
-			}
-
-            newfilter = new coupling::NLM<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _ic, tws);
         }*/
 
 		//Strouhal
@@ -129,8 +121,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
 		//sequential filtering
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-		if(currFilterNode->Attribute("sequential")) {
-			if(std::strcmp(currFilterNode->Attribute("sequential"), "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _ic));
+		if(const char* sequential = currFilterNode->Attribute("sequential")) {
+			if(std::strcmp(sequential, "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, _ic));
 			else _filters.push_back(newfilter);
 		}
 		else
@@ -147,8 +139,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	}
 
 	//Check for modfiability. By default true.
-	if(sequenceNode->Attribute("modifiable")) {
-		if(std::strcmp(currFilterNode->Attribute("modifable"), "false") == 0) _isModifiable = false;
+	if(const char* modifiable = sequenceNode->Attribute("modifiable")) {
+		if(std::strcmp(modifiable, "false") == 0) _isModifiable = false;
 	}
 
 	#ifdef DEBUG_FILTER_PIPELINE
@@ -244,7 +236,7 @@ void coupling::FilterSequence<dim>::initDomain(){
     std::cout << PRINT_PREFIX() << "Initializing domain. Input vector has " << _inputCellVector.size() << " cells. ";
     #endif
     //sanity check
-    if(_inputCellVector.size() % _cellIndices.size() != 0){ //equal unless this is a FilterJunction TODO: check for equality if not FJ
+    if(_inputCellVector.size() % _cellIndices.size() != 0){ 
 		std::cout << std::endl << "ERROR: Cell and index vector of sequence out of synch." << std::endl;
 		exit(EXIT_FAILURE);
     }

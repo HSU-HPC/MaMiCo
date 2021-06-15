@@ -1,0 +1,96 @@
+#pragma once
+
+#include <iostream>
+
+#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/tests/unittests/UnitTestInterface.h"
+#include "coupling/tests/unittests/MockService.cpph"
+#include "coupling/tests/unittests/UnitTestingService.h"
+
+//#define DEBUG_UT_MACROCELL
+
+
+namespace coupling { namespace datastructures {
+	template<unsigned int dim> 
+	class MacroscopicCellUT;
+}}
+
+
+template<unsigned int dim> 
+class coupling::datastructures::MacroscopicCellUT : public testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCell<dim>> {
+	public:
+		MacroscopicCellUT(testing::ut::UnitTestingService *uts):
+		testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCell<dim>>(uts->getRank(), uts->getCommSize())
+		{
+			//Get MockService for double
+			if(uts->getMockService<double>().has_value()) _DMS = uts->getMockService<double>().value();
+			else exit(EXIT_FAILURE); //TODO: EXCEPTION
+			//Get MockService for vector of double
+			if(uts->getMockService<tarch::la::Vector<dim, double>>().has_value()) _DVMS = uts->getMockService<tarch::la::Vector<dim,double>>().value();
+			else exit(EXIT_FAILURE); //TODO: EXCEPTION
+			
+			//Create new MockService for this. MacroscopicCell only has one (default) constructor
+			this->_mockService = uts->addMockService<coupling::datastructures::MacroscopicCell<dim>>( { new coupling::datastructures::MacroscopicCell<dim>() } );
+
+			#ifdef DEBUG_UT_MACROCELL
+				std::cout << this->PRINT_PREFIX() << "Finished generating mocks. " << std::endl;
+			#endif
+			
+			//Add test functions to UTI::_testFuncs
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void (coupling::datastructures::MacroscopicCell<dim>&)>
+				{ [this] (coupling::datastructures::MacroscopicCell<dim>& mock) { testSetGetMicroscopicMass(mock); } }, "testSetGetMicroscopicMass")
+			);
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void (coupling::datastructures::MacroscopicCell<dim>&)>
+				{ [this] (coupling::datastructures::MacroscopicCell<dim>& mock) { testSetGetMacroscopicMass(mock); } }, "testSetGetMacroscopicMass")
+			);
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void (coupling::datastructures::MacroscopicCell<dim>&)>
+				{ [this] (coupling::datastructures::MacroscopicCell<dim>& mock) { testSetGetPotentialEnergy(mock); } }, "testSetGetPotentialEnergy")
+			);
+			this->_testFuncs.push_back(std::make_tuple(new std::function<void (coupling::datastructures::MacroscopicCell<dim>&)>
+				{ [this] (coupling::datastructures::MacroscopicCell<dim>& mock) { testSetGetTemperature(mock); } }, "testSetGetTemperature")
+			);
+		}
+		
+		~MacroscopicCellUT() {}	
+
+		//TODO: print which mock caused failure in exeption
+
+		//Verify correctness of getter/setter methods
+		void testSetGetMicroscopicMass(coupling::datastructures::MacroscopicCell<dim>& mock) {
+			for(double d : _DMS->getMocksCopy<double>(500)) {
+				mock.setMicroscopicMass(d);
+				if (mock.getMicroscopicMass() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
+			}
+		}
+
+		void testSetGetMacroscopicMass(coupling::datastructures::MacroscopicCell<dim>& mock) {
+			for(double d : _DMS->getMocksCopy<double>(1000)) {
+				mock.setPotentialEnergy(d);
+				if (mock.getPotentialEnergy() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
+			}
+		}
+		void testSetGetPotentialEnergy(coupling::datastructures::MacroscopicCell<dim>& mock) {
+			for(double d : _DMS->getMocksCopy<double>(20000)) {
+				mock.setPotentialEnergy(d);
+				if (mock.getPotentialEnergy() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
+			}
+		}
+		void testSetGetTemperature(coupling::datastructures::MacroscopicCell<dim>& mock) {
+			for(double d : _DMS->getMocksCopy<double>(0)) {
+				mock.setTemperature(d);
+				if (mock.getTemperature() != d) throw(std::runtime_error("Setting and then getting didnt work as expected!"));
+			}
+		}
+
+
+
+
+		
+		
+	private:
+		//Used mock service of double
+		testing::ut::MockService* _DMS;
+		//Used mock service of vector of double
+		testing::ut::MockService* _DVMS;
+
+};

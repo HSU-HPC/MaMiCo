@@ -158,90 +158,97 @@ class KVSTest():
         #Add Gauss filter
         def gauss_sca05(data):
             print("Applying gaussian filter to a scalar property. sigma = 0.5.")
-            return gaussian_filter(data, sigma = (0.5,0.5,0.5))
+            return gaussian_filter(data, truncate = 1.0, sigma = (0.5,0.5,0.5))
 
         def gauss_vec05(data):
             print("Applying gaussian filter to a 3d property. sigma = 0.5.")
-            return gaussian_filter(data, sigma = (0.5,0.5,0.5,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (0.5,0.5,0.5,0))
 
         def gauss_sca1(data):
             print("Applying gaussian filter to a scalar property. sigma = 1.")
-            return gaussian_filter(data, sigma = (1,1,1))
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,1,1))
 
         def gauss_vec1(data):
             print("Applying gaussian filter to a 3d property. sigma = 1.")
-            return gaussian_filter(data, sigma = (1,1,1,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,1,1,0))
 
         def gauss_sca15(data):
             print("Applying gaussian filter to a scalar property. sigma = 1.5.")
-            return gaussian_filter(data, sigma = (1.5,1.5,1.5))
+            return gaussian_filter(data, truncate = 1.0, sigma = (1.5,1.5,1.5))
 
         def gauss_vec15(data):
             print("Applying gaussian filter to a 3d property. sigma = 1.5.")
-            return gaussian_filter(data, sigma = (1.5,1.5,1.5,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (1.5,1.5,1.5,0))
 
         def gauss_sca2(data):
             print("Applying gaussian filter to a scalar property. sigma = 2.")
-            return gaussian_filter(data, sigma = (2,2,2))
+            return gaussian_filter(data, truncate = 1.0, sigma = (2,2,2))
 
         def gauss_vec2(data):
             print("Applying gaussian filter to a 3d property. sigma = 2.")
-            return gaussian_filter(data, sigma = (2,2,2,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (2,2,2,0))
 
         def gauss_sca25(data):
             print("Applying gaussian filter to a scalar property. sigma = 2.5.")
-            return gaussian_filter(data, sigma = (2.5,2.5,2.5))
+            return gaussian_filter(data, truncate = 1.0, sigma = (2.5,2.5,2.5))
 
         def gauss_vec25(data):
             print("Applying gaussian filter to a 3d property. sigma = 2.5.")
-            return gaussian_filter(data, sigma = (2.5,2.5,2.5,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (2.5,2.5,2.5,0))
 
         def gauss_sca3(data):
             print("Applying gaussian filter to a scalar property. sigma = 3.")
-            return gaussian_filter(data, sigma = (3,3,3))
+            return gaussian_filter(data, truncate = 1.0, sigma = (3,3,3))
 
         def gauss_vec3(data):
             print("Applying gaussian filter to a 3d property. sigma = 3.")
-            return gaussian_filter(data, sigma = (3,3,3,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (3,3,3,0))
 
         def gauss_sca35(data):
             print("Applying gaussian filter to a scalar property. sigma = 3.5.")
-            return gaussian_filter(data, sigma = (3.5,3.5,3.5))
+            return gaussian_filter(data, truncate = 1.0, sigma = (3.5,3.5,3.5))
 
         def gauss_vec35(data):
             print("Applying gaussian filter to a 3d property. sigma = 3.5.")
-            return gaussian_filter(data, sigma = (3.5,3.5,3.5,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (3.5,3.5,3.5,0))
 
         def gauss_sca4(data):
             print("Applying gaussian filter to a scalar property. sigma = 4.")
-            return gaussian_filter(data, sigma = (4,4,4))
+            return gaussian_filter(data, truncate = 1.0, sigma = (4,4,4))
 
         def gauss_vec4(data):
             print("Applying gaussian filter to a 3d property. sigma = 4.")
-            return gaussian_filter(data, sigma = (4,4,4,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (4,4,4,0))
 
         def gauss_sca45(data):
             print("Applying gaussian filter to a scalar property. sigma = 4.5.")
-            return gaussian_filter(data, sigma = (4.5,4.5,4.5))
+            return gaussian_filter(data, truncate = 1.0, sigma = (4.5,4.5,4.5))
 
         def gauss_vec45(data):
             print("Applying gaussian filter to a 3d property. sigma = 4.5.")
-            return gaussian_filter(data, sigma = (4.5,4.5,4.5,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (4.5,4.5,4.5,0))
 
         def gauss_sca5(data):
             print("Applying gaussian filter to a scalar property. sigma = 5.")
-            return gaussian_filter(data, sigma = (5,5,5))
+            return gaussian_filter(data, truncate = 1.0, sigma = (5,5,5))
 
         def gauss_vec5(data):
             print("Applying gaussian filter to a 3d property. sigma = 5.")
-            return gaussian_filter(data, sigma = (5,5,5,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (5,5,5,0))
 
 
+        def gauss_x_sca1(data):
+            print("Applying gaussian filter to a scalar property. Filtering on X-axis only. sigma = 1.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,0,0))
+
+        def gauss_x_vec1(data):
+            print("Applying gaussian filter to a 3d property. Filtering on X-axis only. sigma = 1.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,0,0,0))
 
 
         mcs = self.multiMDCellService.getMacroscopicCellService(0)
-        #mcs.addFilterToSequence(filter_sequence="wtf-seq", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
-        #mcs.addFilterToSequence(filter_sequence="wtf", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+        mcs.addFilterToSequence(filter_sequence="gaussX-python", filter_index=0, scalar_filter_func = gauss_x_sca1, vector_filter_func=gauss_x_vec1)
+        mcs.addFilterToSequence(filter_sequence="gaussXYZ-python", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
 
         #mcs.addFilterToSequence(filter_sequence="gauss-05", filter_index=0, scalar_filter_func = gauss_sca05, vector_filter_func=gauss_vec05)
         #mcs.addFilterToSequence(filter_sequence="gauss-1", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
