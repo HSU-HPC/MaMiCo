@@ -5,7 +5,7 @@
 
 #pragma once
 
-//#define DEBUG_ICM2M
+#define DEBUG_ICM2M
 
 #include "IndexConversion.h"
 #include "interface/MacroscopicSolverInterface.h"
@@ -130,11 +130,15 @@ class coupling::IndexConversionMD2Macro {
 		}
 
 		tarch::la::Vector<dim, double> getGlobalMD2MacroDomainOffset() const {
-			auto offset = _ic->getGlobalMDDomainOffset(); //standard MD offset
+			tarch::la::Vector<dim, double> offset = _ic->getGlobalMDDomainOffset(); //standard MD offset
+
+			if(_lowerBoundaryAllRanks == nullptr)
+				throw std::runtime_error("ERROR: Calling while _lowerBoundaryAllRanks is uninitialized!");
 
 			//offset of md2macro domain relative to MD domain
-			for(unsigned int d = 0; d < dim; d++) 
+			for(unsigned int d = 0; d < dim; d++) {
 				offset[d] += _ic->getMacroscopicCellSize()[d] * (*_lowerBoundaryAllRanks)[d]; //offset of md2macro domain relative to MD domain
+			}
 
 			//std::cout << offset << std::endl << std::endl;
 			return offset;

@@ -90,7 +90,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 	_upperBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(_ic->convertLocalToGlobalVectorCellIndex(lastMD2MacroIndex));
 
 	
-	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)	
+	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel mode
 	//Broadcast global Boundary. This assumes that the lowest rank of the communicator has the lower bound, while the highest one has the upper bound.
 
 	//use linear indexing for easier MPI communication
@@ -117,13 +117,17 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 	(*_lowerBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearLowerBoundaryAllRanks);
 	(*_upperBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearUpperBoundaryAllRanks);
 
+	#else //sequential mode
+		_lowerBoundaryAllRanks = _lowerBoundaryThisRank;
+		_upperBoundaryAllRanks = _upperBoundaryThisRank;
+	#endif
+
 	#ifdef DEBUG_ICM2M
 	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Total number of cells/md2Macro domain cells: " << inputCells.size() << "/" << m2mDomainCells.size() << std::endl;
 	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Local lowest/highest index in M2M domain: " << *_lowerBoundaryThisRank << "/" << *_upperBoundaryThisRank << std::endl;
 	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Global lowest/highest index in M2M domain: " << *_lowerBoundaryAllRanks << "/" << *_upperBoundaryAllRanks << std::endl;
 	#endif
 
-	#endif
 }
 
 template<unsigned int dim>

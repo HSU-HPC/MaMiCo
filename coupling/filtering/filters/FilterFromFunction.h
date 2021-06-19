@@ -21,7 +21,7 @@ namespace coupling{
  */
 
 template <unsigned int dim>
-class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
+class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 	public:
 		FilterFromFunction(
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
@@ -46,45 +46,62 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 			}
 		}
 
-		~FilterFromFunction(){
+		~FilterFromFunction() {
 			delete _applyScalar;
 			delete _applyVector;
 		}
 
-		void operator()(){	
+		void operator()() {	
 			
 			std::vector<double> input_s;
 			std::vector<std::array<double, dim>> input_v;
 
 			input_s.reserve(coupling::FilterInterface<dim>::_inputCells.size());
 			input_v.reserve(coupling::FilterInterface<dim>::_inputCells.size());
-			
 
-			//SCALAR
+			/*
+			 * SCALAR
+			 */
 			for(unsigned int s = 0; s < coupling::FilterInterface<dim>::_scalarSetters.size(); s++) {
-				//PACK
+
+				/*
+				 * PACK
+				 */
 				for(auto cell : coupling::FilterInterface<dim>::_inputCells) {
 					input_s.push_back((cell->*(coupling::FilterInterface<dim>::_scalarGetters[s]))());
 				}
 
-				//APPLY
 				//std::cout << "Now applying scalar func at: " << _applyScalar << std::endl;
-				std::vector<double> output_s = (*_applyScalar)(input_s, _stlIndices);
+				/*
+				 * APPLY
+				 *
+				 * If the cell vector is emtpy, we skip this step. It would not have any effect anyway
+				 * and could cause problems if the apply functions does cannot handle empty input sets.
+				 */
+				std::vector<double> output_s = {};
+				if(input_s.size() > 0) 
+					output_s = (*_applyScalar)(input_s, _stlIndices);
+
 				input_s.clear();
 
-				//UNPACK
+				/*
+				 * UNPACK
+				 */
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
 					(coupling::FilterInterface<dim>::_outputCells[i]->*(coupling::FilterInterface<dim>::_scalarSetters[s]))(output_s[i]);
 				}	
 			}
 
-
-			//VECTOR
+			/*
+			 * VECTOR
+			 */
 			for(unsigned int v = 0; v < coupling::FilterInterface<dim>::_vectorSetters.size(); v++) {
 
 				//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("FFF BEFORE ");
 
-				//PACK
+				/*
+				 * PACK
+				 */
 				for(auto cell : coupling::FilterInterface<dim>::_inputCells) {
 					tarch::la::Vector<dim, double> mamico_vec = (cell->*(coupling::FilterInterface<dim>::_vectorGetters[v]))();
 					std::array<double, dim> array_vec;
@@ -92,12 +109,21 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim>{
 					input_v.push_back(array_vec);
 				}
 
-				//APPLY
 				//std::cout << "Now applying vector func at: " << _applyVector << std::endl;
-				std::vector<std::array<double, dim>> output_v = (*_applyVector)(input_v, _stlIndices);
+				/*
+				 * APPLY
+				 *
+				 * Cf. scalar case.
+				 */
+				std::vector<std::array<double, dim>> output_v = {};
+				if(input_v.size() > 0) 
+					output_v = (*_applyVector)(input_v, _stlIndices);
+
 				input_v.clear();
 
-				//UNPACK
+				/*
+				 * UNPACK
+				 */
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
 					tarch::la::Vector<dim, double> mamico_vec(-1.0);
 					for(unsigned int d = 0; d < dim; d++) mamico_vec[d] = output_v[i][d];

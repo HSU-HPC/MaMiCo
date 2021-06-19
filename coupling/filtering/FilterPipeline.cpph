@@ -229,7 +229,7 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		}
 
 		#ifdef DEBUG_FILTER_PIPELINE
-			std::cout << "FP: Creating new sequence or junction: Number of inputs found:" << inputCount << std::endl;
+			std::cout << "FP: Creating new sequence or junction: Number of inputs found: " << inputCount << std::endl;
 		#endif
         
         if(inputCount == 0)

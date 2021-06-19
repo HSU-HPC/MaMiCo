@@ -358,11 +358,11 @@ private:
     }
 
 	/*
-	 * A synthethic solver is modeled by a dynamically linked filter,
+	 * A synthethic solver is modeled using a dynamically linked filter,
 	 * i.e. a lambda function producing artifical data in every filter step.
 	 *
 	 * This is how to properly instanciate and use a synthethic solver:
-	 * - Create a sequence named SYNTHETICMD_SEQUENCE in xml. Use whatever input, but make sure the filter system's output is set to this SYNTETHIC_MD sequence.
+	 * - Create a sequence named like the macro SYNTHETICMD_SEQUENCE in xml. Use whatever input, but make sure the filter system's output is set to this sequence.
 	 * - Set filtered-values = "macro-mass macro-momentum" for that sequence.
 	 * - Use that sequence as input for all sequences that want (unfiltered) MD input.
 	 *
@@ -370,6 +370,7 @@ private:
 	 * - test with more than 1 process
 	 * - major bug when there is ONLY a FFF in a sequence (???)
 	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
+	 * - check input (cell/indices) has identical shape
 	 *
 	 * - calculate correct offset using ICM2M
 	 */
@@ -385,6 +386,7 @@ private:
 					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
 
 					//std::cout << "Entering synthetic MD scalar..." << std::endl;
+
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
 					const unsigned int size = cellIndices.size();
 					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
@@ -416,8 +418,10 @@ private:
 					//unlike for the scalar case, we need the MD2Macro version of IC to calculate correct offsets
 					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro =
 						_multiMDCellService->getMacroscopicCellService(0).getFilterPipeline().getICM2M();
+
 					const unsigned int size = cellIndices.size();
-					const tarch::la::Vector<3,double> md2MacroDomainOffset(indexConversionMD2Macro->getGlobalMD2MacroDomainOffset()); //TODO: use ICM2M instead of IC here
+					const tarch::la::Vector<3,double> md2MacroDomainOffset = indexConversionMD2Macro->getGlobalMD2MacroDomainOffset();
+
 					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversionMD2Macro->getBaseIC()->getMacroscopicCellSize());
 					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
