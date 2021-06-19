@@ -6,6 +6,7 @@
 #pragma once
 
 #define DEBUG_ICM2M
+//#define DEBUG_ICM2M_VERBOSE
 
 #include "IndexConversion.h"
 #include "interface/MacroscopicSolverInterface.h"

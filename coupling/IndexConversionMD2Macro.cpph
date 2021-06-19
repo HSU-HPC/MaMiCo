@@ -37,8 +37,8 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 		//removal of cells lying in outer layer not meant for transfer to macro solver
 		//Assuming: dim > 0, INT_MAX at any position in index vector implies MSI function returns false
 		if(!(_msi->receiveMacroscopicQuantityFromMDSolver(_ic->getGlobalVectorCellIndex(_ic->convertLocalToGlobalCellIndex(linearIndex))))) {
-			#ifdef DEBUG_ICM2M
-			std::cout << "ICM2M: initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " not in MD domain." << std::endl;
+			#ifdef DEBUG_ICM2M_VERBOSE
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " not in MD domain." << std::endl;
 			#endif
 
 			outOfBounds = true; 
@@ -51,8 +51,8 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 			if(outOfBounds) continue; //No further checking needed in this case.
 
 			if(convertedIndex[d] == INT_MAX) {
-				#ifdef DEBUG_ICM2M
-				std::cout << "ICM2M: initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in ghost layer." << std::endl;
+				#ifdef DEBUG_ICM2M_VERBOSE
+				std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in ghost layer." << std::endl;
 				#endif
 
 				outOfBounds = true;
@@ -77,7 +77,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 		}
 		else {
 			#ifdef DEBUG_ICM2M
-			std::cout << "ICM2M: initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in MD2Macro-domain." << std::endl;
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in MD2Macro-domain." << std::endl;
 			#endif
 
 			if(_lowerBoundaryThisRank == nullptr) _lowerBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(_ic->convertLocalToGlobalVectorCellIndex(convertedIndex));
