@@ -366,15 +366,25 @@ private:
 	 * - Set filtered-values = "macro-mass macro-momentum" for that sequence.
 	 * - Use that sequence as input for all sequences that want (unfiltered) MD input.
 	 *
-	 * TODO
-	 * - test with more than 1 process
-	 * - major bug when there is ONLY a FFF in a sequence (???)
-	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
-	 * - check input (cell/indices) has identical shape
+	 * Note that this synthethic solver is designed to be used on sequential mode only and with only one MD instance.
 	 *
-	 * - calculate correct offset using ICM2M
+	 * TODO
+	 * - major bug when there is ONLY a FFF in a sequence
+	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
 	 */
 	else if(_cfg.miSolverType == SYNTHETIC)	{
+		
+		/*
+		 * Synthetic MD runs sequentially only, as described above.
+		 */
+        if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
+        _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1) {
+			throw std::runtime_error("ERROR: Syntethic MD is only available in sequential mode!");
+		}
+
+		/*
+		 * Create new FilterFromFunction instance and insert it into Filtering System.
+		 */
 		try {
 			for(unsigned int i = 0; i < _localMDInstances; i++) 
 				_multiMDCellService->getMacroscopicCellService(i).getFilterPipeline().getSequence(SYNTHETICMD_SEQUENCE)->addFilter(
@@ -384,6 +394,10 @@ private:
 					std::vector<std::array<unsigned int, 3>> cellIndices //only gets used to determine "size" (see below)
   				) {
 					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
+
+					//sanity check
+					if(inputScalars.size() != cellIndices.size())
+						throw std::runtime_error("ERROR: Cell data and indexing of non-matching shapes!");
 
 					//std::cout << "Entering synthetic MD scalar..." << std::endl;
 
@@ -412,6 +426,10 @@ private:
 					std::vector<std::array<unsigned int, 3>> cellIndices
   				) {
 					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
+
+					//sanity check
+					if(inputVectors.size() != cellIndices.size())
+						throw std::runtime_error("ERROR: Cell data and indexing of non-matching shapes!");
 
 					//std::cout << "Entering synthetic MD vector." << std::endl;
 
