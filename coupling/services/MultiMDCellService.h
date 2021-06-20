@@ -134,7 +134,7 @@ class coupling::services::MultiMDCellService {
       auto size = macroscopicCellsFromMacroscopicSolver.size();
 
 	  /*
-	   * If this is first coupling step, we must allocate space for the macroscopic cells we filter and determine averages with.
+	   r If this is first coupling step, we must allocate space for the macroscopic cells we filter and determine averages with.
 	   */
 	  if(_macroscopicCells.empty()) {
           //Allocate & init _macroscopicCells
@@ -149,7 +149,7 @@ class coupling::services::MultiMDCellService {
       #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
       if(_postMultiInstanceFilterPipeline == nullptr) {
           //Init filter pipeline
-          _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, &(_macroscopicCellServices[0]->getIndexConversion()), _macroscopicSolverInterface, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
+          _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, globalCellIndicesFromMacroscopicSolver, &(_macroscopicCellServices[0]->getIndexConversion()), _macroscopicSolverInterface, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
       }
       #endif
 

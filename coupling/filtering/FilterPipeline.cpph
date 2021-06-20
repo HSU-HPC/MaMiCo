@@ -9,16 +9,6 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 	const coupling::IndexConversion<dim>* indexConversion,
 	coupling::interface::MacroscopicSolverInterface<dim>* msi,
 	const tarch::utils::MultiMDService<dim>& multiMDService,
-	const char* cfgpath):
-    FilterPipeline(inputCells, indexConversion, msi, multiMDService, POST_MULTI_INSTANCE_FILTERING_NO, cfgpath)
-{}
-
-template<unsigned int dim>
-coupling::FilterPipeline<dim>::FilterPipeline(
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
-	const coupling::IndexConversion<dim>* indexConversion,
-	coupling::interface::MacroscopicSolverInterface<dim>* msi,
-	const tarch::utils::MultiMDService<dim>& multiMDService,
 	coupling::Scope scope, 
 	const char* cfgpath):
 
@@ -45,6 +35,48 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 		case coupling::Scope::postMultiInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")); break;
 	}
 }
+
+template<unsigned int dim>
+coupling::FilterPipeline<dim>::FilterPipeline(
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > md2MacroInputCells,
+	const unsigned int * const md2MacroInputCellIndices, //global!
+	const coupling::IndexConversion<dim>* indexConversion,
+	coupling::interface::MacroscopicSolverInterface<dim>* msi,
+	const tarch::utils::MultiMDService<dim>& multiMDService,
+	coupling::Scope scope, 
+	const char* cfgpath):
+
+	_md2MacroCells(md2MacroInputCells),
+	_multiMDService(multiMDService),
+	_scope(scope)
+{	
+	_ic = new coupling::IndexConversionMD2Macro<dim>(indexConversion, msi);
+	
+    //check if provided file is written in proper XML
+    if(_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR){
+		std::cout << "Filter Pipeline config path: " << cfgpath << std::endl;
+        throw std::runtime_error("Could not read config for Filter-Pipeline: XML syntax error.");
+    }
+            
+    //check for structural errors in config file
+    if (!configIsValid(_config)) exit(EXIT_FAILURE);
+
+	//convert input cell indices to C++ style
+	//this is obviously dangerous, as we cannot check whether the pointer array has the correct size
+	for(unsigned int i = 0; i < md2MacroInputCells.size(); i++)
+		_md2MacroCellIndices.push_back(_ic->getBaseIC()->getGlobalCellIndex(md2MacroInputCellIndices[i]));
+	
+	//load domain vectors
+	_ic->initMD2MacroDomain(_md2MacroCells, _md2MacroCellIndices, _outerCells, _outerCellIndices);
+
+    //load sequences
+	switch(scope) {
+		case coupling::Scope::perInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance")); break;
+		case coupling::Scope::postMultiInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")); break;
+	}
+
+}
+
 
 
 //member functions of coupling::FilterPipeline

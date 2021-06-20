@@ -36,13 +36,8 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterPipeline{
     public:
-        FilterPipeline(
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
-			const coupling::IndexConversion<dim>* indexConversion,
-			coupling::interface::MacroscopicSolverInterface<dim>* msi,
-			const tarch::utils::MultiMDService<dim>& multiMDService,
-			const char* cfgpath);
 
+		//TODO: comment! difference: whole domain vs only md2macro incl. indexing
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 			const coupling::IndexConversion<dim>* indexConversion,
@@ -50,6 +45,16 @@ class coupling::FilterPipeline{
 			const tarch::utils::MultiMDService<dim>& multiMDService,
 			const coupling::Scope scope,
 			const char* cfgpath);
+
+        FilterPipeline(
+			std::vector<coupling::datastructures::MacroscopicCell<dim>* > md2MacroInputCells,
+			const unsigned int * const md2MacroInputCellIndices, //global!
+			const coupling::IndexConversion<dim>* indexConversion,
+			coupling::interface::MacroscopicSolverInterface<dim>* msi,
+			const tarch::utils::MultiMDService<dim>& multiMDService,
+			const coupling::Scope scope,
+			const char* cfgpath);
+
                
         ~FilterPipeline() {
             for(auto sequence : _sequences) delete sequence;

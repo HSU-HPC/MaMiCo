@@ -73,9 +73,25 @@ class coupling::IndexConversionMD2Macro {
 		}
 
 		/*
-		 * Chooses a subspace of the cell (and index) input based on what will be transfered to the macro solver.
+		 * This method assumes the given cells to be the entire m2m-domain (see below).
+		 * It currently only has uses in cases where you do not have access to all cells of the entire domain, 
+		 * which is only the case for post multi-instance filtering as of now.
+		 *
+		 * In this case, the "outer" region is empty.
+		 */
+		void initMD2MacroDomain(
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *> m2mDomainCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>> m2mGlobalCellIndices,
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outerCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices
+				);
+
+		/*
+		 * This alternative chooses a subspace of the cell (and index) input based on what will be transfered to the macro solver.
 		 * This subspace is referred to as "md2Macro-domain" (or sometimes (m2m-domain).
 		 * All other cells will be placed into the "outer" domain.
+		 *
+		 * Note that all indexing here is in terms of MaMiCo-Indexing nonetheless, i.e. m2mDomainCells don't start counting at the start of the MD-To-Macro domain.
 		 */
 		void initMD2MacroDomain(
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,

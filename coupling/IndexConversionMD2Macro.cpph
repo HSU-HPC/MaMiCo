@@ -6,9 +6,74 @@
 //Member functions of coupling::IndexConversionMD2Macro
 template<unsigned int dim>
 void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *> m2mDomainCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>> m2mDomainGlobalIndices,
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outerCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices
+) {
+	//In this case, we ~only~ have m2m cells!
+	outerCells = {};
+	outerIndices = {};
+
+	if(m2mDomainCells.size() != m2mDomainGlobalIndices.size()) {
+		std::cout << "Number of cells: " << m2mDomainCells.size() << std::endl;
+		std::cout << "Number of indices: " << m2mDomainGlobalIndices.size() << std::endl;
+		throw std::runtime_error("ERROR: initMD2MacroDomain(): Input cells and indices mismatch in size!");
+	}
+		
+	//local boundaries are the first and last cell in given m2m domain.
+	_lowerBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(m2mDomainGlobalIndices[0]);
+	_upperBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(m2mDomainGlobalIndices.back());
+
+	//global boundaries must be communated in concurrent scenarios
+
+	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel mode
+		//Broadcast global Boundary. This assumes that the lowest rank of the communicator has the lower bound, while the highest one has the upper bound.
+
+		//use linear indexing for easier MPI communication
+		unsigned int linearLowerBoundaryAllRanks;
+		unsigned int linearUpperBoundaryAllRanks;
+
+		// number of processes (in linear form)
+		unsigned int nprocs = 1;
+		for(unsigned int d = 0; d<dim; d++) nprocs *= _ic->getNumberProcesses()[d];
+
+		if(_myRank ==  _lowestRank) {
+			//sanity check
+			if(_lowerBoundaryThisRank == nullptr) throw std::runtime_error("ERROR: ICM2M: Lowest rank in communicator has no M2M domain cells. This implies an empty M2M domain!");
+			else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_lowerBoundaryThisRank); 
+		} else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
+
+		if(_ic->getThisRank() ==  nprocs-1) { //last process 
+			_upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_upperBoundaryThisRank);
+		} else _upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
+
+		linearLowerBoundaryAllRanks = _ic->getGlobalCellIndex(*_lowerBoundaryAllRanks);
+		linearUpperBoundaryAllRanks = _ic->getGlobalCellIndex(*_upperBoundaryAllRanks);
+
+		MPI_Bcast(&linearLowerBoundaryAllRanks, 1, MPI_UNSIGNED, _lowestRank, _comm);
+		MPI_Bcast(&linearUpperBoundaryAllRanks, 1, MPI_UNSIGNED, nprocs-1, _comm); //last process
+	
+		//convert back to vector
+		(*_lowerBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearLowerBoundaryAllRanks);
+		(*_upperBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearUpperBoundaryAllRanks);
+
+	#else //sequential mode
+		_lowerBoundaryAllRanks = _lowerBoundaryThisRank;
+		_upperBoundaryAllRanks = _upperBoundaryThisRank;
+	#endif
+
+	#ifdef DEBUG_ICM2M
+	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Local lowest/highest index in M2M domain: " << *_lowerBoundaryThisRank << "/" << *_upperBoundaryThisRank << std::endl;
+	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Global lowest/highest index in M2M domain: " << *_lowerBoundaryAllRanks << "/" << *_upperBoundaryAllRanks << std::endl;
+	#endif
+}
+
+template<unsigned int dim>
+void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,
-				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& m2mDomainCells,
-				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& m2mDomainCells, 
+				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,//TODO: double check: these should be global, right?
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outerCells,
 				std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices
 
@@ -17,10 +82,8 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 		throw std::runtime_error("ERROR: ICM2M: Input cell vector is emtpy.");
 	}
 
-	// number of processes (in linear form)
-	unsigned int nprocs = 1;
-	for(unsigned int d = 0; d<dim; d++) nprocs *= _ic->getNumberProcesses()[d];
-
+	//TODO: check for other vectors to be empty!
+	
 	#ifdef DEBUG_ICM2M
 	std::cout << "ICM2M: Initializing md2Macro-domain and outer cells and their index vectors." << std::endl;
 	//std::cout << "Now Looking at slice (3,...)" << std::endl;
@@ -44,7 +107,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 			outOfBounds = true; 
 		}
 
-		//removal of ghost layer
+		//convertion to vector, marking of ghost layer indices as INT_MAX
 		convertedIndex = getLocalVectorCellIndex(linearIndex, false);
 
 		for(unsigned int d = 0; d < dim; d++) {
@@ -78,6 +141,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 		else {
 			#ifdef DEBUG_ICM2M
 			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in MD2Macro-domain." << std::endl;
+			std::cout << "That translates to " << convertedIndex << " in terms of MD-to-Macro indexing." << std::endl; 
 			#endif
 
 			if(_lowerBoundaryThisRank == nullptr) _lowerBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(_ic->convertLocalToGlobalVectorCellIndex(convertedIndex));
@@ -91,31 +155,36 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 
 	
 	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel mode
-	//Broadcast global Boundary. This assumes that the lowest rank of the communicator has the lower bound, while the highest one has the upper bound.
+		//Broadcast global Boundary. This assumes that the lowest rank of the communicator has the lower bound, while the highest one has the upper bound.
 
-	//use linear indexing for easier MPI communication
-	unsigned int linearLowerBoundaryAllRanks;
-	unsigned int linearUpperBoundaryAllRanks;
+		//use linear indexing for easier MPI communication
+		unsigned int linearLowerBoundaryAllRanks;
+		unsigned int linearUpperBoundaryAllRanks;
 
-	if(_myRank ==  _lowestRank) {
-		//sanity check
-		if(_lowerBoundaryThisRank == nullptr) throw std::runtime_error("ERROR: ICM2M: Lowest rank in communicator has no M2M domain cells. This implies an empty M2M domain!");
-		else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_lowerBoundaryThisRank); 
-	} else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
+		// number of processes (in linear form)
+		unsigned int nprocs = 1;
+		for(unsigned int d = 0; d<dim; d++) nprocs *= _ic->getNumberProcesses()[d];
 
-	if(_ic->getThisRank() ==  nprocs-1) { //last process 
-		_upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_upperBoundaryThisRank);
-	} else _upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
 
-	linearLowerBoundaryAllRanks = _ic->getGlobalCellIndex(*_lowerBoundaryAllRanks);
-	linearUpperBoundaryAllRanks = _ic->getGlobalCellIndex(*_upperBoundaryAllRanks);
-
-	MPI_Bcast(&linearLowerBoundaryAllRanks, 1, MPI_UNSIGNED, _lowestRank, _comm);
-	MPI_Bcast(&linearUpperBoundaryAllRanks, 1, MPI_UNSIGNED, nprocs-1, _comm); //last process
+		if(_myRank ==  _lowestRank) {
+			//sanity check
+			if(_lowerBoundaryThisRank == nullptr) throw std::runtime_error("ERROR: ICM2M: Lowest rank in communicator has no M2M domain cells. This implies an empty M2M domain!");
+			else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_lowerBoundaryThisRank); 
+		} else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
 	
-	//convert back to vector
-	(*_lowerBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearLowerBoundaryAllRanks);
-	(*_upperBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearUpperBoundaryAllRanks);
+		if(_ic->getThisRank() ==  nprocs-1) { //last process 
+			_upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_upperBoundaryThisRank);
+		} else _upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
+
+		linearLowerBoundaryAllRanks = _ic->getGlobalCellIndex(*_lowerBoundaryAllRanks);
+		linearUpperBoundaryAllRanks = _ic->getGlobalCellIndex(*_upperBoundaryAllRanks);
+
+		MPI_Bcast(&linearLowerBoundaryAllRanks, 1, MPI_UNSIGNED, _lowestRank, _comm);
+		MPI_Bcast(&linearUpperBoundaryAllRanks, 1, MPI_UNSIGNED, nprocs-1, _comm); //last process
+	
+		//convert back to vector
+		(*_lowerBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearLowerBoundaryAllRanks);
+		(*_upperBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearUpperBoundaryAllRanks);
 
 	#else //sequential mode
 		_lowerBoundaryAllRanks = _lowerBoundaryThisRank;
