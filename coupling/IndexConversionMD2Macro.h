@@ -185,6 +185,10 @@ class coupling::IndexConversionMD2Macro {
 		}
 		
 	private:
+
+		//used during initMD2MacroDomain();
+		void initGlobalMD2MacroDomainBoundaries();
+
 		//used to determine which cells are neither withing GL or M2M domain
 		const coupling::IndexConversion<dim>* _ic;
 		coupling::interface::MacroscopicSolverInterface<dim>* _msi;
