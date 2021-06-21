@@ -5,6 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SENDRECV_FROMMACRO2MD_H_
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_FROMMACRO2MD_H_
 
+#include "coupling/sendrecv/DataExchangeFromMacro2MD.h"
 #include "coupling/sendrecv/SendReceiveBuffer.h"
 #include <vector>
 
@@ -42,10 +43,10 @@ class coupling::sendrecv::FromMacro2MD: public coupling::sendrecv::SendReceiveBu
     );
 
     void sendFromMacro2MDCollective(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+      std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>* > &dataExchangeFromMacroscopicCellServices,
       const std::vector<MacroscopicCell*> &macroscopicCellsFromMacroscopicSolver,
-      const unsigned int * const globalCellIndicesFromMacroscopicSolver
+      const unsigned int * const globalCellIndicesFromMacroscopicSolver,
+      std::vector<std::vector<MacroscopicCell*> > t
     );
 
     /** sends data from macro to MD. After returning, the data transfer may not be completely finished, similar to a IRecv/ISend-call by MPI. Please use wait4SendFromMacro2MD(...) to guarantee
@@ -103,6 +104,12 @@ class coupling::sendrecv::FromMacro2MD: public coupling::sendrecv::SendReceiveBu
      *  macroscopic cells. For each cell, readFromReceiveBuffer(...) of SendReceiveBuffer is called.
      */
     void readFromReceiveBuffer(
+      const coupling::IndexConversion<dim> &indexConversion,
+      coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+      const std::vector<MacroscopicCell *> &macroscopicCells
+    );
+
+    void readFromCollectiveBuffer(
       const coupling::IndexConversion<dim> &indexConversion,
       coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
       const std::vector<MacroscopicCell *> &macroscopicCells

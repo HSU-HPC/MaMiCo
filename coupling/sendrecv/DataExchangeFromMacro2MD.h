@@ -89,6 +89,10 @@ public coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCel
       return 1+dim;
     }
 
+    const coupling::IndexConversion<dim> * getIndexConversion() const {
+      return &_indexConversion;
+    }
+
   private:
     coupling::interface::MacroscopicSolverInterface<dim> *_interface;
     const coupling::IndexConversion<dim> &_indexConversion;

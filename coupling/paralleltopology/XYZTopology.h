@@ -7,6 +7,7 @@
 
 #include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/CouplingMDDefinitions.h"
+#include <mpi.h>
 
 namespace coupling {
   namespace paralleltopology {

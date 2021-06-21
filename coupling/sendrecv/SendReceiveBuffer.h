@@ -66,6 +66,14 @@ class coupling::sendrecv::SendReceiveBuffer {
     );
 
 
+    void readFromCollectiveBuffer(
+      const coupling::IndexConversion<dim> &indexConversion,
+      coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+      MacroscopicCell &macroscopicCell,
+      tarch::la::Vector<dim,unsigned int> globalVectorIndex
+    );
+
+
     /** according to rule by dataExchange, the receive buffers are allocated. This function adds a contribution for the cell at globalVectorIndex.
      */
     void allocateReceiveBuffers(
@@ -88,8 +96,7 @@ class coupling::sendrecv::SendReceiveBuffer {
     );
 
     void triggerSendingCollective(
-      const coupling::IndexConversion<dim>& indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
+      const unsigned int rank
     );
 
     /** triggers the MPI-receiving on the respective buffers. No receiving of information from/to this rank. */
@@ -99,17 +106,18 @@ class coupling::sendrecv::SendReceiveBuffer {
     );
 
     void triggerReceivingCollective(
-      const coupling::IndexConversion<dim>& indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
+      const unsigned int rank
     );
 
     /** wait for all send and receive operations to complete. */
     void waitAllOperations(const coupling::IndexConversion<dim>& indexConversion);
 
+    void waitAllCollectiveOperations(const coupling::IndexConversion<dim>& indexConversion);
+
     /** allocates send and receive requests */
     void allocateRequests(const coupling::IndexConversion<dim>& indexConversion);
 
-    void allocateRequestsCollective(const coupling::IndexConversion<dim>& indexConversion);
+    void allocateRequestsCollective(const unsigned int thisRank);
 
   private:
     /** data structure for send- and receive-buffer. */
@@ -124,7 +132,10 @@ class coupling::sendrecv::SendReceiveBuffer {
     struct BufferCollective {
         std::vector<double> buffer;
         std::set<unsigned int> targetRanks;
+        std::set<unsigned int> cellIndices;
         unsigned int sourceRank;
+
+        BufferCollective(): buffer(), targetRanks(), cellIndices(), sourceRank(-1){}
     };
 
 
@@ -137,7 +148,7 @@ class coupling::sendrecv::SendReceiveBuffer {
 
 
     /** members for collective communication */
-    std::map<unsigned int,BufferCollective> _sendRecvBuffer;
+    std::map<unsigned int,BufferCollective> _sendRecvBuffer; // key is sourceRank * subdomainSize + subdomainID
 
 
     #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
