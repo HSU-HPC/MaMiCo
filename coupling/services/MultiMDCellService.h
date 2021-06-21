@@ -118,12 +118,29 @@ class coupling::services::MultiMDCellService {
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ){
+      int r;
+      MPI_Comm_rank(MPI_COMM_WORLD, &r);
+
+      std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim> * > allDEs(_totalNumberMDSimulations);
+      std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim> *> > allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
+      for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
+        allDEs[i] = new coupling::sendrecv::DataExchangeFromMacro2MD<dim> (
+          _macroscopicSolverInterface, _macroscopicCellServices[i]->getIndexConversion(),
+          _macroscopicCellServices[i]->getID()
+        );
+        if(auto * v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[i])) {
+          allMacroscopicCellsFromMamico[i] = v->getMacroscopicCells().getMacroscopicCells();
+        }
+      }
+
       coupling::sendrecv::FromMacro2MD<coupling::datastructures::MacroscopicCell<dim>, dim > fromMacro2MD;
-      coupling::sendrecv::DataExchangeFromMacro2MD<dim> deFromMacro2MD(_macroscopicSolverInterface, _macroscopicCellServices[0]->getIndexConversion());
       fromMacro2MD.sendFromMacro2MDCollective(
-        _macroscopicCellServices[0]->getIndexConversion(), deFromMacro2MD,
-        macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver
+        allDEs, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver, allMacroscopicCellsFromMamico
       );
+      for(auto & de : allDEs) {
+        delete de;
+        de = nullptr;
+      }
     }
 
     /** collects data from MD simulations, averages over them (only macroscopic mass/momentum is considered) and writes the result back into macroscopicCellsFromMacroscopicSolver. */
