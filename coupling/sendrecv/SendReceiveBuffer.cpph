@@ -411,10 +411,10 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerSendingC
   int counter = 0;
 #endif
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-  std::cout << thisRank << " sendrecvBuffer size " << _sendRecvBuffer.size() << std::endl;
+  //std::cout << thisRank << " sendrecvBuffer size " << _sendRecvBuffer.size() << std::endl;
   for(auto & buffer : _sendRecvBuffer) {
     //if(buffer.second.targetRanks.find(1) != buffer.second.targetRanks.end()) {
-      std::cout <<thisRank << "=====" << buffer.second.cellIndices << "=====" <<buffer.second.sourceRank << "===>" << buffer.second.targetRanks << std::endl;
+    //  std::cout <<thisRank << "=====" << buffer.second.cellIndices << "=====" <<buffer.second.sourceRank << "===>" << buffer.second.targetRanks << std::endl;
     //}
     //std::cout << thisRank << " : Bcast buffer size " << buffer.second.buffer.size() << " from " << buffer.second.sourceRank << " to " << buffer.second.targetRanks << std::endl;
     int err = MPI_Ibcast(buffer.second.buffer.data(), static_cast<int>(buffer.second.buffer.size()), MPI_DOUBLE, 0, _subComms[counter], &_requests[counter]);
