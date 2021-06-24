@@ -5,8 +5,6 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SERVICES_MACROSCOPICCELLSERVICEMACROONLY_H_
 #define _MOLECULARDYNAMICS_COUPLING_SERVICES_MACROSCOPICCELLSERVICEMACROONLY_H_
 
-#include "coupling/IndexConversionMacroOnly.h"
-
 #include "coupling/services/MacroscopicCellService.h"
 
 #include "coupling/sendrecv/FromMacro2MDSendOnly.h"
