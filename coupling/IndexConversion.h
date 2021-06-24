@@ -40,17 +40,6 @@ class coupling::IndexConversion: private tarch::utils::Uncopyable {
       tarch::la::Vector<dim,double> globalMDDomainOffset,
       coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
       unsigned int topologyOffset
-    ): IndexConversion<dim>(globalNumberMacroscopicCells,numberProcesses,rank,globalMDDomainSize,globalMDDomainOffset, parallelTopologyType, topologyOffset, 0){}
-    /** constructor for MacroOnly Macro cell services. */
-    IndexConversion(
-      tarch::la::Vector<dim,unsigned int> globalNumberMacroscopicCells,
-      tarch::la::Vector<dim,unsigned int> numberProcesses,
-      unsigned int rank,
-      tarch::la::Vector<dim,double> globalMDDomainSize,
-      tarch::la::Vector<dim,double> globalMDDomainOffset,
-      coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-      unsigned int topologyOffset,
-      unsigned int rankOffset
     );
     /** constructor for single-MD simulations */
     IndexConversion(

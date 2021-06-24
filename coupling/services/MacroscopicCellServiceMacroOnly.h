@@ -104,7 +104,7 @@ class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::ser
           std::cout << "coupling::services::MacroscopicCellServiceMacroOnly::initIndexConversion(): Deviation of domain size > 1e-13!" << std::endl;
         }
       }
-      coupling::IndexConversion<dim> *ic = new coupling::IndexConversion<dim>(globalNumberMacroscopicCells,numberProcesses,rank,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType,topologyOffset, rank);
+      coupling::IndexConversion<dim> *ic = new coupling::IndexConversion<dim>(globalNumberMacroscopicCells,numberProcesses,rank,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType,topologyOffset);
       if (ic==NULL){std::cout << "coupling::services::MacroscopicCellServiceImpl::initIndexConversion(): ic==NULL!" << std::endl; exit(EXIT_FAILURE);}
       return ic;
     }
