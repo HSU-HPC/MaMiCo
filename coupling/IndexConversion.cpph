@@ -11,7 +11,8 @@ coupling::IndexConversion<dim>::IndexConversion(
   tarch::la::Vector<dim,double> globalMDDomainSize,
   tarch::la::Vector<dim,double> globalMDDomainOffset,
   coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-  unsigned int topologyOffset
+  unsigned int topologyOffset,
+  unsigned int rankOffset
 ):
   // DO NOT CHANGE ORDERING OF THESE PARAMETERS
     // parallel-topology and type need to be initialised first (independent of other class-members in init.)
@@ -21,7 +22,7 @@ coupling::IndexConversion<dim>::IndexConversion(
    _numberProcesses(numberProcesses),
    _rank(rank),
    // depends on parallel-topology
-   _thisProcess(getProcessCoordinates(rank)),
+   _thisProcess(getProcessCoordinates(rank-rankOffset)),
    // independent from other members in init.
    _globalNumberMacroscopicCells(globalNumberMacroscopicCells),
    // independent from other members in init.

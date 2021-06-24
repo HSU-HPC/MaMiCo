@@ -5,6 +5,8 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SERVICES_MACROSCOPICCELLSERVICEMACROONLY_H_
 #define _MOLECULARDYNAMICS_COUPLING_SERVICES_MACROSCOPICCELLSERVICEMACROONLY_H_
 
+#include "coupling/IndexConversionMacroOnly.h"
+
 #include "coupling/services/MacroscopicCellService.h"
 
 #include "coupling/sendrecv/FromMacro2MDSendOnly.h"
@@ -104,7 +106,7 @@ class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::ser
           std::cout << "coupling::services::MacroscopicCellServiceMacroOnly::initIndexConversion(): Deviation of domain size > 1e-13!" << std::endl;
         }
       }
-      coupling::IndexConversion<dim> *ic = new coupling::IndexConversion<dim>(globalNumberMacroscopicCells,numberProcesses,rank,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType,topologyOffset);
+      coupling::IndexConversion<dim> *ic = new coupling::IndexConversion<dim>(globalNumberMacroscopicCells,numberProcesses,rank,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType,topologyOffset, rank);
       if (ic==NULL){std::cout << "coupling::services::MacroscopicCellServiceImpl::initIndexConversion(): ic==NULL!" << std::endl; exit(EXIT_FAILURE);}
       return ic;
     }
