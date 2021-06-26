@@ -160,19 +160,14 @@ void coupling::FilterSequence<dim>::addFilter(
 	//std::cout << PRINT_PREFIX() << "First element of _cellVector1 after add: " << _cellVector1[0] << std::endl;
 	//std::cout << PRINT_PREFIX() << "First element of _cellVector2 after add: " << _cellVector2[0] << std::endl;
 
+	std::cout << "PRE" << PRINT_PREFIX(); printOutputCellVector();
+
+	auto outputCellVectorBefore = getOutputCellVector();
+
 	if(_isModifiable) {
 		unsigned int index;
 		(filterIndex == -1 || filterIndex > (int) _filters.size()) ? index = _filters.size() : index = filterIndex;
 
-		//case: appending	
-		if(index ==  _filters.size()) {
-			if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
-			else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
-			#ifdef DEBUG_FILTER_PIPELINE
-				std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
-			#endif
-		}
-		else {
 		//case: index 0
 		if (index  == 0) {
 			//previous filter at index 0 won't use _inputDomainCellVector any longer
@@ -181,10 +176,26 @@ void coupling::FilterSequence<dim>::addFilter(
 			_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_inputDomainCellVector, _cellVector2 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
 
 			// add copy if no copy after index exists, else remove that copy
-			if(std::strcmp(_filters[1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + 1);
+			if(_filters.size() > 1) { //dont check if the newly added FFF is the only filter in the sequence
+				if(std::strcmp(_filters[1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + 1);
+				else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues));
+			}
 			else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues));
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << PRINT_PREFIX() << "Inserted new filter at index 0" << std::endl;
+			#endif
 		}
-		//case: inserting
+
+		//case: appending to nonempty sequence	
+		else if(index ==  _filters.size()) {
+			if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
+			else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
+			#endif
+		}
+		
+		//case: inserting at nonzero index
 		else {
 			if(index % 2 == 0) { 
 				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2 , _sequenceDomainCellIndices, _filteredValues, applyScalar, applyVector));
@@ -204,12 +215,23 @@ void coupling::FilterSequence<dim>::addFilter(
 				std::cout << PRINT_PREFIX() << "Inserted new filter at index " << index << std::endl;
 			#endif
 
-		}}
+		}
 		#ifdef DEBUG_FILTER_PIPELINE
 		std::cout << PRINT_PREFIX(); printOutputCellVector();
 		#endif
 	}
 	else std::cout << "WARNING: Trying to add filter at runtime to non-modifiable filter sequence " << _name << ". Refused." << std::endl; //exit()?
+
+	//Check if output vector has changed. Currently, this can only happen if the output vector was _inputCellVector before.
+	if(outputCellVectorBefore != getOutputCellVector()) {
+		for(auto child : _childSequences) { 
+			child->updateInputCellVector(getOutputCellVector());
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << PRINT_PREFIX() << "Reported change in output vector to child sequence " << child->getName() << std::endl;
+			#endif
+		}
+	}
+
 }
 
 

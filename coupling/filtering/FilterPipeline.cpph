@@ -329,6 +329,11 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 																	domainStartCell, 
 																	domainEndCell, 
 																	filteredValues));
+
+			//register newborn sequence as child at its input sequence,
+			//unless this parent sequence is md (in which case inputSeqs is empty)
+			if(!inputSeqs.empty()) inputSeqs[0]->addChildSequence(_sequences.back());
+
 			#ifdef DEBUG_FILTER_PIPELINE
 				if(inputSeqs.size() == 1) std::cout << "FP: " << _sequences.back()->getName() << " will use " << inputSeqs[0]->getName() << " as input." << std::endl;
 				else std::cout << "FP: " << _sequences.back()->getName() << " will use MD data as input." << std::endl;
@@ -351,6 +356,7 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 				std::cout << "FP: " << _sequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
 			#endif
 
+			//TODO handling of parent sequences once this becomes relevant for junctions
 		}
 		else { //Junction = Sequence with 2 or more inputs
 			//TODO: move template inputc: currently has 2 hardcoded
@@ -365,7 +371,8 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << "FP: " << _sequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
 			#endif
-
+			
+			//TODO handling of parent sequences once this becomes relevant for junctions
 		}
 
         //Add sequence to temp vector
