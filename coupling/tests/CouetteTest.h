@@ -372,6 +372,7 @@ private:
 	 * TODO
 	 * - major bug when there is ONLY a FFF in a sequence
 	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
+	 * - totalNumberMDSimulations > 1 is theoretically possible with this redesign. test it and remove the restriction for it to be 1
 	 */
 
 	else if(_cfg.miSolverType == SYNTHETIC)	{
@@ -379,7 +380,7 @@ private:
 		/*
 		 * Synthetic MD runs sequentially only, as described above.
 		 */
-        if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 || /* TODO: totalNumberMDSimulations is theoretically possible with this redesign. test it and remove this restriction */
+        if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
         _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1) {
 			throw std::runtime_error("ERROR: Syntethic MD is only available in sequential mode!");
 		}
@@ -402,7 +403,6 @@ private:
 						throw std::runtime_error("ERROR: Cell data and indexing of non-matching shapes!");
 
 					//std::cout << "Entering synthetic MD scalar..." << std::endl;
-
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
 					const unsigned int size = cellIndices.size();
 					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());

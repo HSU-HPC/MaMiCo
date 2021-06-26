@@ -247,9 +247,17 @@ class KVSTest():
 
 
         mcs = self.multiMDCellService.getMacroscopicCellService(0)
-        mcs.addFilterToSequence(filter_sequence="gaussX-python", filter_index=0, scalar_filter_func = gauss_x_sca1, vector_filter_func=gauss_x_vec1)
-        mcs.addFilterToSequence(filter_sequence="gaussXYZ-python", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
 
+        #fff testing
+        #mcs.addFilterToSequence(filter_sequence="gauss-wtf", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+        #mcs.addFilterToSequence(filter_sequence="gauss", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+        
+
+        #gauss testing
+        #mcs.addFilterToSequence(filter_sequence="gaussX-python", filter_index=0, scalar_filter_func = gauss_x_sca1, vector_filter_func=gauss_x_vec1)
+        #mcs.addFilterToSequence(filter_sequence="gaussXYZ-python", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+
+        #param testing
         #mcs.addFilterToSequence(filter_sequence="gauss-05", filter_index=0, scalar_filter_func = gauss_sca05, vector_filter_func=gauss_vec05)
         #mcs.addFilterToSequence(filter_sequence="gauss-1", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
         #mcs.addFilterToSequence(filter_sequence="gauss-15", filter_index=0, scalar_filter_func = gauss_sca15, vector_filter_func=gauss_vec15)
