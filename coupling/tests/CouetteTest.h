@@ -327,6 +327,7 @@ private:
       getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
     );
 
+
     if(_cfg.twsLoop){
       // initialise macroscopic cell service for multi-MD case and set single cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
@@ -372,12 +373,13 @@ private:
 	 * - major bug when there is ONLY a FFF in a sequence
 	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
 	 */
+
 	else if(_cfg.miSolverType == SYNTHETIC)	{
 		
 		/*
 		 * Synthetic MD runs sequentially only, as described above.
 		 */
-        if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
+        if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 || /* TODO: totalNumberMDSimulations is theoretically possible with this redesign. test it and remove this restriction */
         _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1) {
 			throw std::runtime_error("ERROR: Syntethic MD is only available in sequential mode!");
 		}

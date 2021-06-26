@@ -47,6 +47,12 @@ class coupling::services::MultiMDCellService {
        _multiMDService(multiMDService),
        _postMultiInstanceFilterPipeline(nullptr) {
 
+      //If we allow for zero MD instances on ranks, this initializion process would segfault...
+      if(mdSolverInterfaces.size() == 0) {
+        std::cout << "ERROR: Zero MD instances on rank " << rank << ". Maybe you forgot to adjust number-md-simulations in couette.xml?" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
       const tarch::la::Vector<dim,double> mdDomainSize(mdSolverInterfaces[0]->getGlobalMDDomainSize());
       const tarch::la::Vector<dim,double> mdDomainOffset(mdSolverInterfaces[0]->getGlobalMDDomainOffset());
 
@@ -56,6 +62,7 @@ class coupling::services::MultiMDCellService {
       // - an MD simulation executes on one full block of ranks
       _macroscopicCellServices = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations];
       if (_macroscopicCellServices==NULL){std::cout << "ERROR coupling::services::MultiMDCellService::MultiMDCellService(...): _macroscopicCellServices==NULL!" << std::endl; exit(EXIT_FAILURE);}
+
 
       // allocate all macroscopic cell services for macro-only-solver BEFORE topology offset
       // -> we have localNumberMDSimulations that run per block of ranks on intNumberProcesses
@@ -133,13 +140,13 @@ class coupling::services::MultiMDCellService {
       double res = 0;
       auto size = macroscopicCellsFromMacroscopicSolver.size();
 
-	  /*
-	   r If this is first coupling step, we must allocate space for the macroscopic cells we filter and determine averages with.
-	   */
-	  if(_macroscopicCells.empty()) {
+      /*
+       * If this is first coupling step, we must allocate space for the macroscopic cells we filter and determine averages with.
+       */
+      if(_macroscopicCells.empty()) {
           //Allocate & init _macroscopicCells
           for(unsigned int c = _macroscopicCells.size(); c < size; c++) _macroscopicCells.push_back(new coupling::datastructures::MacroscopicCell<dim>());
-	  }
+      }
 
       /*
        * If this is the first coupling step, we must init the post multi instance filter pipeline operating on averaged cell data.
