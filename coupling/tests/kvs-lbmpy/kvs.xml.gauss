@@ -97,6 +97,7 @@
 			<gauss
 				dim="0"
 				sigma="1"
+				extrapolation="mirror"
 			/>
 
 			<write-to-file
@@ -110,14 +111,17 @@
 			<gauss
 				dim="0"
 				sigma="1"
+				extrapolation="mirror"
 			/>
 			<gauss
 				dim="1"
 				sigma="1"
+				extrapolation="mirror"
 			/>
 			<gauss
 				dim="2"
 				sigma="1"
+				extrapolation="mirror"
 			/>
 
 
