@@ -140,7 +140,8 @@ class coupling::FilterSequence {
 				#ifdef DEBUG_FILTER_PIPELINE
 					std::cout 
 						<< PRINT_PREFIX() << "Applied filter " << filter->getType() 
-						<< ". Application time: " << _filterTimes[filter].back() << "\u03BCs" << std::endl;
+						<< ". Application time: " << _filterTimes[filter].back() << "\u03BCs"
+					<< std::endl;
 				#endif
 			}
 			_timestepsElapsed++;
@@ -200,15 +201,35 @@ class coupling::FilterSequence {
 		);
 
 		/*
+		 * Registers existence of a child sequence, i.e. a sequence using this sequence's output as its input.
+		 */
+		virtual void addChildSequence(coupling::FilterSequence<dim>* childSequence) {
+			_childSequences.push_back(childSequence);
+		}
+
+		/*
+		 * Allows changing the input cells after init.
+		 */
+		virtual void updateInputCellVector(const std::vector<coupling::datastructures::MacroscopicCell<dim>* > newInputCellVector) {
+			_inputCellVector = newInputCellVector; //call copy constructor
+
+			//cc this change to this sequence's first vector.
+			if(!_filters.empty()) _filters[0]->setInputCells(_inputCellVector);
+		}
+
+
+		/*
 		 * Which one of the two cell vectors are this sequence's output is solely dependant on the number of filters the sequence contains,
 		 * because each swap (see loadFiltersFromXML) changes what is the sequence's final filter's output.
 		 *
 		 * Some sequences have more than one output, thus the optional parameter. Has no effect on a basic FilterSequence.
 		 */
     	virtual const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex = 0) const{ 
-			if(_filters.empty()) std::cout << PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
+			if(_filters.empty()) return _inputCellVector;
+
 			if(_filters.size() % 2 == 0) return _cellVector1;
-			else return _cellVector2;
+
+			return _cellVector2;
 		}
 
 		virtual void printOutputCellVector() const {
@@ -232,12 +253,6 @@ class coupling::FilterSequence {
 			std::cout << "Filters in sequence " << _name << ": ";
 			for(auto f : _filters) std::cout << f->getType() << " ";
 			std::cout << std::endl;
-		}
-
-		void pintOutputVector() const {
-			std::cout << PRINT_PREFIX() << "Number of Filters: " << _filters.size() <<". Output vector will be ";
-			if(_filters.size() % 2 == 0)  std::cout << "_cellVector1." << std::endl;
-			else std::cout << "_cellVector2." << std::endl;
 		}
 
 		virtual std::string PRINT_PREFIX() const {
@@ -294,6 +309,9 @@ class coupling::FilterSequence {
 
 		//there must be some other place to get this from
 		unsigned int _timestepsElapsed;
+
+		//stores pointers to all sequences that use this sequence's output as their input. 
+		std::vector<coupling::FilterSequence<dim>* > _childSequences;
 };
 
 //inlcude implementation
