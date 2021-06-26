@@ -166,11 +166,11 @@ class KVSTest():
 
         def gauss_sca1(data):
             print("Applying gaussian filter to a scalar property. sigma = 1.")
-            return gaussian_filter(data, truncate = 1.0, sigma = (1,1,1))
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,1,1), mode="mirror")
 
         def gauss_vec1(data):
             print("Applying gaussian filter to a 3d property. sigma = 1.")
-            return gaussian_filter(data, truncate = 1.0, sigma = (1,1,1,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,1,1,0), mode="mirror")
 
         def gauss_sca15(data):
             print("Applying gaussian filter to a scalar property. sigma = 1.5.")
@@ -239,11 +239,11 @@ class KVSTest():
 
         def gauss_x_sca1(data):
             print("Applying gaussian filter to a scalar property. Filtering on X-axis only. sigma = 1.")
-            return gaussian_filter(data, truncate = 1.0, sigma = (1,0,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,0,0), mode="mirror")
 
         def gauss_x_vec1(data):
             print("Applying gaussian filter to a 3d property. Filtering on X-axis only. sigma = 1.")
-            return gaussian_filter(data, truncate = 1.0, sigma = (1,0,0,0))
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,0,0,0), mode="mirror")
 
 
         mcs = self.multiMDCellService.getMacroscopicCellService(0)
