@@ -45,6 +45,7 @@ class coupling::services::MultiMDCellService {
        _macroscopicSolverInterface(macroscopicSolverInterface),
        _filterPipelineConfiguration(filterPipelineConfiguration),
        _multiMDService(multiMDService),
+       _rank(rank),
        _postMultiInstanceFilterPipeline(nullptr) {
 
       //If we allow for zero MD instances on ranks, this initializion process would segfault...
@@ -138,7 +139,7 @@ class coupling::services::MultiMDCellService {
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ){
       double res = 0;
-      auto size = macroscopicCellsFromMacroscopicSolver.size();
+      auto size = macroscopicCellsFromMacroscopicSolver.size(); // we assume globalCellIndicesFromMacroscopicSolver to be of identical size
 
       /*
        * If this is first coupling step, we must allocate space for the macroscopic cells we filter and determine averages with.
@@ -149,14 +150,22 @@ class coupling::services::MultiMDCellService {
       }
 
       /*
+       * If this is the first coupling step, copy cells to be in format compatible with filtering system.
+       * Can be optimized if indices don't change dynamically.
+       */
+      if(_cellIndices.empty()) {
+          for(unsigned int i = 0; i < size; i++) _cellIndices.push_back(globalCellIndicesFromMacroscopicSolver[i]);
+      }
+
+      /*
        * If this is the first coupling step, we must init the post multi instance filter pipeline operating on averaged cell data.
        * The ENABLE_POST_MULTI_INSTANCE_FILTERING flag is used for debugging purposes and shall be removed later.
        * If you wish to not use post multi-instance filtering in deployment, you can simply leave the corresponding XML-Subtag empty.
        */
       #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
-      if(_postMultiInstanceFilterPipeline == nullptr) {
+      if(_postMultiInstanceFilterPipeline == nullptr && _rank == 0) { //TODO: hardcoded master rank
           //Init filter pipeline
-          _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, globalCellIndicesFromMacroscopicSolver, &(_macroscopicCellServices[0]->getIndexConversion()), _macroscopicSolverInterface, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
+          _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, _cellIndices, &(_macroscopicCellServices[0]->getIndexConversion()), _macroscopicSolverInterface, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
       }
       #endif
 
@@ -182,9 +191,17 @@ class coupling::services::MultiMDCellService {
       }
 
       // apply post multi instance FilterPipeline on cell data
-      #ifdef ENABLE_POST_MULTI_INSTANCE_FILTER
-      (*_postMultiInstanceFilterPipeline)();
-      #endif
+      #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
+
+      if(_rank == 0) { //TODO: hardcoded master rank
+        #ifdef DEBUG_FILTER_PIPELINE
+        std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
+        #endif
+
+        (*_postMultiInstanceFilterPipeline)();
+      }
+      #endif  
+
 
       // store data in macroscopicCellsFromMacroscopicSolver
       for (unsigned int i = 0; i < size; i++){
@@ -219,6 +236,7 @@ class coupling::services::MultiMDCellService {
 
     //const coupling::IndexConversion<dim> _indexConversion; /* Used for index conversions during filtering TODO after merge with dynamic-md*/
     std::vector<coupling::datastructures::MacroscopicCell<dim>* > _macroscopicCells; /** used to store in MD data in sendFromMDtoMacro */
+    std::vector<unsigned int> _cellIndices; /** used to store in indexing of the above */ 
 
 
     /*
@@ -228,6 +246,7 @@ class coupling::services::MultiMDCellService {
     coupling::interface::MacroscopicSolverInterface<dim> *_macroscopicSolverInterface;
     const std::string _filterPipelineConfiguration;
     const tarch::utils::MultiMDService<dim>& _multiMDService;
+	const unsigned int _rank;
 
 
     /*
