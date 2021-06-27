@@ -18,7 +18,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 	if(m2mDomainCells.size() != m2mDomainGlobalIndices.size()) {
 		std::cout << "Number of cells: " << m2mDomainCells.size() << std::endl;
 		std::cout << "Number of indices: " << m2mDomainGlobalIndices.size() << std::endl;
-		throw std::runtime_error("ERROR: initMD2MacroDomain(): Input cells and indices mismatch in size!");
+		throw std::runtime_error("Input cells and indices mismatch in size!");
 	}
 		
 	//local boundaries are the first and last cell in given m2m domain.
@@ -32,15 +32,18 @@ template<unsigned int dim>
 void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& m2mDomainCells, 
-				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,//TODO: double check: these should be global, right?
+				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
 				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outerCells,
 				std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices
 ) {
-	if(inputCells.empty()){
-		throw std::runtime_error("ERROR: ICM2M: Input cell vector is emtpy.");
+	if(inputCells.empty()) {
+		throw std::runtime_error("Input cell vector is emtpy.");
 	}
 
-	//TODO: check for other vectors to be empty!
+	if(!m2mDomainCells.empty() || !m2mIndices.empty() || !outerCells.empty() || !outerIndices.empty()) {
+		throw std::runtime_error("One or more of the following is nonempty: m2mDomainCells, m2mIndices, outerCells, outerIndices");
+	}
+
 	
 	#ifdef DEBUG_ICM2M
 	std::cout << "ICM2M: Initializing md2Macro-domain and outer cells and their index vectors." << std::endl;
@@ -48,7 +51,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 	//unsigned int i1 = 0;
 	#endif
 
-	tarch::la::Vector<dim, unsigned int> convertedIndex;
+	tarch::la::Vector<dim, unsigned int> convertedIndex; //TODO: rename this! "converted" is kind of confusing: we convert all the time!
 	tarch::la::Vector<dim, unsigned int> lastMD2MacroIndex(0);
 	bool outOfBounds;
 
@@ -65,7 +68,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 			outOfBounds = true; 
 		}
 
-		//convertion to vector, marking of ghost layer indices as INT_MAX
+		//conversion to vector, marking of ghost layer indices as INT_MAX
 		convertedIndex = getLocalVectorCellIndex(linearIndex, false);
 
 		for(unsigned int d = 0; d < dim; d++) {
@@ -80,32 +83,20 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 			}
 		}
 
-		/*
-		#ifdef DEBUG_ICM2M
-		//Visualisation of slice (3,...)
-		if(_ic->getThisRank() == 0 && convertedIndex[0] == 3){
-			(outOfBounds) ? std::cout << "x" : std::cout << "o";
-			if (i1 <= _ic->getLocalNumberMacroscopicCells()[1]) i1++;
-			else { std::cout << std::endl; i1 = 0; }
-		}
-		#endif
-		*/
-
-		
 		if(outOfBounds) {
 			outerCells.push_back(inputCells[linearIndex]);
 			outerIndices.push_back(_ic->getLocalVectorCellIndex(linearIndex));
 		}
 		else {
 			#ifdef DEBUG_ICM2M
-			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in MD2Macro-domain." << std::endl;
-			std::cout << "That translates to " << convertedIndex << " in terms of MD-to-Macro indexing." << std::endl; 
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in MD2Macro-domain.";
+			std::cout << " That translates to " << _ic->convertLocalToGlobalVectorCellIndex(convertedIndex) << " in global indexing." << std::endl; 
 			#endif
 
 			if(_lowerBoundaryThisRank == nullptr) _lowerBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(_ic->convertLocalToGlobalVectorCellIndex(convertedIndex));
 			lastMD2MacroIndex = convertedIndex;
 			m2mDomainCells.push_back(inputCells[linearIndex]);
-			m2mIndices.push_back(convertedIndex);
+			m2mIndices.push_back(_ic->convertLocalToGlobalVectorCellIndex(convertedIndex));
 		}
 	}
 	//Probably segfaults if rank has 0 M2M cells. Should never be the case (?)
