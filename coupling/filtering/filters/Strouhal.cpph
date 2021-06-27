@@ -48,7 +48,7 @@ double coupling::Strouhal<dim>::calculateStrouhalNumber(){
 
 	for(unsigned int i = 0; i < _v_y.size(); i++){
 		if(firstIntersect == -1) {
-			if(abs(_v_y[i] - eq) < ACCEPTED_STARTING_APPROXIMATE) {
+			if(std::abs(_v_y[i] - eq) < ACCEPTED_STARTING_APPROXIMATE) {
 				firstIntersect = i;
 				#ifdef DEBUG_STROUHAL
 				std::cout << "			Found first intersect at index " << i << ": " << _v_y[i] << std::endl;
@@ -56,13 +56,13 @@ double coupling::Strouhal<dim>::calculateStrouhalNumber(){
 			}
 		}
 		else {
-			if(!onCurve && abs(_v_y[i] - _v_y[firstIntersect]) >= AMP_LOWER_LIMIT * abs(eq - min)/* = abs(eq - max)*/ ){ //0.5 is arbitrary. This just makes sure we dont interprete noise as an intersect.
+			if(!onCurve && std::abs(_v_y[i] - _v_y[firstIntersect]) >= AMP_LOWER_LIMIT * std::abs(eq - min)/* = std::abs(eq - max)*/ ){ //0.5 is arbitrary. This just makes sure we dont interprete noise as an intersect.
 				onCurve = true;
 				#ifdef DEBUG_STROUHAL
 				std::cout << "			Index " << i << " (" << _v_y[i] << ") is far enough from " << _v_y[firstIntersect] << std::endl;
 				#endif
 			}
-			if(onCurve && abs(_v_y[i] - _v_y[firstIntersect]) < ACCEPTED_APPROXIMATE){
+			if(onCurve && std::abs(_v_y[i] - _v_y[firstIntersect]) < ACCEPTED_APPROXIMATE){
 				intersects++;
 				onCurve = false;
 				#ifdef DEBUG_STROUHAL
