@@ -113,7 +113,7 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		/*
 		 * This function is very similar to the interface's. Check coupling::FilterSequence for more details.
 		 */
-		void initDomain();
+		void initDomain() override;
 
 		/*
 		 * The first partition of _cellVector1/2 is the main partition. A junction's default output is always its main partition.
