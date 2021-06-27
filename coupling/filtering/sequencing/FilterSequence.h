@@ -233,7 +233,11 @@ class coupling::FilterSequence {
 		}
 
 		virtual void printOutputCellVector() const {
-			(getOutputCellVector() == _cellVector1) ? std::cout << "Cell vector 1 " : std::cout << "Cell vector 2 ";
+			if(getOutputCellVector() == _inputCellVector) std::cout << "The sequence's input cell vector ";
+			else if(getOutputCellVector() == _cellVector1) std::cout << "Cell vector 1 ";
+			else if(getOutputCellVector() == _cellVector2) std::cout << "Cell vector 2 ";
+			else { /*unreachable, see function definition above*/}
+
 			std::cout << "will be used as output." << std::endl;
 		}
 		

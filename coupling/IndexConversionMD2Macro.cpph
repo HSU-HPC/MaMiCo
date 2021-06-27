@@ -25,7 +25,12 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 	_lowerBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(m2mDomainGlobalIndices[0]);
 	_upperBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(m2mDomainGlobalIndices.back());
 
-	initGlobalMD2MacroDomainBoundaries();
+	//TODO: currently, post multi instance (which is the only use-case for this constructor) filtering operates only on one rank.
+	// This is hardcoded in MultiMDCellService
+
+	//initGlobalMD2MacroDomainBoundaries();
+	_lowerBoundaryAllRanks = _lowerBoundaryAllRanks;
+	_upperBoundaryAllRanks = _upperBoundaryAllRanks;
 }
 
 template<unsigned int dim>
@@ -88,7 +93,7 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
 			outerIndices.push_back(_ic->getLocalVectorCellIndex(linearIndex));
 		}
 		else {
-			#ifdef DEBUG_ICM2M
+			#ifdef DEBUG_ICM2M_VERBOSE
 			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in MD2Macro-domain.";
 			std::cout << " That translates to " << _ic->convertLocalToGlobalVectorCellIndex(convertedIndex) << " in global indexing." << std::endl; 
 			#endif

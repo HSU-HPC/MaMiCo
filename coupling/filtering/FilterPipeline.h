@@ -48,7 +48,7 @@ class coupling::FilterPipeline{
 
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > md2MacroInputCells,
-			const unsigned int * const md2MacroInputCellIndices, //global!
+			std::vector<unsigned int> md2MacroInputCellIndices, //global!
 			const coupling::IndexConversion<dim>* indexConversion,
 			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
