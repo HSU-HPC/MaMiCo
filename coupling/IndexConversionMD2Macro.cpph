@@ -143,7 +143,6 @@ tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getL
 //Member functions of coupling::IndexConversionMD2Macro
 template<unsigned int dim>
 void coupling::IndexConversionMD2Macro<dim>::initGlobalMD2MacroDomainBoundaries() {
-std::cout << "enter init bounds" << std::endl;
 	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel mode
 		//Broadcast global Boundary. This assumes that the lowest rank of the communicator has the lower bound.
 

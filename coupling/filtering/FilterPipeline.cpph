@@ -166,9 +166,13 @@ bool coupling::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile
 
 template<unsigned int dim>
 void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* node){
-	//sanity check
+
 	if(_md2MacroCells.empty()) {
-		std::cout << "Warning: Empty md2Macro-Domain in Filter Pipeline. Disabling filtering." << std::endl;
+		if(_scope == coupling::Scope::perInstance) 
+			std::cout << "Warning: Empty md2Macro-Domain in per-instance Filter Pipeline on rank " << _ic->getBaseIC()->getThisRank() << ". Disabling filtering there." << std::endl;
+		else
+			std::cout << "Warning: Empty md2Macro-Domain in post-multi-instance Filter Pipeline on rank " <<  _ic->getBaseIC()->getThisRank() << ". Disabling filtering there." << std::endl;
+			
 		return;
 	}
 	
