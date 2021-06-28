@@ -163,7 +163,7 @@ class coupling::services::MultiMDCellService {
        * If you wish to not use post multi-instance filtering in deployment, you can simply leave the corresponding XML-Subtag empty.
        */
       #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
-      if(_postMultiInstanceFilterPipeline == nullptr && _rank == 0) { //TODO: hardcoded master rank
+      if(_postMultiInstanceFilterPipeline == nullptr) {
           //Init filter pipeline
           _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, _cellIndices, &(_macroscopicCellServices[0]->getIndexConversion()), _macroscopicSolverInterface, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
       }
@@ -193,13 +193,11 @@ class coupling::services::MultiMDCellService {
       // apply post multi instance FilterPipeline on cell data
       #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
 
-      if(_rank == 0) { //TODO: hardcoded master rank
-        #ifdef DEBUG_FILTER_PIPELINE
-        std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
-        #endif
+      #ifdef DEBUG_FILTER_PIPELINE
+      std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
+      #endif
 
-        (*_postMultiInstanceFilterPipeline)();
-      }
+      (*_postMultiInstanceFilterPipeline)();
       #endif  
 
 
