@@ -16,7 +16,6 @@
  * WORK IN PROGRESS. USE WITH CAUTION
  *
  * Generalizes the concept of FilterSequences: A FilterJunction can have more than a single input.
- * The numbers of in- in output must always the equal. You can, however request only a subset of all output partitions.
  * This allows for seemless integration of FilterJunctions into a net of FilterSequences.
  *
  * TODO: 
