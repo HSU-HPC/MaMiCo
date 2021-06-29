@@ -25,11 +25,11 @@
 
 
 /*/////////////////////////////////////////
-!
-oscillating couette (simplified)
-coupling => real MD test
-SNR calculation
-!
+
+DEPRECATED
+
+TODO REMOVE THIS FILE
+
 *////////////////////////////////////////////
 
 
