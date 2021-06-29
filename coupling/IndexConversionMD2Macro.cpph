@@ -1,0 +1,218 @@
+// Copyright (C) 2015 Technische Universitaet Muenchen
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamico
+
+//Member functions of coupling::IndexConversionMD2Macro
+template<unsigned int dim>
+void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *> m2mDomainCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>> m2mDomainGlobalIndices,
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outerCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices
+) {
+	//In this case, we ~only~ have m2m cells!
+	outerCells = {};
+	outerIndices = {};
+
+	if(m2mDomainCells.size() != m2mDomainGlobalIndices.size()) {
+		std::cout << "Number of cells: " << m2mDomainCells.size() << std::endl;
+		std::cout << "Number of indices: " << m2mDomainGlobalIndices.size() << std::endl;
+		throw std::runtime_error("Input cells and indices mismatch in size!");
+	}
+		
+	//local boundaries are the first and last cell in given m2m domain.
+	if(!m2mDomainCells.empty()) {
+		_lowerBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(m2mDomainGlobalIndices[0]);
+		_upperBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(m2mDomainGlobalIndices.back());
+	}
+	//if there are no cells on this rank, the bounds remain nullptr.
+
+	initGlobalMD2MacroDomainBoundaries();
+
+	_lowerBoundaryAllRanks = _lowerBoundaryAllRanks;
+	_upperBoundaryAllRanks = _upperBoundaryAllRanks;
+}
+
+template<unsigned int dim>
+void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& m2mDomainCells, 
+				std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
+				std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outerCells,
+				std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices
+) {
+	if(inputCells.empty()) {
+		throw std::runtime_error("Input cell vector is emtpy.");
+	}
+
+	if(!m2mDomainCells.empty() || !m2mIndices.empty() || !outerCells.empty() || !outerIndices.empty()) {
+		throw std::runtime_error("One or more of the following is nonempty: m2mDomainCells, m2mIndices, outerCells, outerIndices");
+	}
+
+	
+	#ifdef DEBUG_ICM2M
+	std::cout << "ICM2M: Initializing md2Macro-domain and outer cells and their index vectors." << std::endl;
+	//std::cout << "Now Looking at slice (3,...)" << std::endl;
+	//unsigned int i1 = 0;
+	#endif
+
+	tarch::la::Vector<dim, unsigned int> convertedIndex; //TODO: rename this! "converted" is kind of confusing: we convert all the time!
+	tarch::la::Vector<dim, unsigned int> lastMD2MacroIndex(0);
+	bool outOfBounds;
+
+	for(unsigned int linearIndex = 0; linearIndex < inputCells.size(); linearIndex++){
+		outOfBounds = false;
+					
+		//removal of cells lying in outer layer not meant for transfer to macro solver
+		//Assuming: dim > 0, INT_MAX at any position in index vector implies MSI function returns false
+		if(!(_msi->receiveMacroscopicQuantityFromMDSolver(_ic->getGlobalVectorCellIndex(_ic->convertLocalToGlobalCellIndex(linearIndex))))) {
+			#ifdef DEBUG_ICM2M_VERBOSE
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " not in MD domain." << std::endl;
+			#endif
+
+			outOfBounds = true; 
+		}
+
+		//conversion to vector, marking of ghost layer indices as INT_MAX
+		convertedIndex = getLocalVectorCellIndex(linearIndex, false);
+
+		for(unsigned int d = 0; d < dim; d++) {
+			if(outOfBounds) continue; //No further checking needed in this case.
+
+			if(convertedIndex[d] == INT_MAX) {
+				#ifdef DEBUG_ICM2M_VERBOSE
+				std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in ghost layer." << std::endl;
+				#endif
+
+				outOfBounds = true;
+			}
+		}
+
+		if(outOfBounds) {
+			outerCells.push_back(inputCells[linearIndex]);
+			outerIndices.push_back(_ic->getLocalVectorCellIndex(linearIndex));
+		}
+		else {
+			#ifdef DEBUG_ICM2M_VERBOSE
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " initMD2MacroDomain(): Cell at local index " << _ic->getLocalVectorCellIndex(linearIndex) << " in MD2Macro-domain.";
+			std::cout << " That translates to " << _ic->convertLocalToGlobalVectorCellIndex(convertedIndex) << " in global indexing." << std::endl; 
+			#endif
+
+			if(_lowerBoundaryThisRank == nullptr) _lowerBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(_ic->convertLocalToGlobalVectorCellIndex(convertedIndex));
+			lastMD2MacroIndex = convertedIndex;
+			m2mDomainCells.push_back(inputCells[linearIndex]);
+			m2mIndices.push_back(_ic->convertLocalToGlobalVectorCellIndex(convertedIndex));
+		}
+	}
+	//Probably segfaults if rank has 0 M2M cells. Should never be the case (?)
+	_upperBoundaryThisRank = new tarch::la::Vector<dim, unsigned int>(_ic->convertLocalToGlobalVectorCellIndex(lastMD2MacroIndex));
+
+	initGlobalMD2MacroDomainBoundaries();
+	#ifdef DEBUG_ICM2M
+	std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Total number of cells/md2Macro domain cells: " << inputCells.size() << "/" << m2mDomainCells.size() << std::endl;
+	#endif
+}
+
+template<unsigned int dim>
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getGlobalVectorCellIndex(unsigned int globalCellIndex, bool noGL) const {
+	tarch::la::Vector<dim, unsigned int> globalVectorCellIndex = _ic->getGlobalVectorCellIndex(globalCellIndex);
+	//if(_rank == 0){
+	//	std::cout << "Global: " << globalCellIndex << " GlobalVector: " << globalVectorCellIndex;
+	//}
+	for(unsigned int d = 0; d < dim; d++) {
+		if(globalVectorCellIndex[d] < 1 || globalVectorCellIndex[d] > _ic->getGlobalNumberMacroscopicCells()[d]-3) globalVectorCellIndex[d] = INT_MAX;
+		else if(noGL) globalVectorCellIndex[d] -= 1;
+	}
+	//if(_rank == 0){
+	//	std::cout <<  " Converted: " << globalVectorCellIndex << std::endl;
+	//}
+	return globalVectorCellIndex;
+}
+
+template<unsigned int dim>
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getLocalVectorCellIndex(unsigned int localCellIndex, bool noGL) const {
+	tarch::la::Vector<dim, unsigned int> localVectorCellIndex = _ic->getLocalVectorCellIndex(localCellIndex);
+	for(unsigned int d = 0; d < dim; d++) {
+		if(localVectorCellIndex[d] < 1 || localVectorCellIndex[d] > _ic->getLocalNumberMacroscopicCells()[d]) localVectorCellIndex[d] = INT_MAX;
+		else if(noGL) localVectorCellIndex[d] -= 1;
+	}
+	return localVectorCellIndex;
+}
+
+//Member functions of coupling::IndexConversionMD2Macro
+template<unsigned int dim>
+void coupling::IndexConversionMD2Macro<dim>::initGlobalMD2MacroDomainBoundaries() {
+	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel mode
+		//Broadcast global Boundary. This assumes that the lowest rank of the communicator has the lower bound.
+
+		//use linear indexing for easier MPI communication
+		unsigned int linearLowerBoundaryAllRanks;
+		unsigned int linearUpperBoundaryAllRanks;
+
+		//number of ranks (in linear form)
+		int nranks = 1;
+		for(unsigned int d = 0; d<dim; d++) nranks *= _ic->getNumberProcesses()[d];
+
+		//find last rank with _upperBoundary != nullptr (in linear form as well)
+		bool hasCells;
+		int lastRankContainingCells;
+		for(int r = 0; r < nranks; r++) {
+			hasCells = false;
+
+			//check on rank r if that rank is nonempty
+			if(_myRank == r) {
+				hasCells = _upperBoundaryThisRank; //implicit conversion ptr->bool
+				#ifdef DEBUG_ICM2M_VERBOSE
+					if(hasCells) std::cout << "ICM2M: Rank: " << _myRank << " Contains a nonzero amount of cells!" << std::endl;
+				#endif
+			}
+
+			//broadcast result from
+			MPI_Bcast(&hasCells, 1, MPI::BOOL, r, _comm);
+
+			//memorize this rank if it did have cells
+			if(hasCells) lastRankContainingCells = r;
+		} 
+
+		#ifdef DEBUG_ICM2M_VERBOSE
+			std::cout << "ICM2M: Rank: " << _myRank << " Highest known rank containing cells is: " << lastRankContainingCells << std::endl;
+		#endif
+
+
+		if(_myRank ==  _lowestRank) {
+			//sanity check
+			if(_lowerBoundaryThisRank == nullptr) throw std::runtime_error("ERROR: ICM2M: Lowest rank in communicator has no M2M domain cells. This implies an empty M2M domain!");
+			else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_lowerBoundaryThisRank); 
+		} else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
+	
+		if(_myRank ==  lastRankContainingCells) { //last process 
+			_upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_upperBoundaryThisRank);
+		} else _upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
+
+		linearLowerBoundaryAllRanks = _ic->getGlobalCellIndex(*_lowerBoundaryAllRanks);
+		linearUpperBoundaryAllRanks = _ic->getGlobalCellIndex(*_upperBoundaryAllRanks);
+
+		MPI_Bcast(&linearLowerBoundaryAllRanks, 1, MPI::UNSIGNED, _lowestRank, _comm);
+		MPI_Bcast(&linearUpperBoundaryAllRanks, 1, MPI::UNSIGNED, lastRankContainingCells, _comm); //last process
+	
+		//convert back to vector
+		(*_lowerBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearLowerBoundaryAllRanks);
+		(*_upperBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearUpperBoundaryAllRanks);
+
+	#else //sequential mode
+		_lowerBoundaryAllRanks = _lowerBoundaryThisRank;
+		_upperBoundaryAllRanks = _upperBoundaryThisRank;
+	#endif
+
+	#ifdef DEBUG_ICM2M
+		if(_lowerBoundaryThisRank && _upperBoundaryThisRank) { //i.e. there are cells on this rank
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Local lowest/highest index in M2M domain: " << *_lowerBoundaryThisRank << "/" << *_upperBoundaryThisRank << std::endl;
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Global lowest/highest index in M2M domain: " << *_lowerBoundaryAllRanks << "/" << *_upperBoundaryAllRanks << std::endl;
+		}
+		else {
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " No local cells in M2M domain." << std::endl;
+			std::cout << "ICM2M: Rank: " << _ic->getThisRank() << " Global lowest/highest index in M2M domain: " << *_lowerBoundaryAllRanks << "/" << *_upperBoundaryAllRanks << std::endl;
+		}
+	#endif
+}

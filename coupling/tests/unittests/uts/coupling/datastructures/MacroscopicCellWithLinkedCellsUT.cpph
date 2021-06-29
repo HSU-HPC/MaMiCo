@@ -1,0 +1,57 @@
+#pragma once
+
+#include <iostream>
+
+#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/tests/unittests/UnitTestInterface.h"
+#include "coupling/tests/unittests/MockService.cpph"
+#include "coupling/tests/unittests/UnitTestingService.h"
+
+#define DEBUG_UT_MACROCELL_LINKED
+
+
+namespace coupling { namespace datastructures {
+	template<class LinkedCell, unsigned int dim> 
+	class MacroscopicCellWithLinkedCellsUT;
+}}
+
+
+template<class LinkedCell, unsigned int dim> 
+class coupling::datastructures::MacroscopicCellWithLinkedCellsUT : public testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>> {
+	public:
+		MacroscopicCellWithLinkedCellsUT(testing::ut::UnitTestingService *uts):
+		testing::ut::UnitTestImpl<coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>>(uts->getRank(), uts->getCommSize())
+		{
+			//Get MockService for vector of unsigned int
+			testing::ut::MockService* uIntVecMS;
+			if(uts->getMockService<tarch::la::Vector<dim,unsigned int>>().has_value()) uIntVecMS = uts->getMockService<tarch::la::Vector<dim,unsigned int>>().value();
+			else exit(EXIT_FAILURE); //TODO: EXCEPTION
+
+			//Define predicate to limit mock usage of uInt vectors.
+			auto vector_allLessThanThree_predicate = [] (tarch::la::Vector<dim,unsigned int> v) { 
+														for(unsigned int i = 0; i < dim; i++) if(v[i] > 3) return false;
+														return true;
+													};
+
+			//Create mocks of this
+			std::vector<coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> *> thisMocks;
+			for(auto vec : uIntVecMS->getMocksCopy<tarch::la::Vector<dim,unsigned int>>({}, vector_allLessThanThree_predicate))
+				thisMocks.push_back(new coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>(vec));
+			
+			//Create new MockService for this.
+			this->_mockService = uts->addMockService<coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>>(thisMocks);
+
+			#ifdef DEBUG_UT_MACROCELL_LINKED
+				std::cout << this->PRINT_PREFIX() << "Finished generating mocks. " << std::endl;
+			#endif
+			
+			//Add test functions to UTI::_testFuncs
+				//There are no test functions to this UT.
+		}
+		
+		~MacroscopicCellWithLinkedCellsUT() {}	
+
+
+		//The only member functions worth testing for this class depend on a cell-mapping class template.
+		//We thus test those functions in the corresponding cell-mapping's UT.
+};
