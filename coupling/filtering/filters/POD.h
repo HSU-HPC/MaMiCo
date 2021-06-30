@@ -9,7 +9,7 @@
 #include <Eigen/Eigenvalues>
 
 //#define DEBUG_POD
-#include "coupling/filtering/FilterInterface.h"
+#include "coupling/filtering/interfaces/FilterInterface.h"
 #include "tarch/utils/MultiMDService.h"
 
 namespace coupling {
@@ -27,12 +27,12 @@ class coupling::POD : public coupling::FilterInterface<dim>{
         POD(  	const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-				bool filteredValues[7],
+				const std::array<bool, 7> filteredValues,	
 				const tarch::utils::MultiMDService<dim>& multiMDService,
 				int tws,
 				int kmax
 				):
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "POD"),
 				_multiMDService(multiMDService),
 				_timeWindowSize(tws),
 				_kMax(kmax),
