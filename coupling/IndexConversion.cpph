@@ -11,7 +11,8 @@ coupling::IndexConversion<dim>::IndexConversion(
   tarch::la::Vector<dim,double> globalMDDomainSize,
   tarch::la::Vector<dim,double> globalMDDomainOffset,
   coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-  unsigned int topologyOffset
+  unsigned int topologyOffset,
+  unsigned int rankOnGrid
 ):
   // DO NOT CHANGE ORDERING OF THESE PARAMETERS
     // parallel-topology and type need to be initialised first (independent of other class-members in init.)
@@ -20,14 +21,15 @@ coupling::IndexConversion<dim>::IndexConversion(
    // independent from other members in init.
    _numberProcesses(numberProcesses),
    _rank(rank),
+   _rankOnGrid(rankOnGrid),
    // depends on parallel-topology
-   _thisProcess(getProcessCoordinates(rank)),
+   _thisProcess(getThisProcessCoordinates(rankOnGrid)),
    // independent from other members in init.
    _globalNumberMacroscopicCells(globalNumberMacroscopicCells),
    // independent from other members in init.
    _averageLocalNumberMacroscopicCells(initAverageLocalNumberMacroscopicCells(globalNumberMacroscopicCells,numberProcesses)),
    // requires parallel-topology to be init.
-   _localNumberMacroscopicCells(initLocalNumberMacroscopicCells(globalNumberMacroscopicCells,numberProcesses,rank)),
+   _localNumberMacroscopicCells(initLocalNumberMacroscopicCells(globalNumberMacroscopicCells,numberProcesses,rankOnGrid)),
    // no dependen.
    _divisionFactor4GlobalNumberMacroscopicCells(
      coupling::initDivisionFactor<dim>(_globalNumberMacroscopicCells+tarch::la::Vector<dim,unsigned int>(2))),
@@ -126,6 +128,14 @@ tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getProcessCo
   return _parallelTopology->getProcessCoordinates(rank);
 }
 
+template<unsigned int dim>
+tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getThisProcessCoordinates(unsigned int rank) const {
+  tarch::la::Vector<dim,unsigned int > temp = _parallelTopology->getProcessCoordinates(rank);
+  for(unsigned int d = 0; d < dim; ++d) { temp[d] = temp[d] % _numberProcesses[d]; }
+  
+  return temp;
+}
+
 
 template<unsigned int dim>
 unsigned int coupling::IndexConversion<dim>::getRank(tarch::la::Vector<dim,unsigned int> processCoordinates) const {
@@ -148,8 +158,6 @@ tarch::la::Vector<dim,unsigned int> localCellIndex) const {
   }
   return globalCellIndex;
 }
-
-
 
 
 template<unsigned int dim>

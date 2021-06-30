@@ -40,6 +40,17 @@ class coupling::IndexConversion: private tarch::utils::Uncopyable {
       tarch::la::Vector<dim,double> globalMDDomainOffset,
       coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
       unsigned int topologyOffset
+    ) : IndexConversion<dim>(globalNumberMacroscopicCells,numberProcesses,rank,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType,topologyOffset,rank) {}
+    /** constructor for MacroOnly Cell services */
+    IndexConversion(
+      tarch::la::Vector<dim,unsigned int> globalNumberMacroscopicCells,
+      tarch::la::Vector<dim,unsigned int> numberProcesses,
+      unsigned int rank,
+      tarch::la::Vector<dim,double> globalMDDomainSize,
+      tarch::la::Vector<dim,double> globalMDDomainOffset,
+      coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+      unsigned int topologyOffset,
+      unsigned int rankOnGrid
     );
     /** constructor for single-MD simulations */
     IndexConversion(
@@ -49,7 +60,7 @@ class coupling::IndexConversion: private tarch::utils::Uncopyable {
       tarch::la::Vector<dim,double> globalMDDomainSize,
       tarch::la::Vector<dim,double> globalMDDomainOffset,
       coupling::paralleltopology::ParallelTopologyType parallelTopologyType
-    ): IndexConversion<dim>(globalNumberMacroscopicCells,numberProcesses,rank,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType,0){}
+    ): IndexConversion<dim>(globalNumberMacroscopicCells,numberProcesses,rank,globalMDDomainSize,globalMDDomainOffset,parallelTopologyType,0,0){}
 
     ~IndexConversion();
 
@@ -149,6 +160,7 @@ class coupling::IndexConversion: private tarch::utils::Uncopyable {
 
     /** returns the process coordinates for the rank 'rank'. Forwards the call to the ParallelTopology implementation. */
     tarch::la::Vector<dim,unsigned int> getProcessCoordinates(unsigned int rank) const;
+    tarch::la::Vector<dim,unsigned int> getThisProcessCoordinates(unsigned int rank) const;
     /** returns the linearised index (i.e. rank) of the given process coordinates. Forwards the call to the
      *  ParallelTopology implementation.
      */
@@ -238,8 +250,12 @@ class coupling::IndexConversion: private tarch::utils::Uncopyable {
     const tarch::la::Vector<dim,unsigned int> _numberProcesses;
     /** rank of current process */
     const unsigned int _rank;
+    const unsigned int _rankOnGrid;
+  //end private
+  protected:
     /** the coordinates of the current process. */
     const tarch::la::Vector<dim,unsigned int> _thisProcess;
+  private:
 
     /** global number of (inner) macroscopic cells. In total this number is extended by 2 in order to account for an
      *  additional ghost layer surrounding the global domain.
