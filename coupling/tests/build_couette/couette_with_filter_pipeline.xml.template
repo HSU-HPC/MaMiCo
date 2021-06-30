@@ -22,7 +22,7 @@
     
       <!-- bu wall vel 4.775 -->
   <domain
-    channelheight="200"
+    channelheight="50"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
     wall-velocity="0.0; 0.0 ; 0.574091733 "
@@ -52,7 +52,7 @@
     filter-init-cycles="0"
     write-csv-every-timestep="0"
     send-from-macro-to-md="yes"
-    compute-snr="yes"
+    compute-snr="no"
   />
 
   <!-- Configuration parameters for macroscopic solver:
