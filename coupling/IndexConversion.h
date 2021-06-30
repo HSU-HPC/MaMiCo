@@ -238,11 +238,8 @@ class coupling::IndexConversion: private tarch::utils::Uncopyable {
     const tarch::la::Vector<dim,unsigned int> _numberProcesses;
     /** rank of current process */
     const unsigned int _rank;
-  //end private
-  protected:
     /** the coordinates of the current process. */
     const tarch::la::Vector<dim,unsigned int> _thisProcess;
-  private:
 
     /** global number of (inner) macroscopic cells. In total this number is extended by 2 in order to account for an
      *  additional ghost layer surrounding the global domain.

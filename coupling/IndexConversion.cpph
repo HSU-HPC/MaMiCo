@@ -123,10 +123,7 @@ unsigned int localCellIndex) const {
 
 template<unsigned int dim>
 tarch::la::Vector<dim,unsigned int> coupling::IndexConversion<dim>::getProcessCoordinates(unsigned int rank) const {
-  tarch::la::Vector<dim, unsigned int> temp =  _parallelTopology->getProcessCoordinates(rank);
-  for(unsigned int d = 0; d < dim ; ++d) { temp[d] = temp[d] % _numberProcesses[d];}
-
-  return temp;
+  return _parallelTopology->getProcessCoordinates(rank);
 }
 
 
@@ -151,6 +148,8 @@ tarch::la::Vector<dim,unsigned int> localCellIndex) const {
   }
   return globalCellIndex;
 }
+
+
 
 
 template<unsigned int dim>
