@@ -535,7 +535,7 @@ private:
     if(_cfg.macro2Md){
       //_multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
       _multiMDCellService->sendFromMacro2MDCollective(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-      //std::cout << "Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
+      //std::cout << "Rank " << _rank << ": Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
     }
   }
 
@@ -549,7 +549,6 @@ private:
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
 
         _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
-        //std::cout << "Finish _simpleMD[i]->simulateTimesteps " << std::endl;
 
         // plot macroscopic time step info in multi md service
         _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);

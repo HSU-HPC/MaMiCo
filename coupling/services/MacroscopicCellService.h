@@ -63,6 +63,8 @@ class coupling::services::MacroscopicCellService {
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ) = 0;
+    virtual void sendFromMacro2MDPreProcess() = 0;
+    virtual void sendFromMacro2MDPostProcess() = 0;
     virtual void processInnerMacroscopicCellAfterMDTimestep() = 0;
     virtual void computeAndStoreTemperature(double temperature) = 0;
     virtual void applyTemperatureToMolecules(unsigned int t) = 0;
@@ -168,6 +170,10 @@ public coupling::services::MacroscopicCellService<dim> {
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     );
+
+    void sendFromMacro2MDPreProcess();
+
+    void sendFromMacro2MDPostProcess();
 
 
     /** carries out coupling-dependent operations (such as sampling) on the non-ghost macroscopic cells after each

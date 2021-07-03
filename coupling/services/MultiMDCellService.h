@@ -140,6 +140,8 @@ class coupling::services::MultiMDCellService {
       int r;
       MPI_Comm_rank(MPI_COMM_WORLD, &r);
 
+      
+
       std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim> * > allDEs(_totalNumberMDSimulations);
       std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim> *> > allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
       for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
@@ -152,10 +154,18 @@ class coupling::services::MultiMDCellService {
         }
       }
 
+      for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
+        _macroscopicCellServices[i]->sendFromMacro2MDPreProcess();
+      }
+
       coupling::sendrecv::FromMacro2MD<coupling::datastructures::MacroscopicCell<dim>, dim > fromMacro2MD;
       fromMacro2MD.sendFromMacro2MDCollective(
         allDEs, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver, allMacroscopicCellsFromMamico
       );
+
+      for(unsigned int i=0;i<_totalNumberMDSimulations;++i) {
+        _macroscopicCellServices[i]->sendFromMacro2MDPostProcess();
+      }
       for(auto & de : allDEs) {
         delete de;
         de = nullptr;
