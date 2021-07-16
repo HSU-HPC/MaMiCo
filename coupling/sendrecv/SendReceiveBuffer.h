@@ -49,7 +49,15 @@ class coupling::sendrecv::SendReceiveBuffer {
     );
 
 
-    void writeToSendBufferCollective(
+    void writeToBcastBuffer(
+      const coupling::IndexConversion<dim>& indexConversion,
+      coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+      const MacroscopicCell& cell,
+      tarch::la::Vector<dim, unsigned  int> globalVectorIndex
+    );
+
+
+    void writeToReduceBuffer(
       const coupling::IndexConversion<dim>& indexConversion,
       coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
       const MacroscopicCell& cell,
@@ -82,7 +90,14 @@ class coupling::sendrecv::SendReceiveBuffer {
       tarch::la::Vector<dim,unsigned int> globalVectorIndex
     );
 
-    void allocateReceiveBuffersCollective(
+    void allocateBcastBufferForReceiving(
+      const coupling::IndexConversion<dim> &indexConversion,
+      coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
+      tarch::la::Vector<dim,unsigned int> globalVectorIndex
+    );
+
+
+    void allocateReduceBufferForReceiving(
       const coupling::IndexConversion<dim> &indexConversion,
       coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
       tarch::la::Vector<dim,unsigned int> globalVectorIndex
@@ -95,8 +110,8 @@ class coupling::sendrecv::SendReceiveBuffer {
       coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
     );
 
-    void triggerSendingCollective(
-      const unsigned int rank
+    void triggerBcasts(
+      unsigned int rank
     );
 
     /** triggers the MPI-receiving on the respective buffers. No receiving of information from/to this rank. */
@@ -105,19 +120,19 @@ class coupling::sendrecv::SendReceiveBuffer {
       coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
     );
 
-    void triggerReceivingCollective(
-      const unsigned int rank
+    void triggerReduce(
+      unsigned int rank
     );
 
     /** wait for all send and receive operations to complete. */
     void waitAllOperations(const coupling::IndexConversion<dim>& indexConversion);
 
-    void waitAllCollectiveOperations(const coupling::IndexConversion<dim>& indexConversion);
+    void waitAllBcasts(const coupling::IndexConversion<dim>& indexConversion);
 
     /** allocates send and receive requests */
     void allocateRequests(const coupling::IndexConversion<dim>& indexConversion);
 
-    void allocateRequestsCollective(const unsigned int thisRank);
+    void allocateBcastRequests(const unsigned int thisRank);
 
   private:
     /** data structure for send- and receive-buffer. */
@@ -131,11 +146,11 @@ class coupling::sendrecv::SendReceiveBuffer {
 
     struct BufferCollective {
         std::vector<double> buffer;
-        std::set<unsigned int> targetRanks;
+        std::set<unsigned int> nonRootRanks;
         std::set<unsigned int> cellIndices;
-        unsigned int sourceRank;
+        unsigned int rootRank;
 
-        BufferCollective(): buffer(), targetRanks(), cellIndices(), sourceRank(-1){}
+        BufferCollective(): buffer(), nonRootRanks(), cellIndices(), rootRank(-1){}
     };
 
 
@@ -148,7 +163,8 @@ class coupling::sendrecv::SendReceiveBuffer {
 
 
     /** members for collective communication */
-    std::map<unsigned int,BufferCollective> _sendRecvBuffer; // key is sourceRank * subdomainSize + subdomainID
+    std::map<unsigned int, BufferCollective> _bcastBuffer; // key is sourceRank * subdomainSize + subdomainID
+    std::map<unsigned int, BufferCollective> _reduceBuffer;
 
 
     #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
@@ -160,6 +176,16 @@ class coupling::sendrecv::SendReceiveBuffer {
     std::vector<MPI_Comm> _subComms;
     std::vector<MPI_Group> _subGroups;
     int _bcastSize;
+
+    static void elementWiseSum(void * in, void * inout, int * len, MPI_Datatype *datatype) {
+      auto * output = (double *) inout;
+      auto * input = (double *) in;
+      for(int i = 0; i < *len; ++i) {
+        output[i] = (output[i] + input[i]) / 2;
+      }
+    }
+
+    MPI_Op elementWiseSumOperation;
     #endif
 };
 

@@ -32,8 +32,8 @@ const unsigned int * const globalCellIndices
   const auto numberCells = (unsigned int) macroscopicCells.size();
   for (unsigned int i = 0; i < numberCells; i++){
     const tarch::la::Vector<dim,unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
-    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::writeToSendBufferCollective(
-      indexConversion, dataExchange,*macroscopicCells[i],globalVectorIndex
+    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToBcastBuffer(
+    indexConversion, dataExchange, *macroscopicCells[i], globalVectorIndex
     );  
   }
 }
@@ -92,8 +92,8 @@ template<class MacroscopicCell, unsigned int dim>
         );
 
         // call allocateReceiveBuffers for this cell
-        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateReceiveBuffersCollective(
-          indexConversion,dataExchange,globalVectorIndex
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateBcastBufferForReceiving(
+        indexConversion, dataExchange, globalVectorIndex
         );
       }
     }
@@ -179,7 +179,7 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell,dim>::sendFromMacro2MD(
 
 
 template<class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::FromMacro2MD<MacroscopicCell,dim>::sendFromMacro2MDCollective(
+void coupling::sendrecv::FromMacro2MD<MacroscopicCell,dim>::bcastFromMacro2MD(
 std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>* > &dataExchangeFromMacroscopicCellServices,
 const std::vector<MacroscopicCell*> &macroscopicCellsFromMacroscopicSolver,
 const unsigned int * const globalCellIndicesFromMacroscopicSolver,
@@ -200,12 +200,12 @@ std::vector<std::vector<MacroscopicCell*> > macroscopicCellsFromMamico
     allocateReceiveBuffersCollective(*indexConversion, *de);
   }
 
-  SendReceiveBuffer<MacroscopicCell,dim >::allocateRequestsCollective(rank);
+  SendReceiveBuffer<MacroscopicCell,dim >::allocateBcastRequests(rank);
 
   //SendReceiveBuffer<MacroscopicCell,dim >::triggerReceivingCollective(indexConversion, dataExchange);
-  SendReceiveBuffer<MacroscopicCell,dim >::triggerSendingCollective(rank);
+  SendReceiveBuffer<MacroscopicCell,dim >::triggerBcasts(rank);
 
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::waitAllCollectiveOperations(
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::waitAllBcasts(
     *dataExchangeFromMacroscopicCellServices[0]->getIndexConversion()
   );
 

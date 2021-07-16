@@ -66,6 +66,48 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell,dim>::readFromReceiveBuffe
 }
 
 
+template<class MacroscopicCell, unsigned int dim>
+void coupling::sendrecv::FromMD2Macro<MacroscopicCell,dim>::reduceFromMD2Macro(
+  std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>* > &dataExchange,
+  const std::vector<MacroscopicCell*> macroscopicCellsFromMacroscopicSolver,
+  const unsigned int * const globalCellIndicesFromMacroscopicSolver,
+  const std::vector<MacroscopicCell*> &sumMacroscopicCellsFromMamico
+) {
+
+  const unsigned int rank = dataExchange[0]->getIndexConversion()->getThisRank();
+
+  // empty send and receive buffers
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::deleteBuffers();
+
+  for(unsigned int i = 0 ; i < dataExchange.size() ; ++i) {
+    const auto numberCellsFromMacroscopicSolver = (unsigned int) macroscopicCellsFromMacroscopicSolver.size();
+
+    auto indexConversion = dataExchange[i]->getIndexConversion();
+    // allocate the receive buffers and trigger the MPI-recv
+    allocateBcastBufferForReceiving(
+      indexConversion, dataExchange[i],
+      globalCellIndicesFromMacroscopicSolver, numberCellsFromMacroscopicSolver
+    );
+    // fill the send buffers
+    writeToBcastBuffer(indexConversion, dataExchange, sumMacroscopicCellsFromMamico);
+  }
+
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateBcastRequests(rank);
+
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerReduce(rank);
+
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::waitAllBcasts(
+    dataExchange[0]->getIndexConversion()->getThisRank()
+  );
+
+    readFromCollectiveBuffer(
+      dataExchange,
+      macroscopicCellsFromMacroscopicSolver,
+      globalCellIndicesFromMacroscopicSolver
+    );
+}
+
+
 
 template<class MacroscopicCell,unsigned int dim>
 void coupling::sendrecv::FromMD2Macro<MacroscopicCell,dim>::sendFromMD2Macro(

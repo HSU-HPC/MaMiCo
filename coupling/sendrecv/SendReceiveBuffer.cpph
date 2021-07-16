@@ -9,6 +9,8 @@ coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::SendReceiveBuffer(){
   #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
   _requestsAllocated=false;
   _requests=NULL;
+
+  MPI_Op_create(&elementWiseSum, 1, &elementWiseSumOperation);
   #endif
 }
 
@@ -20,14 +22,16 @@ coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::~SendReceiveBuffer()
   deleteBuffers();
   #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
   if (_requests!= NULL){delete []_requests; _requests = NULL;}
-  for(auto & subcomm : _subComms) {
+  for(MPI_Comm & subcomm : _subComms) {
     if(subcomm != MPI_COMM_NULL) { MPI_Comm_free(&subcomm); subcomm = MPI_COMM_NULL; }
   }
-  for(auto & subgroup : _subGroups) {
+  for(MPI_Group & subgroup : _subGroups) {
     if(subgroup != MPI_GROUP_NULL) { MPI_Group_free(&subgroup); subgroup = MPI_GROUP_NULL; }
   }
   _subComms.clear();
   _subGroups.clear();
+
+  MPI_Op_free(&elementWiseSumOperation);
   #endif
 }
 
@@ -52,12 +56,12 @@ template<class MacroscopicCell,unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::deleteBuffers(){
   deleteBuffer(_sendBuffer);
   deleteBuffer(_receiveBuffer);
-  _sendRecvBuffer.clear();
+  _bcastBuffer.clear();
 }
 
 
 template<class MacroscopicCell, unsigned int dim>
-  void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::writeToSendBufferCollective(
+  void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::writeToBcastBuffer(
   const coupling::IndexConversion<dim>& indexConversion,
   coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
   const MacroscopicCell& macroscopicCell,
@@ -81,7 +85,7 @@ template<class MacroscopicCell, unsigned int dim>
   // determine unique subdomains which need to receive this information
   // and associate them with targetRanks
   std::map<unsigned int, std::set<unsigned int> > subdomainMap;
-  for(auto & rank : ranks) {
+  for(const unsigned int & rank : ranks) {
 
     unsigned int subdomain = rank % intNumberProcesses;
     unsigned int key = indexConversion.getThisRank() * intNumberProcesses + subdomain;
@@ -90,28 +94,28 @@ template<class MacroscopicCell, unsigned int dim>
   }
 
   // collect data for subdomains
-  for(auto & subdomain : subdomainMap) {
+  for(std::pair<const unsigned int, std::set<unsigned int>> & subdomain : subdomainMap) {
     unsigned int key = subdomain.first;
 
     // create new buffer if non-existent and insert
     // information about ranks
-    _sendRecvBuffer[key].sourceRank = indexConversion.getThisRank();
-    _sendRecvBuffer[key].targetRanks.insert(subdomain.second.begin(), subdomain.second.end());
+    _bcastBuffer[key].rootRank = indexConversion.getThisRank();
+    _bcastBuffer[key].nonRootRanks.insert(subdomain.second.begin(), subdomain.second.end());
 
-    if(_sendRecvBuffer[key].cellIndices.find(globalIndex) != _sendRecvBuffer[key].cellIndices.end()) {
+    if(_bcastBuffer[key].cellIndices.find(globalIndex) != _bcastBuffer[key].cellIndices.end()) {
       // buffer already contains data of cell, nothing to do!
       continue;
     }
-    _sendRecvBuffer[key].cellIndices.insert(globalIndex);
+    _bcastBuffer[key].cellIndices.insert(globalIndex);
 
     // resize buffer for additional data
-    const unsigned int firstPos = _sendRecvBuffer[key].buffer.size();
-    _sendRecvBuffer[key].buffer.resize(_sendRecvBuffer[key].buffer.size() + doublesPerCell);
+    const unsigned int firstPos = _bcastBuffer[key].buffer.size();
+    _bcastBuffer[key].buffer.resize(_bcastBuffer[key].buffer.size() + doublesPerCell);
 
     // write global cell index and call to specialised function to read from macroscopic cell and write to send buffer
-    _sendRecvBuffer[key].buffer[firstPos] = (double) globalIndex;
+    _bcastBuffer[key].buffer[firstPos] = (double) globalIndex;
 
-    dataExchange.readFromCell( &_sendRecvBuffer[key].buffer.data()[firstPos+1], macroscopicCell );
+    dataExchange.readFromCell(&_bcastBuffer[key].buffer.data()[firstPos + 1], macroscopicCell );
   }
 }
 
@@ -206,35 +210,55 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::readFromReceive
 
 template<class MacroscopicCell,unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::readFromCollectiveBuffer(
-  const coupling::IndexConversion<dim> &indexConversion,
-  coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
-  MacroscopicCell &macroscopicCell,
-  tarch::la::Vector<dim,unsigned int> globalVectorIndex
+  std::vector<coupling::sendrecv::DataExchange<MacroscopicCell,dim> > &dataExchange,
+  std::vector<MacroscopicCell*> &macroscopicCells,
+  std::vector<tarch::la::Vector<dim,unsigned int> > globalVectorIndexes
 ){
-  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell()+1;
-  const unsigned int globalIndex = indexConversion.getGlobalCellIndex(globalVectorIndex);
+  const unsigned int doublesPerCell = dataExchange[0].getDoublesPerCell()+1;
+  std::vector<std::set<unsigned int> > globalIndexes;
+
+  // for each vector index, for each md instance, compute linearized vector indices
+  for(tarch::la::Vector<dim, unsigned int> & globalVectorIndex : globalIndexes) {
+    globalIndexes.emplace_back();
+    for (coupling::sendrecv::DataExchange<MacroscopicCell, dim> &de : dataExchange) {
+      globalIndexes[globalIndexes.size()-1].insert(dataExchange.getIndexConversion().getGlobalCellIndex(globalVectorIndex));
+    }
+  }
 
   #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
   std::cout << "Rank " << indexConversion.getThisRank() << ": read cell " << globalVectorIndex << " (" << globalIndex << ") " << " from receive buffer" << std::endl;
   #endif
 
+
+  int counter = 0;
   // loop over all received buffers
-  for (typename std::map<unsigned int, BufferCollective>::const_iterator it = _sendRecvBuffer.begin(); it != _sendRecvBuffer.end(); it++){
+  for (std::pair<const unsigned int, BufferCollective> & buffer : _bcastBuffer) {
+
+    int commSize;
+    MPI_Comm_size(_subComms[counter], &commSize);
 
     // loop over all received cells of this buffer
-    const unsigned int bufferSize = it->second.buffer.size();
+    const unsigned int bufferSize = buffer.second.buffer.size();
     for (unsigned int i = 0; i < bufferSize; i+=doublesPerCell){
 
       // determine global cell index for this macroscopic cell
-      const auto thisIndex = (unsigned int) it->second.buffer[i];
+      const auto thisIndex = (unsigned int) buffer.second.buffer[i];
+      unsigned int macroscopicCellIndex = -1;
+      for(unsigned int c = 0; c < globalIndexes.size(); ++c) {
+        if(globalIndexes[c].find(thisIndex) != globalIndexes[c].end()) {
+          macroscopicCellIndex = c;
+          break;
+        }
+      }
 
       // if this is the correct cell, write data into macroscopic cell and return
-      if (thisIndex == globalIndex){
+      if (macroscopicCellIndex != -1){
         // read receive buffer and write to macroscopic cell (use specialised function)
-        dataExchange.writeToCell( &(it->second.buffer.data()[i+1]), macroscopicCell );
+        dataExchange.writeToCell( &(buffer.second.buffer.data()[i+1]), macroscopicCells[macroscopicCellIndex] );
         return;
       }
     } // loop over buffer
+    counter += 1;
   } // loop over all buffers
 }
 
@@ -286,7 +310,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateReceive
 
 
 template<class MacroscopicCell,unsigned int dim>
-  void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateReceiveBuffersCollective(
+  void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateBcastBufferForReceiving(
   const coupling::IndexConversion<dim> &indexConversion,
   coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
   tarch::la::Vector<dim, unsigned int> globalVectorIndex
@@ -332,21 +356,21 @@ template<class MacroscopicCell,unsigned int dim>
     if(sourceRank == indexConversion.getThisRank()) { continue; }
     unsigned int key = sourceRank * intNumberProcesses + thisSubdomain;
 
-    _sendRecvBuffer[key].sourceRank = sourceRank;
-    _sendRecvBuffer[key].targetRanks.insert(subdomainRanks.begin(), subdomainRanks.end());
+    _bcastBuffer[key].rootRank = sourceRank;
+    _bcastBuffer[key].nonRootRanks.insert(subdomainRanks.begin(), subdomainRanks.end());
 
-    if(_sendRecvBuffer[key].cellIndices.find(globalIndex) != _sendRecvBuffer[key].cellIndices.end()) {
+    if(_bcastBuffer[key].cellIndices.find(globalIndex) != _bcastBuffer[key].cellIndices.end()) {
       // space for this cell already allocated, nothing to do!
       continue;
     }
-    _sendRecvBuffer[key].cellIndices.insert(globalIndex);
+    _bcastBuffer[key].cellIndices.insert(globalIndex);
 
     // increment buffer size and resize buffer
-    const unsigned int firstPos = _sendRecvBuffer[key].buffer.size();
-    _sendRecvBuffer[key].buffer.resize(_sendRecvBuffer[key].buffer.size() + doublesPerCell);
+    const unsigned int firstPos = _bcastBuffer[key].buffer.size();
+    _bcastBuffer[key].buffer.resize(_bcastBuffer[key].buffer.size() + doublesPerCell);
     // set all values to -1.0
     for (unsigned int j = firstPos; j < firstPos+doublesPerCell; j++){
-      _sendRecvBuffer[key].buffer[j] = -1.0;
+      _bcastBuffer[key].buffer[j] = -1.0;
     }
   } // rank
 }
@@ -405,7 +429,7 @@ coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange){
 
 
 template<class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerSendingCollective(
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerBcasts(
   const unsigned int thisRank
 ) {
 
@@ -414,7 +438,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerSendingC
 #endif
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
  // if(thisRank == 23) std::cout << thisRank << " sendrecvBuffer size " << _sendRecvBuffer.size() << std::endl;
-  for(auto & buffer : _sendRecvBuffer) {
+  for(std::pair<const unsigned int, BufferCollective> & buffer : _bcastBuffer) {
     /*if(thisRank == 23) {
       std::cout <<thisRank << "=====" << buffer.second.cellIndices << "=====" <<buffer.second.sourceRank << "===>" << buffer.second.targetRanks << std::endl;
     }*/
@@ -424,7 +448,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerSendingC
       char *str= new char[MPI_MAX_ERROR_STRING];
       int len=-1;
       MPI_Error_string(err,str,&len);
-      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerSendingCollective(): Bcasting from rank " << thisRank << " on subcomm " << counter << " failed with error: " << str << std::endl;
+      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerBcasts(): Bcasting from rank " << thisRank << " on subcomm " << counter << " failed with error: " << str << std::endl;
       delete [] str;
       exit(EXIT_FAILURE);
     }
@@ -464,25 +488,40 @@ coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange){
 
 
 template<class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerReceivingCollective(
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerReduce(
   const unsigned int thisRank
 ) {
-/*#if(COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#if(COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   unsigned int counter = _sendSize;
-  for(auto & buffer : _receiveBufferCollective) {
-    
-    int err = MPI_Ibcast(buffer.second.buffer.data(), static_cast<int>(buffer.second.buffer.size()), MPI_DOUBLE, 0, _subComms[counter], &_requests[counter]);
+  for(BufferCollective & buffer : _bcastBuffer) {
+
+    int rankInSubComm;
+    MPI_Comm_rank(_subComms[counter], &rankInSubComm);
+
+    double * sendBuffer, * recvBuffer;
+
+    if(rankInSubComm == 0) {
+      sendBuffer = (double*)MPI_IN_PLACE;
+      recvBuffer = buffer.second.buffer.data();
+    } else {
+      sendBuffer = buffer.second.buffer.data();
+      recvBuffer = nullptr;
+    }
+
+    int err = MPI_Ireduce(sendBuffer, recvBuffer, static_cast<int>(buffer.second.buffer.size()),
+                      MPI_DOUBLE, elementWiseSumOperation, 0, _subComms[counter], &_requests[counter]
+    );
     if (err != MPI_SUCCESS){
-      const unsigned int thisRank = indexConversion.getThisRank();
-      char *str=nullptr; int len=-1;
+      char * str = new char[MPI_MAX_ERROR_STRING];
+      int len;
       MPI_Error_string(err,str,&len);
-      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerReceivingCollective(): Receiving Bcast on rank " << thisRank << " from " << buffer.first << " failed with error: " << str << std::endl;
-      delete str;
+      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerReduce(): Receiving Bcast on rank " << thisRank << " from " << buffer.first << " failed with error: " << str << std::endl;
+      delete [] str;
       exit(EXIT_FAILURE);
     }
     counter += 1;
   }
-#endif*/
+#endif
 }
 
 
@@ -513,19 +552,19 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateRequest
 
 
 template<class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateRequestsCollective(
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateBcastRequests(
   const unsigned int thisRank
 ) {
 #if(COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 
   if (_requestsAllocated){
-    std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequestsCollective(): allocateRequests() called although allocation already took place!" << std::endl;
+    std::cout << "ERROR coupling::SendReceiveBuffer::allocateBcastRequests(): allocateRequests() called although allocation already took place!" << std::endl;
     exit(EXIT_FAILURE);
   }
   if (_requests!=nullptr){delete []_requests; _requests=nullptr;}
 
   // determine number of MPI requests
-  _bcastSize = _sendRecvBuffer.size();
+  _bcastSize = _bcastBuffer.size();
 
   // nop, that is no request allocations, if there are no MPI transfers
   if (_bcastSize==0){ return;}
@@ -545,15 +584,15 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateRequest
 
   // groups for receiving broadcasts
   unsigned int counter = 0;
-  for( auto & buffer : _sendRecvBuffer) {
-    auto duplicate =buffer.second.targetRanks.find(buffer.second.sourceRank);
-    if(duplicate != buffer.second.targetRanks.end()) {
-      buffer.second.targetRanks.erase(duplicate);
+  for( std::pair<const unsigned int, BufferCollective> & buffer : _bcastBuffer) {
+    auto duplicate =buffer.second.nonRootRanks.find(buffer.second.rootRank);
+    if(duplicate != buffer.second.nonRootRanks.end()) {
+      buffer.second.nonRootRanks.erase(duplicate);
     }
 
-    std::vector<int> groupRanks(buffer.second.targetRanks.size()+1);
-    std::copy(buffer.second.targetRanks.begin(), buffer.second.targetRanks.end(), std::next(groupRanks.begin()));
-    groupRanks[0] = buffer.second.sourceRank;
+    std::vector<int> groupRanks(buffer.second.nonRootRanks.size() + 1);
+    std::copy(buffer.second.nonRootRanks.begin(), buffer.second.nonRootRanks.end(), std::next(groupRanks.begin()));
+    groupRanks[0] = buffer.second.rootRank;
 
     MPI_Group_incl(group, static_cast<int>(groupRanks.size()), groupRanks.data(), &_subGroups[counter]);
     int err = MPI_Comm_create_group(MPI_COMM_WORLD, _subGroups[counter], static_cast<int>(buffer.first), &_subComms[counter]);
@@ -561,9 +600,9 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateRequest
       char *str= new char[MPI_MAX_ERROR_STRING];
       int len=-1;
       MPI_Error_string(err,str,&len);
-      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::allocateRequestsCollective(): Unable to create communicator "
+      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::allocateBcastRequests(): Unable to create communicator "
                 << "on rank " << thisRank << " together with ranks [ ";
-      for(auto & item : groupRanks) { std::cout << item << " "; }
+      for(int & item : groupRanks) { std::cout << item << " "; }
       std::cout << " ]" << std::endl;
       delete [] str;
       exit(EXIT_FAILURE);
@@ -595,10 +634,10 @@ waitAllOperations(const coupling::IndexConversion<dim>& indexConversion){
     std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::waitAllOperations(): Waiting failed with error: " << str << std::endl; delete str; exit(EXIT_FAILURE);
   }
   delete [] _requests; _requests = NULL;
-  for(auto & subcomm : _subComms) {
+  for(MPI_Comm & subcomm : _subComms) {
     if (subcomm != MPI_COMM_NULL) { MPI_Comm_free(&subcomm); subcomm = MPI_COMM_NULL; }
   }
-  for(auto & subgroup : _subGroups) {
+  for(MPI_Group & subgroup : _subGroups) {
     if (subgroup != MPI_GROUP_NULL) { MPI_Group_free(&subgroup); subgroup = MPI_GROUP_NULL; }
   }
   _requestsAllocated = false;
@@ -609,7 +648,7 @@ waitAllOperations(const coupling::IndexConversion<dim>& indexConversion){
 
 template<class MacroscopicCell,unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::
-waitAllCollectiveOperations(const coupling::IndexConversion<dim>& indexConversion){
+waitAllBcasts(const coupling::IndexConversion<dim>& indexConversion){
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
   // if no requests have been allocated, return immediately
   if (!_requestsAllocated && (_requests==nullptr)){ return;}
@@ -623,10 +662,10 @@ waitAllCollectiveOperations(const coupling::IndexConversion<dim>& indexConversio
     exit(EXIT_FAILURE);
   }
   delete [] _requests; _requests = nullptr;
-  for(auto & subcomm : _subComms) {
+  for(MPI_Comm & subcomm : _subComms) {
     if (subcomm != MPI_COMM_NULL) { MPI_Comm_free(&subcomm); subcomm = MPI_COMM_NULL; }
   }
-  for(auto & subgroup : _subGroups) {
+  for(MPI_Group & subgroup : _subGroups) {
     if (subgroup != MPI_GROUP_NULL) { MPI_Group_free(&subgroup); subgroup = MPI_GROUP_NULL; }
   }
   _requestsAllocated = false;

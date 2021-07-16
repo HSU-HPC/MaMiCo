@@ -42,11 +42,11 @@ class coupling::sendrecv::FromMacro2MD: public coupling::sendrecv::SendReceiveBu
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     );
 
-    void sendFromMacro2MDCollective(
+    void bcastFromMacro2MD(
       std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>* > &dataExchangeFromMacroscopicCellServices,
       const std::vector<MacroscopicCell*> &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver,
-      std::vector<std::vector<MacroscopicCell*> > t
+      std::vector<std::vector<MacroscopicCell*> > allMacroscopicCellsFromMacroscopicCellServices
     );
 
     /** sends data from macro to MD. After returning, the data transfer may not be completely finished, similar to a IRecv/ISend-call by MPI. Please use wait4SendFromMacro2MD(...) to guarantee

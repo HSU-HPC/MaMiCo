@@ -5,6 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SENDRECV_MD2MACRO_H_
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_MD2MACRO_H_
 
+#include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
 #include "coupling/sendrecv/SendReceiveBuffer.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include <vector>
@@ -39,6 +40,13 @@ class coupling::sendrecv::FromMD2Macro: public coupling::sendrecv::SendReceiveBu
       const std::vector<MacroscopicCell*> &macroscopicCellsFromMamico,
       const std::vector<MacroscopicCell*> &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
+    );
+
+    void reduceFromMD2Macro(
+      std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>* > &dataExchange,
+      const std::vector<MacroscopicCell*> &macroscopicCellsFromMamico,
+      const unsigned int * const globalCellIndicesFromMacroscopicSolver,
+      const std::vector<MacroscopicCell> reducedMacroscopicCellsFromMacroscopicSolver
     );
 
     /** triggers the send/recv operations for data transfer. After returning, these data transfers do not necessarily need to be finished, according to ISend/IRecv in MPI. */

@@ -150,7 +150,14 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMac
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
 }
 
+template<class LinkedCell, unsigned int dim>
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMD2MacroPreProcess() {
+  Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
+  Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
 
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
+  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
+}
 
 template<class LinkedCell,unsigned int dim>
 double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromMD2Macro(
