@@ -146,6 +146,22 @@ class coupling::IndexConversionMD2Macro {
 			return *_upperBoundaryThisRank - *_lowerBoundaryThisRank + plus_one;
 		}
 
+                tarch::la::Vector<dim, unsigned int> convertLocalMD2Macro2GlobalMamicoIndex(const tarch::la::Vector<dim, unsigned int>& i) const{
+			return i + *_lowerBoundaryThisRank;
+		}
+
+		tarch::la::Vector<dim, unsigned int> convertGlobalMamico2LocalMD2MacroIndex(const tarch::la::Vector<dim, unsigned int>& i) const{
+                        return i - *_lowerBoundaryThisRank;
+                }
+
+		tarch::la::Vector<dim, unsigned int> convertGlobalMD2Macro2MamicoIndex(const tarch::la::Vector<dim, unsigned int>& i) const{
+                        return i + *_lowerBoundaryAllRanks;
+                }
+
+                tarch::la::Vector<dim, unsigned int> convertGlobalMamico2MD2MacroIndex(const tarch::la::Vector<dim, unsigned int>& i) const{
+                        return i - *_lowerBoundaryAllRanks;
+                }
+
 		tarch::la::Vector<dim, double> getGlobalMD2MacroDomainOffset() const {
 			tarch::la::Vector<dim, double> offset = _ic->getGlobalMDDomainOffset(); //standard MD offset
 
