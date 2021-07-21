@@ -54,7 +54,6 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back()),
 				_kernel(generateKernel())
 		{
-			std::cout << "WARNING: You're using a GAUSS-Filter. As this filter has not been tested thoroughly, caution is advised!" << std::endl;
 
 			//TODO
 			if(GAUSS_KERNEL_RADIUS != 1) 
