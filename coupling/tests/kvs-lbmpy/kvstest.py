@@ -328,12 +328,14 @@ class KVSTest():
     
     def advanceMicro(self, cycle):
         numT = self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
+        log.debug("Advancing " + str(numT) + " MD timesteps")
         for i in range(self.localMDInstances):
             mamico.coupling.setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
             mamico.coupling.setMDSolverInterface(self.mdSolverInterface[i])
             self.simpleMD[i].simulateTimesteps(numT,self.mdStepCounter)
             self.multiMDCellService.getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle)
         self.mdStepCounter = self.mdStepCounter + numT
+        log.debug("MD timesteps done")
 
         if self.cfg.getboolean("coupling", "send-from-md-to-macro"):
             self.multiMDCellService.sendFromMD2Macro(self.buf)
@@ -357,10 +359,11 @@ class KVSTest():
                     mdpos[1]+6, 
                     mdpos[2]+6,
                     dir].data * (self.dx / self.dt_LB)
-
+        
         if self.cfg.getboolean("coupling", "two-way-coupling") and self.rank==0:
             ovl = self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
             md2macroDomain = ([mdpos[d]+ovl for d in range(3)],[mdpos[d]+numcells[d]-ovl-1 for d in range(3)])
+            log.debug("mdvel standard deviation = " + str(np.std(self.buf.loadRecvVelocity(),axis=(0,1,2))))
             self.macroscopicSolver.setMDBoundaryValues(self.buf.loadRecvVelocity() * (self.dt_LB / self.dx), md2macroDomain)
 
     def __del__(self):
@@ -567,7 +570,7 @@ def main():
         coloredlogs.install(fmt=
             '%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s'
         , level='DEBUG')
-        log.setLevel(level=logging.INFO)
+        log.setLevel(level=logging.DEBUG)
         lb_log.setLevel(level=logging.INFO)
     # job mode, log to file
     elif len(sys.argv) == 2:
