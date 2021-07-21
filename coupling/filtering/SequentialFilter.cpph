@@ -104,6 +104,7 @@ coupling::datastructures::MacroscopicCell<dim>* coupling::SequentialFilter<dim>:
 	for(unsigned int i = 0; i < _cellIndices_Local.size(); i++) {
 		if(_cellIndices_Local[i] == index) return _inputCells_Local[i];
 	}
+	std::cout << "		SEQFILTER (" << _myRank << "): getLocalInputCellofIndex(): Could NOT find index " << index << std::endl;
 	throw std::runtime_error("SequentialFilter: getLocalInputCellofIndex(): Could not find index.");
 }
 		
@@ -117,6 +118,7 @@ coupling::datastructures::MacroscopicCell<dim>* coupling::SequentialFilter<dim>:
 	for(unsigned int i = 0; i < _cellIndices_Local.size(); i++) {
 		if(_cellIndices_Local[i] == index) return _outputCells_Local[i];
 	}
+	std::cout << "		SEQFILTER (" << _myRank << "): getLocalOutputCellofIndex(): Could NOT find index " << index << std::endl;
 	throw std::runtime_error("SequentialFilter: getLocalOutputCellofIndex(): Could not find index.");
 }
 
@@ -204,8 +206,9 @@ void coupling::SequentialFilter<dim>::contribute() {
 		for(unsigned int c = 0; c < numberOfCellsFromThisRank; c++) {
 			//fill buffers
 			macroscopicCellToBuffer(_cellbuf, _filter->getInputCells()[c]);
-			cellIndexToBuffer(_indexbuf, _ic->getBaseIC()->convertLocalToGlobalVectorCellIndex(_filter->getCellIndices()[c]));
-			//std::cout << "Seqfilter 205:" << c << ": " << _indexbuf[0] << ", " << _indexbuf[1] << ", " << _indexbuf[2] << std::endl;
+			cellIndexToBuffer(_indexbuf, _ic->convertGlobalMamico2MD2MacroIndex(
+				_ic->convertLocalMD2Macro2GlobalMamicoIndex( _filter->getCellIndices()[c] )));
+			//std::cout << "Seqfilter (" << _myRank << ") 211:" << c << ": " << _indexbuf[0] << ", " << _indexbuf[1] << ", " << _indexbuf[2] << std::endl;
 
 			//send cell
 			MPI_Send(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, _processingRank, 0, _comm);
@@ -225,7 +228,8 @@ void coupling::SequentialFilter<dim>::contribute() {
 			//find cell in filter's domain and apply
 			tarch::la::Vector<dim, unsigned int> receivedIndex;
 			bufferToCellIndex(_indexbuf, receivedIndex); //Do we even need this anywhere after this on the contributing rank? Note that this a global index also...
-			bufferToMacroscopicCell(_cellbuf, _filter->getOutputCellOfIndex(_ic->getBaseIC()->convertGlobalToLocalVectorCellIndex(receivedIndex)));
+			bufferToMacroscopicCell(_cellbuf, _filter->getOutputCellOfIndex( _ic->convertGlobalMamico2LocalMD2MacroIndex(   
+                              _ic->convertGlobalMD2Macro2MamicoIndex(receivedIndex))));
 		}
 	}
 }
@@ -256,7 +260,7 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 			cellIndexToBuffer(_indexbuf, _cellIndices_Global[c]);
 
 			//get rank of cell
-			int target_rank = _ic->getBaseIC()->getUniqueRankForMacroscopicCell(_cellIndices_Global[c]);
+			int target_rank = _ic->getBaseIC()->getUniqueRankForMacroscopicCell(_ic->convertGlobalMD2Macro2MamicoIndex(_cellIndices_Global[c]));
 				
 			#ifdef DEBUG_SEQ_FILTER_VERBOSE
 				std::cout << "		SEQFILTER (" << _myRank << "): Sending cell of index " << _cellIndices_Global[c] << " to rank " << target_rank << std::endl;
@@ -264,10 +268,11 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 
 			//Case: cell belongs to this rank, no communication needed	
 			if(target_rank == _processingRank) {
-				bufferToMacroscopicCell(_cellbuf, getLocalOutputCellOfIndex(_cellIndices_Global[c]));
+				auto addr = getLocalOutputCellOfIndex(_cellIndices_Global[c]);
+				bufferToMacroscopicCell(_cellbuf, addr);
 
 				#ifdef DEBUG_SEQ_FILTER_VERBOSE
-					std::cout << "		SEQFILTER (" << _myRank << "): Wrote cell of index " << _cellIndices_Global[c] << " to local cell at " << getLocalOutputCellOfIndex(_cellIndices_Global[c]) << std::endl;
+					std::cout << "		SEQFILTER (" << _myRank << "): Wrote cell of index " << _cellIndices_Global[c] << " to local cell at " << addr << std::endl;
 				#endif
 			}
 			//Case: other rank, we need to send cell and index
