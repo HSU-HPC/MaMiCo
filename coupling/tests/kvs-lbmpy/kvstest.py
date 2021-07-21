@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 from configparser import ConfigParser
 import matplotlib.pyplot as mplt
+import itertools 
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -137,16 +138,13 @@ class KVSTest():
         self.mdSolverInterface = [mamico.coupling.getMDSolverInterface(self.simpleMDConfig, self.mamicoConfig,
             self.simpleMD[i]) for i in range(self.localMDInstances)]
 
-
-        self.macroscopicSolverInterface = CouetteSolverInterface(self.getGlobalNumberMacroscopicCells(),
-            self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
+        ovl = self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
+        self.macroscopicSolverInterface = CouetteSolverInterface(self.getGlobalNumberMacroscopicCells(),ovl)
         mamico.coupling.setMacroscopicSolverInterface(self.macroscopicSolverInterface)
-
 
         self.multiMDCellService = MultiMDCellService(self.mdSolverInterface, self.macroscopicSolverInterface, 
             self.simpleMDConfig, self.rank, self.cfg.getint("microscopic-solver","number-md-simulations"),
             self.mamicoConfig, "kvs.xml", self.multiMDService)
-
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
@@ -270,7 +268,7 @@ class KVSTest():
         #mcs.addFilterToSequence(filter_sequence="gauss-5", filter_index=0, scalar_filter_func = gauss_sca5, vector_filter_func=gauss_vec5)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
-            self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
+            self.macroscopicSolverInterface, self.rank, ovl)
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
         self.png = self.cfg.getint("coupling", "png-every-timestep")
@@ -341,9 +339,6 @@ class KVSTest():
             self.multiMDCellService.sendFromMD2Macro(self.buf)
 
     def twoWayCoupling(self, cycle):
-        if self.cfg.getboolean("coupling", "two-way-coupling") and self.rank==0:
-            self.macroscopicSolver.setMDBoundaryValues(self.buf) # TODO
-        
         if self.csv > 0 and (cycle+1)%self.csv == 0 and self.rank==0:
             filename = "KVSMD2Macro_" + str(cycle+1) + ".csv"
             self.buf.recv2CSV(filename)
@@ -362,6 +357,11 @@ class KVSTest():
                     mdpos[1]+6, 
                     mdpos[2]+6,
                     dir].data * (self.dx / self.dt_LB)
+
+        if self.cfg.getboolean("coupling", "two-way-coupling") and self.rank==0:
+            ovl = self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
+            md2macroDomain = ([mdpos[d]+ovl for d in range(3)],[mdpos[d]+numcells[d]-ovl-1 for d in range(3)])
+            self.macroscopicSolver.setMDBoundaryValues(self.buf.loadRecvVelocity() * (self.dt_LB / self.dx), md2macroDomain)
 
     def __del__(self):
         self.shutdown()
@@ -424,18 +424,45 @@ class LBSolver():
         wall = NoSlip()
         self.scen.boundary_handling.set_boundary(wall, mask_callback=obstacle)
 
-        def velocity_info_callback(boundary_data, **_):
+        def UBB_velocity_info_callback(boundary_data, **_):
             boundary_data['vel_1'] = 0
             boundary_data['vel_2'] = 0
             u_max = self.scaling_result.lattice_velocity
             y, z = boundary_data.link_positions(1), boundary_data.link_positions(2)
+            #lb_log.debug("UBB y,z = " + str(y) +", " + str(z))
             H = self.domain_size[1]
             boundary_data['vel_0'] = 16 * u_max * y * z * (H-y) * (H-z) / (H*H*H*H)
-        inflow = UBB(velocity_info_callback, dim=self.scen.method.dim)
+            #lb_log.debug("UBB boundary_data['vel_0'] = " + str(boundary_data['vel_0']))
+        inflow = UBB(UBB_velocity_info_callback, dim=self.scen.method.dim)
         self.scen.boundary_handling.set_boundary(inflow, make_slice[0,:,:])
 
         outflow = FixedDensity(1.0)
         self.scen.boundary_handling.set_boundary(outflow, make_slice[-1, :, :])
+
+        self.hasMDBoundary = False
+
+    def setupMDBoundary(self, md2macroDomain):
+        def md_domain(x, y, z):
+            return (x >= md2macroDomain[0][0]) & (x <= md2macroDomain[1][0]) \
+                &  (y >= md2macroDomain[0][1]) & (y <= md2macroDomain[1][1]) \
+                &  (z >= md2macroDomain[0][2]) & (z <= md2macroDomain[1][2])
+        shape = (md2macroDomain[1][0] - md2macroDomain[0][0]+1, md2macroDomain[1][1] - md2macroDomain[0][1]+1, \
+            md2macroDomain[1][2] - md2macroDomain[0][2]+1, 3)
+        def md_velocity_info_callback(boundary_data, mdvel = np.zeros(shape), **_):
+            assert mdvel.shape==shape, "LBSolver.md_velocity_info_callback(): Received unexpected MD data!"
+            lx, ly, lz = boundary_data.link_positions(0), boundary_data.link_positions(1), boundary_data.link_positions(2)
+            for d in range(3):
+                boundary_data['vel_'+str(d)] = [mdvel[int(x-md2macroDomain[0][0]+1), int(y-md2macroDomain[0][1]+1),\
+                    int(z-md2macroDomain[0][2]+1),d] for (x,y,z) in zip(lx,ly,lz) ]
+        mdboundary = UBB(md_velocity_info_callback, dim=self.scen.method.dim)
+        self.scen.boundary_handling.set_boundary(mdboundary, mask_callback=md_domain)
+
+    def setMDBoundaryValues(self, mdvel, md2macroDomain):
+        if not self.hasMDBoundary:
+            self.setupMDBoundary(md2macroDomain=md2macroDomain)
+            self.hasMDBoundary = True
+        
+        self.scen.boundary_handling.trigger_reinitialization_of_boundary_data(mdvel=mdvel)
 
     def advance(self, timesteps):
         vtk_every_ts = 5000
