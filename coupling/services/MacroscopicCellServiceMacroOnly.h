@@ -78,6 +78,8 @@ class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::ser
     }
     virtual void sendFromMacro2MDPreProcess() {}
     virtual void sendFromMacro2MDPostProcess() {}
+    virtual void sendFromMD2MacroPreProcess() {}
+    virtual void sendFromMD2MacroPostProcess() {}
     virtual void processInnerMacroscopicCellAfterMDTimestep(){}
     virtual void computeAndStoreTemperature(double temperature){}
     virtual void applyTemperatureToMolecules(unsigned int t){}

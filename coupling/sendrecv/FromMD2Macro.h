@@ -46,7 +46,7 @@ class coupling::sendrecv::FromMD2Macro: public coupling::sendrecv::SendReceiveBu
       std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>* > &dataExchange,
       const std::vector<MacroscopicCell*> &macroscopicCellsFromMamico,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver,
-      const std::vector<MacroscopicCell> reducedMacroscopicCellsFromMacroscopicSolver
+      const std::vector<MacroscopicCell*> &reducedMacroscopicCellsFromMacroscopicSolver
     );
 
     /** triggers the send/recv operations for data transfer. After returning, these data transfers do not necessarily need to be finished, according to ISend/IRecv in MPI. */
@@ -77,6 +77,12 @@ class coupling::sendrecv::FromMD2Macro: public coupling::sendrecv::SendReceiveBu
       const std::vector<MacroscopicCell *> &macroscopicCells
     );
 
+    void writeToReduceBuffer(
+      const coupling::IndexConversion<dim>& indexConversion,
+      coupling::sendrecv::DataExchangeFromMD2Macro<dim> &dataExchange,
+      const std::vector<MacroscopicCell *> &macroscopicCells
+    );
+
 
     /** allocates the receive buffers for the macroscopic solver. Since we do not know anything about the macroscopic solver,
      *  we only have a list of global vector cell indices available for possible cells to be received on this rank.
@@ -89,6 +95,13 @@ class coupling::sendrecv::FromMD2Macro: public coupling::sendrecv::SendReceiveBu
       unsigned int numberCells
     );
 
+    void allocateReduceBufferForReceiving(
+      const coupling::IndexConversion<dim> &indexConversion,
+      coupling::sendrecv::DataExchangeFromMD2Macro<dim> &dataExchange,
+      const unsigned int * globalCellIndices,
+      unsigned int numberCells
+    );
+
     /** reads information from the receive buffer and stores the result in the list of macroscopic cells. Since this is a receive
      *  for the macroscopic cells on the side of the macroscopic solver, we just have a list of global cell indices and corresponding
      *  macrocsopic cell buffers. For each cell in this list, readFromReceiveBuffer(...) of SendReceiveBuffer is called.
@@ -98,6 +111,12 @@ class coupling::sendrecv::FromMD2Macro: public coupling::sendrecv::SendReceiveBu
       coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
       const std::vector<MacroscopicCell *> &macroscopicCells,
       const unsigned int * const globalCellIndices
+    );
+
+    void readFromReduceBuffer(
+      coupling::sendrecv::DataExchangeFromMD2Macro<dim> &dataExchange,
+      const std::vector<MacroscopicCell *> &macroscopicCells,
+      const unsigned int * globalCellIndices
     );
 };
 

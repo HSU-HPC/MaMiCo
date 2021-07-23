@@ -93,7 +93,7 @@ template<class MacroscopicCell, unsigned int dim>
 
         // call allocateReceiveBuffers for this cell
         coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateBcastBufferForReceiving(
-        indexConversion, dataExchange, globalVectorIndex
+          indexConversion, dataExchange, globalVectorIndex
         );
       }
     }

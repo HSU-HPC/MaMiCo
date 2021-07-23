@@ -171,22 +171,21 @@ class coupling::services::MultiMDCellService {
     /** Creates the sum over all instances' macroscopic cells, in order to reduce the amount of communication needed.
      */
     void sumUpMacroscopicCellsFromMamico() {
-      for(coupling::services::MacroscopicCellService<dim>* &  macroscopicCellService : _macroscopicCellServices) {
-        if(auto * v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(macroscopicCellService)) {
+      for(unsigned int n=0;n<_totalNumberMDSimulations;++n) {
+        if(auto * v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[n])) {
           for(unsigned int i = 0; i < v->getMacroscopicCells().getMacroscopicCells().size(); ++i) {
             if(_sumMacroscopicCells.size() <= i) {
-              _sumMacroscopicCells.push_back(*v->getMacroscopicCells().getMacroscopicCells()[i]);
+              _sumMacroscopicCells.push_back(v->getMacroscopicCells().getMacroscopicCells()[i]);
             } else {
-              _sumMacroscopicCells[i].addMacroscopicMass(v->getMacroscopicCells().getMacroscopicCells()[i]->getMacroscopicMass());
-              _sumMacroscopicCells[i].addMacroscopicMomentum(v->getMacroscopicCells().getMacroscopicCells()[i]->getMacroscopicMomentum());
+              _sumMacroscopicCells[i]->addMacroscopicMass(v->getMacroscopicCells().getMacroscopicCells()[i]->getMacroscopicMass());
+              _sumMacroscopicCells[i]->addMacroscopicMomentum(v->getMacroscopicCells().getMacroscopicCells()[i]->getMacroscopicMomentum());
             }
           }
         }
       }
-      return _sumMacroscopicCells;
     }
 
-    void reduceFromMD2Macro(
+    double reduceFromMD2Macro(
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ) {
@@ -199,7 +198,13 @@ class coupling::services::MultiMDCellService {
       for (coupling::datastructures::MacroscopicCell<dim> * & macroscopicCell : _macroscopicCells){
         macroscopicCell->setMacroscopicMass(0.0);
         macroscopicCell->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
+
       }
+
+      timeval start{};
+      timeval end{};
+      double runtime=0;
+      if(_rank == 0){ gettimeofday(&start,nullptr); }
 
       std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim> * > allDEs(_totalNumberMDSimulations);
       std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim> *> > allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
@@ -217,6 +222,11 @@ class coupling::services::MultiMDCellService {
         globalCellIndicesFromMacroscopicSolver,
         _sumMacroscopicCells
       );
+
+      if(_rank == 0){
+        gettimeofday(&end,nullptr);
+        runtime += (double)((end.tv_sec-start.tv_sec)*1000000 + (end.tv_usec-start.tv_usec));
+      }
 
       // receive data from each MD simulation and accumulate information in cells
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
@@ -237,6 +247,8 @@ class coupling::services::MultiMDCellService {
         macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMass(_macroscopicCells[i]->getMacroscopicMass());
         macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(_macroscopicCells[i]->getMacroscopicMomentum());
       }
+
+      return runtime;
     }
 
     /** collects data from MD simulations, averages over them (only macroscopic mass/momentum is considered) and writes the result back into macroscopicCellsFromMacroscopicSolver. */
@@ -251,7 +263,10 @@ class coupling::services::MultiMDCellService {
 
       // reset macroscopic data (only those should be used by macroscopic solver anyway) in cells
       for (unsigned int i = 0; i < size; i++){
-        _macroscopicCells[i]->setMacroscopicMass(0.0); _macroscopicCells[i]->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
+        _macroscopicCells[i]->setMacroscopicMass(0.0);
+        _macroscopicCells[i]->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
+        _sumMacroscopicCells[i]->setMacroscopicMass(0.0);
+        _sumMacroscopicCells[i]->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
       }
 
       // receive data from each MD simulation and accumulate information in cells

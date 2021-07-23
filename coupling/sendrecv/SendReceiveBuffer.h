@@ -12,6 +12,8 @@
 #include "coupling/IndexConversion.h"
 #include "coupling/sendrecv/DataExchange.h"
 #include "coupling/CouplingMDDefinitions.h"
+#include "DataExchangeFromMD2Macro.h"
+
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -79,6 +81,13 @@ class coupling::sendrecv::SendReceiveBuffer {
       coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
       MacroscopicCell &macroscopicCell,
       tarch::la::Vector<dim,unsigned int> globalVectorIndex
+    );
+
+    void readFromReduceBuffer(
+      const coupling::IndexConversion<dim> & indexConversion,
+      coupling::sendrecv::DataExchangeFromMD2Macro<dim> &dataExchange,
+      MacroscopicCell & macroscopicCell,
+      tarch::la::Vector<dim, unsigned int> globalVectorIndex
     );
 
 
@@ -181,7 +190,7 @@ class coupling::sendrecv::SendReceiveBuffer {
       auto * output = (double *) inout;
       auto * input = (double *) in;
       for(int i = 0; i < *len; ++i) {
-        output[i] = (output[i] + input[i]) / 2;
+        output[i] += input[i];
       }
     }
 
