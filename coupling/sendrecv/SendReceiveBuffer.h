@@ -172,7 +172,7 @@ class coupling::sendrecv::SendReceiveBuffer {
 
 
     /** members for collective communication */
-    std::map<unsigned int, BufferCollective> _bcastBuffer; // key is sourceRank * subdomainSize + subdomainID
+    std::map<unsigned int, BufferCollective> _bcastBuffer;
     std::map<unsigned int, BufferCollective> _reduceBuffer;
 
 

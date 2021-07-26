@@ -106,14 +106,14 @@ IF(PARALLEL)
 ENDIF()
 #### TARGETS ####
 ## Dynamic MD Test
-add_executable(dynamicMDTest "coupling/tests/main_couette.cpp"
+add_executable(test "coupling/tests/main_couette.cpp"
 		"${MAMICO_SOURCES}"
 		"${SIMPLE_MD_SRC}")
-target_link_libraries(dynamicMDTest mamico)
-target_link_libraries(dynamicMDTest ${LINKED_MD})
-target_compile_definitions(dynamicMDTest PUBLIC ${MD_DIM} ${MD_SIM})
-target_compile_options(dynamicMDTest PUBLIC -pedantic -Werror -Wall -Wno-unknown-pragmas)
+target_link_libraries(test mamico)
+target_link_libraries(test ${LINKED_MD})
+target_compile_definitions(test PUBLIC ${MD_DIM} ${MD_SIM})
+target_compile_options(test PUBLIC -pedantic -Werror -Wall -Wno-unknown-pragmas)
 if(PARALLEL)
-	target_compile_definitions(dynamicMDTest PUBLIC TarchParallel MPICH_IGNORE_CXX_SEEK)
-	target_link_libraries(dynamicMDTest ${MPI_CXX_LIBRARIES})
+	target_compile_definitions(test PUBLIC TarchParallel MPICH_IGNORE_CXX_SEEK)
+	target_link_libraries(test ${MPI_CXX_LIBRARIES})
 endif()

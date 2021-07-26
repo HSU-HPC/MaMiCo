@@ -533,8 +533,8 @@ private:
     // extract data from couette solver and send them to MD (can take any index-conversion object)
     fillSendBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
     if(_cfg.macro2Md){
-      //_multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
-      _multiMDCellService->sendFromMacro2MDCollective(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
+      _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
+      //_multiMDCellService->sendFromMacro2MDCollective(_buf.sendBuffer,_buf.globalCellIndices4SendBuffer);
       //std::cout << "Rank " << _rank << ": Finish _multiMDCellService->sendFromMacro2MD " << std::endl;
     }
   }
@@ -562,7 +562,8 @@ private:
 
       // send back data from MD instances and merge it
       if(_cfg.md2Macro){
-        _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+        _tv.filter += _multiMDCellService->reduceFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+        //_tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
         //std::cout << "Finish _multiMDCellService->sendFromMD2Macro " << std::endl;
       }
     }

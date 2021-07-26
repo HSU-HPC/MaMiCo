@@ -213,10 +213,10 @@ class coupling::services::MultiMDCellService {
           _macroscopicSolverInterface, _macroscopicCellServices[i]->getIndexConversion(),
           _macroscopicCellServices[i]->getID()
         );
+        _macroscopicCellServices[i]->sendFromMD2MacroPreProcess();
       }
 
-      coupling::sendrecv::FromMD2Macro<coupling::datastructures::MacroscopicCell<dim>, dim > fromMD2Macro;
-      fromMD2Macro.reduceFromMD2Macro(
+      _fromMD2Macro.reduceFromMD2Macro(
         allDEs,
         macroscopicCellsFromMacroscopicSolver,
         globalCellIndicesFromMacroscopicSolver,
@@ -230,6 +230,7 @@ class coupling::services::MultiMDCellService {
 
       // receive data from each MD simulation and accumulate information in cells
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
+        _macroscopicCellServices[l]->sendFromMD2MacroPostProcess();
         for (unsigned int i = 0; i < size; i++){
           _macroscopicCells[i]->addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
           _macroscopicCells[i]->addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
@@ -398,5 +399,7 @@ class coupling::services::MultiMDCellService {
      * Is applied during this->sendFromMD2Macro.
     */
     coupling::FilterPipeline<dim> *_postMultiInstanceFilterPipeline;
+
+    coupling::sendrecv::FromMD2Macro<coupling::datastructures::MacroscopicCell<dim>,dim  > _fromMD2Macro;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_MULTIMDCELLSERVICE_H_

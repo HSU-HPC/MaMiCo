@@ -20,7 +20,7 @@ coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::SendReceiveBuffer(){
 
 
 template<class MacroscopicCell,unsigned int dim>
-coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::~SendReceiveBuffer(){
+coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::SendReceiveBuffer::~SendReceiveBuffer(){
   deleteBuffers();
   #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
   if (_requests!= NULL){delete []_requests; _requests = NULL;}
@@ -474,9 +474,10 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerReduce(
   const unsigned int thisRank
 ) {
 #if(COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-  unsigned int counter = _sendSize;
+  unsigned int counter = 0;
   for(std::pair<const unsigned int, BufferCollective> & buffer : _reduceBuffer) {
 
+    if(buffer.second.nonRootRanks.size() <= 1) { continue; }
     int rankInSubComm;
     MPI_Comm_rank(_subComms[counter], &rankInSubComm);
 
@@ -556,6 +557,9 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateBcastRe
     std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): _requests==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
+
+  // TODO better method for checking whether groups changed
+  if(static_cast<unsigned int>(_bcastSize) == _subComms.size()) { return; }
 
   _subComms.resize(_bcastSize);
   _subGroups.resize(_bcastSize);
@@ -799,7 +803,7 @@ const tarch::la::Vector<dim, unsigned int> globalVectorIndex
     for (unsigned int i = 0; i < bufferSize; i+=doublesPerCell){
 
       // determine global cell index for this macroscopic cell
-      const auto thisIndex = (unsigned int) it->second.buffer[i];
+      const auto thisIndex = (unsigned int) it->second.buffer[i] / it->second.nonRootRanks.size();
 
       // if this is the correct cell, write data into macroscopic cell and return
       if (thisIndex == globalIndex){
