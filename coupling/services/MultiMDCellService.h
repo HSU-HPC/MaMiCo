@@ -175,11 +175,10 @@ class coupling::services::MultiMDCellService {
         if(auto * v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[n])) {
           for(unsigned int i = 0; i < v->getMacroscopicCells().getMacroscopicCells().size(); ++i) {
             if(_sumMacroscopicCells.size() <= i) {
-              _sumMacroscopicCells.push_back(v->getMacroscopicCells().getMacroscopicCells()[i]);
-            } else {
+              _sumMacroscopicCells.emplace_back(new coupling::datastructures::MacroscopicCell<dim>());
+            }
               _sumMacroscopicCells[i]->addMacroscopicMass(v->getMacroscopicCells().getMacroscopicCells()[i]->getMacroscopicMass());
               _sumMacroscopicCells[i]->addMacroscopicMomentum(v->getMacroscopicCells().getMacroscopicCells()[i]->getMacroscopicMomentum());
-            }
           }
         }
       }
@@ -189,8 +188,13 @@ class coupling::services::MultiMDCellService {
       const std::vector<coupling::datastructures::MacroscopicCell<dim>* > &macroscopicCellsFromMacroscopicSolver,
       const unsigned int * const globalCellIndicesFromMacroscopicSolver
     ) {
-
+      auto * debugTMP = &dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>* >(_macroscopicCellServices[0])->getMacroscopicCells();
       unsigned int size = macroscopicCellsFromMacroscopicSolver.size(); // we assume globalCellIndicesFromMacroscopicSolver to be of identical size
+
+      for(unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+        _macroscopicCellServices[i]->sendFromMD2MacroPreProcess();
+      }
+      debugTMP = &dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>* >(_macroscopicCellServices[0])->getMacroscopicCells();
 
       preprocessingForMD2Macro(globalCellIndicesFromMacroscopicSolver, size);
 
@@ -198,7 +202,6 @@ class coupling::services::MultiMDCellService {
       for (coupling::datastructures::MacroscopicCell<dim> * & macroscopicCell : _macroscopicCells){
         macroscopicCell->setMacroscopicMass(0.0);
         macroscopicCell->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
-
       }
 
       timeval start{};
@@ -213,7 +216,6 @@ class coupling::services::MultiMDCellService {
           _macroscopicSolverInterface, _macroscopicCellServices[i]->getIndexConversion(),
           _macroscopicCellServices[i]->getID()
         );
-        _macroscopicCellServices[i]->sendFromMD2MacroPreProcess();
       }
 
       _fromMD2Macro.reduceFromMD2Macro(
@@ -230,17 +232,13 @@ class coupling::services::MultiMDCellService {
 
       // receive data from each MD simulation and accumulate information in cells
       for (unsigned int l = 0; l < _totalNumberMDSimulations; l++){
-        _macroscopicCellServices[l]->sendFromMD2MacroPostProcess();
-        for (unsigned int i = 0; i < size; i++){
-          _macroscopicCells[i]->addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
-          _macroscopicCells[i]->addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
-        }
+        //_macroscopicCellServices[l]->sendFromMD2MacroPostProcess();
       }
 
       // average data
       for (unsigned int i = 0; i < size; i++) {
-        _macroscopicCells[i]->setMacroscopicMass(_macroscopicCells[i]->getMacroscopicMass()/_totalNumberMDSimulations);
-        _macroscopicCells[i]->setMacroscopicMomentum(1.0/_totalNumberMDSimulations * _macroscopicCells[i]->getMacroscopicMomentum());
+        _macroscopicCells[i]->setMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass()/_totalNumberMDSimulations);
+        _macroscopicCells[i]->setMacroscopicMomentum(1.0/_totalNumberMDSimulations * macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
       }
 
       // store data in macroscopicCellsFromMacroscopicSolver
@@ -249,6 +247,8 @@ class coupling::services::MultiMDCellService {
         macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(_macroscopicCells[i]->getMacroscopicMomentum());
       }
 
+      debugTMP = &dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>* >(_macroscopicCellServices[0])->getMacroscopicCells();
+      if(debugTMP != nullptr) {}
       return runtime;
     }
 
@@ -344,9 +344,10 @@ class coupling::services::MultiMDCellService {
       /*
        *  On the first coupling step,  initialize the reduced macroscopicCell vector according to `size`
        */
-      if(_sumMacroscopicCells.empty()) {
-        for(unsigned int i = 0 ; i < size; ++i) {
-          _sumMacroscopicCells.push_back(new coupling::datastructures::MacroscopicCell<dim>());
+      if(!_sumMacroscopicCells.empty()) {
+        for(unsigned int i = 0 ; i < _sumMacroscopicCells.size(); ++i) {
+          _sumMacroscopicCells[i]->setMacroscopicMass(0);
+          _sumMacroscopicCells[i]->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
         }
       }
 

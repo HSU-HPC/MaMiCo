@@ -85,16 +85,16 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell,dim>::reduceFromMD2Macro(
     const auto numberCellsFromMacroscopicSolver = (unsigned int) macroscopicCellsFromMacroscopicSolver.size();
 
     const coupling::IndexConversion<dim> * indexConversion = dataExchange[i]->getIndexConversion();
-    // allocate the receive buffers and trigger the MPI-recv
+    // 1. fill the send buffers
+    writeToReduceBuffer(*indexConversion, *dataExchange[i], sumMacroscopicCellsFromMamico);
+    // 2. allocate the receive buffers and trigger the MPI-recv
     allocateReduceBufferForReceiving(
       *indexConversion, *dataExchange[i],
       globalCellIndicesFromMacroscopicSolver, numberCellsFromMacroscopicSolver
     );
-    // fill the send buffers
-    writeToReduceBuffer(*indexConversion, *dataExchange[i], sumMacroscopicCellsFromMamico);
   }
 
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateBcastRequests(rank);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::allocateReduceRequests(rank);
 
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerReduce(rank);
 

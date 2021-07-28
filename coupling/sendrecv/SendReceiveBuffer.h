@@ -8,6 +8,7 @@
 #include <string.h>
 #include <map>
 #include <set>
+#include <algorithm>
 #include "tarch/la/Vector.h"
 #include "coupling/IndexConversion.h"
 #include "coupling/sendrecv/DataExchange.h"
@@ -141,7 +142,9 @@ class coupling::sendrecv::SendReceiveBuffer {
     /** allocates send and receive requests */
     void allocateRequests(const coupling::IndexConversion<dim>& indexConversion);
 
-    void allocateBcastRequests(const unsigned int thisRank);
+    void allocateBcastRequests(unsigned int thisRank);
+
+    void allocateReduceRequests(unsigned int thisRank);
 
   private:
     /** data structure for send- and receive-buffer. */
