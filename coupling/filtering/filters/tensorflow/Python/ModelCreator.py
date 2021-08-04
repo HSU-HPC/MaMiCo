@@ -21,8 +21,6 @@ import tensorflow_probability as tfp
 import numpy as np
 import pandas as pd
 tf.keras.backend.set_floatx('float32')
-from matplotlib import pyplot as plt
-import math
 
 tfd = tfp.distributions
 
@@ -117,6 +115,29 @@ def get_real_trainig_data(datasets_in, datasets_label):
 
     return input_array, label_array, n_scenarios, n_datasets;
 
+def get_clean_training_data():
+    dataset_in=pd.read_csv("../clean_data/writer2_clean.csv", sep=";", header=None)
+    dataset_label=pd.read_csv("../clean_data/writer1_clean.csv", sep=";", header=None)
+    
+    dataset_in=dataset_in[(dataset_in[1]!=0) & (dataset_in[1]!=13) & (dataset_in[2]!=0) & (dataset_in[2]!=13) & (dataset_in[3]!=0) & (dataset_in[3]!=13)]
+    dataset_in=dataset_in[[0,8]]
+    dataset_in.columns = range(dataset_in.shape[1])
+    dataset_in = dataset_in.reset_index(drop=True)
+    
+    dataset_label=dataset_label[[0,4]]
+    dataset_label.columns = range(dataset_label.shape[1])
+    
+    label_array = np.empty((0, 216), float)
+    input_array = np.empty((0, 1512), float)
+    
+    #first four steps are ignored, because unstable/inaccurate
+    for i in range(5, int(dataset_in.iloc[[-1]][0])):
+        input_array = np.append(input_array, np.array([dataset_in[dataset_in[0]==i].transpose().iloc[1].values.tolist()]), axis=0)
+        label_array = np.append(label_array, np.array([dataset_label[dataset_label[0]==i].transpose().iloc[1].values.tolist()]), axis=0)
+    
+    return input_array, label_array, 1, 1;
+
+
 def act(x):
     return x*x*x+100*x
 
@@ -188,11 +209,11 @@ def compile_std_model(size_in, size_out):
     return model
 
 def prob_run(datasets_in, datasets_label, epochs, batch_sizes, kl_mod):
-    if(len(ep)!=len(batch_sizes)):
+    if(len(epochs)!=len(batch_sizes)):
         print("ep and batch_size do not match")
         return
     
-    input_array, label_array, n_scenarios, n_datasets = get_real_trainig_data(datasets_in, datasets_label)
+    input_array, label_array, n_scenarios, n_datasets = get_clean_training_data()#get_real_trainig_data(datasets_in, datasets_label)
 
     model = compile_prob_model(np.shape(input_array)[1], np.shape(label_array)[1], n_datasets, kl_mod)
     
@@ -204,7 +225,6 @@ def prob_run(datasets_in, datasets_label, epochs, batch_sizes, kl_mod):
 
     for i in range(len(epochs)):
         temp=model.fit(input_array, label_array, batch_size=batch_sizes[i], epochs=epochs[i], shuffle=True,callbacks = [lrcall,timetaken])
-        run_comparison_prob(model,batch_sizes[i],kl_mod)
         
         loss.extend(temp.history["loss"])
         mae.extend(temp.history["mean_absolute_error"])
@@ -212,7 +232,7 @@ def prob_run(datasets_in, datasets_label, epochs, batch_sizes, kl_mod):
     tf.keras.models.save_model(model, 'model_prob_s'+str(n_scenarios)+'_b'+str(n_datasets)+"_final_1")
 
 def std_run(datasets_in, datasets_label, epochs, batch_sizes):
-    input_array, label_array, n_scenarios, n_datasets = get_real_trainig_data(datasets_in, datasets_label)
+    input_array, label_array, n_scenarios, n_datasets = get_clean_training_data()#get_real_trainig_data(datasets_in, datasets_label)
     
     timetaken = timecallback()
     lrcall=LearningRateLoggingCallback()
@@ -220,10 +240,8 @@ def std_run(datasets_in, datasets_label, epochs, batch_sizes):
     model = compile_std_model(np.shape(input_array)[1], np.shape(label_array)[1])
     loss=[]
     mae=[]
-    kl_mod=0
     for i in range(len(epochs)):
         temp=model.fit(input_array, label_array, batch_size=batch_sizes[i], epochs=epochs[i], shuffle=True,callbacks = [lrcall,timetaken])
-        run_comparison_std(model,batch_sizes[i],kl_mod)
         loss.extend(temp.history["loss"])
         mae.extend(temp.history["mean_absolute_error"])
     
@@ -240,17 +258,17 @@ def std_run(datasets_in, datasets_label, epochs, batch_sizes):
 #also each set of datasets(i.e. sets of labels assigned to the same input data) should be equally sized
 #otherwise, the batch size will not function as intended
 #please make sure that the indices used in get_real_trainig_data match the columns in the csv containing the momentum and mass data
-
+#these lists are only used when calling get_real_trining_data in prob_run or std_run
 datasets_in = [["../clean_data/writer2_clean.csv"],
-                        #["input2"]
-                        ]
+               #["input2"]
+                ]
 
 datasets_label = [["../clean_data/writer1_clean.csv",
-                               #"label2 for input1"
-                            ],
-                            #["label1 for input2",
-                            #"label2 for input2"]
-                        ]
+                   #"label2 for input1"
+                   ],
+                  #["label1 for input2",
+                  #"label2 for input2"]
+                  ]
 
 
 #the epoch and batch size lists can contain multiple entries but need to be of equal length
