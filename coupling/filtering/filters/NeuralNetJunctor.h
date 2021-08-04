@@ -75,11 +75,10 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 			
 			//this switches between the purely TensorFlow C++ and the Python SavedModel approach
 			//either standalone or loadModel
-			networkType="loadModel";
+			networkType="standalone";
 			
-			//this sets the directory containing the required .csv files, needs to be adjusted accordingly
-			std::string folder=std::getenv("HOME")+std::string("/local/tensorflow_cc-master/test/");
-
+			std::string folder="../../filtering/filters/tensorflow/";
+			
 			//loads config from csv file, contains learning rate and number of epochs
 			std::vector<std::string> config=getConfigFromCSV(folder+"config_main.csv");
 			
@@ -89,7 +88,7 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 				//the last integer is the batch size used for training
 				std::vector<tensorflow::Tensor> input, label;
 				std::string addendum="_clean";
-				SetupBatchesExcludingGhost(input, folder+"writer2"+addendum+".csv", 8, label, folder+"writer1"+addendum+".csv", 4, 1);
+				SetupBatchesExcludingGhost(input, folder+"clean_data/writer2"+addendum+".csv", 8, label, folder+"clean_data/writer1"+addendum+".csv", 4, 1);
 				
 				//init containers required by NN
 				std::vector<std::vector<float>> results;
@@ -119,7 +118,7 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 				//loads SavedModel file into "model"
 				SessionOptions session_options = SessionOptions();
 				RunOptions run_options = RunOptions();
-				Status status = LoadSavedModel(session_options, run_options, folder+config[2], {kSavedModelTagServe}, &model);	
+				Status status = LoadSavedModel(session_options, run_options, folder+"SavedModels/"+config[2], {kSavedModelTagServe}, &model);	
 				//checks if SavedModel was loaded correctly
 				if (!status.ok()) {
 					std::cout << "NeuralNetworkJunctor LoadSavedModel Failed: " << status.ToString()<<std::endl;
