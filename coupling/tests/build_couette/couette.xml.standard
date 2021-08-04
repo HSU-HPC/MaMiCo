@@ -24,7 +24,7 @@
     channelheight="50"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
-    wall-velocity="0.5 ; 0.0 ; 0.0"
+    wall-velocity="1.5 ; 0.0 ; 0.0"
     wall-oscillations="0"
   />
 
@@ -227,47 +227,6 @@
 
 <filter-pipeline>
 	<per-instance output="md">
-		<gaussfilter filtered-values="all">
-			<write-to-file
-				location="data/writer_before.csv"
-			/>
-			<gauss
-				dim="0"
-			/>
-			<gauss
-				dim="1"
-			/>
-			<write-to-file
-				location="data/writer_after1.csv"
-			/>
-			<gauss
-				dim="0"
-			/>
-			<gauss
-				dim="1"
-			/>
-			<write-to-file
-				location="data/writer_after2.csv"
-			/>
-			<gauss
-				dim="0"
-			/>
-			<gauss
-				dim="1"
-			/>
-			<write-to-file
-				location="data/writer_after3.csv"
-			/>
-			<gauss
-				dim="0"
-			/>
-			<gauss
-				dim="1"
-			/>
-			<write-to-file
-				location="data/writer_after4.csv"
-			/>
-		</gaussfilter>
 		
 		<write_csvn input = "outer md" filtered-values="all">
 			<write-to-file-junction

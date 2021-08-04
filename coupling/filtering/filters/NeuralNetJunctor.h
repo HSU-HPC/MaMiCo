@@ -24,7 +24,7 @@
 
 namespace coupling {
   template<unsigned int dim>
-  class NeuralNetFilter;
+  class NeuralNetJunctor;
 }
 
 /*auto tf_tensor_to_vector(tensorflow::Tensor tensor, int32_t tensorSize) {
@@ -35,9 +35,9 @@ namespace coupling {
 */
 
 template<unsigned int dim>
-class coupling::NeuralNetFilter : public coupling::AsymmetricalJunctorInterface<dim>{
+class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface<dim>{
 	public:
-		NeuralNetFilter(
+		NeuralNetJunctor(
 			//first cell data set
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector1,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector1,
@@ -61,7 +61,7 @@ class coupling::NeuralNetFilter : public coupling::AsymmetricalJunctorInterface<
 				inputCellVector2,
 				mamicoCellIndices2,
 				filteredValues,
-		   		"NeuralNetFilter")
+		   		"NeuralNetJunctor")
 		{
 			#ifdef DEBUG_NeuralNet
 				std::cout<<"Constructed Neural Net"<<std::endl;
@@ -111,7 +111,7 @@ class coupling::NeuralNetFilter : public coupling::AsymmetricalJunctorInterface<
 			
 		}
       
-		~NeuralNetFilter() {
+		~NeuralNetJunctor() {
 			
 			#ifdef DEBUG_NeuralNet
 				std::cout << "    NeuralNet: Destroyed NeuralNet instance." << std::endl;

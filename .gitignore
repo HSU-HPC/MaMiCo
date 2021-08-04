@@ -23,4 +23,4 @@ coupling/tests/kvs-lbmpy/*.ini
 /usr/local/include/tensorflow/bazel-bin/tensorflow/
 /usr/local/include/
 ~/opt/
-
+coupling/tests/build_couette/data/

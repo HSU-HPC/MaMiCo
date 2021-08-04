@@ -56,12 +56,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		{
 			std::cout << "WARNING: You're using a GAUSS-Filter. As this filter has not been tested thoroughly, caution is advised!" << std::endl;
 
-<<<<<<< HEAD
-			if(coupling::FilterInterface<dim>::_cellIndices.back()[_dim] < 2){
-				std::cout << "ERROR: GAUSS: Invalid input domain: " <<_dim<< std::endl;
-				exit(EXIT_FAILURE);
-			}
-=======
+
 			//TODO
 			if(GAUSS_KERNEL_RADIUS != 1) 
 				throw std::runtime_error("ERROR: GAUSS: Kernel radius != 1 currently not supported.");
@@ -73,7 +68,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 			//Overwrite kernel with hardcoded weights TODO: fix kernel generation, then remove this
 			_kernel = {0.27901, 0.44198, 0.27901};
 
->>>>>>> origin/piet
+
 
 			if(coupling::FilterInterface<dim>::_cellIndices.back()[_dim] < 2)
 				throw std::runtime_error("ERROR: GAUSS: Invalid input domain.");
