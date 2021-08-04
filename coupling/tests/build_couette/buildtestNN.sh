@@ -37,7 +37,7 @@ rm ${BUILD_PATH}/*.o;
 compiler=""
 libraries=""
 objects=""
-includes="-I${MAMICO_PATH} -Iusr/local/include/tensorflow/bazel-bin/tensorflow/include/"
+includes="-I${MAMICO_PATH}" # -Iusr/local/include/tensorflow/bazel-bin/tensorflow/include/"
 
 ### specify flags, includes, libraries,compiler for parallel or sequential build
 if [ "${parallel}" == "parallel" ]
@@ -88,9 +88,9 @@ objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
 
 ### builds, linking, objects for coupled simulation with MaMiCo
 cd ${BUILD_PATH}
-${compiler} ${MAMICO_PATH}/tensorflow/TensorCalc.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/TensorCalc.o
-${compiler} ${MAMICO_PATH}/tensorflow/ReadCSV.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ReadCSV.o
-${compiler} ${MAMICO_PATH}/tensorflow/NeuralNet.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/NeuralNet.o
+${compiler} ${MAMICO_PATH}/coupling/filtering/filters/tensorflow/TensorCalc.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/TensorCalc.o
+${compiler} ${MAMICO_PATH}/coupling/filtering/filters/tensorflow/ReadCSV.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ReadCSV.o
+${compiler} ${MAMICO_PATH}/coupling/filtering/filters/tensorflow/NeuralNet.cpp  ${FLAGS} ${includes} -c -o ${BUILD_PATH}/NeuralNet.o
 ${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
 ${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_couette.o
 

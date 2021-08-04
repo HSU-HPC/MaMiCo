@@ -1,12 +1,10 @@
-
-
 #include "TensorCalc.h"
 
 float tensorMean(tensorflow::Tensor t){
 	const int max=t.dim_size(0);
 	float sum=0;
 	for(int i=0;i<max;++i){
-		sum+=t.flat<float>()(i);
+		sum+=std::abs(t.flat<float>()(i));
 	}
 	return sum/(float)max;
 }
@@ -28,7 +26,20 @@ float maxInColumn(std::vector<std::vector<float>> vec, int column){
 	return max;
 }
 
-const tensorflow::Tensor VecToTensor(std::vector<float> vec){
+tensorflow::Tensor VecToTensor(std::vector<std::vector<float>> vec){
+	
+	tensorflow::Tensor input(tensorflow::DT_FLOAT, tensorflow::TensorShape({(int)vec.size(), (int)vec[0].size()}));
+	auto input_map = input.tensor<float, 2>();
+	
+	for(int i=0;i<(int)vec.size();++i){
+		for(int j=0;j<(int)vec[i].size();++j){
+			input_map(i, j) = vec[i][j];
+		}
+	}
+	return input;
+}
+
+tensorflow::Tensor VecToTensor(std::vector<float> vec){
 	
 	tensorflow::Tensor input(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,(int)vec.size()}));
 	auto input_map = input.tensor<float, 2>();
