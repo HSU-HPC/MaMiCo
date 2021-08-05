@@ -24,6 +24,7 @@ tf.keras.backend.set_floatx('float32')
 
 tfd = tfp.distributions
 
+#add this callback to the model.fit callback list to write the epoch duration to the console
 class timecallback(tf.keras.callbacks.Callback):
     def __init__(self):
         self.times = []
@@ -37,6 +38,7 @@ class timecallback(tf.keras.callbacks.Callback):
         print("Total Time: "+str(np.sum(self.times)))
         print(len(self.times))
         
+#add this callback to the model.fit callback list to print and modify the learning rate
 class LearningRateLoggingCallback(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch,logs={}):
@@ -46,6 +48,7 @@ class LearningRateLoggingCallback(tf.keras.callbacks.Callback):
             self.model.optimizer.lr.decay_rate=1
             self.model.optimizer.lr.initial_learning_rate=2e-6
 
+#prior for the prob network with trainable mean and standard deviation
 def prior_trainable(kernel_size, bias_size=0, dtype=None):
   n = kernel_size + bias_size
   c = np.log(np.expm1(1))
@@ -56,6 +59,7 @@ def prior_trainable(kernel_size, bias_size=0, dtype=None):
           reinterpreted_batch_ndims=1)),
   ])
 
+#posterior for the prob network with trainable mean and standard deviation
 def posterior_mean_field(kernel_size, bias_size=0, dtype=None):
   n = kernel_size + bias_size
   c = np.log(np.expm1(1))#e-7
@@ -80,20 +84,24 @@ def get_real_trainig_data(datasets_in, datasets_label):
             print("not all scenarios are the same length")
             exit(2)
     
+    #loads all csv files provided in datasets_in
     for scenario_in in datasets_in:
         for dataset_in in scenario_in:
             dflist_in.append(pd.read_csv(dataset_in, sep=";", header=None))
         
+    #loads all csv files provided in datasets_label
     for scenario_label in datasets_label:
         for dataset_label in scenario_label:
             dflist_label.append(pd.read_csv(dataset_label, sep=";", header=None))
         
+    #gets rid of ghost cells and only uses row 0 (time step) and 8 (velocity)
     for i in range(len(dflist_in)):
         dflist_in[i]=dflist_in[i][(dflist_in[i][1]!=0) & (dflist_in[i][1]!=13) & (dflist_in[i][2]!=0) & (dflist_in[i][2]!=13) & (dflist_in[i][3]!=0) & (dflist_in[i][3]!=13)]
         dflist_in[i]=dflist_in[i][[0,8]]
         dflist_in[i].columns = range(dflist_in[i].shape[1])
         dflist_in[i] = dflist_in[i].reset_index(drop=True)
     
+    #only uses row 0 (time step), 8 (mass) and 14 (momentum)
     for i in range(len(dflist_label)):
         dflist_label[i]=dflist_label[i][[0,8,14]]
         dflist_label[i].columns = range(dflist_label[i].shape[1])
@@ -106,6 +114,8 @@ def get_real_trainig_data(datasets_in, datasets_label):
     n_scenarios = len(datasets_label)
     n_datasets = len(datasets_label[0])
     
+    #sorts by timestep and enters all data into label_array and input_array
+    #also divides label data momentum by mass to get the velocity
     for i in range(1, int(dflist_in[0].iloc[[-1]][0])+1):
         for j in range(n_scenarios):
             tmp=j*n_datasets
@@ -115,29 +125,33 @@ def get_real_trainig_data(datasets_in, datasets_label):
 
     return input_array, label_array, n_scenarios, n_datasets;
 
+#use this to load clean training data files, i.e. ones where the momentum has already been divided by the mass
 def get_clean_training_data():
     dataset_in=pd.read_csv("../clean_data/writer2_clean.csv", sep=";", header=None)
     dataset_label=pd.read_csv("../clean_data/writer1_clean.csv", sep=";", header=None)
     
+    #gets rid of ghost cells and only uses row 0 (time step) and 8 (velocity)
     dataset_in=dataset_in[(dataset_in[1]!=0) & (dataset_in[1]!=13) & (dataset_in[2]!=0) & (dataset_in[2]!=13) & (dataset_in[3]!=0) & (dataset_in[3]!=13)]
     dataset_in=dataset_in[[0,8]]
     dataset_in.columns = range(dataset_in.shape[1])
     dataset_in = dataset_in.reset_index(drop=True)
     
+    #only uses row 0 (time step) and 4 (velocity)
     dataset_label=dataset_label[[0,4]]
     dataset_label.columns = range(dataset_label.shape[1])
     
     label_array = np.empty((0, 216), float)
     input_array = np.empty((0, 1512), float)
     
-    #first four steps are ignored, because unstable/inaccurate
+    #arranges data by time step
     for i in range(5, int(dataset_in.iloc[[-1]][0])):
         input_array = np.append(input_array, np.array([dataset_in[dataset_in[0]==i].transpose().iloc[1].values.tolist()]), axis=0)
         label_array = np.append(label_array, np.array([dataset_label[dataset_label[0]==i].transpose().iloc[1].values.tolist()]), axis=0)
     
     return input_array, label_array, 1, 1;
 
-
+#implementation of a cubic activation function
+#use act_cubic instead of "relu"
 def act(x):
     return x*x*x+100*x
 
@@ -147,7 +161,11 @@ act_convert= lambda x: act_vectorize(x).astype(np.float32)
 def act_cubic(arg):
     return tf.convert_to_tensor(arg, dtype=tf.float32)
 
+#creates and initializes the prob network
 def compile_prob_model(size_in, size_out, n_datasets, kl_mod):
+    
+    #keras sequential model
+    #the output layer combines the output of the previous layer into normal distributions for each output
     model = tf.keras.models.Sequential([
       tf.keras.layers.InputLayer(input_shape=(size_in,), name="input"),
       tfp.layers.DenseVariational(size_out*2, posterior_mean_field, prior_trainable, kl_weight=kl_mod,
@@ -156,20 +174,24 @@ def compile_prob_model(size_in, size_out, n_datasets, kl_mod):
       tfp.layers.DistributionLambda(lambda t: tfd.Normal(loc=t[..., :size_out], scale=tf.nn.softplus(t[...,size_out:]))),
     ])
     
+    #learning rate
     lr = 0.000005
     
+    #exponentially decaying learning rate
+    #can be passed to the adam optimizer instead of lr
     lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
         lr,
         decay_steps=100,
         decay_rate=0.95,
         staircase=False)
     
+    #optimizer
     opt=tf.keras.optimizers.Adam(
         learning_rate=lr,
         name='adam_opt'
     )
 
-    
+    #negative log likelihood loss function
     negloglik = lambda y, y_pred: -y_pred.log_prob(y)
     
     model.compile(optimizer=opt,
@@ -178,8 +200,10 @@ def compile_prob_model(size_in, size_out, n_datasets, kl_mod):
     
     return model
 
+#creates and initializes the std network
 def compile_std_model(size_in, size_out):
-    
+    #keras sequential model
+    #modify number of neurons per layer via units
     model = tf.keras.models.Sequential([
       tf.keras.layers.InputLayer(input_shape=size_in),
       tf.keras.layers.Dense(units=size_out/4, activation="relu"),
@@ -187,16 +211,22 @@ def compile_std_model(size_in, size_out):
       tf.keras.layers.Dense(units=size_out)
     ])
 
-    
+    #mean squared error loss function
+    #see tensorflow docs for other options
     loss_fn = tf.keras.losses.MeanSquaredError(reduction="auto")
+    
+    #learning rate
     lr = 0.0000005
     
+    #exponentially decaying learning rate
+    #can be passed to the adam optimizer instead of lr
     lrs= tf.keras.optimizers.schedules.ExponentialDecay(
         lr,
         decay_steps=1000,
         decay_rate=0.96,
         staircase=False)
     
+    #optimizer
     opt=tf.keras.optimizers.Adam(
         learning_rate=lr,
         name='adam_opt'
@@ -213,39 +243,61 @@ def prob_run(datasets_in, datasets_label, epochs, batch_sizes, kl_mod):
         print("ep and batch_size do not match")
         return
     
-    input_array, label_array, n_scenarios, n_datasets = get_clean_training_data()#get_real_trainig_data(datasets_in, datasets_label)
-
+    #load training data
+    #change to get_real_training_data if actual writetofile output is used
+    input_array, label_array, n_scenarios, n_datasets = get_clean_training_data() #get_real_trainig_data(datasets_in, datasets_label)
+    
+    #gets initialized sequential model
     model = compile_prob_model(np.shape(input_array)[1], np.shape(label_array)[1], n_datasets, kl_mod)
     
+    #callbacks for model.fit
     timetaken = timecallback()
     lrcall=LearningRateLoggingCallback()
     
+    #these save the history of the loss and mean absolute error, e.g. to be plotted 
     loss=[]
     mae=[]
-
+    
+    #fits the model for a given number of epochs with the provided batch size
+    #if the epochs and batch_size lists contain multiple entries, batch_size[i] is executed for a number of epochs[i] epochs
     for i in range(len(epochs)):
         temp=model.fit(input_array, label_array, batch_size=batch_sizes[i], epochs=epochs[i], shuffle=True,callbacks = [lrcall,timetaken])
         
         loss.extend(temp.history["loss"])
         mae.extend(temp.history["mean_absolute_error"])
     
-    tf.keras.models.save_model(model, 'model_prob_s'+str(n_scenarios)+'_b'+str(n_datasets)+"_final_1")
+    #the trained model is saved to a SavedModel file at the given location
+    tf.keras.models.save_model(model, "model_prob")
 
 def std_run(datasets_in, datasets_label, epochs, batch_sizes):
-    input_array, label_array, n_scenarios, n_datasets = get_clean_training_data()#get_real_trainig_data(datasets_in, datasets_label)
+    if(len(epochs)!=len(batch_sizes)):
+        print("ep and batch_size do not match")
+        return
+
+    #load training data
+    #change to get_real_training_data if actual writetofile output is used
+    input_array, label_array, n_scenarios, n_datasets = get_clean_training_data() #get_real_trainig_data(datasets_in, datasets_label)
     
+    #callbacks for model.fit
     timetaken = timecallback()
     lrcall=LearningRateLoggingCallback()
-
+    
+    #gets initialized sequential model
     model = compile_std_model(np.shape(input_array)[1], np.shape(label_array)[1])
+    
+    #these save the history of the loss and mean absolute error, e.g. to be plotted 
     loss=[]
     mae=[]
+    
+    #fits the model for a given number of epochs with the provided batch size
+    #if the epochs and batch_size lists contain multiple entries, batch_size[i] is executed for a number of epochs[i] epochs
     for i in range(len(epochs)):
         temp=model.fit(input_array, label_array, batch_size=batch_sizes[i], epochs=epochs[i], shuffle=True,callbacks = [lrcall,timetaken])
         loss.extend(temp.history["loss"])
         mae.extend(temp.history["mean_absolute_error"])
     
-    tf.keras.models.save_model(model, 'model_std_s'+str(n_scenarios)+'_b'+str(n_datasets)+"_sp")
+    #the trained model is saved to a SavedModel file at the given location
+    tf.keras.models.save_model(model, "model_std")
     
 
 
@@ -279,6 +331,8 @@ batch_sizes=[100]
 #to clarify, when providing three csv files as label data each containing 250 time steps, this should be 1/750
 kl_mod=1/(3000)
 
+
+#uncomment one of the following to either produce a trained deterministid or probabilistic neural network and save it as a SavedModel
 #std_run(datasets_in, datasets_label, epochs, batch_sizes)
 #prob_run(datasets_in, datasets_label, epochs, batch_sizes, kl_mod)
 
