@@ -166,7 +166,7 @@ void coupling::IndexConversionMD2Macro<dim>::initGlobalMD2MacroDomainBoundaries(
 			}
 
 			//broadcast result from
-			MPI_Bcast(&hasCells, 1, MPI::BOOL, r, _comm);
+			MPI_Bcast(&hasCells, 1, MPI_CXX_BOOL, r, _comm);
 
 			//memorize this rank if it did have cells
 			if(hasCells) lastRankContainingCells = r;
@@ -190,8 +190,8 @@ void coupling::IndexConversionMD2Macro<dim>::initGlobalMD2MacroDomainBoundaries(
 		linearLowerBoundaryAllRanks = _ic->getGlobalCellIndex(*_lowerBoundaryAllRanks);
 		linearUpperBoundaryAllRanks = _ic->getGlobalCellIndex(*_upperBoundaryAllRanks);
 
-		MPI_Bcast(&linearLowerBoundaryAllRanks, 1, MPI::UNSIGNED, _lowestRank, _comm);
-		MPI_Bcast(&linearUpperBoundaryAllRanks, 1, MPI::UNSIGNED, lastRankContainingCells, _comm); //last process
+		MPI_Bcast(&linearLowerBoundaryAllRanks, 1, MPI_UNSIGNED, _lowestRank, _comm);
+		MPI_Bcast(&linearUpperBoundaryAllRanks, 1, MPI_UNSIGNED, lastRankContainingCells, _comm); //last process
 	
 		//convert back to vector
 		(*_lowerBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearLowerBoundaryAllRanks);

@@ -46,13 +46,13 @@ then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
     FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
     # -DMDCoupledDebug"
-    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH} -I${PYTHON_PATH}"
+    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
     FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3"
     # -Werror
-    includes="${includes} -I${LIB_EIGEN_PATH} -I${PYTHON_PATH}"
+    includes="${includes} -I${LIB_EIGEN_PATH}" 
     compiler="g++"
 fi
 ###
@@ -82,13 +82,13 @@ else
 fi
 
 cd ${BUILD_PATH}
-${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
+${compiler} -c ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
 objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
 
 ### builds, linking, objects for coupled simulation with MaMiCo
 cd ${BUILD_PATH}
-${compiler} ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
-${compiler} ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/main_couette.o -L/usr/lib/python3.8/site-packages/pybind11 #$(python3.8-config --ldflags --embed)
+${compiler} -c ${MAMICO_PATH}/coupling/configurations/ParticleInsertionConfiguration.cpp ${FLAGS} ${includes} -o ${BUILD_PATH}/ParticleInsertionConfiguration.o
+${compiler} -c ${MAMICO_PATH}/coupling/tests/main_couette.cpp ${FLAGS} ${includes} -o ${BUILD_PATH}/main_couette.o
 objects="${objects} ${BUILD_PATH}/ParticleInsertionConfiguration.o ${BUILD_PATH}/main_couette.o"
 
 ${compiler} ${objects} ${libraries} -o ${BUILD_PATH}/test
