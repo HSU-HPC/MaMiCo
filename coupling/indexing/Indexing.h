@@ -51,16 +51,19 @@ class coupling::indexing::CellIndex {
 	using BaseIndex = CellIndex<dim, BaseIndexType>;
 
 	public:
-		//primitive constructor: entry point to indexing type system
-		CellIndex(value_T i) : _index(i){}
+		//primitive constructors
+		CellIndex() : _index(idx_T.vector ? tarch::la::Vector<dim, unsigned int>(0) : 0) {}
+		CellIndex(CellIndex<dim, idx_T>& i) : _index(i.get()) {}
+		CellIndex(const value_T i) : _index(i){}
 
-		CellIndex(BaseIndex i) {	
-			//step 2: get tarch::la::Vector representation of i and offset of this
+		//conversion: BaseIndex -> this index
+		CellIndex(BaseIndex& i) {	
+			//step 1: get tarch::la::Vector representation of i and offset of this
 			auto i_tarch_vec = i.get();
 			auto offset = getLowerBoundary().get();
 			auto ceiling = getUpperBoundary.get();
 
-			//step 3: check if offset > i in any dimension or if i is out of bounds
+			//step 2: check if offset > i in any dimension or if i is out of bounds
 			for(unsigned d = 0; d < dim; d++) {
 				if(i_tarch_vec[d] < offset[d])
 					throw std::runtime_error("Error: Index conversion not possible!"); //TODO: more verbose error
@@ -68,30 +71,30 @@ class coupling::indexing::CellIndex {
 					throw std::runtime_error("Error: Index conversion not possible!"); //TODO: more verbose error
 			}
 
-			//step 4: subtract offset and call value_T(=tarch::la::Vector) constructor
+			//step 3: subtract offset and call value_T(=tarch::la::Vector) constructor
 			auto result = CellIndex<dim, {true, idx_T.local, idx_T.md2macro, idx_T.noGhost}>(i_tarch_vec - offset); 
 
-			//step 3: convert to scalar if neccessary
+			//step 4: convert to scalar if neccessary
 			if(!idx_T.vector)
-				_index = result.swapVectorScalar().get();
+				_index = result.swapScalarVector().get();
 			else /*idx_T.vector == true*/
 				_index = result.get();
 		}
 
-		//conversion constructor: takes any other CellIndex embodying convertedType
+		//conversion: takes any other CellIndex embodying convertedType
 		template<coupling::indexing::IndexType converted_T>
 		CellIndex(CellIndex<dim, converted_T> i) {
 			//step 1: convert i to vector if neccessary
 			
 			CellIndex<dim, {true, converted_T.local, converted_T.md2macro, converted_T.noGhost}> i_vec;
 			if(!converted_T.vector)
-				auto i_vec = i.swapVectorScalar(); 
+				i_vec = i.swapScalarVector(); 
 			else
-				auto i_vec = i;
+				i_vec = i;
 
 			//step 2: get tarch::la::Vector representation of i and its offset
 			auto i_tarch_vec = i_vec.get();
-			auto converted_T_offset = CellIndex<dim, converted_T>::getLowerOffset.get();
+			auto converted_T_offset = CellIndex<dim, converted_T>::getLowerBoundary().get();
 
 			//step 3: check if i is out of bounds
 			for(unsigned int d = 0; d < dim; d++)
@@ -101,10 +104,19 @@ class coupling::indexing::CellIndex {
 			//step 4: add offset to create BaseIndex version of i
 			BaseIndex base_i = BaseIndex(i_tarch_vec + converted_T_offset);
 
-			//step 3: construct index of idx_T type from BaseIndex
-			_index = CellIndex(base_i).get();
+			//step 5: convert to scalar if neccessary
+			if(!idx_T.vector)
+				_index = base_i.swapScalarVector().get();
+			else /*idx_T.vector == true*/
+				_index = base_i.get();
 		}
 
+		value_T get() const { return _index; }
+
+		/*
+		 * This must be initialised for each index type individually.
+		 * Together with the type of value_t, these two boundaries define a CellType.
+		 */
 		static void setBoundaries(
 				BaseIndex lowerBound,
 				BaseIndex upperBound
@@ -113,18 +125,10 @@ class coupling::indexing::CellIndex {
 			_upperBoundary = upperBound;
 		}
 
-		value_T get() { return _index; }
-
-
 		static BaseIndex getLowerBoundary() { return _lowerBoundary; } 
 		static BaseIndex getUpperBoundary() { return _upperBoundary; } 
 
 		unsigned int operator[](unsigned int i) const { return _index[i]; } 
-
-	protected:
-		const tarch::la::Vector<dim, unsigned int> _index;
-
-	private:
 		
 		//TODO: Comment, more descriptive name
 		CellIndex<dim, {not idx_T.vector, idx_T.local, idx_T.md2macro, idx_T.noGhost}> 
@@ -138,10 +142,13 @@ class coupling::indexing::CellIndex {
 			}
 		}
 
+
+	private:
 		static BaseIndex _lowerBoundary;
 		static BaseIndex _upperBoundary;
 
-		value_T index;
+		//TODO: should be const
+		value_T _index;
 			
 };
 
