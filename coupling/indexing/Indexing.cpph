@@ -1,0 +1,13 @@
+//MOVED TO HEADER FOR NOW
+
+//primitive constructor: entry point to indexing type system
+template<unsigned int dim, coupling::indexing::IndexType idx_T>
+coupling::indexing::CellIndex<dim, idx_T>(value_T i) : _index(i) {}
+
+//conversion constructor: takes any other CellIndex, representing some IndexType
+template<unsigned int dim, coupling::indexing::IndexType idx_T>
+template<coupling::indexing::IndexType converted_T>
+coupling::indexing::CellIndex<dim, idx_T>(CellIndex<dim, converted_T> i) {
+	//TODO
+}
+
