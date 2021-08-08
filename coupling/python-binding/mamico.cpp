@@ -19,6 +19,13 @@
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 
+#include "coupling/indexing/Indexing.h"
+/*
+using idx_global = coupling::CellIndex<3>;
+using idx_local = coupling::CellIndex<3, {.local=true}>;
+auto idx1 = new idx_global();
+idx_local idx2 = idx1;
+*/
 // for debugging purposes only
 #include <iostream>
 
