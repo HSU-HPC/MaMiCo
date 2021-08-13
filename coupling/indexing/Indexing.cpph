@@ -1,13 +1,45 @@
-//MOVED TO HEADER FOR NOW
+//Implementation of coupling::indexing::CellIndex
 
-//primitive constructor: entry point to indexing type system
-template<unsigned int dim, coupling::indexing::IndexType idx_T>
-coupling::indexing::CellIndex<dim, idx_T>(value_T i) : _index(i) {}
+//TODO: copy all below this line to cpph
+//TODO: check for dim correctess in all function bodies
+//TODO: step 1-3
 
-//conversion constructor: takes any other CellIndex, representing some IndexType
-template<unsigned int dim, coupling::indexing::IndexType idx_T>
-template<coupling::indexing::IndexType converted_T>
-coupling::indexing::CellIndex<dim, idx_T>(CellIndex<dim, converted_T> i) {
-	//TODO
+using namespace coupling::indexing;
+/*
+ * Using:
+ * 	coupling::indexing::IndexType
+ * 	coupling::indexing::CellIndex
+ */
+
+//conversion: identical IndexType -> "copy constructor"
+template<unsigned int dim, IndexType idx_T>
+CellIndex<dim, idx_T>::operator CellIndex<dim, idx_T>() { return CellIndex<dim, idx_T>(_index); } 
+
+//conversion: non-BaseIndex -> different non-BaseIndex
+template<unsigned int dim, IndexType idx_T, IndexType convert_to_T>
+CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() {
+	CellIndex<dim, BaseIndexType> b = *this;
+	return CellIndex<dim, converto_to_T>(b);
 }
 
+//conversion: non-BaseIndex -> BaseIndex
+template<unsigned int dim, IndexType idx_T, 
+	//if idx_T != BaseIndexType, then enable this implementation...
+	typename = std::enable_if_t<!std::is_same<CellIndex<dim, idx_T>, CellIndex<dim, BaseIndexType>>::value> >
+CellIndex<dim, idx_T>::operator CellIndex<dim, BaseIndexType>() { 
+	//Step 1: convert to vector if neccessary
+	//Step 2: add offset
+	//Step 3: construct BaseIndex
+	return CellIndex<dim, BaseIndexType>(); 
+}	
+
+//conversion: BaseIndex -> non-BaseIndex
+template<unsigned int dim, IndexType convert_to_T, 
+	//if convert_to_T != BaseIndexType, then enable this implementation...
+	typename = std::enable_if_t<!std::is_same<CellIndex<dim, convert_to_T>, CellIndex<dim, BaseIndexType>>::value> >
+CellIndex<dim, BaseIndexType>::operator CellIndex<dim, convert_to_T> {
+	//step 1: subtract offset
+	//step 2: convert to vector if neccessary
+	//step 3: construct CellIndex<dim, convert_to_T>
+	return CellIndex<dim, convert_to,T>();
+}
