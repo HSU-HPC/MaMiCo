@@ -25,6 +25,13 @@ namespace coupling {
 			bool local = false;
 			bool md2macro = false;
 			bool noGhost = false;
+
+			const inline bool operator==(const IndexType& comp) const {
+				return (	vector 		== comp.vector 
+						and local 		== comp.local 
+						and md2macro 	== comp.md2macro 
+						and noGhost 	== comp.noGhost);
+			}
 		};
 
 		// Note: this is -std=c++20
