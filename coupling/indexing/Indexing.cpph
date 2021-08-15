@@ -11,20 +11,17 @@ using namespace coupling::indexing;
  */
 
 //conversion: identical IndexType -> "copy constructor"
-template<unsigned int dim, IndexType idx_T>
-CellIndex<dim, idx_T>::operator CellIndex<dim, idx_T>() { return CellIndex<dim, idx_T>(_index); } 
-
-//conversion: non-BaseIndex -> different non-BaseIndex
-template<unsigned int dim, IndexType idx_T, IndexType convert_to_T>
-CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() {
-	CellIndex<dim, BaseIndexType> b = *this;
-	return CellIndex<dim, converto_to_T>(b);
-}
+template<unsigned int dim, IndexType idx_T, IndexType convert_to_T,
+	//if idx_T = convert_to_T, then enable this implementation...
+	typename = std::enable_if_t<idx_T == convert_to_T> >
+CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() { 
+	return CellIndex<dim, convert_to_T>(_index); 
+} 
 
 //conversion: non-BaseIndex -> BaseIndex
-template<unsigned int dim, IndexType idx_T, 
+template<unsigned int dim, IndexType idx_T,
 	//if idx_T != BaseIndexType, then enable this implementation...
-	typename = std::enable_if_t<!std::is_same<CellIndex<dim, idx_T>, CellIndex<dim, BaseIndexType>>::value> >
+	typename = std::enable_if_t<idx_T !=  BaseIndexType> >
 CellIndex<dim, idx_T>::operator CellIndex<dim, BaseIndexType>() { 
 	//Step 1: convert to vector if neccessary
 	//Step 2: add offset
@@ -35,10 +32,20 @@ CellIndex<dim, idx_T>::operator CellIndex<dim, BaseIndexType>() {
 //conversion: BaseIndex -> non-BaseIndex
 template<unsigned int dim, IndexType convert_to_T, 
 	//if convert_to_T != BaseIndexType, then enable this implementation...
-	typename = std::enable_if_t<!std::is_same<CellIndex<dim, convert_to_T>, CellIndex<dim, BaseIndexType>>::value> >
-CellIndex<dim, BaseIndexType>::operator CellIndex<dim, convert_to_T> {
+	typename = std::enable_if_t<convert_to_T != BaseIndexType> >
+CellIndex<dim, BaseIndexType>::operator CellIndex<dim, convert_to_T>() {
 	//step 1: subtract offset
 	//step 2: convert to vector if neccessary
 	//step 3: construct CellIndex<dim, convert_to_T>
 	return CellIndex<dim, convert_to,T>();
 }
+
+//conversion: non-BaseIndex -> different non-BaseIndex
+template<unsigned int dim, IndexType idx_T, IndexType convert_to_T>
+CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() {
+	//call this -> BaseIndexType conversion
+	CellIndex<dim, BaseIndexType> b = *this;
+	//call BaseIndex -> target index type conversion
+	return CellIndex<dim, converto_to_T>(b);
+}
+
