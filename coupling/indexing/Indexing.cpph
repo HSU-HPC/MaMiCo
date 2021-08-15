@@ -1,8 +1,7 @@
 //Implementation of coupling::indexing::CellIndex
 
-//TODO: copy all below this line to cpph
 //TODO: check for dim correctess in all function bodies
-//TODO: step 1-3
+//TODO: steps 1-3
 
 using namespace coupling::indexing;
 /*
