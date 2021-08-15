@@ -1,21 +1,24 @@
 #pragma once
 
 #include "tarch/la/Vector.h"
-#include <vector>
+
+
+/* 
+ * Types of cell indices:
+ *	-> scalar idx VS vector<dim> idx
+ *	-> MPI rank local VS global idx
+ *	-> Mamico VS MD2Macro Domain idx
+ *	-> NoGL idx VS total domain incl GL 
+ *
+ *	TODO: Proper comment
+ *
+ * @author Felix Maurer, Piet Jarmatz
+ */
+
 
 namespace coupling {
 
 	namespace indexing {
-
-		/* Types of cell indices:
-
-			-> scalar idx VS vector<dim> idx
-			-> MPI rank local VS global idx
-			-> Mamico VS MD2Macro Domain idx
-			-> NoGL idx VS total domain incl GL 
-
-			TODO: proper comment
-		*/
 
 		struct IndexType{
 			bool vector = false;
@@ -25,7 +28,7 @@ namespace coupling {
 		};
 
 		// Note: this is -std=c++20
-		template<unsigned int dim, IndexType idxT = {}>
+		template<unsigned int dim, IndexType idx_T = {}>
 		class CellIndex;
 	}
 }
@@ -57,8 +60,6 @@ class coupling::indexing::CellIndex {
 		template<coupling::indexing::IndexType convert_to_T>
 		operator CellIndex<dim, convert_to_T>();
 
-		value_T get() const { return _index; }
-
 		/*
 		 * This must be initialised for each index type individually.
 		 * Together with the type of value_t, these two boundaries define a CellType.
@@ -74,19 +75,8 @@ class coupling::indexing::CellIndex {
 		static BaseIndex getLowerBoundary() { return _lowerBoundary; } 
 		static BaseIndex getUpperBoundary() { return _upperBoundary; } 
 
-		unsigned int operator[](unsigned int i) const { return _index[i]; } 
-		
-		//TODO: Comment
-		CellIndex<dim, {not idx_T.vector, idx_T.local, idx_T.md2macro, idx_T.noGhost}> 
-		swapScalarVector() {
-			//TODO: implement proper conversion -> copy from IndexConversion
-			if(idx_T.vector) {
-				return CellIndex<dim, {false, idx_T.local, idx_T.md2macro, idx_T.noGhost}>(42);
-			}
-			else /*idx_T.vector == false*/ {
-				return CellIndex<dim, {true, idx_T.local, idx_T.md2macro, idx_T.noGhost}>(tarch::la::Vector<dim, unsigned int>(42));
-			}
-		}
+		// Access to primive value_T of this index
+		value_T get() const { return _index; }
 
 
 	private:
@@ -99,3 +89,6 @@ class coupling::indexing::CellIndex {
 
 //Include implementation of header
 #include "Indexing.cpph"
+
+//Include non-member conversion functions
+#include "Conversion.h"
