@@ -132,7 +132,7 @@ private:
       exit(EXIT_FAILURE);
     }
 	tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
-    if(n_unexpected == NULL){
+    if(n_unexpected != NULL){
       std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
