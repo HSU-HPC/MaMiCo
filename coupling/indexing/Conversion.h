@@ -28,7 +28,7 @@ namespace coupling {
 using namespace coupling::indexing;
 
 /*
- * Pattern matching convertToScalar:.
+ * Pattern matching convertToScalar:
  * Set nullptr as default parameter in order to match template signature of forward decls found above.
  */
 template<unsigned int dim, IndexType idx_T, 

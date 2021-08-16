@@ -21,16 +21,13 @@ namespace coupling {
 	namespace indexing {
 
 		struct IndexType{
-			bool vector = false;
-			bool local = false;
-			bool md2macro = false;
-			bool noGhost = false;
+			const bool vector = false;
+			const bool local = false;
+			const bool md2macro = false;
+			const bool noGhost = false;
 
-			const inline bool operator==(const IndexType& comp) const {
-				return (	vector 		== comp.vector 
-						and local 		== comp.local 
-						and md2macro 	== comp.md2macro 
-						and noGhost 	== comp.noGhost);
+			bool constexpr operator==(const IndexType& comp) const {
+				return (vector == comp.vector and local == comp.local and md2macro == comp.md2macro and noGhost == comp.noGhost);
 			}
 		};
 
@@ -60,7 +57,7 @@ class coupling::indexing::CellIndex {
 
 	public:
 		//primitive constructors
-		CellIndex() : _index() {}
+		CellIndex() = default;
 		CellIndex(const value_T i) : _index(i){}
 		
 		//conversion: convert to convert_to_T
