@@ -70,25 +70,30 @@ class coupling::indexing::CellIndex {
 		 * This must be initialised for each index type individually.
 		 * Together with the type of value_t, these two boundaries define a CellType.
 		 */
+		/*
 		static void setBoundaries(
 				BaseIndex lowerBound,
 				BaseIndex upperBound
 		) {
-			_lowerBoundary = lowerBound;
-			_upperBoundary = upperBound;
+			std::cout << "1" << std::endl;
+			CellIndex::_lowerBoundary = lowerBound;
+			std::cout << "2" << std::endl;
+			Cell::Index::_upperBoundary = upperBound;
+			std::cout << "3" << std::endl;
 		}
 
 		static BaseIndex getLowerBoundary() { return _lowerBoundary; } 
 		static BaseIndex getUpperBoundary() { return _upperBoundary; } 
+		*/
+
+		static BaseIndex lowerBoundary;
+		static BaseIndex upperBoundary;
 
 		// Access to primive value_T of this index
 		value_T get() const { return _index; }
 
 
 	private:
-		static BaseIndex _lowerBoundary;
-		static BaseIndex _upperBoundary;
-
 		value_T _index;
 			
 };
