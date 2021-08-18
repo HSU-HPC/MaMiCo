@@ -1,7 +1,6 @@
 //Implementation of coupling::indexing::CellIndex
 
-//TODO: check for dim correctess
-//TODO: steps 1-3
+//TODO: operator+- for Indices
 
 using namespace coupling::indexing;
 /*
@@ -19,19 +18,31 @@ CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() {
 	if constexpr (idx_T == convert_to_T) {
 		return CellIndex<dim, idx_T>(_index); 
 	}
+
 	//conversion: non-BaseIndex -> BaseIndex
 	if constexpr (convert_to_T == BaseIndexType) {
 		//Step 1: convert to vector if neccessary
+		tarch::la::Vector<dim, unsigned int> i_vec = convertToVector<dim, idx_T>(*this).get();
 		//Step 2: add offset
+		i_vec += CellIndex<dim, idx_T>::lowerBoundary.get(); 
 		//Step 3: construct BaseIndex
-		return CellIndex<dim, BaseIndexType>(); 
+		return CellIndex<dim, BaseIndexType>(i_vec); 
 	}
+
 	//conversion: BaseIndex -> non-BaseIndex
 	if constexpr (idx_T == BaseIndexType) {
 		//step 1: subtract offset
-		//step 2: convert to vector if neccessary
-		//step 3: construct CellIndex<dim, convert_to_T>
-		return CellIndex<dim, convert_to_T>();
+		tarch::la::Vector<dim, unsigned int> i_vec = _index - CellIndex<dim, convert_to_T>::lowerBoundary.get();
+		//step 2: convert to scalar if neccessary + construct CellIndex<dim, convert_to_T>
+		if constexpr(convert_to_T.vector) {
+			return CellIndex<dim, convert_to_T>(i_vec);
+		}
+		else {
+			//get scalar version of i_vec by first constructing a BaseIndex and then converting it
+			const unsigned int i_sca = convertToScalar<dim, BaseIndexType>(BaseIndex(i_vec)).get();	
+
+			return CellIndex<dim, convert_to_T>(i_sca);
+		}
 	}
 
 	//conversion: non-BaseIndex -> different non-BaseIndex
