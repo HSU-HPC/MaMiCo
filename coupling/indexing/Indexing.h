@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+#include <type_traits>
 #include "tarch/la/Vector.h"
 
 
@@ -96,3 +98,10 @@ class coupling::indexing::CellIndex {
 
 //Include non-member conversion functions
 #include "Conversion.h"
+
+//Overloading operator<< for CellIndex
+template<unsigned int dim, coupling::indexing::IndexType idx_T>
+std::ostream& operator<<(std::ostream& os, const CellIndex<dim, idx_T>& i) {
+	os << i.get();
+	return os;
+}

@@ -10,6 +10,8 @@
 #include <limits>
 #include <stdexcept>
 
+#include "coupling/indexing/Indexing.h"
+
 #include "tarch/utils/MultiMDService.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/configuration/ParseConfiguration.h"
@@ -19,12 +21,6 @@
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 
-#include "coupling/indexing/Indexing.h"
-
-using idx_global = coupling::indexing::CellIndex<3>;
-using idx_local = coupling::indexing::CellIndex<3, {.local=true}>;
-auto idx1 = idx_global(10);
-idx_local idx2 = idx1;
 
 // for debugging purposes only
 #include <iostream>
@@ -54,6 +50,7 @@ idx_local idx2 = idx1;
  *
  *  @author Piet Jarmatz
  */
+
 
 namespace py = pybind11;
 using namespace pybind11::literals;
