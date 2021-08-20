@@ -33,6 +33,8 @@ namespace coupling {
 
 template<unsigned int dim>
 class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface<dim>{
+	using coupling::AsymmetricalJunctorInterface<dim>::_cellIndices2;
+	using coupling::FilterInterface<dim>::_outputCells;
 	public:
 		NeuralNetJunctor(
 			//first cell data set
@@ -66,9 +68,6 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 				filteredValues,
 		   		"NeuralNetJunctor"),
 			
-			//store cell indices to later check for ghost cells
-			inputCellIndices_(mamicoCellIndices2),
-			
 			nnType_(nnType),
 			epochs_(epochs),
 			batchSize_(batchSize),
@@ -80,6 +79,7 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 			
 			std::string folder="../../filtering/filters/tensorflow/";		
 			if(nnType_=="standalone"){
+				
 				//loads input and label data from given .csv files into tensors
 				//the first two integers in SetupBatchesExcludingGhost denote the columns of the csv that contain the x component of the velocity
 				//the last integer is the batch size used for training
@@ -108,7 +108,7 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 					}
 					std::cout<<"Loss: "<<total/(float)nBatches<<std::endl;
 					total=0.0;
-					if(i%100==0) std::cout<<"\n"<<"Epoch: "<<i<<"\n"<<std::endl;
+					if(i%50==0) std::cout<<"\n"<<"Epoch: "<<i<<"\n"<<std::endl;
 				}
 			}
 			//nnType_ can only be "standalone" or "loadModel", this is checked before constructing NeuralNetJunctor instance
@@ -133,13 +133,15 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 				std::cout<<"Constructed Neural Net"<<std::endl;
 			#endif
 		}
-      
+		
+		/*
 		~NeuralNetJunctor() {
 			
 			#ifdef DEBUG_NeuralNet
 				std::cout << "    NeuralNet: Destroyed NeuralNet instance." << std::endl;
 			#endif
 		}
+		*/
 
     void operator()() {
 		#ifdef DEBUG_NeuralNet
@@ -150,20 +152,20 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 		std::vector<float> inputVec;
 		for(unsigned int index = 0; index < coupling::AsymmetricalJunctorInterface<dim>::_inputCellVector2.size(); index++){ 
 			
-			if(isNotGhost(inputCellIndices_[index])){
+			if(isNotGhost(_cellIndices2[index])){
 				inputVec.push_back((coupling::AsymmetricalJunctorInterface<dim>::_inputCellVector2[index]->coupling::datastructures::MacroscopicCell<dim>::getMicroscopicMomentum)()[0]);
 			}
 		}
 		auto inputTensor=VecToTensor(inputVec);
 		
-		
+		Tensor resultTensor;
 		
 		if(nnType_=="standalone"){
 			std::vector<float> resultVec;
 			
 			//generate prediction
 			NN.Predict(inputTensor, resultVec);
-			auto resultTensor=VecToTensor(resultVec);
+			resultTensor=VecToTensor(resultVec);
 			std::cout<<inputTensor.DebugString()<<std::endl;
 			std::cout<<resultTensor.DebugString()<<std::endl;
 		}
@@ -176,15 +178,21 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 					std::cout << "NeuralNetworkJunctor Run Failed: " << runStatus.ToString()<<std::endl;
 					exit(3);
 				}
+				resultTensor=resultVec[0];
 				std::cout<<inputTensor.DebugString()<<std::endl;
-				std::cout<<resultVec[0].DebugString()<<std::endl;
+				std::cout<<resultTensor.DebugString()<<std::endl;
 		}
+		tarch::la::Vector<dim,double> velocity(0);
 		
+		//the result is written to the currentVelocity vector instead of macroscopicMomentum because calculating the momentum would require macroscopicMass, 
+		//which the neural network in its current configuration does not predict
+		for(unsigned int index = 0; index < coupling::AsymmetricalJunctorInterface<dim>::_outputCells.size(); index++){ 
+			velocity[0]=resultTensor.flat<float>()(index);
+			(coupling::AsymmetricalJunctorInterface<dim>::_outputCells[index]->coupling::datastructures::MacroscopicCell<dim>::setCurrentVelocity)(velocity);
+		}
 	}
 
   private:
-	//this is a workaround because _cellIndices2 from AsymmetricalJunctorInterface is private
-	const std::vector<tarch::la::Vector<dim, unsigned int>> inputCellIndices_;
 	
 	const std::string nnType_;
 	int epochs_, batchSize_;
