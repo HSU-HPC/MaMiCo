@@ -31,13 +31,6 @@ namespace coupling {
   class NeuralNetJunctor;
 }
 
-/*auto tf_tensor_to_vector(tensorflow::Tensor tensor, int32_t tensorSize) {
-  int32_t* tensor_ptr = tensor.flat<int32_t>().data();
-  std::vector<int32_t> v(tensor_ptr, tensor_ptr + tensorSize);
-  return v;
-}
-*/
-
 template<unsigned int dim>
 class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface<dim>{
 	public:
@@ -55,7 +48,13 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 			//no sequence indices
 	
 			//"global" parameters for both WriteToFile instances
-			const std::array<bool, 7> filteredValues):
+			const std::array<bool, 7> filteredValues,
+			
+			std::string nnType,
+			int epochs,
+			int batchSize,
+			float learningRate,
+			std::string modelPath):
 		  
 			coupling::AsymmetricalJunctorInterface<dim>( 
 				inputCellVector1,
@@ -66,29 +65,27 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 				mamicoCellIndices2,
 				filteredValues,
 		   		"NeuralNetJunctor"),
-			inputCellIndices(mamicoCellIndices2)
+			
+			//store cell indices to later check for ghost cells
+			inputCellIndices_(mamicoCellIndices2),
+			
+			nnType_(nnType),
+			epochs_(epochs),
+			batchSize_(batchSize),
+			learningRate_(learningRate),
+			modelPath_(modelPath)	
 		{
 			using namespace tensorflow;
   			using namespace tensorflow::ops;
 			
-			//store cell indices to later check for ghost cells
-			
-			//this switches between the purely TensorFlow C++ and the Python SavedModel approach
-			//either standalone or loadModel
-			networkType="standalone";
-			
-			std::string folder="../../filtering/filters/tensorflow/";
-			
-			//loads config from csv file, contains learning rate and number of epochs
-			std::vector<std::string> config=getConfigFromCSV(folder+"config_main.csv");
-			
-			if(networkType=="standalone"){
+			std::string folder="../../filtering/filters/tensorflow/";		
+			if(nnType_=="standalone"){
 				//loads input and label data from given .csv files into tensors
 				//the first two integers in SetupBatchesExcludingGhost denote the columns of the csv that contain the x component of the velocity
 				//the last integer is the batch size used for training
 				std::vector<tensorflow::Tensor> input, label;
 				std::string addendum="_clean";
-				SetupBatchesExcludingGhost(input, folder+"clean_data/writer2"+addendum+".csv", 8, label, folder+"clean_data/writer1"+addendum+".csv", 4, 1);
+				SetupBatchesExcludingGhost(input, folder+"clean_data/writer2"+addendum+".csv", 8, label, folder+"clean_data/writer1"+addendum+".csv", 4, batchSize);
 				
 				//init containers required by NN
 				std::vector<std::vector<float>> results;
@@ -99,12 +96,12 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 				//init NN
 				NN.setDims(input[0].dim_size(1), input[0].dim_size(1), label[0].dim_size(1));
 				NN.CreateNNGraph();
-				NN.CreateOptimizationGraph(std::stof(config[0]));
+				NN.CreateOptimizationGraph(learningRate_);
 				NN.Initialize();
 				
 				
 				//train NN with input and label data
-				for(int i=0; i<std::stoi(config[1]); ++i){
+				for(int i=0; i<epochs; ++i){
 					for(int j=0; j<nBatches; j++){
 						NN.Train(input[j], label[j], results, loss); 
 						total+=loss;
@@ -114,11 +111,12 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 					if(i%100==0) std::cout<<"\n"<<"Epoch: "<<i<<"\n"<<std::endl;
 				}
 			}
-			else if(networkType=="loadModel"){
+			//nnType_ can only be "standalone" or "loadModel", this is checked before constructing NeuralNetJunctor instance
+			else{
 				//loads SavedModel file into "model"
 				SessionOptions session_options = SessionOptions();
 				RunOptions run_options = RunOptions();
-				Status status = LoadSavedModel(session_options, run_options, folder+"SavedModels/"+config[2], {kSavedModelTagServe}, &model);	
+				Status status = LoadSavedModel(session_options, run_options, modelPath_, {kSavedModelTagServe}, &model);	
 				//checks if SavedModel was loaded correctly
 				if (!status.ok()) {
 					std::cout << "NeuralNetworkJunctor LoadSavedModel Failed: " << status.ToString()<<std::endl;
@@ -127,13 +125,10 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 				
 				//gets names of input and output of the model to later address them
 				//names can also be accessed from console with: saved_model_cli show --dir ~/local/tensorflow_cc-master/test/model --all
-				input_name = model.GetSignatures().at("serving_default").inputs().begin()->second.name();
-				output_name=model.GetSignatures().at("serving_default").outputs().begin()->second.name();
+				inputName_ = model.GetSignatures().at("serving_default").inputs().begin()->second.name();
+				outputName_ =model.GetSignatures().at("serving_default").outputs().begin()->second.name();
 			}
-			else{ 
-				std::cout<<"NeuralNetworkJunctor: unknown networkType"<<std::endl;
-				exit(1);
-			}
+
 			#ifdef DEBUG_NeuralNet
 				std::cout<<"Constructed Neural Net"<<std::endl;
 			#endif
@@ -151,49 +146,54 @@ class coupling::NeuralNetJunctor : public coupling::AsymmetricalJunctorInterface
 				std::cout << "    NeuralNet: Now calling operator() on NeuralNet instance." << std::endl;
 		#endif
 		
-		//enters all x velocity values from the outer domain into input_vec and converts that to input_pred Tensor
-		std::vector<float> input_vec;
+		//enters all x velocity values from the outer domain into inputVec and converts that to inputTensor
+		std::vector<float> inputVec;
 		for(unsigned int index = 0; index < coupling::AsymmetricalJunctorInterface<dim>::_inputCellVector2.size(); index++){ 
 			
-			if(isNotGhost(inputCellIndices[index])){
-				input_vec.push_back((coupling::AsymmetricalJunctorInterface<dim>::_inputCellVector2[index]->coupling::datastructures::MacroscopicCell<dim>::getMicroscopicMomentum)()[0]);
+			if(isNotGhost(inputCellIndices_[index])){
+				inputVec.push_back((coupling::AsymmetricalJunctorInterface<dim>::_inputCellVector2[index]->coupling::datastructures::MacroscopicCell<dim>::getMicroscopicMomentum)()[0]);
 			}
 		}
-		auto input_tensor=VecToTensor(input_vec);
+		auto inputTensor=VecToTensor(inputVec);
 		
 		
 		
-		if(networkType=="standalone"){
-			std::vector<float> result_vec;
+		if(nnType_=="standalone"){
+			std::vector<float> resultVec;
 			
 			//generate prediction
-			NN.Predict(input_tensor, result_vec);
-			auto result=VecToTensor(result_vec);
-			std::cout<<input_tensor.DebugString()<<std::endl;
-			std::cout<<result.DebugString()<<std::endl;
+			NN.Predict(inputTensor, resultVec);
+			auto resultTensor=VecToTensor(resultVec);
+			std::cout<<inputTensor.DebugString()<<std::endl;
+			std::cout<<resultTensor.DebugString()<<std::endl;
 		}
-		else if(networkType=="loadModel"){
-				std::vector<Tensor> result_vec;
+		else{
+				std::vector<Tensor> resultVec;
 				
 				//generate prediction
-				Status runStatus = model.GetSession()->Run({{input_name, input_tensor}}, {output_name}, {}, &result_vec);
+				Status runStatus = model.GetSession()->Run({{inputName_, inputTensor}}, {outputName_}, {}, &resultVec);
 				if (!runStatus.ok()) {
 					std::cout << "NeuralNetworkJunctor Run Failed: " << runStatus.ToString()<<std::endl;
 					exit(3);
 				}
-				std::cout<<input_tensor.DebugString()<<std::endl;
-				std::cout<<result_vec[0].DebugString()<<std::endl;
+				std::cout<<inputTensor.DebugString()<<std::endl;
+				std::cout<<resultVec[0].DebugString()<<std::endl;
 		}
 		
 	}
 
   private:
+	//this is a workaround because _cellIndices2 from AsymmetricalJunctorInterface is private
+	const std::vector<tarch::la::Vector<dim, unsigned int>> inputCellIndices_;
+	
+	const std::string nnType_;
+	int epochs_, batchSize_;
+	float learningRate_;
+	const std::string modelPath_;
+	
 	NeuralNet NN;
 	SavedModelBundleLite model;
-	std::string networkType, input_name, output_name;
-	
-	//this is a workaround because _cellIndices2 from AsymmetricalJunctorInterface is private
-	const std::vector<tarch::la::Vector<dim, unsigned int>> inputCellIndices;
+	std::string inputName_, outputName_;
 };
 
 //this only works for a 12³ domain

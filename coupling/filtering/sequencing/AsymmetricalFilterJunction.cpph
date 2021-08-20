@@ -78,9 +78,43 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 
 		
 		else if(std::strcmp(currJunctorNode->Value(), "neuralnet") == 0){
-
-            newjunctor = new coupling::NeuralNetJunctor<dim>(	inputCellVector_primary, outputCellVector_primary, this->_mamicoDomainCellIndices, this->_sequenceDomainCellIndices,
-								inputCellVector_secondary, _cellIndices_secondary, this->_filteredValues);
+			int epochs=0, batchSize=0;
+			float learningRate=0;
+			std::string modelPath="";
+			
+			
+			std::string nnType;
+			tarch::configuration::ParseConfiguration::readStringMandatory(nnType, currJunctorNode, "nnType");
+			if(nnType != "standalone" && nnType != "loadModel"){
+				std::cout << "ERROR: Attribute nnType for NeuralNet filter in XML config file must either be standalone or loadModel" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			
+			if(nnType == "standalone"){
+				tarch::configuration::ParseConfiguration::readIntMandatory(epochs, currJunctorNode, "epochs");
+				tarch::configuration::ParseConfiguration::readIntMandatory(batchSize, currJunctorNode, "batchSize");
+				double tmp;
+				tarch::configuration::ParseConfiguration::readDoubleMandatory(tmp, currJunctorNode, "learningRate");
+				learningRate=(float)tmp;
+			}
+			else{
+				tarch::configuration::ParseConfiguration::readStringMandatory(modelPath, currJunctorNode, "modelPath");
+			}
+			
+            newjunctor = new coupling::NeuralNetJunctor<dim>(	
+																	inputCellVector_primary, 
+																	outputCellVector_primary, 
+																	this->_mamicoDomainCellIndices, 
+																	this->_sequenceDomainCellIndices,
+																	inputCellVector_secondary, 
+																	_cellIndices_secondary, 
+																	this->_filteredValues,
+																	
+																	nnType,
+																	epochs,
+																	batchSize,
+																	learningRate,
+																	modelPath);
         }
 		
     //###############################################################
