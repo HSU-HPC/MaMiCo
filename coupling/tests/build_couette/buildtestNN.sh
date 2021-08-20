@@ -37,7 +37,7 @@ rm ${BUILD_PATH}/*.o;
 compiler=""
 libraries=""
 objects=""
-includes="-I${MAMICO_PATH}" # -Iusr/local/include/tensorflow/bazel-bin/tensorflow/include/"
+includes="-I${MAMICO_PATH} -I${TF_PATH} -I${PROTOBUF_PATH}"
 
 ### specify flags, includes, libraries,compiler for parallel or sequential build
 if [ "${parallel}" == "parallel" ]
@@ -49,7 +49,7 @@ then
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3" #-std=c++1z
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3"
     # -Werror
     includes="${includes} -I${LIB_EIGEN_PATH}"
     compiler="g++"

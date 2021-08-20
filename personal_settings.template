@@ -16,6 +16,15 @@ LIB_MPI=mpi
 
 LIB_EIGEN_PATH=/usr/include/eigen3
 
+#TensorFlow Includes
+#easiest way to compile TF library is to use https://github.com/FloopCZ/tensorflow_cc instead of original TF repo
+#this way buildtestNN.sh also automatically locates the library
+#this also automatically compiles a compatible protobuf version
+TF_PATH=/usr/local/include/tensorflow/bazel-bin/tensorflow/include/
+
+#Google Protobuf Includes, should be same version used to compile TF library
+PROTOBUF_PATH=/usr/local/include/tensorflow/bazel-bin/tensorflow/include/src
+
 ### Include general OpenFOAM path
 #FOAM_PATH=/opt/openfoam7/
 
