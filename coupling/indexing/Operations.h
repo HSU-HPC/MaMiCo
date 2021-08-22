@@ -73,7 +73,6 @@ std::ostream& operator<<(std::ostream& os, const CellIndex<dim, idx_T>& i) {
 	return os;
 }
 
-/*
 //Overloading arithmetic operators for CellIndex using friend functions
 template<unsigned int dim, IndexType idx_T>
 CellIndex<dim, idx_T> operator+(
@@ -86,4 +85,4 @@ coupling::indexing::CellIndex<dim, idx_T> operator-(
 		const CellIndex<dim, idx_T>& i1,
 		const CellIndex<dim, idx_T>& i2
 ) { return CellIndex<dim, idx_T>(i1._index - i2._index); }
-*/
+
