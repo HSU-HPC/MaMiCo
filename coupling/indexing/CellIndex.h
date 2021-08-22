@@ -70,9 +70,12 @@ class coupling::indexing::CellIndex {
 		template<coupling::indexing::IndexType convert_to_T>
 		operator CellIndex<dim, convert_to_T>();
 	
-	
 		// Access to primive value_T of this index
 		value_T get() const { return _index; }
+
+		//friend functions: arithmetic operators
+		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
+		friend CellIndex operator-<>(const CellIndex &i1, const CellIndex &i2);
 
 		static CellIndex<dim, BaseIndexType> lowerBoundary;
 		static CellIndex<dim, BaseIndexType> upperBoundary;
