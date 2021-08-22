@@ -44,6 +44,10 @@ namespace coupling {
  */
 auto constexpr BaseIndexType = coupling::indexing::IndexType{true, false, false, false}; //TODO: more descriptive name
 
+//TODO: do i need to do this explicitly?
+//template <unsigned int dim>
+//class coupling::indexing::CellIndex<dim, BaseIndexType>;
+
 
 /*
  * TODO: comment
@@ -65,48 +69,23 @@ class coupling::indexing::CellIndex {
 		//conversion: convert to convert_to_T
 		template<coupling::indexing::IndexType convert_to_T>
 		operator CellIndex<dim, convert_to_T>();
-
-		/*
-		 * This must be initialised for each index type individually.
-		 * Together with the type of value_t, these two boundaries define a CellType.
-		 */
-		/*
-		static void setBoundaries(
-				BaseIndex lowerBound,
-				BaseIndex upperBound
-		) {
-			std::cout << "1" << std::endl;
-			CellIndex::_lowerBoundary = lowerBound;
-			std::cout << "2" << std::endl;
-			Cell::Index::_upperBoundary = upperBound;
-			std::cout << "3" << std::endl;
-		}
-
-		static BaseIndex getLowerBoundary() { return _lowerBoundary; } 
-		static BaseIndex getUpperBoundary() { return _upperBoundary; } 
-		*/
-
-		static BaseIndex lowerBoundary;
-		static BaseIndex upperBoundary;
-
+	
+	
 		// Access to primive value_T of this index
 		value_T get() const { return _index; }
 
+		static CellIndex<dim, BaseIndexType> lowerBoundary;
+		static CellIndex<dim, BaseIndexType> upperBoundary;
 
 	private:
 		value_T _index;
-			
+
 };
 
+
 //Include implementation of header
-#include "Indexing.cpph"
+#include "CellIndex.cpph"
 
-//Include non-member conversion functions
-#include "Conversion.h"
+//Include non-member functions
+#include "Operations.h"
 
-//Overloading operator<< for CellIndex
-template<unsigned int dim, coupling::indexing::IndexType idx_T>
-std::ostream& operator<<(std::ostream& os, const CellIndex<dim, idx_T>& i) {
-	os << i.get();
-	return os;
-}

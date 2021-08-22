@@ -1,8 +1,6 @@
 #pragma once
 
 #include "tarch/la/Vector.h"
-#include "Indexing.h"
-
 
 /*
  * TODO: comment
@@ -68,3 +66,8 @@ convertToVector(CellIndex<dim, idx_T> index) {
 	return CellIndex<dim, {true, idx_T.local, idx_T.md2macro, idx_T.noGhost}>(tarch::la::Vector<dim, unsigned int>(42));
 }
 
+//Overloading operator<< for CellIndex
+template<unsigned int dim, coupling::indexing::IndexType idx_T>
+std::ostream& operator<<(std::ostream& os, const CellIndex<dim, idx_T>& i) {
+	os << i.get();
+	return os;
