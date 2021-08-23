@@ -10,7 +10,7 @@
 #include <limits>
 #include <stdexcept>
 
-#include "coupling/indexing/Indexing.h"
+#include "coupling/indexing/CellIndex.h"
 
 #include "tarch/utils/MultiMDService.h"
 #include "coupling/CouplingMDDefinitions.h"
