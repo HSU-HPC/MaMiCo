@@ -141,7 +141,6 @@ tarch::la::Vector<dim,unsigned int> coupling::IndexConversionMD2Macro<dim>::getL
 template<unsigned int dim>
 void coupling::IndexConversionMD2Macro<dim>::initGlobalMD2MacroDomainBoundaries() {
 	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel mode
-		//Broadcast global Boundary. This assumes that the lowest rank of the communicator has the lower bound.
 
 		//use linear indexing for easier MPI communication
 		unsigned int linearLowerBoundaryAllRanks;
@@ -153,7 +152,8 @@ void coupling::IndexConversionMD2Macro<dim>::initGlobalMD2MacroDomainBoundaries(
 
 		//find last rank with _upperBoundary != nullptr (in linear form as well)
 		bool hasCells;
-		int lastRankContainingCells = 0; //This assumes rank 0 to be nonempty. TODO cleaner solution
+		int highestRankContainingCells = -1;
+		int lowestRankContainingCells = -1;
 		for(int r = 0; r < nranks; r++) {
 			hasCells = false;
 
@@ -168,36 +168,47 @@ void coupling::IndexConversionMD2Macro<dim>::initGlobalMD2MacroDomainBoundaries(
 			//broadcast result from
 			MPI_Bcast(&hasCells, 1, MPI_CXX_BOOL, r, _comm);
 
+			//set this as firstRankContaintingCells if hasCells is true for the first time
+			if(hasCells && (lowestRankContainingCells == -1)) lowestRankContainingCells = r;
+
 			//memorize this rank if it did have cells
-			if(hasCells) lastRankContainingCells = r;
+			if(hasCells) highestRankContainingCells = r;
 		} 
 
+		//check for emtpy domain
+		if(highestRankContainingCells == -1) //implies lowestRankContainingCells == -1 as well
+			throw std::runtime_error("ERROR: ICM2M: Empty M2M domain!");
+
 		#ifdef DEBUG_ICM2M_VERBOSE
-			std::cout << "ICM2M: Rank: " << _myRank << " Highest known rank containing cells is: " << lastRankContainingCells << std::endl;
+			std::cout << "ICM2M: Rank: " << _myRank << " Lowest known rank containing cells is: " << lowestRankContainingCells << std::endl;
+			std::cout << "ICM2M: Rank: " << _myRank << " Highest known rank containing cells is: " << highestRankContainingCells << std::endl;
 		#endif
 
-
-		if(_myRank ==  _lowestRank) {
-			//sanity check
-			if(_lowerBoundaryThisRank == nullptr) throw std::runtime_error("ERROR: ICM2M: Lowest rank in communicator has no M2M domain cells. This implies an empty M2M domain!");
-			else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_lowerBoundaryThisRank); 
+		//Allocate global boundaries
+		if(_myRank ==  lowestRankContainingCells) {
+			_lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_lowerBoundaryThisRank); 
 		} else _lowerBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
 	
-		if(_myRank ==  lastRankContainingCells) { //last process 
+		if(_myRank ==  highestRankContainingCells) { //last process 
 			_upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(*_upperBoundaryThisRank);
 		} else _upperBoundaryAllRanks = new tarch::la::Vector<dim, unsigned int>(0);
 
 		linearLowerBoundaryAllRanks = _ic->getGlobalCellIndex(*_lowerBoundaryAllRanks);
 		linearUpperBoundaryAllRanks = _ic->getGlobalCellIndex(*_upperBoundaryAllRanks);
 
-		MPI_Bcast(&linearLowerBoundaryAllRanks, 1, MPI_UNSIGNED, _lowestRank, _comm);
-		MPI_Bcast(&linearUpperBoundaryAllRanks, 1, MPI_UNSIGNED, lastRankContainingCells, _comm); //last process
+		MPI_Bcast(&linearLowerBoundaryAllRanks, 1, MPI_UNSIGNED, lowestRankContainingCells, _comm);
+		MPI_Bcast(&linearUpperBoundaryAllRanks, 1, MPI_UNSIGNED, highestRankContainingCells, _comm); //last process
 	
 		//convert back to vector
 		(*_lowerBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearLowerBoundaryAllRanks);
 		(*_upperBoundaryAllRanks) = _ic->getGlobalVectorCellIndex(linearUpperBoundaryAllRanks);
 
 	#else //sequential mode
+
+		//check for emtpy domain
+		if(_lowerBoundaryThisRank == nullptr || _upperBoundaryThisRank == nullptr)
+			throw std::runtime_error("ERROR: ICM2M: Empty M2M domain!");
+		
 		_lowerBoundaryAllRanks = _lowerBoundaryThisRank;
 		_upperBoundaryAllRanks = _upperBoundaryThisRank;
 	#endif
