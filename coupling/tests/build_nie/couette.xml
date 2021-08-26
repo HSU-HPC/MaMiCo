@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<!-- Configuration for CouetteTest.h -->
+<couette-test>
+  <domain
+    channelheight="50"
+    wall-init-velocity="0.0 ; 0.0 ; 0.0"
+    wall-init-cycles="50"
+    wall-velocity="0.5 ; 0.0 ; 0.0"
+  />
+
+  <coupling
+    coupling-cycles="400"
+    send-from-md-to-macro="no"
+    filter-init-cycles="25"
+    write-csv-every-timestep="1"
+    send-from-macro-to-md="yes"
+    compute-snr="no"
+  />
+
+  <macroscopic-solver 
+    type="lb"
+    viscosity="2.14"
+    number-of-processes="1 ; 1 ; 1"
+    plot-every-timestep="50"
+    init-advance-cycles="0"
+  />
+
+  <microscopic-solver
+    type="md"
+    temperature="1.1"
+    equilibration-steps="0"
+    number-md-simulations="8"
+  />
+</couette-test>

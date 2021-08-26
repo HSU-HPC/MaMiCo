@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<molecular-dynamics>
+
+  <molecule-configuration
+    mass="1.0"
+    temperature="1.8"
+    sigma="1.0"
+    epsilon="1.0"
+    mean-velocity="1.0 ; 0.0 ; 0.0"
+  ></molecule-configuration>
+
+  <mpi-configuration number-of-processes="3 ; 1 ; 2" ></mpi-configuration>
+
+  <simulation-configuration
+    dt="0.002"
+    number-of-timesteps="11"
+    reorganise-memory-every-timestep="20"
+    compute-macroscopic-quantities-every-timestep="0"
+    fix-seed="yes"
+   ></simulation-configuration>
+
+  <vtk-configuration filename="Molecules" write-every-timestep="10"></vtk-configuration>
+
+  <checkpoint-configuration filename="Checkpoint3D" write-every-timestep="3"></checkpoint-configuration>
+
+  <domain-configuration
+    molecules-per-direction="12 ; 13 ; 13"
+    domain-size="15.0 ; 15.0 ; 15.0"
+    domain-offset="0.0 ; 0.0 ; 0.0"
+    cutoff-radius="2.5"
+    linked-cell-size="2.5 ; 2.5 ; 2.5"
+    k_B="1.0"
+    block-size="100"
+
+    bottom-south-west="periodic" bottom-south="periodic" bottom-south-east="periodic"
+    bottom-west="periodic"       bottom="periodic"       bottom-east="periodic"
+    bottom-north-west="periodic" bottom-north="periodic" bottom-north-east="periodic"
+
+    south-west="periodic"        south="periodic"        south-east="periodic"
+    west="periodic"                                      east="periodic"
+    north-west="periodic"        north="periodic"        north-east="periodic"
+
+    top-south-west="periodic"    top-south="periodic"    top-south-east="periodic"
+    top-west="periodic"          top="periodic"          top-east="periodic"
+    top-north-west="periodic"    top-north="periodic"    top-north-east="periodic"
+  > </domain-configuration>
+</molecular-dynamics>

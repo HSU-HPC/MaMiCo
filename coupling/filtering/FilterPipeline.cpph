@@ -1,0 +1,401 @@
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamico
+
+//constructors of coupling::FilterPipeline
+template<unsigned int dim>
+coupling::FilterPipeline<dim>::FilterPipeline(
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
+	const coupling::IndexConversion<dim>* indexConversion,
+	coupling::interface::MacroscopicSolverInterface<dim>* msi,
+	const tarch::utils::MultiMDService<dim>& multiMDService,
+	coupling::Scope scope, 
+	const char* cfgpath):
+
+	_multiMDService(multiMDService),
+	_scope(scope)
+{
+	_ic = new coupling::IndexConversionMD2Macro<dim>(indexConversion, msi);
+	
+    //check if provided file is written in proper XML
+    if(_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR){
+		std::cout << "Filter Pipeline config path: " << cfgpath << std::endl;
+        throw std::runtime_error("Could not read config for Filter-Pipeline: XML syntax error.");
+    }
+            
+    //check for structural errors in config file
+    if (!configIsValid(_config)) exit(EXIT_FAILURE);
+	
+	//load domain vectors
+	_ic->initMD2MacroDomain(inputCells, _md2MacroCells, _md2MacroCellIndices, _outerCells, _outerCellIndices);
+
+    //load sequences
+	switch(scope) {
+		case coupling::Scope::perInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance")); break;
+		case coupling::Scope::postMultiInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")); break;
+	}
+}
+
+template<unsigned int dim>
+coupling::FilterPipeline<dim>::FilterPipeline(
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > md2MacroInputCells,
+	std::vector<unsigned int> md2MacroInputCellIndices, //global!
+	const coupling::IndexConversion<dim>* indexConversion,
+	coupling::interface::MacroscopicSolverInterface<dim>* msi,
+	const tarch::utils::MultiMDService<dim>& multiMDService,
+	coupling::Scope scope, 
+	const char* cfgpath):
+
+	_md2MacroCells(md2MacroInputCells),
+	_multiMDService(multiMDService),
+	_scope(scope)
+{	
+	_ic = new coupling::IndexConversionMD2Macro<dim>(indexConversion, msi);
+	
+    //check if provided file is written in proper XML
+    if(_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR){
+		std::cout << "Filter Pipeline config path: " << cfgpath << std::endl;
+        throw std::runtime_error("Could not read config for Filter-Pipeline: XML syntax error.");
+    }
+            
+    //check for structural errors in config file
+    if (!configIsValid(_config)) exit(EXIT_FAILURE);
+
+	//convert linear indexes to vector format
+	for(unsigned int linearIndex : md2MacroInputCellIndices) {
+		_md2MacroCellIndices.push_back(_ic->getBaseIC()->getGlobalVectorCellIndex(linearIndex));
+		//std::cout << "rank: " << _ic->getBaseIC()->getThisRank() << ": " << _md2MacroCellIndices.back() << std::endl;
+	}
+	
+	//load domain vectors
+	_ic->initMD2MacroDomain(_md2MacroCells, _md2MacroCellIndices, _outerCells, _outerCellIndices);
+
+    //load sequences
+	switch(scope) {
+		case coupling::Scope::perInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance")); break;
+		case coupling::Scope::postMultiInstance : loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")); break;
+	}
+
+}
+
+
+
+//member functions of coupling::FilterPipeline
+template<unsigned int dim>
+void coupling::FilterPipeline<dim>::operator()(){
+    for(coupling::FilterSequence<dim>* sequence : _sequences){
+		//finalize FS's filter vector
+		if(sequence->isModifiable()){
+			#ifdef DEBUF_FILTER_PIPELINE
+			sequence->printFilters();
+			#endif
+			sequence->makeUnmodifiable();
+		}
+		
+		//update cell vector contents	
+		sequence->updateCellVectors();
+
+		//apply all filters of sequence
+		(*sequence)();
+
+        #ifdef DEBUG_FILTER_PIPELINE
+		std::cout << "FP: Done applying sequence " << sequence->getName() << std::endl;
+		#endif
+
+		//If !isOutputToMacro() for all sequences, "md" must be our output. This is equivalent to a read-only filter pipeline.
+		if(sequence->isOutputToMacro()){
+			auto sequenceOutputCells = sequence->getOutputCellVector(); 
+			for(unsigned int index = 0; index < _md2MacroCells.size(); index++) *(_md2MacroCells[index]) = *(sequenceOutputCells[index]);
+		}
+    }
+}
+
+template<unsigned int dim>
+coupling::FilterSequence<dim> * coupling::FilterPipeline<dim>::getSequence(const char* sequenceIdentifier) const {
+	for(auto sequence : _sequences) {
+		if(std::strcmp(sequence->getName(), sequenceIdentifier) == 0) {
+			return sequence;
+		}
+	}
+	throw std::runtime_error(std::string("ERROR: Could not find Filter Sequence named ").append(sequenceIdentifier));
+}
+
+
+
+
+//Private functions of coupling::FilterPipeline:
+template<unsigned int dim>
+bool coupling::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile){
+    //Check main node 
+    tinyxml2::XMLElement* node = cfgfile.FirstChildElement("filter-pipeline");
+    if (!node){
+        std::cout << "ERROR: Could not read config for Filter-Pipeline: missing element <filter-pipeline>" << std::endl;
+        return false;
+    }
+
+    //verfiy per-instance subtag
+    tinyxml2::XMLElement* perInstanceTag = node->FirstChildElement("per-instance");
+    if(!perInstanceTag){
+        std::cout << "ERROR: Could not read config for Filter-Pipeline: missing element <per-instance>" << std::endl;
+        return false;
+    }
+	if(!perInstanceTag->Attribute("output")){
+		std::cout << "ERROR: Could not read config for Filter-Pipeline: no output specified for <per-instance>" << std::endl;
+	}
+
+    //verify multi-instance subtag
+	tinyxml2::XMLElement* multiInstanceTag = node->FirstChildElement("post-multi-instance");
+    if(!multiInstanceTag){
+		std::cout << "ERROR: Could not read config for Filter-Pipeline: missing element <post-multi-instance>" << std::endl;
+        return false;
+    }
+	if(!multiInstanceTag->Attribute("output")){
+		std::cout << "ERROR: Could not read config for Filter-Pipeline: no output specified for <post-multi-instance>" << std::endl;
+		return false;
+	}
+
+    //No checks are done to determine if any more subtags of main node exist as they do not interfer with implementation of this class.
+    //Syntax checking for sequence-subnodes can be found in their respective initializer methods.
+
+    #ifdef DEBUG_FILTER_PIPELINE
+    std::cout << "FP: Config is valid!" << std:: endl;
+    #endif
+
+    return true;
+}
+
+template<unsigned int dim>
+void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* node){
+
+	if(_md2MacroCells.empty()) {
+		if(_scope == coupling::Scope::perInstance) 
+			std::cout << "Warning: Empty md2Macro-Domain in per-instance Filter Pipeline on rank " << _ic->getBaseIC()->getThisRank() << ". Disabling filtering there." << std::endl;
+		else
+			std::cout << "Warning: Empty md2Macro-Domain in post-multi-instance Filter Pipeline on rank " <<  _ic->getBaseIC()->getThisRank() << ". Disabling filtering there." << std::endl;
+			
+		return;
+	}
+	
+    tinyxml2::XMLElement* currSequenceNode = node->FirstChildElement();
+
+	//true once specified output sequence has been found
+	bool outputDefined = false; 
+
+	//Special case: MD values (i.e. FP input) is also used as output.
+	if(std::strcmp(node->Attribute("output"), "md") == 0) outputDefined = true;
+    
+    //Check if all outputs are specified before being used by sequences
+    while(currSequenceNode){
+		//NAME
+
+		//Check for illegal sequence names
+		//"md" is reserved
+		if(std::strcmp(currSequenceNode->Value(), "md") == 0)
+			throw std::runtime_error("ERROR: Filter-Pipeline: Sequence name may not be 'md'.");
+
+		//"outer" is reserved as well
+		if(std::strcmp(currSequenceNode->Value(), "outer") == 0)
+			throw std::runtime_error("ERROR: Filter-Pipeline: Sequence name may not be 'outer'.");
+
+		//Duplicate names are not allowed
+		bool duplicate = true;
+		try {
+			getSequence(currSequenceNode->Value());
+		}
+		catch(...) { //TODO: use more precise exception in getFilterSequence, so that we can differentiate between "wanted" not-found error and other exceptions
+			duplicate = false;
+		}
+		if(duplicate)
+			throw std::runtime_error(std::string("ERROR: Filter-Pipeline: Two or more sequences of identical name ").append(currSequenceNode->Value()));
+		
+		//INPUT
+		std::stringstream  inputStringStream;
+        if(currSequenceNode->Attribute("input")) 
+			inputStringStream = std::stringstream(currSequenceNode->Attribute("input"));
+		else
+			inputStringStream = std::stringstream("");
+
+		//Split into input names, seperated by " ".
+		std::vector<std::string> inputNames;
+		std::string namebuf;
+		while (inputStringStream >> namebuf) {
+			inputNames.push_back(namebuf);
+		}
+
+		//Default input if none is specified
+        if(inputNames.empty()) { 
+			inputNames.push_back("md");
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << "FP: Choosing default (md) input for sequence " << currSequenceNode->Value() << std::endl;
+			#endif
+		}
+
+		//For regular sequences, this holds just one element.
+		std::vector<FilterSequence<dim> *> inputSeqs;
+
+		//Holds all input cells for this sequence
+		std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector;
+
+		//Iterate over all inputs specified in input string.
+		//Note: If there are non-matching names in input String, they are ignored.
+
+		bool asymmetrical = false; //true if we need to build an asymmetrical junction
+		unsigned int inputCount = 0;
+
+		for(auto inputName : inputNames) {
+        	//Special case: "md" is the default input and is not associated to any sequence
+        	if(inputName == "md") { 
+				for(auto cell : _md2MacroCells) inputCellVector.push_back(cell);
+				inputCount++;	
+			}
+
+			//Special case: "outer" refers to all cells lying outside the md2macro domain. only used by asymmetrical junctions
+			else if(inputName == "outer") {
+				asymmetrical = true;
+				inputCount++;
+			}
+
+        	//Default case: search for sequence
+			else try {
+				inputSeqs.push_back(getSequence(inputName.c_str())); //this may throw: if inputName is not recognized.
+				inputCount++; //if above didnt throw, we can safely increase the input count by one
+			}
+			catch(...) {
+				std::cout << "Warning: Input identifier " << inputName << " for sequence " << currSequenceNode->Value() << " not recognized." << std::endl;
+			}
+		}
+
+		#ifdef DEBUG_FILTER_PIPELINE
+			std::cout << "FP: Creating new sequence or junction: Number of inputs found: " << inputCount << std::endl;
+		#endif
+        
+        if(inputCount == 0)
+            throw std::runtime_error(std::string("ERROR: Filter-Pipeline: Invalid input ").append(inputStringStream.str()).append(" specified for sequence named ").append(currSequenceNode->Value()));
+
+   		//DOMAIN LIMITING
+    	tarch::la::Vector<dim, double> domainStart;
+   	 	tarch::la::Vector<dim, double> domainEnd;
+		//default domain boundaries
+    	tarch::la::Vector<dim, unsigned int> domainStartCell = _md2MacroCellIndices.front();
+    	tarch::la::Vector<dim, unsigned int> domainEndCell = _md2MacroCellIndices.back();
+
+		//if custom start/end is specified use that instead
+        if(currSequenceNode->Attribute("domain-start")){ 
+			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currSequenceNode, "domain-start");
+	        for(unsigned int d = 0; d < dim; d++){
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
+  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
+        	}
+		}
+        if(currSequenceNode->Attribute("domain-end")){
+			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currSequenceNode, "domain-end");
+	        for(unsigned int d = 0; d < dim; d++){
+    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
+        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
+        	}
+		}
+
+		//"filtered-values" is not mandatory, default is false
+		std::array<bool, 7> filteredValues = {false};
+		const char* fvStr = currSequenceNode->Attribute("filtered-values");
+		if(fvStr){
+			if(strstr(fvStr, "all")) for(unsigned int i = 0; i < 7; i++) filteredValues[i] = true;
+			else{
+				if(strstr(fvStr, "micro-mass")) 		filteredValues[0] = true;
+				if(strstr(fvStr, "micro-momentum")) 	filteredValues[1] = true;
+				if(strstr(fvStr, "macro-mass")) 		filteredValues[2] = true;
+				if(strstr(fvStr, "macro-momentum")) 	filteredValues[3] = true;
+				if(strstr(fvStr, "potential-energy")) 	filteredValues[4] = true;
+				if(strstr(fvStr, "velocity")) 			filteredValues[5] = true;
+				if(strstr(fvStr, "temperature")) 		filteredValues[6] = true;
+			}
+		}
+
+		/*
+		*	Concat output vectors of the new sequence's input(s) (singular for non-Junction sequences)
+		*	NOTE: If MD is (possibly among others) chosen as input, it will always occupy the first cells of inputCellVector,
+		*		  i.e. be in cell partition one in the context of FilterJunctions.
+		*/
+		//TODO: If a junction has multiple partitions, this only gets the first output partition.
+		for(auto seq : inputSeqs) for (auto cell : seq->getOutputCellVector()) inputCellVector.push_back(cell);
+		//Can this be done more efficiently? I dont think so. std::move is not an option, std::insert does the same...	
+
+		#ifdef DEBUG_FILTER_PIPELINE
+			std::cout << "FP: Creating new sequence or junction: Size of inputCellVector: " << inputCellVector.size() << std::endl;
+		#endif
+		
+		//CREATE SEQUENCE/JUNCTION
+		if(inputCount == 1) {
+			_sequences.push_back(new coupling::FilterSequence<dim>(	_ic,
+																	_multiMDService, 
+																	currSequenceNode->Value(), 
+																	inputCellVector, 
+																	_md2MacroCellIndices, 
+																	domainStartCell, 
+																	domainEndCell, 
+																	filteredValues));
+
+			//register newborn sequence as child at its input sequence,
+			//unless this parent sequence is md (in which case inputSeqs is empty)
+			if(!inputSeqs.empty()) inputSeqs[0]->addChildSequence(_sequences.back());
+
+			#ifdef DEBUG_FILTER_PIPELINE
+				if(inputSeqs.size() == 1) std::cout << "FP: " << _sequences.back()->getName() << " will use " << inputSeqs[0]->getName() << " as input." << std::endl;
+				else std::cout << "FP: " << _sequences.back()->getName() << " will use MD data as input." << std::endl;
+			#endif
+		} 
+		else if(asymmetrical) {
+			if(inputCount != 2) throw std::runtime_error("ERROR: Currently, asymmetrical junctions are only allowed for exactly two inputs!");
+			//TODO: currently, the only support asymmetrical junction is one that uses outer cells as secondary input
+			_sequences.push_back(new coupling::AsymmetricalFilterJunction<dim>(	_ic, 
+																				_multiMDService, 
+																				currSequenceNode->Value(), 
+																				inputCellVector, 
+																				_md2MacroCellIndices, 
+																				_outerCells, 
+																				_outerCellIndices, 
+																				domainStartCell, 
+																				domainEndCell, 
+																				filteredValues));
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << "FP: " << _sequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
+			#endif
+
+			//TODO handling of parent sequences once this becomes relevant for junctions
+		}
+		else { //Junction = Sequence with 2 or more inputs
+			//TODO: move template inputc: currently has 2 hardcoded
+			_sequences.push_back(new coupling::FilterJunction<dim, 2>(	_ic, 
+																		_multiMDService, 
+																		currSequenceNode->Value(), 
+																		inputCellVector, 
+																		_md2MacroCellIndices, 
+																		domainStartCell, 
+																		domainEndCell, 
+																		filteredValues));
+			#ifdef DEBUG_FILTER_PIPELINE
+				std::cout << "FP: " << _sequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
+			#endif
+			
+			//TODO handling of parent sequences once this becomes relevant for junctions
+		}
+
+        //Add sequence to temp vector
+		//Check if it's the output sequence.
+		if(std::strcmp(_sequences.back()->getName(),  node->Attribute("output")) == 0){
+			outputDefined = true;
+			_sequences.back()->setAsOutputToMacro();
+		}
+
+		//Load filters of the newly created sequence
+		if(_sequences.back()->loadFiltersFromXML(currSequenceNode)) return /*EXCEPTION*/;
+
+        //Proceed to iterate over next element
+        currSequenceNode = currSequenceNode->NextSiblingElement();
+    }
+
+	if(!outputDefined) {
+		std::cout << "ERROR: Output sequence not specified or unknown." << std::endl;
+        exit(EXIT_FAILURE);
+	}
+}
