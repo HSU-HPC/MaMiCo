@@ -4,6 +4,8 @@
 #ifndef _COUPLING_TESTS_COUETTETEST_H_
 #define _COUPLING_TESTS_COUETTETEST_H_
 
+#include "coupling/indexing/IndexingService.h"
+
 #include "tarch/utils/MultiMDService.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "coupling/tests/Test.h"
@@ -66,7 +68,22 @@ private:
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void init(){
-    initMPI();
+	using idx_scalar = coupling::indexing::CellIndex<3>;
+	using idx_vector = coupling::indexing::CellIndex<3, {.vector=true}>;
+	//using idx_m2m_scalar = coupling::indexing::CellIndex<3, {.md2macro=true}>;
+	//using idx_m2m_vector = coupling::indexing::CellIndex<3, {.vector=true, .md2macro=true}>;
+
+	//TODO: error. incomplete type
+	//idx_global::lowerBoundary = 10;
+
+	idx_vector idx1 = coupling::indexing::CellIndex<3, {.vector=true}>(10u);
+
+	std::cout << idx1 << std::endl;
+	std::cout << (idx_vector )(idx_scalar) idx1 << std::endl;
+	//std::cout << (idx_m2m_vector) (idx_m2m_scalar) idx1 << std::endl;
+
+	exit(0);
+
     parseConfigurations();
     initSolvers();
   }

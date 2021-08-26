@@ -21,28 +21,28 @@ namespace coupling {
 		template<>
 		CellIndex<3, BaseIndexType> CellIndex<3, BaseIndexType>::lowerBoundary {0};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, BaseIndexType>::upperBoundary {0};
+		CellIndex<3, BaseIndexType> CellIndex<3, BaseIndexType>::upperBoundary {13};
 
 		//scalar, global, not md2macro, noGL
 		template class CellIndex<3>;
 		template<>
 		CellIndex<3, BaseIndexType> CellIndex<3>::lowerBoundary {0};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3>::upperBoundary {0};
+		CellIndex<3, BaseIndexType> CellIndex<3>::upperBoundary {13};
 
 		//vector, local, not md2macro, noGL
 		template class CellIndex<3, {.vector=true, .local=true}>;
 		template<>
 		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true}>::lowerBoundary {0};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true}>::upperBoundary {0};
+		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true}>::upperBoundary {13};
 
 		//scalar, local, not md2macro, noGL
 		template class CellIndex<3, {.local=true}>;
 		template<>
 		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true}>::lowerBoundary {0};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true}>::upperBoundary {0};
+		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true}>::upperBoundary {13};
 
 		/*
 		 * MD TO MACRO
