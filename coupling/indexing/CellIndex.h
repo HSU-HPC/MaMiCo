@@ -56,8 +56,13 @@ class coupling::indexing::CellIndex {
 		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
 		friend CellIndex operator-<>(const CellIndex &i1, const CellIndex &i2);
 
+		static tarch::la::Vector<dim, unsigned int> getNumberCells() {
+			return (upperBoundary - lowerBoundary).get();
+		}
+
 		static CellIndex<dim, BaseIndexType> lowerBoundary;
 		static CellIndex<dim, BaseIndexType> upperBoundary;
+
 
 	private:
 		value_T _index;
