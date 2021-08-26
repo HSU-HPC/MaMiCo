@@ -53,15 +53,22 @@ CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() {
 
 } 
 
+//Overloading operator<< for CellIndex
+template<unsigned int dim, coupling::indexing::IndexType idx_T>
+std::ostream& operator<<(std::ostream& os, const CellIndex<dim, idx_T>& i) {
+	os << i.get();
+	return os;
+}
 
-//TODO: figure out how to init + access static members of template class of "does-not-name-a-type"-types (?)
-//template <> 
-//coupling::indexing::CellIndex<3>::lowerBoundary = tarch::la::Vector<3, unsigned int>(2);
-//template <> 
-//CellIndex<3, BaseIndexType> coupling::indexing::CellIndex<3>::upperBoundary = tarch::la::Vector<3, unsigned int>(0);
+//Overloading arithmetic operators for CellIndex using friend functions
+template<unsigned int dim, IndexType idx_T>
+CellIndex<dim, idx_T> operator+(
+		const CellIndex<dim, idx_T>& i1,
+		const CellIndex<dim, idx_T>& i2
+) { return CellIndex<dim, idx_T>(i1._index + i2._index); }
 
-//TODO: this is still an incomplete type
-//template<> class coupling::indexing::CellIndex<3, BaseIndexType>;
-
-//TODO: while this overrides the correct definition from header
-//template<> class coupling::indexing::CellIndex<3, BaseIndexType>{/*...*/};
+template<unsigned int dim, coupling::indexing::IndexType idx_T>
+coupling::indexing::CellIndex<dim, idx_T> operator-(
+		const CellIndex<dim, idx_T>& i1,
+		const CellIndex<dim, idx_T>& i2
+) { return CellIndex<dim, idx_T>(i1._index - i2._index); }
