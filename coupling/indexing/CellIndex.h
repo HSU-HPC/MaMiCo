@@ -47,25 +47,29 @@ class coupling::indexing::CellIndex {
 		
 		//conversion: convert to convert_to_T
 		template<coupling::indexing::IndexType convert_to_T>
-		operator CellIndex<dim, convert_to_T>();
+		operator CellIndex<dim, convert_to_T>() const;
 	
 		//access to primive value_T of this index
-		value_T get() const { return _index; }
+		value_T get() const { return (value_T) _index; }
+		//explicit operator value_T() const { return _index; } TODO: enable this?
 
 		//friend functions: overload arithmetic operators
 		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
 		friend CellIndex operator-<>(const CellIndex &i1, const CellIndex &i2);
 
 		static tarch::la::Vector<dim, unsigned int> getNumberCells() {
-			return (upperBoundary - lowerBoundary).get();
+			return (upperBoundary - lowerBoundary).get() + tarch::la::Vector<dim, unsigned int> {1};
 		}
 
+		/*
+		 * Note: both are inclusive
+		 */
 		static CellIndex<dim, BaseIndexType> lowerBoundary;
 		static CellIndex<dim, BaseIndexType> upperBoundary;
 
 
 	private:
-		value_T _index;
+		const value_T _index;
 
 };
 
