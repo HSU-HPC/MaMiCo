@@ -12,7 +12,7 @@ using namespace coupling::indexing;
 
 template<unsigned int dim, IndexType idx_T>
 template<IndexType convert_to_T>
-CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() { 
+CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() const { 
 
 	//conversion: identical IndexType -> "copy constructor"
 	if constexpr (idx_T == convert_to_T) {

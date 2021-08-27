@@ -76,10 +76,13 @@ private:
 	//TODO: error. incomplete type
 	//idx_global::lowerBoundary = 10;
 
-	idx_vector idx1 = coupling::indexing::CellIndex<3, {.vector=true}>(10u);
+	idx_vector idx1 = coupling::indexing::CellIndex<3, {.vector=true}>( {0,1,0} );
+	idx_scalar idx2 {14};
 
-	std::cout << idx1 << std::endl;
-	std::cout << (idx_vector )(idx_scalar) idx1 << std::endl;
+	std::cout << "idx1: " << idx1 << std::endl;
+	std::cout << "idx1 to scalar: " << (idx_scalar) idx1 << std::endl;
+	std::cout << "idx2: " << idx2 << std::endl;
+	std::cout << "idx2 to vector: " << (idx_vector) idx2 << std::endl;
 	//std::cout << (idx_m2m_vector) (idx_m2m_scalar) idx1 << std::endl;
 
 	exit(0);
