@@ -70,6 +70,8 @@ private:
   void init(){
 	using idx_scalar = coupling::indexing::CellIndex<3>;
 	using idx_vector = coupling::indexing::CellIndex<3, {.vector=true}>;
+	idx_scalar::setDomainParameters(); 
+	idx_vector::setDomainParameters(); 
 	//using idx_m2m_scalar = coupling::indexing::CellIndex<3, {.md2macro=true}>;
 	//using idx_m2m_vector = coupling::indexing::CellIndex<3, {.vector=true, .md2macro=true}>;
 
