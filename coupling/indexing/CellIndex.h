@@ -44,6 +44,7 @@ class coupling::indexing::CellIndex {
 		//primitive constructors
 		CellIndex() = default;
 		CellIndex(const value_T i) : _index(i){}
+		CellIndex(const CellIndex& ci) : _index(ci.get()){}
 		
 		//conversion: convert to convert_to_T
 		template<coupling::indexing::IndexType convert_to_T>
@@ -57,16 +58,25 @@ class coupling::indexing::CellIndex {
 		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
 		friend CellIndex operator-<>(const CellIndex &i1, const CellIndex &i2);
 
-		static tarch::la::Vector<dim, unsigned int> getNumberCells() {
-			return (upperBoundary - lowerBoundary).get() + tarch::la::Vector<dim, unsigned int> {1};
+		//TODO: move init of boundaries here. decide where this should be called. constexpr -> Decls?
+		static void setDomainParameters() {
+			numberCellsInDomain = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
+
+			tarch::la::Vector<dim, unsigned int> divFactor { 1 };
+			for (unsigned int d = 1; d < dim; d++) divFactor[d] = divFactor[d-1]*(numberCellsInDomain[d-1]);
+			divisionFactor = divFactor;
 		}
 
 		/*
 		 * Note: both are inclusive
 		 */
-		static CellIndex<dim, BaseIndexType> lowerBoundary;
-		static CellIndex<dim, BaseIndexType> upperBoundary;
+		static BaseIndex lowerBoundary;
+		static BaseIndex upperBoundary;
 
+		//Number of cells in this indexing's domain. Because the above declared boundaries are inclusive, this is never 0 in any direction.
+		static tarch::la::Vector<dim, unsigned int> numberCellsInDomain;
+		//Used in scalar -> vector indexing functions
+		static tarch::la::Vector<dim, unsigned int> divisionFactor;
 
 	private:
 		const value_T _index;
