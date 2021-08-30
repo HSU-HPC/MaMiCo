@@ -27,19 +27,18 @@ CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() const {
 
 	//conversion: BaseIndex -> non-BaseIndex
 	if constexpr (idx_T == BaseIndexType) {
-		//step 1: subtract offset
-		tarch::la::Vector<dim, unsigned int> i_vec { _index - CellIndex<dim, convert_to_T>::lowerBoundary.get() };
-		//step 2: convert to scalar if neccessary + construct CellIndex<dim, convert_to_T>
+		//convert to scalar if neccessary + construct CellIndex<dim, convert_to_T>
 		if constexpr(convert_to_T.vector) {
-			return CellIndex<dim, convert_to_T> { i_vec };
+			return CellIndex<dim, convert_to_T> { (*this - CellIndex<dim, convert_to_T>::lowerBoundary).get() };
 		}
 		else /* convert_to_T.vector == false */ {
 			//get scalar version of i_vec by first constructing a BaseIndex and then converting it
-			const unsigned int i_sca = convertToScalar<dim, BaseIndexType>(BaseIndex { i_vec }).get();	
+			const unsigned int i_sca = convertToScalar<dim, BaseIndexType>(*this - CellIndex<dim, convert_to_T>::lowerBoundary).get();	
 
 			return CellIndex<dim, convert_to_T> { i_sca };
 		}
 	}
+	std::cout << "case 4 " << std::endl;
 
 	//conversion: non-BaseIndex -> different non-BaseIndex
 	//call this -> BaseIndexType conversion
