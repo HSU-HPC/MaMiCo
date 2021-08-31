@@ -20,7 +20,20 @@
 
 namespace coupling {
 	namespace indexing {
-	
+
+		struct IndexType{
+			const bool vector = false;
+			const bool local = false;
+			const bool md2macro = false;
+			const bool noGhost = false;
+
+			bool constexpr operator==(const IndexType& comp) const {
+				return (vector == comp.vector and local == comp.local and md2macro == comp.md2macro and noGhost == comp.noGhost);
+			}
+		};
+
+		auto constexpr BaseIndexType = coupling::indexing::IndexType{true, false, false, false}; //TODO: more descriptive name
+
 		// Note: this is -std=c++20
 		template<unsigned int dim, IndexType idx_T = {}>
 		class CellIndex;
