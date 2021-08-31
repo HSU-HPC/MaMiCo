@@ -38,7 +38,6 @@ CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() const {
 			return CellIndex<dim, convert_to_T> { i_sca };
 		}
 	}
-	std::cout << "case 4 " << std::endl;
 
 	//conversion: non-BaseIndex -> different non-BaseIndex
 	//call this -> BaseIndexType conversion
