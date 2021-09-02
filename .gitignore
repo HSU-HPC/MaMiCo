@@ -21,3 +21,4 @@ coupling/tests/kvs-lbmpy/*.ini
 *.old
 *.html
 *.dot
+docs/
