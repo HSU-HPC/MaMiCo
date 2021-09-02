@@ -92,7 +92,7 @@ class coupling::indexing::CellIndex {
 		static tarch::la::Vector<dim, unsigned int> divisionFactor;
 
 	private:
-		const value_T _index;
+		value_T _index;
 
 };
 
