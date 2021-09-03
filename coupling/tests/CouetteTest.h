@@ -73,7 +73,8 @@ private:
 	idx_scalar::setDomainParameters(); 
 	idx_vector::setDomainParameters(); 
 	//using idx_m2m_scalar = coupling::indexing::CellIndex<3, {.md2macro=true}>;
-	//using idx_m2m_vector = coupling::indexing::CellIndex<3, {.vector=true, .md2macro=true}>;
+	using idx_m2m_vector = coupling::indexing::CellIndex<3, {.vector=true, .md2macro=true}>;
+	idx_m2m_vector::setDomainParameters();
 
 	//TODO: error. incomplete type
 	//idx_global::lowerBoundary = 10;
@@ -83,6 +84,7 @@ private:
 
 	std::cout << "idx1: " << idx1 << std::endl;
 	std::cout << "idx1 to scalar: " << (idx_scalar) idx1 << std::endl;
+	std::cout << "idx1 to m2m vector: " << (idx_m2m_vector) idx1 << std::endl;
 	std::cout << "idx2: " << idx2 << std::endl;
 	std::cout << "idx2 to vector: " << (idx_vector) idx2 << std::endl;
 	//std::cout << (idx_m2m_vector) (idx_m2m_scalar) idx1 << std::endl;
