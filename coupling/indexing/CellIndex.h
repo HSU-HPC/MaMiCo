@@ -46,14 +46,14 @@ namespace coupling {
  */
 template<unsigned int dim, coupling::indexing::IndexType idx_T>
 class coupling::indexing::CellIndex {
-
-	/*
-	 * TODO: comment
-	 */
-	using value_T = std::conditional_t<idx_T.vector, tarch::la::Vector<dim, unsigned int>, unsigned int>;
-	using BaseIndex = CellIndex<dim, BaseIndexType>;
-
 	public:
+
+		/*
+		 * TODO: comment
+		 */
+		using value_T = std::conditional_t<idx_T.vector, tarch::la::Vector<dim, unsigned int>, unsigned int>;
+		using BaseIndex = CellIndex<dim, BaseIndexType>;
+
 		//primitive constructors
 		CellIndex() = default;
 		CellIndex(const value_T i) : _index(i){}
@@ -92,7 +92,7 @@ class coupling::indexing::CellIndex {
 		static tarch::la::Vector<dim, unsigned int> divisionFactor;
 
 	private:
-		const value_T _index;
+		value_T _index;
 
 };
 
