@@ -69,27 +69,6 @@ private:
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void init(){
-	using idx_scalar = coupling::indexing::CellIndex<3>;
-	using idx_vector = coupling::indexing::CellIndex<3, {.vector=true}>;
-	idx_scalar::setDomainParameters(); 
-	idx_vector::setDomainParameters(); 
-	//using idx_m2m_scalar = coupling::indexing::CellIndex<3, {.md2macro=true}>;
-	using idx_m2m_vector = coupling::indexing::CellIndex<3, {.vector=true, .md2macro=true}>;
-	idx_m2m_vector::setDomainParameters();
-
-	//TODO: error. incomplete type
-	//idx_global::lowerBoundary = 10;
-
-	idx_vector idx1 = coupling::indexing::CellIndex<3, {.vector=true}>( {0,1,0} );
-	idx_scalar idx2 {14};
-
-	std::cout << "idx1: " << idx1 << std::endl;
-	std::cout << "idx1 to scalar: " << (idx_scalar) idx1 << std::endl;
-	std::cout << "idx1 to m2m vector: " << (idx_m2m_vector) idx1 << std::endl;
-	std::cout << "idx2: " << idx2 << std::endl;
-	std::cout << "idx2 to vector: " << (idx_vector) idx2 << std::endl;
-	//std::cout << (idx_m2m_vector) (idx_m2m_scalar) idx1 << std::endl;
-
     parseConfigurations();
     initSolvers();
 
