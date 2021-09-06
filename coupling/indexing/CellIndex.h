@@ -71,9 +71,33 @@ class coupling::indexing::CellIndex {
 		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
 		friend CellIndex operator-<>(const CellIndex &i1, const CellIndex &i2);
 
+		//overload increment operators
+		CellIndex& operator++() {
+			if constexpr (idx_T.vector) {
+				CellIndex<dim> scalar_base { *this };
+				*this = CellIndex { ++scalar_base };
+			}
+			else ++_index;
+
+			return *this;
+		}
+		CellIndex& operator--() {
+			if constexpr (idx_T.vector) {
+				CellIndex<dim> scalar_base { *this };
+				*this = CellIndex { --scalar_base };
+
+			}
+			else --_index;
+
+			return *this;
+		}
+
 		//overload comparison operators
 		bool operator==(const CellIndex &) const = default;
 		bool operator!=(const CellIndex &) const = default;
+		/*
+		 * TODO: comment: why exactly this meaning of these operators
+		 */
 		bool operator<(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() < convertToScalar<dim, idx_T>(i).get() ); };
 		bool operator<=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() <= convertToScalar<dim, idx_T>(i).get() ); };
 		bool operator>(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() > convertToScalar<dim, idx_T>(i).get() ); };
@@ -109,6 +133,5 @@ template<unsigned int dim, coupling::indexing::IndexType idx_T>
 std::ostream& operator<<(std::ostream& os, const coupling::indexing::CellIndex<dim, idx_T>& i);
 
 
-
-//Include implementation of header
+//Include implementation
 #include "CellIndex.cpph"
