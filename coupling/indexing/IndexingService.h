@@ -32,10 +32,10 @@ class coupling::indexing::IndexingService{
 	public:
 		IndexingService(const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig,
 						const coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig,
-						const coupling::interface::MacroscopicSolverInterface<dim> *msi);
+						coupling::interface::MacroscopicSolverInterface<dim> *msi);
 
 	private:
 		const simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
 		const coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
-		const coupling::interface::MacroscopicSolverInterface<dim> *_msi; 
+		coupling::interface::MacroscopicSolverInterface<dim> *_msi; 
 };
