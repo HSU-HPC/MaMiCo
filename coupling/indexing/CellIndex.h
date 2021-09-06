@@ -71,6 +71,14 @@ class coupling::indexing::CellIndex {
 		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
 		friend CellIndex operator-<>(const CellIndex &i1, const CellIndex &i2);
 
+		//overload comparison operators
+		bool operator==(const CellIndex &) const = default;
+		bool operator!=(const CellIndex &) const = default;
+		bool operator<(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() < convertToScalar<dim, idx_T>(i).get() ); };
+		bool operator<=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() <= convertToScalar<dim, idx_T>(i).get() ); };
+		bool operator>(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() > convertToScalar<dim, idx_T>(i).get() ); };
+		bool operator>=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() >= convertToScalar<dim, idx_T>(i).get() ); };
+
 		//TODO: move init of boundaries here. decide where this should be called. constexpr -> Decls?
 		static void setDomainParameters() {
 			numberCellsInDomain = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };

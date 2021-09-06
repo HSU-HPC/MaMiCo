@@ -274,12 +274,11 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			auto m2mGlobal_lowerBoundary { CellIndex<3, BaseIndexType>::lowerBoundary };
 			while(_msi->receiveMacroscopicQuantityFromMDSolver( m2mGlobal_lowerBoundary.get() ) == false) {
 				//increment by one (in all dims) if above is too low to be in md-to-macro domain
+				//TODO: impl operator+ for CellIndex
 				m2mGlobal_lowerBoundary = { m2mGlobal_lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 } };
 
-				std::cout << "lower: now testing: " << m2mGlobal_lowerBoundary << std::endl;
-
-				//sanity check: empty m2m domain TODO: impl operator<=> for CellIndex
-				if(m2mGlobal_lowerBoundary.get() == CellIndex<3, BaseIndexType>::upperBoundary.get())
+				//sanity check: empty m2m domain 
+				if(m2mGlobal_lowerBoundary == CellIndex<3, BaseIndexType>::upperBoundary)
 					throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
 			}
 
@@ -287,12 +286,11 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			auto m2mGlobal_upperBoundary { CellIndex<3, BaseIndexType>::upperBoundary };
 			while(_msi->receiveMacroscopicQuantityFromMDSolver( m2mGlobal_upperBoundary.get() ) == false) {
 				//decrement by one (in all dims) if above is too high to be in md-to-macro domain
+				//TODO: impl operator- for CellIndex
 				m2mGlobal_upperBoundary = { m2mGlobal_upperBoundary.get() - tarch::la::Vector<dim, unsigned int> { 1 } };
 
-				std::cout << "upper: now testing: " << m2mGlobal_upperBoundary << std::endl;
-
 				//sanity check: empty m2m domain
-				if(m2mGlobal_upperBoundary.get() == CellIndex<3, BaseIndexType>::lowerBoundary.get())
+				if(m2mGlobal_upperBoundary == CellIndex<3, BaseIndexType>::lowerBoundary)
 					throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
 
 			}
