@@ -273,7 +273,7 @@ private:
       _simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
       );
 	if (_couetteSolver != NULL) std::cout << "Couette solver not null on rank: " << _rank << std::endl; //TODO: remove debug
-
+ 
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized anyway,
     // so that we can finally obtain getIndexConversion from MultiMDCellService,
@@ -935,10 +935,12 @@ private:
     }
     #if(BUILD_WITH_OPENFOAM)
     else if(_cfg.maSolverType == COUETTE_FOAM){
-      solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD);
-      if (solver==NULL){
-        std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
-        exit(EXIT_FAILURE);
+      if(_rank==0){
+        solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD);
+        if (solver==NULL){
+          std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
+          exit(EXIT_FAILURE);
+        }
       }
     }
     #endif
