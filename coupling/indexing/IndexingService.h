@@ -41,6 +41,9 @@ class coupling::indexing::IndexingService{
 						const unsigned int rank);
 
 	private:
+		std::vector<unsigned int> getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
+		unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const;
+
 		const simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
 		const coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
 		coupling::interface::MacroscopicSolverInterface<dim> *_msi; 
