@@ -306,7 +306,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		//init boundaries of all local, non-m2m, GL including indexing types
 		CellIndex<3, BaseIndexType> local_lowerBoundary { CellIndex<3 /*global*/>::lowerBoundary }; //used to test which indices are within local bounds
 		while(true) {
-			ranks = coupling::indexing::getRanksForGlobalIndex<3>(local_lowerBoundary, globalNumberMacroscopicCells);
+			ranks = getRanksForGlobalIndex(local_lowerBoundary, globalNumberMacroscopicCells);
 			//std::cout << "local lower: " << local_lowerBoundary << " is first found in " << ranks[0] << " while my rank is " << _rank << std::endl;
 			if(std::ranges::find(ranks, _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
 				break;
@@ -320,7 +320,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		}
 		CellIndex<3, BaseIndexType> local_upperBoundary { CellIndex<3 /*global*/>::upperBoundary };
 		while(true) {
-			ranks = coupling::indexing::getRanksForGlobalIndex<3>(local_upperBoundary, globalNumberMacroscopicCells);
+			ranks = getRanksForGlobalIndex(local_upperBoundary, globalNumberMacroscopicCells);
 			//std::cout << "local upper: " << local_upperBoundary << " is first found in " << ranks[0]<< ranks[0] << " while my rank is " << _rank << std::endl;
 			if(std::ranges::find(ranks, _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
 				break;
@@ -430,11 +430,10 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 
 /*
  * This was in large parts stolen from IndexConversion.
- * TODO: getUnique...
  */
 template<unsigned int dim>
 std::vector<unsigned int> 
-coupling::indexing::getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) {
+coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) {
 	std::vector<unsigned int> ranks;
 
 	// start and end coordinates of neighboured cells.
@@ -460,7 +459,7 @@ coupling::indexing::getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &
 				for (unsigned int d = 0; d <dim; d++){thisGlobalCellIndex[d] = loopIndex[d];}
 
 				// determine the unique rank for this cell
-				const unsigned int rank = 0;// getUniqueRankForMacroscopicCell(thisGlobalCellIndex); //TODO port this
+				const unsigned int rank = getUniqueRankForMacroscopicCell(thisGlobalCellIndex, globalNumberMacroscopicCells); 
 
 				// add this rank to the vector with all ranks if we did not add this one before
 				bool isContained = false;
@@ -474,4 +473,36 @@ coupling::indexing::getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &
 	}
 
 	return ranks;
+}
+
+//TODO: inline everything below here
+/*
+ * This was in large parts stolen from IndexConversion.
+ */
+template<unsigned int dim>
+unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
+	const auto numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses();
+	tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells;
+
+  for (unsigned int d = 0; d < dim; d++){
+    averageLocalNumberMacroscopicCells[d] = globalNumberMacroscopicCells[d]/numberProcesses[d];
+  }
+
+  tarch::la::Vector<dim,unsigned int> processCoords(0);
+  for (unsigned int d = 0; d < dim; d++){
+    // special case: cell in first section
+    if ( globalCellIndex[d] < averageLocalNumberMacroscopicCells[d]+1 ){
+      processCoords[d] = 0;
+    // special case: cell in last section
+    } else if ( globalCellIndex[d] > averageLocalNumberMacroscopicCells[d]*(numberProcesses[d]-1) ){
+      processCoords[d] = numberProcesses[d]-1;
+    // all other cases
+    } else {
+      // remove ghost layer contribution from vector index (...-1)
+      processCoords[d] = (globalCellIndex[d]-1)/averageLocalNumberMacroscopicCells[d];
+    }
+  }
+
+  return 0;
+  //return getRank(processCoords); TODO: port this
 }
