@@ -1,7 +1,5 @@
 //Implementation of coupling::indexing::CellIndex
 
-//TODO: operator+- for Indices
-
 using namespace coupling::indexing;
 /*
  * Using:
