@@ -262,22 +262,21 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	//init boundaries of all global, m2m, GL including indexing types
 	CellIndex<3> m2mGlobal_lowerBoundary { CellIndex<3, BaseIndexType>::lowerBoundary };
 	while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<3, {.vector=true}>{ m2mGlobal_lowerBoundary }.get() ) == false) {
-		//increment by one if above is too low to be in md-to-macro domain
-		++m2mGlobal_lowerBoundary;
-
-		//sanity check: empty m2m domain TODO: what if domain contains exactly one element?
+		//sanity check: empty m2m domain
 		if(m2mGlobal_lowerBoundary == CellIndex<3, BaseIndexType>::upperBoundary)
 			throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
+
+		//increment by one if above is too low to be in md-to-macro domain
+		++m2mGlobal_lowerBoundary;
 	}
 	CellIndex<3> m2mGlobal_upperBoundary { CellIndex<3, BaseIndexType>::upperBoundary };
 	while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<3, {.vector=true}>{ m2mGlobal_upperBoundary }.get() ) == false) {
-		//decrement by one if above is too high to be in md-to-macro domain
-		--m2mGlobal_upperBoundary;
-
-		//sanity check: empty m2m domain TODO: what if domain contains exactly one element?
-		if(m2mGlobal_upperBoundary == CellIndex<3, BaseIndexType>::lowerBoundary)
+		//sanity check: empty m2m domain 
+		if(m2mGlobal_upperBoundary < m2mGlobal_lowerBoundary)
 			throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
 
+		//decrement by one if above is too high to be in md-to-macro domain
+		--m2mGlobal_upperBoundary;
 	}
 
 	CellIndex<3, {.md2macro=true}>::lowerBoundary = m2mGlobal_lowerBoundary; 
@@ -308,35 +307,30 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<3, BaseIndexType> local_lowerBoundary { CellIndex<3 /*global*/>::lowerBoundary }; //used to test which indices are within local bounds
 		while(true) {
 			ranks = coupling::indexing::getRanksForGlobalIndex<3>(local_lowerBoundary, globalNumberMacroscopicCells);
-
-			std::cout << "local lower: " << local_lowerBoundary << " is first found in " << ranks[0] << " while my rank is " << _rank << std::endl;
-
+			//std::cout << "local lower: " << local_lowerBoundary << " is first found in " << ranks[0] << " while my rank is " << _rank << std::endl;
 			if(std::ranges::find(ranks, _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
 				break;
 
+			//sanity check: empty local domain 
+			if(local_lowerBoundary == CellIndex<3 /*global*/>::upperBoundary)
+				throw std::runtime_error("IndexingService: ERROR: Empty local domain!"); //TODO: print rank
+
 			//...increment by one if above is too high to be in md-to-macro domain
 			++local_lowerBoundary; 
-
-
-			//sanity check: empty local domain TODO: what if domain contains exactly one element?
-			if(local_lowerBoundary == CellIndex<3 /*global*/>::upperBoundary)
-				throw std::runtime_error("IndexingService: ERROR: Empty domain!"); //TODO: print rank
 		}
 		CellIndex<3, BaseIndexType> local_upperBoundary { CellIndex<3 /*global*/>::upperBoundary };
 		while(true) {
 			ranks = coupling::indexing::getRanksForGlobalIndex<3>(local_upperBoundary, globalNumberMacroscopicCells);
-
-			std::cout << "local upper: " << local_upperBoundary << " is first found in " << ranks[0]<< ranks[0] << " while my rank is " << _rank << std::endl;
-
+			//std::cout << "local upper: " << local_upperBoundary << " is first found in " << ranks[0]<< ranks[0] << " while my rank is " << _rank << std::endl;
 			if(std::ranges::find(ranks, _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
 				break;
 
+			//sanity check: empty local domain 
+			if(local_upperBoundary < local_lowerBoundary)
+				throw std::runtime_error("IndexingService: ERROR: Empty local domain!"); //TODO: print rank
+
 			//...decrement by one if above is too high to be in md-to-macro domain
 			--local_upperBoundary; 
-
-			//sanity check: empty local domain TODO: what if domain contains exactly one element?
-			if(local_upperBoundary == CellIndex<3 /*global*/>::lowerBoundary)
-				throw std::runtime_error("IndexingService: ERROR: Empty domain!"); //TODO: print rank
 		}
 
 		CellIndex<3, {.local=true}>::lowerBoundary = local_lowerBoundary; 
@@ -359,25 +353,25 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		//init boundaries of all local, m2m, GL including indexing types
 		CellIndex<3> m2mLocal_lowerBoundary { CellIndex<3, {.local=true}>::lowerBoundary };
 		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<3, BaseIndexType>{ m2mLocal_lowerBoundary }.get() ) == false) {
+			//sanity check: empty m2m domain 
+			if(m2mLocal_lowerBoundary == CellIndex<3, {.local=true}>::upperBoundary) {
+				std::cout << "IndexingService: WARNING: Empty local MD-To-Macro domain!" << std::endl; //TODO: print rank
+				break; 
+			}
+
 			//increment by one if above is too high to be in md-to-macro domain
 			++m2mLocal_lowerBoundary; 
-
-			//std::cout << "now trying local lower: " << m2mLocal_lowerBoundary << std::endl;
-
-			//sanity check: empty m2m domain TODO: what if domain contains exactly one element?
-			if(m2mLocal_lowerBoundary == CellIndex<3, {.local=true}>::upperBoundary)
-				; //TODO
 		}
 		CellIndex<3> m2mLocal_upperBoundary { CellIndex<3, {.local=true}>::upperBoundary };
 		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<3, BaseIndexType>{ m2mLocal_upperBoundary }.get() ) == false) {
+			//sanity check: empty m2m domain TODO: what if domain contains exactly one element?
+			if(m2mLocal_upperBoundary < m2mLocal_lowerBoundary) {
+				std::cout << "IndexingService: WARNING: Empty local MD-To-Macro domain!" << std::endl; //TODO: print rank
+				break;
+			}
+
 			//decrement by one if above is too high to be in md-to-macro domain
 			--m2mLocal_upperBoundary; 
-
-			//std::cout << "now trying local upper: " << m2mLocal_upperBoundary << std::endl;
-
-			//sanity check: empty m2m domain TODO: what if domain contains exactly one element?
-			if(m2mLocal_upperBoundary == CellIndex<3, {.local=true}>::lowerBoundary)
-				; //TODO
 		}
 
 		CellIndex<3, {.local=true, .md2macro=true}>::lowerBoundary = m2mLocal_lowerBoundary;
