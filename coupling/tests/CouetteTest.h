@@ -71,6 +71,7 @@ private:
   void init(){
     parseConfigurations();
     initSolvers();
+    initMPI();
 
 	//TODO: make couetteSolverInterface a member?
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
@@ -79,7 +80,7 @@ private:
       getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
     );
 
-	coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface);
+    coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
   }
 
   void runOneCouplingCycle(int cycle){

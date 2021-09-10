@@ -15,11 +15,16 @@ namespace coupling {
 
 		template<unsigned int dim>
 		class IndexingService;
+
+		template<unsigned int dim>
+		std::vector<unsigned int> 
+		getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
+
 	}
 }
 
 /*
- * TODO: is it really that smart to design this as a class and not just as a function?
+ * TODO: redesign as function
  *
  * TODO: check includes
  *
@@ -32,10 +37,12 @@ class coupling::indexing::IndexingService{
 	public:
 		IndexingService(const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig,
 						const coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig,
-						coupling::interface::MacroscopicSolverInterface<dim> *msi);
+						coupling::interface::MacroscopicSolverInterface<dim> *msi,
+						const unsigned int rank);
 
 	private:
 		const simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
 		const coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
 		coupling::interface::MacroscopicSolverInterface<dim> *_msi; 
+		const unsigned int _rank;
 };
