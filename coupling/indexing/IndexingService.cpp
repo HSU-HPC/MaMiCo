@@ -301,6 +301,14 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	//handle all local indexing types
 	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
 
+		_numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses();
+
+      // determine topology offset of this rank
+		const auto parallelTopologyType { _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType() };
+	  	const unsigned int scalarNumberProcesses = _numberProcesses[0] * _numberProcesses[1] * _numberProcesses[2];
+      	const unsigned int parallelTopologyOffset = (_rank/scalarNumberProcesses)*scalarNumberProcesses; //copied from IndexConversion
+		_parallelTopology = coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<3>(parallelTopologyType, _numberProcesses, parallelTopologyOffset);
+
 		std::vector<unsigned int> ranks; //used to store ranks in which certain indices occur
 
 		//init boundaries of all local, non-m2m, GL including indexing types
@@ -364,7 +372,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		}
 		CellIndex<3> m2mLocal_upperBoundary { CellIndex<3, {.local=true}>::upperBoundary };
 		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<3, BaseIndexType>{ m2mLocal_upperBoundary }.get() ) == false) {
-			//sanity check: empty m2m domain TODO: what if domain contains exactly one element?
+			//sanity check: empty m2m domain
 			if(m2mLocal_upperBoundary < m2mLocal_lowerBoundary) {
 				std::cout << "IndexingService: WARNING: Empty local MD-To-Macro domain!" << std::endl; //TODO: print rank
 				break;
@@ -481,11 +489,10 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const CellIndex
  */
 template<unsigned int dim>
 unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
-	const auto numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses();
 	tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells;
 
   for (unsigned int d = 0; d < dim; d++){
-    averageLocalNumberMacroscopicCells[d] = globalNumberMacroscopicCells[d]/numberProcesses[d];
+    averageLocalNumberMacroscopicCells[d] = globalNumberMacroscopicCells[d]/_numberProcesses[d];
   }
 
   tarch::la::Vector<dim,unsigned int> processCoords(0);
@@ -494,8 +501,8 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscop
     if ( globalCellIndex[d] < averageLocalNumberMacroscopicCells[d]+1 ){
       processCoords[d] = 0;
     // special case: cell in last section
-    } else if ( globalCellIndex[d] > averageLocalNumberMacroscopicCells[d]*(numberProcesses[d]-1) ){
-      processCoords[d] = numberProcesses[d]-1;
+    } else if ( globalCellIndex[d] > averageLocalNumberMacroscopicCells[d]*(_numberProcesses[d]-1) ){
+      processCoords[d] = _numberProcesses[d]-1;
     // all other cases
     } else {
       // remove ghost layer contribution from vector index (...-1)
@@ -503,6 +510,5 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscop
     }
   }
 
-  return 0;
-  //return getRank(processCoords); TODO: port this
+  return _parallelTopology->getRank(processCoords); 
 }

@@ -3,6 +3,9 @@
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
+// parallel topologies
+#include "coupling/paralleltopology/ParallelTopology.h"
+#include "coupling/paralleltopology/ParallelTopologyFactory.h"
 
 //Include CellIndex template class definition
 #include "CellIndex.h"
@@ -41,8 +44,13 @@ class coupling::indexing::IndexingService{
 						const unsigned int rank);
 
 	private:
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
 		std::vector<unsigned int> getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
 		unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const;
+
+		/*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; //TODO: make const
+		const coupling::paralleltopology::ParallelTopology<dim> *_parallelTopology;
+		#endif
 
 		const simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
 		const coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
