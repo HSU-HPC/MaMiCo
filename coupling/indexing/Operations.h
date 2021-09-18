@@ -1,7 +1,5 @@
 #pragma once
 
-#include "tarch/la/Vector.h"
-
 /*
  * TODO: comment
  *

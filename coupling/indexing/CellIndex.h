@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <type_traits>
-#include "tarch/la/Vector.h"
-
 
 /* 
  * Types of cell indices:
@@ -32,7 +30,7 @@ namespace coupling {
 			}
 		};
 
-		auto constexpr BaseIndexType = coupling::indexing::IndexType{true, false, false, false}; //TODO: more descriptive name
+		auto constexpr BaseIndexType = coupling::indexing::IndexType{true, false, false, false}; 
 
 		// Note: this is -std=c++20
 		template<unsigned int dim, IndexType idx_T = {}>
@@ -65,7 +63,6 @@ class coupling::indexing::CellIndex {
 	
 		//access to primive value_T of this index
 		value_T get() const { return (value_T) _index; }
-		//explicit operator value_T() const { return _index; } TODO: enable this?
 
 		//friend functions: overload arithmetic operators
 		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
@@ -92,18 +89,19 @@ class coupling::indexing::CellIndex {
 			return *this;
 		}
 
-		//overload comparison operators
+		/*
+		 * overload comparison operators
+		 *
+		 * An index A of any idx_T and another index B (of same or of different idx_T) fulfill a (comparison) relation 
+		 * iff the unsigned integers of their CellIndex<dim, {}> equivalents fulfill that relation.
+		 */
 		bool operator==(const CellIndex &) const = default;
 		bool operator!=(const CellIndex &) const = default;
-		/*
-		 * TODO: comment: why exactly this meaning of these operators
-		 */
 		bool operator<(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() < convertToScalar<dim, idx_T>(i).get() ); };
 		bool operator<=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() <= convertToScalar<dim, idx_T>(i).get() ); };
 		bool operator>(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() > convertToScalar<dim, idx_T>(i).get() ); };
 		bool operator>=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() >= convertToScalar<dim, idx_T>(i).get() ); };
 
-		//TODO: move init of boundaries here. decide where this should be called. constexpr -> Decls?
 		static void setDomainParameters() {
 			numberCellsInDomain = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
 
