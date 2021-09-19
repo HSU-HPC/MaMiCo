@@ -226,19 +226,19 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	  _rank(rank)
 {
 	//read relevant data from configs 
-	const auto globalMDDomainSize { _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize() };
+	const auto globalMDDomainSize { _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()}; 
 	const auto macroscopicCellSize { _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize() };
 	
 	//calculate total number of macroscopic cells on all ranks in Base Domain
 	tarch::la::Vector<dim,unsigned int> globalNumberMacroscopicCells(0);
 	for (unsigned int d = 0; d < dim; d++){
-		globalNumberMacroscopicCells[d] = (unsigned int) floor( globalMDDomainSize[d]/macroscopicCellSize[d] + 0.5 );
+		//+2 in all dims because ghost layer is not included in globalMDDomainSize as defined above for this scope
+		//TODO: verify
+		globalNumberMacroscopicCells[d] = (unsigned int) floor( globalMDDomainSize[d]/macroscopicCellSize[d] + 0.5 ) + 2 ;
 
-		if ( fabs(globalNumberMacroscopicCells[d]*macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13 )
+		if ( fabs((globalNumberMacroscopicCells[d]-2)*macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13 )
 			std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
 	}
-	//TODO: globalNumberMacroscopicCells is not calculated correctly! (too small!)
-	//std::cout << globalNumberMacroscopicCells << std::endl;
 
 	//init boundaries of all global, non-m2m, GL including indexing types
 	CellIndex<dim>::lowerBoundary = { 0 };
