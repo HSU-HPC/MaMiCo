@@ -10,6 +10,8 @@
 #include <limits>
 #include <stdexcept>
 
+#include "coupling/indexing/CellIndex.h"
+
 #include "tarch/utils/MultiMDService.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/configuration/ParseConfiguration.h"
@@ -18,6 +20,7 @@
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
+
 
 // for debugging purposes only
 #include <iostream>
@@ -47,6 +50,7 @@
  *
  *  @author Piet Jarmatz
  */
+
 
 namespace py = pybind11;
 using namespace pybind11::literals;
