@@ -3,6 +3,8 @@
 #include <iostream>
 #include <type_traits>
 
+#include "tarch/la/Vector.h"
+
 /* 
  * Types of cell indices:
  *	-> scalar idx VS vector<dim> idx
