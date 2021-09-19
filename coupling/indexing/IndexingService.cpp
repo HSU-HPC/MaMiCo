@@ -361,8 +361,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<dim, {.vector=true, .local=true, .noGhost=true}>::setDomainParameters();
 
 		//init boundaries of all local, m2m, GL including indexing types
-		//TODO: this just copies the regular lower boundaries
-		CellIndex<dim> m2mLocal_lowerBoundary { CellIndex<dim, {.local=true}>::lowerBoundary };
+		CellIndex<dim, {.local=true}> m2mLocal_lowerBoundary { CellIndex<dim, {.local=true}>::lowerBoundary };
 		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, BaseIndexType>{ m2mLocal_lowerBoundary }.get() ) == false) {
 			//sanity check: empty m2m domain 
 			if(m2mLocal_lowerBoundary == CellIndex<dim, {.local=true}>::upperBoundary) {
@@ -373,7 +372,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			//increment by one if above is too high to be in md-to-macro domain
 			++m2mLocal_lowerBoundary; 
 		}
-		CellIndex<dim> m2mLocal_upperBoundary { CellIndex<dim, {.local=true}>::upperBoundary };
+		CellIndex<dim, {.local=true}> m2mLocal_upperBoundary { CellIndex<dim, {.local=true}>::upperBoundary };
 		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, BaseIndexType>{ m2mLocal_upperBoundary }.get() ) == false) {
 			//sanity check: empty m2m domain
 			if(m2mLocal_upperBoundary < m2mLocal_lowerBoundary) {
@@ -462,8 +461,9 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const CellIndex
 
 	/*
 	 * TODO: refactor
-	 * FM: I dont really get what is going on here.
+	 * FM: I dont really get what is going on in {-- .. --}.
 	 */
+	// {--
 	// loop over neighbouring regions
 	for (loopIndex[2] = start[2]; loopIndex[2] <= end[2]; loopIndex[2]++){
 		for (loopIndex[1] = start[1]; loopIndex[1] <= end[1]; loopIndex[1]++){
@@ -486,6 +486,7 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const CellIndex
 			}
 		}
 	}
+	// --}
 
 	return ranks;
 }
