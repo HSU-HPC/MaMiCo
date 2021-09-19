@@ -226,23 +226,24 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	  _rank(rank)
 {
 	//read relevant data from configs 
-	const auto globalMDDomainSize { _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()}; 
+	const auto globalMDDomainSize { _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize() }; 
 	const auto macroscopicCellSize { _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize() };
 	
 	//calculate total number of macroscopic cells on all ranks in Base Domain
 	tarch::la::Vector<dim,unsigned int> globalNumberMacroscopicCells(0);
 	for (unsigned int d = 0; d < dim; d++){
-		//+2 in all dims because ghost layer is not included in globalMDDomainSize as defined above for this scope
-		//TODO: verify
-		globalNumberMacroscopicCells[d] = (unsigned int) floor( globalMDDomainSize[d]/macroscopicCellSize[d] + 0.5 ) + 2 ;
+		globalNumberMacroscopicCells[d] = (unsigned int) floor( globalMDDomainSize[d]/macroscopicCellSize[d] + 0.5 );
 
-		if ( fabs((globalNumberMacroscopicCells[d]-2)*macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13 )
+		if ( fabs((globalNumberMacroscopicCells[d])*macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13 )
 			std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
 	}
 
+	//TODO: make this globalNumberMacroscopicCells and remove all usages of the old meaning (seen above)
+	const auto globalNumberMacroscopicCellsInclGL { globalNumberMacroscopicCells + tarch::la::Vector<dim, unsigned int> { 2 } };
+
 	//init boundaries of all global, non-m2m, GL including indexing types
 	CellIndex<dim>::lowerBoundary = { 0 };
-	CellIndex<dim>::upperBoundary = globalNumberMacroscopicCells - tarch::la::Vector<dim, unsigned int> {1};
+	CellIndex<dim>::upperBoundary = globalNumberMacroscopicCellsInclGL - tarch::la::Vector<dim, unsigned int> { 1 };
 	CellIndex<dim>::setDomainParameters();
 
 	CellIndex<dim, {.vector=true}>::lowerBoundary = CellIndex<dim>::lowerBoundary;
@@ -251,7 +252,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 
 	//init boundaries of all global, non-m2m, GL excluding indexing types
 	CellIndex<dim, {.noGhost=true}>::lowerBoundary = { 1 };
-	CellIndex<dim, {.noGhost=true}>::upperBoundary = globalNumberMacroscopicCells - tarch::la::Vector<dim, unsigned int> {2};
+	CellIndex<dim, {.noGhost=true}>::upperBoundary = globalNumberMacroscopicCellsInclGL - tarch::la::Vector<dim, unsigned int> { 2 };
 	CellIndex<dim, {.noGhost=true}>::setDomainParameters();
 
 	CellIndex<dim, {.vector=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.noGhost=true}>::lowerBoundary;
@@ -300,9 +301,9 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	//handle all local indexing types
 	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
 
-		_numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses();
+		_numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(); //TODO read this properly
 
-      // determine topology offset of this rank
+      	// determine topology offset of this rank
 		const auto parallelTopologyType { _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType() };
 	  	const unsigned int scalarNumberProcesses = _numberProcesses[0] * _numberProcesses[1] * _numberProcesses[2];
       	const unsigned int parallelTopologyOffset = (_rank/scalarNumberProcesses)*scalarNumberProcesses; //copied from IndexConversion
@@ -360,6 +361,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<dim, {.vector=true, .local=true, .noGhost=true}>::setDomainParameters();
 
 		//init boundaries of all local, m2m, GL including indexing types
+		//TODO: this just copies the regular lower boundaries
 		CellIndex<dim> m2mLocal_lowerBoundary { CellIndex<dim, {.local=true}>::lowerBoundary };
 		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, BaseIndexType>{ m2mLocal_lowerBoundary }.get() ) == false) {
 			//sanity check: empty m2m domain 
@@ -458,6 +460,10 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const CellIndex
     	if (globalCellIndex.get()[d] < end[d]  ){end[d] = globalCellIndex.get()[d]+1;}
   	}
 
+	/*
+	 * TODO: refactor
+	 * FM: I dont really get what is going on here.
+	 */
 	// loop over neighbouring regions
 	for (loopIndex[2] = start[2]; loopIndex[2] <= end[2]; loopIndex[2]++){
 		for (loopIndex[1] = start[1]; loopIndex[1] <= end[1]; loopIndex[1]++){
@@ -487,35 +493,36 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const CellIndex
 //TODO: inline everything below here
 /*
  * This was in large parts stolen from IndexConversion.
+ * Note that this uses the globalNumberMacroscopicCells definition excl. the ghost layer.
  */
 template<unsigned int dim>
 unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
-	tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells;
 
-  for (unsigned int d = 0; d < dim; d++){
-    averageLocalNumberMacroscopicCells[d] = globalNumberMacroscopicCells[d]/_numberProcesses[d];
-  }
+	//vector containing avg number of macro cells, not counting global GL. //TODO: make this a member?
+	tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells { 0 };
+	for (unsigned int d = 0; d < dim; d++) {
+		if(globalCellIndex[d] >= globalNumberMacroscopicCells[d]+2) { //greater or equal to the total global number incl GL (+2)
+			using namespace std::string_literals;
+			throw std::runtime_error("IndexingService: getUniqueRankForMacroscopicCell(): Global cell index greater than global size in dim "s + std::to_string(d));
+		}
+			
+		averageLocalNumberMacroscopicCells[d] = globalNumberMacroscopicCells[d]/_numberProcesses[d];
+	}
 
-  tarch::la::Vector<dim,unsigned int> processCoords(0);
-  for (unsigned int d = 0; d < dim; d++){
-    // special case: cell in first section
-    if ( globalCellIndex[d] < averageLocalNumberMacroscopicCells[d]+1 ){
-      processCoords[d] = 0;
-    // special case: cell in last section
-    } else if ( globalCellIndex[d] > averageLocalNumberMacroscopicCells[d]*(_numberProcesses[d]-1) ){
-      processCoords[d] = _numberProcesses[d]-1;
-    // all other cases
-    } else {
-      // remove ghost layer contribution from vector index (...-1)
-      processCoords[d] = (globalCellIndex[d]-1)/averageLocalNumberMacroscopicCells[d];
-    }
-  }
-
-  //TODO: fix the following:
-  //this appears to be correct
-  std::cout << "process coords: " << processCoords << std::endl;
-  //this is always _rank
-  std::cout << "_parallelTopology->getRank(processCoords): " << _parallelTopology->getRank(processCoords) << std::endl;
+	tarch::la::Vector<dim,unsigned int> processCoords(0);
+	for (unsigned int d = 0; d < dim; d++){
+		// special case: cell in first section
+		if ( globalCellIndex[d] < averageLocalNumberMacroscopicCells[d]+1 ) [[unlikely]] {
+			processCoords[d] = 0;
+  		// special case: cell in last section
+		} else if ( globalCellIndex[d] > averageLocalNumberMacroscopicCells[d]*(_numberProcesses[d]-1) ) [[unlikely]] {
+			processCoords[d] = _numberProcesses[d]-1;
+  		// all other cases
+		} else [[likely]]{
+			// remove ghost layer contribution from vector index (...-1)
+			processCoords[d] = (globalCellIndex[d]-1)/averageLocalNumberMacroscopicCells[d];
+		}
+	}
 
   return _parallelTopology->getRank(processCoords); 
 }
