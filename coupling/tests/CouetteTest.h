@@ -22,6 +22,9 @@
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/services/MultiMDCellService.h"
+
+#include "coupling/indexing/IndexingService.h"
+
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -66,9 +69,18 @@ private:
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void init(){
-    initMPI();
     parseConfigurations();
     initSolvers();
+    initMPI();
+
+	//TODO: make couetteSolverInterface a member?
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
+      _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+      _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+      getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
+    );
+
+    coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
   }
 
   void runOneCouplingCycle(int cycle){

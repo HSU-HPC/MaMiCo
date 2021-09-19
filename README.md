@@ -5,7 +5,7 @@ The macro-micro-coupling tool for multiscale coupled molecular-continuum flow si
 * TODO
 
 ## Requirements and dependencies
-* C++17 compiler
+* C++20 compiler
 * TODO
 
 ## Build instructions

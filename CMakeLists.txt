@@ -35,7 +35,7 @@ else()
 endif()
 
 #enforce c++17 in order to support the use of modern C++ features
-target_compile_features(mamico_ctest PRIVATE cxx_std_17)
+target_compile_features(mamico_ctest PRIVATE cxx_std_20)
 
 #Add SimpleMD's scons build script to target ---
 add_custom_target(

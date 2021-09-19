@@ -1,0 +1,137 @@
+#pragma once
+
+#include <iostream>
+#include <type_traits>
+
+#include "tarch/la/Vector.h"
+
+/* 
+ * Types of cell indices:
+ *	-> scalar idx VS vector<dim> idx
+ *	-> MPI rank local VS global idx
+ *	-> Mamico VS MD2Macro Domain idx
+ *	-> NoGL idx VS total domain incl GL 
+ *
+ *	TODO: Proper comment
+ *
+ * @author Felix Maurer, Piet Jarmatz
+ */
+
+
+namespace coupling {
+	namespace indexing {
+
+		struct IndexType{
+			const bool vector = false;
+			const bool local = false;
+			const bool md2macro = false;
+			const bool noGhost = false;
+
+			bool constexpr operator==(const IndexType& comp) const {
+				return (vector == comp.vector and local == comp.local and md2macro == comp.md2macro and noGhost == comp.noGhost);
+			}
+		};
+
+		auto constexpr BaseIndexType = coupling::indexing::IndexType{true, false, false, false}; 
+
+		// Note: this is -std=c++20
+		template<unsigned int dim, IndexType idx_T = {}>
+		class CellIndex;
+	}
+}
+
+
+/*
+ * TODO: comment
+ */
+template<unsigned int dim, coupling::indexing::IndexType idx_T>
+class coupling::indexing::CellIndex {
+	public:
+
+		/*
+		 * TODO: comment
+		 */
+		using value_T = std::conditional_t<idx_T.vector, tarch::la::Vector<dim, unsigned int>, unsigned int>;
+		using BaseIndex = CellIndex<dim, BaseIndexType>;
+
+		//primitive constructors
+		CellIndex() = default;
+		CellIndex(const value_T i) : _index(i){}
+		CellIndex(const CellIndex& ci) : _index(ci.get()){}
+		
+		//conversion: convert to convert_to_T
+		template<coupling::indexing::IndexType convert_to_T>
+		operator CellIndex<dim, convert_to_T>() const;
+	
+		//access to primive value_T of this index
+		value_T get() const { return (value_T) _index; }
+
+		//friend functions: overload arithmetic operators
+		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
+		friend CellIndex operator-<>(const CellIndex &i1, const CellIndex &i2);
+
+		//overload increment operators
+		CellIndex& operator++() {
+			if constexpr (idx_T.vector) {
+				CellIndex<dim> scalar_base { *this };
+				*this = CellIndex { ++scalar_base };
+			}
+			else ++_index;
+
+			return *this;
+		}
+		CellIndex& operator--() {
+			if constexpr (idx_T.vector) {
+				CellIndex<dim> scalar_base { *this };
+				*this = CellIndex { --scalar_base };
+
+			}
+			else --_index;
+
+			return *this;
+		}
+
+		/*
+		 * overload comparison operators
+		 *
+		 * An index A of any idx_T and another index B (of same or of different idx_T) fulfill a (comparison) relation 
+		 * iff the unsigned integers of their CellIndex<dim, {}> equivalents fulfill that relation.
+		 */
+		bool operator==(const CellIndex &) const = default;
+		bool operator!=(const CellIndex &) const = default;
+		bool operator<(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() < convertToScalar<dim, idx_T>(i).get() ); };
+		bool operator<=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() <= convertToScalar<dim, idx_T>(i).get() ); };
+		bool operator>(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() > convertToScalar<dim, idx_T>(i).get() ); };
+		bool operator>=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() >= convertToScalar<dim, idx_T>(i).get() ); };
+
+		static void setDomainParameters() {
+			numberCellsInDomain = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
+
+			tarch::la::Vector<dim, unsigned int> divFactor { 1 };
+			for (unsigned int d = 1; d < dim; d++) divFactor[d] = divFactor[d-1]*(numberCellsInDomain[d-1]);
+			divisionFactor = divFactor;
+		}
+
+		/*
+		 * Note: both are inclusive
+		 */
+		static BaseIndex lowerBoundary;
+		static BaseIndex upperBoundary;
+
+		//Number of cells in this indexing's domain. Because the above declared boundaries are inclusive, this is never 0 in any direction.
+		static tarch::la::Vector<dim, unsigned int> numberCellsInDomain;
+		//Used in scalar -> vector indexing functions
+		static tarch::la::Vector<dim, unsigned int> divisionFactor;
+
+	private:
+		value_T _index;
+
+};
+
+//overload operator<<
+template<unsigned int dim, coupling::indexing::IndexType idx_T>
+std::ostream& operator<<(std::ostream& os, const coupling::indexing::CellIndex<dim, idx_T>& i);
+
+
+//Include implementation
+#include "CellIndex.cpph"
