@@ -81,18 +81,6 @@ private:
     );
 
     coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
-
-	std::cout << "m2m global lower: " << coupling::indexing::CellIndex<3, {.md2macro=true}>::lowerBoundary << std::endl;
-	std::cout << "m2m global upper: " << coupling::indexing::CellIndex<3, {.md2macro=true}>::upperBoundary << std::endl;
-	std::cout << "local lower: " << coupling::indexing::CellIndex<3, {.local=true}>::lowerBoundary << std::endl;
-	std::cout << "local upper: " << coupling::indexing::CellIndex<3, {.local=true}>::upperBoundary << std::endl;
-	std::cout << "m2m local lower: " << coupling::indexing::CellIndex<3, {.local=true, .md2macro=true}>::lowerBoundary << std::endl;
-	std::cout << "m2m local upper: " << coupling::indexing::CellIndex<3, {.local=true, .md2macro=true}>::upperBoundary << std::endl;
-
-
-	std::cout << std::boolalpha << (coupling::indexing::CellIndex<3, {.md2macro=true}>::lowerBoundary < coupling::indexing::CellIndex<3, {.md2macro=true}>::upperBoundary) << std::endl;
-	std::cout << std::boolalpha << (coupling::indexing::CellIndex<3, {.md2macro=true}>::upperBoundary < coupling::indexing::CellIndex<3, {.md2macro=true}>::lowerBoundary) << std::endl;
-
   }
 
   void runOneCouplingCycle(int cycle){
