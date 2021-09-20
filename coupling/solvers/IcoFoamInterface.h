@@ -1,8 +1,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _COUPLING_SOLVERS_IcoFoam_H_
-#define _COUPLING_SOLVERS_FoamTest_H_
+#ifndef _COUPLING_SOLVERS_IcoFoamInterface_H_
+#define _COUPLING_SOLVERS_IcoFoamInterface_H_
 
 #include "coupling/solvers/CouetteSolver.h"
 // Includes from OpenFOAM fdCFD.H, unnecessary includes are removed
@@ -16,7 +16,7 @@
 
 namespace coupling{
   namespace solvers{
-    class IcoFoam;
+    class IcoFoamInterface;
   }
 }
 
@@ -29,9 +29,9 @@ namespace coupling{
  * 6 of them to be boundaries with the MD.
  * @author Helene Wittenberg
  */
-class coupling::solvers::IcoFoam: public coupling::solvers::AbstractCouetteSolver<3> {
+class coupling::solvers::IcoFoamInterface: public coupling::solvers::AbstractCouetteSolver<3> {
 public:
-  IcoFoam(int rank, int plotEveryTimestep, double channelheight, std::string dict, std::string folder,
+  IcoFoamInterface(int rank, int plotEveryTimestep, double channelheight, std::string dict, std::string folder,
     tarch::la::Vector<12, unsigned int> boundariesWithMD, tarch::la::Vector<3,double> uWall):
   AbstractCouetteSolver<3>(),
   runTime(Foam::Time::controlDictName, dict,folder),
@@ -53,7 +53,7 @@ public:
     mesh.setFluxRequired(p.name());
   }
 
-  virtual ~IcoFoam(){
+  virtual ~IcoFoamInterface(){
     if(skipRank()){return;}
     if(_boundary2RecvBufferIndicesOuter){ delete [] _boundary2RecvBufferIndicesOuter; _boundary2RecvBufferIndicesOuter=NULL;}
     if(_boundary2RecvBufferIndicesInner){ delete [] _boundary2RecvBufferIndicesInner; _boundary2RecvBufferIndicesInner=NULL;}
@@ -189,7 +189,7 @@ public:
               goto endloop;
             }
           }
-          std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
+          std::cout << "IcoFoamInterface: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
           endloop:
           for(size_t k = 0; k < size; k++){
             if(globalIndexInner==recvIndice[k]){
@@ -197,7 +197,7 @@ public:
               goto endloop2;
             }
           }
-          std::cout << "IcoFoam: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
+          std::cout << "IcoFoamInterface: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
           endloop2:
           counter++;
         }
