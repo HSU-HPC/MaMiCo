@@ -73,11 +73,12 @@ $(function() {
   <div class="headertitle"><div class="title">coupling::indexing::IndexType Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="CellIndex_8h_source.html">CellIndex.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa0248293968d4dd49b26ad3b6c520f1a"><td class="memItemLeft" align="right" valign="top"><a id="aa0248293968d4dd49b26ad3b6c520f1a" name="aa0248293968d4dd49b26ad3b6c520f1a"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="structcoupling_1_1indexing_1_1IndexType.html">IndexType</a> &amp;comp) const</td></tr>
+<tr class="memitem:aa0248293968d4dd49b26ad3b6c520f1a"><td class="memItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcoupling_1_1indexing_1_1IndexType.html#aa0248293968d4dd49b26ad3b6c520f1a">operator==</a> (const <a class="el" href="structcoupling_1_1indexing_1_1IndexType.html">IndexType</a> &amp;comp) const</td></tr>
 <tr class="separator:aa0248293968d4dd49b26ad3b6c520f1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -95,6 +96,49 @@ const bool&#160;</td><td class="memItemRight" valign="bottom"><b>md2macro</b> = 
 const bool&#160;</td><td class="memItemRight" valign="bottom"><b>noGhost</b> = false</td></tr>
 <tr class="separator:a2c28ed91ca33dd10ea40ed66ae1fd84c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p >Stores type parametrisation of <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">CellIndex</a> specialisation.</p>
+<p >.vector: True implies representation as vector, false implies scalar index. <br  />
+ .local: True implies indexing restricted to local MD domain. <br  />
+ .md2macro: True implies indexing restricted to cells that are sent from MD to macro solver. <br  />
+ .noGhost: True implies ghost layer cells to not be included in indexing. <br  />
+</p>
+<dl class="section author"><dt>Author</dt><dd>Felix Maurer, Piet Jarmatz </dd></dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa0248293968d4dd49b26ad3b6c520f1a" name="aa0248293968d4dd49b26ad3b6c520f1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0248293968d4dd49b26ad3b6c520f1a">&#9670;&nbsp;</a></span>operator==()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr bool coupling::indexing::IndexType::operator== </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structcoupling_1_1indexing_1_1IndexType.html">IndexType</a> &amp;&#160;</td>
+          <td class="paramname"><em>comp</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Pointwise equality operator for <a class="el" href="structcoupling_1_1indexing_1_1IndexType.html">IndexType</a> instances.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">comp</td><td><a class="el" href="structcoupling_1_1indexing_1_1IndexType.html">IndexType</a> to compare *this to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true iff all four boolean parameters match between the two <a class="el" href="structcoupling_1_1indexing_1_1IndexType.html">IndexType</a> instances </dd></dl>
+
+</div>
+</div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>coupling/indexing/<a class="el" href="CellIndex_8h_source.html">CellIndex.h</a></li>
 </ul>

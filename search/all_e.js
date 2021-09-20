@@ -18,5 +18,6 @@ var searchData=
   ['nochildren_15',['NoChildren',['../classtinyxml2_1_1XMLNode.html#ac3ab489e6e202a3cd1762d3b332e89d4',1,'tinyxml2::XMLNode']]],
   ['nomomentuminsertion_16',['NoMomentumInsertion',['../classcoupling_1_1NoMomentumInsertion.html',1,'coupling']]],
   ['noparticleinsertion_17',['NoParticleInsertion',['../classcoupling_1_1NoParticleInsertion.html',1,'coupling']]],
-  ['numericalsolver_18',['NumericalSolver',['../classcoupling_1_1solvers_1_1NumericalSolver.html',1,'coupling::solvers']]]
+  ['numbercellsindomain_18',['numberCellsInDomain',['../classcoupling_1_1indexing_1_1CellIndex.html#abbc85663eaf3c6bc6516910dadcdf392',1,'coupling::indexing::CellIndex']]],
+  ['numericalsolver_19',['NumericalSolver',['../classcoupling_1_1solvers_1_1NumericalSolver.html',1,'coupling::solvers']]]
 ];
