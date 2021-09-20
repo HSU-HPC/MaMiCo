@@ -438,6 +438,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	#endif
 }
 
+#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //unused in sequential scenario
 /*
  * This was in large parts stolen from IndexConversion.
  */
@@ -490,7 +491,9 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const CellIndex
 
 	return ranks;
 }
+#endif
 
+#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //unused in sequential scenario
 //TODO: inline everything below here
 /*
  * This was in large parts stolen from IndexConversion.
@@ -527,3 +530,4 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscop
 
   return _parallelTopology->getRank(processCoords); 
 }
+#endif

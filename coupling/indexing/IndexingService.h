@@ -26,15 +26,17 @@ namespace coupling {
 	}
 }
 
-/*
- * TODO: redesign as function
+/**
+ * Singleton service class initialising lower and upper boundaries of all possible CellIndex specialisations.
  *
- * TODO: check includes
- *
- * TODO: comment
+ * @tparam dim number of dimensions of the coupled simulation
+ * @param simpleMDConfig config object of SimpleMD instance used in coupling
+ * @param mamicoConfig config object containg general information of coupling process
+ * @param msi pointer to interface of coupled macroscopic solver
  *
  * @author Felix Maurer
  */
+//TODO: redesign as function
 template<unsigned int dim>
 class coupling::indexing::IndexingService{
 	public:
@@ -45,7 +47,20 @@ class coupling::indexing::IndexingService{
 
 	private:
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
+		/**
+		 * Determines all ranks that contain a certain global BaseIndex.
+		 * Ripped from deprecated IndexConversion.
+		 *
+		 * @param globalCellIndex index to be looked up
+		 * @param globalNumberMacroscopicCells global number of cells in BaseIndex domain EXCLUDING global ghost layer cells.
+		 * @returns vector of all cells which contain the index
+		 */
+
 		std::vector<unsigned int> getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
+		/**
+		 * Helper function used by getRanksForGlobalIndex().
+		 */
+		//TODO inline in getRanksForGlobalIndex()
 		unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const;
 
 		/*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; //TODO: make const
