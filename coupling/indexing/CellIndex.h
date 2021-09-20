@@ -5,33 +5,40 @@
 
 #include "tarch/la/Vector.h"
 
-/* 
- * Types of cell indices:
- *	-> scalar idx VS vector<dim> idx
- *	-> MPI rank local VS global idx
- *	-> Mamico VS MD2Macro Domain idx
- *	-> NoGL idx VS total domain incl GL 
- *
- *	TODO: Proper comment
- *
- * @author Felix Maurer, Piet Jarmatz
- */
-
 
 namespace coupling {
 	namespace indexing {
 
+		/**
+		 * Stores type parametrisation of CellIndex specialisation.
+		 *
+		 * .vector: True implies representation as vector, false implies scalar index. \n 
+		 * .local: True implies indexing restricted to local MD domain. \n 
+		 * .md2macro: True implies indexing restricted to cells that are sent from MD to macro solver. \n 
+		 * .noGhost: True implies ghost layer cells to not be included in indexing. \n 
+		 *
+		 * @author Felix Maurer, Piet Jarmatz
+		 */
 		struct IndexType{
 			const bool vector = false;
 			const bool local = false;
 			const bool md2macro = false;
 			const bool noGhost = false;
 
+			/**
+			 * Pointwise equality operator for IndexType instances.
+			 *
+			 * @param comp IndexType to compare *this to.
+			 * @returns true iff all four boolean parameters match between the two IndexType instances
+			 */
 			bool constexpr operator==(const IndexType& comp) const {
 				return (vector == comp.vector and local == comp.local and md2macro == comp.md2macro and noGhost == comp.noGhost);
 			}
 		};
 
+		/**
+		 * This specific instance of IndexType is used to enable streamlined conversions and computations on CellIndex objects.
+		 */
 		auto constexpr BaseIndexType = coupling::indexing::IndexType{true, false, false, false}; 
 
 		// Note: this is -std=c++20
@@ -41,17 +48,27 @@ namespace coupling {
 }
 
 
-/*
- * TODO: comment
+/**
+ * Index used to describe spatial location of a MacroscopicCell.
+ * Since various different ways of expressing this location are useful for different applications, IndexType is used to describe the context of this index.
+ *
+ * All commonly used (arithmetic) operations on MacroscopicCell indices are provided as well as seamless conversion between any two ways of expressing these indices.
+ * (cf. user-defined conversion function below)
+ *
+ * @tparam dim number of dimensions of the coupled simulation
+ * @tparam idx_T index type parametrisation used by this specific index
  */
 template<unsigned int dim, coupling::indexing::IndexType idx_T>
 class coupling::indexing::CellIndex {
 	public:
 
-		/*
-		 * TODO: comment
+		/**
+		 * The type of this CellIndex's underlying index representation.
 		 */
 		using value_T = std::conditional_t<idx_T.vector, tarch::la::Vector<dim, unsigned int>, unsigned int>;
+		/**
+		 * CellIndex specialisation using BaseIndexType for this cell's number of dimensions.
+		 */
 		using BaseIndex = CellIndex<dim, BaseIndexType>;
 
 		//primitive constructors
@@ -59,18 +76,31 @@ class coupling::indexing::CellIndex {
 		CellIndex(const value_T i) : _index(i){}
 		CellIndex(const CellIndex& ci) : _index(ci.get()){}
 		
-		//conversion: convert to convert_to_T
+		/**
+		 * Conversion function: Convert to CellIndex of same dim but different IndexType.
+		 *
+		 * @tparam convert_to_T IndexType parameter of the CellIndex specialisation to convert to
+		 * @returns CellIndex of different template parametrisation.
+		 */
 		template<coupling::indexing::IndexType convert_to_T>
 		operator CellIndex<dim, convert_to_T>() const;
 	
-		//access to primive value_T of this index
+		/**
+		 * Access to primive value_T of this index.
+		 * Should be used as sparingly as possible since it can lead to bugs preventable by using CellIndex instances instead of primitives.
+		 *
+		 * @returns unsigned integer/vector representation of this index.
+		 */
 		value_T get() const { return (value_T) _index; }
 
 		//friend functions: overload arithmetic operators
 		friend CellIndex operator+<>(const CellIndex &i1, const CellIndex &i2);
 		friend CellIndex operator-<>(const CellIndex &i1, const CellIndex &i2);
 
-		//overload increment operators
+		/**
+		 * Increments the index by one.
+		 * Note that this does NOT increments indices in vector representation in all directions.
+		 */
 		CellIndex& operator++() {
 			if constexpr (idx_T.vector) {
 				CellIndex<dim> scalar_base { *this };
@@ -80,6 +110,10 @@ class coupling::indexing::CellIndex {
 
 			return *this;
 		}
+		/**
+		 * Decrements the index by one.
+		 * Note that this does NOT decrements indices in vector representation in all directions.
+		 */
 		CellIndex& operator--() {
 			if constexpr (idx_T.vector) {
 				CellIndex<dim> scalar_base { *this };
@@ -92,10 +126,9 @@ class coupling::indexing::CellIndex {
 		}
 
 		/*
-		 * overload comparison operators
+		 * Any two indices fulfill some relation iff the unsigned integers underlying their CellIndex<dim, {}> equivalents fulfill that relation.
 		 *
-		 * An index A of any idx_T and another index B (of same or of different idx_T) fulfill a (comparison) relation 
-		 * iff the unsigned integers of their CellIndex<dim, {}> equivalents fulfill that relation.
+		 * @param CellIndex index to compare this index to
 		 */
 		bool operator==(const CellIndex &) const = default;
 		bool operator!=(const CellIndex &) const = default;
@@ -104,6 +137,10 @@ class coupling::indexing::CellIndex {
 		bool operator>(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() > convertToScalar<dim, idx_T>(i).get() ); };
 		bool operator>=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() >= convertToScalar<dim, idx_T>(i).get() ); };
 
+
+		/**
+		 * Initialises all static members dependant only on upperBoundary and lowerBoundary
+		 */
 		static void setDomainParameters() {
 			numberCellsInDomain = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
 
@@ -112,15 +149,26 @@ class coupling::indexing::CellIndex {
 			divisionFactor = divFactor;
 		}
 
-		/*
-		 * Note: both are inclusive
+		/**
+		 * Defines where this type of cell index starts counting. 
+		 * Read inclusively, e.g.: lowerBoundary = {1,2,3} means {1,2,3} is the first index contained in this type of cell index' domain.
 		 */
 		static BaseIndex lowerBoundary;
+		/**
+		 * Defines where this type of cell index stops counting. 
+		 * Read inclusively, e.g.: upperBoundary = {4,5,6} means {4,5,6} is the last index contained in this type of cell index' domain.
+		 */
 		static BaseIndex upperBoundary;
 
-		//Number of cells in this indexing's domain. Because the above declared boundaries are inclusive, this is never 0 in any direction.
+		/**
+		 * Number of cells in this indexing's domain. Because the above declared boundaries are inclusive, this is never 0 in any direction.
+		 * Initialised in setDomainParameters().
+		 */
 		static tarch::la::Vector<dim, unsigned int> numberCellsInDomain;
-		//Used in scalar -> vector indexing functions
+		/**
+		 * Used in scalar -> vector indexing conversion functions
+		 * Initialised in setDomainParameters().
+		 */
 		static tarch::la::Vector<dim, unsigned int> divisionFactor;
 
 	private:
@@ -128,7 +176,9 @@ class coupling::indexing::CellIndex {
 
 };
 
-//overload operator<<
+/**
+ * Overload operator<< for CellIndex
+ */
 template<unsigned int dim, coupling::indexing::IndexType idx_T>
 std::ostream& operator<<(std::ostream& os, const coupling::indexing::CellIndex<dim, idx_T>& i);
 

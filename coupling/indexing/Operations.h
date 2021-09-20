@@ -1,14 +1,19 @@
 #pragma once
 
-/*
- * TODO: comment
- *
- * @author Felix Maurer
- */
 
-namespace coupling {
+namespace coupling { 
 	namespace indexing {
 
+		/**
+		 * Conversion function to convert from vector to scalar representation of CellIndex spcialisations.
+		 *
+		 * @tparam dim number of dimensions of the coupled simulation.
+		 * @tparam idx_T index type parametrisation used by index.
+		 * @param index index that shall be converted
+		 * @returns CellIndex with .vector=false. All other IndexType parameters remain identical.
+		 *
+		 * @author Felix Maurer
+		 */
 		template<unsigned int dim, IndexType idx_T>
 		CellIndex<dim, {false, idx_T.local, idx_T.md2macro, idx_T.noGhost}>
 		convertToScalar(CellIndex<dim, idx_T> index) {
@@ -28,7 +33,16 @@ namespace coupling {
 			}	
 		}
 
-
+		/**
+		 * Conversion function to convert from scalar to vector representation of CellIndex spcialisations.
+		 *
+		 * @tparam dim number of dimensions of the coupled simulation.
+		 * @tparam idx_T index type parametrisation used by index.
+		 * @param index index that shall be converted
+		 * @returns CellIndex with .vector=false. All other IndexType parameters remain identical.
+		 *
+		 * @author Felix Maurer
+		 */
 		template<unsigned int dim, IndexType idx_T>
 		CellIndex<dim, {true, idx_T.local, idx_T.md2macro, idx_T.noGhost}>
 		convertToVector(CellIndex<dim, idx_T> index) {
