@@ -1,0 +1,38 @@
+#pragma once
+
+#include "coupling/cell-mappings/ComputeMassMapping.h"
+#include "coupling/tests/unittests/UnitTestInterface.h"
+#include "coupling/tests/unittests/MockService.cpph"
+#include "coupling/tests/unittests/UnitTestingService.h"
+
+namespace coupling { namespace cellmappings {
+	template<class LinkedCell, unsigned int dim>
+	class ComputeMassMappingUT;
+}}
+
+template<class LinkedCell,unsigned int dim>
+class coupling::cellmappings::ComputeMassMappingUT : public testing::ut::UnitTestImpl<coupling::cellmappings::ComputeMassMapping<LinkedCell,dim>> {
+	public:
+		ComputeMassMappingUT(testing::ut::UnitTestingService *uts):
+		testing::ut::UnitTestImpl<coupling::cellmappings::ComputeMassMapping<LinkedCell,dim>>(uts->getRank(), uts->getCommSize())
+		{
+			//Generate vector containing mocks of coupling::cellmappings::ComputeMassMapping<LinkedCell,dim>
+			std::vector<coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> *> this_mocks;
+			for(auto simpleMDInstance : uts->getMDInterfaces()) 
+				this_mocks.push_back(new coupling::cellmappings::ComputeMassMapping<LinkedCell,dim>(simpleMDInstance));
+
+			//Create new MockService for coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> using mocks generated above:
+			this->_mockService = uts->addMockService<coupling::cellmappings::ComputeMassMapping<LinkedCell,dim>>(this_mocks);
+			
+			//Add test functions
+			this->_testFuncs.push_back(std::make_tuple(new 
+				std::function<void (coupling::cellmappings::ComputeMassMapping<LinkedCell,dim>&)>
+				{ [this] (coupling::cellmappings::ComputeMassMapping<LinkedCell,dim>& mock) { testHandleCell(mock); } }, "testHandleCell"
+			));
+		}
+
+		void testHandleCell(coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> mock) {
+			//TODO
+		}
+};
+

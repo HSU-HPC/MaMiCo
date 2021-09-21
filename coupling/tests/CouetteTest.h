@@ -22,11 +22,17 @@
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/services/MultiMDCellService.h"
+
+#include "coupling/indexing/IndexingService.h"
+
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
 #include <sys/time.h>
 #include <random>
+
+//This is ignored if you dont use synthetic MD. For further instructions cf. SYNTHETIC part of initSolvers().
+#define SYNTHETICMD_SEQUENCE "SYNTHETIC-MD"
 
 /**
  * Versatile configurable Couette flow test for noise-filtered multi-instance Nie coupling.
@@ -52,8 +58,9 @@ public:
   virtual void run(){
     init();
     if(_cfg.twsLoop){twsLoop();return;}
-    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++)
+    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++) {
       runOneCouplingCycle(cycle);
+	 }
     shutdown();
   }
 
@@ -62,9 +69,18 @@ private:
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void init(){
-    initMPI();
     parseConfigurations();
     initSolvers();
+    initMPI();
+
+	//TODO: make couetteSolverInterface a member?
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
+      _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+      _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+      getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
+    );
+
+    coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
   }
 
   void runOneCouplingCycle(int cycle){
@@ -127,7 +143,7 @@ private:
       exit(EXIT_FAILURE);
     }
 	tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
-    if(n_unexpected == NULL){
+    if(n_unexpected != NULL){
       std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -241,7 +257,7 @@ private:
     }
 
     if(_cfg.miSolverType == SYNTHETIC){
-      if(_cfg.md2Macro || _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
+      if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
         _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1){
         std::cout << "Invalid configuration: Synthetic MD runs sequentially on rank 0 only. "
           << "It does neither support parallel communication nor multi-instance sampling" << std::endl;
@@ -267,6 +283,7 @@ private:
     _couetteSolver = getCouetteSolver( _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
       _simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
       );
+	if (_couetteSolver != NULL) std::cout << "Couette solver not null on rank: " << _rank << std::endl; //TODO: remove debug
 
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized anyway,
@@ -321,12 +338,13 @@ private:
       getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
     );
 
+
     if(_cfg.twsLoop){
       // initialise macroscopic cell service for multi-MD case and set single cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
-        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService, _tws
       );
     }
@@ -335,7 +353,7 @@ private:
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
-        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getNoiseReductionConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }
@@ -351,26 +369,135 @@ private:
       }
     }
 
+	/*
+	 * A synthethic solver is modeled using a dynamically linked filter,
+	 * i.e. a lambda function producing artifical data in every filter step.
+	 *
+	 * This is how to properly instanciate and use a synthethic solver:
+	 * - Create a sequence named like the macro SYNTHETICMD_SEQUENCE in xml. Use whatever input, but make sure the filter system's output is set to this sequence.
+	 * - Set filtered-values = "macro-mass macro-momentum" for that sequence.
+	 * - Use that sequence as input for all sequences that want (unfiltered) MD input.
+	 *
+	 * Note that this synthethic solver is designed to be used on sequential mode only and with only one MD instance.
+	 *
+	 * TODO
+	 * - major bug when there is ONLY a FFF in a sequence
+	 * - reduce capture: most variables in lambda can be defined beforehand as they are const (e.g. everything coming from cfg)
+	 * - totalNumberMDSimulations > 1 is theoretically possible with this redesign. test it and remove the restriction for it to be 1
+	 */
+
+	else if(_cfg.miSolverType == SYNTHETIC)	{
+
+		/*
+		 * Synthetic MD runs sequentially only, as described above.
+		 */
+        if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
+        _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1) {
+			throw std::runtime_error("ERROR: Syntethic MD is only available in sequential mode!");
+		}
+
+		/*
+		 * Create new FilterFromFunction instance and insert it into Filtering System.
+		 */
+		try {
+			for(unsigned int i = 0; i < _localMDInstances; i++)
+				_multiMDCellService->getMacroscopicCellService(i).getFilterPipeline().getSequence(SYNTHETICMD_SEQUENCE)->addFilter(
+				new std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, 3>>)>{ //applyScalar
+				[this] (
+   	 				std::vector<double> inputScalars, //doesnt get used: matching MCS's addFilterToSequence(...) signature
+					std::vector<std::array<unsigned int, 3>> cellIndices //only gets used to determine "size" (see below)
+  				) {
+					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
+
+					//sanity check
+					if(inputScalars.size() != cellIndices.size())
+						throw std::runtime_error("ERROR: Cell data and indexing of non-matching shapes!");
+
+					//std::cout << "Entering synthetic MD scalar..." << std::endl;
+					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+					const unsigned int size = cellIndices.size();
+					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+
+					std::vector<double> syntheticMasses;
+					for (unsigned int i = 0; i < size; i++){
+						syntheticMasses.push_back(mass);
+					}
+					//std::cout << "Generated masses!" << std::endl;
+
+					if (_rank==0){
+						gettimeofday(&_tv.end,NULL);
+						_tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+					}
+
+					return syntheticMasses;
+
+  				}},
+				new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double,3>>, std::vector<std::array<unsigned int, 3>>)> { //applyVector
+				[this] (
+					std::vector<std::array<double, 3>> inputVectors, //same for these 2
+					std::vector<std::array<unsigned int, 3>> cellIndices
+  				) {
+					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
+
+					//sanity check
+					if(inputVectors.size() != cellIndices.size())
+						throw std::runtime_error("ERROR: Cell data and indexing of non-matching shapes!");
+
+					//std::cout << "Entering synthetic MD vector." << std::endl;
+
+					//unlike for the scalar case, we need the MD2Macro version of IC to calculate correct offsets
+					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro =
+						_multiMDCellService->getMacroscopicCellService(0).getFilterPipeline().getICM2M();
+
+					const unsigned int size = cellIndices.size();
+					const tarch::la::Vector<3,double> md2MacroDomainOffset = indexConversionMD2Macro->getGlobalMD2MacroDomainOffset();
+
+					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversionMD2Macro->getBaseIC()->getMacroscopicCellSize());
+					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+
+					std::normal_distribution<double> distribution (0.0,_cfg.noiseSigma);
+					std::vector<std::array<double, 3>> syntheticMomenta;
+					for (unsigned int i = 0; i < size; i++){
+						// determine cell midpoint
+						const tarch::la::Vector<3,unsigned int> globalIndex(indexConversionMD2Macro->getBaseIC()->getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
+						tarch::la::Vector<3,double> cellMidPoint(md2MacroDomainOffset-0.5*macroscopicCellSize);
+						for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
+
+						//compute momentum
+						const tarch::la::Vector<3,double> noise(distribution(_generator),distribution(_generator),distribution(_generator));
+						const tarch::la::Vector<3,double> momentum(mass*((*_couetteSolver).getVelocity(cellMidPoint)+noise));
+
+						//conversion from tarch::la::Vector to std::array
+						syntheticMomenta.push_back({momentum[0], momentum[1], momentum[2]});
+					}
+					//std::cout << "Generated momenta!" << std::endl;
+
+					if (_rank==0){
+						gettimeofday(&_tv.end,NULL);
+						_tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+					}
+
+					return syntheticMomenta;
+  				}},
+			   	0 //filterIndex
+				);
+		}
+		catch(std::runtime_error& e) {
+			auto expectedError = std::string("ERROR: Could not find Filter Sequence named ").append(SYNTHETICMD_SEQUENCE);
+			if(expectedError.compare(e.what()) == 0)  {
+				std::cout << "ERROR: Synthetic MD solver selected without providing filter sequence '" << SYNTHETICMD_SEQUENCE <<"' in config." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			else throw e;
+		}
+	}
+
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
     allocateRecvBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
 
-    // manually allocate noise reduction if necessary
-    if(_cfg.miSolverType == SYNTHETIC){
-      if(_cfg.twsLoop){
-        _noiseReduction = _mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(
-          _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_multiMDService, _tws);
-      }
-      else{
-        _noiseReduction = _mamicoConfig.getNoiseReductionConfiguration().interpreteConfiguration<3>(
-          _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_multiMDService);
-      }
-    }
-
-    if(_cfg.initAdvanceCycles > 0 && _couetteSolver != NULL){
-      for (unsigned int i = 0; i < _localMDInstances; i++){
-        static_cast<coupling::services::MacroscopicCellServiceImpl<MY_LINKEDCELL,3>&>(_multiMDCellService->getMacroscopicCellService(i)).setParticleInsertionType(coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION);
-      }
+    if(_cfg.initAdvanceCycles > 0 && _couetteSolver != NULL)
       _couetteSolver->advance(_cfg.initAdvanceCycles * _simpleMDConfig.getSimulationConfiguration().getDt()
         * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
       for (unsigned int i = 0; i < _localMDInstances; i++){
@@ -403,6 +530,7 @@ private:
       // run one time step for macroscopic couette solver
       if( _cfg.wallInitCycles > 0 && cycle == _cfg.wallInitCycles){
         _couetteSolver->setWallVelocity(_cfg.wallVelocity);
+		//When using Synthetic MD,
       }
       if(_cfg.wallOscillations != 0){
         tarch::la::Vector<3,double> vel = cycle < _cfg.wallInitCycles ? _cfg.wallInitVelocity : _cfg.wallVelocity;
@@ -496,33 +624,27 @@ private:
       }
     }
 
+	//Now that synthetic filters are modelled as filters, this looks very similar to the SimpleMD case above...
     if(_cfg.miSolverType == SYNTHETIC){
-      fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
-
-      if (_rank==0){
-        gettimeofday(&_tv.end,NULL);
-        _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
-        gettimeofday(&_tv.start,NULL);
+      //fillRecvBuffer(_cfg.density,*_couetteSolver,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+	  for (unsigned int i = 0; i < _localMDInstances; i++){
+        // set macroscopic cell service and interfaces in MamicoInterfaceProvider
+        coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
+        coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
       }
 
-      //call noise filter on recvBuffer
-      _noiseReduction->beginProcessInnerMacroscopicCells();
-      for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
-        _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],_buf.globalCellIndices4RecvBuffer[i]);
-      }
-      _noiseReduction->endProcessInnerMacroscopicCells();
-      if(_noiseReduction->_doubleTraversal){
-        _noiseReduction->beginProcessInnerMacroscopicCells();
-        for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
-          _noiseReduction->processInnerMacroscopicCell(*_buf.recvBuffer[i],_buf.globalCellIndices4RecvBuffer[i]);
-        }
-        _noiseReduction->endProcessInnerMacroscopicCells();
+      // send back data from MD instances and merge it
+      if(_cfg.md2Macro){
+		//_buf does not get used here: Instead, the synthetic MD in the SYNTHETICMD_SEQUENCE generates values. To prevent segfaults, it has to be nonempty, though.
+		/*std::cout << "RECV BUF ADRESSES:" << std::endl;
+		for (auto cell : _buf.recvBuffer) {
+			std::cout << cell << ", ";
+		}
+		std::cout << std::endl;*/
+        _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer);
+        //std::cout << "Finish _multiMDCellService->sendFromMD2Macro " << std::endl;
       }
 
-      if (_rank==0){
-        gettimeofday(&_tv.end,NULL);
-        _tv.filter += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
-      }
     }
   }
 
@@ -631,7 +753,6 @@ private:
     if (couetteSolverInterface != NULL){delete couetteSolverInterface; couetteSolverInterface = NULL;}
     if (_couetteSolver != NULL){delete _couetteSolver; _couetteSolver=NULL;}
     if(_multiMDCellService != NULL){delete _multiMDCellService; _multiMDCellService=NULL;}
-    if(_noiseReduction != NULL){delete _noiseReduction; _noiseReduction=NULL;}
 
     std::cout << "Finish CouetteTest::shutdown() " << std::endl;
   }
@@ -856,6 +977,18 @@ private:
           exit(EXIT_FAILURE);
         }
       }
+	//In case of synthetic MD, each rank needs access to the analytical solution. In that case we thus initialize analytical solvers on each rank other than 0
+	else if( _cfg.miSolverType == SYNTHETIC){ //rank != 0
+      if (_rank == 0){
+        solver = new coupling::solvers::CouetteSolver<3>(_cfg.channelheight,vel[0],_cfg.kinVisc);
+        if (solver==NULL){ //How is this even reachable? Copied it from above...
+          std::cout << "ERROR CouetteTest::getCouetteSolver(): Analytic solver==NULL!" << std::endl;
+          exit(EXIT_FAILURE);
+        }
+      }
+
+
+	  }
     }
     #if(BUILD_WITH_OPENFOAM)
     else if(_cfg.maSolverType == COUETTE_FOAM){
@@ -1002,7 +1135,6 @@ private:
   std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterface;
   std::vector<coupling::interface::MDSimulation*> _simpleMD;
   std::default_random_engine _generator;
-  coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;
   TimingValues _tv;
   #if(BUILD_WITH_OPENFOAM)

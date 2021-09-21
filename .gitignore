@@ -4,6 +4,7 @@ build/
 *.vtk
 *.txt
 *.png
+*.vti
 *.o
 *.out
 *.h.gch
@@ -25,3 +26,7 @@ FoamSetup/
 *.png
 coupling/tests/kvs-lbmpy/*.xml
 coupling/tests/kvs-lbmpy/*.ini
+*.old
+*.html
+*.dot
+docs/

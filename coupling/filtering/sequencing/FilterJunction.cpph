@@ -1,0 +1,151 @@
+// This file is part of the Mamico proJunctionn conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamic::o
+
+//Member functions of coupling::FilterJunction
+
+template<unsigned int dim, std::size_t inputc>
+int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) { //in our case "junctionNode" would be more precise
+	if(!sequenceNode) return EXIT_FAILURE;
+
+	//null if junction is empty
+    tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
+	
+	std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> inputCellVector = _inputDomainCellVector_parted;
+	std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc>  outputCellVector = _domainCellVector2_parted;
+	#ifdef DEBUG_FILTER_PIPELINE
+	std::cout << PRINT_PREFIX() << "Initializing junctor objects." << std::endl;
+	#endif	
+
+	//Keep track of this for each indivial input partition.
+	bool firstIteration[inputc] = { true };
+
+    while(currJunctorNode) {
+
+		//All Junctors must implement one of the {X,Y}-Junctor interfaces, each of which implement FilterInterface.
+		coupling::FilterInterface<dim>* newjunctor = nullptr;
+		
+	//TODO: reduce per-junctor customization: generalize!
+	//###############################################################
+	//This is where you have to define how to handle each junctor individually.
+
+        //NLM
+        if(std::strcmp(currJunctorNode->Value(), "NLM") == 0) {
+
+			//Optional parameters
+			int inputp_unfiltered = 0; //default
+			tarch::configuration::ParseConfiguration::readIntOptional(inputp_unfiltered, currJunctorNode, "input-unfiltered");
+			int inputp_prefiltered = 1; //default
+			tarch::configuration::ParseConfiguration::readIntOptional(inputp_prefiltered, currJunctorNode, "input-filtered");
+			int outputp = 0; //default
+			tarch::configuration::ParseConfiguration::readIntOptional(outputp, currJunctorNode, "output");
+
+			//check for invalid partition indexes
+			for(auto p : { inputp_unfiltered, inputp_prefiltered, outputp }) {
+				if(p < 0) {
+					std::cout << PRINT_PREFIX() << "ERROR: Negative input or output lane index specified in XML:" << p << std::endl;
+					return EXIT_FAILURE;	
+				}
+				if(p >= (int) inputc) {
+					std::cout << PRINT_PREFIX() << "ERROR: Input or output lane index specified in XML (" << p << ") is too large!" << std::endl;
+					return EXIT_FAILURE;	
+				}
+			}
+	
+			//Mandatory parameters
+			int tws;
+			if(currJunctorNode->QueryIntAttribute("time-window-size", &tws)){
+				std::cout << "ERROR: NLM filter misses attribute time-window-size in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(tws <= 2){
+				std::cout << "ERROR: NLM: time-window-size must be greater than two." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			double sigsq;
+			if(currJunctorNode->QueryDoubleAttribute("sigsq", &sigsq)){
+				std::cout << "ERROR: NLM filter misses attribute sigsq in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(tws < 0){
+				std::cout << "ERROR: NLM: sigsq must be greater than zero." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			double hsq;
+			if(currJunctorNode->QueryDoubleAttribute("hsq", &hsq)){
+				std::cout << "ERROR: NLM filter misses attribute hsq in config file." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			if(hsq < 0){
+				std::cout << "ERROR: NLM: hsq must be greater than zero." << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+
+
+			//Instanciation
+			newjunctor = new coupling::NLM<dim>(
+					inputCellVector[inputp_unfiltered],
+					inputCellVector[inputp_prefiltered],
+					outputCellVector[outputp], 
+					coupling::FilterSequence<dim>::_sequenceDomainCellIndices,
+					coupling::FilterSequence<dim>::_filteredValues, 
+					coupling::FilterSequence<dim>::_ic, 
+					tws,
+					sigsq,
+					hsq);
+
+			//TODO: generalize this for arbitrary junctors?
+			//Swapping for output partition
+			if(firstIteration[outputp]){
+				inputCellVector[outputp] = _domainCellVector1_parted[outputp];
+				firstIteration[outputp] = false;
+			}
+			inputCellVector[outputp].swap(outputCellVector[outputp]);
+
+        }		
+	//###############################################################
+
+		//Unknown junctor identifier
+        else {
+			std::cout << "ERROR: Filter-Junction does not recognize junctor called " << currJunctorNode->Value() << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        coupling::FilterSequence<dim>::_filters.push_back(newjunctor);
+		currJunctorNode = currJunctorNode->NextSiblingElement();
+	}
+
+	#ifdef DEBUG_FILTER_JUNCTIONS
+	std::cout << PRINT_PREFIX(); printOutputCellVector();
+	#endif
+	
+	return 0;
+}
+
+//Disclaimer: All uses of "this->" in this function reference members of FilterSequence.
+template<unsigned int dim, std::size_t inputc>
+void coupling::FilterJunction<dim, inputc>::initDomain(){
+	#ifdef DEBUG_FILTER_PIPELINE
+    std::cout << PRINT_PREFIX() << "Initializing partitioned domains." << std::endl;
+    #endif
+
+	//sanity check
+	if(_inputCellVector_parted[0].size() != this->_cellIndices.size()) //assumes _inputCellVector.size > 0, which is checked in constrcutor.
+		throw std::runtime_error("ERROR: FilterJunction: initDomain(): Mismatching partition sizes.");
+
+    bool outOfBounds;
+	for(unsigned int p = 0; p < inputc; p++) {
+		for(unsigned int index = 0; index < _inputCellVector_parted[p].size(); index++){
+			outOfBounds = false;
+			for(unsigned int d = 0; d < dim; d++) 
+				if(this->_cellIndices[index][d] < this->_domainStart[d] || this->_cellIndices[index][d] > this->_domainEnd[d]) outOfBounds = true;
+			if(!outOfBounds){
+				_inputDomainCellVector_parted[p].push_back(_inputCellVector_parted[p][index]);
+				_domainCellVector1_parted[p].push_back(_cellVector1_parted[p][index]);
+				_domainCellVector2_parted[p].push_back(_cellVector2_parted[p][index]);
+			}
+		}
+	}
+}
+
