@@ -488,10 +488,10 @@ private:
     if(_cfg.initAdvanceCycles > 0 && _couetteSolver != NULL)
       _couetteSolver->advance(_cfg.initAdvanceCycles * _simpleMDConfig.getSimulationConfiguration().getDt()
         * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
-      for (unsigned int i = 0; i < _localMDInstances; i++){
-        static_cast<coupling::services::MacroscopicCellServiceImpl<MY_LINKEDCELL,3>&>(_multiMDCellService->getMacroscopicCellService(i)).setParticleInsertionType(coupling::configurations::ParticleInsertionConfiguration::PUSH);
-      }
-    }
+      //for (unsigned int i = 0; i < _localMDInstances; i++){
+        //static_cast<coupling::services::MacroscopicCellServiceImpl<MY_LINKEDCELL,3>&>(_multiMDCellService->getMacroscopicCellService(i)).setParticleInsertionType(coupling::configurations::ParticleInsertionConfiguration::PUSH);
+      //}
+    //}
 
     // finish time measurement for initialisation
     if(_rank == 0){
