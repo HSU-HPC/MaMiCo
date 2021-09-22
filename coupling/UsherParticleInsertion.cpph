@@ -3,6 +3,68 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <cstdio>
+#include "coupling/interface/Molecule.h"
+
+namespace coupling {
+  namespace cellmappings {
+    template<class LinkedCell,unsigned int dim>
+    class usherVisPlotter;
+  }
+}
+
+
+template<class LinkedCell,unsigned int dim>
+class coupling::cellmappings::usherVisPlotter {
+  public:
+    usherVisPlotter(
+      std::stringstream &moleculeVelocities,
+      std::stringstream &moleculePositions,
+      coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface
+    ): _mdSolverInterface(mdSolverInterface),_moleculeVelocities(moleculeVelocities), _moleculePositions(moleculePositions),_particleCounter(0){}
+
+    ~usherVisPlotter(){}
+
+    void beginCellIteration(){
+      _particleCounter = 0;
+    }
+
+    void endCellIteration(){}
+
+    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+      coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
+      it->begin();
+      while(it->continueIteration()){
+        const coupling::interface::Molecule<dim> &wrapper(it->getConst());
+        const tarch::la::Vector<dim,double> position = wrapper.getPosition();
+        const tarch::la::Vector<dim,double> velocity = wrapper.getVelocity();
+        //std::cout << "Touch molecule " << position << std::endl;
+        for (unsigned int d = 0; d < dim; d++){
+          _moleculePositions << position[d] << std::endl;
+          _moleculeVelocities << velocity[d] << std::endl;
+        }
+        _moleculePositions << "-" << std::endl;
+        _moleculeVelocities << "-" << std::endl;
+
+        _particleCounter++;
+        it->next();
+      }
+      delete it;
+    }
+
+    const unsigned int& getParticleCounter() const { return _particleCounter;}
+
+  private:
+    coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;
+    std::stringstream &_moleculeVelocities;
+    std::stringstream &_moleculePositions;
+    unsigned int _particleCounter;
+};
+
 template<class LinkedCell,unsigned int dim>
 coupling::UsherParticleInsertion<LinkedCell,dim>::UsherParticleInsertion(
 unsigned int insertDeleteMassEveryTimestep,
@@ -19,7 +81,27 @@ _particlesInserted(0),
 _particlesRemoved(0),
 #endif
 _mdSolverInterface(mdSolverInterface),
-_usherParams(rSigmaCoeff,meanPotentialEnergyFactor,uOverlapCoeff,stepRefCoeff,iterMax,restartMax,tolerance,offsetFromOuterBoundary){}
+_usherParams(rSigmaCoeff,meanPotentialEnergyFactor,uOverlapCoeff,stepRefCoeff,iterMax,restartMax,tolerance,offsetFromOuterBoundary)
+{
+  remove("usherPositions.txt");
+  remove("usherVelocities.txt");
+  remove("StatusDoc.txt");
+
+  tarch::la::Vector<dim,double> size = _mdSolverInterface->getGlobalMDDomainSize();
+  tarch::la::Vector<dim,double> offset = _mdSolverInterface->getGlobalMDDomainOffset();
+
+  std::ofstream posDoc;
+  posDoc.open("usherPositions.txt", std::ios::trunc);
+  posDoc<<size.operator[](0)<<std::endl<<size.operator[](1)<<std::endl<<size.operator[](2)<<std::endl;
+  posDoc<<offset.operator[](0)<<std::endl<<offset.operator[](1)<<std::endl<<offset.operator[](2)<<std::endl;
+  posDoc<<macroscopicCellSize.operator[](0)<<std::endl<<macroscopicCellSize.operator[](1)<<std::endl<<macroscopicCellSize.operator[](2)<<std::endl;
+  posDoc.close();
+
+  std::ofstream StatusDoc;
+  StatusDoc.open("StatusDoc.txt", std::ios::trunc);
+  StatusDoc<<"0";
+  StatusDoc.close();
+}
 
 
 
@@ -40,7 +122,62 @@ const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
     action = insertParticle(cell,macroscopicCellPosition,macroscopicCellSize,meanVelocity,temperature,boundaryForceController);
     if (action == coupling::ParticleInsertion<LinkedCell,dim>::Insertion){
       cell.addMicroscopicMass(-moleculeMass);
+      remove ("pathDoc.txt");
     }
+
+  //particle insertion failed
+  else{
+    std::ofstream pfile("usherPositions.txt", std::ios::app);
+    std::ofstream vfile("usherVelocities.txt", std::ios::app);
+
+    pfile << "failure" << std::endl;
+    vfile << "failure" << std::endl;
+
+    std::string help;
+    for (unsigned int d = 0; d < dim; d++)
+    {
+      help = std::to_string(macroscopicCellPosition.operator[](d));
+      std::replace(help.begin(),help.end(),'.',',');
+      pfile << help << std::endl;
+    }
+
+    pfile << "failpath" << std::endl;
+    vfile << "failpath" << std::endl;
+    std::ifstream pathDoc2in ("pathDoc.txt");
+    std::stringstream data;
+    data << pathDoc2in.rdbuf();
+    pfile << data.str();
+    pfile << "endpath" << std::endl;
+    pathDoc2in.close();
+    remove ("pathDoc.txt");
+
+    std::stringstream _moleculeVelocities;
+    std::stringstream _moleculePositions;
+
+    coupling::cellmappings::usherVisPlotter<LinkedCell,dim> usherPlotter = coupling::cellmappings::usherVisPlotter(_moleculeVelocities,_moleculePositions,_mdSolverInterface);
+    cell.iterateConstCells(usherPlotter);
+
+    help = _moleculePositions.str();
+    std::replace(help.begin(),help.end(),'.',',');
+    pfile << help;
+
+    help = _moleculeVelocities.str();
+    std::replace(help.begin(),help.end(),'.',',');
+    vfile << help;
+
+    pfile << "break" << std::endl;
+    vfile << "break" << std::endl;
+
+    vfile.close();
+    pfile.close();
+
+    std::ofstream StatusDoc;
+    StatusDoc.open("StatusDoc.txt", std::ios::trunc);
+    StatusDoc<<"success";
+    StatusDoc.close();
+    }
+  }
+
   // if we need to delete a particle, we try this and - in case it works - add a particle mass to the negative buffer
   } else if (cell.getMicroscopicMass() <= -moleculeMass){
     action = deleteParticle(cell,boundaryForceController);
@@ -50,6 +187,35 @@ const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
       std::cout << "Delete particle: Success" << std::endl;
       #endif
     }
+  }
+
+  //if no particle was inserted, the algorithm did not fail inserting and no particle was deleted, only plot the cell,
+  //if the microscopic mass is greater than 0.5 and the cell is at a surface of the domain
+  else if(toBePlotted && std::abs(cell.getMicroscopicMass())>0.5)
+  {
+    std::string help;
+    std::stringstream _moleculeVelocities;
+    std::stringstream _moleculePositions;
+
+    coupling::cellmappings::usherVisPlotter<LinkedCell,dim> usherPlotter = coupling::cellmappings::usherVisPlotter(_moleculeVelocities,_moleculePositions,_mdSolverInterface);
+    cell.iterateConstCells(usherPlotter);
+
+    std::ofstream pfile("usherPositions.txt", std::ios::app);
+    std::ofstream vfile("usherVelocities.txt", std::ios::app);
+
+    help = _moleculePositions.str();
+    std::replace(help.begin(),help.end(),'.',',');
+    pfile << help;
+
+    help = _moleculeVelocities.str();
+    std::replace(help.begin(),help.end(),'.',',');
+    vfile << help;
+
+    pfile << "break" << std::endl;
+    vfile << "break" << std::endl;
+
+    pfile.close();
+    vfile.close();
   }
 
   return action;
@@ -83,7 +249,51 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::insertParticle(
     #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
     std::cout << "Insert particle: Success " << molecule.getPosition() << std::endl;
     #endif
+
+    std::string help;
+    std::stringstream _moleculeVelocities;
+    std::stringstream _moleculePositions;
+
+    coupling::cellmappings::usherVisPlotter<LinkedCell,dim> usherPlotter = coupling::cellmappings::usherVisPlotter(_moleculeVelocities,_moleculePositions,_mdSolverInterface);
+    cell.iterateConstCells(usherPlotter);
+
+    std::ofstream pfile("usherPositions.txt", std::ios::app);
+    std::ofstream vfile("usherVelocities.txt", std::ios::app);
+
+    help = _moleculePositions.str();
+    std::replace(help.begin(),help.end(),'.',',');
+    pfile << help;
+
+    help = _moleculeVelocities.str();
+    std::replace(help.begin(),help.end(),'.',',');
+    vfile << help;
+
+
+    for (int k = 0; k < 3; k++)
+    {
+      help = std::to_string(molecule.getPosition().operator[](k));
+      std::replace(help.begin(),help.end(),'.',',');
+      pfile << help << std::endl;
+    }
+    pfile << "-" << std::endl;
+    pfile << "inserted" << std::endl;
+    pfile.close();
+
+    for (int k = 0; k < 3; k++)
+    {
+      help = std::to_string(molecule.getVelocity().operator[](k));
+      std::replace(help.begin(),help.end(),'.',',');
+      vfile << help << std::endl;
+    }
+    vfile << "-" << std::endl;
+    vfile << "inserted" << std::endl;
+    vfile.close();
+
+    std::ofstream StatusDoc("StatusDoc.txt", std::ios::trunc);
+    StatusDoc << "success";
+    StatusDoc.close();
   }
+
   #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
   else {
     std::cout << "Insert particle: Failure" << std::endl;
@@ -118,6 +328,50 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   _ZhouEnergyRemoved += boundaryForceController.getPotentialEnergy(deleteParticleMapping.getDeletedMolecule().getPosition());
   _particlesRemoved++;
   #endif
+
+  std::string help;
+  std::stringstream _moleculeVelocities;
+  std::stringstream _moleculePositions;
+
+  coupling::cellmappings::usherVisPlotter<LinkedCell,dim> usherPlotter = coupling::cellmappings::usherVisPlotter(_moleculeVelocities,_moleculePositions,_mdSolverInterface);
+  cell.iterateConstCells(usherPlotter);
+
+  std::ofstream pfile("usherPositions.txt", std::ios::app);
+  std::ofstream vfile("usherVelocities.txt", std::ios::app);
+
+  help = _moleculePositions.str();
+  std::replace(help.begin(),help.end(),'.',',');
+  pfile << help;
+
+  help = _moleculeVelocities.str();
+  std::replace(help.begin(),help.end(),'.',',');
+  vfile << help;
+
+  for (int k = 0; k < 3; k++)
+  {
+    help = std::to_string(deleteParticleMapping.getDeletedMolecule().getPosition().operator[](k));
+    std::replace(help.begin(),help.end(),'.',',');
+    pfile << help << std::endl;
+  }
+  pfile << "-" << std::endl;
+  pfile << "removed" << std::endl;
+  pfile.close();
+
+  for (int k = 0; k < 3; k++)
+  {
+    help = std::to_string(deleteParticleMapping.getDeletedMolecule().getVelocity().operator[](k));
+    std::replace(help.begin(),help.end(),'.',',');
+    vfile << help << std::endl;
+  }
+  vfile << "-" << std::endl;
+  vfile << "removed" << std::endl;
+  vfile.close();
+
+
+  std::ofstream StatusDoc;
+  StatusDoc.open("StatusDoc.txt", std::ios::trunc);
+  StatusDoc << "success";
+  StatusDoc.close();
 
   return coupling::ParticleInsertion<LinkedCell,dim>::Deletion;
 }
@@ -201,6 +455,16 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       position[d] = macroscopicCellPosition[d] +  macroscopicCellSize[d]*tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();
     }
 
+    std::string help;
+    std::ofstream pathDoc2("pathDoc.txt", std::ios::app);
+    for (unsigned int d = 0; d < dim; d++)
+    {
+      help = std::to_string(position.operator[](d));
+      std::replace(help.begin(),help.end(),'.',',');
+      pathDoc2<<help<<std::endl;
+    }
+    pathDoc2.close();
+
     // determine force and energy that act on molecule
     molecule.setPosition(position);
     _mdSolverInterface->calculateForceAndEnergy( molecule);
@@ -268,6 +532,16 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       position = position + (stepSize*signAl/absForce)*force;
 
       molecule.setPosition(position);
+
+      std::string help;
+      std::ofstream pathDoc2("pathDoc.txt", std::ios::app);
+      for (unsigned int d = 0; d < dim; d++)
+      {
+        help = std::to_string(position.operator[](d));
+        std::replace(help.begin(),help.end(),'.',',');
+        pathDoc2<<help<<std::endl;
+      }
+      pathDoc2.close();
       
       // restart searching if the new position of the particle is outside the macroscopic cell
       for (unsigned int d = 0; d < dim; d++ ){
@@ -300,6 +574,11 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
         break;
       }
     }
+
+    std::ofstream pathDoc("pathDoc.txt", std::ios::app);
+    pathDoc << "restart" << std::endl;
+    pathDoc.close();
+
     if(success>0){
        molecule.setPosition(positionOld);
       _mdSolverInterface->calculateForceAndEnergy( molecule);
