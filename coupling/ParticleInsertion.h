@@ -32,6 +32,7 @@ class coupling::ParticleInsertion {
       const tarch::la::Vector<dim,double>& macroscopicCellSize,
       const tarch::la::Vector<dim,double>& meanVelocity,
       const double &temperature,
+      bool toBePlotted,
       const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
     )  = 0;
 

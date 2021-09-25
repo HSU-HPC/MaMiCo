@@ -44,7 +44,7 @@ _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscop
 _filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, _macroscopicSolverInterface, multiMDService, coupling::Scope::perInstance, filterPipelineConfiguration),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
-_particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
+_particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface, _indexConversion->getMacroscopicCellSize())),
 _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
 _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
 _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface,*_indexConversion,numberMDTimestepsPerCouplingCycle)),
@@ -385,6 +385,13 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
             potentialEnergy = computeMeanPotentialEnergyMapping.getPotentialEnergy();
             macroscopicCells[index].setPotentialEnergy(potentialEnergy);
 
+            bool toBePlotted = false;
+
+            if(cellIndex[2] == 1|| cellIndex[1] == 1 || cellIndex[0] == 1 || cellIndex[2] == 12|| cellIndex[1] == 12 || cellIndex[0] == 12)
+            {
+              toBePlotted = true;
+            }
+
             // insert/ delete mass
             particleInsertionAction = _particleInsertion->insertDeleteMass(
                                         macroscopicCells[index],
@@ -392,6 +399,7 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
                                         _indexConversion->getMacroscopicCellSize(),
                                         meanVelocity,
                                         temperature,
+                                        toBePlotted,
                                         *_boundaryForceController
                                       );
             // if insertion/ deletion was successful...
@@ -415,6 +423,43 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
     _mdSolverInterface->synchronizeMoleculesAfterMassModification();
 
   } // 2^dim-colour whole domain (1<<dim)
+
+  std::ifstream inHelperDoc("StatusDoc.txt");
+  std::string inH;
+  getline(inHelperDoc,inH);
+
+  if(inH == "success")
+  {
+    inHelperDoc.close();
+    std::ofstream posDoc("usherPositions.txt", std::ios::app);
+    std::ofstream velDoc("usherVelocities.txt", std::ios::app);
+    posDoc<<"end"<<std::endl;
+    velDoc<<"end"<<std::endl;
+    posDoc.close();
+    velDoc.close();
+  }
+
+  else
+  {
+    std::ifstream inPosDoc("usherPositions.txt");
+    std::stringstream metaData;
+    std::string metaValue;
+    for (int j = 0; j < 9; j++)
+    {
+      getline(inPosDoc, metaValue);
+      std::replace(metaValue.begin(),metaValue.end(),'.',',');
+      metaData<<metaValue<<std::endl;
+    }
+    inPosDoc.close();
+
+    std::ofstream outPosDoc("usherPositions.txt", std::ios::trunc);
+    outPosDoc<<metaData.str();
+    outPosDoc.close();    
+    
+    remove("usherVelocities.txt");
+
+  }
+
 
   #ifdef USHER_DEBUG
   coupling::UsherParticleInsertion<LinkedCell,dim>* p = ((coupling::UsherParticleInsertion<LinkedCell,dim>*)_particleInsertion);

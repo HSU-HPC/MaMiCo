@@ -37,7 +37,7 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
      unsigned int insertDeleteMassEveryTimestep,
      double rSigmaCoeff, double meanPotentialEnergyFactor,double uOverlapCoeff,
      double stepRefCoeff,unsigned int iterMax,unsigned int restartMax,double tolerance, double offsetFromOuterBoundary,
-      coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface
+      coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface, const tarch::la::Vector<dim,double>& macroscopicCellSize
     );
     virtual ~UsherParticleInsertion(){}
 
@@ -52,8 +52,9 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
       const tarch::la::Vector<dim,double>& macroscopicCellSize,
       const tarch::la::Vector<dim,double>& meanVelocity,
       const double &temperature,
+      bool toBePlotted,
       const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
-    ) ;
+    ) override;
 
     virtual bool requiresPotentialEnergyLandscape(){ return true; }
 

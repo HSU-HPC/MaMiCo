@@ -59,11 +59,11 @@ class coupling::configurations::ParticleInsertionConfiguration: public tarch::co
     bool isValid() const;
 
     template<class LinkedCell, unsigned int dim>
-    coupling::ParticleInsertion<LinkedCell,dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface) const {
+    coupling::ParticleInsertion<LinkedCell,dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface, const tarch::la::Vector<dim,double>& macroscopicCellSize) const {
       if (_particleInsertionType==USHER){
         return new coupling::UsherParticleInsertion<LinkedCell,dim>(
           _insertDeleteMassEveryTimestep,_rSigmaCoeff, _meanPotentialEnergyFactor, _uOverlapCoeff, _stepRefCoeff, _iterMax, _restartMax, _tolerance, _offsetFromOuterBoundary,
-          mdSolverInterface);
+          mdSolverInterface, macroscopicCellSize);
       } else if (_particleInsertionType==NO_INSERTION){
         return new coupling::NoParticleInsertion<LinkedCell,dim>();
       }
