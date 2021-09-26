@@ -438,7 +438,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	#endif
 }
 
-#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //unused in sequential scenario
+#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //only used for parallel scenarios
 /*
  * This was in large parts stolen from IndexConversion.
  */

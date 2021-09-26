@@ -24,29 +24,31 @@ template <unsigned int dim>
 class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 	public:
 		FilterFromFunction(
-					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
-					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-					const std::vector<tarch::la::Vector<dim, unsigned int>>& cellIndices,
+					const std::vector<coupling::datastructures::IndexedMacroscopicCell<dim> *>& inputCellVector,
+					const std::vector<coupling::datastructures::IndexedMacroscopicCell<dim> *>& outputCellVector,
 					std::array<bool, 7> filteredValues,
 					const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
 					const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector
 					):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "FFF"),
+			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "FFF"),
 			_applyScalar(applyScalar),
 			_applyVector(applyVector)
 		{
 			if(applyScalar == nullptr or applyVector == nullptr) 
 				throw std::runtime_error("ERROR: FilterFromFunction received nullptr as function pointer!");
 
-			//cast tarch::la indexing to std::array
+			//cast MaMiCo indexing to std::array
 			std::array<unsigned int, dim> stlIndex;
-			for(auto mamicoIndex : cellIndices) {
-				for(unsigned int d = 0; d < dim; d++) stlIndex[d] = mamicoIndex[d];
+			coupling::indexing::CellIndex<dim, {.vector=true}> vectorIndex;
+			for(auto c : inputCellVector) {
+				vectorIndex = c->index;
+				for(unsigned int d = 0; d < dim; d++) stlIndex[d] = vectorIndex.get()[d];
 				_stlIndices.push_back(stlIndex);
 			}
 		}
 
 		~FilterFromFunction() {
+			//TODO: is this safe?
 			delete _applyScalar;
 			delete _applyVector;
 		}
@@ -67,8 +69,8 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				/*
 				 * PACK
 				 */
-				for(auto cell : coupling::FilterInterface<dim>::_inputCells) {
-					input_s.push_back((cell->*(coupling::FilterInterface<dim>::_scalarGetters[s]))());
+				for(auto c : coupling::FilterInterface<dim>::_inputCells) {
+					input_s.push_back((c->cell.*(coupling::FilterInterface<dim>::_scalarGetters[s]))());
 				}
 
 				//std::cout << "Now applying scalar func at: " << _applyScalar << std::endl;
@@ -88,7 +90,7 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				 * UNPACK
 				 */
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
-					(coupling::FilterInterface<dim>::_outputCells[i]->*(coupling::FilterInterface<dim>::_scalarSetters[s]))(output_s[i]);
+					(coupling::FilterInterface<dim>::_outputCells[i]->cell.*(coupling::FilterInterface<dim>::_scalarSetters[s]))(output_s[i]);
 				}	
 			}
 
@@ -102,8 +104,8 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				/*
 				 * PACK
 				 */
-				for(auto cell : coupling::FilterInterface<dim>::_inputCells) {
-					tarch::la::Vector<dim, double> mamico_vec = (cell->*(coupling::FilterInterface<dim>::_vectorGetters[v]))();
+				for(auto c : coupling::FilterInterface<dim>::_inputCells) {
+					tarch::la::Vector<dim, double> mamico_vec = (c->cell.*(coupling::FilterInterface<dim>::_vectorGetters[v]))();
 					std::array<double, dim> array_vec;
 					for(unsigned int d = 0; d < dim; d++) array_vec[d] = mamico_vec[d];
 					input_v.push_back(array_vec);
@@ -125,9 +127,9 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				 * UNPACK
 				 */
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
-					tarch::la::Vector<dim, double> mamico_vec(-1.0);
+					tarch::la::Vector<dim, double> mamico_vec {};
 					for(unsigned int d = 0; d < dim; d++) mamico_vec[d] = output_v[i][d];
-					(coupling::FilterInterface<dim>::_outputCells[i]->*(coupling::FilterInterface<dim>::_vectorSetters[v]))(mamico_vec);
+					(coupling::FilterInterface<dim>::_outputCells[i]->cell.*(coupling::FilterInterface<dim>::_vectorSetters[v]))(mamico_vec);
 				}
 
 				//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("FFF AFTER ");

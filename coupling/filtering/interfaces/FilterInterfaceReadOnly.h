@@ -14,20 +14,19 @@ namespace coupling{
  * Extension of FilterInterface.h for cases in which the filter itself does not produce any output data.
  * For such filters, you want to make use of copyInputToOutput() (see below) in every filter step.
  *
- * @Author Felix Maurer
+ * @author Felix Maurer
  */
 
 template <unsigned int dim>
 class coupling::FilterInterfaceReadOnly : public coupling::FilterInterface<dim>{
 	public:
 		FilterInterfaceReadOnly(
-					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
-					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-					const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
+					const std::vector<coupling::datastructures::IndexedMacroscopicCell<dim> *>& inputCellVector,
+					const std::vector<coupling::datastructures::IndexedMacroscopicCell<dim> *>& outputCellVector,
 					const std::array<bool, 7> filteredValues,
 					const char* type
 		):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, type)
+			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, type)
 		{}
 	protected:
 		/*
@@ -43,14 +42,15 @@ class coupling::FilterInterfaceReadOnly : public coupling::FilterInterface<dim>{
 			 */
 			if(coupling::FilterInterface<dim>::_outputCells.empty()) return;
 
+			//TODO: increase readibility. maybe some using-directives?
 			for(unsigned int ci = 0; ci < coupling::FilterInterface<dim>::_outputCells.size(); ci++){
 				for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++){
-					(coupling::FilterInterface<dim>::_outputCells[ci]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
-					(coupling::FilterInterface<dim>::_inputCells[ci]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))());
+					(coupling::FilterInterface<dim>::_outputCells[ci]->cell.*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
+					(coupling::FilterInterface<dim>::_inputCells[ci]->cell.*(coupling::FilterInterface<dim>::_scalarGetters[si]))());
 				}
 				for(unsigned int vi = 0; vi < coupling::FilterInterface<dim>::_vectorSetters.size(); vi++){
-					(coupling::FilterInterface<dim>::_outputCells[ci]->*(coupling::FilterInterface<dim>::_vectorSetters[vi]))(
-					(coupling::FilterInterface<dim>::_inputCells[ci]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))());
+					(coupling::FilterInterface<dim>::_outputCells[ci]->cell.*(coupling::FilterInterface<dim>::_vectorSetters[vi]))(
+					(coupling::FilterInterface<dim>::_inputCells[ci]->cell.*(coupling::FilterInterface<dim>::_vectorGetters[vi]))());
 				}
 			}
 

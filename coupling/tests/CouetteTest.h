@@ -434,6 +434,7 @@ private:
 					return syntheticMasses;
 
   				}},
+				//TODO: update this to new indexing system, i.e. eliminate occurences of icm2m
 				new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double,3>>, std::vector<std::array<unsigned int, 3>>)> { //applyVector
 				[this] (	
 					std::vector<std::array<double, 3>> inputVectors, //same for these 2
@@ -448,8 +449,7 @@ private:
 					//std::cout << "Entering synthetic MD vector." << std::endl;
 
 					//unlike for the scalar case, we need the MD2Macro version of IC to calculate correct offsets
-					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro =
-						_multiMDCellService->getMacroscopicCellService(0).getFilterPipeline().getICM2M();
+					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro = nullptr;
 
 					const unsigned int size = cellIndices.size();
 					const tarch::la::Vector<3,double> md2MacroDomainOffset = indexConversionMD2Macro->getGlobalMD2MacroDomainOffset();
