@@ -165,7 +165,7 @@ class coupling::services::MultiMDCellService {
       #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
       if(_postMultiInstanceFilterPipeline == nullptr) {
           //Init filter pipeline
-          _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, _cellIndices, &(_macroscopicCellServices[0]->getIndexConversion()), _macroscopicSolverInterface, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
+          _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, _multiMDService, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
       }
       #endif
 

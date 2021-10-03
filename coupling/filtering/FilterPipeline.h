@@ -43,8 +43,6 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterPipeline{
     public:
-
-		//TODO: comment! difference: whole domain vs only md2macro incl. indexing
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 			const tarch::utils::MultiMDService<dim>& multiMDService,

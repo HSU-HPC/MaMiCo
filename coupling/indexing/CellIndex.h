@@ -5,7 +5,6 @@
 
 #include "tarch/la/Vector.h"
 
-
 namespace coupling {
 	namespace indexing {
 
@@ -182,6 +181,8 @@ class coupling::indexing::CellIndex {
 template<unsigned int dim, coupling::indexing::IndexType idx_T>
 std::ostream& operator<<(std::ostream& os, const coupling::indexing::CellIndex<dim, idx_T>& i);
 
+//Include non-member index operations
+#include "Operations.h"
 
 //Include implementation
 #include "CellIndex.cpph"

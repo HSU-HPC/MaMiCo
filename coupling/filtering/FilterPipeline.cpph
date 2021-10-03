@@ -19,34 +19,51 @@ coupling::FilterPipeline<dim>::FilterPipeline(
         throw std::runtime_error("Could not read config for Filter-Pipeline: XML syntax error.");
     }
 
+	//auxilliary declarations for this scope only TODO: comments
+	enum class cellDomainType { mdDomain, md2MacroDomain }; //maybe a global declaration of this could be useful?
+	using LocalMDDomainIndex = coupling::indexing::CellIndex<dim, {.local=true}>;
+	using LocalMD2MacroDomainIndex = coupling::indexing::CellIndex<dim, {.local=true, .md2macro=true}>;
+	
+	//get linear size of all domains contained in cellDomainType
+	unsigned int linearMDDomainSize = 1;
+	unsigned int linearMD2MacroDomainSize = 1;
+	for(unsigned int d = 0; d < dim; d++) {
+		linearMDDomainSize *= LocalMDDomainIndex::numberCellsInDomain[d];
+		linearMD2MacroDomainSize *= LocalMD2MacroDomainIndex::numberCellsInDomain[d];
+	}
+
+	cellDomainType inputCellDomain;
+	//TODO: comparing uint size with tarch la size
+	//Deduct the kind of domain passed from its size: //TODO: emphasize this! its very important
+	if(inputCells.size() == linearMDDomainSize) {
+		inputCellDomain = cellDomainType::mdDomain; 
+	}
+	else if(inputCells.size() == linearMD2MacroDomainSize) {
+		inputCellDomain = cellDomainType::md2MacroDomain;
+	}
+	else throw std::runtime_error("Invalid amount of input cells");
+
 	//construct indices for inputCells
 	std::vector<coupling::datastructures::IndexedMacroscopicCell<dim>* > indexedInputCells;
-	for(unsigned int linearLocalIdx = 0; auto c : inputCells) {
+	for(coupling::indexing::CellIndex<dim> i { inputCellDomain == cellDomainType::mdDomain ? LocalMDDomainIndex::lowerBoundary : LocalMD2MacroDomainIndex::lowerBoundary }; 
+		auto c : inputCells) {
 		//TODO: use smart pointers
-		indexedInputCells.push_back(new coupling::datastructures::IndexedMacroscopicCell<dim>
-		{ 	
-			*c, //copy contents of input cell
-			coupling::indexing::CellIndex<dim, {.local=true}>(linearLocalIdx) //construct new IndexedMacroscopicCell
-		});
-		linearLocalIdx++;
+		indexedInputCells.push_back(new coupling::datastructures::IndexedMacroscopicCell<dim> { *c, i });
+		++i;	
 	}
 
-	{
-		using Md2MacroIndex = coupling::indexing::CellIndex<dim, {.local=true, .md2macro=true}>;
+	auto isInMd2MacroDomainPredicate 
+		= [](coupling::datastructures::IndexedMacroscopicCell<dim> *c) { 
+				return (c->index >= LocalMD2MacroDomainIndex::lowerBoundary) and (c->index <= LocalMD2MacroDomainIndex::upperBoundary); 
+			};
 
-		auto isInMd2MacroDomainPredicate 
-			= [](coupling::datastructures::IndexedMacroscopicCell<dim> *c) { 
-					return (c->index >= Md2MacroIndex::lowerBoundary) and (c->index <= Md2MacroIndex::upperBoundary); 
-				};
+	//init _md2macroCells
+	std::copy_if(indexedInputCells.begin(), indexedInputCells.end(), std::back_inserter(_md2MacroCells), isInMd2MacroDomainPredicate);
 
-		//init _md2macroCells
-		std::copy_if(indexedInputCells.begin(), indexedInputCells.end(), std::back_inserter(_md2MacroCells), isInMd2MacroDomainPredicate);
+	//init _outerCells
+	std::remove_copy_if(indexedInputCells.begin(), indexedInputCells.end(), std::back_inserter(_outerCells), isInMd2MacroDomainPredicate);
 
-		//init _outerCells
-		std::remove_copy_if(indexedInputCells.begin(), indexedInputCells.end(), std::back_inserter(_outerCells), isInMd2MacroDomainPredicate);
-
-		//note that by definition all cells allocated above are now either in _md2MacroCells or _outerCells
-	}
+	//note that by definition all cells allocated above are now either in _md2MacroCells or _outerCells
             
     //check for structural errors in config file
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
