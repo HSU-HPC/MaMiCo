@@ -4,7 +4,6 @@
 
 #pragma once
 #include "coupling/filtering/interfaces/FilterInterface.h"
-#include "coupling/IndexConversionMD2Macro.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include <mpi.h>
 
@@ -12,7 +11,8 @@
 #define FILTER_SEQUENTIAL true
 #define FILTER_PARALLEL false
 
-#define DEBUG_SEQ_FILTER
+//TODO: port these 
+//#define DEBUG_SEQ_FILTER
 //#define DEBUG_SEQ_FILTER_VERBOSE
 
 namespace coupling{
@@ -33,8 +33,8 @@ namespace coupling{
  * Used in coupling::FilterSequence<dim>::loadFiltersFromXML.
  *
  * Disclaimer: 
- * 	1. In this context 'globalized' is equivalent to 'sequentialized' and 'local' to 'parallel'.
- * 	2. Only via XML can globalized filters be added to a sequence. This implies FFF with e.g. a python function is not compatible.
+ * 	1. In this context 'globalized' is equivalent to 'sequentialized' and 'local' to 'parallel'. TODO: fix semantics
+ * 	2. Only via XML can globalized filters be added to a sequence. This implies FFF with e.g. a python function is not compatible with this feature.
  *
  * @Author Felix Maurer
  */
@@ -44,13 +44,12 @@ template <unsigned int dim>
 class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 	public:
 		SequentialFilter(
-					coupling::FilterInterface<dim>* filter,
-					const coupling::IndexConversionMD2Macro<dim>* ic = nullptr, //null if run locally i.e. parallel
-					const MPI_Comm comm = MPI_COMM_WORLD //null if run locally i.e. parallel TODO: remove default parameter, pass communicator
+					coupling::FilterInterface<dim>* filter, 
+					const MPI_Comm comm = MPI_COMM_WORLD //TODO: remove default parameter, pass communicator
 		);
 
 		~SequentialFilter() {
-			delete _filter;
+			delete _filter; //TODO: possible double free?
 			for(auto cell : _inputCells_Global) delete cell;
 			for(auto cell : _outputCells_Global) delete cell;
 	   	}
@@ -58,62 +57,59 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		/*
 		 * Implements FilterInterface's requirement of having a ()-operand defined.
 		 */
-		virtual void operator()();
+		void operator()();
 
 		/*
 		 * These work in a very similar fashion to FilterInterface's advanced getter/setter methods.
 		 */
-		coupling::datastructures::MacroscopicCell<dim>* getLocalInputCellOfIndex(tarch::la::Vector<dim,unsigned int> index);
-		coupling::datastructures::MacroscopicCell<dim>* getLocalOutputCellOfIndex(tarch::la::Vector<dim,unsigned int> index);
+		coupling::datastructures::IndexedMacroscopicCell<dim>* getLocalInputCellOfIndex(const coupling::indexing::CellIndex<dim> index) const;
+		coupling::datastructures::IndexedMacroscopicCell<dim>* getLocalOutputCellOfIndex(const coupling::indexing::CellIndex<dim> index) const;
 
 	private:
 
 		/*
 		 * When sequentialized, all ranks call this function.
 		 */
-		virtual void contribute();
+		void contribute();
 
 		/*
 		 * When sequentialized, only the processing rank calls this function. It acts as a wrapper of _filter's operator() member function.
 		 */
-		virtual void process(bool sequential);
+		void process();
 		
 		/*
 		 * Auxilliary functions providing an interface between low-level double buffers used by MPI and Macro Cells.
 		 */
-		void macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell);
+		void macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>& cell) const;
 
-		void bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell);
+		void bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>& cell) const;
 
-		void cellIndexToBuffer(std::vector<unsigned int>& buf, const tarch::la::Vector<dim, unsigned int>& index);
+		template<coupling::indexing::IndexType idx_T>
+		void cellIndexToBuffer(std::vector<unsigned int>& buf, const coupling::indexing::CellIndex<dim, idx_T>& index) const;
 
-		void bufferToCellIndex(const std::vector<unsigned int>& buf, tarch::la::Vector<dim, unsigned int>& index);
+		template<coupling::indexing::IndexType idx_T>
+		void bufferToCellIndex(const std::vector<unsigned int>& buf, coupling::indexing::CellIndex<dim, idx_T>& index) const;
 
 		//The sequentialized Filter
 		coupling::FilterInterface<dim>* _filter;
 
-		//Null if run locally.
-		const coupling::IndexConversionMD2Macro<dim>* _ic;	
-
 		//MPI related stuff
 		const MPI_Comm _comm;
 		int _commSize;
-		const int _processingRank;
-		const int _myRank;
-
-		//Globalized variants of cell and indexing data structures (i.e spanning across all cells of the global domain). Only the master rank uses these.
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Global; 	
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Global;
-		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices_Global;
+		int _processingRank;
+		int _myRank;
 
 		//Buffers macro cells and indices for MPI communication
 		std::vector<double> _cellbuf;
 		std::vector<unsigned int> _indexbuf;
 
+		//Globalized variants of cell and indexing data structures (i.e spanning across all cells of the global domain). Only the master rank uses these.
+		std::vector<coupling::datastructures::IndexedMacroscopicCell<dim>* > _inputCells_Global; 	
+		std::vector<coupling::datastructures::IndexedMacroscopicCell<dim>* > _outputCells_Global;
+
 		//Used by the processing rank to remember its local domain
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Local;	
-		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Local;	
-		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices_Local;
+		std::vector<coupling::datastructures::IndexedMacroscopicCell<dim>* > _inputCells_Local;	
+		std::vector<coupling::datastructures::IndexedMacroscopicCell<dim>* > _outputCells_Local;	
 };
 
 #include "SequentialFilter.cpph"

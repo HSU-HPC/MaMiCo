@@ -218,7 +218,9 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		//Iterate over all inputs specified in input string.
 		//Note: If there are non-matching names in input String, they are ignored.
 
+		#ifdef JUNCTIONS_PORTED
 		bool asymmetrical = false; //true if we need to build an asymmetrical junction
+		#endif
 		unsigned int inputCount = 0;
 
 		for(auto inputName : inputNames) {
@@ -230,7 +232,9 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 
 			//Special case: "outer" refers to all cells lying outside the md2macro domain. only used by asymmetrical junctions
 			else if(inputName == "outer") {
+				#ifdef JUNCTIONS_PORTED
 				asymmetrical = true;
+				#endif
 				inputCount++;
 			}
 
