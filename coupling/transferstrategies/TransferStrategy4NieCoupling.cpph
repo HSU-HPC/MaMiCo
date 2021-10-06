@@ -108,10 +108,10 @@ processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
   cell.setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
 }
 
-template<class LinkedCell,unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
-beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
-}
+// template<class LinkedCell,unsigned int dim>
+// void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
+// beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
+// }
 
 template<class LinkedCell,unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
@@ -142,11 +142,11 @@ processInnerMacroscopicCellBeforeSendingMDSolverData(
   // _totalMass +=  cell.getMicroscopicMass();
 }
 
-template<class LinkedCell,unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
-endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
+//template<class LinkedCell,unsigned int dim>
+//void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
+//endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
   //std::cout << "Avg massFluxBoundary MD density: " << _totalMass/(_cellCount*15.625) << std::endl;
-}
+//}
 
 
 template<class LinkedCell,unsigned int dim>
