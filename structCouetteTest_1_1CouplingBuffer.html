@@ -72,23 +72,33 @@ $(function() {
   <div class="headertitle"><div class="title">CouetteTest::CouplingBuffer Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>holds the buffers for the data transfer  
+ <a href="structCouetteTest_1_1CouplingBuffer.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ae7f3db9ccc9760ba367e9f0766132a74"><td class="memItemLeft" align="right" valign="top"><a id="ae7f3db9ccc9760ba367e9f0766132a74" name="ae7f3db9ccc9760ba367e9f0766132a74"></a>
 std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; 3 &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>sendBuffer</b></td></tr>
+<tr class="memdesc:ae7f3db9ccc9760ba367e9f0766132a74"><td class="mdescLeft">&#160;</td><td class="mdescRight">the buffer for data transfer from macro to md <br /></td></tr>
 <tr class="separator:ae7f3db9ccc9760ba367e9f0766132a74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae385ef912c79a573f151cc1c97d798d1"><td class="memItemLeft" align="right" valign="top"><a id="ae385ef912c79a573f151cc1c97d798d1" name="ae385ef912c79a573f151cc1c97d798d1"></a>
 unsigned int *&#160;</td><td class="memItemRight" valign="bottom"><b>globalCellIndices4SendBuffer</b></td></tr>
+<tr class="memdesc:ae385ef912c79a573f151cc1c97d798d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global indices of the macroscopic cells in the sendBuffer <br /></td></tr>
 <tr class="separator:ae385ef912c79a573f151cc1c97d798d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb12cd8f76e97a3c1866d9f0431bcedb"><td class="memItemLeft" align="right" valign="top"><a id="afb12cd8f76e97a3c1866d9f0431bcedb" name="afb12cd8f76e97a3c1866d9f0431bcedb"></a>
 std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; 3 &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>recvBuffer</b></td></tr>
+<tr class="memdesc:afb12cd8f76e97a3c1866d9f0431bcedb"><td class="mdescLeft">&#160;</td><td class="mdescRight">the buffer for data transfer from md to macro <br /></td></tr>
 <tr class="separator:afb12cd8f76e97a3c1866d9f0431bcedb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae30cca54862d79f5abf59ac74ff87857"><td class="memItemLeft" align="right" valign="top"><a id="ae30cca54862d79f5abf59ac74ff87857" name="ae30cca54862d79f5abf59ac74ff87857"></a>
 unsigned int *&#160;</td><td class="memItemRight" valign="bottom"><b>globalCellIndices4RecvBuffer</b></td></tr>
+<tr class="memdesc:ae30cca54862d79f5abf59ac74ff87857"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global indices of the macroscopic cells in the recvBuffer <br /></td></tr>
 <tr class="separator:ae30cca54862d79f5abf59ac74ff87857"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this struct was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p >holds the buffers for the data transfer </p>
+<p >the buffers store macroscopic cells, so momentum and density will be transferred </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>coupling/tests/<a class="el" href="CouetteTest_8h_source.html">CouetteTest.h</a></li>
 </ul>
 </div><!-- contents -->

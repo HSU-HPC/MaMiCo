@@ -73,43 +73,228 @@ $(function() {
   <div class="headertitle"><div class="title">coupling::UsherParticleInsertion&lt; LinkedCell, dim &gt;::UsherParams Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>collects all the parameters necessary for the Usher algorithm  
+ <a href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="UsherParticleInsertion_8h_source.html">UsherParticleInsertion.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2736f024966db1e6828bbd79ae46a5b3"><td class="memItemLeft" align="right" valign="top"><a id="a2736f024966db1e6828bbd79ae46a5b3" name="a2736f024966db1e6828bbd79ae46a5b3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>UsherParams</b> (double rSigmaCoeff, double meanPotentialEnergyFactor, double uOverlapCoeff, double stepRefCoeff, unsigned int iterMax, unsigned int restartMax, double tolerance, double offsetFromOuterBoundary)</td></tr>
+<tr class="memdesc:a2736f024966db1e6828bbd79ae46a5b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
 <tr class="separator:a2736f024966db1e6828bbd79ae46a5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21ef845e7d19178f7add71492adafeaa"><td class="memItemLeft" align="right" valign="top"><a id="a21ef845e7d19178f7add71492adafeaa" name="a21ef845e7d19178f7add71492adafeaa"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>getStepRef</b> (double numberDensity, double sigma) const</td></tr>
+<tr class="memitem:a996701a5e9e720ff1e8bb5427e9c433d"><td class="memItemLeft" align="right" valign="top"><a id="a996701a5e9e720ff1e8bb5427e9c433d" name="a996701a5e9e720ff1e8bb5427e9c433d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>~UsherParams</b> ()</td></tr>
+<tr class="memdesc:a996701a5e9e720ff1e8bb5427e9c433d"><td class="mdescLeft">&#160;</td><td class="mdescRight">a dummy destructor <br /></td></tr>
+<tr class="separator:a996701a5e9e720ff1e8bb5427e9c433d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21ef845e7d19178f7add71492adafeaa"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a21ef845e7d19178f7add71492adafeaa">getStepRef</a> (double numberDensity, double sigma) const</td></tr>
+<tr class="memdesc:a21ef845e7d19178f7add71492adafeaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the maximal displacement parameter for the usher method, ref. figure 7 in the paper  <a href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a21ef845e7d19178f7add71492adafeaa">More...</a><br /></td></tr>
 <tr class="separator:a21ef845e7d19178f7add71492adafeaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a85d5049e450937a25908d5e51c9ccf79"><td class="memItemLeft" align="right" valign="top"><a id="a85d5049e450937a25908d5e51c9ccf79" name="a85d5049e450937a25908d5e51c9ccf79"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_rSigmaCoeff</b></td></tr>
+<tr class="memitem:a85d5049e450937a25908d5e51c9ccf79"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a85d5049e450937a25908d5e51c9ccf79">_rSigmaCoeff</a></td></tr>
 <tr class="separator:a85d5049e450937a25908d5e51c9ccf79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2631f7fd17b717a4df8e17aaec23d5cb"><td class="memItemLeft" align="right" valign="top"><a id="a2631f7fd17b717a4df8e17aaec23d5cb" name="a2631f7fd17b717a4df8e17aaec23d5cb"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_meanPotentialEnergyFactor</b></td></tr>
+<tr class="memitem:a2631f7fd17b717a4df8e17aaec23d5cb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a2631f7fd17b717a4df8e17aaec23d5cb">_meanPotentialEnergyFactor</a></td></tr>
 <tr class="separator:a2631f7fd17b717a4df8e17aaec23d5cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ba2890a06981c5ede13860f3d3fc02e"><td class="memItemLeft" align="right" valign="top"><a id="a0ba2890a06981c5ede13860f3d3fc02e" name="a0ba2890a06981c5ede13860f3d3fc02e"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_uOverlapCoeff</b></td></tr>
+<tr class="memitem:a0ba2890a06981c5ede13860f3d3fc02e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a0ba2890a06981c5ede13860f3d3fc02e">_uOverlapCoeff</a></td></tr>
 <tr class="separator:a0ba2890a06981c5ede13860f3d3fc02e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40fcbd5d07846aa476e203b17281454f"><td class="memItemLeft" align="right" valign="top"><a id="a40fcbd5d07846aa476e203b17281454f" name="a40fcbd5d07846aa476e203b17281454f"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_stepRefCoeff</b></td></tr>
+<tr class="memitem:a40fcbd5d07846aa476e203b17281454f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a40fcbd5d07846aa476e203b17281454f">_stepRefCoeff</a></td></tr>
 <tr class="separator:a40fcbd5d07846aa476e203b17281454f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f699ea6e59bcd2ab057c64c7e4c8f64"><td class="memItemLeft" align="right" valign="top"><a id="a7f699ea6e59bcd2ab057c64c7e4c8f64" name="a7f699ea6e59bcd2ab057c64c7e4c8f64"></a>
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_iterMax</b></td></tr>
+<tr class="memitem:a7f699ea6e59bcd2ab057c64c7e4c8f64"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a7f699ea6e59bcd2ab057c64c7e4c8f64">_iterMax</a></td></tr>
 <tr class="separator:a7f699ea6e59bcd2ab057c64c7e4c8f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b8857c223eae772008d3fc4b66fa7fb"><td class="memItemLeft" align="right" valign="top"><a id="a1b8857c223eae772008d3fc4b66fa7fb" name="a1b8857c223eae772008d3fc4b66fa7fb"></a>
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_restartMax</b></td></tr>
+<tr class="memitem:a1b8857c223eae772008d3fc4b66fa7fb"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a1b8857c223eae772008d3fc4b66fa7fb">_restartMax</a></td></tr>
 <tr class="separator:a1b8857c223eae772008d3fc4b66fa7fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a998896a1adc55d036d0c884045b83555"><td class="memItemLeft" align="right" valign="top"><a id="a998896a1adc55d036d0c884045b83555" name="a998896a1adc55d036d0c884045b83555"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_tolerance</b></td></tr>
+<tr class="memitem:a998896a1adc55d036d0c884045b83555"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a998896a1adc55d036d0c884045b83555">_tolerance</a></td></tr>
 <tr class="separator:a998896a1adc55d036d0c884045b83555"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a831cf3aa17bc089941a87b18034d1d10"><td class="memItemLeft" align="right" valign="top"><a id="a831cf3aa17bc089941a87b18034d1d10" name="a831cf3aa17bc089941a87b18034d1d10"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_offsetFromOuterBoundary</b></td></tr>
+<tr class="memitem:a831cf3aa17bc089941a87b18034d1d10"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1UsherParticleInsertion_1_1UsherParams.html#a831cf3aa17bc089941a87b18034d1d10">_offsetFromOuterBoundary</a></td></tr>
 <tr class="separator:a831cf3aa17bc089941a87b18034d1d10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
+class coupling::UsherParticleInsertion&lt; LinkedCell, dim &gt;::UsherParams</div><p >collects all the parameters necessary for the Usher algorithm </p>
+<dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a21ef845e7d19178f7add71492adafeaa" name="a21ef845e7d19178f7add71492adafeaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21ef845e7d19178f7add71492adafeaa">&#9670;&nbsp;</a></span>getStepRef()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::getStepRef </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>numberDensity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>sigma</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>returns the maximal displacement parameter for the usher method, ref. figure 7 in the paper </p>
+<dl class="section return"><dt>Returns</dt><dd>the maximal displacement </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a7f699ea6e59bcd2ab057c64c7e4c8f64" name="a7f699ea6e59bcd2ab057c64c7e4c8f64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f699ea6e59bcd2ab057c64c7e4c8f64">&#9670;&nbsp;</a></span>_iterMax</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::_iterMax</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >maximal number of usher iterations per try </p>
+
+</div>
+</div>
+<a id="a2631f7fd17b717a4df8e17aaec23d5cb" name="a2631f7fd17b717a4df8e17aaec23d5cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2631f7fd17b717a4df8e17aaec23d5cb">&#9670;&nbsp;</a></span>_meanPotentialEnergyFactor</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::_meanPotentialEnergyFactor</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >scales for the U_0 value of the Usher algorithm </p>
+
+</div>
+</div>
+<a id="a831cf3aa17bc089941a87b18034d1d10" name="a831cf3aa17bc089941a87b18034d1d10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a831cf3aa17bc089941a87b18034d1d10">&#9670;&nbsp;</a></span>_offsetFromOuterBoundary</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::_offsetFromOuterBoundary</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >offset of the md domain (difference between the left, lower, front corner to 0,0,0) </p>
+
+</div>
+</div>
+<a id="a1b8857c223eae772008d3fc4b66fa7fb" name="a1b8857c223eae772008d3fc4b66fa7fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b8857c223eae772008d3fc4b66fa7fb">&#9670;&nbsp;</a></span>_restartMax</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::_restartMax</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >maximal number of usher restarts </p>
+
+</div>
+</div>
+<a id="a85d5049e450937a25908d5e51c9ccf79" name="a85d5049e450937a25908d5e51c9ccf79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85d5049e450937a25908d5e51c9ccf79">&#9670;&nbsp;</a></span>_rSigmaCoeff</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::_rSigmaCoeff</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >coefficient to adapt r_sigma (see Usher algorithm for details,), r_sigma = sigma * rSigmaCoeff </p>
+
+</div>
+</div>
+<a id="a40fcbd5d07846aa476e203b17281454f" name="a40fcbd5d07846aa476e203b17281454f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40fcbd5d07846aa476e203b17281454f">&#9670;&nbsp;</a></span>_stepRefCoeff</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::_stepRefCoeff</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >the maximal displacment </p>
+
+</div>
+</div>
+<a id="a998896a1adc55d036d0c884045b83555" name="a998896a1adc55d036d0c884045b83555"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a998896a1adc55d036d0c884045b83555">&#9670;&nbsp;</a></span>_tolerance</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::_tolerance</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >sets the tolerance, between the reached energy level and the goal energy level </p>
+
+</div>
+</div>
+<a id="a0ba2890a06981c5ede13860f3d3fc02e" name="a0ba2890a06981c5ede13860f3d3fc02e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ba2890a06981c5ede13860f3d3fc02e">&#9670;&nbsp;</a></span>_uOverlapCoeff</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1UsherParticleInsertion.html">coupling::UsherParticleInsertion</a>&lt; LinkedCell, dim &gt;::UsherParams::_uOverlapCoeff</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >scales the overlap energy U_ovlp (refers to the Usher algorithm) </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>coupling/<a class="el" href="UsherParticleInsertion_8h_source.html">UsherParticleInsertion.h</a></li>
 </ul>

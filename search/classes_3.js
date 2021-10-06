@@ -8,8 +8,5 @@ var searchData=
   ['deleteparticlemapping_5',['DeleteParticleMapping',['../classcoupling_1_1cellmappings_1_1DeleteParticleMapping.html',1,'coupling::cellmappings']]],
   ['differencetransferstrategy_6',['DifferenceTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DifferenceTransferStrategy.html',1,'coupling::transferstrategies']]],
   ['directtransferstrategy_7',['DirectTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DirectTransferStrategy.html',1,'coupling::transferstrategies']]],
-  ['dummysolver_8',['DummySolver',['../classDummySolver.html',1,'']]],
-  ['dummysolverinterface_9',['DummySolverInterface',['../classDummySolverInterface.html',1,'']]],
-  ['dummysolverinterfaceservice_10',['DummySolverInterfaceService',['../classDummySolverInterfaceService.html',1,'']]],
-  ['dynarray_11',['DynArray',['../classtinyxml2_1_1DynArray.html',1,'tinyxml2']]]
+  ['dynarray_8',['DynArray',['../classtinyxml2_1_1DynArray.html',1,'tinyxml2']]]
 ];

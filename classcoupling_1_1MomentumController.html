@@ -74,39 +74,116 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>controls the momentum in a macroscopic cell.  
+ <a href="classcoupling_1_1MomentumController.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="MomentumController_8h_source.html">MomentumController.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a20a13847aebdc85c639e61c2820732e8"><td class="memItemLeft" align="right" valign="top"><a id="a20a13847aebdc85c639e61c2820732e8" name="a20a13847aebdc85c639e61c2820732e8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MomentumController</b> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
+<tr class="memitem:a20a13847aebdc85c639e61c2820732e8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#a20a13847aebdc85c639e61c2820732e8">MomentumController</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
+<tr class="memdesc:a20a13847aebdc85c639e61c2820732e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <a href="classcoupling_1_1MomentumController.html#a20a13847aebdc85c639e61c2820732e8">More...</a><br /></td></tr>
 <tr class="separator:a20a13847aebdc85c639e61c2820732e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace1afc2211e36ec74a3d4ecfbbe60270"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#ace1afc2211e36ec74a3d4ecfbbe60270">~MomentumController</a> ()</td></tr>
+<tr class="separator:ace1afc2211e36ec74a3d4ecfbbe60270"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb4835ce462fe3e638acfc985c3a9790"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#acb4835ce462fe3e638acfc985c3a9790">computeMomentumAndMeanVelocity</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;meanVelocity)</td></tr>
+<tr class="memdesc:acb4835ce462fe3e638acfc985c3a9790"><td class="mdescLeft">&#160;</td><td class="mdescRight">computes and returns the momentum and mean velocity of a macroscopic cell  <a href="classcoupling_1_1MomentumController.html#acb4835ce462fe3e638acfc985c3a9790">More...</a><br /></td></tr>
 <tr class="separator:acb4835ce462fe3e638acfc985c3a9790"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a640e68bcade6cdae826bd72fb3f9e69a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#a640e68bcade6cdae826bd72fb3f9e69a">computeMomentum</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
+<tr class="memdesc:a640e68bcade6cdae826bd72fb3f9e69a"><td class="mdescLeft">&#160;</td><td class="mdescRight">computes and returns the momentum of a macroscopic cell  <a href="classcoupling_1_1MomentumController.html#a640e68bcade6cdae826bd72fb3f9e69a">More...</a><br /></td></tr>
 <tr class="separator:a640e68bcade6cdae826bd72fb3f9e69a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63edcd3940c3caae0dbc448855161782"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#a63edcd3940c3caae0dbc448855161782">computeMeanVelocity</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;meanVelocity)</td></tr>
 <tr class="separator:a63edcd3940c3caae0dbc448855161782"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17b639bd39b71cf8a33cdafb696aa710"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#a17b639bd39b71cf8a33cdafb696aa710">setMomentum</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;newMomentum)</td></tr>
+<tr class="memdesc:a17b639bd39b71cf8a33cdafb696aa710"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets the momentum of a macroscopic cell to the input value.  <a href="classcoupling_1_1MomentumController.html#a17b639bd39b71cf8a33cdafb696aa710">More...</a><br /></td></tr>
 <tr class="separator:a17b639bd39b71cf8a33cdafb696aa710"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:ac59bd812ff14cdf6dec41c50c2c32cb1"><td class="memItemLeft" align="right" valign="top"><a id="ac59bd812ff14cdf6dec41c50c2c32cb1" name="ac59bd812ff14cdf6dec41c50c2c32cb1"></a>
-<a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMassMapping.html">coupling::cellmappings::ComputeMassMapping</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_computeMassMapping</b></td></tr>
+<tr class="memitem:ac59bd812ff14cdf6dec41c50c2c32cb1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMassMapping.html">coupling::cellmappings::ComputeMassMapping</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#ac59bd812ff14cdf6dec41c50c2c32cb1">_computeMassMapping</a></td></tr>
 <tr class="separator:ac59bd812ff14cdf6dec41c50c2c32cb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3120a532684f2524952d2c9462f6a08"><td class="memItemLeft" align="right" valign="top"><a id="ac3120a532684f2524952d2c9462f6a08" name="ac3120a532684f2524952d2c9462f6a08"></a>
-<a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMomentumMapping.html">coupling::cellmappings::ComputeMomentumMapping</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_computeMomentumMapping</b></td></tr>
+<tr class="memitem:ac3120a532684f2524952d2c9462f6a08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMomentumMapping.html">coupling::cellmappings::ComputeMomentumMapping</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#ac3120a532684f2524952d2c9462f6a08">_computeMomentumMapping</a></td></tr>
 <tr class="separator:ac3120a532684f2524952d2c9462f6a08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ca7cc464ea0d28339e423db4fd11243"><td class="memItemLeft" align="right" valign="top"><a id="a0ca7cc464ea0d28339e423db4fd11243" name="a0ca7cc464ea0d28339e423db4fd11243"></a>
-<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td><td class="memItemRight" valign="bottom"><b>_mdSolverInterface</b></td></tr>
+<tr class="memitem:a0ca7cc464ea0d28339e423db4fd11243"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumController.html#a0ca7cc464ea0d28339e423db4fd11243">_mdSolverInterface</a></td></tr>
 <tr class="separator:a0ca7cc464ea0d28339e423db4fd11243"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::MomentumController&lt; LinkedCell, dim &gt;</div><p >controles the momentum in a macroscopic cell. This class can compute the momentum and set a certain value for the momentum.</p>
-<dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+class coupling::MomentumController&lt; LinkedCell, dim &gt;</div><p >controls the momentum in a macroscopic cell. </p>
+<p >This class can compute the momentum and set a certain value for the momentum. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">LinkedCell</td><td>the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation </td></tr>
+    <tr><td class="paramname">dim</td><td>refers to the spacial dimension of the simulation, can be 1, 2, or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a20a13847aebdc85c639e61c2820732e8" name="a20a13847aebdc85c639e61c2820732e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20a13847aebdc85c639e61c2820732e8">&#9670;&nbsp;</a></span>MomentumController()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt; LinkedCell, dim &gt;::<a class="el" href="classcoupling_1_1MomentumController.html">MomentumController</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td>
+          <td class="paramname"><em>mdSolverInterface</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>a simple constructor </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mdSolverInterface</td><td>interface to the md solver </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ace1afc2211e36ec74a3d4ecfbbe60270" name="ace1afc2211e36ec74a3d4ecfbbe60270"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace1afc2211e36ec74a3d4ecfbbe60270">&#9670;&nbsp;</a></span>~MomentumController()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt; LinkedCell, dim &gt;::~<a class="el" href="classcoupling_1_1MomentumController.html">MomentumController</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >a simple destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a63edcd3940c3caae0dbc448855161782" name="a63edcd3940c3caae0dbc448855161782"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a63edcd3940c3caae0dbc448855161782">&#9670;&nbsp;</a></span>computeMeanVelocity()</h2>
 
@@ -142,7 +219,13 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >computes and returns the mean velocity of a macroscopic cell </p>
+<p >computes and returns the mean velocity of a macroscopic cell </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>the macroscopic cell, for which the values shall be calculated </td></tr>
+    <tr><td class="paramname">meanVelocity</td><td>vector to which the mean velocity of the cell will be written to </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -181,7 +264,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >computes and returns the momentum of a macroscopic cell </p>
+
+<p>computes and returns the momentum of a macroscopic cell </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>the macroscopic cell, for which the values shall be calculated </td></tr>
+    <tr><td class="paramname">momentum</td><td>vector to which the momentum of the cell will be written to </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -226,7 +317,16 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >computes and returns the momentum and mean velocity of a macroscopic cell </p>
+
+<p>computes and returns the momentum and mean velocity of a macroscopic cell </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>the macroscopic cell, for which the values shall be calculated </td></tr>
+    <tr><td class="paramname">momentum</td><td>vector to which the momentum of the cell will be written to </td></tr>
+    <tr><td class="paramname">meanVelocity</td><td>vector to which the mean velocity of the cell will be written to </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -265,7 +365,91 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets the momentum of a macroscopic cell to newMomentum. This cell does not consider the kinetic energy of the system, so the kinetic energy will be different after executing this method! In order to also retain the kinetic energy, one might compute the kinetic energy before calling this method (using the <a class="el" href="classcoupling_1_1KineticEnergyController.html">KineticEnergyController</a>) and set the old kinetic energy afterwards (again using the <a class="el" href="classcoupling_1_1KineticEnergyController.html">KineticEnergyController</a>). This will then set the right kinetic energy again, conserving both mass and momentum over this cell. </p>
+
+<p>sets the momentum of a macroscopic cell to the input value. </p>
+<p >This cell does not consider the kinetic energy of the system, so the kinetic energy will be different after executing this method! In order to also retain the kinetic energy, one might compute the kinetic energy before calling this method (using the <a class="el" href="classcoupling_1_1KineticEnergyController.html" title="controles and regulates the kinetic energy of the MD system.">KineticEnergyController</a>) and set the old kinetic energy afterwards (again using the <a class="el" href="classcoupling_1_1KineticEnergyController.html" title="controles and regulates the kinetic energy of the MD system.">KineticEnergyController</a>). This will then set the right kinetic energy again, conserving both mass and momentum over this cell. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>the macroscopic cell in which the momentum shall be changed </td></tr>
+    <tr><td class="paramname">newMomentum</td><td>the value to which the momentum will be set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ac59bd812ff14cdf6dec41c50c2c32cb1" name="ac59bd812ff14cdf6dec41c50c2c32cb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac59bd812ff14cdf6dec41c50c2c32cb1">&#9670;&nbsp;</a></span>_computeMassMapping</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMassMapping.html">coupling::cellmappings::ComputeMassMapping</a>&lt;LinkedCell,dim&gt; <a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt; LinkedCell, dim &gt;::_computeMassMapping</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >instance of the ComputeMassMapping </p>
+
+</div>
+</div>
+<a id="ac3120a532684f2524952d2c9462f6a08" name="ac3120a532684f2524952d2c9462f6a08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3120a532684f2524952d2c9462f6a08">&#9670;&nbsp;</a></span>_computeMomentumMapping</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMomentumMapping.html">coupling::cellmappings::ComputeMomentumMapping</a>&lt;LinkedCell,dim&gt; <a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt; LinkedCell, dim &gt;::_computeMomentumMapping</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >instance of the ComputeMomentumMapping </p>
+
+</div>
+</div>
+<a id="a0ca7cc464ea0d28339e423db4fd11243" name="a0ca7cc464ea0d28339e423db4fd11243"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ca7cc464ea0d28339e423db4fd11243">&#9670;&nbsp;</a></span>_mdSolverInterface</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt;LinkedCell,dim&gt;* const <a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt; LinkedCell, dim &gt;::_mdSolverInterface</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >interface to the md solver </p>
 
 </div>
 </div>

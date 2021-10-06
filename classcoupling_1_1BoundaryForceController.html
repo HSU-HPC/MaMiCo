@@ -74,32 +74,88 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>controller for forces acting at open MD boundaries  
+ <a href="classcoupling_1_1BoundaryForceController.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="BoundaryForceController_8h_source.html">BoundaryForceController.h</a>&gt;</code></p>
 
 <p>Inherited by <a class="el" href="classcoupling_1_1NoBoundaryForce.html">coupling::NoBoundaryForce&lt; LinkedCell, dim &gt;</a>, and <a class="el" href="classcoupling_1_1ZhouBoundaryForceController.html">coupling::ZhouBoundaryForceController&lt; LinkedCell, dim &gt;</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2b1891868681bf76e49c813eaf6075e3"><td class="memItemLeft" align="right" valign="top"><a id="a2b1891868681bf76e49c813eaf6075e3" name="a2b1891868681bf76e49c813eaf6075e3"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>BoundaryForceController</b> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
+<tr class="memitem:a2b1891868681bf76e49c813eaf6075e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1BoundaryForceController.html#a2b1891868681bf76e49c813eaf6075e3">BoundaryForceController</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
+<tr class="memdesc:a2b1891868681bf76e49c813eaf6075e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constructor.  <a href="classcoupling_1_1BoundaryForceController.html#a2b1891868681bf76e49c813eaf6075e3">More...</a><br /></td></tr>
 <tr class="separator:a2b1891868681bf76e49c813eaf6075e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14e3771be5cfd5d226270690cf1c2a6b"><td class="memItemLeft" align="right" valign="top"><a id="a14e3771be5cfd5d226270690cf1c2a6b" name="a14e3771be5cfd5d226270690cf1c2a6b"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~BoundaryForceController</b> ()</td></tr>
+<tr class="memdesc:a14e3771be5cfd5d226270690cf1c2a6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple destructor. <br /></td></tr>
+<tr class="separator:a14e3771be5cfd5d226270690cf1c2a6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76b6fde8c0b42413893db5e6196c0469"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1BoundaryForceController.html#a76b6fde8c0b42413893db5e6196c0469">applyBoundaryForce</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;currentLocalMacroscopicCellIndex)=0</td></tr>
+<tr class="memdesc:a76b6fde8c0b42413893db5e6196c0469"><td class="mdescLeft">&#160;</td><td class="mdescRight">applies the boundary force on a boundary cell  <a href="classcoupling_1_1BoundaryForceController.html#a76b6fde8c0b42413893db5e6196c0469">More...</a><br /></td></tr>
 <tr class="separator:a76b6fde8c0b42413893db5e6196c0469"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7097910fdcc8d83c4a9395916ac207d6"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1BoundaryForceController.html#a7097910fdcc8d83c4a9395916ac207d6">getPotentialEnergy</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;position) const</td></tr>
+<tr class="memdesc:a7097910fdcc8d83c4a9395916ac207d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the potential energy for a given position  <a href="classcoupling_1_1BoundaryForceController.html#a7097910fdcc8d83c4a9395916ac207d6">More...</a><br /></td></tr>
 <tr class="separator:a7097910fdcc8d83c4a9395916ac207d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af04472eba05caec718b024a7548484cc"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1BoundaryForceController.html#af04472eba05caec718b024a7548484cc">getForce</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;position) const</td></tr>
+<tr class="memdesc:af04472eba05caec718b024a7548484cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the boundary force for the given particle position  <a href="classcoupling_1_1BoundaryForceController.html#af04472eba05caec718b024a7548484cc">More...</a><br /></td></tr>
 <tr class="separator:af04472eba05caec718b024a7548484cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:aaddbd53d4af75266ce67cb30e4af17ee"><td class="memItemLeft" align="right" valign="top"><a id="aaddbd53d4af75266ce67cb30e4af17ee" name="aaddbd53d4af75266ce67cb30e4af17ee"></a>
 <a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td><td class="memItemRight" valign="bottom"><b>_mdSolverInterface</b></td></tr>
+<tr class="memdesc:aaddbd53d4af75266ce67cb30e4af17ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">interface of the molecular dynamics solver <br /></td></tr>
 <tr class="separator:aaddbd53d4af75266ce67cb30e4af17ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::BoundaryForceController&lt; LinkedCell, dim &gt;</div><p >controller for forces acting at open MD boundaries. There is an interface method applyBoundaryForce which triggers potential boundary forcing in each macroscopic cell that is located at the very outer MD boundary (first layer of non-ghost macroscopic cells). </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+class coupling::BoundaryForceController&lt; LinkedCell, dim &gt;</div><p >controller for forces acting at open MD boundaries </p>
+<p >There is an interface method applyBoundaryForce which triggers potential boundary forcing in each macroscopic cell that is located at the very outer MD boundary (first layer of non-ghost macroscopic cells). </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">LinkedCell</td><td>the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation </td></tr>
+    <tr><td class="paramname">dim</td><td>the integer dim refers to the spacial dimension of the simulation, can be 1, 2, or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a2b1891868681bf76e49c813eaf6075e3" name="a2b1891868681bf76e49c813eaf6075e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b1891868681bf76e49c813eaf6075e3">&#9670;&nbsp;</a></span>BoundaryForceController()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1BoundaryForceController.html">coupling::BoundaryForceController</a>&lt; LinkedCell, dim &gt;::<a class="el" href="classcoupling_1_1BoundaryForceController.html">BoundaryForceController</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td>
+          <td class="paramname"><em>mdSolverInterface</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A simple constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mdSolverInterface</td><td>interface to the molecular dynamics solver </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a76b6fde8c0b42413893db5e6196c0469" name="a76b6fde8c0b42413893db5e6196c0469"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a76b6fde8c0b42413893db5e6196c0469">&#9670;&nbsp;</a></span>applyBoundaryForce()</h2>
 
@@ -136,7 +192,16 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classcoupling_1_1ZhouBoundaryForceController.html#a1c7b0fd6e99fe57186e47bd8cbc5c304">coupling::ZhouBoundaryForceController&lt; LinkedCell, dim &gt;</a>.</p>
+<p>applies the boundary force on a boundary cell </p>
+<p >iterates over all linked cells of the given macroscopic cell and applies the cellmapping for the boundary force </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>the macroscopic boundary cell to apply the boundary force </td></tr>
+    <tr><td class="paramname">currentLocalMacroscopicCellIndex</td><td>the index of the macroscopic cell </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classcoupling_1_1NoBoundaryForce.html#a39dbc6c9c5f96dc6fb210c04e1a698c7">coupling::NoBoundaryForce&lt; LinkedCell, dim &gt;</a>, and <a class="el" href="classcoupling_1_1ZhouBoundaryForceController.html#a1c7b0fd6e99fe57186e47bd8cbc5c304">coupling::ZhouBoundaryForceController&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>
@@ -165,6 +230,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>calculates the boundary force for the given particle position </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">position</td><td>particle position for the force calculation </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the force for the given position </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classcoupling_1_1ZhouBoundaryForceController.html#a61849b690ec981b07b2d6ad61824011c">coupling::ZhouBoundaryForceController&lt; LinkedCell, dim &gt;</a>.</p>
 
@@ -195,6 +269,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>calculates the potential energy for a given position </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">position</td><td>the position for which the potential energy will be calculated </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the potential energy for the given position </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classcoupling_1_1ZhouBoundaryForceController.html#a715dfa4bb6441d5c907e0cc3a31a5c5e">coupling::ZhouBoundaryForceController&lt; LinkedCell, dim &gt;</a>.</p>
 

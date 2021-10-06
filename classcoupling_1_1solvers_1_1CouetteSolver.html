@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacecoupling.html">coupling</a></li><li class="navelem"><b>solvers</b></li><li class="navelem"><a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html">CouetteSolver</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacecoupling.html">coupling</a></li><li class="navelem"><a class="el" href="namespacecoupling_1_1solvers.html">solvers</a></li><li class="navelem"><a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html">CouetteSolver</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -74,41 +74,121 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>implements an analytic Couette flow solver.  
+ <a href="classcoupling_1_1solvers_1_1CouetteSolver.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="CouetteSolver_8h_source.html">CouetteSolver.h</a>&gt;</code></p>
 
 <p>Inherits <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver&lt; dim &gt;</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a95fa9141ac0aeb76eef0d1e2dbafc5c3"><td class="memItemLeft" align="right" valign="top"><a id="a95fa9141ac0aeb76eef0d1e2dbafc5c3" name="a95fa9141ac0aeb76eef0d1e2dbafc5c3"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>CouetteSolver</b> (const double &amp;channelheight, const double &amp;wallVelocity, const double kinVisc)</td></tr>
+<tr class="memitem:a95fa9141ac0aeb76eef0d1e2dbafc5c3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html#a95fa9141ac0aeb76eef0d1e2dbafc5c3">CouetteSolver</a> (const double &amp;channelheight, const double &amp;wallVelocity, const double kinVisc)</td></tr>
+<tr class="memdesc:a95fa9141ac0aeb76eef0d1e2dbafc5c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <a href="classcoupling_1_1solvers_1_1CouetteSolver.html#a95fa9141ac0aeb76eef0d1e2dbafc5c3">More...</a><br /></td></tr>
 <tr class="separator:a95fa9141ac0aeb76eef0d1e2dbafc5c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85683fd8de0f413cd743bfd216faad9f"><td class="memItemLeft" align="right" valign="top"><a id="a85683fd8de0f413cd743bfd216faad9f" name="a85683fd8de0f413cd743bfd216faad9f"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~CouetteSolver</b> ()</td></tr>
+<tr class="memdesc:a85683fd8de0f413cd743bfd216faad9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">a dummy destructor <br /></td></tr>
+<tr class="separator:a85683fd8de0f413cd743bfd216faad9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a154f215735b1b5bbd6404b344385456c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html#a154f215735b1b5bbd6404b344385456c">advance</a> (double dt)</td></tr>
+<tr class="memdesc:a154f215735b1b5bbd6404b344385456c"><td class="mdescLeft">&#160;</td><td class="mdescRight">advances one time step dt in time  <a href="classcoupling_1_1solvers_1_1CouetteSolver.html#a154f215735b1b5bbd6404b344385456c">More...</a><br /></td></tr>
 <tr class="separator:a154f215735b1b5bbd6404b344385456c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0fc24289859fed3fe99be8a8e5918007"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html#a0fc24289859fed3fe99be8a8e5918007">getVelocity</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; pos) const</td></tr>
+<tr class="memdesc:a0fc24289859fed3fe99be8a8e5918007"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the velocity vector at a certain channel position  <a href="classcoupling_1_1solvers_1_1CouetteSolver.html#a0fc24289859fed3fe99be8a8e5918007">More...</a><br /></td></tr>
 <tr class="separator:a0fc24289859fed3fe99be8a8e5918007"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8441a4f8579c685a57404aaa9cdadaff"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html#a8441a4f8579c685a57404aaa9cdadaff">setWallVelocity</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; wallVelocity)</td></tr>
+<tr class="memdesc:a8441a4f8579c685a57404aaa9cdadaff"><td class="mdescLeft">&#160;</td><td class="mdescRight">changes the velocity at the moving for, refers to Couette scenario  <a href="classcoupling_1_1solvers_1_1CouetteSolver.html#a8441a4f8579c685a57404aaa9cdadaff">More...</a><br /></td></tr>
 <tr class="separator:a8441a4f8579c685a57404aaa9cdadaff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcoupling_1_1solvers_1_1AbstractCouetteSolver"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcoupling_1_1solvers_1_1AbstractCouetteSolver')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver&lt; dim &gt;</a></td></tr>
+<tr class="memitem:a5e2d5340f95d44003f1f0f043f4307b0 inherit pub_methods_classcoupling_1_1solvers_1_1AbstractCouetteSolver"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html#a5e2d5340f95d44003f1f0f043f4307b0">~AbstractCouetteSolver</a> ()</td></tr>
+<tr class="memdesc:a5e2d5340f95d44003f1f0f043f4307b0 inherit pub_methods_classcoupling_1_1solvers_1_1AbstractCouetteSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">a dummy destructor  <a href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html#a5e2d5340f95d44003f1f0f043f4307b0">More...</a><br /></td></tr>
+<tr class="separator:a5e2d5340f95d44003f1f0f043f4307b0 inherit pub_methods_classcoupling_1_1solvers_1_1AbstractCouetteSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:afffde69f34abe6a00b67f30c8523876e"><td class="memItemLeft" align="right" valign="top"><a id="afffde69f34abe6a00b67f30c8523876e" name="afffde69f34abe6a00b67f30c8523876e"></a>
 const double&#160;</td><td class="memItemRight" valign="bottom"><b>_channelheight</b></td></tr>
+<tr class="memdesc:afffde69f34abe6a00b67f30c8523876e"><td class="mdescLeft">&#160;</td><td class="mdescRight">height of couette channel <br /></td></tr>
 <tr class="separator:afffde69f34abe6a00b67f30c8523876e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43c51d94639c131e0f6f263879ecd0fd"><td class="memItemLeft" align="right" valign="top"><a id="a43c51d94639c131e0f6f263879ecd0fd" name="a43c51d94639c131e0f6f263879ecd0fd"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>_wallVelocity</b></td></tr>
+<tr class="memdesc:a43c51d94639c131e0f6f263879ecd0fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">velocity of moving wall <br /></td></tr>
 <tr class="separator:a43c51d94639c131e0f6f263879ecd0fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf05cc6d048a14764e166c9b5f30a4d1"><td class="memItemLeft" align="right" valign="top"><a id="adf05cc6d048a14764e166c9b5f30a4d1" name="adf05cc6d048a14764e166c9b5f30a4d1"></a>
 const double&#160;</td><td class="memItemRight" valign="bottom"><b>_kinVisc</b></td></tr>
+<tr class="memdesc:adf05cc6d048a14764e166c9b5f30a4d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">kinematic viscosity <br /></td></tr>
 <tr class="separator:adf05cc6d048a14764e166c9b5f30a4d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abeac4310a6ec1b550b02472f64eea019"><td class="memItemLeft" align="right" valign="top"><a id="abeac4310a6ec1b550b02472f64eea019" name="abeac4310a6ec1b550b02472f64eea019"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>_time</b></td></tr>
+<tr class="memdesc:abeac4310a6ec1b550b02472f64eea019"><td class="mdescLeft">&#160;</td><td class="mdescRight">current time <br /></td></tr>
 <tr class="separator:abeac4310a6ec1b550b02472f64eea019"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
-class coupling::solvers::CouetteSolver&lt; dim &gt;</div><p >implements an analytic Couette flow solver. In our scenario, the lower wall is accelerated and the upper wall stands still. The lower wall is located at zero height. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+class coupling::solvers::CouetteSolver&lt; dim &gt;</div><p >implements an analytic Couette flow solver. </p>
+<p >In our scenario, the lower wall is accelerated and the upper wall stands still. The lower wall is located at zero height. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">dim</td><td>refers to the spacial dimension of the simulation, can be 1, 2, or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a95fa9141ac0aeb76eef0d1e2dbafc5c3" name="a95fa9141ac0aeb76eef0d1e2dbafc5c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95fa9141ac0aeb76eef0d1e2dbafc5c3">&#9670;&nbsp;</a></span>CouetteSolver()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html">coupling::solvers::CouetteSolver</a>&lt; dim &gt;::<a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html">CouetteSolver</a> </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>channelheight</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>wallVelocity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>kinVisc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>a simple constructor </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channelheight</td><td>the height and width of the channel in y and z direction </td></tr>
+    <tr><td class="paramname">wallVelocity</td><td>the velocity at the moving wall </td></tr>
+    <tr><td class="paramname">kinVisc</td><td>the kinematic viscosity of the fluid </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a154f215735b1b5bbd6404b344385456c" name="a154f215735b1b5bbd6404b344385456c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a154f215735b1b5bbd6404b344385456c">&#9670;&nbsp;</a></span>advance()</h2>
 
@@ -134,9 +214,16 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >advances one time step dt in time </p>
 
-<p>Implements <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver&lt; dim &gt;</a>.</p>
+<p>advances one time step dt in time </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dt</td><td>size of the time step to advance </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html#aa7a970b297fdc6494bf64da2b2d9c2e6">coupling::solvers::AbstractCouetteSolver&lt; dim &gt;</a>.</p>
 
 </div>
 </div>
@@ -165,9 +252,17 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the velocity vector at a certain channel height pos[dim-1], given by: u(z,t)= V(1-z/H) - 2V/pi*sum_k=1^infty 1/k*sin(k*pi*z/H)*exp(-k^2 pi^2/H^2 * nu*t) </p>
 
-<p>Implements <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver&lt; dim &gt;</a>.</p>
+<p>returns the velocity vector at a certain channel position </p>
+<p >for the first entry of the vector is the analytic solution of the Couette scenario returned, given by: u(z,t)= V(1-z/H) - 2V/pi*sum_k=1^infty 1/k*sin(k*pi*z/H)*exp(-k^2 pi^2/H^2 * nu*t) The other two entries are 0 </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>the position to return the velocity for </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a velocity vector </dd></dl>
+
+<p>Implements <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html#a9410af278c6c75d1cdb753847c7b04fa">coupling::solvers::AbstractCouetteSolver&lt; dim &gt;</a>.</p>
 
 </div>
 </div>
@@ -197,7 +292,15 @@ template&lt;unsigned int dim&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented from <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver&lt; dim &gt;</a>.</p>
+<p>changes the velocity at the moving for, refers to Couette scenario </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wallVelocity</td><td>value to which the veloctiy will be set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html#a38504e9eddc52a019144f3d41222ccd2">coupling::solvers::AbstractCouetteSolver&lt; dim &gt;</a>.</p>
 
 </div>
 </div>

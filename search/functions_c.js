@@ -1,9 +1,19 @@
 var searchData=
 [
-  ['open_0',['open',['../classcoupling_1_1MacroscopicCellPlotter.html#af29ee3fe5e9de670281501e0c87ec992',1,'coupling::MacroscopicCellPlotter']]],
-  ['openelement_1',['OpenElement',['../classtinyxml2_1_1XMLPrinter.html#aa10d330818dbc31b44e9ffc27618bdfb',1,'tinyxml2::XMLPrinter']]],
-  ['operator_2b_3d_2',['operator+=',['../classtarch_1_1la_1_1Vector.html#a294a7d8f3713413c9ec031c7ef32b597',1,'tarch::la::Vector']]],
-  ['operator_2d_3d_3',['operator-=',['../classtarch_1_1la_1_1Vector.html#a77664176b2eb66cfdece0a48a7ebddf3',1,'tarch::la::Vector']]],
-  ['operator_3d_4',['operator=',['../classtarch_1_1la_1_1Vector.html#a4d8a0af080145a5fb2b4fb4586e67e4a',1,'tarch::la::Vector::operator=()'],['../classtinyxml2_1_1XMLHandle.html#aa07c9a53f78d7b2dc1018668641521d8',1,'tinyxml2::XMLHandle::operator=()']]],
-  ['operator_5b_5d_5',['operator[]',['../classtarch_1_1la_1_1Vector.html#a2115b064610248e7d6dbf47042070222',1,'tarch::la::Vector']]]
+  ['name_0',['Name',['../classtinyxml2_1_1XMLElement.html#abd36e34e4428a8eeeffbe87eab0b124d',1,'tinyxml2::XMLElement::Name()'],['../classtinyxml2_1_1XMLAttribute.html#a5a5c135d24cce7abda6f17301c6274d8',1,'tinyxml2::XMLAttribute::Name()']]],
+  ['newcomment_1',['NewComment',['../classtinyxml2_1_1XMLDocument.html#a386df0befd06aadb5e0cd21381aa955a',1,'tinyxml2::XMLDocument']]],
+  ['newdeclaration_2',['NewDeclaration',['../classtinyxml2_1_1XMLDocument.html#ae519030c0262fa2daff8993681990e16',1,'tinyxml2::XMLDocument']]],
+  ['newelement_3',['NewElement',['../classtinyxml2_1_1XMLDocument.html#a3c335a700a43d7c363a393142a23f234',1,'tinyxml2::XMLDocument']]],
+  ['newtext_4',['NewText',['../classtinyxml2_1_1XMLDocument.html#acece5de77a0819f2341b08c1e1ed9987',1,'tinyxml2::XMLDocument']]],
+  ['newunknown_5',['NewUnknown',['../classtinyxml2_1_1XMLDocument.html#a4954f502c5fd7f49de54c3c0c99bb73d',1,'tinyxml2::XMLDocument']]],
+  ['next_6',['next',['../classcoupling_1_1interface_1_1MoleculeIterator.html#a2584a0d65a215e940a6d7d35c013a654',1,'coupling::interface::MoleculeIterator']]],
+  ['next_7',['Next',['../classtinyxml2_1_1XMLAttribute.html#aa8c7cf4c94a636ae75046658e551614e',1,'tinyxml2::XMLAttribute']]],
+  ['nextsibling_8',['NextSibling',['../classtinyxml2_1_1XMLNode.html#af986c568061b020cf6232bec091388c0',1,'tinyxml2::XMLNode::NextSibling()'],['../classtinyxml2_1_1XMLHandle.html#aad2eccc7c7c7b18145877c978c3850b5',1,'tinyxml2::XMLHandle::NextSibling()']]],
+  ['nextsiblingelement_9',['NextSiblingElement',['../classtinyxml2_1_1XMLNode.html#a4691e8feb9cfc7dbf12a8a4e54f20d06',1,'tinyxml2::XMLNode::NextSiblingElement()'],['../classtinyxml2_1_1XMLHandle.html#a447c9b284cfcd5518f9e320ba14b9c46',1,'tinyxml2::XMLHandle::NextSiblingElement()']]],
+  ['nievelocityimposition_10',['NieVelocityImposition',['../classcoupling_1_1NieVelocityImposition.html#ab35e4284533d9bff11feba35bba3ab5a',1,'coupling::NieVelocityImposition']]],
+  ['noboundaryforce_11',['NoBoundaryForce',['../classcoupling_1_1NoBoundaryForce.html#a5df7ee94202cdeebf8444a70bffe2ca3',1,'coupling::NoBoundaryForce']]],
+  ['nochildren_12',['NoChildren',['../classtinyxml2_1_1XMLNode.html#ac3ab489e6e202a3cd1762d3b332e89d4',1,'tinyxml2::XMLNode']]],
+  ['nomomentuminsertion_13',['NoMomentumInsertion',['../classcoupling_1_1NoMomentumInsertion.html#a09f250d1669b5b5b2d8c28e91b287408',1,'coupling::NoMomentumInsertion']]],
+  ['noparticleinsertion_14',['NoParticleInsertion',['../classcoupling_1_1NoParticleInsertion.html#a02b0cda8847b09a6e4fb49e18deef08b',1,'coupling::NoParticleInsertion']]],
+  ['numericalsolver_15',['NumericalSolver',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a72ac62f4677473f0cbeb16d265c15605',1,'coupling::solvers::NumericalSolver']]]
 ];

@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacecoupling.html">coupling</a></li><li class="navelem"><b>transferstrategies</b></li><li class="navelem"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">TransferStrategy4NieCoupling</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacecoupling.html">coupling</a></li><li class="navelem"><a class="el" href="namespacecoupling_1_1transferstrategies.html">transferstrategies</a></li><li class="navelem"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">TransferStrategy4NieCoupling</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -81,65 +81,83 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a47787cef3dc469f7d94b209060e544bd"><td class="memItemLeft" align="right" valign="top"><a id="a47787cef3dc469f7d94b209060e544bd" name="a47787cef3dc469f7d94b209060e544bd"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>TransferStrategy4NieCoupling</b> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, unsigned int numberMDSteps, double shiftTimestep, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt; massFluxBoundary)</td></tr>
+<tr class="memitem:a47787cef3dc469f7d94b209060e544bd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a47787cef3dc469f7d94b209060e544bd">TransferStrategy4NieCoupling</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, unsigned int numberMDSteps, double shiftTimestep, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt; massFluxBoundary)</td></tr>
+<tr class="memdesc:a47787cef3dc469f7d94b209060e544bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a47787cef3dc469f7d94b209060e544bd">More...</a><br /></td></tr>
 <tr class="separator:a47787cef3dc469f7d94b209060e544bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52488330b3d6a14dd8c7c3a8e7cff827"><td class="memItemLeft" align="right" valign="top"><a id="a52488330b3d6a14dd8c7c3a8e7cff827" name="a52488330b3d6a14dd8c7c3a8e7cff827"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~TransferStrategy4NieCoupling</b> ()</td></tr>
+<tr class="memdesc:a52488330b3d6a14dd8c7c3a8e7cff827"><td class="mdescLeft">&#160;</td><td class="mdescRight">a dummy destructor <br /></td></tr>
+<tr class="separator:a52488330b3d6a14dd8c7c3a8e7cff827"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af85482e39570883fe53df5003fa2f824"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#af85482e39570883fe53df5003fa2f824">beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData</a> ()</td></tr>
+<tr class="memdesc:af85482e39570883fe53df5003fa2f824"><td class="mdescLeft">&#160;</td><td class="mdescRight">stores the old cont.-velocity field solution and resets time step counter  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#af85482e39570883fe53df5003fa2f824">More...</a><br /></td></tr>
 <tr class="separator:af85482e39570883fe53df5003fa2f824"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a880dd92a5e99b016085fcb36d5be8417"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a880dd92a5e99b016085fcb36d5be8417">processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;index)</td></tr>
+<tr class="memdesc:a880dd92a5e99b016085fcb36d5be8417"><td class="mdescLeft">&#160;</td><td class="mdescRight">store old microscopic mass in excess-mass buffer and reset microscopic mass buffer  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a880dd92a5e99b016085fcb36d5be8417">More...</a><br /></td></tr>
 <tr class="separator:a880dd92a5e99b016085fcb36d5be8417"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a500d50d0d6c132b9db88248ffb78f3fb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a500d50d0d6c132b9db88248ffb78f3fb">processInnerMacroscopicCellAfterReceivingMacroscopicSolverData</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;index)</td></tr>
+<tr class="memdesc:a500d50d0d6c132b9db88248ffb78f3fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">converts momentum into velocity values;  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a500d50d0d6c132b9db88248ffb78f3fb">More...</a><br /></td></tr>
 <tr class="separator:a500d50d0d6c132b9db88248ffb78f3fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4332e5ecfa2dc1f437e738d13e31eec2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a4332e5ecfa2dc1f437e738d13e31eec2">beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData</a> ()</td></tr>
-<tr class="separator:a4332e5ecfa2dc1f437e738d13e31eec2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81810690da7ad8eac7d583bf38681471"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a81810690da7ad8eac7d583bf38681471">processInnerMacroscopicCellBeforeSendingMDSolverData</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;index)</td></tr>
+<tr class="memdesc:a81810690da7ad8eac7d583bf38681471"><td class="mdescLeft">&#160;</td><td class="mdescRight">divides accumulated mass and momentum values by time step counter.  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a81810690da7ad8eac7d583bf38681471">More...</a><br /></td></tr>
 <tr class="separator:a81810690da7ad8eac7d583bf38681471"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0fc82fda985e7f2377e7294c4218df0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#af0fc82fda985e7f2377e7294c4218df0">endProcessInnerMacroscopicCellsBeforeSendingMDSolverData</a> ()</td></tr>
-<tr class="separator:af0fc82fda985e7f2377e7294c4218df0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95a728fcce606175b4caaa6808dc2a8e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a95a728fcce606175b4caaa6808dc2a8e">beginProcessInnerMacroscopicCellsAfterMDTimestep</a> ()</td></tr>
+<tr class="memdesc:a95a728fcce606175b4caaa6808dc2a8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">increments time step counter  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a95a728fcce606175b4caaa6808dc2a8e">More...</a><br /></td></tr>
 <tr class="separator:a95a728fcce606175b4caaa6808dc2a8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67ce773d7d91b6c2dc3cc3dfc08ef13a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a67ce773d7d91b6c2dc3cc3dfc08ef13a">processInnerMacroscopicCellAfterMDTimestep</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;index)</td></tr>
+<tr class="memdesc:a67ce773d7d91b6c2dc3cc3dfc08ef13a"><td class="mdescLeft">&#160;</td><td class="mdescRight">computes current velocity (linear time interpolation) in this cell and accumulates mass/momentum for sampling  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a67ce773d7d91b6c2dc3cc3dfc08ef13a">More...</a><br /></td></tr>
 <tr class="separator:a67ce773d7d91b6c2dc3cc3dfc08ef13a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a></td></tr>
-<tr class="memitem:a8b289edb95ae3d7a071cb3b313c8c085 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a8b289edb95ae3d7a071cb3b313c8c085" name="a8b289edb95ae3d7a071cb3b313c8c085"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>TransferStrategy</b> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion)</td></tr>
+<tr class="memitem:a8b289edb95ae3d7a071cb3b313c8c085 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a8b289edb95ae3d7a071cb3b313c8c085">TransferStrategy</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion)</td></tr>
+<tr class="memdesc:a8b289edb95ae3d7a071cb3b313c8c085 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a8b289edb95ae3d7a071cb3b313c8c085">More...</a><br /></td></tr>
 <tr class="separator:a8b289edb95ae3d7a071cb3b313c8c085 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93ab3c99304fb7e5948f0323e916b8ef inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a93ab3c99304fb7e5948f0323e916b8ef" name="a93ab3c99304fb7e5948f0323e916b8ef"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>endProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData</b> ()</td></tr>
+<tr class="memitem:a59320cf1d75db54cb48fbaf3fa638ac2 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a59320cf1d75db54cb48fbaf3fa638ac2" name="a59320cf1d75db54cb48fbaf3fa638ac2"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~TransferStrategy</b> ()</td></tr>
+<tr class="memdesc:a59320cf1d75db54cb48fbaf3fa638ac2 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">a dummy destructor <br /></td></tr>
+<tr class="separator:a59320cf1d75db54cb48fbaf3fa638ac2 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93ab3c99304fb7e5948f0323e916b8ef inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a93ab3c99304fb7e5948f0323e916b8ef">endProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData</a> ()</td></tr>
+<tr class="memdesc:a93ab3c99304fb7e5948f0323e916b8ef inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called after the cells are processed, e.g. some general evaluation might happen like sum/counter  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a93ab3c99304fb7e5948f0323e916b8ef">More...</a><br /></td></tr>
 <tr class="separator:a93ab3c99304fb7e5948f0323e916b8ef inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a831af5e85d4aeba3bf94b696c60ea6 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a9a831af5e85d4aeba3bf94b696c60ea6">processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;index)</td></tr>
+<tr class="memdesc:a9a831af5e85d4aeba3bf94b696c60ea6 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">is called on the outer macroscopic cells before the data from the macro solver is applied  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a9a831af5e85d4aeba3bf94b696c60ea6">More...</a><br /></td></tr>
 <tr class="separator:a9a831af5e85d4aeba3bf94b696c60ea6 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58d0e0f545e7ea2ae2065c05e2f47856 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a58d0e0f545e7ea2ae2065c05e2f47856" name="a58d0e0f545e7ea2ae2065c05e2f47856"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData</b> ()</td></tr>
+<tr class="memitem:a58d0e0f545e7ea2ae2065c05e2f47856 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a58d0e0f545e7ea2ae2065c05e2f47856">beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData</a> ()</td></tr>
+<tr class="memdesc:a58d0e0f545e7ea2ae2065c05e2f47856 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called before the outer cells are processed, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a58d0e0f545e7ea2ae2065c05e2f47856">More...</a><br /></td></tr>
 <tr class="separator:a58d0e0f545e7ea2ae2065c05e2f47856 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1494bdeb447090cc1815367d55e58b34 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a1494bdeb447090cc1815367d55e58b34" name="a1494bdeb447090cc1815367d55e58b34"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>endProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData</b> ()</td></tr>
+<tr class="memitem:a1494bdeb447090cc1815367d55e58b34 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a1494bdeb447090cc1815367d55e58b34">endProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData</a> ()</td></tr>
+<tr class="memdesc:a1494bdeb447090cc1815367d55e58b34 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called after the outer cells are processed, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a1494bdeb447090cc1815367d55e58b34">More...</a><br /></td></tr>
 <tr class="separator:a1494bdeb447090cc1815367d55e58b34 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa98702cd292a707f9c8541c2a9438246 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="aa98702cd292a707f9c8541c2a9438246" name="aa98702cd292a707f9c8541c2a9438246"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>beginProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData</b> ()</td></tr>
+<tr class="memitem:aa98702cd292a707f9c8541c2a9438246 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#aa98702cd292a707f9c8541c2a9438246">beginProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData</a> ()</td></tr>
+<tr class="memdesc:aa98702cd292a707f9c8541c2a9438246 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called before the inner cells are processed, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#aa98702cd292a707f9c8541c2a9438246">More...</a><br /></td></tr>
 <tr class="separator:aa98702cd292a707f9c8541c2a9438246 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7425c7fd98a29ea65af6f4902f2b0f96 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a7425c7fd98a29ea65af6f4902f2b0f96" name="a7425c7fd98a29ea65af6f4902f2b0f96"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData</b> ()</td></tr>
+<tr class="memitem:a7425c7fd98a29ea65af6f4902f2b0f96 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a7425c7fd98a29ea65af6f4902f2b0f96">endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData</a> ()</td></tr>
+<tr class="memdesc:a7425c7fd98a29ea65af6f4902f2b0f96 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called after the inner cells are processed, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a7425c7fd98a29ea65af6f4902f2b0f96">More...</a><br /></td></tr>
 <tr class="separator:a7425c7fd98a29ea65af6f4902f2b0f96 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7e55c4bb2e274ec4787c2e12ca6e879 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="ad7e55c4bb2e274ec4787c2e12ca6e879" name="ad7e55c4bb2e274ec4787c2e12ca6e879"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>processOuterMacroscopicCellAfterReceivingMacroscopicSolverData</b> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;index)</td></tr>
+<tr class="memitem:ad7e55c4bb2e274ec4787c2e12ca6e879 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#ad7e55c4bb2e274ec4787c2e12ca6e879">processOuterMacroscopicCellAfterReceivingMacroscopicSolverData</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;index)</td></tr>
+<tr class="memdesc:ad7e55c4bb2e274ec4787c2e12ca6e879 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">is called for every macroscopic cell after the microscopicMass and -Momentum have been filled in with data from the macroscopic solver.  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#ad7e55c4bb2e274ec4787c2e12ca6e879">More...</a><br /></td></tr>
 <tr class="separator:ad7e55c4bb2e274ec4787c2e12ca6e879 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af09fb7279b028aba47fb9de0116a1e1f inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="af09fb7279b028aba47fb9de0116a1e1f" name="af09fb7279b028aba47fb9de0116a1e1f"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData</b> ()</td></tr>
+<tr class="memitem:af09fb7279b028aba47fb9de0116a1e1f inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#af09fb7279b028aba47fb9de0116a1e1f">beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData</a> ()</td></tr>
+<tr class="memdesc:af09fb7279b028aba47fb9de0116a1e1f inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called before the outer cells are processed, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#af09fb7279b028aba47fb9de0116a1e1f">More...</a><br /></td></tr>
 <tr class="separator:af09fb7279b028aba47fb9de0116a1e1f inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a992b57f7a0660fa42df6a8f74e3eac15 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a992b57f7a0660fa42df6a8f74e3eac15" name="a992b57f7a0660fa42df6a8f74e3eac15"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData</b> ()</td></tr>
+<tr class="memitem:a992b57f7a0660fa42df6a8f74e3eac15 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a992b57f7a0660fa42df6a8f74e3eac15">endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData</a> ()</td></tr>
+<tr class="memdesc:a992b57f7a0660fa42df6a8f74e3eac15 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called after the outer cells are processed, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a992b57f7a0660fa42df6a8f74e3eac15">More...</a><br /></td></tr>
 <tr class="separator:a992b57f7a0660fa42df6a8f74e3eac15 inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38967f3012fbc93ac86c9c44607105fa inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a38967f3012fbc93ac86c9c44607105fa">beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData</a> ()</td></tr>
+<tr class="memdesc:a38967f3012fbc93ac86c9c44607105fa inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called before the inner cell data is send, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a38967f3012fbc93ac86c9c44607105fa">More...</a><br /></td></tr>
+<tr class="separator:a38967f3012fbc93ac86c9c44607105fa inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06c458d2bfa9ca7e890a0c92dc78bd8a inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a06c458d2bfa9ca7e890a0c92dc78bd8a">endProcessInnerMacroscopicCellsBeforeSendingMDSolverData</a> ()</td></tr>
+<tr class="memdesc:a06c458d2bfa9ca7e890a0c92dc78bd8a inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called after the inner cell data is send, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a06c458d2bfa9ca7e890a0c92dc78bd8a">More...</a><br /></td></tr>
+<tr class="separator:a06c458d2bfa9ca7e890a0c92dc78bd8a inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78fb7c05ac0e55e14e4d37f01dd4df8a inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a78fb7c05ac0e55e14e4d37f01dd4df8a">processOuterMacroscopicCellBeforeSendingMDSolverData</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;index)</td></tr>
+<tr class="memdesc:a78fb7c05ac0e55e14e4d37f01dd4df8a inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">is called for outer macroscopic cell before sending the macroscopicMass and -Momentum data to the macroscopic solver and before noise reduction invocation.  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a78fb7c05ac0e55e14e4d37f01dd4df8a">More...</a><br /></td></tr>
 <tr class="separator:a78fb7c05ac0e55e14e4d37f01dd4df8a inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a072ca22bb93203f8d9d6509f14ee3bcf inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a072ca22bb93203f8d9d6509f14ee3bcf" name="a072ca22bb93203f8d9d6509f14ee3bcf"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>beginProcessOuterMacroscopicCellsBeforeSendingMDSolverData</b> ()</td></tr>
+<tr class="memitem:a072ca22bb93203f8d9d6509f14ee3bcf inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a072ca22bb93203f8d9d6509f14ee3bcf">beginProcessOuterMacroscopicCellsBeforeSendingMDSolverData</a> ()</td></tr>
+<tr class="memdesc:a072ca22bb93203f8d9d6509f14ee3bcf inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called before the outer cells are processed, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a072ca22bb93203f8d9d6509f14ee3bcf">More...</a><br /></td></tr>
 <tr class="separator:a072ca22bb93203f8d9d6509f14ee3bcf inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7c1b00b68e9e3cf38ab90061899e72e inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="ad7c1b00b68e9e3cf38ab90061899e72e" name="ad7c1b00b68e9e3cf38ab90061899e72e"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>endProcessOuterMacroscopicCellsBeforeSendingMDSolverData</b> ()</td></tr>
+<tr class="memitem:ad7c1b00b68e9e3cf38ab90061899e72e inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#ad7c1b00b68e9e3cf38ab90061899e72e">endProcessOuterMacroscopicCellsBeforeSendingMDSolverData</a> ()</td></tr>
+<tr class="memdesc:ad7c1b00b68e9e3cf38ab90061899e72e inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called after the outer cells are processed, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#ad7c1b00b68e9e3cf38ab90061899e72e">More...</a><br /></td></tr>
 <tr class="separator:ad7c1b00b68e9e3cf38ab90061899e72e inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8807e797fd49b368e1c6d3447dacf4ea inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a8807e797fd49b368e1c6d3447dacf4ea" name="a8807e797fd49b368e1c6d3447dacf4ea"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>endProcessInnerMacroscopicCellsAfterMDTimestep</b> ()</td></tr>
+<tr class="memitem:a8807e797fd49b368e1c6d3447dacf4ea inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a8807e797fd49b368e1c6d3447dacf4ea">endProcessInnerMacroscopicCellsAfterMDTimestep</a> ()</td></tr>
+<tr class="memdesc:a8807e797fd49b368e1c6d3447dacf4ea inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="mdescLeft">&#160;</td><td class="mdescRight">the method is called after the inner cell data is send, e.g. general values might be set here  <a href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a8807e797fd49b368e1c6d3447dacf4ea">More...</a><br /></td></tr>
 <tr class="separator:a8807e797fd49b368e1c6d3447dacf4ea inherit pub_methods_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
@@ -151,51 +169,106 @@ Private Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a6888a6b564edf63a202bc604c5976d94"><td class="memItemLeft" align="right" valign="top"><a id="a6888a6b564edf63a202bc604c5976d94" name="a6888a6b564edf63a202bc604c5976d94"></a>
-<a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMassMapping.html">coupling::cellmappings::ComputeMassMapping</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_massMapping</b></td></tr>
+<tr class="memitem:a6888a6b564edf63a202bc604c5976d94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMassMapping.html">coupling::cellmappings::ComputeMassMapping</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a6888a6b564edf63a202bc604c5976d94">_massMapping</a></td></tr>
 <tr class="separator:a6888a6b564edf63a202bc604c5976d94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99ce87881b127fca01a083452ce862e2"><td class="memItemLeft" align="right" valign="top"><a id="a99ce87881b127fca01a083452ce862e2" name="a99ce87881b127fca01a083452ce862e2"></a>
-<a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMomentumMapping.html">coupling::cellmappings::ComputeMomentumMapping</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_momentumMapping</b></td></tr>
+<tr class="memitem:a99ce87881b127fca01a083452ce862e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMomentumMapping.html">coupling::cellmappings::ComputeMomentumMapping</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a99ce87881b127fca01a083452ce862e2">_momentumMapping</a></td></tr>
 <tr class="separator:a99ce87881b127fca01a083452ce862e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeaf22a21f424556288590b511c52e1e5"><td class="memItemLeft" align="right" valign="top"><a id="aeaf22a21f424556288590b511c52e1e5" name="aeaf22a21f424556288590b511c52e1e5"></a>
-<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_oldSolution</b></td></tr>
+<tr class="memitem:aeaf22a21f424556288590b511c52e1e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#aeaf22a21f424556288590b511c52e1e5">_oldSolution</a></td></tr>
 <tr class="separator:aeaf22a21f424556288590b511c52e1e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b1719c68d758e74ea7a80c6c85338b3"><td class="memItemLeft" align="right" valign="top"><a id="a7b1719c68d758e74ea7a80c6c85338b3" name="a7b1719c68d758e74ea7a80c6c85338b3"></a>
-<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_newSolution</b></td></tr>
+<tr class="memitem:a7b1719c68d758e74ea7a80c6c85338b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a7b1719c68d758e74ea7a80c6c85338b3">_newSolution</a></td></tr>
 <tr class="separator:a7b1719c68d758e74ea7a80c6c85338b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a1665db46fb3ebec1a99ead731fe9a4"><td class="memItemLeft" align="right" valign="top"><a id="a6a1665db46fb3ebec1a99ead731fe9a4" name="a6a1665db46fb3ebec1a99ead731fe9a4"></a>
-const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_numberMDSteps</b></td></tr>
+<tr class="memitem:a6a1665db46fb3ebec1a99ead731fe9a4"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a6a1665db46fb3ebec1a99ead731fe9a4">_numberMDSteps</a></td></tr>
 <tr class="separator:a6a1665db46fb3ebec1a99ead731fe9a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c981966dc9d192dac94b0b245cff7d9"><td class="memItemLeft" align="right" valign="top"><a id="a7c981966dc9d192dac94b0b245cff7d9" name="a7c981966dc9d192dac94b0b245cff7d9"></a>
-const double&#160;</td><td class="memItemRight" valign="bottom"><b>_shiftTimestep</b></td></tr>
+<tr class="memitem:a7c981966dc9d192dac94b0b245cff7d9"><td class="memItemLeft" align="right" valign="top">const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a7c981966dc9d192dac94b0b245cff7d9">_shiftTimestep</a></td></tr>
 <tr class="separator:a7c981966dc9d192dac94b0b245cff7d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44443ea7bce435e8a55c70f3fc2a0827"><td class="memItemLeft" align="right" valign="top"><a id="a44443ea7bce435e8a55c70f3fc2a0827" name="a44443ea7bce435e8a55c70f3fc2a0827"></a>
-const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_numberLocalCells</b></td></tr>
+<tr class="memitem:a44443ea7bce435e8a55c70f3fc2a0827"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a44443ea7bce435e8a55c70f3fc2a0827">_numberLocalCells</a></td></tr>
 <tr class="separator:a44443ea7bce435e8a55c70f3fc2a0827"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d3cbeb2998244f7410212f67e0218b8"><td class="memItemLeft" align="right" valign="top"><a id="a1d3cbeb2998244f7410212f67e0218b8" name="a1d3cbeb2998244f7410212f67e0218b8"></a>
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_timestepCounter</b></td></tr>
+<tr class="memitem:a1d3cbeb2998244f7410212f67e0218b8"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a1d3cbeb2998244f7410212f67e0218b8">_timestepCounter</a></td></tr>
 <tr class="separator:a1d3cbeb2998244f7410212f67e0218b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabb666a6e2d11cd001a949e310524a80"><td class="memItemLeft" align="right" valign="top"><a id="aabb666a6e2d11cd001a949e310524a80" name="aabb666a6e2d11cd001a949e310524a80"></a>
-double *&#160;</td><td class="memItemRight" valign="bottom"><b>_excessMass</b></td></tr>
+<tr class="memitem:aabb666a6e2d11cd001a949e310524a80"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#aabb666a6e2d11cd001a949e310524a80">_excessMass</a></td></tr>
 <tr class="separator:aabb666a6e2d11cd001a949e310524a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30949b325b647f7a91f8f2ff1d666f40"><td class="memItemLeft" align="right" valign="top"><a id="a30949b325b647f7a91f8f2ff1d666f40" name="a30949b325b647f7a91f8f2ff1d666f40"></a>
-const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_massFluxBoundary</b></td></tr>
+<tr class="memitem:a30949b325b647f7a91f8f2ff1d666f40"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a30949b325b647f7a91f8f2ff1d666f40">_massFluxBoundary</a></td></tr>
 <tr class="separator:a30949b325b647f7a91f8f2ff1d666f40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_attribs_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classcoupling_1_1transferstrategies_1_1TransferStrategy')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a></td></tr>
-<tr class="memitem:a039fe54468c8af62e22c8c0260cb3c9b inherit pro_attribs_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a039fe54468c8af62e22c8c0260cb3c9b" name="a039fe54468c8af62e22c8c0260cb3c9b"></a>
-<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td><td class="memItemRight" valign="bottom"><b>_mdSolverInterface</b></td></tr>
+<tr class="memitem:a039fe54468c8af62e22c8c0260cb3c9b inherit pro_attribs_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a039fe54468c8af62e22c8c0260cb3c9b">_mdSolverInterface</a></td></tr>
 <tr class="separator:a039fe54468c8af62e22c8c0260cb3c9b inherit pro_attribs_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a357c542644390eb5ac9ce1097e9780f0 inherit pro_attribs_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top"><a id="a357c542644390eb5ac9ce1097e9780f0" name="a357c542644390eb5ac9ce1097e9780f0"></a>
-const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>_indexConversion</b></td></tr>
+<tr class="memitem:a357c542644390eb5ac9ce1097e9780f0 inherit pro_attribs_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a357c542644390eb5ac9ce1097e9780f0">_indexConversion</a></td></tr>
 <tr class="separator:a357c542644390eb5ac9ce1097e9780f0 inherit pro_attribs_classcoupling_1_1transferstrategies_1_1TransferStrategy"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
 class coupling::transferstrategies::TransferStrategy4NieCoupling&lt; LinkedCell, dim &gt;</div><p >transfer strategy for Nie coupling algorithm, adopted from: X.B. Nie, S.Y. Chen, W.N. E, M.O. Robbins A continuum and molecular dynamics hybrid method for micro- and nano-fluid flow J. Fluid. Mech. 500: 55-64, 2004 We basically sample in every MD time step. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">LinkedCell</td><td>the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation </td></tr>
+    <tr><td class="paramname">dim</td><td>refers to the spacial dimension of the simulation, can be 1, 2, or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a47787cef3dc469f7d94b209060e544bd" name="a47787cef3dc469f7d94b209060e544bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47787cef3dc469f7d94b209060e544bd">&#9670;&nbsp;</a></span>TransferStrategy4NieCoupling()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::<a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">TransferStrategy4NieCoupling</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td>
+          <td class="paramname"><em>mdSolverInterface</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td>
+          <td class="paramname"><em>indexConversion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>numberMDSteps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>shiftTimestep</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt;&#160;</td>
+          <td class="paramname"><em>massFluxBoundary</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>a simple </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mdSolverInterface</td><td>interface for the md solver </td></tr>
+    <tr><td class="paramname">indexConversion</td><td>an instance of the indexConversion </td></tr>
+    <tr><td class="paramname">shiftTimestep</td><td>parameter for the inter- and extrapolation of the time steps refers to the Nie algorithm </td></tr>
+    <tr><td class="paramname">massFluxBoundary</td><td>indicates at which boundary mass shall be transferred (true) or not (false); in their order the entries refer to: west, east, south, north, bottom, top boundary </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a95a728fcce606175b4caaa6808dc2a8e" name="a95a728fcce606175b4caaa6808dc2a8e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a95a728fcce606175b4caaa6808dc2a8e">&#9670;&nbsp;</a></span>beginProcessInnerMacroscopicCellsAfterMDTimestep()</h2>
 
@@ -220,9 +293,10 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >increments time step counter </p>
 
-<p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
+<p>increments time step counter </p>
+
+<p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a317fd9664415cf1514c39e5e9a0c44b4">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>
@@ -250,38 +324,10 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >stores the old cont.-velocity field solution and resets time step counter </p>
 
-<p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
+<p>stores the old cont.-velocity field solution and resets time step counter </p>
 
-</div>
-</div>
-<a id="a4332e5ecfa2dc1f437e738d13e31eec2" name="a4332e5ecfa2dc1f437e738d13e31eec2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4332e5ecfa2dc1f437e738d13e31eec2">&#9670;&nbsp;</a></span>beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class LinkedCell , unsigned int dim&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
+<p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a80015eb4b46ecdce89b0e648b8c91508">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>
@@ -327,35 +373,6 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 </table>
 </div><div class="memdoc">
 <p >computes the mass flux in the outermost inner macroscopic cells. For all other cells, 0.0 is returned. </p>
-
-</div>
-</div>
-<a id="af0fc82fda985e7f2377e7294c4218df0" name="af0fc82fda985e7f2377e7294c4218df0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af0fc82fda985e7f2377e7294c4218df0">&#9670;&nbsp;</a></span>endProcessInnerMacroscopicCellsBeforeSendingMDSolverData()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class LinkedCell , unsigned int dim&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::endProcessInnerMacroscopicCellsBeforeSendingMDSolverData </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>
@@ -423,7 +440,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >computes current velocity (linear time interpolation) in this cell and accumulates mass/momentum for sampling </p>
+
+<p>computes current velocity (linear time interpolation) in this cell and accumulates mass/momentum for sampling </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>the macroscopic cell to be processed </td></tr>
+    <tr><td class="paramname">index</td><td>the index of the macroscopic cell </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#aa6e80f5c8be4c9968587454c1f583895">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
 
@@ -464,7 +489,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >converts momentum into velocity values; stores velocity values in new cont.-velocity field solution and sets correct velocity value for first MD time step in microscopic momentum buffer. </p>
+
+<p>converts momentum into velocity values; </p>
+<p >stores velocity values in new cont.-velocity field solution and sets correct velocity value for first MD time step in microscopic momentum buffer. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>the macroscopic cell to be processed </td></tr>
+    <tr><td class="paramname">index</td><td>the index of the macroscopic cell </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a3b876fd72875750a9b58beffa249747a">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
 
@@ -505,7 +538,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >store old microscopic mass in excess-mass buffer and reset microscopic mass buffer </p>
+
+<p>store old microscopic mass in excess-mass buffer and reset microscopic mass buffer </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>the macroscopic cell to be processed </td></tr>
+    <tr><td class="paramname">index</td><td>the index of the macroscopic cell </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#ad968e0374b613aab9e5bb8b6591e425c">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
 
@@ -546,9 +587,261 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >divides accumulated mass and momentum values by time step counter. </p>
+
+<p>divides accumulated mass and momentum values by time step counter. </p>
 
 <p>Reimplemented from <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a9064bbea81a8e6f5dd2efc76ba5cd9c9">coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="aabb666a6e2d11cd001a949e310524a80" name="aabb666a6e2d11cd001a949e310524a80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabb666a6e2d11cd001a949e310524a80">&#9670;&nbsp;</a></span>_excessMass</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double* <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_excessMass</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >mass that was transferred in an earlier coupled step </p>
+
+</div>
+</div>
+<a id="a30949b325b647f7a91f8f2ff1d666f40" name="a30949b325b647f7a91f8f2ff1d666f40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30949b325b647f7a91f8f2ff1d666f40">&#9670;&nbsp;</a></span>_massFluxBoundary</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;2*dim,bool&gt; <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_massFluxBoundary</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >true in each entry if west/east, south/north, bottom/top boundary is a mass flux boundary </p>
+
+</div>
+</div>
+<a id="a6888a6b564edf63a202bc604c5976d94" name="a6888a6b564edf63a202bc604c5976d94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6888a6b564edf63a202bc604c5976d94">&#9670;&nbsp;</a></span>_massMapping</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMassMapping.html">coupling::cellmappings::ComputeMassMapping</a>&lt;LinkedCell,dim&gt; <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_massMapping</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >class to compute the amount of mass in every single cell </p>
+
+</div>
+</div>
+<a id="a99ce87881b127fca01a083452ce862e2" name="a99ce87881b127fca01a083452ce862e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99ce87881b127fca01a083452ce862e2">&#9670;&nbsp;</a></span>_momentumMapping</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1cellmappings_1_1ComputeMomentumMapping.html">coupling::cellmappings::ComputeMomentumMapping</a>&lt;LinkedCell,dim&gt; <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_momentumMapping</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >class to compute the amount of momentum in every single cell </p>
+
+</div>
+</div>
+<a id="a7b1719c68d758e74ea7a80c6c85338b3" name="a7b1719c68d758e74ea7a80c6c85338b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b1719c68d758e74ea7a80c6c85338b3">&#9670;&nbsp;</a></span>_newSolution</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;dim,double&gt;* <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_newSolution</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >solution of velocity field at the end of coupling cycle </p>
+
+</div>
+</div>
+<a id="a44443ea7bce435e8a55c70f3fc2a0827" name="a44443ea7bce435e8a55c70f3fc2a0827"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44443ea7bce435e8a55c70f3fc2a0827">&#9670;&nbsp;</a></span>_numberLocalCells</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const unsigned int <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_numberLocalCells</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >local number of cells (incl. ghost layers) </p>
+
+</div>
+</div>
+<a id="a6a1665db46fb3ebec1a99ead731fe9a4" name="a6a1665db46fb3ebec1a99ead731fe9a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a1665db46fb3ebec1a99ead731fe9a4">&#9670;&nbsp;</a></span>_numberMDSteps</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const unsigned int <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_numberMDSteps</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >number of MD time steps per coupling cycle </p>
+
+</div>
+</div>
+<a id="aeaf22a21f424556288590b511c52e1e5" name="aeaf22a21f424556288590b511c52e1e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaf22a21f424556288590b511c52e1e5">&#9670;&nbsp;</a></span>_oldSolution</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;dim,double&gt;* <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_oldSolution</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >solution of velocity field at the beginning of coupling cycle (=end of old coupling cycle) </p>
+
+</div>
+</div>
+<a id="a7c981966dc9d192dac94b0b245cff7d9" name="a7c981966dc9d192dac94b0b245cff7d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c981966dc9d192dac94b0b245cff7d9">&#9670;&nbsp;</a></span>_shiftTimestep</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_shiftTimestep</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >offset by which evaluation of time interval is shifted compared to continuum solver. A value of zero implies interpolation between new and old solution, corresponding to a time interval t-&gt;t+dt. A value of one implies extrapolation between the times t+dt (newSolution) and t+2dt using oldSolution and newSolution. All inter-/extrapolations are linear. </p>
+
+</div>
+</div>
+<a id="a1d3cbeb2998244f7410212f67e0218b8" name="a1d3cbeb2998244f7410212f67e0218b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d3cbeb2998244f7410212f67e0218b8">&#9670;&nbsp;</a></span>_timestepCounter</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int <a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html">coupling::transferstrategies::TransferStrategy4NieCoupling</a>&lt; LinkedCell, dim &gt;::_timestepCounter</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >time step counter within a coupling cycle (should run from 0 to _numberMDSteps) </p>
 
 </div>
 </div>

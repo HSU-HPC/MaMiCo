@@ -75,53 +75,138 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Velocity imposition scheme following the respective paper by Nie et al., J. Fluid. Mech. 500, 2004.  
+ <a href="classcoupling_1_1NieVelocityImposition.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="NieVelocityImposition_8h_source.html">NieVelocityImposition.h</a>&gt;</code></p>
 
 <p>Inherits <a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion&lt; LinkedCell, dim &gt;</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab35e4284533d9bff11feba35bba3ab5a"><td class="memItemLeft" align="right" valign="top"><a id="ab35e4284533d9bff11feba35bba3ab5a" name="ab35e4284533d9bff11feba35bba3ab5a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>NieVelocityImposition</b> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, const unsigned int &amp;outermostLayer, const unsigned int &amp;innermostLayer)</td></tr>
+<tr class="memitem:ab35e4284533d9bff11feba35bba3ab5a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NieVelocityImposition.html#ab35e4284533d9bff11feba35bba3ab5a">NieVelocityImposition</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, const unsigned int &amp;outermostLayer, const unsigned int &amp;innermostLayer)</td></tr>
+<tr class="memdesc:ab35e4284533d9bff11feba35bba3ab5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <a href="classcoupling_1_1NieVelocityImposition.html#ab35e4284533d9bff11feba35bba3ab5a">More...</a><br /></td></tr>
 <tr class="separator:ab35e4284533d9bff11feba35bba3ab5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06690fb0f347209526dcb052d5803229"><td class="memItemLeft" align="right" valign="top"><a id="a06690fb0f347209526dcb052d5803229" name="a06690fb0f347209526dcb052d5803229"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~NieVelocityImposition</b> ()</td></tr>
+<tr class="memdesc:a06690fb0f347209526dcb052d5803229"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
+<tr class="separator:a06690fb0f347209526dcb052d5803229"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55e173a245126d52dbfbfbc03965526f"><td class="memItemLeft" align="right" valign="top">virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NieVelocityImposition.html#a55e173a245126d52dbfbfbc03965526f">getTimeIntervalPerMomentumInsertion</a> () const</td></tr>
+<tr class="memdesc:a55e173a245126d52dbfbfbc03965526f"><td class="mdescLeft">&#160;</td><td class="mdescRight">momentum shall be inserted in every md time step, so this returns 1  <a href="classcoupling_1_1NieVelocityImposition.html#a55e173a245126d52dbfbfbc03965526f">More...</a><br /></td></tr>
 <tr class="separator:a55e173a245126d52dbfbfbc03965526f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3644258b1cb2b319fa969083a7286018"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NieVelocityImposition.html#a3644258b1cb2b319fa969083a7286018">insertMomentum</a> (<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, const unsigned int &amp;currentLocalMacroscopicCellIndex) const</td></tr>
+<tr class="memdesc:a3644258b1cb2b319fa969083a7286018"><td class="mdescLeft">&#160;</td><td class="mdescRight">inserts momentum to a cell  <a href="classcoupling_1_1NieVelocityImposition.html#a3644258b1cb2b319fa969083a7286018">More...</a><br /></td></tr>
 <tr class="separator:a3644258b1cb2b319fa969083a7286018"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcoupling_1_1MomentumInsertion"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcoupling_1_1MomentumInsertion')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion&lt; LinkedCell, dim &gt;</a></td></tr>
-<tr class="memitem:af10b00331787d64c1a0fdba158d8abec inherit pub_methods_classcoupling_1_1MomentumInsertion"><td class="memItemLeft" align="right" valign="top"><a id="af10b00331787d64c1a0fdba158d8abec" name="af10b00331787d64c1a0fdba158d8abec"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MomentumInsertion</b> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
+<tr class="memitem:af10b00331787d64c1a0fdba158d8abec inherit pub_methods_classcoupling_1_1MomentumInsertion"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumInsertion.html#af10b00331787d64c1a0fdba158d8abec">MomentumInsertion</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
+<tr class="memdesc:af10b00331787d64c1a0fdba158d8abec inherit pub_methods_classcoupling_1_1MomentumInsertion"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <a href="classcoupling_1_1MomentumInsertion.html#af10b00331787d64c1a0fdba158d8abec">More...</a><br /></td></tr>
 <tr class="separator:af10b00331787d64c1a0fdba158d8abec inherit pub_methods_classcoupling_1_1MomentumInsertion"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac890873bf7467fc67b839e5c0b0c7116 inherit pub_methods_classcoupling_1_1MomentumInsertion"><td class="memItemLeft" align="right" valign="top"><a id="ac890873bf7467fc67b839e5c0b0c7116" name="ac890873bf7467fc67b839e5c0b0c7116"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~MomentumInsertion</b> ()</td></tr>
+<tr class="memdesc:ac890873bf7467fc67b839e5c0b0c7116 inherit pub_methods_classcoupling_1_1MomentumInsertion"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
+<tr class="separator:ac890873bf7467fc67b839e5c0b0c7116 inherit pub_methods_classcoupling_1_1MomentumInsertion"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:a64db6f9279bfbd66638396ae69f48313"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NieVelocityImposition.html#a64db6f9279bfbd66638396ae69f48313">isInsideImpositionLayer</a> (const unsigned int &amp;currentLocalMacroscopicCellIndex) const</td></tr>
+<tr class="memdesc:a64db6f9279bfbd66638396ae69f48313"><td class="mdescLeft">&#160;</td><td class="mdescRight">based on the cell index, the function tells if the cell is inside the imposition layer  <a href="classcoupling_1_1NieVelocityImposition.html#a64db6f9279bfbd66638396ae69f48313">More...</a><br /></td></tr>
 <tr class="separator:a64db6f9279bfbd66638396ae69f48313"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a7856e745fe50a3a10ba9597e64123135"><td class="memItemLeft" align="right" valign="top"><a id="a7856e745fe50a3a10ba9597e64123135" name="a7856e745fe50a3a10ba9597e64123135"></a>
 const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>_indexConversion</b></td></tr>
+<tr class="memdesc:a7856e745fe50a3a10ba9597e64123135"><td class="mdescLeft">&#160;</td><td class="mdescRight">a instance of the indexConversion <br /></td></tr>
 <tr class="separator:a7856e745fe50a3a10ba9597e64123135"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4aafe46e64a3e8724cd5692598cf953"><td class="memItemLeft" align="right" valign="top"><a id="ad4aafe46e64a3e8724cd5692598cf953" name="ad4aafe46e64a3e8724cd5692598cf953"></a>
 const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_outermostLayer</b></td></tr>
+<tr class="memdesc:ad4aafe46e64a3e8724cd5692598cf953"><td class="mdescLeft">&#160;</td><td class="mdescRight">the index of the outermost cell layer <br /></td></tr>
 <tr class="separator:ad4aafe46e64a3e8724cd5692598cf953"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a882853f0567902de5d2a0546981e6f"><td class="memItemLeft" align="right" valign="top"><a id="a1a882853f0567902de5d2a0546981e6f" name="a1a882853f0567902de5d2a0546981e6f"></a>
 const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_innermostLayer</b></td></tr>
+<tr class="memdesc:a1a882853f0567902de5d2a0546981e6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">the index of the innermost cell layer <br /></td></tr>
 <tr class="separator:a1a882853f0567902de5d2a0546981e6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_attribs_classcoupling_1_1MomentumInsertion"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classcoupling_1_1MomentumInsertion')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion&lt; LinkedCell, dim &gt;</a></td></tr>
-<tr class="memitem:a1da6dd93bfe488d981485ca9052e7e05 inherit pro_attribs_classcoupling_1_1MomentumInsertion"><td class="memItemLeft" align="right" valign="top"><a id="a1da6dd93bfe488d981485ca9052e7e05" name="a1da6dd93bfe488d981485ca9052e7e05"></a>
-<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td><td class="memItemRight" valign="bottom"><b>_mdSolverInterface</b></td></tr>
+<tr class="memitem:a1da6dd93bfe488d981485ca9052e7e05 inherit pro_attribs_classcoupling_1_1MomentumInsertion"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumInsertion.html#a1da6dd93bfe488d981485ca9052e7e05">_mdSolverInterface</a></td></tr>
 <tr class="separator:a1da6dd93bfe488d981485ca9052e7e05 inherit pro_attribs_classcoupling_1_1MomentumInsertion"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::NieVelocityImposition&lt; LinkedCell, dim &gt;</div><p >Velocity imposition scheme following the respective paper by Nie et al., J. Fluid. Mech. 500, 2004</p>
+class coupling::NieVelocityImposition&lt; LinkedCell, dim &gt;</div><p >Velocity imposition scheme following the respective paper by Nie et al., J. Fluid. Mech. 500, 2004. </p>
 <dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">LinkedCell</td><td>the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation </td></tr>
+    <tr><td class="paramname">dim</td><td>refers to the spacial dimension of the simulation, can be 1, 2, or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ab35e4284533d9bff11feba35bba3ab5a" name="ab35e4284533d9bff11feba35bba3ab5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab35e4284533d9bff11feba35bba3ab5a">&#9670;&nbsp;</a></span>NieVelocityImposition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1NieVelocityImposition.html">coupling::NieVelocityImposition</a>&lt; LinkedCell, dim &gt;::<a class="el" href="classcoupling_1_1NieVelocityImposition.html">NieVelocityImposition</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td>
+          <td class="paramname"><em>mdSolverInterface</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td>
+          <td class="paramname"><em>indexConversion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int &amp;&#160;</td>
+          <td class="paramname"><em>outermostLayer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int &amp;&#160;</td>
+          <td class="paramname"><em>innermostLayer</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>a simple constructor </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mdSolverInterface</td><td>interface to the md solver </td></tr>
+    <tr><td class="paramname">indexConversion</td><td>instance of the indexConversion for the current simulation </td></tr>
+    <tr><td class="paramname">outermostLayer</td><td>the index of the outermost cell layer </td></tr>
+    <tr><td class="paramname">innermostLayer</td><td>the index of the innermost cell layer </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a55e173a245126d52dbfbfbc03965526f" name="a55e173a245126d52dbfbfbc03965526f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a55e173a245126d52dbfbfbc03965526f">&#9670;&nbsp;</a></span>getTimeIntervalPerMomentumInsertion()</h2>
 
@@ -146,7 +231,9 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the number of MD steps between subsequent momentum insertions </p>
+
+<p>momentum shall be inserted in every md time step, so this returns 1 </p>
+<dl class="section return"><dt>Returns</dt><dd>the time step interval for momentum insertion, always 1 </dd></dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1MomentumInsertion.html#ad7a6c5ad3c7bffda9a0671835e16daf9">coupling::MomentumInsertion&lt; LinkedCell, dim &gt;</a>.</p>
 
@@ -173,7 +260,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const unsigned int &amp;&#160;</td>
-          <td class="paramname"><em>currentMacroscopicCellIndex</em>&#160;</td>
+          <td class="paramname"><em>currentLocalMacroscopicCellIndex</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -187,7 +274,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >inserts a fraction 'fraction' from the momentum of the macroscopic cell 'cell' and distributes it over all molecules. This method does not conserve the kinetic energy of the respective macroscopic cell. To conserve the energy as well, see the description of <a class="el" href="classcoupling_1_1MomentumController.html">MomentumController</a> on details how to do that. </p>
+
+<p>inserts momentum to a cell </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>to the macroscopic cell will the momentum be inserted </td></tr>
+    <tr><td class="paramname">currentLocalMacroscopicCell</td><td>local linearised index for the macroscopic cell </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1MomentumInsertion.html#ae3cc0d6019cb03bfd53cc78d1aad78d2">coupling::MomentumInsertion&lt; LinkedCell, dim &gt;</a>.</p>
 
@@ -218,7 +313,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns true if the local cell at index currentLocalMacroscopicCell is inside the layer of imposition cells, given by outermostLayer and innermostLayer. For, e.g., outermostLayer=2 and innermostLayer=3, the layers for imposition are located in the 3rd and 4th strip of cells (we start counting from cell layer=0 which corresponds to the outermost, actually ghost-layer of cells which surrounds the MD domain). </p>
+
+<p>based on the cell index, the function tells if the cell is inside the imposition layer </p>
+<p >returns true if the local cell at index currentLocalMacroscopicCell is inside the layer of imposition cells, given by outermostLayer and innermostLayer. For, e.g., outermostLayer=2 and innermostLayer=3, the layers for imposition are located in the 3rd and 4th strip of cells (we start counting from cell layer=0 which corresponds to the outermost, actually ghost-layer of cells which surrounds the MD domain). </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">currentLocalMacroscopicCell</td><td>local linearised index of a macroscopic cell to check </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a bool, that indicates if the given cell index is located in the imposition layer (true) or not (false) </dd></dl>
 
 </div>
 </div>
