@@ -47,7 +47,6 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling: public couplin
     virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
     );
-    virtual void endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData()override;
 
     virtual void beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
     /** divides accumulated mass and momentum values by time step counter.
@@ -68,7 +67,7 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling: public couplin
     unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const;
 
     /** computes the mass flux in the outermost inner macroscopic cells. For all other cells, 0.0 is returned. */
-    tarch::la::Vector<dim,double> computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) ;
+    double computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) ;
 
     coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> _massMapping;
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell,dim> _momentumMapping;

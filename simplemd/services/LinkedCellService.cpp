@@ -123,29 +123,6 @@ void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule &mo
   _cells[localCellIndex].addMolecule(&molecule);
 }
 
-void simplemd::services::LinkedCellService::addGhostMoleculeToLinkedCell(Molecule &molecule, const tarch::la::Vector<MD_DIM,unsigned int> &localCellIndex, const tarch::la::Vector<MD_DIM, double> &moveTo,
-const unsigned int ghostIteratorIndex){
-#if (MD_DEBUG == MD_YES)
-  for (unsigned int d = 0; d < MD_DIM; d++){
-    if (localCellIndex[d] >= _totalNumberOfCells[d]){
-      std::cout << "ERROR simplemd::services::LinkedCellService::addMoleculeToLinkedCell: localCellIndex out of range!" << std::endl;
-      std::cout << "Cell index=" << localCellIndex << "; " << molecule.getConstPosition() << "; " << molecule.getConstVelocity() << ";" << molecule.getConstForce() << ";" << molecule.getConstForceOld() << std::endl;
-      exit(EXIT_FAILURE);
-    }
-  }
-#endif
-  unsigned int index = localCellIndex[0]
-#if (MD_DIM > 1)
-                     + _totalNumberOfCells[0]*localCellIndex[1]
-#endif
-#if (MD_DIM > 2)
-                     +   _totalNumberOfCells_X_By_totalNumberOfCells_Y*localCellIndex[2]
-#endif
-                     ;
-  molecule.setPosition(molecule.getPosition()+moveTo);
-  _cells[index].addGhostMolecule(&molecule, ghostIteratorIndex);
-}
-
 simplemd::LinkedCell& simplemd::services::LinkedCellService::getLinkedCell(const tarch::la::Vector<MD_DIM,unsigned int> &localCellIndex){
 #if (MD_DEBUG==MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++){

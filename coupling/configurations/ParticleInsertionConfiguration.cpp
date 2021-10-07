@@ -27,8 +27,6 @@ parseSubtag( tinyxml2::XMLElement* node ){
     return;
   } else if (thisType == "usher"){
     _particleInsertionType = USHER;
-  } else if (thisType == "push"){
-    _particleInsertionType = PUSH;
   } else {
     std::cout << "ERROR coupling::configurations::ParticleInsertionConfiguration::parseSubtag(): 'type' not specified!" << std::endl;
     exit(EXIT_FAILURE);

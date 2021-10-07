@@ -17,7 +17,6 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDMoleculeIterator.h"
-#include "coupling/interface/impl/SimpleMD/SimpleMDGhostMoleculeIterator.h"
 
 namespace coupling {
 namespace interface{
@@ -229,15 +228,6 @@ class SimpleMDSolverInterface: public MDSolverInterface<simplemd::LinkedCell,MD_
       _linkedCellService.addMoleculeToLinkedCell(*myMolecule,linkedCellIndex);
     }
 
-    void addGhostMoleculeToMDSimulation(const coupling::interface::Molecule<MD_DIM>& molecule, const tarch::la::Vector<MD_DIM, double>& moveTo, const unsigned int ghostIteratorIndex=0){
-      const tarch::la::Vector<MD_DIM,double> position = molecule.getPosition();
-      const tarch::la::Vector<MD_DIM,double> velocity = molecule.getVelocity();
-      simplemd::Molecule newMolecule(position,velocity);
-      tarch::la::Vector<MD_DIM,unsigned int> linkedCellIndex(getLinkedCellIndexForMoleculePosition(position));
-      _linkedCellService.addGhostMoleculeToLinkedCell(newMolecule,linkedCellIndex, moveTo, ghostIteratorIndex);
-    }
-
-
     tarch::la::Vector<MD_DIM,unsigned int> getLinkedCellIndexForMoleculePosition(
       const tarch::la::Vector<MD_DIM,double>& position
     ){
@@ -375,10 +365,6 @@ class SimpleMDSolverInterface: public MDSolverInterface<simplemd::LinkedCell,MD_
 
     coupling::interface::MoleculeIterator<simplemd::LinkedCell,MD_DIM>* getMoleculeIterator(simplemd::LinkedCell& cell){
       return new coupling::interface::SimpleMDMoleculeIterator(cell);
-    }
-
-    coupling::interface::SimpleMDGhostMoleculeIterator* getGhostMoleculeIterator(simplemd::LinkedCell& cell){
-      return new coupling::interface::SimpleMDGhostMoleculeIterator(cell);
     }
 };
 

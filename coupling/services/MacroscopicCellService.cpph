@@ -44,14 +44,13 @@ _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscop
 _filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, _macroscopicSolverInterface, multiMDService, coupling::Scope::perInstance, filterPipelineConfiguration),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
-_particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion)),
+_particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
 _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
 _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
 _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface,*_indexConversion,numberMDTimestepsPerCouplingCycle)),
 //_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService, tws)),
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
-_forceController(particleInsertionConfiguration.interpreteConfigurationForceController(mdSolverInterface)),
 _momentumController(mdSolverInterface),
 _microscopicFilename(macroscopicCellConfiguration.getMicroscopicFilename()),
 _writeEveryMicroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMicroscopicTimestep()),
@@ -228,15 +227,6 @@ applyBoundaryForce(unsigned int t){
   Wrapper4ApplyBoundaryForce wrapper(this);
   _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);
 }
-
-template<class LinkedCell,unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
-limitForceInOuterCells(){
-  // only do if particle insertion = push
-  Wrapper4LimitForce wrapper(this);
-  _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);
-}
-
 
 template<class LinkedCell,unsigned int dim>
 coupling::IndexConversion<dim>* coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::

@@ -78,12 +78,6 @@ processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
 
 template<class LinkedCell,unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
-endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData(){
-}
-
-
-template<class LinkedCell,unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
 processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
   coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
 ){
@@ -103,14 +97,10 @@ processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
   cell.setMicroscopicMomentum((1.0-_shiftTimestep)*_oldSolution[index] + _shiftTimestep*_newSolution[index]);
 
   const tarch::la::Vector<dim,double> velocity = (0.5-_shiftTimestep)*_oldSolution[index] + (_shiftTimestep+0.5)*_newSolution[index];
-  cell.setMicroscopicMomentum(velocity); //wrotn TODO correct
 
   // for mass transfer: compute mass flux if required and add excess mass
-  //const double massFlux = computeMassFlux(cell.getMicroscopicMass(),velocity,index) + _excessMass[index];
-  //cell.setMicroscopicMass(massFlux);
-  const tarch::la::Vector<dim,double> massFlux = computeMassFlux(cell.getMicroscopicMass(),velocity,index);
-  cell.setMicroscopicMass(_excessMass[index]);
-  cell.setMassFlux(massFlux);
+  const double massFlux = computeMassFlux(cell.getMicroscopicMass(),velocity,index) + _excessMass[index];
+  cell.setMicroscopicMass(massFlux);
 
   // reset macroscopic solver values (from averaging)
   cell.setMacroscopicMass(0.0);
@@ -190,7 +180,6 @@ processInnerMacroscopicCellAfterMDTimestep(
   #endif
   const tarch::la::Vector<dim,double> velocity = (1.0-factor)*_oldSolution[index] + factor*_newSolution[index];
   cell.setMicroscopicMomentum(velocity);
-  cell.addMicroscopicMass(cell.getMassFlux());
 }
 
 
@@ -202,7 +191,7 @@ unsigned int coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCe
 }
 
 template<class LinkedCell,unsigned int dim>
-tarch::la::Vector<dim,double> coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) {
+double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::computeMassFlux(const double& mass, const tarch::la::Vector<dim,double>& velocity, const unsigned int index) {
   const tarch::la::Vector<dim,unsigned int> globalIndex(coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.convertLocalToGlobalVectorCellIndex(
     coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.getLocalVectorCellIndex(index)));
   const tarch::la::Vector<dim,unsigned int> globalNumberCells(coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_indexConversion.getGlobalNumberMacroscopicCells());
@@ -214,10 +203,9 @@ tarch::la::Vector<dim,double> coupling::transferstrategies::TransferStrategy4Nie
   // mass density of cell
   const double density = mass/volume;
   // coupling time interval
-  //const double couplingTimeInterval = coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_mdSolverInterface->getDt()*_numberMDSteps;
-  const double couplingTimeInterval = coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_mdSolverInterface->getDt();
+  const double couplingTimeInterval = coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_mdSolverInterface->getDt()*_numberMDSteps;
 
-  tarch::la::Vector<dim,double> massFlux = 0.0;
+  double massFlux = 0.0;
 
   // compute normal vector for this cell, checking whether there is mass flux or not
   tarch::la::Vector<dim,int> n(0);
@@ -233,7 +221,7 @@ tarch::la::Vector<dim,double> coupling::transferstrategies::TransferStrategy4Nie
     for (unsigned int e = 0; e < d; e++){surface = surface*meshsize[e]; }
     for (unsigned int e = d+1; e < dim; e++){surface =surface*meshsize[e];}
 
-    massFlux[d] = n[d]*surface*density*velocity[d]*couplingTimeInterval;
+    massFlux += n[d]*surface*density*velocity[d]*couplingTimeInterval;
   }
   return massFlux;
 }

@@ -9,10 +9,8 @@
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/la/Vector.h"
 #include "coupling/interface/MDSolverInterface.h"
-#include "coupling/PushParticleInsertion.h"
 #include "coupling/UsherParticleInsertion.h"
 #include "coupling/NoParticleInsertion.h"
-#include "coupling/ForceController.h"
 #include <iostream>
 
 namespace coupling {
@@ -61,13 +59,11 @@ class coupling::configurations::ParticleInsertionConfiguration: public tarch::co
     bool isValid() const;
 
     template<class LinkedCell, unsigned int dim>
-    coupling::ParticleInsertion<LinkedCell,dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface, const coupling::IndexConversion<dim> &indexConversion) const {
+    coupling::ParticleInsertion<LinkedCell,dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface) const {
       if (_particleInsertionType==USHER){
         return new coupling::UsherParticleInsertion<LinkedCell,dim>(
           _insertDeleteMassEveryTimestep,_rSigmaCoeff, _meanPotentialEnergyFactor, _uOverlapCoeff, _stepRefCoeff, _iterMax, _restartMax, _tolerance, _offsetFromOuterBoundary,
           mdSolverInterface);
-      } else if (_particleInsertionType==PUSH){
-        return new coupling::PushParticleInsertion<LinkedCell,dim>(_insertDeleteMassEveryTimestep, mdSolverInterface, indexConversion);
       } else if (_particleInsertionType==NO_INSERTION){
         return new coupling::NoParticleInsertion<LinkedCell,dim>();
       }
@@ -76,15 +72,7 @@ class coupling::configurations::ParticleInsertionConfiguration: public tarch::co
       return NULL;
     }
 
-    template<class LinkedCell, unsigned int dim>
-    coupling::ForceController<LinkedCell,dim>* interpreteConfigurationForceController(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface)const{
-    // if(_particleInsertionType==PUSH){
-      return new coupling::ForceController<LinkedCell,dim>(mdSolverInterface);
-    // }
-    // return NULL;
-    }
-
-    enum ParticleInsertionType{USHER=0,NO_INSERTION=1, PUSH=2};
+    enum ParticleInsertionType{USHER=0,NO_INSERTION=1};
     ParticleInsertionType getParticleInsertionType() const { return _particleInsertionType; }
 
   private:
