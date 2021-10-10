@@ -8,59 +8,75 @@ using namespace coupling::indexing;
  *	coupling::indexing::BaseIndexType
  */
 
-template<unsigned int dim, IndexType idx_T>
-template<IndexType convert_to_T>
-CellIndex<dim, idx_T>::operator CellIndex<dim, convert_to_T>() const { 
+template<unsigned int dim, bool is_vector, is_local, is_md2macro, is_noGhost>
+template<bool convert_to_vector, bool convert_to_local, convert_to_md2macro, convert_to_noGhost>
+CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>::operator CellIndex<dim, convert_to_vector, convert_to_local, convert_to_md2macro, convert_to_noGhost>() const { 
+
+	//Note: In the previous C++20 version of this code, idx_T and convert_to_T were non-type template paramters. 
+	//We try to stay as close to the original implementation as possible, which is why they are declared here. This has negative perf. impact on compile time only.
+	constexpr IndexType idx_T {is_vector, is_local, is_md2macro, is_noGhost};
+	constexpr IndexType convert_to_T {convert_to_vector, convert_to_local, convert_to_md2macro, convert_to_noGhost};
 
 	//conversion: identical IndexType -> "copy constructor"
 	if constexpr (idx_T == convert_to_T) {
-		return CellIndex<dim, idx_T> { _index }; 
+		return CellIndex/*implicit: <dim, is_vector, is_local, is_md2macro, is_noGhost>*/ { _index }; 
 	}
 
 	//conversion: non-BaseIndex -> BaseIndex
 	if constexpr (convert_to_T == BaseIndexType) {
 		//convert to vector if neccessary, then add offset, then construct a BaseIndex from that tarch::la::Vector
-		return CellIndex<dim, BaseIndexType> { convertToVector<dim, idx_T>(*this).get() + CellIndex<dim, idx_T>::lowerBoundary.get() } ;
+		return BaseIndex<dim> 
+				{ 
+					convertToVector<dim, idx_T.vector, idx_T.local, idx_t.md2macro, idx_T.noGhost>(*this).get() 
+					+ CellIndex<dim, idx_T.vector, idx_T.local, idx_T.md2macro, idx_T.noGhost>::lowerBoundary.get() 
+				} ;
 	}
 
 	//conversion: BaseIndex -> non-BaseIndex
 	if constexpr (idx_T == BaseIndexType) {
 		//convert to scalar if neccessary + construct CellIndex<dim, convert_to_T>
 		if constexpr(convert_to_T.vector) {
-			return CellIndex<dim, convert_to_T> { (*this - CellIndex<dim, convert_to_T>::lowerBoundary).get() };
+			return CellIndex<dim, convert_to_T.vector, convert_to_T.local, convert_to_T.md2macro, convert_to_T.noGhost> 
+				{ 
+					(*this - CellIndex<dim, convert_to_T.vector, convert_to_T.local, convert_to_T.md2macro, convert_to_T.noGhost>::lowerBoundary).get() 
+				};
 		}
 		else /* convert_to_T.vector == false */ {
 			//get scalar version of i_vec by first constructing a BaseIndex and then converting it
-			const unsigned int i_sca = convertToScalar<dim, BaseIndexType>(*this - CellIndex<dim, convert_to_T>::lowerBoundary).get();	
+			const unsigned int i_sca 
+				{
+					//Get BaseIndex (i.e. vector=true, rest false)
+				 	convertToScalar<dim, vector=true>(*this - CellIndex<dim, convert_to_T.vector, convert_to_T.local, convert_to_T.md2macro, convert_to_T.noGhost>::lowerBoundary).get()
+				};
 
 			return CellIndex<dim, convert_to_T> { i_sca };
 		}
 	}
 
 	//conversion: non-BaseIndex -> different non-BaseIndex
-	//call this -> BaseIndexType conversion
-	CellIndex<dim, BaseIndexType> b { *this };
+	//call this -> BaseIndex conversion
+	BaseIndex<dim> b { *this };
 	//call BaseIndex -> target index type conversion
-	return CellIndex<dim, convert_to_T> { b };
+	return CellIndex<dim, convert_to_T.vector, convert_to_T.local, convert_to_T.md2macro, convert_to_T.noGhost> { b };
 
 } 
 
 //Overloading operator<< for CellIndex
-template<unsigned int dim, coupling::indexing::IndexType idx_T>
-std::ostream& operator<<(std::ostream& os, const CellIndex<dim, idx_T>& i) {
+template<unsigned int dim, bool is_vector, bool is_local, bool is_md2macro, bool is_noGhost>
+std::ostream& operator<<(std::ostream& os, const CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>& i) {
 	os << i.get();
 	return os;
 }
 
 //Overloading arithmetic operators for CellIndex using friend functions
-template<unsigned int dim, IndexType idx_T>
-CellIndex<dim, idx_T> operator+(
-		const CellIndex<dim, idx_T>& i1,
-		const CellIndex<dim, idx_T>& i2
-) { return CellIndex<dim, idx_T> { i1._index + i2._index }; }
+template<unsigned int dim, bool is_vector, bool is_local, bool is_md2macro, bool is_noGhost>
+CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost> operator+(
+		const CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>& i1,
+		const CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>& i2
+) { return CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost> { i1._index + i2._index }; }
 
-template<unsigned int dim, coupling::indexing::IndexType idx_T>
-coupling::indexing::CellIndex<dim, idx_T> operator-(
-		const CellIndex<dim, idx_T>& i1,
-		const CellIndex<dim, idx_T>& i2
-) { return CellIndex<dim, idx_T> { i1._index - i2._index }; }
+template<unsigned int dim, bool is_vector, bool is_local, bool is_md2macro, bool is_noGhost>
+coupling::indexing::CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost> operator-(
+		const CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>& i1,
+		const CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>& i2
+) { return CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost> { i1._index - i2._index }; }

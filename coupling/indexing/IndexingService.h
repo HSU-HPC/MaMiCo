@@ -21,7 +21,7 @@ namespace coupling {
 
 		template<unsigned int dim>
 		std::vector<unsigned int> 
-		getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
+		getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
 
 	}
 }
@@ -56,7 +56,7 @@ class coupling::indexing::IndexingService{
 		 * @returns vector of all cells which contain the index
 		 */
 
-		std::vector<unsigned int> getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
+		std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
 		/**
 		 * Helper function used by getRanksForGlobalIndex().
 		 */

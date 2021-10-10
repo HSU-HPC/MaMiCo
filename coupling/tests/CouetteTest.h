@@ -81,6 +81,7 @@ private:
     );
 
     coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
+	//TODO: copy fix for segfault here from indexing-c++20 branch
   }
 
   void runOneCouplingCycle(int cycle){

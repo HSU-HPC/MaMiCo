@@ -6,6 +6,11 @@
 #include "tarch/la/Vector.h"
 
 
+/**
+ * TODO:
+ * update comments for cpp17 port
+ */
+
 namespace coupling {
 	namespace indexing {
 
@@ -19,7 +24,7 @@ namespace coupling {
 		 *
 		 * @author Felix Maurer, Piet Jarmatz
 		 */
-		struct IndexType{
+		struct IndexType{ //structs are non-types, maybe this name is a bit misleading? 
 			const bool vector = false;
 			const bool local = false;
 			const bool md2macro = false;
@@ -41,9 +46,22 @@ namespace coupling {
 		 */
 		auto constexpr BaseIndexType = coupling::indexing::IndexType{true, false, false, false}; 
 
-		// Note: this is -std=c++20
+		// Note:
+		// This is a workaround NOT utilizing the IndexType struct defined above, in order to be able to use the indexing system in c++1z. 
+		// In the future, when c++20 support is widely established, this should be reverted.
+		template<unsigned int dim, bool is_vector=false, bool is_local=false, bool is_md2macro=false, bool is_noGhost=false>
+		class CellIndex;
+		// This would be the c++20 declaration:
+		/*
 		template<unsigned int dim, IndexType idx_T = {}>
 		class CellIndex;
+		*/
+
+		/**
+		 * Base CellIndex specialisation (mainly) used for conversions.
+		 */
+		template<unsigned int dim>
+		using BaseIndex = CellIndex<dim, /*is_vector=*/true>;
 	}
 }
 
@@ -58,18 +76,14 @@ namespace coupling {
  * @tparam dim number of dimensions of the coupled simulation
  * @tparam idx_T index type parametrisation used by this specific index
  */
-template<unsigned int dim, coupling::indexing::IndexType idx_T>
+template<unsigned int dim, bool is_vector=false, bool is_local=false, bool is_md2macro=false, bool is_noGhost=false>
 class coupling::indexing::CellIndex {
 	public:
 
 		/**
 		 * The type of this CellIndex's underlying index representation.
 		 */
-		using value_T = std::conditional_t<idx_T.vector, tarch::la::Vector<dim, unsigned int>, unsigned int>;
-		/**
-		 * CellIndex specialisation using BaseIndexType for this cell's number of dimensions.
-		 */
-		using BaseIndex = CellIndex<dim, BaseIndexType>;
+		using value_T = std::conditional_t<is_vector, tarch::la::Vector<dim, unsigned int>, unsigned int>;
 
 		//primitive constructors
 		CellIndex() = default;
@@ -82,8 +96,8 @@ class coupling::indexing::CellIndex {
 		 * @tparam convert_to_T IndexType parameter of the CellIndex specialisation to convert to
 		 * @returns CellIndex of different template parametrisation.
 		 */
-		template<coupling::indexing::IndexType convert_to_T>
-		operator CellIndex<dim, convert_to_T>() const;
+		template<bool convert_to_vector=false, bool convert_to_local=false, bool convert_to_md2macro=false, bool convert_to_noGhost=false>
+		operator CellIndex<dim, convert_to_vector, convert_to_local, convert_to_md2macro, convert_to_noGhost>() const;
 	
 		/**
 		 * Access to primive value_T of this index.
@@ -102,7 +116,7 @@ class coupling::indexing::CellIndex {
 		 * Note that this does NOT increments indices in vector representation in all directions.
 		 */
 		CellIndex& operator++() {
-			if constexpr (idx_T.vector) {
+			if constexpr (is_vector) {
 				CellIndex<dim> scalar_base { *this };
 				*this = CellIndex { ++scalar_base };
 			}
@@ -115,7 +129,7 @@ class coupling::indexing::CellIndex {
 		 * Note that this does NOT decrements indices in vector representation in all directions.
 		 */
 		CellIndex& operator--() {
-			if constexpr (idx_T.vector) {
+			if constexpr (is_vector) {
 				CellIndex<dim> scalar_base { *this };
 				*this = CellIndex { --scalar_base };
 
@@ -132,10 +146,10 @@ class coupling::indexing::CellIndex {
 		 */
 		bool operator==(const CellIndex &) const = default;
 		bool operator!=(const CellIndex &) const = default;
-		bool operator<(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() < convertToScalar<dim, idx_T>(i).get() ); };
-		bool operator<=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() <= convertToScalar<dim, idx_T>(i).get() ); };
-		bool operator>(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() > convertToScalar<dim, idx_T>(i).get() ); };
-		bool operator>=(const CellIndex &i) const { return ( convertToScalar<dim, idx_T>(*this).get() >= convertToScalar<dim, idx_T>(i).get() ); };
+		bool operator<(const CellIndex &i) const { return ( convertToScalar<dim, is_vector, is_local, is_md2macro, is_noGhost>(*this).get() < convertToScalar<dim, is_vector, is_local, is_md2macro, is_noGhost>(i).get() ); };
+		bool operator<=(const CellIndex &i) const { return ( convertToScalar<dim, is_vector, is_local, is_md2macro, is_noGhost>(*this).get() <= convertToScalar<dim, is_vector, is_local, is_md2macro, is_noGhost>(i).get() ); };
+		bool operator>(const CellIndex &i) const { return ( convertToScalar<dim, is_vector, is_local, is_md2macro, is_noGhost>(*this).get() > convertToScalar<dim, is_vector, is_local, is_md2macro, is_noGhost>(i).get() ); };
+		bool operator>=(const CellIndex &i) const { return ( convertToScalar<dim, is_vector, is_local, is_md2macro, is_noGhost>(*this).get() >= convertToScalar<dim, is_vector, is_local, is_md2macro, is_noGhost>(i).get() ); };
 
 
 		/**
@@ -179,8 +193,8 @@ class coupling::indexing::CellIndex {
 /**
  * Overload operator<< for CellIndex
  */
-template<unsigned int dim, coupling::indexing::IndexType idx_T>
-std::ostream& operator<<(std::ostream& os, const coupling::indexing::CellIndex<dim, idx_T>& i);
+template<unsigned int dim, bool is_vector=false, bool is_local=false, bool is_md2macro=false, bool is_noGhost=false>
+std::ostream& operator<<(std::ostream& os, const coupling::indexing::CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>& i);
 
 
 //Include implementation

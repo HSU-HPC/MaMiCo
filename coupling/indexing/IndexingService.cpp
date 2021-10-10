@@ -30,9 +30,9 @@ namespace coupling {
 		
 		//scalar, global, not md2macro, not noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3>::upperBoundary {};
+		BaseIndex<3> CellIndex<3>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3>::numberCellsInDomain {};
 		template<>
@@ -40,33 +40,33 @@ namespace coupling {
 
 		//BaseIndex
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, BaseIndexType>::lowerBoundary {};
+		BaseIndex<3> BaseIndex<3>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, BaseIndexType>::upperBoundary {};
+		BaseIndex<3> BaseIndex<3>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, BaseIndexType>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> BaseIndex<3>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, BaseIndexType>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> BaseIndex<3>::divisionFactor {};
 		
 		//scalar, local, not md2macro, not noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_local=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_local=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.local=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_local=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.local=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_local=true>::divisionFactor {};
 
 		//vector, local, not md2macro, not noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_local=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_local=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .local=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_local=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .local=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_local=true>::divisionFactor {};
 
 
 		/*
@@ -75,43 +75,43 @@ namespace coupling {
 
 		//scalar, global, md2macro, not noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.md2macro=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, md2macro=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.md2macro=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, md2macro=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.md2macro=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, md2macro=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.md2macro=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, md2macro=true>::divisionFactor {};
 
 		//vector, global, md2macro, not noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .md2macro=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, md2macro=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .md2macro=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, md2macro=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .md2macro=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, md2macro=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .md2macro=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, md2macro=true>::divisionFactor {};
 
 		//scalar, local, md2macro, not noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true, .md2macro=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_local=true, md2macro=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true, .md2macro=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_local=true, md2macro=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.local=true, .md2macro=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_local=true, md2macro=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.local=true, .md2macro=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_local=true, md2macro=true>::divisionFactor {};
 
 		//vector, local, md2macro, not noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true, .md2macro=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_local=true, md2macro=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true, .md2macro=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_local=true, md2macro=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .local=true, .md2macro=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_local=true, md2macro=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .local=true, .md2macro=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_local=true, md2macro=true>::divisionFactor {};
 		
 
 		/*
@@ -120,43 +120,43 @@ namespace coupling {
 		
 		//scalar, global, not md2macro, noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.noGhost=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_noGhost=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.noGhost=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_noGhost=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.noGhost=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_noGhost=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.noGhost=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_noGhost=true>::divisionFactor {};
 
 		//vector, global, not md2macro, noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .noGhost=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_noGhost=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .noGhost=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_noGhost=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .noGhost=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_noGhost=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .noGhost=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_noGhost=true>::divisionFactor {};
 
 		//scalar, local, not md2macro, noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true, .noGhost=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_local=true, is_noGhost=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true, .noGhost=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_local=true, is_noGhost=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.local=true, .noGhost=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_local=true, is_noGhost=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.local=true, .noGhost=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_local=true, is_noGhost=true>::divisionFactor {};
 
 		//vector, local, not md2macro, noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true, .noGhost=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_local=true, is_noGhost=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true, .noGhost=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_local=true, is_noGhost=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .local=true, .noGhost=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_local=true, is_noGhost=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .local=true, .noGhost=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_local=true, is_noGhost=true>::divisionFactor {};
 
 
 		/*
@@ -165,44 +165,44 @@ namespace coupling {
 
 		//scalar, global, md2macro, noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.md2macro=true, .noGhost=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, md2macro=true, is_noGhost=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.md2macro=true, .noGhost=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, md2macro=true, is_noGhost=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.md2macro=true, .noGhost=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, md2macro=true, is_noGhost=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.md2macro=true, .noGhost=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, md2macro=true, is_noGhost=true>::divisionFactor {};
 
 		//vector, global, md2macro, noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .md2macro=true, .noGhost=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, md2macro=true, is_noGhost=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .md2macro=true, .noGhost=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, md2macro=true, is_noGhost=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .md2macro=true, .noGhost=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, md2macro=true, is_noGhost=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .md2macro=true, .noGhost=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, md2macro=true, is_noGhost=true>::divisionFactor {};
 
 				
 		//scalar, local, md2macro, noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true, .md2macro=true, .noGhost=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_local=true, md2macro=true, is_noGhost=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.local=true, .md2macro=true, .noGhost=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_local=true, md2macro=true, is_noGhost=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.local=true, .md2macro=true, .noGhost=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_local=true, md2macro=true, is_noGhost=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.local=true, .md2macro=true, .noGhost=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_local=true, md2macro=true, is_noGhost=true>::divisionFactor {};
 
 		//vector, local, md2macro, noGL
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::lowerBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::lowerBoundary {};
 		template<>
-		CellIndex<3, BaseIndexType> CellIndex<3, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::upperBoundary {};
+		BaseIndex<3> CellIndex<3, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::upperBoundary {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::numberCellsInDomain {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::numberCellsInDomain {};
 		template<>
-		tarch::la::Vector<3, unsigned int> CellIndex<3, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::divisionFactor {};
+		tarch::la::Vector<3, unsigned int> CellIndex<3, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::divisionFactor {};
 
 		//declare specialisation of IndexingService
 		template class IndexingService<3>;
@@ -246,31 +246,31 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	CellIndex<dim>::upperBoundary = globalNumberMacroscopicCellsInclGL - tarch::la::Vector<dim, unsigned int> { 1 };
 	CellIndex<dim>::setDomainParameters();
 
-	CellIndex<dim, {.vector=true}>::lowerBoundary = CellIndex<dim>::lowerBoundary;
-	CellIndex<dim, {.vector=true}>::upperBoundary = CellIndex<dim>::upperBoundary;
-	CellIndex<dim, {.vector=true}>::setDomainParameters();
+	CellIndex<dim, is_vector=true>::lowerBoundary = CellIndex<dim>::lowerBoundary;
+	CellIndex<dim, is_vector=true>::upperBoundary = CellIndex<dim>::upperBoundary;
+	CellIndex<dim, is_vector=true>::setDomainParameters();
 
 	//init boundaries of all global, non-m2m, GL excluding indexing types
-	CellIndex<dim, {.noGhost=true}>::lowerBoundary = { 1 };
-	CellIndex<dim, {.noGhost=true}>::upperBoundary = globalNumberMacroscopicCellsInclGL - tarch::la::Vector<dim, unsigned int> { 2 };
-	CellIndex<dim, {.noGhost=true}>::setDomainParameters();
+	CellIndex<dim, is_noGhost=true>::lowerBoundary = { 1 };
+	CellIndex<dim, is_noGhost=true>::upperBoundary = globalNumberMacroscopicCellsInclGL - tarch::la::Vector<dim, unsigned int> { 2 };
+	CellIndex<dim, is_noGhost=true>::setDomainParameters();
 
-	CellIndex<dim, {.vector=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.noGhost=true}>::lowerBoundary;
-	CellIndex<dim, {.vector=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.noGhost=true}>::upperBoundary;
-	CellIndex<dim, {.vector=true, .noGhost=true}>::setDomainParameters();
+	CellIndex<dim, is_vector=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, is_noGhost=true>::lowerBoundary;
+	CellIndex<dim, is_vector=true, is_noGhost=true>::upperBoundary = CellIndex<dim, is_noGhost=true>::upperBoundary;
+	CellIndex<dim, is_vector=true, is_noGhost=true>::setDomainParameters();
 
 	//init boundaries of all global, m2m, GL including indexing types
-	CellIndex<dim> m2mGlobal_lowerBoundary { CellIndex<dim, BaseIndexType>::lowerBoundary };
-	while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, {.vector=true}>{ m2mGlobal_lowerBoundary }.get() ) == false) {
+	CellIndex<dim> m2mGlobal_lowerBoundary { BaseIndex<dim>::lowerBoundary };
+	while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, is_vector=true>{ m2mGlobal_lowerBoundary }.get() ) == false) {
 		//sanity check: empty m2m domain
-		if(m2mGlobal_lowerBoundary == CellIndex<dim, BaseIndexType>::upperBoundary)
+		if(m2mGlobal_lowerBoundary == BaseIndex<dim>::upperBoundary)
 			throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
 
 		//increment by one if above is too low to be in md-to-macro domain
 		++m2mGlobal_lowerBoundary;
 	}
-	CellIndex<dim> m2mGlobal_upperBoundary { CellIndex<dim, BaseIndexType>::upperBoundary };
-	while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, {.vector=true}>{ m2mGlobal_upperBoundary }.get() ) == false) {
+	CellIndex<dim> m2mGlobal_upperBoundary { BaseIndex<dim>::upperBoundary };
+	while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, is_vector=true>{ m2mGlobal_upperBoundary }.get() ) == false) {
 		//sanity check: empty m2m domain 
 		if(m2mGlobal_upperBoundary < m2mGlobal_lowerBoundary)
 			throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
@@ -279,23 +279,23 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		--m2mGlobal_upperBoundary;
 	}
 
-	CellIndex<dim, {.md2macro=true}>::lowerBoundary = m2mGlobal_lowerBoundary; 
-	CellIndex<dim, {.md2macro=true}>::upperBoundary = m2mGlobal_upperBoundary; 
-	CellIndex<dim, {.md2macro=true}>::setDomainParameters();
+	CellIndex<dim, md2macro=true>::lowerBoundary = m2mGlobal_lowerBoundary; 
+	CellIndex<dim, md2macro=true>::upperBoundary = m2mGlobal_upperBoundary; 
+	CellIndex<dim, md2macro=true>::setDomainParameters();
 
-	CellIndex<dim, {.vector=true, .md2macro=true}>::lowerBoundary = CellIndex<dim, {.md2macro=true}>::lowerBoundary;
-	CellIndex<dim, {.vector=true, .md2macro=true}>::upperBoundary = CellIndex<dim, {.md2macro=true}>::upperBoundary;
-	CellIndex<dim, {.vector=true, .md2macro=true}>::setDomainParameters();
+	CellIndex<dim, is_vector=true, md2macro=true>::lowerBoundary = CellIndex<dim, md2macro=true>::lowerBoundary;
+	CellIndex<dim, is_vector=true, md2macro=true>::upperBoundary = CellIndex<dim, md2macro=true>::upperBoundary;
+	CellIndex<dim, is_vector=true, md2macro=true>::setDomainParameters();
 
 	//init boundaries of all global, m2m, GL excluding indexing types
 	//note that m2m overrules GL by definition, i.e. .noGhost has no effect if .md2macro == true
-	CellIndex<dim, {.md2macro=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.md2macro=true}>::lowerBoundary;
-	CellIndex<dim, {.md2macro=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.md2macro=true}>::upperBoundary;
-	CellIndex<dim, {.md2macro=true, .noGhost=true}>::setDomainParameters();
+	CellIndex<dim, md2macro=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, md2macro=true>::lowerBoundary;
+	CellIndex<dim, md2macro=true, is_noGhost=true>::upperBoundary = CellIndex<dim, md2macro=true>::upperBoundary;
+	CellIndex<dim, md2macro=true, is_noGhost=true>::setDomainParameters();
 
-	CellIndex<dim, {.vector=true, .md2macro=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.md2macro=true}>::lowerBoundary;
-	CellIndex<dim, {.vector=true, .md2macro=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.md2macro=true}>::upperBoundary;
-	CellIndex<dim, {.vector=true, .md2macro=true, .noGhost=true}>::setDomainParameters();
+	CellIndex<dim, is_vector=true, md2macro=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, md2macro=true>::lowerBoundary;
+	CellIndex<dim, is_vector=true, md2macro=true, is_noGhost=true>::upperBoundary = CellIndex<dim, md2macro=true>::upperBoundary;
+	CellIndex<dim, is_vector=true, md2macro=true, is_noGhost=true>::setDomainParameters();
 
 
 	//handle all local indexing types
@@ -312,7 +312,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		std::vector<unsigned int> ranks; //used to store ranks in which certain indices occur
 
 		//init boundaries of all local, non-m2m, GL including indexing types
-		CellIndex<dim, BaseIndexType> local_lowerBoundary { CellIndex<dim /*global*/>::lowerBoundary }; //used to test which indices are within local bounds
+		BaseIndex<dim> local_lowerBoundary { CellIndex<dim /*global*/>::lowerBoundary }; //used to test which indices are within local bounds
 		while(true) {
 			ranks = getRanksForGlobalIndex(local_lowerBoundary, globalNumberMacroscopicCells);
 			if(std::ranges::find(ranks, _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
@@ -327,7 +327,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			//...increment by one if above is too high to be in md-to-macro domain
 			++local_lowerBoundary; 
 		}
-		CellIndex<dim, BaseIndexType> local_upperBoundary { CellIndex<dim /*global*/>::upperBoundary };
+		BaseIndex<dim> local_upperBoundary { CellIndex<dim /*global*/>::upperBoundary };
 		while(true) {
 			ranks = getRanksForGlobalIndex(local_upperBoundary, globalNumberMacroscopicCells);
 			if(std::ranges::find(ranks, _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
@@ -343,28 +343,28 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			--local_upperBoundary; 
 		}
 
-		CellIndex<dim, {.local=true}>::lowerBoundary = local_lowerBoundary; 
-		CellIndex<dim, {.local=true}>::upperBoundary = local_upperBoundary;
-		CellIndex<dim, {.local=true}>::setDomainParameters();
+		CellIndex<dim, is_local=true>::lowerBoundary = local_lowerBoundary; 
+		CellIndex<dim, is_local=true>::upperBoundary = local_upperBoundary;
+		CellIndex<dim, is_local=true>::setDomainParameters();
 
-		CellIndex<dim, {.vector=true, .local=true}>::lowerBoundary = CellIndex<dim, {.vector=true}>::lowerBoundary;
-		CellIndex<dim, {.vector=true, .local=true}>::upperBoundary = CellIndex<dim, {.vector=true}>::upperBoundary;
-		CellIndex<dim, {.vector=true, .local=true}>::setDomainParameters();
+		CellIndex<dim, is_vector=true, is_local=true>::lowerBoundary = CellIndex<dim, is_vector=true>::lowerBoundary;
+		CellIndex<dim, is_vector=true, is_local=true>::upperBoundary = CellIndex<dim, is_vector=true>::upperBoundary;
+		CellIndex<dim, is_vector=true, is_local=true>::setDomainParameters();
 
 		//init boundaries of all local, non-m2m, GL excluding indexing types
-		CellIndex<dim, {.local=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.local=true}>::lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
-		CellIndex<dim, {.local=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.local=true}>::upperBoundary.get() - tarch::la::Vector<dim, unsigned int> { 1 };
-		CellIndex<dim, {.local=true, .noGhost=true}>::setDomainParameters();
+		CellIndex<dim, is_local=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, is_local=true>::lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
+		CellIndex<dim, is_local=true, is_noGhost=true>::upperBoundary = CellIndex<dim, is_local=true>::upperBoundary.get() - tarch::la::Vector<dim, unsigned int> { 1 };
+		CellIndex<dim, is_local=true, is_noGhost=true>::setDomainParameters();
 
-		CellIndex<dim, {.vector=true, .local=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.local=true, .noGhost=true}>::lowerBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.local=true, .noGhost=true}>::upperBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .noGhost=true}>::setDomainParameters();
+		CellIndex<dim, is_vector=true, is_local=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, is_local=true, is_noGhost=true>::lowerBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, is_noGhost=true>::upperBoundary = CellIndex<dim, is_local=true, is_noGhost=true>::upperBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, is_noGhost=true>::setDomainParameters();
 
 		//init boundaries of all local, m2m, GL including indexing types
-		CellIndex<dim, {.local=true}> m2mLocal_lowerBoundary { CellIndex<dim, {.local=true}>::lowerBoundary };
-		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, BaseIndexType>{ m2mLocal_lowerBoundary }.get() ) == false) {
+		CellIndex<dim, is_local=true> m2mLocal_lowerBoundary { CellIndex<dim, is_local=true>::lowerBoundary };
+		while(_msi->receiveMacroscopicQuantityFromMDSolver( BaseIndex<dim>{ m2mLocal_lowerBoundary }.get() ) == false) {
 			//sanity check: empty m2m domain 
-			if(m2mLocal_lowerBoundary == CellIndex<dim, {.local=true}>::upperBoundary) {
+			if(m2mLocal_lowerBoundary == CellIndex<dim, is_local=true>::upperBoundary) {
 				std::cout << "IndexingService: WARNING: Empty local MD-To-Macro domain on rank " << _rank << "!" << std::endl;
 				break; 
 			}
@@ -372,8 +372,8 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			//increment by one if above is too high to be in md-to-macro domain
 			++m2mLocal_lowerBoundary; 
 		}
-		CellIndex<dim, {.local=true}> m2mLocal_upperBoundary { CellIndex<dim, {.local=true}>::upperBoundary };
-		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, BaseIndexType>{ m2mLocal_upperBoundary }.get() ) == false) {
+		CellIndex<dim, is_local=true> m2mLocal_upperBoundary { CellIndex<dim, is_local=true>::upperBoundary };
+		while(_msi->receiveMacroscopicQuantityFromMDSolver( BaseIndex<dim>{ m2mLocal_upperBoundary }.get() ) == false) {
 			//sanity check: empty m2m domain
 			if(m2mLocal_upperBoundary < m2mLocal_lowerBoundary) {
 				std::cout << "IndexingService: WARNING: Empty local MD-To-Macro domain on rank " << _rank << "!" << std::endl;
@@ -384,57 +384,57 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			--m2mLocal_upperBoundary; 
 		}
 
-		CellIndex<dim, {.local=true, .md2macro=true}>::lowerBoundary = m2mLocal_lowerBoundary;
-		CellIndex<dim, {.local=true, .md2macro=true}>::upperBoundary = m2mLocal_upperBoundary;
-		CellIndex<dim, {.local=true, .md2macro=true}>::setDomainParameters();
+		CellIndex<dim, is_local=true, md2macro=true>::lowerBoundary = m2mLocal_lowerBoundary;
+		CellIndex<dim, is_local=true, md2macro=true>::upperBoundary = m2mLocal_upperBoundary;
+		CellIndex<dim, is_local=true, md2macro=true>::setDomainParameters();
 
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true}>::lowerBoundary = CellIndex<dim, {.local=true, .md2macro=true}>::lowerBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true}>::upperBoundary = CellIndex<dim, {.local=true, .md2macro=true}>::upperBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true}>::setDomainParameters();
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true>::lowerBoundary = CellIndex<dim, is_local=true, md2macro=true>::lowerBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true>::upperBoundary = CellIndex<dim, is_local=true, md2macro=true>::upperBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true>::setDomainParameters();
 
 		//init boundaries of all local, m2m, GL excluding indexing types
 		//note that m2m overrules GL by definition, i.e. .noGhost has no effect if .md2macro == true
-		CellIndex<dim, {.local=true, .md2macro=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.local=true, .md2macro=true}>::lowerBoundary;
-		CellIndex<dim, {.local=true, .md2macro=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.local=true, .md2macro=true}>::upperBoundary;
-		CellIndex<dim, {.local=true, .md2macro=true, .noGhost=true}>::setDomainParameters();
+		CellIndex<dim, is_local=true, md2macro=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, is_local=true, md2macro=true>::lowerBoundary;
+		CellIndex<dim, is_local=true, md2macro=true, is_noGhost=true>::upperBoundary = CellIndex<dim, is_local=true, md2macro=true>::upperBoundary;
+		CellIndex<dim, is_local=true, md2macro=true, is_noGhost=true>::setDomainParameters();
 
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.vector=true, .local=true, .md2macro=true}>::lowerBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.vector=true, .local=true, .md2macro=true}>::upperBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::setDomainParameters();
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, is_vector=true, is_local=true, md2macro=true>::lowerBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::upperBoundary = CellIndex<dim, is_vector=true, is_local=true, md2macro=true>::upperBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::setDomainParameters();
 
 	#else //sequential scenario
 		//Copy all local indexing from global
-		CellIndex<dim, {.local=true}>::lowerBoundary = CellIndex<dim>::lowerBoundary;
-		CellIndex<dim, {.local=true}>::upperBoundary = CellIndex<dim>::upperBoundary;
-		CellIndex<dim, {.local=true}>::setDomainParameters();
+		CellIndex<dim, is_local=true>::lowerBoundary = CellIndex<dim>::lowerBoundary;
+		CellIndex<dim, is_local=true>::upperBoundary = CellIndex<dim>::upperBoundary;
+		CellIndex<dim, is_local=true>::setDomainParameters();
 
-		CellIndex<dim, {.vector=true, .local=true}>::lowerBoundary = CellIndex<dim, {.vector=true}>::lowerBoundary;
-		CellIndex<dim, {.vector=true, .local=true}>::upperBoundary = CellIndex<dim, {.vector=true}>::upperBoundary;
-		CellIndex<dim, {.vector=true, .local=true}>::setDomainParameters();
+		CellIndex<dim, is_vector=true, is_local=true>::lowerBoundary = CellIndex<dim, is_vector=true>::lowerBoundary;
+		CellIndex<dim, is_vector=true, is_local=true>::upperBoundary = CellIndex<dim, is_vector=true>::upperBoundary;
+		CellIndex<dim, is_vector=true, is_local=true>::setDomainParameters();
 
-		CellIndex<dim, {.local=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.noGhost=true}>::lowerBoundary;
-		CellIndex<dim, {.local=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.noGhost=true}>::upperBoundary;
-		CellIndex<dim, {.local=true, .noGhost=true}>::setDomainParameters();
+		CellIndex<dim, is_local=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, is_noGhost=true>::lowerBoundary;
+		CellIndex<dim, is_local=true, is_noGhost=true>::upperBoundary = CellIndex<dim, is_noGhost=true>::upperBoundary;
+		CellIndex<dim, is_local=true, is_noGhost=true>::setDomainParameters();
 
-		CellIndex<dim, {.vector=true, .local=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.vector=true, .noGhost=true}>::lowerBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.vector=true, .noGhost=true}>::upperBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .noGhost=true}>::setDomainParameters();
+		CellIndex<dim, is_vector=true, is_local=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, is_vector=true, is_noGhost=true>::lowerBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, is_noGhost=true>::upperBoundary = CellIndex<dim, is_vector=true, is_noGhost=true>::upperBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, is_noGhost=true>::setDomainParameters();
 
-		CellIndex<dim, {.local=true, .md2macro=true}>::lowerBoundary = CellIndex<dim, {.md2macro=true}>::lowerBoundary;
-		CellIndex<dim, {.local=true, .md2macro=true}>::upperBoundary = CellIndex<dim, {.md2macro=true}>::upperBoundary;
-		CellIndex<dim, {.local=true, .md2macro=true}>::setDomainParameters();
+		CellIndex<dim, is_local=true, md2macro=true>::lowerBoundary = CellIndex<dim, md2macro=true>::lowerBoundary;
+		CellIndex<dim, is_local=true, md2macro=true>::upperBoundary = CellIndex<dim, md2macro=true>::upperBoundary;
+		CellIndex<dim, is_local=true, md2macro=true>::setDomainParameters();
 
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true}>::lowerBoundary = CellIndex<dim, {.vector=true, .md2macro=true}>::lowerBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true}>::upperBoundary = CellIndex<dim, {.vector=true, .md2macro=true}>::upperBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true}>::setDomainParameters();
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true>::lowerBoundary = CellIndex<dim, is_vector=true, md2macro=true>::lowerBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true>::upperBoundary = CellIndex<dim, is_vector=true, md2macro=true>::upperBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true>::setDomainParameters();
 
-		CellIndex<dim, {.local=true, .md2macro=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.md2macro=true, .noGhost=true}>::lowerBoundary;
-		CellIndex<dim, {.local=true, .md2macro=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.md2macro=true, .noGhost=true}>::upperBoundary;
-		CellIndex<dim, {.local=true, .md2macro=true, .noGhost=true}>::setDomainParameters();
+		CellIndex<dim, is_local=true, md2macro=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, md2macro=true, is_noGhost=true>::lowerBoundary;
+		CellIndex<dim, is_local=true, md2macro=true, is_noGhost=true>::upperBoundary = CellIndex<dim, md2macro=true, is_noGhost=true>::upperBoundary;
+		CellIndex<dim, is_local=true, md2macro=true, is_noGhost=true>::setDomainParameters();
 
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::lowerBoundary = CellIndex<dim, {.vector=true, .md2macro=true, .noGhost=true}>::lowerBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::upperBoundary = CellIndex<dim, {.vector=true, .md2macro=true, .noGhost=true}>::upperBoundary;
-		CellIndex<dim, {.vector=true, .local=true, .md2macro=true, .noGhost=true}>::setDomainParameters();
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::lowerBoundary = CellIndex<dim, is_vector=true, md2macro=true, is_noGhost=true>::lowerBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::upperBoundary = CellIndex<dim, is_vector=true, md2macro=true, is_noGhost=true>::upperBoundary;
+		CellIndex<dim, is_vector=true, is_local=true, md2macro=true, is_noGhost=true>::setDomainParameters();
 	#endif
 }
 
@@ -444,7 +444,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
  */
 template<unsigned int dim>
 std::vector<unsigned int> 
-coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const CellIndex<dim, BaseIndexType> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) {
+coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) {
 	std::vector<unsigned int> ranks;
 
 	// start and end coordinates of neighboured cells.
@@ -516,13 +516,13 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscop
 	tarch::la::Vector<dim,unsigned int> processCoords(0);
 	for (unsigned int d = 0; d < dim; d++){
 		// special case: cell in first section
-		if ( globalCellIndex[d] < averageLocalNumberMacroscopicCells[d]+1 ) [[unlikely]] {
+		if ( globalCellIndex[d] < averageLocalNumberMacroscopicCells[d]+1 ) {
 			processCoords[d] = 0;
   		// special case: cell in last section
-		} else if ( globalCellIndex[d] > averageLocalNumberMacroscopicCells[d]*(_numberProcesses[d]-1) ) [[unlikely]] {
+		} else if ( globalCellIndex[d] > averageLocalNumberMacroscopicCells[d]*(_numberProcesses[d]-1) ) {
 			processCoords[d] = _numberProcesses[d]-1;
   		// all other cases
-		} else [[likely]]{
+		} else {
 			// remove ghost layer contribution from vector index (...-1)
 			processCoords[d] = (globalCellIndex[d]-1)/averageLocalNumberMacroscopicCells[d];
 		}
