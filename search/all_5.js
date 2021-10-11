@@ -10,5 +10,6 @@ var searchData=
   ['endprocessoutermacroscopiccellsbeforesendingmdsolverdata_7',['endProcessOuterMacroscopicCellsBeforeSendingMDSolverData',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#ad7c1b00b68e9e3cf38ab90061899e72e',1,'coupling::transferstrategies::TransferStrategy']]],
   ['equsteps_8',['equSteps',['../structCouetteTest_1_1CouetteConfig.html#a50000a099f12318a694a0054115d252d',1,'CouetteTest::CouetteConfig']]],
   ['error_9',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
-  ['errorid_10',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]]
+  ['errorestimation_10',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html',1,'coupling::error']]],
+  ['errorid_11',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]]
 ];
