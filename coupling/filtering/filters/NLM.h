@@ -7,6 +7,7 @@
 
 #include "coupling/filtering/interfaces/JunctorInterface.h"
 #include "coupling/filtering/filters/Datastructures.h"
+#include <array>
 
 namespace coupling {
   template<unsigned int dim>
@@ -105,6 +106,13 @@ private:
    * Main loop of NLM algorithm, computes filtering output for one coupling cycle. 
    */
   void denoise();
+
+  /**
+   * Compute which filtering results we need here. 
+   * @param idx_inner Index of this cell on the inner local MD 2 macro domain, i.e. the domain where the patchfield is defined
+   * @return Relative offsets, of all neighboring boundary cells and this cell itself
+   */
+  std::vector<tarch::la::Vector<dim, int>> compute_boundary_neighbors(const tarch::la::Vector<dim, unsigned int>&);
 
   /**
    * Must be called to indicate that one coupling cycle is finished and timestep counters should be incremented.
