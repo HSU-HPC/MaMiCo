@@ -12,23 +12,27 @@
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 
 namespace coupling {
+  /** transferstrategies define how the data will be applied, send, and received 
+   *  @brief the namespace is used for transferstrategies */
   namespace transferstrategies {
     template<class LinkedCell,unsigned int dim>
     class AveragingTransferStrategy;
   }
 }
 
-
 /** this class is used for pure averaging operations on the macroscopic cells.
  *  This can be used e.g. to measure errors in averaging over time, to estimate number
  *  of samples etc.
  *  @author Philipp Neumann
- */
+ *  @tparam LinkedCell the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation
+ *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2, or 3  */
 template<class LinkedCell,unsigned int dim>
 class coupling::transferstrategies::AveragingTransferStrategy:
 public coupling::transferstrategies::TransferStrategy<LinkedCell,dim> {
 public:
-
+  /** @brief a simple constructor
+   *  @param mdSolverInterface interface for the md solver
+   *  @param indexConversion instance of the indexConversion*/
   AveragingTransferStrategy(
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,
     const coupling::IndexConversion<dim> &indexConversion
@@ -37,14 +41,20 @@ public:
      _momentumMapping(mdSolverInterface),
      _sampleCounter(0),
      _rank(indexConversion.getThisRank())
-  {
-  }
+  {}
+
+  /** @brief a dummy destructor */
   virtual ~AveragingTransferStrategy(){}
 
+  /** @brief reset the sample counter before processing any cell */
   virtual void beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData(){
     // reset sample counter for each coupling cycle
     _sampleCounter = 0;
   }
+
+  /** @brief macroscopicMass and -Momentum are reset before the data from the macro solver is transferred
+   *  @param cell the macroscopic cell to process
+   *  @param index the index of the macroscopic cell */
   virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
     coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
   ){
@@ -53,6 +63,7 @@ public:
     cell.setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
   }
 
+  /** @brief values are reseted before the cells are processes and on rank=0 info is written to the stdstream */
   virtual void beginProcessInnerMacroscopicCellsAfterMDTimestep(){
     // output information of last sampling...
     if (_rank==0){
@@ -64,6 +75,11 @@ public:
     // and increment sample counter
     _sampleCounter++;
   }
+
+  /** the macroscopicMass and -Momentum are averaged over all md time steps
+   *  @brief the averaging operation is applied to the cell
+   *  @param cell the macroscopic cell to process
+   *  @param index the index of the macroscopic cell */
   virtual void processInnerMacroscopicCellAfterMDTimestep(
     coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
   ){
@@ -84,17 +100,19 @@ public:
   }
 
   private:
-    // compute mass and momentum in a cell
+    /** necessary to compute the mass in the cells*/
     coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> _massMapping;
+    /** necessary to compute the current momentum in the cell */
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell,dim> _momentumMapping;
-    // required for counting the samples
+    /** counter for the samples*/
     unsigned int _sampleCounter;
-
-    // this rank -> only output info for rank 0
+    /** rank of the mpi process*/
     const unsigned int _rank;
-    // avg. velocity
+    /** the momentum of every cell is summed in this variable and divided by the _sampleCounter
+     *  so it holds the average momentum in the end */
     tarch::la::Vector<dim,double> _avgMomentum;
-    // avg. mass
+    /** the mass of every cell is summed in this variable and divided by the _sampleCounter
+     *  so it holds the average mass in the end */
     double _avgMass;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_AVERAGINGTRANSFERSTRATEGY_H_

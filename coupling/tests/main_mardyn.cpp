@@ -15,7 +15,6 @@
 #include "TestMarDynMolecule.h"
 #include "TestMarDynAddDeleteMolecule.h"
 
-#include "TestMarDyn2DummyCoupling.h"
 
 
 /* executes a newly created test and deletes it immediately again. */
@@ -44,9 +43,6 @@ int main(int argc, char **argv) {
 
 	//Test for molecule insertion/deletion
 	runTest(new TestMarDynAddDeleteMolecule(argc,argv,"MarDyn Deletion/Insertion Test"));
-
- 	//Test MarDyn coupling with Dummy macroscopic solver
- 	runTest(new TestMarDyn2DummyCoupling("Test MarDyn Coupling with Dummy Solver",argc,argv) );
 
 	std::cout << "Finished!" << std::endl;
 

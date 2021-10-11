@@ -8,96 +8,93 @@
 
 //Member functions of Gauss.h:
 template<unsigned int dim>
+//TODO: This is very much hardcoded for kernel radius = 1
 void coupling::Gauss<dim>::operator()(){	
     #ifdef DEBUG_GAUSS
     std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter...";
     #endif 
 
-	//using coupling::FilterInterface<dim>::_inputCells;
-	//using coupling::FilterInterface<dim>::_outputCells;
+	for(tarch::la::Vector<dim,unsigned int> index : this->_cellIndices) {
 
+		auto indexAbove = getIndexAbove(index, _dim);
+		auto indexBelow = getIndexBelow(index, _dim);
 
-	for(unsigned int index = 0; index < coupling::FilterInterface<dim>::_cellIndices.size(); index++){
-
-		unsigned int indexAbove = getIndexAbove(index, _dim);
-		unsigned int indexBelow = getIndexBelow(index, _dim);
-
+				
+		//Used when accessing cell vectors using operator[].
+		unsigned int indexLinear = _ic->getLocalCellIndex(index);
+		unsigned int indexAboveLinear = _ic->getLocalCellIndex(indexAbove);
+		unsigned int indexBelowLinear = _ic->getLocalCellIndex(indexBelow);
 
 		//[0] = below, [1] = at index, [2] = above 
-		double weights[3] = {GAUSS_OUTER_WEIGHT, GAUSS_INNER_WEIGHT, GAUSS_OUTER_WEIGHT};
+		double weights[3] = {_kernel[0], _kernel[1], _kernel[2]};
 
 		//only one of these two cases can occur at once
 		if(indexBelow == index){
-			if(_extrapolationStrategy == 0){
-				weights[0] = 0;
-				weights[1] *= 1.38713; //TODO: This is slightly inaccurate. Total weight is 1.00011 (should be 1).
-				weights[2] *= 1.38713;
-			}
-			else if(_extrapolationStrategy == 1){
-				weights[0] = 0;
-				//TODO: test this
-				for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++)
-					(coupling::FilterInterface<dim>::_outputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
-					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()
-					+
-					(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()*2
-					-
-					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))());
-				for(unsigned int vi = 0; vi < coupling::FilterInterface<dim>::_scalarSetters.size(); vi++)
-					(coupling::FilterInterface<dim>::_outputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarSetters[vi]))(
-					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))()
-					+
-					(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))()*2
-					-
-					(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))());
-			}
-			else{/*unreachable*/}
+			//set weight of out of bounds index to zero
+			weights[0] = 0;
 
+			switch(_extrapolationStrategy){
+				case NONE : 
+					break;
+				case MIRROR : 
+					weights[2] *= 2;
+					break;
+				case REFLECT:
+					weights[1] *= 2;
+					break;
+			}
+
+			//normalize the other two weights
+			double weightsSum = weights[1] + weights[2];
+			weights[1] /= weightsSum;
+			weights[2] /= weightsSum;
 		}
+
+		//Since the domain has to be larger than one unit in all directions, not both the index above and below can be illegal at the same time.
 		else if(indexAbove == index){
-			if(_extrapolationStrategy == 0){
-				weights[0] *= 1.38713; //TODO: See above.
-				weights[1] *= 1.38713;
-				weights[2] = 0;
+			//set weight of out of bounds index to zero
+			weights[2] = 0;
+
+			switch(_extrapolationStrategy){
+				case NONE : 
+					break;
+				case MIRROR : 
+					weights[0] *= 2;
+					break;
+				case REFLECT:
+					weights[1] *= 2;
+					break;
 			}
-			else if(_extrapolationStrategy == 1){
-				weights[0] = 0;
-				//TODO: test this
-				for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++)
-					(coupling::FilterInterface<dim>::_outputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
-					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()
-					+
-					(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))()*2
-					-
-					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))());
-				for(unsigned int vi = 0; vi < coupling::FilterInterface<dim>::_scalarSetters.size(); vi++)
-					(coupling::FilterInterface<dim>::_outputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarSetters[vi]))(
-					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))()
-					+
-					(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))()*2
-					-
-					(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[vi]))());
-			}
-			else{/*unreachable*/}
+
+			//normalize the other two weights
+			double weightsSum = weights[0] + weights[1];
+			weights[0] /= weightsSum;
+			weights[1] /= weightsSum;
 		}
-		#ifdef DEBUG_GAUSS
-		//std::cout << "GAUSS: Weigths at index " << index << ": ";
-		//for(int i = 0; i < 3; i++) std::cout << weights[i]<< " ";
-		//std::cout << "Total: " << weights[0] + weights[1] + weights[2] << std::endl;
-		#endif
+
 		//apply to scalars
-		for(unsigned int si = 0; si < coupling::FilterInterface<dim>::_scalarSetters.size(); si++){
-			(coupling::FilterInterface<dim>::_outputCells[index]->*(coupling::FilterInterface<dim>::_scalarSetters[si]))(
-			(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))() * weights[0]
-			+(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))() * weights[1]
-			+(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_scalarGetters[si]))() * weights[2]);
+		for(unsigned int si = 0; si < _scalarSetters.size(); si++){
+			(_outputCells[indexLinear]
+				->*(_scalarSetters[si]))
+					(
+						(_inputCells[indexBelowLinear]->*(_scalarGetters[si]))() * weights[0]
+						+
+						(_inputCells[indexLinear]->*(_scalarGetters[si]))() * weights[1]
+						+
+						(_inputCells[indexAboveLinear]->*(_scalarGetters[si]))() * weights[2]
+					);
 		}
 		//apply to vectors	
-		for(unsigned int vi = 0; vi < coupling::FilterInterface<dim>::_vectorSetters.size(); vi++){
-			(coupling::FilterInterface<dim>::_outputCells[index]->*(coupling::FilterInterface<dim>::_vectorSetters[vi]))(
-			(coupling::FilterInterface<dim>::_inputCells[indexBelow]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[0]
-			+(coupling::FilterInterface<dim>::_inputCells[index]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[1]
-			+(coupling::FilterInterface<dim>::_inputCells[indexAbove]->*(coupling::FilterInterface<dim>::_vectorGetters[vi]))() * weights[2]);
+		for(unsigned int vi = 0; vi < _vectorSetters.size(); vi++){
+			(_outputCells[indexLinear]
+				->*(_vectorSetters[vi]))
+					(		
+						(_inputCells[indexBelowLinear]->*(_vectorGetters[vi]))() * weights[0]
+						+
+						(_inputCells[indexLinear]->*(_vectorGetters[vi]))() * weights[1]
+						+
+						(_inputCells[indexAboveLinear]->*(_vectorGetters[vi]))() * weights[2]
+					);
 		}
 	}//index
    
@@ -108,20 +105,64 @@ void coupling::Gauss<dim>::operator()(){
 
 //Private functions of Gauss.h: 
 template<unsigned int dim>
-unsigned int coupling::Gauss<dim>::getIndexAbove(unsigned int index, unsigned int d){
-	unsigned int diff = 1;
-	//iterate over all lower dimensions
-	for(unsigned int ld = 0; ld < d; ld++) diff *= (_lastIndex[ld]+1); //*= size in ld-Dimension
-	if(index + diff < coupling::FilterInterface<dim>::_inputCells.size()) return index+diff;
-	else return index; //in this case, the lower cell is nonexistant and should have weight 0
+std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel() {
+	//std::cout << "gauss: kernel radius: " << GAUSS_KERNEL_RADIUS << std::endl;	
 
+	std::array<double, 1+2*GAUSS_KERNEL_RADIUS> kernel;
+	unsigned int i = 0; //index in kernel
+	double sum = 0; //used for normalization
+
+	//fill kernel using Gaussian error function
+	for(int x = -GAUSS_KERNEL_RADIUS; x <= GAUSS_KERNEL_RADIUS; x++) {
+		kernel[i] = gaussianDensityFunction(x);
+		sum += kernel[i];
+		i++;
+	}
+	
+	//std::cout << "gauss: kernel sum: " << sum << std::endl;
+
+	//normalize kernel. by definition, sum cannot be 0.
+	for(auto k : kernel) { 
+		k *= 1/sum; 
+
+		#ifdef DEBUG_GAUSS
+    	std::cout << "		GAUSS(Dim: " << _dim << "): Add kernel entry: " << k;
+    	#endif 
 	}
 
+	return kernel;
+}
+
 template<unsigned int dim>
-unsigned int coupling::Gauss<dim>::getIndexBelow(unsigned int index, unsigned int d){
-	unsigned int diff = 1;
-	//iterate over all lower dimensions
-	for(unsigned int ld = 0; ld < d; ld++) diff *= (_lastIndex[ld]+1);
-	if(index > diff) return index-diff;
-	else return index; //in this case, the upper cell is nonexistant and should have weight 0
+double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
+	double ans = ( 1 / ( _sigma * sqrt(2*M_PI) ) ) * exp(-0.5 * (x/_sigma) * (x/_sigma));
+	//std::cout << "gauss: error function at x = " << x << ": " << ans << std::endl; 
+	return ans;
+}
+
+
+template<unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::Gauss<dim>::getIndexAbove(const tarch::la::Vector<dim, unsigned int> index, unsigned int d){
+	//check for border indices
+	if(index[d] >= _lastIndex[d]) return index;
+
+	//copy input index
+	auto ans = tarch::la::Vector<dim, unsigned int>(index);
+
+	//get upper index in dimension d
+	ans[d] += 1;
+	return ans;
+}
+
+template<unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::Gauss<dim>::getIndexBelow(const tarch::la::Vector<dim, unsigned int> index, unsigned int d){
+	//check for border indices
+	if(index[d] == 0) return index;
+
+	//copy input index
+	auto ans = tarch::la::Vector<dim, unsigned int>(index);
+
+	//get lower index in dimension d
+	ans[d] -= 1;
+	return ans;
 } 

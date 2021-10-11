@@ -4,10 +4,8 @@
 // www5.in.tum.de/mamico
 #include "coupling/tests/TestEspresso.h"
 #include "coupling/tests/TestEspressoMDMolecule.h"
-#include "coupling/tests/TestDummySolverInterface.h"
 #include "coupling/tests/TestEspressoAddDeleteMolecule.h"
 #include "coupling/tests/TestEspressoForceEnergyCalculation.h"
-#include "coupling/tests/TestEspresso2DummyCoupling.h"
 #include "coupling/tests/TestEspressoMoleculeIterator.h"
 
 #include <mpi.h>
@@ -26,11 +24,8 @@ int main(int argc, char *argv[]){
     case 0:
       runTest(new TestEspresso("TestEspresso", argc, argv));
       break;
-    case 1: 
+    case 1:
       runTest(new TestEspressoMDMolecule("TestEspressoMDMolecule", argc, argv));
-      break;
-    case 2:
-      runTest(new TestDummySolverInterface("TestDummySolverInterface", argc, argv));
       break;
     case 3:
       runTest(new TestEspressoAddDeleteMolecule("TestEspressoAddDeleteMolecule", argc, argv));
@@ -41,13 +36,9 @@ int main(int argc, char *argv[]){
     case 5:
       runTest(new TestEspressoMoleculeIterator("TestEspressoMoleculeIterator", argc, argv));
       break;
-    case 6:
-      runTest(new TestEspresso2DummyCoupling("TestEspresso2DummyCoupling", argc, argv));
-      break;
     default:
       std::cout << "Test number " << thisTest << " out of range..." << std::endl;
     }
-   
+
     return 0;
 }
-

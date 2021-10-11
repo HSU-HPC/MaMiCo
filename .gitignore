@@ -2,6 +2,7 @@ build/
 .sconsign.dblite
 *.csv
 *.vtk
+*.vti
 *.o
 *.out
 out/
@@ -17,3 +18,7 @@ personal_settings
 *.png
 coupling/tests/kvs-lbmpy/*.xml
 coupling/tests/kvs-lbmpy/*.ini
+*.old
+*.html
+*.dot
+docs/

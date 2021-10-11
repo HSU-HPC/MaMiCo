@@ -61,6 +61,16 @@ processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
 ){
   // backup old mass that could not be inserted into cells
   _excessMass[index] = cell.getMicroscopicMass();
+
+  //TODO: remove temporary debug output
+  //if(_excessMass[index] > 0) std::cout << "TransferStrategy4NieCoupling: _excessMass[" << index << "]: " << _excessMass[index] << std::endl;
+  //TODO: make threshold customizable
+  //const unsigned int threshold = 3;
+  /*if(_excessMass[index] > threshold) {
+	std::cout << "TransferStrategy4NieCoupling: ERROR: Excess mass above threshold (= " << threshold << "): _excessMass[" << index << "] = " << _excessMass[index] << std::endl;
+	exit(EXIT_FAILURE);
+  }*/
+
   // reset cell-mass (would be overwritten anyway; but just to be on safe side)
   cell.setMicroscopicMass(0.0);
 
@@ -98,10 +108,10 @@ processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
   cell.setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
 }
 
-template<class LinkedCell,unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
-beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
-}
+// template<class LinkedCell,unsigned int dim>
+// void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
+// beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
+// }
 
 template<class LinkedCell,unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
@@ -132,11 +142,11 @@ processInnerMacroscopicCellBeforeSendingMDSolverData(
   // _totalMass +=  cell.getMicroscopicMass();
 }
 
-template<class LinkedCell,unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
-endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
+//template<class LinkedCell,unsigned int dim>
+//void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
+//endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
   //std::cout << "Avg massFluxBoundary MD density: " << _totalMass/(_cellCount*15.625) << std::endl;
-}
+//}
 
 
 template<class LinkedCell,unsigned int dim>
