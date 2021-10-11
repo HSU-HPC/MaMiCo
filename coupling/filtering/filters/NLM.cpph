@@ -4,13 +4,17 @@
 template<unsigned int dim>
 void coupling::NLM<dim>::operator()(){
   #ifdef NLM_DEBUG
-    std::cout << "    NLM: called operator()" << std::endl;
+  std::cout << "    NLM: called operator()" << std::endl;
   #endif
 
-  //const double sigsq = 0;  // TODO configure
-  //const double hsq = .45;    // TODO configure
+  save_data();
+  update_patchfield();
+  denoise();
+  increment_time();
+}
 
-  // Save data
+template<unsigned int dim>
+void coupling::NLM<dim>::save_data(){
   for(unsigned int i = 0; i < this->_inputCells.size(); ++i){ 
     coupling::filtering::Quantities<dim>& q = _flowfield(this->_cellIndices[i], _t);
     coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(this->_cellIndices[i], _t);
@@ -21,8 +25,10 @@ void coupling::NLM<dim>::operator()(){
       qp[d+1] = this->_inputCellVectors[1][i]->getMacroscopicMomentum()[d];
     } 
   }
- 
-  // Update patchfield
+}
+
+template<unsigned int dim>
+void coupling::NLM<dim>::update_patchfield(){
   for(auto idx : _innerCellIndices){
     auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
     if(_cycleCounter > _t) _patchfield.destroy(idx_inner,_t);
@@ -30,8 +36,10 @@ void coupling::NLM<dim>::operator()(){
       tarch::la::Vector<dim,unsigned int>(2*_d+1), 2*_d+1, _flowfield_prefiltered, 
       idx, _t);
   }
+}
 
-  // Main denoising
+template<unsigned int dim>
+void coupling::NLM<dim>::denoise(){
   for(auto idx : _innerCellIndices){
     auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
     auto& me = _patchfield(idx_inner, _t);
@@ -65,10 +73,12 @@ void coupling::NLM<dim>::operator()(){
     coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][i]->setMacroscopicMass(res[0]);
     tarch::la::Vector<dim,double> momentum;
     for (unsigned int d = 0; d < dim; d++)  momentum[d] = res[d+1];
-    coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][i]->setMacroscopicMomentum(momentum);
+      coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][i]->setMacroscopicMomentum(momentum);
   }
+}
 
-  // Increment time
+template<unsigned int dim>
+void coupling::NLM<dim>::increment_time(){
   _cycleCounter++;
   _t = _cycleCounter%_timeWindowSize;
 }
