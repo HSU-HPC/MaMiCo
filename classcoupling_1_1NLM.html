@@ -130,6 +130,16 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getSize</b> () const</
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
+<tr class="memitem:a572fe3c381654385baf3fe95822646f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NLM.html#a572fe3c381654385baf3fe95822646f6">save_data</a> ()</td></tr>
+<tr class="separator:a572fe3c381654385baf3fe95822646f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3167752e83f94b91b3aa7d48934b7031"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NLM.html#a3167752e83f94b91b3aa7d48934b7031">update_patchfield</a> ()</td></tr>
+<tr class="separator:a3167752e83f94b91b3aa7d48934b7031"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78d1f361566838872d4700b780fed2fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NLM.html#a78d1f361566838872d4700b780fed2fc">denoise</a> ()</td></tr>
+<tr class="separator:a78d1f361566838872d4700b780fed2fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac65980d2354e2d616552732fe60e79e2"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NLM.html#ac65980d2354e2d616552732fe60e79e2">compute_boundary_neighbors</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;)</td></tr>
+<tr class="separator:ac65980d2354e2d616552732fe60e79e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab92b0d4ffbcb2cdceb72ae996cd64c08"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NLM.html#ab92b0d4ffbcb2cdceb72ae996cd64c08">increment_time</a> ()</td></tr>
+<tr class="separator:ab92b0d4ffbcb2cdceb72ae996cd64c08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8066dda21dd287fe15166d7ea96de2b"><td class="memItemLeft" align="right" valign="top"><a id="aa8066dda21dd287fe15166d7ea96de2b" name="aa8066dda21dd287fe15166d7ea96de2b"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>posmod</b> (int i, int n) const</td></tr>
 <tr class="separator:aa8066dda21dd287fe15166d7ea96de2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -215,6 +225,97 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>_type</b></td
 class coupling::NLM&lt; dim &gt;</div><p >Noise reduction algorithm using non-local means (<a class="el" href="classcoupling_1_1NLM.html">NLM</a>) method See 'Fast Non Local Means Denoising for 3D MR Images' by Coupé et al. 2006 and 'Non-Local Means Denoising' by Buades et al. 2011.</p>
 <dl class="section author"><dt>Author</dt><dd>Piet Jarmatz </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ac65980d2354e2d616552732fe60e79e2" name="ac65980d2354e2d616552732fe60e79e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac65980d2354e2d616552732fe60e79e2">&#9670;&nbsp;</a></span>compute_boundary_neighbors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, int &gt; &gt; <a class="el" href="classcoupling_1_1NLM.html">coupling::NLM</a>&lt; dim &gt;::compute_boundary_neighbors </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Compute which filtering results we need here. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">idx_inner</td><td>Index of this cell on the inner local MD 2 macro domain, i.e. the domain where the patchfield is defined </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Relative offsets, of all neighboring boundary cells and this cell itself </dd></dl>
+
+</div>
+</div>
+<a id="a78d1f361566838872d4700b780fed2fc" name="a78d1f361566838872d4700b780fed2fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78d1f361566838872d4700b780fed2fc">&#9670;&nbsp;</a></span>denoise()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1NLM.html">coupling::NLM</a>&lt; dim &gt;::denoise </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Main loop of <a class="el" href="classcoupling_1_1NLM.html">NLM</a> algorithm, computes filtering output for one coupling cycle. </p>
+
+</div>
+</div>
+<a id="ab92b0d4ffbcb2cdceb72ae996cd64c08" name="ab92b0d4ffbcb2cdceb72ae996cd64c08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab92b0d4ffbcb2cdceb72ae996cd64c08">&#9670;&nbsp;</a></span>increment_time()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1NLM.html">coupling::NLM</a>&lt; dim &gt;::increment_time </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Must be called to indicate that one coupling cycle is finished and timestep counters should be incremented. </p>
+
+</div>
+</div>
 <a id="a91ae203d2f58ea5f1c48c3d03451e314" name="a91ae203d2f58ea5f1c48c3d03451e314"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a91ae203d2f58ea5f1c48c3d03451e314">&#9670;&nbsp;</a></span>operator()()</h2>
 
@@ -241,6 +342,62 @@ template&lt;unsigned int dim&gt; </div>
 </div><div class="memdoc">
 
 <p>Implements <a class="el" href="classcoupling_1_1FilterInterface.html">coupling::FilterInterface&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a572fe3c381654385baf3fe95822646f6" name="a572fe3c381654385baf3fe95822646f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a572fe3c381654385baf3fe95822646f6">&#9670;&nbsp;</a></span>save_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1NLM.html">coupling::NLM</a>&lt; dim &gt;::save_data </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Stores new values from inputCellVectors into _flowfield and _flowfield_prefiltered for this timestep _t. </p>
+
+</div>
+</div>
+<a id="a3167752e83f94b91b3aa7d48934b7031" name="a3167752e83f94b91b3aa7d48934b7031"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3167752e83f94b91b3aa7d48934b7031">&#9670;&nbsp;</a></span>update_patchfield()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1NLM.html">coupling::NLM</a>&lt; dim &gt;::update_patchfield </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Reconstructs _patchfield(idx,_t) for all inner cell indices idx, so that new information from updated flowfield will be included. </p>
 
 </div>
 </div>
