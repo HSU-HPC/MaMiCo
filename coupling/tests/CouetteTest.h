@@ -1106,7 +1106,7 @@ private:
     /** @todo piet */
     bool twsLoop;
     /** @todo piet*/
-    int twsLoopMin
+    int twsLoopMin;
     /** @todo piet */
     int twsLoopMax;
     /** @todo piet */
