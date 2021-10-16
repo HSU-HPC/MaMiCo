@@ -4,13 +4,17 @@
 template<unsigned int dim>
 void coupling::NLM<dim>::operator()(){
   #ifdef NLM_DEBUG
-    std::cout << "    NLM: called operator()" << std::endl;
+  std::cout << "    NLM: called operator()" << std::endl;
   #endif
 
-  //const double sigsq = 0;  // TODO configure
-  //const double hsq = .45;    // TODO configure
+  save_data();
+  update_patchfield();
+  denoise();
+  increment_time();
+}
 
-  // Save data
+template<unsigned int dim>
+void coupling::NLM<dim>::save_data(){
   for(unsigned int i = 0; i < this->_inputCells.size(); ++i){ 
     coupling::filtering::Quantities<dim>& q = _flowfield(this->_cellIndices[i], _t);
     coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(this->_cellIndices[i], _t);
@@ -21,8 +25,10 @@ void coupling::NLM<dim>::operator()(){
       qp[d+1] = this->_inputCellVectors[1][i]->getMacroscopicMomentum()[d];
     } 
   }
- 
-  // Update patchfield
+}
+
+template<unsigned int dim>
+void coupling::NLM<dim>::update_patchfield(){
   for(auto idx : _innerCellIndices){
     auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
     if(_cycleCounter > _t) _patchfield.destroy(idx_inner,_t);
@@ -30,15 +36,19 @@ void coupling::NLM<dim>::operator()(){
       tarch::la::Vector<dim,unsigned int>(2*_d+1), 2*_d+1, _flowfield_prefiltered, 
       idx, _t);
   }
+}
 
-  // Main denoising
-  for(auto idx : _innerCellIndices){
+template<unsigned int dim>
+void coupling::NLM<dim>::denoise(){
+  for(auto const &idx : _innerCellIndices){
     auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
     auto& me = _patchfield(idx_inner, _t);
     double C = 0;
-    coupling::filtering::Quantities<dim> res(0);
-    int tdist = std::min((int)_timeWindowSize,(int)_cycleCounter+1);
 
+    auto res_offset = compute_boundary_neighbors(idx_inner);
+    std::vector<coupling::filtering::Quantities<dim>> res(res_offset.size(), 0);
+
+    int tdist = std::min((int)_timeWindowSize,(int)_cycleCounter+1);
     // TODO restrict loops to bouncing V_i search window
     for(int offset_t = 0; offset_t > -tdist; offset_t--){
       unsigned int t = posmod((int)_t + offset_t,_timeWindowSize);
@@ -53,22 +63,78 @@ void coupling::NLM<dim>::operator()(){
 #ifdef NLM_DEBUG        
        //std::cout << "weight = " << weight << std::endl;
 #endif
-        coupling::filtering::Quantities<dim>&  q = _flowfield(idx2, t);
-        res += q * weight;
+        for(unsigned int i = 0; i < res_offset.size(); i++){
+          tarch::la::Vector<dim,unsigned int> residx(
+            (int)idx2[0]+res_offset[i][0],
+            (int)idx2[1]+res_offset[i][1],
+            (int)idx2[2]+res_offset[i][2]);
+          coupling::filtering::Quantities<dim>& q = _flowfield(residx, t);
+          res[i] += q * weight;
+        }
         C += weight;
       }
     }
 
-    res = res * (1/C);
-    unsigned int i = _ic->getLocalCellIndex(idx);
+    for(unsigned int i = 0; i < res_offset.size(); i++){
+      res[i] = res[i] * (1/C);
+      tarch::la::Vector<dim,unsigned int> residx(
+            (int)idx[0]+res_offset[i][0],
+            (int)idx[1]+res_offset[i][1],
+            (int)idx[2]+res_offset[i][2]);
+      unsigned int cellidx = _ic->getLocalCellIndex(residx);
 
-    coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][i]->setMacroscopicMass(res[0]);
-    tarch::la::Vector<dim,double> momentum;
-    for (unsigned int d = 0; d < dim; d++)  momentum[d] = res[d+1];
-    coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][i]->setMacroscopicMomentum(momentum);
+      coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMass(res[i][0]);
+      tarch::la::Vector<dim,double> momentum;
+      for (unsigned int d = 0; d < dim; d++)  momentum[d] = res[i][d+1];
+        coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMomentum(momentum);
+    }
   }
+}
 
-  // Increment time
+template<unsigned int dim> 
+std::vector<tarch::la::Vector<dim, int>> coupling::NLM<dim>::compute_boundary_neighbors(
+const tarch::la::Vector<dim, unsigned int>& idx_inner){
+  auto domainSize = _ic->getLocalMD2MacroDomainSize();
+  std::vector<tarch::la::Vector<dim, int>> res_offset;
+  res_offset.reserve(1 << dim); // max this many neighbors are possible
+  res_offset.push_back(0);  // result for me (i.e. idx) is always needed
+  for(unsigned int d = 0; d < dim; d++){    
+    tarch::la::Vector<dim, int> offset{0};
+    if(idx_inner[d] == 0){
+      offset[d] = -1;
+      res_offset.push_back(offset);     // Comp res for neighbor cell on boundary surface
+    } else if(idx_inner[d] == domainSize[d]-3){
+      offset[d] = 1;
+      res_offset.push_back(offset);     // Comp res for neighbor cell on boundary surface
+    }
+    if(offset[d] != 0){
+      for(unsigned int d2 = d+1; d2 < dim; d2++){
+        if(idx_inner[d2] == 0){
+          offset[d2] = -1;
+          res_offset.push_back(offset);     // Comp res for neighbor cell on boundary edge
+        } else if(idx_inner[d2] == domainSize[d2]-3){
+          offset[d2] = 1;
+          res_offset.push_back(offset);     // Comp res for neighbor cell on boundary edge
+        }
+        if(dim==3 && d2==1 && offset[d2]!=0){
+          if(idx_inner[2] == 0){
+            offset[2] = -1;
+            res_offset.push_back(offset);     // Comp res for neighbor cell on boundary corner
+          } else if(idx_inner[2] == domainSize[2]-3){
+            offset[2] = 1;
+            res_offset.push_back(offset);     // Comp res for neighbor cell on boundary corner
+          }
+          offset[2]=0;
+        }
+        offset[d2]=0;
+      }
+    }
+  }
+  return res_offset;  // (implicit std::move here)
+}
+
+template<unsigned int dim>
+void coupling::NLM<dim>::increment_time(){
   _cycleCounter++;
   _t = _cycleCounter%_timeWindowSize;
 }
