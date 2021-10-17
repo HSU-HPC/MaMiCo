@@ -10,6 +10,7 @@
 
 //INCLUDE ALL JUNCTOR HEADERS HERE
 #include "coupling/filtering/filters/NLM.h"
+#include "coupling/filtering/filters/AveragingJunctor.h"
 #include "coupling/filtering/interfaces/JunctorInterface.h" //this will be redundant in the future
 
 /*

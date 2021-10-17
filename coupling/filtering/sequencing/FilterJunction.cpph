@@ -93,10 +93,11 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 					coupling::FilterSequence<dim>::_ic, 
 					tws,
 					sigsq,
-					hsq);
+					hsq
+			);
 
 			//TODO: generalize this for arbitrary junctors?
-			//Swapping for output partition
+			//Swap output partition
 			if(firstIteration[outputp]){
 				inputCellVector[outputp] = _domainCellVector1_parted[outputp];
 				firstIteration[outputp] = false;
@@ -104,6 +105,28 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 			inputCellVector[outputp].swap(outputCellVector[outputp]);
 
         }		
+
+		//Averaging Junctor
+		else if(std::strcmp(currJunctorNode->Value(), "Average") == 0) {
+
+			//Instanciation
+			newjunctor = new coupling::AveragingJunctor<dim>(
+					inputCellVector[0], //TODO: make partition selection customizable
+					inputCellVector[1], //TODO: make parition selection customizable
+					outputCellVector[0], //TODO: make partition selection customizable
+					coupling::FilterSequence<dim>::_sequenceDomainCellIndices,
+					coupling::FilterSequence<dim>::_filteredValues
+			);
+
+			//TODO: generalize this for arbitrary junctors?
+			//Swap output partition TODO allow selection of output partition (i.e. remove hardcoded 0)
+			if(firstIteration[0]){
+				inputCellVector[0] = _domainCellVector1_parted[0];
+				firstIteration[0] = false;
+			}
+			inputCellVector[0].swap(outputCellVector[0]);
+
+		}
 	//###############################################################
 
 		//Unknown junctor identifier
