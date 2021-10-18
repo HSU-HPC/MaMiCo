@@ -35,5 +35,6 @@ var searchData=
   ['momentuminsertionconfiguration_32',['MomentumInsertionConfiguration',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html',1,'coupling::configurations']]],
   ['moving_5fwall_33',['MOVING_WALL',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a9be98c40ee9eca5a8522dc7b30396b8bae73fc8cdb8feea009e386ed640f3edb9',1,'coupling::solvers::NumericalSolver']]],
   ['multimdcellservice_34',['MultiMDCellService',['../classcoupling_1_1services_1_1MultiMDCellService.html',1,'coupling::services']]],
-  ['multimdservice_35',['MultiMDService',['../classtarch_1_1utils_1_1MultiMDService.html',1,'tarch::utils']]]
+  ['multimdmediator_35',['MultiMDMediator',['../classcoupling_1_1MultiMDMediator.html',1,'coupling']]],
+  ['multimdservice_36',['MultiMDService',['../classtarch_1_1utils_1_1MultiMDService.html',1,'tarch::utils']]]
 ];

@@ -17,12 +17,13 @@ var searchData=
   ['deletion_14',['Deletion',['../classcoupling_1_1ParticleInsertion.html#a6cb63e8cc21131195a1d4da388ad8e06a7e47aac31c6ae04a7516fb1f999b3858',1,'coupling::ParticleInsertion']]],
   ['denoise_15',['denoise',['../classcoupling_1_1NLM.html#a78d1f361566838872d4700b780fed2fc',1,'coupling::NLM']]],
   ['density_16',['density',['../structCouetteTest_1_1CouetteConfig.html#a312d2c0467cefe5a53a6f143004f728c',1,'CouetteTest::CouetteConfig']]],
-  ['determineparallelneighbours_17',['determineParallelNeighbours',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a5c55dd2fbfb5b46f0363b62352d0edaa',1,'coupling::solvers::NumericalSolver']]],
-  ['differencetransferstrategy_18',['DifferenceTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DifferenceTransferStrategy.html',1,'coupling::transferstrategies::DifferenceTransferStrategy&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1transferstrategies_1_1DifferenceTransferStrategy.html#a54b0876cf325469210f6fad7f661269f',1,'coupling::transferstrategies::DifferenceTransferStrategy::DifferenceTransferStrategy()']]],
-  ['directtransferstrategy_19',['DirectTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DirectTransferStrategy.html',1,'coupling::transferstrategies::DirectTransferStrategy&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1transferstrategies_1_1DirectTransferStrategy.html#acb7a365647a5e2045199c498fecd45ae',1,'coupling::transferstrategies::DirectTransferStrategy::DirectTransferStrategy()']]],
-  ['distributemass_20',['distributeMass',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a015676f2cf3eccc5b91c403546cad0f2',1,'coupling::services::MacroscopicCellServiceImpl']]],
-  ['distributemomentum_21',['distributeMomentum',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a5286140c580ffe1ad9c09d15b7053b7e',1,'coupling::services::MacroscopicCellServiceImpl']]],
-  ['doubleattribute_22',['DoubleAttribute',['../classtinyxml2_1_1XMLElement.html#a8948baa30b3a557d5ad84e7ab6d445fe',1,'tinyxml2::XMLElement']]],
-  ['doublevalue_23',['DoubleValue',['../classtinyxml2_1_1XMLAttribute.html#a4aa73513f54ff0087d3e804f0f54e30f',1,'tinyxml2::XMLAttribute']]],
-  ['dynarray_24',['DynArray',['../classtinyxml2_1_1DynArray.html',1,'tinyxml2']]]
+  ['density_17',['Density',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967aae1728916469d43f566f80892987ee17e',1,'coupling::error::ErrorEstimation']]],
+  ['determineparallelneighbours_18',['determineParallelNeighbours',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a5c55dd2fbfb5b46f0363b62352d0edaa',1,'coupling::solvers::NumericalSolver']]],
+  ['differencetransferstrategy_19',['DifferenceTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DifferenceTransferStrategy.html',1,'coupling::transferstrategies::DifferenceTransferStrategy&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1transferstrategies_1_1DifferenceTransferStrategy.html#a54b0876cf325469210f6fad7f661269f',1,'coupling::transferstrategies::DifferenceTransferStrategy::DifferenceTransferStrategy()']]],
+  ['directtransferstrategy_20',['DirectTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DirectTransferStrategy.html',1,'coupling::transferstrategies::DirectTransferStrategy&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1transferstrategies_1_1DirectTransferStrategy.html#acb7a365647a5e2045199c498fecd45ae',1,'coupling::transferstrategies::DirectTransferStrategy::DirectTransferStrategy()']]],
+  ['distributemass_21',['distributeMass',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a015676f2cf3eccc5b91c403546cad0f2',1,'coupling::services::MacroscopicCellServiceImpl']]],
+  ['distributemomentum_22',['distributeMomentum',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a5286140c580ffe1ad9c09d15b7053b7e',1,'coupling::services::MacroscopicCellServiceImpl']]],
+  ['doubleattribute_23',['DoubleAttribute',['../classtinyxml2_1_1XMLElement.html#a8948baa30b3a557d5ad84e7ab6d445fe',1,'tinyxml2::XMLElement']]],
+  ['doublevalue_24',['DoubleValue',['../classtinyxml2_1_1XMLAttribute.html#a4aa73513f54ff0087d3e804f0f54e30f',1,'tinyxml2::XMLAttribute']]],
+  ['dynarray_25',['DynArray',['../classtinyxml2_1_1DynArray.html',1,'tinyxml2']]]
 ];
