@@ -75,7 +75,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Class to handle interaction between MultiMDCellService and <a class="el" href="classcoupling_1_1InstanceHandling.html" title="Simulation slots are managed (i.e., added/removed) via this class. Works and interacts with the class...">InstanceHandling</a> This is currently mainly used for activating/deactivating and addtion/removal of md simulations. Works and interacts with the class <a class="el" href="classcoupling_1_1InstanceHandling.html" title="Simulation slots are managed (i.e., added/removed) via this class. Works and interacts with the class...">coupling::InstanceHandling</a> closely.  
+<p>Class to handle interaction between MultiMDCellService and InstanceHandling This is currently mainly used for activating/deactivating and addtion/removal of md simulations. Works and interacts with the class coupling::InstanceHandling closely.  
  <a href="classcoupling_1_1MultiMDMediator.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="MultiMDMediator_8h_source.html">MultiMDMediator.h</a>&gt;</code></p>
@@ -83,7 +83,7 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a9379c29033f63ad2c4fc3bb819184348"><td class="memItemLeft" align="right" valign="top"><a id="a9379c29033f63ad2c4fc3bb819184348" name="a9379c29033f63ad2c4fc3bb819184348"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MultiMDMediator</b> (<a class="el" href="classcoupling_1_1services_1_1MultiMDCellService.html">coupling::services::MultiMDCellService</a>&lt; LinkedCell, dim &gt; &amp;multiMDCellService, <a class="el" href="classcoupling_1_1InstanceHandling.html">coupling::InstanceHandling</a>&lt; LinkedCell, dim &gt; &amp;instanceHandling, <a class="el" href="classtarch_1_1utils_1_1MultiMDService.html">tarch::utils::MultiMDService</a>&lt; dim &gt; &amp;multiMDService, <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *macroscopicSolverInterface)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><b>MultiMDMediator</b> (<a class="el" href="classcoupling_1_1services_1_1MultiMDCellService.html">coupling::services::MultiMDCellService</a>&lt; LinkedCell, dim &gt; &amp;multiMDCellService, coupling::InstanceHandling&lt; LinkedCell, dim &gt; &amp;instanceHandling, <a class="el" href="classtarch_1_1utils_1_1MultiMDService.html">tarch::utils::MultiMDService</a>&lt; dim &gt; &amp;multiMDService, <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *macroscopicSolverInterface)</td></tr>
 <tr class="separator:a9379c29033f63ad2c4fc3bb819184348"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a5f58624a076746f0296c675fd47e9d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MultiMDMediator.html#a1a5f58624a076746f0296c675fd47e9d">addMDSimulation</a> ()</td></tr>
 <tr class="separator:a1a5f58624a076746f0296c675fd47e9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,7 +131,7 @@ Private Attributes</h2></td></tr>
 <a class="el" href="classcoupling_1_1services_1_1MultiMDCellService.html">coupling::services::MultiMDCellService</a>&lt; LinkedCell, dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>_multiMDCellService</b></td></tr>
 <tr class="separator:a1a9f6f596a5669e97caa2abb453bf3b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00b0c91313b4769569d3e506d01b25b7"><td class="memItemLeft" align="right" valign="top"><a id="a00b0c91313b4769569d3e506d01b25b7" name="a00b0c91313b4769569d3e506d01b25b7"></a>
-<a class="el" href="classcoupling_1_1InstanceHandling.html">coupling::InstanceHandling</a>&lt; LinkedCell, dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>_instanceHandling</b></td></tr>
+coupling::InstanceHandling&lt; LinkedCell, dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>_instanceHandling</b></td></tr>
 <tr class="separator:a00b0c91313b4769569d3e506d01b25b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a507d3df614a5671ba8250cb7be9d45ad"><td class="memItemLeft" align="right" valign="top"><a id="a507d3df614a5671ba8250cb7be9d45ad" name="a507d3df614a5671ba8250cb7be9d45ad"></a>
 <a class="el" href="classtarch_1_1utils_1_1MultiMDService.html">tarch::utils::MultiMDService</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>_multiMDService</b></td></tr>
@@ -145,7 +145,7 @@ std::vector&lt; std::vector&lt; bool &gt; &gt;&#160;</td><td class="memItemRight
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::MultiMDMediator&lt; LinkedCell, dim &gt;</div><p >Class to handle interaction between MultiMDCellService and <a class="el" href="classcoupling_1_1InstanceHandling.html" title="Simulation slots are managed (i.e., added/removed) via this class. Works and interacts with the class...">InstanceHandling</a> This is currently mainly used for activating/deactivating and addtion/removal of md simulations. Works and interacts with the class <a class="el" href="classcoupling_1_1InstanceHandling.html" title="Simulation slots are managed (i.e., added/removed) via this class. Works and interacts with the class...">coupling::InstanceHandling</a> closely. </p>
+class coupling::MultiMDMediator&lt; LinkedCell, dim &gt;</div><p >Class to handle interaction between MultiMDCellService and InstanceHandling This is currently mainly used for activating/deactivating and addtion/removal of md simulations. Works and interacts with the class coupling::InstanceHandling closely. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">LinkedCell</td><td>type of the cell </td></tr>
@@ -153,7 +153,7 @@ class coupling::MultiMDMediator&lt; LinkedCell, dim &gt;</div><p >Class to handl
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd>see also <a class="el" href="classcoupling_1_1InstanceHandling.html" title="Simulation slots are managed (i.e., added/removed) via this class. Works and interacts with the class...">coupling::InstanceHandling</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>see also coupling::InstanceHandling </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Niklas Wittmer </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a1a5f58624a076746f0296c675fd47e9d" name="a1a5f58624a076746f0296c675fd47e9d"></a>
