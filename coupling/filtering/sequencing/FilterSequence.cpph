@@ -47,6 +47,14 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             newfilter = new coupling::ReadFromFile<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"));
 		}
 
+		//Constant Filter
+        else if(std::strcmp(currFilterNode->Value(), "constant") == 0){
+			double constant = 0.0; //by default, constant filter uses 0 as its constant.
+			tarch::configuration::ParseConfiguration::readDoubleOptional(constant, currFilterNode, "value");
+
+            newfilter = new coupling::Constant<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, constant);
+		}
+
 		//Gauss
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
 			//dimension the gauss filter operates on
