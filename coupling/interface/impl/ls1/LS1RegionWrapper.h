@@ -1,0 +1,159 @@
+// Maps regions in the LS1 MD domain to mamico cells
+// Causes behavior identical to fixed regular cells
+
+#include "ls1/src/particleContainer/RegionParticleIterator.h"
+#include "ls1/src/particleContainer/ParticleContainer.h"
+#include "ls1/src/molecules/Molecule.h"
+//#include "ls1/ensemble/EnsembleBase.h"
+
+
+#include "coupling/interface/Molecule.h"
+
+namespace ls1 {
+
+class LS1RegionWrapper
+{
+public:
+    LS1RegionWrapper(double startRegion[3], double endRegion[3])
+    {
+        _curParticleID = 0;
+        _IDinited = false;
+        for(int i = 0; i < 3; i++)
+        {
+            _startRegion[i] = startRegion[i];
+            _endRegion[i] = endRegion[i]; //boundingboxmin
+        }
+        _particleContainer = ::global_simulation->getMoleculeContainer();
+        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
+    }
+    LS1RegionWrapper() : _startRegion({0,0,0}), _endRegion({0,0,0}), _curParticleID(0), _IDinited(false) {}
+
+    void setRegion(double startRegion[3], double endRegion[3])
+    {
+        for(int i = 0; i < 3; i++)
+        {
+            _startRegion[i] = startRegion[i];
+            _endRegion[i] = endRegion[i];
+        }
+        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
+    }
+
+    void iteratorReset()
+    {
+        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
+    }
+
+    void iteratorNext() { ++_iterator; }
+
+    bool iteratorValid() { return _iterator.isValid(); }
+
+    ::Molecule* getParticleAtIterator()
+    {
+        ::Molecule* temp = &(*_iterator);
+        return temp;
+    }
+
+    bool isInRegion(const double point[3])
+    {
+        bool isInRegion = true;
+        for (int i = 0; i < 3; i++) { isInRegion &= ((point[i] >= _startRegion[i]) & (point[i] < _endRegion[i])); }
+        return isInRegion;
+    }
+    bool isInRegion(const tarch::la::Vector<3, double> point)
+    {
+        return isInRegion(new double[3]{point[0], point[1], point[2]});
+    }
+
+    bool isInRegion(const double startBox[3], const double endBox[3])
+    {
+        bool isInRegion = true;
+        for (int i = 0; i < 3; i++) { isInRegion &= ((startBox[i] >= _startRegion[i]) & (endBox[i] < _endRegion[i])); }
+        return isInRegion;
+    }
+
+    void addMolecule(::Molecule &molecule)
+    {
+        _particleContainer->addParticle(molecule);
+    }
+
+    void deleteMolecule(ParticleIterator &iterator)
+    {
+        _particleContainer->deleteMolecule(iterator, false);
+    }
+
+    void addMolecule(const coupling::interface::Molecule<3> &molecule)
+    {
+        ::Molecule temp;
+        temp.setr(0, molecule.getPosition()[0]);
+        temp.setr(1, molecule.getPosition()[1]);
+        temp.setr(2, molecule.getPosition()[2]);
+        
+        temp.setv(0, molecule.getVelocity()[0]);
+        temp.setv(1, molecule.getVelocity()[1]);
+        temp.setv(2, molecule.getVelocity()[2]);
+
+        temp.setF(0, molecule.getForce()[0]);  //more important for usher particles
+        temp.setF(1, molecule.getForce()[1]);
+        temp.setF(2, molecule.getForce()[2]);
+        if(!_IDinited)
+        {
+            _curParticleID = ::global_simulation->getTotalNumberOfMolecules() + 1;
+            _IDIncrementor = 1;
+            #ifdef ENABLE_MPI
+                int curRank;
+                MPI_Comm_rank(MPI_COMM_WORLD,&curRank);
+                _curParticleID += curRank + 1;
+                MPI_Comm_size(MPI_COMM_WORLD,&_IDIncrementor);  // interleave the particles
+            #endif
+
+            _IDinited = true;
+        }
+
+        temp.setid(_curParticleID);
+        _curParticleID += _IDIncrementor;
+
+        addMolecule(temp);
+        //_particleContainer->addParticle(temp);
+    }
+
+    void deleteMolecule(const coupling::interface::Molecule<3> &molecule)
+    {
+        //check if coords in region
+        auto molPosition = molecule.getPosition();
+        if(!isInRegion(molPosition))
+            return;
+        //check if molecule at location specified
+        double cutoff = ::global_simulation->getcutoffRadius();
+
+        double startBox[] = {molPosition[0]-cutoff/10, molPosition[1]-cutoff/10, molPosition[2]-cutoff/10};
+        double endBox[] = {molPosition[0]+cutoff/10, molPosition[1]+cutoff/10, molPosition[2]+cutoff/10};
+
+        RegionParticleIterator temp = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
+        bool found = false;
+        while(temp.isValid())
+        {
+            ::Molecule* temp = &(*_iterator);
+            if(temp->r(0) == molPosition[0] && temp->r(1) == molPosition[1] && temp->r(2) == molPosition[2])
+            {
+                found = true;
+                break;
+            }
+            temp++;
+        }
+        //delete molecule
+        if(!found)
+            return;
+
+        deleteMolecule(temp);
+        //_particleContainer->deleteMolecule(temp, false);
+    }
+
+private:
+    double _startRegion[3], _endRegion[3];
+    unsigned long int _curParticleID;
+    int _IDIncrementor;
+    bool _IDinited;
+    RegionParticleIterator _iterator;
+    ParticleContainer* _particleContainer;
+};
+}
