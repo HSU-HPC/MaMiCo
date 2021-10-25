@@ -32,14 +32,13 @@
 #include "input.h"
 #include "mamico_lammps_md_solver_interface.h"
 #define MY_LINKEDCELL LAMMPS_NS::MamicoCell
-#endif
-//#elif defined(LS1_MARDYN)
+#elif defined(LS1_MARDYN)
 #include "ls1/src/Simulation.h"
 #include "coupling/interface/impl/ls1/LS1MamicoCouplingSwitch.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
-//#endif
+#endif
 
 
 /** interface for differend MD solvers.
@@ -539,7 +538,7 @@ class LammpsDPDSimulation: public coupling::interface::MDSimulation {
 };
 #endif
 
-//#if defined(LS1_MARDYN)
+#if defined(LS1_MARDYN)
 class LS1MDSimulation : public coupling::interface::MDSimulation
 {
 private:
@@ -587,7 +586,7 @@ public:
       simulation.finalize();
     }
 };
-//#endif
+#endif
 
 /** factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service */
 class SimulationAndInterfaceFactory {
@@ -678,6 +677,11 @@ class SimulationAndInterfaceFactory {
       // nop, since the fix-mamico takes care of deleting the MD solver interface
       #elif defined(LAMMPS_DPD)
       // nop
+      #elif defined(LS1_MARDYN)
+      coupling::interface::MDSolverInterface<MY_LINKEDCELL,MDSIMULATIONFACTORY_DIMENSION> *interface =
+        coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
+      if (interface != NULL){ delete interface;}
+      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(NULL);
       #endif
     }
 
@@ -688,4 +692,4 @@ class SimulationAndInterfaceFactory {
 
 }
 }
-#endif // _MDSIMULATIONFACTORY_H_
+#endif// _MDSIMULATIONFACTORY_H_
