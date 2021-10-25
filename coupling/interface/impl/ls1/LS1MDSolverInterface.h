@@ -19,6 +19,8 @@ namespace coupling
 
 class coupling::interface::LS1MDSolverInterface : public coupling::interface::MDSolverInterface<ls1::LS1RegionWrapper, 3>
 {
+  public:
+    LS1MDSolverInterface() {}
     /** returns a particular linked cell inside a macroscopic cell.
      *  The macroscopic cells are currently located on the same process as the respective linked cells.
      *  However, several linked cells may be part of a macroscopic cell.

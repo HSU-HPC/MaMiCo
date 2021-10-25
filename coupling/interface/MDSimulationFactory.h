@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <ctime>
+#include <string>
 
 #include "tarch/la/ScalarOperations.h"
 #include "tarch/utils/MultiMDService.h"
@@ -31,11 +32,14 @@
 #include "input.h"
 #include "mamico_lammps_md_solver_interface.h"
 #define MY_LINKEDCELL LAMMPS_NS::MamicoCell
-#elif defined(LS1_MARDYN)
+#endif
+//#elif defined(LS1_MARDYN)
+#include "ls1/src/Simulation.h"
 #include "coupling/interface/impl/ls1/LS1MamicoCouplingSwitch.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
+#include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
-#endif
+//#endif
 
 
 /** interface for differend MD solvers.
@@ -535,34 +539,55 @@ class LammpsDPDSimulation: public coupling::interface::MDSimulation {
 };
 #endif
 
-#if defined(LS1_MARDYN)
+//#if defined(LS1_MARDYN)
 class LS1MDSimulation : public coupling::interface::MDSimulation
 {
 private:
     ::Simulation simulation;
 public:
+    LS1MDSimulation() {}
+    virtual ~LS1MDSimulation(){}
     /** switches coupling on/off*/
     void switchOffCoupling()
     {
-        coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
+      coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
     }
     void switchOnCoupling()
     {
-        coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
+      coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
     }
 
     /** simulates numberTimesteps time steps and starts at time step no. firstTimestep*/
-    virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep) = 0;
+    virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep)
+    {
+      for(int i = 0; i < numberTimesteps; i++) { simulation.simulateOneTimestep(); }
+    }
     /** simulates a single time step*/
     //virtual void simulateTimestep(const unsigned int &thisTimestep ){const unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
-    virtual void sortMoleculesIntoCells() = 0;
+    virtual void sortMoleculesIntoCells() {}
 
-    virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) = 0;
-    virtual void init() = 0;
-    virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) = 0;
-    virtual void shutdown() = 0;
+    virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService)
+    {
+      coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper,MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(macroscopicCellService);
+    }
+    virtual void init()
+    {
+      //parse file
+      const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
+      simulation.readConfigFile(filename);
+
+      //all the things
+      simulation.prepare_start();
+      simulation.preSimLoopSteps();
+    }
+    virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) {}
+    virtual void shutdown()
+    {
+      simulation.postSimLoopSteps();
+      simulation.finalize();
+    }
 };
-#endif
+//#endif
 
 /** factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service */
 class SimulationAndInterfaceFactory {
@@ -592,6 +617,8 @@ class SimulationAndInterfaceFactory {
         ,localComm
         #endif
       );
+      #elif defined(LS1_MARDYN)
+      return new coupling::interface::LS1MDSimulation();
       #else
       std::cout << "ERROR MDSimulationFactory::getMDSimulation(): Unknown MD simulation!" << std::endl; exit(EXIT_FAILURE);
       return NULL;
@@ -631,6 +658,9 @@ class SimulationAndInterfaceFactory {
       mdSolverInterface = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
       #elif defined(LAMMPS_DPD)
       mdSolverInterface = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
+      #elif defined(LS1_MARDYN)
+      mdSolverInterface = new coupling::interface::LS1MDSolverInterface();
+      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(mdSolverInterface);
       #endif
 
       if (mdSolverInterface == NULL){std::cout << "ERROR MDSimulationFactory::getMDSolverInterface(): mdSolverInterface==NULL!" << std::endl; exit(EXIT_FAILURE);}
