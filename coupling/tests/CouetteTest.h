@@ -848,6 +848,7 @@ private:
     std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,const unsigned int * const recvIndices,
     const coupling::IndexConversion<3>& indexConversion, int couplingCycle
   ) const {
+    if(recvBuffer.size() == 0) return;
     if(_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0) return;
     // form file name and open file
     std::stringstream ss;
