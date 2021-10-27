@@ -95,8 +95,8 @@ $(function() {
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keyword">const</span> std::array&lt;bool, 7&gt; filteredValues, </div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keyword">const</span> <a class="code hl_class" href="classcoupling_1_1IndexConversionMD2Macro.html">coupling::IndexConversionMD2Macro&lt;dim&gt;</a>* indexConversion,</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordtype">int</span> tws,</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">double</span> sigsq,</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">double</span> hsq,</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">double</span> sigsq, <span class="keywordtype">double</span> sigsq_rel,</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">double</span> hsq, <span class="keywordtype">double</span> hsq_rel,</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordtype">int</span> M = 2,</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="keywordtype">int</span> d = 1</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    ):</div>
@@ -109,8 +109,8 @@ $(function() {
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  _timeWindowSize(tws),</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  _M(M),</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  _d(d),</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  _sigsq(sigsq),</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  _hsq(hsq),</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  _sigsq(sigsq),_sigsq_rel(sigsq_rel),</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  _hsq(hsq),_hsq_rel(hsq_rel),</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  _cycleCounter(0),</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  _t(0),</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  _ic(indexConversion),</div>
@@ -168,8 +168,8 @@ $(function() {
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>  <span class="comment">//unsigned int _timeModulo; // e.g. 2,4,8 ....</span></div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _M; <span class="comment">// search volume has size (2M+1)^3</span></div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _d; <span class="comment">// patches have size (2d+1)^4; this makes at least _d ghost layer necessary</span></div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> _sigsq;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> _hsq;</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  <span class="keywordtype">double</span> _sigsq, _sigsq_rel;</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>  <span class="keywordtype">double</span> _hsq, _hsq_rel;</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _cycleCounter; <span class="comment">// coupling cycle counter, indicates how many data snapshots are available already</span></div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _t; <span class="comment">// active temporal index, iterates cyclic between zero and _timeWindowSize</span></div>

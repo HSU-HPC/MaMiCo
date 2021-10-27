@@ -81,9 +81,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1cb6a18ffdbe0414ed7b9367d9cbf0fa"><td class="memItemLeft" align="right" valign="top"><a id="a1cb6a18ffdbe0414ed7b9367d9cbf0fa" name="a1cb6a18ffdbe0414ed7b9367d9cbf0fa"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>NLM</b> (const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; inputCellVector_unfiltered, const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; inputCellVector_prefiltered, const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; outputCellVector, const std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &gt; cellIndices, const std::array&lt; bool, 7 &gt; filteredValues, const <a class="el" href="classcoupling_1_1IndexConversionMD2Macro.html">coupling::IndexConversionMD2Macro</a>&lt; dim &gt; *indexConversion, int tws, double sigsq, double hsq, int M=2, int d=1)</td></tr>
-<tr class="separator:a1cb6a18ffdbe0414ed7b9367d9cbf0fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17bf13487d4864e7111a0214db94045a"><td class="memItemLeft" align="right" valign="top"><a id="a17bf13487d4864e7111a0214db94045a" name="a17bf13487d4864e7111a0214db94045a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>NLM</b> (const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; inputCellVector_unfiltered, const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; inputCellVector_prefiltered, const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; outputCellVector, const std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &gt; cellIndices, const std::array&lt; bool, 7 &gt; filteredValues, const <a class="el" href="classcoupling_1_1IndexConversionMD2Macro.html">coupling::IndexConversionMD2Macro</a>&lt; dim &gt; *indexConversion, int tws, double sigsq, double sigsq_rel, double hsq, double hsq_rel, int M=2, int d=1)</td></tr>
+<tr class="separator:a17bf13487d4864e7111a0214db94045a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91ae203d2f58ea5f1c48c3d03451e314"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1NLM.html#a91ae203d2f58ea5f1c48c3d03451e314">operator()</a> ()</td></tr>
 <tr class="separator:a91ae203d2f58ea5f1c48c3d03451e314"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcoupling_1_1JunctorInterface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcoupling_1_1JunctorInterface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1JunctorInterface.html">coupling::JunctorInterface&lt; dim, 2, 1 &gt;</a></td></tr>
@@ -155,12 +155,18 @@ const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_M</b><
 <tr class="memitem:ae96ea2f6ceb415ea5e326c29bf529e8c"><td class="memItemLeft" align="right" valign="top"><a id="ae96ea2f6ceb415ea5e326c29bf529e8c" name="ae96ea2f6ceb415ea5e326c29bf529e8c"></a>
 const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_d</b></td></tr>
 <tr class="separator:ae96ea2f6ceb415ea5e326c29bf529e8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dfe97395dcf39cd032afc8886414b37"><td class="memItemLeft" align="right" valign="top"><a id="a5dfe97395dcf39cd032afc8886414b37" name="a5dfe97395dcf39cd032afc8886414b37"></a>
-const double&#160;</td><td class="memItemRight" valign="bottom"><b>_sigsq</b></td></tr>
-<tr class="separator:a5dfe97395dcf39cd032afc8886414b37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abec876d43ed1d9f0d18c05d5f10a1f4b"><td class="memItemLeft" align="right" valign="top"><a id="abec876d43ed1d9f0d18c05d5f10a1f4b" name="abec876d43ed1d9f0d18c05d5f10a1f4b"></a>
-const double&#160;</td><td class="memItemRight" valign="bottom"><b>_hsq</b></td></tr>
-<tr class="separator:abec876d43ed1d9f0d18c05d5f10a1f4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90c86f7874f0f8bc333771ad23772064"><td class="memItemLeft" align="right" valign="top"><a id="a90c86f7874f0f8bc333771ad23772064" name="a90c86f7874f0f8bc333771ad23772064"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>_sigsq</b></td></tr>
+<tr class="separator:a90c86f7874f0f8bc333771ad23772064"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13fcb564e839360131e411d283fc7c46"><td class="memItemLeft" align="right" valign="top"><a id="a13fcb564e839360131e411d283fc7c46" name="a13fcb564e839360131e411d283fc7c46"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>_sigsq_rel</b></td></tr>
+<tr class="separator:a13fcb564e839360131e411d283fc7c46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa727100b891b882d6207a1b5afd06309"><td class="memItemLeft" align="right" valign="top"><a id="aa727100b891b882d6207a1b5afd06309" name="aa727100b891b882d6207a1b5afd06309"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>_hsq</b></td></tr>
+<tr class="separator:aa727100b891b882d6207a1b5afd06309"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89f9b0c81ee11a4416d8eaf831191563"><td class="memItemLeft" align="right" valign="top"><a id="a89f9b0c81ee11a4416d8eaf831191563" name="a89f9b0c81ee11a4416d8eaf831191563"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>_hsq_rel</b></td></tr>
+<tr class="separator:a89f9b0c81ee11a4416d8eaf831191563"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f659fdb168e66797db5f759d43f1488"><td class="memItemLeft" align="right" valign="top"><a id="a7f659fdb168e66797db5f759d43f1488" name="a7f659fdb168e66797db5f759d43f1488"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_cycleCounter</b></td></tr>
 <tr class="separator:a7f659fdb168e66797db5f759d43f1488"><td class="memSeparator" colspan="2">&#160;</td></tr>
