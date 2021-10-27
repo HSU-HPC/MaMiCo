@@ -35,8 +35,9 @@ class coupling::solvers::FoamSolverInterface: public coupling::interface::Macros
     /** receive all (inner) cells */
     virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim,unsigned int> globalCellIndex){
       bool recv=true;
-      // for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>_outerRegion) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1-_outerRegion); }
-      for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>0) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1); }
+      //for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>_outerRegion) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1-_outerRegion); }
+      for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>_outerRegion-1) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+2-_outerRegion); }
+      //for (unsigned int d = 0; d < dim; d++){ recv = recv && (globalCellIndex[d]>0) && (globalCellIndex[d]<_globalNumberMacroscopicCells[d]+1); }
       return recv;
     }
 
