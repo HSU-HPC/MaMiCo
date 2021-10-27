@@ -70,8 +70,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _ic, (unsigned int) d, sigma, extrapolation);
 		}
 
-		//POD: Currently disabled. TODO: fix eigen error
-        /*else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
+        else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
 			//In earlier implementations, it used to be possible to override tws via function parameter. This feature was removed.
 			//See: coupling::noisereduction::NoiseReductionConfiguration::interpreteConfiguration<dim>(..., int tws)
 			int tws;
@@ -94,7 +93,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			}
 
             newfilter = new coupling::POD<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _multiMDService, tws, kmax);
-        }*/
+        }
 
 		//Strouhal
 		else if(std::strcmp(currFilterNode->Value(), "strouhal") == 0) {
