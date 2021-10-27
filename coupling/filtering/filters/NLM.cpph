@@ -4,7 +4,7 @@
 template<unsigned int dim>
 void coupling::NLM<dim>::operator()(){
   #ifdef NLM_DEBUG
-  std::cout << "    NLM: called operator()" << std::endl;
+  //std::cout << "    NLM: called operator()" << std::endl;
   #endif
 
   save_data();
@@ -40,6 +40,8 @@ void coupling::NLM<dim>::update_patchfield(){
 
 template<unsigned int dim>
 void coupling::NLM<dim>::denoise(){
+  // counter for adaptive parameter modification
+  int cnt_sigsq = 0, cnt_hsq = 0, cnt_total = 0;
   for(auto const &idx : _innerCellIndices){
     auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
     auto& me = _patchfield(idx_inner, _t);
@@ -59,6 +61,9 @@ void coupling::NLM<dim>::denoise(){
 #ifdef NLM_DEBUG
         //std::cout << "dist = " << dist << std::endl;
 #endif
+        if(dist < _sigsq) cnt_sigsq++;
+        if(dist - _sigsq < _hsq) cnt_hsq++;
+        cnt_total++;
         double weight = std::exp(-  std::max(dist - _sigsq ,0.0) / _hsq) * 1/(-offset_t +1);
 #ifdef NLM_DEBUG        
        //std::cout << "weight = " << weight << std::endl;
@@ -88,6 +93,19 @@ void coupling::NLM<dim>::denoise(){
       for (unsigned int d = 0; d < dim; d++)  momentum[d] = res[i][d+1];
         coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMomentum(momentum);
     }
+  }
+  // dynamic parameter adaption: Goal: cnt/cnt_total should be close to value_rel
+  if(_sigsq_rel >= 0){  // negative value means adaptivity disabled
+    double rel = (double)(cnt_sigsq) / cnt_total;
+    if(rel < _sigsq_rel * 0.9) _sigsq *= 1.05;
+    else if(rel > _sigsq_rel * 1.1) _sigsq *= 0.95;
+    std::cout << "NLM info: _sigsq is " << _sigsq << std::endl; 
+  }
+  if(_hsq_rel >= 0){  // negative value means adaptivity disabled
+    double rel = (double)(cnt_hsq) / cnt_total;
+    if(rel < _hsq_rel * 0.9) _hsq *= 1.05;
+    else if(rel > _hsq_rel * 1.1) _hsq *= 0.95;
+    std::cout << "NLM info: _hsq is " << _hsq << std::endl;
   }
 }
 

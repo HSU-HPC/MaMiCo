@@ -67,7 +67,7 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 				std::cout << "ERROR: NLM filter misses attribute sigsq in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}
-			if(tws < 0){
+			if(sigsq < 0){
 				std::cout << "ERROR: NLM: sigsq must be greater than zero." << std::endl;
 				exit(EXIT_FAILURE);
 			}
@@ -81,7 +81,16 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 				exit(EXIT_FAILURE);
 			}
 
+			//Optional parameters
+			double sigsq_rel = -1;
+			tarch::configuration::ParseConfiguration::readDoubleOptional(sigsq_rel, currJunctorNode, "sigsq_rel");
+			if(sigsq_rel > 1) { std::cout << "ERROR: NLM: sigsq_rel must be 0 <= sigsq_rel <= 1" << std::endl; exit(EXIT_FAILURE); }
+			if(sigsq_rel >= 0) { std::cout << "INFO: NLM: sigsq adaptivity enabled, target value = " << sigsq_rel*100 << " % " << std::endl; }
 
+			double hsq_rel = -1;
+                        tarch::configuration::ParseConfiguration::readDoubleOptional(hsq_rel, currJunctorNode, "hsq_rel");
+                        if(hsq_rel > 1) { std::cout << "ERROR: NLM: hsq_rel must be 0 <= hsq_rel <= 1" << std::endl; exit(EXIT_FAILURE); }
+                        if(hsq_rel >= 0) { std::cout << "INFO: NLM: hsq adaptivity enabled, target value = " << hsq_rel*100 << " % " << std::endl; }
 
 			//Instanciation
 			newjunctor = new coupling::NLM<dim>(
@@ -92,8 +101,8 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
 					coupling::FilterSequence<dim>::_filteredValues, 
 					coupling::FilterSequence<dim>::_ic, 
 					tws,
-					sigsq,
-					hsq);
+					sigsq, sigsq_rel,
+					hsq, hsq_rel );
 
 			//TODO: generalize this for arbitrary junctors?
 			//Swapping for output partition
