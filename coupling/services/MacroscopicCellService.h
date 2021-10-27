@@ -255,7 +255,7 @@ public coupling::services::MacroscopicCellService<dim> {
 
     std::function<void(Wrapper4ApplyTemperature&)> initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration& thermostatConfiguration){
       if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::all)
-        return [this](Wrapper4ApplyTemperature& wrapper){_macroscopicCells.applyToAllLocalMacroscopicCellsWithLinkedCells(wrapper);};
+        return [this](Wrapper4ApplyTemperature& wrapper){_macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);};
       else if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::overlap)
         return [this](Wrapper4ApplyTemperature& wrapper){_macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);};
       else
