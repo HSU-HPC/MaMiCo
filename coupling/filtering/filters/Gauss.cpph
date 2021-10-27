@@ -115,14 +115,13 @@ std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel
 	//fill kernel using Gaussian error function
 	for(int x = -GAUSS_KERNEL_RADIUS; x <= GAUSS_KERNEL_RADIUS; x++) {
 		kernel[i] = gaussianDensityFunction(x);
+
 		sum += kernel[i];
 		i++;
 	}
-	
-	//std::cout << "gauss: kernel sum: " << sum << std::endl;
 
 	//normalize kernel. by definition, sum cannot be 0.
-	for(auto k : kernel) { 
+	for(auto& k : kernel) { 
 		k *= 1/sum; 
 
 		#ifdef DEBUG_GAUSS
@@ -134,9 +133,8 @@ std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel
 }
 
 template<unsigned int dim>
-double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
-	double ans = ( 1 / ( _sigma * sqrt(2*M_PI) ) ) * exp(-0.5 * (x/_sigma) * (x/_sigma));
-	//std::cout << "gauss: error function at x = " << x << ": " << ans << std::endl; 
+constexpr double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
+    double ans = ( 1 / ( _sigma * sqrt(2*M_PI) ) ) * exp(-0.5 * (x/_sigma) * (x/_sigma));
 	return ans;
 }
 

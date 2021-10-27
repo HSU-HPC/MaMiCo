@@ -44,8 +44,8 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //Use local indexing! (starting at (0,...,0))
 				const std::array<bool, 7> filteredValues,
 				const coupling::IndexConversionMD2Macro<dim>* indexConversion,
-				unsigned int dimension,
-				int sigma,
+				const unsigned int dimension,
+				const double sigma,
 				const char* extrapolationStrategy):
 				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "GAUSS"),
 				_ic(indexConversion),
@@ -54,18 +54,9 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back()),
 				_kernel(generateKernel())
 		{
-
 			//TODO
 			if(GAUSS_KERNEL_RADIUS != 1) 
 				throw std::runtime_error("ERROR: GAUSS: Kernel radius != 1 currently not supported.");
-
-			//TODO
-			if(sigma != 1) 
-				throw std::runtime_error("ERROR: GAUSS: sigma != 1 currently not supported.");
-
-			//Overwrite kernel with hardcoded weights TODO: fix kernel generation, then remove this
-			_kernel = {0.27901, 0.44198, 0.27901};
-
 
 			if(coupling::FilterInterface<dim>::_cellIndices.back()[_dim] < 2)
 				throw std::runtime_error("ERROR: GAUSS: Invalid input domain.");
@@ -96,7 +87,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 	private:
 		std::array<double, 1+2*GAUSS_KERNEL_RADIUS> generateKernel();
 
-		double gaussianDensityFunction(int x);
+		constexpr double gaussianDensityFunction(int x);
 
 		/*
 		 * Returns the index of te cell cell that's above the cell at index on the d-axis
@@ -117,10 +108,10 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		const coupling::IndexConversionMD2Macro<dim>* _ic;
 
 		//on which axis this filter operates. 0 <= _dim <= dim
-		unsigned int _dim;
+		const unsigned int _dim;
 
 		//standard deviation used
-		int _sigma;
+		const double _sigma;
 
 		tarch::la::Vector<dim, unsigned int> _lastIndex;
 

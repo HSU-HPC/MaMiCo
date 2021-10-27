@@ -57,8 +57,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			}
 
 			//standard deviation of the gauss filter
-			int sigma;
-			if(currFilterNode->QueryIntAttribute("sigma", &sigma)){
+			double sigma;
+			if(currFilterNode->QueryDoubleAttribute("sigma", &sigma)){
 				std::cout << "ERROR: Gaussian filter misses attribute sigma in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}
