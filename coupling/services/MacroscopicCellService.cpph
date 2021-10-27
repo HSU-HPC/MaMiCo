@@ -20,6 +20,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellS
   const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
   //const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,
   const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
+  const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
   unsigned int numberMDTimestepsPerCouplingCycle,
   const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
   const char* filterPipelineConfiguration,
@@ -52,6 +53,7 @@ _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolver
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
 _momentumController(mdSolverInterface),
+_applyAccordingToConfiguration(initCorrectApplicationOfThermostat(thermostatConfiguration)),
 _microscopicFilename(macroscopicCellConfiguration.getMicroscopicFilename()),
 _writeEveryMicroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMicroscopicTimestep()),
 _macroscopicFilename(macroscopicCellConfiguration.getMacroscopicFilename()),
@@ -88,8 +90,6 @@ _writeEveryMacroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMacrosc
   // init vector of inner (MD Domain/non-ghost) cells and their indices
   //TODO: REMOVE initInnerMacroscopicCells(_macroscopicCells.getMacroscopicCells());
 }
-
-
 
 template<class LinkedCell,unsigned int dim>
 coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::~MacroscopicCellServiceImpl(){
@@ -217,7 +217,7 @@ template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 applyTemperatureToMolecules(unsigned int t){
   Wrapper4ApplyTemperature wrapper(this);
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+  _applyAccordingToConfiguration(wrapper);
 }
 
 

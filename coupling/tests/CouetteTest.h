@@ -332,7 +332,7 @@ private:
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
-        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(),  _mamicoConfig.getThermostatConfiguration(),_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService, _tws
       );
     }
@@ -341,7 +341,7 @@ private:
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
         _mdSolverInterface,couetteSolverInterface, _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), (unsigned int) _rank, _cfg.totalNumberMDSimulations,
         _mamicoConfig.getParticleInsertionConfiguration(), _mamicoConfig.getMomentumInsertionConfiguration(), _mamicoConfig.getBoundaryForceConfiguration(),
-        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+        _mamicoConfig.getTransferStrategyConfiguration(), _mamicoConfig.getParallelTopologyConfiguration(),  _mamicoConfig.getThermostatConfiguration(), _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }

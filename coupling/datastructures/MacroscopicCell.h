@@ -94,7 +94,6 @@ class coupling::datastructures::MacroscopicCell {
     tarch::la::Vector<dim,double> _currentVelocity;
 };
 
-
 /** describes a quadratic/ cubic macroscopic cell filled with fluid. It is built up by
  *  a certain number of linked cells (from the MD algorithm). The linked
  *  cells need to exactly fill this cell; no overlap/ non-fitting boundaries
