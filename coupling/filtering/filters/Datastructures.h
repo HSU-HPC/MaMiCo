@@ -184,7 +184,7 @@ public:
 		double* const other_data = reinterpret_cast<double* const>(other._flowfield._data);
 
 		double res = 0;
-		for(unsigned int i = 0; i < size; i += 4){
+		for(unsigned int i = 0; i < size; i += 1){
 			double diff(my_data[i] - other_data[i]);
 			res += diff*diff;
 		}

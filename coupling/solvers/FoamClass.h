@@ -58,6 +58,7 @@ public:
   }
 
   virtual ~IcoFoam(){
+    if(skipRank()){return;}
     if(_boundary2RecvBufferIndicesOuter){ delete [] _boundary2RecvBufferIndicesOuter; _boundary2RecvBufferIndicesOuter=NULL;}
     if(_boundary2RecvBufferIndicesInner){ delete [] _boundary2RecvBufferIndicesInner; _boundary2RecvBufferIndicesInner=NULL;}
     if(_boundaryIndices){ delete [] _boundaryIndices; _boundaryIndices=NULL;}
@@ -200,8 +201,8 @@ private:
     std::stringstream velocity;
 
     // loop over domain (incl. boundary)
-    double y=_channelheight/2;
-    double x=_channelheight/2;
+    double y=_channelheight/2 + _dx/2;
+    double x=_channelheight/2 + _dx/2;
     for (double z = _dx/2; z < _channelheight; z=z+_dx){
       const int foamIndice = U.mesh().findCell(Foam::vector(x,y,z));
       // write information to streams
@@ -212,41 +213,43 @@ private:
     file.close();
   }
 
-  // /** create vtk plot if required */
-  // void plot() const {
-  //   // only plot output if this is the correct timestep
-  //   if (_plotEveryTimestep==-1){ return;}
-  //   if (_timestepCounter%_plotEveryTimestep!=0){return;}
-  //
-  //   std::stringstream ss; ss << "Continuum_Velocity_IcoFoam_" << _rank << "_" << _timestepCounter << ".vtk";
-  //   std::ofstream file(ss.str().c_str());
-  //   if (!file.is_open()){std::cout << "ERROR NumericalSolver::plot(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-  //   std::stringstream velocity;
-  //
-  //   file << "# vtk DataFile Version 2.0" << std::endl;
-  //   file << "MaMiCo FoamSolver" << std::endl;
-  //   file << "ASCII" << std::endl << std::endl;
-  //   file << "DATASET STRUCTURED_GRID" << std::endl; It is not a structured grid, the md domain in the middle is missing. ToDo check which other type is fitting
-  //   int pointsPerDimension = _channelheight/_dx+2;
-  //   file << "DIMENSIONS " << pointsPerDimension << " " << pointsPerDimension << " " << pointsPerDimension << std::endl; // everything +1 cause of change in index
-  //   file << "POINTS " << (pointsPerDimension)*(pointsPerDimension)*(pointsPerDimension) << " float" << std::endl;
-  //
-  //   velocity << std::setprecision(12);
-  //   velocity << "VECTORS velocity float" << std::endl;
-  //
-  //   // // loop over domain (incl. boundary)
-  //   // int size = U.size();
-  //   // for (int i = 0; i < size; i++){
-  //   //   // write information to streams;
-  //   //   file << U.mesh()[i][0] << ", " << U.mesh()[i][1] << ", " << U.mesh()[i][2] << std::endl; // boundary is missing, how to include? Just not do?
-  //   //   velocity << U[i][0] << ", " << U[i][1] << ", " << U[i][2] << std::endl;
-  //   // }
-  //
-  //   file << std::endl;
-  //   file << velocity.str() << std::endl;
-  //   velocity.str("");
-  //   file.close();
-  // }
+  /** create vtk plot if required */
+  void plot() const {
+    // only plot output if this is the correct timestep
+    if (_plotEveryTimestep==-1){ return;}
+    if (_timestepCounter%_plotEveryTimestep!=0){return;}
+
+    std::stringstream ss; ss << "Continuum_Velocity_IcoFoam_" << _rank << "_" << _timestepCounter << ".vtk";
+    std::ofstream file(ss.str().c_str());
+    if (!file.is_open()){std::cout << "ERROR NumericalSolver::plot(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+    std::stringstream velocity;
+
+    file << "# vtk DataFile Version 2.0" << std::endl;
+    file << "MaMiCo FoamSolver" << std::endl;
+    file << "ASCII" << std::endl << std::endl;
+    file << "DATASET UNSTRUCTURED_GRID" << std::endl;
+    // file << "DATASET STRUCTURED_GRID" << std::endl;
+    // int pointsPerDimension = 20;//U.mesh().nCells();
+    // file << "DIMENSIONS " << pointsPerDimension << " " << pointsPerDimension << " " << pointsPerDimension << std::endl; // everything +1 cause of change in index
+    file << "POINTS " << U.mesh().nCells() << " float" << std::endl;
+
+    velocity << std::setprecision(12);
+    velocity << "POINT_DATA " << U.mesh().nCells() << std::endl;
+    velocity << "VECTORS velocity float" << std::endl;
+
+    // loop over domain (incl. boundary)
+    int size = U.size();
+    for (int i = 0; i < size; i++){
+      // write information to streams;
+      file << U.mesh().C()[i][0] << " " << U.mesh().C()[i][1] << " " << U.mesh().C()[i][2] << std::endl; // boundary is missing, how to include? Just not do?
+      velocity << U[i][0] << " " << U[i][1] << " " << U[i][2] << std::endl;
+    }
+
+    file << std::endl;
+    file << velocity.str() << std::endl;
+    velocity.str("");
+    file.close();
+  }
 
   // The solver runs sequentially on rank 0. Therefore the function checks if the acutal rank is zero.
   bool skipRank(){

@@ -32,8 +32,8 @@ public:
     const std::array<bool, 7> filteredValues, 
     const coupling::IndexConversionMD2Macro<dim>* indexConversion,
     int tws,
-    double sigsq,
-    double hsq,
+    double sigsq, double sigsq_rel,
+    double hsq, double hsq_rel,
     int M = 2,
     int d = 1
     ):
@@ -46,8 +46,8 @@ public:
   _timeWindowSize(tws),
   _M(M),
   _d(d),
-  _sigsq(sigsq),
-  _hsq(hsq),
+  _sigsq(sigsq),_sigsq_rel(sigsq_rel),
+  _hsq(hsq),_hsq_rel(hsq_rel),
   _cycleCounter(0),
   _t(0),
   _ic(indexConversion),
@@ -123,8 +123,8 @@ private:
   //unsigned int _timeModulo; // e.g. 2,4,8 ....
 	const unsigned int _M; // search volume has size (2M+1)^3
 	const unsigned int _d; // patches have size (2d+1)^4; this makes at least _d ghost layer necessary
-  const double _sigsq;
-  const double _hsq;
+  double _sigsq, _sigsq_rel;
+  double _hsq, _hsq_rel;
 
   unsigned int _cycleCounter; // coupling cycle counter, indicates how many data snapshots are available already
   unsigned int _t; // active temporal index, iterates cyclic between zero and _timeWindowSize
