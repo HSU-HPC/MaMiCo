@@ -23,7 +23,7 @@ namespace coupling {
 class coupling::configurations::ThermostatConfiguration:
 public tarch::configuration::Configuration {
   public:
-    enum ThermostatRegion{outer, overlap, all, none};
+    enum ThermostatRegion{onlyOutestLayer, outerLayers, all, none};
     ThermostatConfiguration(): _type{none},_isValid(true){}
 
     virtual ~ThermostatConfiguration(){}
@@ -31,10 +31,18 @@ public tarch::configuration::Configuration {
     void parseSubtag( tinyxml2::XMLElement* node ){
       std::string value;
       tarch::configuration::ParseConfiguration::readStringMandatory(value,node,"type");
-      if (value=="outer"){
-        _type = outer;
-      } else if (value=="overlap"){
-        _type = overlap;
+      if (value=="onlyOutestLayer"){
+        _type = onlyOutestLayer;
+      } else if (value=="outerLayers"){
+        _type = outerLayers;
+        int cellsTemp=0;
+        tarch::configuration::ParseConfiguration::readIntOptional(cellsTemp,node,"number-layers");
+        if(cellsTemp>=0){
+          std::cout << "ERROR coupling::ThermostatConfiguration: Wrong number of cells to use!" << std::endl;
+          _isValid = false;
+          exit(EXIT_FAILURE);
+        }
+        _cells = cellsTemp-1;
       } else if (value=="all"){
         _type = all;
       } else {
@@ -64,9 +72,11 @@ public tarch::configuration::Configuration {
 
     ThermostatRegion getThermostatRegionType() const { return _type;}
 
+    unsigned int getCells2Use() const {return _cells;}
+
   private:
     ThermostatRegion _type;
-
+    int _cells{0};
     bool _isValid;
 };
 

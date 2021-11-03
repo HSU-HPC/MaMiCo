@@ -61,6 +61,8 @@ class coupling::datastructures::MacroscopicCells {
     template<class A>
     void applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A &a);
 
+    template<class A>
+    void applyXLayersOfGlobalNonGhostCellsWithLinkedCells(A &a, unsigned int layers2Use);
 
   private:
     /** initialises the macroscopic cells: creates the buffer for the cells and embeds linked cells into the macroscopic

@@ -253,13 +253,14 @@ public coupling::services::MacroscopicCellService<dim> {
 
     tarch::la::Vector<dim,double> getPositionOfFirstLocalGhostCell() const;
 
-    std::function<void(Wrapper4ApplyTemperature&)> initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration& thermostatConfiguration){
+    std::function<void(Wrapper&)> initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration& thermostatConfiguration){
       if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::all)
-        return [this](Wrapper4ApplyTemperature& wrapper){_macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);};
-      else if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::overlap)
-        return [this](Wrapper4ApplyTemperature& wrapper){_macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);};
+        return [this](Wrapper& wrapper){_macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);};
+      else if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::outerLayers)
+        return [this, &thermostatConfiguration](Wrapper& wrapper){
+          _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCells(wrapper, thermostatConfiguration.getCells2Use());};
       else
-        return [this](Wrapper4ApplyTemperature& wrapper){_macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);};
+        return [this](Wrapper& wrapper){_macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);};
     }
 
     /** needed to determine cell range, ranks etc. */
@@ -302,7 +303,7 @@ public coupling::services::MacroscopicCellService<dim> {
     /** controls/ maintains momentum, e.g. after particle insertion */
     coupling::MomentumController<LinkedCell,dim> _momentumController;
 
-    std::function<void(Wrapper4ApplyTemperature&)> _applyAccordingToConfiguration;
+    std::function<void(Wrapper&)> _applyAccordingToConfiguration;
 
     /** information for plotting */
     const std::string _microscopicFilename;
