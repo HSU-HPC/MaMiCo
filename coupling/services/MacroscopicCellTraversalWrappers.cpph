@@ -175,14 +175,25 @@ public:
 
 /** calls the MomentumInsertion-mechanisms on each non-ghost macroscopic cell, including the energy controller */
 class Wrapper4DistributeMomentum: public Wrapper {
+private:
+  double buffer;
+  double counter;
 public:
   Wrapper4DistributeMomentum(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr,unsigned int t): Wrapper(thisPtr){}
 
-  void beginCellIteration(){
+  void beginCellIteration(){buffer=0; counter=0;
   }
-  void endCellIteration(){}
+  void endCellIteration(){
+    std::string filename = "meanT_MD.txt";
+    std::ofstream file(filename, std::ios_base::app );
+    if (!file.is_open()){std::cout << "ERROR CouetteTest::meanT(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
+    file << buffer/counter << std::endl;
+    file.close();
+  }
   void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
     const double temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
+    buffer += temperature;
+    counter += 1;
     Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell,index);
     Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell,temperature);
   }
