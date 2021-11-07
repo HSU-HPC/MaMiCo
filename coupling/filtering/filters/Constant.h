@@ -26,7 +26,7 @@ class coupling::Constant : public coupling::FilterInterface<dim> {
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 					const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 					const std::array<bool, 7> filteredValues,
-					const tarch::la::Vector<dim, bool> filteredDims, //TODO streamline std::array vs tarch::la::Vector usage
+					const tarch::la::Vector<dim, bool> filteredDims, 
 					const double constant
 		):
 			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "Constant"),
@@ -38,20 +38,20 @@ class coupling::Constant : public coupling::FilterInterface<dim> {
 			tarch::la::Vector<dim, double> vec_buf;
 			for(auto outputCell : FilterInterface<dim>::_outputCells) {
 				//apply to scalars
-				for(auto scalarSetter : FilterInterface<dim>::_scalarSetters) {
-					(outputCell->*scalarSetter)(_constant);
+				for(auto scalarProperty : FilterInterface<dim>::_scalarAccessFunctionPairs) {
+					(outputCell->*scalarProperty.set)(_constant);
 				}
 
 				//apply to vectors	
-				for(auto vectorSetter : FilterInterface<dim>::_vectorSetters) {
-					//TODO: perhaps check if _dims == {true} before this for performance reasons?
-					vec_buf = { -42.0/*TODO appropriate vectorGetter. fill after getter/setter redesign*/ };
+				for(auto vectorProperty : FilterInterface<dim>::_vectorAccessFunctionPairs) {
+					//TODO: perhaps check if _filteredDims == true,..,true before this for performance reasons?
+					vec_buf = (outputCell->*vectorProperty.get)();
 
 					for(unsigned int d = 0; d<dim; d++) {
 						if(_filteredDims[d]) vec_buf[d] = _constant;
 					}
 
-					(outputCell->*vectorSetter)(vec_buf);
+					(outputCell->*vectorProperty.set)(vec_buf);
 				}
 			}
 		}
