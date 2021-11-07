@@ -48,20 +48,20 @@ void coupling::ReadFromFile<dim>::operator()(){
 		unsigned int incr_offset = 0;
 
 		//Apply scalar setters
-		for(auto sSetter : coupling::FilterInterface<dim>::_scalarSetters){
-			(coupling::FilterInterface<dim>::_outputCells[ic_index]->*sSetter)(doublesFromLine[const_offset + incr_offset]);
+		for(const auto scalarProperty : coupling::FilterInterface<dim>::_scalarAccessFunctionPairs){
+			(coupling::FilterInterface<dim>::_outputCells[ic_index]->*scalarProperty.set)(doublesFromLine[const_offset + incr_offset]);
 			if( ic_index  == 0) std::cout << "		RFF: Scalar sent to cell 0: " << doublesFromLine[const_offset + incr_offset] << std::endl;
 			incr_offset++;
 		}
 		//Apply vector setters
-		for(auto vSetter : coupling::FilterInterface<dim>::_vectorSetters){
+		for(const auto vectorProperty : coupling::FilterInterface<dim>::_vectorAccessFunctionPairs){
 			tarch::la::Vector<dim, double> tempVec;
 			for(unsigned int d = 0; d < dim; d++) {
 				 tempVec[d] = doublesFromLine[const_offset+incr_offset+d]; 
 			}
 			if( ic_index  == 0) std::cout << "		RFF: Vector sent to cell 0: " << tempVec << std::endl;
 
-			(coupling::FilterInterface<dim>::_outputCells[ic_index]->*vSetter)(tempVec);
+			(coupling::FilterInterface<dim>::_outputCells[ic_index]->*vectorProperty.set)(tempVec);
 			incr_offset += dim;
 		}
     }
