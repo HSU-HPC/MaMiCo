@@ -52,7 +52,16 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			double constant = 0.0; //by default, constant filter uses 0 as its constant.
 			tarch::configuration::ParseConfiguration::readDoubleOptional(constant, currFilterNode, "value");
 
-            newfilter = new coupling::Constant<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, constant);
+			tarch::la::Vector<dim, bool> filteredDims = {true}; //default: filter multidimensional properties in all dims
+			int dir = -1;
+			tarch::configuration::ParseConfiguration::readIntOptional(dir, currFilterNode, "dir");
+			if(dir >= 0 && (unsigned int) dir < dim) /*if d is within range...*/ {
+				/*... set all dims but d to false*/
+				filteredDims = {false};
+				filteredDims[dir] = true;
+			}
+
+            newfilter = new coupling::Constant<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, filteredDims, constant);
 		}
 
 		//Gauss
