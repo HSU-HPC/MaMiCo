@@ -73,27 +73,27 @@ void coupling::Gauss<dim>::operator()(){
 		}
 
 		//apply to scalars
-		for(unsigned int si = 0; si < _scalarSetters.size(); si++){
+		for(const auto scalarProperty : _scalarAccessFunctionPairs){
 			(_outputCells[indexLinear]
-				->*(_scalarSetters[si]))
+				->*scalarProperty.set)
 					(
-						(_inputCells[indexBelowLinear]->*(_scalarGetters[si]))() * weights[0]
+						(_inputCells[indexBelowLinear]->*scalarProperty.get)() * weights[0]
 						+
-						(_inputCells[indexLinear]->*(_scalarGetters[si]))() * weights[1]
+						(_inputCells[indexLinear]->*scalarProperty.get)() * weights[1]
 						+
-						(_inputCells[indexAboveLinear]->*(_scalarGetters[si]))() * weights[2]
+						(_inputCells[indexAboveLinear]->*scalarProperty.get)() * weights[2]
 					);
 		}
 		//apply to vectors	
-		for(unsigned int vi = 0; vi < _vectorSetters.size(); vi++){
+		for(const auto vectorProperty : _vectorAccessFunctionPairs){
 			(_outputCells[indexLinear]
-				->*(_vectorSetters[vi]))
+				->*vectorProperty.set)
 					(		
-						(_inputCells[indexBelowLinear]->*(_vectorGetters[vi]))() * weights[0]
+						(_inputCells[indexBelowLinear]->*vectorProperty.get)() * weights[0]
 						+
-						(_inputCells[indexLinear]->*(_vectorGetters[vi]))() * weights[1]
+						(_inputCells[indexLinear]->*vectorProperty.get)() * weights[1]
 						+
-						(_inputCells[indexAboveLinear]->*(_vectorGetters[vi]))() * weights[2]
+						(_inputCells[indexAboveLinear]->*vectorProperty.get)() * weights[2]
 					);
 		}
 	}//index

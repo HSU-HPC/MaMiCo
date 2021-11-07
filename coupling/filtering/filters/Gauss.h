@@ -33,10 +33,8 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 	using coupling::FilterInterface<dim>::_inputCells;
 	using coupling::FilterInterface<dim>::_outputCells;
 	using coupling::FilterInterface<dim>::_cellIndices;
-	using coupling::FilterInterface<dim>::_scalarGetters;
-	using coupling::FilterInterface<dim>::_vectorGetters;
-	using coupling::FilterInterface<dim>::_scalarSetters;
-	using coupling::FilterInterface<dim>::_vectorSetters;
+	using coupling::FilterInterface<dim>::_scalarAccessFunctionPairs;
+	using coupling::FilterInterface<dim>::_vectorAccessFunctionPairs;
 
     public:
         Gauss(  const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
