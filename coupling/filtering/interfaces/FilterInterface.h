@@ -43,33 +43,54 @@ class coupling::FilterInterface{
 				_cellIndices(cellIndices),
 				_type(type)
 		{
-			if(filteredValues[0]){
-				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setMicroscopicMass);
-				_scalarGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getMicroscopicMass);
+			//microscopic mass
+			if(filteredValues[0]) {
+				_scalarAccessFunctionPairs.push_back( {
+					&coupling::datastructures::MacroscopicCell<dim>::getMicroscopicMass,
+					&coupling::datastructures::MacroscopicCell<dim>::setMicroscopicMass
+				} );
 			}
-			if(filteredValues[1]){
-				_vectorSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setMicroscopicMomentum);
-				_vectorGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getMicroscopicMomentum);
+			//microscopic momentum
+			if(filteredValues[1]) {
+				_vectorAccessFunctionPairs.push_back( {
+					&coupling::datastructures::MacroscopicCell<dim>::getMicroscopicMomentum,
+					&coupling::datastructures::MacroscopicCell<dim>::setMicroscopicMomentum
+				} );
 			}
-			if(filteredValues[2]){
-				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setMacroscopicMass);
-				_scalarGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getMacroscopicMass);
+			//macroscopic mass
+			if(filteredValues[2]) {
+				_scalarAccessFunctionPairs.push_back( {
+					&coupling::datastructures::MacroscopicCell<dim>::getMacroscopicMass,
+					&coupling::datastructures::MacroscopicCell<dim>::setMacroscopicMass
+				} );
 			}
-			if(filteredValues[3]){
-				_vectorSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setMacroscopicMomentum);
-				_vectorGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getMacroscopicMomentum);
+			//macroscopic momentum
+			if(filteredValues[3]) {
+				_vectorAccessFunctionPairs.push_back( {
+					&coupling::datastructures::MacroscopicCell<dim>::getMacroscopicMomentum,
+					&coupling::datastructures::MacroscopicCell<dim>::setMacroscopicMomentum
+				} );
 			}
-			if(filteredValues[4]){
-				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setPotentialEnergy);
-				_scalarGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getPotentialEnergy);
+			//potential energy
+			if(filteredValues[4]) {
+				_scalarAccessFunctionPairs.push_back( {
+					&coupling::datastructures::MacroscopicCell<dim>::getPotentialEnergy,
+					&coupling::datastructures::MacroscopicCell<dim>::setPotentialEnergy
+				} );
 			}
-			if(filteredValues[5]){
-				_vectorSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setCurrentVelocity);
-				_vectorGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getCurrentVelocity);
+			//velocity
+			if(filteredValues[5]) {
+				_vectorAccessFunctionPairs.push_back( {
+					&coupling::datastructures::MacroscopicCell<dim>::getCurrentVelocity,
+					&coupling::datastructures::MacroscopicCell<dim>::setCurrentVelocity
+				} );
 			}
-			if(filteredValues[6]){
-				_scalarSetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::setTemperature);
-				_scalarGetters.push_back(&coupling::datastructures::MacroscopicCell<dim>::getTemperature);
+			//temperature
+			if(filteredValues[6]) {
+				_scalarAccessFunctionPairs.push_back( {
+					&coupling::datastructures::MacroscopicCell<dim>::getTemperature,
+					&coupling::datastructures::MacroscopicCell<dim>::setTemperature
+				} );
 			}
 		}
 
@@ -146,6 +167,16 @@ class coupling::FilterInterface{
 		//Size = number of cells in this filter.
 		int getSize() const { return _cellIndices.size(); }
 		
+		//TODO: @felix comment!
+		struct ScalarAccessFunctionPair {
+			const double& (coupling::datastructures::MacroscopicCell<dim>::* get)() const; //getter function pointer
+			void (coupling::datastructures::MacroscopicCell<dim>::* set)(const double&); //setter function pointer
+		};
+		struct VectorAccessFunctionPair {
+			const tarch::la::Vector<dim, double>& (coupling::datastructures::MacroscopicCell<dim>::* get)() const;
+			void (coupling::datastructures::MacroscopicCell<dim>::* set)(const tarch::la::Vector<dim, double>&);
+		};
+
 	protected:
 		void DEBUG_PRINT_CELL_VELOCITY(const char* caller, unsigned int index = 0) {
 			std::cout << "		" << caller << " IN ("<< (_inputCells[index]) <<"): " << _inputCells[index]->getCurrentVelocity() << std::endl;
@@ -162,10 +193,16 @@ class coupling::FilterInterface{
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells;
 		std::vector<tarch::la::Vector<dim,unsigned int>> _cellIndices;
 
-		//scalars
+		//TODO: @felix comment!
+		//scalars getters/setters
+		std::vector<ScalarAccessFunctionPair> _scalarAccessFunctionPairs;
+		
+		//vectors getters/setters
+		std::vector<VectorAccessFunctionPair> _vectorAccessFunctionPairs;
+
+		//TODO: remove deprecated version below
 		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const double&)> _scalarSetters;
 		std::vector<const double& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _scalarGetters;
-		//vectors
 		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const tarch::la::Vector<dim, double>&)> _vectorSetters;
 		std::vector<const tarch::la::Vector<dim, double>& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _vectorGetters;
 
