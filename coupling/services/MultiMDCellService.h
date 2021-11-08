@@ -35,11 +35,12 @@ class coupling::services::MultiMDCellService {
       const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,
       const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
+      const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
       const char* filterPipelineConfiguration, //location of the .xml file containing the static filter pipeline config
       const tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0
-    ): 
+    ):
        _localNumberMDSimulations((unsigned int)mdSolverInterfaces.size()), _totalNumberMDSimulations(totalNumberMDSimulations),
        _macroscopicCellServices(NULL), _topologyOffset(computeTopologyOffset(numberProcesses,rank)), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)),
        _macroscopicSolverInterface(macroscopicSolverInterface),
@@ -82,7 +83,7 @@ class coupling::services::MultiMDCellService {
       for (unsigned int i = _localNumberMDSimulations*_topologyOffset/_intNumberProcesses; i<_localNumberMDSimulations*(_topologyOffset+_intNumberProcesses)/_intNumberProcesses; i++){
         _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>(
                                         i, mdSolverInterfaces[i-_localNumberMDSimulations*_topologyOffset/_intNumberProcesses], macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,
-                                        momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration, parallelTopologyConfiguration,
+                                        momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration, parallelTopologyConfiguration, thermostatConfiguration,
                                         numberMDTimestepsPerCouplingCycle, macroscopicCellConfiguration, filterPipelineConfiguration, multiMDService, _topologyOffset, _tws
                                       );
         if (_macroscopicCellServices[i]==NULL){
@@ -198,7 +199,7 @@ class coupling::services::MultiMDCellService {
       #endif
 
       (*_postMultiInstanceFilterPipeline)();
-      #endif  
+      #endif
 
 
       // store data in macroscopicCellsFromMacroscopicSolver
@@ -224,7 +225,7 @@ class coupling::services::MultiMDCellService {
       for (unsigned int d = 1; d < dim; d++){ np = np*numberProcesses[d]; }
       return np;
     }
-    
+
     const unsigned int _localNumberMDSimulations; /** number of MD simulations run on the current rank. This can differ for different blocks, i.e. different topologyOffset values. */
     const unsigned int _totalNumberMDSimulations; /** total number of MD simulations */
     coupling::services::MacroscopicCellService<dim> **_macroscopicCellServices; /** pointers of MacroscopicCellService type, one for each MD simulation */
@@ -234,7 +235,7 @@ class coupling::services::MultiMDCellService {
 
     //const coupling::IndexConversion<dim> _indexConversion; /* Used for index conversions during filtering TODO after merge with dynamic-md*/
     std::vector<coupling::datastructures::MacroscopicCell<dim>* > _macroscopicCells; /** used to store in MD data in sendFromMDtoMacro */
-    std::vector<unsigned int> _cellIndices; /** used to store in indexing of the above */ 
+    std::vector<unsigned int> _cellIndices; /** used to store in indexing of the above */
 
 
     /*
@@ -248,7 +249,7 @@ class coupling::services::MultiMDCellService {
 
 
     /*
-     * Analogon to MacroscopicCellService's FilterPipeline. 
+     * Analogon to MacroscopicCellService's FilterPipeline.
      * Is applied during this->sendFromMD2Macro.
     */
     coupling::FilterPipeline<dim> *_postMultiInstanceFilterPipeline;

@@ -23,6 +23,9 @@ class Wrapper {
   public:
     Wrapper(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): _thisPtr(thisPtr){}
     virtual ~Wrapper(){}
+    virtual void beginCellIteration()=0;
+    virtual void endCellIteration()=0;
+    virtual void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index)=0;
   protected:
     coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>* _thisPtr;
 };

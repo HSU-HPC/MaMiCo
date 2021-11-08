@@ -25,15 +25,17 @@ void coupling::configurations::MaMiCoConfiguration<dim>::parseSubtag( tinyxml2::
     } else if ( nodename == _boundaryForceConfiguration.getTag() ){
       _boundaryForceConfiguration.parseSubtag(child);
       _isDefinedBoundaryForce = true;
+    } else if ( nodename == _thermostatConfiguration.getTag() ){
+      _thermostatConfiguration.parseSubtag(child);
+      _isDefinedThermostat = true;
     } else {
       std::cout << "Unknown subtag " << nodename << "!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
-  
+
   _isValid = _momentumInsertionConfiguration.isValid() && _particleInsertionConfiguration.isValid()
     && _macroscopicCellConfiguration.isValid() && _transferStrategyConfiguration.isValid()
     && _boundaryForceConfiguration.isValid()
     && _parallelTopologyConfiguration.isValid();
 }
-
