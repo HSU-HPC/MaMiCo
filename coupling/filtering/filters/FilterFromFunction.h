@@ -62,13 +62,13 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 			/*
 			 * SCALAR
 			 */
-			for(unsigned int s = 0; s < coupling::FilterInterface<dim>::_scalarSetters.size(); s++) {
+			for(const auto scalarProperty : coupling::FilterInterface<dim>::_scalarAccessFunctionPairs) {
 
 				/*
 				 * PACK
 				 */
 				for(auto cell : coupling::FilterInterface<dim>::_inputCells) {
-					input_s.push_back((cell->*(coupling::FilterInterface<dim>::_scalarGetters[s]))());
+					input_s.push_back( (cell->*scalarProperty.get)() );
 				}
 
 				//std::cout << "Now applying scalar func at: " << _applyScalar << std::endl;
@@ -88,14 +88,14 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				 * UNPACK
 				 */
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
-					(coupling::FilterInterface<dim>::_outputCells[i]->*(coupling::FilterInterface<dim>::_scalarSetters[s]))(output_s[i]);
+					(coupling::FilterInterface<dim>::_outputCells[i]->*scalarProperty.set)(output_s[i]);
 				}	
 			}
 
 			/*
 			 * VECTOR
 			 */
-			for(unsigned int v = 0; v < coupling::FilterInterface<dim>::_vectorSetters.size(); v++) {
+			for(const auto vectorProperty : coupling::FilterInterface<dim>::_vectorAccessFunctionPairs) {
 
 				//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("FFF BEFORE ");
 
@@ -103,7 +103,7 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				 * PACK
 				 */
 				for(auto cell : coupling::FilterInterface<dim>::_inputCells) {
-					tarch::la::Vector<dim, double> mamico_vec = (cell->*(coupling::FilterInterface<dim>::_vectorGetters[v]))();
+					tarch::la::Vector<dim, double> mamico_vec = (cell->*vectorProperty.get)();
 					std::array<double, dim> array_vec;
 					for(unsigned int d = 0; d < dim; d++) array_vec[d] = mamico_vec[d];
 					input_v.push_back(array_vec);
@@ -127,7 +127,7 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
 					tarch::la::Vector<dim, double> mamico_vec(-1.0);
 					for(unsigned int d = 0; d < dim; d++) mamico_vec[d] = output_v[i][d];
-					(coupling::FilterInterface<dim>::_outputCells[i]->*(coupling::FilterInterface<dim>::_vectorSetters[v]))(mamico_vec);
+					(coupling::FilterInterface<dim>::_outputCells[i]->*vectorProperty.set)(mamico_vec);
 				}
 
 				//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("FFF AFTER ");
