@@ -201,11 +201,12 @@ class coupling::FilterInterface{
 		std::vector<VectorAccessFunctionPair> _vectorAccessFunctionPairs;
 
 		//TODO: remove deprecated version below
+		/*
 		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const double&)> _scalarSetters;
 		std::vector<const double& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _scalarGetters;
 		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const tarch::la::Vector<dim, double>&)> _vectorSetters;
 		std::vector<const tarch::la::Vector<dim, double>& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _vectorGetters;
-
+		*/
 		//unique identifier per filter class
 		const char* _type;
 };
