@@ -514,7 +514,8 @@ py::class_<coupling::configurations::MaMiCoConfiguration<3>>(configuration, "MaM
 	.def("getMomentumInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMomentumInsertionConfiguration, py::return_value_policy::reference)
 	.def("getBoundaryForceConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getBoundaryForceConfiguration, py::return_value_policy::reference)
 	.def("getTransferStrategyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getTransferStrategyConfiguration, py::return_value_policy::reference)
-	.def("getParallelTopologyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParallelTopologyConfiguration, py::return_value_policy::reference);
+	.def("getParallelTopologyConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParallelTopologyConfiguration, py::return_value_policy::reference)
+	.def("getThermostatConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getThermostatConfiguration, py::return_value_policy::reference);
 
 py::class_<coupling::configurations::MacroscopicCellConfiguration<3>>(configuration, "MacroscopicCellConfiguration")
 	.def("getMacroscopicCellSize", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicCellSize)
@@ -539,6 +540,10 @@ py::class_<coupling::configurations::TransferStrategyConfiguration<3>>(configura
 
 py::class_<coupling::configurations::ParallelTopologyConfiguration>(configuration, "ParallelTopologyConfiguration")
 	.def("getParallelTopologyType", &coupling::configurations::ParallelTopologyConfiguration::getParallelTopologyType);
+
+py::class_<coupling::configurations::ThermostatConfiguration>(configuration, "ThermostatConfiguration")
+        .def("getThermostatRegionType", &coupling::configurations::ThermostatConfiguration::getThermostatRegionType)
+        .def("getCells2Use", &coupling::configurations::ThermostatConfiguration::getCells2Use);
 
 configuration.def("parseMolecularDynamicsConfiguration", &makeConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>, py::return_value_policy::take_ownership);
 configuration.def("parseMaMiCoConfiguration", &makeConfiguration<coupling::configurations::MaMiCoConfiguration<3>>, py::return_value_policy::take_ownership);
@@ -661,8 +666,9 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 			        mamicoConfig.getMomentumInsertionConfiguration(), 
 			        mamicoConfig.getBoundaryForceConfiguration(),
 			        mamicoConfig.getTransferStrategyConfiguration(), 
-			        mamicoConfig.getParallelTopologyConfiguration(), 
-			        simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+			        mamicoConfig.getParallelTopologyConfiguration(),
+                                mamicoConfig.getThermostatConfiguration(),
+                                simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
 			        mamicoConfig.getMacroscopicCellConfiguration(), 
 			        filterPipelineConfiguration.c_str(),
 			        multiMDService
