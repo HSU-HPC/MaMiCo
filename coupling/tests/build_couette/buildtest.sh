@@ -53,7 +53,7 @@ else
     FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3"
     # -Werror
     includes="${includes} -I${LIB_EIGEN_PATH}" 
-    compiler="/usr/bin/gcc-10"
+    compiler="g++"
 fi
 ###
 

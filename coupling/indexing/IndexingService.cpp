@@ -315,7 +315,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		BaseIndex<dim> local_lowerBoundary { CellIndex<dim /*global*/>::lowerBoundary }; //used to test which indices are within local bounds
 		while(true) {
 			ranks = getRanksForGlobalIndex(local_lowerBoundary, globalNumberMacroscopicCells);
-			if(std::ranges::find(ranks, _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
+			if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
 				break;
 
 			//sanity check: empty local domain 
@@ -330,7 +330,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		BaseIndex<dim> local_upperBoundary { CellIndex<dim /*global*/>::upperBoundary };
 		while(true) {
 			ranks = getRanksForGlobalIndex(local_upperBoundary, globalNumberMacroscopicCells);
-			if(std::ranges::find(ranks, _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
+			if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
 				break;
 
 			//sanity check: empty local domain 
