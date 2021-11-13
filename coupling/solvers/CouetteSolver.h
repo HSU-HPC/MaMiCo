@@ -18,7 +18,7 @@ namespace coupling {
         virtual void advance(double dt)=0;
         virtual tarch::la::Vector<dim,double> getVelocity(tarch::la::Vector<dim,double> pos) const = 0;
         virtual void setWallVelocity(tarch::la::Vector<dim,double> wallVelocity);
-        virtual void writeError() const = 0;
+        virtual void writeError(tarch::la::Vector<3,double>& lowerLeftCorner, tarch::la::Vector<3,double>& upperRightCorner) const = 0;
     };
 
     template<unsigned int dim>
@@ -64,7 +64,7 @@ class coupling::solvers::CouetteSolver: public coupling::solvers::AbstractCouett
       _wallVelocity = wallVelocity[0];
     }
 
-    void writeError()const override{
+    void writeError(tarch::la::Vector<3,double>& lowerLeftCorner, tarch::la::Vector<3,double>& upperRightCorner)const override{
     }
 
   private:

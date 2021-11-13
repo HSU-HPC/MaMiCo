@@ -484,7 +484,6 @@ private:
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
     allocateRecvBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
-
     if(_cfg.initAdvanceCycles > 0 && _couetteSolver != NULL)
       _couetteSolver->advance(_cfg.initAdvanceCycles * _simpleMDConfig.getSimulationConfiguration().getDt()
         * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
@@ -530,9 +529,9 @@ private:
         gettimeofday(&_tv.end,NULL);
         _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
         //std::cout << "Finish _couetteSolver->advance " << std::endl;
-        if(cycle%1 == 0){
-          _couetteSolver->writeError();
-        }
+        tarch::la::Vector<3,double> lowerLeftCorner(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion().getGlobalMDDomainOffset());
+        tarch::la::Vector<3,double> upperRightCorner(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion().getGlobalMDDomainSize()+lowerLeftCorner);
+        _couetteSolver->writeError(lowerLeftCorner, upperRightCorner);
       }
     }
 
@@ -575,32 +574,42 @@ private:
           double error = 0.0;
           double errorRMS = 0.0;
           double maxError = 0.0;
+          double overlapError = 0.0;
+          double maxOverlapError = 0.0;
           const double pi = 3.141592653589793238;
           int elements = 0;
+          int overlapElements = 0;
           const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
           const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+          const tarch::la::Vector<3,unsigned int> domainSize(indexConversion.getGlobalNumberMacroscopicCells() -tarch::la::Vector<3,unsigned int>(2.0));
           const double cellSize(indexConversion.getMacroscopicCellSize()[2]);
           const unsigned int numCellsRecv = _buf.recvBuffer.size();
           for (unsigned int i = 0; i < numCellsRecv; i++){
             const tarch::la::Vector<3,unsigned int> counter(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
-            if((counter[0]>3) & (counter[1]>3) & (counter[2]>3) & (counter[0]<10) & (counter[1]<10) & (counter[2]<10) ){
-              const double velSim =_buf.recvBuffer[i]->getMacroscopicMass()!=0.0? _buf.recvBuffer[i]->getMacroscopicMomentum()[0]/_buf.recvBuffer[i]->getMacroscopicMass() : 0.0;
-              double velAna = 0.0;
-              const double pos = domainOffset[2]+(counter[2]-1)*cellSize+0.5*cellSize;
-              for (int k = 1; k < 30; k++){
-                velAna += 1.0/k * sin(k*pi*pos/_cfg.channelheight) * exp(-k*k * pi*pi/(_cfg.channelheight*_cfg.channelheight) * _cfg.kinVisc * cycle *_simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
-              }
-              velAna = _cfg.wallVelocity[0]*(1.0-pos/_cfg.channelheight - 2.0/pi * velAna);
-              actualError = std::abs(velAna-velSim);
+            const double velSim =_buf.recvBuffer[i]->getMacroscopicMass()!=0.0? _buf.recvBuffer[i]->getMacroscopicMomentum()[0]/_buf.recvBuffer[i]->getMacroscopicMass() : 0.0;
+            double velAna = 0.0;
+            const double pos = domainOffset[2]+(counter[2]-1)*cellSize+0.5*cellSize;
+            for (int k = 1; k < 30; k++){
+              velAna += 1.0/k * sin(k*pi*pos/_cfg.channelheight) * exp(-k*k * pi*pi/(_cfg.channelheight*_cfg.channelheight) * _cfg.kinVisc * cycle *_simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
+            }
+            velAna = _cfg.wallVelocity[0]*(1.0-pos/_cfg.channelheight - 2.0/pi * velAna);
+            actualError = std::abs(velAna-velSim);
+            if((counter[0]>3) & (counter[1]>3) & (counter[2]>3) & (counter[0]<domainSize[0]) & (counter[1]<domainSize[1]) & (counter[2]<domainSize[2]) ){
               error += actualError;
               errorRMS += actualError*actualError;
               maxError = actualError>maxError? actualError: maxError;
               elements++;
             }
+            else{
+              overlapError += actualError;
+              maxOverlapError = actualError>maxOverlapError? actualError: maxOverlapError;
+              overlapElements++;
+            }
           }
           error /= elements;
+          overlapError /= overlapElements;
           errorRMS = std::sqrt(errorRMS/elements);
-          file << cycle << " " << error << " "<< errorRMS << " " << maxError<< std::endl;
+          file << cycle << " " << error << " "<< errorRMS << " " << maxError<< " "<< overlapError << " " << maxOverlapError <<std::endl;
           file.close();
         }
       }

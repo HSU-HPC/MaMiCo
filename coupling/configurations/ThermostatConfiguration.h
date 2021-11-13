@@ -23,7 +23,7 @@ namespace coupling {
 class coupling::configurations::ThermostatConfiguration:
 public tarch::configuration::Configuration {
   public:
-    enum ThermostatRegion{onlyOutestLayer, outerLayers, all, none};
+    enum ThermostatRegion{onlyOutestLayer, outerLayers, all, nowhere,none};
     ThermostatConfiguration(): _type{none},_isValid(true){}
 
     virtual ~ThermostatConfiguration(){}
@@ -45,6 +45,8 @@ public tarch::configuration::Configuration {
         _cells = cellsTemp-1;
       } else if (value=="all"){
         _type = all;
+      } else if (value=="nowhere"){
+        _type = nowhere;
       } else {
         std::cout << "ERROR coupling::ThermostatConfiguration: Wrong type!" << std::endl;
         _isValid = false;

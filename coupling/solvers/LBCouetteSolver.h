@@ -101,7 +101,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       return _wallVelocity[0]*(1.0-pos/_channelheight - 2.0/pi * u_analytical);
     }
 
-    void writeError()const override{
+    void writeError(tarch::la::Vector<3,double>& lowerLeftCorner, tarch::la::Vector<3,double>& upperRightCorner)const override{
       double error = 0.0;
       double errorRMS = 0.0;
       double maxError = 0.0;

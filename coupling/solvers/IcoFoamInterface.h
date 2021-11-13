@@ -106,24 +106,44 @@ public:
   }
 
   // write the difference between the calculated and the analytical solution to the couetteError_CFD.txt file
-  void writeError()const override{
+  void writeError(tarch::la::Vector<3,double>& lowerLeftCorner, tarch::la::Vector<3,double>& upperRightCorner)const override{
     double error = 0.0;
     double errorRMS = 0.0;
     double maxError = 0.0;
+    double overlapError = 0.0;
+    double overlapMaxError = 0.0;
+    int counter = 0;
+    int overlapCounter = 0;
     const size_t s = static_cast<size_t>(U.mesh().nCells());
     for(size_t i = 0; i< s; i++){
-      const double pos = U.mesh().C()[i][2];
-      const double actualError = std::abs(getAnalyticalCouetteU(pos)-static_cast<double>(U[i][0]));
-      error += actualError;
-      errorRMS += actualError*actualError;
-      maxError = actualError>maxError? actualError: maxError;
+      const Foam::Vector<double> pos = U.mesh().C()[i];
+      const double actualError = std::abs(getAnalyticalCouetteU(pos[2])-static_cast<double>(U[i][0]));
+      if(pos[0]<lowerLeftCorner[0] && pos[1]<lowerLeftCorner[1] && pos[2]<lowerLeftCorner[2]){
+        if(pos[0]>upperRightCorner[0] && pos[1]>upperRightCorner[1] && pos[2]>upperRightCorner[2]){
+          error += actualError;
+          errorRMS += actualError*actualError;
+          maxError = actualError>maxError? actualError: maxError;
+          counter++;
+        }
+        else{
+          overlapError += actualError;
+          overlapMaxError = actualError>overlapMaxError? actualError: overlapMaxError;
+          overlapCounter++;
+        }
+      }
+      else{
+        overlapError += actualError;
+        overlapMaxError = actualError>overlapMaxError? actualError: overlapMaxError;
+        overlapCounter++;
+      }
     }
-    error /= s;
-    errorRMS = std::sqrt(errorRMS/s);
+    error /= counter;
+    errorRMS = std::sqrt(errorRMS/counter);
+    overlapError /= overlapCounter;
     std::string filename = "couetteError_CFD.txt";
     std::ofstream file(filename, std::ios_base::app );
     if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
-    file << _timestepCounter << " " << error << " "<< errorRMS << " " << maxError<< std::endl;
+    file << _timestepCounter << " " << error << " "<< errorRMS << " " << maxError<< " " << overlapError << " " << overlapMaxError << std::endl;
     file.close();
   }
 

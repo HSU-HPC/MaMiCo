@@ -110,7 +110,7 @@ public:
 		return _density[index];
 	}
 
-	void writeError()const override{
+	void writeError(tarch::la::Vector<3,double>& lowerLeftCorner, tarch::la::Vector<3,double>& upperRightCorner)const override{
 	}
 
 	void setMDBoundaryValues(

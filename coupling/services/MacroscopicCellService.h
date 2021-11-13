@@ -259,8 +259,10 @@ public coupling::services::MacroscopicCellService<dim> {
       else if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::outerLayers)
         return [this, &thermostatConfiguration](Wrapper& wrapper){
           _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCells(wrapper, thermostatConfiguration.getCells2Use());};
-      else
+      else if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::onlyOutestLayer)
         return [this](Wrapper& wrapper){_macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);};
+      else
+        return [](Wrapper& wrapper){};
     }
 
     /** needed to determine cell range, ranks etc. */
