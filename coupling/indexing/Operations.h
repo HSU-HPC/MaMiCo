@@ -14,23 +14,22 @@ namespace coupling {
 		 *
 		 * @author Felix Maurer
 		 */
-		template<unsigned int dim, bool is_vector, bool is_local, bool is_md2macro, bool is_noGhost>
-		CellIndex<dim, false, is_local, is_md2macro, is_noGhost>
-		convertToScalar(CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost> index) {
-			if constexpr(is_vector) {
+		template<unsigned int dim, IndexTrait ... traits>
+		unsigned int 
+		convertToScalar(const CellIndex<dim, traits...>& index) {
+			if constexpr( std::is_same_v<unsigned int, typename CellIndex<dim, traits...>::value_T> ) {
+				return index.get();
+			}
+			else {
 				//copied from deprecated coupling::IndexConversion::getCellIndex())
 				
 				unsigned int i { index.get()[dim-1] };
 				for (int d = dim-2; d >-1; d--){
-					i = (CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>::numberCellsInDomain[d])*i + index.get()[d];
+					i = (CellIndex<dim, traits...>::numberCellsInDomain[d])*i + index.get()[d];
 				}
 
-				return CellIndex<dim, false, is_local, is_md2macro, is_noGhost> { i };
+				return i;
 			}
-			else {
-				//trivial case: convert scalar to scalar
-				return index;
-			}	
 		}
 
 		/**
@@ -43,12 +42,12 @@ namespace coupling {
 		 *
 		 * @author Felix Maurer
 		 */
-		template<unsigned int dim, bool is_vector, bool is_local, bool is_md2macro, bool is_noGhost>
-		CellIndex<dim, true, is_local, is_md2macro, is_noGhost>
-		convertToVector(CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost> index) {
-			if constexpr(is_vector) {
+		template<unsigned int dim, IndexTrait ... traits>
+		tarch::la::Vector<dim, unsigned int>
+		convertToVector(const CellIndex<dim, traits...>& index) {
+			if constexpr( std::is_same_v<tarch::la::Vector<dim, unsigned int>, typename CellIndex<dim, traits...>::value_T>) {
 				//trivial case: convert vector to vector
-				return index;
+				return index.get();
 			}
 			else {
 				//copied from coupling::getVectorCellIndex()
@@ -56,12 +55,12 @@ namespace coupling {
 				tarch::la::Vector<dim,unsigned int> i { 0 };
 				unsigned int i_sca { index.get() };
 				for (int d = dim-1; d> 0; d--){
-					i[d] = i_sca / CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>::divisionFactor[d];
-					i_sca -= i[d]*CellIndex<dim, is_vector, is_local, is_md2macro, is_noGhost>::divisionFactor[d];
+					i[d] = i_sca / CellIndex<dim, traits...>::divisionFactor[d];
+					i_sca -= i[d]*CellIndex<dim, traits...>::divisionFactor[d];
 				}
 				i[0] = i_sca;
 
-				return CellIndex<dim, true, is_local, is_md2macro, is_noGhost> { i };
+				return i;
 			}
 		}
 
