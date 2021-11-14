@@ -22,10 +22,9 @@ class coupling::Copy : public coupling::FilterInterfaceReadOnly<dim>{
 		Copy(
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-					const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 					const std::array<bool, 7> filteredValues
 		):
-			coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "COPY")
+			coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, filteredValues, "COPY")
 		{}
 
 		void operator()() {

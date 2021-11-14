@@ -11,14 +11,15 @@
 #include "tarch/configuration/ParseConfiguration.h"
 
 //INCLUDE ALL FILTER HEADERS HERE
-#include "coupling/filtering/filters/WriteToFile.h"
+//TODO: port filter to new Index System
+/*#include "coupling/filtering/filters/WriteToFile.h"
 #include "coupling/filtering/filters/ReadFromFile.h"
 #include "coupling/filtering/filters/Gauss.h"
 //#include "coupling/filtering/filters/POD.h" TODO: fix eigen error
 #include "coupling/filtering/filters/NLM.h"
 #include "coupling/filtering/filters/Strouhal.h"
 #include "coupling/filtering/filters/FilterFromFunction.h"
-#include "coupling/filtering/filters/Copy.h"
+#include "coupling/filtering/filters/Copy.h"*/
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include "coupling/filtering/SequentialFilter.h"
@@ -28,7 +29,6 @@
  * Filter Sequences are used to group filters that will be applied in chronological order.
  * It is possible to customize
  *  - sequence input
- * 	- sequence domain
  * 	- filter parameters
  * 	- modifiablitiy of filter list
  * per Filter Sequence.
@@ -42,6 +42,9 @@ namespace coupling{
     class FilterSequence;
 }
 
+using coupling::indexing::CellIndex;
+using coupling::indexing::IndexTrait;
+
 template<unsigned int dim>
 class coupling::FilterSequence {
 	public:
@@ -53,18 +56,12 @@ class coupling::FilterSequence {
     	FilterSequence( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
 						const tarch::utils::MultiMDService<dim>& multiMDService,
 						const char* name,
-						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector,
-						std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-						tarch::la::Vector<dim, unsigned int> domainStart,
-						tarch::la::Vector<dim, unsigned int> domainEnd,
+						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCells,
+						tarch::la::Vector<dim, unsigned int> domainStart = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary, //TODO: remove
+						tarch::la::Vector<dim, unsigned int> domainEnd = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary,
 						std::array<bool, 7> filteredValues):
-    	_ic(indexConversion), 
 		_multiMDService(multiMDService),
 		_name(name), 
-		_inputCellVector(inputCellVector),
-		_cellIndices(cellIndices), 
-		_domainStart(domainStart),
-		_domainEnd(domainEnd),
 		_filteredValues(filteredValues),
 		_isOutput(false), //potentially updated via loadSequencesFromXML calling setAsOutput()
 		_isModifiable(true), //TODO: allow const sequences via XML attribute
@@ -81,9 +78,23 @@ class coupling::FilterSequence {
 
 			initCellVectors();
 			initDomain();
+			//init domain
+			//TODO: port for cells without index
+			/*
+			{
+				auto isInSequenceDomainPredicate 
+					= [domainStart, domainEnd](coupling::datastructures::IndexedMacroscopicCell<dim> *c) { 
+							return (c->index >= domainStart) and (c->index <= domainEnd); 
+						};
+
+				//do some filtering
+				std::copy_if(_inputCellVector.begin(), _inputCellVector.end(), std::back_inserter(_inputDomainCellVector), isInSequenceDomainPredicate);
+				std::copy_if(_cellVector1.begin(), _cellVector1.end(), std::back_inserter(_domainCellVector1), isInSequenceDomainPredicate);
+				std::copy_if(_cellVector2.begin(), _cellVector2.end(), std::back_inserter(_domainCellVector2), isInSequenceDomainPredicate);
+			}*/
 
 			bool filtersAnything = false;
-			for(unsigned int i = 0; i < 7; i++) if(_filteredValues[i]) filtersAnything = true;
+			for(unsigned int i = 0; i < 7; i++) if(_filteredValues[i]) { filtersAnything = true; break; }
 			if(!filtersAnything) std::cout << "Warning: Filter sequence " << _name << " does not filter any values. Add 'filtered-values' attribute to XML element to change this." << std::endl;
 			#ifdef DEBUG_FILTER_PIPELINE
         	std::cout << PRINT_PREFIX() << "Finished initialization." << std::endl;
@@ -111,7 +122,7 @@ class coupling::FilterSequence {
 		 * Thus, before applying the sequence, we need to update these two copies.
 		 */
 		void updateCellVectors(){
-			for(unsigned int index = 0; index < _cellIndices.size(); index++){
+			for(unsigned int index = 0; index < _cellVector1.size(); index++){
 				*(_cellVector1[index]) = *(_inputCellVector[index]);
 				*(_cellVector2[index]) = *(_inputCellVector[index]);
 			}
@@ -180,16 +191,6 @@ class coupling::FilterSequence {
 		 * In addition to that, if this sequence is declared as unmodifibale, this gets also detected in here
 		 */
 		virtual int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
-
-		/*
-		 * Determines based on _domainStart and _domainEnd which of the md-to-macro domain's cell belong to the sequence's domain.
-		 * This initializes all domain vector member variables (see below).
-		 *
-		 * Used in constructor.
-		 *
-		 * Implemented by FilterJunction to init domain partitions.
-		 */
-		virtual void initDomain();
 
 		/*
 		 * This member function allows appendance and insertion of filters defined by two processing functions to a modifiable sequence at runtime. Index -1 implies appending. 
@@ -275,16 +276,14 @@ class coupling::FilterSequence {
 		void initCellVectors();
 	
 	protected:
-
-		const coupling::IndexConversionMD2Macro<dim>* _ic;
 		const tarch::utils::MultiMDService<dim> _multiMDService;
 
     	const char* _name;
 
+		//TODO: standardize naming in cell vectors -> remove "vector"?
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector2;//allocated for this sequence only
-    	std::vector<tarch::la::Vector<dim, unsigned int>> _cellIndices;//all of the above use the same indexing
 
 		//points to macro cells of this sequence's input that are within domain
         /*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputDomainCellVector;
@@ -292,14 +291,6 @@ class coupling::FilterSequence {
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector1;
 		//same for vector 2
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector2;
-
-		tarch::la::Vector<dim, unsigned int> _domainStart;
-		tarch::la::Vector<dim, unsigned int> _domainEnd;
-
-		//uses _cellIndices indexing (i. e. _domainStart .... _domainEnd))
-    	std::vector<tarch::la::Vector<dim, unsigned int>> _mamicoDomainCellIndices;     	
-		//starts at (0,...,0)
-		std::vector<tarch::la::Vector<dim, unsigned int>> _sequenceDomainCellIndices; 
 		
 		std::array<bool, 7> _filteredValues;
 

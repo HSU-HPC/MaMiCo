@@ -40,25 +40,13 @@ class coupling::FilterPipeline{
 		//TODO: comment! difference: whole domain vs only md2macro incl. indexing
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
-			const coupling::IndexConversion<dim>* indexConversion,
-			coupling::interface::MacroscopicSolverInterface<dim>* msi,
 			const tarch::utils::MultiMDService<dim>& multiMDService,
 			const coupling::Scope scope,
 			const char* cfgpath);
-
-        FilterPipeline(
-			std::vector<coupling::datastructures::MacroscopicCell<dim>* > md2MacroInputCells,
-			std::vector<unsigned int> md2MacroInputCellIndices, //global!
-			const coupling::IndexConversion<dim>* indexConversion,
-			coupling::interface::MacroscopicSolverInterface<dim>* msi,
-			const tarch::utils::MultiMDService<dim>& multiMDService,
-			const coupling::Scope scope,
-			const char* cfgpath);
-
                
         ~FilterPipeline() {
             for(auto sequence : _sequences) delete sequence;
-			delete _ic;
+			//TODO: do i have to delete the _...cells as well?
 
             #ifdef DEBUG_FILTER_PIPELINE
             std::cout << "FP: FilterPipeline deconstructed." << std::endl;
@@ -80,11 +68,6 @@ class coupling::FilterPipeline{
        	coupling::FilterSequence<dim> * getSequence(const char* identifier) const;
        	std::vector<coupling::FilterSequence<dim> *> getAllSequences() const { return _sequences; }
 
-		/*
-		 * Returns the md2macro-IC this instance uses. Used to access MD2Macro-domain properties from outside the FilterPipeline.
-		 */
-		const coupling::IndexConversionMD2Macro<dim>* getICM2M() const { return _ic; }
-
     private:
 		/*
 		 * Detects errors in XML-config file.
@@ -100,13 +83,8 @@ class coupling::FilterPipeline{
        	void loadSequencesFromXML(tinyxml2::XMLElement* metaNode);
 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _md2MacroCells;
-		std::vector<tarch::la::Vector<dim, unsigned int>> _md2MacroCellIndices;		
-
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outerCells;
-		std::vector<tarch::la::Vector<dim, unsigned int>> _outerCellIndices;		
 
-
-		coupling::IndexConversionMD2Macro<dim>* _ic;
 		const tarch::utils::MultiMDService<dim>& _multiMDService;
 
 		tinyxml2::XMLDocument _config;

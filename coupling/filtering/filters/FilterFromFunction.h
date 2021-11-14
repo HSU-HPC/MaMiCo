@@ -26,21 +26,23 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 		FilterFromFunction(
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-					const std::vector<tarch::la::Vector<dim, unsigned int>>& cellIndices,
 					std::array<bool, 7> filteredValues,
 					const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
 					const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector
 					):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "FFF"),
+			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "FFF"),
 			_applyScalar(applyScalar),
 			_applyVector(applyVector)
 		{
 			if(applyScalar == nullptr or applyVector == nullptr) 
 				throw std::runtime_error("ERROR: FilterFromFunction received nullptr as function pointer!");
 
-			//cast tarch::la indexing to std::array
+			//cast MaMiCo indexing to std::array
+			tarch::la::vector<dim, unsigned int> mamicoIndex;
 			std::array<unsigned int, dim> stlIndex;
-			for(auto mamicoIndex : cellIndices) {
+			for(unsigned int i = 0; i < inputCellVector.size(); i++) {
+				//interpret position of cell in inputCellVector as linear local md-to-macro index, then convert it to vector
+				mamicoIndex = coupling::indexing::convertToVector<dim, IndexTrait::local, IndexTrait::md2macro>( {i} );
 				for(unsigned int d = 0; d < dim; d++) stlIndex[d] = mamicoIndex[d];
 				_stlIndices.push_back(stlIndex);
 			}
@@ -52,7 +54,6 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 		}
 
 		void operator()() {	
-			
 			std::vector<double> input_s;
 			std::vector<std::array<double, dim>> input_v;
 
@@ -125,7 +126,7 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				 * UNPACK
 				 */
 				for(unsigned int i = 0; i < coupling::FilterInterface<dim>::_inputCells.size(); i++) {
-					tarch::la::Vector<dim, double> mamico_vec(-1.0);
+					tarch::la::Vector<dim, double> mamico_vec {};
 					for(unsigned int d = 0; d < dim; d++) mamico_vec[d] = output_v[i][d];
 					(coupling::FilterInterface<dim>::_outputCells[i]->*(coupling::FilterInterface<dim>::_vectorSetters[v]))(mamico_vec);
 				}

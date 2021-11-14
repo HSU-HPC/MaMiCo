@@ -81,7 +81,6 @@ private:
     );
 
     coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
-	//TODO: copy fix for segfault here from indexing-c++20 branch
   }
 
   void runOneCouplingCycle(int cycle){
@@ -449,8 +448,8 @@ private:
 					//std::cout << "Entering synthetic MD vector." << std::endl;
 
 					//unlike for the scalar case, we need the MD2Macro version of IC to calculate correct offsets
-					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro =
-						_multiMDCellService->getMacroscopicCellService(0).getFilterPipeline().getICM2M();
+					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro = nullptr;
+ 					//TODO: update this to new indexing system, i.e. eliminate occurences of icm2m
 
 					const unsigned int size = cellIndices.size();
 					const tarch::la::Vector<3,double> md2MacroDomainOffset = indexConversionMD2Macro->getGlobalMD2MacroDomainOffset();
