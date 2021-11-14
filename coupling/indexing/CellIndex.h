@@ -15,12 +15,12 @@ namespace coupling {
 	namespace indexing {
 
 		/**
-		 * Stores type parametrisation of CellIndex specialisation.
+		 * Expresses type parametrisation of CellIndex specialisations.
 		 *
-		 * .vector: True implies representation as vector, false implies scalar index. \n 
-		 * .local: True implies indexing restricted to local MD domain. \n 
-		 * .md2macro: True implies indexing restricted to cells that are sent from MD to macro solver. \n 
-		 * .noGhost: True implies ghost layer cells to not be included in indexing. \n 
+		 * vector: True implies representation as vector, false implies scalar index. \n 
+		 * local: True implies indexing restricted to local MD domain. \n 
+		 * md2macro: True implies indexing restricted to cells that are sent from MD to macro solver. \n 
+		 * noGhost: True implies ghost layer cells to not be included in indexing. \n 
 		 *
 		 * @author Felix Maurer
 		 */
@@ -34,13 +34,39 @@ namespace coupling {
 			constexpr bool is_same(const IndexTrait& t2) { return t1 == t2; }
 
 			/**
-			 * Returns true iff the template pack contains t.
+			 * Checks if a given parameter pack of at least two IndexTrait entries is in the correct order.
+			 * The correct order is the order in which the Traits occur in IndexTrait's declaration, i.e.:
+			 *
+			 * 		*vector < local < md2macro < noGhost*
+			 *
+			 * This order is naturally induced by operator> on the enum class IndexTrait.
+			 *
+			 * @tparam Parameter pack of at least two IndexTraits
+			 * @return true iff the parameter pack is ordered correctly.
 			 */
-			//template<IndexTrait ... Ts>
-			//constexpr bool contains(const IndexTrait t) { return (is_same<t>(Ts) or ...; }
+			template<IndexTrait t1, IndexTrait t2, IndexTrait ... rest>
+			constexpr bool is_ordered() {
+				if constexpr (sizeof...(rest) == 0) {
+					return t1 < t2;
+				}
+				else {
+					return t1 < t2 and is_ordered<t2, rest...>();
+				}
+			}
 		}
 
-		//TODO comment
+		/**
+ 		* Index used to describe spatial location of a MacroscopicCell.
+ 		* Since various different ways of expressing this location are useful for different applications, IndexTraits are used to describe the context of this index.
+ 		*
+ 		* All commonly used (arithmetic) operations on MacroscopicCell indices are provided as well as seamless conversion between any two ways of expressing these indices.
+ 		* (cf. user-defined conversion function below)
+ 		*
+ 		* @tparam dim number of dimensions of the coupled simulation
+ 		* @tparam traits... index type parametrisation (expressed via IndexTraits) used by this specific index
+		*
+		* @author Felix Maurer
+ 		*/
 		template<unsigned int dim, IndexTrait ... traits>
 		class CellIndex;
 
@@ -59,23 +85,30 @@ namespace coupling {
 }
 
 
-/**
- * Index used to describe spatial location of a MacroscopicCell.
- * Since various different ways of expressing this location are useful for different applications, IndexType is used to describe the context of this index.
- *
- * All commonly used (arithmetic) operations on MacroscopicCell indices are provided as well as seamless conversion between any two ways of expressing these indices.
- * (cf. user-defined conversion function below)
- *
- * @tparam dim number of dimensions of the coupled simulation
- * @tparam idx_T index type parametrisation used by this specific index
- *
- *
- *TODO: problem: different ordering in Ts creates different types -> enable_if usage?
- */
 template<unsigned int dim, coupling::indexing::IndexTrait ... traits>
 class coupling::indexing::CellIndex {
 	public:
 
+		/**
+		 * Check at compile time wether traits... is in proper order, i.e.
+		 *
+		 * \forall i<j: traits[i] < traits[j]
+		 *
+		 * where '<' is the standard operator< on enum classes.
+		 * This means: vector < local < md2macro < noGhost
+		 * 
+		 * Note that this causes duplicate IndexTraits in 'traits' to be not accepted.
+		 */
+		static constexpr bool checkIndexTraitOrder() {
+			if constexpr(sizeof...(traits) > 1) {
+				return coupling::indexing::TraitComparisons::is_ordered<traits...>();
+			}
+			else {
+				return true;
+			}
+		}
+		static_assert(checkIndexTraitOrder(), "Invalid order in IndexTrait parameter pack! Correct oder: IndexTrait::vector < IndexTrait::local < IndexTrait::md2macro < IndexTrait::noGhost");
+		
 		/**
 		 * The type of this CellIndex's underlying index representation.
 		 */
@@ -85,7 +118,9 @@ class coupling::indexing::CellIndex {
 			unsigned int
 		>;
 
-		//primitive constructors
+		/**
+		 * primitive constructors
+		 */
 		CellIndex() = default;
 		CellIndex(const value_T& i) : _index(i){}
 		CellIndex(const CellIndex& ci) : _index(ci.get()){}
