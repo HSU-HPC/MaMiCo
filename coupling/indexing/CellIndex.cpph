@@ -4,6 +4,7 @@ using namespace coupling::indexing;
 /*
  * Using:
  * 	coupling::indexing::IndexTrait
+ * 	coupling::indexing::TraitComparisons
  * 	coupling::indexing::CellIndex
  *	coupling::indexing::BaseIndex
  */

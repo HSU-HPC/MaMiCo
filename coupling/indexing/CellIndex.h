@@ -6,21 +6,16 @@
 #include "tarch/la/Vector.h"
 
 
-/**
- * TODO:
- * update comments for cpp17 port
- */
-
 namespace coupling {
 	namespace indexing {
 
 		/**
 		 * Expresses type parametrisation of CellIndex specialisations.
 		 *
-		 * vector: True implies representation as vector, false implies scalar index. \n 
-		 * local: True implies indexing restricted to local MD domain. \n 
-		 * md2macro: True implies indexing restricted to cells that are sent from MD to macro solver. \n 
-		 * noGhost: True implies ghost layer cells to not be included in indexing. \n 
+		 * vector: implies representation as vector, false implies scalar index. \n 
+		 * local: implies indexing restricted to local MD domain. \n 
+		 * md2macro: implies indexing restricted to cells that are sent from MD to macro solver. \n 
+		 * noGhost: implies ghost layer cells to not be included in indexing. \n 
 		 *
 		 * @author Felix Maurer
 		 */
@@ -35,7 +30,7 @@ namespace coupling {
 
 			/**
 			 * Checks if a given parameter pack of at least two IndexTrait entries is in the correct order.
-			 * The correct order is the order in which the Traits occur in IndexTrait's declaration, i.e.:
+			 * The correct order is the order in which the Traits occur in IndexTrait's declaration, i.e.:\n
 			 *
 			 * 		*vector < local < md2macro < noGhost*
 			 *
@@ -57,10 +52,10 @@ namespace coupling {
 
 		/**
  		* Index used to describe spatial location of a MacroscopicCell.
- 		* Since various different ways of expressing this location are useful for different applications, IndexTraits are used to describe the context of this index.
+ 		* Since various different ways of expressing this location are useful for different applications, IndexTraits are used to describe the context of this index. \n
  		*
  		* All commonly used (arithmetic) operations on MacroscopicCell indices are provided as well as seamless conversion between any two ways of expressing these indices.
- 		* (cf. user-defined conversion function below)
+ 		* (cf. user-defined conversion function below)\n
  		*
  		* @tparam dim number of dimensions of the coupled simulation
  		* @tparam traits... index type parametrisation (expressed via IndexTraits) used by this specific index
@@ -76,6 +71,7 @@ namespace coupling {
 		template<unsigned int dim>
 		using BaseIndex = CellIndex<dim, IndexTrait::vector>;
 
+		//TODO: refactor as member functions
 		template<unsigned int dim, IndexTrait ... traits>
 		unsigned int convertToScalar(const CellIndex<dim, traits...>&);
 
@@ -119,17 +115,17 @@ class coupling::indexing::CellIndex {
 		>;
 
 		/**
-		 * primitive constructors
+		 * Constructors
 		 */
 		CellIndex() = default;
+		CellIndex(const CellIndex& ci) = default;
 		CellIndex(const value_T& i) : _index(i){}
-		CellIndex(const CellIndex& ci) : _index(ci.get()){}
 		
 		/**
 		 * Conversion function: Convert to CellIndex of same dim but different IndexType.
 		 *
 		 * @tparam convert_to_T IndexType parameter of the CellIndex specialisation to convert to
-		 * @returns CellIndex of different template parametrisation.
+		 * @return CellIndex of different template parametrisation.
 		 */
 		template<coupling::indexing::IndexTrait ... converted_traits>
 		operator CellIndex<dim, converted_traits...>() const;
@@ -138,7 +134,7 @@ class coupling::indexing::CellIndex {
 		 * Access to primive value_T of this index.
 		 * Should be used as sparingly as possible since it can lead to bugs preventable by using CellIndex instances instead of primitives.
 		 *
-		 * @returns unsigned integer/vector representation of this index.
+		 * @return unsigned integer/vector representation of this index.
 		 */
 		value_T get() const { return (value_T) _index; }
 	

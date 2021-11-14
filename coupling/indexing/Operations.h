@@ -10,7 +10,7 @@ namespace coupling {
 		 * @tparam dim number of dimensions of the coupled simulation.
 		 * @tparam idx_T index type parametrisation used by index.
 		 * @param index index that shall be converted
-		 * @returns CellIndex with .vector=false. All other IndexType parameters remain identical.
+		 * @return unsigned int representation of index
 		 *
 		 * @author Felix Maurer
 		 */
@@ -38,7 +38,7 @@ namespace coupling {
 		 * @tparam dim number of dimensions of the coupled simulation.
 		 * @tparam idx_T index type parametrisation used by index.
 		 * @param index index that shall be converted
-		 * @returns CellIndex with .vector=false. All other IndexType parameters remain identical.
+		 * @returns vector representation of index
 		 *
 		 * @author Felix Maurer
 		 */
@@ -50,7 +50,7 @@ namespace coupling {
 				return index.get();
 			}
 			else {
-				//copied from coupling::getVectorCellIndex()
+				//copied from coupling::getVectorCellIndex() 
 
 				tarch::la::Vector<dim,unsigned int> i { 0 };
 				unsigned int i_sca { index.get() };
