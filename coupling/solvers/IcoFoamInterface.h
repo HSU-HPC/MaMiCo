@@ -118,8 +118,8 @@ public:
     for(size_t i = 0; i< s; i++){
       const Foam::Vector<double> pos = U.mesh().C()[i];
       const double actualError = std::abs(getAnalyticalCouetteU(pos[2])-static_cast<double>(U[i][0]));
-      if(pos[0]<lowerLeftCorner[0] && pos[1]<lowerLeftCorner[1] && pos[2]<lowerLeftCorner[2]){
-        if(pos[0]>upperRightCorner[0] && pos[1]>upperRightCorner[1] && pos[2]>upperRightCorner[2]){
+      if(pos[0]>lowerLeftCorner[0] && pos[1]>lowerLeftCorner[1] && pos[2]>lowerLeftCorner[2]){
+        if(pos[0]<upperRightCorner[0] && pos[1]<upperRightCorner[1] && pos[2]<upperRightCorner[2]){
           error += actualError;
           errorRMS += actualError*actualError;
           maxError = actualError>maxError? actualError: maxError;
@@ -137,6 +137,7 @@ public:
         overlapCounter++;
       }
     }
+    std::cout << counter << " " << error << std::endl;
     error /= counter;
     errorRMS = std::sqrt(errorRMS/counter);
     overlapError /= overlapCounter;
