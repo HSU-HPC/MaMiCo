@@ -74,6 +74,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>defines the cell type with cell-averaged quantities only (no linked cells).  
+ <a href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="MacroscopicCell_8h_source.html">MacroscopicCell.h</a>&gt;</code></p>
 
 <p>Inherited by <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells&lt; LinkedCell, dim &gt;</a>.</p>
@@ -82,65 +85,54 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a947976623b3eb216204c459575260426"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a947976623b3eb216204c459575260426">MacroscopicCell</a> ()</td></tr>
 <tr class="separator:a947976623b3eb216204c459575260426"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7144cc90b1bc0d246a93e84c98e50fa0"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a7144cc90b1bc0d246a93e84c98e50fa0">~MacroscopicCell</a> ()</td></tr>
+<tr class="separator:a7144cc90b1bc0d246a93e84c98e50fa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21c27441afef2a44788ee17e84964077"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a21c27441afef2a44788ee17e84964077">setMicroscopicMass</a> (const double &amp;mass)</td></tr>
 <tr class="separator:a21c27441afef2a44788ee17e84964077"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49646e1484ccc5e74a8fb1cd3175ab05"><td class="memItemLeft" align="right" valign="top"><a id="a49646e1484ccc5e74a8fb1cd3175ab05" name="a49646e1484ccc5e74a8fb1cd3175ab05"></a>
-const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getMicroscopicMass</b> () const</td></tr>
+<tr class="memitem:a49646e1484ccc5e74a8fb1cd3175ab05"><td class="memItemLeft" align="right" valign="top">const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a49646e1484ccc5e74a8fb1cd3175ab05">getMicroscopicMass</a> () const</td></tr>
 <tr class="separator:a49646e1484ccc5e74a8fb1cd3175ab05"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad55fb8ed32f2f6951fe90413363e6ce5"><td class="memItemLeft" align="right" valign="top"><a id="ad55fb8ed32f2f6951fe90413363e6ce5" name="ad55fb8ed32f2f6951fe90413363e6ce5"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setMicroscopicMomentum</b> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
+<tr class="memitem:ad55fb8ed32f2f6951fe90413363e6ce5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#ad55fb8ed32f2f6951fe90413363e6ce5">setMicroscopicMomentum</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
 <tr class="separator:ad55fb8ed32f2f6951fe90413363e6ce5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7ba3a0e6376e30ff502169bbdb0bf70"><td class="memItemLeft" align="right" valign="top"><a id="ae7ba3a0e6376e30ff502169bbdb0bf70" name="ae7ba3a0e6376e30ff502169bbdb0bf70"></a>
-const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getMicroscopicMomentum</b> () const</td></tr>
+<tr class="memitem:ae7ba3a0e6376e30ff502169bbdb0bf70"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#ae7ba3a0e6376e30ff502169bbdb0bf70">getMicroscopicMomentum</a> () const</td></tr>
 <tr class="separator:ae7ba3a0e6376e30ff502169bbdb0bf70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1905a47885032be2a06cee9d2a8ae869"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a1905a47885032be2a06cee9d2a8ae869">setMacroscopicMass</a> (const double &amp;mass)</td></tr>
 <tr class="separator:a1905a47885032be2a06cee9d2a8ae869"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a502ca12f44969ecad12fa98c6aa063b9"><td class="memItemLeft" align="right" valign="top"><a id="a502ca12f44969ecad12fa98c6aa063b9" name="a502ca12f44969ecad12fa98c6aa063b9"></a>
-const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getMacroscopicMass</b> () const</td></tr>
+<tr class="memitem:a502ca12f44969ecad12fa98c6aa063b9"><td class="memItemLeft" align="right" valign="top">const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a502ca12f44969ecad12fa98c6aa063b9">getMacroscopicMass</a> () const</td></tr>
 <tr class="separator:a502ca12f44969ecad12fa98c6aa063b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0d134c84e9a6e3d32a13ef0988d17f2"><td class="memItemLeft" align="right" valign="top"><a id="af0d134c84e9a6e3d32a13ef0988d17f2" name="af0d134c84e9a6e3d32a13ef0988d17f2"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setMacroscopicMomentum</b> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
+<tr class="memitem:af0d134c84e9a6e3d32a13ef0988d17f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#af0d134c84e9a6e3d32a13ef0988d17f2">setMacroscopicMomentum</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
 <tr class="separator:af0d134c84e9a6e3d32a13ef0988d17f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa2d06da8e087f790d825719b618dfb7"><td class="memItemLeft" align="right" valign="top"><a id="aaa2d06da8e087f790d825719b618dfb7" name="aaa2d06da8e087f790d825719b618dfb7"></a>
-const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getMacroscopicMomentum</b> () const</td></tr>
+<tr class="memitem:aaa2d06da8e087f790d825719b618dfb7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#aaa2d06da8e087f790d825719b618dfb7">getMacroscopicMomentum</a> () const</td></tr>
 <tr class="separator:aaa2d06da8e087f790d825719b618dfb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a580f6737512ef237c33ff16b3bd02092"><td class="memItemLeft" align="right" valign="top">const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a580f6737512ef237c33ff16b3bd02092">getPotentialEnergy</a> () const</td></tr>
 <tr class="separator:a580f6737512ef237c33ff16b3bd02092"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fbc69ab2de80e99b07ae1c5878bb85c"><td class="memItemLeft" align="right" valign="top"><a id="a0fbc69ab2de80e99b07ae1c5878bb85c" name="a0fbc69ab2de80e99b07ae1c5878bb85c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setPotentialEnergy</b> (const double &amp;potentialEnergy)</td></tr>
+<tr class="memitem:a0fbc69ab2de80e99b07ae1c5878bb85c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a0fbc69ab2de80e99b07ae1c5878bb85c">setPotentialEnergy</a> (const double &amp;potentialEnergy)</td></tr>
 <tr class="separator:a0fbc69ab2de80e99b07ae1c5878bb85c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca66f5587fa6d09921f7185a5d6cb233"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#aca66f5587fa6d09921f7185a5d6cb233">addMicroscopicMass</a> (const double &amp;mass)</td></tr>
 <tr class="separator:aca66f5587fa6d09921f7185a5d6cb233"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b9e06dec4c7713851825df4c338dfff"><td class="memItemLeft" align="right" valign="top"><a id="a4b9e06dec4c7713851825df4c338dfff" name="a4b9e06dec4c7713851825df4c338dfff"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>addMicroscopicMomentum</b> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
+<tr class="memitem:a4b9e06dec4c7713851825df4c338dfff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a4b9e06dec4c7713851825df4c338dfff">addMicroscopicMomentum</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
 <tr class="separator:a4b9e06dec4c7713851825df4c338dfff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2dbee9d4d9f90d5fc474cc95dd1a7f0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a2dbee9d4d9f90d5fc474cc95dd1a7f0a">addMacroscopicMass</a> (const double &amp;mass)</td></tr>
 <tr class="separator:a2dbee9d4d9f90d5fc474cc95dd1a7f0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa52519f2f4000437bc1b08d742fbcf30"><td class="memItemLeft" align="right" valign="top"><a id="aa52519f2f4000437bc1b08d742fbcf30" name="aa52519f2f4000437bc1b08d742fbcf30"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>addMacroscopicMomentum</b> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
+<tr class="memitem:aa52519f2f4000437bc1b08d742fbcf30"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#aa52519f2f4000437bc1b08d742fbcf30">addMacroscopicMomentum</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;momentum)</td></tr>
 <tr class="separator:aa52519f2f4000437bc1b08d742fbcf30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb56ab081f5e32a6fbda5629ec17c818"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#acb56ab081f5e32a6fbda5629ec17c818">setCurrentVelocity</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;velocity)</td></tr>
 <tr class="separator:acb56ab081f5e32a6fbda5629ec17c818"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a082062f461dbbdf2ea7a509ec44b42b3"><td class="memItemLeft" align="right" valign="top"><a id="a082062f461dbbdf2ea7a509ec44b42b3" name="a082062f461dbbdf2ea7a509ec44b42b3"></a>
-const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getCurrentVelocity</b> () const</td></tr>
+<tr class="memitem:a082062f461dbbdf2ea7a509ec44b42b3"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a082062f461dbbdf2ea7a509ec44b42b3">getCurrentVelocity</a> () const</td></tr>
 <tr class="separator:a082062f461dbbdf2ea7a509ec44b42b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ee730501b599fada6fcd7510d4ba497"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a0ee730501b599fada6fcd7510d4ba497">setTemperature</a> (const double &amp;temperature)</td></tr>
 <tr class="separator:a0ee730501b599fada6fcd7510d4ba497"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad012083c6d52126d03fee03d343b5383"><td class="memItemLeft" align="right" valign="top"><a id="ad012083c6d52126d03fee03d343b5383" name="ad012083c6d52126d03fee03d343b5383"></a>
-const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getTemperature</b> () const</td></tr>
+<tr class="memitem:ad012083c6d52126d03fee03d343b5383"><td class="memItemLeft" align="right" valign="top">const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#ad012083c6d52126d03fee03d343b5383">getTemperature</a> () const</td></tr>
 <tr class="separator:ad012083c6d52126d03fee03d343b5383"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a039f028bddaa944b4e655afa8a08fbe6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a039f028bddaa944b4e655afa8a08fbe6">_microscopicMass</a></td></tr>
 <tr class="separator:a039f028bddaa944b4e655afa8a08fbe6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f8bce075c616a71ef2b37fb652abb2a"><td class="memItemLeft" align="right" valign="top"><a id="a5f8bce075c616a71ef2b37fb652abb2a" name="a5f8bce075c616a71ef2b37fb652abb2a"></a>
-<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_microscopicMomentum</b></td></tr>
+<tr class="memitem:a5f8bce075c616a71ef2b37fb652abb2a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a5f8bce075c616a71ef2b37fb652abb2a">_microscopicMomentum</a></td></tr>
 <tr class="separator:a5f8bce075c616a71ef2b37fb652abb2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe520a132bc231dc7d5cba6091573a24"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#abe520a132bc231dc7d5cba6091573a24">_macroscopicMass</a></td></tr>
 <tr class="separator:abe520a132bc231dc7d5cba6091573a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7fadec09e4cd131cdcc61301df746bff"><td class="memItemLeft" align="right" valign="top"><a id="a7fadec09e4cd131cdcc61301df746bff" name="a7fadec09e4cd131cdcc61301df746bff"></a>
-<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_macroscopicMomentum</b></td></tr>
+<tr class="memitem:a7fadec09e4cd131cdcc61301df746bff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#a7fadec09e4cd131cdcc61301df746bff">_macroscopicMomentum</a></td></tr>
 <tr class="separator:a7fadec09e4cd131cdcc61301df746bff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae88f0bd6a68e390a68090e5ebef82f03"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html#ae88f0bd6a68e390a68090e5ebef82f03">_potentialEnergy</a></td></tr>
 <tr class="separator:ae88f0bd6a68e390a68090e5ebef82f03"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,7 +143,14 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
-class coupling::datastructures::MacroscopicCell&lt; dim &gt;</div><p >cell type with cell-averaged quantities only (no linked cells). </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+class coupling::datastructures::MacroscopicCell&lt; dim &gt;</div><p >defines the cell type with cell-averaged quantities only (no linked cells). </p>
+<p >describes a quadratic/ cubic macroscopic cell filled with fluid (no linked cells). Base class for the class <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html" title="defines the cell type with cell-averaged quantities. Derived from the class coupling::datastructures:...">coupling::datastructures::MacroscopicCellWithLinkedCells</a> </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a947976623b3eb216204c459575260426" name="a947976623b3eb216204c459575260426"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a947976623b3eb216204c459575260426">&#9670;&nbsp;</a></span>MacroscopicCell()</h2>
@@ -177,7 +176,35 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >initialises the macroscopic cell based on the assumption of having blockSize linked cells; blockSize represents the number of linked cells in all spatial directions. </p>
+<p >Constructor: initialises the macroscopic cell with zero values. </p>
+
+</div>
+</div>
+<a id="a7144cc90b1bc0d246a93e84c98e50fa0" name="a7144cc90b1bc0d246a93e84c98e50fa0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7144cc90b1bc0d246a93e84c98e50fa0">&#9670;&nbsp;</a></span>~MacroscopicCell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::~<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">MacroscopicCell</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Destructor </p>
 
 </div>
 </div>
@@ -207,7 +234,46 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >adds a certain amount to the macroscopic moments </p>
+<p >adds a certain amount to the macroscopic mass </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mass</td><td>Mass to be added to the macroscopic mass </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa52519f2f4000437bc1b08d742fbcf30" name="aa52519f2f4000437bc1b08d742fbcf30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa52519f2f4000437bc1b08d742fbcf30">&#9670;&nbsp;</a></span>addMacroscopicMomentum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::addMacroscopicMomentum </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>momentum</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >adds a certain amount to the macroscopic moments </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">momentum</td><td>Momentum to be added to the macroscopic moments </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -236,7 +302,186 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >adds a certain amount to the microscopic moments </p>
+<p >adds a certain amount to the microscopic mass </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mass</td><td>Mass to be added to the microscopic mass </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4b9e06dec4c7713851825df4c338dfff" name="a4b9e06dec4c7713851825df4c338dfff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b9e06dec4c7713851825df4c338dfff">&#9670;&nbsp;</a></span>addMicroscopicMomentum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::addMicroscopicMomentum </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>momentum</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >adds a certain amount to the microscopic moments </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">momentum</td><td>Momentum to be added to the microscopic moments </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a082062f461dbbdf2ea7a509ec44b42b3" name="a082062f461dbbdf2ea7a509ec44b42b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a082062f461dbbdf2ea7a509ec44b42b3">&#9670;&nbsp;</a></span>getCurrentVelocity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::getCurrentVelocity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >returns current velocity (sampled right before any distributeX(...) call) </p><dl class="section return"><dt>Returns</dt><dd>_currentVelocity velocity </dd></dl>
+
+</div>
+</div>
+<a id="a502ca12f44969ecad12fa98c6aa063b9" name="a502ca12f44969ecad12fa98c6aa063b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a502ca12f44969ecad12fa98c6aa063b9">&#9670;&nbsp;</a></span>getMacroscopicMass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double &amp; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::getMacroscopicMass </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >returns the microscopic mass </p><dl class="section return"><dt>Returns</dt><dd>_microscopicMass Mass </dd></dl>
+
+</div>
+</div>
+<a id="aaa2d06da8e087f790d825719b618dfb7" name="aaa2d06da8e087f790d825719b618dfb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa2d06da8e087f790d825719b618dfb7">&#9670;&nbsp;</a></span>getMacroscopicMomentum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::getMacroscopicMomentum </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >returns the microscopic moments </p><dl class="section return"><dt>Returns</dt><dd>_microscopicMomentum Momentum </dd></dl>
+
+</div>
+</div>
+<a id="a49646e1484ccc5e74a8fb1cd3175ab05" name="a49646e1484ccc5e74a8fb1cd3175ab05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49646e1484ccc5e74a8fb1cd3175ab05">&#9670;&nbsp;</a></span>getMicroscopicMass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double &amp; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::getMicroscopicMass </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >returns the microscopic mass </p><dl class="section return"><dt>Returns</dt><dd>_microscopicMass Mass </dd></dl>
+
+</div>
+</div>
+<a id="ae7ba3a0e6376e30ff502169bbdb0bf70" name="ae7ba3a0e6376e30ff502169bbdb0bf70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7ba3a0e6376e30ff502169bbdb0bf70">&#9670;&nbsp;</a></span>getMicroscopicMomentum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::getMicroscopicMomentum </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >returns the microscopic moments </p><dl class="section return"><dt>Returns</dt><dd>_microscopicMomentum Momentum </dd></dl>
 
 </div>
 </div>
@@ -264,7 +509,35 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets/ returns the mean potential energy over the macroscopic cell </p>
+<p >returns the mean potential energy over the macroscopic cell </p><dl class="section return"><dt>Returns</dt><dd>_potentialEnergy potential energy </dd></dl>
+
+</div>
+</div>
+<a id="ad012083c6d52126d03fee03d343b5383" name="ad012083c6d52126d03fee03d343b5383"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad012083c6d52126d03fee03d343b5383">&#9670;&nbsp;</a></span>getTemperature()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double &amp; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::getTemperature </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >returns the temperature </p><dl class="section return"><dt>Returns</dt><dd>_temperature temperature </dd></dl>
 
 </div>
 </div>
@@ -293,7 +566,12 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets/ gets current velocity (sampled right before any distributeX(...) call) </p>
+<p >sets current velocity (sampled right before any distributeX(...) call) </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">velocity</td><td>velocity </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -322,7 +600,46 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets/ returns the macroscopic moments </p>
+<p >sets the microscopic mass </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mass</td><td>Mass </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af0d134c84e9a6e3d32a13ef0988d17f2" name="af0d134c84e9a6e3d32a13ef0988d17f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0d134c84e9a6e3d32a13ef0988d17f2">&#9670;&nbsp;</a></span>setMacroscopicMomentum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::setMacroscopicMomentum </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>momentum</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >sets the microscopic moments </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">momentum</td><td>Momentum </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -351,7 +668,80 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets/ returns the microscopic moments </p>
+<p >sets the microscopic mass </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mass</td><td>Mass </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad55fb8ed32f2f6951fe90413363e6ce5" name="ad55fb8ed32f2f6951fe90413363e6ce5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad55fb8ed32f2f6951fe90413363e6ce5">&#9670;&nbsp;</a></span>setMicroscopicMomentum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::setMicroscopicMomentum </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>momentum</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >sets the microscopic moments </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">momentum</td><td>Momentum </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a0fbc69ab2de80e99b07ae1c5878bb85c" name="a0fbc69ab2de80e99b07ae1c5878bb85c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fbc69ab2de80e99b07ae1c5878bb85c">&#9670;&nbsp;</a></span>setPotentialEnergy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::setPotentialEnergy </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>potentialEnergy</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >sets the mean potential energy over the macroscopic cell </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">potentialEnergy</td><td>potential energy </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -380,7 +770,12 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets and return the temperature value </p>
+<p >sets the temperature </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">temperature</td><td>temperature </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -415,7 +810,24 @@ template&lt;unsigned int dim&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >buffers for macroscopic quantities of mass, momentum that need to be returned from the microscopic to the macroscopic simulation </p>
+<p >buffers for macroscopic mass that need to be returned from the microscopic to the macroscopic simulation </p>
+
+</div>
+</div>
+<a id="a7fadec09e4cd131cdcc61301df746bff" name="a7fadec09e4cd131cdcc61301df746bff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fadec09e4cd131cdcc61301df746bff">&#9670;&nbsp;</a></span>_macroscopicMomentum</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;dim,double&gt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::_macroscopicMomentum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >buffers for macroscopic quantities of momentum that need to be returned from the microscopic to the macroscopic simulation </p>
 
 </div>
 </div>
@@ -432,7 +844,24 @@ template&lt;unsigned int dim&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >buffers for macroscopic quantities of mass, momentum that need to be transferred from the macroscopic to the microscopic simulation </p>
+<p >buffers for macroscopic mass that need to be transferred from the macroscopic to the microscopic simulation </p>
+
+</div>
+</div>
+<a id="a5f8bce075c616a71ef2b37fb652abb2a" name="a5f8bce075c616a71ef2b37fb652abb2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f8bce075c616a71ef2b37fb652abb2a">&#9670;&nbsp;</a></span>_microscopicMomentum</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;dim,double&gt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;::_microscopicMomentum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >buffers for macroscopic quantities of momentum that need to be transferred from the macroscopic to the microscopic simulation </p>
 
 </div>
 </div>

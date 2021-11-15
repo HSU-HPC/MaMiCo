@@ -75,13 +75,17 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>provides access to the macroscopic cells.  
+ <a href="classcoupling_1_1datastructures_1_1MacroscopicCells.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="MacroscopicCells_8h_source.html">MacroscopicCells.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a774f802ca6158b12f9b839455568e124"><td class="memItemLeft" align="right" valign="top"><a id="a774f802ca6158b12f9b839455568e124" name="a774f802ca6158b12f9b839455568e124"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MacroscopicCells</b> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; numberLinkedCellsPerMacroscopicCell, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *mdSolverInterface)</td></tr>
+<tr class="memitem:a774f802ca6158b12f9b839455568e124"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html#a774f802ca6158b12f9b839455568e124">MacroscopicCells</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; numberLinkedCellsPerMacroscopicCell, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *mdSolverInterface)</td></tr>
 <tr class="separator:a774f802ca6158b12f9b839455568e124"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a733c822351f3204ada59c2040be1871d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html#a733c822351f3204ada59c2040be1871d">~MacroscopicCells</a> ()</td></tr>
+<tr class="separator:a733c822351f3204ada59c2040be1871d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78f99ec40bee9df4cb5db90ab06c24fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html">coupling::datastructures::MacroscopicCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html#a78f99ec40bee9df4cb5db90ab06c24fd">getMacroscopicCellsWithLinkedCells</a> ()</td></tr>
 <tr class="separator:a78f99ec40bee9df4cb5db90ab06c24fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad12b0fbbfe5e723e24ca910c5f8a79cf"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html#ad12b0fbbfe5e723e24ca910c5f8a79cf">getMacroscopicCells</a> () const</td></tr>
@@ -98,10 +102,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a50f45f9b3029b22c75ee38b220ba4854"><td class="memTemplParams" colspan="2">template&lt;class A &gt; </td></tr>
 <tr class="memitem:a50f45f9b3029b22c75ee38b220ba4854"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html#a50f45f9b3029b22c75ee38b220ba4854">applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells</a> (A &amp;a)</td></tr>
 <tr class="separator:a50f45f9b3029b22c75ee38b220ba4854"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66266c363c9da4105225872548246c66"><td class="memTemplParams" colspan="2"><a id="a66266c363c9da4105225872548246c66" name="a66266c363c9da4105225872548246c66"></a>
-template&lt;class A &gt; </td></tr>
-<tr class="memitem:a66266c363c9da4105225872548246c66"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>applyXLayersOfGlobalNonGhostCellsWithLinkedCells</b> (A &amp;a, unsigned int layers2Use)</td></tr>
-<tr class="separator:a66266c363c9da4105225872548246c66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -121,8 +121,81 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::datastructures::MacroscopicCells&lt; LinkedCell, dim &gt;</div><p >provides access to the macroscopic cells. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+class coupling::datastructures::MacroscopicCells&lt; LinkedCell, dim &gt;</div><p >provides access to the macroscopic cells. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">LinkedCell</td><td>linked cells that build up the <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html" title="defines the cell type with cell-averaged quantities. Derived from the class coupling::datastructures:...">MacroscopicCellWithLinkedCells</a> </td></tr>
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a774f802ca6158b12f9b839455568e124" name="a774f802ca6158b12f9b839455568e124"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a774f802ca6158b12f9b839455568e124">&#9670;&nbsp;</a></span>MacroscopicCells()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">coupling::datastructures::MacroscopicCells</a>&lt; LinkedCell, dim &gt;::<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">MacroscopicCells</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td>
+          <td class="paramname"><em>numberLinkedCellsPerMacroscopicCell</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td>
+          <td class="paramname"><em>indexConversion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *&#160;</td>
+          <td class="paramname"><em>mdSolverInterface</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Constructor: initialises the macroscopic cell </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">numberLinkedCellsPerMacroscopicCell</td><td></td></tr>
+    <tr><td class="paramname">indexConversion</td><td></td></tr>
+    <tr><td class="paramname">mdSolverInterface</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a733c822351f3204ada59c2040be1871d" name="a733c822351f3204ada59c2040be1871d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a733c822351f3204ada59c2040be1871d">&#9670;&nbsp;</a></span>~MacroscopicCells()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">coupling::datastructures::MacroscopicCells</a>&lt; LinkedCell, dim &gt;::~<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">MacroscopicCells</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a402b02cbf5ee83d45e93902fa21e7d1e" name="a402b02cbf5ee83d45e93902fa21e7d1e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a402b02cbf5ee83d45e93902fa21e7d1e">&#9670;&nbsp;</a></span>applyToAllLocalMacroscopicCellsWithLinkedCells()</h2>
 
@@ -165,7 +238,18 @@ template&lt;class A &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >apply the function apply(MacroscopicCell&amp;,const unsigned int&amp;) of a generic class A to the first layer of GLOBAL non-ghost cells. If a cell is a local ghost cell (due to parallelization, not due to being located outside MD domain!), it will not be handled by this method. If a cell is a local non-ghost cell and is not located at the boundary of the MD domain, it will not be handled by this method. We use this traversal, e.g., for applying boundary forces to molecules close to the outer boundary. </p>
+<p >apply the function apply(MacroscopicCell&amp;,const unsigned int&amp;) of a generic class A to the first layer of GLOBAL non-ghost cells. If a cell is a local ghost cell (due to parallelization, not due to being located outside MD domain!), it will not be handled by this method. If a cell is a local non-ghost cell and is not located at the boundary of the MD domain, it will not be handled by this method. We use this traversal, e.g., for applying boundary forces to molecules close to the outer boundary. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">A</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -188,7 +272,18 @@ template&lt;class A &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >apply the function apply(MacroscopicCell&amp;,const unsigned int&amp;) of a generic class A to all local ghost macroscopic cells. </p>
+<p >apply the function apply(MacroscopicCell&amp;,const unsigned int&amp;) of a generic class A to all local ghost macroscopic cells. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">A</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -280,7 +375,12 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >initialises the macroscopic cells (without linked cells). This method needs to be used in the constructor AFTER initialising the _macroscopicCellsWithLinkedCells. </p>
+<p >initialises the macroscopic cells (without linked cells). This method needs to be used in the constructor AFTER initialising the _macroscopicCellsWithLinkedCells. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">indexConversion</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -325,7 +425,14 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >initialises the macroscopic cells: creates the buffer for the cells and embeds linked cells into the macroscopic cells. </p>
+<p >initialises the macroscopic cells: creates the buffer for the cells and embeds linked cells into the macroscopic cells. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">numberLinkedCellsPerMacroscopicCell</td><td></td></tr>
+    <tr><td class="paramname">indexConversion</td><td></td></tr>
+    <tr><td class="paramname">mdSolverInterface</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

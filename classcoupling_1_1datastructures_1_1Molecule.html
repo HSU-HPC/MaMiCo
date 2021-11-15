@@ -74,14 +74,16 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>molecule representation for coupling component. Dericed from the class <a class="el" href="classcoupling_1_1interface_1_1Molecule.html" title="interface to access a single molecule in the MD simulation.">coupling::interface::Molecule</a>  
+ <a href="classcoupling_1_1datastructures_1_1Molecule.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="datastructures_2Molecule_8h_source.html">Molecule.h</a>&gt;</code></p>
 
 <p>Inherits <a class="el" href="classcoupling_1_1interface_1_1Molecule.html">coupling::interface::Molecule&lt; dim &gt;</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a63f66107f1e73619052f1903293bd252"><td class="memItemLeft" align="right" valign="top"><a id="a63f66107f1e73619052f1903293bd252" name="a63f66107f1e73619052f1903293bd252"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Molecule</b> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;position, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;velocity, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;force, const double &amp;potentialEnergy)</td></tr>
+<tr class="memitem:a63f66107f1e73619052f1903293bd252"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html#a63f66107f1e73619052f1903293bd252">Molecule</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;position, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;velocity, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;force, const double &amp;potentialEnergy)</td></tr>
 <tr class="separator:a63f66107f1e73619052f1903293bd252"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0683a44c38965bf38eddd2f3227d43ec"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html#a0683a44c38965bf38eddd2f3227d43ec">~Molecule</a> ()</td></tr>
 <tr class="separator:a0683a44c38965bf38eddd2f3227d43ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -104,24 +106,85 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a4dfa16d04a21cff99a07af0326d9b56f"><td class="memItemLeft" align="right" valign="top"><a id="a4dfa16d04a21cff99a07af0326d9b56f" name="a4dfa16d04a21cff99a07af0326d9b56f"></a>
-<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_position</b></td></tr>
+<tr class="memitem:a4dfa16d04a21cff99a07af0326d9b56f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html#a4dfa16d04a21cff99a07af0326d9b56f">_position</a></td></tr>
 <tr class="separator:a4dfa16d04a21cff99a07af0326d9b56f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8449dc23db0f6c03647be1b98aae2d8"><td class="memItemLeft" align="right" valign="top"><a id="ae8449dc23db0f6c03647be1b98aae2d8" name="ae8449dc23db0f6c03647be1b98aae2d8"></a>
-<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_velocity</b></td></tr>
+<tr class="memitem:ae8449dc23db0f6c03647be1b98aae2d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html#ae8449dc23db0f6c03647be1b98aae2d8">_velocity</a></td></tr>
 <tr class="separator:ae8449dc23db0f6c03647be1b98aae2d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8fac469d84236c75afc291097233c52"><td class="memItemLeft" align="right" valign="top"><a id="ae8fac469d84236c75afc291097233c52" name="ae8fac469d84236c75afc291097233c52"></a>
-<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_force</b></td></tr>
+<tr class="memitem:ae8fac469d84236c75afc291097233c52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html#ae8fac469d84236c75afc291097233c52">_force</a></td></tr>
 <tr class="separator:ae8fac469d84236c75afc291097233c52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abcfeba5a9416c8e6c51ef836b6cdfc96"><td class="memItemLeft" align="right" valign="top"><a id="abcfeba5a9416c8e6c51ef836b6cdfc96" name="abcfeba5a9416c8e6c51ef836b6cdfc96"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_potentialEnergy</b></td></tr>
+<tr class="memitem:abcfeba5a9416c8e6c51ef836b6cdfc96"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html#abcfeba5a9416c8e6c51ef836b6cdfc96">_potentialEnergy</a></td></tr>
 <tr class="separator:abcfeba5a9416c8e6c51ef836b6cdfc96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
-class coupling::datastructures::Molecule&lt; dim &gt;</div><p >molecule representation for coupling component.</p>
+class coupling::datastructures::Molecule&lt; dim &gt;</div><p >molecule representation for coupling component. Dericed from the class <a class="el" href="classcoupling_1_1interface_1_1Molecule.html" title="interface to access a single molecule in the MD simulation.">coupling::interface::Molecule</a> </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a63f66107f1e73619052f1903293bd252" name="a63f66107f1e73619052f1903293bd252"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63f66107f1e73619052f1903293bd252">&#9670;&nbsp;</a></span>Molecule()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html">coupling::datastructures::Molecule</a>&lt; dim &gt;::<a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html">Molecule</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>position</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>velocity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>force</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>potentialEnergy</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Constructor: initialises the molecule; </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">position</td><td></td></tr>
+    <tr><td class="paramname">velocity</td><td></td></tr>
+    <tr><td class="paramname">force</td><td></td></tr>
+    <tr><td class="paramname">potentialEnergy</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a0683a44c38965bf38eddd2f3227d43ec" name="a0683a44c38965bf38eddd2f3227d43ec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0683a44c38965bf38eddd2f3227d43ec">&#9670;&nbsp;</a></span>~Molecule()</h2>
 
@@ -177,7 +240,7 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the force acting on this molecule. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html#aecac391956237a6e7b005f091c743367">setForce</a> </dd></dl>
+<p >returns the force of the molecule </p><dl class="section return"><dt>Returns</dt><dd>_force Force </dd></dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1interface_1_1Molecule.html#a66086015a553fa9cfb9abf538d85e03d">coupling::interface::Molecule&lt; dim &gt;</a>.</p>
 
@@ -207,7 +270,7 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns/ sets the position of the molecule </p>
+<p >returns the velocity of the molecule </p><dl class="section return"><dt>Returns</dt><dd>_position Position </dd></dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1interface_1_1Molecule.html#adfd9e5f7db8b02754743b8b728e9e885">coupling::interface::Molecule&lt; dim &gt;</a>.</p>
 
@@ -237,7 +300,7 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns/ sets the potential energy of the molecule </p>
+<p >returns potential energy of the molecule </p><dl class="section return"><dt>Returns</dt><dd>_potentialEnergy Potential energy of the molecule </dd></dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1interface_1_1Molecule.html#a46c8ba158d7b210e1ea58dac0a2c935e">coupling::interface::Molecule&lt; dim &gt;</a>.</p>
 
@@ -267,7 +330,7 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns/ sets the velocity of the molecule </p>
+<p >returns the velocity of the molecule </p><dl class="section return"><dt>Returns</dt><dd>_velocity Velocity </dd></dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1interface_1_1Molecule.html#a4a65b057c8182fce6f4b0ae09b4c8889">coupling::interface::Molecule&lt; dim &gt;</a>.</p>
 
@@ -298,7 +361,13 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets the force acting on this molecule. This function is only called in the USHER scheme so far If you want to set the force of a newly created molecule, you need to implement this function. </p>
+<p >sets the force acting on this molecule. This function is called in the USHER scheme so far only if the force of a newly created molecule should be set </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">force</td><td>Force </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd>Philipp When the force should be set? when not? you need to implement this function. </dd></dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1interface_1_1Molecule.html#a00dfddd8735fc7ef1b2fa094a52a7296">coupling::interface::Molecule&lt; dim &gt;</a>.</p>
 
@@ -329,9 +398,9 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets the position of the molecule </p><dl class="params"><dt>Parameters</dt><dd>
+<p >sets the velocity of the molecule </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">position</td><td></td></tr>
+    <tr><td class="paramname">position</td><td>Position </td></tr>
   </table>
   </dd>
 </dl>
@@ -365,9 +434,9 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets the potential energy of the molecule </p><dl class="params"><dt>Parameters</dt><dd>
+<p >sets potential energy of the molecule </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">potentialEnergy</td><td></td></tr>
+    <tr><td class="paramname">_potentialEnergy</td><td>Potential energy of the molecule </td></tr>
   </table>
   </dd>
 </dl>
@@ -403,12 +472,113 @@ template&lt;unsigned int dim&gt; </div>
 </div><div class="memdoc">
 <p >sets the velocity of the molecule </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">velocity</td><td></td></tr>
+    <tr><td class="paramname">velocity</td><td>Velocity </td></tr>
   </table>
   </dd>
 </dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1interface_1_1Molecule.html#a13ed8c9f341a10d3d6a0cfe2e72427be">coupling::interface::Molecule&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ae8fac469d84236c75afc291097233c52" name="ae8fac469d84236c75afc291097233c52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8fac469d84236c75afc291097233c52">&#9670;&nbsp;</a></span>_force</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;dim,double&gt; <a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html">coupling::datastructures::Molecule</a>&lt; dim &gt;::_force</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Force vector of the molecule </p>
+
+</div>
+</div>
+<a id="a4dfa16d04a21cff99a07af0326d9b56f" name="a4dfa16d04a21cff99a07af0326d9b56f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4dfa16d04a21cff99a07af0326d9b56f">&#9670;&nbsp;</a></span>_position</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;dim,double&gt; <a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html">coupling::datastructures::Molecule</a>&lt; dim &gt;::_position</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Position of the molecule </p>
+
+</div>
+</div>
+<a id="abcfeba5a9416c8e6c51ef836b6cdfc96" name="abcfeba5a9416c8e6c51ef836b6cdfc96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcfeba5a9416c8e6c51ef836b6cdfc96">&#9670;&nbsp;</a></span>_potentialEnergy</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html">coupling::datastructures::Molecule</a>&lt; dim &gt;::_potentialEnergy</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Potential energy of the molecule </p>
+
+</div>
+</div>
+<a id="ae8449dc23db0f6c03647be1b98aae2d8" name="ae8449dc23db0f6c03647be1b98aae2d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8449dc23db0f6c03647be1b98aae2d8">&#9670;&nbsp;</a></span>_velocity</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;dim,double&gt; <a class="el" href="classcoupling_1_1datastructures_1_1Molecule.html">coupling::datastructures::Molecule</a>&lt; dim &gt;::_velocity</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Velocity vector of the molecule </p>
 
 </div>
 </div>
