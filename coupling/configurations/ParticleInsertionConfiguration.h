@@ -19,12 +19,14 @@ namespace coupling {
   }
 }
 
-
-/** configuration for particle insertion algorithm (e.g.: USHER).
+ /** configuration for particle insertion algorithm (e.g.: USHER). Derive from the class tarch::configuration::Configuration
+ *	@brief configuration for particle insertion algorithm (e.g.: USHER).
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 class coupling::configurations::ParticleInsertionConfiguration: public tarch::configuration::Configuration {
   public:
+	/** Constructor, initializes the class  */
     ParticleInsertionConfiguration():
     _insertDeleteMassEveryTimestep(1),
     _rSigmaCoeff(0.0),
@@ -36,29 +38,34 @@ class coupling::configurations::ParticleInsertionConfiguration: public tarch::co
     _tolerance(0.0),
     _offsetFromOuterBoundary(0.0){}
 
-    virtual ~ParticleInsertionConfiguration(){}
+    /** Destructor */
+	virtual ~ParticleInsertionConfiguration(){}
 
-    void parseSubtag( tinyxml2::XMLElement* node );
-
-    /**
-     * Return name of xml tag that is associated to the configuration.
+    /** parseSubtag
+	 * 	@param node
      */
-    std::string getTag() const;
+	void parseSubtag( tinyxml2::XMLElement* node );
 
-    /**
-     * Is config valid?
-     *
-     * This operation usually fails, if
-     *
-     * - parseSubtag() hasn't been called, i.e. configuration has not been
-     *   used, or
-     * - parseSubtag() failed due to a wrong file.
-     *
-     * If a tag ain't optional and parseSubtag() was not called (first case)
+    /** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
+     */string getTag() const;
+
+  
+	 /** checks if the configuration is valid. This operation usually fails, if e.g.
+	 *	1. parseSubtag() hasn't been called, i.e. configuration has not been used, or 
+     *  2. parseSubtag() failed due to a wrong file.
+	 *  3. If a tag ain't optional and parseSubtag() was not called (first case)
+	 * 	@return _isValid
      */
     bool isValid() const;
 
-    template<class LinkedCell, unsigned int dim>
+    /** Returns particle insertion config
+	 * 	@tparam LinkedCell type of the cell
+	 * 	@tparam dim Number of dimensions; it can be 1, 2 or 3
+	 * 	@param mdSolverInterface
+	 * 	@return particle insertion config
+     */
+	template<class LinkedCell, unsigned int dim>
     coupling::ParticleInsertion<LinkedCell,dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface) const {
       if (_particleInsertionType==USHER){
         return new coupling::UsherParticleInsertion<LinkedCell,dim>(
@@ -72,7 +79,14 @@ class coupling::configurations::ParticleInsertionConfiguration: public tarch::co
       return NULL;
     }
 
-    enum ParticleInsertionType{USHER=0,NO_INSERTION=1};
+    /** particle insertion types that are implemented. 
+	 *	@enum ParticleInsertionType
+	 */
+	enum ParticleInsertionType{USHER=0/**< Usher*/,NO_INSERTION=1/**< no particle insertion */};
+	
+	/** Returns the particle insertion type.
+	 * 	@return _particleInsertionType
+     */
     ParticleInsertionType getParticleInsertionType() const { return _particleInsertionType; }
 
   private:
