@@ -24,22 +24,31 @@ namespace coupling {
 }
 
 
-
-/** send-/ receive methodology including buffer implementations. The access to the buffers is prescribed by the DataExchange object.
+/** generic class for send-/ receive methodology including buffer implementations. The access to the buffers is prescribed by the DataExchange object.
+ *	@brief generic class for send-/ receive methodology.
+ *	@tparam MacroscopicCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class MacroscopicCell,unsigned int dim>
 class coupling::sendrecv::SendReceiveBuffer {
   public:
+	/** Constructor */
     SendReceiveBuffer();
+	/** Destructor */
     virtual ~SendReceiveBuffer();
 
   protected:
-    /** deletes the buffers */
+    /** @brief deletes the buffers */
     void deleteBuffers();
 
 
-    /** fills all information that needs to be sent from a macroscopic cell into the send-buffer. */
+    /** @brief fills all information that needs to be sent from a macroscopic cell into the send-buffer.
+	 * 	@param indexConversion 
+	 * 	@param dataExchange
+	 * 	@param cell 
+	 * 	@param globalVectorIndex 
+	 */
     void writeToSendBuffer(
       const coupling::IndexConversion<dim>& indexConversion,
       coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
@@ -48,7 +57,12 @@ class coupling::sendrecv::SendReceiveBuffer {
     );
 
 
-    /** reads the information from the receive-buffer and fills it into a macroscopic cell. */
+    /** reads the information from the receive-buffer and fills it into a macroscopic cell.
+	 * 	@param indexConversion 
+	 * 	@param dataExchange
+	 * 	@param macroscopicCell 
+	 * 	@param globalVectorIndex 
+	 */
     void readFromReceiveBuffer(
       const coupling::IndexConversion<dim> &indexConversion,
       coupling::sendrecv::DataExchange<MacroscopicCell,dim> &dataExchange,
@@ -58,6 +72,9 @@ class coupling::sendrecv::SendReceiveBuffer {
 
 
     /** according to rule by dataExchange, the receive buffers are allocated. This function adds a contribution for the cell at globalVectorIndex.
+	 * 	@param indexConversion 
+	 * 	@param dataExchange
+	 * 	@param globalVectorIndex
      */
     void allocateReceiveBuffers(
       const coupling::IndexConversion<dim> &indexConversion,
@@ -66,22 +83,32 @@ class coupling::sendrecv::SendReceiveBuffer {
     );
 
 
-    /** triggers the MPI-sending on the respective buffers. No sending for information transfer from/ to this rank. */
+    /** triggers the MPI-sending on the respective buffers. No sending for information transfer from/ to this rank.
+	 * 	@param indexConversion 
+	 * 	@param dataExchange
+	 */
     void triggerSending(
       const coupling::IndexConversion<dim>& indexConversion,
       coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
     );
 
-    /** triggers the MPI-receiving on the respective buffers. No receiving of information from/to this rank. */
+    /** triggers the MPI-receiving on the respective buffers. No receiving of information from/to this rank.
+	 * 	@param indexConversion 
+	 * 	@param dataExchange
+	 */
     void triggerReceiving(
       const coupling::IndexConversion<dim>& indexConversion,
       coupling::sendrecv::DataExchange<MacroscopicCell,dim>& dataExchange
     );
 
-    /** wait for all send and receive operations to complete. */
+    /** wait for all send and receive operations to complete.
+	 * 	@param indexConversion 
+	 */
     void waitAllOperations(const coupling::IndexConversion<dim>& indexConversion);
 
-    /** allocates send and receive requests */
+    /** allocates send and receive requests
+	 * 	@param indexConversion 
+	 */
     void allocateRequests(const coupling::IndexConversion<dim>& indexConversion);
 
   private:
@@ -94,7 +121,9 @@ class coupling::sendrecv::SendReceiveBuffer {
     };
 
 
-    /** deletes everything inside a given buffer */
+    /** deletes everything inside a given buffer
+	 * 	@param buffer 
+	 */
     void deleteBuffer(std::map<unsigned int,BufferWithID>& buffer);
 
     /** buffer for storing all received messages from MD. Each map entry is identified by a respective rank. */
