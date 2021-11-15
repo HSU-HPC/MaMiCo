@@ -75,26 +75,27 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>This class sets kinetic energy over several linked cells.  
+ <a href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="SetKineticEnergyMapping_8h_source.html">SetKineticEnergyMapping.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a6c86ab09c34f75684981e484b9465e29"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html#a6c86ab09c34f75684981e484b9465e29">SetKineticEnergyMapping</a> (const double &amp;oldKineticEnergy, const double &amp;newKineticEnergy, const unsigned int &amp;numberParticles, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;meanVelocity, <a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
 <tr class="separator:a6c86ab09c34f75684981e484b9465e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3bc3025152dc228eb4d0fdcff3ed9f11"><td class="memItemLeft" align="right" valign="top"><a id="a3bc3025152dc228eb4d0fdcff3ed9f11" name="a3bc3025152dc228eb4d0fdcff3ed9f11"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>beginCellIteration</b> ()</td></tr>
+<tr class="memitem:a69b884eca1316a2221bcdb1a49a8dd2f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html#a69b884eca1316a2221bcdb1a49a8dd2f">~SetKineticEnergyMapping</a> ()</td></tr>
+<tr class="separator:a69b884eca1316a2221bcdb1a49a8dd2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bc3025152dc228eb4d0fdcff3ed9f11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html#a3bc3025152dc228eb4d0fdcff3ed9f11">beginCellIteration</a> ()</td></tr>
 <tr class="separator:a3bc3025152dc228eb4d0fdcff3ed9f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80db976894d5a76b764e0d5c4c414fe8"><td class="memItemLeft" align="right" valign="top"><a id="a80db976894d5a76b764e0d5c4c414fe8" name="a80db976894d5a76b764e0d5c4c414fe8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>endCellIteration</b> ()</td></tr>
+<tr class="memitem:a80db976894d5a76b764e0d5c4c414fe8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html#a80db976894d5a76b764e0d5c4c414fe8">endCellIteration</a> ()</td></tr>
 <tr class="separator:a80db976894d5a76b764e0d5c4c414fe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7860abb4030c7468bcddf8e96f4c9e4"><td class="memItemLeft" align="right" valign="top"><a id="af7860abb4030c7468bcddf8e96f4c9e4" name="af7860abb4030c7468bcddf8e96f4c9e4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>handleCell</b> (LinkedCell &amp;cell, const unsigned int &amp;cellIndex)</td></tr>
+<tr class="memitem:af7860abb4030c7468bcddf8e96f4c9e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html#af7860abb4030c7468bcddf8e96f4c9e4">handleCell</a> (LinkedCell &amp;cell, const unsigned int &amp;cellIndex)</td></tr>
 <tr class="separator:af7860abb4030c7468bcddf8e96f4c9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:ae81276ba78e89f8ecb2ff24f1f4ac20a"><td class="memItemLeft" align="right" valign="top"><a id="ae81276ba78e89f8ecb2ff24f1f4ac20a" name="ae81276ba78e89f8ecb2ff24f1f4ac20a"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>getCorrectionFactor</b> (const double &amp;oldKineticEnergy, const double &amp;newKineticEnergy, const unsigned int &amp;numberParticles, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;meanVelocity) const</td></tr>
+<tr class="memitem:ae81276ba78e89f8ecb2ff24f1f4ac20a"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html#ae81276ba78e89f8ecb2ff24f1f4ac20a">getCorrectionFactor</a> (const double &amp;oldKineticEnergy, const double &amp;newKineticEnergy, const unsigned int &amp;numberParticles, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;meanVelocity) const</td></tr>
 <tr class="separator:ae81276ba78e89f8ecb2ff24f1f4ac20a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
@@ -111,7 +112,14 @@ const double&#160;</td><td class="memItemRight" valign="bottom"><b>_correctionFa
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::cellmappings::SetKineticEnergyMapping&lt; LinkedCell, dim &gt;</div><p >sets kinetic energy.</p>
+class coupling::cellmappings::SetKineticEnergyMapping&lt; LinkedCell, dim &gt;</div><p >This class sets kinetic energy over several linked cells. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">LinkedCell</td><td>cell type </td></tr>
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a6c86ab09c34f75684981e484b9465e29" name="a6c86ab09c34f75684981e484b9465e29"></a>
@@ -167,7 +175,205 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >obtains the old momentum over the region of interest. Besides, obtains the new momentum that shall be set. </p>
+<p >obtains the old momentum over the region of interest. Besides, obtains the new momentum that shall be set. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">oldKineticEnergy</td><td></td></tr>
+    <tr><td class="paramname">newKineticEnergy</td><td></td></tr>
+    <tr><td class="paramname">numberParticles</td><td></td></tr>
+    <tr><td class="paramname">meanVelocity</td><td></td></tr>
+    <tr><td class="paramname">mdSolverInterface</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a69b884eca1316a2221bcdb1a49a8dd2f" name="a69b884eca1316a2221bcdb1a49a8dd2f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69b884eca1316a2221bcdb1a49a8dd2f">&#9670;&nbsp;</a></span>~SetKineticEnergyMapping()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html">coupling::cellmappings::SetKineticEnergyMapping</a>&lt; LinkedCell, dim &gt;::~<a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html">SetKineticEnergyMapping</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a3bc3025152dc228eb4d0fdcff3ed9f11" name="a3bc3025152dc228eb4d0fdcff3ed9f11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bc3025152dc228eb4d0fdcff3ed9f11">&#9670;&nbsp;</a></span>beginCellIteration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html">coupling::cellmappings::SetKineticEnergyMapping</a>&lt; LinkedCell, dim &gt;::beginCellIteration </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >empty function </p>
+
+</div>
+</div>
+<a id="a80db976894d5a76b764e0d5c4c414fe8" name="a80db976894d5a76b764e0d5c4c414fe8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80db976894d5a76b764e0d5c4c414fe8">&#9670;&nbsp;</a></span>endCellIteration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html">coupling::cellmappings::SetKineticEnergyMapping</a>&lt; LinkedCell, dim &gt;::endCellIteration </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >empty function </p>
+
+</div>
+</div>
+<a id="ae81276ba78e89f8ecb2ff24f1f4ac20a" name="ae81276ba78e89f8ecb2ff24f1f4ac20a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae81276ba78e89f8ecb2ff24f1f4ac20a">&#9670;&nbsp;</a></span>getCorrectionFactor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html">coupling::cellmappings::SetKineticEnergyMapping</a>&lt; LinkedCell, dim &gt;::getCorrectionFactor </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>oldKineticEnergy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>newKineticEnergy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int &amp;&#160;</td>
+          <td class="paramname"><em>numberParticles</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>meanVelocity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >returns the correction factor between the old and new kinetic energy </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">numberParticles</td><td></td></tr>
+    <tr><td class="paramname">momentum</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>correctionFactor </dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>no correction possible if the correction factor would tend to infinity; I just hard-coded 1e-7 for this case </dd></dl>
+
+</div>
+</div>
+<a id="af7860abb4030c7468bcddf8e96f4c9e4" name="af7860abb4030c7468bcddf8e96f4c9e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7860abb4030c7468bcddf8e96f4c9e4">&#9670;&nbsp;</a></span>handleCell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1cellmappings_1_1SetKineticEnergyMapping.html">coupling::cellmappings::SetKineticEnergyMapping</a>&lt; LinkedCell, dim &gt;::handleCell </td>
+          <td>(</td>
+          <td class="paramtype">LinkedCell &amp;&#160;</td>
+          <td class="paramname"><em>cell</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int &amp;&#160;</td>
+          <td class="paramname"><em>cellIndex</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >sets new velocity: still with same mean, but re-scale the deviation for correct thermal energy </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td></td></tr>
+    <tr><td class="paramname">cellIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

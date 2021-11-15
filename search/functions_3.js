@@ -8,12 +8,13 @@ var searchData=
   ['deletemoleculefrommdsimulation_5',['deleteMoleculeFromMDSimulation',['../classcoupling_1_1interface_1_1MDSolverInterface.html#aacc5933bd52f8ccaaf5fea7022e482b4',1,'coupling::interface::MDSolverInterface::deleteMoleculeFromMDSimulation()'],['../classMacroscopicCellsTest_1_1TestMDSolverInterface.html#aa868e13d334dc629a06e20d791681bf7',1,'MacroscopicCellsTest::TestMDSolverInterface::deleteMoleculeFromMDSimulation()']]],
   ['deletenode_6',['DeleteNode',['../classtinyxml2_1_1XMLDocument.html#ac1d6e2c7fcc1a660624ac4f68e96380d',1,'tinyxml2::XMLDocument']]],
   ['deleteparticle_7',['deleteParticle',['../classcoupling_1_1UsherParticleInsertion.html#a62fff91ffad10ad00fc715c815589027',1,'coupling::UsherParticleInsertion']]],
-  ['denoise_8',['denoise',['../classcoupling_1_1NLM.html#a78d1f361566838872d4700b780fed2fc',1,'coupling::NLM']]],
-  ['determineparallelneighbours_9',['determineParallelNeighbours',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a5c55dd2fbfb5b46f0363b62352d0edaa',1,'coupling::solvers::NumericalSolver']]],
-  ['differencetransferstrategy_10',['DifferenceTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DifferenceTransferStrategy.html#a54b0876cf325469210f6fad7f661269f',1,'coupling::transferstrategies::DifferenceTransferStrategy']]],
-  ['directtransferstrategy_11',['DirectTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DirectTransferStrategy.html#acb7a365647a5e2045199c498fecd45ae',1,'coupling::transferstrategies::DirectTransferStrategy']]],
-  ['distributemass_12',['distributeMass',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a015676f2cf3eccc5b91c403546cad0f2',1,'coupling::services::MacroscopicCellServiceImpl']]],
-  ['distributemomentum_13',['distributeMomentum',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a5286140c580ffe1ad9c09d15b7053b7e',1,'coupling::services::MacroscopicCellServiceImpl']]],
-  ['doubleattribute_14',['DoubleAttribute',['../classtinyxml2_1_1XMLElement.html#a8948baa30b3a557d5ad84e7ab6d445fe',1,'tinyxml2::XMLElement']]],
-  ['doublevalue_15',['DoubleValue',['../classtinyxml2_1_1XMLAttribute.html#a4aa73513f54ff0087d3e804f0f54e30f',1,'tinyxml2::XMLAttribute']]]
+  ['deleteparticlemapping_8',['DeleteParticleMapping',['../classcoupling_1_1cellmappings_1_1DeleteParticleMapping.html#ae5308c3c587ca3860d5b503b218f3cb9',1,'coupling::cellmappings::DeleteParticleMapping']]],
+  ['denoise_9',['denoise',['../classcoupling_1_1NLM.html#a78d1f361566838872d4700b780fed2fc',1,'coupling::NLM']]],
+  ['determineparallelneighbours_10',['determineParallelNeighbours',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a5c55dd2fbfb5b46f0363b62352d0edaa',1,'coupling::solvers::NumericalSolver']]],
+  ['differencetransferstrategy_11',['DifferenceTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DifferenceTransferStrategy.html#a54b0876cf325469210f6fad7f661269f',1,'coupling::transferstrategies::DifferenceTransferStrategy']]],
+  ['directtransferstrategy_12',['DirectTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DirectTransferStrategy.html#acb7a365647a5e2045199c498fecd45ae',1,'coupling::transferstrategies::DirectTransferStrategy']]],
+  ['distributemass_13',['distributeMass',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a015676f2cf3eccc5b91c403546cad0f2',1,'coupling::services::MacroscopicCellServiceImpl']]],
+  ['distributemomentum_14',['distributeMomentum',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a5286140c580ffe1ad9c09d15b7053b7e',1,'coupling::services::MacroscopicCellServiceImpl']]],
+  ['doubleattribute_15',['DoubleAttribute',['../classtinyxml2_1_1XMLElement.html#a8948baa30b3a557d5ad84e7ab6d445fe',1,'tinyxml2::XMLElement']]],
+  ['doublevalue_16',['DoubleValue',['../classtinyxml2_1_1XMLAttribute.html#a4aa73513f54ff0087d3e804f0f54e30f',1,'tinyxml2::XMLAttribute']]]
 ];

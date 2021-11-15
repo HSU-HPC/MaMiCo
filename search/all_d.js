@@ -28,7 +28,7 @@ var searchData=
   ['microsolvertype_25',['MicroSolverType',['../classCouetteTest.html#a1be6dbd366d9e95716e29b7b59ebb2a5',1,'CouetteTest']]],
   ['misolvertype_26',['miSolverType',['../structCouetteTest_1_1CouetteConfig.html#aead2f6f9b2faff895c9ec44a43440d42',1,'CouetteTest::CouetteConfig']]],
   ['molecule_27',['Molecule',['../classcoupling_1_1datastructures_1_1Molecule.html',1,'coupling::datastructures::Molecule&lt; dim &gt;'],['../classcoupling_1_1interface_1_1Molecule.html',1,'coupling::interface::Molecule&lt; dim &gt;']]],
-  ['moleculeextractor_28',['MoleculeExtractor',['../classcoupling_1_1cellmappings_1_1MoleculeExtractor.html',1,'coupling::cellmappings']]],
+  ['moleculeextractor_28',['MoleculeExtractor',['../classcoupling_1_1cellmappings_1_1MoleculeExtractor.html',1,'coupling::cellmappings::MoleculeExtractor&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#a842b774d1d8e92f235efcdb564e0ef95',1,'coupling::cellmappings::MoleculeExtractor::MoleculeExtractor()']]],
   ['moleculeiterator_29',['MoleculeIterator',['../classcoupling_1_1interface_1_1MoleculeIterator.html',1,'coupling::interface']]],
   ['momentumcontroller_30',['MomentumController',['../classcoupling_1_1MomentumController.html',1,'coupling::MomentumController&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1MomentumController.html#a20a13847aebdc85c639e61c2820732e8',1,'coupling::MomentumController::MomentumController()']]],
   ['momentuminsertion_31',['MomentumInsertion',['../classcoupling_1_1MomentumInsertion.html',1,'coupling::MomentumInsertion&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1MomentumInsertion.html#af10b00331787d64c1a0fdba158d8abec',1,'coupling::MomentumInsertion::MomentumInsertion()']]],

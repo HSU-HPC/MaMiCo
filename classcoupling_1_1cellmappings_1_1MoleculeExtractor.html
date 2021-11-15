@@ -74,21 +74,22 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>This class extracts molecule information from a given macroscopic cell and stores all molecule positions in a vector.  
+ <a href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="MoleculeExtractor_8h_source.html">MoleculeExtractor.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a842b774d1d8e92f235efcdb564e0ef95"><td class="memItemLeft" align="right" valign="top"><a id="a842b774d1d8e92f235efcdb564e0ef95" name="a842b774d1d8e92f235efcdb564e0ef95"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MoleculeExtractor</b> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
+<tr class="memitem:a842b774d1d8e92f235efcdb564e0ef95"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#a842b774d1d8e92f235efcdb564e0ef95">MoleculeExtractor</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
 <tr class="separator:a842b774d1d8e92f235efcdb564e0ef95"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa87c364b0e911da4d4e5eebd25063819"><td class="memItemLeft" align="right" valign="top"><a id="aa87c364b0e911da4d4e5eebd25063819" name="aa87c364b0e911da4d4e5eebd25063819"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>beginCellIteration</b> ()</td></tr>
+<tr class="memitem:aad3eab4f42a07b5c611645b2909295aa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#aad3eab4f42a07b5c611645b2909295aa">~MoleculeExtractor</a> ()</td></tr>
+<tr class="separator:aad3eab4f42a07b5c611645b2909295aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa87c364b0e911da4d4e5eebd25063819"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#aa87c364b0e911da4d4e5eebd25063819">beginCellIteration</a> ()</td></tr>
 <tr class="separator:aa87c364b0e911da4d4e5eebd25063819"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3790ca2999c12c2c6c42a422775ed9c4"><td class="memItemLeft" align="right" valign="top"><a id="a3790ca2999c12c2c6c42a422775ed9c4" name="a3790ca2999c12c2c6c42a422775ed9c4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>endCellIteration</b> ()</td></tr>
+<tr class="memitem:a3790ca2999c12c2c6c42a422775ed9c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#a3790ca2999c12c2c6c42a422775ed9c4">endCellIteration</a> ()</td></tr>
 <tr class="separator:a3790ca2999c12c2c6c42a422775ed9c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e1150093c8b50c7a3a129589256a1b9"><td class="memItemLeft" align="right" valign="top"><a id="a8e1150093c8b50c7a3a129589256a1b9" name="a8e1150093c8b50c7a3a129589256a1b9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>handleCell</b> (LinkedCell &amp;cell, unsigned int &amp;cellIndex)</td></tr>
+<tr class="memitem:a8e1150093c8b50c7a3a129589256a1b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#a8e1150093c8b50c7a3a129589256a1b9">handleCell</a> (LinkedCell &amp;cell, unsigned int &amp;cellIndex)</td></tr>
 <tr class="separator:a8e1150093c8b50c7a3a129589256a1b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5fa475cc7fb24adde0c16a8b044f506"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#ac5fa475cc7fb24adde0c16a8b044f506">getExtractedMolecules</a> () const</td></tr>
 <tr class="separator:ac5fa475cc7fb24adde0c16a8b044f506"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -104,8 +105,135 @@ std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::cellmappings::MoleculeExtractor&lt; LinkedCell, dim &gt;</div><p >extracts molecule information from a given macroscopic cell and stores all molecule positions in a vector. This class is only meant for testing purposes! If you need individual access to molecules + some functionality, please do so in a separate cell-mapping and call it from the respective transfer strategy instance. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+class coupling::cellmappings::MoleculeExtractor&lt; LinkedCell, dim &gt;</div><p >This class extracts molecule information from a given macroscopic cell and stores all molecule positions in a vector. </p>
+<p >extracts molecule information from a given macroscopic cell and stores all molecule positions in a vector. This class is only meant for testing purposes! If you need individual access to molecules + some functionality, please do so in a separate cell-mapping and call it from the respective transfer strategy instance. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">LinkedCell</td><td>cell type </td></tr>
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a842b774d1d8e92f235efcdb564e0ef95" name="a842b774d1d8e92f235efcdb564e0ef95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a842b774d1d8e92f235efcdb564e0ef95">&#9670;&nbsp;</a></span>MoleculeExtractor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html">coupling::cellmappings::MoleculeExtractor</a>&lt; LinkedCell, dim &gt;::<a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html">MoleculeExtractor</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const&#160;</td>
+          <td class="paramname"><em>mdSolverInterface</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Constructor </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mdSolverInterface</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aad3eab4f42a07b5c611645b2909295aa" name="aad3eab4f42a07b5c611645b2909295aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad3eab4f42a07b5c611645b2909295aa">&#9670;&nbsp;</a></span>~MoleculeExtractor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html">coupling::cellmappings::MoleculeExtractor</a>&lt; LinkedCell, dim &gt;::~<a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html">MoleculeExtractor</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa87c364b0e911da4d4e5eebd25063819" name="aa87c364b0e911da4d4e5eebd25063819"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa87c364b0e911da4d4e5eebd25063819">&#9670;&nbsp;</a></span>beginCellIteration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html">coupling::cellmappings::MoleculeExtractor</a>&lt; LinkedCell, dim &gt;::beginCellIteration </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >clear the vector of the molecule position, to make sure it is empty before the iteration starts. </p>
+
+</div>
+</div>
+<a id="a3790ca2999c12c2c6c42a422775ed9c4" name="a3790ca2999c12c2c6c42a422775ed9c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3790ca2999c12c2c6c42a422775ed9c4">&#9670;&nbsp;</a></span>endCellIteration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html">coupling::cellmappings::MoleculeExtractor</a>&lt; LinkedCell, dim &gt;::endCellIteration </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >empty function </p>
+
+</div>
+</div>
 <a id="ac5fa475cc7fb24adde0c16a8b044f506" name="ac5fa475cc7fb24adde0c16a8b044f506"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac5fa475cc7fb24adde0c16a8b044f506">&#9670;&nbsp;</a></span>getExtractedMolecules()</h2>
 
@@ -130,7 +258,52 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns access to the extracted molecules. </p>
+<p >returns access to the extracted molecules. </p><dl class="section return"><dt>Returns</dt><dd>_molecules </dd></dl>
+
+</div>
+</div>
+<a id="a8e1150093c8b50c7a3a129589256a1b9" name="a8e1150093c8b50c7a3a129589256a1b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e1150093c8b50c7a3a129589256a1b9">&#9670;&nbsp;</a></span>handleCell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1cellmappings_1_1MoleculeExtractor.html">coupling::cellmappings::MoleculeExtractor</a>&lt; LinkedCell, dim &gt;::handleCell </td>
+          <td>(</td>
+          <td class="paramtype">LinkedCell &amp;&#160;</td>
+          <td class="paramname"><em>cell</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int &amp;&#160;</td>
+          <td class="paramname"><em>cellIndex</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >This function stores all molecule positions in a vector </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td></td></tr>
+    <tr><td class="paramname">cellIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
