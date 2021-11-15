@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['calculateforceandenergy_0',['calculateForceAndEnergy',['../classcoupling_1_1interface_1_1MDSolverInterface.html#ab7b7d9f1df3fbcc8810111eaaf4f83f8',1,'coupling::interface::MDSolverInterface::calculateForceAndEnergy()'],['../classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a4fe36e9339c948969eeb16e44c29c023',1,'MacroscopicCellsTest::TestMDSolverInterface::calculateForceAndEnergy()']]],
+  ['calculateforceandenergy_0',['calculateForceAndEnergy',['../classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a4fe36e9339c948969eeb16e44c29c023',1,'MacroscopicCellsTest::TestMDSolverInterface::calculateForceAndEnergy()'],['../classcoupling_1_1interface_1_1MDSolverInterface.html#ab7b7d9f1df3fbcc8810111eaaf4f83f8',1,'coupling::interface::MDSolverInterface::calculateForceAndEnergy()']]],
   ['cdata_1',['CData',['../classtinyxml2_1_1XMLText.html#ac1bb5ea4166c320882d9e0ad16fd385b',1,'tinyxml2::XMLText']]],
   ['channelheight_2',['channelheight',['../structCouetteTest_1_1CouetteConfig.html#afda029592a5f72c9d89f8dd572eb9246',1,'CouetteTest::CouetteConfig']]],
   ['chunk_3',['Chunk',['../uniontinyxml2_1_1MemPoolT_1_1Chunk.html',1,'tinyxml2::MemPoolT']]],
@@ -41,7 +41,7 @@ var searchData=
   ['couetteconfig_38',['CouetteConfig',['../structCouetteTest_1_1CouetteConfig.html',1,'CouetteTest']]],
   ['couettesolver_39',['CouetteSolver',['../classcoupling_1_1solvers_1_1CouetteSolver.html#a95fa9141ac0aeb76eef0d1e2dbafc5c3',1,'coupling::solvers::CouetteSolver::CouetteSolver()'],['../classcoupling_1_1solvers_1_1CouetteSolver.html',1,'coupling::solvers::CouetteSolver&lt; dim &gt;']]],
   ['couettesolverinterface_40',['CouetteSolverInterface',['../classcoupling_1_1solvers_1_1CouetteSolverInterface.html#aced85d303c45922443250b1ab5d50efe',1,'coupling::solvers::CouetteSolverInterface::CouetteSolverInterface()'],['../classcoupling_1_1solvers_1_1CouetteSolverInterface.html',1,'coupling::solvers::CouetteSolverInterface&lt; dim &gt;']]],
-  ['couettetest_41',['CouetteTest',['../classCouetteTest.html#adfd5aff778cbe3f7e324a3bcad644eb9',1,'CouetteTest::CouetteTest()'],['../classCouetteTest.html',1,'CouetteTest']]],
+  ['couettetest_41',['CouetteTest',['../classCouetteTest.html',1,'CouetteTest'],['../classCouetteTest.html#adfd5aff778cbe3f7e324a3bcad644eb9',1,'CouetteTest::CouetteTest()']]],
   ['coupledmoleculardynamicssimulation_42',['CoupledMolecularDynamicsSimulation',['../classcoupling_1_1solvers_1_1CoupledMolecularDynamicsSimulation.html#a574d7625fb513ac31881debdbd99577b',1,'coupling::solvers::CoupledMolecularDynamicsSimulation::CoupledMolecularDynamicsSimulation()'],['../classcoupling_1_1solvers_1_1CoupledMolecularDynamicsSimulation.html',1,'coupling::solvers::CoupledMolecularDynamicsSimulation']]],
   ['coupling_43',['coupling',['../namespacecoupling.html',1,'']]],
   ['couplingbuffer_44',['CouplingBuffer',['../structCouetteTest_1_1CouplingBuffer.html',1,'CouetteTest']]],
@@ -50,6 +50,7 @@ var searchData=
   ['cstr_47',['CStr',['../classtinyxml2_1_1XMLPrinter.html#abfa772366c44a17cdeb8aea294d57f78',1,'tinyxml2::XMLPrinter']]],
   ['cstrsize_48',['CStrSize',['../classtinyxml2_1_1XMLPrinter.html#a3256cf3523d4898b91abb18b924be04c',1,'tinyxml2::XMLPrinter']]],
   ['csveverytimestep_49',['csvEveryTimestep',['../structCouetteTest_1_1CouetteConfig.html#aa755cace760d778f73691cf34b94d3de',1,'CouetteTest::CouetteConfig']]],
-  ['solvers_50',['solvers',['../namespacecoupling_1_1solvers.html',1,'coupling']]],
-  ['transferstrategies_51',['transferstrategies',['../namespacecoupling_1_1transferstrategies.html',1,'coupling']]]
+  ['paralleltopology_50',['paralleltopology',['../namespacecoupling_1_1paralleltopology.html',1,'coupling']]],
+  ['solvers_51',['solvers',['../namespacecoupling_1_1solvers.html',1,'coupling']]],
+  ['transferstrategies_52',['transferstrategies',['../namespacecoupling_1_1transferstrategies.html',1,'coupling']]]
 ];

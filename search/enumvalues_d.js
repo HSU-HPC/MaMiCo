@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['velocity_0',['Velocity',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967aafbe734dd44b038d51b2895d807993fe6',1,'coupling::error::ErrorEstimation']]]
+  ['undefined_0',['UNDEFINED',['../namespacecoupling_1_1paralleltopology.html#ad59b0afbf0aa9de388db04cbd6c1c5d0a56e51bb453ee2704a15c37ec80affb9e',1,'coupling::paralleltopology']]]
 ];

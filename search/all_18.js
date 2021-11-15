@@ -13,5 +13,6 @@ var searchData=
   ['xmlunknown_10',['XMLUnknown',['../classtinyxml2_1_1XMLUnknown.html',1,'tinyxml2']]],
   ['xmlutil_11',['XMLUtil',['../classtinyxml2_1_1XMLUtil.html',1,'tinyxml2']]],
   ['xmlvisitor_12',['XMLVisitor',['../classtinyxml2_1_1XMLVisitor.html',1,'tinyxml2']]],
-  ['xyztopology_13',['XYZTopology',['../classcoupling_1_1paralleltopology_1_1XYZTopology.html',1,'coupling::paralleltopology']]]
+  ['xyz_13',['XYZ',['../namespacecoupling_1_1paralleltopology.html#ad59b0afbf0aa9de388db04cbd6c1c5d0ab3877ae490d4d2300313c9678ade4d75',1,'coupling::paralleltopology']]],
+  ['xyztopology_14',['XYZTopology',['../classcoupling_1_1paralleltopology_1_1XYZTopology.html',1,'coupling::paralleltopology::XYZTopology&lt; dim &gt;'],['../classcoupling_1_1paralleltopology_1_1XYZTopology.html#a95e8b285de99f0f39ab9b65f94077998',1,'coupling::paralleltopology::XYZTopology::XYZTopology()']]]
 ];
