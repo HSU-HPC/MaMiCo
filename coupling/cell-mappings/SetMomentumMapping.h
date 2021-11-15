@@ -16,9 +16,10 @@ namespace coupling {
   }
 }
 
-
-/** sets a certain momentum over several linked cells.
- *
+/** 
+ *	@brief This class sets a certain momentum over several linked cells.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
@@ -27,6 +28,10 @@ class coupling::cellmappings::SetMomentumMapping {
     /** obtains the old momentum over the region of interest. Besides,
      *  obtains the new momentum that shall be set and the number of particles
      *  contained in the macroscopic cell.
+	 *	@param oldMomentum
+	 *	@param newMomentum
+	 *	@param numberParticles
+	 *	@param mdSolverInterface
      */
     SetMomentumMapping(
       const tarch::la::Vector<dim,double>& oldMomentum,
@@ -38,13 +43,22 @@ class coupling::cellmappings::SetMomentumMapping {
        _newVelocity(getVelocity(numberParticles,newMomentum))
     {}
 
-    ~SetMomentumMapping(){}
+    /** Destructor */
+	~SetMomentumMapping(){}
 
-    void beginCellIteration(){}
+    /** empty function
+	 */
+	void beginCellIteration(){}
 
-    void endCellIteration(){}
+    /** empty function
+	 */
+	void endCellIteration(){}
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** applies a certain momentum over several linked cells, by steering the velocity.
+	 *	@param cell
+	 *	@param cellIndex
+	 */
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
       while(it->continueIteration()){
@@ -59,7 +73,12 @@ class coupling::cellmappings::SetMomentumMapping {
     }
 
   private:
-    tarch::la::Vector<dim,double> getVelocity(const unsigned int& numberParticles, const tarch::la::Vector<dim,double> &momentum) const {
+    /** returns mean velocity og the cell
+	 *	@param numberParticles
+	 *	@param momentum
+	 *	@return mean velocity og the cell
+	 */	
+	tarch::la::Vector<dim,double> getVelocity(const unsigned int& numberParticles, const tarch::la::Vector<dim,double> &momentum) const {
       if (numberParticles != 0){
        return (1.0/(numberParticles*_mdSolverInterface->getMoleculeMass()) )*momentum;
       } else {

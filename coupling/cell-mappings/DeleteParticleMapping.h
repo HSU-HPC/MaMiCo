@@ -17,28 +17,43 @@ namespace coupling {
   }
 }
 
-
-/** deletes a certain particle from a macroscopic cell.
- *
+/** 
+ *	@brief This class deletes a certain particle from a macroscopic cell.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::DeleteParticleMapping {
   public:
+	/** Constructor
+	 *	@param particle
+	 *	@param mdSolverInterface
+	 */
     DeleteParticleMapping(const unsigned int& particle,coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
     _mdSolverInterface(mdSolverInterface),
     _particle(particle), _particleCounter(0),
     _deletedMoleculeCopy(tarch::la::Vector<dim,double>(0.0),tarch::la::Vector<dim,double>(0.0),tarch::la::Vector<dim,double>(0.0),0.0){}
 
-    ~DeleteParticleMapping(){}
+    /** Destructor */
+	~DeleteParticleMapping(){}
 
-    void beginCellIteration(){
+    /** sets the particle counter to zero, before the iteration process begins.
+	 */
+	void beginCellIteration(){
       _particleCounter = 0;
     }
 
-    void endCellIteration(){}
+    /** empty function
+	 */
+	void endCellIteration(){}
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** This function saves a copy of particle that has to be deleted, then deletes the molecule from MD simulation. It does nothiung,
+	 *	if the particle is already deleted.
+	 *	@param cell
+	 *	@param cellIndex
+	 */	
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       // return, if we already deleted the respective particle
       if (_particleCounter > _particle){
         return;
@@ -71,7 +86,10 @@ class coupling::cellmappings::DeleteParticleMapping {
       delete it;
     }
 
-    coupling::datastructures::Molecule<dim> getDeletedMolecule() const { return _deletedMoleculeCopy; }
+    /** returns a copy of the deleted molecule.
+	 *	@return _deletedMoleculeCopy
+	 */
+	coupling::datastructures::Molecule<dim> getDeletedMolecule() const { return _deletedMoleculeCopy; }
 
   private:
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;

@@ -18,9 +18,10 @@ namespace coupling {
   }
 }
 
-
-/** sets kinetic energy.
- *
+/** 
+ *	@brief This class sets kinetic energy over several linked cells.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
@@ -28,6 +29,11 @@ class coupling::cellmappings::SetKineticEnergyMapping {
   public:
     /** obtains the old momentum over the region of interest. Besides,
      *  obtains the new momentum that shall be set.
+	 *	@param oldKineticEnergy
+	 *	@param newKineticEnergy
+	 *	@param numberParticles
+	 *	@param meanVelocity
+	 *	@param mdSolverInterface
      */
     SetKineticEnergyMapping(
       const double& oldKineticEnergy,
@@ -41,13 +47,22 @@ class coupling::cellmappings::SetKineticEnergyMapping {
     _correctionFactor(getCorrectionFactor(oldKineticEnergy,newKineticEnergy,numberParticles,meanVelocity))
     {}
 
-    ~SetKineticEnergyMapping(){}
+    /** Destructor */
+	~SetKineticEnergyMapping(){}
 
-    void beginCellIteration(){}
+    /** empty function
+	 */
+	void beginCellIteration(){}
 
-    void endCellIteration(){}
+    /** empty function
+	 */
+	void endCellIteration(){}
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** sets new velocity: still with same mean, but re-scale the deviation for correct thermal energy
+	 *	@param cell
+	 *	@param cellIndex
+	 */
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
       while(it->continueIteration()){
@@ -64,7 +79,13 @@ class coupling::cellmappings::SetKineticEnergyMapping {
     }
 
   private:
-    double getCorrectionFactor(
+    /** returns the correction factor between the old and new kinetic energy
+	 *	@param numberParticles
+	 *	@param momentum
+	 *	@return correctionFactor
+	 *	@remark no correction possible if the correction factor would tend to infinity; I just hard-coded 1e-7 for this case
+	 */	
+	double getCorrectionFactor(
       const double& oldKineticEnergy, const double& newKineticEnergy,
       const unsigned int& numberParticles,
       const tarch::la::Vector<dim,double>& meanVelocity

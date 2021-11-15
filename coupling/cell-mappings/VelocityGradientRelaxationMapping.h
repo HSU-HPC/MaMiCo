@@ -23,20 +23,29 @@ namespace coupling {
 }
 
 
-/** relaxes velocities of molecules towards an interpolated avergaged velocity value.
+/** This class relaxes velocities of molecules towards an interpolated avergaged velocity value.
  *  Only molecules within a three cell-wide boundary strip are considered if they are inside the one cell-wide boundary strip
  *  that is spanned by the outermost non-ghost macroscopic cell midpoints.
  *  Currently, a second-order interpolation of the molecules in the outer boundary strip is used (that is the first layer with three macroscopic cells
  *  needs to be initialised with valid LB velocities).
- *  ONLY SUPPORTS 3D AT THE MOMENT!
- *
+ *	@brief This class relaxes velocities of molecules towards an interpolated avergaged velocity value.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
+ *  @note ONLY SUPPORTS 3D AT THE MOMENT!
+ *	\todo Philipp please take a look on this class
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::VelocityGradientRelaxationMapping {
   public:
     /** obtains relaxation factor and current velocity (the velocity towards which the relaxation shall be done
      *  is later obtained from the microscopicmomentum-buffers).
+	 *	@param velocityRelaxationFactor
+	 *	@param currentVelocity
+	 *	@param currentLocalMacroscopicCellIndex
+	 *	@param mdSolverInterface
+	 *	@param indexConversion
+	 *	@param macroscopicCells
      */
     VelocityGradientRelaxationMapping(
       const double &velocityRelaxationFactor,
@@ -62,13 +71,23 @@ class coupling::cellmappings::VelocityGradientRelaxationMapping {
     {}
 
 
-    virtual ~VelocityGradientRelaxationMapping(){}
+    /** Destructor */
+	virtual ~VelocityGradientRelaxationMapping(){}
 
-    void beginCellIteration(){}
+    /** empty function
+	 */
+	void beginCellIteration(){}
 
-    void endCellIteration(){}
+    /** empty function
+	 */
+	void endCellIteration(){}
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** computes the current velocity directly from macroscopic cell and the new velocity (microscopicMomentum) with second-order interpolation
+	 *	multiplies the difference between the two with the velocity relaxation factor add it to the velocity of the molecule and applies it to the molecule.
+	 *	@param cell
+	 *	@param cellIndex
+	 */	
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       // if this macroscopic cell is not interesting, skip it immediately
       if (_ignoreThisCell){return;}
 
@@ -127,7 +146,10 @@ class coupling::cellmappings::VelocityGradientRelaxationMapping {
     }
 
   protected:
-    // returns true, if the position 'position' is within the respective boundary strip that is spanned by the two outermost macroscopic cell midpoints
+    /** 
+	 *	@param position
+	 *	@returns true, if the position 'position' is within the respective boundary strip that is spanned by the two outermost macroscopic cell midpoints
+	 */
     virtual bool relaxMolecule(const tarch::la::Vector<dim,double> &position) const {
       // check if molecule is in the respective boundary strip
       bool isInsideOuter = true;
@@ -139,8 +161,11 @@ class coupling::cellmappings::VelocityGradientRelaxationMapping {
       return isInsideOuter && isOutsideInner;
     }
 
-    // returns true if all molecules in this macroscopic cell do not require any velocity relaxation (-> used to speed up the code)
-    bool ignoreThisCell(const unsigned int& currentLocalMacroscopicCellIndex) const {
+    /**
+	 *	@param currentLocalMacroscopicCellIndex
+	 *	@returns true if all molecules in this macroscopic cell do not require any velocity relaxation (-> used to speed up the code)
+     */
+	bool ignoreThisCell(const unsigned int& currentLocalMacroscopicCellIndex) const {
       const tarch::la::Vector<dim,unsigned int> globalIndex = _indexConversion.convertLocalToGlobalVectorCellIndex(_indexConversion.getLocalVectorCellIndex(currentLocalMacroscopicCellIndex));
       bool innerCell = true;
       for (unsigned int d = 0; d < dim; d++){
@@ -161,38 +186,56 @@ class coupling::cellmappings::VelocityGradientRelaxationMapping {
     const tarch::la::Vector<dim,double> _domainOffset;
     const tarch::la::Vector<dim,double> _cellSize;
     const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> * const _macroscopicCells;
-    // relaxation factor for velocity relaxation
+    /** relaxation factor for velocity relaxation */
     const double _velocityRelaxationFactor;
-    // current velocity in this macroscopic cell
+    /** current velocity in this macroscopic cell */
     const tarch::la::Vector<dim,double> _currentVelocity;
 
-    // boundary points of the boundary strip under consideration
+    /** boundary points of the boundary strip under consideration */
     const tarch::la::Vector<dim,double> _innerLowerLeft;
     const tarch::la::Vector<dim,double> _innerUpperRight;
     const tarch::la::Vector<dim,double> _outerLowerLeft;
     const tarch::la::Vector<dim,double> _outerUpperRight;
 
-    // index of macroscopic cell under consideration
+    /** index of macroscopic cell under consideration */
     const unsigned int _currentLocalMacroscopicCellIndex;
-    // true, if all molecules in this cell do not require any velocity relaxation
+    /** true, if all molecules in this cell do not require any velocity relaxation */
     bool _ignoreThisCell;
 
   private:
-    tarch::la::Vector<dim,double> getInnerLowerLeftCorner() const {
+    /** 
+	 *	@returns the inner lower left corner of the cell
+     */
+	tarch::la::Vector<dim,double> getInnerLowerLeftCorner() const {
       return _indexConversion.getGlobalMDDomainOffset()+1.5*_indexConversion.getMacroscopicCellSize();
     }
+	/** 
+	 *	@returns the inner upper right corner of the cell
+     */
     tarch::la::Vector<dim,double> getInnerUpperRightCorner() const {
       return _indexConversion.getGlobalMDDomainOffset()+_indexConversion.getGlobalMDDomainSize()-1.5*_indexConversion.getMacroscopicCellSize();
     }
+	/** 
+	 *	@returns the outer lower left corner of the cell
+     */
     tarch::la::Vector<dim,double> getOuterLowerLeftCorner() const {
       return _indexConversion.getGlobalMDDomainOffset()+0.5*_indexConversion.getMacroscopicCellSize();
     }
+	/** 
+	 *	@returns the outer upper right corner of the cell
+     */
     tarch::la::Vector<dim,double> getOuterUpperRightCorner() const {
       return _indexConversion.getGlobalMDDomainOffset()+_indexConversion.getGlobalMDDomainSize()-0.5*_indexConversion.getMacroscopicCellSize();
     }
 
 
-    void createMacroscopicCellIndex4SecondOrderInterpolation(
+    /** creates a macroscopic cell index for the second order interpolation.
+	 *	@param position
+	 *	@param normalisedPosition
+	 *	@param secondCake
+	 *	@param macroscopicCellIndex
+	 */
+	void createMacroscopicCellIndex4SecondOrderInterpolation(
       const tarch::la::Vector<dim,double> &position, tarch::la::Vector<dim,double> &normalisedPosition, bool &secondCake,
       unsigned int *macroscopicCellIndex
     ) const {
@@ -270,7 +313,12 @@ class coupling::cellmappings::VelocityGradientRelaxationMapping {
     }
 
 
-    /** carries out second order interpolation of the velocity value (microscopicmomentum-buffer) at position 'position' */
+    /** carries out second order interpolation of the velocity value (microscopicmomentum-buffer) at position 'position'
+	 *	@param cellIndex
+	 *	@param normalisedPosition
+	 *	@param secondCake
+	 *	@param newVelocity
+	 */
     void interpolateVelocitySecondOrder(
       unsigned int* cellIndex,const tarch::la::Vector<dim,double> &normalisedPosition,const bool &secondCake,
       tarch::la::Vector<dim,double>& newVelocity
@@ -332,10 +380,28 @@ class coupling::cellmappings::VelocityGradientRelaxationMapping {
 };
 
 
-/** same as VelocityGradientRelaxationMapping, but relaxes only those molecules which are located in the top boundary strip. */
+/** This is the same as the class coupling::cellmappings::VelocityGradientRelaxationMapping, but relaxes only those molecules which are located in the top boundary strip. derived from the class coupling::cellmappings::VelocityGradientRelaxationMapping.
+ *	@brief This is the same as the class coupling::cellmappings::VelocityGradientRelaxationMapping, but relaxes only those molecules which are located in the top boundary strip.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
+ *  @author Philipp Neumann
+ *  @note ONLY SUPPORTS 3D AT THE MOMENT!
+ *	\todo Philipp please take a look on this class
+ */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::VelocityGradientRelaxationTopOnlyMapping: public coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell,dim>{
   public:
+	/** obtains relaxation factor and current velocity (the velocity towards which the relaxation shall be done
+     *  is later obtained from the microscopicmomentum-buffers).
+	 *	@param velocityRelaxationFactor
+	 *	@param currentVelocity
+	 *	@param currentLocalMacroscopicCellIndex
+	 *	@param mdSolverInterface
+	 *	@param indexConversion
+	 *	@param macroscopicCells
+	 *	@note  the method ignoreThisCell() of the class coupling::cellmappings::VelocityGradientRelaxationMapping is replaceed. Since this function is called in the constructor of the based class,
+     *	we cannot overwrite it; hence, we solve it by overwriting the respective variable from within this constructor (called after base object is constructed)
+     */
     VelocityGradientRelaxationTopOnlyMapping(
       const double &velocityRelaxationFactor,
       const tarch::la::Vector<dim,double> &currentVelocity,
@@ -356,7 +422,10 @@ class coupling::cellmappings::VelocityGradientRelaxationTopOnlyMapping: public c
 
 
   protected:
-    // returns true, if the position 'position' is within the respective boundary strip that is spanned by the two outermost macroscopic cell midpoints
+    /** returns true, if the position 'position' is within the respective boundary strip that is spanned by the two outermost macroscopic cell midpoints
+	 *	@param position
+	 *  @return true, if the position 'position' is within the respective boundary strip that is spanned by the two outermost macroscopic cell midpoints
+	 */
     virtual bool relaxMolecule(const tarch::la::Vector<dim,double> &position) const {
       // check if molecule is in the respective boundary strip (only upper part is considered)
       return (position[dim-1]>coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell,dim>::_innerUpperRight[dim-1])
