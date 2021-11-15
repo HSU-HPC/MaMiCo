@@ -74,13 +74,17 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>generic class for the the data exchange purposes.  
+ <a href="classcoupling_1_1sendrecv_1_1DataExchange.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="DataExchange_8h_source.html">DataExchange.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a737ef9579997ea1740ce8856784f1a90"><td class="memItemLeft" align="right" valign="top"><a id="a737ef9579997ea1740ce8856784f1a90" name="a737ef9579997ea1740ce8856784f1a90"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>DataExchange</b> (unsigned int tag)</td></tr>
+<tr class="memitem:a737ef9579997ea1740ce8856784f1a90"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html#a737ef9579997ea1740ce8856784f1a90">DataExchange</a> (unsigned int tag)</td></tr>
 <tr class="separator:a737ef9579997ea1740ce8856784f1a90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69d3026741a4c7486d8d304bf7202c93"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html#a69d3026741a4c7486d8d304bf7202c93">~DataExchange</a> ()</td></tr>
+<tr class="separator:a69d3026741a4c7486d8d304bf7202c93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0d1b2c7f702b554d164eceb18a06728"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html#af0d1b2c7f702b554d164eceb18a06728">getTag</a> () const</td></tr>
 <tr class="separator:af0d1b2c7f702b554d164eceb18a06728"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1073b35d674537bcdc40482ad9ff397f"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html#a1073b35d674537bcdc40482ad9ff397f">getTargetRanks</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalCellIndex)=0</td></tr>
@@ -101,8 +105,79 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class MacroscopicCell, unsigned int dim&gt;<br />
-class coupling::sendrecv::DataExchange&lt; MacroscopicCell, dim &gt;</div><p >This class holds information on the data exchange between processes. In contrast to the <a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html">SendReceiveBuffer</a> which solely handles the technical part of sending and receiving, this class needs to guarantee the validity in communication, e.g. make sure that each source rank matches to a target rank etc. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+class coupling::sendrecv::DataExchange&lt; MacroscopicCell, dim &gt;</div><p >generic class for the the data exchange purposes. </p>
+<p >This class holds information on the data exchange between processes. In contrast to the <a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send-/ receive methodology.">SendReceiveBuffer</a> which solely handles the technical part of sending and receiving, this class needs to guarantee the validity in communication, e.g. make sure that each source rank matches to a target rank etc. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">MacroscopicCell</td><td>cell type </td></tr>
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a737ef9579997ea1740ce8856784f1a90" name="a737ef9579997ea1740ce8856784f1a90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a737ef9579997ea1740ce8856784f1a90">&#9670;&nbsp;</a></span>DataExchange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt;::<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">DataExchange</a> </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>tag</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Constructor: assign an tag (_tag) to the <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html" title="generic class for the the data exchange purposes.">DataExchange</a>. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a69d3026741a4c7486d8d304bf7202c93" name="a69d3026741a4c7486d8d304bf7202c93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69d3026741a4c7486d8d304bf7202c93">&#9670;&nbsp;</a></span>~DataExchange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt;::~<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">DataExchange</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad86c5f7b293f25163d38f515cf8e2fdf" name="ad86c5f7b293f25163d38f515cf8e2fdf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad86c5f7b293f25163d38f515cf8e2fdf">&#9670;&nbsp;</a></span>getDoublesPerCell()</h2>
 
@@ -158,7 +233,12 @@ template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns all ranks from which a particular cell (at index globalCellIndex) is sent. This method should globally define the source ranks for each global cell index of a macroscopic cell. </p>
+<p >returns all ranks from which a particular cell (at index globalCellIndex) is sent. This method should globally define the source ranks for each global cell index of a macroscopic cell. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">globalCellIndex</td><td>unique global cell index </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html#aaee21a9f612ba8e193c489dd2d587533">coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &gt;</a>, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html#ac87acdda0af6008a668cdee528a68a14">coupling::sendrecv::DataExchangeFromMD2Macro&lt; dim &gt;</a>, <a class="el" href="classTestDataExchangeFromMD2Macro.html#aee93f1343fe94bb0b52b1c202bdadbb2">TestDataExchangeFromMD2Macro&lt; dim &gt;</a>, and <a class="el" href="classTestDataExchangeFromMacro2MD.html#ab73bf69be71101c699dcc57c9fb17307">TestDataExchangeFromMacro2MD&lt; dim &gt;</a>.</p>
 
@@ -188,7 +268,7 @@ template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the tag associated to messages for this <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">DataExchange</a>. </p>
+<p >returns the tag associated to messages for this <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html" title="generic class for the the data exchange purposes.">DataExchange</a>. </p><dl class="section return"><dt>Returns</dt><dd>_tag </dd></dl>
 
 </div>
 </div>
@@ -217,7 +297,12 @@ template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the ranks to which a particular cell (at index globalCellIndex) should be sent. This method should globally define the target ranks for each global cell index of a macroscopic cell. </p>
+<p >returns the ranks to which a particular cell (at index globalCellIndex) should be sent. This method should globally define the target ranks for each global cell index of a macroscopic cell. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">globalCellIndex</td><td>unique global cell index </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html#a52b3e4b527c54c04dbf02ff3a74dd1f2">coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &gt;</a>, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html#a2aa9c31281f95b2acb6a9563e4a3269e">coupling::sendrecv::DataExchangeFromMD2Macro&lt; dim &gt;</a>, <a class="el" href="classTestDataExchangeFromMD2Macro.html#a3d6e89c05d2a547b0b35cba732ef44e9">TestDataExchangeFromMD2Macro&lt; dim &gt;</a>, and <a class="el" href="classTestDataExchangeFromMacro2MD.html#ad2dae1f1d345176d985c6ed366b20c01">TestDataExchangeFromMacro2MD&lt; dim &gt;</a>.</p>
 
@@ -258,7 +343,13 @@ template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >local rule to read from a macroscopic cell and write data to (e.g. send) buffer </p>
+<p >local rule to read from a macroscopic cell and write data to (e.g. send) buffer </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buffer</td><td></td></tr>
+    <tr><td class="paramname">cell</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html#ab1c86ae04d6eb8e15d02fe4e2b260cb1">coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &gt;</a>, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html#a4bd2dc735dcff29c93696e5d3ed34ca0">coupling::sendrecv::DataExchangeFromMD2Macro&lt; dim &gt;</a>, and <a class="el" href="classTestDataExchangeFromMD2Macro.html#a0a0699458b1583c1e1241ba7104cd7bb">TestDataExchangeFromMD2Macro&lt; dim &gt;</a>.</p>
 
@@ -299,7 +390,13 @@ template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >local rule to read from receive buffer and write data to macroscopic cell </p>
+<p >local rule to read from receive buffer and write data to macroscopic cell </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buffer</td><td></td></tr>
+    <tr><td class="paramname">cell</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html#ae5de4149ee3b952a1d32b09372816ee9">coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &gt;</a>, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html#a68011261075228a5b879548e96a3f44d">coupling::sendrecv::DataExchangeFromMD2Macro&lt; dim &gt;</a>, and <a class="el" href="classTestDataExchangeFromMD2Macro.html#a14054472a1f0188ca354ce231b213871">TestDataExchangeFromMD2Macro&lt; dim &gt;</a>.</p>
 

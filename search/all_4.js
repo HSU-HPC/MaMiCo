@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['dataexchange_0',['DataExchange',['../classcoupling_1_1sendrecv_1_1DataExchange.html',1,'coupling::sendrecv']]],
+  ['dataexchange_0',['DataExchange',['../classcoupling_1_1sendrecv_1_1DataExchange.html',1,'coupling::sendrecv::DataExchange&lt; MacroscopicCell, dim &gt;'],['../classcoupling_1_1sendrecv_1_1DataExchange.html#a737ef9579997ea1740ce8856784f1a90',1,'coupling::sendrecv::DataExchange::DataExchange()']]],
   ['dataexchange_3c_20coupling_3a_3adatastructures_3a_3amacroscopiccell_3c_20dim_20_3e_2c_20dim_20_3e_1',['DataExchange&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1DataExchange.html',1,'coupling::sendrecv']]],
   ['dataexchange_3c_20testcell_3c_20dim_20_3e_2c_20dim_20_3e_2',['DataExchange&lt; TestCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1DataExchange.html',1,'coupling::sendrecv']]],
-  ['dataexchangefrommacro2md_3',['DataExchangeFromMacro2MD',['../classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html',1,'coupling::sendrecv']]],
-  ['dataexchangefrommd2macro_4',['DataExchangeFromMD2Macro',['../classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html',1,'coupling::sendrecv']]],
+  ['dataexchangefrommacro2md_3',['DataExchangeFromMacro2MD',['../classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html',1,'coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &gt;'],['../classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html#a4d234798b32ac2f039cc2585c1fbf5c4',1,'coupling::sendrecv::DataExchangeFromMacro2MD::DataExchangeFromMacro2MD()']]],
+  ['dataexchangefrommd2macro_4',['DataExchangeFromMD2Macro',['../classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html',1,'coupling::sendrecv::DataExchangeFromMD2Macro&lt; dim &gt;'],['../classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html#a955e1162d7b3352b76b0b4ccff75a6e1',1,'coupling::sendrecv::DataExchangeFromMD2Macro::DataExchangeFromMD2Macro()']]],
   ['deleteattribute_5',['DeleteAttribute',['../classtinyxml2_1_1XMLElement.html#aebd45aa7118964c30b32fe12e944628a',1,'tinyxml2::XMLElement']]],
-  ['deletebuffer_6',['deleteBuffer',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ae944a23bd62e4d1ecc9df6d18edf17e9',1,'coupling::sendrecv::SendReceiveBuffer::deleteBuffer()'],['../classCouetteTest.html#ab09cd82d672adf7b2a200015b31b588c',1,'CouetteTest::deleteBuffer()'],['../classNieTest.html#aeb0d73d463dcd8c2f9e30517207f6628',1,'NieTest::deleteBuffer()']]],
+  ['deletebuffer_6',['deleteBuffer',['../classNieTest.html#aeb0d73d463dcd8c2f9e30517207f6628',1,'NieTest::deleteBuffer()'],['../classCouetteTest.html#ab09cd82d672adf7b2a200015b31b588c',1,'CouetteTest::deleteBuffer()'],['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ae944a23bd62e4d1ecc9df6d18edf17e9',1,'coupling::sendrecv::SendReceiveBuffer::deleteBuffer(std::map&lt; unsigned int, BufferWithID &gt; &amp;buffer)']]],
   ['deletebuffers_7',['deleteBuffers',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a6a0d413eda893974a535c2310cbbb951',1,'coupling::sendrecv::SendReceiveBuffer']]],
   ['deletechild_8',['DeleteChild',['../classtinyxml2_1_1XMLNode.html#a363b6edbd6ebd55f8387d2b89f2b0921',1,'tinyxml2::XMLNode']]],
   ['deletechildren_9',['DeleteChildren',['../classtinyxml2_1_1XMLNode.html#a0360085cc54df5bff85d5c5da13afdce',1,'tinyxml2::XMLNode']]],
