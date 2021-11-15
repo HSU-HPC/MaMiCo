@@ -37,6 +37,8 @@
 #include "coupling/interface/impl/ls1/LS1MamicoCouplingSwitch.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
+#include <iostream>
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
 #endif
 
@@ -542,9 +544,13 @@ class LammpsDPDSimulation: public coupling::interface::MDSimulation {
 class LS1MDSimulation : public coupling::interface::MDSimulation
 {
 private:
-    ::Simulation simulation;
+    Simulation *simulation;
 public:
-    LS1MDSimulation() {}
+    LS1MDSimulation(): coupling::interface::MDSimulation() 
+    {
+      simulation = new Simulation();
+      global_simulation = simulation;
+    }
     virtual ~LS1MDSimulation(){}
     /** switches coupling on/off*/
     void switchOffCoupling()
@@ -559,7 +565,7 @@ public:
     /** simulates numberTimesteps time steps and starts at time step no. firstTimestep*/
     virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep)
     {
-      for(int i = 0; i < numberTimesteps; i++) { simulation.simulateOneTimestep(); }
+      for(int i = 0; i < numberTimesteps; i++) { simulation->simulateOneTimestep(); }
     }
     /** simulates a single time step*/
     //virtual void simulateTimestep(const unsigned int &thisTimestep ){const unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
@@ -572,18 +578,23 @@ public:
     virtual void init()
     {
       //parse file
+      std::cout << "here 31" << std::endl;
       const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
-      simulation.readConfigFile(filename);
-
+      std::cout << "here 32" << std::endl;
+      global_simulation->readConfigFile(filename);
+      std::cout << "here 33" << std::endl;
       //all the things
-      simulation.prepare_start();
-      simulation.preSimLoopSteps();
+      global_simulation->prepare_start();
+      std::cout << "here 34" << std::endl;
+      global_simulation->preSimLoopSteps();
+      std::cout << "here 35" << std::endl;
     }
-    virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) {}
+    virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) { init(); }
     virtual void shutdown()
     {
-      simulation.postSimLoopSteps();
-      simulation.finalize();
+      global_simulation->markSimAsDone();
+      global_simulation->postSimLoopSteps();
+      global_simulation->finalize();
     }
 };
 #endif
@@ -617,7 +628,9 @@ class SimulationAndInterfaceFactory {
         #endif
       );
       #elif defined(LS1_MARDYN)
+      std::cout << "here 21" << std::endl;
       return new coupling::interface::LS1MDSimulation();
+      std::cout << "here 22" << std::endl;
       #else
       std::cout << "ERROR MDSimulationFactory::getMDSimulation(): Unknown MD simulation!" << std::endl; exit(EXIT_FAILURE);
       return NULL;

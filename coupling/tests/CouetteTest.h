@@ -27,7 +27,13 @@
 #endif
 #include <sys/time.h>
 #include <random>
-
+#if defined(LS1_MARDYN)
+#include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
+#include "coupling/interface/impl/ls1/LS1MamicoCouplingSwitch.h"
+#include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "utils/Logger.h"
+using Log::global_log;
+#endif
 /**
  * Versatile configurable Couette flow test for noise-filtered multi-instance Nie coupling.
  *
@@ -59,12 +65,18 @@ public:
 
 private:
   enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2, COUETTE_FOAM=3};
-  enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
+  enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1, LS1=2};
 
   void init(){
+    #if defined(LS1_MARDYN)
+      global_log = new Log::Logger(Log::Info);
+    #endif
     initMPI();
+    std::cout << "init mpi done " << std::endl;
     parseConfigurations();
+    std::cout << "parse config done " << std::endl;
     initSolvers();
+    std::cout << "init solver done " << std::endl;
   }
 
   void runOneCouplingCycle(int cycle){
@@ -183,6 +195,16 @@ private:
       _cfg.totalNumberMDSimulations = 1;
       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations,subtag,"number-md-simulations");
     }
+    else if(type == "ls1"){
+      _cfg.miSolverType = LS1;
+      assert((_mamicoConfig.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3,unsigned int>(1)));
+      _cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations,subtag,"number-md-simulations");
+      assert(_cfg.totalNumberMDSimulations == 1);
+      #if defined(LS1_MARDYN)
+      coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
+      #endif
+    }
     else{
       std::cout << "Could not read input file couette.xml: Unknown microscopic solver type!" << std::endl;
       exit(EXIT_FAILURE);
@@ -268,60 +290,60 @@ private:
     _couetteSolver = getCouetteSolver( _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
       _simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
       );
-
+    std::cout << "here 1" << std::endl;
     // even if _cfg.miSolverType == SYNTHETIC then
-    // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized anyway,
+    // multiMDService, _MDSimulations, _mdSolverInterface etc need to be initialized anyway,
     // so that we can finally obtain getIndexConversion from MultiMDCellService,
     // because SYNTHETIC should fill the same cells which SIMPLEMD would use
     // depending e.g. on domain size and offset from simpleMDConfig
 
     _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),_cfg.totalNumberMDSimulations);
     _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
-
+    std::cout << "here 2" << std::endl;
     for (unsigned int i = 0; i < _localMDInstances; i++){
-      _simpleMD.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
+      _MDSimulations.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(
         _simpleMDConfig,_mamicoConfig
         #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
         , _multiMDService->getLocalCommunicator()
         #endif
       ));
-      if (_simpleMD[i]==NULL){
-        std::cout << "ERROR CouetteTest: _simpleMD[" << i << "]==NULL!" << std::endl;
+      if (_MDSimulations[i]==NULL){
+        std::cout << "ERROR CouetteTest: _MDSimulations[" << i << "]==NULL!" << std::endl;
         exit(EXIT_FAILURE);
       }
     }
-
+    std::cout << "here 3" << std::endl;
     _mdStepCounter = 0;
     if (_rank == 0){ gettimeofday(&_tv.start,NULL); }
     for (unsigned int i = 0; i < _localMDInstances; i++){
-      _simpleMD[i]->init(*_multiMDService,_multiMDService->getGlobalNumberOfLocalMDSimulation(i));
-    }
-    if(_cfg.miSolverType == SIMPLEMD){
+      _MDSimulations[i]->init(*_multiMDService,_multiMDService->getGlobalNumberOfLocalMDSimulation(i));
+    }std::cout << "here 4" << std::endl;
+    if(_cfg.miSolverType == SIMPLEMD || _cfg.miSolverType == LS1){
       // equilibrate MD
       for (unsigned int i = 0; i < _localMDInstances; i++){
-        _simpleMD[i]->switchOffCoupling();
-        _simpleMD[i]->simulateTimesteps(_cfg.equSteps,_mdStepCounter);
+        _MDSimulations[i]->switchOffCoupling();
+        _MDSimulations[i]->simulateTimesteps(_cfg.equSteps,_mdStepCounter);
       }
       _mdStepCounter += _cfg.equSteps;
     }
-
+    std::cout << "here 5" << std::endl;
     // allocate coupling interfaces
     for (unsigned int i = 0; i < _localMDInstances; i++){
-      _simpleMD[i]->switchOnCoupling();
+      _MDSimulations[i]->switchOnCoupling();
       _mdSolverInterface.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().
-        getMDSolverInterface(_simpleMDConfig, _mamicoConfig, _simpleMD[i]));
+        getMDSolverInterface(_simpleMDConfig, _mamicoConfig, _MDSimulations[i]));
       if (_mdSolverInterface[i] == NULL){
         std::cout << "ERROR CouetteTest: mdSolverInterface[" << i << "] == NULL!" << std::endl;
         exit(EXIT_FAILURE);
       }
     }
-
+    std::cout << "here 6" << std::endl;
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
       _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
       _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
       getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
     );
-
+    std::cout << "here 7" << std::endl;
     if(_cfg.twsLoop){
       // initialise macroscopic cell service for multi-MD case and set single cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
@@ -340,13 +362,13 @@ private:
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }
-
+    std::cout << "here 8" << std::endl;
     if(_cfg.miSolverType == SIMPLEMD){
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
       for (unsigned int i = 0; i < _localMDInstances; i++){
-        _simpleMD[i]->setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
+        _MDSimulations[i]->setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
         // compute and store temperature in macroscopic cells (temp=1.1 everywhere)
         _multiMDCellService->getMacroscopicCellService(i).computeAndStoreTemperature(_cfg.temp);
       }
@@ -421,15 +443,15 @@ private:
 
   void advanceMicro(int cycle){
     if (_rank==0){ gettimeofday(&_tv.start,NULL); }
-    if(_cfg.miSolverType == SIMPLEMD){
+    if(_cfg.miSolverType == SIMPLEMD || _cfg.miSolverType == LS1){
       // run MD instances
       for (unsigned int i = 0; i < _localMDInstances; i++){
         // set macroscopic cell service and interfaces in MamicoInterfaceProvider
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
 
-        _simpleMD[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
-        //std::cout << "Finish _simpleMD[i]->simulateTimesteps " << std::endl;
+        _MDSimulations[i]->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),_mdStepCounter);
+        //std::cout << "Finish _MDSimulations[i]->simulateTimesteps " << std::endl;
 
         // plot macroscopic time step info in multi md service
         _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);
@@ -563,10 +585,10 @@ private:
     for (unsigned int i = 0; i < _localMDInstances; i++) {
       // the shutdown operation may also delete the md solver interface; therefore, we update the MD solver interface in the vector _mdSolverInteface after the shutdown is completed
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
-      _simpleMD[i]->shutdown(); delete _simpleMD[i]; _simpleMD[i] = NULL;
+      _MDSimulations[i]->shutdown(); delete _MDSimulations[i]; _MDSimulations[i] = NULL;
       _mdSolverInterface[i] = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
     }
-    _simpleMD.clear();
+    _MDSimulations.clear();
     for (unsigned int i = 0; i < _localMDInstances; i++) {
       if (_mdSolverInterface[i] != NULL){
         delete _mdSolverInterface[i];
@@ -952,7 +974,7 @@ private:
   CouplingBuffer _buf;
   unsigned int _localMDInstances;
   std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterface;
-  std::vector<coupling::interface::MDSimulation*> _simpleMD;
+  std::vector<coupling::interface::MDSimulation*> _MDSimulations;
   std::default_random_engine _generator;
   coupling::noisereduction::NoiseReduction<3>* _noiseReduction;
   double _sum_signal, _sum_noise;

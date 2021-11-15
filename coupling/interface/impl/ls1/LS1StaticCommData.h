@@ -1,8 +1,9 @@
-#ifndef LS1_STATIC_COMM_DATA_H
-#define LS1_STATIC_COMM_DATA_H
+#ifndef LS1_STATIC_COMM_DATA_H_
+#define LS1_STATIC_COMM_DATA_H_
 
 //possibly bad practice? will phase out
 #include <string>
+#include <iostream>
 
 namespace coupling
 {
@@ -20,7 +21,7 @@ namespace coupling
             void operator=(LS1StaticCommData const&) = delete;
             
             //data accesses
-            void setConfigFilename(std::string name) {ls1ConfigFilename = name; }
+            void setConfigFilename(std::string name) {ls1ConfigFilename = name; std::cout << "setConfigFilename" << name << std::endl;}
             const std::string getConfigFilename() {return ls1ConfigFilename;}
 
         private:

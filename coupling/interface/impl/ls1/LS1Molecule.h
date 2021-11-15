@@ -2,9 +2,8 @@
 #define LS1_MOLECULE_H_
 
 //MD library
-//#include "ls1/molecules/Molecule.h"
-//#include "ls1/src/Simulation.h"
-//#include "ls1/particleContainer/RegionParticleIterator.h"
+#include "ls1/src/molecules/Molecule.h"
+#include "ls1/src/Simulation.h"
 #include "ls1/src/ensemble/EnsembleBase.h"
 
 //utils
@@ -99,8 +98,8 @@ public:
         location1 = { _myMolecule->r(0), _myMolecule->r(1), _myMolecule->r(2)};
         
         //find all molecules within cutoff
-        double cutoff = ::global_simulation->getcutoffRadius();
-        Ensemble* ensemble = ::global_simulation->getEnsemble();
+        double cutoff = global_simulation->getcutoffRadius();
+        Ensemble* ensemble = global_simulation->getEnsemble();
         const double sigma = ensemble->getComponent(0)->getSigma(0);
         const double epsilon = ensemble->getComponent(0)->ljcenter(0).eps();
 

@@ -49,10 +49,17 @@ then
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3"
-    # -Werror
-    includes="${includes} -I${LIB_EIGEN_PATH}"
-    compiler="g++"
+    if [ -v MARDYN_PATH ]
+    then
+      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wno-unknown-pragmas -O0 -DMARDYN_DPDP" # todo put -Werror
+      includes="${includes} -I${LIB_EIGEN_PATH} -I${MARDYN_PATH}/src -I${MARDYN_PATH}/libs/rapidxml -I${MARDYN_PATH}/build/_deps/autopasfetch-src/src -I${MARDYN_PATH}/build/_deps/spdlog-src/include"
+      compiler="g++"
+    else
+      FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -O3" 
+      # -Werror
+      includes="${includes} -I${LIB_EIGEN_PATH} "
+      compiler="g++"
+    fi
 fi
 ###
 
@@ -76,13 +83,35 @@ then
         libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
         FLAGS="${FLAGS} -DMDParallel"
 else
-        scons target=libsimplemd dim=3 build=release parallel=no -j4
-        libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+  if [ -v MARDYN_PATH ]
+  then
+  scons target=libsimplemd dim=3 build=release parallel=no -j4
+  libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+  ### tinyxml2
+
+  ### ls1 mardyn
+    libraries="${libraries} -L${MARDYN_PATH}/build/src -l:libMarDyn.a"
+  ### autopas
+    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/src/autopas -l:libautopas.a"
+  ### spdlog (for ls1)
+    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlogd.a -lpthread"
+  ### harmony (for autopas)
+    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/libs/harmony/include/lib -l:libharmony.a"
+  else
+    scons target=libsimplemd dim=3 build=release parallel=no -j4
+    libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+  fi
 fi
 
+FLAGS="${FLAGS} -pthread"
+
+FLAGS="${FLAGS} -g"
+
 cd ${BUILD_PATH}
-${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
-objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
+if ! [ -v MARDYN_PATH ]; then
+  ${compiler} ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -c -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o
+  objects="${objects} ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o"
+fi
 
 ### builds, linking, objects for coupled simulation with MaMiCo
 cd ${BUILD_PATH}

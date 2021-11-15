@@ -5,9 +5,13 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
 
-#include "ls1/src/ensemble/EnsembleBase.h"
+#include "tarch/utils/RandomNumberService.h"
+
+#include "ensemble/EnsembleBase.h"
 #include "ls1/src/integrators/Integrator.h"
 #include "ls1/src/parallel/DomainDecompBase.h"
+
+#include <cmath>
 
 namespace coupling
 {
@@ -38,18 +42,44 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
     )
     {
       //only one cell per macroscopic cell
+      if(linkedCellInMacroscopicCell[0] != 0 || linkedCellInMacroscopicCell[1] != 0 || linkedCellInMacroscopicCell[2] != 0)
+      {
+        std::cout << "ERROR in LS1MDSolverInterface::getLinkedCell(): only one linked cell per macroscopic cell allowed!" << std::endl;
+				exit(EXIT_FAILURE);
+      }
+      //ghost layer not allowed to have linked cells
+      if(macroscopicCellIndex[0] == 0 || macroscopicCellIndex[1] == 0 || macroscopicCellIndex[2] == 0)
+      {
+        std::cout << "ERROR in LS1MDSolverInterface::getLinkedCell(): ghost macroscopic cells may not have linked cells!" << std::endl;
+				exit(EXIT_FAILURE);
+      }
+
+      //get bounds of current process
       double bBoxMin[3];
 			double bBoxMax[3];
-      ::global_simulation->domainDecomposition().getBoundingBoxMinMax(::global_simulation->getDomain(), bBoxMin, bBoxMax);
-      ls1::LS1RegionWrapper cell(bBoxMin, bBoxMax);
-      return cell;
+      global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
+
+      //size of the macroscopic cell
+			tarch::la::Vector<3,double> macroCellSize = indexConversion.getMacroscopicCellSize();
+
+      //We have unbroken MD domain, which we will divide into region iterators
+      //So we split the MD into the same grid as the macro, and give the macroscopic cell the corresponding region
+      double regionOffset[3], regionEndpoint[3];
+      for(int i = 0; i < 3; i++)
+      {
+        regionOffset[i] = (macroscopicCellIndex[i] - 1) * macroCellSize[i];
+        regionEndpoint[i] = regionOffset[i] + macroCellSize[i];
+      }
+
+      ls1::LS1RegionWrapper *cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint);
+      return *cell;
     }
 
     /** returns the global size of the box-shaped MD domain */
     virtual tarch::la::Vector<3,double> getGlobalMDDomainSize() const
     {
-      auto up = ::global_simulation->getEnsemble()->domain()->rmax();
-      auto down = ::global_simulation->getEnsemble()->domain()->rmin();
+      auto up = global_simulation->getEnsemble()->domain()->rmax();
+      auto down = global_simulation->getEnsemble()->domain()->rmin();
       tarch::la::Vector<3, double> globalSize = {up[0]-down[0], up[1]-down[1], up[2]-down[2]};
       return globalSize;
     }
@@ -57,22 +87,22 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
     /** returns the offset (i.e. lower,left corner) of MD domain */
     virtual tarch::la::Vector<3,double> getGlobalMDDomainOffset() const
     {
-      auto down = ::global_simulation->getEnsemble()->domain()->rmin();
+      auto down = global_simulation->getEnsemble()->domain()->rmin();
       tarch::la::Vector<3, double> globalOffset(down[0], down[1], down[2]);
       return globalOffset;
     }
 
     /** returns the mass of a single fluid molecule */
-    virtual double getMoleculeMass() const { return ::global_simulation->getEnsemble()->getComponent(0)->m(); }
+    virtual double getMoleculeMass() const { return global_simulation->getEnsemble()->getComponent(0)->m(); }
 
     /** returns Boltzmann's constant */
     virtual double getKB() const { return 1.0; }
 
     /** returns the sigma parameter of the LJ potential */
-    virtual double getMoleculeSigma() const { return ::global_simulation->getEnsemble()->getComponent(0)->getSigma(0);  }
+    virtual double getMoleculeSigma() const { return global_simulation->getEnsemble()->getComponent(0)->getSigma(0);  }
 
     /** returns the epsilon parameter of the LJ potential */
-    virtual double getMoleculeEpsilon() const { return ::global_simulation->getEnsemble()->getComponent(0)->ljcenter(0).eps(); }
+    virtual double getMoleculeEpsilon() const { return global_simulation->getEnsemble()->getComponent(0)->ljcenter(0).eps(); }
 
     /** sets a random velocity in the vector 'initialVelocity'. This velocity is sampled from
      *  a Maxwellian assuming a mean flow velocity 'meanVelocity' and a temperature 'temperature'
@@ -80,7 +110,23 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      */
     virtual void getInitialVelocity(
       const tarch::la::Vector<3,double>& meanVelocity, const double &kB, const double& temperature, tarch::la::Vector<3,double>& initialVelocity
-    ) const = 0;
+    ) const
+    {
+      //taken from MarDynMDSolverInterface
+      //temperature based standard deviation of gaussian distribution
+      const double standardDeviation = std::sqrt(kB * 3 * temperature / getMoleculeMass());
+
+      //set a random number
+      tarch::la::Vector<3,double> random (0.0);
+      random[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
+      for(unsigned int d=1; d<3; d++)
+        random[d] = 2.0 * M_PI * tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();
+
+      //set initial velocity with randomized values
+      initialVelocity[0] = meanVelocity[0] + standardDeviation * (random[0] * std::sin(random[1]) * std::cos(random[2]));
+      initialVelocity[1] = meanVelocity[1] + standardDeviation * (random[0] * std::sin(random[1]) * std::sin(random[2]));
+      initialVelocity[2] = meanVelocity[2] + standardDeviation * (random[0] * std::cos(random[1]));
+    }
 
     /** deletes the molecule from the MD simulation */
     virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<3>& molecule,ls1::LS1RegionWrapper& cell) { cell.deleteMolecule(molecule); }
@@ -91,7 +137,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
     { 
       double bBoxMin[3];
 			double bBoxMax[3];
-      ::global_simulation->domainDecomposition().getBoundingBoxMinMax(::global_simulation->getDomain(), bBoxMin, bBoxMax);
+      global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
       ls1::LS1RegionWrapper cell(bBoxMin, bBoxMax);
       cell.addMolecule(molecule);
     }
@@ -105,7 +151,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       const tarch::la::Vector<3,unsigned int>& indexOfFirstMacroscopicCell,
       const tarch::la::Vector<3,unsigned int>& rangeMacroscopicCells,
       const tarch::la::Vector<3,unsigned int>& linkedCellsPerMacroscopicCell
-    ) = 0;
+    ) {}
 
     /** returns the local index vector (w.r.t. lexicographic ordering of the linked cells in the MD simulation,
      *  see getLinkedCell()) for the linked cell that the position 'position' belongs to. This method is
@@ -114,7 +160,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      */
     virtual tarch::la::Vector<3,unsigned int> getLinkedCellIndexForMoleculePosition(
       const tarch::la::Vector<3,double>& position
-    ) = 0;
+    ) { return tarch::la::Vector<3, unsigned int> {1,1,1}; }
 
 
     /** assumes that a molecule is placed somewhere inside the linked cell at index
@@ -137,8 +183,8 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
 
       //calculate force
       //find all molecules within cutoff
-      double cutoff = ::global_simulation->getcutoffRadius();
-      Ensemble* ensemble = ::global_simulation->getEnsemble();
+      double cutoff = global_simulation->getcutoffRadius();
+      Ensemble* ensemble = global_simulation->getEnsemble();
       const double sigma = ensemble->getComponent(0)->getSigma(0);
       const double epsilon = ensemble->getComponent(0)->ljcenter(0).eps();
 
@@ -197,17 +243,17 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      *  For the builtin MD simulation, the implementation of this method clears all molecules from the ghost
      *  layers and re-fills the ghost layers again.
      */
-    virtual void synchronizeMoleculesAfterMassModification() = 0;
+    virtual void synchronizeMoleculesAfterMassModification() {}
 
     /** is called each time when MaMiCo tried to insert momentum in the MD simulation. For the builtin MD simulation,
      *  this method is empty as the simulation does not need to synchronize changing momentum over the processes
      *  within a timestep (only the positions and numbers of molecules in possible ghost layers matter!).
      *  However, other solvers might need to implement something in here.
      */
-    virtual void synchronizeMoleculesAfterMomentumModification() = 0;
+    virtual void synchronizeMoleculesAfterMomentumModification() {}
 
     /** returns the timestep of the MD simulation */
-    virtual double getDt() { return ::global_simulation->getIntegrator()->getTimestepLength();}
+    virtual double getDt() { return global_simulation->getIntegrator()->getTimestepLength();}
 
     /** returns a new molecule iterator for a certain linked cell */
     virtual coupling::interface::MoleculeIterator<ls1::LS1RegionWrapper,3>* getMoleculeIterator(ls1::LS1RegionWrapper& cell)

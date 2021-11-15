@@ -1,9 +1,13 @@
 // Maps regions in the LS1 MD domain to mamico cells
 // Causes behavior identical to fixed regular cells
+#ifndef LS1_REGION_WRAPPER_H_
+#define LS1_REGION_WRAPPER_H_
+
 
 #include "ls1/src/particleContainer/RegionParticleIterator.h"
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/molecules/Molecule.h"
+#include "ls1/src/Simulation.h"
 //#include "ls1/ensemble/EnsembleBase.h"
 
 
@@ -23,7 +27,7 @@ public:
             _startRegion[i] = startRegion[i];
             _endRegion[i] = endRegion[i]; //boundingboxmin
         }
-        _particleContainer = ::global_simulation->getMoleculeContainer();
+        _particleContainer = global_simulation->getMoleculeContainer();
         _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
     }
     LS1RegionWrapper() : _startRegion({0,0,0}), _endRegion({0,0,0}), _curParticleID(0), _IDinited(false) {}
@@ -97,7 +101,7 @@ public:
         temp.setF(2, molecule.getForce()[2]);
         if(!_IDinited)
         {
-            _curParticleID = ::global_simulation->getTotalNumberOfMolecules() + 1;
+            _curParticleID = global_simulation->getTotalNumberOfMolecules() + 1;
             _IDIncrementor = 1;
             #ifdef ENABLE_MPI
                 int curRank;
@@ -123,7 +127,7 @@ public:
         if(!isInRegion(molPosition))
             return;
         //check if molecule at location specified
-        double cutoff = ::global_simulation->getcutoffRadius();
+        double cutoff = global_simulation->getcutoffRadius();
 
         double startBox[] = {molPosition[0]-cutoff/10, molPosition[1]-cutoff/10, molPosition[2]-cutoff/10};
         double endBox[] = {molPosition[0]+cutoff/10, molPosition[1]+cutoff/10, molPosition[2]+cutoff/10};
@@ -157,3 +161,5 @@ private:
     ParticleContainer* _particleContainer;
 };
 }
+
+#endif
