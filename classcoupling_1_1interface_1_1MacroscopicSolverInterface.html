@@ -73,12 +73,19 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>interface for the macroscopic, i.e. continuum solver  
+ <a href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="MacroscopicSolverInterface_8h_source.html">MacroscopicSolverInterface.h</a>&gt;</code></p>
 
 <p>Inherited by <a class="el" href="classcoupling_1_1solvers_1_1CouetteSolverInterface.html">coupling::solvers::CouetteSolverInterface&lt; dim &gt;</a>, and <a class="el" href="classcoupling_1_1solvers_1_1FoamSolverInterface.html">coupling::solvers::FoamSolverInterface&lt; dim &gt;</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aabc9a3c07ba90a3e8cdb0c0adcade7ae"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#aabc9a3c07ba90a3e8cdb0c0adcade7ae">MacroscopicSolverInterface</a> ()</td></tr>
+<tr class="separator:aabc9a3c07ba90a3e8cdb0c0adcade7ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d73417c7e97ff80e0cb258c16d3bb56"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#a9d73417c7e97ff80e0cb258c16d3bb56">~MacroscopicSolverInterface</a> ()</td></tr>
+<tr class="separator:a9d73417c7e97ff80e0cb258c16d3bb56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a356e11f29dba1f67c62b87011623f886"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#a356e11f29dba1f67c62b87011623f886">receiveMacroscopicQuantityFromMDSolver</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalCellIndex)=0</td></tr>
 <tr class="separator:a356e11f29dba1f67c62b87011623f886"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c76b25e64bd22712909ed62e1e40f9d"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#a0c76b25e64bd22712909ed62e1e40f9d">sendMacroscopicQuantityToMDSolver</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalCellIndex)=0</td></tr>
@@ -92,8 +99,72 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
-class coupling::interface::MacroscopicSolverInterface&lt; dim &gt;</div><p >interface for the macroscopic, i.e. continuum, solver. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+class coupling::interface::MacroscopicSolverInterface&lt; dim &gt;</div><p >interface for the macroscopic, i.e. continuum solver </p>
+<p >This class provides </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aabc9a3c07ba90a3e8cdb0c0adcade7ae" name="aabc9a3c07ba90a3e8cdb0c0adcade7ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabc9a3c07ba90a3e8cdb0c0adcade7ae">&#9670;&nbsp;</a></span>MacroscopicSolverInterface()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt;::<a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">MacroscopicSolverInterface</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Costructor </p>
+
+</div>
+</div>
+<a id="a9d73417c7e97ff80e0cb258c16d3bb56" name="a9d73417c7e97ff80e0cb258c16d3bb56"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d73417c7e97ff80e0cb258c16d3bb56">&#9670;&nbsp;</a></span>~MacroscopicSolverInterface()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt;::~<a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">MacroscopicSolverInterface</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a17dcf7e08d5c3b42842cb4de22e766ee" name="a17dcf7e08d5c3b42842cb4de22e766ee"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a17dcf7e08d5c3b42842cb4de22e766ee">&#9670;&nbsp;</a></span>getRanks()</h2>
 
@@ -119,7 +190,13 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns all the ranks on which the macroscopic solver holds data of the macroscopic cell at index globalCellIndex. By default, this method is used for send/recv operations. However, there are situations where the target and source rank definitions (target rank=rank of macroscopic solver that shall receive data from MD; source rank=rank of macroscopic solver that shall send data to MD) may differ. For example, assume a domain decomposition using ghost layers. You may want to send data from cells inside a process-local domain and want to receive data in all copies of a given macroscopic cell (incl. ghost cells), but you may not be able to provide valid data on every process for each cell instance (e.g., if this cell is part of a ghost layer). For this case, the method <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#a05e00fda6a3d4d9283e5a0447cc3acdb">getSourceRanks()</a> and <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#a286f1b55099ae105c386b1062573c791">getTargetRanks()</a> can be implemented accordingly. </p>
+<p >This function determines all the ranks on which the macroscopic solver holds data of the macroscopic cell at index globalCellIndex. By default, this method is used for send/recv operations. However, there are situations where the target and source rank definitions (target rank=rank of macroscopic solver that shall receive data from MD; source rank=rank of macroscopic solver that shall send data to MD) may differ. For example, assume a domain decomposition using ghost layers. You may want to send data from cells inside a process-local domain and want to receive data in all copies of a given macroscopic cell (incl. ghost cells), but you may not be able to provide valid data on every process for each cell instance (e.g., if this cell is part of a ghost layer). For this case, the method <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#a05e00fda6a3d4d9283e5a0447cc3acdb">getSourceRanks()</a> and <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#a286f1b55099ae105c386b1062573c791">getTargetRanks()</a> can be implemented accordingly. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">globalCellIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>all the ranks on which the macroscopic solver holds data of the macroscopic cell at index globalCellIndex. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1solvers_1_1CouetteSolverInterface.html#a672da4a842fd7c28d7ff2881361fc4a8">coupling::solvers::CouetteSolverInterface&lt; dim &gt;</a>, and <a class="el" href="classcoupling_1_1solvers_1_1FoamSolverInterface.html#a93803f16f74d588eba95b92814c05e5e">coupling::solvers::FoamSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -150,7 +227,13 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the source ranks for the global macroscopic cell at index globalCellIndex. A "source rank" is defined as a rank of the macroscopic solver that provides a valid copy of the cell at globalCellIndex to the coupling tool. You may have multiple source ranks; however, each source rank should hold a valid copy. Default: return all ranks that the cell at globalCellIndex is associated to. </p>
+<p >This function determines the source ranks for the global macroscopic cell at index globalCellIndex. A "source rank" is defined as a rank of the macroscopic solver that provides a valid copy of the cell at globalCellIndex to the coupling tool. You may have multiple source ranks; however, each source rank should hold a valid copy. Default: return all ranks that the cell at globalCellIndex is associated to. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">globalCellIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the source ranks for the global macroscopic cell at index globalCellIndex. </dd></dl>
 
 </div>
 </div>
@@ -179,7 +262,13 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the target ranks for the global macroscopic cell at index globalCellIndex. A "target rank" is defined as a rank of the macroscopic solver that obtains a valid copy of the cell at globalCellIndex from the coupling tool. You may have multiple target ranks. Default: return all ranks that the cell at globalCellIndex is associated to. </p>
+<p >This function determines the target ranks for the global macroscopic cell at index globalCellIndex. A "target rank" is defined as a rank of the macroscopic solver that obtains a valid copy of the cell at globalCellIndex from the coupling tool. You may have multiple target ranks. Default: return all ranks that the cell at globalCellIndex is associated to. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">globalCellIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the target ranks for the global macroscopic cell at index globalCellIndex </dd></dl>
 
 </div>
 </div>
@@ -208,7 +297,13 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns true if the cell at position globalCellIndex shall be received from the MD solver. This function does not send the cell, but only steers the process. </p>
+<p >This function specifies if the cell at position globalCellIndex shall be received from the MD solver It does not send the cell, but only steers the process. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">globalCellIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the cell at position globalCellIndex shall be received from the MD solver, false otherwise. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1solvers_1_1CouetteSolverInterface.html#accb7e1504fb7d8efc0a68b1388a86b76">coupling::solvers::CouetteSolverInterface&lt; dim &gt;</a>, and <a class="el" href="classcoupling_1_1solvers_1_1FoamSolverInterface.html#aa667e4d5411d6734c38d497c34ae2ffd">coupling::solvers::FoamSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -239,7 +334,13 @@ template&lt;unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns true if the cell at position globalCellIndex shall be sent to the MD solver. This function does not send the cell, but only steers the process. </p>
+<p >This function specifies if the cell at position globalCellIndex shall be sent to the MD solver. It does not send the cell, but only steers the process. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">globalCellIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the cell at position globalCellIndex shall be sent to the MD solver, false otherwise. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1solvers_1_1CouetteSolverInterface.html#ab0e691464e46784f58571a5050de89c6">coupling::solvers::CouetteSolverInterface&lt; dim &gt;</a>, and <a class="el" href="classcoupling_1_1solvers_1_1FoamSolverInterface.html#a17e859bdce945b7f9593ac5c2cea4b80">coupling::solvers::FoamSolverInterface&lt; dim &gt;</a>.</p>
 

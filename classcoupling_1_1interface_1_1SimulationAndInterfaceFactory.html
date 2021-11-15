@@ -69,10 +69,14 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="classcoupling_1_1interface_1_1SimulationAndInterfaceFactory-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">coupling::interface::SimulationAndInterfaceFactory Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service  
+ <a href="classcoupling_1_1interface_1_1SimulationAndInterfaceFactory.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="MDSimulationFactory_8h_source.html">MDSimulationFactory.h</a>&gt;</code></p>
 <table class="memberdecls">
@@ -89,10 +93,71 @@ Public Member Functions</h2></td></tr>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a8be1ee924fdd1889d6ae65fa71e8a7dc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcoupling_1_1interface_1_1SimulationAndInterfaceFactory.html">SimulationAndInterfaceFactory</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1SimulationAndInterfaceFactory.html#a8be1ee924fdd1889d6ae65fa71e8a7dc">getInstance</a> ()</td></tr>
 <tr class="separator:a8be1ee924fdd1889d6ae65fa71e8a7dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a8c93dee31dad9fdf17b054d75cfe838c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1SimulationAndInterfaceFactory.html#a8c93dee31dad9fdf17b054d75cfe838c">SimulationAndInterfaceFactory</a> ()</td></tr>
+<tr class="separator:a8c93dee31dad9fdf17b054d75cfe838c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08c91a7a5d0024d35d9114324b8b1cf7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1SimulationAndInterfaceFactory.html#a08c91a7a5d0024d35d9114324b8b1cf7">~SimulationAndInterfaceFactory</a> ()</td></tr>
+<tr class="separator:a08c91a7a5d0024d35d9114324b8b1cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >define MD simulation from default MD code md simulation based on LAMMPS, encapsulated in this simulation interface factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<div class="textblock"><p >factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service </p>
+<p >define MD simulation from default MD code md simulation based on LAMMPS, encapsulated in this simulation interface factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service using singleton pattern. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a8c93dee31dad9fdf17b054d75cfe838c" name="a8c93dee31dad9fdf17b054d75cfe838c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c93dee31dad9fdf17b054d75cfe838c">&#9670;&nbsp;</a></span>SimulationAndInterfaceFactory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">coupling::interface::SimulationAndInterfaceFactory::SimulationAndInterfaceFactory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Private constructor </p><dl class="section note"><dt>Note</dt><dd>singelton pattern </dd></dl>
+
+</div>
+</div>
+<a id="a08c91a7a5d0024d35d9114324b8b1cf7" name="a08c91a7a5d0024d35d9114324b8b1cf7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08c91a7a5d0024d35d9114324b8b1cf7">&#9670;&nbsp;</a></span>~SimulationAndInterfaceFactory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">coupling::interface::SimulationAndInterfaceFactory::~SimulationAndInterfaceFactory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Private destructor </p><dl class="section note"><dt>Note</dt><dd>singelton pattern </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a8be1ee924fdd1889d6ae65fa71e8a7dc" name="a8be1ee924fdd1889d6ae65fa71e8a7dc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8be1ee924fdd1889d6ae65fa71e8a7dc">&#9670;&nbsp;</a></span>getInstance()</h2>
 
@@ -115,7 +180,8 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >singleton pattern for factory </p>
+<dl class="section return"><dt>Returns</dt><dd>the <a class="el" href="classcoupling_1_1interface_1_1SimulationAndInterfaceFactory.html" title="factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service">SimulationAndInterfaceFactory</a> object </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>singleton pattern </dd></dl>
 
 </div>
 </div>
@@ -158,7 +224,15 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns a pointer to the md simulation. This will create a new simulation which needs to be deleted at the end </p>
+<p >returns a pointer to the md simulation. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">configuration</td><td></td></tr>
+    <tr><td class="paramname">mamicoConfiguration</td><td></td></tr>
+    <tr><td class="paramname">localComm</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section remark"><dt>Remarks</dt><dd>This will create a new simulation which needs to be deleted at the end </dd></dl>
 
 </div>
 </div>
@@ -201,7 +275,14 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the MD solver interface. This method should be called AFTER initialising the MD simulation AND AFTER the equilibration of MD. We thus expect that getMDSimulationInterface() and switchOnCoupling() of the MDSimulationInterface() have been called before. </p>
+<p >returns the MD solver interface. This method should be called AFTER initialising the MD simulation AND AFTER the equilibration of MD. We thus expect that getMDSimulationInterface() and switchOnCoupling() of the MDSimulationInterface() have been called before. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">configuration</td><td></td></tr>
+    <tr><td class="paramname">mamicoConfiguration</td><td></td></tr>
+    <tr><td class="paramname">mdSimulation</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

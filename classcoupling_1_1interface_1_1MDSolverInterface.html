@@ -73,10 +73,15 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>interface to the MD simulation  
+ <a href="classcoupling_1_1interface_1_1MDSolverInterface.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="MDSolverInterface_8h_source.html">MDSolverInterface.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a22e268632ce04a50e00ca2838ecfe17d"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html#a22e268632ce04a50e00ca2838ecfe17d">~MDSolverInterface</a> ()</td></tr>
+<tr class="separator:a22e268632ce04a50e00ca2838ecfe17d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e08f009e1ff5168fc1cf0bfee5cd186"><td class="memItemLeft" align="right" valign="top">virtual LinkedCell &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html#a4e08f009e1ff5168fc1cf0bfee5cd186">getLinkedCell</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;macroscopicCellIndex, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;linkedCellInMacroscopicCell, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;linkedCellsPerMacroscopicCell, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion)=0</td></tr>
 <tr class="separator:a4e08f009e1ff5168fc1cf0bfee5cd186"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14de67098380e5b5f8d8fb5d3631906a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html#a14de67098380e5b5f8d8fb5d3631906a">getGlobalMDDomainSize</a> () const =0</td></tr>
@@ -114,9 +119,44 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::interface::MDSolverInterface&lt; LinkedCell, dim &gt;</div><p >interface to the moleculardynamics simulation</p>
+class coupling::interface::MDSolverInterface&lt; LinkedCell, dim &gt;</div><p >interface to the MD simulation </p>
+<p >This class provides </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a22e268632ce04a50e00ca2838ecfe17d" name="a22e268632ce04a50e00ca2838ecfe17d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22e268632ce04a50e00ca2838ecfe17d">&#9670;&nbsp;</a></span>~MDSolverInterface()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt;::~<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">MDSolverInterface</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad56211464c12be4833cbaefff740efd9" name="ad56211464c12be4833cbaefff740efd9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad56211464c12be4833cbaefff740efd9">&#9670;&nbsp;</a></span>addMoleculeToMDSimulation()</h2>
 
@@ -142,7 +182,12 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >adds the molecule to the MD simulation. </p>
+<p >This function adds the molecule to the MD simulation. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">molecule</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a158d685d20b14022d3467864ca3761d8">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -173,7 +218,12 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >assumes that a molecule is placed somewhere inside the linked cell at index 'linkedCellIndex' and computes the force and potential energy contributions from all molecules in the same linked cell and the neighboured linked cells onto this molecule. The molecule "molecule" is considered to NOT be part of the simulation domain and thus the linked cells. Therefore, another molecule inside the linked cells may even coincide with "molecule". The results are stored within the molecule. </p>
+<p >This function assumes that a molecule is placed somewhere inside the linked cell at index 'linkedCellIndex' and computes the force and potential energy contributions from all molecules in the same linked cell and the neighboured linked cells onto this molecule. The molecule "molecule" is considered to NOT be part of the simulation domain and thus the linked cells. Therefore, another molecule inside the linked cells may even coincide with "molecule". The results are stored within the molecule. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">molecule</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a4fe36e9339c948969eeb16e44c29c023">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -214,7 +264,13 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >deletes the molecule from the MD simulation </p>
+<p >This function deletes the molecule from the MD simulation </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">molecule</td><td></td></tr>
+    <tr><td class="paramname">cell</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#aa868e13d334dc629a06e20d791681bf7">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -244,7 +300,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the timestep of the MD simulation </p>
+<dl class="section return"><dt>Returns</dt><dd>the timestep of the MD simulation </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#aa9709a942e679b61a4e58f0fe266fe82">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -274,7 +330,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the offset (i.e. lower,left corner) of MD domain </p>
+<p >This function determines the offset (i.e. lower,left corner) of MD domain </p><dl class="section return"><dt>Returns</dt><dd>the offset (i.e. lower,left corner) of MD domain </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a8b5fe302a0dd742e444ef46a03dee090">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -304,7 +360,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the global size of the box-shaped MD domain </p>
+<p >This function specifies the global size of the box-shaped MD domain </p><dl class="section return"><dt>Returns</dt><dd>the global size of the box-shaped MD domain </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a4bb91bd3043959455b01b17debd81391">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -357,7 +413,15 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets a random velocity in the vector 'initialVelocity'. This velocity is sampled from a Maxwellian assuming a mean flow velocity 'meanVelocity' and a temperature 'temperature' of the fluid. </p>
+<p >This function sets a random velocity in the vector 'initialVelocity'. This velocity is sampled from a Maxwellian assuming a mean flow velocity 'meanVelocity' and a temperature 'temperature' of the fluid. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">meanVelocity</td><td></td></tr>
+    <tr><td class="paramname">kB</td><td></td></tr>
+    <tr><td class="paramname">temperature</td><td></td></tr>
+    <tr><td class="paramname">initialVelocity</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#ad2a4214e7b51d60b564a2b0b9d87030a">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -387,7 +451,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns Boltzmann's constant </p>
+<dl class="section return"><dt>Returns</dt><dd>Boltzmann's constant </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a5b5bf44adcde33b1c37bded2e51d9043">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -440,7 +504,16 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns a particular linked cell inside a macroscopic cell. The macroscopic cells are currently located on the same process as the respective linked cells. However, several linked cells may be part of a macroscopic cell. The macroscopic cells also contain a ghost layer which surrounds each local domain; the very first macroscopic cell inside the global MD domain (or local MD domain) is thus given by coordinates (1,1,1) (or (1,1) in 2D, respectively). The index linkedCellInMacroscopicCell corresponds to the coordinates of the linked cell inside the given macroscopic cell. These coordinates thus lie in a range (0,linkedCellsPerMacroscopicCell-1). </p>
+<p >This function specifies a particular linked cell inside a macroscopic cell. The macroscopic cells are currently located on the same process as the respective linked cells. However, several linked cells may be part of a macroscopic cell. The macroscopic cells also contain a ghost layer which surrounds each local domain; the very first macroscopic cell inside the global MD domain (or local MD domain) is thus given by coordinates (1,1,1) (or (1,1) in 2D, respectively). The index linkedCellInMacroscopicCell corresponds to the coordinates of the linked cell inside the given macroscopic cell. These coordinates thus lie in a range (0,linkedCellsPerMacroscopicCell-1). </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">macroscopicCellIndex</td><td></td></tr>
+    <tr><td class="paramname">linkedCellInMacroscopicCell</td><td></td></tr>
+    <tr><td class="paramname">linkedCellsPerMacroscopicCell</td><td></td></tr>
+    <tr><td class="paramname">indexConversion</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a particular linked cell inside a macroscopic cell. </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a7c0275a36ff9106c917dd2dd18787562">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -471,7 +544,14 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the local index vector (w.r.t. lexicographic ordering of the linked cells in the MD simulation, see <a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html#a4e08f009e1ff5168fc1cf0bfee5cd186">getLinkedCell()</a>) for the linked cell that the position 'position' belongs to. This method is crucial for the USHER particle insertion scheme as we need to loop over all neighboured linked cells and the cell itself to determine potential energy and forces acting on the molecule at position 'position'. </p>
+<p >This function specifies the local index vector (w.r.t. lexicographic ordering of the linked cells in the MD simulation, for the linked cell that the position 'position' belongs to. This method is crucial for the USHER particle insertion scheme as we need to loop over all neighboured linked cells and the cell itself to determine potential energy and forces acting on the molecule at position 'position'. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">position</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the local index vector for the linked cell that the position 'position' belongs to </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html#a4e08f009e1ff5168fc1cf0bfee5cd186">getLinkedCell()</a> </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a38da2fff874ec99c51b9022a4d9d5c60">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -501,7 +581,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the epsilon parameter of the LJ potential </p>
+<dl class="section return"><dt>Returns</dt><dd>the epsilon parameter of the Lennard-Jones potential </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a52d5dbeccdd86353f416f03923c9803f">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -532,7 +612,13 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns a new molecule iterator for a certain linked cell </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a new molecule iterator for a certain linked cell </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#abf1c228c375e520dc08023a66cb00e8f">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -562,7 +648,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the mass of a single fluid molecule </p>
+<p >This function specifies the mass of a single fluid molecule </p><dl class="section return"><dt>Returns</dt><dd>the mass of a single fluid molecule </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a27c78212422897a0ca296e673b4d28fe">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -592,7 +678,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns the sigma parameter of the LJ potential </p>
+<dl class="section return"><dt>Returns</dt><dd>the sigma parameter of the Lennard-Jones potential </dd></dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a95ccc7fa69b7a72a02f51efe26b03347">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -639,7 +725,14 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >sets up the potential energy landscape over the domain spanned by indexOfFirstMacroscopicCell and rangeCoordinates. The first vector denotes the position of the lower,left,front corner of the domain, rangeCoordinates the number of macroscopic cells in each spatial direction in which the potential energy needs to be computed. </p>
+<p >This function sets up the potential energy landscape over the domain spanned by indexOfFirstMacroscopicCell and rangeCoordinates. The first vector denotes the position of the lower,left,front corner of the domain, rangeCoordinates the number of macroscopic cells in each spatial direction in which the potential energy needs to be computed. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">indexOfFirstMacroscopicCell</td><td></td></tr>
+    <tr><td class="paramname">rangeMacroscopicCells</td><td></td></tr>
+    <tr><td class="paramname">linkedCellsPerMacroscopicCell</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#ab413e734af6c0eb12ac75e1c4a1badb9">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -669,7 +762,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >is called each time when MaMiCo tried to insert/ delete molecules from the MD simulation. As a consequence, a synchronization between processes or with local boundary data might be necessary. Example: If in the lower left cell of a 2D MD simulation a molecule was inserted and we use periodic boundary conditions, we need to provide the inserted molecule (amongst others) to the upper right cell by adding this molecule to the ghost boundary layer (when using the builtin MD simulation). For the builtin MD simulation, the implementation of this method clears all molecules from the ghost layers and re-fills the ghost layers again. </p>
+<p >This function is called each time when MaMiCo tried to insert/ delete molecules from the MD simulation. As a consequence, a synchronization between processes or with local boundary data might be necessary. Example: If in the lower left cell of a 2D MD simulation a molecule was inserted and we use periodic boundary conditions, we need to provide the inserted molecule (amongst others) to the upper right cell by adding this molecule to the ghost boundary layer (when using the builtin MD simulation). For the builtin MD simulation, the implementation of this method clears all molecules from the ghost layers and re-fills the ghost layers again. </p>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a3b5fc5f5cc60cafcbbce39bb64deecd2">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 
@@ -699,7 +792,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >is called each time when MaMiCo tried to insert momentum in the MD simulation. For the builtin MD simulation, this method is empty as the simulation does not need to synchronize changing momentum over the processes within a timestep (only the positions and numbers of molecules in possible ghost layers matter!). However, other solvers might need to implement something in here. </p>
+<p >This function is called each time when MaMiCo tried to insert momentum in the MD simulation. For the builtin MD simulation, this method is empty as the simulation does not need to synchronize changing momentum over the processes within a timestep (only the positions and numbers of molecules in possible ghost layers matter!). However, other solvers might need to implement something in here. </p>
 
 <p>Implemented in <a class="el" href="classMacroscopicCellsTest_1_1TestMDSolverInterface.html#a670b18401b187858da7b6d5358426a77">MacroscopicCellsTest::TestMDSolverInterface&lt; dim &gt;</a>.</p>
 

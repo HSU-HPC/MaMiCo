@@ -74,13 +74,17 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>some iterator scheme for traversing the molecules within a linked cell.  
+ <a href="classcoupling_1_1interface_1_1MoleculeIterator.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="MoleculeIterator_8h_source.html">MoleculeIterator.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a628874b05d58d9a1bb93a8b2a90de242"><td class="memItemLeft" align="right" valign="top"><a id="a628874b05d58d9a1bb93a8b2a90de242" name="a628874b05d58d9a1bb93a8b2a90de242"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MoleculeIterator</b> (LinkedCell &amp;cell)</td></tr>
+<tr class="memitem:a628874b05d58d9a1bb93a8b2a90de242"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MoleculeIterator.html#a628874b05d58d9a1bb93a8b2a90de242">MoleculeIterator</a> (LinkedCell &amp;cell)</td></tr>
 <tr class="separator:a628874b05d58d9a1bb93a8b2a90de242"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b07e3a5bc0732fbd8bc663a2defcd2b"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MoleculeIterator.html#a5b07e3a5bc0732fbd8bc663a2defcd2b">~MoleculeIterator</a> ()</td></tr>
+<tr class="separator:a5b07e3a5bc0732fbd8bc663a2defcd2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6edd0019ac09207a6c079449dc7b7190"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MoleculeIterator.html#a6edd0019ac09207a6c079449dc7b7190">begin</a> ()=0</td></tr>
 <tr class="separator:a6edd0019ac09207a6c079449dc7b7190"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a8a867d51b384c6d4bc4dcc9baf1f4b"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1interface_1_1MoleculeIterator.html#a1a8a867d51b384c6d4bc4dcc9baf1f4b">continueIteration</a> () const =0</td></tr>
@@ -100,9 +104,74 @@ LinkedCell &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>_cell</b>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class LinkedCell, unsigned int dim&gt;<br />
-class coupling::interface::MoleculeIterator&lt; LinkedCell, dim &gt;</div><p >some iterator scheme for traversing the molecules within a linked cell.</p>
+class coupling::interface::MoleculeIterator&lt; LinkedCell, dim &gt;</div><p >some iterator scheme for traversing the molecules within a linked cell. </p>
+<p >This class provides some iterator scheme for traversing the molecules within a linked cell. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">LinkedCell</td><td>cell type </td></tr>
+    <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a628874b05d58d9a1bb93a8b2a90de242" name="a628874b05d58d9a1bb93a8b2a90de242"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a628874b05d58d9a1bb93a8b2a90de242">&#9670;&nbsp;</a></span>MoleculeIterator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1interface_1_1MoleculeIterator.html">coupling::interface::MoleculeIterator</a>&lt; LinkedCell, dim &gt;::<a class="el" href="classcoupling_1_1interface_1_1MoleculeIterator.html">MoleculeIterator</a> </td>
+          <td>(</td>
+          <td class="paramtype">LinkedCell &amp;&#160;</td>
+          <td class="paramname"><em>cell</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Constructor </p>
+
+</div>
+</div>
+<a id="a5b07e3a5bc0732fbd8bc663a2defcd2b" name="a5b07e3a5bc0732fbd8bc663a2defcd2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b07e3a5bc0732fbd8bc663a2defcd2b">&#9670;&nbsp;</a></span>~MoleculeIterator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classcoupling_1_1interface_1_1MoleculeIterator.html">coupling::interface::MoleculeIterator</a>&lt; LinkedCell, dim &gt;::~<a class="el" href="classcoupling_1_1interface_1_1MoleculeIterator.html">MoleculeIterator</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a6edd0019ac09207a6c079449dc7b7190" name="a6edd0019ac09207a6c079449dc7b7190"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6edd0019ac09207a6c079449dc7b7190">&#9670;&nbsp;</a></span>begin()</h2>
 
@@ -155,7 +224,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns true, if the iterator should continue the molecule traversal </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if the iterator should continue the molecule traversal, false otherwise. </dd></dl>
 
 </div>
 </div>
@@ -183,7 +252,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns a reference to the molecule that this iterator currently points to </p>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the molecule that this iterator currently points to </dd></dl>
 
 </div>
 </div>
@@ -211,7 +280,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >returns a const reference to the current molecule for pure reading purposes </p>
+<dl class="section return"><dt>Returns</dt><dd>a const reference to the current molecule for pure reading purposes </dd></dl>
 
 </div>
 </div>
