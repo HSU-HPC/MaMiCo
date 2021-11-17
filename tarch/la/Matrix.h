@@ -25,7 +25,7 @@ class tarch::la::Matrix {
     T _entries[rows][cols];
 
   public:
-    /** @brief Two constructors, a default one and a constructor, which initializes all elemnet of the matrix with entry t
+    /** @brief Two constructors, a default one and a constructor, which initializes all elemnet of the matrix with entry t.
     * 	@param t the initial value for all elemnts of the matrix.
 	*/
     Matrix(){}
