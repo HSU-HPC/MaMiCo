@@ -9,7 +9,9 @@
 #include "coupling/noisereduction/POD.h"
 #include "coupling/noisereduction/NLM.h"
 
+/**	namespace coupling */
 namespace coupling {
+	/**	namespace configurations */
   namespace configurations {
     class NoiseReductionConfiguration;
   }
@@ -18,7 +20,7 @@ namespace coupling {
 /** noise reduction configuration, i.e. smoothing algorithm to filter MD fluctuations. Derive from the class tarch::configuration::Configuration
  *	@brief noise reduction configuration, i.e. smoothing algorithm to filter MD fluctuations
  *  @author Piet Jarmatz
- *	@ Piet could you please take a look on this class
+ *	@todo Piet could you please take a look on this class
  */
 class coupling::configurations::NoiseReductionConfiguration:
 public tarch::configuration::Configuration {
