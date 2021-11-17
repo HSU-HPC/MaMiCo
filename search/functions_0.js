@@ -26,7 +26,8 @@ var searchData=
   ['applytofirstlayerofglobalnonghostcellswithlinkedcells_23',['applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells',['../classcoupling_1_1datastructures_1_1MacroscopicCells.html#a50f45f9b3029b22c75ee38b220ba4854',1,'coupling::datastructures::MacroscopicCells']]],
   ['applytolocalghostmacroscopiccellswithlinkedcells_24',['applyToLocalGhostMacroscopicCellsWithLinkedCells',['../classcoupling_1_1datastructures_1_1MacroscopicCells.html#a86c0b0005ddf8229cc66949ce391da16',1,'coupling::datastructures::MacroscopicCells']]],
   ['applytolocalnonghostmacroscopiccellswithlinkedcells_25',['applyToLocalNonGhostMacroscopicCellsWithLinkedCells',['../classcoupling_1_1datastructures_1_1MacroscopicCells.html#a156cd063ab0af980ea345bb333c224ea',1,'coupling::datastructures::MacroscopicCells']]],
-  ['assign_26',['assign',['../classtarch_1_1la_1_1Vector.html#ac5b7ac1a89207651f96c7021f8177103',1,'tarch::la::Vector']]],
-  ['attribute_27',['Attribute',['../classtinyxml2_1_1XMLElement.html#a48cf4a315cfbac7d74cd0d5ff2c5df51',1,'tinyxml2::XMLElement']]],
-  ['averagingtransferstrategy_28',['AveragingTransferStrategy',['../classcoupling_1_1transferstrategies_1_1AveragingTransferStrategy.html#ab2d58c8f9f3a70481ab8aa626955cc82',1,'coupling::transferstrategies::AveragingTransferStrategy']]]
+  ['applyxlayersofglobalnonghostcellswithlinkedcells_26',['applyXLayersOfGlobalNonGhostCellsWithLinkedCells',['../classcoupling_1_1datastructures_1_1MacroscopicCells.html#a66266c363c9da4105225872548246c66',1,'coupling::datastructures::MacroscopicCells']]],
+  ['assign_27',['assign',['../classtarch_1_1la_1_1Vector.html#ac5b7ac1a89207651f96c7021f8177103',1,'tarch::la::Vector']]],
+  ['attribute_28',['Attribute',['../classtinyxml2_1_1XMLElement.html#a48cf4a315cfbac7d74cd0d5ff2c5df51',1,'tinyxml2::XMLElement']]],
+  ['averagingtransferstrategy_29',['AveragingTransferStrategy',['../classcoupling_1_1transferstrategies_1_1AveragingTransferStrategy.html#ab2d58c8f9f3a70481ab8aa626955cc82',1,'coupling::transferstrategies::AveragingTransferStrategy']]]
 ];
