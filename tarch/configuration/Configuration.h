@@ -16,7 +16,7 @@ namespace tarch {
   }
 }
 
-/**	interface for configuration using tinyxml2 
+/**	interface for configuration using tinyxml2.
  *  @author Philipp Neumann
  */
 class tarch::configuration::Configuration {
