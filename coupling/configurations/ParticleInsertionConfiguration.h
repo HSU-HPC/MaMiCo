@@ -48,7 +48,8 @@ class coupling::configurations::ParticleInsertionConfiguration: public tarch::co
 
     /** Returns name of xml tag that is associated to the configuration.
 	 * 	@return name of xml tag that is associated to the configuration
-     */string getTag() const;
+     */
+	std::string getTag() const;
 
   
 	 /** checks if the configuration is valid. This operation usually fails, if e.g.
