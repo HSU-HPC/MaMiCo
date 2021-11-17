@@ -11,8 +11,9 @@ var searchData=
   ['transferstrategy_8',['TransferStrategy',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a8b289edb95ae3d7a071cb3b313c8c085',1,'coupling::transferstrategies::TransferStrategy']]],
   ['transferstrategy4niecoupling_9',['TransferStrategy4NieCoupling',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a47787cef3dc469f7d94b209060e544bd',1,'coupling::transferstrategies::TransferStrategy4NieCoupling']]],
   ['transferstrategy4schwarzcoupling_10',['TransferStrategy4SchwarzCoupling',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4SchwarzCoupling.html#a0e4f5a33ca2193654c1b8c34605136a3',1,'coupling::transferstrategies::TransferStrategy4SchwarzCoupling']]],
-  ['triggerreceiving_11',['triggerReceiving',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a5685ebdb7b1c89cca733641164a4fb8c',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['triggersending_12',['triggerSending',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ac98cde3865a7c34a6a0a3447e23689cc',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['twowaycoupling_13',['twoWayCoupling',['../classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168',1,'CouetteTest']]],
-  ['twsloop_14',['twsLoop',['../classCouetteTest.html#a03ed7ba5923445c75bee6f2c5e1bee86',1,'CouetteTest']]]
+  ['transferstrategyconfiguration_11',['TransferStrategyConfiguration',['../classcoupling_1_1configurations_1_1TransferStrategyConfiguration.html#ade8ab7551a02e11f86623ea836dab703',1,'coupling::configurations::TransferStrategyConfiguration']]],
+  ['triggerreceiving_12',['triggerReceiving',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a5685ebdb7b1c89cca733641164a4fb8c',1,'coupling::sendrecv::SendReceiveBuffer']]],
+  ['triggersending_13',['triggerSending',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ac98cde3865a7c34a6a0a3447e23689cc',1,'coupling::sendrecv::SendReceiveBuffer']]],
+  ['twowaycoupling_14',['twoWayCoupling',['../classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168',1,'CouetteTest']]],
+  ['twsloop_15',['twsLoop',['../classCouetteTest.html#a03ed7ba5923445c75bee6f2c5e1bee86',1,'CouetteTest']]]
 ];

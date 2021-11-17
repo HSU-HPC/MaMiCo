@@ -10,7 +10,7 @@ var searchData=
   ['computetemperaturemapping_7',['ComputeTemperatureMapping',['../classcoupling_1_1cellmappings_1_1ComputeTemperatureMapping.html',1,'coupling::cellmappings']]],
   ['configuration_8',['Configuration',['../classtarch_1_1configuration_1_1Configuration.html',1,'tarch::configuration']]],
   ['copy_9',['Copy',['../classcoupling_1_1Copy.html',1,'coupling']]],
-  ['couetteconfig_10',['CouetteConfig',['../structCouetteTest_1_1CouetteConfig.html',1,'CouetteTest']]],
+  ['couetteconfig_10',['CouetteConfig',['../structCouetteTest_1_1CouetteConfig.html',1,'CouetteTest::CouetteConfig'],['../structcoupling_1_1configurations_1_1CouetteConfig.html',1,'coupling::configurations::CouetteConfig']]],
   ['couettesolver_11',['CouetteSolver',['../classcoupling_1_1solvers_1_1CouetteSolver.html',1,'coupling::solvers']]],
   ['couettesolverinterface_12',['CouetteSolverInterface',['../classcoupling_1_1solvers_1_1CouetteSolverInterface.html',1,'coupling::solvers']]],
   ['couettetest_13',['CouetteTest',['../classCouetteTest.html',1,'']]],

@@ -12,5 +12,6 @@ var searchData=
   ['boolattribute_9',['BoolAttribute',['../classtinyxml2_1_1XMLElement.html#a07f6033f25eab7b246b57f4bff0758be',1,'tinyxml2::XMLElement']]],
   ['boolvalue_10',['BoolValue',['../classtinyxml2_1_1XMLAttribute.html#a98ce5207344ad33a265b0422addae1ff',1,'tinyxml2::XMLAttribute']]],
   ['boundary_11',['boundary',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a677344e27f8faf2644d9bef3c50a993b',1,'coupling::solvers::LBCouetteSolver']]],
-  ['boundaryforcecontroller_12',['BoundaryForceController',['../classcoupling_1_1BoundaryForceController.html#a2b1891868681bf76e49c813eaf6075e3',1,'coupling::BoundaryForceController']]]
+  ['boundaryforceconfiguration_12',['BoundaryForceConfiguration',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html#adbe59b414f39d6a78c87b307e4cc445c',1,'coupling::configurations::BoundaryForceConfiguration']]],
+  ['boundaryforcecontroller_13',['BoundaryForceController',['../classcoupling_1_1BoundaryForceController.html#a2b1891868681bf76e49c813eaf6075e3',1,'coupling::BoundaryForceController']]]
 ];

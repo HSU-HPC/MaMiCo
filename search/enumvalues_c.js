@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['temperature_0',['Temperature',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967aaa8359ac43a16edd905af999cff354a37',1,'coupling::error::ErrorEstimation']]],
-  ['test_5flocal_5fmacroscopic_5fsolver_5fid_1',['TEST_LOCAL_MACROSCOPIC_SOLVER_ID',['../namespacecoupling.html#a6d56a3a8dd5094eba68e6ffdf1782f66ab0e0f8a62d16eee48ad023110a44861d',1,'coupling']]],
-  ['top_2',['TOP',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a84f11769e98cd2a7ca834deb019491c7ade06c09e08a732ef7198784bbbf10a0e',1,'coupling::solvers::NumericalSolver']]]
+  ['simplemd_0',['SIMPLEMD',['../structcoupling_1_1configurations_1_1CouetteConfig.html#aef04cb07afb10e80bbc425c30de71ee9a4496ec9bd026e07bfd16f819b9a6904e',1,'coupling::configurations::CouetteConfig::SIMPLEMD()'],['../classCouetteTest.html#a1be6dbd366d9e95716e29b7b59ebb2a5af116bbe71f98ff1e566b54ee8becdee7',1,'CouetteTest::SIMPLEMD()']]],
+  ['synthetic_1',['SYNTHETIC',['../structcoupling_1_1configurations_1_1CouetteConfig.html#aef04cb07afb10e80bbc425c30de71ee9a72f1f7a5dfbde8a057a650bfa091164a',1,'coupling::configurations::CouetteConfig::SYNTHETIC()'],['../classCouetteTest.html#a1be6dbd366d9e95716e29b7b59ebb2a5a918730c741a607a11ab9fb79165cb563',1,'CouetteTest::SYNTHETIC()']]]
 ];

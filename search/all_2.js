@@ -15,7 +15,8 @@ var searchData=
   ['boolvalue_12',['BoolValue',['../classtinyxml2_1_1XMLAttribute.html#a98ce5207344ad33a265b0422addae1ff',1,'tinyxml2::XMLAttribute']]],
   ['bottom_13',['BOTTOM',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a84f11769e98cd2a7ca834deb019491c7a8f39992e40015c632ee618a03e34f6bf',1,'coupling::solvers::NumericalSolver']]],
   ['boundary_14',['boundary',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a677344e27f8faf2644d9bef3c50a993b',1,'coupling::solvers::LBCouetteSolver']]],
-  ['boundaryforceconfiguration_15',['BoundaryForceConfiguration',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html',1,'coupling::configurations']]],
+  ['boundaryforceconfiguration_15',['BoundaryForceConfiguration',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html#adbe59b414f39d6a78c87b307e4cc445c',1,'coupling::configurations::BoundaryForceConfiguration::BoundaryForceConfiguration()'],['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html',1,'coupling::configurations::BoundaryForceConfiguration&lt; dim &gt;']]],
   ['boundaryforcecontroller_16',['BoundaryForceController',['../classcoupling_1_1BoundaryForceController.html#a2b1891868681bf76e49c813eaf6075e3',1,'coupling::BoundaryForceController::BoundaryForceController()'],['../classcoupling_1_1BoundaryForceController.html',1,'coupling::BoundaryForceController&lt; LinkedCell, dim &gt;']]],
-  ['bufferwithid_17',['BufferWithID',['../structcoupling_1_1sendrecv_1_1SendReceiveBuffer_1_1BufferWithID.html',1,'coupling::sendrecv::SendReceiveBuffer']]]
+  ['boundaryforcetype_17',['BoundaryForceType',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html#a86965f71f03c562a1912e0509e8038be',1,'coupling::configurations::BoundaryForceConfiguration']]],
+  ['bufferwithid_18',['BufferWithID',['../structcoupling_1_1sendrecv_1_1SendReceiveBuffer_1_1BufferWithID.html',1,'coupling::sendrecv::SendReceiveBuffer']]]
 ];

@@ -6,7 +6,7 @@ var searchData=
   ['wallinitcycles_3',['wallInitCycles',['../structCouetteTest_1_1CouetteConfig.html#acc25c059fb2ba23fc84f07081f3ce139',1,'CouetteTest::CouetteConfig']]],
   ['wallinitvelocity_4',['wallInitVelocity',['../structCouetteTest_1_1CouetteConfig.html#a88af4a21eaaca3b0f0c1e3eb96ebebc0',1,'CouetteTest::CouetteConfig']]],
   ['walloscillations_5',['wallOscillations',['../structCouetteTest_1_1CouetteConfig.html#af7b2a7a8ef2b693bb187c4cf22139181',1,'CouetteTest::CouetteConfig']]],
-  ['wallvelocity_6',['wallVelocity',['../structCouetteTest_1_1CouetteConfig.html#a5b2c7ad362cd6f783b40d587214b8a79',1,'CouetteTest::CouetteConfig']]],
+  ['wallvelocity_6',['wallVelocity',['../structcoupling_1_1configurations_1_1CouetteConfig.html#ac66251a7036c702bcf95364d78b839f6',1,'coupling::configurations::CouetteConfig::wallVelocity()'],['../structCouetteTest_1_1CouetteConfig.html#a5b2c7ad362cd6f783b40d587214b8a79',1,'CouetteTest::CouetteConfig::wallVelocity()']]],
   ['write2csv_7',['write2CSV',['../classNieTest.html#a39e464f6633faab210049bf719b81611',1,'NieTest::write2CSV()'],['../classCouetteTest.html#ab4a2efee61cd4d1b2c14882171199f4b',1,'CouetteTest::write2CSV()']]],
   ['writecheckpoint_8',['writeCheckpoint',['../classcoupling_1_1interface_1_1MDSimulation.html#a8b2984e545fa526d7824f2ffce650d3d',1,'coupling::interface::MDSimulation::writeCheckpoint()'],['../classcoupling_1_1InstanceHandling.html#a59ff2b1aead9634d9bbeec3c4abaf0c5',1,'coupling::InstanceHandling::writeCheckpoint()']]],
   ['writeindex_9',['WriteIndex',['../classMacroscopicCellsTest_1_1WriteIndex.html',1,'MacroscopicCellsTest']]],
