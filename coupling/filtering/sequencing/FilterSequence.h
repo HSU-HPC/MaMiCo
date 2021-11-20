@@ -5,21 +5,26 @@
 #pragma once
 #include<map>
 #include<numeric>
+#include<functional>
 #include<sys/time.h>
 
 #include "coupling/IndexConversionMD2Macro.h"
 #include "tarch/configuration/ParseConfiguration.h"
+#include "coupling/filtering/interfaces/FilterInterface.h"
+#include "coupling/indexing/CellIndex.h"
 
 //INCLUDE ALL FILTER HEADERS HERE
 //TODO: port filter to new Index System
-/*#include "coupling/filtering/filters/WriteToFile.h"
+/*
+#include "coupling/filtering/filters/WriteToFile.h"
 #include "coupling/filtering/filters/ReadFromFile.h"
 #include "coupling/filtering/filters/Gauss.h"
 //#include "coupling/filtering/filters/POD.h" TODO: fix eigen error
 #include "coupling/filtering/filters/NLM.h"
 #include "coupling/filtering/filters/Strouhal.h"
+*/
 #include "coupling/filtering/filters/FilterFromFunction.h"
-#include "coupling/filtering/filters/Copy.h"*/
+#include "coupling/filtering/filters/Copy.h"
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include "coupling/filtering/SequentialFilter.h"
@@ -53,13 +58,12 @@ class coupling::FilterSequence {
 		 * inputCellVector and cellIndices cover the entire md2Macro domain.
 		 * domainStart and domainEnd span a subspace of the md-to-macro) domain.
 		 */
-    	FilterSequence( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
-						const tarch::utils::MultiMDService<dim>& multiMDService,
+    	FilterSequence(	const tarch::utils::MultiMDService<dim>& multiMDService,
 						const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCells,
-						tarch::la::Vector<dim, unsigned int> domainStart = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary, //TODO: remove
-						tarch::la::Vector<dim, unsigned int> domainEnd = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary,
-						std::array<bool, 7> filteredValues):
+						//const auto domainStart = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary, //TODO: port?
+						//const auto domainEnd = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary, //TODO: port?
+						std::array<bool, 7> filteredValues = { true } ):
 		_multiMDService(multiMDService),
 		_name(name), 
 		_filteredValues(filteredValues),
@@ -71,13 +75,7 @@ class coupling::FilterSequence {
         	std::cout << PRINT_PREFIX() << "Now initializing." << std::endl;
         	#endif
 
-            for(unsigned int d = 0; d < dim; d++) if(_cellIndices.back()[d] < _domainEnd[d]){
-                std::cout << "Filter domain size larger than MD domain. Aborting." << std::endl;
-                exit(EXIT_FAILURE);
-            }
-
 			initCellVectors();
-			initDomain();
 			//init domain
 			//TODO: port for cells without index
 			/*

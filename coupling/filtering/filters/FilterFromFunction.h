@@ -38,7 +38,7 @@ class coupling::FilterFromFunction : public coupling::FilterInterface<dim> {
 				throw std::runtime_error("ERROR: FilterFromFunction received nullptr as function pointer!");
 
 			//cast MaMiCo indexing to std::array
-			tarch::la::vector<dim, unsigned int> mamicoIndex;
+			tarch::la::Vector<dim, unsigned int> mamicoIndex;
 			std::array<unsigned int, dim> stlIndex;
 			for(unsigned int i = 0; i < inputCellVector.size(); i++) {
 				//interpret position of cell in inputCellVector as linear local md-to-macro index, then convert it to vector

@@ -115,7 +115,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	//###############################################################
 
 		//Unknown filter identifier
-        else {
+        /*else*/ {
 			std::cout << "ERROR: Filter-Sequence does not recognize filter called " << currFilterNode->Value() << std::endl;
             exit(EXIT_FAILURE);
         }
@@ -174,7 +174,7 @@ void coupling::FilterSequence<dim>::addFilter(
 			// add copy if no copy after index exists, else remove that copy
 			if(_filters.size() > 1) { //dont check if the newly added FFF is the only filter in the sequence
 				if(std::strcmp(_filters[1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + 1);
-				else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _sequenceDomainCellIndices, _filteredValues));
+				else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1, _filteredValues));
 			}
 			else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE

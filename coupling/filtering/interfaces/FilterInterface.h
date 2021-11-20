@@ -5,6 +5,8 @@
 #pragma once
 #include <vector>
 
+#include "coupling/indexing/CellIndex.h"
+
 //#define DEBUG_FILTER_INTERFACE
 
 namespace coupling{
@@ -93,7 +95,7 @@ class coupling::FilterInterface{
 
 		void updateCellData(
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_inputCells,
-			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells,
+			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& new_outputCells
 		) {
 			if(new_inputCells.size() != new_outputCells.size())
 			   	throw std::runtime_error("New input-, output-, and indexing vectors must be of identical size.");
