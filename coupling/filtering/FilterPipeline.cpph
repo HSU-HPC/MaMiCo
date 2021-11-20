@@ -231,7 +231,7 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		//Iterate over all inputs specified in input string.
 		//Note: If there are non-matching names in input String, they are ignored.
 
-		[[maybe_unused]] bool asymmetrical = false; //true if we need to build an asymmetrical junction
+		bool asymmetrical = false; //true if we need to build an asymmetrical junction
 		unsigned int inputCount = 0;
 
 		for(auto inputName : inputNames) {
@@ -334,20 +334,13 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 				else std::cout << "FP: " << _sequences.back()->getName() << " will use MD data as input." << std::endl;
 			#endif
 		} 
-		else throw std::runtime_error("FP: Junctions are currently disabled!");
-		/* TODO: disabled because of index rework. refactor!
 		else if(asymmetrical) {
 			if(inputCount != 2) throw std::runtime_error("ERROR: Currently, asymmetrical junctions are only allowed for exactly two inputs!");
 			//TODO: currently, the only support asymmetrical junction is one that uses outer cells as secondary input
-			_sequences.push_back(new coupling::AsymmetricalFilterJunction<dim>(	_ic, 
-																				_multiMDService, 
+			_sequences.push_back(new coupling::AsymmetricalFilterJunction<dim>(	_multiMDService, 
 																				currSequenceNode->Value(), 
 																				inputCellVector, 
-																				_md2MacroCellIndices, 
 																				_outerCells, 
-																				_outerCellIndices, 
-																				domainStartCell, 
-																				domainEndCell, 
 																				filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << "FP: " << _sequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
@@ -357,13 +350,9 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		}
 		else { //(symmetrical) Junction = Sequence with 2 or more inputs
 			//TODO: move template inputc: currently has 2 hardcoded
-			_sequences.push_back(new coupling::FilterJunction<dim, 2>(	_ic, 
-																		_multiMDService, 
+			_sequences.push_back(new coupling::FilterJunction<dim, 2>(	_multiMDService, 
 																		currSequenceNode->Value(), 
 																		inputCellVector, 
-																		_md2MacroCellIndices, 
-																		domainStartCell, 
-																		domainEndCell, 
 																		filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << "FP: " << _sequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
@@ -372,7 +361,6 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 			//TODO handling of parent sequences once this becomes relevant for junctions
 		}
 
-		*/
         //Add sequence to temp vector
 		//Check if it's the output sequence.
 		if(std::strcmp(_sequences.back()->getName(),  node->Attribute("output")) == 0){

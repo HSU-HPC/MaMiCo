@@ -32,16 +32,17 @@ namespace coupling{
 template<unsigned int dim, std::size_t inputc>
 class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 	public:
-    	FilterJunction( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
-						const tarch::utils::MultiMDService<dim>& multiMDService,
-						const char* name,
-						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector, //concatenation of numberImput input cell vectors
-						std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, 
-						tarch::la::Vector<dim, unsigned int> domainStart,
-						tarch::la::Vector<dim, unsigned int> domainEnd,
-						std::array<bool, 7> filteredValues
+    	FilterJunction( 
+			const tarch::utils::MultiMDService<dim>& multiMDService,
+			const char* name,
+			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector, //concatenation of numberImput input cell vectors
+			std::array<bool, 7> filteredValues
 		):
-		coupling::FilterSequence<dim>(indexConversion, multiMDService, name, inputCellVector, cellIndices, domainStart, domainEnd, filteredValues)
+		coupling::FilterSequence<dim>(
+			multiMDService, 
+			name, 
+			inputCellVector, 
+			filteredValues)
 		{	
 			if(inputc == 0)
 				throw std::runtime_error("ERROR: Creating FilterJunction with inputc = 0.");
@@ -83,12 +84,8 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 				#endif
 			}
 
-			initDomain();
-
 			coupling::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported.
     	}
-
-    	~FilterJunction(){}
 
 		/*
 		 * This member function allows appendance and insertion of filters defined by two processing functions to a modifiable sequence at runtime. Index -1 implies appending. 
@@ -110,14 +107,9 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) override;
 
 		/*
-		 * This function is very similar to the interface's. Check coupling::FilterSequence for more details.
-		 */
-		void initDomain() override;
-
-		/*
 		 * The first partition of _cellVector1/2 is the main partition. A junction's default output is always its main partition.
 		 */
-    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex = 0) const override{ 
+    	const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& getOutputCellVector(unsigned int outputIndex = 0) const override { 
 			if(outputIndex >= inputc) {
 				std::cout << PRINT_PREFIX() << "ERROR: getOutputCellVector: Requested output index(" << outputIndex << ") too high. (partitions: )" << inputc << std::endl;
 				exit(EXIT_FAILURE);
@@ -145,11 +137,6 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _inputCellVector_parted;
 		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _cellVector1_parted;
 		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _cellVector2_parted;
-
-		//Partitions are given to junctors. Goal: Arbitrary number of input/output partitions.
-		std::array</*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _inputDomainCellVector_parted;
-		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _domainCellVector1_parted;
-		std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>* >, inputc> _domainCellVector2_parted;
 };
 
 //inlcude implementation

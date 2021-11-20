@@ -28,14 +28,10 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 			//first cell data set
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector1,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector1,
-			const std::vector<tarch::la::Vector<dim, unsigned int>> mamicoCellIndices1,
-			const std::vector<tarch::la::Vector<dim, unsigned int>> sequenceCellIndices1, //TODO: remove this parameter: write to file no longer takes two sets of indices
 
 			//second cell data set
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector2,
 			//no output cells
-			const std::vector<tarch::la::Vector<dim, unsigned int>> mamicoCellIndices2,
-			//no sequence indices
 	
 			//"global" parameters for both WriteToFile instances
 			const std::array<bool, 7> filteredValues,
@@ -43,23 +39,20 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 			//WriteToFile-specific parameters. [0] is for the first WriteToFile instance and [1] for the second one respectively.
 			std::array<std::string,2> location,
 			std::array<bool,2> overwrite = { false },
-			std::array<int,2> oneCellOnly = { -1 }):
-		  
+			std::array<int,2> oneCellOnly = { -1 }
+		):
 			coupling::AsymmetricalJunctorInterface<dim>( 
 				inputCellVector1,
 				outputCellVector1,
-				mamicoCellIndices1,
-				
 				inputCellVector2,
-				mamicoCellIndices2,
 				filteredValues,
-		   		"WTF-J")
+		   		"WTF-J"
+			)
 		{
 			//write to file instance covering first cell data set
 			coupling::AsymmetricalJunctorInterface<dim>::_filter1 
 				= new coupling::WriteToFile<dim>(	inputCellVector1,
 													outputCellVector1,
-													mamicoCellIndices1,
 													filteredValues,
 													location[0],
 													overwrite[0],
@@ -69,7 +62,6 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 			coupling::AsymmetricalJunctorInterface<dim>::_filter2
 				= new coupling::WriteToFile<dim>(	inputCellVector2,
 													{}, //no output
-													mamicoCellIndices2,
 													filteredValues,
 													location[1],
 													overwrite[1],
@@ -82,4 +74,3 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 			#endif
 		}
 };
-

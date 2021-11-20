@@ -64,12 +64,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 
             newjunctor = new coupling::WriteToFileJunctor<dim>(	inputCellVector_primary,
 																outputCellVector_primary,
-																this->_mamicoDomainCellIndices,
-																this->_sequenceDomainCellIndices,
-
 																inputCellVector_secondary,
-																_cellIndices_secondary,
-
 																this->_filteredValues,
 																{ currJunctorNode->Attribute("wtf1-location"), currJunctorNode->Attribute("wtf2-location") },
 																overwrite, 

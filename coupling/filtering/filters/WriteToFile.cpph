@@ -17,17 +17,17 @@ void coupling::WriteToFile<dim>::operator()(){
 	else {
 		_file.open(_location);
 	}
-
-	//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("WTF");	
 	
     for(unsigned int ic_index = 0; ic_index < coupling::FilterInterface<dim>::_inputCells.size(); ic_index++) {
 		//case: only one cell
 		if(_oneCellOnly != -1) ic_index = (unsigned int) _oneCellOnly;
 
         _file << _iteration << " ; ";
+		/* TODO: port & use CellIndex here!
         if(!_sequenceCellIndices.empty()) //these indices are optional; if none are provided, we simply don't print them
 			for(unsigned int d = 0; d < dim; d++) _file << _sequenceCellIndices[ic_index][d] << " ; ";
      	for(unsigned int d = 0; d < dim; d++) _file << coupling::FilterInterface<dim>::_cellIndices[ic_index][d] << " ; ";
+		*/
 
 		//printing all scalar values
 		for(auto sGetter : coupling::FilterInterface<dim>::_scalarGetters)
@@ -52,4 +52,3 @@ void coupling::WriteToFile<dim>::operator()(){
     std::cout << " ... done" << std::endl;
     #endif
 }
- 

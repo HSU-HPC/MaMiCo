@@ -39,14 +39,12 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
         WriteToFile(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> mamicoCellIndices,
 				const std::array<bool, 7> filteredValues, 
 				std::string location,
 				bool overwrite = false,
 				int oneCellOnly = -1):
 
-				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, mamicoCellIndices, filteredValues, "WTF"),
-				_sequenceCellIndices({}), //TODO: pass ic to this filter
+				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, filteredValues, "WTF"),
 		   		_location(location),
 				_overwrite(overwrite),
 				_oneCellOnly(oneCellOnly),
@@ -73,14 +71,13 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 	    void operator()();
 
     private:
-		const std::vector<tarch::la::Vector<dim, unsigned int>> _sequenceCellIndices;
         std::string _location;
 
 		//true of only the last iteration should be in file output
 		bool _overwrite;
 
 		//-1 if all cells should be in file output, holds index of the only cell to be outputted otherwise
-		int _oneCellOnly;
+		int _oneCellOnly; //TODO: use CellIndex!
 
         std::ofstream _file;
 		unsigned int _iteration; 
