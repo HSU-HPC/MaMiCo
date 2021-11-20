@@ -11,6 +11,9 @@
 //#define DEBUG_GAUSS
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
+using coupling::indexing::CellIndex;
+using coupling::indexing::IndexTrait;
+
 namespace coupling {
     template<unsigned int dim>
     class Gauss;
@@ -32,27 +35,24 @@ template<unsigned int dim>
 class coupling::Gauss : public coupling::FilterInterface<dim>{
 	using coupling::FilterInterface<dim>::_inputCells;
 	using coupling::FilterInterface<dim>::_outputCells;
-	using coupling::FilterInterface<dim>::_cellIndices;
 	using coupling::FilterInterface<dim>::_scalarGetters;
 	using coupling::FilterInterface<dim>::_vectorGetters;
 	using coupling::FilterInterface<dim>::_scalarSetters;
 	using coupling::FilterInterface<dim>::_vectorSetters;
 
     public:
-        Gauss(  const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
-				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //Use local indexing! (starting at (0,...,0))
-				const std::array<bool, 7> filteredValues,
-				const coupling::IndexConversionMD2Macro<dim>* indexConversion,
-				unsigned int dimension,
-				int sigma,
-				const char* extrapolationStrategy):
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "GAUSS"),
-				_ic(indexConversion),
-				_dim(dimension),
-				_sigma(sigma),
-				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back()),
-				_kernel(generateKernel())
+        Gauss(
+			const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
+			const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
+			const std::array<bool, 7> filteredValues,
+			unsigned int dimension,
+			int sigma,
+			const char* extrapolationStrategy
+		):
+			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"),
+			_dim(dimension),
+			_sigma(sigma),
+			_kernel(generateKernel())
 		{
 			std::cout << "WARNING: You're using a GAUSS-Filter. As this filter has not been tested thoroughly, caution is advised!" << std::endl;
 
@@ -68,8 +68,10 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 			_kernel = {0.27901, 0.44198, 0.27901};
 
 
+			/* TODO: @felix what was this for?
 			if(coupling::FilterInterface<dim>::_cellIndices.back()[_dim] < 2)
 				throw std::runtime_error("ERROR: GAUSS: Invalid input domain.");
+			*/
 
 			if(extrapolationStrategy == nullptr || std::strcmp(extrapolationStrategy, "none") == 0) _extrapolationStrategy = NONE;
 			else if(std::strcmp(extrapolationStrategy, "mirror") == 0) _extrapolationStrategy = MIRROR;
@@ -100,12 +102,12 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		double gaussianDensityFunction(int x);
 
 		/*
-		 * Returns the index of te cell cell that's above the cell at index on the d-axis
+		 * Returns the index of the cell cell that's above the cell at index on the d-axis
 		 * If no such index exists, index (the first parameter) is returned.
 		 *
 		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
-		tarch::la::Vector<dim, unsigned int> getIndexBelow(const tarch::la::Vector<dim, unsigned int> index, unsigned int d);
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> getIndexAbove(const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index, unsigned int d);
 
 		/*
 		 * Returns the index of the cell that's below the cell at index on the d-axis
@@ -113,17 +115,13 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		 *
 		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
-		tarch::la::Vector<dim, unsigned int> getIndexAbove(const tarch::la::Vector<dim, unsigned int> index, unsigned int d);
-
-		const coupling::IndexConversionMD2Macro<dim>* _ic;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> getIndexBelow(const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index, unsigned int d);
 
 		//on which axis this filter operates. 0 <= _dim <= dim
 		unsigned int _dim;
 
 		//standard deviation used
 		int _sigma;
-
-		tarch::la::Vector<dim, unsigned int> _lastIndex;
 
 		std::array<double, 1+2*GAUSS_KERNEL_RADIUS> _kernel;
 		

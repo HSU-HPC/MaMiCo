@@ -23,7 +23,6 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 		
 	//###############################################################
 	//This is where you have to define how to handle each filter individually.
-	/* TODO: refactor filters to new type system
 		//Write To File
         if(std::strcmp(currFilterNode->Value(), "write-to-file") == 0){
 			bool overwrite = false;
@@ -38,13 +37,13 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _mamicoDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
+            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
         }
 	
 		//Read From File
         else if(std::strcmp(currFilterNode->Value(), "read-from-file") == 0){
 			
-            newfilter = new coupling::ReadFromFile<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, currFilterNode->Attribute("location"));
+            newfilter = new coupling::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"));
 		}
 
 		//Gauss
@@ -67,9 +66,11 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			const char* extrapolation;
 			extrapolation = currFilterNode->Attribute("extrapolation");
 
-			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, _ic, (unsigned int) d, sigma, extrapolation);
+			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int) d, sigma, extrapolation);
 		}
 
+	//TODO: refactor the following filters to fit to new type system
+	/*
 		//POD:
         else if(std::strcmp(currFilterNode->Value(), "POD") == 0) {
 			//In earlier implementations, it used to be possible to override tws via function parameter. This feature was removed.
