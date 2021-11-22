@@ -15,7 +15,7 @@ void coupling::ReadFromFile<dim>::operator()(){
 
 	_file.open(_location);
 
-	//TODO: cleaner solution: skipp all lines of previous iterations
+	//Skip all lines of previous iterations
 	std::string skipstr;
 	for(unsigned int s = 0; s < _iteration * ((coupling::FilterInterface<dim>::_inputCells.size())+1); s++) std::getline(_file, skipstr);
 
@@ -35,14 +35,18 @@ void coupling::ReadFromFile<dim>::operator()(){
 		while(std::getline(lineiss, d, ';')) {
 			if(d != " ") { //ignore what comes after last ';'
 				doublesFromLine.push_back( std::stod(d) );
-				if( ic_index == 0 ) std::cout << "		RFF: New double read for cell 0: " << doublesFromLine.back() << std::endl;
+
+				#ifdef DEBUG_READ_FROM_FILE
+				if( ic_index == 0 ) 
+					std::cout << "		RFF: New double read for cell 0: " << doublesFromLine.back() << std::endl;
+				#endif
 			}
 		}
 
 		//TODO: check if number of doubles match dim*_vectorSetters.size() + _scalarSetters.size()
 		
-		//iteration, both types of indices
-		const unsigned int const_offset = 1 + dim + dim;
+		//iteration, indexes. Adjust this if write-to-file's output changes!
+		const unsigned int const_offset = 1 + dim;
 
 		//increases for each double read from line
 		unsigned int incr_offset = 0;
@@ -50,8 +54,12 @@ void coupling::ReadFromFile<dim>::operator()(){
 		//Apply scalar setters
 		for(const auto scalarProperty : coupling::FilterInterface<dim>::_scalarAccessFunctionPairs){
 			(coupling::FilterInterface<dim>::_outputCells[ic_index]->*scalarProperty.set)(doublesFromLine[const_offset + incr_offset]);
-			if( ic_index  == 0) std::cout << "		RFF: Scalar sent to cell 0: " << doublesFromLine[const_offset + incr_offset] << std::endl;
+
+			#ifdef DEBUG_READ_FROM_FILE
+			if( ic_index  == 0)
+				std::cout << "		RFF: Scalar sent to cell 0: " << doublesFromLine[0/*const_offset + incr_offset*/] << std::endl;
 			incr_offset++;
+			#endif
 		}
 		//Apply vector setters
 		for(const auto vectorProperty : coupling::FilterInterface<dim>::_vectorAccessFunctionPairs){
@@ -59,7 +67,11 @@ void coupling::ReadFromFile<dim>::operator()(){
 			for(unsigned int d = 0; d < dim; d++) {
 				 tempVec[d] = doublesFromLine[const_offset+incr_offset+d]; 
 			}
-			if( ic_index  == 0) std::cout << "		RFF: Vector sent to cell 0: " << tempVec << std::endl;
+
+			#ifdef DEBUG_READ_FROM_FILE
+			if( ic_index  == 0) 
+				std::cout << "		RFF: Vector sent to cell 0: " << tempVec << std::endl;
+			#endif
 
 			(coupling::FilterInterface<dim>::_outputCells[ic_index]->*vectorProperty.set)(tempVec);
 			incr_offset += dim;

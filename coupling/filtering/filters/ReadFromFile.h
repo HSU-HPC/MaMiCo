@@ -9,7 +9,7 @@
 #include <vector>
 #include <fstream>
 
-#define DEBUG_READ_FROM_FILE
+//#define DEBUG_READ_FROM_FILE
 
 namespace coupling {
     template<unsigned int dim>
