@@ -25,14 +25,19 @@ template<unsigned int dim, std::size_t inputc, std::size_t outputc>
 class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 	public:
 		JunctorInterface(
-				const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> inputCellVectors,
-				const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, outputc> outputCellVectors,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-				const std::array<bool, 7> filteredValues,
-				const char* type):
+			const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> inputCellVectors,
+			const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, outputc> outputCellVectors,
+			const std::array<bool, 7> filteredValues,
+			const char* type
+		):
 			//This assumes the array of cell vectors to be nonempty. Suboptimal.
 			//NOTE: Avoid using FI's cell vectors. Use _inputCellVectors/_outputCellVectors instead.
-			coupling::FilterInterface<dim>(inputCellVectors[0], outputCellVectors[0], cellIndices, filteredValues, type),
+			coupling::FilterInterface<dim>(
+				inputCellVectors[0], 
+				outputCellVectors[0], 
+				filteredValues, 
+				type
+			),
 			_inputCellVectors(inputCellVectors),
 			_outputCellVectors(outputCellVectors)
 		{
@@ -46,14 +51,6 @@ class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 			#endif	
 		}
 
-		//TODO: do i need this constructor here as well?
-		//FilterInterface(const char* type) : _type(type) {/* Used by incomplete implementations of FilterInterface. Should be redesigned via meta class.*/}
-
-
-		virtual ~JunctorInterface(){};
-
-
-		//TODO: changed this to pass by reference. not sure if thats safe
 		void updateCellData(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > new_inputCellVectors[inputc],
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > new_outputCellVectors[outputc],
@@ -64,10 +61,7 @@ class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 			_outputCellVectors = new_outputCellVectors;
 
 			//Assumes the input c-style vectors to be nonempty. May be problematic.
-			coupling::FilterInterface<dim>::updateCellData(
-					new_inputCellVectors[0],
-					new_outputCellVectors[0],
-					new_cellIndices);
+			coupling::FilterInterface<dim>::updateCellData(new_inputCellVectors[0], new_outputCellVectors[0]);
 		}
 
 	protected:

@@ -29,26 +29,19 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::AsymmetricalFilterJunction : public coupling::FilterSequence<dim> {
 	public:
-    	AsymmetricalFilterJunction( const coupling::IndexConversionMD2Macro<dim>* indexConversion,
-						const tarch::utils::MultiMDService<dim>& multiMDService,
-						const char* name,
-						const std::vector<coupling::datastructures::MacroscopicCell<dim>* > primaryInputCellVector, // primary input of sequence. 
-						std::vector<tarch::la::Vector<dim, unsigned int>> primaryCellIndices, 
-						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	secondaryInputCellVector, // additional data, presented as macro cells as well
-						std::vector<tarch::la::Vector<dim, unsigned int>> secondaryCellIndices, 
-						tarch::la::Vector<dim, unsigned int> primaryDomainStart,
-						tarch::la::Vector<dim, unsigned int> primaryDomainEnd,
-						std::array<bool, 7> filteredValues
+    	AsymmetricalFilterJunction( 
+			const tarch::utils::MultiMDService<dim>& multiMDService,
+			const char* name,
+			const std::vector<coupling::datastructures::MacroscopicCell<dim>* > primaryInputCellVector, // primary input of sequence. 
+			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	secondaryInputCellVector, // additional data, presented as macro cells as well
+			std::array<bool, 7> filteredValues
 		):
-		coupling::FilterSequence<dim>(	indexConversion, 
-										multiMDService, 
-										name, 
-										primaryInputCellVector,
-									   	primaryCellIndices, 
-										primaryDomainStart, 
-										primaryDomainEnd, 
-										filteredValues),
-		_cellIndices_secondary(secondaryCellIndices),
+		coupling::FilterSequence<dim>(
+			multiMDService, 
+			name, 
+			primaryInputCellVector,
+			filteredValues
+		),
 		_inputCellVector_secondary(secondaryInputCellVector)
 		{	
 			#ifdef DEBUG_FILTER_JUNCTION_ASYM
@@ -91,9 +84,6 @@ class coupling::AsymmetricalFilterJunction : public coupling::FilterSequence<dim
 
 
 	private:
-		//all secondary cell vectors use the same indexing
-		std::vector<tarch::la::Vector<dim, unsigned int>> _cellIndices_secondary;
-
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector_secondary;
 		
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1_secondary;

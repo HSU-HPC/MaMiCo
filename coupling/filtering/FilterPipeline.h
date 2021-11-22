@@ -14,7 +14,6 @@
 #include "coupling/filtering/sequencing/AsymmetricalFilterJunction.h"
 #include "coupling/IndexConversionMD2Macro.h"
 
-
 /*
  * TODO: rework comment
  *
