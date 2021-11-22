@@ -10,7 +10,7 @@ namespace coupling{
 	class Copy;
 }
 
-/*
+/**
  * Simplest practical implementation of FilterInterfaceReadOnly. 
  * Used primarily as a "filler" filter when adding filters at runtime. Check FilterSequence.h for details.
  * @author Felix Maurer

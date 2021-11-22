@@ -6,7 +6,10 @@
 #include <memory>
 
 namespace coupling {
-  namespace filtering {
+	/** Modular filtering and data analytics system. Includes inferfaces and services that manage the filtering subsystem,
+	 * as well as several filter implementations. 
+	 */
+	namespace filtering {
   	/***
 	* Quantities<dim>[0] := mass
 	* Quantities<dim>[1..dim] := momentum
