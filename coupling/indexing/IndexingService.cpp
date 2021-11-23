@@ -25,7 +25,7 @@ namespace coupling {
 
 
 		/*
-		 * !MD TO MACRO aka MAMICO INDEXING, INCL GHOST LAYER
+		 * NON-MD-TO-MACRO aka MAMICO INDEXING, INCL GHOST LAYER
 		 */
 		
 		//scalar, global, not md2macro, not noGL
@@ -301,7 +301,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	//handle all local indexing types
 	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
 
-		_numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(); //TODO read this properly
+		_numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses();
 
       	// determine topology offset of this rank
 		const auto parallelTopologyType { _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType() };
@@ -313,6 +313,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 
 		//init boundaries of all local, non-m2m, GL including indexing types
 		BaseIndex<dim> local_lowerBoundary { CellIndex<dim /*global*/>::lowerBoundary }; //used to test which indices are within local bounds
+		//TODO: determine these two analyticaly (i.e. calculate domain bounds): you dont need to iterate over all global indices.
 		while(true) {
 			ranks = getRanksForGlobalIndex(local_lowerBoundary, globalNumberMacroscopicCells);
 			if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
@@ -324,7 +325,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 				throw std::runtime_error( "IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s); 
 			}
 
-			//...increment by one if above is too high to be in md-to-macro domain
+			//...increment by one if above is too high to be in local domain
 			++local_lowerBoundary; 
 		}
 		BaseIndex<dim> local_upperBoundary { CellIndex<dim /*global*/>::upperBoundary };
@@ -339,7 +340,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 				throw std::runtime_error( "IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s); 
 			}
 
-			//...decrement by one if above is too high to be in md-to-macro domain
+			//...decrement by one if above is too high to be in local domain
 			--local_upperBoundary; 
 		}
 
@@ -347,8 +348,8 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<dim, IndexTrait::local>::upperBoundary = local_upperBoundary;
 		CellIndex<dim, IndexTrait::local>::setDomainParameters();
 
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::lowerBoundary = CellIndex<dim, IndexTrait::vector>::lowerBoundary;
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::upperBoundary = CellIndex<dim, IndexTrait::vector>::upperBoundary;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::lowerBoundary = CellIndex<dim, IndexTrait::local>::lowerBoundary;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::upperBoundary = CellIndex<dim, IndexTrait::local>::upperBoundary;
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::setDomainParameters();
 
 		//init boundaries of all local, non-m2m, GL excluding indexing types
@@ -460,11 +461,6 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex
     	if (globalCellIndex.get()[d] < end[d]  ){end[d] = globalCellIndex.get()[d]+1;}
   	}
 
-	/*
-	 * TODO: refactor
-	 * FM: I dont really get what is going on in {-- .. --}.
-	 */
-	// {--
 	// loop over neighbouring regions
 	for (loopIndex[2] = start[2]; loopIndex[2] <= end[2]; loopIndex[2]++){
 		for (loopIndex[1] = start[1]; loopIndex[1] <= end[1]; loopIndex[1]++){
@@ -487,14 +483,12 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex
 			}
 		}
 	}
-	// --}
 
 	return ranks;
 }
 #endif
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //unused in sequential scenario
-//TODO: inline everything below here
 /*
  * This was in large parts stolen from IndexConversion.
  * Note that this uses the globalNumberMacroscopicCells definition excl. the ghost layer.
@@ -502,7 +496,7 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex
 template<unsigned int dim>
 unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
 
-	//vector containing avg number of macro cells, not counting global GL. //TODO: make this a member?
+	//vector containing avg number of macro cells, not counting global GL. 
 	tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells { 0 };
 	for (unsigned int d = 0; d < dim; d++) {
 		if(globalCellIndex[d] >= globalNumberMacroscopicCells[d]+2) { //greater or equal to the total global number incl GL (+2)
