@@ -35,12 +35,8 @@ coupling::SequentialFilter<dim>::SequentialFilter(
 			_inputCells_Local = _filter->getInputCells(); 
 			_outputCells_Local = _filter->getOutputCells(); 			
 
-			//Get linear domain size, i.e amount of cells in MD-To-Macro domain. 
-			unsigned int linearNumberOfCells = 1;
-			for(unsigned int d = 0; d < dim; d++)
-				linearNumberOfCells *= CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain[d];
-
-			for(unsigned int c = 0; c < linearNumberOfCells ; c++) { 
+			//allocate global cell datastructures
+			for(unsigned int c = 0; c < CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain; c++) {
 				_inputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 				_outputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 			}

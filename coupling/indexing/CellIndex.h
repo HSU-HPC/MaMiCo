@@ -136,7 +136,7 @@ class coupling::indexing::CellIndex {
 		 *
 		 * @return unsigned integer/vector representation of this index.
 		 */
-		value_T get() const { return (value_T) _index; }
+		value_T get() const { return _index; } //TODO: why (value_T) cast?
 	
 		/**
 		 * Increments the index by one.
@@ -184,6 +184,11 @@ class coupling::indexing::CellIndex {
 		 */
 		static void setDomainParameters() {
 			numberCellsInDomain = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
+			//TODO: test
+			
+			linearNumberCellsInDomain = 1;
+			//for(unsigned int d = 0; d < dim; d++) linearNumberCellsInDomain *= numberCellsInDomain[d];
+			
 
 			tarch::la::Vector<dim, unsigned int> divFactor { 1 };
 			for (unsigned int d = 1; d < dim; d++) divFactor[d] = divFactor[d-1]*(numberCellsInDomain[d-1]);
@@ -206,6 +211,12 @@ class coupling::indexing::CellIndex {
 		 * Initialised in setDomainParameters().
 		 */
 		static tarch::la::Vector<dim, unsigned int> numberCellsInDomain;
+
+		/**
+		 * Number of cells in this indexing's domain. Same as numberCellsInDomain, but expressed as a scalar.
+		 */
+		static unsigned int linearNumberCellsInDomain;
+
 		/**
 		 * Used in scalar -> vector indexing conversion functions
 		 * Initialised in setDomainParameters().

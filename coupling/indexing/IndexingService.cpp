@@ -36,6 +36,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3>::divisionFactor {};
 
 		//BaseIndex
@@ -45,6 +47,8 @@ namespace coupling {
 		BaseIndex<3> BaseIndex<3>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> BaseIndex<3>::numberCellsInDomain {};
+		template<>
+		unsigned int BaseIndex<3>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> BaseIndex<3>::divisionFactor {};
 		
@@ -56,6 +60,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::local>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::divisionFactor {};
 
 		//vector, local, not md2macro, not noGL
@@ -65,6 +71,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local>::divisionFactor {};
 
@@ -81,6 +89,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::md2macro>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::divisionFactor {};
 
 		//vector, global, md2macro, not noGL
@@ -90,6 +100,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::divisionFactor {};
 
@@ -101,6 +113,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::divisionFactor {};
 
 		//vector, local, md2macro, not noGL
@@ -110,6 +124,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::divisionFactor {};
 		
@@ -126,6 +142,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::noGhost>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::divisionFactor {};
 
 		//vector, global, not md2macro, noGL
@@ -135,6 +153,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::divisionFactor {};
 
@@ -146,6 +166,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::divisionFactor {};
 
 		//vector, local, not md2macro, noGL
@@ -155,6 +177,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::divisionFactor {};
 
@@ -171,6 +195,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor {};
 
 		//vector, global, md2macro, noGL
@@ -180,6 +206,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor {};
 
@@ -192,6 +220,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor {};
 
 		//vector, local, md2macro, noGL
@@ -201,6 +231,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor {};
 
