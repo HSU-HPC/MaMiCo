@@ -184,10 +184,9 @@ class coupling::indexing::CellIndex {
 		 */
 		static void setDomainParameters() {
 			numberCellsInDomain = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
-			//TODO: test
 			
 			linearNumberCellsInDomain = 1;
-			//for(unsigned int d = 0; d < dim; d++) linearNumberCellsInDomain *= numberCellsInDomain[d];
+			for(unsigned int d = 0; d < dim; d++) linearNumberCellsInDomain *= numberCellsInDomain[d];
 			
 
 			tarch::la::Vector<dim, unsigned int> divFactor { 1 };

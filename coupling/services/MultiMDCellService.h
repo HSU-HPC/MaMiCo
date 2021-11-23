@@ -157,6 +157,15 @@ class coupling::services::MultiMDCellService {
           for(unsigned int i = 0; i < size; i++) _cellIndices.push_back(globalCellIndicesFromMacroscopicSolver[i]);
       }
 
+	  /*
+	   * If this the first coupling step, construct filter pipeline instances on each MacroscopicCellService instance.
+	   */
+	  for(unsigned int md = 0; md < _totalNumberMDSimulations; md++) {
+		  if(_macroscopicCellServices[md]->getFilterPipeline() == nullptr) {
+			  _macroscopicCellServices[md]->initFiltering();
+		  }
+	  }
+
       /*
        * If this is the first coupling step, we must init the post multi instance filter pipeline operating on averaged cell data.
        * The ENABLE_POST_MULTI_INSTANCE_FILTERING flag is used for debugging purposes and shall be removed later.

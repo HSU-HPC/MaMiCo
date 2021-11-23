@@ -116,7 +116,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	//###############################################################
 
 		//Unknown filter identifier
-        /*else*/ {
+        else {
 			std::cout << "ERROR: Filter-Sequence does not recognize filter called " << currFilterNode->Value() << std::endl;
             exit(EXIT_FAILURE);
         }
