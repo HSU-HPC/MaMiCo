@@ -182,7 +182,7 @@ public:
   }
   void endCellIteration(){}
   void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    const double temperature = cell.getTemperature();
+    const double temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
     Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell,index);
     Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell,temperature);
   }
