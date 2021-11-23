@@ -129,7 +129,6 @@ class coupling::FilterSequence {
 		 */
 		void operator()() {
 			for(auto filter : _filters){
-				//TODO: isnt there a C++ way to do this?
 				//measure time before application
 				timeval before;
 				gettimeofday(&before, NULL);
