@@ -2,13 +2,14 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-
+#if (USHER_VIS)
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <algorithm>
 #include <cstdio>
 #include "coupling/interface/Molecule.h"
+#endif
 
 namespace coupling {
   namespace cellmappings {
@@ -17,7 +18,7 @@ namespace coupling {
   }
 }
 
-
+#if (USHER_VIS)
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::usherVisPlotter {
   public:
@@ -64,6 +65,7 @@ class coupling::cellmappings::usherVisPlotter {
     std::stringstream &_moleculePositions;
     unsigned int _particleCounter;
 };
+#endif
 
 template<class LinkedCell,unsigned int dim>
 coupling::UsherParticleInsertion<LinkedCell,dim>::UsherParticleInsertion(
@@ -83,6 +85,7 @@ _particlesRemoved(0),
 _mdSolverInterface(mdSolverInterface),
 _usherParams(rSigmaCoeff,meanPotentialEnergyFactor,uOverlapCoeff,stepRefCoeff,iterMax,restartMax,tolerance,offsetFromOuterBoundary)
 {
+  #if (USHER_VIS)
   remove("usherPositions.txt");
   remove("usherVelocities.txt");
   remove("StatusDoc.txt");
@@ -101,6 +104,7 @@ _usherParams(rSigmaCoeff,meanPotentialEnergyFactor,uOverlapCoeff,stepRefCoeff,it
   StatusDoc.open("StatusDoc.txt", std::ios::trunc);
   StatusDoc<<"0";
   StatusDoc.close();
+  #endif
 }
 
 
@@ -123,9 +127,13 @@ const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
     action = insertParticle(cell,macroscopicCellPosition,macroscopicCellSize,meanVelocity,temperature,boundaryForceController);
     if (action == coupling::ParticleInsertion<LinkedCell,dim>::Insertion){
       cell.addMicroscopicMass(-moleculeMass);
+
+      #if (USHER_VIS)
       remove ("pathDoc.txt");
+      #endif
     }
 
+  #if (USHER_VIS)
   //particle insertion failed
   else{
     std::ofstream pfile("usherPositions.txt", std::ios::app);
@@ -177,6 +185,7 @@ const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
     StatusDoc<<"success";
     StatusDoc.close();
     }
+    #endif
   }
 
   // if we need to delete a particle, we try this and - in case it works - add a particle mass to the negative buffer
@@ -190,6 +199,7 @@ const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
     }
   }
 
+  #if (USHER_VIS)
   //if no particle was inserted, the algorithm did not fail inserting and no particle was deleted, only plot the cell,
   //if the microscopic mass is greater than 0.5 and the cell is at a surface of the domain
   else if(toBePlotted && std::abs(cell.getMicroscopicMass())>0.5)
@@ -218,6 +228,7 @@ const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
     pfile.close();
     vfile.close();
   }
+  #endif
 
   return action;
 }
@@ -245,6 +256,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::insertParticle(
     _mdSolverInterface->getInitialVelocity(meanVelocity,_mdSolverInterface->getKB(),temperature,velocity);
     molecule.setVelocity(velocity);
     
+    #if (USHER_VIS)
     //write molecules within the considered cell
     std::string help;
     std::stringstream _moleculeVelocities;
@@ -289,7 +301,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::insertParticle(
     std::ofstream StatusDoc("StatusDoc.txt", std::ios::trunc);
     StatusDoc << "success";
     StatusDoc.close();
-
+    #endif
 
     // add molecule to MD simulation and linked cell structures
     _mdSolverInterface->addMoleculeToMDSimulation(molecule);
@@ -333,6 +345,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   _particlesRemoved++;
   #endif
 
+  #if (USHER_VIS)
   std::string help;
   std::stringstream _moleculeVelocities;
   std::stringstream _moleculePositions;
@@ -376,6 +389,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::deleteParticle(
   StatusDoc.open("StatusDoc.txt", std::ios::trunc);
   StatusDoc << "success";
   StatusDoc.close();
+  #endif
 
   return coupling::ParticleInsertion<LinkedCell,dim>::Deletion;
 }
@@ -459,6 +473,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       position[d] = macroscopicCellPosition[d] +  macroscopicCellSize[d]*tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();
     }
 
+    #if (USHER_VIS)
     std::string help;
     std::ofstream pathDoc2("pathDoc.txt", std::ios::app);
     for (unsigned int d = 0; d < dim; d++)
@@ -468,6 +483,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       pathDoc2<<help<<std::endl;
     }
     pathDoc2.close();
+    #endif
 
     // determine force and energy that act on molecule
     molecule.setPosition(position);
@@ -537,6 +553,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
 
       molecule.setPosition(position);
 
+      #if (USHER_VIS)
       std::string help;
       std::ofstream pathDoc2("pathDoc.txt", std::ios::app);
       for (unsigned int d = 0; d < dim; d++)
@@ -546,6 +563,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
         pathDoc2<<help<<std::endl;
       }
       pathDoc2.close();
+      #endif
       
       // restart searching if the new position of the particle is outside the macroscopic cell
       for (unsigned int d = 0; d < dim; d++ ){
@@ -579,9 +597,11 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       }
     }
 
+    #if (USHER_VIS)
     std::ofstream pathDoc("pathDoc.txt", std::ios::app);
     pathDoc << "restart" << std::endl;
     pathDoc.close();
+    #endif
 
     if(success>0){
        molecule.setPosition(positionOld);

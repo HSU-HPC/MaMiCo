@@ -424,6 +424,7 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
 
   } // 2^dim-colour whole domain (1<<dim)
 
+  #if (USHER_VIS)
   std::ifstream inHelperDoc("StatusDoc.txt");
   std::string inH;
   getline(inHelperDoc,inH);
@@ -457,8 +458,8 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::distributeM
     outPosDoc.close();    
     
     remove("usherVelocities.txt");
-
   }
+  #endif
 
 
   #ifdef USHER_DEBUG
