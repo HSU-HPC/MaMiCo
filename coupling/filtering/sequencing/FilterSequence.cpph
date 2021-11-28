@@ -243,8 +243,5 @@ void coupling::FilterSequence<dim>::initCellVectors(){
 	}
 	#ifdef DEBUG_FILTER_PIPELINE
 		std::cout << PRINT_PREFIX() << "Initialized cell vectors." << std::endl;
-		std::cout << PRINT_PREFIX() << "First element of _cellVector1 after init: " << _cellVector1[0] << std::endl;
-		std::cout << PRINT_PREFIX() << "First element of _cellVector2 after init: " << _cellVector2[0] << std::endl;
-
     #endif 
 }

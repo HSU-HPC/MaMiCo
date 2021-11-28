@@ -168,6 +168,7 @@ class coupling::indexing::CellIndex {
 
 		/*
 		 * Any two indices fulfill some relation iff the unsigned integers underlying their CellIndex<dim, {}> equivalents fulfill that relation.
+		 * Note that this is different than what the static member 'contains(...)' does.
 		 *
 		 * @param CellIndex index to compare this index to
 		 */
@@ -192,6 +193,21 @@ class coupling::indexing::CellIndex {
 			tarch::la::Vector<dim, unsigned int> divFactor { 1 };
 			for (unsigned int d = 1; d < dim; d++) divFactor[d] = divFactor[d-1]*(numberCellsInDomain[d-1]);
 			divisionFactor = divFactor;
+		}
+
+		/**
+		 * Checks if a given index is within the domain between this the lower and upper bound of this kind of indexing.
+		 *
+		 * @param CellIndex index index to be checked
+		 * @return true iff i is within the domain of this CellIndex template specialisation.
+		 */
+		static bool contains(const coupling::indexing::BaseIndex<dim>& index) {
+			for(unsigned int d = 0; d < dim; d++) {
+				if(index.get()[d] < CellIndex::lowerBoundary.get()[d]) return false;
+				if(index.get()[d] > CellIndex::upperBoundary.get()[d]) return false;
+			}
+
+			return true;
 		}
 
 		/**

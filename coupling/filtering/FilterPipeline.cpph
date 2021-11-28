@@ -30,12 +30,14 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 	//case: the input vector contains the entire MD domain
 	if(inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
 		using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>;
+
 		for(unsigned int i = 0; i < inputCells.size(); i++) {
-			//TODO: most likely bugged
-			if(CellIndex<dim> { i } >= Md2MacroIndex::lowerBoundary and CellIndex<dim> { i } <= Md2MacroIndex::upperBoundary)
+			if(Md2MacroIndex::contains(CellIndex<dim, IndexTrait::local> { i } )) {
 				_md2MacroCells.emplace_back(inputCells[i]);
-			else
+			}
+			else {
 				_outerCells.emplace_back(inputCells[i]);
+			}
 		}
 	}
 	//case: the input vector contains only the MD-To-Macro domain
