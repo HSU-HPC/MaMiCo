@@ -11,8 +11,9 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	if(!sequenceNode) return EXIT_FAILURE;
     tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
 	
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector = _inputDomainCellVector;	
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector = _domainCellVector2;	
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector = _inputCellVector;	
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector = _cellVector2;	
+	
 	#ifdef DEBUG_FILTER_PIPELINE
 	std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
 	#endif	
@@ -132,7 +133,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 		_filters.push_back(newfilter);
 
 		if(firstIteration){
-			inputCellVector = _domainCellVector1;
+			inputCellVector = _cellVector1;
 			firstIteration = false;
 		}
 
@@ -167,10 +168,10 @@ void coupling::FilterSequence<dim>::addFilter(
 
 		//case: index 0
 		if (index  == 0) {
-			//previous filter at index 0 won't use _inputDomainCellVector any longer
+			//previous filter at index 0 won't use _inputCellVector any longer
 			if(!_filters.empty()) _filters[0]->setInputCells(_cellVector1);
 
-			_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_inputDomainCellVector, _cellVector2 , _filteredValues, applyScalar, applyVector));
+			_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_inputCellVector, _cellVector2 , _filteredValues, applyScalar, applyVector));
 
 			// add copy if no copy after index exists, else remove that copy
 			if(_filters.size() > 1) { //dont check if the newly added FFF is the only filter in the sequence

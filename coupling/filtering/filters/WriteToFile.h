@@ -37,14 +37,14 @@ template<unsigned int dim>
 class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
     public:
         WriteToFile(
-				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
-				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
+				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,
+				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCells,
 				const std::array<bool, 7> filteredValues, 
 				std::string location,
 				bool overwrite = false,
 				int oneCellOnly = -1):
 
-				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, filteredValues, "WTF"),
+				coupling::FilterInterfaceReadOnly<dim>(inputCells, outputCells, filteredValues, "WTF"),
 		   		_location(location),
 				_overwrite(overwrite),
 				_oneCellOnly(oneCellOnly),
@@ -56,7 +56,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 			}
 
         	#ifdef DEBUG_WRITE_TO_FILE
-            std::cout << "		WTF: Write to file instance created. Will save to: " << _location << ". Last Cell Index: " << coupling::FilterInterface<dim>::_cellIndices.back() << std::endl;
+            std::cout << "		WTF: Write to file instance created. Will save to: " << _location << std::endl;
 			if(_overwrite) std::cout << "		It will only print output of the last iteration." << std::endl;
 			if(_oneCellOnly != -1) std::cout << "		It will only print data of cell with linear sequence domain index " << _oneCellOnly << std::endl;
         	#endif
