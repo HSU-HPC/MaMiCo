@@ -41,7 +41,9 @@ _macroscopicSolverInterface(macroscopicSolverInterface),
 _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
 _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID),
 _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface ),
-_filterPipeline(_macroscopicCells.getMacroscopicCells(), multiMDService, coupling::Scope::perInstance, filterPipelineConfiguration),
+_filterPipeline(nullptr),
+_filterPipelineConfiguration(filterPipelineConfiguration),
+_multiMDService(multiMDService),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
 _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
@@ -100,6 +102,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::~MacroscopicCell
   //if (_noiseReduction  != NULL){ delete    _noiseReduction;  _noiseReduction  = NULL; }
   if (_boundaryForceController!=NULL){ delete _boundaryForceController; _boundaryForceController=NULL;}
   if (_indexConversion   != NULL){ delete    _indexConversion;   _indexConversion   = NULL; }
+  if (_filterPipeline    != nullptr){ delete _filterPipeline;}
 }
 
 
@@ -165,7 +168,9 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
-  _filterPipeline(); 
+  if(_filterPipeline != nullptr) {
+    (*_filterPipeline)(); 
+  }
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);

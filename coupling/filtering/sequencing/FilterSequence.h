@@ -54,16 +54,14 @@ class coupling::FilterSequence {
 		/*
 		 * Filter Sequences are constructed in coupling::FilterPipeline::loadSequencesFromXML(...).
 		 * inputCellVector and cellIndices cover the entire md2Macro domain.
-		 * domainStart and domainEnd span a subspace of the md-to-macro) domain.
 		 */
     	FilterSequence(	const tarch::utils::MultiMDService<dim>& multiMDService,
 						const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCells,
-						//const auto domainStart = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary, //TODO: port?
-						//const auto domainEnd = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary, //TODO: port?
 						std::array<bool, 7> filteredValues = { true } ):
 		_multiMDService(multiMDService),
 		_name(name), 
+		_inputCellVector(inputCells),
 		_filteredValues(filteredValues),
 		_isOutput(false), //potentially updated via loadSequencesFromXML calling setAsOutput()
 		_isModifiable(true), //TODO: allow const sequences via XML attribute
@@ -74,21 +72,7 @@ class coupling::FilterSequence {
         	#endif
 
 			initCellVectors();
-			//init domain
-			//TODO: port for cells without index
-			/*
-			{
-				auto isInSequenceDomainPredicate 
-					= [domainStart, domainEnd](coupling::datastructures::IndexedMacroscopicCell<dim> *c) { 
-							return (c->index >= domainStart) and (c->index <= domainEnd); 
-						};
-
-				//do some filtering
-				std::copy_if(_inputCellVector.begin(), _inputCellVector.end(), std::back_inserter(_inputDomainCellVector), isInSequenceDomainPredicate);
-				std::copy_if(_cellVector1.begin(), _cellVector1.end(), std::back_inserter(_domainCellVector1), isInSequenceDomainPredicate);
-				std::copy_if(_cellVector2.begin(), _cellVector2.end(), std::back_inserter(_domainCellVector2), isInSequenceDomainPredicate);
-			}*/
-
+			
 			bool filtersAnything = false;
 			for(unsigned int i = 0; i < 7; i++) if(_filteredValues[i]) { filtersAnything = true; break; }
 			if(!filtersAnything) std::cout << "Warning: Filter sequence " << _name << " does not filter any values. Add 'filtered-values' attribute to XML element to change this." << std::endl;
@@ -129,7 +113,6 @@ class coupling::FilterSequence {
 		 */
 		void operator()() {
 			for(auto filter : _filters){
-				//TODO: isnt there a C++ way to do this?
 				//measure time before application
 				timeval before;
 				gettimeofday(&before, NULL);
@@ -280,13 +263,6 @@ class coupling::FilterSequence {
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector2;//allocated for this sequence only
-
-		//points to macro cells of this sequence's input that are within domain
-        /*pseudo const*/std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputDomainCellVector;
-		//points to cells of vector 1 that are within the domain's range
-    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector1;
-		//same for vector 2
-    	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _domainCellVector2;
 		
 		std::array<bool, 7> _filteredValues;
 

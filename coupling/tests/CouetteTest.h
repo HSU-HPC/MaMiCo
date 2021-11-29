@@ -22,8 +22,8 @@
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/services/MultiMDCellService.h"
-
 #include "coupling/indexing/IndexingService.h"
+
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
@@ -402,7 +402,7 @@ private:
 		 */
 		try {
 			for(unsigned int i = 0; i < _localMDInstances; i++) 
-				_multiMDCellService->getMacroscopicCellService(i).getFilterPipeline().getSequence(SYNTHETICMD_SEQUENCE)->addFilter(
+				_multiMDCellService->getMacroscopicCellService(i).getFilterPipeline()->getSequence(SYNTHETICMD_SEQUENCE)->addFilter(
 				new std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, 3>>)>{ //applyScalar
 				[this] (
    	 				std::vector<double> inputScalars, //doesnt get used: matching MCS's addFilterToSequence(...) signature

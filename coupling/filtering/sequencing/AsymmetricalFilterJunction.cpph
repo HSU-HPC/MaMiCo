@@ -12,8 +12,8 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
     tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
 	
 	//These four are not to be confused with member variables of similar names. Watch out for the "_" in front of member variables.
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_primary = coupling::FilterSequence<dim>::_inputDomainCellVector;
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_primary = coupling::FilterSequence<dim>::_domainCellVector2;
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_primary = coupling::FilterSequence<dim>::_inputCellVector;
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_primary = coupling::FilterSequence<dim>::_cellVector2;
 
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_secondary = _inputCellVector_secondary;
 	//Note: To prevent counter intuitive design, secondary output has been disabled, i.e. all junctors in an AFJ take the same secondary input.
@@ -81,7 +81,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
         }
 
 		if(firstIteration){
-			inputCellVector_primary = coupling::FilterSequence<dim>::_domainCellVector1;
+			inputCellVector_primary = coupling::FilterSequence<dim>::_cellVector1;
 			inputCellVector_secondary = _cellVector1_secondary;
 			firstIteration = false;
 		}

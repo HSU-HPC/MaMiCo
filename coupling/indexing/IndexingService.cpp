@@ -25,7 +25,7 @@ namespace coupling {
 
 
 		/*
-		 * !MD TO MACRO aka MAMICO INDEXING, INCL GHOST LAYER
+		 * NON-MD-TO-MACRO aka MAMICO INDEXING, INCL GHOST LAYER
 		 */
 		
 		//scalar, global, not md2macro, not noGL
@@ -35,6 +35,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3>::divisionFactor {};
 
@@ -46,6 +48,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> BaseIndex<3>::numberCellsInDomain {};
 		template<>
+		unsigned int BaseIndex<3>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> BaseIndex<3>::divisionFactor {};
 		
 		//scalar, local, not md2macro, not noGL
@@ -56,6 +60,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::local>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::divisionFactor {};
 
 		//vector, local, not md2macro, not noGL
@@ -65,6 +71,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local>::divisionFactor {};
 
@@ -81,6 +89,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::md2macro>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::divisionFactor {};
 
 		//vector, global, md2macro, not noGL
@@ -90,6 +100,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::divisionFactor {};
 
@@ -101,6 +113,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::divisionFactor {};
 
 		//vector, local, md2macro, not noGL
@@ -110,6 +124,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::divisionFactor {};
 		
@@ -126,6 +142,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::noGhost>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::divisionFactor {};
 
 		//vector, global, not md2macro, noGL
@@ -135,6 +153,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::divisionFactor {};
 
@@ -146,6 +166,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::divisionFactor {};
 
 		//vector, local, not md2macro, noGL
@@ -155,6 +177,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::divisionFactor {};
 
@@ -171,6 +195,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor {};
 
 		//vector, global, md2macro, noGL
@@ -180,6 +206,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor {};
 
@@ -192,6 +220,8 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain {};
 		template<>
+		unsigned int CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain {};
+		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor {};
 
 		//vector, local, md2macro, noGL
@@ -201,6 +231,8 @@ namespace coupling {
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain {};
+		template<>
+		unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain {};
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor {};
 
@@ -301,7 +333,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	//handle all local indexing types
 	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
 
-		_numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(); //TODO read this properly
+		_numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses();
 
       	// determine topology offset of this rank
 		const auto parallelTopologyType { _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType() };
@@ -313,6 +345,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 
 		//init boundaries of all local, non-m2m, GL including indexing types
 		BaseIndex<dim> local_lowerBoundary { CellIndex<dim /*global*/>::lowerBoundary }; //used to test which indices are within local bounds
+		//TODO: determine these two analyticaly (i.e. calculate domain bounds): you dont need to iterate over all global indices.
 		while(true) {
 			ranks = getRanksForGlobalIndex(local_lowerBoundary, globalNumberMacroscopicCells);
 			if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
@@ -324,7 +357,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 				throw std::runtime_error( "IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s); 
 			}
 
-			//...increment by one if above is too high to be in md-to-macro domain
+			//...increment by one if above is too high to be in local domain
 			++local_lowerBoundary; 
 		}
 		BaseIndex<dim> local_upperBoundary { CellIndex<dim /*global*/>::upperBoundary };
@@ -339,7 +372,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 				throw std::runtime_error( "IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s); 
 			}
 
-			//...decrement by one if above is too high to be in md-to-macro domain
+			//...decrement by one if above is too high to be in local domain
 			--local_upperBoundary; 
 		}
 
@@ -347,8 +380,8 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<dim, IndexTrait::local>::upperBoundary = local_upperBoundary;
 		CellIndex<dim, IndexTrait::local>::setDomainParameters();
 
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::lowerBoundary = CellIndex<dim, IndexTrait::vector>::lowerBoundary;
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::upperBoundary = CellIndex<dim, IndexTrait::vector>::upperBoundary;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::lowerBoundary = CellIndex<dim, IndexTrait::local>::lowerBoundary;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::upperBoundary = CellIndex<dim, IndexTrait::local>::upperBoundary;
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::setDomainParameters();
 
 		//init boundaries of all local, non-m2m, GL excluding indexing types
@@ -460,11 +493,6 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex
     	if (globalCellIndex.get()[d] < end[d]  ){end[d] = globalCellIndex.get()[d]+1;}
   	}
 
-	/*
-	 * TODO: refactor
-	 * FM: I dont really get what is going on in {-- .. --}.
-	 */
-	// {--
 	// loop over neighbouring regions
 	for (loopIndex[2] = start[2]; loopIndex[2] <= end[2]; loopIndex[2]++){
 		for (loopIndex[1] = start[1]; loopIndex[1] <= end[1]; loopIndex[1]++){
@@ -487,14 +515,12 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex
 			}
 		}
 	}
-	// --}
 
 	return ranks;
 }
 #endif
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //unused in sequential scenario
-//TODO: inline everything below here
 /*
  * This was in large parts stolen from IndexConversion.
  * Note that this uses the globalNumberMacroscopicCells definition excl. the ghost layer.
@@ -502,7 +528,7 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex
 template<unsigned int dim>
 unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
 
-	//vector containing avg number of macro cells, not counting global GL. //TODO: make this a member?
+	//vector containing avg number of macro cells, not counting global GL. 
 	tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells { 0 };
 	for (unsigned int d = 0; d < dim; d++) {
 		if(globalCellIndex[d] >= globalNumberMacroscopicCells[d]+2) { //greater or equal to the total global number incl GL (+2)

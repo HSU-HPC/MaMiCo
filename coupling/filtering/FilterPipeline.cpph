@@ -27,36 +27,21 @@ coupling::FilterPipeline<dim>::FilterPipeline(
     //check for structural errors in config file
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
 	
-    //load sequences
-	switch(_scope) {
-		case coupling::Scope::perInstance : 
-			loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance")); 
-			break;
-		case coupling::Scope::postMultiInstance : 
-			loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
-			break;
-	}
-
-	unsigned int mdDomainSize = 1;
-	unsigned int md2MacroDomainSize = 1;
-	for(unsigned int d = 0; d < dim; d++) {
-		mdDomainSize *= CellIndex<dim, IndexTrait::local>::numberCellsInDomain[d];
-		md2MacroDomainSize *= CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain[d];
-	}
-		
-	
 	//case: the input vector contains the entire MD domain
-	if(inputCells.size() == mdDomainSize) {
+	if(inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
 		using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>;
+
 		for(unsigned int i = 0; i < inputCells.size(); i++) {
-			if(CellIndex<dim> { i } >= Md2MacroIndex::lowerBoundary and CellIndex<dim> { i } <= Md2MacroIndex::upperBoundary)
+			if(Md2MacroIndex::contains(CellIndex<dim, IndexTrait::local> { i } )) {
 				_md2MacroCells.emplace_back(inputCells[i]);
-			else
+			}
+			else {
 				_outerCells.emplace_back(inputCells[i]);
+			}
 		}
 	}
 	//case: the input vector contains only the MD-To-Macro domain
-	else if(inputCells.size() == md2MacroDomainSize) {
+	else if(inputCells.size() == CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain) {
 		std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
 		_outerCells = {};
 	}
@@ -66,9 +51,19 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 		throw std::runtime_error(
 			"Unexpected cell input size: "s + std::to_string(inputCells.size()) + "\n"
 			+ "Expected either:\n"s 
-			+ std::to_string(mdDomainSize) + "(MD domain size)"
-			+ std::to_string(md2MacroDomainSize) + "(MD-To-Macro domain size)"
+			+ std::to_string(CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) + "(MD domain size)"
+			+ std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain) + "(MD-To-Macro domain size)"
 		);
+	}
+
+    //load sequences
+	switch(_scope) {
+		case coupling::Scope::perInstance : 
+			loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance")); 
+			break;
+		case coupling::Scope::postMultiInstance : 
+			loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
+			break;
 	}
 }
 
