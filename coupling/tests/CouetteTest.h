@@ -69,9 +69,9 @@ private:
   enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void init(){
+    initMPI();
     parseConfigurations();
     initSolvers();
-    initMPI();
 
 	//TODO: make couetteSolverInterface a member?
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
