@@ -590,7 +590,7 @@ py::class_<coupling::services::MacroscopicCellService<3>>(services, "Macroscopic
 				if(vector_filter_func.has_value()) vf_ptr = &(vector_filter_func.value());
 
 				//each coupling::conversion:functionWrapper checks for nullptrs, i.e "None" args
-				service->getFilterPipeline().getSequence(filter_sequence)->addFilter( 
+				service->getFilterPipeline()->getSequence(filter_sequence)->addFilter( 
 						coupling::conversion::functionWrapper_Scalar(sf_ptr),
 						coupling::conversion::functionWrapper_Vector(vf_ptr),
 						filter_index);
