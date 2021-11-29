@@ -291,43 +291,44 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::noGhost>::upperBoundary;
 	CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::setDomainParameters();
 
-	//init boundaries of all global, m2m, GL including indexing types
-	CellIndex<dim> m2mGlobal_lowerBoundary { BaseIndex<dim>::lowerBoundary };
-	while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, IndexTrait::vector>{ m2mGlobal_lowerBoundary }.get() ) == false) {
-		//sanity check: empty m2m domain
-		if(m2mGlobal_lowerBoundary == BaseIndex<dim>::upperBoundary)
-			throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
+	//init boundaries of all global, m2m, GL excluding indexing types
+	{
+		CellIndex<dim> lowerBoundary { BaseIndex<dim>::lowerBoundary };
+		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, IndexTrait::vector>{ lowerBoundary }.get() ) == false) {
+			//sanity check: empty m2m domain
+			if(lowerBoundary == BaseIndex<dim>::upperBoundary)
+				throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
 
-		//increment by one if above is too low to be in md-to-macro domain
-		++m2mGlobal_lowerBoundary;
+			//increment by one if above is too low to be in md-to-macro domain
+			++lowerBoundary;
+		}
+		CellIndex<dim> upperBoundary { BaseIndex<dim>::upperBoundary };
+		while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, IndexTrait::vector>{ upperBoundary }.get() ) == false) {
+			//sanity check: empty m2m domain 
+			if(upperBoundary < lowerBoundary)
+				throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
+
+			//decrement by one if above is too high to be in md-to-macro domain
+			--upperBoundary;
+		}
+
+		CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = lowerBoundary; 
+		CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = upperBoundary; 
+		CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 	}
-	CellIndex<dim> m2mGlobal_upperBoundary { BaseIndex<dim>::upperBoundary };
-	while(_msi->receiveMacroscopicQuantityFromMDSolver( CellIndex<dim, IndexTrait::vector>{ m2mGlobal_upperBoundary }.get() ) == false) {
-		//sanity check: empty m2m domain 
-		if(m2mGlobal_upperBoundary < m2mGlobal_lowerBoundary)
-			throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
-
-		//decrement by one if above is too high to be in md-to-macro domain
-		--m2mGlobal_upperBoundary;
-	}
-
-	CellIndex<dim, IndexTrait::md2macro>::lowerBoundary = m2mGlobal_lowerBoundary; 
-	CellIndex<dim, IndexTrait::md2macro>::upperBoundary = m2mGlobal_upperBoundary; 
-	CellIndex<dim, IndexTrait::md2macro>::setDomainParameters();
 
 	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::md2macro>::lowerBoundary;
 	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::md2macro>::upperBoundary;
 	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::setDomainParameters();
 
-	//init boundaries of all global, m2m, GL excluding indexing types
-	//note that m2m overrules GL by definition, i.e. .noGhost has no effect if .md2macro == true
-	CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::md2macro>::lowerBoundary;
-	CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::md2macro>::upperBoundary;
-	CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
+	//init boundaries of all global, m2m, GL including indexing types
+	CellIndex<dim, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get() - tarch::la::Vector<dim, unsigned int> { 1 };
+	CellIndex<dim, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
+	CellIndex<dim, IndexTrait::md2macro>::setDomainParameters();
 
-	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::md2macro>::lowerBoundary;
-	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::md2macro>::upperBoundary;
-	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
+	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::md2macro>::lowerBoundary;
+	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::md2macro>::upperBoundary;
+	CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::setDomainParameters();
 
 
 	//handle all local indexing types
@@ -393,47 +394,35 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::upperBoundary;
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::setDomainParameters();
 
+		//init boundaries of all local, m2m, GL excluding indexing types
+		{
+			using LocalNoGlIndex = CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>;
+			using GlobalMD2MacroNoGlIndex = CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>;
+
+			tarch::la::Vector<dim, unsigned int> lowerBoundary;
+			tarch::la::Vector<dim, unsigned int> upperBoundary;
+			for(unsigned int d = 0; d < dim; d++) {
+				lowerBoundary[d] = std::max(LocalNoGlIndex::lowerBoundary.get()[d], GlobalMD2MacroNoGlIndex::lowerBoundary.get()[d]);
+				upperBoundary[d] = std::min(LocalNoGlIndex::upperBoundary.get()[d], GlobalMD2MacroNoGlIndex::upperBoundary.get()[d]);
+			}
+
+			CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = lowerBoundary;
+			CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = upperBoundary;
+			CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
+		}
+		
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
+
 		//init boundaries of all local, m2m, GL including indexing types
-		CellIndex<dim, IndexTrait::local> m2mLocal_lowerBoundary { CellIndex<dim, IndexTrait::local>::lowerBoundary };
-		while(_msi->receiveMacroscopicQuantityFromMDSolver( BaseIndex<dim>{ m2mLocal_lowerBoundary }.get() ) == false) {
-			//sanity check: empty m2m domain 
-			if(m2mLocal_lowerBoundary == CellIndex<dim, IndexTrait::local>::upperBoundary) {
-				std::cout << "IndexingService: WARNING: Empty local MD-To-Macro domain on rank " << _rank << "!" << std::endl;
-				break; 
-			}
-
-			//increment by one if above is too high to be in md-to-macro domain
-			++m2mLocal_lowerBoundary; 
-		}
-		CellIndex<dim, IndexTrait::local> m2mLocal_upperBoundary { CellIndex<dim, IndexTrait::local>::upperBoundary };
-		while(_msi->receiveMacroscopicQuantityFromMDSolver( BaseIndex<dim>{ m2mLocal_upperBoundary }.get() ) == false) {
-			//sanity check: empty m2m domain
-			if(m2mLocal_upperBoundary < m2mLocal_lowerBoundary) {
-				std::cout << "IndexingService: WARNING: Empty local MD-To-Macro domain on rank " << _rank << "!" << std::endl;
-				break;
-			}
-
-			//decrement by one if above is too high to be in md-to-macro domain
-			--m2mLocal_upperBoundary; 
-		}
-
-		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = m2mLocal_lowerBoundary;
-		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary = m2mLocal_upperBoundary;
+		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary.get() - tarch::la::Vector<dim, unsigned int> { 1 };
+		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
 		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
 
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary;
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary;
+		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary;
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
-
-		//init boundaries of all local, m2m, GL excluding indexing types
-		//note that m2m overrules GL by definition, i.e. .noGhost has no effect if .md2macro == true
-		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary;
-		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary;
-		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
-
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary;
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary;
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 
 	#else //sequential scenario
 		//Copy all local indexing from global

@@ -29,7 +29,7 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 	
 	//case: the input vector contains the entire MD domain
 	if(inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
-		using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>;
+		using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
 
 		for(unsigned int i = 0; i < inputCells.size(); i++) {
 			if(Md2MacroIndex::contains(CellIndex<dim, IndexTrait::local> { i } )) {
