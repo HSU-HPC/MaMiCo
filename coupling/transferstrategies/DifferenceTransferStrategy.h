@@ -17,18 +17,21 @@ namespace coupling {
   }
 }
 
-
 /** from MD to macroscopic solver: mass and momentum are computed at the current timestep and
  *  mapped to macroscopic solver. The values are averaged over a certain time.
  *  from macroscopic solver to MD: The difference in mass and momentum between both solvers is
  *  computed and introduced on MD side.
- *
  *  @author Philipp Neumann
- */
+ *  @tparam LinkedCell the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation
+ *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2, or 3*/
 template<class LinkedCell,unsigned int dim>
 class coupling::transferstrategies::DifferenceTransferStrategy:
 public coupling::transferstrategies::TransferStrategy<LinkedCell,dim> {
   public:
+    /** @brief a simple constructor
+     *  @param mdSolverInterface interface for the md solver
+     *  @param indexConversion instance of the indexConversion
+     *  @param numberMDSteps number of md steps within one coupling time step */
     DifferenceTransferStrategy(
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,
       const coupling::IndexConversion<dim> &indexConversion,
@@ -36,8 +39,13 @@ public coupling::transferstrategies::TransferStrategy<LinkedCell,dim> {
     ): coupling::transferstrategies::TransferStrategy<LinkedCell,dim>(mdSolverInterface,indexConversion),
        _numberMDsteps(numberMDsteps),_zero(0.0),
        _massMapping(mdSolverInterface), _momentumMapping(mdSolverInterface){}
+
+    /** @brief a dummy destructor */
     virtual ~DifferenceTransferStrategy(){}
 
+    /** @brief
+     *  @param cell macroscopic cell to process
+     *  @param index index of the macroscopic cell */
     virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
     ){
@@ -46,6 +54,9 @@ public coupling::transferstrategies::TransferStrategy<LinkedCell,dim> {
       cell.setMicroscopicMomentum(_zero);
     }
 
+    /** @brief the microscopicMass and -Momentum are reseted to zero 
+     *  @param cell macroscopic cell to process
+     *  @param index index of the macroscopic cell */
     virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
     ){
@@ -54,6 +65,9 @@ public coupling::transferstrategies::TransferStrategy<LinkedCell,dim> {
       cell.setMicroscopicMomentum(_zero);
     }
 
+    /** @brief difference between microscopic and macroscopic values is evaluated and stored in the macroscopic quantity
+     *  @param cell macroscopic cell to process
+     *  @param index index of the macroscopic cell */
     virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
     ){
@@ -68,6 +82,9 @@ public coupling::transferstrategies::TransferStrategy<LinkedCell,dim> {
       cell.setMacroscopicMomentum(_zero);
     }
 
+    /** @brief the quantities (mass & momentum) are averaged (divided by the amount of md time steps)
+     *  @param cell macroscopic cell to process
+     *  @param index index of the macroscopic cell */
     virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
     ){
@@ -78,7 +95,9 @@ public coupling::transferstrategies::TransferStrategy<LinkedCell,dim> {
       cell.setMacroscopicMomentum(momentum);
     }
 
-    // compute current mass and momentum and add it to averaged buffer value
+    /** @brief compute current mass and momentum and add it to averaged buffer value
+     *  @param cell macroscopic cell to process
+     *  @param index index of the macroscopic cell */
     virtual void processInnerMacroscopicCellAfterMDTimestep(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index
     ){
@@ -91,9 +110,13 @@ public coupling::transferstrategies::TransferStrategy<LinkedCell,dim> {
     }
 
   private:
+    /** number of md time steps within one coupling time step  */
     const unsigned int _numberMDsteps;
+    /** vector containing zeros, the dimension is the spacial dimension of the simulation */
     const tarch::la::Vector<dim,double> _zero;
+    /** class to compute the mass within every single cell */
     coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> _massMapping;
+    /** class to compute the momentum within every single cell */
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell,dim> _momentumMapping;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_DIFFERENCETRANSFERSTRATEGY_H_

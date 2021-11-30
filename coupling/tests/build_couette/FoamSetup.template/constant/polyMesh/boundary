@@ -1,0 +1,96 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+12
+(
+    movingWall
+    {
+        type            wall;
+        inGroups        List<word> 1(wall);
+        nFaces          400;
+        startFace       22044;
+    }
+    fixedWall
+    {
+        type            wall;
+        inGroups        List<word> 1(wall);
+        nFaces          400;
+        startFace       22444;
+    }
+    front
+    {
+        type            patch;
+        nFaces          400;
+        startFace       22844;
+    }
+    back
+    {
+        type            patch;
+        nFaces          400;
+        startFace       23244;
+    }
+    left
+    {
+        type            patch;
+        nFaces          400;
+        startFace       23644;
+    }
+    right
+    {
+        type            patch;
+        nFaces          400;
+        startFace       24044;
+    }
+    fronti
+    {
+        type            patch;
+        nFaces          36;
+        startFace       24444;
+    }
+    backi
+    {
+        type            patch;
+        nFaces          36;
+        startFace       24480;
+    }
+    lefti
+    {
+        type            patch;
+        nFaces          36;
+        startFace       24516;
+    }
+    righti
+    {
+        type            patch;
+        nFaces          36;
+        startFace       24552;
+    }
+    topi
+    {
+        type            patch;
+        nFaces          36;
+        startFace       24588;
+    }
+    buttomi
+    {
+        type            patch;
+        nFaces          36;
+        startFace       24624;
+    }
+)
+
+// ************************************************************************* //

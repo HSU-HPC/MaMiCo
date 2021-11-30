@@ -77,34 +77,34 @@ void coupling::Gauss<dim>::operator()(){
 		}
 
 		//apply to scalars
-		for(unsigned int si = 0; si < _scalarSetters.size(); si++){
+		for(const auto scalarProperty : _scalarAccessFunctionPairs){
 			(_outputCells[raw_index]
-				->*(_scalarSetters[si]))
+				->*scalarProperty.set)
 					(
-						(_inputCells[indexBelow.get()]->*(_scalarGetters[si]))() * weights[0]
+						(_inputCells[indexBelow.get()]->*scalarProperty.get)() * weights[0]
 						+
-						(_inputCells[raw_index]->*(_scalarGetters[si]))() * weights[1]
+						(_inputCells[raw_index]->*scalarProperty.get)() * weights[1]
 						+
-						(_inputCells[indexAbove.get()]->*(_scalarGetters[si]))() * weights[2]
+						(_inputCells[indexAbove.get()]->*scalarProperty.get)() * weights[2]
 					);
 		}
 		//apply to vectors	
-		for(unsigned int vi = 0; vi < _vectorSetters.size(); vi++){
+		for(const auto vectorProperty : _vectorAccessFunctionPairs){
 			(_outputCells[raw_index]
-				->*(_vectorSetters[vi]))
+				->*vectorProperty.set)
 					(		
-						(_inputCells[indexBelow.get()]->*(_vectorGetters[vi]))() * weights[0]
+						(_inputCells[indexBelow.get()]->*vectorProperty.get)() * weights[0]
 						+
-						(_inputCells[raw_index]->*(_vectorGetters[vi]))() * weights[1]
+						(_inputCells[raw_index]->*vectorProperty.get)() * weights[1]
 						+
-						(_inputCells[indexAbove.get()]->*(_vectorGetters[vi]))() * weights[2]
+						(_inputCells[indexAbove.get()]->*vectorProperty.get)() * weights[2]
 					);
 		}
 	}//index
    
-    #ifdef DEBUG_GAUSS
-    std::cout << "done." << std::endl;
-    #endif
+	#ifdef DEBUG_GAUSS
+	std::cout << "done." << std::endl;
+	#endif
 }
 
 //Private functions of Gauss.h: 
@@ -119,28 +119,26 @@ std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel
 	//fill kernel using Gaussian error function
 	for(int x = -GAUSS_KERNEL_RADIUS; x <= GAUSS_KERNEL_RADIUS; x++) {
 		kernel[i] = gaussianDensityFunction(x);
+
 		sum += kernel[i];
 		i++;
 	}
-	
-	//std::cout << "gauss: kernel sum: " << sum << std::endl;
 
 	//normalize kernel. by definition, sum cannot be 0.
-	for(auto k : kernel) { 
+	for(auto& k : kernel) { 
 		k *= 1/sum; 
 
 		#ifdef DEBUG_GAUSS
-    	std::cout << "		GAUSS(Dim: " << _dim << "): Add kernel entry: " << k;
-    	#endif 
+		std::cout << "		GAUSS(Dim: " << _dim << "): Add kernel entry: " << k;
+		#endif 
 	}
 
 	return kernel;
 }
 
 template<unsigned int dim>
-double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
+constexpr double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
 	double ans = ( 1 / ( _sigma * sqrt(2*M_PI) ) ) * exp(-0.5 * (x/_sigma) * (x/_sigma));
-	//std::cout << "gauss: error function at x = " << x << ": " << ans << std::endl; 
 	return ans;
 }
 

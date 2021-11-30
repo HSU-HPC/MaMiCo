@@ -30,12 +30,12 @@ void coupling::WriteToFile<dim>::operator()(){
 		*/
 
 		//printing all scalar values
-		for(auto sGetter : coupling::FilterInterface<dim>::_scalarGetters)
-        	_file << (coupling::FilterInterface<dim>::_inputCells[ic_index]->*sGetter)() << " ; ";
+		for(const auto scalarProperty : coupling::FilterInterface<dim>::_scalarAccessFunctionPairs)
+        	_file << (coupling::FilterInterface<dim>::_inputCells[ic_index]->*scalarProperty.get)() << " ; ";
 
 		//printing all vectorized values
-		for(auto vGetter : coupling::FilterInterface<dim>::_vectorGetters)
-        	for(unsigned int d = 0; d < dim; d++) _file << (coupling::FilterInterface<dim>::_inputCells[ic_index]->*vGetter)()[d] << " ; ";
+		for(const auto vectorProperty : coupling::FilterInterface<dim>::_vectorAccessFunctionPairs)
+        	for(unsigned int d = 0; d < dim; d++) _file << (coupling::FilterInterface<dim>::_inputCells[ic_index]->*vectorProperty.get)()[d] << " ; ";
 
 		//case: only one cell
 		if(_oneCellOnly != -1) break;

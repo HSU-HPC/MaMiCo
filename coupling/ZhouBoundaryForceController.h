@@ -14,13 +14,11 @@ namespace coupling {
 }
 
 
-/** applies the interpolating boundary force from Zhou et al. in every boundary cell. For details on the forcing,
- *  check out the descriptions in cell-mappings/ZhouBoundaryForce.
- *  @tparam LinkedCell defines the type of linked cells in application
- *  @tparam dim is the spacial dimension of the simulation, can be 1, 2, or 3 
+/** For details on the forcing, check out the descriptions in cell-mappings/ZhouBoundaryForce.
+ *  @brief applies the boundary force from Zhou et al. in boundary cell.
+ *  @tparam LinkedCell the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation
+ *  @tparam dim the integer dim refers to the spacial dimension of the simulation, can be 1, 2, or 3
  *  @author Philipp Neumann
- *  \todo @all Here we can easily collect todos
- *  \test this needs to be tested?
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::ZhouBoundaryForceController: public coupling::BoundaryForceController<LinkedCell,dim> {
@@ -39,26 +37,28 @@ class coupling::ZhouBoundaryForceController: public coupling::BoundaryForceContr
       _zhouBoundaryForce(density,temperature,mdSolverInterface->getMoleculeEpsilon(),mdSolverInterface->getMoleculeSigma(),
         boundary,mdSolverInterface->getGlobalMDDomainOffset(),mdSolverInterface->getGlobalMDDomainSize(), mdSolverInterface)
     {}
-    
+
     /** @brief Destructor*/
     virtual ~ZhouBoundaryForceController(){}
-    
+
     /** iterates over all linked cells of the given macroscopic cell and applies the cellmapping for the Zhou boundary force
-    *@brief applies the Zhou boundary force on a boundary cell
+    * @brief applies the Zhou boundary force on a boundary cell
     * @param cell the macroscopic boundary cell to apply the boundary force
     * @param currentLocalMacroscopicCellIndex the index of the macroscopic cell */
     virtual void  applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell, const unsigned int &currentLocalMacroscopicCellIndex){
       cell.iterateCells(_zhouBoundaryForce);
     }
-    
-    /** @brief calculates the potential energy for a given position 
-    *  @param position the position for which the potential energy will be calculated */
+
+    /** @brief calculates the potential energy for a given position
+    *  @param position the position for which the potential energy will be calculated
+    *  @returns the potential energy at the given position */
     virtual double getPotentialEnergy(const tarch::la::Vector<dim,double>& position) const {
       return _zhouBoundaryForce.getPotentialEnergy(position);
     }
 
-    /** @brief calculates the boundary force for the given particle position 
-    *   @param position particle position for the force calculation*/
+    /** @brief calculates the boundary force for the given particle position
+     *  @param position particle position for the force calculation
+     *  @returns the boundary force at the given position */
     virtual tarch::la::Vector<dim,double> getForce(const tarch::la::Vector<dim,double>& position) const {
       return _zhouBoundaryForce.getBoundaryForces(position);
     }
@@ -69,8 +69,7 @@ class coupling::ZhouBoundaryForceController: public coupling::BoundaryForceContr
     /** A boolean vector which indicates where to apply the boundary force.
      * Per dimension it has two enteries. They refer to the boundaries in the following order: left (small x), right (high x), front (small y), back (high y), bottom (small z), top (high z).
      * @brief indicates at which boundaries to apply the force  */
-    const tarch::la::Vector<2*dim,bool> _boundary; 
+    const tarch::la::Vector<2*dim,bool> _boundary;
     coupling::cellmappings::ZhouBoundaryForce<LinkedCell,dim> _zhouBoundaryForce; ///< the cell mapping for the application of the force
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_ZHOUBOUNDARYFORCECONTROLLER_H_
-

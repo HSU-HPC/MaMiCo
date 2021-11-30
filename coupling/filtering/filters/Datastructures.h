@@ -6,16 +6,18 @@
 #include <memory>
 
 namespace coupling {
+
 	/** Modular filtering and data analytics system. Includes inferfaces and services that manage the filtering subsystem,
 	 * as well as several filter implementations. 
 	 */
 	namespace filtering {
+
   	/***
 	* Quantities<dim>[0] := mass
 	* Quantities<dim>[1..dim] := momentum
   	*/
     template<unsigned int dim>
-    using Quantities = tarch::la::Vector<dim+1,double>;
+		using Quantities = tarch::la::Vector<dim+1,double>;
 
     /***
     *	Spacetime window of data, i.e. 4D field of T
@@ -26,7 +28,7 @@ namespace coupling {
     *	Spacetime window of flow quantities
     */
     template<unsigned int dim>
-    using Flowfield = Field<dim, Quantities<dim>>;
+		using Flowfield = Field<dim, Quantities<dim>>;
 
     /***
     *	includes local flowfield, and mean and standard deviation of quantities
@@ -43,9 +45,9 @@ namespace coupling {
     *	Spacetime window of patches
     */
     template<unsigned int dim>
-    using Patchfield = Field<dim, Patch<dim>>;
+		using Patchfield = Field<dim, Patch<dim>>;
     //using Patchfield = Field<dim, PatchView<dim>>;
-  }
+	}
 }
 
 /***
@@ -69,35 +71,35 @@ public:
 	}
 
 	T& operator()(const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t){
-	    return _data[idx(pos, t)];
+		return _data[idx(pos, t)];
 	}
 
 	const T& operator()  (const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t) const{
-	    return _data[idx(pos, t)];
+		return _data[idx(pos, t)];
 	}
 
 	T& operator[](unsigned int pos) {
 		#ifdef NLM_DEBUG
 		if(pos<0 || pos>_scalarSize-1){
-  			std::cout << "ERROR Field T& operator[](int pos): pos out of range!" << std::endl; 
-  			std::cout << "pos=" << pos << ", _scalarSize=" << _scalarSize << std::endl; 
-  			exit(EXIT_FAILURE);
-  		}
+			std::cout << "ERROR Field T& operator[](int pos): pos out of range!" << std::endl; 
+			std::cout << "pos=" << pos << ", _scalarSize=" << _scalarSize << std::endl; 
+			exit(EXIT_FAILURE);
+		}
   		#endif
-  		return _data[pos];
+		return _data[pos];
 	}
 
 	const T& operator[](unsigned int pos) const {
 		#ifdef NLM_DEBUG
 		if(pos<0 || pos>_scalarSize-1){
-  			std::cout << "ERROR Field T& operator[](int pos): pos out of range!" << std::endl; 
-  			std::cout << "pos=" << pos << ", _scalarSize=" << _scalarSize << std::endl; 
-  			exit(EXIT_FAILURE);
-  		}
+			std::cout << "ERROR Field T& operator[](int pos): pos out of range!" << std::endl; 
+			std::cout << "pos=" << pos << ", _scalarSize=" << _scalarSize << std::endl; 
+			exit(EXIT_FAILURE);
+		}
   		#endif
-  		return _data[pos];
+		return _data[pos];
 	}
-	 
+	
 	~Field(){
 		std::allocator_traits<std::allocator<T>>::deallocate(allo, _data, _scalarSize);
 	}
@@ -123,35 +125,35 @@ public:
 private:
 	unsigned int computeScalarSize(const tarch::la::Vector<dim,unsigned int> &spatialSize, const unsigned int &temporalSize) const{
 		unsigned int res = spatialSize[0]; 
-  		for (unsigned int d = 1; d < dim; d++){
-    		res *= (spatialSize[d]); 
-  		}
-  		res *= temporalSize;
-  		return res;
+		for (unsigned int d = 1; d < dim; d++){
+			res *= (spatialSize[d]); 
+		}
+		res *= temporalSize;
+		return res;
 	}
 
 	unsigned int idx(const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t) const {
 		#ifdef NLM_DEBUG
-	    for (unsigned int d = 0; d < dim; d++){
-      		if(pos[d]<0 || pos[d]>_spatialSize[d]-1){
-      			std::cout << "ERROR Field idx(): pos out of range!" << std::endl; 
-      			std::cout << "pos=" << pos << ", _spatialSize=" << _spatialSize << std::endl; 
-      			exit(EXIT_FAILURE);
-      		}
-  		}
-  		if(t<0 || t>_temporalSize-1){
-  			std::cout << "ERROR Field idx(): t out of range!" << std::endl; 
-  			std::cout << "t=" << t << ", _temporalSize=" << _temporalSize << std::endl; 
-  			exit(EXIT_FAILURE);
-  		}
+		for (unsigned int d = 0; d < dim; d++){
+			if(pos[d]<0 || pos[d]>_spatialSize[d]-1){
+				std::cout << "ERROR Field idx(): pos out of range!" << std::endl; 
+				std::cout << "pos=" << pos << ", _spatialSize=" << _spatialSize << std::endl; 
+				exit(EXIT_FAILURE);
+			}
+		}
+		if(t<0 || t>_temporalSize-1){
+			std::cout << "ERROR Field idx(): t out of range!" << std::endl; 
+			std::cout << "t=" << t << ", _temporalSize=" << _temporalSize << std::endl; 
+			exit(EXIT_FAILURE);
+		}
       	#endif
-      	unsigned int idx = 0, step = 1;
-      	for (unsigned int d = 0; d < dim; d++){
-      		idx += pos[d] * step;
-      		step *= _spatialSize[d];
-      	}
-      	idx += t * step;
-      	return idx;
+		unsigned int idx = 0, step = 1;
+		for (unsigned int d = 0; d < dim; d++){
+			idx += pos[d] * step;
+			step *= _spatialSize[d];
+		}
+		idx += t * step;
+		return idx;
 	}
 
 	static std::allocator<T> allo;
@@ -172,7 +174,7 @@ template<unsigned int dim>
 class coupling::filtering::Patch{
 public:
 	Patch(const tarch::la::Vector<dim,unsigned int> &spatialSize, const unsigned int &temporalSize,
-	const Flowfield<dim> &basefield, const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t):
+		const Flowfield<dim> &basefield, const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t):
 	_flowfield(spatialSize, temporalSize), _localMean(0.0), _localStandardDeviation(0.0)
 	{
 		fillFromBasefield(basefield, pos, t);
@@ -187,7 +189,7 @@ public:
 		double* const other_data = reinterpret_cast<double* const>(other._flowfield._data);
 
 		double res = 0;
-		for(unsigned int i = 0; i < size; i += 4){
+		for(unsigned int i = 0; i < size; i += 1){
 			double diff(my_data[i] - other_data[i]);
 			res += diff*diff;
 		}
@@ -203,7 +205,7 @@ public:
 	
 private:
 	inline unsigned int posmod(int i, int n) {
-    	return (i % n + n) % n;
+		return (i % n + n) % n;
 	}
 
 	void fillFromBasefield(const Flowfield<dim> &basefield, const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t){
@@ -211,8 +213,8 @@ private:
 
 		tarch::la::Vector<dim,unsigned int> center;
 		for (unsigned int d = 0; d < dim; d++){
-      		center[d] = _flowfield.getSpatialSize()[d] / 2;
-      	}
+			center[d] = _flowfield.getSpatialSize()[d] / 2;
+		}
 
 		tarch::la::Vector<dim,unsigned int> local_pos(0);
 		unsigned int local_t(0);
@@ -270,7 +272,7 @@ template<unsigned int dim>
 class coupling::filtering::PatchView{
 public:
 	PatchView(const tarch::la::Vector<dim,unsigned int> &spatialSize, const unsigned int &temporalSize,
-	const Flowfield<dim> &basefield, const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t):
+		const Flowfield<dim> &basefield, const tarch::la::Vector<dim,unsigned int> &pos, const unsigned int &t):
 	_spatialSize(spatialSize), _temporalSize(temporalSize), _basefield(basefield), _pos(pos), _t(t){}
 
 	double distance(const coupling::filtering::PatchView<dim>& other) const{
@@ -305,7 +307,7 @@ public:
 	
 private:
 	inline unsigned int posmod(int i, int n) const{
-    	return (i % n + n) % n;
+		return (i % n + n) % n;
 	}
 
 	const tarch::la::Vector<dim,unsigned int> _spatialSize;

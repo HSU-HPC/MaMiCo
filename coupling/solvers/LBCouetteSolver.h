@@ -16,13 +16,24 @@ namespace coupling {
   }
 }
 
-/** implements an analytic Couette flow solver.
- *  In our scenario, the lower wall is accelerated and the upper wall stands still.
+/** In our scenario, the lower wall is accelerated and the upper wall stands still.
  *  The lower wall is located at zero height.
- *  @author Philipp Neumann
- */
+ *  @brief implements a three-dimensional Lattice-Boltzmann Couette flow solver.
+ *  @author Philipp Neumann  */
 class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSolver {
   public:
+    /** @brief a simple constructor
+     *  @param channelheight the width and height of the channel in y and z direction
+     *  @param wallVelocity velocity at the moving wall, refers to Couette scenario
+     *  @param dx the spacial step size, and equidistant grid is applied
+     *  @param dt the time step
+     *  @param kinVisc the kinematic viscosity of the fluid
+     *  @param plotEveryTimestep the time step interval for plotting data;
+     *                           4 means, every 4th time step is plotted
+     *  @param filestem the name of the plotted file
+     *  @param processes defines on how many processes the solver will run;
+     *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes
+     *  @param numThreads number of OpenMP threads */
     LBCouetteSolver(
       const double channelheight,
       tarch::la::Vector<3,double> wallVelocity,
@@ -41,10 +52,8 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
     {
       // return if required
       if (skipRank()){return;}
-
       _pdf1 = new double[19*(_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2)];
       _pdf2 = new double[19*(_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2)];
-
       #if defined(_OPENMP)
       omp_set_num_threads(numThreads);
       #endif
@@ -65,7 +74,6 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
         std::cout << "ERROR LBCouetteSolver: NULL ptr in send/recv!" << std::endl; exit(EXIT_FAILURE);
       }
       #endif
-
       // init everything with lattice weights
       #pragma omp parallel for
       for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++){
@@ -73,6 +81,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       }
     }
 
+    /** @brief a simple destructor */
     virtual ~LBCouetteSolver(){
       if (_pdf1!=NULL){delete [] _pdf1; _pdf1=NULL;}
       if (_pdf2!=NULL){delete [] _pdf2; _pdf2=NULL;}
@@ -89,7 +98,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       #endif
     }
 
-    /** advances one time step dt in time and triggers vtk plot if required */
+    /** @brief advances one time step dt in time and triggers vtk plot if required */
     void advance(double dt) override {
       if (skipRank()){return;}
       const int timesteps=floor( dt/_dt+0.5 );
@@ -102,11 +111,14 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       }
     }
 
+    /** @brief applies the values received from the MD-solver within the conntinuum solver
+     *  @param recvBuffer holds the data from the md solver
+     *  @param recvIndice the indices to connect the data from the buffer with macroscopic cells
+     *  @param indexConversion instance of the indexConversion */
     void setMDBoundaryValues(
       std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,const unsigned int * const recvIndices,
       const coupling::IndexConversion<3>& indexConversion)override{
       if (skipRank()){return ;}
-
       // loop over all received cells
       const unsigned int size = (unsigned int) recvBuffer.size();
       for (unsigned int i = 0; i < size; i++){
@@ -141,11 +153,12 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       }
     }
 
-    /*returns velocity at a certain position.*/
+    /** @brief returns velocity at a certain position
+     *  @param pos position for which the velocity will be returned
+     *  @returns the velocity vector for the position */
     tarch::la::Vector<3,double> getVelocity(tarch::la::Vector<3,double> pos) const override {
       tarch::la::Vector<3,unsigned int> coords;
       const tarch::la::Vector<3,double> domainOffset(_coords[0]*_dx*_avgDomainSizeX,_coords[1]*_dx*_avgDomainSizeY,_coords[2]*_dx*_avgDomainSizeZ);
-
       // check pos-data for process locality (todo: put this in debug mode in future releases)
       if (   (pos[0]<domainOffset[0]) || (pos[0]>domainOffset[0]+_domainSizeX*_dx)
           || (pos[1]<domainOffset[1]) || (pos[1]>domainOffset[1]+_domainSizeY*_dx)
@@ -164,10 +177,12 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       return vel;
     }
 
+    /** @brief returns density at a certain position
+     *  @param pos position for which the density will be returned
+     *  @returns the density vector for the position */
     double getDensity(tarch::la::Vector<3,double> pos) const override{
       tarch::la::Vector<3,unsigned int> coords;
       const tarch::la::Vector<3,double> domainOffset(_coords[0]*_dx*_avgDomainSizeX,_coords[1]*_dx*_avgDomainSizeY,_coords[2]*_dx*_avgDomainSizeZ);
-
       // check pos-data for process locality (todo: put this in debug mode in future releases)
       if (   (pos[0]<domainOffset[0]) || (pos[0]>domainOffset[0]+_domainSizeX*_dx)
          || (pos[1]<domainOffset[1]) || (pos[1]>domainOffset[1]+_domainSizeY*_dx)
@@ -180,14 +195,15 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       return _density[index];
   }
 
-
+  /** @brief changes the velocity at the moving wall (z=0)
+   *  @param wallVelocity the velocity will be set at the moving wall */
   virtual void setWallVelocity(const tarch::la::Vector<3,double> wallVelocity) override{
       _wallVelocity = (_dt/_dx)*wallVelocity;
     }
 
-
   private:
-    /** collide-stream algorithm */
+    /** calls stream() and collide() and swaps the fields
+     *  @brief collide-stream algorithm for the Lattice-Boltzmann method  */
     void collidestream(){
       #pragma omp parallel for
       for (int z = 1; z < _domainSizeZ+1; z++){
@@ -207,7 +223,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       _pdf2 = swap;
     }
 
-    // stream from pdf1 to pdf2
+    /** @brief the stream part of the LB algorithm (from pdf1 to pdf2) */
     void stream(int index){
       const int pI = 19*index;
       for (int q = 0; q < 9; q++){
@@ -218,15 +234,13 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       _pdf2[pI+9] = _pdf1[pI+9];
     }
 
-    // collide within pdf2
+    /** @brieff the collide step within pdf2 */
     void collide(int index,int x, int y, int z){
       // index of start of cell-local pdfs in AoS
       const int pI = 19*index;
-
       // compute and store density, velocity
       double *vel = &_vel[3*index];
       computeDensityAndVelocity(vel,_density[index],&_pdf2[pI]);
-
       // collide (BGK); always handle pdfs no. q and inv(q)=18-q in one step
       const double u2 = 1.0 - 1.5*(vel[0]*vel[0] + vel[1]*vel[1] + vel[2]*vel[2]);
       // pdf 0,18
@@ -314,9 +328,16 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       _pdf2[pI+9] -= _omega*(_pdf2[pI+9] - _W[9]*_density[index]*u2);
     }
 
-    // boundary treatment; pdf - distributions (typically _pdf2), index - start index for current cell in pdf-array, x/y/z - cell coordinates of current cell,
-    // q - distribution function no., flag - boundary flag of neighbouring cell, nbIndex - index of neighbouring cell
-    void boundary(double * const pdf, int index, int x, int y, int z, int q, const Flag &flag,int nbIndex){
+    /** @brief takes care of the correct boundary treatment for the LB method
+     *  @param pdf particle distribution function
+     *  @param index start index for current cell in pdf-array
+     *  @param x the position in x direction of the cell
+     *  @param y the position in y direction of the cell
+     *  @param z the position in z direction of the cell
+     *  @param q distribution function number
+     *  @param flag boundary flag of neighbouring cell
+     *  @param nbIndex index of neighbouring cell */
+    void boundary(double * const pdf, int index, int x, int y, int z, int q, const Flag &flag, int nbIndex){
       if (flag!=FLUID){
         if (flag==NO_SLIP){
           // half-way bounce back
@@ -338,7 +359,10 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       }
     }
 
-    //compute density and velocity on pdf
+    /** @brief refers to the LB method; computes density and velocity on pdf
+     *  @param vel velocity
+     *  @param density density
+     *  @param pdf partial distribution function */
     void computeDensityAndVelocity(double * const vel, double &density, const double * const pdf){
       vel[0] = -(pdf[1]+pdf[5]+pdf[8]+pdf[11]+pdf[15]);
       density=   pdf[3]+pdf[7]+pdf[10]+pdf[13]+pdf[17];
@@ -352,13 +376,15 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
     }
 
     /** takes care of communication across one face in one direction.
-     *  pdf - pdf field
-     *  sendBuffer, recvBuffer - send and recv buffer
-     *  nbFlagTo - direction into which message is sent
-     *  nbFlagFrom - direction from which message is received
-     *  startSend,endSend - 3-d coordinates that define a range to be sent to neighbouring process
-     *  startRecv,endRecv - 3-d coordinates that define a range to be received from neighbouring process
-     */
+     *  @param pdf partial distribution function
+     *  @param sendBuffer send buffer
+     *  @param recvBuffer receive buffer
+     *  @param nbFlagTo direction into which message is sent
+     *  @param nbFlagFrom direction from which message is received
+     *  @param startSend 3d coordinates that define the start of the data to be sent to neighbouring process
+     *  @param endSend 3d coordinates that define the end of the data to to be sent to neighbouring process
+     *  @param startRecv 3d coordinates that define the start of the data to be received from neighbouring process
+     *  @param endRecv 3d coordinates that define the end of the data to be received from neighbouring process */
     void communicatePart(double *pdf, double *sendBuffer, double *recvBuffer, NbFlag nbFlagTo, NbFlag nbFlagFrom,
       tarch::la::Vector<3,int> startSend, tarch::la::Vector<3,int> endSend,
       tarch::la::Vector<3,int> startRecv, tarch::la::Vector<3,int> endRecv){
@@ -404,6 +430,7 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       #endif
     }
 
+    /** @brief comunicates the boundary field data between the different processes */
     void communicate(){
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
       // send from right to left
@@ -433,16 +460,22 @@ class coupling::solvers::LBCouetteSolver: public coupling::solvers::NumericalSol
       #endif
     }
 
-    const double _omega; // relaxation frequency
-    tarch::la::Vector<3,double> _wallVelocity; // velocity of moving wall of Couette flow
-    double *_pdf1{NULL}; // field 1
-    double *_pdf2{NULL}; // field 2
+    /** @brief relaxation frequency */
+    const double _omega;
+    /** @brief velocity of moving wall of Couette flow */
+    tarch::la::Vector<3,double> _wallVelocity;
+    /** @brief partical distribution function field */
+    double *_pdf1{NULL};
+    /** @brief partial distribution function field (stores the old time step)*/
+    double *_pdf2{NULL};
+    /** @brief lattice velocities*/
     const int _C[19][3]{{ 0,-1,-1}, {-1, 0,-1}, { 0, 0,-1}, { 1, 0,-1}, { 0, 1,-1},
        {-1,-1, 0}, { 0,-1, 0}, { 1,-1, 0}, {-1, 0, 0}, { 0, 0, 0}, { 1, 0, 0}, {-1, 1, 0}, { 0, 1, 0}, { 1, 1, 0},
-       { 0,-1, 1}, {-1, 0, 1}, { 0, 0, 1}, { 1, 0, 1}, { 0, 1, 1}}; // lattice velocities
+       { 0,-1, 1}, {-1, 0, 1}, { 0, 0, 1}, { 1, 0, 1}, { 0, 1, 1}};
+   /** @brief lattice weights */
     const double _W[19]{1.0/36.0, 1.0/36.0, 1.0/18.0, 1.0/36.0, 1.0/36.0,
        1.0/36.0, 1.0/18.0, 1.0/36.0, 1.0/18.0, 1.0/ 3.0, 1.0/18.0, 1.0/36.0, 1.0/18.0, 1.0/36.0,
-       1.0/36.0, 1.0/36.0, 1.0/18.0, 1.0/36.0, 1.0/36.0}; // lattice weights
+       1.0/36.0, 1.0/36.0, 1.0/18.0, 1.0/36.0, 1.0/36.0};
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_

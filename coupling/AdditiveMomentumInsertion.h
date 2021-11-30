@@ -11,39 +11,48 @@
 #include "coupling/cell-mappings/SetMomentumMapping.h"
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 
+/** @brief everything necessary for coupling operations, is defined in here */
 namespace coupling {
   template<class LinkedCell, unsigned int dim>
   class AdditiveMomentumInsertion;
 }
 
-
-/** used to manipulate the momentum/ velocity of the molecules contained in a macroscopic cell.
- *  This class allows to add momentum to molecules. In each MD timestep, it takes a respective fraction
+/** This class allows to add momentum to molecules. In each MD timestep, it takes a respective fraction
  *  from the momentum buffer of a macroscopic cell and adds this momentum to the molecules of the
  *  macroscopic cell.
- *
+ *  @brief used to manipulate the momentum/velocity of the molecules contained in a macroscopic cell.
+ *  @tparam LinkedCell the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation
+ *  @tparam dim the integer dim refers to the spacial dimension of the simulation, can be 1, 2, or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell, unsigned int dim>
 class coupling::AdditiveMomentumInsertion:
 public coupling::MomentumInsertion<LinkedCell,dim> {
   public:
+    /** @brief A simple constructor
+    *   @param mdSolverInterface The interface of the molecular dynamics solver in application
+    *   @param numberMDTimestepsPerCouplingCycle The number of molecular dynamics timesteps within one coupling cycle */
     AdditiveMomentumInsertion(
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,
       unsigned int numberMDTimestepsPerCouplingCycle
     ):
     coupling::MomentumInsertion<LinkedCell,dim>(mdSolverInterface),
     _numberMDTimestepsPerCouplingCycle(numberMDTimestepsPerCouplingCycle){}
+
+    /** @brief A simple destructor*/
     ~AdditiveMomentumInsertion(){}
 
-    /** insert momentum each timestep */
+    /** returns 1 since momentum shall be inserted in every time step
+     *  @brief returns the interval of time steps for momentum insertion
+     *  @returns 1 */
     virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1;}
 
-    /** inserts a fraction 'fraction' from the momentum of the macroscopic cell 'cell' and distributes
-     *  it over all molecules.
+    /** inserts the momentum of the macroscopic cell and distributes it over all molecules.
      *  This method does not conserve the kinetic energy of the respective macroscopic cell. To conserve
      *  the energy as well, see the description of MomentumController on details how to do that.
-     */
+     *  @brief inserts momentum to the cell
+     *  @param cell macroscopic cell to insert momentum to
+     *  @param currentMacroscopicCellIndex macroscopic cell index of the cell      */
     virtual void insertMomentum(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
       const unsigned int& currentMacroscopicCellIndex
@@ -71,6 +80,6 @@ public coupling::MomentumInsertion<LinkedCell,dim> {
     }
 
   private:
-    const unsigned int _numberMDTimestepsPerCouplingCycle;
+    const unsigned int _numberMDTimestepsPerCouplingCycle; ///< The number of molecular dynamics timesteps within one coupling cycle */
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_ADDITIVEMOMENTUMINSERTION_H_

@@ -47,6 +47,23 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
             newfilter = new coupling::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"));
 		}
 
+		//Constant Filter
+        else if(std::strcmp(currFilterNode->Value(), "constant") == 0){
+			double constant = 0.0; //by default, constant filter uses 0 as its constant.
+			tarch::configuration::ParseConfiguration::readDoubleOptional(constant, currFilterNode, "value");
+
+			tarch::la::Vector<dim, bool> filteredDims = {true}; //default: filter multidimensional properties in all dims
+			int dir = -1;
+			tarch::configuration::ParseConfiguration::readIntOptional(dir, currFilterNode, "dir");
+			if(dir >= 0 && (unsigned int) dir < dim) /*if d is within range...*/ {
+				/*... set all dims but d to false*/
+				filteredDims = {false};
+				filteredDims[dir] = true;
+			}
+
+            newfilter = new coupling::Constant<dim>(inputCellVector, outputCellVector, _filteredValues, filteredDims, constant);
+		}
+
 		//Gauss
 		else if(std::strcmp(currFilterNode->Value(), "gauss") == 0) {
 			//dimension the gauss filter operates on
@@ -57,8 +74,8 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			}
 
 			//standard deviation of the gauss filter
-			int sigma;
-			if(currFilterNode->QueryIntAttribute("sigma", &sigma)){
+			double sigma;
+			if(currFilterNode->QueryDoubleAttribute("sigma", &sigma)){
 				std::cout << "ERROR: Gaussian filter misses attribute sigma in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}

@@ -22,7 +22,7 @@
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/services/MultiMDCellService.h"
-#include "coupling/indexing/IndexingService.h"
+#include "coupling/indexing/IndexingService.cpp"
 
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
@@ -34,10 +34,7 @@
 //This is ignored if you dont use synthetic MD. For further instructions cf. SYNTHETIC part of initSolvers().
 #define SYNTHETICMD_SEQUENCE "SYNTHETIC-MD"
 
-/**
- * Versatile configurable Couette flow test for noise-filtered multi-instance Nie coupling.
- *
- * Features, depending on couette.xml config file:
+/** Features, depending on couette.xml config file:
  * -> one-way or two-way coupling
  * -> statup or oscillating flow scenario
  * -> using analytical or Lattice Bolzmann Couette flow solver
@@ -47,14 +44,18 @@
  * -> signal-to-noise ratio (SNR) computation (between filter output and macroscopic solver)
  * -> runtime measurements and logging separately for coupled simulation components
  * -> 'tws-loop' feature for testing many POD time-window-size parameters in a single run
- *
- *  @author Piet Jarmatz
+ * @brief Versatile configurable Couette flow test for noise-filtered multi-instance Nie coupling.
+ * @author Piet Jarmatz
  */
 class CouetteTest: public Test {
 public:
+  /** @brief simple constructor */
   CouetteTest(): Test("CouetteTest"), _generator(0){}
+  /** @brief a dummy destructor */
   virtual ~CouetteTest(){}
 
+  /** triggers void init(), runOneCouplingCycle() and shutdown()
+   *  @brief runs the simulation */
   virtual void run(){
     init();
     if(_cfg.twsLoop){twsLoop();return;}
@@ -65,9 +66,19 @@ public:
   }
 
 private:
-  enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2, COUETTE_FOAM=3};
-  enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
+  /** Defines the type of continuum solver for the coupled simulation  */
+  enum MacroSolverType{COUETTE_ANALYTICAL=0, ///< the analytical couette solver is used (coupling::solvers::CouetteSolver)
+    COUETTE_LB=1, ///< the Lattice-Bolzmann solver is used (coupling::solvers::LBCouetteSolver)
+    COUETTE_FD=2, ///< the 1d finite-difference solver is used (coupling::solvers::FiniteDifferenceSolver)
+    COUETTE_FOAM=3 ///< the IcoFoam solver is used (coupling::solvers::IcoFoam)
+  };
+  /** Defines the type of md solver for the coupled simulation  */
+  enum MicroSolverType{SIMPLEMD=0, ///< the SimpleMD solver is used
+    SYNTHETIC=1 ///< the synthetic solver is used
+  };
 
+  /** triggers initMPI(), parseConfiguration(), and initSolvers()
+   *  @brief initialises everthing necessary for the test */
   void init(){
     initMPI();
     parseConfigurations();
@@ -83,6 +94,10 @@ private:
     coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
   }
 
+  /** it advances the macro (advanceMacro()) and micro solver (advanceMicro),
+   *  computes the signal to noise ratio (computeSNR()) and sends the data from the macro to
+   *  the micro solver (twoWayCoupling())
+   *  @brief combines the functioniality necessary for a cycle of the coupled simulation  */
   void runOneCouplingCycle(int cycle){
     advanceMacro(cycle);
     advanceMicro(cycle);
@@ -93,6 +108,7 @@ private:
     // }
   }
 
+  /** @brief initialises all MPI variables  */
   void initMPI(){
     _rank = 0;
     #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
@@ -100,6 +116,7 @@ private:
     #endif
   }
 
+  /** @todo @Piet write comment */
   void twsLoop(){
     for(_tws = _cfg.twsLoopMin; _tws <= _cfg.twsLoopMax; _tws += _cfg.twsLoopStep){
       init();
@@ -109,6 +126,7 @@ private:
     }
   }
 
+  /** @brief reads the configuration from the xml file and calls parseCouetteTestConfiguration() */
   void parseConfigurations(){
     tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("couette.xml","molecular-dynamics",_simpleMDConfig);
     if (!_simpleMDConfig.isValid()){std::cout << "ERROR CouetteTest: Invalid SimpleMD config!" << std::endl; exit(EXIT_FAILURE);}
@@ -118,6 +136,7 @@ private:
     parseCouetteTestConfiguration();
   }
 
+  /** @brief reads the configuartion, checks that mandatory data is provided and stores the data in variables */
   void parseCouetteTestConfiguration(){
     tinyxml2::XMLDocument conffile;
     tinyxml2::XMLElement *node = NULL;
@@ -127,7 +146,6 @@ private:
       std::cout << "Could not read input file couette.xml: missing element <couette-test>" << std::endl;
       exit(EXIT_FAILURE);
     }
-
     tinyxml2::XMLElement *n_mamico = node->NextSiblingElement();
     if(n_mamico == NULL){
       std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
@@ -148,7 +166,6 @@ private:
       std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
-
     tinyxml2::XMLElement* subtag = node->FirstChildElement("domain");
     if (subtag == NULL){
       std::cout << "Could not read input file couette.xml: Missing subtag: domain" << std::endl;
@@ -175,7 +192,6 @@ private:
     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.filterInitCycles,subtag,"filter-init-cycles");
     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.csvEveryTimestep,subtag,"write-csv-every-timestep");
     tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.computeSNR,subtag,"compute-snr");
-
     subtag = node->FirstChildElement("microscopic-solver");
     if (subtag == NULL){
       std::cout << "Could not read input file couette.xml: Missing subtag: microscopic-solver" << std::endl;
@@ -204,7 +220,6 @@ private:
       exit(EXIT_FAILURE);
     }
     tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.density,subtag,"density");
-
     subtag = node->FirstChildElement("macroscopic-solver");
     if (subtag == NULL){
       std::cout << "Could not read input file couette.xml: Missing subtag: macroscopic-solver" << std::endl;
@@ -246,7 +261,6 @@ private:
     tarch::configuration::ParseConfiguration::readDoubleMandatory(vis, subtag, "viscosity");
     _cfg.kinVisc = vis / _cfg.density;
     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.initAdvanceCycles,subtag,"init-advance-cycles");
-
     subtag = node->FirstChildElement("tws-loop");
     if (subtag == NULL) _cfg.twsLoop = false;
     else{
@@ -256,7 +270,6 @@ private:
       _cfg.twsLoopStep = 1;
       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.twsLoopStep,subtag,"step");
     }
-
     if(_cfg.miSolverType == SYNTHETIC){
       if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
         _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1){
@@ -273,6 +286,7 @@ private:
     }
   }
 
+  /** @brief initialises the macro and micro solver according to the setup from the xml file and pre-proccses them */
   void initSolvers(){
     // for timing measurements
     _tv.micro = 0;
@@ -285,7 +299,7 @@ private:
       _simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
       );
 	if (_couetteSolver != NULL) std::cout << "Couette solver not null on rank: " << _rank << std::endl; //TODO: remove debug
- 
+
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized anyway,
     // so that we can finally obtain getIndexConversion from MultiMDCellService,
@@ -388,7 +402,7 @@ private:
 	 */
 
 	else if(_cfg.miSolverType == SYNTHETIC)	{
-		
+
 		/*
 		 * Synthetic MD runs sequentially only, as described above.
 		 */
@@ -425,7 +439,7 @@ private:
 						syntheticMasses.push_back(mass);
 					}
 					//std::cout << "Generated masses!" << std::endl;
-					
+
 					if (_rank==0){
 						gettimeofday(&_tv.end,NULL);
 						_tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
@@ -435,7 +449,7 @@ private:
 
   				}},
 				new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double,3>>, std::vector<std::array<unsigned int, 3>>)> { //applyVector
-				[this] (	
+				[this] (
 					std::vector<std::array<double, 3>> inputVectors, //same for these 2
 					std::vector<std::array<unsigned int, 3>> cellIndices
   				) {
@@ -473,7 +487,7 @@ private:
 						syntheticMomenta.push_back({momentum[0], momentum[1], momentum[2]});
 					}
 					//std::cout << "Generated momenta!" << std::endl;
-					
+
 					if (_rank==0){
 						gettimeofday(&_tv.end,NULL);
 						_tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
@@ -520,6 +534,8 @@ private:
     std::cout << "Finish CouetteTest::initSolvers() " << std::endl;
   }
 
+  /** @brief advances the continuum solver and collects data to send to md (fillSendBuffer())
+   *  @param cycle the number of the current coupling time step */
   void advanceMacro(int cycle){
     if(_couetteSolver != NULL){
       if (_rank==0){ gettimeofday(&_tv.start,NULL); }
@@ -527,7 +543,7 @@ private:
       // run one time step for macroscopic couette solver
       if( _cfg.wallInitCycles > 0 && cycle == _cfg.wallInitCycles){
         _couetteSolver->setWallVelocity(_cfg.wallVelocity);
-		//When using Synthetic MD, 
+		//When using Synthetic MD,
       }
       if(_cfg.wallOscillations != 0){
         tarch::la::Vector<3,double> vel = cycle < _cfg.wallInitCycles ? _cfg.wallInitVelocity : _cfg.wallVelocity;
@@ -550,6 +566,8 @@ private:
     }
   }
 
+  /** @brief advances the md solver for one coupling time step and collect the data for the coupling
+   *  @param cycle the number of the current coupling time step  */
   void advanceMicro(int cycle){
     if (_rank==0){ gettimeofday(&_tv.start,NULL); }
     if(_cfg.miSolverType == SIMPLEMD){
@@ -603,6 +621,7 @@ private:
     }
   }
 
+  /** @todo @Piet*/
   void computeSNR(int cycle){
     if(_cfg.computeSNR && cycle >= _cfg.filterInitCycles){
       std::cout << cycle - _cfg.filterInitCycles << ", ";
@@ -612,7 +631,7 @@ private:
       const double mass = _cfg.density*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
       for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++){
 
-        // TODO use more cells
+        /// todo@ use more cells
         if (i==87){
 
         // get global cell index vector
@@ -630,6 +649,8 @@ private:
     }
   }
 
+  /** @brief sets up the boundaries in the macro solver for the coupling and applies the values from the md in the macro solver
+   *  @param cycle current time step of the coupled simulation */
   void twoWayCoupling(int cycle){
     if (( _cfg.maSolverType==COUETTE_LB || _cfg.maSolverType==COUETTE_FD) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
       static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
@@ -656,6 +677,7 @@ private:
     write2CSV(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle+1);
   }
 
+  /** @brief finalize the time measurement, and cleans up at the end of the simulation */
   void shutdown(){
     if(_cfg.computeSNR){
       std::cout << "SNR = " << 10 * log10(_sum_signal / _sum_noise) << std::endl;
@@ -724,16 +746,17 @@ private:
     return globalNumberMacroscopicCells;
   }
 
-  /** allocates the send buffer (with values for all macroscopic cells) and returns indices. This is only done on rank 0. */
+  /** This is only done on rank 0.
+   *  @brief allocates the send buffer (with values for all macroscopic cells).
+   *  @param indexConversion instance of the indexConversion
+   *  @param couetteSolverInterface interface for the continuum solver */
   void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion,
   coupling::interface::MacroscopicSolverInterface<3> &couetteSolverInterface) {
     // determine global number of cells
     const tarch::la::Vector<3,unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells()+tarch::la::Vector<3,unsigned int>(2));
     const unsigned int num = cells[0]*cells[1]*cells[2];
-
     // delete all potential entries of sendBuffer
     deleteBuffer(_buf.sendBuffer);
-
     // count number of cells to be sent from this process; therefore, loop over all global macroscopic cells...
     unsigned int numCellsSent=0;
     for (unsigned int i =0; i < num; i++){
@@ -747,11 +770,9 @@ private:
          if (containsThisRank){ numCellsSent++; }
       }
     }
-
     // allocate array for cell indices
     unsigned int* indices = new unsigned int [numCellsSent];
     if (indices==NULL){std::cout << "ERROR CouetteTest::allocateSendBuffer(): indices==NULL!" << std::endl; exit(EXIT_FAILURE); }
-
     // allocate sendBuffer and initialise all entries, incl. indices
     for (unsigned int i = 0; i < num; i++){
       if (couetteSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))){
@@ -767,7 +788,6 @@ private:
          }
       }
     }
-
     #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
     for (unsigned int i = 0; i < numCellsSent; i++){
       std::vector<unsigned int> ranks = couetteSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(indices[i]));
@@ -786,10 +806,8 @@ private:
     // determine global number of cells
     const tarch::la::Vector<3,unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells()+tarch::la::Vector<3,unsigned int>(2));
     const unsigned int num = cells[0]*cells[1]*cells[2];
-
     // delete all potential entries of sendBuffer
     deleteBuffer(_buf.recvBuffer);
-
     // determine number of cells that should be received
     unsigned int numCellsRecv = 0;
     for (unsigned int i = 0; i < num; i++){
@@ -822,7 +840,6 @@ private:
         }
       }
     }
-
     #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
     for (unsigned int i = 0; i < numCellsRecv; i++){
       std::vector<unsigned int> ranks = couetteSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(indices[i]));
@@ -834,12 +851,16 @@ private:
     _buf.globalCellIndices4RecvBuffer = indices;
   }
 
-
-  /** write cells that have been received from MD to csv file */
+  /** @brief write macroscopic cells that have been received from MD to csv file
+   *  @param recvBuffer the buffer for the data, which comes from md
+   *  @param recvIndices the indices for the macr cells in the buffer
+   *  @param indexConversion an instance of the indexConversion
+   *  @param couplingCycle the current number of coupling cycle */
   void write2CSV(
     std::vector<coupling::datastructures::MacroscopicCell<3>* >& recvBuffer,const unsigned int * const recvIndices,
     const coupling::IndexConversion<3>& indexConversion, int couplingCycle
   ) const {
+    if(recvBuffer.size() == 0) return;
     if(_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0) return;
     // form file name and open file
     std::stringstream ss;
@@ -862,14 +883,20 @@ private:
   }
 
 
-  /** deletes the send buffer */
+  /** @brief deletes the data in the buffer for the macro to md transfer
+   *  @param sendBuffer the buffer to be cleaned */
   void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>* >& sendBuffer) const {
     // delete all potential entries of sendBuffer
     for (unsigned int i = 0; i < sendBuffer.size(); i++){if (sendBuffer[i]!=NULL){ delete sendBuffer[i]; sendBuffer[i]=NULL;}}
     sendBuffer.clear();
   }
 
-  /** fills send buffer with data from couette solver */
+  /** @brief fills send buffer with data from macro/continuum solver
+   *  @param density the general density of the fluid
+   *  @param couetteSolver the continuum solver
+   *  @param indexConversion an instance of the indexConversion
+   *  @param sendBuffer the bufffer to send data from macro to micro
+   *  @param globalCellIndices4SendBuffer the global linearized indices of the macroscopic cells in the buffer  */
   void fillSendBuffer(
     const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver, const coupling::IndexConversion<3>& indexConversion,
     std::vector<coupling::datastructures::MacroscopicCell<3>* >& sendBuffer, const unsigned int * const globalCellIndices4SendBuffer
@@ -896,6 +923,12 @@ private:
     }
   }
 
+  /** @brief fills the buffer with the velocity values from the analytical couette solution with additional random noise
+   *  @param density the general density of the fluid
+   *  @param couetteSolver the continuum solver
+   *  @param indexConversion an instance of the indexConversion
+   *  @param sendBuffer the bufffer to send data from macro to micro
+   *  @param globalCellIndices4SendBuffer the global linearized indices of the macroscopic cells in the buffer  */
   void fillRecvBuffer(
     const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver, const coupling::IndexConversion<3>& indexConversion,
     std::vector<coupling::datastructures::MacroscopicCell<3>* >& sendBuffer, const unsigned int * const globalCellIndices4SendBuffer
@@ -920,6 +953,9 @@ private:
     }
   }
 
+  /** @returns the correct marco/continuum solver for the given setup
+   *  @param dx the grid size (equidistant mesh)
+   *  @param dt the time step  */
   coupling::solvers::AbstractCouetteSolver<3>* getCouetteSolver(const double dx, const double dt){
     coupling::solvers::AbstractCouetteSolver<3>* solver = NULL;
     tarch::la::Vector<3,double> vel = _cfg.wallInitCycles > 0 ? _cfg.wallInitVelocity : _cfg.wallVelocity;
@@ -932,8 +968,9 @@ private:
           exit(EXIT_FAILURE);
         }
       }
-	//In case of synthetic MD, each rank needs access to the analytical solution. In that case we thus initialize analytical solvers on each rank other than 0
-	else if( _cfg.miSolverType == SYNTHETIC){ //rank != 0
+    }
+	  //In case of synthetic MD, each rank needs access to the analytical solution. In that case we thus initialize analytical solvers on each rank other than 0
+	  else if( _cfg.miSolverType == SYNTHETIC){ //rank != 0
       if (_rank == 0){
         solver = new coupling::solvers::CouetteSolver<3>(_cfg.channelheight,vel[0],_cfg.kinVisc);
         if (solver==NULL){ //How is this even reachable? Copied it from above...
@@ -941,18 +978,13 @@ private:
           exit(EXIT_FAILURE);
         }
       }
-
-
-	  }
     }
     #if(BUILD_WITH_OPENFOAM)
     else if(_cfg.maSolverType == COUETTE_FOAM){
-      if(_rank==0){
-        solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD);
-        if (solver==NULL){
-          std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
-          exit(EXIT_FAILURE);
-        }
+      solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD);
+      if (solver==NULL){
+        std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
     #endif
@@ -978,6 +1010,13 @@ private:
     return solver;
   }
 
+  /** @returns the interface for the macro/continuum solver
+   *  @param couetteSolver the macro/continuum solver
+   *  @param mdOffset the offset of the md domain from (0.0.0)
+   *  @param mamicoMeshsize
+   *  @param globalNumberMacroscopicCells the total number macroscopic cells for the whole domain
+   *  @param outerRegion
+   *  @todo piet, what is the mamicoMeshsize & the outer layer  */
   coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(
     coupling::solvers::AbstractCouetteSolver<3>* couetteSolver,
     tarch::la::Vector<3,double> mdOffset,
@@ -1027,74 +1066,143 @@ private:
     return interface;
   }
 
+  /** @brief all the variables necessary to define the couette scenario are stored in here */
   struct CouetteConfig{
-    // channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0)
+    /** @brief channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0) */
     double channelheight;
-    // velocity of moving wall (lower boundary moves)
+    /** @brief velocity of moving wall (lower boundary moves) */
     tarch::la::Vector<3,double> wallVelocity;
+    /** @brief number of coupling cycles that will be done, while the wall velocity is the wallInitVelocity */
     int wallInitCycles;
+    /** @brief the velocity at the moving wall (z=0) while the wallInitCycles*/
     tarch::la::Vector<3,double> wallInitVelocity;
+    /** @brief total number of oscillation periods of the oscillating wall velocity*/
     double wallOscillations;
-    // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
+    /** @brief number of coupling cycles, that is continuum time steps; MD/DPD: 1000 */
     int couplingCycles;
-    bool md2Macro, macro2Md, computeSNR, twoWayCoupling;
+    /** @brief true if data will be send & received from the md to the continuum solver */
+    bool md2Macro;
+    /** @brief true if data will be send & received from the continuum to the md solver  */
+    bool macro2Md;
+    /** @brief true if the signal to noise ratio shall be evaluated */
+    bool computeSNR;
+    /** @brief true if from the md solver will be applied as boundary condition for the continuum solver */
+    bool twoWayCoupling;
+    /** @brief number of coupling cycles before a filter is applied*/
     int filterInitCycles;
+    /** @brief the time step interval for writing the md data to csv files  */
     int csvEveryTimestep;
+    /** @brief the type of continuum solver */
     MacroSolverType maSolverType;
+    /** @brief the type of md solver */
     MicroSolverType miSolverType;
-    double density, kinVisc;
-    // only for LB couette solver: number of processes
+    /** @brief the general density of the fluid under consideration */
+    double density;
+    /** @brief the kinematic viscosity of the fluid under consideration */
+    double kinVisc;
+    /** @brief only for LB couette solver: number of processes */
     tarch::la::Vector<3,unsigned int> lbNumberProcesses;
-    // only for LB couette solver: VTK plotting per time step
+    /** @brief  only for LB couette solver: VTK plotting per time step */
     int plotEveryTimestep;
+    /** @brief number of cycles the continuum solver is advanced before the coupling is enabled */
     int initAdvanceCycles;
+    /** @brief the start temperature for the fluid under consideration */
     double temp;
+    /** @brief number of equilibartion time steps = number of time steps that the md will run before the coupling is enabled */
     int equSteps;
+    /** @brief the number of md simulation instances in a multi-instance coupling  */
     int totalNumberMDSimulations;
+    /** @brief the sigma for the random noise in the case of synthetic md solver */
     double noiseSigma;
+    /** @todo piet */
     bool twsLoop;
-    int twsLoopMin,twsLoopMax,twsLoopStep;
+    /** @todo piet*/
+    int twsLoopMin;
+    /** @todo piet */
+    int twsLoopMax;
+    /** @todo piet */
+    int twsLoopStep;
   };
 
+  /** the buffers store macroscopic cells, so momentum and density will be transferred
+   *  @brief holds the buffers for the data transfer */
   struct CouplingBuffer{
+    /** @brief the buffer for data transfer from macro to md */
     std::vector<coupling::datastructures::MacroscopicCell<3>* > sendBuffer;
+    /** @brief the global indices of the macroscopic cells in the sendBuffer */
     unsigned int *globalCellIndices4SendBuffer;
+    /** @brief the buffer for data transfer from md to macro */
     std::vector<coupling::datastructures::MacroscopicCell<3>* > recvBuffer;
+    /** @brief the global indices of the macroscopic cells in the recvBuffer*/
     unsigned int *globalCellIndices4RecvBuffer;
   };
 
+  /** @brief holds all the variables for the time measurement of a simulation
+   *  @todo Piet*/
   struct TimingValues{
+    /** @brief */
     timeval start_total;
+    /** @brief */
     timeval start;
+    /** @brief */
     timeval end;
+    /** @brief */
     double micro;
+    /** @brief */
     double macro;
+    /** @brief */
     double filter;
   };
+
   #if(BUILD_WITH_OPENFOAM)
+  /** @brief holds the variables necessary for the interface to the IcoFoam solver  */
   struct FoamConfig{
+    /** @brief the path to the directory, where the folder with the IcoFoam OpenFOAM setup files are */
     std::string directory;
+    /** @brief the name of the OpenFOAM folder */
     std::string folder;
+    /** @brief the cubic mesh with a cubic hole has 12 boundaries, this vector tells which of them
+     *         shall be coupled with the md; The order has to be the same as in the blockMeshDict */
     tarch::la::Vector<12,unsigned int> boundariesWithMD;
   };
   #endif
 
-  int _rank, _tws;
+  /** @brief the rank of the current MPI process */
+  int _rank;
+  /** @todo Piet */
+  int _tws;
+  /** @brief the config data and information for SimpleMD */
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
+  /** @brief the config data and information for MaMiCo*/
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
+  /** @brief the CouetteConfig for the current setup */
   CouetteConfig _cfg;
+  /** @brief the counter for the time steps, which are done within the md */
   unsigned int _mdStepCounter;
+  /** @brief the current macro/continuum solver */
   coupling::solvers::AbstractCouetteSolver<3> *_couetteSolver;
+  /** @todo piet */
   tarch::utils::MultiMDService<3>* _multiMDService;
+  /** @todo piet */
   coupling::services::MultiMDCellService<MY_LINKEDCELL,3> *_multiMDCellService;
+  /** @brief the current buffer for the coupling */
   CouplingBuffer _buf;
+  /** @todo piet */
   unsigned int _localMDInstances;
+  /** @brief the interface to the md solver */
   std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL,3>* > _mdSolverInterface;
+  /** @brief the md solver */
   std::vector<coupling::interface::MDSimulation*> _simpleMD;
+  /** @todo piet */
   std::default_random_engine _generator;
-  double _sum_signal, _sum_noise;
+  /** @todo piet */
+  double _sum_signal;
+  /** @todo piet */
+  double _sum_noise;
+  /** @brief a instance of the timingValues */
   TimingValues _tv;
   #if(BUILD_WITH_OPENFOAM)
+  /** @brief the configurations for the OpenFoam solver */
   FoamConfig _foam;
   #endif
 };
