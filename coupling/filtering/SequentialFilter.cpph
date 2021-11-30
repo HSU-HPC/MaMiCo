@@ -36,7 +36,7 @@ coupling::SequentialFilter<dim>::SequentialFilter(
 			_outputCells_Local = _filter->getOutputCells(); 			
 
 			//allocate global cell datastructures
-			for(unsigned int c = 0; c < CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain; c++) {
+			for(unsigned int c = 0; c < CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain; c++) {
 				_inputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 				_outputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 			}
@@ -93,7 +93,6 @@ void coupling::SequentialFilter<dim>::contribute() {
 				#ifdef DEBUG_SEQ_FILTER
 					std::cout << "		SEQFILTER (" << _myRank << "): Copying " << _inputCells_Local.size() << " cells from local on processing rank " << rank << std::endl;
 				#endif
-
 				//Copy all cell data to global data structures. TODO: use std list and concat
 				for(unsigned int c = 0; c < _inputCells_Local.size(); c++) {
 					*(_inputCells_Global[cellsUpdated]) = *(_inputCells_Local[c]);

@@ -8,7 +8,6 @@
 #include<functional>
 #include<sys/time.h>
 
-#include "coupling/IndexConversionMD2Macro.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "coupling/filtering/interfaces/FilterInterface.h"
 #include "coupling/indexing/CellIndex.h"

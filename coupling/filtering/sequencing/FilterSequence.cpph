@@ -125,8 +125,14 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 		//sequential filtering
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 		if(const char* sequential = currFilterNode->Attribute("sequential")) {
-			if(std::strcmp(sequential, "true") == 0) _filters.push_back(new coupling::SequentialFilter<dim>(newfilter, 0 /*TODO: get rank!*/));
-			else _filters.push_back(newfilter);
+			if(std::strcmp(sequential, "true") == 0) {
+				//TODO: remove usage of IndexConversion. make own rank/communicator more accessible
+				//const auto rank = MamicoInterfaceProvier::getInstance().getMacroscopicCellService().getIndexConversion.getThisRank();
+				_filters.push_back(new coupling::SequentialFilter<dim>(newfilter, /*TODO*/ 0));
+			}
+			else {
+				_filters.push_back(newfilter);
+			}
 		}
 		else
 		#endif 
