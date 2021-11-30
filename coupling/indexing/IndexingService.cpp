@@ -345,42 +345,45 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		std::vector<unsigned int> ranks; //used to store ranks in which certain indices occur
 
 		//init boundaries of all local, non-m2m, GL including indexing types
-		BaseIndex<dim> local_lowerBoundary { CellIndex<dim /*global*/>::lowerBoundary }; //used to test which indices are within local bounds
-		//TODO: determine these two analyticaly (i.e. calculate domain bounds): you dont need to iterate over all global indices.
-		while(true) {
-			ranks = getRanksForGlobalIndex(local_lowerBoundary, globalNumberMacroscopicCells);
-			if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
-				break;
+		{
+			BaseIndex<dim> lowerBoundary { CellIndex<dim /*global*/>::lowerBoundary }; 
+			BaseIndex<dim> upperBoundary { CellIndex<dim /*global*/>::upperBoundary };
+			
+			//TODO: determine these two analyticaly (i.e. calculate domain bounds): you dont need to iterate over all global indices.
+			while(true) {
+				ranks = getRanksForGlobalIndex(lowerBoundary, globalNumberMacroscopicCells);
+				if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
+					break;
 
-			//sanity check: empty local domain 
-			if(local_lowerBoundary == CellIndex<dim /*global*/>::upperBoundary) {
-				using namespace std::string_literals;
-				throw std::runtime_error( "IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s); 
+				//sanity check: empty local domain 
+				if(lowerBoundary == CellIndex<dim /*global*/>::upperBoundary) {
+					using namespace std::string_literals;
+					throw std::runtime_error( "IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s); 
+				}
+
+				//...increment by one if above is too high to be in local domain
+				++lowerBoundary; 
+			}
+			while(true) {
+				ranks = getRanksForGlobalIndex(upperBoundary, globalNumberMacroscopicCells);
+				if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
+					break;
+
+				//sanity check: empty local domain 
+				if(upperBoundary < lowerBoundary) {
+					using namespace std::string_literals;
+					throw std::runtime_error( "IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s); 
+				}
+
+				//...decrement by one if above is too high to be in local domain
+				--upperBoundary; 
 			}
 
-			//...increment by one if above is too high to be in local domain
-			++local_lowerBoundary; 
+			CellIndex<dim, IndexTrait::local>::lowerBoundary = lowerBoundary; 
+			CellIndex<dim, IndexTrait::local>::upperBoundary = upperBoundary;
+			CellIndex<dim, IndexTrait::local>::setDomainParameters();
 		}
-		BaseIndex<dim> local_upperBoundary { CellIndex<dim /*global*/>::upperBoundary };
-		while(true) {
-			ranks = getRanksForGlobalIndex(local_upperBoundary, globalNumberMacroscopicCells);
-			if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
-				break;
-
-			//sanity check: empty local domain 
-			if(local_upperBoundary < local_lowerBoundary) {
-				using namespace std::string_literals;
-				throw std::runtime_error( "IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s); 
-			}
-
-			//...decrement by one if above is too high to be in local domain
-			--local_upperBoundary; 
-		}
-
-		CellIndex<dim, IndexTrait::local>::lowerBoundary = local_lowerBoundary; 
-		CellIndex<dim, IndexTrait::local>::upperBoundary = local_upperBoundary;
-		CellIndex<dim, IndexTrait::local>::setDomainParameters();
-
+		
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::lowerBoundary = CellIndex<dim, IndexTrait::local>::lowerBoundary;
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::upperBoundary = CellIndex<dim, IndexTrait::local>::upperBoundary;
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local>::setDomainParameters();
@@ -416,8 +419,8 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 
 		//init boundaries of all local, m2m, GL including indexing types
-		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary.get() - tarch::la::Vector<dim, unsigned int> { 1 };
-		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
+		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get() - tarch::la::Vector<dim, unsigned int> { 1 };
+		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
 		CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
 
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary;
