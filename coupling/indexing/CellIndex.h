@@ -73,10 +73,10 @@ namespace coupling {
 
 		//TODO: refactor as member functions
 		template<unsigned int dim, IndexTrait ... traits>
-		unsigned int convertToScalar(const CellIndex<dim, traits...>&);
+		int convertToScalar(const CellIndex<dim, traits...>&);
 
 		template<unsigned int dim, IndexTrait ... traits>
-		tarch::la::Vector<dim, unsigned int> convertToVector(const CellIndex<dim, traits...>&);
+		tarch::la::Vector<dim, int> convertToVector(const CellIndex<dim, traits...>&);
 	}
 }
 
@@ -110,8 +110,8 @@ class coupling::indexing::CellIndex {
 		 */
 		using value_T = std::conditional_t<(
 			coupling::indexing::TraitComparisons::is_same<coupling::indexing::IndexTrait::vector>(traits) or ...),
-			tarch::la::Vector<dim, unsigned int>, 
-			unsigned int
+			tarch::la::Vector<dim, int>, 
+			int
 		>;
 
 		/**
@@ -143,7 +143,7 @@ class coupling::indexing::CellIndex {
 		 * Note that this does NOT increments indices in vector representation in all directions.
 		 */
 		CellIndex& operator++() {
-			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, unsigned int>>) {
+			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
 				CellIndex<dim> scalar_base { *this };
 				*this = CellIndex { ++scalar_base };
 			}
@@ -156,7 +156,7 @@ class coupling::indexing::CellIndex {
 		 * Note that this does NOT decrements indices in vector representation in all directions.
 		 */
 		CellIndex& operator--() {
-			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, unsigned int>>) {
+			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
 				CellIndex<dim> scalar_base { *this };
 				*this = CellIndex { --scalar_base };
 
@@ -167,7 +167,7 @@ class coupling::indexing::CellIndex {
 		}
 
 		/*
-		 * Any two indices fulfill some relation iff the unsigned integers underlying their CellIndex<dim, {}> equivalents fulfill that relation.
+		 * Any two indices fulfill some relation iff the integers underlying their CellIndex<dim, {}> equivalents fulfill that relation.
 		 * Note that this is different than what the static member 'contains(...)' does.
 		 *
 		 * @param CellIndex index to compare this index to
@@ -184,7 +184,7 @@ class coupling::indexing::CellIndex {
 		 * Initialises all static members dependant only on upperBoundary and lowerBoundary
 		 */
 		static void setDomainParameters() {
-			numberCellsInDomain = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, unsigned int> { 1 };
+			numberCellsInDomain = tarch::la::Vector<dim, unsigned int> { upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, int> { 1 } };
 			
 			linearNumberCellsInDomain = 1;
 			for(unsigned int d = 0; d < dim; d++) linearNumberCellsInDomain *= numberCellsInDomain[d];

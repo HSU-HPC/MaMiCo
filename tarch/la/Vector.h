@@ -77,6 +77,14 @@ class tarch::la::Vector {
       for (int i = 0; i < size; i++){ _entries[i] -= v[i];}
       return *this;
     }
+
+    /** cast Vector<size, T> to Vector<size, convert_to_T> */
+    template<class convert_to_T>
+    explicit operator Vector<size, convert_to_T>() const{
+      Vector<size, convert_to_T> ans;
+      for(unsigned int i = 0; i < size; i++){ ans[i] = static_cast<convert_to_T>(_entries[i]); } 
+      return ans;
+    }
 };
 
 
