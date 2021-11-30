@@ -135,10 +135,9 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      */
     virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<3>& molecule) 
     { 
-      double bBoxMin[3];
-			double bBoxMax[3];
-      global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
-      ls1::LS1RegionWrapper cell(bBoxMin, bBoxMax);
+      auto up = global_simulation->getEnsemble()->domain()->rmax();
+      auto down = global_simulation->getEnsemble()->domain()->rmin();
+      ls1::LS1RegionWrapper cell(down, up);
       cell.addMolecule(molecule);
     }
 
@@ -216,20 +215,20 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       //calculate energy (copied from coupling::interface, assuming that the molecule used here is a coupling::datastructures)
       region.iteratorReset();
       while(region.iteratorValid())
-        {
-            ::Molecule* temp = region.getParticleAtIterator();
-            tempMoleculePosition = { temp->r(0), temp->r(1), temp->r(2) };
-            const auto r = tempMoleculePosition - moleculePosition;
-            const double r2 = tarch::la::dot(r, r);
-            if(r2 < cutoff2)
-            {
-                const double r6 = r2 * r2 * r2;
-                const double contrib =  2.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0);
-                potentialEnergy += contrib;
-            }
+      {
+          ::Molecule* temp = region.getParticleAtIterator();
+          tempMoleculePosition = { temp->r(0), temp->r(1), temp->r(2) };
+          const auto r = tempMoleculePosition - moleculePosition;
+          const double r2 = tarch::la::dot(r, r);
+          if(r2 < cutoff2)
+          {
+              const double r6 = r2 * r2 * r2;
+              const double contrib =  2.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0);
+              potentialEnergy += contrib;
+          }
 
-            region.iteratorNext();
-        }
+          region.iteratorNext();
+      }
 
       molecule.setForce(force);
       molecule.setPotentialEnergy(potentialEnergy);

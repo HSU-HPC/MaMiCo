@@ -94,7 +94,7 @@ else
   ### autopas
     libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/src/autopas -l:libautopas.a"
   ### spdlog (for ls1)
-    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlogd.a -lpthread"
+    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlogd.a -lpthread" #in debug, libspdlogd, else libspdlog
   ### harmony (for autopas)
     libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/libs/harmony/include/lib -l:libharmony.a"
   else

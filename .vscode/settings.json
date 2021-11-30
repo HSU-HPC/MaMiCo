@@ -73,7 +73,9 @@
         "valarray": "cpp",
         "variant": "cpp",
         "dense": "cpp",
-        "eigenvalues": "cpp"
+        "eigenvalues": "cpp",
+        "*.txx": "cpp",
+        "*.ixx": "cpp"
     },
     "cmake.configureOnOpen": false
 }

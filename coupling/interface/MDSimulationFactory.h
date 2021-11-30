@@ -578,16 +578,11 @@ public:
     virtual void init()
     {
       //parse file
-      std::cout << "here 31" << std::endl;
       const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
-      std::cout << "here 32" << std::endl;
       global_simulation->readConfigFile(filename);
-      std::cout << "here 33" << std::endl;
       //all the things
       global_simulation->prepare_start();
-      std::cout << "here 34" << std::endl;
       global_simulation->preSimLoopSteps();
-      std::cout << "here 35" << std::endl;
     }
     virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) { init(); }
     virtual void shutdown()
@@ -628,9 +623,7 @@ class SimulationAndInterfaceFactory {
         #endif
       );
       #elif defined(LS1_MARDYN)
-      std::cout << "here 21" << std::endl;
       return new coupling::interface::LS1MDSimulation();
-      std::cout << "here 22" << std::endl;
       #else
       std::cout << "ERROR MDSimulationFactory::getMDSimulation(): Unknown MD simulation!" << std::endl; exit(EXIT_FAILURE);
       return NULL;

@@ -88,17 +88,23 @@ public:
     void addMolecule(const coupling::interface::Molecule<3> &molecule)
     {
         ::Molecule temp;
-        temp.setr(0, molecule.getPosition()[0]);
-        temp.setr(1, molecule.getPosition()[1]);
-        temp.setr(2, molecule.getPosition()[2]);
-        
-        temp.setv(0, molecule.getVelocity()[0]);
-        temp.setv(1, molecule.getVelocity()[1]);
-        temp.setv(2, molecule.getVelocity()[2]);
 
-        temp.setF(0, molecule.getForce()[0]);  //more important for usher particles
-        temp.setF(1, molecule.getForce()[1]);
-        temp.setF(2, molecule.getForce()[2]);
+        auto position = molecule.getPosition();
+        auto velocity = molecule.getVelocity();
+        auto force = molecule.getForce();
+
+        temp.setr(0, position[0]);
+        temp.setr(1, position[1]);
+        temp.setr(2, position[2]);
+        
+        temp.setv(0, velocity[0]);
+        temp.setv(1, velocity[1]);
+        temp.setv(2, velocity[2]);
+
+        temp.setF(0, force[0]);  //more important for usher particles
+        temp.setF(1, force[1]);
+        temp.setF(2, force[2]);
+        
         if(!_IDinited)
         {
             _curParticleID = global_simulation->getTotalNumberOfMolecules() + 1;

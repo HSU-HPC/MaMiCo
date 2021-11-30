@@ -963,3 +963,12 @@ spdlog/sinks/tcp_sink.h
 spdlog/sinks/win_eventlog_sink.h
 spdlog/sinks/wincolor_sink-inl.h
 spdlog/sinks/wincolor_sink.h
+cmake-build-debug/CMakeFiles/clion-environment.txt
+cmake-build-debug/CMakeFiles/clion-log.txt
+cmake-build-debug/CMakeCache.txt
+.gitignore
+.idea/MaMiCo.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+cmake-build-debug/CMakeFiles/cmake.check_cache

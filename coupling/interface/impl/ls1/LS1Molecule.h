@@ -25,7 +25,7 @@ class coupling::interface::LS1Molecule: public coupling::interface::Molecule<3>
 {
 public:
     LS1Molecule(::Molecule *myMolecule): _myMolecule(myMolecule){}
-    LS1Molecule(): _myMolecule(NULL){}
+    LS1Molecule(): _myMolecule(){}
     virtual ~LS1Molecule(){}
 
     void setMolecule(::Molecule *newMolecule) { _myMolecule=newMolecule;}
