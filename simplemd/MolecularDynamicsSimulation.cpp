@@ -33,7 +33,7 @@ double simplemd::MolecularDynamicsSimulation::getNumberDensity(
   return (density*numberMolecules);
 }
 
-
+// TODO: fix duplicate copy-paste code in both versions of initServices
 void simplemd::MolecularDynamicsSimulation::initServices(){
   // set vtk file stem and checkpoint filestem -> only one MD simulation runs
   _localMDSimulation = 0;
@@ -76,7 +76,13 @@ void simplemd::MolecularDynamicsSimulation::initServices(){
       localDomainOffset[d] = localDomainOffset[d]
                       + ( processCoordinates[d]*_parallelTopologyService->getLocalNumberOfCells()[d]*
                           realMeshWidth[d] );
+      int missingMolecules = moleculesPerDirection[d]%(_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
       moleculesPerDirection[d] = moleculesPerDirection[d]/(_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
+      for(int i=0;i<missingMolecules;i++){
+        if ( processCoordinates[d] == 
+          (unsigned int) ( i*(1.0 * _configuration.getMPIConfiguration().getNumberOfProcesses()[d]) / missingMolecules) )
+        moleculesPerDirection[d]++;
+      }
     }
     #if (MD_DEBUG==MD_YES)
     if (_parallelTopologyService->getProcessCoordinates()==tarch::la::Vector<MD_DIM,unsigned int>(0)){
@@ -233,7 +239,13 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
       localDomainOffset[d] = localDomainOffset[d]
                       + ( processCoordinates[d]*_parallelTopologyService->getLocalNumberOfCells()[d]*
                           realMeshWidth[d] );
+      int missingMolecules = moleculesPerDirection[d]%(_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
       moleculesPerDirection[d] = moleculesPerDirection[d]/(_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
+      for(int i=0;i<missingMolecules;i++){
+        if ( processCoordinates[d] == 
+          (unsigned int) ( i*(1.0 * _configuration.getMPIConfiguration().getNumberOfProcesses()[d]) / missingMolecules) )
+        moleculesPerDirection[d]++;
+      }    
     }
     #if (MD_DEBUG==MD_YES)
     if (_parallelTopologyService->getProcessCoordinates()==tarch::la::Vector<MD_DIM,unsigned int>(0)){
