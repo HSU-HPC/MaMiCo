@@ -30,14 +30,12 @@ template<unsigned int dim>
 class coupling::AsymmetricalFilterJunction : public coupling::FilterSequence<dim> {
 	public:
     	AsymmetricalFilterJunction( 
-			const tarch::utils::MultiMDService<dim>& multiMDService,
 			const char* name,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* > primaryInputCellVector, // primary input of sequence. 
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	secondaryInputCellVector, // additional data, presented as macro cells as well
 			std::array<bool, 7> filteredValues
 		):
 		coupling::FilterSequence<dim>(
-			multiMDService, 
 			name, 
 			primaryInputCellVector,
 			filteredValues

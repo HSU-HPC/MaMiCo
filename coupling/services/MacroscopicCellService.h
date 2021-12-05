@@ -212,7 +212,7 @@ public coupling::services::MacroscopicCellService<dim> {
 	 * Initialises the _filterPipeline member. Called from _multiMDCellService's sendFromMD2Macro during the first coupling iteration.
 	 * Make sure to delete _filterPipeline in ~MacroscopicCellServiceImpl()
 	 */
-	void initFiltering() { _filterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells.getMacroscopicCells(), _multiMDService, coupling::Scope::perInstance, _filterPipelineConfiguration); }
+	void initFiltering() { _filterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells.getMacroscopicCells(), coupling::Scope::perInstance, _filterPipelineConfiguration); }
 
 	const coupling::FilterPipeline<dim>* getFilterPipeline() const { return _filterPipeline; }
 

@@ -8,9 +8,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 
-//#define DEBUG_POD
+#define DEBUG_POD
 #include "coupling/filtering/interfaces/FilterInterface.h"
-#include "tarch/utils/MultiMDService.h"
 
 namespace coupling {
     template<unsigned int dim>
@@ -26,14 +25,11 @@ class coupling::POD : public coupling::FilterInterface<dim>{
     public:
         POD(  	const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
 				const std::array<bool, 7> filteredValues,	
-				const tarch::utils::MultiMDService<dim>& multiMDService,
 				int tws,
 				int kmax
 				):
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "POD"),
-				_multiMDService(multiMDService),
+				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "POD"),
 				_timeWindowSize(tws),
 				_kMax(kmax),
 				_cycleCounter(0),
@@ -44,7 +40,7 @@ class coupling::POD : public coupling::FilterInterface<dim>{
 				_A(NULL),
 				_A_T(NULL)
 		{
-			int spatialSize = cellIndices.size();
+			int spatialSize = inputCellVector.size();
 			_data = new Eigen::MatrixXd[dim+1]; // separate data matrices for: mass, momentum0, momentum1, momentum2
 			_C = new Eigen::MatrixXd[dim+1];
  			_A = new Eigen::MatrixXd[dim+1];
@@ -74,7 +70,6 @@ class coupling::POD : public coupling::FilterInterface<dim>{
      
 	    void operator()();
 	private:
-		const tarch::utils::MultiMDService<dim>& _multiMDService;
 		unsigned int _timeWindowSize; // number of snapshots / coupling cycles taken into consideration for noise reduction
     	const unsigned int _kMax; // number of dominant eigenvalues
     	unsigned int _cycleCounter; // coupling cycle counter, indicates how many data snapshots are available already

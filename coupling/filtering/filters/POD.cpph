@@ -11,18 +11,27 @@
 
 template<unsigned int dim>
 void coupling::POD<dim>::operator()(){	
-    #ifdef DEBUG_POD
+   	#ifdef DEBUG_POD
     std::cout << "		POD: Applying filter...";
     #endif 
+
+    #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+    //get MPI parameters TODO: make them members?
+    const MPI_Comm comm = {}; //TODO
+    unsigned int my_rank; 
+    MPI_Comm_rank(comm, (int*) &my_rank);
+    unsigned int comm_size;
+    MPI_Comm_size(comm, (int*) &comm_size);
+    #endif
 
 //beginProcess: first traversal
 	_spatialIndex = 0;
 //process: first traversal
-	for(unsigned int index = 0; index < coupling::FilterInterface<dim>::_cellIndices.size(); index++){
+	for(unsigned int index = 0; index < this->_inputCells.size(); index++){
 		// save data into snapshot matrix
-    	_data[0](_t, _spatialIndex) = coupling::FilterInterface<dim>::_inputCells[index]->getMacroscopicMass();
+    	_data[0](_t, _spatialIndex) = this->_inputCells[index]->getMacroscopicMass();
     	for (unsigned int d = 0; d < dim; d++){    // (optimized compiler will unroll this loop)
-      		_data[d+1](_t, _spatialIndex) = coupling::FilterInterface<dim>::_inputCells[index]->getMacroscopicMomentum()[d];
+      		_data[d+1](_t, _spatialIndex) = this->_inputCells[index]->getMacroscopicMomentum()[d];
     	}
 		_spatialIndex++;
 	}//index
@@ -37,16 +46,14 @@ void coupling::POD<dim>::operator()(){
 
       #ifdef DEBUG_POD
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      for(unsigned int rank = 0; rank<_multiMDService.getLocalSize(); rank++){
-        if(rank == _multiMDService.getLocalRank()){
-      #endif
-        std::cout << "Rank " << _multiMDService.getLocalRank()
-          << ", _cycleCounter " << _cycleCounter << ": _data["<<d<<"] = " << _data[d] << std::endl;
-        std::cout << "Rank " << _multiMDService.getLocalRank()
-          << ", _cycleCounter " << _cycleCounter << ": _C["<<d<<"] = " << _C[d] << std::endl;
-      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+      for(unsigned int rank = 0; rank < comm_size; rank++) {
+        if(rank == my_rank) {
+          std::cout << "Rank " << my_rank
+            << ", _cycleCounter " << _cycleCounter << ": _data["<<d<<"] = " << _data[d] << std::endl;
+          std::cout << "Rank " << my_rank
+            << ", _cycleCounter " << _cycleCounter << ": _C["<<d<<"] = " << _C[d] << std::endl;
         }
-        MPI_Barrier(_multiMDService.getLocalCommunicator());
+        MPI_Barrier(comm);
       }
       #endif
       #endif
@@ -62,7 +69,7 @@ void coupling::POD<dim>::operator()(){
     for (unsigned int d = 0; d < dim+1; d++)
       for(unsigned int i = 0; i < _timeWindowSize*_timeWindowSize; i++)
         send_data[index++] = _C[d].data()[i];
-    MPI_Allreduce(send_data, recv_data, count, MPI_DOUBLE, MPI_SUM, _multiMDService.getLocalCommunicator());
+    MPI_Allreduce(send_data, recv_data, count, MPI_DOUBLE, MPI_SUM, comm);
     for (unsigned int d = 0; d < dim+1; d++){
       Eigen::Map<Eigen::MatrixXd> map(&recv_data[d*_timeWindowSize*_timeWindowSize], _timeWindowSize, _timeWindowSize);
       _C[d] = map;  // copy assignment
@@ -74,16 +81,14 @@ void coupling::POD<dim>::operator()(){
     for (unsigned int d = 0; d < dim+1; d++){
       #ifdef DEBUG_POD
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      for(unsigned int rank = 0; rank<_multiMDService.getLocalSize(); rank++){
-        if(rank == _multiMDService.getLocalRank()){
-      #endif
-          std::cout << "Rank " << _multiMDService.getLocalRank()
+      for(unsigned int rank = 0; rank < comm_size; rank++){
+        if(rank == my_rank){
+          std::cout << "Rank " << my_rank
             << ", _cycleCounter " << _cycleCounter << ": Communication finished" << std::endl;
-          std::cout << "Rank " << _multiMDService.getLocalRank()
+          std::cout << "Rank " << my_rank
             << ", _cycleCounter " << _cycleCounter << ": _C["<<d<<"] = " << _C[d] << std::endl;
-      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
         }
-        MPI_Barrier(_multiMDService.getLocalCommunicator());
+        MPI_Barrier(comm);
       }
       #endif
       #endif
@@ -94,7 +99,7 @@ void coupling::POD<dim>::operator()(){
       _A_T[d] = _A[d].transpose();
     }
 //process: second traversal
-	for(unsigned int index = 0; index < coupling::FilterInterface<dim>::_cellIndices.size(); index++){
+	for(unsigned int index = 0; index < this->_inputCells.size(); index++){
 		// compute and store smoothed result
     	Eigen::VectorXd phi_x = _A_T[0] * _data[0].col(_spatialIndex);
     	coupling::FilterInterface<dim>::_outputCells[index]->setMacroscopicMass((_A[0].row(_t) * phi_x).value());

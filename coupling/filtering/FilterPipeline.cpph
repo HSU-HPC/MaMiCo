@@ -11,11 +11,9 @@ using coupling::indexing::IndexTrait;
 template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
-	const tarch::utils::MultiMDService<dim>& multiMDService,
 	coupling::Scope scope, 
 	const char* cfgpath):
 
-	_multiMDService(multiMDService), //TODO: integrate loading of sequences into constructor, then remove this member
 	_scope(scope)
 {
     //check if provided file is written in proper XML
@@ -315,8 +313,7 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		
 		//CREATE SEQUENCE/JUNCTION
 		if(inputCount == 1) {
-			_sequences.push_back(new coupling::FilterSequence<dim>(	_multiMDService, 
-																	currSequenceNode->Value(), 
+			_sequences.push_back(new coupling::FilterSequence<dim>(	currSequenceNode->Value(), 
 																	inputCellVector, 
 																	filteredValues));
 
@@ -332,8 +329,7 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		else if(asymmetrical) {
 			if(inputCount != 2) throw std::runtime_error("ERROR: Currently, asymmetrical junctions are only allowed for exactly two inputs!");
 			//TODO: currently, the only support asymmetrical junction is one that uses outer cells as secondary input
-			_sequences.push_back(new coupling::AsymmetricalFilterJunction<dim>(	_multiMDService, 
-																				currSequenceNode->Value(), 
+			_sequences.push_back(new coupling::AsymmetricalFilterJunction<dim>(	currSequenceNode->Value(), 
 																				inputCellVector, 
 																				_outerCells, 
 																				filteredValues));
@@ -345,8 +341,7 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		}
 		else { //(symmetrical) Junction = Sequence with 2 or more inputs
 			//TODO: move template inputc: currently has 2 hardcoded
-			_sequences.push_back(new coupling::FilterJunction<dim, 2>(	_multiMDService, 
-																		currSequenceNode->Value(), 
+			_sequences.push_back(new coupling::FilterJunction<dim, 2>(	currSequenceNode->Value(), 
 																		inputCellVector, 
 																		filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE

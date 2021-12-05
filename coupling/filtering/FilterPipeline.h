@@ -39,7 +39,6 @@ class coupling::FilterPipeline{
 		//TODO: comment! difference: whole domain vs only md2macro incl. indexing
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
-			const tarch::utils::MultiMDService<dim>& multiMDService,
 			const coupling::Scope scope,
 			const char* cfgpath);
                
@@ -83,8 +82,6 @@ class coupling::FilterPipeline{
 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _md2MacroCells;
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outerCells;
-
-		const tarch::utils::MultiMDService<dim>& _multiMDService;
 
 		tinyxml2::XMLDocument _config;
 

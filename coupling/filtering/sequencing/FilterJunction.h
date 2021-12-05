@@ -33,13 +33,11 @@ template<unsigned int dim, std::size_t inputc>
 class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 	public:
     	FilterJunction( 
-			const tarch::utils::MultiMDService<dim>& multiMDService,
 			const char* name,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector, //concatenation of numberImput input cell vectors
 			std::array<bool, 7> filteredValues
 		):
 		coupling::FilterSequence<dim>(
-			multiMDService, 
 			name, 
 			inputCellVector, 
 			filteredValues)

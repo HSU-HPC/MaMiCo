@@ -17,8 +17,8 @@
 #include "coupling/filtering/filters/ReadFromFile.h"
 #include "coupling/filtering/filters/Constant.h"
 #include "coupling/filtering/filters/Gauss.h"
-/*
 #include "coupling/filtering/filters/POD.h"
+/*
 #include "coupling/filtering/filters/Strouhal.h"
 */
 #include "coupling/filtering/filters/FilterFromFunction.h"
@@ -55,11 +55,9 @@ class coupling::FilterSequence {
 		 * Filter Sequences are constructed in coupling::FilterPipeline::loadSequencesFromXML(...).
 		 * inputCellVector and cellIndices cover the entire md2Macro domain.
 		 */
-    	FilterSequence(	const tarch::utils::MultiMDService<dim>& multiMDService,
-						const char* name,
+    	FilterSequence(	const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCells,
 						std::array<bool, 7> filteredValues = { true } ):
-		_multiMDService(multiMDService),
 		_name(name), 
 		_inputCellVector(inputCells),
 		_filteredValues(filteredValues),
@@ -255,8 +253,6 @@ class coupling::FilterSequence {
 		void initCellVectors();
 	
 	protected:
-		const tarch::utils::MultiMDService<dim> _multiMDService;
-
     	const char* _name;
 
 		//TODO: standardize naming in cell vectors -> remove "vector"?
