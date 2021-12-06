@@ -25,10 +25,11 @@ namespace coupling {
 template<unsigned int dim>
 class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
 public:
+  using CellIndex_T = CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost, IndexTrait::local, IndexTrait::md2macro>;
+
   NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_unfiltered,
     const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_prefiltered,
     const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector,
-    const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
     const std::array<bool, 7> filteredValues, 
     const coupling::IndexConversionMD2Macro<dim>* indexConversion,
     int tws,
@@ -40,7 +41,6 @@ public:
   coupling::JunctorInterface<dim,2,1>( 
    { inputCellVector_unfiltered, inputCellVector_prefiltered },
    { outputCellVector }, 
-   cellIndices, 
    filteredValues,
    "NLM"),
   _timeWindowSize(tws),
@@ -67,7 +67,7 @@ public:
         for(unsigned int d = 1; d <= dim; ++d) qp[d] = 0;
       }
 
-    // Initialize innerCellIndices
+    /*// Initialize innerCellIndices
     auto domainSize = _ic->getLocalMD2MacroDomainSize();
     for(auto idx : cellIndices){ 
       for (unsigned int d = 0; d < dim; d++)  
@@ -75,12 +75,20 @@ public:
           goto continue_loop;
       _innerCellIndices.push_back(idx);
       continue_loop:;
-    }
+    }*/
+
+    for(int x = 1; x < CellIndex_T::numberCellsInDomain[0]-2; x++)
+      for(int y = 1; y < CellIndex_T::numberCellsInDomain[0]-2; y++)
+        for(int z = 1; z < CellIndex_T::numberCellsInDomain[0]-2; z++){
+          auto offset = CellIndex_T(x,y,z);
+          _innerCellIndices.push_back(CellIndex_T::lowerBoundary + offset);
+        }
 
     #ifdef NLM_DEBUG
     std::cout << "    NLM: Created NLM instance." << std::endl;
     std::cout << "    WARNING: Regardless of configuration, NLM always filters macroscopic mass and momentum." << std::endl;
     #endif
+        }
   }
 
   virtual ~NLM(){
@@ -132,7 +140,7 @@ private:
   coupling::filtering::Flowfield<dim> _flowfield;
   coupling::filtering::Flowfield<dim> _flowfield_prefiltered;
   coupling::filtering::Patchfield<dim> _patchfield;
-  std::vector<tarch::la::Vector<dim, unsigned int>> _innerCellIndices;
+  std::vector<CellIndex_T> _innerCellIndices;
 
   inline unsigned int posmod(int i, int n) const{
     return (i % n + n) % n;
