@@ -23,24 +23,37 @@ namespace coupling {
   }
 }
 
-
-/** transfer strategy configuration, i.e. algorithm/combin. of quantity transfer steps and quantity interpretation (e.g. momentum vs. velocity).
+/** transfer strategy configuration, i.e. algorithm/combin. of quantity transfer steps and quantity interpretation (e.g. momentum vs. velocity). Derive from the class tarch::configuration::Configuration
+ *	@brief transfer strategy configuration, i.e. algorithm/combin. of quantity transfer steps and quantity interpretation (e.g. momentum vs. velocity).
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<unsigned int dim>
 class coupling::configurations::TransferStrategyConfiguration:
 public tarch::configuration::Configuration {
   public:
+	/** transfer strategy types that are implemented. 
+	 *	@enum StrategyType
+	 */
     enum StrategyType{
-      DirectTransferStrategy=0,DifferenceTransferStrategy=1,TransferStrategy4FluxCoupling=2,TransferStrategy4SchwarzCoupling=3,AveragingTransferStrategy=4,
-      TransferStrategy4NieCoupling=5
+      DirectTransferStrategy=0 /**< DirectTransferStrategy*/,
+	  DifferenceTransferStrategy=1 /**< DifferenceTransferStrategy*/,
+	  TransferStrategy4FluxCoupling=2 /**< TransferStrategy4FluxCoupling*/,
+	  TransferStrategy4SchwarzCoupling=3 /**< TransferStrategy4SchwarzCoupling*/,
+	  AveragingTransferStrategy=4 /**< AveragingTransferStrategy*/,
+      TransferStrategy4NieCoupling=5 /**< TransferStrategy4NieCoupling*/
     };
 
-    TransferStrategyConfiguration(): _type(DirectTransferStrategy),_massFluxBoundary(false),_isValid(true){}
+    /** Constructor, initializes the class  */
+	TransferStrategyConfiguration(): _type(DirectTransferStrategy),_massFluxBoundary(false),_isValid(true){}
 
-    virtual ~TransferStrategyConfiguration(){}
+    /** Destructor */
+	virtual ~TransferStrategyConfiguration(){}
 
-    void parseSubtag( tinyxml2::XMLElement* node ){
+    /** parseSubtag
+	 * 	@param node
+     */
+	void parseSubtag( tinyxml2::XMLElement* node ){
       std::string value;
       tarch::configuration::ParseConfiguration::readStringMandatory(value,node,"type");
       if (value=="direct-transfer"){
@@ -74,26 +87,28 @@ public tarch::configuration::Configuration {
       }
     }
 
-    /**
-     * Return name of xml tag that is associated to the configuration.
+    /** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
      */
     std::string getTag() const {return "transfer-strategy";}
 
-    /**
-     * Is config valid?
-     *
-     * This operation usually fails, if
-     *
-     * - parseSubtag() hasn't been called, i.e. configuration has not been
-     *   used, or
-     * - parseSubtag() failed due to a wrong file.
-     *
-     * If a tag ain't optional and parseSubtag() was not called (first case)
+    /** checks if the configuration is valid. This operation usually fails, if e.g.
+	 *	1. parseSubtag() hasn't been called, i.e. configuration has not been used, or 
+     *  2. parseSubtag() failed due to a wrong file.
+	 *  3. If a tag ain't optional and parseSubtag() was not called (first case)
+	 * 	@return _isValid
      */
     bool isValid() const { return _isValid;}
 
 
-    template<class LinkedCell>
+    /** Returns transfer strategy configuration.
+	 * 	@tparam LinkedCell type of the cell
+	 * 	@param mdSolverInterface
+	 * 	@param indexConversion
+	 * 	@param numberOfMDTimesteps
+	 * 	@return transfer strategy config
+     */
+	template<class LinkedCell>
     coupling::transferstrategies::TransferStrategy<LinkedCell,dim>* interpreteConfiguration(
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,
       const coupling::IndexConversion<dim> &indexConversion,
@@ -114,7 +129,10 @@ public tarch::configuration::Configuration {
       }
     }
 
-    StrategyType getStrategyType() const {return _type;}
+    /** Returns the transfer strategy type.
+	 * 	@return _type
+     */
+	StrategyType getStrategyType() const {return _type;}
 
   private:
     StrategyType _type;

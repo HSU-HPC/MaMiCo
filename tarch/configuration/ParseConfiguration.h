@@ -12,9 +12,15 @@
 
 namespace tarch {
 namespace configuration {
+	
+/**	interface for configuration using tinyxml2 
+ *  @author Philipp Neumann
+ */
 class ParseConfiguration {
 public:
-/** parses a xml configuration file, and stores the information in the object config */
+/** parses a xml configuration file, and stores the information in the object config
+ *	@tparam Configuration
+ */
 template<class Configuration>
 static void parseConfiguration(
   const std::string filename,
@@ -35,8 +41,10 @@ static void parseConfiguration(
 
 
 /** reads a double value at node "node" with tag "tag" and stores the result in "storage".
- *  For readDoubleMandatory(...), the program is exited if the value cannot be read.
- *  For readDoubleOptional(...), the program continues and only stores the result in "storage" if "tag" is existent
+ *  the program is exited if the value cannot be read.
+ *	@param storage
+ *	@param node
+ *	@param tag
  */
 static void readDoubleMandatory(double& storage, tinyxml2::XMLElement *node, std::string tag){
     double value;
@@ -47,6 +55,12 @@ static void readDoubleMandatory(double& storage, tinyxml2::XMLElement *node, std
     }
 }
 
+/** reads a double value at node "node" with tag "tag" and stores the result in "storage".
+ *  the program continues and only stores the result in "storage" if "tag" is existent
+ *	@param storage
+ *	@param node
+ *	@param tag
+ */
 static void readDoubleOptional(double& storage, tinyxml2::XMLElement *node, std::string tag){
     double value;
     int result = node->QueryDoubleAttribute(tag.c_str(), &value);
@@ -59,7 +73,12 @@ static void readDoubleOptional(double& storage, tinyxml2::XMLElement *node, std:
     }
 }
 
-/** see readDoubleMandatory */
+/** reads a int value at node "node" with tag "tag" and stores the result in "storage".
+ *  the program is exited if the value cannot be read.
+ *	@param storage
+ *	@param node
+ *	@param tag
+ */
 static void readIntMandatory(int & storage, tinyxml2::XMLElement *node, std::string tag){
     int value;
     if (node->QueryIntAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR){
@@ -69,6 +88,12 @@ static void readIntMandatory(int & storage, tinyxml2::XMLElement *node, std::str
     }
 }
 
+/** reads a int value at node "node" with tag "tag" and stores the result in "storage".
+ *  the program continues and only stores the result in "storage" if "tag" is existent
+ *	@param storage
+ *	@param node
+ *	@param tag
+ */
 static void readIntOptional(int & storage, tinyxml2::XMLElement *node, std::string tag){
     int value;
     int result = node->QueryIntAttribute(tag.c_str(), &value);
@@ -81,7 +106,12 @@ static void readIntOptional(int & storage, tinyxml2::XMLElement *node, std::stri
     }
 }
 
-/** see readDoubleMandatory */
+/** reads a bool value at node "node" with tag "tag" and stores the result in "storage".
+ *  the program is exited if the value cannot be read.
+ *	@param storage
+ *	@param node
+ *	@param tag
+ */
 static void readBoolMandatory(bool &storage, tinyxml2::XMLElement *node, std::string tag){
     const char * myTextChar = node->Attribute(tag.c_str());
     if (myTextChar == NULL){ std::cout << "Error: mandatory bool " << tag << " could not be found!" << std::endl; exit(EXIT_FAILURE);}
@@ -93,7 +123,12 @@ static void readBoolMandatory(bool &storage, tinyxml2::XMLElement *node, std::st
     }
 }
 
-
+/** reads a bool value at node "node" with tag "tag" and stores the result in "storage".
+ *  the program continues and only stores the result in "storage" if "tag" is existent
+ *	@param storage
+ *	@param node
+ *	@param tag
+ */
 static void readBoolOptional(bool & storage, tinyxml2::XMLElement *node, std::string tag){
     const char * myTextChar = node->Attribute(tag.c_str());
     if (myTextChar == NULL){ return ;}
@@ -106,7 +141,12 @@ static void readBoolOptional(bool & storage, tinyxml2::XMLElement *node, std::st
 }
 
 
-/** see readDoubleMandatory */
+/** reads a string value at node "node" with tag "tag" and stores the result in "storage".
+ *  the program is exited if the value cannot be read.
+ *	@param storage
+ *	@param node
+ *	@param tag
+ */
 static void readStringMandatory(std::string & storage, tinyxml2::XMLElement *node, std::string tag){
     const char *myText = node->Attribute(tag.c_str());
     if (myText == NULL){
@@ -116,13 +156,25 @@ static void readStringMandatory(std::string & storage, tinyxml2::XMLElement *nod
     }
 }
 
+/** reads a string value at node "node" with tag "tag" and stores the result in "storage".
+ *  the program continues and only stores the result in "storage" if "tag" is existent
+ *	@param storage
+ *	@param node
+ *	@param tag
+ */
 static void readStringOptional(std::string &storage, tinyxml2::XMLElement *node, std::string tag){
   const char *myText = node->Attribute(tag.c_str());
   if (myText != NULL){ storage = std::string(myText); }
 }
 
 
-/** reads ";"-separated entry "tag" with "size" entries and returns the corresponding vector on success */
+/** reads with ";"-separated entry "tag" with "size" entries and returns the corresponding vector on success 
+ *	@tparam T Data type
+ *	@tparam Size size of the entry
+ *	@param result
+ *	@param node
+ *	@param tag
+ */
 template<unsigned int size,class T>
 static void readVector(tarch::la::Vector<size,T>& result, tinyxml2::XMLElement *node, std::string tag){
   const char *myText = node->Attribute(tag.c_str());

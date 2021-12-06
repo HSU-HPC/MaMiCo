@@ -16,28 +16,42 @@ namespace coupling {
 }
 
 
-/** computes the mass over certain linked cells.
- *
+/** 
+ *	@brief This class computes the mass over certain linked cells.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::ComputeMassMapping {
   public:
-    ComputeMassMapping(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
+    /** Constructor
+	 *	@param mdSolverInterface
+	 */
+	ComputeMassMapping(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
     _mdSolverInterface(mdSolverInterface), _mass(0.0),_particleCounter(0){}
 
-    ~ComputeMassMapping(){}
+	/** Destructor */
+	~ComputeMassMapping(){}
 
-    void beginCellIteration(){
+    /** sets the mass and the particlee counter to zero, before the iteration process begins.
+	 */
+	void beginCellIteration(){
       _mass = 0.0;
       _particleCounter = 0;
     }
 
-    void endCellIteration(){
+    /** computes the mass in a linked cell, by multiplying the number of particles inside the cell with the particel mass(which is assuemd to be constant).
+	 */
+	void endCellIteration(){
       _mass = _mdSolverInterface->getMoleculeMass()*_particleCounter;
     }
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** counts the molecules inside a linked cell.
+	 *	@param cell
+	 *	@param cellIndex
+	 */	
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
       while(it->continueIteration()){
@@ -47,7 +61,13 @@ class coupling::cellmappings::ComputeMassMapping {
       delete it;
     }
 
-    double getMass() const { return _mass; }
+    /** returns the mass inside a linked cell
+	 *	@return _mass
+	 */
+	double getMass() const { return _mass; }
+	/** returns the number of particles inside a linked cell
+	 *	@return _particleCounter
+	 */
     unsigned int getNumberOfParticles() const { return _particleCounter; }
 
   private:

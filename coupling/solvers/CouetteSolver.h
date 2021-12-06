@@ -29,7 +29,7 @@ namespace coupling {
         virtual tarch::la::Vector<dim,double> getVelocity(tarch::la::Vector<dim,double> pos) const = 0;
         /** @brief changes the velocity at the moving for, refers to Couette scenario
          *  @param wallVelocity value to which the veloctiy will be set */
-        virtual void setWallVelocity(const tarch::la::Vector<dim,double> wallVelocity);
+        virtual void setWallVelocity(const tarch::la::Vector<dim,double> wallVelocity)=0;
     };
 
     template<unsigned int dim>

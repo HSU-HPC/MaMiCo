@@ -34,33 +34,76 @@
 #endif
 
 
-/** interface for differend MD solvers.
+/** interface for different MD solvers.
  *  @author Philipp Neumann
  */
-
 namespace coupling {
 namespace interface {
+	
+/** 
+ *	@brief generic interface class for different microscopic (MD) solvers.
+ *  @author Philipp Neumann
+ */
 class MDSimulation {
   public:
+  
+	/** Destructor */
     virtual ~MDSimulation(){}
-    /** switches coupling on/off*/
+	
+    /** switches coupling off*/
     virtual void switchOffCoupling() = 0;
+	
+	/** switches coupling on*/
     virtual void switchOnCoupling() = 0;
-    /** simulates numberTimesteps time steps and starts at time step no. firstTimestep*/
+	
+    /** simulates numberTimesteps time steps and starts at time step no. firstTimestep
+	 *	@param numberTimesteps
+	 *	@param firstTimestep
+	 */
     virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep) = 0;
-    /** simulates a single time step*/
+	
+    // simulates a single time step
     //virtual void simulateTimestep(const unsigned int &thisTimestep ){const unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
-    virtual void sortMoleculesIntoCells() = 0;
+    
+	/** sortMoleculesIntoCells*/
+	virtual void sortMoleculesIntoCells() = 0;
 
-    virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) = 0;
-    virtual void init() = 0;
+    /** setMacroscopicCellService
+	 *	@param macroscopicCellService
+	 */
+	virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) = 0;
+    
+	/** initialises the _molecularDynamicsSimulation solver 
+	 *	@sa simplemd::MolecularDynamicsSimulation::initServices()
+	 *	@todo Philipp ??
+	 */
+	virtual void init() = 0;
+	
+	/** initialises the _molecularDynamicsSimulation solver 
+	 *	@param multiMDService
+	 *	@param localMDSimulation
+	 *	@sa simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::MultiMDService<MD_DIM>& multiMDService,unsigned int localMDSimulation)
+	 *	@todo Philipp ??
+	 */
     virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) = 0;
-    virtual void shutdown() = 0;
+    
+	/** shuts down the MD simulation*/
+	virtual void shutdown() = 0;
+	
+	/** Saves the simulation result as check point in the file filestem
+	 *	@param filestem
+	 *	@param t
+	 */
+    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t) = 0;
 };
 
 
 /** define MD simulation from default MD code */
 #if defined(SIMPLE_MD)
+/** defines MD simulation from default MD code. Derived from the class MDSimulation.
+ *	@brief defines MD simulation from default MD code.
+ *  @author Philipp Neumann
+ */
 class SimpleMDSimulation: public coupling::interface::MDSimulation {
   public:
     SimpleMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration):
@@ -87,6 +130,10 @@ class SimpleMDSimulation: public coupling::interface::MDSimulation {
     virtual void init(){ _molecularDynamicsSimulation.initServices(); }
     virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation){ _molecularDynamicsSimulation.initServices(multiMDService,localMDSimulation); }
     virtual void shutdown(){ _molecularDynamicsSimulation.shutdownServices(); }
+
+    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t) {
+      getMoleculeService().writeCheckPoint(getParallelTopologyService(), filestem, t);
+    }
 
     // function particularly needed to init MD solver interface -> should only be called from factory
     simplemd::BoundaryTreatment& getBoundaryTreatment(){ return _molecularDynamicsSimulation.getBoundaryTreatment(); }
@@ -122,6 +169,12 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
     _lmp(new LAMMPS_NS::LAMMPS(0,NULL,localComm)),
     _configuration(configuration),_mamicoConfiguration(mamicoConfiguration),
     _tolerance(1.0e-8){}
+
+    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t){
+      std::stringstream command;
+      command << "write_dump all atom restart_checkpoint.dump";
+      _lmp->input->one(command.str().c_str());
+    } //TODO
 
     // switch off coupling in simulation -> we assume the mamico fix to have ID=2
     virtual void switchOffCoupling(){
@@ -230,13 +283,17 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
       // create atoms based on input configuration; currently, only creation of molecules on a lattice is supported -------------------
       tarch::la::Vector<3,double> domainOffset(0.0); for (int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){ domainOffset[d] = _configuration.getDomainConfiguration().getGlobalDomainOffset()[d];}
       tarch::la::Vector<3,double> domainSize  (1.0); for (int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){ domainSize[d]   = _configuration.getDomainConfiguration().getGlobalDomainSize()[d];}
-      double particleDensity=1.0;
-      for (int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){
-        particleDensity = particleDensity*_configuration.getDomainConfiguration().getMoleculesPerDirection()[d]/domainSize[d];
+      if (!_configuration.getDomainConfiguration().initFromCheckpoint() 
+        && !_configuration.getDomainConfiguration().initFromSequentialCheckpoint() ) {
+        tarch::la::Vector<3,unsigned int> moleculesPerDirection(0); for(int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){ moleculesPerDirection[d] = _configuration.getDomainConfiguration().getMoleculesPerDirection()[d];}
+        double particleDensity=1.0;
+        for (int d=0; d<MDSIMULATIONFACTORY_DIMENSION; d++){
+          particleDensity = particleDensity*_configuration.getDomainConfiguration().getMoleculesPerDirection()[d]/domainSize[d];
+        }
+        ss.str("");
+        ss << "lattice sc " << particleDensity << " origin 0.5 0.5 0.5";
+        _lmp->input->one(ss.str().c_str());
       }
-      ss.str("");
-      ss << "lattice sc " << particleDensity << " origin 0.5 0.5 0.5";
-      _lmp->input->one(ss.str().c_str());
 
 
       // define simulation region
@@ -245,16 +302,23 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
       ss << domainOffset[2] << " " << (domainOffset[2]+domainSize[2]) << " units box";
       _lmp->input->one(ss.str().c_str());
 
+      
 
-      _lmp->input->one("create_box 1 box");
-
-      _lmp->input->one("create_atoms 1 box");
-      // set mass and correct temperature
-      ss.str(""); ss << "mass 1 " << _configuration.getMoleculeConfiguration().getMass();
-      _lmp->input->one(ss.str().c_str());
-      // initialise velocities on molecules; for parallel simulations, we do this according to global MD simulation number (we add 1 as 0 is not a valid seed)
-      ss.str(""); ss << "velocity all create " << _configuration.getMoleculeConfiguration().getTemperature() << " " << localMDSimulation+1 << " loop geom";
-      _lmp->input->one(ss.str().c_str());
+      if(_configuration.getDomainConfiguration().initFromCheckpoint() || 
+          _configuration.getDomainConfiguration().initFromSequentialCheckpoint() ) {
+        std::stringstream command;
+        command << "read_restart " << _configuration.getDomainConfiguration().getCheckpointFilestem() << ".restart";
+        _lmp->input->one(command.str().c_str());
+      } else {
+        _lmp->input->one("create_box 1 box");
+        _lmp->input->one("create_atoms 1 box");
+        // set mass and correct temperature
+        ss.str(""); ss << "mass 1 " << _configuration.getMoleculeConfiguration().getMass();
+        _lmp->input->one(ss.str().c_str());
+        // initialise velocities on molecules; for parallel simulations, we do this according to global MD simulation number (we add 1 as 0 is not a valid seed)
+        ss.str(""); ss << "velocity all create " << _configuration.getMoleculeConfiguration().getTemperature() << " " << localMDSimulation+1 << " loop geom";
+        _lmp->input->one(ss.str().c_str());
+      }
 
       // incorporate reflecting boundaries, pt.2 (this needs to be done after the box was created); to be extended to 2D
       if (MDSIMULATIONFACTORY_DIMENSION==3){
@@ -281,7 +345,7 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
 
       // set some verlet-specific values; currently hard-coded
       _lmp->input->one("neighbor 0.5 bin");
-      _lmp->input->one("neigh_modify delay 0 every 20 check no");
+      _lmp->input->one("neigh_modify delay 0 every 1 check no");
 
       // write output; though this is not vtk format, we use this config for that purpose
       if (_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0){
@@ -292,7 +356,7 @@ class LammpsMDSimulation: public coupling::interface::MDSimulation {
       // write checkpointing
       if (_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0){
         ss.str(""); ss << "restart " << _configuration.getCheckpointConfiguration().getWriteEveryTimestep() << " ";
-        ss << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_" << "1 " << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_" << "2";
+        ss << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_" << "1.restart " << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_" << "2.restart";
         _lmp->input->one(ss.str().c_str());
       }
       // set nve ensemble
@@ -532,13 +596,24 @@ class LammpsDPDSimulation: public coupling::interface::MDSimulation {
 #endif
 
 
-/** factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service */
+/** factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service using singleton pattern.
+ *	@brief factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service
+ *  @author Philipp Neumann
+ */
 class SimulationAndInterfaceFactory {
   public:
-    /** singleton pattern for factory */
+
+	/** @returns the SimulationAndInterfaceFactory object
+     *	@note singleton pattern
+	 */
     static SimulationAndInterfaceFactory& getInstance(){ static SimulationAndInterfaceFactory singleton; return singleton; }
 
-    /** returns a pointer to the md simulation. This will create a new simulation which needs to be deleted at the end */
+    /** returns a pointer to the md simulation.
+	 *  @param configuration
+	 *  @param mamicoConfiguration
+	 *  @param localComm
+	 *	@remark This will create a new simulation which needs to be deleted at the end
+	 */
     coupling::interface::MDSimulation* getMDSimulation(
       const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
       const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>&  mamicoConfiguration
@@ -568,6 +643,9 @@ class SimulationAndInterfaceFactory {
 
     /** returns the MD solver interface. This method should be called AFTER initialising the MD simulation AND AFTER the equilibration
      *  of MD. We thus expect that getMDSimulationInterface() and switchOnCoupling() of the MDSimulationInterface() have been called before.
+	 *  @param configuration
+	 *  @param mamicoConfiguration
+	 *  @param mdSimulation
      */
     coupling::interface::MDSolverInterface<MY_LINKEDCELL,MDSIMULATIONFACTORY_DIMENSION>* getMDSolverInterface(
       const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
@@ -620,7 +698,13 @@ class SimulationAndInterfaceFactory {
     }
 
   private:
-    SimulationAndInterfaceFactory(){}
+    /** Private constructor
+     *  @note singelton pattern
+     */
+	SimulationAndInterfaceFactory(){}
+	/** Private destructor
+	 *  @note singelton pattern
+     */
     ~SimulationAndInterfaceFactory(){}
 };
 

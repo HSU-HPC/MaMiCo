@@ -20,6 +20,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellS
   const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
   //const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,
   const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
+  const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
   unsigned int numberMDTimestepsPerCouplingCycle,
   const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
   const char* filterPipelineConfiguration,
@@ -54,6 +55,7 @@ _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolver
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
 _momentumController(mdSolverInterface),
+_applyAccordingToConfiguration(initCorrectApplicationOfThermostat(thermostatConfiguration)),
 _microscopicFilename(macroscopicCellConfiguration.getMicroscopicFilename()),
 _writeEveryMicroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMicroscopicTimestep()),
 _macroscopicFilename(macroscopicCellConfiguration.getMacroscopicFilename()),
@@ -154,7 +156,7 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   timeval start;
   timeval end;
   double runtime=0;
-  if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); } 
+  if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); }
 
   //TODO: deprecated, moved to filter pipeline.
   // run noise reduction
@@ -164,10 +166,11 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   //  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
   //  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
   //}
- 
+
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
+  
   if(_filterPipeline != nullptr) {
     (*_filterPipeline)(); 
   }
@@ -213,7 +216,7 @@ template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 computeAndStoreTemperature(double temperature){
   Wrapper4ComputeAndStoreTemperature wrapper(this,temperature);
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+  _applyAccordingToConfiguration(wrapper);
 }
 
 
@@ -222,7 +225,7 @@ template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 applyTemperatureToMolecules(unsigned int t){
   Wrapper4ApplyTemperature wrapper(this);
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+  _applyAccordingToConfiguration(wrapper);
 }
 
 

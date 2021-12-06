@@ -11,6 +11,13 @@ namespace tarch { namespace la {
   class Matrix;
 }}
 
+/**	used to define 2-D matrices of arbitrary types.
+ *  @tparam rows defines the number f rows
+ *  @tparam cols defines the number f columns
+ *  @tparam T data type 
+ *  @author Philipp Neumann
+ */
+
 
 template<int rows,int cols, class T>
 class tarch::la::Matrix {
@@ -18,6 +25,9 @@ class tarch::la::Matrix {
     T _entries[rows][cols];
 
   public:
+    /** @brief Two constructors, a default one and a constructor, which initializes all elemnet of the matrix with entry t.
+    * 	@param t the initial value for all elemnts of the matrix.
+	*/
     Matrix(){}
     Matrix(const T& t){
       for (int i = 0; i < rows; i++){
@@ -27,6 +37,10 @@ class tarch::la::Matrix {
       }
     }
 
+    /** @brief operator(i, j) gives back the the element (i, j)
+    * 	@param i row index
+	* 	@param j column index
+	*/
     T& operator()(int i,int j){
       #if (TARCH_DEBUG==TARCH_YES)
       if (i<0 || i>rows-1){std::cout << "ERROR Matrix T& operator(): i out of range!" << std::endl; exit(EXIT_FAILURE);}
