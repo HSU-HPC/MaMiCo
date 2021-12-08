@@ -1,13 +1,6 @@
 //Implementation of coupling::indexing::CellIndex
 
-using namespace coupling::indexing;
-/*
- * Using:
- * 	coupling::indexing::IndexTrait
- * 	coupling::indexing::TraitComparisons
- * 	coupling::indexing::CellIndex
- *	coupling::indexing::BaseIndex
- */
+namespace coupling { namespace indexing {
 
 template<unsigned int dim, IndexTrait ... traits>
 template<IndexTrait ... converted_traits>
@@ -91,3 +84,5 @@ coupling::indexing::CellIndex<dim, traits...>
 operator-(const CellIndex<dim, traits...>& i1, const typename CellIndex<dim, traits...>::value_T& raw_i) {
 	return CellIndex<dim, traits...> { i1.get() - raw_i }; 
 }
+
+}}

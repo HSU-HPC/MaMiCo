@@ -16,9 +16,6 @@ namespace coupling{
 	}
 }
 
-using coupling::indexing::CellIndex;
-using coupling::indexing::IndexTrait;
-
 /**
  *  Generic interface for filters that are to be applied to data of coupling::MacroscopicCells before MD to Macro transfer.
  *  Examples for such filters can be found in coupling/filtering/filters.
@@ -138,10 +135,11 @@ class coupling::filtering::FilterInterface{
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getInputCells() const { return _inputCells; }
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getOutputCells() const { return _outputCells; }
 
+		using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro>;
 		/*
 		 * Advanced Getters/Setters
 		 */
-		coupling::datastructures::MacroscopicCell<dim>* getInputCellOfIndex(const CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>& index) {
+		coupling::datastructures::MacroscopicCell<dim>* getInputCellOfIndex(const CellIndex_T& index) {
 			if(index.get() < _inputCells.size) {
 				return _inputCells[index.get()];
 			}
@@ -150,7 +148,7 @@ class coupling::filtering::FilterInterface{
 				throw std::runtime_error("FilterInterface: getInputCellofIndex(): Could not find index.");
 			}
 		}
-		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(const CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>& index) {
+		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(const CellIndex_T& index) {
 			if(index.get() < _outputCells.size) {
 				return _outputCells[index.get()];
 			}

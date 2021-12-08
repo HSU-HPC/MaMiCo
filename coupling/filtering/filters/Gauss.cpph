@@ -6,9 +6,6 @@
  *  @author Felix Maurer
  */
 
-using coupling::indexing::CellIndex;
-using coupling::indexing::IndexTrait;
-
 //Member functions of Gauss.h:
 template<unsigned int dim>
 //TODO: This is very much hardcoded for kernel radius = 1
@@ -17,6 +14,7 @@ void coupling::filtering::Gauss<dim>::operator()(){
     std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter...";
     #endif 
 
+    using namespace coupling::indexing;
 	CellIndex<dim, IndexTrait::local, IndexTrait::md2macro> index;
 	CellIndex<dim, IndexTrait::local, IndexTrait::md2macro> indexAbove;
 	CellIndex<dim, IndexTrait::local, IndexTrait::md2macro> indexBelow;
@@ -144,12 +142,12 @@ constexpr double coupling::filtering::Gauss<dim>::gaussianDensityFunction(int x)
 
 //TODO: redesign so you dont need these two any more?
 template<unsigned int dim>
-CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> coupling::filtering::Gauss<dim>::getIndexAbove(
-	const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index, 
+typename coupling::filtering::Gauss<dim>::CellIndex_T coupling::filtering::Gauss<dim>::getIndexAbove(
+	const coupling::filtering::Gauss<dim>::CellIndex_T index, 
 	unsigned int d
 ) {
 	//check for border indices
-	const coupling::indexing::BaseIndex<dim> boundary = CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary;
+	const coupling::indexing::BaseIndex<dim> boundary = CellIndex_T::upperBoundary;
 	for(unsigned int d = 0; d < dim; d++) {
 		//convert index to BaseIndex and compare with boundary. 
 		if((coupling::indexing::BaseIndex<dim> { index }).get()[d] >= boundary.get()[d])
@@ -167,12 +165,12 @@ CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> coup
 }
 
 template<unsigned int dim>
-CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> coupling::filtering::Gauss<dim>::getIndexBelow(
-	const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index,
+typename coupling::filtering::Gauss<dim>::CellIndex_T coupling::filtering::Gauss<dim>::getIndexBelow(
+	const coupling::filtering::Gauss<dim>::CellIndex_T index,
 	unsigned int d
 ) {
 	//check for border indices
-	const coupling::indexing::BaseIndex<dim> boundary = CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary;
+	const coupling::indexing::BaseIndex<dim> boundary = CellIndex_T::lowerBoundary;
 	for(unsigned int d = 0; d < dim; d++) {
 		//convert index to BaseIndex and compare with boundary. 
 		if((coupling::indexing::BaseIndex<dim> { index }).get()[d] <= boundary.get()[d])

@@ -47,9 +47,6 @@ namespace coupling{
 	}
 }
 
-using coupling::indexing::CellIndex;
-using coupling::indexing::IndexTrait;
-
 template<unsigned int dim>
 class coupling::filtering::FilterSequence {
 	public:

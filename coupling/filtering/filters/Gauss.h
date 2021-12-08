@@ -11,9 +11,6 @@
 //#define DEBUG_GAUSS
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
-using coupling::indexing::CellIndex;
-using coupling::indexing::IndexTrait;
-
 namespace coupling {
 	namespace filtering {
 	    template<unsigned int dim>
@@ -81,6 +78,9 @@ class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<d
 		}
      
 		void operator()();
+
+		using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, 
+			coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro>;
 	private:
 		std::array<double, 1+2*GAUSS_KERNEL_RADIUS> generateKernel();
 
@@ -92,7 +92,7 @@ class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<d
 		 *
 		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> getIndexAbove(const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index, unsigned int d);
+		CellIndex_T getIndexAbove(const CellIndex_T index, unsigned int d);
 
 		/*
 		 * Returns the index of the cell that's below the cell at index on the d-axis
@@ -100,7 +100,7 @@ class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<d
 		 *
 		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> getIndexBelow(const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index, unsigned int d);
+		CellIndex_T getIndexBelow(const CellIndex_T index, unsigned int d);
 
 		//on which axis this filter operates. 0 <= _dim <= dim
 		const unsigned int _dim;

@@ -5,9 +5,6 @@
 
 //Implementation of SequentialFilter.h
 
-using coupling::indexing::CellIndex;
-using coupling::indexing::IndexTrait;
-
 //CONSTRUCTOR
 template <unsigned int dim>
 coupling::filtering::SequentialFilter<dim>::SequentialFilter(
@@ -36,7 +33,10 @@ coupling::filtering::SequentialFilter<dim>::SequentialFilter(
 			_outputCells_Local = _filter->getOutputCells(); 			
 
 			//allocate global cell datastructures
-			for(unsigned int c = 0; c < CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain; c++) {
+			unsigned int numcells = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, 
+				coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>
+				::linearNumberCellsInDomain;
+			for(unsigned int c = 0; c < numcells; c++) {
 				_inputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 				_outputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 			}

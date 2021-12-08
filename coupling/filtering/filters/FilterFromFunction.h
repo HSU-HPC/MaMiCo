@@ -44,7 +44,7 @@ class coupling::filtering::FilterFromFunction : public coupling::filtering::Filt
 			std::array<unsigned int, dim> stlIndex;
 			for(unsigned int i = 0; i < inputCellVector.size(); i++) {
 				//interpret position of cell in inputCellVector as linear local md-to-macro index, then convert it to vector
-				mamicoIndex = coupling::indexing::convertToVector<dim, IndexTrait::local, IndexTrait::md2macro>( { (int) i } );
+				mamicoIndex = coupling::indexing::convertToVector<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro>( { (int) i } );
 				for(unsigned int d = 0; d < dim; d++) stlIndex[d] = mamicoIndex[d];
 				_stlIndices.push_back(stlIndex);
 			}

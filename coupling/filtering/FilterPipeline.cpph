@@ -4,9 +4,6 @@
 
 //TODO: replace exit()s with throws
 
-using coupling::indexing::CellIndex;
-using coupling::indexing::IndexTrait;
-
 //constructors of coupling::filtering::FilterPipeline
 template<unsigned int dim>
 coupling::filtering::FilterPipeline<dim>::FilterPipeline(
@@ -25,6 +22,8 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(
     //check for structural errors in config file
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
 	
+    using namespace coupling::indexing;
+
 	//case: the input vector contains the entire MD domain
 	if(inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
 		using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
