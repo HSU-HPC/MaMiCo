@@ -9,7 +9,7 @@
 #include "coupling/filtering/sequencing/FilterSequence.h"
 
 //INCLUDE ALL JUNCTOR HEADERS HERE
-//#include "coupling/filtering/filters/NLM.h" TODO: port to new index system
+#include "coupling/filtering/filters/NLM.h"
 #include "coupling/filtering/interfaces/JunctorInterface.h" //this will be redundant in the future
 
 /*

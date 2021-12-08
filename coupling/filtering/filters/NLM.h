@@ -27,13 +27,14 @@ namespace coupling {
 template<unsigned int dim>
 class coupling::filtering::NLM : public coupling::filtering::JunctorInterface<dim,2,1> {
 public:
-  using CellIndex_T = CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost, IndexTrait::local, IndexTrait::md2macro>;
+  using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, 
+    coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro, 
+    coupling::indexing::IndexTrait::noGhost>;
 
   NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_unfiltered,
     const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_prefiltered,
     const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector,
     const std::array<bool, 7> filteredValues, 
-    const coupling::IndexConversionMD2Macro<dim>* indexConversion,
     int tws,
     double sigsq, double sigsq_rel,
     double hsq, double hsq_rel,
@@ -52,39 +53,33 @@ public:
   _hsq(hsq),_hsq_rel(hsq_rel),
   _cycleCounter(0),
   _t(0),
-  _ic(indexConversion),
-  _flowfield(_ic->getLocalMD2MacroDomainSize(), tws),
-  _flowfield_prefiltered(_ic->getLocalMD2MacroDomainSize(), tws),
-  _patchfield(_ic->getLocalMD2MacroDomainSize() - tarch::la::Vector<dim,unsigned int>(2), tws),
+  _flowfield(CellIndex_T::numberCellsInDomain, tws),
+  _flowfield_prefiltered(CellIndex_T::numberCellsInDomain, tws),
+  _patchfield(CellIndex_T::numberCellsInDomain - tarch::la::Vector<dim,unsigned int>(2), tws),
   _innerCellIndices()
   {
     // Initialize flowfield
     for(int t = 0; t < tws; ++t)
-      for(const tarch::la::Vector<dim, unsigned int>& idx : cellIndices) {
-        coupling::filtering::Quantities<dim>& q = _flowfield(idx, t);
+      for(auto idx : CellIndex_T()) {
+        tarch::la::Vector<dim,unsigned int> idxv(idx.get());
+        coupling::filtering::Quantities<dim>& q = _flowfield(idxv, t);
         q[0] = 1;
         for(unsigned int d = 1; d <= dim; ++d) q[d] = 0;
-          coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(idx, t);
+          coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(idxv, t);
         qp[0] = 1;
         for(unsigned int d = 1; d <= dim; ++d) qp[d] = 0;
       }
 
-    /*// Initialize innerCellIndices
-    auto domainSize = _ic->getLocalMD2MacroDomainSize();
-    for(auto idx : cellIndices){ 
+    // Initialize innerCellIndices
+    auto domainSize = CellIndex_T::numberCellsInDomain;
+    for(auto idx : CellIndex_T()){ 
+      tarch::la::Vector<dim,unsigned int> idxv(idx.get());
       for (unsigned int d = 0; d < dim; d++)  
-        if(idx[d] == 0 || idx[d] == domainSize[d] - 1)
+        if(idxv[d] == 0 || idxv[d] == domainSize[d] - 1)
           goto continue_loop;
       _innerCellIndices.push_back(idx);
       continue_loop:;
-    }*/
-
-    for(int x = 1; x < CellIndex_T::numberCellsInDomain[0]-2; x++)
-      for(int y = 1; y < CellIndex_T::numberCellsInDomain[1]-2; y++)
-        for(int z = 1; z < CellIndex_T::numberCellsInDomain[2]-2; z++){
-          auto offset = CellIndex_T(x,y,z);
-          _innerCellIndices.push_back(CellIndex_T::lowerBoundary + offset);
-        }
+    }
 
     #ifdef NLM_DEBUG
     std::cout << "    NLM: Created NLM instance." << std::endl;
@@ -137,7 +132,6 @@ private:
 
   unsigned int _cycleCounter; // coupling cycle counter, indicates how many data snapshots are available already
   unsigned int _t; // active temporal index, iterates cyclic between zero and _timeWindowSize
-  const coupling::IndexConversionMD2Macro<dim>* _ic;
   coupling::filtering::Flowfield<dim> _flowfield;
   coupling::filtering::Flowfield<dim> _flowfield_prefiltered;
   coupling::filtering::Patchfield<dim> _patchfield;

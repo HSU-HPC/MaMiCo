@@ -1,7 +1,3 @@
-// This file is part of the Mamico proJunctionn conditions of distribution
-// and use, please see the copyright notice in Mamico's main folder, or at
-// www5.in.tum.de/mamic::o
-
 //Member functions of coupling::filtering::FilterJunction
 
 template<unsigned int dim, std::size_t inputc>
@@ -31,9 +27,7 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml
 
         //NLM
         if(std::strcmp(currJunctorNode->Value(), "NLM") == 0) {
-			std::runtime_error("NLM is currently disabled.");
 		
-		/* TODO: port NLM to support new index system
 			//Optional parameters
 			int inputp_unfiltered = 0; //default
 			tarch::configuration::ParseConfiguration::readIntOptional(inputp_unfiltered, currJunctorNode, "input-unfiltered");
@@ -111,7 +105,6 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml
 				firstIteration[outputp] = false;
 			}
 			inputCellVector[outputp].swap(outputCellVector[outputp]);
-		*/
         }		
 	//###############################################################
 

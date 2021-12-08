@@ -15,9 +15,11 @@ void coupling::filtering::NLM<dim>::operator()(){
 
 template<unsigned int dim>
 void coupling::filtering::NLM<dim>::save_data(){
-  for(unsigned int i = 0; i < this->_inputCells.size(); ++i){ 
-    coupling::filtering::Quantities<dim>& q = _flowfield(this->_cellIndices[i], _t);
-    coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(this->_cellIndices[i], _t);
+  for(unsigned int i = 0; i < this->_inputCells.size(); ++i){
+    using namespace coupling::indexing;
+    CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost> idx(i);
+    coupling::filtering::Quantities<dim>& q = _flowfield(idx.get(), _t);
+    coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(idx.get(), _t);
     q[0] = this->_inputCellVectors[0][i]->getMacroscopicMass();
     qp[0] = this->_inputCellVectors[1][i]->getMacroscopicMass();
     for (unsigned int d = 0; d < dim; d++){  
@@ -30,11 +32,11 @@ void coupling::filtering::NLM<dim>::save_data(){
 template<unsigned int dim>
 void coupling::filtering::NLM<dim>::update_patchfield(){
   for(auto idx : _innerCellIndices){
-    auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
+    auto idx_inner = (tarch::la::Vector<dim,unsigned int>)(idx.get()) - tarch::la::Vector<dim,unsigned int>{1};
     if(_cycleCounter > _t) _patchfield.destroy(idx_inner,_t);
     _patchfield.construct(idx_inner, _t,
       tarch::la::Vector<dim,unsigned int>(2*_d+1), 2*_d+1, _flowfield_prefiltered, 
-      idx, _t);
+      (tarch::la::Vector<dim,unsigned int>)(idx.get()), _t);
   }
 }
 
@@ -43,7 +45,7 @@ void coupling::filtering::NLM<dim>::denoise(){
   // counter for adaptive parameter modification
   int cnt_sigsq = 0, cnt_hsq = 0, cnt_total = 0;
   for(auto const &idx : _innerCellIndices){
-    auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
+    auto idx_inner = (tarch::la::Vector<dim,unsigned int>)(idx.get()) - tarch::la::Vector<dim,unsigned int>{1};
     auto& me = _patchfield(idx_inner, _t);
     double C = 0;
 
@@ -55,7 +57,7 @@ void coupling::filtering::NLM<dim>::denoise(){
     for(int offset_t = 0; offset_t > -tdist; offset_t--){
       unsigned int t = posmod((int)_t + offset_t,_timeWindowSize);
       for(auto idx2 : _innerCellIndices){
-        auto idx2_inner = idx2 - tarch::la::Vector<dim,unsigned int>(1);
+        auto idx2_inner = (tarch::la::Vector<dim,unsigned int>)(idx2.get()) - tarch::la::Vector<dim,unsigned int>{1};
         auto& other = _patchfield(idx2_inner, t);
         double dist = me.distance(other);
 #ifdef NLM_DEBUG
@@ -70,9 +72,9 @@ void coupling::filtering::NLM<dim>::denoise(){
 #endif
         for(unsigned int i = 0; i < res_offset.size(); i++){
           tarch::la::Vector<dim,unsigned int> residx(
-            (int)idx2[0]+res_offset[i][0],
-            (int)idx2[1]+res_offset[i][1],
-            (int)idx2[2]+res_offset[i][2]);
+            idx2.get()[0]+res_offset[i][0],
+            idx2.get()[1]+res_offset[i][1],
+            idx2.get()[2]+res_offset[i][2]);
           coupling::filtering::Quantities<dim>& q = _flowfield(residx, t);
           res[i] += q * weight;
         }
@@ -82,16 +84,16 @@ void coupling::filtering::NLM<dim>::denoise(){
 
     for(unsigned int i = 0; i < res_offset.size(); i++){
       res[i] = res[i] * (1/C);
-      tarch::la::Vector<dim,unsigned int> residx(
-            (int)idx[0]+res_offset[i][0],
-            (int)idx[1]+res_offset[i][1],
-            (int)idx[2]+res_offset[i][2]);
-      unsigned int cellidx = _ic->getLocalCellIndex(residx);
+      tarch::la::Vector<dim,int> residx(
+            idx.get()[0]+res_offset[i][0],
+            idx.get()[1]+res_offset[i][1],
+            idx.get()[2]+res_offset[i][2]);
+      int cellidx = coupling::indexing::convertToScalar(CellIndex_T(residx));
 
-      coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMass(res[i][0]);
+      coupling::filtering::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMass(res[i][0]);
       tarch::la::Vector<dim,double> momentum;
       for (unsigned int d = 0; d < dim; d++)  momentum[d] = res[i][d+1];
-        coupling::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMomentum(momentum);
+        coupling::filtering::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMomentum(momentum);
     }
   }
   // dynamic parameter adaption: Goal: cnt/cnt_total should be close to value_rel
@@ -112,7 +114,7 @@ void coupling::filtering::NLM<dim>::denoise(){
 template<unsigned int dim> 
 std::vector<tarch::la::Vector<dim, int>> coupling::filtering::NLM<dim>::compute_boundary_neighbors(
 const tarch::la::Vector<dim, unsigned int>& idx_inner){
-  auto domainSize = _ic->getLocalMD2MacroDomainSize();
+  auto domainSize = CellIndex_T::numberCellsInDomain;
   std::vector<tarch::la::Vector<dim, int>> res_offset;
   res_offset.reserve(1 << dim); // max this many neighbors are possible
   res_offset.push_back(0);  // result for me (i.e. idx) is always needed
@@ -152,7 +154,7 @@ const tarch::la::Vector<dim, unsigned int>& idx_inner){
 }
 
 template<unsigned int dim>
-void coupling::NLM<dim>::increment_time(){
+void coupling::filtering::NLM<dim>::increment_time(){
   _cycleCounter++;
   _t = _cycleCounter%_timeWindowSize;
 }
