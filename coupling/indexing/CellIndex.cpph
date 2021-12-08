@@ -55,18 +55,39 @@ CellIndex<dim, traits...>::operator CellIndex<dim, converted_traits...>() const 
 
 //Overloading operator<< for CellIndex
 template<unsigned int dim, IndexTrait ... traits>
-std::ostream& operator<<(std::ostream& os, const CellIndex<dim, traits...>& i) {
+std::ostream& 
+operator<<(std::ostream& os, const CellIndex<dim, traits...>& i) {
 	os << i.get();
 	return os;
 }
 
 //Overloading arithmetic operators for CellIndex 
 template<unsigned int dim, IndexTrait ... traits>
-CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...>& i1, const CellIndex<dim, traits...>& i2) {
-	return CellIndex<dim, traits...> { i1.get() + i2.get() }; 
+CellIndex<dim, traits...> 
+operator+(const CellIndex<dim, traits...>& i1, const CellIndex<dim, traits...>& i2) {
+	if constexpr (std::is_same_v<CellIndex<dim, traits...>, BaseIndex<dim>>)
+		return BaseIndex<dim> { i1.get() + i2.get() }; 
+	else
+		return BaseIndex<dim> { i1 } + BaseIndex<dim> { i2 };
 }
 
 template<unsigned int dim, IndexTrait ... traits>
-coupling::indexing::CellIndex<dim, traits...> operator-(const CellIndex<dim, traits...>& i1, const CellIndex<dim, traits...>& i2) {
-	return CellIndex<dim, traits...> { i1.get() - i2.get() }; 
+coupling::indexing::CellIndex<dim, traits...> 
+operator-(const CellIndex<dim, traits...>& i1, const CellIndex<dim, traits...>& i2) {
+	if constexpr (std::is_same_v<CellIndex<dim, traits...>, BaseIndex<dim>>)
+		return BaseIndex<dim> { i1.get() - i2.get() }; 
+	else
+		return BaseIndex<dim> { i1 } - BaseIndex<dim> { i2 };
+}
+
+template<unsigned int dim, IndexTrait ... traits>
+CellIndex<dim, traits...> 
+operator+(const CellIndex<dim, traits...>& i1, const typename CellIndex<dim, traits...>::value_T& raw_i) {
+	return CellIndex<dim, traits...> { i1.get() + raw_i }; 
+}
+
+template<unsigned int dim, IndexTrait ... traits>
+coupling::indexing::CellIndex<dim, traits...> 
+operator-(const CellIndex<dim, traits...>& i1, const typename CellIndex<dim, traits...>::value_T& raw_i) {
+	return CellIndex<dim, traits...> { i1.get() - raw_i }; 
 }
