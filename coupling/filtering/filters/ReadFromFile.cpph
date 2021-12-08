@@ -8,7 +8,7 @@
 
 //Member functions of ReadFromFile.h:
 template<unsigned int dim>
-void coupling::ReadFromFile<dim>::operator()(){	
+void coupling::filtering::ReadFromFile<dim>::operator()(){	
     #ifdef DEBUG_READ_FROM_FILE
     std::cout << "		RFF: Now reading input data from: " << _location;
     #endif 
@@ -17,11 +17,11 @@ void coupling::ReadFromFile<dim>::operator()(){
 
 	//Skip all lines of previous iterations
 	std::string skipstr;
-	for(unsigned int s = 0; s < _iteration * ((coupling::FilterInterface<dim>::_inputCells.size())+1); s++) std::getline(_file, skipstr);
+	for(unsigned int s = 0; s < _iteration * ((coupling::filtering::FilterInterface<dim>::_inputCells.size())+1); s++) std::getline(_file, skipstr);
 
 	//TODO: check if number of lines match number of cells
 	
-    for(unsigned int ic_index = 0; ic_index < coupling::FilterInterface<dim>::_inputCells.size(); ic_index++) {
+    for(unsigned int ic_index = 0; ic_index < coupling::filtering::FilterInterface<dim>::_inputCells.size(); ic_index++) {
 		//get next input line
 		std::string linestr;
 		std::getline(_file, linestr);
@@ -52,8 +52,8 @@ void coupling::ReadFromFile<dim>::operator()(){
 		unsigned int incr_offset = 0;
 
 		//Apply scalar setters
-		for(const auto scalarProperty : coupling::FilterInterface<dim>::_scalarAccessFunctionPairs){
-			(coupling::FilterInterface<dim>::_outputCells[ic_index]->*scalarProperty.set)(doublesFromLine[const_offset + incr_offset]);
+		for(const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs){
+			(coupling::filtering::FilterInterface<dim>::_outputCells[ic_index]->*scalarProperty.set)(doublesFromLine[const_offset + incr_offset]);
 
 			#ifdef DEBUG_READ_FROM_FILE
 			if( ic_index  == 0)
@@ -62,7 +62,7 @@ void coupling::ReadFromFile<dim>::operator()(){
 			#endif
 		}
 		//Apply vector setters
-		for(const auto vectorProperty : coupling::FilterInterface<dim>::_vectorAccessFunctionPairs){
+		for(const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs){
 			tarch::la::Vector<dim, double> tempVec;
 			for(unsigned int d = 0; d < dim; d++) {
 				 tempVec[d] = doublesFromLine[const_offset+incr_offset+d]; 
@@ -73,7 +73,7 @@ void coupling::ReadFromFile<dim>::operator()(){
 				std::cout << "		RFF: Vector sent to cell 0: " << tempVec << std::endl;
 			#endif
 
-			(coupling::FilterInterface<dim>::_outputCells[ic_index]->*vectorProperty.set)(tempVec);
+			(coupling::filtering::FilterInterface<dim>::_outputCells[ic_index]->*vectorProperty.set)(tempVec);
 			incr_offset += dim;
 		}
     }

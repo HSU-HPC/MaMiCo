@@ -2,10 +2,10 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamic::o
 
-//Member functions of coupling::FilterJunction
+//Member functions of coupling::filtering::FilterJunction
 
 template<unsigned int dim, std::size_t inputc>
-int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) { //in our case "junctionNode" would be more precise
+int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) { //in our case "junctionNode" would be more precise
 	if(!sequenceNode) return EXIT_FAILURE;
 
 	//null if junction is empty
@@ -23,7 +23,7 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
     while(currJunctorNode) {
 
 		//All Junctors must implement one of the {X,Y}-Junctor interfaces, each of which implement FilterInterface.
-		coupling::FilterInterface<dim>* newjunctor = nullptr;
+		coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 		
 	//TODO: reduce per-junctor customization: generalize!
 	//###############################################################
@@ -95,11 +95,11 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
                         if(hsq_rel >= 0) { std::cout << "INFO: NLM: hsq adaptivity enabled, target value = " << hsq_rel*100 << " % " << std::endl; }
 
 			//Instantiation
-			newjunctor = new coupling::NLM<dim>(
+			newjunctor = new coupling::filtering::NLM<dim>(
 					inputCellVector[inputp_unfiltered],
 					inputCellVector[inputp_prefiltered],
 					outputCellVector[outputp], 
-					coupling::FilterSequence<dim>::_filteredValues, 
+					coupling::filtering::FilterSequence<dim>::_filteredValues, 
 					tws,
 					sigsq, sigsq_rel,
 					hsq, hsq_rel );
@@ -121,7 +121,7 @@ int coupling::FilterJunction<dim, inputc>::loadFiltersFromXML(tinyxml2::XMLEleme
             return EXIT_FAILURE;
         }
 
-        coupling::FilterSequence<dim>::_filters.push_back(newjunctor);
+        coupling::filtering::FilterSequence<dim>::_filters.push_back(newjunctor);
 		currJunctorNode = currJunctorNode->NextSiblingElement();
 	}
 

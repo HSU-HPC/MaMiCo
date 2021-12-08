@@ -2,18 +2,18 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamic::o
 
-//Member functions of coupling::AsymmetricalFilterJunction
+//Member functions of coupling::filtering::AsymmetricalFilterJunction
 
 template<unsigned int dim>
-int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) { //in our case "junctionNode" would be more precise
+int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) { //in our case "junctionNode" would be more precise
 	if(!sequenceNode) return EXIT_FAILURE;
 
 	//null if junction is empty
     tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
 	
 	//These four are not to be confused with member variables of similar names. Watch out for the "_" in front of member variables.
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_primary = coupling::FilterSequence<dim>::_inputCellVector;
-	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_primary = coupling::FilterSequence<dim>::_cellVector2;
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_inputCellVector;
+	std::vector<coupling::datastructures::MacroscopicCell<dim>* > outputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector2;
 
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCellVector_secondary = _inputCellVector_secondary;
 	//Note: To prevent counter intuitive design, secondary output has been disabled, i.e. all junctors in an AFJ take the same secondary input.
@@ -30,7 +30,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
     while(currJunctorNode) {
 
 		//All Junctors must implement one of the {X,Y}-Junctor interfaces, each of which implement FilterInterface.
-		coupling::FilterInterface<dim>* newjunctor = nullptr;
+		coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 		
 	//###############################################################
 	//This is where you have to define how to handle each junctor individually.
@@ -62,7 +62,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 				exit(EXIT_FAILURE);
 			}
 
-            newjunctor = new coupling::WriteToFileJunctor<dim>(	inputCellVector_primary,
+            newjunctor = new coupling::filtering::WriteToFileJunctor<dim>(	inputCellVector_primary,
 																outputCellVector_primary,
 																inputCellVector_secondary,
 																this->_filteredValues,
@@ -81,7 +81,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
         }
 
 		if(firstIteration){
-			inputCellVector_primary = coupling::FilterSequence<dim>::_cellVector1;
+			inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector1;
 			inputCellVector_secondary = _cellVector1_secondary;
 			firstIteration = false;
 		}
@@ -92,7 +92,7 @@ int coupling::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(tinyxml2::XMLE
 		//inputCellVector_secondary.swap(outputCellVector_secondary);
 
 
-        coupling::FilterSequence<dim>::_filters.push_back(newjunctor);
+        coupling::filtering::FilterSequence<dim>::_filters.push_back(newjunctor);
 		currJunctorNode = currJunctorNode->NextSiblingElement();
 	}
 

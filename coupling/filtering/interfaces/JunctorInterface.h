@@ -8,8 +8,10 @@
 #define DEBUG_JUNCTOR_INTERFACE
 
 namespace coupling{
-    template<unsigned int dim, std::size_t inputc, std::size_t outputc>
-    class JunctorInterface;
+	namespace filtering{
+	    template<unsigned int dim, std::size_t inputc, std::size_t outputc>
+	    class JunctorInterface;
+	}
 }
 
 /**
@@ -22,7 +24,7 @@ namespace coupling{
  *  @Author Felix Maurer
  */
 template<unsigned int dim, std::size_t inputc, std::size_t outputc>
-class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
+class coupling::filtering::JunctorInterface : public coupling::filtering::FilterInterface<dim> {
 	public:
 		JunctorInterface(
 			const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> inputCellVectors,
@@ -32,7 +34,7 @@ class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 		):
 			//This assumes the array of cell vectors to be nonempty. Suboptimal.
 			//NOTE: Avoid using FI's cell vectors. Use _inputCellVectors/_outputCellVectors instead.
-			coupling::FilterInterface<dim>(
+			coupling::filtering::FilterInterface<dim>(
 				inputCellVectors[0], 
 				outputCellVectors[0], 
 				filteredValues, 
@@ -61,7 +63,7 @@ class coupling::JunctorInterface : public coupling::FilterInterface<dim> {
 			_outputCellVectors = new_outputCellVectors;
 
 			//Assumes the input c-style vectors to be nonempty. May be problematic.
-			coupling::FilterInterface<dim>::updateCellData(new_inputCellVectors[0], new_outputCellVectors[0]);
+			coupling::filtering::FilterInterface<dim>::updateCellData(new_inputCellVectors[0], new_outputCellVectors[0]);
 		}
 
 	protected:

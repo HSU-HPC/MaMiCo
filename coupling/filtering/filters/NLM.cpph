@@ -2,7 +2,7 @@
 // and use, please see the copyright notice in Mamico's main folder
 
 template<unsigned int dim>
-void coupling::NLM<dim>::operator()(){
+void coupling::filtering::NLM<dim>::operator()(){
   #ifdef NLM_DEBUG
   //std::cout << "    NLM: called operator()" << std::endl;
   #endif
@@ -14,7 +14,7 @@ void coupling::NLM<dim>::operator()(){
 }
 
 template<unsigned int dim>
-void coupling::NLM<dim>::save_data(){
+void coupling::filtering::NLM<dim>::save_data(){
   for(unsigned int i = 0; i < this->_inputCells.size(); ++i){ 
     coupling::filtering::Quantities<dim>& q = _flowfield(this->_cellIndices[i], _t);
     coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(this->_cellIndices[i], _t);
@@ -28,7 +28,7 @@ void coupling::NLM<dim>::save_data(){
 }
 
 template<unsigned int dim>
-void coupling::NLM<dim>::update_patchfield(){
+void coupling::filtering::NLM<dim>::update_patchfield(){
   for(auto idx : _innerCellIndices){
     auto idx_inner = idx - tarch::la::Vector<dim,unsigned int>(1);
     if(_cycleCounter > _t) _patchfield.destroy(idx_inner,_t);
@@ -39,7 +39,7 @@ void coupling::NLM<dim>::update_patchfield(){
 }
 
 template<unsigned int dim>
-void coupling::NLM<dim>::denoise(){
+void coupling::filtering::NLM<dim>::denoise(){
   // counter for adaptive parameter modification
   int cnt_sigsq = 0, cnt_hsq = 0, cnt_total = 0;
   for(auto const &idx : _innerCellIndices){
@@ -110,7 +110,7 @@ void coupling::NLM<dim>::denoise(){
 }
 
 template<unsigned int dim> 
-std::vector<tarch::la::Vector<dim, int>> coupling::NLM<dim>::compute_boundary_neighbors(
+std::vector<tarch::la::Vector<dim, int>> coupling::filtering::NLM<dim>::compute_boundary_neighbors(
 const tarch::la::Vector<dim, unsigned int>& idx_inner){
   auto domainSize = _ic->getLocalMD2MacroDomainSize();
   std::vector<tarch::la::Vector<dim, int>> res_offset;

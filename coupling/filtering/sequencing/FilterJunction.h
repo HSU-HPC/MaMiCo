@@ -25,19 +25,21 @@
  */
 
 namespace coupling{
-	template<unsigned int dim, std::size_t inputc>
-    class FilterJunction;
+	namespace filtering{
+		template<unsigned int dim, std::size_t inputc>
+	    class FilterJunction;
+	}
 }
 
 template<unsigned int dim, std::size_t inputc>
-class coupling::FilterJunction : public coupling::FilterSequence<dim> {
+class coupling::filtering::FilterJunction : public coupling::filtering::FilterSequence<dim> {
 	public:
     	FilterJunction( 
 			const char* name,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector, //concatenation of numberImput input cell vectors
 			std::array<bool, 7> filteredValues
 		):
-		coupling::FilterSequence<dim>(
+		coupling::filtering::FilterSequence<dim>(
 			name, 
 			inputCellVector, 
 			filteredValues)
@@ -50,14 +52,14 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
         	#endif
 
 			//Partition input vector
-			unsigned int partitionSize = coupling::FilterSequence<dim>::_inputCellVector.size() / inputc;
+			unsigned int partitionSize = coupling::filtering::FilterSequence<dim>::_inputCellVector.size() / inputc;
 
 			for( unsigned int p = 0; p < inputc; p++) {
 				//_inputCellVector 
 				_inputCellVector_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_inputCellVector.begin() + (p * partitionSize), 
-					coupling::FilterSequence<dim>::_inputCellVector.begin() + ((p+1) * partitionSize));
+					(coupling::filtering::FilterSequence<dim>::_inputCellVector.begin() + (p * partitionSize), 
+					coupling::filtering::FilterSequence<dim>::_inputCellVector.begin() + ((p+1) * partitionSize));
 				#ifdef DEBUG_FILTER_JUNCTION
 					std::cout << PRINT_PREFIX() << "Size of _inputCellVector_parted[" << p << "]: " << _inputCellVector_parted[p].size() << std::endl;
 				#endif
@@ -66,8 +68,8 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 				//_cellVector1
 				_cellVector1_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_cellVector1.begin() + (p * partitionSize), 
-					coupling::FilterSequence<dim>::_cellVector1.begin() + ((p+1) * partitionSize));
+					(coupling::filtering::FilterSequence<dim>::_cellVector1.begin() + (p * partitionSize), 
+					coupling::filtering::FilterSequence<dim>::_cellVector1.begin() + ((p+1) * partitionSize));
 				#ifdef DEBUG_FILTER_JUNCTION
 					std::cout << PRINT_PREFIX() << "Size of _cellVector1_parted[" << p << "]: " << _cellVector1_parted[p].size() << std::endl;
 				#endif
@@ -75,14 +77,14 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 				//_cellVector2
 				_cellVector2_parted[p] =
 					std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-					(coupling::FilterSequence<dim>::_cellVector2.begin() + (p * partitionSize), 
-					coupling::FilterSequence<dim>::_cellVector2.begin() + ((p+1) * partitionSize));
+					(coupling::filtering::FilterSequence<dim>::_cellVector2.begin() + (p * partitionSize), 
+					coupling::filtering::FilterSequence<dim>::_cellVector2.begin() + ((p+1) * partitionSize));
 				#ifdef DEBUG_FILTER_JUNCTION
 					std::cout << PRINT_PREFIX() << "Size of _cellVector2_parted[" << p << "]: " << _cellVector2_parted[p].size() << std::endl;
 				#endif
 			}
 
-			coupling::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported.
+			coupling::filtering::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported.
     	}
 
 		/*
@@ -113,20 +115,20 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
 				exit(EXIT_FAILURE);
 			}
 
-			if(coupling::FilterSequence<dim>::_filters.empty()) std::cout << PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
-			if(coupling::FilterSequence<dim>::_filters.size() % 2 == 0) return _cellVector1_parted[0];
+			if(coupling::filtering::FilterSequence<dim>::_filters.empty()) std::cout << PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
+			if(coupling::filtering::FilterSequence<dim>::_filters.size() % 2 == 0) return _cellVector1_parted[0];
 			else return _cellVector2_parted[0];
 		}
 
 
 		void printFilters() override {
-			std::cout << "Junctors in junction " << coupling::FilterSequence<dim>::_name << ": ";
-			for(auto f : coupling::FilterSequence<dim>::_filters) std::cout << f->getType() << " ";
+			std::cout << "Junctors in junction " << coupling::filtering::FilterSequence<dim>::_name << ": ";
+			for(auto f : coupling::filtering::FilterSequence<dim>::_filters) std::cout << f->getType() << " ";
 			std::cout << std::endl;
 		}
 
 		std::string PRINT_PREFIX() const override {
-			return std::string("	FJ(").std::string::append(coupling::FilterSequence<dim>::_name).std::string::append("): ");
+			return std::string("	FJ(").std::string::append(coupling::filtering::FilterSequence<dim>::_name).std::string::append("): ");
 		}
 
 

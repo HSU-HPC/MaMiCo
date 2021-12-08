@@ -7,11 +7,13 @@
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling{
-	template<unsigned int dim>
-	class Constant;
+	namespace filtering {
+		template<unsigned int dim>
+		class Constant;
+	}
 }
 
-/*
+/**
  * Filter applying a constant floating point value to all cells for all filtered values.
  * Optionally, one can specify to apply this filter only to certain directions of multidimensional cell properties.
  *
@@ -19,7 +21,7 @@ namespace coupling{
  */
 
 template <unsigned int dim>
-class coupling::Constant : public coupling::FilterInterface<dim> {
+class coupling::filtering::Constant : public coupling::filtering::FilterInterface<dim> {
 	public:
 		Constant(
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
@@ -28,7 +30,7 @@ class coupling::Constant : public coupling::FilterInterface<dim> {
 					const tarch::la::Vector<dim, bool> filteredDims, 
 					const double constant
 		):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "Constant"),
+			coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "Constant"),
 			_constant(constant),
 			_filteredDims(filteredDims)
 		{}

@@ -10,8 +10,10 @@
 //#define DEBUG_FILTER_INTERFACE
 
 namespace coupling{
-    template<unsigned int dim>
-    class FilterInterface;
+	namespace filtering{
+	    template<unsigned int dim>
+	    class FilterInterface;
+	}
 }
 
 using coupling::indexing::CellIndex;
@@ -29,7 +31,7 @@ using coupling::indexing::IndexTrait;
  *  @Author Felix Maurer
  */
 template<unsigned int dim>
-class coupling::FilterInterface{
+class coupling::filtering::FilterInterface{
 	public:
 
 		/*

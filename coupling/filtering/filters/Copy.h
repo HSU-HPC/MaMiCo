@@ -6,8 +6,10 @@
 #include "coupling/filtering/interfaces/FilterInterfaceReadOnly.h"
 
 namespace coupling{
-	template<unsigned int dim>
-	class Copy;
+	namespace filtering {
+		template<unsigned int dim>
+		class Copy;
+	}
 }
 
 /**
@@ -17,18 +19,18 @@ namespace coupling{
  */
 
 template <unsigned int dim>
-class coupling::Copy : public coupling::FilterInterfaceReadOnly<dim>{
+class coupling::filtering::Copy : public coupling::filtering::FilterInterfaceReadOnly<dim>{
 	public:
 		Copy(
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 					const std::array<bool, 7> filteredValues
 		):
-			coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, filteredValues, "COPY")
+			coupling::filtering::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, filteredValues, "COPY")
 		{}
 
 		void operator()() {
-			coupling::FilterInterfaceReadOnly<dim>::copyInputToOutput();
-			//coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("COPY");
+			coupling::filtering::FilterInterfaceReadOnly<dim>::copyInputToOutput();
+			//coupling::filtering::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("COPY");
 		}
 };

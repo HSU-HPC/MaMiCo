@@ -12,8 +12,10 @@
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling {
-    template<unsigned int dim>
-    class POD;
+	namespace filtering {
+	    template<unsigned int dim>
+	    class POD;
+	}
 }
 
 /** Noise reduction algorithm using Proper orthogonal decomposition
@@ -21,7 +23,7 @@ namespace coupling {
  *  @author Piet Jarmatz, Felix Maurer
  */
 template<unsigned int dim>
-class coupling::POD : public coupling::FilterInterface<dim>{
+class coupling::filtering::POD : public coupling::filtering::FilterInterface<dim>{
     public:
         POD(  	const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
@@ -29,7 +31,7 @@ class coupling::POD : public coupling::FilterInterface<dim>{
 				int tws,
 				int kmax
 				):
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "POD"),
+				coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "POD"),
 				_timeWindowSize(tws),
 				_kMax(kmax),
 				_cycleCounter(0),

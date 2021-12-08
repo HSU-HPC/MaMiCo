@@ -4,10 +4,10 @@
 
 #include <typeinfo>
 
-//Member functions of coupling::FilterSequence
+//Member functions of coupling::filtering::FilterSequence
 
 template<unsigned int dim>
-int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){
+int coupling::filtering::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode){
 	if(!sequenceNode) return EXIT_FAILURE;
     tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
 	
@@ -20,7 +20,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 	bool firstIteration = true;
 
     while(currFilterNode){
-		coupling::FilterInterface<dim>* newfilter = nullptr;
+		coupling::filtering::FilterInterface<dim>* newfilter = nullptr;
 		
 	//###############################################################
 	//This is where you have to define how to handle each filter individually.
@@ -38,13 +38,13 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::WriteToFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
+            newfilter = new coupling::filtering::WriteToFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
         }
 	
 		//Read From File
         else if(std::strcmp(currFilterNode->Value(), "read-from-file") == 0){
 			
-            newfilter = new coupling::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"));
+            newfilter = new coupling::filtering::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"));
 		}
 
 		//Constant Filter
@@ -61,7 +61,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				filteredDims[dir] = true;
 			}
 
-            newfilter = new coupling::Constant<dim>(inputCellVector, outputCellVector, _filteredValues, filteredDims, constant);
+            newfilter = new coupling::filtering::Constant<dim>(inputCellVector, outputCellVector, _filteredValues, filteredDims, constant);
 		}
 
 		//Gauss
@@ -84,7 +84,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			const char* extrapolation;
 			extrapolation = currFilterNode->Attribute("extrapolation");
 
-			newfilter = new coupling::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int) d, sigma, extrapolation);
+			newfilter = new coupling::filtering::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int) d, sigma, extrapolation);
 		}
 
 		//POD
@@ -110,7 +110,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::POD<dim>(inputCellVector, outputCellVector, _filteredValues, tws, kmax);
+            newfilter = new coupling::filtering::POD<dim>(inputCellVector, outputCellVector, _filteredValues, tws, kmax);
         }
 
 	//TODO: refactor the following filters to fit to new type system
@@ -127,7 +127,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 				std::cout << "ERROR: Strouhal filter misses attribute U in config file." << std::endl;
 				exit(EXIT_FAILURE);
 			}
-			newfilter = new coupling::Strouhal<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, u , d);
+			newfilter = new coupling::filtering::Strouhal<dim>(inputCellVector, outputCellVector, _sequenceDomainCellIndices, _filteredValues, u , d);
         }
 	*/
 		
@@ -145,7 +145,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 			if(std::strcmp(sequential, "true") == 0) {
 				//TODO: remove usage of IndexConversion. make own rank/communicator more accessible
 				//const auto rank = MamicoInterfaceProvier::getInstance().getMacroscopicCellService().getIndexConversion.getThisRank();
-				_filters.push_back(new coupling::SequentialFilter<dim>(newfilter, /*TODO*/ 0));
+				_filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, /*TODO*/ 0));
 			}
 			else {
 				_filters.push_back(newfilter);
@@ -178,7 +178,7 @@ int coupling::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequ
 
 //TODO: restructure code: reduce code duplication
 template<unsigned int dim>
-void coupling::FilterSequence<dim>::addFilter( 	
+void coupling::filtering::FilterSequence<dim>::addFilter( 	
 				const std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
 				const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
 				int filterIndex //counting starts at 0, -1 is equivalent to EOL
@@ -194,14 +194,14 @@ void coupling::FilterSequence<dim>::addFilter(
 			//previous filter at index 0 won't use _inputCellVector any longer
 			if(!_filters.empty()) _filters[0]->setInputCells(_cellVector1);
 
-			_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_inputCellVector, _cellVector2 , _filteredValues, applyScalar, applyVector));
+			_filters.insert(_filters.begin() + index, new coupling::filtering::FilterFromFunction<dim>(_inputCellVector, _cellVector2 , _filteredValues, applyScalar, applyVector));
 
 			// add copy if no copy after index exists, else remove that copy
 			if(_filters.size() > 1) { //dont check if the newly added FFF is the only filter in the sequence
 				if(std::strcmp(_filters[1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + 1);
-				else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1, _filteredValues));
+				else _filters.insert(_filters.begin() + 1, new coupling::filtering::Copy<dim>(_cellVector2, _cellVector1, _filteredValues));
 			}
-			else _filters.insert(_filters.begin() + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1 , _filteredValues));
+			else _filters.insert(_filters.begin() + 1, new coupling::filtering::Copy<dim>(_cellVector2, _cellVector1 , _filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << PRINT_PREFIX() << "Inserted new filter at index 0" << std::endl;
 			#endif
@@ -209,8 +209,8 @@ void coupling::FilterSequence<dim>::addFilter(
 
 		//case: appending to nonempty sequence	
 		else if(index ==  _filters.size()) {
-			if(_filters.size() % 2 == 0) _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2, _filteredValues, applyScalar, applyVector));
-			else _filters.push_back(new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1, _filteredValues, applyScalar, applyVector));
+			if(_filters.size() % 2 == 0) _filters.push_back(new coupling::filtering::FilterFromFunction<dim>(_cellVector1, _cellVector2, _filteredValues, applyScalar, applyVector));
+			else _filters.push_back(new coupling::filtering::FilterFromFunction<dim>(_cellVector2, _cellVector1, _filteredValues, applyScalar, applyVector));
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
 			#endif
@@ -219,18 +219,18 @@ void coupling::FilterSequence<dim>::addFilter(
 		//case: inserting at nonzero index
 		else {
 			if(index % 2 == 0) { 
-				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector1, _cellVector2, _filteredValues, applyScalar, applyVector));
+				_filters.insert(_filters.begin() + index, new coupling::filtering::FilterFromFunction<dim>(_cellVector1, _cellVector2, _filteredValues, applyScalar, applyVector));
 
 				// add copy if no copy after index exists, else remove that copy
 				if(std::strcmp(_filters[index + 1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + index +1);
-				else _filters.insert(_filters.begin() + index + 1, new coupling::Copy<dim>(_cellVector2, _cellVector1, _filteredValues));
+				else _filters.insert(_filters.begin() + index + 1, new coupling::filtering::Copy<dim>(_cellVector2, _cellVector1, _filteredValues));
 			}
 			else {
-				_filters.insert(_filters.begin() + index, new coupling::FilterFromFunction<dim>(_cellVector2, _cellVector1, _filteredValues, applyScalar, applyVector));	
+				_filters.insert(_filters.begin() + index, new coupling::filtering::FilterFromFunction<dim>(_cellVector2, _cellVector1, _filteredValues, applyScalar, applyVector));	
 
 				// add copy if no copy after index exists, else remove that copy
 				if(std::strcmp(_filters[index + 1]->getType(), "COPY") == 0) _filters.erase(_filters.begin() + index +1);
-				else _filters.insert(_filters.begin() + index + 1, new coupling::Copy<dim>(_cellVector1, _cellVector2, _filteredValues));
+				else _filters.insert(_filters.begin() + index + 1, new coupling::filtering::Copy<dim>(_cellVector1, _cellVector2, _filteredValues));
 			}
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << PRINT_PREFIX() << "Inserted new filter at index " << index << std::endl;
@@ -256,11 +256,11 @@ void coupling::FilterSequence<dim>::addFilter(
 }
 
 
-//Private functions of coupling::FilterSequence
+//Private functions of coupling::filtering::FilterSequence
 
 //TODO: inline in constructor
 template<unsigned int dim>
-void coupling::FilterSequence<dim>::initCellVectors(){
+void coupling::filtering::FilterSequence<dim>::initCellVectors(){
 	for(auto cell: _inputCellVector){
 		_cellVector1.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
     	_cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));

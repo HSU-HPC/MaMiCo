@@ -74,7 +74,7 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
 	virtual void initFiltering() { throw std::runtime_error("MacroscopicCellService: Error: Called initFiltering for non-Impl object."); }  /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
-	virtual const coupling::FilterPipeline<dim>* getFilterPipeline() const { throw std::runtime_error("MacroscopicCellService: Error: Called getFilterPipeline() in instance without FilterPipeline."); }  /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
+	virtual const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const { throw std::runtime_error("MacroscopicCellService: Error: Called getFilterPipeline() in instance without FilterPipeline."); }  /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
 	unsigned int getID() const { return _id;}
 
 
@@ -215,9 +215,9 @@ public coupling::services::MacroscopicCellService<dim> {
   	 * Initialises the _filterPipeline member. Called from _multiMDCellService's sendFromMD2Macro during the first coupling iteration.
   	 * Make sure to delete _filterPipeline in ~MacroscopicCellServiceImpl()
   	 */
-  	void initFiltering() { _filterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells.getMacroscopicCells(), coupling::Scope::perInstance, _filterPipelineConfiguration); }
+  	void initFiltering() { _filterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells.getMacroscopicCells(), coupling::filtering::Scope::perInstance, _filterPipelineConfiguration); }
 
-  	const coupling::FilterPipeline<dim>* getFilterPipeline() const { return _filterPipeline; }
+  	const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const { return _filterPipeline; }
 
   	/**
   	 * Creates a new filter from scratch and appends it to a sequence that is part of this service's filter pipelining system.
@@ -287,7 +287,7 @@ public coupling::services::MacroscopicCellService<dim> {
     coupling::datastructures::MacroscopicCells<LinkedCell,dim> _macroscopicCells;
 
     /** filter pipeline, used to apply filters in sendFromMD2Macro */
-    coupling::FilterPipeline<dim>* _filterPipeline;
+    coupling::filtering::FilterPipeline<dim>* _filterPipeline;
 
 	/**parameters needed in initFiltering() */
     const char* _filterPipelineConfiguration;

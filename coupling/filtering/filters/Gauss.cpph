@@ -12,7 +12,7 @@ using coupling::indexing::IndexTrait;
 //Member functions of Gauss.h:
 template<unsigned int dim>
 //TODO: This is very much hardcoded for kernel radius = 1
-void coupling::Gauss<dim>::operator()(){	
+void coupling::filtering::Gauss<dim>::operator()(){	
     #ifdef DEBUG_GAUSS
     std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter...";
     #endif 
@@ -109,7 +109,7 @@ void coupling::Gauss<dim>::operator()(){
 
 //Private functions of Gauss.h: 
 template<unsigned int dim>
-std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel() {
+std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::filtering::Gauss<dim>::generateKernel() {
 	//std::cout << "gauss: kernel radius: " << GAUSS_KERNEL_RADIUS << std::endl;	
 
 	std::array<double, 1+2*GAUSS_KERNEL_RADIUS> kernel;
@@ -137,14 +137,14 @@ std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel
 }
 
 template<unsigned int dim>
-constexpr double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
+constexpr double coupling::filtering::Gauss<dim>::gaussianDensityFunction(int x) {
 	double ans = ( 1 / ( _sigma * sqrt(2*M_PI) ) ) * exp(-0.5 * (x/_sigma) * (x/_sigma));
 	return ans;
 }
 
 //TODO: redesign so you dont need these two any more?
 template<unsigned int dim>
-CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> coupling::Gauss<dim>::getIndexAbove(
+CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> coupling::filtering::Gauss<dim>::getIndexAbove(
 	const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index, 
 	unsigned int d
 ) {
@@ -167,7 +167,7 @@ CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> coup
 }
 
 template<unsigned int dim>
-CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> coupling::Gauss<dim>::getIndexBelow(
+CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> coupling::filtering::Gauss<dim>::getIndexBelow(
 	const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index,
 	unsigned int d
 ) {

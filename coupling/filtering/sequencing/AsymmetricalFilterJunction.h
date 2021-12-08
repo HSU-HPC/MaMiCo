@@ -22,12 +22,14 @@
  */
 
 namespace coupling{
-	template<unsigned int dim>
-    class AsymmetricalFilterJunction;
+	namespace filtering{
+		template<unsigned int dim>
+	    class AsymmetricalFilterJunction;
+	}
 }
 
 template<unsigned int dim>
-class coupling::AsymmetricalFilterJunction : public coupling::FilterSequence<dim> {
+class coupling::filtering::AsymmetricalFilterJunction : public coupling::filtering::FilterSequence<dim> {
 	public:
     	AsymmetricalFilterJunction( 
 			const char* name,
@@ -35,7 +37,7 @@ class coupling::AsymmetricalFilterJunction : public coupling::FilterSequence<dim
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	secondaryInputCellVector, // additional data, presented as macro cells as well
 			std::array<bool, 7> filteredValues
 		):
-		coupling::FilterSequence<dim>(
+		coupling::filtering::FilterSequence<dim>(
 			name, 
 			primaryInputCellVector,
 			filteredValues
@@ -57,7 +59,7 @@ class coupling::AsymmetricalFilterJunction : public coupling::FilterSequence<dim
 				std::cout << PRINT_PREFIX() << "First element of _cellVector2_secondary after init: " << _cellVector2_secondary[0] << std::endl;
     		#endif 
 
-			coupling::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported. TODO
+			coupling::filtering::FilterSequence<dim>::_isModifiable = false; //Dynamic filters are not yet supported. TODO
     	}
 
     	~AsymmetricalFilterJunction(){
@@ -71,13 +73,13 @@ class coupling::AsymmetricalFilterJunction : public coupling::FilterSequence<dim
 		int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) override;	
 
 		void printFilters() override {
-			std::cout << "Junctors in asymmetrical junction " << coupling::FilterSequence<dim>::_name << ": ";
-			for(auto f : coupling::FilterSequence<dim>::_filters) std::cout << f->getType() << " ";
+			std::cout << "Junctors in asymmetrical junction " << coupling::filtering::FilterSequence<dim>::_name << ": ";
+			for(auto f : coupling::filtering::FilterSequence<dim>::_filters) std::cout << f->getType() << " ";
 			std::cout << std::endl;
 		}
 
 		std::string PRINT_PREFIX() const override {
-			return std::string("	AFJ(").std::string::append(coupling::FilterSequence<dim>::_name).std::string::append("): ");
+			return std::string("	AFJ(").std::string::append(coupling::filtering::FilterSequence<dim>::_name).std::string::append("): ");
 		}
 
 

@@ -122,7 +122,7 @@ class coupling::services::MultiMDCellService {
       else{ std::cout << "ERROR MultiMDCellService::getMacroscopicCellService(localIndex): localIndex >_localNumberMDSimulations-1!" << std::endl; exit(EXIT_FAILURE);}
     }
 
-    coupling::FilterPipeline<dim>& getPostMultiInstanceFilterPipeline() { return _postMultiInstanceFilterPipeline; }
+    coupling::filtering::FilterPipeline<dim>& getPostMultiInstanceFilterPipeline() { return _postMultiInstanceFilterPipeline; }
 
     /** broadcasts data from macroscopic solver to all MD simulations */
     void sendFromMacro2MD(
@@ -177,7 +177,7 @@ class coupling::services::MultiMDCellService {
       #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
       if(_postMultiInstanceFilterPipeline == nullptr) {
           //Init filter pipeline
-          _postMultiInstanceFilterPipeline = new coupling::FilterPipeline<dim>(_macroscopicCells, coupling::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
+          _postMultiInstanceFilterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells, coupling::filtering::Scope::postMultiInstance, _filterPipelineConfiguration.c_str());
       }
       #endif
 
@@ -263,6 +263,6 @@ class coupling::services::MultiMDCellService {
      * Analogon to MacroscopicCellService's FilterPipeline.
      * Is applied during this->sendFromMD2Macro.
     */
-    coupling::FilterPipeline<dim> *_postMultiInstanceFilterPipeline;
+    coupling::filtering::FilterPipeline<dim> *_postMultiInstanceFilterPipeline;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_MULTIMDCELLSERVICE_H_

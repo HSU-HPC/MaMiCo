@@ -9,8 +9,10 @@
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling{
-    template<unsigned int dim>
-    class AsymmetricalJunctorInterface;
+	namespace filtering{
+	    template<unsigned int dim>
+	    class AsymmetricalJunctorInterface;
+	}
 }
 
 /**
@@ -21,7 +23,7 @@ namespace coupling{
  *  @Author Felix Maurer
  */
 template<unsigned int dim>
-class coupling::AsymmetricalJunctorInterface : public coupling::FilterInterface<dim> {
+class coupling::filtering::AsymmetricalJunctorInterface : public coupling::filtering::FilterInterface<dim> {
 	public:
 		AsymmetricalJunctorInterface(
 			//first cell data set
@@ -37,7 +39,7 @@ class coupling::AsymmetricalJunctorInterface : public coupling::FilterInterface<
 			const char* type
 		):
 			//The first cell data set in stored in FI's member variables...
-			coupling::FilterInterface<dim>(
+			coupling::filtering::FilterInterface<dim>(
 				inputCellVector1, 
 				outputCellVector1, 
 				filteredValues, 
@@ -69,7 +71,7 @@ class coupling::AsymmetricalJunctorInterface : public coupling::FilterInterface<
 			_inputCellVector2 = new_inputCellVector2;
 
 			//Assumes the input c-style vectors to be nonempty. May be problematic.
-			coupling::FilterInterface<dim>::updateCellData(new_inputCellVector1, new_outputCellVector1);
+			coupling::filtering::FilterInterface<dim>::updateCellData(new_inputCellVector1, new_outputCellVector1);
 		}
 
 	protected:
@@ -84,6 +86,6 @@ class coupling::AsymmetricalJunctorInterface : public coupling::FilterInterface<
 		 * Note that you have to do this manually in your implementation of this interface.
 		 * For an example, cf. filters/WriteToFileJunctor.h
 		 */
-		coupling::FilterInterface<dim>* _filter1;
-		coupling::FilterInterface<dim>* _filter2;
+		coupling::filtering::FilterInterface<dim>* _filter1;
+		coupling::filtering::FilterInterface<dim>* _filter2;
 };

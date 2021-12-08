@@ -12,8 +12,10 @@
 //#define DEBUG_READ_FROM_FILE
 
 namespace coupling {
-    template<unsigned int dim>
-    class ReadFromFile;
+    namespace filtering {
+        template<unsigned int dim>
+        class ReadFromFile;
+    }
 }
 
 
@@ -32,7 +34,7 @@ namespace coupling {
  * The input file must contain one separate line per cell.
  */
 template<unsigned int dim>
-class coupling::ReadFromFile : public coupling::FilterInterface<dim>{
+class coupling::filtering::ReadFromFile : public coupling::filtering::FilterInterface<dim>{
     public:
         ReadFromFile(
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
@@ -40,7 +42,7 @@ class coupling::ReadFromFile : public coupling::FilterInterface<dim>{
 			const std::array<bool, 7> filteredValues, 
 			std::string location
 		):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "RFF"),
+			coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "RFF"),
 		   	_location(location),
 			_iteration(0)
 		{	

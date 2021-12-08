@@ -8,16 +8,16 @@
 
 //Member functions of Strouhal.h:
 template<unsigned int dim>
-void coupling::Strouhal<dim>::operator()(){	
+void coupling::filtering::Strouhal<dim>::operator()(){	
 	double vAvg = 0;
-    for(auto cell : coupling::FilterInterface<dim>::_inputCells){
+    for(auto cell : coupling::filtering::FilterInterface<dim>::_inputCells){
 		vAvg += cell->getCurrentVelocity()[1];
     }
-	vAvg /= coupling::FilterInterface<dim>::_inputCells.size();
+	vAvg /= coupling::filtering::FilterInterface<dim>::_inputCells.size();
 
 	_v_y.push_back(vAvg);
 
-	coupling::FilterInterfaceReadOnly<dim>::copyInputToOutput();
+	coupling::filtering::FilterInterfaceReadOnly<dim>::copyInputToOutput();
 
     #ifdef DEBUG_STROUHAL
     std::cout << "		STROUHAL: Average velocity in y-direction at iteration " << _v_y.size() << " is " << vAvg << std::endl;
@@ -31,7 +31,7 @@ void coupling::Strouhal<dim>::operator()(){
 
 //Private functions of Strouhal.h:
 template<unsigned int dim>
-double coupling::Strouhal<dim>::calculateStrouhalNumber(){
+double coupling::filtering::Strouhal<dim>::calculateStrouhalNumber(){
 	double f = 0; 	
 
 	//TODO: BIG COMMENT GOES HERE

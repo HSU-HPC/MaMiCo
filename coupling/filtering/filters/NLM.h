@@ -10,8 +10,10 @@
 #include <array>
 
 namespace coupling {
-  template<unsigned int dim>
-  class NLM;
+  namespace filtering {
+    template<unsigned int dim>
+    class NLM;
+  }
 }
 
 /** 
@@ -23,7 +25,7 @@ namespace coupling {
  * 
  */
 template<unsigned int dim>
-class coupling::NLM : public coupling::JunctorInterface<dim,2,1> {
+class coupling::filtering::NLM : public coupling::filtering::JunctorInterface<dim,2,1> {
 public:
   using CellIndex_T = CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost, IndexTrait::local, IndexTrait::md2macro>;
 
@@ -38,7 +40,7 @@ public:
     int M = 2,
     int d = 1
     ):
-  coupling::JunctorInterface<dim,2,1>( 
+  coupling::filtering::JunctorInterface<dim,2,1>( 
    { inputCellVector_unfiltered, inputCellVector_prefiltered },
    { outputCellVector }, 
    filteredValues,
@@ -88,7 +90,6 @@ public:
     std::cout << "    NLM: Created NLM instance." << std::endl;
     std::cout << "    WARNING: Regardless of configuration, NLM always filters macroscopic mass and momentum." << std::endl;
     #endif
-        }
   }
 
   virtual ~NLM(){

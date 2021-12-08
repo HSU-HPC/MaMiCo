@@ -15,11 +15,13 @@ using coupling::indexing::CellIndex;
 using coupling::indexing::IndexTrait;
 
 namespace coupling {
-    template<unsigned int dim>
-    class Gauss;
+	namespace filtering {
+	    template<unsigned int dim>
+	    class Gauss;
 
-	//cf. member variable in coupling::Gauss for more details
-	enum GaussExtrapolationStrategy {NONE, MIRROR, REFLECT};
+		//cf. member variable in coupling::Gauss for more details
+		enum GaussExtrapolationStrategy {NONE, MIRROR, REFLECT};
+	}
 }
 
 //Define kernel radius. e.g. radius = 1 means kernel size of 3
@@ -32,11 +34,11 @@ namespace coupling {
  * @author Felix Maurer
  */
 template<unsigned int dim>
-class coupling::Gauss : public coupling::FilterInterface<dim>{
-	using coupling::FilterInterface<dim>::_inputCells;
-	using coupling::FilterInterface<dim>::_outputCells;
-	using coupling::FilterInterface<dim>::_scalarAccessFunctionPairs;
-	using coupling::FilterInterface<dim>::_vectorAccessFunctionPairs;
+class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<dim>{
+	using coupling::filtering::FilterInterface<dim>::_inputCells;
+	using coupling::filtering::FilterInterface<dim>::_outputCells;
+	using coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs;
+	using coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs;
 
     public:
         Gauss(
@@ -47,7 +49,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 			int sigma,
 			const char* extrapolationStrategy
 		):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"),
+			coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"),
 			_dim(dimension),
 			_sigma(sigma),
 			_kernel(generateKernel())
@@ -116,7 +118,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		 *
 		 * The last two are congruent to SciPy's gaussian filter's respective extrapolation modes
 		 */
-		coupling::GaussExtrapolationStrategy _extrapolationStrategy;
+		coupling::filtering::GaussExtrapolationStrategy _extrapolationStrategy;
 
 
 };

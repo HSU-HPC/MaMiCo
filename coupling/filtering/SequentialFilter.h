@@ -16,8 +16,10 @@
 //#define DEBUG_SEQ_FILTER_VERBOSE
 
 namespace coupling{
-	template<unsigned int dim>
-	class SequentialFilter;
+	namespace filtering{
+		template<unsigned int dim>
+		class SequentialFilter;
+	}
 }
 
 
@@ -39,10 +41,10 @@ namespace coupling{
 
 
 template <unsigned int dim>
-class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
+class coupling::filtering::SequentialFilter : public coupling::filtering::FilterInterface<dim> {
 	public:
 		SequentialFilter(
-					coupling::FilterInterface<dim>* filter,
+					coupling::filtering::FilterInterface<dim>* filter,
 					const int rank, //rank of this process
 					const MPI_Comm comm = MPI_COMM_WORLD //TODO: remove default parameter, pass communicator
 		);
@@ -78,7 +80,7 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		void bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell);
 
 		//The sequentialized Filter
-		coupling::FilterInterface<dim>* _filter;
+		coupling::filtering::FilterInterface<dim>* _filter;
 
 		//MPI related stuff
 		const MPI_Comm _comm;

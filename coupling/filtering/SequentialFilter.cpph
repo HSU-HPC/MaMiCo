@@ -10,12 +10,12 @@ using coupling::indexing::IndexTrait;
 
 //CONSTRUCTOR
 template <unsigned int dim>
-coupling::SequentialFilter<dim>::SequentialFilter(
-	coupling::FilterInterface<dim>* filter,
+coupling::filtering::SequentialFilter<dim>::SequentialFilter(
+	coupling::filtering::FilterInterface<dim>* filter,
 	const int rank,
 	const MPI_Comm comm
 ):
-	coupling::FilterInterface<dim>("SEQUENTIALIZED_FILTER"),
+	coupling::filtering::FilterInterface<dim>("SEQUENTIALIZED_FILTER"),
 	_filter(filter),
 	_comm(comm),
 	_processingRank(0), //TODO: Make this customizable.
@@ -62,7 +62,7 @@ coupling::SequentialFilter<dim>::SequentialFilter(
 
 //MEMBER FUNCTIONS
 template<unsigned int dim>
-void coupling::SequentialFilter<dim>::operator()(){	
+void coupling::filtering::SequentialFilter<dim>::operator()(){	
 	if(_commSize > 1) {
 		if(_processingRank == _myRank) {
 			contribute();
@@ -76,7 +76,7 @@ void coupling::SequentialFilter<dim>::operator()(){
 		
 //PRIVATE FUNCTIONS
 template<unsigned int dim>
-void coupling::SequentialFilter<dim>::contribute() {	
+void coupling::filtering::SequentialFilter<dim>::contribute() {	
 	#ifdef DEBUG_SEQ_FILTER
 	std::cout << "		SEQFILTER (" << _myRank << "): Sending cells and indices." << std::endl;
 	#endif
@@ -170,7 +170,7 @@ void coupling::SequentialFilter<dim>::contribute() {
 
 
 template<unsigned int dim>
-void coupling::SequentialFilter<dim>::process(bool sequential) {
+void coupling::filtering::SequentialFilter<dim>::process(bool sequential) {
 	if(sequential) {
 		_filter->updateCellData(_inputCells_Global, _outputCells_Global);
 	}
@@ -221,7 +221,7 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 
 
 template<unsigned int dim>
-void coupling::SequentialFilter<dim>::macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell){
+void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell){
 	//Resize if buffer is too small to contain cell data
 	if(buf.capacity() < 4+3*dim) {
 		buf.resize(4+3*dim); 
@@ -244,7 +244,7 @@ void coupling::SequentialFilter<dim>::macroscopicCellToBuffer(std::vector<double
 
 
 template<unsigned int dim>
-void coupling::SequentialFilter<dim>::bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell) {
+void coupling::filtering::SequentialFilter<dim>::bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell) {
 	if(buf.capacity() < 4+3*dim) throw std::runtime_error("Buffer too small for cell data!");
 
 	tarch::la::Vector<dim, double> mvec_buf;

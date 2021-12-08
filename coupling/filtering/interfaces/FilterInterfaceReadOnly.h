@@ -6,8 +6,10 @@
 #include "FilterInterface.h"
 
 namespace coupling{
-	template<unsigned int dim>
-	class FilterInterfaceReadOnly;
+	namespace filtering{
+		template<unsigned int dim>
+		class FilterInterfaceReadOnly;
+	}
 }
 
 /*
@@ -18,7 +20,7 @@ namespace coupling{
  */
 
 template <unsigned int dim>
-class coupling::FilterInterfaceReadOnly : public coupling::FilterInterface<dim> {
+class coupling::filtering::FilterInterfaceReadOnly : public coupling::filtering::FilterInterface<dim> {
 	public:
 		FilterInterfaceReadOnly(
 					const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
@@ -26,7 +28,7 @@ class coupling::FilterInterfaceReadOnly : public coupling::FilterInterface<dim> 
 					const std::array<bool, 7> filteredValues,
 					const char* type
 		):
-			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, type)
+			coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, type)
 		{}
 	protected:
 		/*
@@ -40,17 +42,17 @@ class coupling::FilterInterfaceReadOnly : public coupling::FilterInterface<dim> 
 			 * In certain cases, e.g. read-only filters that operate on secondary cells of an AsymmetricalFilterJunction, we don't want the filter to produce any output.
 			 * Then, and only then, the output cells vector will be empty.
 			 */
-			if(coupling::FilterInterface<dim>::_outputCells.empty()) return;
+			if(coupling::filtering::FilterInterface<dim>::_outputCells.empty()) return;
 
-			for(unsigned int ci = 0; ci < coupling::FilterInterface<dim>::_outputCells.size(); ci++) {
-				for(const auto scalarProperty : coupling::FilterInterface<dim>::_scalarAccessFunctionPairs) {
-					(coupling::FilterInterface<dim>::_outputCells[ci]->*scalarProperty.set)(
-						(coupling::FilterInterface<dim>::_inputCells[ci]->*scalarProperty.get)()
+			for(unsigned int ci = 0; ci < coupling::filtering::FilterInterface<dim>::_outputCells.size(); ci++) {
+				for(const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs) {
+					(coupling::filtering::FilterInterface<dim>::_outputCells[ci]->*scalarProperty.set)(
+						(coupling::filtering::FilterInterface<dim>::_inputCells[ci]->*scalarProperty.get)()
 					); //call setter from output cell using getter from input cell.
 				}
-				for(const auto vectorProperty : coupling::FilterInterface<dim>::_vectorAccessFunctionPairs) {
-					(coupling::FilterInterface<dim>::_outputCells[ci]->*vectorProperty.set)(
-						(coupling::FilterInterface<dim>::_inputCells[ci]->*vectorProperty.get)()
+				for(const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs) {
+					(coupling::filtering::FilterInterface<dim>::_outputCells[ci]->*vectorProperty.set)(
+						(coupling::filtering::FilterInterface<dim>::_inputCells[ci]->*vectorProperty.get)()
 					); //call setter from output cell using getter from input cell.
 				}
 			}

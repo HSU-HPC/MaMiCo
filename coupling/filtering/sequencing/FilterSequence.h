@@ -41,15 +41,17 @@
  */
 
 namespace coupling{
-    template<unsigned int dim>
-    class FilterSequence;
+	namespace filtering{
+	    template<unsigned int dim>
+	    class FilterSequence;
+	}
 }
 
 using coupling::indexing::CellIndex;
 using coupling::indexing::IndexTrait;
 
 template<unsigned int dim>
-class coupling::FilterSequence {
+class coupling::filtering::FilterSequence {
 	public:
 		/*
 		 * Filter Sequences are constructed in coupling::FilterPipeline::loadSequencesFromXML(...).
@@ -150,7 +152,7 @@ class coupling::FilterSequence {
 		bool isModifiable() { return _isModifiable; }
 		void makeUnmodifiable() { _isModifiable = false; }
 
-		std::vector<coupling::FilterInterface<dim> *> getFilters() { return _filters; }	
+		std::vector<coupling::filtering::FilterInterface<dim> *> getFilters() { return _filters; }	
 
 		/*
 		 * All virtual functions below are redefined in case this sequence is actually a FilterJunction.
@@ -181,7 +183,7 @@ class coupling::FilterSequence {
 		/*
 		 * Registers existence of a child sequence, i.e. a sequence using this sequence's output as its input.
 		 */
-		virtual void addChildSequence(coupling::FilterSequence<dim>* childSequence) {
+		virtual void addChildSequence(coupling::filtering::FilterSequence<dim>* childSequence) {
 			_childSequences.push_back(childSequence);
 		}
 
@@ -265,16 +267,16 @@ class coupling::FilterSequence {
 		bool _isOutput; //true if this sequence's output vector (see above) is the Filter Pipeline's output
 		bool _isModifiable; //true while filters can be added to sequence
 		
-		std::vector<coupling::FilterInterface<dim> *> _filters;
+		std::vector<coupling::filtering::FilterInterface<dim> *> _filters;
 
 		//stores application times for all filters
-		std::map<coupling::FilterInterface<dim> *, std::vector<unsigned int>> _filterTimes;
+		std::map<coupling::filtering::FilterInterface<dim> *, std::vector<unsigned int>> _filterTimes;
 
 		//there must be some other place to get this from
 		unsigned int _timestepsElapsed;
 
 		//stores pointers to all sequences that use this sequence's output as their input. 
-		std::vector<coupling::FilterSequence<dim>* > _childSequences;
+		std::vector<coupling::filtering::FilterSequence<dim>* > _childSequences;
 };
 
 //inlcude implementation

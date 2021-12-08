@@ -10,8 +10,10 @@
 #define DEBUG_STROUHAL
 
 namespace coupling {
-    template<unsigned int dim>
-    class Strouhal;
+	namespace filtering{
+	    template<unsigned int dim>
+	    class Strouhal;
+	}
 }
 
 /**
@@ -21,7 +23,7 @@ namespace coupling {
  * @author Felix Maurer
  */
 template<unsigned int dim>
-class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{
+class coupling::filtering::Strouhal : public coupling::filtering::FilterInterfaceReadOnly<dim>{
     public:
         Strouhal(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
@@ -30,7 +32,7 @@ class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{
 				std::array<bool, 7> filteredValues,
 				double u,
 				double d):
-				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "STROUHALCPP"),
+				coupling::filtering::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "STROUHALCPP"),
 				_U(u),
 				_D(d)
 		{	

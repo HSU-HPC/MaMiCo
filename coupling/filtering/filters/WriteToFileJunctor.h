@@ -9,8 +9,10 @@
 #include "coupling/filtering/filters/WriteToFile.h"
 
 namespace coupling {
-  template<unsigned int dim>
-  class WriteToFileJunctor;
+	namespace filtering{
+	  template<unsigned int dim>
+	  class WriteToFileJunctor;
+	}
 }
 
 /** 
@@ -22,7 +24,7 @@ namespace coupling {
  * 
  */
 template<unsigned int dim>
-class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterface<dim> {
+class coupling::filtering::WriteToFileJunctor : public coupling::filtering::AsymmetricalJunctorInterface<dim> {
 	public:
 		WriteToFileJunctor(
 			//first cell data set
@@ -41,7 +43,7 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 			std::array<bool,2> overwrite = { false },
 			std::array<int,2> oneCellOnly = { -1 }
 		):
-			coupling::AsymmetricalJunctorInterface<dim>( 
+			coupling::filtering::AsymmetricalJunctorInterface<dim>( 
 				inputCellVector1,
 				outputCellVector1,
 				inputCellVector2,
@@ -50,8 +52,8 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 			)
 		{
 			//write to file instance covering first cell data set
-			coupling::AsymmetricalJunctorInterface<dim>::_filter1 
-				= new coupling::WriteToFile<dim>(	inputCellVector1,
+			coupling::filtering::AsymmetricalJunctorInterface<dim>::_filter1 
+				= new coupling::filtering::WriteToFile<dim>(	inputCellVector1,
 													outputCellVector1,
 													filteredValues,
 													location[0],
@@ -59,8 +61,8 @@ class coupling::WriteToFileJunctor : public coupling::AsymmetricalJunctorInterfa
 													oneCellOnly[0]);
 
 			//write to file instance covering second cell data set
-			coupling::AsymmetricalJunctorInterface<dim>::_filter2
-				= new coupling::WriteToFile<dim>(	inputCellVector2,
+			coupling::filtering::AsymmetricalJunctorInterface<dim>::_filter2
+				= new coupling::filtering::WriteToFile<dim>(	inputCellVector2,
 													{}, //no output
 													filteredValues,
 													location[1],

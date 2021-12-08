@@ -12,8 +12,10 @@
 //#define DEBUG_WRITE_TO_FILE
 
 namespace coupling {
-    template<unsigned int dim>
-    class WriteToFile;
+	namespace filtering{
+	    template<unsigned int dim>
+	    class WriteToFile;
+	}
 }
 
 
@@ -34,7 +36,7 @@ namespace coupling {
  * The output file will either contain data of all or just the final coupling iteration. Boolean parameter 'overwrite' is used for that.
  */
 template<unsigned int dim>
-class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
+class coupling::filtering::WriteToFile : public coupling::filtering::FilterInterfaceReadOnly<dim>{
     public:
         WriteToFile(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,
@@ -44,7 +46,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 				bool overwrite = false,
 				int oneCellOnly = -1):
 
-				coupling::FilterInterfaceReadOnly<dim>(inputCells, outputCells, filteredValues, "WTF"),
+				coupling::filtering::FilterInterfaceReadOnly<dim>(inputCells, outputCells, filteredValues, "WTF"),
 		   		_location(location),
 				_overwrite(overwrite),
 				_oneCellOnly(oneCellOnly),

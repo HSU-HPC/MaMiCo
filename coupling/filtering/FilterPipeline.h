@@ -24,22 +24,24 @@
  * @Author Felix Maurer
  */
 namespace coupling{
-    template<unsigned int dim>
-    class FilterPipeline;
+	namespace filtering{
+	    template<unsigned int dim>
+	    class FilterPipeline;
 
-	//TODO: comment
-	enum class Scope { perInstance, postMultiInstance};
+		//TODO: comment
+		enum class Scope { perInstance, postMultiInstance};
+	}
 }
 
 
 template<unsigned int dim>
-class coupling::FilterPipeline{
+class coupling::filtering::FilterPipeline{
     public:
 
 		//TODO: comment! difference: whole domain vs only md2macro incl. indexing
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
-			const coupling::Scope scope,
+			const coupling::filtering::Scope scope,
 			const char* cfgpath);
                
         ~FilterPipeline() {
@@ -63,8 +65,8 @@ class coupling::FilterPipeline{
 		 * Getters for FilterSequences.
 		 * Not that Junction is a subtype of Sequence, so this is how to get Junctions as well.
 		 */
-       	coupling::FilterSequence<dim> * getSequence(const char* identifier) const;
-       	std::vector<coupling::FilterSequence<dim> *> getAllSequences() const { return _sequences; }
+       	coupling::filtering::FilterSequence<dim> * getSequence(const char* identifier) const;
+       	std::vector<coupling::filtering::FilterSequence<dim> *> getAllSequences() const { return _sequences; }
 
     private:
 		/*
@@ -85,9 +87,9 @@ class coupling::FilterPipeline{
 
 		tinyxml2::XMLDocument _config;
 
-		const coupling::Scope _scope;
+		const coupling::filtering::Scope _scope;
 
-       	std::vector<coupling::FilterSequence<dim> *> _sequences; 
+       	std::vector<coupling::filtering::FilterSequence<dim> *> _sequences; 
 };
 
 
