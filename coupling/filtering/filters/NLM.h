@@ -78,8 +78,8 @@ public:
     }*/
 
     for(int x = 1; x < CellIndex_T::numberCellsInDomain[0]-2; x++)
-      for(int y = 1; y < CellIndex_T::numberCellsInDomain[0]-2; y++)
-        for(int z = 1; z < CellIndex_T::numberCellsInDomain[0]-2; z++){
+      for(int y = 1; y < CellIndex_T::numberCellsInDomain[1]-2; y++)
+        for(int z = 1; z < CellIndex_T::numberCellsInDomain[2]-2; z++){
           auto offset = CellIndex_T(x,y,z);
           _innerCellIndices.push_back(CellIndex_T::lowerBoundary + offset);
         }
