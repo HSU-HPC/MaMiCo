@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <type_traits>
+#include <iterator>
 
 #include "tarch/la/Vector.h"
 
@@ -140,12 +141,12 @@ class coupling::indexing::CellIndex {
 	
 		/**
 		 * Increments the index by one.
-		 * Note that this does NOT increments indices in vector representation in all directions.
+		 * Note that this does NOT increment indices in vector representation in all directions.
 		 */
 		CellIndex& operator++() {
 			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
-				CellIndex<dim> scalar_base { *this };
-				*this = CellIndex { ++scalar_base };
+				int val = convertToScalar<dim, traits...>(*this) + 1;
+				*this = CellIndex<dim, traits...>(getScalarCellIndex<traits...> ( val ));
 			}
 			else ++_index;
 
@@ -153,13 +154,12 @@ class coupling::indexing::CellIndex {
 		}
 		/**
 		 * Decrements the index by one.
-		 * Note that this does NOT decrements indices in vector representation in all directions.
+		 * Note that this does NOT decrement indices in vector representation in all directions.
 		 */
 		CellIndex& operator--() {
 			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
-				CellIndex<dim> scalar_base { *this };
-				*this = CellIndex { --scalar_base };
-
+				int val = convertToScalar<dim, traits...>(*this) - 1;
+				*this = CellIndex<dim, traits...>(getScalarCellIndex<traits...> ( val ));
 			}
 			else --_index;
 
@@ -238,9 +238,37 @@ class coupling::indexing::CellIndex {
 		 */
 		static tarch::la::Vector<dim, unsigned int> divisionFactor;
 
+		class IndexIterator : public std::iterator<std::input_iterator_tag, CellIndex>{
+		public:
+		    IndexIterator(CellIndex x): _idx(x) {}
+  			IndexIterator(const IndexIterator& a) : _idx(a._idx) {}
+
+		    CellIndex& operator*() { return _idx; }
+		    CellIndex* operator->() { return &_idx; }
+
+		    // Prefix increment
+		    IndexIterator& operator++() { ++_idx; return *this; }  
+
+		    // Postfix increment
+		    IndexIterator operator++(int) { IndexIterator tmp = *this; ++(*this); return tmp; }
+
+		    friend bool operator== (const IndexIterator& a, const IndexIterator& b) { return a._idx == b._idx; };
+		    friend bool operator!= (const IndexIterator& a, const IndexIterator& b) { return a._idx != b._idx; }; 
+
+		private:
+			CellIndex _idx;
+		};
+		static IndexIterator begin() { return IndexIterator( lowerBoundary ); }
+    	static IndexIterator end()   { return ++IndexIterator( upperBoundary ); } 
+
 	private:
 		value_T _index;
 
+		template<coupling::indexing::IndexTrait T1, coupling::indexing::IndexTrait ... other_traits>
+		CellIndex<dim,other_traits...> getScalarCellIndex(int value){
+			static_assert(T1 == coupling::indexing::IndexTrait::vector);
+			return CellIndex<dim, other_traits...>(value);
+		}
 };
 
 /**
