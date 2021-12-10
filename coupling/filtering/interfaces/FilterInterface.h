@@ -139,7 +139,7 @@ class coupling::FilterInterface{
 		/*
 		 * Advanced Getters/Setters
 		 */
-		coupling::datastructures::MacroscopicCell<dim>* getInputCellOfIndex(const CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>& index) {
+		coupling::datastructures::MacroscopicCell<dim>* getInputCellOfIndex(const CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>& index) {
 			if(index.get() < _inputCells.size) {
 				return _inputCells[index.get()];
 			}
@@ -148,7 +148,7 @@ class coupling::FilterInterface{
 				throw std::runtime_error("FilterInterface: getInputCellofIndex(): Could not find index.");
 			}
 		}
-		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(const CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>& index) {
+		coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(const CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>& index) {
 			if(index.get() < _outputCells.size) {
 				return _outputCells[index.get()];
 			}
@@ -198,13 +198,6 @@ class coupling::FilterInterface{
 		//vectors getters/setters
 		std::vector<VectorAccessFunctionPair> _vectorAccessFunctionPairs;
 
-		//TODO: remove deprecated version below
-		/*
-		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const double&)> _scalarSetters;
-		std::vector<const double& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _scalarGetters;
-		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const tarch::la::Vector<dim, double>&)> _vectorSetters;
-		std::vector<const tarch::la::Vector<dim, double>& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _vectorGetters;
-		*/
 		//unique identifier per filter class
 		const char* _type;
 };

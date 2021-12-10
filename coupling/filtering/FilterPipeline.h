@@ -99,8 +99,6 @@ class coupling::FilterPipeline{
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 		MPI_Comm _comm;
 		#endif 
-
-
 };
 
 

@@ -160,9 +160,8 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 
 	if(_md2MacroCells.empty()) {
 		switch(_scope) { /*TODO: print rank as well */
-			case coupling::Scope::perInstance : std::cout << "Warning: Empty md2Macro-Domain in per-instance Filter Pipeline. Disabling filtering." << std::endl;
-			case coupling::Scope::postMultiInstance : std::cout << "Warning: Empty md2Macro-Domain in post-multi-instance Filter Pipeline. Disabling filtering." << std::endl;
-			//TODO: actually disable filtering ;)
+			case coupling::Scope::perInstance : std::cout << "Warning: Empty md2Macro-Domain in per-instance Filter Pipeline." << std::endl;
+			case coupling::Scope::postMultiInstance : std::cout << "Warning: Empty md2Macro-Domain in post-multi-instance Filter Pipeline." << std::endl;
 		}
 	}
 	
@@ -260,31 +259,6 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
         
         if(inputCount == 0)
             throw std::runtime_error(std::string("ERROR: Filter-Pipeline: Invalid input ").append(inputStringStream.str()).append(" specified for sequence named ").append(currSequenceNode->Value()));
-
-		/* TODO: disabled after index rework. refactor?
-   		//DOMAIN LIMITING
-    	tarch::la::Vector<dim, double> domainStart;
-   	 	tarch::la::Vector<dim, double> domainEnd;
-		//default domain boundaries
-    	tarch::la::Vector<dim, unsigned int> domainStartCell = _md2MacroCellIndices.front();
-    	tarch::la::Vector<dim, unsigned int> domainEndCell = _md2MacroCellIndices.back();
-
-		//if custom start/end is specified use that instead
-        if(currSequenceNode->Attribute("domain-start")){ 
-			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainStart, currSequenceNode, "domain-start");
-	        for(unsigned int d = 0; d < dim; d++){
-    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
-  			    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
-        	}
-		}
-        if(currSequenceNode->Attribute("domain-end")){
-			tarch::configuration::ParseConfiguration::readVector<dim, double>(domainEnd, currSequenceNode, "domain-end");
-	        for(unsigned int d = 0; d < dim; d++){
-    	        domainStartCell[d] = (unsigned int) std::floor(domainStart[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
-        	    domainEndCell[d] = (unsigned int) std::ceil(domainEnd[d] / _ic->getBaseIC()->getMacroscopicCellSize()[d]);
-        	}
-		}
-		*/
 
 		//"filtered-values" is not mandatory, default is false
 		std::array<bool, 7> filteredValues = {false};
