@@ -11,9 +11,6 @@
 //#define DEBUG_GAUSS
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
-using coupling::indexing::CellIndex;
-using coupling::indexing::IndexTrait;
-
 namespace coupling {
     template<unsigned int dim>
     class Gauss;
@@ -21,6 +18,9 @@ namespace coupling {
 	//cf. member variable in coupling::Gauss for more details
 	enum GaussExtrapolationStrategy {NONE, MIRROR, REFLECT};
 }
+
+using coupling::indexing::CellIndex;
+using coupling::indexing::IndexTrait;
 
 //Define kernel radius. e.g. radius = 1 means kernel size of 3
 #define GAUSS_KERNEL_RADIUS 1
@@ -37,6 +37,9 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 	using coupling::FilterInterface<dim>::_outputCells;
 	using coupling::FilterInterface<dim>::_scalarAccessFunctionPairs;
 	using coupling::FilterInterface<dim>::_vectorAccessFunctionPairs;
+
+	using ScalarIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
+	using VectorIndex = CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
 
     public:
         Gauss(
@@ -90,7 +93,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		 *
 		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> getIndexAbove(const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index, unsigned int d);
+		VectorIndex getIndexAbove(const VectorIndex index, unsigned int d);
 
 		/*
 		 * Returns the index of the cell that's below the cell at index on the d-axis
@@ -98,7 +101,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 		 *
 		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
-		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> getIndexBelow(const CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro> index, unsigned int d);
+		VectorIndex getIndexBelow(const VectorIndex index, unsigned int d);
 
 		//on which axis this filter operates. 0 <= _dim <= dim
 		const unsigned int _dim;
