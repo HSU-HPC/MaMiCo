@@ -35,11 +35,17 @@ class coupling::FilterJunction : public coupling::FilterSequence<dim> {
     	FilterJunction( 
 			const char* name,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector, //concatenation of numberImput input cell vectors
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+			MPI_Comm comm,
+			#endif
 			std::array<bool, 7> filteredValues
 		):
 		coupling::FilterSequence<dim>(
 			name, 
 			inputCellVector, 
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+			comm,
+			#endif
 			filteredValues)
 		{	
 			if(inputc == 0)

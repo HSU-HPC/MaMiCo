@@ -12,20 +12,19 @@ using coupling::indexing::IndexTrait;
 template <unsigned int dim>
 coupling::SequentialFilter<dim>::SequentialFilter(
 	coupling::FilterInterface<dim>* filter,
-	const int rank,
 	const MPI_Comm comm
 ):
 	coupling::FilterInterface<dim>("SEQUENTIALIZED_FILTER"),
 	_filter(filter),
 	_comm(comm),
 	_processingRank(0), //TODO: Make this customizable.
-	_myRank(rank),
 	_cellbuf()
 {
 	#ifdef DEBUG_SEQ_FILTER
 	std::cout << "		SEQFILTER (" << _myRank << "): Now initializing sequentialized Filter of type: " << _filter->getType() <<std::endl;
 	#endif
 
+	MPI_Comm_rank(_comm, &_myRank);
 	MPI_Comm_size(_comm, &_commSize);	
 	if(_commSize > 1) {
 		//allocate global cell data structures for processing rank only

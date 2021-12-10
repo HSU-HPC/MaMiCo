@@ -33,11 +33,17 @@ class coupling::AsymmetricalFilterJunction : public coupling::FilterSequence<dim
 			const char* name,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* > primaryInputCellVector, // primary input of sequence. 
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	secondaryInputCellVector, // additional data, presented as macro cells as well
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+			MPI_Comm comm,
+			#endif
 			std::array<bool, 7> filteredValues
 		):
 		coupling::FilterSequence<dim>(
 			name, 
 			primaryInputCellVector,
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+			comm,
+			#endif
 			filteredValues
 		),
 		_inputCellVector_secondary(secondaryInputCellVector)

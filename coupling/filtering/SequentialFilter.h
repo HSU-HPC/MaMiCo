@@ -41,11 +41,7 @@ namespace coupling{
 template <unsigned int dim>
 class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 	public:
-		SequentialFilter(
-					coupling::FilterInterface<dim>* filter,
-					const int rank, //rank of this process
-					const MPI_Comm comm = MPI_COMM_WORLD //TODO: remove default parameter, pass communicator
-		);
+		SequentialFilter(coupling::FilterInterface<dim>* filter, const MPI_Comm comm);
 
 		~SequentialFilter() {
 			delete _filter;
@@ -83,8 +79,8 @@ class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 		//MPI related stuff
 		const MPI_Comm _comm;
 		int _commSize;
-		const int _processingRank;
-		const int _myRank;
+		int _processingRank;
+		int _myRank;
 
 		//Globalized variants of cell data structures (i.e spanning across all cells of the global domain). Only the master rank uses these.
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Global; 	

@@ -16,6 +16,9 @@ coupling::FilterPipeline<dim>::FilterPipeline(
 	const char* cfgpath):
 
 	_scope(scope)
+	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+	,_comm(multiMDService.getLocalCommunicator())
+	#endif
 {
     //check if provided file is written in proper XML
     if(_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR){
@@ -25,11 +28,6 @@ coupling::FilterPipeline<dim>::FilterPipeline(
             
     //check for structural errors in config file
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
-
-	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-	//init static communicator member
-	filteringCommunicator = multiMDService.getLocalCommunicator();
-	#endif
 	
 	//case: the input vector contains the entire MD domain
 	if(inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
@@ -321,6 +319,9 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		if(inputCount == 1) {
 			_sequences.push_back(new coupling::FilterSequence<dim>(	currSequenceNode->Value(), 
 																	inputCellVector, 
+																	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+																	_comm,
+																	#endif
 																	filteredValues));
 
 			//register newborn sequence as child at its input sequence,
@@ -338,6 +339,9 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 			_sequences.push_back(new coupling::AsymmetricalFilterJunction<dim>(	currSequenceNode->Value(), 
 																				inputCellVector, 
 																				_outerCells, 
+																				#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+																				_comm,
+																				#endif
 																				filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << "FP: " << _sequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;
@@ -349,6 +353,9 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 			//TODO: move template inputc: currently has 2 hardcoded
 			_sequences.push_back(new coupling::FilterJunction<dim, 2>(	currSequenceNode->Value(), 
 																		inputCellVector, 
+																		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+																		_comm,	
+																		#endif
 																		filteredValues));
 			#ifdef DEBUG_FILTER_PIPELINE
 				std::cout << "FP: " << _sequences.back()->getName() << " will use " << currSequenceNode->Attribute("input") << " as input." << std::endl;

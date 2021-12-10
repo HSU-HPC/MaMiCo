@@ -8,11 +8,11 @@
 #define POST_MULTI_INSTANCE_FILTERING_YES true
 #define POST_MULTI_INSTANCE_FILTERING_NO false
 
+//include dependencies
 #include "tarch/tinyxml2/tinyxml2.h"
 #include "coupling/filtering/sequencing/FilterSequence.h"
 #include "coupling/filtering/sequencing/FilterJunction.h"
 #include "coupling/filtering/sequencing/AsymmetricalFilterJunction.h"
-#include "coupling/IndexConversionMD2Macro.h"
 
 /*
  * TODO: rework comment
@@ -65,12 +65,14 @@ class coupling::FilterPipeline{
        	coupling::FilterSequence<dim> * getSequence(const char* identifier) const;
        	std::vector<coupling::FilterSequence<dim> *> getAllSequences() const { return _sequences; }
 
-		/*
-		 * Communicator used by all parallel filters.
-		 */
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-		inline static MPI_Comm filteringCommunicator;
+		/*
+		 * Get MPI communicator used by all parallel filters.
+	 	 */
+		MPI_Comm getFilteringCommunicator() { return _comm; };
 		#endif 
+
+
     private:
 		/*
 		 * Detects errors in XML-config file.
@@ -93,6 +95,11 @@ class coupling::FilterPipeline{
 		const coupling::Scope _scope;
 
        	std::vector<coupling::FilterSequence<dim> *> _sequences; 
+
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+		MPI_Comm _comm;
+		#endif 
+
 
 };
 

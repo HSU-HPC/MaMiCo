@@ -57,9 +57,15 @@ class coupling::FilterSequence {
 		 */
     	FilterSequence(	const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCells,
+						#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+						MPI_Comm comm,
+						#endif
 						std::array<bool, 7> filteredValues = { true } ):
 		_name(name), 
 		_inputCellVector(inputCells),
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+		_comm(comm),
+		#endif
 		_filteredValues(filteredValues),
 		_isOutput(false), //potentially updated via loadSequencesFromXML calling setAsOutput()
 		_isModifiable(true), //TODO: allow const sequences via XML attribute
@@ -259,6 +265,10 @@ class coupling::FilterSequence {
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector2;//allocated for this sequence only
+
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+		MPI_Comm _comm;
+		#endif
 		
 		std::array<bool, 7> _filteredValues;
 
