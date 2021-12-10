@@ -12,6 +12,7 @@ template<unsigned int dim>
 coupling::FilterPipeline<dim>::FilterPipeline(
 	std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 	coupling::Scope scope, 
+	const tarch::utils::MultiMDService<dim>& multiMDService,
 	const char* cfgpath):
 
 	_scope(scope)
@@ -24,6 +25,11 @@ coupling::FilterPipeline<dim>::FilterPipeline(
             
     //check for structural errors in config file
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
+
+	#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+	//init static communicator member
+	filteringCommunicator = multiMDService.getLocalCommunicator();
+	#endif
 	
 	//case: the input vector contains the entire MD domain
 	if(inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {

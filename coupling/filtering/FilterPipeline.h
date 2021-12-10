@@ -35,11 +35,10 @@ namespace coupling{
 template<unsigned int dim>
 class coupling::FilterPipeline{
     public:
-
-		//TODO: comment! difference: whole domain vs only md2macro incl. indexing
         FilterPipeline(
 			std::vector<coupling::datastructures::MacroscopicCell<dim>* > inputCells,
 			const coupling::Scope scope,
+			const tarch::utils::MultiMDService<dim>& multiMDService,
 			const char* cfgpath);
                
         ~FilterPipeline() {
@@ -66,6 +65,12 @@ class coupling::FilterPipeline{
        	coupling::FilterSequence<dim> * getSequence(const char* identifier) const;
        	std::vector<coupling::FilterSequence<dim> *> getAllSequences() const { return _sequences; }
 
+		/*
+		 * Communicator used by all parallel filters.
+		 */
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+		inline static MPI_Comm filteringCommunicator;
+		#endif 
     private:
 		/*
 		 * Detects errors in XML-config file.
@@ -88,6 +93,7 @@ class coupling::FilterPipeline{
 		const coupling::Scope _scope;
 
        	std::vector<coupling::FilterSequence<dim> *> _sequences; 
+
 };
 
 
