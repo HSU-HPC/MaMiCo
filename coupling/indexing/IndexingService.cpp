@@ -28,7 +28,7 @@ namespace coupling {
 		 * NON-MD-TO-MACRO aka MAMICO INDEXING, INCL GHOST LAYER
 		 */
 		
-		//scalar, global, not md2macro, not noGL
+		//scalar, global, !md2macro, !noGL
 		template<>
 		BaseIndex<3> CellIndex<3>::lowerBoundary {};
 		template<>
@@ -52,7 +52,7 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> BaseIndex<3>::divisionFactor {};
 		
-		//scalar, local, not md2macro, not noGL
+		//scalar, local, !md2macro, !noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::local>::lowerBoundary {};
 		template<>
@@ -64,7 +64,7 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::divisionFactor {};
 
-		//vector, local, not md2macro, not noGL
+		//vector, local, !md2macro, !noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local>::lowerBoundary {};
 		template<>
@@ -81,7 +81,7 @@ namespace coupling {
 		 * MD TO MACRO, INCL GHOST LAYER
 		 */
 
-		//scalar, global, md2macro, not noGL
+		//scalar, global, md2macro, !noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::md2macro>::lowerBoundary {};
 		template<>
@@ -93,7 +93,7 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::divisionFactor {};
 
-		//vector, global, md2macro, not noGL
+		//vector, global, md2macro, !noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary {};
 		template<>
@@ -105,7 +105,7 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::divisionFactor {};
 
-		//scalar, local, md2macro, not noGL
+		//scalar, local, md2macro, !noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary {};
 		template<>
@@ -117,7 +117,7 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::divisionFactor {};
 
-		//vector, local, md2macro, not noGL
+		//vector, local, md2macro, !noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary {};
 		template<>
@@ -134,7 +134,7 @@ namespace coupling {
 		 * !MD TO MACRO aka MAMICO INDEXING, EXCL GHOST LAYER
 		 */
 		
-		//scalar, global, not md2macro, noGL
+		//scalar, global, !md2macro, noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::noGhost>::lowerBoundary {};
 		template<>
@@ -146,7 +146,7 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::divisionFactor {};
 
-		//vector, global, not md2macro, noGL
+		//vector, global, !md2macro, noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary {};
 		template<>
@@ -158,7 +158,7 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::divisionFactor {};
 
-		//scalar, local, not md2macro, noGL
+		//scalar, local, !md2macro, noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary {};
 		template<>
@@ -170,7 +170,7 @@ namespace coupling {
 		template<>
 		tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::divisionFactor {};
 
-		//vector, local, not md2macro, noGL
+		//vector, local, !md2macro, noGL
 		template<>
 		BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary {};
 		template<>
@@ -294,7 +294,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	//init boundaries of all global, m2m, GL excluding indexing types
 	{
 		CellIndex<dim> lowerBoundary { BaseIndex<dim>::lowerBoundary };
-		while(	not _msi->receiveMacroscopicQuantityFromMDSolver(
+		while(not _msi->receiveMacroscopicQuantityFromMDSolver(
 				tarch::la::Vector<dim, unsigned int> { CellIndex<dim, IndexTrait::vector>{ lowerBoundary }.get() })
 			 ) {
 			//sanity check: empty m2m domain
@@ -305,7 +305,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			++lowerBoundary;
 		}
 		CellIndex<dim> upperBoundary { BaseIndex<dim>::upperBoundary };
-		while(	not _msi->receiveMacroscopicQuantityFromMDSolver(
+		while(not _msi->receiveMacroscopicQuantityFromMDSolver(
 				tarch::la::Vector<dim, unsigned int> { CellIndex<dim, IndexTrait::vector>{ upperBoundary }.get() })
 			 ) {
 			//sanity check: empty m2m domain 
@@ -465,6 +465,10 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary;
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 	#endif
+	
+	//run tests
+	testing::printAllBoundaries<dim>();
+	exit(0);
 }
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //unused in sequential scenario
