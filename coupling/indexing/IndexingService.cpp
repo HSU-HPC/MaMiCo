@@ -466,9 +466,26 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 		CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 	#endif
 	
+	#ifdef TEST_INDEXING
 	//run tests
-	testing::printAllBoundaries<dim>();
-	exit(0);
+	
+	//get output file for boundaries
+	std::ofstream of;
+	{
+		using namespace std::string_literals;
+		of.open("indexbounds_rank"s + std::to_string(_rank) + ".txt"s);
+	}
+	testing::printAllBoundaries<dim>(of);
+
+	try {
+		testing::checkTrivialConversions<dim>();
+	}
+	catch (const std::exception& e) {
+		std::cout << "WARNING: IndexingService: Test indicated faulty conversion: " << e.what() << std::endl;
+	}
+
+	of.close();
+	#endif
 }
 
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //unused in sequential scenario
