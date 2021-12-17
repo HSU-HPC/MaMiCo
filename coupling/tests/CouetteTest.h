@@ -402,18 +402,17 @@ private:
 	 */
 
 	else if(_cfg.miSolverType == SYNTHETIC)	{
+		std::cout << "Couette: Synthetic solver feature is currently disabled." << std::endl;
+	}
 
-		/*
-		 * Synthetic MD runs sequentially only, as described above.
-		 */
-        if(/*_cfg.md2Macro ||*/ _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
+	/* TODO: port to index type system
+		//Synthetic MD runs sequentially only, as described above.
+        if(_cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
         _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1) {
 			throw std::runtime_error("ERROR: Syntethic MD is only available in sequential mode!");
 		}
 
-		/*
-		 * Create new FilterFromFunction instance and insert it into Filtering System.
-		 */
+		//Create new FilterFromFunction instance and insert it into Filtering System.
 		try {
 			for(unsigned int i = 0; i < _localMDInstances; i++) 
 				_multiMDCellService->getMacroscopicCellService(i).getFilterPipeline()->getSequence(SYNTHETICMD_SEQUENCE)->addFilter(
@@ -506,7 +505,7 @@ private:
 			}
 			else throw e;
 		}
-	}
+	}*/
 
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
