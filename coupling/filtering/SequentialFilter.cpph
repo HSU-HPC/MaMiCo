@@ -185,7 +185,7 @@ void coupling::SequentialFilter<dim>::process(bool sequential) {
 
 	if(sequential) {
 		//Now ready to distribute data back to the data's original ranks...
-		for(unsigned int c, localCellsUpdated = 0; c < _outputCells_Global.size(); c++) {
+		for(unsigned int c = 0, localCellsUpdated = 0; c < _outputCells_Global.size(); c++) {
 			//fill buffers with cell data
 			macroscopicCellToBuffer(_cellbuf, _outputCells_Global[c]);
 
