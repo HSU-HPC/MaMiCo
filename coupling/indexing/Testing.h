@@ -11,7 +11,7 @@ namespace coupling::indexing::testing {
 	/**
 	 * TODO: comment
 	 */
-	template<unsigned int dim>
+	template<unsigned int dim, coupling::indexing::IndexTrait ...>
 	void checkTrivialConversions();
 }
 

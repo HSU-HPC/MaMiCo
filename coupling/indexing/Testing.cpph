@@ -159,6 +159,122 @@ void coupling::indexing::testing::printAllBoundaries(std::ostream& os) {
 		os << std::endl;
 }
 
-template<unsigned int dim>
+template<unsigned int dim, IndexTrait ... traits>
 void coupling::indexing::testing::checkTrivialConversions() {
+	using namespace coupling::indexing::TraitOperations;
+
+	//case: vector index type
+	if constexpr(std::is_same_v<tarch::la::Vector<dim, int>, typename CellIndex<dim, traits...>::value_T>) { 
+		for(int i = 0; i < (int) CellIndex<dim>::linearNumberCellsInDomain; i++) { //for each valid global index
+			//construct vector representation
+			const auto i_vec = coupling::indexing::convertToVector<dim, traits...>( { i } );
+			//check trivial conversion: tested index -> some other index -> tested index == tested index
+			try {
+				if(CellIndex<dim, traits...> { CellIndex<dim>																					{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector>																{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec })
+					throw std::runtime_error("vector");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::local>																{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("local");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::local>											{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("vector, local");
+
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::md2macro>																{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("md2macro");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>											{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("vector, md2macro");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>											{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("local, md2macro");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>						{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("vector, local, md2macro");
+
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::noGhost>																{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>											{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("vector, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>											{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("local, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>						{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("vector, local, noGhost");
+
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost> 										{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("md2macro, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>					{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("vector, md2macro, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>						{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("local, md2macro, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>	{ CellIndex<dim, traits...> { i_vec } } } != CellIndex<dim, traits...> { i_vec }) 
+					throw std::runtime_error("vector, local, md2macro, noGhost");
+			}
+			catch(std::runtime_error& e) {
+				using namespace std::string_literals;
+
+				//TODO: more elegant solution
+				std::cout << "Last tested global index: " << i_vec << std::endl;
+
+				if constexpr (sizeof...(traits) > 0)
+					throw std::runtime_error("("s + print_traitlist<traits...>() + ") -> ("s +  e.what() + ") -> ("s + print_traitlist<traits...>() + ")"s);
+				else 
+					throw std::runtime_error("() -> ("s +  e.what() + ") -> ()"s);
+			}
+		}
+	}
+
+	//case: scalar index type
+	else { 
+		for(int i = 0; i < (int) CellIndex<dim>::linearNumberCellsInDomain; i++) { //for each valid global index
+			//check trivial conversion: tested index -> some other index -> tested index == tested index
+			try {
+				if(CellIndex<dim, traits...> { CellIndex<dim>																					{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector>																{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i })
+					throw std::runtime_error("vector");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::local>																{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("local");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::local>											{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("vector, local");
+
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::md2macro>																{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("md2macro");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>											{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("vector, md2macro");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>											{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("local, md2macro");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>						{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("vector, local, md2macro");
+
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::noGhost>																{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>											{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("vector, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>											{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("local, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>						{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("vector, local, noGhost");
+
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost> 										{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("md2macro, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>					{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("vector, md2macro, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>						{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("local, md2macro, noGhost");
+				if(CellIndex<dim, traits...> { CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>	{ CellIndex<dim, traits...> { i } } } != CellIndex<dim, traits...> { i }) 
+					throw std::runtime_error("vector, local, md2macro, noGhost");
+
+			}
+			catch(std::runtime_error& e) {
+				using namespace std::string_literals;
+
+				//TODO: more elegant solution
+				std::cout << "Last tested global index: " << i << std::endl;
+
+				if constexpr (sizeof...(traits) > 0)
+					throw std::runtime_error("("s + print_traitlist<traits...>() + ") -> ("s +  e.what() + ") -> ("s + print_traitlist<traits...>() + ")"s);
+				else 
+					throw std::runtime_error("() -> ("s +  e.what() + ") -> ()"s);
+			}
+
+		}
+	}
 }
+
