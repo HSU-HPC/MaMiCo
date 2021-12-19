@@ -18,15 +18,15 @@ using coupling::indexing::CellIndex;
 using coupling::indexing::IndexTrait;
 
 /**
- *  Generic interface for filters that are to be applied to data of coupling::MacroscopicCells before MD to Macro transfer.
- *  Examples for such filters can be found in coupling/filtering/filters.
+ * Generic interface for filters that are to be applied to data of coupling::MacroscopicCells before MD to Macro transfer.
+ * Implementations can be found in coupling/filtering/filters.
  *
- *  If you wish to use a filter that does not give cell output data, i.e that is read-only, you want to use 
- *  	coupling::FilterInterfaceReadOnly<dim>
- *  instead (as provided in header file coupling/filtering/FilterPipelineReadOnly.h).
- *  Examples for such filters are WriteToFile or Strouhal (in coupling/filtering/filters).
+ * If you wish to use a filter that does not alter its input data, i.e that is read-only, you want to use 
+ * 	coupling::FilterInterfaceReadOnly<dim>
+ * instead (as provided in header file coupling/filtering/FilterPipelineReadOnly.h).
+ * Examples for such filters are WriteToFile or Strouhal (in coupling/filtering/filters).
  *
- *  @Author Felix Maurer
+ * @author Felix Maurer
  */
 template<unsigned int dim>
 class coupling::FilterInterface{
@@ -163,7 +163,7 @@ class coupling::FilterInterface{
 		 * Only used in one scenario:
 		 *  - this is at index 0 in FS
 		 *  - new filter gets dynamically linked into FS at index 0
-		 * In that case, this was previously getting input from MD but won't any longer.
+		 * In that case, this was previously getting input from MD but won't be any longer.
 		 * The newly added filter will provide input for this one instead.
 		 */
 		void setInputCells(const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& newInputCells) { _inputCells = newInputCells; }
@@ -171,7 +171,12 @@ class coupling::FilterInterface{
 		//Size = number of cells in this filter.
 		int getSize() const { return _inputCells.size(); }
 		
-		//TODO: @felix comment!
+		/*
+		 * Used by filter implementations to iterate over physical properties stored in a MacroscopicCell.
+		 *
+		 * Examplary usage:
+		 * 'for(auto scalar : _scalarAccessFunctionPairs)' loops over all scalar properties (e.g. macro/micro mass, temperate) filtered by this specific filter.
+		 */
 		struct ScalarAccessFunctionPair {
 			const double& (coupling::datastructures::MacroscopicCell<dim>::* get)() const; //getter function pointer
 			void (coupling::datastructures::MacroscopicCell<dim>::* set)(const double&); //setter function pointer
@@ -191,7 +196,6 @@ class coupling::FilterInterface{
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells;
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells;
 
-		//TODO: @felix comment!
 		//scalars getters/setters
 		std::vector<ScalarAccessFunctionPair> _scalarAccessFunctionPairs;
 		

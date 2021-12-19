@@ -32,10 +32,8 @@ namespace coupling{
  *
  * Disclaimer: Sequential filters be added to a sequence via XML only. This implies FFF with e.g. a python function is not compatible.
  *
- * @Author Felix Maurer
+ * @author Felix Maurer
  */
-
-
 template <unsigned int dim>
 class coupling::SequentialFilter : public coupling::FilterInterface<dim> {
 	public:

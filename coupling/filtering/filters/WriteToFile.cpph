@@ -23,11 +23,6 @@ void coupling::WriteToFile<dim>::operator()(){
 		if(_oneCellOnly != -1) ic_index = (unsigned int) _oneCellOnly;
 
         _file << _iteration << " ; ";
-		/* TODO: port & use CellIndex here!
-        if(!_sequenceCellIndices.empty()) //these indices are optional; if none are provided, we simply don't print them
-			for(unsigned int d = 0; d < dim; d++) _file << _sequenceCellIndices[ic_index][d] << " ; ";
-     	for(unsigned int d = 0; d < dim; d++) _file << coupling::FilterInterface<dim>::_cellIndices[ic_index][d] << " ; ";
-		*/
 
 		//printing all scalar values
 		for(const auto scalarProperty : coupling::FilterInterface<dim>::_scalarAccessFunctionPairs)

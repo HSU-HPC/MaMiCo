@@ -10,18 +10,16 @@
 
 //INCLUDE ALL JUNCTOR HEADERS HERE
 //#include "coupling/filtering/filters/NLM.h" TODO: port to new index system
-#include "coupling/filtering/interfaces/JunctorInterface.h" //this will be redundant in the future
+#include "coupling/filtering/interfaces/JunctorInterface.h" 
 
 /*
- * WORK IN PROGRESS. USE WITH CAUTION
- *
  * Generalizes the concept of FilterSequences: A FilterJunction can have more than a single input.
  * This allows for seemless integration of FilterJunctions into a net of FilterSequences.
  *
- * TODO: 
- *  - Support multiple outputs. ("X-Junctions")
- *  - Support dynamically linked filters.
- * @Author Felix Maurer
+ *  
+ * @todo Support multiple outputs. ("X-Junctions")
+ * @todo Support dynamically linked filters.
+ * @author Felix Maurer
  */
 
 namespace coupling{

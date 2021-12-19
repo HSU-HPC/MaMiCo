@@ -37,7 +37,7 @@
  * per Filter Sequence.
  *
  * A generalized version of this concept is FilterJunction.
- * @Author Felix Maurer
+ * @author Felix Maurer
  */
 
 namespace coupling{
@@ -53,7 +53,6 @@ class coupling::FilterSequence {
 	public:
 		/*
 		 * Filter Sequences are constructed in coupling::FilterPipeline::loadSequencesFromXML(...).
-		 * inputCellVector and cellIndices cover the entire md2Macro domain.
 		 */
     	FilterSequence(	const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCells,
@@ -142,9 +141,8 @@ class coupling::FilterSequence {
 		}
 
 		/*
-		 * GETTER/SETTER SECTION
+		 * Returns unique name identifier of this sequence.
 		 */
-
     	const char* getName() { return _name; }
 
 		bool isOutputToMacro() { return _isOutput; }
@@ -153,6 +151,9 @@ class coupling::FilterSequence {
 			_isOutput = true; 
 		}
 
+		/*
+		 * Modifiable sequences may have filters added dynamically via FilterFromFunction.
+		 */
 		bool isModifiable() { return _isModifiable; }
 		void makeUnmodifiable() { _isModifiable = false; }
 
@@ -171,7 +172,7 @@ class coupling::FilterSequence {
 		 * Since after all filter objects are created it is possible to determine whether _cellVector1 or _cellVector2 will be used as output,
 		 * this is also done in here.
 		 *
-		 * In addition to that, if this sequence is declared as unmodifibale, this gets also detected in here
+		 * In addition to that, if this sequence is declared as unmodifibale, this gets also detected in here.
 		 */
 		virtual int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
@@ -261,7 +262,6 @@ class coupling::FilterSequence {
 	protected:
     	const char* _name;
 
-		//TODO: standardize naming in cell vectors -> remove "vector"?
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector2;//allocated for this sequence only

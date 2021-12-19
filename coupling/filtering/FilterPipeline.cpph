@@ -190,7 +190,7 @@ void coupling::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* n
 		try {
 			getSequence(currSequenceNode->Value());
 		}
-		catch(...) { //TODO: use more precise exception in getFilterSequence, so that we can differentiate between "wanted" not-found error and other exceptions
+		catch(...) { 
 			duplicate = false;
 		}
 		if(duplicate)

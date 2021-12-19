@@ -12,13 +12,11 @@
 #include "coupling/filtering/filters/WriteToFileJunctor.h"
 
 /*
- * WORK IN PROGRESS. USE WITH CAUTION
+ * Filtering junction which does not use multiple identical input domains, but rather uses one primary input partition to filter on while having access to a secondary input data set.
+ * As no filtering is conducted on that secondary input cell data set, it may be of any shape or size.
+ * The primary input partition has to follow the restrictions to input data sets of FilterSequences and FilterJunctions.
  *
- * TODO
- * - Currently limited to two inputs.
- * - Domain selection for secondary input?
- *
- * @Author Felix Maurer
+ * @author Felix Maurer
  */
 
 namespace coupling{

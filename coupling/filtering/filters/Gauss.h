@@ -15,7 +15,9 @@ namespace coupling {
     template<unsigned int dim>
     class Gauss;
 
-	//cf. member variable in coupling::Gauss for more details
+	/*
+	 * cf. member variable in coupling::Gauss for more details
+	 */
 	enum GaussExtrapolationStrategy {NONE, MIRROR, REFLECT};
 }
 
@@ -26,8 +28,8 @@ using coupling::indexing::IndexTrait;
 #define GAUSS_KERNEL_RADIUS 1
 
 /*
- * Implements a gaussian filter. Limited to what is listed in the disclaimer above. 
- * Only specified in one dimension: If you wish to use a multidimensional gaussian filter, simply chain multiple instances of this filter in one FilterSequence.
+ * Gaussian filter. 
+ * Operates in one dimension: If you wish to use a multidimensional gaussian filter, simply chain multiple instances of this filter in one FilterSequence.
  *
  * @author Felix Maurer
  */
@@ -47,7 +49,7 @@ class coupling::Gauss : public coupling::FilterInterface<dim>{
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 			const std::array<bool, 7> filteredValues,
 			unsigned int dimension,
-			int sigma,
+			int sigma, 
 			const char* extrapolationStrategy
 		):
 			coupling::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"),

@@ -19,19 +19,17 @@ namespace coupling {
 
 /*
  * Read-only filter that writes cell data to a specified file in .csv format.
- * @author Felix Maurer
- *
- * Information regarding the terms "mamico"/"sequence" indices, confer ../sequencing/FilterSequence.h
  *
  * Output format will be compliant to the usual MaMiCo CSV format (using ';' as separator).
  * Output order will be:
  * - current iteration
- * - sequence indexing
- * - mamico indexing
- * - scalars
- * - vectors
+ * - scalar cell properties
+ * - vector cell properties
  *
- * The output file will either contain data of all or just the final coupling iteration. Boolean parameter 'overwrite' is used for that.
+ * The output file will either contain data of all or just the final coupling iteration. Boolean parameter 'overwrite' is true in the latter case.
+ * If you wish to print out just one cell and not the entire input domain, pass to "oneCellOnly" in constructor the corresponding local, md2macro, noGhost index.
+ *
+ * @author Felix Maurer
  */
 template<unsigned int dim>
 class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
@@ -40,7 +38,7 @@ class coupling::WriteToFile : public coupling::FilterInterfaceReadOnly<dim>{
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCells,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCells,
 				const std::array<bool, 7> filteredValues, 
-				std::string location,
+				std::string location, //output file location
 				bool overwrite = false,
 				int oneCellOnly = -1):
 
