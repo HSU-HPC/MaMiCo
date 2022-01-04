@@ -165,8 +165,13 @@ class coupling::indexing::CellIndex {
 		 */
 		CellIndex& operator++() {
 			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
-				int val = convertToScalar<dim, traits...>(*this) + 1;
-				_index = convertToVector( getScalarCellIndex<traits...> ( val ) );
+				++_index[0];
+				if(_index[0] == (int)numberCellsInDomain[0]){
+					_index[0]=0; ++_index[1];
+					if(_index[1] == (int)numberCellsInDomain[1]){
+						_index[1]=0; ++_index[2];
+					}
+				}
 			}
 			else ++_index;
 
@@ -178,8 +183,13 @@ class coupling::indexing::CellIndex {
 		 */
 		CellIndex& operator--() {
 			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
-				int val = convertToScalar<dim, traits...>(*this) - 1;
-				_index = convertToVector( getScalarCellIndex<traits...> ( val ) );
+				--_index[0];
+				if(_index[0] < 0){
+					_index[0]=numberCellsInDomain[0]-1; --_index[1];
+					if(_index[1] < 0){
+						_index[1]=numberCellsInDomain[1]-1; --_index[2];
+					}
+				}
 			}
 			else --_index;
 

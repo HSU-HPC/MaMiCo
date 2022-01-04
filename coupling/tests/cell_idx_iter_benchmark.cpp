@@ -6,29 +6,17 @@
 #include <cstdlib>
 #include <cstdio>
 #include "coupling/CouplingMDDefinitions.h"
-#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-#include <mpi.h>
-#endif
-
-//#include "tarch/utils/MultiMDService.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "coupling/tests/Test.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/configuration/ParseConfiguration.h"
-//#include "coupling/solvers/CouetteSolver.h"
-
 #include "coupling/solvers/CouetteSolverInterface.h"
-//#include "coupling/interface/MDSimulationFactory.h"
-
-//#include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
-//#include "coupling/services/MultiMDCellService.h"
 #include "coupling/indexing/IndexingService.cpp"
-
+#include <sys/time.h>
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
-#include <sys/time.h>
 
 class CellIdxIterBench: public Test {
 public:
@@ -148,8 +136,14 @@ private:
     timeval start, end;
 
     std::cout << std::endl << "Scalar benchmark ------------- " << std::endl;
-    gettimeofday(&start,NULL);
     tarch::la::Vector<3,long> result(0);
+    for(int count=0;count < numcounts; count++)
+      for(unsigned int i = 0; i < numcells; i++){
+        result[0] += i; // do something with i so that the compiler can not optimize this away ...
+      }
+    // (second try after warm-up phase)
+    gettimeofday(&start,NULL);
+    result = 0;
     for(int count=0;count < numcounts; count++)
       for(unsigned int i = 0; i < numcells; i++){
         result[0] += i; // do something with i so that the compiler can not optimize this away ...
@@ -225,3 +219,25 @@ int main(int argc, char *argv[]){
 
   return 0;
 };
+
+/* Sampe Output:
+
+Run CellIdxIterBench...
+Number cells in test domain: 74088
+lowerBoundary = 4 , 4 , 4
+upperBoundary = 45 , 45 , 45
+
+Scalar benchmark ------------- 
+Useless result: 27444788280000
+Raw loop: 191ms
+Useless result: 27444788280000
+Index range iterator: 119ms
+
+Vector benchmark ------------- 
+Useless result: 15188040000 , 15188040000 , 15188040000
+Raw loop: 147ms
+Useless result: 15188040000 , 15188040000 , 15188040000
+Index range iterator: 152ms
+Shut down CellIdxIterBench
+
+*/
