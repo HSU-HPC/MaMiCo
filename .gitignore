@@ -5,6 +5,7 @@ build/
 *.vti
 *.o
 *.out
+*.checkpoint
 out/
 !coupling/tests/build/
 coupling/tests/build_nie/test
