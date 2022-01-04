@@ -166,7 +166,7 @@ class coupling::indexing::CellIndex {
 		CellIndex& operator++() {
 			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
 				int val = convertToScalar<dim, traits...>(*this) + 1;
-				*this = CellIndex<dim, traits...>(getScalarCellIndex<traits...> ( val ));
+				_index = convertToVector( getScalarCellIndex<traits...> ( val ) );
 			}
 			else ++_index;
 
@@ -179,7 +179,7 @@ class coupling::indexing::CellIndex {
 		CellIndex& operator--() {
 			if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
 				int val = convertToScalar<dim, traits...>(*this) - 1;
-				*this = CellIndex<dim, traits...>(getScalarCellIndex<traits...> ( val ));
+				_index = convertToVector( getScalarCellIndex<traits...> ( val ) );
 			}
 			else --_index;
 
