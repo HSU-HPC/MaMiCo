@@ -9,21 +9,21 @@
 template <unsigned int dim>
 coupling::filtering::SequentialFilter<dim>::SequentialFilter(
 	coupling::filtering::FilterInterface<dim>* filter,
-	const int rank,
 	const MPI_Comm comm
 ):
 	coupling::filtering::FilterInterface<dim>("SEQUENTIALIZED_FILTER"),
 	_filter(filter),
 	_comm(comm),
 	_processingRank(0), //TODO: Make this customizable.
-	_myRank(rank),
 	_cellbuf()
 {
+	MPI_Comm_rank(_comm, &_myRank);
+	MPI_Comm_size(_comm, &_commSize);	
+
 	#ifdef DEBUG_SEQ_FILTER
 	std::cout << "		SEQFILTER (" << _myRank << "): Now initializing sequentialized Filter of type: " << _filter->getType() <<std::endl;
 	#endif
 
-	MPI_Comm_size(_comm, &_commSize);	
 	if(_commSize > 1) {
 		//allocate global cell data structures for processing rank only
 		if( _processingRank == _myRank) {
@@ -33,7 +33,7 @@ coupling::filtering::SequentialFilter<dim>::SequentialFilter(
 			_outputCells_Local = _filter->getOutputCells(); 			
 
 			//allocate global cell datastructures
-			unsigned int numcells = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, 
+			unsigned int numcells = coupling::indexing::CellIndex<dim,
 				coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>
 				::linearNumberCellsInDomain;
 			for(unsigned int c = 0; c < numcells; c++) {
@@ -86,7 +86,7 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 		unsigned int cellsUpdated = 0;
 		
 		//Iterate over all (contributing) ranks...
-		for(int rank = 0; rank < _commSize; rank++) { //TODO: allow arbitrary comms: with ranks < _commSize that are not in _comm
+		for(int rank = 0; rank < _commSize; rank++) {
 
 			//Case: The contributing rank is the processing rank. In this case, we only need to copy cell data.
 			if(rank == _myRank) {
@@ -124,7 +124,7 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 					cellsUpdated++;
 
 					#ifdef DEBUG_SEQ_FILTER_VERBOSE
-					std::cout << "			SEQFILTER (" << _myRank << "): Received cell and index (" << rank << ") from rank " << rank << std::endl;
+					std::cout << "			SEQFILTER (" << _myRank << "): Received cell from rank " << rank << std::endl;
 					#endif
 
 				}
@@ -134,9 +134,6 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 			std::cout << "		SEQFILTER (" << _myRank << "): Received cells and indices from rank " << rank << std::endl;
 			#endif
 		}	
-
-
-		//TODO: Assert cellsUpdated == inputCells_Global.size()
 
 		//This rank now processes...
 	}
@@ -161,9 +158,9 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 		for(unsigned int c = 0; c < numberOfCellsFromThisRank; c++) { //TODO: receive all cells at once
 			//receive cell
 			MPI_Recv(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, _processingRank, 0, _comm, MPI_STATUS_IGNORE);
-			
+
 			//find cell in filter's domain and apply
-			bufferToMacroscopicCell(_cellbuf, nullptr/*TODO: derive location from c*/);
+			bufferToMacroscopicCell(_cellbuf, _filter->getOutputCells()[c]);
 		}
 	}
 }
@@ -188,23 +185,24 @@ void coupling::filtering::SequentialFilter<dim>::process(bool sequential) {
 
 	if(sequential) {
 		//Now ready to distribute data back to the data's original ranks...
-		for(unsigned int c = 0; c < _outputCells_Global.size(); c++) {
+		for(unsigned int c = 0, localCellsUpdated = 0; c < _outputCells_Global.size(); c++) {
 			//fill buffers with cell data
 			macroscopicCellToBuffer(_cellbuf, _outputCells_Global[c]);
 
 			//get rank of cell
-			int target_rank = 0; //TODO
+			int target_rank = c % _commSize; //TODO: properly determine correct target rank
 				
 			#ifdef DEBUG_SEQ_FILTER_VERBOSE
-				std::cout << "		SEQFILTER (" << _myRank << "): Sending cell of index " << _cellIndices_Global[c] << " to rank " << target_rank << std::endl;
+				std::cout << "		SEQFILTER (" << _myRank << "): Sending cell " << c << " to rank " << target_rank << std::endl;
 			#endif
 
 			//Case: cell belongs to this rank, no communication needed	
 			if(target_rank == _processingRank) {
-				bufferToMacroscopicCell(_cellbuf, _outputCells_Local[0/*TODO: derive correct index from c*/]);
+				bufferToMacroscopicCell(_cellbuf, _outputCells_Local[localCellsUpdated]);
+				localCellsUpdated++;
 
 				#ifdef DEBUG_SEQ_FILTER_VERBOSE
-					std::cout << "		SEQFILTER (" << _myRank << "): Wrote cell of index " << _cellIndices_Global[c] << " to local cell at " << getLocalOutputCellOfIndex(_cellIndices_Global[c]) << std::endl;
+					std::cout << "		SEQFILTER (" << _myRank << "): Wrote cell " << c << " to local cell." << std::endl;
 				#endif
 			}
 			//Case: other rank, we need to send cell and index

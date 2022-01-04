@@ -17,15 +17,15 @@ namespace coupling{
 }
 
 /**
- *  Generic interface for filters that are to be applied to data of coupling::MacroscopicCells before MD to Macro transfer.
- *  Examples for such filters can be found in coupling/filtering/filters.
+ * Generic interface for filters that are to be applied to data of coupling::MacroscopicCells before MD to Macro transfer.
+ * Implementations can be found in coupling/filtering/filters.
  *
- *  If you wish to use a filter that does not give cell output data, i.e that is read-only, you want to use 
- *  	coupling::FilterInterfaceReadOnly<dim>
- *  instead (as provided in header file coupling/filtering/FilterPipelineReadOnly.h).
- *  Examples for such filters are WriteToFile or Strouhal (in coupling/filtering/filters).
+ * If you wish to use a filter that does not alter its input data, i.e that is read-only, you want to use 
+ * 	coupling::FilterInterfaceReadOnly<dim>
+ * instead (as provided in header file coupling/filtering/FilterPipelineReadOnly.h).
+ * Examples for such filters are WriteToFile or Strouhal (in coupling/filtering/filters).
  *
- *  @Author Felix Maurer
+ * @author Felix Maurer
  */
 template<unsigned int dim>
 class coupling::filtering::FilterInterface{
@@ -135,7 +135,7 @@ class coupling::filtering::FilterInterface{
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getInputCells() const { return _inputCells; }
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > getOutputCells() const { return _outputCells; }
 
-		using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro>;
+		using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
 		/*
 		 * Advanced Getters/Setters
 		 */
@@ -163,7 +163,7 @@ class coupling::filtering::FilterInterface{
 		 * Only used in one scenario:
 		 *  - this is at index 0 in FS
 		 *  - new filter gets dynamically linked into FS at index 0
-		 * In that case, this was previously getting input from MD but won't any longer.
+		 * In that case, this was previously getting input from MD but won't be any longer.
 		 * The newly added filter will provide input for this one instead.
 		 */
 		void setInputCells(const std::vector<coupling::datastructures::MacroscopicCell<dim>* >& newInputCells) { _inputCells = newInputCells; }
@@ -171,7 +171,12 @@ class coupling::filtering::FilterInterface{
 		//Size = number of cells in this filter.
 		int getSize() const { return _inputCells.size(); }
 		
-		//TODO: @felix comment!
+		/*
+		 * Used by filter implementations to iterate over physical properties stored in a MacroscopicCell.
+		 *
+		 * Examplary usage:
+		 * 'for(auto scalar : _scalarAccessFunctionPairs)' loops over all scalar properties (e.g. macro/micro mass, temperate) filtered by this specific filter.
+		 */
 		struct ScalarAccessFunctionPair {
 			const double& (coupling::datastructures::MacroscopicCell<dim>::* get)() const; //getter function pointer
 			void (coupling::datastructures::MacroscopicCell<dim>::* set)(const double&); //setter function pointer
@@ -191,20 +196,12 @@ class coupling::filtering::FilterInterface{
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells;
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells;
 
-		//TODO: @felix comment!
 		//scalars getters/setters
 		std::vector<ScalarAccessFunctionPair> _scalarAccessFunctionPairs;
 		
 		//vectors getters/setters
 		std::vector<VectorAccessFunctionPair> _vectorAccessFunctionPairs;
 
-		//TODO: remove deprecated version below
-		/*
-		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const double&)> _scalarSetters;
-		std::vector<const double& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _scalarGetters;
-		std::vector<void (coupling::datastructures::MacroscopicCell<dim>::*)(const tarch::la::Vector<dim, double>&)> _vectorSetters;
-		std::vector<const tarch::la::Vector<dim, double>& (coupling::datastructures::MacroscopicCell<dim>::*)() const> _vectorGetters;
-		*/
 		//unique identifier per filter class
 		const char* _type;
 };

@@ -21,7 +21,7 @@ namespace coupling{
  * You can currently not add Junctors dynamically via FFF.
  *
  * Implemenents FI. The underlying FI has the junctor's main partition's (i.e [0] of the corresponding std::array) input/output data. (cf. lines 35, 67.)
- *  @Author Felix Maurer
+ * @author Felix Maurer
  */
 template<unsigned int dim, std::size_t inputc, std::size_t outputc>
 class coupling::filtering::JunctorInterface : public coupling::filtering::FilterInterface<dim> {

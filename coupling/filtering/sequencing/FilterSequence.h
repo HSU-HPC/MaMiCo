@@ -37,7 +37,7 @@
  * per Filter Sequence.
  *
  * A generalized version of this concept is FilterJunction.
- * @Author Felix Maurer
+ * @author Felix Maurer
  */
 
 namespace coupling{
@@ -52,13 +52,18 @@ class coupling::filtering::FilterSequence {
 	public:
 		/*
 		 * Filter Sequences are constructed in coupling::FilterPipeline::loadSequencesFromXML(...).
-		 * inputCellVector and cellIndices cover the entire md2Macro domain.
 		 */
     	FilterSequence(	const char* name,
 						const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCells,
+						#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+						MPI_Comm comm,
+						#endif
 						std::array<bool, 7> filteredValues = { true } ):
 		_name(name), 
 		_inputCellVector(inputCells),
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+		_comm(comm),
+		#endif
 		_filteredValues(filteredValues),
 		_isOutput(false), //potentially updated via loadSequencesFromXML calling setAsOutput()
 		_isModifiable(true), //TODO: allow const sequences via XML attribute
@@ -135,9 +140,8 @@ class coupling::filtering::FilterSequence {
 		}
 
 		/*
-		 * GETTER/SETTER SECTION
+		 * Returns unique name identifier of this sequence.
 		 */
-
     	const char* getName() { return _name; }
 
 		bool isOutputToMacro() { return _isOutput; }
@@ -146,6 +150,9 @@ class coupling::filtering::FilterSequence {
 			_isOutput = true; 
 		}
 
+		/*
+		 * Modifiable sequences may have filters added dynamically via FilterFromFunction.
+		 */
 		bool isModifiable() { return _isModifiable; }
 		void makeUnmodifiable() { _isModifiable = false; }
 
@@ -164,7 +171,7 @@ class coupling::filtering::FilterSequence {
 		 * Since after all filter objects are created it is possible to determine whether _cellVector1 or _cellVector2 will be used as output,
 		 * this is also done in here.
 		 *
-		 * In addition to that, if this sequence is declared as unmodifibale, this gets also detected in here
+		 * In addition to that, if this sequence is declared as unmodifibale, this gets also detected in here.
 		 */
 		virtual int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
@@ -254,10 +261,13 @@ class coupling::filtering::FilterSequence {
 	protected:
     	const char* _name;
 
-		//TODO: standardize naming in cell vectors -> remove "vector"?
     	std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCellVector;//points to (foreign) input vector 
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector1;//allocated for this sequence only
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _cellVector2;//allocated for this sequence only
+
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+		MPI_Comm _comm;
+		#endif
 		
 		std::array<bool, 7> _filteredValues;
 

@@ -22,7 +22,7 @@ CellIndex<dim, traits...>::operator CellIndex<dim, converted_traits...>() const 
 	//conversion: BaseIndex -> non-BaseIndex
 	if constexpr (std::is_same_v<CellIndex, BaseIndex<dim>>) {
 		//convert to scalar if neccessary + construct CellIndex<dim, converted_traits...>
-		if constexpr((TraitComparisons::is_same<IndexTrait::vector>(converted_traits) or ...)) {
+		if constexpr((TraitOperations::is_same<IndexTrait::vector>(converted_traits) or ...)) {
 			return CellIndex<dim, converted_traits...> { 
 					(*this - CellIndex<dim, converted_traits...>::lowerBoundary).get() 
 				};

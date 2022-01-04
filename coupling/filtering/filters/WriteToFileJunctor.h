@@ -16,12 +16,10 @@ namespace coupling {
 }
 
 /** 
- * Combines two WriteToFile objects into one FilterJunctor.
- * You can use this e.g. to output both primary and secondary cell data in an AsymmetricalFilterJunction.
- * TODO: more explanation
+ * Combines two WriteToFile objects into one asymmetrical FilterJunctor.
+ * Used to output both primary and secondary cell data in an AsymmetricalFilterJunction.
  *
  * @author Felix Maurer
- * 
  */
 template<unsigned int dim>
 class coupling::filtering::WriteToFileJunctor : public coupling::filtering::AsymmetricalJunctorInterface<dim> {
@@ -33,7 +31,7 @@ class coupling::filtering::WriteToFileJunctor : public coupling::filtering::Asym
 
 			//second cell data set
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector2,
-			//no output cells
+			//no secondary output cells
 	
 			//"global" parameters for both WriteToFile instances
 			const std::array<bool, 7> filteredValues,

@@ -16,11 +16,11 @@ namespace coupling{
 }
 
 /**
- * To be used in for Junctors in Asymmetrical Filter Junctions.
- * TODO: more explanation
+ * Interface for Junctors in Asymmetrical Filter Junctions.
+ * Cf. filtering/sequencing/AsymmetricalFilterJunction.h
  *
  * Implemenents FI. The underlying FI has the junctor's first cell data set.
- *  @Author Felix Maurer
+ * @author Felix Maurer
  */
 template<unsigned int dim>
 class coupling::filtering::AsymmetricalJunctorInterface : public coupling::filtering::FilterInterface<dim> {

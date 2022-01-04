@@ -110,7 +110,11 @@ int coupling::filtering::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLEl
 				exit(EXIT_FAILURE);
 			}
 
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+            newfilter = new coupling::filtering::POD<dim>(inputCellVector, outputCellVector, _comm, _filteredValues, tws, kmax);
+			#else
             newfilter = new coupling::filtering::POD<dim>(inputCellVector, outputCellVector, _filteredValues, tws, kmax);
+			#endif
         }
 
 	//TODO: refactor the following filters to fit to new type system
@@ -142,14 +146,10 @@ int coupling::filtering::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLEl
 		//sequential filtering
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 		if(const char* sequential = currFilterNode->Attribute("sequential")) {
-			if(std::strcmp(sequential, "true") == 0) {
-				//TODO: remove usage of IndexConversion. make own rank/communicator more accessible
-				//const auto rank = MamicoInterfaceProvier::getInstance().getMacroscopicCellService().getIndexConversion.getThisRank();
-				_filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, /*TODO*/ 0));
-			}
-			else {
+			if(std::strcmp(sequential, "true") == 0)
+				_filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, _comm));
+			else
 				_filters.push_back(newfilter);
-			}
 		}
 		else
 		#endif 

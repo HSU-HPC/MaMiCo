@@ -211,11 +211,11 @@ public coupling::services::MacroscopicCellService<dim> {
      */
     const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 	
-  	/**
-  	 * Initialises the _filterPipeline member. Called from _multiMDCellService's sendFromMD2Macro during the first coupling iteration.
-  	 * Make sure to delete _filterPipeline in ~MacroscopicCellServiceImpl()
-  	 */
-  	void initFiltering() { _filterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells.getMacroscopicCells(), coupling::filtering::Scope::perInstance, _filterPipelineConfiguration); }
+	/**
+	 * Initialises the _filterPipeline member. Called from _multiMDCellService's sendFromMD2Macro during the first coupling iteration.
+	 * Make sure to delete _filterPipeline in ~MacroscopicCellServiceImpl()
+	 */
+	void initFiltering() { _filterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells.getMacroscopicCells(), coupling::filtering::Scope::perInstance, _multiMDService, _filterPipelineConfiguration); }
 
   	const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const { return _filterPipeline; }
 

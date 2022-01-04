@@ -21,7 +21,7 @@ namespace coupling {
 		 * @author Felix Maurer
 		 */
 		enum class IndexTrait {vector, local, md2macro, noGhost};
-		namespace TraitComparisons {
+		namespace TraitOperations {
 
 			/**
 			 * Returns true iff the template and runtime argument match. Curried operator== for above enum class.
@@ -47,6 +47,26 @@ namespace coupling {
 				}
 				else {
 					return t1 < t2 and is_ordered<t2, rest...>();
+				}
+			}
+
+			template<IndexTrait t>
+			constexpr std::string print_trait() {
+				if constexpr (t == IndexTrait::vector) return "vector";
+				if constexpr (t == IndexTrait::local) return "local";
+				if constexpr (t == IndexTrait::md2macro) return "md2macro";
+				if constexpr (t == IndexTrait::noGhost) return "noGhost";
+			}
+
+			template<IndexTrait t1, IndexTrait ... rest>
+			constexpr std::string print_traitlist() {
+				using namespace std::string_literals;
+
+				if constexpr (sizeof...(rest) == 0) {
+					return print_trait<t1>();
+				}
+				else {
+					return print_trait<t1>() + ", "s  +  print_traitlist<rest...>();
 				}
 			}
 		}
@@ -98,7 +118,7 @@ class coupling::indexing::CellIndex {
 		 */
 		static constexpr bool checkIndexTraitOrder() {
 			if constexpr(sizeof...(traits) > 1) {
-				return coupling::indexing::TraitComparisons::is_ordered<traits...>();
+				return coupling::indexing::TraitOperations::is_ordered<traits...>();
 			}
 			else {
 				return true;
@@ -110,7 +130,7 @@ class coupling::indexing::CellIndex {
 		 * The type of this CellIndex's underlying index representation.
 		 */
 		using value_T = std::conditional_t<(
-			coupling::indexing::TraitComparisons::is_same<coupling::indexing::IndexTrait::vector>(traits) or ...),
+			coupling::indexing::TraitOperations::is_same<coupling::indexing::IndexTrait::vector>(traits) or ...),
 			tarch::la::Vector<dim, int>, 
 			int
 		>;

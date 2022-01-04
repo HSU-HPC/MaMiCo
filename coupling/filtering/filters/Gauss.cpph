@@ -11,13 +11,15 @@ template<unsigned int dim>
 //TODO: This is very much hardcoded for kernel radius = 1
 void coupling::filtering::Gauss<dim>::operator()(){	
     #ifdef DEBUG_GAUSS
-    std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter...";
+    std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter..." << std::endl;
     #endif 
 
     using namespace coupling::indexing;
-	CellIndex<dim, IndexTrait::local, IndexTrait::md2macro> index;
-	CellIndex<dim, IndexTrait::local, IndexTrait::md2macro> indexAbove;
-	CellIndex<dim, IndexTrait::local, IndexTrait::md2macro> indexBelow;
+
+	ScalarIndex index;
+	ScalarIndex indexAbove;
+	ScalarIndex indexBelow;
+
 	for(unsigned int raw_index = 0; raw_index < _inputCells.size(); raw_index++) {
 		
 		//construct CellIndex using raw index
@@ -26,6 +28,12 @@ void coupling::filtering::Gauss<dim>::operator()(){
 		//make use of implicit conversion between linear <-> vector indices
 		indexAbove = getIndexAbove(index, _dim);
 		indexBelow = getIndexBelow(index, _dim);
+
+		/*
+		std::cout << "INDEX: " << index << std::endl;
+		std::cout << "ABOVE: " << indexAbove << std::endl;
+		std::cout << "BELOW: " << indexBelow << std::endl;
+		*/
 
 		//[0] = below, [1] = at index, [2] = above 
 		double weights[3] = {_kernel[0], _kernel[1], _kernel[2]};
@@ -127,7 +135,7 @@ std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::filtering::Gauss<dim>::gen
 		k *= 1/sum; 
 
 		#ifdef DEBUG_GAUSS
-		std::cout << "		GAUSS(Dim: " << _dim << "): Add kernel entry: " << k;
+		std::cout << "		GAUSS(Dim: " << _dim << "): Add kernel entry: " << k << std::endl;
 		#endif 
 	}
 
@@ -140,14 +148,12 @@ constexpr double coupling::filtering::Gauss<dim>::gaussianDensityFunction(int x)
 	return ans;
 }
 
-//TODO: redesign so you dont need these two any more?
 template<unsigned int dim>
-typename coupling::filtering::Gauss<dim>::CellIndex_T coupling::filtering::Gauss<dim>::getIndexAbove(
-	const coupling::filtering::Gauss<dim>::CellIndex_T index, 
-	unsigned int d
-) {
+typename coupling::filtering::Gauss<dim>::VectorIndex coupling::filtering::Gauss<dim>::getIndexAbove(
+	const coupling::filtering::Gauss<dim>::VectorIndex index, 
+	unsigned int d) {
 	//check for border indices
-	const coupling::indexing::BaseIndex<dim> boundary = CellIndex_T::upperBoundary;
+	const coupling::indexing::BaseIndex<dim> boundary = coupling::filtering::Gauss<dim>::VectorIndex::upperBoundary;
 	for(unsigned int d = 0; d < dim; d++) {
 		//convert index to BaseIndex and compare with boundary. 
 		if((coupling::indexing::BaseIndex<dim> { index }).get()[d] >= boundary.get()[d])
@@ -165,12 +171,10 @@ typename coupling::filtering::Gauss<dim>::CellIndex_T coupling::filtering::Gauss
 }
 
 template<unsigned int dim>
-typename coupling::filtering::Gauss<dim>::CellIndex_T coupling::filtering::Gauss<dim>::getIndexBelow(
-	const coupling::filtering::Gauss<dim>::CellIndex_T index,
-	unsigned int d
-) {
+typename coupling::filtering::Gauss<dim>::VectorIndex coupling::filtering::Gauss<dim>::getIndexBelow(
+	const coupling::filtering::Gauss<dim>::VectorIndex index, unsigned int d) {
 	//check for border indices
-	const coupling::indexing::BaseIndex<dim> boundary = CellIndex_T::lowerBoundary;
+	const coupling::indexing::BaseIndex<dim> boundary = coupling::filtering::Gauss<dim>::VectorIndex::lowerBoundary;
 	for(unsigned int d = 0; d < dim; d++) {
 		//convert index to BaseIndex and compare with boundary. 
 		if((coupling::indexing::BaseIndex<dim> { index }).get()[d] <= boundary.get()[d])

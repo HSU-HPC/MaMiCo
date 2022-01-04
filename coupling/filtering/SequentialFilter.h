@@ -12,7 +12,7 @@
 #define FILTER_SEQUENTIAL true
 #define FILTER_PARALLEL false
 
-#define DEBUG_SEQ_FILTER
+//#define DEBUG_SEQ_FILTER
 //#define DEBUG_SEQ_FILTER_VERBOSE
 
 namespace coupling{
@@ -24,7 +24,7 @@ namespace coupling{
 
 
 /*
- * Implementation of FilterInterface.h for filters which operate (optionally or mandatorily) in a sequential manner, i.e. process data on one master rank.
+ * Implementation of FilterInterface.h for filters which operate in a sequential manner, i.e. process data on one master rank.
  * For such filters, operator()() will
  * 		- contribute to one dedicated processing rank: by calling contribute()
  * 		- process on master rank only and then scatter data correctly: by calling process()
@@ -32,21 +32,16 @@ namespace coupling{
  * Meant to be used as a wrapper class, i.e. take a pointer to a filter object and then sequentualizes it. 
  * Used in coupling::FilterSequence<dim>::loadFiltersFromXML.
  *
- * Disclaimer: 
- * 	1. In this context 'globalized' is equivalent to 'sequentialized' and 'local' to 'parallel'.
- * 	2. Only via XML can globalized filters be added to a sequence. This implies FFF with e.g. a python function is not compatible.
+ * Disclaimer: Sequential filters be added to a sequence via XML only. This implies FFF with e.g. a python function is not compatible.
  *
- * @Author Felix Maurer
+ * @author Felix Maurer
  */
-
-
 template <unsigned int dim>
 class coupling::filtering::SequentialFilter : public coupling::filtering::FilterInterface<dim> {
 	public:
 		SequentialFilter(
 					coupling::filtering::FilterInterface<dim>* filter,
-					const int rank, //rank of this process
-					const MPI_Comm comm = MPI_COMM_WORLD //TODO: remove default parameter, pass communicator
+					const MPI_Comm comm
 		);
 
 		~SequentialFilter() {
@@ -85,8 +80,8 @@ class coupling::filtering::SequentialFilter : public coupling::filtering::Filter
 		//MPI related stuff
 		const MPI_Comm _comm;
 		int _commSize;
-		const int _processingRank;
-		const int _myRank;
+		int _processingRank;
+		int _myRank;
 
 		//Globalized variants of cell data structures (i.e spanning across all cells of the global domain). Only the master rank uses these.
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Global; 	

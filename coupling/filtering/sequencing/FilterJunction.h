@@ -10,18 +10,16 @@
 
 //INCLUDE ALL JUNCTOR HEADERS HERE
 #include "coupling/filtering/filters/NLM.h"
-#include "coupling/filtering/interfaces/JunctorInterface.h" //this will be redundant in the future
+#include "coupling/filtering/interfaces/JunctorInterface.h"
 
 /*
- * WORK IN PROGRESS. USE WITH CAUTION
- *
  * Generalizes the concept of FilterSequences: A FilterJunction can have more than a single input.
  * This allows for seemless integration of FilterJunctions into a net of FilterSequences.
  *
- * TODO: 
- *  - Support multiple outputs. ("X-Junctions")
- *  - Support dynamically linked filters.
- * @Author Felix Maurer
+ *  
+ * @todo Support multiple outputs. ("X-Junctions")
+ * @todo Support dynamically linked filters.
+ * @author Felix Maurer
  */
 
 namespace coupling{
@@ -37,11 +35,17 @@ class coupling::filtering::FilterJunction : public coupling::filtering::FilterSe
     	FilterJunction( 
 			const char* name,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim>* >	inputCellVector, //concatenation of numberImput input cell vectors
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+			MPI_Comm comm,
+			#endif
 			std::array<bool, 7> filteredValues
 		):
 		coupling::filtering::FilterSequence<dim>(
 			name, 
 			inputCellVector, 
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+			comm,
+			#endif
 			filteredValues)
 		{	
 			if(inputc == 0)

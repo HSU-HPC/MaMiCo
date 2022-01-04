@@ -13,6 +13,14 @@
 //Include non-member functions operating on indexes
 #include "Operations.h"
 
+//enable/disable tests
+#define TEST_INDEXING
+
+#ifdef TEST_INDEXING
+//Inlcude index tests
+#include "Testing.h"
+#endif
+
 namespace coupling {
 	namespace indexing {
 

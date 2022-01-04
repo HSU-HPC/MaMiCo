@@ -21,17 +21,16 @@ namespace coupling {
 
 /*
  * Filter that reads cell data from a specified file in .csv format and then writes that data to its output cells.
- * @author Felix Maurer
  *
  * Input format must be compliant to the usual MaMiCo CSV format (using ';' as separator).
  * The following order is assumed:
  * - current iteration
- * - md-to-macro indexing
- * - mamico indexing
- * - scalars
- * - vectors
+ * - scalar cell properties
+ * - vector cell properties
  *
  * The input file must contain one separate line per cell.
+ *
+ * @Author Felix Maurer
  */
 template<unsigned int dim>
 class coupling::filtering::ReadFromFile : public coupling::filtering::FilterInterface<dim>{

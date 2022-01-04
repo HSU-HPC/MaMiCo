@@ -25,8 +25,8 @@ namespace coupling {
 #define GAUSS_KERNEL_RADIUS 1
 
 /*
- * Implements a gaussian filter. Limited to what is listed in the disclaimer above. 
- * Only specified in one dimension: If you wish to use a multidimensional gaussian filter, simply chain multiple instances of this filter in one FilterSequence.
+ * Gaussian filter. 
+ * Operates in one dimension: If you wish to use a multidimensional gaussian filter, simply chain multiple instances of this filter in one FilterSequence.
  *
  * @author Felix Maurer
  */
@@ -37,13 +37,16 @@ class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<d
 	using coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs;
 	using coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs;
 
+	using ScalarIndex = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
+	using VectorIndex = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
+
     public:
         Gauss(
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 			const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
 			const std::array<bool, 7> filteredValues,
 			unsigned int dimension,
-			int sigma,
+			int sigma, 
 			const char* extrapolationStrategy
 		):
 			coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"),
@@ -92,7 +95,8 @@ class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<d
 		 *
 		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
-		CellIndex_T getIndexAbove(const CellIndex_T index, unsigned int d);
+
+		VectorIndex getIndexAbove(const VectorIndex index, unsigned int d);
 
 		/*
 		 * Returns the index of the cell that's below the cell at index on the d-axis
@@ -100,7 +104,8 @@ class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<d
 		 *
 		 * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the lowest cell that gets sent from MD to Macro.
 		 */
-		CellIndex_T getIndexBelow(const CellIndex_T index, unsigned int d);
+
+		VectorIndex getIndexBelow(const VectorIndex index, unsigned int d);
 
 		//on which axis this filter operates. 0 <= _dim <= dim
 		const unsigned int _dim;
