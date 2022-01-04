@@ -230,6 +230,12 @@ applyBoundaryForce(unsigned int t){
   _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);
 }
 
+template<class LinkedCell,unsigned int dim>
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
+applyVacuum(unsigned int t){
+  Wrapper4ApplyVacuumAndSetAccordingMasses wrapper(this);
+  _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtTop(wrapper,1);
+}
 
 template<class LinkedCell,unsigned int dim>
 coupling::IndexConversion<dim>* coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::

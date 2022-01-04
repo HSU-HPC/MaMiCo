@@ -73,6 +73,7 @@ processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
 
   // reset cell-mass (would be overwritten anyway; but just to be on safe side)
   cell.setMicroscopicMass(0.0);
+  cell.setMacroscopicTemperature(0.0);
 
 }
 
@@ -121,16 +122,18 @@ processInnerMacroscopicCellBeforeSendingMDSolverData(
   #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
   std::cout << "processInnerMacroscopicCellBeforeSendingMDSolverData(): Data before averaging from cell " << index << "Mass: " << cell.getMacroscopicMass() << " , momentum: " << cell.getMacroscopicMomentum() << std::endl;
   #endif
-
   // average sampled data from MD
   if (_timestepCounter != 0){
     const double mass = cell.getMacroscopicMass()/((double)_timestepCounter);
     const tarch::la::Vector<dim,double> momentum = (1.0/((double)_timestepCounter))*cell.getMacroscopicMomentum();
+    const double temperature = cell.getMacroscopicTemperature()/((double)_timestepCounter);
     cell.setMacroscopicMass(mass);
     cell.setMacroscopicMomentum(momentum);
+    cell.setMacroscopicTemperature(temperature);
   } else {
     cell.setMacroscopicMass(0.0);
     cell.setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
+    cell.setMacroscopicTemperature(0.0);
   }
   #if (COUPLING_MD_DEBUG==COUPLING_MD_YES)
   std::cout << "Time step counter=" << _timestepCounter << std::endl;
@@ -168,9 +171,12 @@ processInnerMacroscopicCellAfterMDTimestep(
   //_cellCount++;
   cell.iterateConstCells(_momentumMapping);
   const tarch::la::Vector<dim,double> momentum(_momentumMapping.getMomentum());
+  coupling::cellmappings::ComputeTemperatureMapping<LinkedCell,dim> temperatureMapping(_momentumMapping.getMeanVelocity(), coupling::transferstrategies::TransferStrategy<LinkedCell,dim>::_mdSolverInterface);
+  cell.iterateConstCells(temperatureMapping);
+  const double temperature = temperatureMapping.getTemperature();
   cell.addMacroscopicMass(mass);
   cell.addMacroscopicMomentum(momentum);
-
+  cell.addMacroscopicTemperature(temperature);
   // interpolation of velocity value from old and new solution
   // we shift the factor by _shiftTimestep time steps and inter- or extrapolate velocities. A CFD solver will deliver values at t and t+dt and we want to advance the simulation potentially differently
   const double factor = _shiftTimestep+((double)_timestepCounter)/((double)_numberMDSteps);

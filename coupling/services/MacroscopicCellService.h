@@ -70,6 +70,7 @@ class coupling::services::MacroscopicCellService {
     virtual void distributeMass(unsigned int t) = 0;
     virtual void distributeMomentum(unsigned int t) = 0;
     virtual void applyBoundaryForce(unsigned int t) = 0;
+    virtual void applyVacuum(unsigned int t) = 0;
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
@@ -210,6 +211,8 @@ public coupling::services::MacroscopicCellService<dim> {
      */
     const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 
+    void applyVacuum(unsigned int t);
+
 	const coupling::FilterPipeline<dim>& getFilterPipeline() const { return _filterPipeline; }
 
 	/**
@@ -255,7 +258,7 @@ public coupling::services::MacroscopicCellService<dim> {
       else if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::onlyOutestLayer)
         return [this](Wrapper& wrapper){_macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);};
       else
-        return [](Wrapper& wrapper){};
+        return [this](Wrapper& wrapper){_macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtBottom(wrapper,4);};
     }
 
 

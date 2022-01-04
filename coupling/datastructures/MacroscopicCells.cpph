@@ -320,6 +320,57 @@ void coupling::datastructures::MacroscopicCells<LinkedCell,dim>::applyXLayersOfG
   a.endCellIteration();
 }
 
+template<class LinkedCell,unsigned int dim>
+template<class A>
+void coupling::datastructures::MacroscopicCells<LinkedCell,dim>::applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtBottom(A &a, unsigned int layers2Use){
+  // global coordinate of first non-ghost cell
+  const tarch::la::Vector<dim,unsigned int> globalLowerLeftCorner(layers2Use);
+  // start and end coordinates for all local non-ghost cells
+  const tarch::la::Vector<3,unsigned int> start(1);
+  const tarch::la::Vector<3,unsigned int> end = start + coupling::initRange<dim>(_indexConversion.getLocalNumberMacroscopicCells());
+  tarch::la::Vector<3,unsigned int> loop(0);
+
+  a.beginCellIteration();
+  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++){
+    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++){
+      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++){
+        // get global coordinate of local cell
+        const tarch::la::Vector<dim,unsigned> globalCoord = _indexConversion.convertLocalToGlobalVectorCellIndex(coupling::initDimVector<dim>(loop));
+        if (globalCoord[2]<=globalLowerLeftCorner[2]){
+          const unsigned int linearIndex = _indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop));
+          a.apply(_macroscopicCellsWithLinkedCells[linearIndex],linearIndex);
+        }
+      }
+    }
+  }
+  a.endCellIteration();
+}
+
+template<class LinkedCell,unsigned int dim>
+template<class A>
+void coupling::datastructures::MacroscopicCells<LinkedCell,dim>::applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtTop(A &a, unsigned int layers2Use){
+  // global coordinate of last non-ghost cell
+  const tarch::la::Vector<dim,unsigned int> globalUpperRightCorner(_indexConversion.getGlobalNumberMacroscopicCells()-tarch::la::Vector<dim,unsigned int>(layers2Use-1));
+  // start and end coordinates for all local non-ghost cells
+  const tarch::la::Vector<3,unsigned int> start(1);
+  const tarch::la::Vector<3,unsigned int> end = start + coupling::initRange<dim>(_indexConversion.getLocalNumberMacroscopicCells());
+  tarch::la::Vector<3,unsigned int> loop(0);
+
+  a.beginCellIteration();
+  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++){
+    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++){
+      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++){
+        // get global coordinate of local cell
+        const tarch::la::Vector<dim,unsigned> globalCoord = _indexConversion.convertLocalToGlobalVectorCellIndex(coupling::initDimVector<dim>(loop));
+        if (globalCoord[2]>=globalUpperRightCorner[2]){
+          const unsigned int linearIndex = _indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop));
+          a.apply(_macroscopicCellsWithLinkedCells[linearIndex],linearIndex);
+        }
+      }
+    }
+  }
+  a.endCellIteration();
+}
 
 template<class LinkedCell,unsigned int dim>
 std::vector<coupling::datastructures::MacroscopicCell<dim>* >

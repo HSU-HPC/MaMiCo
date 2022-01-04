@@ -40,29 +40,29 @@ class coupling::datastructures::MacroscopicCell {
     /** Destructor */
 	virtual ~MacroscopicCell(){}
 
-    /** sets the microscopic mass 
+    /** sets the microscopic mass
 	* @param mass Mass*/
     void setMicroscopicMass(const double& mass){ _microscopicMass = mass; }
-	/** returns the microscopic mass 
+	/** returns the microscopic mass
 	* @returns _microscopicMass Mass*/
     const double& getMicroscopicMass() const {return _microscopicMass;}
-	/** sets the microscopic moments 
+	/** sets the microscopic moments
 	* @param momentum Momentum*/
     void setMicroscopicMomentum(const tarch::la::Vector<dim,double>& momentum){ _microscopicMomentum = momentum; }
-	/** returns the microscopic moments 
+	/** returns the microscopic moments
 	* @returns _microscopicMomentum Momentum*/
     const tarch::la::Vector<dim,double>& getMicroscopicMomentum() const {return _microscopicMomentum;}
 
-    /** sets the microscopic mass 
+    /** sets the microscopic mass
 	* @param mass Mass*/
     void setMacroscopicMass(const double& mass){ _macroscopicMass = mass; }
-	/** returns the microscopic mass 
+	/** returns the microscopic mass
 	* @returns _microscopicMass Mass*/
     const double& getMacroscopicMass() const {return _macroscopicMass;}
-	/** sets the microscopic moments 
+	/** sets the microscopic moments
 	* @param momentum Momentum*/
     void setMacroscopicMomentum(const tarch::la::Vector<dim,double>& momentum){ _macroscopicMomentum = momentum; }
-	/** returns the microscopic moments 
+	/** returns the microscopic moments
 	* @returns _microscopicMomentum Momentum*/
     const tarch::la::Vector<dim,double>& getMacroscopicMomentum() const {return _macroscopicMomentum;}
 
@@ -98,11 +98,19 @@ class coupling::datastructures::MacroscopicCell {
     /** sets the temperature
 	* @param temperature temperature*/
     void setTemperature(const double& temperature){ _temperature = temperature;}
-	/** returns the temperature
+  /** returns the temperature
 	* @return _temperature temperature*/
     const double& getTemperature() const { return _temperature;}
 
+    /** sets the temperature
+	* @param temperature temperature*/
+    void setMacroscopicTemperature(const double& temperature){ _macroscopicTemperature = temperature;}
+    void addMacroscopicTemperature(const double& temperature){ _macroscopicTemperature += temperature;}
+  /** returns the temperature
+	* @return _temperature temperature*/
+    const double& getMacroscopicTemperature() const { return _macroscopicTemperature;}
 
+    double _macroscopicTemperature;
     /** buffers for macroscopic mass that need to be transferred
      *  from the macroscopic to the microscopic simulation */
     double _microscopicMass;
@@ -183,7 +191,7 @@ class coupling::datastructures::MacroscopicCellWithLinkedCells: public coupling:
 
     /** This template fuction applies class A to all linked cells of this macroscopic cell. The syntax is exactly the same as for regular cell mappings so
      *  that a general cell mapping can also be directly applied to single macroscopic cells only.
-	 *	@tparam A 
+	 *	@tparam A
 	 * 	@param a
      */
     template<class A>
@@ -198,7 +206,7 @@ class coupling::datastructures::MacroscopicCellWithLinkedCells: public coupling:
     /** This template function applies class A to all linked cells of this macroscopic cell. The syntax is exactly the same as for regular cell mappings so
      *  that a general cell mapping can also be directly applied to single macroscopic cells only.
      *  This method is const, i.e. id does not modify anything except for the object a. This allows for further optimisations.
-	 *	@tparam A 
+	 *	@tparam A
 	 * 	@param a
      */
     template<class A>

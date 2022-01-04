@@ -18,7 +18,7 @@ namespace coupling {
 }
 
 
-/** 
+/**
  *	@brief provides access to the macroscopic cells.
  *	@tparam LinkedCell linked cells that build up the MacroscopicCellWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
@@ -28,7 +28,7 @@ template<class LinkedCell,unsigned int dim>
 class coupling::datastructures::MacroscopicCells {
   public:
     /** Constructor: initialises the macroscopic cell
-	 *	@param numberLinkedCellsPerMacroscopicCell 
+	 *	@param numberLinkedCellsPerMacroscopicCell
 	 * 	@param indexConversion
 	 * 	@param mdSolverInterface
      */
@@ -55,7 +55,7 @@ class coupling::datastructures::MacroscopicCells {
     template<class A>
     void applyToLocalNonGhostMacroscopicCellsWithLinkedCells( A &a );
     /** apply the function apply(MacroscopicCell&,const unsigned int&) of a generic class A to all local ghost macroscopic cells.
-	 *	@tparam A 
+	 *	@tparam A
 	 * 	@param a */
     template<class A>
     void applyToLocalGhostMacroscopicCellsWithLinkedCells(A &a );
@@ -69,16 +69,22 @@ class coupling::datastructures::MacroscopicCells {
      *  If a cell is a local ghost cell (due to parallelization, not due to being located outside MD domain!), it will not be handled by this method.
      *  If a cell is a local non-ghost cell and is not located at the boundary of the MD domain, it will not be handled by this method.
      *  We use this traversal, e.g., for applying boundary forces to molecules close to the outer boundary.
-	 *	@tparam A 
+	 *	@tparam A
 	 * 	@param a
      */
     template<class A>
     void applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A &a);
-	
+
 	/** \todo Helene!!
 	*/
 	template<class A>
     void applyXLayersOfGlobalNonGhostCellsWithLinkedCells(A &a, unsigned int layers2Use);
+
+  template<class A>
+    void applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtBottom(A &a, unsigned int layers2Use);
+
+  template<class A>
+    void applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtTop(A &a, unsigned int layers2Use);
 
   private:
     /** initialises the macroscopic cells: creates the buffer for the cells and embeds linked cells into the macroscopic

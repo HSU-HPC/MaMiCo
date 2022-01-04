@@ -21,10 +21,10 @@
         wall-velocity * cos(2PI * wall-oscillations * CYCLE / coupling-cycles)
   -->
   <domain
-    channelheight="50"
+    channelheight="500"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
-    wall-velocity="0.5 ; 0.0 ; 0.0"
+    wall-velocity="0.0 ; 0.0 ; 0.0"
     wall-oscillations="0"
   />
 
@@ -46,12 +46,12 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout. Only for sequential tests.
   -->
   <coupling
-    coupling-cycles="50"
-    two-way-coupling="yes"
+    coupling-cycles="1000"
+    two-way-coupling="no"
     send-from-md-to-macro="yes"
     filter-init-cycles="0"
-    write-csv-every-timestep="2"
-    send-from-macro-to-md="yes"
+    write-csv-every-timestep="5"
+    send-from-macro-to-md="no"
     compute-snr="no"
   />
 
@@ -78,7 +78,7 @@
       vector of '0' and '1', '1' for a boundary OpenFOAM when it shall be coupled with MaMiCo, uses the order according to the blockMesh order, '0' when the boundary shall not be coupled
   -->
   <macroscopic-solver
-    type="fd"
+    type="foam"
     viscosity="2.14"
     number-of-processes="1 ; 1 ; 1"
     plot-every-timestep="2"
@@ -110,9 +110,9 @@
   -->
   <microscopic-solver
     type="md"
-    temperature="1.1"
+    temperature="0.8"
     equilibration-steps="0"
-    number-md-simulations="4"
+    number-md-simulations="1"
     density="0.813037037"
   />
 
@@ -128,13 +128,12 @@
     Example <tws-loop min="3" max="100" step="5" />
   -->
 </couette-test>
-
 <!-- MaMiCo configuration for NieTest, as described in the respective paper -->
 <mamico>
   <!-- "write-every-macroscopic-timestep" means CFD time step /-->
   <macroscopic-cell-configuration
-    cell-size="2.5 ; 2.5 ; 2.5"
-    linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+    cell-size="200 ; 200 ; 2.5"
+    linked-cells-per-macroscopic-cell="80 ; 80 ; 1"
     write-every-microscopic-timestep="0"
     microscopic-filename="MacroscopicCell_micro"
     write-every-macroscopic-timestep="0"
@@ -143,21 +142,21 @@
   <!-- particle-insertion type="usher" enables removal of particles  /-->
   <!-- TODO choose insert-every-timestep automatically /-->
   <!-- TODO check tolerance criterium /-->
-  <particle-insertion type="none" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
+  <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
   <!--<particle-insertion type="none" />/-->
-  <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
+  <momentum-insertion type="none" outermost-overlap-layer="2" innermost-overlap-layer="3" />
   <!-- TODO inconsistent mass flux evaluation? /-->
-  <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
+  <transfer-strategy type="nie-transfer" mass-flux-west="no" mass-flux-east="no" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
   <!-- time-window-size means number of coupling cycles/-->
   <!-- TODO try to use local density for boundary force /-->
-  <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
+  <boundary-force type="zhou-boundary-force" west="no" east="no" north="no" south="no" bottom="yes" top="no" density="0.73" temperature="0.8" />
   <parallel-topology type="xyz" />
   <!-- the thermostat option defines, where to apply the above defined temperature within the md region, options:
     -all: the thermostat will be applied in every cell of the md region
     -outerLayers: the thermostat will be applied in the value defined in "number-layers" (integer value) number of layers, starting with the most outer layer
     -onlyOutestLayer: the thermostat will be applied only in the outest cell layer of the md region
     -nowhere: the thermostat will be applied nowehere within the md region /-->
-  <thermostat type='outerLayers' number-layers='1' />
+  <thermostat type='nowhere' number-layers='1' />
 </mamico>
 
 <molecular-dynamics>
@@ -177,7 +176,7 @@
 
   <!-- TODO check fix-seed for mamico / USHER /-->
   <simulation-configuration
-    dt="0.005"
+    dt="0.001824"
     number-of-timesteps="50"
     reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
@@ -191,12 +190,12 @@
   <!-- max density using molecules-per-direction ca. 0.9  /-->
   <!-- cutoff-radius should be 2.2 to be consistent with Nie et. al paper /-->
   <domain-configuration
-    init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"
+    init-from-sequential-checkpoint="CheckpointSimpleMD_Eva"
 
     molecules-per-direction="28 ; 28 ; 28"
-    domain-size="30.0 ; 30.0 ; 30.0"
-    domain-offset="10.0 ; 10.0 ; 2.5"
-    cutoff-radius="2.2"
+    domain-size="200 ; 200 ; 422.5"
+    domain-offset="0 ; 0 ; 0"
+    cutoff-radius="2.5"
     linked-cell-size="2.5 ; 2.5 ; 2.5"
     k_B="1.0"
     block-size="100"
@@ -205,9 +204,9 @@
     bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
     bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
 
-    south-west="reflecting"        south="reflecting"        south-east="reflecting"
-    west="reflecting"                                          east="reflecting"
-    north-west="reflecting"        north="reflecting"        north-east="reflecting"
+    south-west="periodic"        south="periodic"        south-east="periodic"
+    west="periodic"                                          east="periodic"
+    north-west="periodic"        north="periodic"        north-east="periodic"
 
     top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
     top-west="reflecting"          top="reflecting"          top-east="reflecting"
@@ -215,8 +214,6 @@
   > </domain-configuration>
 
 </molecular-dynamics>
-
-<!-- XML config file used by MaMiCo's FilterPipeline -->
 
 <filter-pipeline>
 

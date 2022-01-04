@@ -29,6 +29,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   // do it BEFORE quantities are manipulated as we can then also do some pre-processing here.
   _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
 
+  _macroscopicCellService->applyVacuum(t);
   // ------------ coupling step: distribute mass ---------------------
   _macroscopicCellService->distributeMass(t);
 
@@ -68,7 +69,6 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
       && (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0) ){
     _moleculeService->reorganiseMemory(*_parallelTopologyService,*_linkedCellService);
   }
-
   // plot also macroscopic cell information
   _macroscopicCellService->plotEveryMicroscopicTimestep(t);
 
@@ -76,12 +76,9 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
 
   // time integration. After this step, the velocities and the positions of the molecules have been updated.
   _moleculeService->iterateMolecules(*_timeIntegrator,false);
-
   // sort molecules into linked cells
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping,false);
-
   if (_parallelTopologyService->getProcessCoordinates()==tarch::la::Vector<MD_DIM,unsigned int>(0)){
     //if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
   }
 }
-

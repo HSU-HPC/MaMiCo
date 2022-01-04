@@ -68,7 +68,6 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::insertParticle(
 
   const typename coupling::ParticleInsertion<LinkedCell,dim>::Action action
   = findParticlePosition(cell,macroscopicCellPosition,macroscopicCellSize,molecule,boundaryForceController);
-
   // if insertion was successful, initialise velocity according to temperature in macroscopic cell
   if (action == coupling::ParticleInsertion<LinkedCell,dim>::Insertion){
     // initialise velocity of molecule

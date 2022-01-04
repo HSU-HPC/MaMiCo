@@ -73,6 +73,15 @@ class coupling::ParticleInsertion {
       return (t%_insertDeleteMassEveryTimestep==0);
     }
 
+    virtual typename coupling::ParticleInsertion<LinkedCell,dim>::Action insertParticle(
+      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
+      const tarch::la::Vector<dim,double>& macroscopicCellPosition,
+      const tarch::la::Vector<dim,double>& macroscopicCellSize,
+      const tarch::la::Vector<dim,double>& meanVelocity,
+      const double &temperature,
+      const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
+    ) {return coupling::ParticleInsertion<LinkedCell,dim>::NoAction;}
+
   private:
     /** interval of time steps for the insertion/removal of particles */
     const unsigned int _insertDeleteMassEveryTimestep;

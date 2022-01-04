@@ -95,7 +95,7 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
     int _particlesRemoved;
     #endif
 
-  private:
+  // private:
     /** Returns Insertion on success and NoAction otherwise.
      *  @brief tries to insert a particle in the respective macroscopic cell.
      *  @param cell the macroscopic cell to check if an action is necessary
@@ -113,8 +113,8 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
       const tarch::la::Vector<dim,double>& meanVelocity,
       const double &temperature,
       const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
-    ) ;
-
+    ) override ;
+  private:
     /** Returns Deletion on success and NoAction otherwise.
      *  @brief tries to delete a particle from the macroscopic cell.
      *  @param cell the macroscopic cell to check if an action is necessary
