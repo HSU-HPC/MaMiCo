@@ -49,7 +49,7 @@ then
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -Wfatal-errors -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -Wfatal-errors -Ofast"
     # -Werror
     includes="${includes} -I${LIB_EIGEN_PATH}" 
     compiler="g++"

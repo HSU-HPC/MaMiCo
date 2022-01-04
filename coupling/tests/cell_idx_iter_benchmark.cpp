@@ -139,27 +139,63 @@ private:
   void bench(){
     using namespace coupling::indexing;
     using CellIndex_T = CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
+    using CellIndex_T_vec = CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
     unsigned int numcells = CellIndex_T::linearNumberCellsInDomain;
     std::cout << "Number cells in test domain: " << numcells << std::endl;
-
     std::cout << "lowerBoundary = " << CellIndex_T::lowerBoundary.get() << std::endl;
     std::cout << "upperBoundary = " << CellIndex_T::upperBoundary.get() << std::endl;
+    const int numcounts = 10000;
+    timeval start, end;
 
-    std::cout << CellIndex_T().begin()->get() << std::endl;
-    std::cout << CellIndex_T().end()->get() << std::endl;
-    std::cout << CellIndex_T{CellIndex_T::lowerBoundary}.get() << std::endl;
-    std::cout << CellIndex_T{CellIndex_T::upperBoundary}.get() << std::endl;
+    std::cout << std::endl << "Scalar benchmark ------------- " << std::endl;
+    gettimeofday(&start,NULL);
+    tarch::la::Vector<3,long> result(0);
+    for(int count=0;count < numcounts; count++)
+      for(unsigned int i = 0; i < numcells; i++){
+        result[0] += i; // do something with i so that the compiler can not optimize this away ...
+      }
+    std::cout << "Useless result: " << result[0] << std::endl;
+    gettimeofday(&end,NULL);
+    double runtime = (end.tv_sec - start.tv_sec)*1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Raw loop: " << (int)(runtime/1000) << "ms" << std::endl;
 
-    long result = 0;
-    for(unsigned int i = 0; i < numcells; i++){
-      result += i; // do something with i so that the compiler can not optimize this away ...
-    }
-    std::cout << "Useless result: " << result << std::endl;
+    gettimeofday(&start,NULL);
     result = 0;
-    for(auto idx : CellIndex_T()){
-      result += idx.get(); // do something with idx so that the compiler can not optimize this away ...
-    }
+    for(int count=0;count < numcounts; count++)
+      for(auto idx : CellIndex_T()){
+        // do something with idx so that the compiler can not optimize this away (and to check if we do the same here)
+        result[0] += idx.get(); 
+      }
+    std::cout << "Useless result: " << result[0] << std::endl;
+    gettimeofday(&end,NULL);
+    runtime = (end.tv_sec - start.tv_sec)*1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Index range iterator: " << (int)(runtime/1000) << "ms" << std::endl;
+
+    std::cout << std::endl << "Vector benchmark ------------- " << std::endl;
+    gettimeofday(&start,NULL);
+    result = 0;
+    for(int count=0;count < numcounts; count++)
+      for(unsigned int z = 0; z < CellIndex_T::numberCellsInDomain[2]; z++)
+        for(unsigned int y = 0; y < CellIndex_T::numberCellsInDomain[1]; y++)
+          for(unsigned int x = 0; x < CellIndex_T::numberCellsInDomain[0]; x++){
+            tarch::la::Vector<3,int> idx(x,y,z);
+            result[0] += idx[0];result[1] += idx[1];result[2] += idx[2];
+          }
     std::cout << "Useless result: " << result << std::endl;
+    gettimeofday(&end,NULL);
+    runtime = (end.tv_sec - start.tv_sec)*1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Raw loop: " << (int)(runtime/1000) << "ms" << std::endl;
+
+    gettimeofday(&start,NULL);
+    result = 0;
+    for(int count=0;count < numcounts; count++)
+      for(auto idx : CellIndex_T_vec()){
+            result[0] += idx.get()[0];result[1] += idx.get()[1];result[2] += idx.get()[2];
+          }
+    std::cout << "Useless result: " << result << std::endl;
+    gettimeofday(&end,NULL);
+    runtime = (end.tv_sec - start.tv_sec)*1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Index range iterator: " << (int)(runtime/1000) << "ms" << std::endl;
   }
 
   int _rank;
