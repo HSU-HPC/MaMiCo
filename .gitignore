@@ -12,6 +12,7 @@ coupling/tests/build_nie/test
 coupling/tests/build_nie/out/
 coupling/tests/build_couette/test
 coupling/tests/build_couette/*.xml
+coupling/tests/build_evaporation/*.xml
 stuff/
 personal_settings
 *.so
@@ -23,3 +24,4 @@ coupling/tests/kvs-lbmpy/*.ini
 *.html
 *.dot
 docs/
+test
