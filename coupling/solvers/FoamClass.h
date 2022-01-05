@@ -1,8 +1,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _COUPLING_SOLVERS_IcoFoam_H_
-#define _COUPLING_SOLVERS_FoamTest_H_
+#ifndef _COUPLING_SOLVERS_ICOFOAM_H_
+#define _COUPLING_SOLVERS_ICOFOAM_H_
 
 #include "coupling/solvers/CouetteSolver.h"
 // Includes from OpenFOAM fdCFD.H, unnecessary includes are removed
@@ -129,14 +129,14 @@ public:
 
   // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
   const tarch::la::Vector<3,double> getOuterPointFromBoundary(const int layer, const int index){
-     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
+     const Foam::vectorField FoamCoord( U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5) );
      const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
      return FoamCoordVector;
   }
 
   // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
   const tarch::la::Vector<3,double> getInnerPointFromBoundary(const int layer, const int index){
-     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
+     const Foam::vectorField FoamCoord( U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5) );
      const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
      return FoamCoordVector;
   }
@@ -281,6 +281,5 @@ private:
   // the following are original OpenFOAM variables, their names shall not be changed
   Foam::label pRefCell{0};
   Foam::scalar pRefValue{0.0};
-  Foam::scalar cumulativeContErr{0};
 };
 #endif // _COUPLING_SOLVERS_ICOFOAM_H
