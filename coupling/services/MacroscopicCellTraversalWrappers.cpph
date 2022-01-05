@@ -242,8 +242,8 @@ public:
                                   Wrapper::_thisPtr->_indexConversion->getMacroscopicCellSize(),
                                   meanVelocity, temperature, *Wrapper::_thisPtr->_boundaryForceController);
     }
-    cell.iterateConstCells(computeMassMapping);
-    numberOfParticles = computeMassMapping.getNumberOfParticles();
+    // cell.iterateConstCells(computeMassMapping);
+    // numberOfParticles = computeMassMapping.getNumberOfParticles();
   }
 };
 
@@ -325,9 +325,39 @@ public:
 
   void beginCellIteration(){}
   void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+    coupling::interface::MoleculeIterator<LinkedCell,dim> *it = Wrapper::_thisPtr->_mdSolverInterface->getMoleculeIterator(cell);
+    it->begin();
+    while(it->continueIteration()){
+      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
+      const int posZ = wrapper.getPosition()[2];
+      _velocity[posZ] += wrapper.getVelocity();
+      _datacountTmp[posZ]++;
 
+      it->next();
+    }
+    delete it;
+  }
+  void postprocess(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+    coupling::interface::MoleculeIterator<LinkedCell,dim> *it = Wrapper::_thisPtr->_mdSolverInterface->getMoleculeIterator(cell);
+    it->begin();
+    while(it->continueIteration()){
+      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
+      const int posZ = wrapper.getPosition()[2];
+      _temperature += tarch::la::dot((wrapper.getVelocity() - _velocityTmp[posZ]),(wrapper.getVelocity() - _velocityTmp[posZ]));
+
+      it->next();
+    }
+    delete it;
   }
   void endCellIteration(){}
+  void endIteration(){
+    for(unsigned int i=0; i<_numberBins;i++){
+      _velocityTmp=0;
+      _densityTmp=0;
+      _datacountTmp=0;
+    }
+
+  }
 
 private:
   tarch::la::Vector<dim,double> * _velocity;
@@ -338,6 +368,7 @@ private:
   double * _temperatureTmp;
   unsigned int * _datacount;
   unsigned int * _datacountTmp;
+  const unsigned int _numberBins{1680};
 
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLTRAVERSALWRAPPERS_H_

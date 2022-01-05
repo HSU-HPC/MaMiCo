@@ -50,7 +50,7 @@
     two-way-coupling="no"
     send-from-md-to-macro="yes"
     filter-init-cycles="0"
-    write-csv-every-timestep="5"
+    write-csv-every-timestep="1"
     send-from-macro-to-md="no"
     compute-snr="no"
   />
