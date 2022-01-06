@@ -47,6 +47,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   // apply boundary forces
   _macroscopicCellService->applyBoundaryForce(t);
 
+  _macroscopicCellService->checkMass(t);
   // evaluate statistics
   evaluateStatistics(t);
 

@@ -172,7 +172,7 @@ class coupling::services::MultiMDCellService {
 
       // reset macroscopic data (only those should be used by macroscopic solver anyway) in cells
       for (unsigned int i = 0; i < size; i++){
-        _macroscopicCells[i]->setMacroscopicMass(0.0); _macroscopicCells[i]->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));  _macroscopicCells[i]->setTemperature(0.0);
+        _macroscopicCells[i]->setMacroscopicMass(0.0); _macroscopicCells[i]->setMacroscopicMomentum(tarch::la::Vector<dim,double>(0.0));
       }
 
       // receive data from each MD simulation and accumulate information in cells
@@ -182,7 +182,6 @@ class coupling::services::MultiMDCellService {
         for (unsigned int i = 0; i < size; i++){
           _macroscopicCells[i]->addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
           _macroscopicCells[i]->addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
-          _macroscopicCells[i]->setTemperature(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicTemperature()+_macroscopicCells[i]->getTemperature());
         }
       }
 
@@ -190,7 +189,6 @@ class coupling::services::MultiMDCellService {
       for (unsigned int i = 0; i < size; i++) {
         _macroscopicCells[i]->setMacroscopicMass(_macroscopicCells[i]->getMacroscopicMass()/_totalNumberMDSimulations);
         _macroscopicCells[i]->setMacroscopicMomentum(1.0/_totalNumberMDSimulations * _macroscopicCells[i]->getMacroscopicMomentum());
-        _macroscopicCells[i]->setTemperature(_macroscopicCells[i]->getTemperature()/_totalNumberMDSimulations);
       }
 
       // apply post multi instance FilterPipeline on cell data
@@ -208,7 +206,6 @@ class coupling::services::MultiMDCellService {
       for (unsigned int i = 0; i < size; i++){
         macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMass(_macroscopicCells[i]->getMacroscopicMass());
         macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(_macroscopicCells[i]->getMacroscopicMomentum());
-        macroscopicCellsFromMacroscopicSolver[i]->setTemperature(_macroscopicCells[i]->getTemperature());
       }
 
       return res;

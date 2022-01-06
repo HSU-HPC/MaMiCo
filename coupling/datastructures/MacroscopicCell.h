@@ -102,15 +102,6 @@ class coupling::datastructures::MacroscopicCell {
 	* @return _temperature temperature*/
     const double& getTemperature() const { return _temperature;}
 
-    /** sets the temperature
-	* @param temperature temperature*/
-    void setMacroscopicTemperature(const double& temperature){ _macroscopicTemperature = temperature;}
-    void addMacroscopicTemperature(const double& temperature){ _macroscopicTemperature += temperature;}
-  /** returns the temperature
-	* @return _temperature temperature*/
-    const double& getMacroscopicTemperature() const { return _macroscopicTemperature;}
-
-    double _macroscopicTemperature;
     /** buffers for macroscopic mass that need to be transferred
      *  from the macroscopic to the microscopic simulation */
     double _microscopicMass;

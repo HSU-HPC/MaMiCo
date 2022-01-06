@@ -172,6 +172,23 @@ public:
 };
 
 /** computes and stores the current velocity in each non-ghost macroscopic cell. */
+class Wrapper4CheckMass: public Wrapper {
+public:
+  Wrapper4CheckMass(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+
+  void beginCellIteration(){}
+  void endCellIteration(){std::cout << _counter << std::endl;
+    _counter =0;}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+    coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(Wrapper::_thisPtr->_mdSolverInterface);
+    cell.iterateConstCells(computeMassMapping);
+    _counter += computeMassMapping.getNumberOfParticles();
+  }
+private:
+  unsigned int _counter{};
+};
+
+/** computes and stores the current velocity in each non-ghost macroscopic cell. */
 class Wrapper4ApplyVacuumAndSetAccordingMasses: public Wrapper {
 public:
   Wrapper4ApplyVacuumAndSetAccordingMasses(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
@@ -179,10 +196,13 @@ public:
   void beginCellIteration(){}
   void endCellIteration(){}
   void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+    // calculate number of particles in cell
     coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(Wrapper::_thisPtr->_mdSolverInterface);
     cell.iterateConstCells(computeMassMapping);
     unsigned int numberOfParticles = computeMassMapping.getNumberOfParticles();
+    // do while there are still particles in the cell
     while(numberOfParticles > 0){
+      // delete one particle
       coupling::cellmappings::DeleteParticleMapping<LinkedCell,dim> deleteParticleMapping(numberOfParticles-1,Wrapper::_thisPtr->_mdSolverInterface);
       cell.iterateCells(deleteParticleMapping);
       numberOfParticles--;
@@ -196,18 +216,9 @@ public:
       tarch::la::Vector<dim,double> momentum(0.0);
       tarch::la::Vector<dim,double> meanVelocity(0.0);
       double potentialEnergy = 0.0;
-      // buffer for insertion/deletion action that has been carried out
-      // typename coupling::ParticleInsertion<LinkedCell,dim>::Action particleInsertionAction;
-      // true, if the costly operation of contructing the energy landscape is really required
-      bool constructEnergyLandscape;
 
-      // variables for internal looping --------------------------
-      // cellIndex used as loop counter
       tarch::la::Vector<3,unsigned int> cellIndex(1);
 
-      // we have to at least carry out the construction of the energy landscape once for each sub-domain (since we do not know a priori if we need
-      // to insert particles or not)
-      constructEnergyLandscape = true;
       // reduce size of usherCellStart-vector to be consistent with MDSolverInterface
       const tarch::la::Vector<dim,unsigned int> usherCellStart = coupling::initDimVector<dim>(Wrapper::_thisPtr->_usherCellStart[0]);
 
@@ -217,19 +228,12 @@ public:
       // Only carry out this costly operation, if there have been modifications to the MD system OR this is the first consideration of
       // this sub-domain. Besides, we skip this operation if the particle insertion does not require it (e.g. in case of rarefied gases,
       // we possibly can come up with something better than USHER)
-      if ( constructEnergyLandscape && Wrapper::_thisPtr->_particleInsertion->requiresPotentialEnergyLandscape() ){
-        Wrapper::_thisPtr->_mdSolverInterface->setupPotentialEnergyLandscape(usherCellStart,Wrapper::_thisPtr->_usherRange[0],Wrapper::_thisPtr->_numberLinkedCellsPerMacroscopicCell);
-        // reset flag
-        constructEnergyLandscape = false;
-      }
+      Wrapper::_thisPtr->_mdSolverInterface->setupPotentialEnergyLandscape(usherCellStart,Wrapper::_thisPtr->_usherRange[0],Wrapper::_thisPtr->_numberLinkedCellsPerMacroscopicCell);
 
       // determine macroscopic cell index
       const unsigned int index = Wrapper::_thisPtr->_indexConversion->getLocalCellIndex(coupling::initDimVector<dim>(cellIndex));
       // compute cell position
       tarch::la::Vector<dim,double> macroscopicCellPosition(0);
-      for (unsigned int d = 0; d < dim; d++){
-        macroscopicCellPosition[d] = 0;//Wrapper::_thisPtr->_indexConversion->getMacroscopicCellSize()[d]*cellIndex[d];
-      }
       // compute current momentum and energy
       Wrapper::_thisPtr->_momentumController.computeMomentumAndMeanVelocity(macroscopicCells[index],momentum,meanVelocity);
       temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(macroscopicCells[index]);
@@ -242,8 +246,6 @@ public:
                                   Wrapper::_thisPtr->_indexConversion->getMacroscopicCellSize(),
                                   meanVelocity, temperature, *Wrapper::_thisPtr->_boundaryForceController);
     }
-    // cell.iterateConstCells(computeMassMapping);
-    // numberOfParticles = computeMassMapping.getNumberOfParticles();
   }
 };
 
@@ -317,58 +319,38 @@ public:
   }
 };
 
-class Wrapper4SampleDataInZ: public Wrapper {
+class Wrapper4SampleVelocityAndParticlesInZ: public Wrapper {
 public:
-  Wrapper4SampleDataInZ(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr),
-  _velocity(new tarch::la::Vector<dim,double> [1680]), _density(new double [1680]), _temperature(new double [1680]),
-  _datacount(new unsigned int [1680]){}
+  Wrapper4SampleVelocityAndParticlesInZ(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr,
+   tarch::la::Vector<dim, double>* velocity, unsigned int* numberParticles): Wrapper(thisPtr),
+   _velocity(velocity), _numberParticles(numberParticles){}
 
   void beginCellIteration(){}
   void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    coupling::interface::MoleculeIterator<LinkedCell,dim> *it = Wrapper::_thisPtr->_mdSolverInterface->getMoleculeIterator(cell);
-    it->begin();
-    while(it->continueIteration()){
-      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
-      const int posZ = wrapper.getPosition()[2];
-      _velocity[posZ] += wrapper.getVelocity();
-      _datacountTmp[posZ]++;
-
-      it->next();
-    }
-    delete it;
-  }
-  void postprocess(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    coupling::interface::MoleculeIterator<LinkedCell,dim> *it = Wrapper::_thisPtr->_mdSolverInterface->getMoleculeIterator(cell);
-    it->begin();
-    while(it->continueIteration()){
-      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
-      const int posZ = wrapper.getPosition()[2];
-      _temperature += tarch::la::dot((wrapper.getVelocity() - _velocityTmp[posZ]),(wrapper.getVelocity() - _velocityTmp[posZ]));
-
-      it->next();
-    }
-    delete it;
+    coupling::cellmappings::ComputeVelocityBinMapping<LinkedCell,dim> velocityBinMapping(Wrapper::_thisPtr->_mdSolverInterface, _velocity, _numberParticles);
+    cell.iterateConstCells(velocityBinMapping);
   }
   void endCellIteration(){}
-  void endIteration(){
-    for(unsigned int i=0; i<_numberBins;i++){
-      _velocityTmp=0;
-      _densityTmp=0;
-      _datacountTmp=0;
-    }
-
-  }
-
 private:
-  tarch::la::Vector<dim,double> * _velocity;
-  tarch::la::Vector<dim,double> * _velocityTmp;
-  double * _density;
-  double * _densityTmp;
-  double * _temperature;
-  double * _temperatureTmp;
-  unsigned int * _datacount;
-  unsigned int * _datacountTmp;
-  const unsigned int _numberBins{1680};
-
+  tarch::la::Vector<dim, double>* _velocity;
+  unsigned int* _numberParticles;
 };
+
+class Wrapper4SampleTemperatureInZ: public Wrapper {
+public:
+  Wrapper4SampleTemperatureInZ(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr,
+   tarch::la::Vector<dim, double>* velocity, double* temperature): Wrapper(thisPtr),
+   _velocity(velocity), _temperature(temperature){}
+
+  void beginCellIteration(){}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+    coupling::cellmappings::ComputeTemperatureBinMapping<LinkedCell,dim> temperatureBinMapping(Wrapper::_thisPtr->_mdSolverInterface, _velocity, _temperature);
+    cell.iterateConstCells(temperatureBinMapping);
+  }
+  void endCellIteration(){}
+private:
+  tarch::la::Vector<dim, double>* _velocity;
+  double* _temperature;
+};
+
 #endif // _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLTRAVERSALWRAPPERS_H_

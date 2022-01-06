@@ -237,6 +237,75 @@ applyVacuum(unsigned int t){
   _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtTop(wrapper,1);
 }
 
+template<class LinkedCell, unsigned int dim>
+struct dataOutputForEvaporation{
+  dataOutputForEvaporation(){clean();}
+  tarch::la::Vector<dim, double> velocity[1680];
+  double temperature[1680];
+  unsigned int numberParticles[1680];
+  unsigned int numberSamples{};
+
+  void clean(){
+    for(unsigned int i=0; i<1680; i++){
+      velocity[i] = tarch::la::Vector<dim, double>(0.0);
+      temperature[i] = 0.0;
+      numberParticles[i] = 0;
+    }
+    numberSamples = 0;
+  }
+  void write(const unsigned int t){
+    // form file name and open file
+    std::stringstream ss;
+    ss << "EvaporationZAvgBin_" << t << ".csv";
+    std::ofstream file(ss.str().c_str());
+    if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
+    for (unsigned int i = 0; i < 1680; i++){
+      file << i << " ; " << velocity[i][0]/numberSamples << " ; " << velocity[i][1]/numberSamples << " ; " << velocity[i][2]/numberSamples << " ; " << numberParticles[i]/numberSamples << " ; " << temperature[i]/numberSamples;
+      file << std::endl;
+    }
+    // close file
+    file.close();
+    clean();
+  }
+};
+
+template<class LinkedCell,unsigned int dim>
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
+checkMass(unsigned int t){
+  static dataOutputForEvaporation<LinkedCell, dim> data{};
+  tarch::la::Vector<dim, double> velocity[1680];
+  double temperature[1680];
+  unsigned int numberParticles[1680];
+  for(unsigned int i=0; i<1680; i++){
+    velocity[i] = 0.0;//tarch::la::Vector<dim, double>(0.0);
+    temperature[i] = 0;
+    numberParticles[i] = 0;
+  }
+  Wrapper4SampleVelocityAndParticlesInZ wrapper(this, velocity, numberParticles);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+  for(unsigned int i=0; i<1680; i++){
+    if(numberParticles[i]>0){
+      velocity[i][0] /= numberParticles[i];
+      velocity[i][1] /= numberParticles[i];
+      velocity[i][2] /= numberParticles[i];
+      data.velocity[i] += velocity[i];
+      data.numberParticles[i] += numberParticles[i];
+    }
+  }
+  Wrapper4SampleTemperatureInZ wrapper2(this, velocity, temperature);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper2);
+  for(unsigned int i=0; i<1680; i++){
+    if(numberParticles[i]>0){
+      temperature[i] = _mdSolverInterface->getMoleculeMass()*temperature[i]/ (dim*_mdSolverInterface->getKB()*numberParticles[i]);
+      data.temperature[i] += temperature[i];
+    }
+  }
+  data.numberSamples++;
+  if(data.numberSamples == 50){
+    data.write(t);
+  }
+}
+
 template<class LinkedCell,unsigned int dim>
 coupling::IndexConversion<dim>* coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 initIndexConversion(

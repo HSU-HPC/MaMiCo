@@ -25,6 +25,8 @@
 #include "coupling/KineticEnergyController.h"
 #include "coupling/MomentumController.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
+#include "coupling/cell-mappings/ComputeVelocityBinMapping.h"
+#include "coupling/cell-mappings/ComputeTemperatureBinMapping.h"
 #include "coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h"
 #include "tarch/utils/MultiMDService.h"
 
@@ -71,6 +73,7 @@ class coupling::services::MacroscopicCellService {
     virtual void distributeMomentum(unsigned int t) = 0;
     virtual void applyBoundaryForce(unsigned int t) = 0;
     virtual void applyVacuum(unsigned int t) = 0;
+    virtual void checkMass(unsigned int t) {};
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
@@ -212,6 +215,8 @@ public coupling::services::MacroscopicCellService<dim> {
     const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 
     void applyVacuum(unsigned int t);
+
+    void checkMass(unsigned int t);
 
 	const coupling::FilterPipeline<dim>& getFilterPipeline() const { return _filterPipeline; }
 
