@@ -44,15 +44,13 @@ public:
   _boundariesWithMD(boundariesWithMD),
   _dx(std::cbrt(Foam::max(mesh.cellVolumes()))),
   _channelheight(channelheight),
+  _numberBoundaryPoints(getNumBoundaryPoints()),
   _boundary2RecvBufferIndicesOuter(new unsigned int [_numberBoundaryPoints]),
   _boundary2RecvBufferIndicesInner(new unsigned int [_numberBoundaryPoints]),
   _boundaryIndices(new Foam::vector* [_numberBoundaryPoints]),
   _rank(rank),
   _plotEveryTimestep(plotEveryTimestep){
     if(skipRank()){return;}
-    unsigned int innerMDBoundaryIndex=0;
-    while (_boundariesWithMD[innerMDBoundaryIndex] == 0){innerMDBoundaryIndex++;}
-    _numberBoundaryPoints = 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
@@ -192,6 +190,12 @@ public:
   }
 
 private:
+  unsigned int getNumBoundaryPoints(){
+	  unsigned int innerMDBoundaryIndex=0;
+          while (_boundariesWithMD[innerMDBoundaryIndex] == 0) innerMDBoundaryIndex++;
+          return 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
+  }
+
   /** create txt plot if required */
   void plottxt() {
     if(_plotEveryTimestep < 1 || _timestepCounter % _plotEveryTimestep > 0) return;
@@ -271,12 +275,12 @@ private:
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
   float _dx; // mesh size
   double _channelheight; // overall height of the Couette channel
+  unsigned int _numberBoundaryPoints; // the number of CFD boundary points which need data from the MD
   unsigned int *_boundary2RecvBufferIndicesOuter; // pointer to an array with data for communication
   unsigned int *_boundary2RecvBufferIndicesInner; // pointer to an array with data for communication
   Foam::vector **_boundaryIndices; // pointer to OpenFOAM data for communication
   int _rank; // rank of the actual process
   int _plotEveryTimestep; // every n-th time step should be plotted
-  unsigned int _numberBoundaryPoints; // the number of CFD boundary points which need data from the MD
   int _timestepCounter{0}; // actual time step number
   // the following are original OpenFOAM variables, their names shall not be changed
   Foam::label pRefCell{0};
