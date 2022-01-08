@@ -402,13 +402,8 @@ private:
 	 */
 
 	else if(_cfg.miSolverType == SYNTHETIC)	{
-		std::cout << "Couette: Synthetic solver feature is currently disabled." << std::endl;
-	}
-
-	/* TODO: port to index type system
 		//Synthetic MD runs sequentially only, as described above.
-        if(_cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 ||
-        _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1) {
+		if(_cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 || _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 || _cfg.lbNumberProcesses[2] != 1) {
 			throw std::runtime_error("ERROR: Syntethic MD is only available in sequential mode!");
 		}
 
@@ -416,20 +411,17 @@ private:
 		try {
 			for(unsigned int i = 0; i < _localMDInstances; i++) 
 				_multiMDCellService->getMacroscopicCellService(i).getFilterPipeline()->getSequence(SYNTHETICMD_SEQUENCE)->addFilter(
-				new std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int, 3>>)>{ //applyScalar
+				new std::function<std::vector<double> (std::vector<double>, std::vector<std::array<unsigned int,3>>)>{ //applyScalar
 				[this] (
-   	 				std::vector<double> inputScalars, //doesnt get used: matching MCS's addFilterToSequence(...) signature
-					std::vector<std::array<unsigned int, 3>> cellIndices //only gets used to determine "size" (see below)
-  				) {
+					std::vector<double> inputScalars, //not actually used as input: matching MCS's addFilterToSequence(...) signature
+					std::vector<std::array<unsigned int, 3>> cellIndices //not used either
+				) {
 					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
 
-					//sanity check
-					if(inputScalars.size() != cellIndices.size())
-						throw std::runtime_error("ERROR: Cell data and indexing of non-matching shapes!");
-
 					//std::cout << "Entering synthetic MD scalar..." << std::endl;
+					//TODO: replace usage of deprecated IndexConversion
 					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
-					const unsigned int size = cellIndices.size();
+					const unsigned int size = inputScalars.size();
 					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
 					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
@@ -446,35 +438,33 @@ private:
 
 					return syntheticMasses;
 
-  				}},
-				new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double,3>>, std::vector<std::array<unsigned int, 3>>)> { //applyVector
+				}},
+				new std::function<std::vector<std::array<double, 3>> (std::vector<std::array<double,3>>, std::vector<std::array<unsigned int,3>>)> { //applyVector
 				[this] (
-					std::vector<std::array<double, 3>> inputVectors, //same for these 2
-					std::vector<std::array<unsigned int, 3>> cellIndices
-  				) {
+					std::vector<std::array<double, 3>> inputVectors, //same as above
+					std::vector<std::array<unsigned int, 3>> cellIndices //same as above
+				) {
 					if (_rank==0){ gettimeofday(&_tv.start,NULL); }
-
-					//sanity check
-					if(inputVectors.size() != cellIndices.size())
-						throw std::runtime_error("ERROR: Cell data and indexing of non-matching shapes!");
 
 					//std::cout << "Entering synthetic MD vector." << std::endl;
 
-					//unlike for the scalar case, we need the MD2Macro version of IC to calculate correct offsets
-					const coupling::IndexConversionMD2Macro<3>* indexConversionMD2Macro = nullptr;
- 					//TODO: update this to new indexing system, i.e. eliminate occurences of icm2m
-
-					const unsigned int size = cellIndices.size();
-					const tarch::la::Vector<3,double> md2MacroDomainOffset = indexConversionMD2Macro->getGlobalMD2MacroDomainOffset();
-
-					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversionMD2Macro->getBaseIC()->getMacroscopicCellSize());
+					const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+					const unsigned int size = inputVectors.size();
+					const tarch::la::Vector<3,double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
 					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
+
+					using coupling::indexing::IndexTrait;
+					const tarch::la::Vector<3,double> md2MacroDomainOffset = {
+						coupling::indexing::CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[0] * macroscopicCellSize[0],
+						coupling::indexing::CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[1] * macroscopicCellSize[1],
+						coupling::indexing::CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[2] * macroscopicCellSize[2],
+					};
 
 					std::normal_distribution<double> distribution (0.0,_cfg.noiseSigma);
 					std::vector<std::array<double, 3>> syntheticMomenta;
 					for (unsigned int i = 0; i < size; i++){
 						// determine cell midpoint
-						const tarch::la::Vector<3,unsigned int> globalIndex(indexConversionMD2Macro->getBaseIC()->getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
+						const tarch::la::Vector<3,unsigned int> globalIndex(coupling::indexing::convertToVector<3>( { _buf.globalCellIndices4RecvBuffer[i] } )); //construct global CellIndex from buffer and convert it to vector
 						tarch::la::Vector<3,double> cellMidPoint(md2MacroDomainOffset-0.5*macroscopicCellSize);
 						for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
 
@@ -493,8 +483,8 @@ private:
 					}
 
 					return syntheticMomenta;
-  				}},
-			   	0 //filterIndex
+				}},
+				0 //filterIndex
 				);
 		}
 		catch(std::runtime_error& e) {
@@ -505,7 +495,7 @@ private:
 			}
 			else throw e;
 		}
-	}*/
+	}
 
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*couetteSolverInterface);
