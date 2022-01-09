@@ -36,6 +36,7 @@ class coupling::filtering::FilterFromFunction : public coupling::filtering::Filt
 			_applyScalar(applyScalar),
 			_applyVector(applyVector)
 		{
+
 			if(applyScalar == nullptr or applyVector == nullptr) 
 				throw std::runtime_error("ERROR: FilterFromFunction received nullptr as function pointer!");
 
@@ -44,7 +45,9 @@ class coupling::filtering::FilterFromFunction : public coupling::filtering::Filt
 			std::array<unsigned int, dim> stlIndex;
 			for(unsigned int i = 0; i < inputCellVector.size(); i++) {
 				//interpret position of cell in inputCellVector as linear local md-to-macro index, then convert it to vector
-				mamicoIndex = coupling::indexing::convertToVector<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>( { (int) i } );
+				using coupling::indexing::IndexTrait;
+				mamicoIndex = coupling::indexing::convertToVector<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>( { i } );
+
 				for(unsigned int d = 0; d < dim; d++) stlIndex[d] = mamicoIndex[d];
 				_stlIndices.push_back(stlIndex);
 			}

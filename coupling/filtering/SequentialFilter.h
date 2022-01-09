@@ -4,7 +4,7 @@
 
 #pragma once
 #include "coupling/filtering/interfaces/FilterInterface.h"
-#include "coupling/IndexConversionMD2Macro.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include <mpi.h>
 

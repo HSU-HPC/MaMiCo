@@ -94,7 +94,7 @@ namespace coupling {
 
 		//TODO: refactor as member functions
 		template<unsigned int dim, IndexTrait ... traits>
-		int convertToScalar(const CellIndex<dim, traits...>&);
+		unsigned int convertToScalar(const CellIndex<dim, traits...>&);
 
 		template<unsigned int dim, IndexTrait ... traits>
 		tarch::la::Vector<dim, int> convertToVector(const CellIndex<dim, traits...>&);
@@ -132,7 +132,7 @@ class coupling::indexing::CellIndex {
 		using value_T = std::conditional_t<(
 			coupling::indexing::TraitOperations::is_same<coupling::indexing::IndexTrait::vector>(traits) or ...),
 			tarch::la::Vector<dim, int>, 
-			int
+			unsigned int
 		>;
 
 		/**
@@ -197,7 +197,7 @@ class coupling::indexing::CellIndex {
 		}
 
 		/*
-		 * Any two indices fulfill some relation iff the integers underlying their CellIndex<dim, {}> equivalents fulfill that relation.
+		 * Any two indices fulfill some relation iff the unsigned integers underlying their CellIndex<dim, {}> equivalents fulfill that relation.
 		 * Note that this is different than what the static member 'contains(...)' does.
 		 *
 		 * @param CellIndex index to compare this index to

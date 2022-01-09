@@ -247,16 +247,18 @@ static_assert(false, "IndexingService only available for dim=2 or dim=3.");
 
 //impl of IndexingService
 template<unsigned int dim>
-coupling::indexing::IndexingService<dim>::IndexingService(
+void coupling::indexing::IndexingService<dim>::init(
 	const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig, 
 	const coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig,
 	coupling::interface::MacroscopicSolverInterface<dim> * msi,
 	const unsigned int rank)
-	: _simpleMDConfig(simpleMDConfig),
-	  _mamicoConfig(mamicoConfig),
-	  _msi(msi),
-	  _rank(rank)
 {
+	//init members
+	_simpleMDConfig = simpleMDConfig;
+	_mamicoConfig = mamicoConfig;
+	_msi = msi;
+	_rank = rank;
+
 	//read relevant data from configs 
 	const auto globalMDDomainSize { _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize() }; 
 	const auto macroscopicCellSize { _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize() };
@@ -355,7 +357,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 			
 			//TODO: determine these two analyticaly (i.e. calculate domain bounds): you dont need to iterate over all global indices.
 			while(true) {
-				ranks = getRanksForGlobalIndex(lowerBoundary, globalNumberMacroscopicCells);
+				ranks = getRanksForGlobalIndex(lowerBoundary);
 				if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
 					break;
 
@@ -369,7 +371,7 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 				++lowerBoundary; 
 			}
 			while(true) {
-				ranks = getRanksForGlobalIndex(upperBoundary, globalNumberMacroscopicCells);
+				ranks = getRanksForGlobalIndex(upperBoundary);
 				if(std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index occurs...*/
 					break;
 
@@ -478,25 +480,25 @@ coupling::indexing::IndexingService<dim>::IndexingService(
 	testing::printAllBoundaries<dim>(of);
 
 	try {
-		testing::checkTrivialConversions<dim>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector>();
-		testing::checkTrivialConversions<dim, IndexTrait::local>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::local>();
+		testing::checkAllTrivialConversions<dim>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::local>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local>();
 
-		testing::checkTrivialConversions<dim, IndexTrait::md2macro>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro>();
-		testing::checkTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::md2macro>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>();
 
-		testing::checkTrivialConversions<dim, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::local, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>();
 
-		testing::checkTrivialConversions<dim, IndexTrait::md2macro, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::md2macro, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
 	}
 	catch (const std::exception& e) {
 		std::cout << "WARNING: IndexingService: Test indicated faulty conversion: " << e.what() << std::endl;
@@ -512,8 +514,10 @@ coupling::indexing::IndexingService<dim>::IndexingService(
  */
 template<unsigned int dim>
 std::vector<unsigned int> 
-coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) {
+coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex) {
 	std::vector<unsigned int> ranks;
+	//using the old meaning of 'globalNumberMacroscopicCells' from IndexConversion
+	const auto globalNumberMacroscopicCells = BaseIndex<dim>::numberCellsInDomain - tarch::la::Vector<dim, unsigned int> { 2 };
 
 	// start and end coordinates of neighboured cells.
 	tarch::la::Vector<dim,unsigned int> start(0);
@@ -562,7 +566,6 @@ coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex
  */
 template<unsigned int dim>
 unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim,unsigned int> globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
-
 	//vector containing avg number of macro cells, not counting global GL. 
 	tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells { 0 };
 	for (unsigned int d = 0; d < dim; d++) {

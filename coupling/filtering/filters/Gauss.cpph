@@ -23,7 +23,7 @@ void coupling::filtering::Gauss<dim>::operator()(){
 	for(unsigned int raw_index = 0; raw_index < _inputCells.size(); raw_index++) {
 		
 		//construct CellIndex using raw index
-		index = { (int) raw_index };
+		index = { raw_index };
 
 		//make use of implicit conversion between linear <-> vector indices
 		indexAbove = getIndexAbove(index, _dim);

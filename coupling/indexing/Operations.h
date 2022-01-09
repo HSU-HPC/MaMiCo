@@ -15,17 +15,20 @@ namespace coupling {
 		 * @author Felix Maurer
 		 */
 		template<unsigned int dim, IndexTrait ... traits>
-		int 
+		unsigned int 
 		convertToScalar(const CellIndex<dim, traits...>& index) {
-			if constexpr( std::is_same_v<int, typename CellIndex<dim, traits...>::value_T> ) {
+			if constexpr( std::is_same_v<unsigned int, typename CellIndex<dim, traits...>::value_T> ) {
 				return index.get();
 			}
 			else {
 				//copied from deprecated coupling::IndexConversion::getCellIndex())
 				
-				int i { index.get()[dim-1] };
+				for(unsigned d = 0; d < dim; d++)
+					if(index.get()[d] < 0) throw std::runtime_error("ERROR: Indexing: Cannot convert negative vector index to scalar.");
+
+				unsigned int i { static_cast<unsigned int>(index.get()[dim-1]) };
 				for (int d = dim-2; d >-1; d--){
-					i = (CellIndex<dim, traits...>::numberCellsInDomain[d])*i + index.get()[d];
+					i = (CellIndex<dim, traits...>::numberCellsInDomain[d])*i + static_cast<unsigned int>(index.get()[d]);
 				}
 
 				return i;
@@ -53,10 +56,10 @@ namespace coupling {
 				//copied from coupling::getVectorCellIndex() 
 
 				tarch::la::Vector<dim, int> i { 0 };
-				int i_sca { index.get() };
+				unsigned int i_sca { index.get() };
 				for (int d = dim-1; d> 0; d--){
-					i[d] = i_sca / CellIndex<dim, traits...>::divisionFactor[d];
-					i_sca -= i[d]*CellIndex<dim, traits...>::divisionFactor[d];
+					i[d] = static_cast<int>(i_sca / CellIndex<dim, traits...>::divisionFactor[d]);
+					i_sca -= static_cast<unsigned int>(i[d])*CellIndex<dim, traits...>::divisionFactor[d];
 				}
 				i[0] = i_sca;
 

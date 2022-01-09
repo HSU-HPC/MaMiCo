@@ -14,7 +14,7 @@
 #include "Operations.h"
 
 //enable/disable tests
-#define TEST_INDEXING
+//#define TEST_INDEXING
 
 #ifdef TEST_INDEXING
 //Inlcude index tests
@@ -44,16 +44,19 @@ namespace coupling {
  *
  * @author Felix Maurer
  */
-//TODO: redesign as function
 template<unsigned int dim>
 class coupling::indexing::IndexingService{
 	public:
-		IndexingService(const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig,
-						const coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig,
-						coupling::interface::MacroscopicSolverInterface<dim> *msi,
-						const unsigned int rank);
+		static IndexingService& getInstance() {
+			static IndexingService singleton {};
+			return singleton;
+		}
 
-	private:
+		void init(	const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig,
+					const coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig,
+					coupling::interface::MacroscopicSolverInterface<dim> *msi,
+					const unsigned int rank);
+
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
 		/**
 		 * Determines all ranks that contain a certain global BaseIndex.
@@ -63,8 +66,11 @@ class coupling::indexing::IndexingService{
 		 * @param globalNumberMacroscopicCells global number of cells in BaseIndex domain EXCLUDING global ghost layer cells.
 		 * @returns vector of all cells which contain the index
 		 */
+		std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex);
+		#endif
 
-		std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex, const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
+	private:
+		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
 		/**
 		 * Helper function used by getRanksForGlobalIndex().
 		 */
@@ -75,8 +81,8 @@ class coupling::indexing::IndexingService{
 		const coupling::paralleltopology::ParallelTopology<dim> *_parallelTopology;
 		#endif
 
-		const simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
-		const coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
+		simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
+		coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
 		coupling::interface::MacroscopicSolverInterface<dim> *_msi; 
-		const unsigned int _rank;
+		unsigned int _rank;
 };
