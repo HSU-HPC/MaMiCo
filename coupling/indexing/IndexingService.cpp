@@ -480,25 +480,25 @@ void coupling::indexing::IndexingService<dim>::init(
 	testing::printAllBoundaries<dim>(of);
 
 	try {
-		testing::checkTrivialConversions<dim>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector>();
-		testing::checkTrivialConversions<dim, IndexTrait::local>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::local>();
+		testing::checkAllTrivialConversions<dim>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::local>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local>();
 
-		testing::checkTrivialConversions<dim, IndexTrait::md2macro>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro>();
-		testing::checkTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::md2macro>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>();
 
-		testing::checkTrivialConversions<dim, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::local, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>();
 
-		testing::checkTrivialConversions<dim, IndexTrait::md2macro, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
-		testing::checkTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::md2macro, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
+		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
 	}
 	catch (const std::exception& e) {
 		std::cout << "WARNING: IndexingService: Test indicated faulty conversion: " << e.what() << std::endl;

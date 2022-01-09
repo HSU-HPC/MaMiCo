@@ -11,8 +11,12 @@ namespace coupling::indexing::testing {
 	/**
 	 * TODO: comment
 	 */
-	template<unsigned int dim, coupling::indexing::IndexTrait ...>
-	void checkTrivialConversions();
+	template<unsigned int dim, coupling::indexing::IndexTrait ... traits>
+	void checkAllTrivialConversions();
+
+	template<unsigned int dim, coupling::indexing::IndexTrait ... traits, coupling::indexing::IndexTrait... convert_to_traits>
+	void checkTrivialConversion(CellIndex<dim, traits...>);
+
 }
 
 //include implementation

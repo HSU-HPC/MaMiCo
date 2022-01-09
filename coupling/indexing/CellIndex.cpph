@@ -36,7 +36,7 @@ CellIndex<dim, traits...>::operator CellIndex<dim, converted_traits...>() const 
 		}
 		else /* result index is not a vector */ {
 			//get scalar version of i_vec by first constructing a BaseIndex and then converting it
-			const int i_sca {
+			const unsigned int i_sca {
 					//Get BaseIndex (i.e. traits=vector) and convert that to scalar
 				 	convertToScalar<dim, IndexTrait::vector>( BaseIndex<dim>(*this - CellIndex<dim, converted_traits...>::lowerBoundary) )
 				};
