@@ -15,6 +15,10 @@
 #include "coupling/solvers/FoamClass.h"
 #include "coupling/solvers/FoamSolverInterface.h"
 #endif
+#if(BUILD_WITH_PRECICE)
+#include "coupling/solvers/PreciceSolver.h"
+#include "coupling/solvers/PreciceSolverInterface.h"
+#endif
 #include "coupling/solvers/FDCouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/solvers/LBCouetteSolverInterface.h"
@@ -67,7 +71,8 @@ private:
   enum MacroSolverType{COUETTE_ANALYTICAL=0, ///< the analytical couette solver is used (coupling::solvers::CouetteSolver)
     COUETTE_LB=1, ///< the Lattice-Bolzmann solver is used (coupling::solvers::LBCouetteSolver)
     COUETTE_FD=2, ///< the 1d finite-difference solver is used (coupling::solvers::FiniteDifferenceSolver)
-    COUETTE_FOAM=3 ///< the IcoFoam solver is used (coupling::solvers::IcoFoam)
+    COUETTE_FOAM=3, ///< the IcoFoam solver is used (coupling::solvers::IcoFoam)
+    COUETTE_PRECICE=4 ///< a preCICE adapter is used (coupling::solvers::PreCICESolver)
   };
   /** Defines the type of md solver for the coupled simulation  */
   enum MicroSolverType{SIMPLEMD=0, ///< the SimpleMD solver is used
@@ -232,6 +237,15 @@ private:
       tarch::configuration::ParseConfiguration::readStringMandatory(_foam.directory,subtag,"foam-setup-directory");
       tarch::configuration::ParseConfiguration::readStringMandatory(_foam.folder,subtag,"foam-setup-folder");
       tarch::configuration::ParseConfiguration::readVector<12,unsigned int>(_foam.boundariesWithMD,subtag,"boundaries-with-MD");
+    }
+    #endif
+    #if(BUILD_WITH_PRECICE)
+    else if(type == "precice"){
+      _cfg.maSolverType = COUETTE_PRECICE;
+      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep,subtag,"plot-every-timestep");
+      /*tarch::configuration::ParseConfiguration::readStringMandatory(_foam.directory,subtag,"foam-setup-directory");
+      tarch::configuration::ParseConfiguration::readStringMandatory(_foam.folder,subtag,"foam-setup-folder");
+      tarch::configuration::ParseConfiguration::readVector<12,unsigned int>(_foam.boundariesWithMD,subtag,"boundaries-with-MD");*/
     }
     #endif
     else if(type == "analytical"){
@@ -978,6 +992,17 @@ private:
       }
     }
     #endif
+    #if(BUILD_WITH_PRECICE)
+    else if(_cfg.maSolverType == COUETTE_PRECICE){
+      if(_rank==0){
+        solver = new coupling::solvers::PreciceSolver(_rank, _cfg.plotEveryTimestep, _cfg.channelheight);
+        if (solver==NULL){
+          std::cout << "ERROR CouetteTest::getCouetteSolver(): preCICE solver==NULL!" << std::endl;
+          exit(EXIT_FAILURE);
+        }
+      }
+    }
+    #endif
     // LB solver: active on lbNumberProcesses
     else if(_cfg.maSolverType == COUETTE_LB){
       solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight,vel,_cfg.kinVisc,dx,dt,_cfg.plotEveryTimestep,"LBCouette",_cfg.lbNumberProcesses,1);
@@ -1034,6 +1059,11 @@ private:
     #if(BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == COUETTE_FOAM){
       interface = new coupling::solvers::FoamSolverInterface<3>(globalNumberMacroscopicCells,outerRegion);
+    }
+    #endif
+    #if(BUILD_WITH_PRECICE)
+    else if (_cfg.maSolverType == COUETTE_PRECICE){
+      interface = new coupling::solvers::PreciceSolverInterface<3>(globalNumberMacroscopicCells,outerRegion);
     }
     #endif
     else if (_cfg.maSolverType == COUETTE_FD){

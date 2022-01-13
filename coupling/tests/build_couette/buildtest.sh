@@ -69,6 +69,18 @@ else
 fi
 ###
 
+### specity flags, includes and libraries for a run with OpenFOAM
+if [ -v PRECICE_DIR ]
+then
+  echo "MaMiCo is compiled including preCICE library"
+  FLAGS="${FLAGS} -DBUILD_WITH_PRECICE"
+  includes="${includes} -I${PRECICE_DIR}/include/"
+  libraries="${libraries} -lprecice"
+else
+  FLAGS="${FLAGS} -pedantic"
+fi
+###
+
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH}
 if [ "${parallel}" == "parallel" ]
