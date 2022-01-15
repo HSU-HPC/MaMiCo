@@ -42,7 +42,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(
 		}
 	}
 	//case: the input vector contains only the MD-To-Macro domain
-	else if(inputCells.size() == CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain) {
+	else if(inputCells.size() == CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
 		std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
 		_outerCells = {};
 	}
@@ -53,7 +53,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(
 			"Unexpected cell input size: "s + std::to_string(inputCells.size()) + "\n"
 			+ "Expected either:\n"s 
 			+ std::to_string(CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) + "(MD domain size)"
-			+ std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain) + "(MD-To-Macro domain size)"
+			+ std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) + "(MD-To-Macro domain size)"
 		);
 	}
 
