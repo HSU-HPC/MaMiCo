@@ -162,42 +162,36 @@ void coupling::indexing::testing::printAllBoundaries(std::ostream& os) {
 		os << std::endl;
 }
 
-<<<<<<< HEAD
 template<unsigned int dim, coupling::indexing::IndexTrait ... traits>
-void coupling::indexing::testing::checkTrivialConversions() {
+void coupling::indexing::testing::checkAllTrivialConversions() {
 	using namespace coupling::indexing::TraitOperations;
 	using coupling::indexing::CellIndex;
 	using coupling::indexing::IndexTrait;
-=======
-template<unsigned int dim, IndexTrait ... traits>
-void coupling::indexing::testing::checkAllTrivialConversions() {
-	using namespace coupling::indexing::TraitOperations;
-	CellIndex<dim> i {};
->>>>>>> indexing-c++17
 
-//TODO: enable range after merge with piet branch
-//	for(const auto i : CellIndex<dim, traits...>) { //for each valid global index
+	for(const auto& i : CellIndex<dim, traits...>()) { //for each valid global index
 		//check trivial conversion: tested index -> some other index -> tested index == tested index
 		try {
-			checkTrivialConversion<dim, traits...>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::vector>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::local>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::vector, IndexTrait::local>(i);
+			using I = CellIndex<dim, traits...>;		
+	
+			checkTrivialConversion<dim, I>(i);
+			checkTrivialConversion<dim, I, IndexTrait::vector>(i);
+			checkTrivialConversion<dim, I, IndexTrait::local>(i);
+			checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local>(i);
 
-			checkTrivialConversion<dim, traits..., IndexTrait::md2macro>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::vector, IndexTrait::md2macro>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::local, IndexTrait::md2macro>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>(i);
+			checkTrivialConversion<dim, I, IndexTrait::md2macro>(i);
+			checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::md2macro>(i);
+			checkTrivialConversion<dim, I, IndexTrait::local, IndexTrait::md2macro>(i);
+			checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>(i);
 
-			checkTrivialConversion<dim, traits..., IndexTrait::noGhost>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::vector, IndexTrait::noGhost>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::local, IndexTrait::noGhost>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>(i);
+			checkTrivialConversion<dim, I, IndexTrait::noGhost>(i);
+			checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::noGhost>(i);
+			checkTrivialConversion<dim, I, IndexTrait::local, IndexTrait::noGhost>(i);
+			checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>(i);
 
-			checkTrivialConversion<dim, traits..., IndexTrait::md2macro, IndexTrait::noGhost>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(i);
-			checkTrivialConversion<dim, traits..., IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(i);
+			checkTrivialConversion<dim, I, IndexTrait::md2macro, IndexTrait::noGhost>(i);
+			checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>(i);
+			checkTrivialConversion<dim, I, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(i);
+			checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(i);
 		}
 		catch(std::runtime_error& e) {
 			using namespace std::string_literals;
@@ -210,18 +204,17 @@ void coupling::indexing::testing::checkAllTrivialConversions() {
 			else 
 				throw std::runtime_error("() -> ("s +  e.what() + ") -> ()"s);
 		}
-//	}
+	}
 }
 
-//TODO: problem: double parameter pack is not supported by c++
-template<unsigned int dim, IndexTrait... traits, IndexTrait... convert_to_traits>
-void coupling::indexing::testing::checkTrivialConversion(CellIndex<dim, traits...> i) {
+template<unsigned int dim, class Index, IndexTrait... convert_to_traits>
+void coupling::indexing::testing::checkTrivialConversion(Index i) {
 
 	//check for illegal out-of-bounds conversions. these need no testing
 	if(i < CellIndex<dim, convert_to_traits...>::lowerBoundary) return;
 	if(i > CellIndex<dim, convert_to_traits...>::upperBoundary) return;
 
-	if(CellIndex<dim, traits...> { CellIndex<dim, convert_to_traits...> { i } } != i) {
+	if(Index { CellIndex<dim, convert_to_traits...> { i } } != i) {
 		if constexpr (sizeof...(convert_to_traits) > 0)
 			throw std::runtime_error(coupling::indexing::TraitOperations::print_traitlist<convert_to_traits...>());
 		else

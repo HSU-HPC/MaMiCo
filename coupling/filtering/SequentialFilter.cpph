@@ -190,7 +190,9 @@ void coupling::filtering::SequentialFilter<dim>::process(bool sequential) {
 			macroscopicCellToBuffer(_cellbuf, _outputCells_Global[c]);
 
 			//get rank of cell
-			int target_rank = c % _commSize; //TODO: properly determine correct target rank
+			const auto is = coupling::indexing::IndexingService<dim>::getInstance();
+			//TODO: use getUniqueRank instead
+			int target_rank = static_cast<int>(is.getRanksForGlobalIndex(coupling::indexing::CellIndex<dim> { c })[0]);
 				
 			#ifdef DEBUG_SEQ_FILTER_VERBOSE
 				std::cout << "		SEQFILTER (" << _myRank << "): Sending cell " << c << " to rank " << target_rank << std::endl;

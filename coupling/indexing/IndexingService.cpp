@@ -514,7 +514,7 @@ void coupling::indexing::IndexingService<dim>::init(
  */
 template<unsigned int dim>
 std::vector<unsigned int> 
-coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex) {
+coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex) const {
 	std::vector<unsigned int> ranks;
 	//using the old meaning of 'globalNumberMacroscopicCells' from IndexConversion
 	const auto globalNumberMacroscopicCells = BaseIndex<dim>::numberCellsInDomain - tarch::la::Vector<dim, unsigned int> { 2 };

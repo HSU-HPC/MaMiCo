@@ -14,7 +14,7 @@
 #include "Operations.h"
 
 //enable/disable tests
-//#define TEST_INDEXING
+#define TEST_INDEXING
 
 #ifdef TEST_INDEXING
 //Inlcude index tests
@@ -66,7 +66,7 @@ class coupling::indexing::IndexingService{
 		 * @param globalNumberMacroscopicCells global number of cells in BaseIndex domain EXCLUDING global ghost layer cells.
 		 * @returns vector of all cells which contain the index
 		 */
-		std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex);
+		std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex) const;
 		#endif
 
 	private:
