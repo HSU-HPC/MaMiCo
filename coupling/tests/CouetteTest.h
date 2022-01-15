@@ -83,15 +83,6 @@ private:
     initMPI();
     parseConfigurations();
     initSolvers();
-
-	//TODO: make couetteSolverInterface a member?
-    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
-      _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-      _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
-      getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
-    );
-
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
   }
 
   /** it advances the macro (advanceMacro()) and micro solver (advanceMicro),
@@ -151,17 +142,17 @@ private:
       std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
       exit(EXIT_FAILURE);
     }
-	tinyxml2::XMLElement *n_md = n_mamico->NextSiblingElement();
+    tinyxml2::XMLElement *n_md = n_mamico->NextSiblingElement();
     if(n_md == NULL){
       std::cout << "Could not read input file couette.xml: missing element <molecular-dynamics>" << std::endl;
       exit(EXIT_FAILURE);
     }
-	tinyxml2::XMLElement *n_fp = n_md->NextSiblingElement();
+    tinyxml2::XMLElement *n_fp = n_md->NextSiblingElement();
     if(n_fp == NULL){
       std::cout << "Could not read input file couette.xml: missing element <filter-pipeline>" << std::endl;
       exit(EXIT_FAILURE);
     }
-	tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
+    tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
     if(n_unexpected != NULL){
       std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
@@ -298,7 +289,6 @@ private:
     _couetteSolver = getCouetteSolver( _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
       _simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
       );
-	if (_couetteSolver != NULL) std::cout << "Couette solver not null on rank: " << _rank << std::endl; //TODO: remove debug
 
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized anyway,
@@ -372,6 +362,12 @@ private:
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }
+
+    //init indexing
+    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
+
+    //init filtering for all md instances
+    _multiMDCellService->constructFilterPipelines();
 
     if(_cfg.miSolverType == SIMPLEMD){
       // set couette solver interface in MamicoInterfaceProvider
@@ -454,19 +450,21 @@ private:
 					const double mass = (_cfg.density)*macroscopicCellSize[0]*macroscopicCellSize[1]*macroscopicCellSize[2];
 
 					using coupling::indexing::IndexTrait;
+					using coupling::indexing::CellIndex;
+
 					const tarch::la::Vector<3,double> md2MacroDomainOffset = {
-						coupling::indexing::CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[0] * macroscopicCellSize[0],
-						coupling::indexing::CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[1] * macroscopicCellSize[1],
-						coupling::indexing::CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[2] * macroscopicCellSize[2],
+						CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[0] * macroscopicCellSize[0],
+						CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[1] * macroscopicCellSize[1],
+						CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[2] * macroscopicCellSize[2],
 					};
 
 					std::normal_distribution<double> distribution (0.0,_cfg.noiseSigma);
 					std::vector<std::array<double, 3>> syntheticMomenta;
 					for (unsigned int i = 0; i < size; i++){
 						// determine cell midpoint
-						const tarch::la::Vector<3,unsigned int> globalIndex(coupling::indexing::convertToVector<3>( { _buf.globalCellIndices4RecvBuffer[i] } )); //construct global CellIndex from buffer and convert it to vector
+						CellIndex<3, IndexTrait::vector> globalIndex(CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost> { i }); //construct global CellIndex from buffer and convert it to vector
 						tarch::la::Vector<3,double> cellMidPoint(md2MacroDomainOffset-0.5*macroscopicCellSize);
-						for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d])*macroscopicCellSize[d]; }
+						for (unsigned int d = 0; d < 3; d++){ cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex.get()[d])*macroscopicCellSize[d]; }
 
 						//compute momentum
 						const tarch::la::Vector<3,double> noise(distribution(_generator),distribution(_generator),distribution(_generator));
