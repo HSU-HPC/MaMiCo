@@ -87,6 +87,10 @@ class coupling::filtering::SequentialFilter : public coupling::filtering::Filter
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _inputCells_Global; 	
 		std::vector<coupling::datastructures::MacroscopicCell<dim>* > _outputCells_Global;
 
+		//Used by the processing rank to remember from which rank it received cells located at which global index TODO: use CellIndex?
+		std::vector<unsigned int> _cellRanks;
+
+
 		//Buffers macro cells for MPI communication
 		std::vector<double> _cellbuf;
 

@@ -34,12 +34,13 @@ coupling::filtering::SequentialFilter<dim>::SequentialFilter(
 
 			//allocate global cell datastructures
 			unsigned int numcells = coupling::indexing::CellIndex<dim,
-				coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>
+				/*global*/ coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>
 				::linearNumberCellsInDomain;
 			for(unsigned int c = 0; c < numcells; c++) {
 				_inputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 				_outputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
 			}
+			_cellRanks.resize(numcells);
 		}//end: if rank processing rank
 
 		//Resize if buffers are too small to contain cell data
@@ -77,12 +78,18 @@ void coupling::filtering::SequentialFilter<dim>::operator()(){
 //PRIVATE FUNCTIONS
 template<unsigned int dim>
 void coupling::filtering::SequentialFilter<dim>::contribute() {	
+	using coupling::indexing::CellIndex;
+	using coupling::indexing::IndexTrait;
+
+	//buffer used locally for raw indices
+	unsigned int indexbuf {};
+
 	#ifdef DEBUG_SEQ_FILTER
 	std::cout << "		SEQFILTER (" << _myRank << "): Sending cells and indices." << std::endl;
 	#endif
 
 	if(_processingRank == _myRank) {
-		//Count cells that we update. This should be equal to _inputCells_Global.size().
+		//count cells that we update. This should be equal to _inputCells_Global.size().
 		unsigned int cellsUpdated = 0;
 		
 		//Iterate over all (contributing) ranks...
@@ -93,9 +100,12 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 				#ifdef DEBUG_SEQ_FILTER
 					std::cout << "		SEQFILTER (" << _myRank << "): Copying " << _inputCells_Local.size() << " cells from local on processing rank " << rank << std::endl;
 				#endif
-				//Copy all cell data to global data structures. TODO: use std list and concat
-				for(unsigned int c = 0; c < _inputCells_Local.size(); c++) {
-					*(_inputCells_Global[cellsUpdated]) = *(_inputCells_Local[c]);
+				//copy all cell data to global data structures. TODO: use std list and concat
+				for(const auto& index : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>()) {
+					//determine corresponding global index
+					indexbuf = 	CellIndex<dim, /*global*/ IndexTrait::md2macro, IndexTrait::noGhost>(index).get(); //then convert back to unsigned int
+
+					*(_inputCells_Global[indexbuf]) = *(_inputCells_Local[index.get()]);
 					cellsUpdated++;
 				}
 
@@ -106,7 +116,7 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 
 			//Case: the contributing rank is not the processing rank. We need to communicate cell data using MPI.
 			else {
-				//Receive number of cells+indices that will be sent from that rank
+				//receive number of cells+indices that will be sent from that rank
 				unsigned int numberOfCellsFromRank;
 				MPI_Recv(&numberOfCellsFromRank, 1, MPI_UNSIGNED, rank, 0, _comm, MPI_STATUS_IGNORE);
 				#ifdef DEBUG_SEQ_FILTER
@@ -117,9 +127,14 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 				for(unsigned int c = 0; c < numberOfCellsFromRank; c++) { //TODO: receive all cells at once
 					//receive cell
 					MPI_Recv(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, rank, 0, _comm, MPI_STATUS_IGNORE);
+					//receive global index
+					MPI_Recv(&indexbuf, 1, MPI_UNSIGNED, rank, 0, _comm, MPI_STATUS_IGNORE);
 
-					//Insert data received into global cell data structures TODO: use std list and concat
-					bufferToMacroscopicCell(_cellbuf, _inputCells_Global[cellsUpdated]);
+					//insert data received into global cell data structures TODO: use std list and concat
+					bufferToMacroscopicCell(_cellbuf, _inputCells_Global[indexbuf]);
+
+					//save rank for this cell to be able to send it back later
+					_cellRanks[indexbuf] = rank;
 					
 					cellsUpdated++;
 
@@ -139,28 +154,38 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 	}
 	else /* contributing rank */{
 		
-		//Communicate to processing rank how many cells+indices will be send
+		//communicate to processing rank how many cells+indices will be send
 		unsigned int numberOfCellsFromThisRank = _filter->getInputCells().size();
 		MPI_Send(&numberOfCellsFromThisRank, 1, MPI_UNSIGNED, _processingRank, 0, _comm);
 
-		//Send that many cells (and indices)
+		//send that many cells (and indices)
 		for(unsigned int c = 0; c < numberOfCellsFromThisRank; c++) { //TODO: send all cells at once
-			//fill buffers
+			//fill buffer
 			macroscopicCellToBuffer(_cellbuf, _filter->getInputCells()[c]);
 
 			//send cell
 			MPI_Send(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, _processingRank, 0, _comm);
+			//send global index
+			indexbuf = CellIndex<dim, /*global*/ IndexTrait::md2macro, IndexTrait::noGhost>(c).get();
+			MPI_Send(&indexbuf, 1, MPI_UNSIGNED, _processingRank, 0, _comm);
 		}
 
-		//The processing rank now processes...
+		//the processing rank now processes...
 
-		//Receive output data
+		//receive output data
 		for(unsigned int c = 0; c < numberOfCellsFromThisRank; c++) { //TODO: receive all cells at once
 			//receive cell
 			MPI_Recv(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, _processingRank, 0, _comm, MPI_STATUS_IGNORE);
+			//receive global index
+			MPI_Recv(&indexbuf, 1, MPI_UNSIGNED, _processingRank, 0, _comm, MPI_STATUS_IGNORE);
+
+			//convert received index
+			indexbuf = 	CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>( //get local index
+							CellIndex<dim, /*global*/ IndexTrait::md2macro, IndexTrait::noGhost>(indexbuf) //by constructing and converting global index
+						).get(); //then convert back to unsigned int
 
 			//find cell in filter's domain and apply
-			bufferToMacroscopicCell(_cellbuf, _filter->getOutputCells()[c]);
+			bufferToMacroscopicCell(_cellbuf, _filter->getOutputCells()[indexbuf]);
 		}
 	}
 }
@@ -189,10 +214,8 @@ void coupling::filtering::SequentialFilter<dim>::process(bool sequential) {
 			//fill buffers with cell data
 			macroscopicCellToBuffer(_cellbuf, _outputCells_Global[c]);
 
-			//get rank of cell
-			const auto is = coupling::indexing::IndexingService<dim>::getInstance();
-			//TODO: use getUniqueRank instead
-			int target_rank = static_cast<int>(is.getRanksForGlobalIndex(coupling::indexing::CellIndex<dim> { c })[0]);
+			//get origin rank of cell
+			int target_rank = _cellRanks[c];
 				
 			#ifdef DEBUG_SEQ_FILTER_VERBOSE
 				std::cout << "		SEQFILTER (" << _myRank << "): Sending cell " << c << " to rank " << target_rank << std::endl;
@@ -211,6 +234,8 @@ void coupling::filtering::SequentialFilter<dim>::process(bool sequential) {
 			else {
 				//send cell
 				MPI_Send(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, target_rank, 0, _comm);
+				//send corresponding global index
+				MPI_Send(&c, 1, MPI_UNSIGNED, target_rank, 0, _comm);
 			}
 		}
 
