@@ -67,7 +67,6 @@ class coupling::services::MultiMDCellService {
       _macroscopicCellServices = new coupling::services::MacroscopicCellService<dim>* [_totalNumberMDSimulations];
       if (_macroscopicCellServices==NULL){std::cout << "ERROR coupling::services::MultiMDCellService::MultiMDCellService(...): _macroscopicCellServices==NULL!" << std::endl; exit(EXIT_FAILURE);}
 
-
       // allocate all macroscopic cell services for macro-only-solver BEFORE topology offset
       // -> we have localNumberMDSimulations that run per block of ranks on intNumberProcesses
       //    -> this yields localNumberMDSimulations*topologyOffset/intNumberProcesses MD simulations before the actual block of ranks
@@ -216,8 +215,14 @@ class coupling::services::MultiMDCellService {
 	//Must be called after construction of MultiMDCellService, but before the first coupling step.
     void constructFilterPipelines() {
 		for(unsigned int md = 0; md < _totalNumberMDSimulations; md++) {
-			if(_macroscopicCellServices[md]->getFilterPipeline() == nullptr) {
-				_macroscopicCellServices[md]->initFiltering();
+			//get macroscopic cell service of instance
+			auto& mcs = _macroscopicCellServices[md];
+
+			//only Impl instances of MCS contain filtering
+			if(dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim> *>(mcs) == nullptr) continue;
+
+			if(mcs->getFilterPipeline() == nullptr) {
+				mcs->initFiltering();
 			}
 		}
     }
