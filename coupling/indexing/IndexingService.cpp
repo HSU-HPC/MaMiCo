@@ -478,6 +478,15 @@ void coupling::indexing::IndexingService<dim>::init(
 		of.open("indexbounds_rank"s + std::to_string(_rank) + ".txt"s);
 	}
 	testing::printAllBoundaries<dim>(of);
+	of.close();
+	//get output file for domains
+	{
+		using namespace std::string_literals;
+		of.open("indexdomains_rank"s + std::to_string(_rank) + ".txt"s);
+	}
+	testing::printAllDomains<dim>(of);
+	of.close();
+
 
 	try {
 		testing::checkAllTrivialConversions<dim>();
