@@ -510,7 +510,7 @@ void coupling::indexing::IndexingService<dim>::init(
 		testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
 	}
 	catch (const std::exception& e) {
-		std::cout << "WARNING: IndexingService: Test indicated faulty conversion: " << e.what() << std::endl;
+		std::cout << _rank << ": WARNING: IndexingService: Test indicated faulty conversion: " << e.what() << std::endl;
 	}
 
 	of.close();

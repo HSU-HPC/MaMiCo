@@ -325,15 +325,20 @@ void coupling::indexing::testing::checkAllTrivialConversions() {
 template<unsigned int dim, class Index, IndexTrait... convert_to_traits>
 void coupling::indexing::testing::checkTrivialConversion(Index i) {
 	//check for illegal out-of-bounds conversions. these need no testing
-	if(i < CellIndex<dim, convert_to_traits...>::lowerBoundary) return;
-	if(i > CellIndex<dim, convert_to_traits...>::upperBoundary) return;
+	for(unsigned int d = 0; d < dim; d++) {
+		if(static_cast<coupling::indexing::BaseIndex<dim> >(i).get()[d] < CellIndex<dim, convert_to_traits...>::lowerBoundary.get()[d]) return;
+		if(static_cast<coupling::indexing::BaseIndex<dim> >(i).get()[d] > CellIndex<dim, convert_to_traits...>::upperBoundary.get()[d]) return;
+	}
 
 	Index conv_i {};
-	//try "back and fourth" conversion
+	//try "back and forth" conversion
 	try {
 		conv_i = CellIndex<dim, convert_to_traits...> { i };
 	}
 	catch(std::runtime_error& e) {
+		std::cout << static_cast<coupling::indexing::BaseIndex<dim> >(i) << std::endl;
+		std::cout << CellIndex<dim, convert_to_traits...>::lowerBoundary << std::endl;
+		
 		//output error
 		std::cout << e.what() << std::endl;
 
