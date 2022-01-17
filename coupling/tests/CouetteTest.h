@@ -403,6 +403,9 @@ private:
 			throw std::runtime_error("ERROR: Syntethic MD is only available in sequential mode!");
 		}
 
+		// set couette solver interface in MamicoInterfaceProvider
+		coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
+
 		//Create new FilterFromFunction instance and insert it into Filtering System.
 		try {
 			for(unsigned int i = 0; i < _localMDInstances; i++) 
@@ -948,7 +951,7 @@ private:
     tarch::la::Vector<3,double> vel = _cfg.wallInitCycles > 0 ? _cfg.wallInitVelocity : _cfg.wallVelocity;
     // analytical solver: is only active on rank 0
     if (_cfg.maSolverType == COUETTE_ANALYTICAL){
-      if (_rank == 0){
+      if (_rank == 0 || _cfg.miSolverType == SYNTHETIC){
         solver = new coupling::solvers::CouetteSolver<3>(_cfg.channelheight,vel[0],_cfg.kinVisc);
         if (solver==NULL){
           std::cout << "ERROR CouetteTest::getCouetteSolver(): Analytic solver==NULL!" << std::endl;
@@ -956,17 +959,7 @@ private:
         }
       }
     }
-	  //In case of synthetic MD, each rank needs access to the analytical solution. In that case we thus initialize analytical solvers on each rank other than 0
-	  else if( _cfg.miSolverType == SYNTHETIC){ //rank != 0
-      if (_rank == 0){
-        solver = new coupling::solvers::CouetteSolver<3>(_cfg.channelheight,vel[0],_cfg.kinVisc);
-        if (solver==NULL){ //How is this even reachable? Copied it from above...
-          std::cout << "ERROR CouetteTest::getCouetteSolver(): Analytic solver==NULL!" << std::endl;
-          exit(EXIT_FAILURE);
-        }
-      }
-    }
-    #if(BUILD_WITH_OPENFOAM)
+	#if(BUILD_WITH_OPENFOAM)
     else if(_cfg.maSolverType == COUETTE_FOAM){
       solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD);
       if (solver==NULL){
@@ -994,6 +987,7 @@ private:
       std::cout << "ERROR CouetteTest::getCouetteSolver(): Unknown solver type!" << std::endl;
       exit(EXIT_FAILURE);
     }
+
     return solver;
   }
 
