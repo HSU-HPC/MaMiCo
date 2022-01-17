@@ -17,6 +17,9 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(
 	,_comm(multiMDService.getLocalCommunicator())
 	#endif
 {
+    using namespace coupling::indexing;
+	using namespace std::string_literals;
+
     //check if provided file is written in proper XML
     if(_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR){
 		std::cout << "Filter Pipeline config path: " << cfgpath << std::endl;
@@ -25,44 +28,61 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(
             
     //check for structural errors in config file
     if (!configIsValid(_config)) exit(EXIT_FAILURE);
-	
-    using namespace coupling::indexing;
 
-	//case: the input vector contains the entire MD domain
-	if(inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
-		using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
-
-		for(unsigned int i = 0; i < inputCells.size(); i++) {
-			if(Md2MacroIndex::contains(CellIndex<dim, IndexTrait::local> { i } )) {
-				_md2MacroCells.emplace_back(inputCells[i]);
-			}
-			else {
-				_outerCells.emplace_back(inputCells[i]);
-			}
-		}
-	}
-	//case: the input vector contains only the MD-To-Macro domain
-	else if(inputCells.size() == CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
-		std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
-		_outerCells = {};
-	}
-	//case: the input vector contains a nonexpected amount of cells
-	else {
-		using namespace std::string_literals;
-		throw std::runtime_error(
-			"Unexpected cell input size: "s + std::to_string(inputCells.size()) + "\n"
-			+ "Expected either:\n"s 
-			+ std::to_string(CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) + "(MD domain size)"
-			+ std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) + "(MD-To-Macro domain size)"
-		);
-	}
-
-    //load sequences
+	//differentiate between per-instance and post-multi-instance filtering
 	switch(_scope) {
 		case coupling::filtering::Scope::perInstance : 
+			//check for valid amount of input cells
+			//case 1: the input vector contains the entire MD domain
+			if(inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
+				using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
+
+				for(unsigned int i = 0; i < inputCells.size(); i++) {
+					if(Md2MacroIndex::contains(CellIndex<dim, IndexTrait::local> { i } ))
+						_md2MacroCells.emplace_back(inputCells[i]);
+					else 
+						_outerCells.emplace_back(inputCells[i]);
+				}
+			}
+			//case 2: the input vector contains only the MD-To-Macro domain
+			else if(inputCells.size() == CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
+				std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
+				_outerCells = {};
+			}
+			//case 3: the input vector contains a nonexpected amount of cells
+			else {
+				throw std::runtime_error(
+					"Per-Instance-Filtering: Unexpected cell input size: "s + std::to_string(inputCells.size()) + "\n"
+					+ "Expected either:\n"s 
+					+ std::to_string(CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) + "(local MD domain size)"
+					+ std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) + "(local MD-To-Macro domain size)"
+				);
+			}
+
+    		//load sequences
 			loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance")); 
 			break;
 		case coupling::filtering::Scope::postMultiInstance : 
+			//check for valid amount of input cells
+			//case 1: the input vector contains the entire global MD-To-Macro domain
+			if(inputCells.size() == CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
+				std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
+				_outerCells = {};
+			}
+			//case 2: the input vector is empty
+			else if(inputCells.size() == 0) {
+				_md2MacroCells = {};
+				_outerCells = {};
+			}
+			//case 3: the input vector contains a nonexpected amount of cells
+			else {
+				throw std::runtime_error(
+					"Post-Multi-Instance-Filtering: Unexpected cell input size: "s + std::to_string(inputCells.size()) + "\n"
+					+ "Expected:\n"s 
+					+ std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) + "(global MD-To-Macro domain size)"
+				);
+			}
+
 			loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
 			break;
 	}
