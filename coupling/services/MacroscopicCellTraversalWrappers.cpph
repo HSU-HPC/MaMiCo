@@ -230,7 +230,6 @@ public:
     for(unsigned int i=0; i<particlesToInserte; i++){
       int tmp = static_cast<int>(tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber()*totalCells);
       _toInserte[tmp] += 1;
-      std::cout << "insertion takes place in " << tmp << " of " << totalCells << std::endl;
     }
   }
   ~Wrapper4InserteCertainParticlesOverZPlane(){delete[] _toInserte;}
@@ -240,7 +239,6 @@ public:
   void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
     tarch::la::Vector<dim,unsigned int> cellIndex = Wrapper::_thisPtr->_indexConversion->getLocalVectorCellIndex(index);
     if(_toInserte[(cellIndex[0]-1)+_numberNonGhostCellsInX*(cellIndex[1]-1)]==0) return;
-    std::cout << (cellIndex[0]-1)+_numberNonGhostCellsInX*(cellIndex[1]-1) << " "<<_toInserte[(cellIndex[0]-1)+_numberNonGhostCellsInX*(cellIndex[1]-1)] << " " << cellIndex<< std::endl;
     // setup potential energy landscape (i.e. computes the potential energy for relevant molecules).
     Wrapper::_thisPtr->_mdSolverInterface->setupPotentialEnergyLandscape(Wrapper::_thisPtr->_indexConversion->convertLocalToGlobalVectorCellIndex(cellIndex),
       tarch::la::Vector<dim,unsigned int>(0),Wrapper::_thisPtr->_numberLinkedCellsPerMacroscopicCell);

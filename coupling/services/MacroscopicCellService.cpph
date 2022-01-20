@@ -249,16 +249,16 @@ applyVacuum(unsigned int t){
     particlesToInserte = wrapper.getNumberOfDeletedParticels();
     tarch::la::Vector<dim,unsigned int> sendToProcess = thisProcess;
     sendToProcess[2] = 0;
-    std::cout << thisProcess  << " sending " << particlesToInserte << " to " << sendToProcess << " rank " << _indexConversion->getRank(sendToProcess) << std::endl;
+    // std::cout << thisProcess  << " sending " << particlesToInserte << " to " << sendToProcess << " rank " << _indexConversion->getRank(sendToProcess) << std::endl;
     MPI_Send(&particlesToInserte, 1, MPI_INT, _indexConversion->getRank(sendToProcess), 0, MPI_COMM_WORLD);
   }
   if(thisProcess[2]==0){
     tarch::la::Vector<dim,unsigned int> getFromProcess = thisProcess;
     getFromProcess[2] = _indexConversion->getNumberProcesses()[2]-1;
     MPI_Recv(&particlesToInserte, 1, MPI_INT, _indexConversion->getRank(getFromProcess), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    std::cout << thisProcess  << " receiving " << particlesToInserte << " to " << getFromProcess << " rank " << _indexConversion->getRank(getFromProcess) << std::endl;
+    // std::cout << thisProcess  << " receiving " << particlesToInserte << " to " << getFromProcess << " rank " << _indexConversion->getRank(getFromProcess) << std::endl;
     if(particlesToInserte>0){
-    std::cout << "insertion" << std::endl;
+    // std::cout << "insertion" << std::endl;
     inserteMassFromVacuum(t, particlesToInserte);
     }
   }
