@@ -34,10 +34,6 @@
 #include "utils/Logger.h"
 using Log::global_log;
 #endif
-/**
- * Versatile configurable Couette flow test for noise-filtered multi-instance Nie coupling.
- *
- * Features, depending on couette.xml config file:
 
 //This is ignored if you dont use synthetic MD. For further instructions cf. SYNTHETIC part of initSolvers().
 #define SYNTHETICMD_SEQUENCE "SYNTHETIC-MD"

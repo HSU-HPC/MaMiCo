@@ -655,6 +655,10 @@ public:
       global_simulation->postSimLoopSteps();
       global_simulation->finalize();
     }
+    virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t)
+    {
+      //configure through ls1 config file, using plugins
+    }
 };
 #endif
 
