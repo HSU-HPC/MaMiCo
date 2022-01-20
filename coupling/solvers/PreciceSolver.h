@@ -36,7 +36,7 @@ public:
 	 */
 	PreciceSolver(
 	  const int rank,
-	  const double channelheight,
+	  const double channelHeight,
 	  const double dx,
 	  const double dt,
 	  const double kinVisc,
@@ -44,42 +44,49 @@ public:
 	  const std::string filestem) :
 	coupling::solvers::AbstractCouetteSolver<3>(),
 	_rank(rank),
-	_channelheight(channelheight),
+	_channelHeight(channelHeight),
 	_dx(dx), 
 	_dt(dt), 
 	_kinVisc(kinVisc), 
 	_plotEveryTimestep(plotEveryTimestep), 
-	_filestem(filestem)
+	_filestem(filestem),
+	_domainSize(std::floor(_channelHeight/dx)),
+	_numberOfVertices(std::pow(_domainSize, 3))
 	{
 		std::cout << "PreciceSolver constructor call" << std::endl;	
 		if(skipRank()){return;}
-		
-		_vel = new double[3*(_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2)];
-		_density = new double[(_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2)];
-		// zero velocity, unit density;
-		for (int i = 0; i < (_domainSizeX+2)*(_domainSizeY+2)*(_domainSizeZ+2); i++)
-		{
-			for (int d = 0; d <  3; d++)
-				_vel[i*3+d]  = (double)0.0;
-			_density[i] = 1.0;
-		}
 		_interface = new precice::SolverInterface("MAMICO","precice-config.xml",0,1);
 		int dim = _interface->getDimensions();
+		if (dim!=3)
+		{
+			std::cout << "main: preCICE dimension should be 3" << std::endl;
+			exit(EXIT_FAILURE);
+		}
 		int meshID = _interface->getMeshID("MamicoMesh");
-		int vertexSize = 10;
-		// determine vertexSize
-		double* coords = new double[vertexSize*dim]; // coords of coupling vertices 
-		// determine coordinates
-		int* vertexIDs = new int[vertexSize];
-		_interface->setMeshVertices(meshID, vertexSize, coords, vertexIDs); 
+		double* coords = new double[dim*_numberOfVertices];
+		_vel = new double[dim*_numberOfVertices];
+		_density = new double[_numberOfVertices];
+		for (int vertexIndex = 0; vertexIndex < _numberOfVertices; vertexIndex++)
+		{
+			for (int currentDim = 0; currentDim < dim; currentDim++)
+				_vel[dim*vertexIndex+currentDim]  = (double)0.0;
+			_density[vertexIndex] = 1.0;
+		}
+		for (int x = 0; x < _domainSize; x++)
+		{
+			for (int y = 0; y < _domainSize; y++)
+			{
+				for (int z = 0; z < _domainSize; z++)
+				{
+					coords[dim*get(x,y,z)] = x * _dx;
+					coords[dim*get(x,y,z)+1] = y * _dx;
+					coords[dim*get(x,y,z)+2] = z * _dx;			
+				}
+			}
+		}
+		_vertexIDs = new int[_numberOfVertices];
+		_interface->setMeshVertices(meshID, _numberOfVertices, coords, _vertexIDs); 
 		delete[] coords;
-		delete[] vertexIDs;
-
-		/*int mvsID = precice->getDataID("MamicoVelocities", meshID); 
-		int dvsID = precice->getDataID("DummmyVelocities", meshID); 
-		double* mvs = new double[vertexSize*dim];
-		double* dvs = new double[vertexSize*dim];*/
-
 		_precice_dt = _interface->initialize();
 		std::cout << "PreciceSolver constructor called" << std::endl;
 	}
@@ -110,7 +117,7 @@ public:
 		// compute index for respective cell (_dx+... for ghost cells); use coords to store local cell coordinates
 		tarch::la::Vector<3,unsigned int> coords;
 		for (unsigned int d = 0; d < 3; d++) 
-			coords[d] =  (unsigned int) ((_dx+pos[d])/_dx);
+			coords[d] =  (unsigned int) pos[d]/_dx;
 		const int index = get(coords[0],coords[1],coords[2]);
 		tarch::la::Vector<3,double> vel(0.0);
 		// extract velocity
@@ -127,7 +134,7 @@ public:
 	{
 		tarch::la::Vector<3,unsigned int> coords;
 		for (unsigned int d = 0; d < 3; d++)
-			coords[d] =  (unsigned int) ((_dx+pos[d])/_dx);
+			coords[d] =  (unsigned int) pos[d]/_dx;
 		const int index = get(coords[0],coords[1],coords[2]);
 		return _density[index];
 	}
@@ -136,23 +143,16 @@ public:
     */
 	void advance(double dt) override 
 	{
-		/*
-		if (skipRank()){return;}
-		const int timesteps=floor( dt/_dt+0.5 );
-		if ( fabs(timesteps*_dt-dt)/_dt > 1.0e-8 )
-		{
-			std::cout << "ERROR PreCICESolver::advance(): time steps and dt do not match!" << std::endl; 
-			exit(EXIT_FAILURE);
-		}
-		for (int i = 0; i < timesteps; i++)
-		{
-			setBeyondWall();
-			update();
-			plot();
-			_counter++;
-		}
-		*/
 		if(skipRank()){return;}
+		int dim = _interface->getDimensions();
+		int meshID = _interface->getMeshID("MamicoMesh");
+		int exvsID = _interface->getDataID("ExternalVelocities", meshID); 
+		double* velocities = new double[_numberOfVertices*dim];
+		_interface->readBlockVectorData(exvsID, _numberOfVertices, _vertexIDs, velocities);
+		for (int vertexIndex = 0; vertexIndex < _numberOfVertices; vertexIndex++)
+		{
+			std::cout << "PreciceSolver::advance: read velocities[" << vertexIndex << "] = [" << velocities[dim*vertexIndex] << "," << velocities[dim*vertexIndex+1] << "," << velocities[dim*vertexIndex+2] << "]" << std::endl;
+		}
 		std::cout << "PreciceSolver::advance called with dt = " << dt << std::endl;
 		//while (_interface->isCouplingOngoing()) {
 			double computed_dt = std::min(_precice_dt, dt);
@@ -161,19 +161,12 @@ public:
     	//}
 	}
 
-  private:
-    /** @brief determines the local domain size on this rank where channelheight is the domain length in direction d.
-     *  @returns the size of the domain */
-    int getDomainSize(double channelheight, double dx) const 
-    {
-      return floor( (channelheight+0.5)/dx );
-    }
-    
-    /** @brief returns linearized index and performs checks in debug mode
+  private:    
+    /** @brief returns linearized index
      *  @returns the linearized index */
     int get(int x,int y,int z) const
     {
-      return x + (_domainSizeX+2)*(y+(_domainSizeY+2)*z);
+      return x + _domainSize*(y+_domainSize*z);
     }
 
     /** @brief returns true, if this rank is not of relevance for the LB simulation
@@ -186,7 +179,7 @@ public:
     /** @brief rank of this process */
     const int _rank;
     /** @brief the height and width of the channel in z and y direction */
-    const double _channelheight; //
+    const double _channelHeight; //
     /** @brief mesh size, dx=dy=dz */
     const double _dx;
     /** @brief time step*/
@@ -197,12 +190,10 @@ public:
     const int _plotEveryTimestep;
     /** @brief file stem for vtk plot */
     const std::string _filestem;
-    /** @brief domain size in x-direction */
-    const int _domainSizeX { getDomainSize(_channelheight,_dx) };
-    /** @brief domain size in y-direction */
-    const int _domainSizeY { getDomainSize(_channelheight,_dx) };
-    /** @brief domain size in z-direction */
-    const int _domainSizeZ { getDomainSize(_channelheight,_dx) };
+    /** @brief domain size in x-y-z-direction */
+    const int _domainSize;
+     /** @brief number of vertices */
+    const int _numberOfVertices;
     /** @brief time step counter */
     int _counter{0};
     /** @brief velocity field */
@@ -215,6 +206,8 @@ public:
     precice::SolverInterface *_interface;
     /** @brief preCICE time step */
 	double _precice_dt;
+	/** @brief preCICE vertex ids **/
+	int* _vertexIDs;
 };
 
 #endif// _MOLECULARDYNAMICS_COUPLING_SOLVERS_PRECICESOLVER_H_
