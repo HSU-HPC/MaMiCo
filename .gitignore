@@ -2,6 +2,7 @@ build/
 .sconsign.dblite
 *.csv
 *.vtk
+*.vti
 *.o
 *.out
 out/
@@ -33,3 +34,7 @@ cmake-build-debug/CMakeFiles/cmake.check_cache
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/settings.json
+*.old
+*.html
+*.dot
+docs/

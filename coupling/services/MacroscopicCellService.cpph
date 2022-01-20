@@ -4,6 +4,7 @@
 // www5.in.tum.de/mamico
 
 #include <sys/time.h>
+#include <stdexcept>
 
 
 template<class LinkedCell,unsigned int dim>
@@ -17,8 +18,9 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::MacroscopicCellS
   const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,
   const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,
   const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
-  const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,
+  //const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,
   const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
+  const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
   unsigned int numberMDTimestepsPerCouplingCycle,
   const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
   const char* filterPipelineConfiguration,
@@ -40,17 +42,18 @@ _macroscopicSolverInterface(macroscopicSolverInterface),
 _deFromMacro2MD(_macroscopicSolverInterface,*_indexConversion,ID),
 _deFromMD2Macro(_macroscopicSolverInterface,*_indexConversion,ID),
 _macroscopicCells( macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface ),
-_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, multiMDService, false, filterPipelineConfiguration),
+_filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, _macroscopicSolverInterface, multiMDService, coupling::Scope::perInstance, filterPipelineConfiguration),
 _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface,*_indexConversion,_macroscopicCells.getMacroscopicCellsWithLinkedCells(),numberMDTimestepsPerCouplingCycle)),
 _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
 _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell,dim>(mdSolverInterface)),
 _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
 _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
 _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface,*_indexConversion,numberMDTimestepsPerCouplingCycle)),
-_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService, tws)),
+//_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion, multiMDService, tws)),
 _kineticEnergyController(mdSolverInterface),
 _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
 _momentumController(mdSolverInterface),
+_applyAccordingToConfiguration(initCorrectApplicationOfThermostat(thermostatConfiguration)),
 _microscopicFilename(macroscopicCellConfiguration.getMicroscopicFilename()),
 _writeEveryMicroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMicroscopicTimestep()),
 _macroscopicFilename(macroscopicCellConfiguration.getMacroscopicFilename()),
@@ -69,10 +72,10 @@ _writeEveryMacroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMacrosc
     std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _transferStrategy==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
-  if (_noiseReduction==NULL){
+  /*if (_noiseReduction==NULL){
     std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _noiseReduction==NULL!" << std::endl;
     exit(EXIT_FAILURE);
-  }
+  }*/
   if (_boundaryForceController==NULL){
     std::cout << "ERROR coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl(): _boundaryForceController==NULL!" << std::endl;
   }
@@ -96,7 +99,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::~MacroscopicCell
   if (_particleInsertion != NULL){ delete    _particleInsertion; _particleInsertion = NULL; }
   if (_momentumInsertion != NULL){ delete    _momentumInsertion; _momentumInsertion = NULL; }
   if (_transferStrategy  != NULL){ delete    _transferStrategy;  _transferStrategy  = NULL; }
-  if (_noiseReduction  != NULL){ delete    _noiseReduction;  _noiseReduction  = NULL; }
+  //if (_noiseReduction  != NULL){ delete    _noiseReduction;  _noiseReduction  = NULL; }
   if (_boundaryForceController!=NULL){ delete _boundaryForceController; _boundaryForceController=NULL;}
   if (_indexConversion   != NULL){ delete    _indexConversion;   _indexConversion   = NULL; }
 }
@@ -150,7 +153,7 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   timeval start;
   timeval end;
   double runtime=0;
-  if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); } 
+  if(_indexConversion->getThisRank() == 0){ gettimeofday(&start,NULL); }
 
   //TODO: deprecated, moved to filter pipeline.
   // run noise reduction
@@ -160,11 +163,11 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::sendFromM
   //  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
   //  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
   //}
- 
+
   #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
   #endif
-  _filterPipeline(); 
+  _filterPipeline();
 
   if(_indexConversion->getThisRank() == 0){
     gettimeofday(&end,NULL);
@@ -207,7 +210,7 @@ template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 computeAndStoreTemperature(double temperature){
   Wrapper4ComputeAndStoreTemperature wrapper(this,temperature);
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+  _applyAccordingToConfiguration(wrapper);
 }
 
 
@@ -216,7 +219,7 @@ template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 applyTemperatureToMolecules(unsigned int t){
   Wrapper4ApplyTemperature wrapper(this);
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+  _applyAccordingToConfiguration(wrapper);
 }
 
 
@@ -287,32 +290,6 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::initIndexVe
   } // loop over all staggered versions (-> (0,0,0), (0,0,1), (0,1,0),...., (1,1,1) )
 }
 
-/* TODO: REMOVE
-template<class LinkedCell,unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
-initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells) {	
-	tarch::la::Vector<dim, unsigned int> convertedIndex;
-	bool outOfBounds;
-
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << "MacroscopicCellService [ID: " << coupling::services::MacroscopicCellService<dim>::getID() << "]: Initializing inner cells and their index vectors." << std::endl;
-	std::cout << "Total number of cells: " << cells.size() << std::endl;
-	#endif
-
-	for(unsigned int linear_index = 0; linear_index < cells.size(); linear_index++){
-		outOfBounds = false;
-		convertedIndex = _indexConversion->getGlobalInnerVectorCellIndex(linear_index);
-		for(unsigned int d = 0; d < dim; d++) if(convertedIndex[d] == INT_MAX) outOfBounds = true;
-		if(!outOfBounds){
-			_innerMacroscopicCells.push_back(cells[linear_index]);
-			_innerMacroscopicCellIndices.push_back(convertedIndex);
-		}
-	}
-	#ifdef DEBUG_FILTER_PIPELINE
-	std::cout << _innerMacroscopicCells.size() << " of those cells are inner cells." << std::endl;
-	#endif
-}
-*/
 
 template<class LinkedCell,unsigned int dim>
 tarch::la::Vector<dim,double> coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::

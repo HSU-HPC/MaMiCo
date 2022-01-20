@@ -20,23 +20,32 @@ namespace coupling {
   }
 }
 
-
-/** reads boundary force tag.
+/** boundary force configuration
+ *	@brief reads boundary force tag
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<unsigned int dim>
 class coupling::configurations::BoundaryForceConfiguration:
 public tarch::configuration::Configuration {
   public:
+	/** boundary force types that are implemented. 
+	 *	@enum BoundaryForceType
+	 */
     enum BoundaryForceType{
-      ZHOU=0,NO_BOUNDARYFORCE=1
+      ZHOU=0 /**< ZHOU*/,NO_BOUNDARYFORCE=1 /**< NO_BOUNDARYFORCE*/
     };
 
-    BoundaryForceConfiguration(): _insertionType(NO_BOUNDARYFORCE),_density(0.0),_temperature(0.0),_isValid(true){}
+    /** Constructor, initializes the class  */
+	BoundaryForceConfiguration(): _insertionType(NO_BOUNDARYFORCE),_density(0.0),_temperature(0.0),_isValid(true){}
 
-    virtual ~BoundaryForceConfiguration(){}
+    /** Destructor */
+	virtual ~BoundaryForceConfiguration(){}
 
-    void parseSubtag( tinyxml2::XMLElement* node ){
+    /** parseSubtag
+	 * 	@param node
+     */
+	void parseSubtag( tinyxml2::XMLElement* node ){
       std::string value;
       tarch::configuration::ParseConfiguration::readStringMandatory(value,node,"type");
       const std::string boundaries[6] = {"west","east","south","north","bottom","top"};
@@ -75,30 +84,35 @@ public tarch::configuration::Configuration {
       }
     }
 
-    /**
-     * Return name of xml tag that is associated to the configuration.
+    /** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
      */
     std::string getTag() const {return "boundary-force";}
 
-    /**
-     * Is config valid?
-     *
-     * This operation usually fails, if
-     *
-     * - parseSubtag() hasn't been called, i.e. configuration has not been
-     *   used, or
-     * - parseSubtag() failed due to a wrong file.
-     *
-     * If a tag ain't optional and parseSubtag() was not called (first case)
+    /** checks if the configuration is valid. This operation usually fails, if e.g.
+	 *	1. parseSubtag() hasn't been called, i.e. configuration has not been used, or 
+     *  2. parseSubtag() failed due to a wrong file.
+	 *  3. If a tag ain't optional and parseSubtag() was not called (first case)
+	 * 	@return _isValid
      */
     bool isValid() const { return _isValid;}
 
-    /** getters */
+    /** Returns boundary force type.
+	 * 	@return _insertionType
+     */
     const BoundaryForceType& getBoundaryForceType() const {return _insertionType;}
 
-    const tarch::la::Vector<2*dim,bool>& getBoundary() const {return _boundary;}
+    /** Returns boundary ??
+	 * 	@return _boundary
+     */
+	const tarch::la::Vector<2*dim,bool>& getBoundary() const {return _boundary;}
 
-    template<class LinkedCell>
+    /** Returns boundary force configuration.
+	 * 	@tparam LinkedCell type of the cell
+	 * 	@param mdSolverInterface
+	 * 	@return boundary force config
+     */
+	template<class LinkedCell>
     coupling::BoundaryForceController<LinkedCell,dim>* interpreteConfiguration(
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface
     ) const {

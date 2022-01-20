@@ -41,13 +41,20 @@
 #include "tarch/la/Vector.h"
 
   namespace coupling {
-    enum MacroscopicSolverID{PEANO_LATTICEBOLTZMANN_ID=0,TEST_LOCAL_MACROSCOPIC_SOLVER_ID=1};
+    /** This is an enum for the macroscopic solver ID
+     * @todo I have no idea what this is @someone */
+    enum MacroscopicSolverID{PEANO_LATTICEBOLTZMANN_ID=0, ///< test1
+      TEST_LOCAL_MACROSCOPIC_SOLVER_ID=1 ///< test2
+    };
 
 
 
     // --------------------------- HELPER FUNCTIONS ----------------------------------------
 
-    /** inits the range for looping over Cartesian grid for general case (1D/2D/3D support).*/
+    /** @brief initialises the range for looping over Cartesian grid for general case
+     *  @param vec the input vector to be generalised
+     *  @tparam dim refers to the spacial dimension of the simulation, can be 1, 2, or 3
+     *  @returns the given vector as 3d version */
     template<unsigned int dim>
     tarch::la::Vector<3,unsigned int> initRange(tarch::la::Vector<dim,unsigned int> vec) {
       tarch::la::Vector<3,unsigned int> range(1);
@@ -57,8 +64,10 @@
       return range;
     }
 
-
-    /** reduces three-dimensional vector to vector of size dim (assumes that dim<= 3). */
+    /** @brief reduces three-dimensional vector to vector of size dim (assumes that dim<= 3).
+     *  @param vec the input which will be reduced
+     *  @tparam dim refers to the spacial dimension of the simulation, can be 1, 2, or 3
+     *  @return the given 3d vector as a vector for the simulation dimension (dim) */
     template<unsigned int dim>
     tarch::la::Vector<dim,unsigned int> initDimVector(tarch::la::Vector<3,unsigned int> vec){
       tarch::la::Vector<dim,unsigned int> smallVec;
@@ -66,8 +75,10 @@
       return smallVec;
     }
 
-
-    /** computes a vectorwise division factor for the conversion of linearised to vector indices */
+    /** @briefcomputes a vectorwise division factor for the conversion of linearised to vector indices
+     *  @param numberCells the number of cells per direction in the spacial domain
+     *  @tparam dim refers to the spacial dimension of the simulation, can be 1, 2, or 3
+     *  @returns the division factor for the simulation */
     template<unsigned int dim>
     tarch::la::Vector<dim,unsigned int> initDivisionFactor(tarch::la::Vector<dim,unsigned int> numberCells) {
       tarch::la::Vector<dim,unsigned int> divFactor(1);
@@ -79,9 +90,12 @@
 
 
 
-    /** converts linearised cell index to a vector cell index using predefined division factors.
-     *  This method is supposed to be only called with member divisionFactor variables, cf. initDivisionFactor()-method.
-     */
+    /** This method is supposed to be only called with member divisionFactor variables, cf. initDivisionFactor()-method.
+     *  @brief converts linearised cell index to a vector cell index using predefined division factors.
+     *  @param cellIndex the index of the cell which shall be transformed
+     *  @param divisionFactor the division factor for the corresponding spacial setup of the domain
+     *  @tparam dim refers to the spacial dimension of the simulation, can be 1, 2, or 3
+     *  @returns the dimensionized index for a given cell */
     template<unsigned int dim>
     tarch::la::Vector<dim,unsigned int> getVectorCellIndex(
     unsigned int cellIndex,const tarch::la::Vector<dim,unsigned int>& divisionFactor){

@@ -11,8 +11,8 @@
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
 #include "coupling/configurations/BoundaryForceConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
-#include "coupling/configurations/NoiseReductionConfiguration.h"
 #include "coupling/configurations/ParallelTopologyConfiguration.h"
+#include "coupling/configurations/ThermostatConfiguration.h"
 #include "tarch/la/Vector.h"
 #include <iostream>
 
@@ -30,7 +30,7 @@ template<unsigned int dim>
 class coupling::configurations::MaMiCoConfiguration: public tarch::configuration::Configuration {
   public:
     MaMiCoConfiguration(): _isValid(true),_isDefinedParticleInsertion(false),_isDefinedMomentumInsertion(false), _isDefinedBoundaryForce(false),
-    _isDefinedTransferStrategy(false), _isDefinedNoiseReduction(false), _isDefinedParallelTopology(false){}
+    _isDefinedTransferStrategy(false), _isDefinedParallelTopology(false), _isDefinedThermostat(false){}
 
     virtual ~MaMiCoConfiguration(){}
 
@@ -88,20 +88,20 @@ class coupling::configurations::MaMiCoConfiguration: public tarch::configuration
       return _transferStrategyConfiguration;
     }
 
-    const coupling::configurations::NoiseReductionConfiguration& getNoiseReductionConfiguration() const {
-      if (!_isDefinedNoiseReduction){
-        std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Noise-Reduction not defined!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      return _noiseReductionConfiguration;
-    }
-
     const coupling::configurations::ParallelTopologyConfiguration& getParallelTopologyConfiguration() const {
       if (!_isDefinedParallelTopology){
         std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Parallel-Topology not defined!" << std::endl;
         exit(EXIT_FAILURE);
       }
       return _parallelTopologyConfiguration;
+    }
+
+    const coupling::configurations::ThermostatConfiguration& getThermostatConfiguration() const {
+      if (!_isDefinedThermostat){
+        std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Thermostat not defined!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      return _thermostatConfiguration;
     }
 
   private:
@@ -112,14 +112,14 @@ class coupling::configurations::MaMiCoConfiguration: public tarch::configuration
     coupling::configurations::MomentumInsertionConfiguration _momentumInsertionConfiguration;
     coupling::configurations::BoundaryForceConfiguration<dim> _boundaryForceConfiguration;
     coupling::configurations::TransferStrategyConfiguration<dim> _transferStrategyConfiguration;
-    coupling::configurations::NoiseReductionConfiguration _noiseReductionConfiguration;
     coupling::configurations::ParallelTopologyConfiguration _parallelTopologyConfiguration;
+    coupling::configurations::ThermostatConfiguration _thermostatConfiguration;
     bool _isDefinedParticleInsertion;
     bool _isDefinedMomentumInsertion;
     bool _isDefinedBoundaryForce;
     bool _isDefinedTransferStrategy;
-    bool _isDefinedNoiseReduction;
     bool _isDefinedParallelTopology;
+    bool _isDefinedThermostat;
 };
 #include "coupling/configurations/MaMiCoConfiguration.cpph"
 

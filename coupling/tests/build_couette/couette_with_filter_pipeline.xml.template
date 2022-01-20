@@ -22,7 +22,7 @@
     
       <!-- bu wall vel 4.775 -->
   <domain
-    channelheight="200"
+    channelheight="50"
     wall-init-velocity="0.0 ; 0.0 ; 0.0"
     wall-init-cycles="0"
     wall-velocity="0.0; 0.0 ; 0.574091733 "
@@ -52,7 +52,7 @@
     filter-init-cycles="0"
     write-csv-every-timestep="0"
     send-from-macro-to-md="yes"
-    compute-snr="yes"
+    compute-snr="no"
   />
 
   <!-- Configuration parameters for macroscopic solver:
@@ -135,7 +135,6 @@
   <!--<particle-insertion type="none" />/-->
   <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
   <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" />
-  <noise-reduction type="NLM" time-window-size="5" kmax="1"/>
   <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
   <parallel-topology type="xyz" />
 </mamico>

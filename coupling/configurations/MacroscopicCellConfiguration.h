@@ -16,49 +16,67 @@ namespace coupling {
   }
 }
 
-
-/** configuration for output of macroscopic cell data to vtk files.
+/** configuration for output of macroscopic cell data to vtk files. Derive from the class tarch::configuration::Configuration
+ *	@brief configuration for output of macroscopic cell data to vtk files.
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<unsigned int dim>
 class coupling::configurations::MacroscopicCellConfiguration: public tarch::configuration::Configuration {
   public:
+	/** Constructor, initializes the class  */
     MacroscopicCellConfiguration():
       _isValid(true),_macroscopicCellSize(0.0), _linkedCellsPerMacroscopicCell(0),
       _writeEveryMicroscopicTimestep(0), _microscopicFilename(""),
       _writeEveryMacroscopicTimestep(0), _macroscopicFilename(""){}
 
+	/** Destructor */
     ~MacroscopicCellConfiguration(){}
 
-    void parseSubtag( tinyxml2::XMLElement* node );
+    /** parseSubtag
+	 * 	@param node
+     */
+	void parseSubtag( tinyxml2::XMLElement* node );
 
-    /**
-     * Return name of xml tag that is associated to the configuration.
+
+	/** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
      */
     std::string getTag() const;
-
-    /**
-     * Is config valid?
-     *
-     * This operation usually fails, if
-     *
-     * - parseSubtag() hasn't been called, i.e. configuration has not been
-     *   used, or
-     * - parseSubtag() failed due to a wrong file.
-     *
-     * If a tag ain't optional and parseSubtag() was not called (first case)
+	
+	/** checks if the configuration is valid. This operation usually fails, if e.g.
+	 *	1. parseSubtag() hasn't been called, i.e. configuration has not been used, or 
+     *  2. parseSubtag() failed due to a wrong file.
+	 * 	@return _isValid
      */
     bool isValid() const { return _isValid;}
 
-    /** getters */
+    /** Returns the macroscopic cell size
+	 * 	@return _macroscopicCellSize
+     */
     tarch::la::Vector<dim,double> getMacroscopicCellSize() const { return _macroscopicCellSize;}
 
-    tarch::la::Vector<dim,unsigned int> getNumberLinkedCellsPerMacroscopicCell() const {return _linkedCellsPerMacroscopicCell;}
+    /** Returns the number of linked cell encapsulated within a macroscopic cell
+	 * 	@return _linkedCellsPerMacroscopicCell
+     */
+	tarch::la::Vector<dim,unsigned int> getNumberLinkedCellsPerMacroscopicCell() const {return _linkedCellsPerMacroscopicCell;}
 
-    unsigned int getWriteEveryMicroscopicTimestep() const { return _writeEveryMicroscopicTimestep; }
+    /** Returns step interval, at which the micro infos is to be written out
+	 * 	@return _writeEveryMicroscopicTimestep
+     */
+	unsigned int getWriteEveryMicroscopicTimestep() const { return _writeEveryMicroscopicTimestep; }
+	/** Returns the microscopic file name
+	 * 	@return _microscopicFilename
+     */
     std::string getMicroscopicFilename() const { return _microscopicFilename;}
 
-    unsigned int getWriteEveryMacroscopicTimestep() const { return _writeEveryMacroscopicTimestep; }
+    /** Returns step interval, at which the macro infos is to be written out
+	 * 	@return _writeEveryMacroscopicTimestep
+     */
+	unsigned int getWriteEveryMacroscopicTimestep() const { return _writeEveryMacroscopicTimestep; }
+	/** Returns the macroscopic file name
+	 * 	@return _maroscopicFilename
+     */
     std::string getMacroscopicFilename() const { return _macroscopicFilename;}
 
   private:

@@ -21,8 +21,6 @@ _particlesRemoved(0),
 _mdSolverInterface(mdSolverInterface),
 _usherParams(rSigmaCoeff,meanPotentialEnergyFactor,uOverlapCoeff,stepRefCoeff,iterMax,restartMax,tolerance,offsetFromOuterBoundary){}
 
-
-
 template<class LinkedCell,unsigned int dim>
 typename coupling::ParticleInsertion<LinkedCell,dim>::Action
 coupling::UsherParticleInsertion<LinkedCell,dim>::insertDeleteMass(
@@ -268,7 +266,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       position = position + (stepSize*signAl/absForce)*force;
 
       molecule.setPosition(position);
-      
+
       // restart searching if the new position of the particle is outside the macroscopic cell
       for (unsigned int d = 0; d < dim; d++ ){
         restartSearch = restartSearch
@@ -291,8 +289,8 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       xiOld = xiloc;
       xiloc = fabs(energy-U_0)/fabs(U_0);
 
-      if ( xiloc < xiMax ){ 
-        success++; 
+      if ( xiloc < xiMax ){
+        success++;
       }
 
       // restart searching if the difference energy-U_0 increases
@@ -312,7 +310,7 @@ coupling::UsherParticleInsertion<LinkedCell,dim>::findParticlePosition(
       energy += boundaryForceController.getPotentialEnergy(positionOld);
       if(fabs(energy-U_0)/fabs(U_0) >= xiMax )
         std::cout << "USHER critical ERROR: fabs(energy-U_0)/fabs(U_0) >= xiMax" << std::endl;
-      std::cout << "Finished with energy = " << energy << " after " << i 
+      std::cout << "Finished with energy = " << energy << " after " << i
         << " restarts and " << loci << " iterations" << std::endl;
       #endif
 

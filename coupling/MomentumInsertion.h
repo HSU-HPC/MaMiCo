@@ -8,38 +8,42 @@
 #include "tarch/la/Vector.h"
 #include "coupling/datastructures/MacroscopicCell.h"
 
-
 namespace coupling {
   template<class LinkedCell, unsigned int dim>
   class MomentumInsertion;
 }
 
-
-/** used to manipulate the momentum/ velocity of the molecules contained in a macroscopic cell.
- *
+/** @brief used to manipulate the momentum/ velocity of the molecules contained in a macroscopic cell.
  *  @author Philipp Neumann
+ *  @tparam LinkedCell the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation
+ *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2, or 3
  */
 template<class LinkedCell, unsigned int dim>
 class coupling::MomentumInsertion {
   public:
+    /** @brief a simple constructor
+     *  @param mdSolverInterface interface to the md solver*/
     MomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
     _mdSolverInterface(mdSolverInterface){}
+    /** @brief a simple destructor*/
     virtual ~MomentumInsertion(){}
 
-    /** returns the number of MD steps between subsequent momentum insertions */
+    /** @brief returns the number of MD steps between subsequent momentum insertions
+     *  @returns the time step interval for momentum insertion */
     virtual unsigned int getTimeIntervalPerMomentumInsertion() const = 0;
 
-    /** inserts a fraction 'fraction' from the momentum of the macroscopic cell 'cell' and distributes
-     *  it over all molecules.
-     *  This method does not conserve the kinetic energy of the respective macroscopic cell. To conserve
+    /** This method does not conserve the kinetic energy of the respective macroscopic cell. To conserve
      *  the energy as well, see the description of MomentumController on details how to do that.
-     */
+     *  @brief inserts a fraction from the momentum of the macroscopic cell and distributes is over all molecules.
+     *  @param cell the macroscopic cell to insert the momentum
+     *  @param fraction the fraction of momentum to use */
     virtual void insertMomentum(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
       const unsigned int& currentMacroscopicCellIndex
     ) const = 0;
 
   protected:
+    /** interface to the md solver */
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;
 };
 

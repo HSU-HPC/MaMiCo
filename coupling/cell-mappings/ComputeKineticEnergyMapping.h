@@ -18,28 +18,42 @@ namespace coupling {
 }
 
 
-/** computes the kinetic energy.
- *
+/** 
+ *	@brief This class computes the kinetic energy. inside a linked cell
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::ComputeKineticEnergyMapping {
   public:
+	/** Constructor
+	 *	@param mdSolverInterface
+	 */
     ComputeKineticEnergyMapping(
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface
     ): _mdSolverInterface(mdSolverInterface), _kineticEnergy(0.0){}
 
-    ~ComputeKineticEnergyMapping(){}
+    /** Destructor */
+	~ComputeKineticEnergyMapping(){}
 
-    void beginCellIteration(){
+    /** sets the kinetic energy to zero, before the iteration process begins.
+	 */
+	void beginCellIteration(){
       _kineticEnergy = 0.0;
     }
 
-    void endCellIteration(){
+    /** computes the kinetic energy in a linked cell, by multiplying the specific kinetic energy with the mass and 0.5.
+	 */
+	void endCellIteration(){
       _kineticEnergy = 0.5*_mdSolverInterface->getMoleculeMass()*_kineticEnergy;
     }
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** sums up the specific kinetic energy of all molecules inside a linked cell.
+	 *	@param cell
+	 *	@param cellIndex
+	 */
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
 
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
@@ -52,7 +66,10 @@ class coupling::cellmappings::ComputeKineticEnergyMapping {
       delete it;
     }
 
-    double getKineticEnergy() const { return _kineticEnergy; }
+    /** returns the kinetic energy inside a linked cell
+	 *	@return _kineticEnergy
+	 */
+	double getKineticEnergy() const { return _kineticEnergy; }
 
   private:
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;

@@ -16,27 +16,31 @@ namespace coupling {
   class SetGivenVelocity4MomentumInsertion;
 }
 
-
-/** interpretes the vector in the microscopicMomentum-buffer as velocity and sets this value in the
+/** interpretes the microscopicMomentum-buffer as velocity and sets this value in the
  *  respective macroscopic cell.
- *
  *  @author Philipp Neumann
- */
+ *  @tparam LinkedCell the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation
+ *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2, or 3  */
 template<class LinkedCell,unsigned int dim>
-class coupling::SetGivenVelocity4MomentumInsertion:
-public coupling::MomentumInsertion<LinkedCell,dim> {
+class coupling::SetGivenVelocity4MomentumInsertion : public coupling::MomentumInsertion<LinkedCell,dim> {
   public:
+    /** @brief a simple constructor
+     *  @param mdSolverInterface interface for the md solver */
     SetGivenVelocity4MomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
     coupling::MomentumInsertion<LinkedCell,dim>(mdSolverInterface){}
+
+    /** @brief a simple destructor */
     virtual ~SetGivenVelocity4MomentumInsertion(){}
 
-    /** returns the number of MD steps between subsequent momentum insertions */
+    /** @brief returns 1, since momentum insertions will be applied in every md timestep
+     *  @returns the time step interval for momentum insertion */
     virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1;}
 
-    /** inserts a fraction 'fraction' from the momentum of the macroscopic cell 'cell' and distributes
-     *  it over all molecules.
-     *  This method does not conserve the kinetic energy of the respective macroscopic cell. To conserve
+    /** This method does not conserve the kinetic energy of the respective macroscopic cell. To conserve
      *  the energy as well, see the description of MomentumController on details how to do that.
+     *  @brief updates the momentum based on the microscopic momentum
+     *  @param cell macroscopic cell
+     *  @param currentMacroscopicCellIndex index of the macroscopic cell
      */
     virtual void insertMomentum(
       coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>& cell,
@@ -57,7 +61,6 @@ public coupling::MomentumInsertion<LinkedCell,dim> {
       // set new momentum (only number of particles is missing)
       newMomentum = massMapping.getMass()*cell.getMicroscopicMomentum();
       particleCounter = massMapping.getNumberOfParticles();
-
 
       // set new momentum (based on velocity stored in microscopic momentum-buffer)
       coupling::cellmappings::SetMomentumMapping<LinkedCell,dim> setMomentumMapping(

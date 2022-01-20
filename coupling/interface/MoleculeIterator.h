@@ -14,9 +14,10 @@ namespace coupling {
   }
 }
 
-
-/** some iterator scheme for traversing the molecules within a linked cell.
- *
+/** This class provides some iterator scheme for traversing the molecules within a linked cell.
+ *	@brief some iterator scheme for traversing the molecules within a linked cell.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
@@ -24,22 +25,26 @@ class coupling::interface::MoleculeIterator {
   protected:
     LinkedCell &_cell;
   public:
+  
+  /** Constructor */
     MoleculeIterator(LinkedCell& cell): _cell(cell){}
+	
+	/** Destructor */
     virtual ~MoleculeIterator(){}
 
     /** sets the iterator to the first element */
     virtual void begin() = 0;
 
-    /** returns true, if the iterator should continue the molecule traversal */
+    /** @returns true, if the iterator should continue the molecule traversal, false otherwise. */
     virtual bool continueIteration() const = 0;
 
     /** sets the iterator to the next molecule */
     virtual void next() = 0;
 
-    /** returns a reference to the molecule that this iterator currently points to */
+    /** @returns a reference to the molecule that this iterator currently points to */
     virtual coupling::interface::Molecule<dim>& get() = 0;
 
-    /** returns a const reference to the current molecule for pure reading purposes */
+    /** @returns a const reference to the current molecule for pure reading purposes */
     virtual const coupling::interface::Molecule<dim>& getConst() = 0;
 };
 

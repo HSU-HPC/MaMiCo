@@ -17,17 +17,21 @@ namespace coupling {
   }
 }
 
-
-/** sets a certain temperature over several linked cells.
- *
+/** 
+ *	@brief This class sets a certain temperature over several linked cells.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::SetTemperatureMapping {
   public:
-    /** obtains the old momentum over the region of interest. Besides,
-     *  obtains the new momentum that shall be set and the number of particles
-     *  contained in the macroscopic cell.
+    /** Constructor: obtains the old temperature over the region of interest. Besides,
+     *  obtains the new temperature.
+	 *	@param oldTemperature
+	 *	@param newTemperature
+	 *	@param meanVelocity
+	 *	@param mdSolverInterface
      */
     SetTemperatureMapping(
       const double& oldTemperature,
@@ -37,13 +41,22 @@ class coupling::cellmappings::SetTemperatureMapping {
     ): _mdSolverInterface(mdSolverInterface), _factor(getScalingFactor(oldTemperature,newTemperature)), _meanVelocity(meanVelocity){
     }
 
-    ~SetTemperatureMapping(){}
+    /** Destructor */
+	~SetTemperatureMapping(){}
 
-    void beginCellIteration(){}
+    /** empty function
+	 */
+	void beginCellIteration(){}
 
-    void endCellIteration(){}
+    /** empty function
+	 */
+	void endCellIteration(){}
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** applies a certain temperature over several linked cells, by changing the velocity (velocity fluctuation).
+	 *	@param cell
+	 *	@param cellIndex
+	 */	
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
       while(it->continueIteration()){
@@ -58,8 +71,14 @@ class coupling::cellmappings::SetTemperatureMapping {
     }
 
   private:
-    double getScalingFactor(const double& oldTemperature, const double &newTemperature) const {
-      // only allow re-scaling if the original temperature was not zero (can happen in empty cells that just became populated)
+    /** calculates the scaling factor between the old and new temperatures.
+	 *	@param oldTemperature
+	 *	@param newTemperature
+	 *	@return newTemperature
+	 *	@remark only allow re-scaling if the original temperature was not zero (can happen in empty cells that just became populated)
+	 */	
+	double getScalingFactor(const double& oldTemperature, const double &newTemperature) const {
+      
       if (oldTemperature!= 0.0){
         return sqrt(newTemperature/oldTemperature);
       } else {

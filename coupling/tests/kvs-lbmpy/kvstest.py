@@ -8,6 +8,7 @@
 
 import sys
 sys.path.append('../../python-binding')
+sys.path.append('../../filtering/filters')
 import coloredlogs, logging
 import math
 import json
@@ -16,11 +17,17 @@ from mamico.coupling.services import MultiMDCellService
 from mamico.coupling.solvers import CouetteSolverInterface
 import mamico.coupling
 import mamico.tarch.utils
+import pythonfilters as pf
 import numpy as np
+import pandas as pd
 from configparser import ConfigParser
 import matplotlib.pyplot as mplt
 
 log = logging.getLogger('KVSTest')
+logging.getLogger('matplotlib.font_manager').disabled = True
+
+
+BENCH_BEFORE_RUN = False
 
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
@@ -28,6 +35,8 @@ log = logging.getLogger('KVSTest')
 # -> using lbmpy for Lattice Bolzmann flow simulation with CUDA on GPU
 # -> using (multi-instance) SimpleMD or synthetic MD data (with Gaussian noise) (TODO)
 # -> using filtering subsystem with configurable coupling data analysis or noise filter sequences (TODO)
+
+
 class KVSTest():
     def __init__(self, cfg):
         self.cfg = cfg
@@ -40,7 +49,8 @@ class KVSTest():
         self.initSolvers()
         for cycle in range(self.cfg.getint("coupling", "couplingCycles")):
             self.runOneCouplingCycle(cycle)
-        self.plot()
+        pd.DataFrame(self.velLB).to_csv("lbm.csv", sep = ";", header = False)
+
 
     def runOneCouplingCycle(self, cycle):
         self.advanceMacro(cycle)
@@ -84,29 +94,36 @@ class KVSTest():
 
             isteps = self.cfg.getint("macroscopic-solver", "init-timesteps")
             log.info("Running " + str(isteps) + " LB initialisation timesteps ...")
-            timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
-                self.macroscopicSolver.domain_size[1] * \
-                self.macroscopicSolver.domain_size[2] / \
-                (self.macroscopicSolver.mlups * 1e6)
-            log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
+            
+            if BENCH_BEFORE_RUN == True:
+                timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
+                    self.macroscopicSolver.domain_size[1] * \
+                    self.macroscopicSolver.domain_size[2] / \
+                    (self.macroscopicSolver.mlups * 1e6)
+                log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
+
             self.macroscopicSolver.advance(isteps) 
             log.info("Finished LB init-timesteps.")
 
         numMD = self.cfg.getint("microscopic-solver","number-md-simulations")
 
+
         self.multiMDService = mamico.tarch.utils.MultiMDService(numberProcesses = self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
             totalNumberMDSimulations = numMD)
 
         self.localMDInstances = self.multiMDService.getLocalNumberOfMDSimulations()
-        if self.rank==0:
+        
+        if self.rank == 0:
             log.info("totalNumberMDSimulations = " + str(numMD))
             log.info("localMDInstances on rank 0 = " + str(self.localMDInstances))
 
         self.simpleMD = [mamico.coupling.getMDSimulation(self.simpleMDConfig,self.mamicoConfig, 
             self.multiMDService.getLocalCommunicator()) for i in range(self.localMDInstances)]
+        
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].init(self.multiMDService, self.multiMDService.getGlobalNumberOfLocalMDSimulation(i))
+
         
         equSteps = self.cfg.getint("microscopic-solver", "equilibration-steps")
         for i in range(self.localMDInstances):
@@ -115,21 +132,142 @@ class KVSTest():
             self.simpleMD[i].switchOnCoupling()
         self.mdStepCounter = equSteps
     
+
+        #Warning: If instances < ranks, this is empty for rank 0. In that case, the MultiMDCellService intialisation below segfaults. FIXME
         self.mdSolverInterface = [mamico.coupling.getMDSolverInterface(self.simpleMDConfig, self.mamicoConfig,
             self.simpleMD[i]) for i in range(self.localMDInstances)]
+
 
         self.macroscopicSolverInterface = CouetteSolverInterface(self.getGlobalNumberMacroscopicCells(),
             self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
         mamico.coupling.setMacroscopicSolverInterface(self.macroscopicSolverInterface)
-    
+
+
         self.multiMDCellService = MultiMDCellService(self.mdSolverInterface, self.macroscopicSolverInterface, 
             self.simpleMDConfig, self.rank, self.cfg.getint("microscopic-solver","number-md-simulations"),
             self.mamicoConfig, "kvs.xml", self.multiMDService)
+
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
                 self.cfg.getfloat("microscopic-solver", "temperature"))
+
+
+        from scipy.ndimage import gaussian_filter, median_filter
+        #Add Gauss filter
+        def gauss_sca05(data):
+            print("Applying gaussian filter to a scalar property. sigma = 0.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (0.5,0.5,0.5))
+
+        def gauss_vec05(data):
+            print("Applying gaussian filter to a 3d property. sigma = 0.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (0.5,0.5,0.5,0))
+
+        def gauss_sca1(data):
+            print("Applying gaussian filter to a scalar property. sigma = 1.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,1,1), mode="mirror")
+
+        def gauss_vec1(data):
+            print("Applying gaussian filter to a 3d property. sigma = 1.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,1,1,0), mode="mirror")
+
+        def gauss_sca15(data):
+            print("Applying gaussian filter to a scalar property. sigma = 1.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (1.5,1.5,1.5))
+
+        def gauss_vec15(data):
+            print("Applying gaussian filter to a 3d property. sigma = 1.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (1.5,1.5,1.5,0))
+
+        def gauss_sca2(data):
+            print("Applying gaussian filter to a scalar property. sigma = 2.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (2,2,2))
+
+        def gauss_vec2(data):
+            print("Applying gaussian filter to a 3d property. sigma = 2.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (2,2,2,0))
+
+        def gauss_sca25(data):
+            print("Applying gaussian filter to a scalar property. sigma = 2.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (2.5,2.5,2.5))
+
+        def gauss_vec25(data):
+            print("Applying gaussian filter to a 3d property. sigma = 2.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (2.5,2.5,2.5,0))
+
+        def gauss_sca3(data):
+            print("Applying gaussian filter to a scalar property. sigma = 3.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (3,3,3))
+
+        def gauss_vec3(data):
+            print("Applying gaussian filter to a 3d property. sigma = 3.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (3,3,3,0))
+
+        def gauss_sca35(data):
+            print("Applying gaussian filter to a scalar property. sigma = 3.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (3.5,3.5,3.5))
+
+        def gauss_vec35(data):
+            print("Applying gaussian filter to a 3d property. sigma = 3.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (3.5,3.5,3.5,0))
+
+        def gauss_sca4(data):
+            print("Applying gaussian filter to a scalar property. sigma = 4.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (4,4,4))
+
+        def gauss_vec4(data):
+            print("Applying gaussian filter to a 3d property. sigma = 4.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (4,4,4,0))
+
+        def gauss_sca45(data):
+            print("Applying gaussian filter to a scalar property. sigma = 4.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (4.5,4.5,4.5))
+
+        def gauss_vec45(data):
+            print("Applying gaussian filter to a 3d property. sigma = 4.5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (4.5,4.5,4.5,0))
+
+        def gauss_sca5(data):
+            print("Applying gaussian filter to a scalar property. sigma = 5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (5,5,5))
+
+        def gauss_vec5(data):
+            print("Applying gaussian filter to a 3d property. sigma = 5.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (5,5,5,0))
+
+
+        def gauss_x_sca1(data):
+            print("Applying gaussian filter to a scalar property. Filtering on X-axis only. sigma = 1.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,0,0), mode="mirror")
+
+        def gauss_x_vec1(data):
+            print("Applying gaussian filter to a 3d property. Filtering on X-axis only. sigma = 1.")
+            return gaussian_filter(data, truncate = 1.0, sigma = (1,0,0,0), mode="mirror")
+
+
+        mcs = self.multiMDCellService.getMacroscopicCellService(0)
+
+        #fff testing
+        #mcs.addFilterToSequence(filter_sequence="gauss-wtf", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+        #mcs.addFilterToSequence(filter_sequence="gauss", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+        
+
+        #gauss testing
+        #mcs.addFilterToSequence(filter_sequence="gaussX-python", filter_index=0, scalar_filter_func = gauss_x_sca1, vector_filter_func=gauss_x_vec1)
+        #mcs.addFilterToSequence(filter_sequence="gaussXYZ-python", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+
+        #param testing
+        #mcs.addFilterToSequence(filter_sequence="gauss-05", filter_index=0, scalar_filter_func = gauss_sca05, vector_filter_func=gauss_vec05)
+        #mcs.addFilterToSequence(filter_sequence="gauss-1", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
+        #mcs.addFilterToSequence(filter_sequence="gauss-15", filter_index=0, scalar_filter_func = gauss_sca15, vector_filter_func=gauss_vec15)
+        #mcs.addFilterToSequence(filter_sequence="gauss-2", filter_index=0, scalar_filter_func = gauss_sca2, vector_filter_func=gauss_vec2)
+        #mcs.addFilterToSequence(filter_sequence="gauss-25", filter_index=0, scalar_filter_func = gauss_sca25, vector_filter_func=gauss_vec25)
+        #mcs.addFilterToSequence(filter_sequence="gauss-3", filter_index=0, scalar_filter_func = gauss_sca3, vector_filter_func=gauss_vec3)
+        #mcs.addFilterToSequence(filter_sequence="gauss-35", filter_index=0, scalar_filter_func = gauss_sca35, vector_filter_func=gauss_vec35)
+        #mcs.addFilterToSequence(filter_sequence="gauss-4", filter_index=0, scalar_filter_func = gauss_sca4, vector_filter_func=gauss_vec4)
+        #mcs.addFilterToSequence(filter_sequence="gauss-45", filter_index=0, scalar_filter_func = gauss_sca45, vector_filter_func=gauss_vec45)
+        #mcs.addFilterToSequence(filter_sequence="gauss-5", filter_index=0, scalar_filter_func = gauss_sca5, vector_filter_func=gauss_vec5)
       
         self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
             self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
@@ -139,7 +277,6 @@ class KVSTest():
 
         # buffer for evaluation plot
         if self.rank==0:
-            self.velMD = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
     
         if self.rank==0:
@@ -148,6 +285,10 @@ class KVSTest():
     def shutdown(self):
         if self.rank==0:
             log.info("Finished " + str(self.mdStepCounter) + " MD timesteps")
+
+        #Analyse data gathered by StrouhalPython filter
+        #self.sf.calculateStrouhalNumber()
+
         for i in range(self.localMDInstances):
             self.simpleMD[i].shutdown()
         # TODO something else to do here??
@@ -207,35 +348,20 @@ class KVSTest():
             filename = "KVSMD2Macro_" + str(cycle+1) + ".csv"
             self.buf.recv2CSV(filename)
 
-        # extract data for eval plots
-        numcells = self.getGlobalNumberMacroscopicCells()
-        mdpos = json.loads(self.cfg.get("domain", "md-pos"))
-        # Convert center of MD domain in SI units to offset of MD domain as cell index
-        mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
-            for d in range(3)]
         if self.rank==0:
+            # extract data for eval plots
+            numcells = self.getGlobalNumberMacroscopicCells()
+            mdpos = json.loads(self.cfg.get("domain", "md-pos"))
+            # Convert center of MD domain in SI units to offset of MD domain as cell index
+            mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2) 
+                for d in range(3)]
             for dir in range(2):
-                self.velMD[cycle, dir] = np.mean(self.buf.loadRecvVelocity()[2,2,:,dir])
-                self.velLB[cycle, dir] = np.mean(self.macroscopicSolver.scen.velocity[
-                    mdpos[0]+5, 
-                    mdpos[1]+5, 
-                    mdpos[2]:mdpos[2]+numcells[2],
-                    dir].data * (self.dx / self.dt_LB))
-
-    def plot(self):
-        if self.rank==0:
-            mplt.style.use("seaborn")
-            fig, ax = mplt.subplots(2,1)
-            t = range(len(self.velMD))
-            for dir in range(2):
-                ax[dir].plot(t, self.velLB[:,dir], "-", color="blue")
-                ax[dir].plot(t, self.velMD[:,dir], "o", color="red")
-                ax[dir].set_xlabel('coupling cycles')
-                ax[dir].grid(True)
-            ax[0].set_ylabel('velocity_x')
-            ax[1].set_ylabel('velocity_y')
-            fig.tight_layout()
-            mplt.savefig("plot.png")
+                self.velLB[cycle, dir] = self.macroscopicSolver.scen.velocity[
+					#TODO: exact cell index in md2macro
+                    mdpos[0]+6,
+                    mdpos[1]+6, 
+                    mdpos[2]+6,
+                    dir].data * (self.dx / self.dt_LB)
 
     def __del__(self):
         self.shutdown()
@@ -259,7 +385,7 @@ class LBSolver():
         self.cpm = cpm = cfg.getint("macroscopic-solver", "cells-per-meter")
         self.domain_size = (int(2.5*cpm), int(0.41*cpm), int(0.41*cpm))
         self.vis = 1e-3
-        self.scaling = Scaling(physical_length=0.1, physical_velocity=2.25, kinematic_viscosity=self.vis,
+        self.scaling = Scaling(physical_length=0.1, physical_velocity=1, kinematic_viscosity=self.vis,
              cells_per_length=0.1*cpm)
         self.omega = cfg.getfloat("macroscopic-solver", "omega")
         if self.omega > 1.92:
@@ -278,9 +404,11 @@ class LBSolver():
         lb_log.info("Successfully created scenario")
         lb_log.info("Domain size = " + str(self.domain_size))
         lb_log.info("Total number of cells = " + str(self.domain_size[0]*self.domain_size[1]*self.domain_size[2]))
-        lb_log.info("Running benchmark ...")
-        self.mlups = self.scen.benchmark()
-        lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
+
+        if BENCH_BEFORE_RUN == True:
+            lb_log.info("Running benchmark ...")
+            self.mlups = self.scen.benchmark()
+       	    lb_log.info("Benchmark result = " + str(self.mlups) + " MLUPS")
 
         self.cD_max = 0
         self.cL_max = 0
@@ -310,9 +438,17 @@ class LBSolver():
         self.scen.boundary_handling.set_boundary(outflow, make_slice[-1, :, :])
 
     def advance(self, timesteps):
-        self.scen.run(timesteps)
-        self.timesteps_finished = self.timesteps_finished + timesteps
-        #self.scen.write_vtk()
+        vtk_every_ts = 5000
+       	ts_goal = self.timesteps_finished + timesteps
+        while self.timesteps_finished < ts_goal:
+            if ts_goal - self.timesteps_finished < vtk_every_ts:
+                steps = ts_goal - self.timesteps_finished
+                self.scen.run(steps)
+            else:
+                steps = vtk_every_ts
+                self.scen.run(steps)
+                self.scen.write_vtk()
+            self.timesteps_finished = self.timesteps_finished + steps
         self.compute_drag_lift()
 
     def compute_drag_lift(self):
@@ -399,12 +535,21 @@ def main():
     cfg = ConfigParser()
     cfg.read("kvstest.ini")
 
-    coloredlogs.install(fmt=
-        '%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s'
-    , level='DEBUG')
-
-    log.setLevel(level=logging.INFO)
-    lb_log.setLevel(level=logging.INFO)
+    # console mode, colored log to stdout
+    if len(sys.argv) == 1:
+        coloredlogs.install(fmt=
+            '%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s'
+        , level='DEBUG')
+        log.setLevel(level=logging.INFO)
+        lb_log.setLevel(level=logging.INFO)
+    # job mode, log to file
+    elif len(sys.argv) == 2:
+        logging.basicConfig(filename=sys.argv[1],level=logging.INFO)
+    else:
+        print("Usage:")
+        print("[1] " + str(sys.argv[0]))
+        print("[2] " + str(sys.argv[0]) + " logfile")
+        sys.exit(1)
 
     test = KVSTest(cfg)
     test.run()

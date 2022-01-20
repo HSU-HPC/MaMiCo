@@ -19,8 +19,8 @@
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
 #include "coupling/configurations/BoundaryForceConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
-#include "coupling/configurations/NoiseReductionConfiguration.h"
 #include "coupling/configurations/ParallelTopologyConfiguration.h"
+#include "coupling/configurations/ThermostatConfiguration.h"
 #include "coupling/configurations/MacroscopicCellConfiguration.h"
 #include "coupling/KineticEnergyController.h"
 #include "coupling/MomentumController.h"
@@ -73,7 +73,9 @@ class coupling::services::MacroscopicCellService {
     virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
     virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
     virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
-    unsigned int getID() const { return _id;}
+	virtual const coupling::FilterPipeline<dim>& getFilterPipeline() const { throw std::runtime_error("MacroscopicCellService: Error: Called getFilterPipeline() in instance without FilterPipeline."); }  /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
+	unsigned int getID() const { return _id;}
+
 
   protected:
     const unsigned int _id; /** (unique) identifier of this macroscopic cell service */
@@ -96,7 +98,6 @@ public coupling::services::MacroscopicCellService<dim> {
      *  particleInsertionConfiguration    - configuration object for (USHER-based) particle insertion and particle removal
      *  momentumInsertionConfiguration    - configuration object which determines the momentum transfer on MD side
      *  transferStrategyConfiguration     - configuration object which determines the respective transfer strategy
-     *  noiseReductionConfiguration       - configuration object which determines the type of noise reduction for MD data
      *  parallelTopologyConfiguration     - configuratio object which defines the parallel topology of the simulation (domain decomposition of the MD simulation)
      *  numberMDTimestepsPerCouplingCycle - number of MD time steps per coupling cycle
      *  macroscopicCellConfiguration      - configuration object which determines the properties of the macroscopic cells
@@ -116,8 +117,8 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,  // configuration for momentum insertion
       const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,     // configuration for boundary forces
       const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,    // configuration for transfer strategy
-      const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,    // configuration for noise reduction
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
+      const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells and respective plotting
 	  const char* filterPipelineConfiguration,
@@ -135,15 +136,15 @@ public coupling::services::MacroscopicCellService<dim> {
       const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,  // configuration for momentum insertion
       const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,     // configuration for boundary forces
       const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,    // configuration for transfer strategy
-      const coupling::configurations::NoiseReductionConfiguration &noiseReductionConfiguration,    // configuration for noise reduction
       const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
+      const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling cycle (required to initialise transfer strategy)
       const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,  // configuration for macroscopic cells and respective plotting
 	  const char* filterPipelineConfiguration,
       const tarch::utils::MultiMDService<dim>& multiMDService
     ): MacroscopicCellServiceImpl<LinkedCell,dim>(ID,mdSolverInterface,macroscopicSolverInterface,numberProcesses,rank,
-       particleInsertionConfiguration,momentumInsertionConfiguration,boundaryForceConfiguration,transferStrategyConfiguration,noiseReductionConfiguration,
-       parallelTopologyConfiguration,numberMDTimestepsPerCouplingCycle,macroscopicCellConfiguration,multiMDService,0){}
+       particleInsertionConfiguration,momentumInsertionConfiguration,boundaryForceConfiguration,transferStrategyConfiguration,
+       parallelTopologyConfiguration,thermostatConfiguration,numberMDTimestepsPerCouplingCycle,macroscopicCellConfiguration,multiMDService,0){}
 
     /** destructor. Frees dynamically allocated memory for particle insertion, momentum insertion and the transfer
      *  strategy.
@@ -209,16 +210,28 @@ public coupling::services::MacroscopicCellService<dim> {
      */
     const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 
+	const coupling::FilterPipeline<dim>& getFilterPipeline() const { return _filterPipeline; }
+
+	/**
+	 * Creates a new filter from scratch and appends it to a sequence that is part of this service's filter pipelining system.
+	 * For that, the desired sequence's identifier and two functions are needed:
+	 *  - applyScalar What to do with scalar properties of the sequence's Macroscopic Cells.
+	 *  - applyVector: What to do with properties stored as vectors of the sequence's of Macroscopic Cells.
+	 */
+	/*
+	 * TODO: MOVE COMMENT
+	void addFilterToSequence(	const char *sequenceIdentifier,
+		   						const std::function<std::vector<double> (std::vector<double> cells_s, std::vector<std::array<unsigned int, dim>> indices)>* applyScalar,
+		   						const std::function<std::vector<std::array<double, dim>> (std::vector<std::array<double, dim>> cells_v, std::vector<std::array<unsigned int, dim>> indices)>* applyVector,
+								int filterIndex = -1
+	);*/
+
     /** returns the macroscopic cells. This functions is meant to be used in test scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
     coupling::datastructures::MacroscopicCells<LinkedCell,dim>& getMacroscopicCells() { return _macroscopicCells;}
 
-	/** returns all macroscopic cells located within MD domain boundaries. */
-	//TODO: REMOVE std::vector<coupling::datastructures::MacroscopicCell<dim> *> getInnerMacroscopicCells() {return _innerMacroscopicCells;}
-
-	/** returns those cells' index vectors */
-	//TODO: REMOVE std::vector<tarch::la::Vector<dim, unsigned int>> getInnerMacroscopicCellIndices() {return _innerMacroscopicCellIndices;}
-	
   private:
+    // ------------------- INCLUDE WRAPPER DEFINITIONS -------------------------------------
+    #include "MacroscopicCellTraversalWrappers.cpph"
     /** initialises the IndexConversion object at start up. This is the very first thing to be done in the
      *  constructor since nearly all subsequent operations depend on indexing of cells.
      */
@@ -230,17 +243,20 @@ public coupling::services::MacroscopicCellService<dim> {
 
     /** initialises the index structures for USHER scheme */
     void initIndexVectors4Usher( tarch::la::Vector<dim,unsigned int> numberLinkedCellsPerMacroscopicCell );
-	
-	/**
-	 * initializes _innerMacroscopicCells and _innerMacroscopicCellIndices
-	 */
-	//TODO: REMOVE void initInnerMacroscopicCells(std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells);
 
-    /** returns the position (in space) of the lower,left corner if the first local ghost cell. Needed
-     *  in distributeMass().
-     */
     tarch::la::Vector<dim,double> getPositionOfFirstLocalGhostCell() const;
-	
+
+    std::function<void(Wrapper&)> initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration& thermostatConfiguration){
+      if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::all)
+        return [this](Wrapper& wrapper){_macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);};
+      else if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::outerLayers)
+        return [this, &thermostatConfiguration](Wrapper& wrapper){
+          _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCells(wrapper, thermostatConfiguration.getCells2Use());};
+      else if(thermostatConfiguration.getThermostatRegionType()==coupling::configurations::ThermostatConfiguration::ThermostatRegion::onlyOutestLayer)
+        return [this](Wrapper& wrapper){_macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);};
+      else
+        return [](Wrapper& wrapper){};
+    }
 
 
     /** needed to determine cell range, ranks etc. */
@@ -275,9 +291,6 @@ public coupling::services::MacroscopicCellService<dim> {
     const coupling::configurations::ParticleInsertionConfiguration::ParticleInsertionType _particleInsertionType;
     /** coupling strategy */
     coupling::transferstrategies::TransferStrategy<LinkedCell,dim>* _transferStrategy;
-    /** noise reduction method for data from MD */
-    coupling::noisereduction::NoiseReduction<dim>* _noiseReduction;
-
 
     /** controls the kinetic energy of the system, i.e. maintains temperature in case of changing mass/momentum. */
     coupling::KineticEnergyController<LinkedCell,dim> _kineticEnergyController;
@@ -285,6 +298,8 @@ public coupling::services::MacroscopicCellService<dim> {
     coupling::BoundaryForceController<LinkedCell,dim> *_boundaryForceController;
     /** controls/ maintains momentum, e.g. after particle insertion */
     coupling::MomentumController<LinkedCell,dim> _momentumController;
+
+    std::function<void(Wrapper&)> _applyAccordingToConfiguration;
 
     /** information for plotting */
     const std::string _microscopicFilename;
@@ -304,8 +319,7 @@ public coupling::services::MacroscopicCellService<dim> {
     // offset in red-black loops nested within the block loops (always 0 or 1 entries)
     tarch::la::Vector<3,unsigned int> _usherCellOffset[1<<dim];
 
-    // ------------------- INCLUDE WRAPPER DEFINITIONS -------------------------------------
-    #include "MacroscopicCellTraversalWrappers.cpph"
+
 };
 #include "MacroscopicCellService.cpph"
 

@@ -18,16 +18,19 @@ namespace coupling {
 }
 
 
-/** reads parallel topology configuration. XYZ and ZYX are supported.
+ /** reads parallel topology configuration. XYZ and ZYX are supported.. Derive from the class tarch::configuration::Configuration
+ *	@brief reads parallel topology configuration. XYZ and ZYX are supported.
  *  @author Philipp Neumann
  */
 class coupling::configurations::ParallelTopologyConfiguration:
 public tarch::configuration::Configuration {
   public:
 
-    ParallelTopologyConfiguration(): _type(coupling::paralleltopology::UNDEFINED),_isValid(true){}
+    /** Constructor, initializes the class  */
+	ParallelTopologyConfiguration(): _type(coupling::paralleltopology::UNDEFINED),_isValid(true){}
 
-    virtual ~ParallelTopologyConfiguration(){}
+    /** Destructor */
+	virtual ~ParallelTopologyConfiguration(){}
 
     void parseSubtag( tinyxml2::XMLElement* node ){
       std::string value;
@@ -43,25 +46,22 @@ public tarch::configuration::Configuration {
       }
     }
 
-    /**
-     * Return name of xml tag that is associated to the configuration.
+    /** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
      */
     std::string getTag() const {return "parallel-topology";}
 
-    /**
-     * Is config valid?
-     *
-     * This operation usually fails, if
-     *
-     * - parseSubtag() hasn't been called, i.e. configuration has not been
-     *   used, or
-     * - parseSubtag() failed due to a wrong file.
-     *
-     * If a tag ain't optional and parseSubtag() was not called (first case)
+    /** checks if the configuration is valid. This operation usually fails, if e.g.
+	 *	1. parseSubtag() hasn't been called, i.e. configuration has not been used, or 
+     *  2. parseSubtag() failed due to a wrong file.
+	 * 	@return _isValid
      */
     bool isValid() const { return _isValid;}
 
-    coupling::paralleltopology::ParallelTopologyType getParallelTopologyType() const { return _type;}
+    /** Returns the parallel topology type.
+	 * 	@return _type
+     */
+	coupling::paralleltopology::ParallelTopologyType getParallelTopologyType() const { return _type;}
 
   private:
     coupling::paralleltopology::ParallelTopologyType _type;

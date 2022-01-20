@@ -149,8 +149,32 @@ elif compiler == 'icc':
       ccflags.append('-Werror-all')
       ccflags.append('-align')
       ccflags.append('-ansi-alias')
+elif compiler == 'fcc':
+   if(parallel=='parallel_no' or parallel=='no'):
+      cxx = 'FCCpx -Nclang'
+   else:
+      cxx = 'mpiFCCpx -Nclang'
+
+   ccflags.append('-Wall')
+   ccflags.append('-Werror')
+   ccflags.append('-pedantic')
+   ccflags.append('-pedantic-errors')
+   ccflags.append('-Wstrict-aliasing')
+   ccflags.append('-fstrict-aliasing')
+   ccflags.append('-Wno-long-long')
+   ccflags.append('-Wno-unknown-pragmas')
+   ccflags.append('-Wconversion')
+   ccflags.append('-Wno-non-virtual-dtor')
+   ccflags.append('-Wno-sign-conversion')
+   ccflags.append('-Wno-unused-private-field')
+   ccflags.append('-mcpu=a64fx') ###################
+   if build == 'debug':
+      ccflags.append('-g3')
+      ccflags.append('-O0')
+   elif build == 'release':
+      ccflags.append('-Ofast')
 else:
-   print("ERROR: compiler must be = 'gcc' or 'icc'!")
+   print("ERROR: compiler must be = 'gcc' or 'icc' or 'fcc'!")
    sys.exit(1)
       
 ##### Determine build path
@@ -162,10 +186,7 @@ if parallel == 'yes' or parallel == 'parallel_yes':
    buildpath = buildpath + 'parallel_yes/'
 else:
    buildpath = buildpath + 'parallel_no/'
-if compiler == 'icc':
-   buildpath = buildpath + 'icc/'
-if compiler == 'gcc':
-   buildpath = buildpath + 'gcc/'
+buildpath = buildpath + compiler + '/'
 if gprof == 'yes' or gprof == 'gprof_yes':
    buildpath = buildpath + 'gprof/'
 else:

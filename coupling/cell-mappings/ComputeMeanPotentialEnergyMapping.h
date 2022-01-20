@@ -17,31 +17,46 @@ namespace coupling {
   }
 }
 
-
-/** computes the mean potential energy over this macroscopic cell.
- *
+/** 
+ *	@brief This class computes the mean potential energy over this macroscopic cell.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::ComputeMeanPotentialEnergyMapping {
   public:
-    ComputeMeanPotentialEnergyMapping(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController):
+    /** Constructor
+	 *	@param mdSolverInterface
+	 *	@param boundaryForceController
+	 */
+	ComputeMeanPotentialEnergyMapping(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController):
     _mdSolverInterface(mdSolverInterface), _meanPotentialEnergy(0.0),_particleCounter(0), _boundaryForceController(boundaryForceController){}
 
-    ~ComputeMeanPotentialEnergyMapping(){}
+    /** Destructor */
+	~ComputeMeanPotentialEnergyMapping(){}
 
-    void beginCellIteration(){
+    /** sets the mean potential energy and the particle counter to zero, before the iteration process begins.
+	 */
+	void beginCellIteration(){
       _meanPotentialEnergy = 0.0;
       _particleCounter = 0;
     }
 
-    void endCellIteration(){
+    /** computes the mean potential energy in a linked cell, by dividing the summation of the mean potential energy of all particles inside the cell over the number of particles.
+	 */
+	void endCellIteration(){
       if (_particleCounter!=0){
         _meanPotentialEnergy = _meanPotentialEnergy/_particleCounter;
       }
     }
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    
+	/** counts the molecules inside a linked cell and sums up the of the mean potential energy of all particles inside the cell.
+	 *	@param cell
+	 *	@param cellIndex
+	 */	
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
       while(it->continueIteration()){
@@ -55,7 +70,10 @@ class coupling::cellmappings::ComputeMeanPotentialEnergyMapping {
       delete it;
     }
 
-    double getPotentialEnergy() const { return _meanPotentialEnergy; }
+    /** returns the mean potential energy inside a linked cell
+	 *	@return _meanPotentialEnergy
+	 */
+	double getPotentialEnergy() const { return _meanPotentialEnergy; }
 
   private:
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;

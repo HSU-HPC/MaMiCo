@@ -2,7 +2,7 @@
 The macro-micro-coupling tool for multiscale coupled molecular-continuum flow simulation.
 
 ## Documentation
-* TODO
+* The docu can be found [here](https://hsu-hpc.github.io/MaMiCo/)
 
 ## Requirements and dependencies
 * C++17 compiler

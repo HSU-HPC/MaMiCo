@@ -3,11 +3,11 @@
 // www5.in.tum.de/mamico
 
 #pragma once
-#include "coupling/filtering/FilterInterfaceReadOnly.h"
-
+#include "coupling/filtering/interfaces/FilterInterfaceReadOnly.h"
 #include <vector>
+#include <algorithm>
 
-//#define DEBUG_STROUHAL
+#define DEBUG_STROUHAL
 
 namespace coupling {
     template<unsigned int dim>
@@ -15,7 +15,10 @@ namespace coupling {
 }
 
 /**
- * TODO: Comment
+ * Implements a read-only filter evaluating given input velocity data to approximate a Strouhal number in y-direction.
+ * As an alternative to this, Numpy-compatible implementations of FFT can be linked into a FS using FilterFromFunction.
+ * Fourier transformations are expected to yield more accurate results.
+ * @author Felix Maurer
  */
 template<unsigned int dim>
 class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{
@@ -23,11 +26,11 @@ class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{
         Strouhal(
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
 				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-				bool filteredValues[7],
+	  			const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
+				std::array<bool, 7> filteredValues,
 				double u,
 				double d):
-				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
+				coupling::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "STROUHALCPP"),
 				_U(u),
 				_D(d)
 		{	
@@ -60,3 +63,8 @@ class coupling::Strouhal : public coupling::FilterInterfaceReadOnly<dim>{
 
 //include implementation of header
 #include "Strouhal.cpph"
+
+/*
+ * TODO:
+ * allow offset (e.g. start measuring after 500 coupling cycles)
+ */

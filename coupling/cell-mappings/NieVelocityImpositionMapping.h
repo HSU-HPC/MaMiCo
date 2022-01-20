@@ -20,19 +20,27 @@ namespace coupling {
   }
 }
 
-
 /** employs an acceleration based on velocity gradients (in time) using the forcing term of the molecules.
  *  We currently expect that valid force entries are provided in each molecule, that is all molecule-molecule
  *  interactions have previously been computed.
  *  The scheme follows the descriptions in the paper by Nie et al., J. Fluid. Mech. 500, 55-64, 2004.
  *  However, we only average over single grid cells (no averaging over one (periodic) dimension or similar tricks ;-) ).
- *
+ *	@brief This class employs an acceleration based on velocity gradients (in time) using the forcing term of the molecules.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::NieVelocityImpositionMapping {
   public:
-    NieVelocityImpositionMapping(
+    
+	/** Constructor
+	 *	@param continuumVelocity    current velocity in this macroscopic cell (=velocity from continuum solver)
+	 *	@param avgMDVelocity		current avg. velocity of molecules
+	 *	@param avgForce				average force within this macroscopic cell
+	 *	@param mdSolverInterface	MD solver interface, required for molecule iterator and molecule mass
+	 */
+	NieVelocityImpositionMapping(
       const tarch::la::Vector<dim,double> &continuumVelocity,
       const tarch::la::Vector<dim,double> &avgMDVelocity,
       const tarch::la::Vector<dim,double> &avgForce,
@@ -44,16 +52,25 @@ class coupling::cellmappings::NieVelocityImpositionMapping {
     {}
 
 
-    virtual ~NieVelocityImpositionMapping(){}
+    /** Destructor */
+	virtual ~NieVelocityImpositionMapping(){}
 
-    void beginCellIteration(){}
+     /** empty function
+	  */
+	void beginCellIteration(){}
 
-    void endCellIteration(){}
+    
+	 /** empty function
+	  */
+	void endCellIteration(){}
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** This function computes average force contribution inside this linked cell
+	 *	@param cell
+	 *	@param cellIndex
+	 */	
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
 
-      // compute average force contribution inside this linked cell
       it->begin();
       while(it->continueIteration()){
         coupling::interface::Molecule<dim> &wrapper(it->get());
@@ -66,13 +83,13 @@ class coupling::cellmappings::NieVelocityImpositionMapping {
     }
 
   private:
-    // MD solver interface, required for molecule iterator and molecule mass
+    /** MD solver interface, required for molecule iterator and molecule mass */
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;
-    // current velocity in this macroscopic cell (=velocity from continuum solver)
+    /** current velocity in this macroscopic cell (=velocity from continuum solver) */
     const tarch::la::Vector<dim,double> _continuumVelocity;
-    // current avg. velocity of molecules
+    /** current avg. velocity of molecules */
     const tarch::la::Vector<dim,double> _avgMDVelocity;
-    // average force within this macroscopic cell
+    /** average force within this macroscopic cell */
     const tarch::la::Vector<dim,double> _avgForce;
 };
 
