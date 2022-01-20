@@ -31,3 +31,4 @@ cmake-build-debug/CMakeCache.txt
 .idea/modules.xml
 .idea/vcs.xml
 cmake-build-debug/CMakeFiles/cmake.check_cache
+.vscode/
