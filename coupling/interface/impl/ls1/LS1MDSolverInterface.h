@@ -4,6 +4,7 @@
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
+#include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 
 #include "tarch/utils/RandomNumberService.h"
 
@@ -71,7 +72,8 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
         regionEndpoint[i] = regionOffset[i] + macroCellSize[i];
       }
 
-      ls1::LS1RegionWrapper *cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint);
+      ls1::LS1RegionWrapper *cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint); //temporary till ls1 offset is natively supported
+      //when offset is supported, the offset min will need to be added to both regions
       return *cell;
     }
 
@@ -87,8 +89,12 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
     /** returns the offset (i.e. lower,left corner) of MD domain */
     virtual tarch::la::Vector<3,double> getGlobalMDDomainOffset() const
     {
-      auto down = global_simulation->getEnsemble()->domain()->rmin();
-      tarch::la::Vector<3, double> globalOffset(down[0], down[1], down[2]);
+      //auto down = global_simulation->getEnsemble()->domain()->rmin();
+      //tarch::la::Vector<3, double> globalOffset(down[0], down[1], down[2]);
+      tarch::la::Vector<3,double> globalOffset(
+        coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(0),
+        coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(1),
+        coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(2));
       return globalOffset;
     }
 

@@ -12,6 +12,7 @@
 //MaMiCo
 #include "coupling/interface/Molecule.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
+#include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 
 namespace coupling
 {
@@ -54,7 +55,7 @@ public:
         tarch::la::Vector<3, double> position(0.0);
         for(int i = 0; i < 3; i++)
         {
-            position[i] = _myMolecule->r(i);
+            position[i] = _myMolecule->r(i) + coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); //temporary till ls1 offset is natively supported
         }
         return position;
     }
@@ -62,7 +63,7 @@ public:
     {
         for(int i = 0; i < 3; i++)
         {
-            _myMolecule->setr(i, position[i]);
+            _myMolecule->setr(i, position[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i)); //temporary till ls1 offset is natively supported
         }        
     }
 

@@ -51,7 +51,7 @@ then
 else
     if [ -v MARDYN_PATH ]
     then
-      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wno-unknown-pragmas -O0 -DMARDYN_DPDP" # todo put -Werror
+      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wno-unknown-pragmas -O3 -DMARDYN_DPDP" # todo put -Werror
       includes="${includes} -I${LIB_EIGEN_PATH} -I${MARDYN_PATH}/src -I${MARDYN_PATH}/libs/rapidxml -I${MARDYN_PATH}/build/_deps/autopasfetch-src/src -I${MARDYN_PATH}/build/_deps/spdlog-src/include"
       compiler="g++"
     else
@@ -94,7 +94,7 @@ else
   ### autopas
     libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/src/autopas -l:libautopas.a"
   ### spdlog (for ls1)
-    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlogd.a -lpthread" #in debug, libspdlogd, else libspdlog
+    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlog.a -lpthread" #in debug, libspdlogd, else libspdlog
   ### harmony (for autopas)
     libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/libs/harmony/include/lib -l:libharmony.a"
   else
@@ -105,7 +105,7 @@ fi
 
 FLAGS="${FLAGS} -pthread"
 
-FLAGS="${FLAGS} -g"
+#FLAGS="${FLAGS} -g"
 
 cd ${BUILD_PATH}
 if ! [ -v MARDYN_PATH ]; then

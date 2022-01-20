@@ -12,6 +12,7 @@
 
 
 #include "coupling/interface/Molecule.h"
+#include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 
 namespace ls1 {
 
@@ -93,9 +94,9 @@ public:
         auto velocity = molecule.getVelocity();
         auto force = molecule.getForce();
 
-        temp.setr(0, position[0]);
-        temp.setr(1, position[1]);
-        temp.setr(2, position[2]);
+        temp.setr(0, position[0] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(0)); //temporary till ls1 offset is natively supported
+        temp.setr(1, position[1] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(1));
+        temp.setr(2, position[2] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(2));
         
         temp.setv(0, velocity[0]);
         temp.setv(1, velocity[1]);
@@ -130,6 +131,7 @@ public:
     {
         //check if coords in region
         auto molPosition = molecule.getPosition();
+        for(int i = 0; i < 3; i++) {molPosition[i] = molPosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i);} //temporary till ls1 offset is natively supported
         if(!isInRegion(molPosition))
             return;
         //check if molecule at location specified

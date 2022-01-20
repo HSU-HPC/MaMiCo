@@ -199,11 +199,16 @@ private:
       _cfg.miSolverType = LS1;
       assert((_mamicoConfig.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3,unsigned int>(1)));
       _cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp,subtag,"temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps,subtag,"equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations,subtag,"number-md-simulations");
       assert(_cfg.totalNumberMDSimulations == 1);
+      auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
       #if defined(LS1_MARDYN)
       coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
+      coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); //temporary till ls1 offset is natively supported
+      coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
+      coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
       #endif
     }
     else{
@@ -357,7 +362,7 @@ private:
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }
-    if(_cfg.miSolverType == SIMPLEMD){
+    if(_cfg.miSolverType == SIMPLEMD || _cfg.miSolverType ==LS1){
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
