@@ -731,7 +731,7 @@ private:
     if (couetteSolverInterface != NULL){delete couetteSolverInterface; couetteSolverInterface = NULL;}
     if (_couetteSolver != NULL){delete _couetteSolver; _couetteSolver=NULL;}
     if(_multiMDCellService != NULL){delete _multiMDCellService; _multiMDCellService=NULL;}
-
+	
     std::cout << "Finish CouetteTest::shutdown() " << std::endl;
   }
 
@@ -995,7 +995,7 @@ private:
     #if(BUILD_WITH_PRECICE)
     else if(_cfg.maSolverType == COUETTE_PRECICE){
       if(_rank==0){
-        solver = new coupling::solvers::PreciceSolver(_rank, _cfg.plotEveryTimestep, _cfg.channelheight);
+        solver = new coupling::solvers::PreciceSolver(_rank, _cfg.channelheight, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "preCICECouette");
         if (solver==NULL){
           std::cout << "ERROR CouetteTest::getCouetteSolver(): preCICE solver==NULL!" << std::endl;
           exit(EXIT_FAILURE);

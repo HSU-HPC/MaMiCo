@@ -75,7 +75,7 @@ then
   echo "MaMiCo is compiled including preCICE library"
   FLAGS="${FLAGS} -DBUILD_WITH_PRECICE"
   includes="${includes} -I${PRECICE_DIR}/include/"
-  libraries="${libraries} -lprecice"
+  libraries="${libraries} -L${PRECICE_DIR}/lib/ -lprecice"
 else
   FLAGS="${FLAGS} -pedantic"
 fi
