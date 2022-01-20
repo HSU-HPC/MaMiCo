@@ -18,7 +18,6 @@ personal_settings
 *.svg
 coupling/tests/kvs-lbmpy/*.xml
 coupling/tests/kvs-lbmpy/*.ini
-.vscode/c_cpp_properties.json
 coupling/tests/build_couette/*.dat
 coupling/tests/build_couette/*.restart.dat
 coupling/tests/build_couette/*.res
@@ -31,4 +30,6 @@ cmake-build-debug/CMakeCache.txt
 .idea/modules.xml
 .idea/vcs.xml
 cmake-build-debug/CMakeFiles/cmake.check_cache
-.vscode/
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/settings.json
