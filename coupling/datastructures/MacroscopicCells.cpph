@@ -324,7 +324,7 @@ template<class LinkedCell,unsigned int dim>
 template<class A>
 void coupling::datastructures::MacroscopicCells<LinkedCell,dim>::applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtBottom(A &a, unsigned int layers2Use){
   // global coordinate of first non-ghost cell
-  const tarch::la::Vector<dim,unsigned int> globalLowerLeftCorner(layers2Use);
+  const tarch::la::Vector<dim,unsigned int> globalLowerLeftCorner(0,0,layers2Use);
   // start and end coordinates for all local non-ghost cells
   const tarch::la::Vector<3,unsigned int> start(1);
   const tarch::la::Vector<3,unsigned int> end = start + coupling::initRange<dim>(_indexConversion.getLocalNumberMacroscopicCells());
@@ -350,7 +350,7 @@ template<class LinkedCell,unsigned int dim>
 template<class A>
 void coupling::datastructures::MacroscopicCells<LinkedCell,dim>::applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtTop(A &a, unsigned int layers2Use){
   // global coordinate of last non-ghost cell
-  const tarch::la::Vector<dim,unsigned int> globalUpperRightCorner(_indexConversion.getGlobalNumberMacroscopicCells()-tarch::la::Vector<dim,unsigned int>(layers2Use-1));
+  const tarch::la::Vector<dim,unsigned int> globalUpperRightCorner(_indexConversion.getGlobalNumberMacroscopicCells()-tarch::la::Vector<dim,unsigned int>(0,0,layers2Use-1));
   // start and end coordinates for all local non-ghost cells
   const tarch::la::Vector<3,unsigned int> start(1);
   const tarch::la::Vector<3,unsigned int> end = start + coupling::initRange<dim>(_indexConversion.getLocalNumberMacroscopicCells());

@@ -214,6 +214,8 @@ public coupling::services::MacroscopicCellService<dim> {
      */
     const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 
+    void inserteMassFromVacuum(unsigned int t, unsigned int particlesToInserte);
+
     void applyVacuum(unsigned int t);
 
     void checkMass(unsigned int t);

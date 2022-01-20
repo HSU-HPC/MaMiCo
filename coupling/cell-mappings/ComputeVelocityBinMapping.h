@@ -29,8 +29,10 @@ class coupling::cellmappings::ComputeVelocityBinMapping {
 	 *	@param mdSolverInterface
 	 */
 	ComputeVelocityBinMapping(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,
-    tarch::la::Vector<dim, double>* velocity, unsigned int* numberParticles):
-    _mdSolverInterface(mdSolverInterface),_velocity(velocity), _numberParticles(numberParticles){}
+    tarch::la::Vector<dim, double>* velocity, tarch::la::Vector<dim, double>* velocityPlus, tarch::la::Vector<dim, double>* velocityMinus,
+    unsigned int* numberParticles, unsigned int* numberParticlesPlus, unsigned int* numberParticlesMinus):
+    _mdSolverInterface(mdSolverInterface),_velocity(velocity), _velocityPlus(velocityPlus), _velocityMinus(velocityMinus),
+    _numberParticles(numberParticles), _numberParticlesPlus(numberParticlesPlus), _numberParticlesMinus(numberParticlesMinus){}
 
     /** Destructor */
 	~ComputeVelocityBinMapping(){}
@@ -58,14 +60,26 @@ class coupling::cellmappings::ComputeVelocityBinMapping {
       const int posZ = std::floor(wrapper.getPosition()[2]*4);
       _velocity[posZ] += wrapper.getVelocity();
       _numberParticles[posZ]++;
+      if(wrapper.getVelocity()[2]>0.0){
+        _velocityPlus[posZ] += wrapper.getVelocity();
+        _numberParticlesPlus[posZ]++;
+      }
+      else{
+        _velocityMinus[posZ] += wrapper.getVelocity();
+        _numberParticlesMinus[posZ]++;
+      }
       it->next();
     }
     delete it;
-    }
+  }
 
   private:
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;
     tarch::la::Vector<dim, double>* _velocity;
+    tarch::la::Vector<dim, double>* _velocityPlus;
+    tarch::la::Vector<dim, double>* _velocityMinus;
     unsigned int* _numberParticles;
+    unsigned int* _numberParticlesPlus;
+    unsigned int* _numberParticlesMinus;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEVELOCITYBINMAPPING_H_

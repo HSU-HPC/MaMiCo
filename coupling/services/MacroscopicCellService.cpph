@@ -232,38 +232,89 @@ applyBoundaryForce(unsigned int t){
 
 template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
+inserteMassFromVacuum(unsigned int t, unsigned int particlesToInserte){
+  Wrapper4InserteCertainParticlesOverZPlane wrapper(this, particlesToInserte);
+ _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtBottom(wrapper, 1);
+}
+
+template<class LinkedCell,unsigned int dim>
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 applyVacuum(unsigned int t){
   Wrapper4ApplyVacuumAndSetAccordingMasses wrapper(this);
   _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtTop(wrapper,1);
+  #if (MD_PARALLEL==MD_YES)
+  tarch::la::Vector<dim,unsigned int> thisProcess = _indexConversion->getThisProcess();
+  unsigned int particlesToInserte;
+  if(thisProcess[2]==(_indexConversion->getNumberProcesses()[2]-1)){
+    particlesToInserte = wrapper.getNumberOfDeletedParticels();
+    tarch::la::Vector<dim,unsigned int> sendToProcess = thisProcess;
+    sendToProcess[2] = 0;
+    std::cout << thisProcess  << " sending " << particlesToInserte << " to " << sendToProcess << " rank " << _indexConversion->getRank(sendToProcess) << std::endl;
+    MPI_Send(&particlesToInserte, 1, MPI_INT, _indexConversion->getRank(sendToProcess), 0, MPI_COMM_WORLD);
+  }
+  if(thisProcess[2]==0){
+    tarch::la::Vector<dim,unsigned int> getFromProcess = thisProcess;
+    getFromProcess[2] = _indexConversion->getNumberProcesses()[2]-1;
+    MPI_Recv(&particlesToInserte, 1, MPI_INT, _indexConversion->getRank(getFromProcess), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    std::cout << thisProcess  << " receiving " << particlesToInserte << " to " << getFromProcess << " rank " << _indexConversion->getRank(getFromProcess) << std::endl;
+    if(particlesToInserte>0){
+    std::cout << "insertion" << std::endl;
+    inserteMassFromVacuum(t, particlesToInserte);
+    }
+  }
+  #else
+  const unsigned int particlesToInserte = wrapper.getNumberOfDeletedParticels();
+  inserteMassFromVacuum(t, particlesToInserte);
+  #endif
 }
 
 template<class LinkedCell, unsigned int dim>
 struct dataOutputForEvaporation{
-  dataOutputForEvaporation(){clean();}
-  tarch::la::Vector<dim, double> velocity[1680];
-  double temperature[1680];
-  unsigned int numberParticles[1680];
+  dataOutputForEvaporation()=default;
+  ~dataOutputForEvaporation(){
+    delete[] velocity;
+    delete[] velocityPlus;
+    delete[] velocityMinus;
+    delete[] temperature;
+    delete[] numberParticles;
+    delete[] numberParticlesPlus;
+    delete[] numberParticlesMinus;
+  }
+  tarch::la::Vector<dim, double>* velocity{new tarch::la::Vector<dim, double> [1690]{}};
+  tarch::la::Vector<dim, double>* velocityPlus{new tarch::la::Vector<dim, double> [1690]{}};
+  tarch::la::Vector<dim, double>* velocityMinus{new tarch::la::Vector<dim, double> [1690]{}};
+  double* temperature{new double [1690]{}};
+  unsigned int* numberParticles{new unsigned int [1690]{}};
+  unsigned int* numberParticlesPlus{new unsigned int [1690]{}};
+  unsigned int* numberParticlesMinus{new unsigned int [1690]{}};
   unsigned int numberSamples{};
 
   void clean(){
-    for(unsigned int i=0; i<1680; i++){
-      velocity[i] = tarch::la::Vector<dim, double>(0.0);
+    for(unsigned int i=0; i<1690; i++){
+      velocity[i] = 0.0;
+      velocityPlus[i] = 0.0;
+      velocityMinus[i] = 0.0;
       temperature[i] = 0.0;
       numberParticles[i] = 0;
+      numberParticlesPlus[i] = 0;
+      numberParticlesMinus[i] = 0;
     }
     numberSamples = 0;
   }
-  void write(const unsigned int t){
+
+  void write(const unsigned int t, const unsigned int rank){
     // form file name and open file
     std::stringstream ss;
-    ss << "EvaporationZAvgBin_" << t << ".csv";
+    ss << "EvaporationZAvgBin_" << rank << "_" << t << ".csv";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
-    for (unsigned int i = 0; i < 1680; i++){
-      file << i << " ; " << velocity[i][0]/numberSamples << " ; " << velocity[i][1]/numberSamples << " ; " << velocity[i][2]/numberSamples << " ; " << numberParticles[i]/numberSamples << " ; " << temperature[i]/numberSamples;
+    const double tmp = 1/static_cast<double>(numberSamples);
+    for (unsigned int i = 0; i < 1690; i++){
+      file << i << " ; " << velocity[i][0]*tmp << " ; " << velocity[i][1]*tmp << " ; " << velocity[i][2]*tmp << " ; " << numberParticles[i]*tmp << " ; " << temperature[i]*tmp;
+      file << " ; " << velocityPlus[i][0]*tmp << " ; " << velocityPlus[i][1]*tmp << " ; " << velocityPlus[i][2]*tmp << " ; " << numberParticlesPlus[i]*tmp;
+      file << " ; " << velocityMinus[i][0]*tmp << " ; " << velocityMinus[i][1]*tmp << " ; " << velocityMinus[i][2]*tmp << " ; " << numberParticlesMinus[i]*tmp;
       file << std::endl;
     }
-    // close file
     file.close();
     clean();
   }
@@ -273,37 +324,48 @@ template<class LinkedCell,unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>::
 checkMass(unsigned int t){
   static dataOutputForEvaporation<LinkedCell, dim> data{};
-  tarch::la::Vector<dim, double> velocity[1680];
-  double temperature[1680];
-  unsigned int numberParticles[1680];
-  for(unsigned int i=0; i<1680; i++){
-    velocity[i] = 0.0;//tarch::la::Vector<dim, double>(0.0);
-    temperature[i] = 0;
-    numberParticles[i] = 0;
-  }
-  Wrapper4SampleVelocityAndParticlesInZ wrapper(this, velocity, numberParticles);
+  tarch::la::Vector<dim, double>* velocity = new tarch::la::Vector<dim, double> [1690]{};
+  tarch::la::Vector<dim, double>* velocityPlus = new tarch::la::Vector<dim, double> [1690]{};
+  tarch::la::Vector<dim, double>* velocityMinus = new tarch::la::Vector<dim, double> [1690]{};
+  double * temperature = new double [1690]{};
+  unsigned int * numberParticles = new unsigned int [1690]{};
+  unsigned int * numberParticlesPlus = new unsigned int [1690]{};
+  unsigned int * numberParticlesMinus = new unsigned int [1690]{};
+  Wrapper4SampleVelocityAndParticlesInZ wrapper(this, velocity, velocityPlus, velocityMinus, numberParticles, numberParticlesPlus, numberParticlesMinus);
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
-  for(unsigned int i=0; i<1680; i++){
-    if(numberParticles[i]>0){
-      velocity[i][0] /= numberParticles[i];
-      velocity[i][1] /= numberParticles[i];
-      velocity[i][2] /= numberParticles[i];
-      data.velocity[i] += velocity[i];
-      data.numberParticles[i] += numberParticles[i];
-    }
+  for(unsigned int i=0; i<1690; i++){
+    if(numberParticles[i]>0)
+      velocity[i] = velocity[i]*(1/static_cast<double>(numberParticles[i]));
+    if(numberParticlesPlus[i]>0)
+      velocityPlus[i] = velocityPlus[i]*(1/static_cast<double>(numberParticlesPlus[i]));
+    if(numberParticlesMinus[i]>0)
+      velocityMinus[i] = velocityMinus[i]*(1/static_cast<double>(numberParticlesMinus[i]));
   }
   Wrapper4SampleTemperatureInZ wrapper2(this, velocity, temperature);
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper2);
-  for(unsigned int i=0; i<1680; i++){
+  for(unsigned int i=0; i<1690; i++){
     if(numberParticles[i]>0){
       temperature[i] = _mdSolverInterface->getMoleculeMass()*temperature[i]/ (dim*_mdSolverInterface->getKB()*numberParticles[i]);
+      data.velocity[i] += velocity[i];
+      data.velocityPlus[i] += velocityPlus[i];
+      data.velocityMinus[i] += velocityMinus[i];
+      data.numberParticles[i] += numberParticles[i];
+      data.numberParticlesPlus[i] += numberParticlesPlus[i];
+      data.numberParticlesMinus[i] += numberParticlesMinus[i];
       data.temperature[i] += temperature[i];
     }
   }
   data.numberSamples++;
-  if(data.numberSamples == 50){
-    data.write(t);
+  if(data.numberSamples == 2500){
+    data.write(t, _indexConversion->getThisRank());
   }
+  delete[] velocity;
+  delete[] velocityPlus;
+  delete[] velocityMinus;
+  delete[] temperature;
+  delete[] numberParticles;
+  delete[] numberParticlesPlus;
+  delete[] numberParticlesMinus;
 }
 
 template<class LinkedCell,unsigned int dim>

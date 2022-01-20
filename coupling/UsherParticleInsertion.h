@@ -51,6 +51,7 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
      double stepRefCoeff,unsigned int iterMax,unsigned int restartMax,double tolerance, double offsetFromOuterBoundary,
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface
     );
+
     /** @brief a dummy destructor*/
     virtual ~UsherParticleInsertion(){}
 
@@ -114,6 +115,7 @@ class coupling::UsherParticleInsertion: public coupling::ParticleInsertion<Linke
       const double &temperature,
       const coupling::BoundaryForceController<LinkedCell,dim>& boundaryForceController
     ) override ;
+    
   private:
     /** Returns Deletion on success and NoAction otherwise.
      *  @brief tries to delete a particle from the macroscopic cell.
