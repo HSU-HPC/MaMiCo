@@ -50,7 +50,7 @@ public:
 	_kinVisc(kinVisc), 
 	_plotEveryTimestep(plotEveryTimestep), 
 	_filestem(filestem),
-	_domainSize(std::floor(_channelHeight/dx)),
+	_domainSize(std::floor(channelHeight/dx)+1),
 	_numberOfVertices(std::pow(_domainSize, 3))
 	{
 		std::cout << "PreciceSolver constructor call" << std::endl;	
@@ -62,6 +62,10 @@ public:
 			std::cout << "main: preCICE dimension should be 3" << std::endl;
 			exit(EXIT_FAILURE);
 		}
+		std::cout << "_channelHeight " << _channelHeight << std::endl;
+		std::cout << "_dx " << _dx << std::endl;
+		std::cout << "_domainSize " << _domainSize << std::endl;
+		std::cout << "_numberOfVertices " << _numberOfVertices << std::endl;
 		int meshID = _interface->getMeshID("MamicoMesh");
 		double* coords = new double[dim*_numberOfVertices];
 		_vel = new double[dim*_numberOfVertices];
@@ -84,11 +88,22 @@ public:
 				}
 			}
 		}
+		for (int vertexIndex = 0; vertexIndex < _numberOfVertices; vertexIndex++)
+		{
+			std::cout << "PreciceSolver: coords[" << vertexIndex << "] = [" << coords[dim*vertexIndex] << "," << coords[dim*vertexIndex+1] << "," << coords[dim*vertexIndex+2] << "]" << std::endl;
+		}
 		_vertexIDs = new int[_numberOfVertices];
 		_interface->setMeshVertices(meshID, _numberOfVertices, coords, _vertexIDs); 
 		delete[] coords;
 		_precice_dt = _interface->initialize();
 		std::cout << "PreciceSolver constructor called" << std::endl;
+		int exvsID = _interface->getDataID("ExternalVelocities", meshID); 
+		double* velocities = new double[_numberOfVertices*dim];
+		_interface->readBlockVectorData(exvsID, _numberOfVertices, _vertexIDs, velocities);
+		for (int vertexIndex = 0; vertexIndex < _numberOfVertices; vertexIndex++)
+		{
+			std::cout << "PreciceSolver: read velocities[" << vertexIndex << "] = [" << velocities[dim*vertexIndex] << "," << velocities[dim*vertexIndex+1] << "," << velocities[dim*vertexIndex+2] << "]" << std::endl;
+		}
 	}
 
     /** @brief a simple destructor 
@@ -144,21 +159,21 @@ public:
 	void advance(double dt) override 
 	{
 		if(skipRank()){return;}
-		int dim = _interface->getDimensions();
-		int meshID = _interface->getMeshID("MamicoMesh");
-		int exvsID = _interface->getDataID("ExternalVelocities", meshID); 
-		double* velocities = new double[_numberOfVertices*dim];
-		_interface->readBlockVectorData(exvsID, _numberOfVertices, _vertexIDs, velocities);
-		for (int vertexIndex = 0; vertexIndex < _numberOfVertices; vertexIndex++)
-		{
-			std::cout << "PreciceSolver::advance: read velocities[" << vertexIndex << "] = [" << velocities[dim*vertexIndex] << "," << velocities[dim*vertexIndex+1] << "," << velocities[dim*vertexIndex+2] << "]" << std::endl;
-		}
 		std::cout << "PreciceSolver::advance called with dt = " << dt << std::endl;
-		//while (_interface->isCouplingOngoing()) {
+		if (_interface->isCouplingOngoing()) {
+			int dim = _interface->getDimensions();
+			int meshID = _interface->getMeshID("MamicoMesh");
+			int exvsID = _interface->getDataID("ExternalVelocities", meshID); 
+			double* velocities = new double[_numberOfVertices*dim];
+			_interface->readBlockVectorData(exvsID, _numberOfVertices, _vertexIDs, velocities);
+			for (int vertexIndex = 0; vertexIndex < _numberOfVertices; vertexIndex++)
+			{
+				std::cout << "PreciceSolver::advance: read velocities[" << vertexIndex << "] = [" << velocities[dim*vertexIndex] << "," << velocities[dim*vertexIndex+1] << "," << velocities[dim*vertexIndex+2] << "]" << std::endl;
+			}
 			double computed_dt = std::min(_precice_dt, dt);
 			_precice_dt = _interface->advance(computed_dt);
 			std::cout << "PreciceSolver::advance preCICE solver advanced with dt = " << computed_dt << std::endl;
-    	//}
+    	}
 	}
 
   private:    
