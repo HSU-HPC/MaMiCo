@@ -181,7 +181,8 @@ void coupling::filtering::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XM
 		switch(_scope) { /*TODO: print rank as well */
 
 			case coupling::filtering::Scope::perInstance : std::cout << "Warning: Empty md2Macro-Domain in per-instance Filter Pipeline." << std::endl;
-			case coupling::filtering::Scope::postMultiInstance : std::cout << "Warning: Empty md2Macro-Domain in post-multi-instance Filter Pipeline." << std::endl;
+			//TODO: only output the following in cases where this is unexpected
+			case coupling::filtering::Scope::postMultiInstance : /*std::cout << "Warning: Empty md2Macro-Domain in post-multi-instance Filter Pipeline." << std::endl*/;
 		}
 	}
 	

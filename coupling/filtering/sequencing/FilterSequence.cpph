@@ -38,13 +38,33 @@ int coupling::filtering::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLEl
 				exit(EXIT_FAILURE);
 			}
 
-            newfilter = new coupling::filtering::WriteToFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"), overwrite, oco);
+			const std::string location = currFilterNode->Attribute("location");
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+			using namespace std::string_literals;
+			int rank;
+			MPI_Comm_rank(_comm, &rank);
+
+            newfilter = new coupling::filtering::WriteToFile<dim>(inputCellVector, outputCellVector, _filteredValues, std::to_string(rank) + "_"s + location, overwrite, oco);
+			#else
+            newfilter = new coupling::filtering::WriteToFile<dim>(inputCellVector, outputCellVector, _filteredValues, location, overwrite, oco);
+			#endif
         }
 	
 		//Read From File
         else if(std::strcmp(currFilterNode->Value(), "read-from-file") == 0){
 			
             newfilter = new coupling::filtering::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"));
+			const std::string location = currFilterNode->Attribute("location");
+			#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+			using namespace std::string_literals;
+			int rank;
+			MPI_Comm_rank(_comm, &rank);
+
+            newfilter = new coupling::filtering::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, std::to_string(rank) + "_"s + location);
+			#else
+            newfilter = new coupling::filtering::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, location);
+			#endif
+
 		}
 
 		//Constant Filter

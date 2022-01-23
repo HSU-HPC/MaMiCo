@@ -46,7 +46,7 @@ void coupling::filtering::ReadFromFile<dim>::operator()(){
 		//TODO: check if number of doubles match dim*_vectorSetters.size() + _scalarSetters.size()
 		
 		//iteration, indexes. Adjust this if write-to-file's output changes!
-		const unsigned int const_offset = 1 + dim;
+		const unsigned int const_offset = 1;
 
 		//increases for each double read from line
 		unsigned int incr_offset = 0;
@@ -58,8 +58,9 @@ void coupling::filtering::ReadFromFile<dim>::operator()(){
 			#ifdef DEBUG_READ_FROM_FILE
 			if( ic_index  == 0)
 				std::cout << "		RFF: Scalar sent to cell 0: " << doublesFromLine[0/*const_offset + incr_offset*/] << std::endl;
-			incr_offset++;
 			#endif
+
+			incr_offset++;
 		}
 		//Apply vector setters
 		for(const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs){
