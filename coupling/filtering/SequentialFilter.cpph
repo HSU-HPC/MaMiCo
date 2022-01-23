@@ -44,7 +44,7 @@ coupling::filtering::SequentialFilter<dim>::SequentialFilter(
 		}//end: if rank processing rank
 
 		//Resize if buffers are too small to contain cell data
-		if(_cellbuf.capacity() < 4+3*dim) {
+		if(_cellbuf.size() < 4+3*dim) {
 			_cellbuf.resize(4+3*dim); 
 			#ifdef DEBUG_SEQ_FILTER
 			std::cout << "		SEQFILTER (" << _myRank << "): Cell buffer resized to: " << _cellbuf.size() << std::endl;
@@ -159,21 +159,21 @@ void coupling::filtering::SequentialFilter<dim>::contribute() {
 		MPI_Send(&numberOfCellsFromThisRank, 1, MPI_UNSIGNED, _processingRank, 0, _comm);
 
 		//send that many cells (and indices)
-		for(unsigned int c = 0; c < numberOfCellsFromThisRank; c++) { //TODO: send all cells at once
+		for(auto& i : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>()) { //TODO: send all cells at once
 			//fill buffer
-			macroscopicCellToBuffer(_cellbuf, _filter->getInputCells()[c]);
+			macroscopicCellToBuffer(_cellbuf, _filter->getInputCells()[i.get()]);
 
 			//send cell
 			MPI_Send(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, _processingRank, 0, _comm);
 			//send global index
-			indexbuf = CellIndex<dim, /*global*/ IndexTrait::md2macro, IndexTrait::noGhost>(c).get();
+			indexbuf = CellIndex<dim, /*global*/ IndexTrait::md2macro, IndexTrait::noGhost>(i).get();
 			MPI_Send(&indexbuf, 1, MPI_UNSIGNED, _processingRank, 0, _comm);
 		}
 
 		//the processing rank now processes...
 
 		//receive output data
-		for(unsigned int c = 0; c < numberOfCellsFromThisRank; c++) { //TODO: receive all cells at once
+		for(auto& i [[maybe_unused]] : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>()) { //TODO: receive all cells at once
 			//receive cell
 			MPI_Recv(_cellbuf.data(), 4+3*dim, MPI_DOUBLE, _processingRank, 0, _comm, MPI_STATUS_IGNORE);
 			//receive global index
