@@ -3,6 +3,7 @@
 #include <iostream>
 #include <type_traits>
 #include <iterator>
+#include <string_view>
 
 #include "tarch/la/Vector.h"
 
@@ -66,7 +67,7 @@ namespace coupling {
 					return print_trait<t1>();
 				}
 				else {
-					return print_trait<t1>() + ", "s  +  print_traitlist<rest...>();
+					return std::string_view{print_trait<t1>().data() + ", "s  +  print_traitlist<rest...>().data()};
 				}
 			}
 		}

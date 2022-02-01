@@ -315,7 +315,7 @@ void coupling::indexing::testing::checkAllTrivialConversions() {
 			using namespace std::string_literals;
 
 			if constexpr (sizeof...(traits) > 0)
-				throw std::runtime_error("("s + print_traitlist<traits...>() + ") -> ("s +  e.what() + ") -> ("s + print_traitlist<traits...>() + ")"s);
+				throw std::runtime_error("("s + print_traitlist<traits...>().data() + ") -> ("s +  e.what() + ") -> ("s + print_traitlist<traits...>().data() + ")"s);
 			else 
 				throw std::runtime_error("() -> ("s +  e.what() + ") -> ()"s);
 		}
@@ -344,7 +344,7 @@ void coupling::indexing::testing::checkTrivialConversion(Index i) {
 
 		//throw where (i.e. for what traits) this error occured
 		if constexpr (sizeof...(convert_to_traits) > 0)
-			throw std::runtime_error(coupling::indexing::TraitOperations::print_traitlist<convert_to_traits...>());
+			throw std::runtime_error(std::string{coupling::indexing::TraitOperations::print_traitlist<convert_to_traits...>()});
 		else
 			throw std::runtime_error("");
 
@@ -360,7 +360,7 @@ void coupling::indexing::testing::checkTrivialConversion(Index i) {
 
 		//output where (i.e. for what traits) this conversion occured
 		if constexpr (sizeof...(convert_to_traits) > 0)
-			throw std::runtime_error(coupling::indexing::TraitOperations::print_traitlist<convert_to_traits...>());
+			throw std::runtime_error(std::string{coupling::indexing::TraitOperations::print_traitlist<convert_to_traits...>()});
 		else
 			throw std::runtime_error("");
 	}
