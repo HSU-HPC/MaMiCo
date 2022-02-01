@@ -51,7 +51,7 @@ namespace coupling {
 			}
 
 			template<IndexTrait t>
-			constexpr std::string print_trait() {
+			constexpr std::string_view print_trait() {
 				if constexpr (t == IndexTrait::vector) return "vector";
 				if constexpr (t == IndexTrait::local) return "local";
 				if constexpr (t == IndexTrait::md2macro) return "md2macro";
@@ -59,7 +59,7 @@ namespace coupling {
 			}
 
 			template<IndexTrait t1, IndexTrait ... rest>
-			constexpr std::string print_traitlist() {
+			constexpr std::string_view print_traitlist() {
 				using namespace std::string_literals;
 
 				if constexpr (sizeof...(rest) == 0) {
