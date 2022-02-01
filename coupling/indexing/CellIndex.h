@@ -301,31 +301,5 @@ class coupling::indexing::CellIndex {
 		}
 };
 
-/**
- * Overload operator<< for CellIndex
- */
-template<unsigned int dim, coupling::indexing::IndexTrait ... traits>
-std::ostream& 
-operator<<(std::ostream&, const coupling::indexing::CellIndex<dim, traits...>&);
-
-/**
- * Overload arithmetic operators for CellIndex
- */
-template<unsigned int dim, coupling::indexing::IndexTrait ... traits>
-coupling::indexing::CellIndex<dim, traits...> 
-operator+(const coupling::indexing::CellIndex<dim, traits...>&, const coupling::indexing::CellIndex<dim, traits...>&);
-
-template<unsigned int dim, coupling::indexing::IndexTrait ... traits>
-coupling::indexing::CellIndex<dim, traits...> 
-operator-(const coupling::indexing::CellIndex<dim, traits...>&, const coupling::indexing::CellIndex<dim, traits...>&);
-
-template<unsigned int dim, coupling::indexing::IndexTrait ... traits>
-coupling::indexing::CellIndex<dim, traits...> 
-operator+(const coupling::indexing::CellIndex<dim, traits...>&, const typename coupling::indexing::CellIndex<dim, traits...>::value_T&);
-
-template<unsigned int dim, coupling::indexing::IndexTrait ... traits>
-coupling::indexing::CellIndex<dim, traits...> 
-operator-(const coupling::indexing::CellIndex<dim, traits...>&, const typename coupling::indexing::CellIndex<dim, traits...>::value_T&);
-
 //Include implementation
 #include "CellIndex.cpph"
