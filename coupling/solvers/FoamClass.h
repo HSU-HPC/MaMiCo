@@ -1,8 +1,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _COUPLING_SOLVERS_IcoFoam_H_
-#define _COUPLING_SOLVERS_FoamTest_H_
+#ifndef _COUPLING_SOLVERS_ICOFOAM_H_
+#define _COUPLING_SOLVERS_ICOFOAM_H_
 
 #include "coupling/solvers/CouetteSolver.h"
 // Includes from OpenFOAM fdCFD.H, unnecessary includes are removed
@@ -44,15 +44,13 @@ public:
   _boundariesWithMD(boundariesWithMD),
   _dx(std::cbrt(Foam::max(mesh.cellVolumes()))),
   _channelheight(channelheight),
+  _numberBoundaryPoints(getNumBoundaryPoints()),
   _boundary2RecvBufferIndicesOuter(new unsigned int [_numberBoundaryPoints]),
   _boundary2RecvBufferIndicesInner(new unsigned int [_numberBoundaryPoints]),
   _boundaryIndices(new Foam::vector* [_numberBoundaryPoints]),
   _rank(rank),
   _plotEveryTimestep(plotEveryTimestep){
     if(skipRank()){return;}
-    unsigned int innerMDBoundaryIndex=0;
-    while (_boundariesWithMD[innerMDBoundaryIndex] == 0){innerMDBoundaryIndex++;}
-    _numberBoundaryPoints = 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
     Foam::setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
     mesh.setFluxRequired(p.name());
   }
@@ -129,14 +127,14 @@ public:
 
   // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
   const tarch::la::Vector<3,double> getOuterPointFromBoundary(const int layer, const int index){
-     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
+     const Foam::vectorField FoamCoord( U.boundaryFieldRef()[layer].patch().Cf()[index]+(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5) );
      const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
      return FoamCoordVector;
   }
 
   // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
   const tarch::la::Vector<3,double> getInnerPointFromBoundary(const int layer, const int index){
-     const Foam::vectorField FoamCoord = U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5);
+     const Foam::vectorField FoamCoord( U.boundaryFieldRef()[layer].patch().Cf()[index]-(U.boundaryFieldRef()[layer].patch().nf()*_dx*0.5) );
      const tarch::la::Vector<3,double> FoamCoordVector(FoamCoord[0][0],FoamCoord[0][1],FoamCoord[0][2]);
      return FoamCoordVector;
   }
@@ -192,6 +190,12 @@ public:
   }
 
 private:
+  unsigned int getNumBoundaryPoints(){
+	  unsigned int innerMDBoundaryIndex=0;
+          while (_boundariesWithMD[innerMDBoundaryIndex] == 0) innerMDBoundaryIndex++;
+          return 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
+  }
+
   /** create txt plot if required */
   void plottxt() {
     if(_plotEveryTimestep < 1 || _timestepCounter % _plotEveryTimestep > 0) return;
@@ -271,16 +275,15 @@ private:
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
   float _dx; // mesh size
   double _channelheight; // overall height of the Couette channel
+  unsigned int _numberBoundaryPoints; // the number of CFD boundary points which need data from the MD
   unsigned int *_boundary2RecvBufferIndicesOuter; // pointer to an array with data for communication
   unsigned int *_boundary2RecvBufferIndicesInner; // pointer to an array with data for communication
   Foam::vector **_boundaryIndices; // pointer to OpenFOAM data for communication
   int _rank; // rank of the actual process
   int _plotEveryTimestep; // every n-th time step should be plotted
-  unsigned int _numberBoundaryPoints; // the number of CFD boundary points which need data from the MD
   int _timestepCounter{0}; // actual time step number
   // the following are original OpenFOAM variables, their names shall not be changed
   Foam::label pRefCell{0};
   Foam::scalar pRefValue{0.0};
-  Foam::scalar cumulativeContErr{0};
 };
 #endif // _COUPLING_SOLVERS_ICOFOAM_H
