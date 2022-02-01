@@ -24,7 +24,14 @@ namespace coupling {
 				//copied from deprecated coupling::IndexConversion::getCellIndex())
 				
 				for(unsigned d = 0; d < dim; d++)
-					if(index.get()[d] < 0) throw std::runtime_error("ERROR: Indexing: Cannot convert negative vector index to scalar.");
+					if(index.get()[d] < 0){ 
+						std::stringstream ss;
+						ss << "ERROR: Indexing: Cannot convert negative vector index to scalar." << std::endl;
+						ss << "Faulty Index = " << index.get() << std::endl;
+						ss << "Index Traits = " << TraitOperations::print_traitlist<traits...>().data() << std::endl;
+						ss << "My rank = " << IndexingService<dim>::getInstance().getRank() << std::endl;
+						throw std::runtime_error(ss.str());
+					}
 
 				unsigned int i { static_cast<unsigned int>(index.get()[dim-1]) };
 				for (int d = dim-2; d >-1; d--){

@@ -10,17 +10,6 @@
 //Include CellIndex template class definition
 #include "CellIndex.h"
 
-//Include non-member functions operating on indexes
-#include "Operations.h"
-
-//enable/disable tests
-#define TEST_INDEXING
-
-#ifdef TEST_INDEXING
-//Inlcude index tests
-#include "Testing.h"
-#endif
-
 namespace coupling {
 	namespace indexing {
 
@@ -33,6 +22,17 @@ namespace coupling {
 
 	}
 }
+
+//Include non-member functions operating on indexes
+#include "Operations.h"
+
+//enable/disable tests
+#define TEST_INDEXING
+
+#ifdef TEST_INDEXING
+//Inlcude index tests
+#include "Testing.h"
+#endif
 
 /**
  * Singleton service class initialising lower and upper boundaries of all possible CellIndex specialisations.
@@ -68,6 +68,8 @@ class coupling::indexing::IndexingService{
 		 */
 		std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex) const;
 		#endif
+
+		unsigned int getRank() const {return _rank;}
 
 	private:
 		#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES) //parallel scenario
