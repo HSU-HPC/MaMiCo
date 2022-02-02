@@ -477,14 +477,24 @@ void coupling::indexing::IndexingService<dim>::init(
 		using namespace std::string_literals;
 		of.open("indexbounds_rank"s + std::to_string(_rank) + ".txt"s);
 	}
-	testing::printAllBoundaries<dim>(of);
+	try {
+		testing::printAllBoundaries<dim>(of);
+	}
+	catch (const std::exception& e) {
+		std::cout << _rank << ": WARNING: IndexingService: Failed to call printAllBoundaries() " << e.what() << std::endl;
+	}
 	of.close();
 	//get output file for domains
 	{
 		using namespace std::string_literals;
 		of.open("indexdomains_rank"s + std::to_string(_rank) + ".txt"s);
 	}
-	testing::printAllDomains<dim>(of);
+	try {
+		testing::printAllDomains<dim>(of);
+	}
+	catch (const std::exception& e) {
+		std::cout << _rank << ": WARNING: IndexingService: Failed to call printAllDomains() " << e.what() << std::endl;
+	}
 	of.close();
 
 

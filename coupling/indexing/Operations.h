@@ -28,8 +28,8 @@ namespace coupling {
 						std::stringstream ss;
 						ss << "ERROR: Indexing: Cannot convert negative vector index to scalar." << std::endl;
 						ss << "Faulty Index = " << index.get() << std::endl;
-						ss << "Index Traits = " << TraitOperations::print_traitlist<traits...>().data() << std::endl;
 						ss << "My rank = " << IndexingService<dim>::getInstance().getRank() << std::endl;
+						ss << "Index Traits = " << TraitOperations::print_traitlist<traits...>().data() << std::endl;
 						throw std::runtime_error(ss.str());
 					}
 
