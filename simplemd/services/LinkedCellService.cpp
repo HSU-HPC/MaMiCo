@@ -97,7 +97,7 @@ const tarch::la::Vector<MD_DIM,double>& simplemd::services::LinkedCellService::g
 
 
 void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule &molecule, const tarch::la::Vector<MD_DIM,unsigned int> &localCellIndex){
-#if (MD_DEBUG == MD_YES)
+#if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++){
     if (localCellIndex[d] >= _totalNumberOfCells[d]){
       std::cout << "ERROR simplemd::services::LinkedCellService::addMoleculeToLinkedCell: localCellIndex out of range!" << std::endl;
@@ -125,7 +125,7 @@ void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule &mo
 
 
 simplemd::LinkedCell& simplemd::services::LinkedCellService::getLinkedCell(const tarch::la::Vector<MD_DIM,unsigned int> &localCellIndex){
-#if (MD_DEBUG==MD_YES)
+#if (MD_ERROR==MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++){
     if (localCellIndex[d] >= _totalNumberOfCells[d]){
       std::cout << "ERROR simplemd::services::LinkedCellService::getLinkedCell: localCellIndex out of range!" << std::endl;

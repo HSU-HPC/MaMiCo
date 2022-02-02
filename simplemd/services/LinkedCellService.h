@@ -173,7 +173,7 @@ void simplemd::services::LinkedCellService::iterateCells(
   const bool& useOpenMP
 ){
   unsigned int index = 0;
-#if (MD_DEBUG==MD_YES)
+#if (MD_ERROR==MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++){
     if (cellRange[d]==0){std::cout << "ERROR simplemd::services::LinkedCellService::iterateCells: cellRange(" << d << ")==0!" << std::endl; exit(EXIT_FAILURE); }
     if (lowerLeftFrontCell[d]+cellRange[d] > 2*_indexOffset[d]+_numberOfCells[d]){
@@ -334,7 +334,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
   neighbourOffset[12] = (_numberOfCells[0] + 2)*(_numberOfCells[1] + 2);
 #endif
 
-#if (MD_DEBUG==MD_YES)
+#if (MD_ERROR==MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++){
     if (cellRange[d] > 2*_indexOffset[d]+_numberOfCells[d]-1){
       std::cout << "ERROR simplemd::services::LinkedCellService::iterateCellPairs(): defined Range does not fit into local sub-domain!" << std::endl;
