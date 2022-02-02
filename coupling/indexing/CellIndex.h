@@ -215,7 +215,9 @@ class coupling::indexing::CellIndex {
 		 * Initialises all static members dependant only on upperBoundary and lowerBoundary
 		 */
 		static void setDomainParameters() {
-			numberCellsInDomain = tarch::la::Vector<dim, unsigned int> { upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, int> { 1 } };
+			auto cellnum = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, int> { 1 } ;
+			for(unsigned int d = 0; d < dim; d++) cellnum[d] = std::max(0, cellnum[d]);
+			numberCellsInDomain = tarch::la::Vector<dim, unsigned int> { cellnum };
 			
 			linearNumberCellsInDomain = 1;
 			for(unsigned int d = 0; d < dim; d++) linearNumberCellsInDomain *= numberCellsInDomain[d];
@@ -252,7 +254,7 @@ class coupling::indexing::CellIndex {
 		static BaseIndex<dim> upperBoundary;
 
 		/**
-		 * Number of cells in this indexing's domain. Because the above declared boundaries are inclusive, this is never 0 in any direction.
+		 * Number of cells in this indexing's domain. The above declared boundaries are inclusive.
 		 * Initialised in setDomainParameters().
 		 */
 		static tarch::la::Vector<dim, unsigned int> numberCellsInDomain;
