@@ -128,7 +128,7 @@ if compiler == 'gcc':
    ccflags.append('-Wno-non-virtual-dtor')
    if build == 'debug':
       ccflags.append('-g3')
-      ccflags.append('-O0')
+      ccflags.append('-O3')
    elif build == 'release':
       ccflags.append('-O3') 
 elif compiler == 'icc':
@@ -142,7 +142,7 @@ elif compiler == 'icc':
    ccflags.append('-ipo')
    linkerflags.append('-ipo')
    if build == 'debug':
-      ccflags.append('-O0')
+      ccflags.append('-O3')
    elif build == 'release':
       ccflags.append('-fast')
       ccflags.append('-w')
@@ -170,7 +170,7 @@ elif compiler == 'fcc':
    ccflags.append('-mcpu=a64fx') ###################
    if build == 'debug':
       ccflags.append('-g3')
-      ccflags.append('-O0')
+      ccflags.append('-O3')
    elif build == 'release':
       ccflags.append('-Ofast')
 else:
