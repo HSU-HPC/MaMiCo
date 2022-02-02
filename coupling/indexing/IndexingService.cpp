@@ -596,7 +596,13 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscop
 			using namespace std::string_literals;
 			throw std::runtime_error("IndexingService: getUniqueRankForMacroscopicCell(): Global cell index greater than global size in dim "s + std::to_string(d));
 		}
-			
+		if(globalNumberMacroscopicCells[d] % _numberProcesses[d] != 0){
+			std::stringstream ss;
+			ss << "IndexingService: getUniqueRankForMacroscopicCell(): ERROR: Number of macroscopic cells must be divisible by number of processes! ";
+			ss << "globalNumberMacroscopicCells = " << globalNumberMacroscopicCells;
+			ss << ", numberProcesses = " << _numberProcesses;
+			throw std::runtime_error(ss.str());
+		}
 		averageLocalNumberMacroscopicCells[d] = globalNumberMacroscopicCells[d]/_numberProcesses[d];
 	}
 
