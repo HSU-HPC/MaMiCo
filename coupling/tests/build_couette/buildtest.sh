@@ -11,8 +11,8 @@ else
 fi
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
-SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
-SIMPLEMD_SEQUENTIAL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_no/gcc/gprof_no/
+SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/debug/dim3/parallel_yes/gcc/gprof_no/
+SIMPLEMD_SEQUENTIAL_PATH=${MAMICO_PATH}/build/libsimplemd/debug/dim3/parallel_no/gcc/gprof_no/
 ### name of lib for SIMPLE_MD
 LIBSIMPLEMD=simplemd
 
@@ -73,11 +73,11 @@ fi
 cd ${MAMICO_PATH}
 if [ "${parallel}" == "parallel" ]
 then
-        scons target=libsimplemd dim=3 build=release parallel=yes -j4
+        scons target=libsimplemd dim=3 build=debug parallel=yes -j4
         libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
         FLAGS="${FLAGS} -DMDParallel"
 else
-        scons target=libsimplemd dim=3 build=release parallel=no -j4
+        scons target=libsimplemd dim=3 build=debug parallel=no -j4
         libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
 fi
 
