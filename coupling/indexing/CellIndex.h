@@ -219,7 +219,6 @@ class coupling::indexing::CellIndex {
 			
 			linearNumberCellsInDomain = 1;
 			for(unsigned int d = 0; d < dim; d++) linearNumberCellsInDomain *= numberCellsInDomain[d];
-			
 
 			tarch::la::Vector<dim, unsigned int> divFactor { 1 };
 			for (unsigned int d = 1; d < dim; d++) divFactor[d] = divFactor[d-1]*(numberCellsInDomain[d-1]);
@@ -290,7 +289,11 @@ class coupling::indexing::CellIndex {
 			CellIndex _idx;
 		};
 		static IndexIterator begin() { return IndexIterator( lowerBoundary ); }
-    	static IndexIterator end()   { return ++IndexIterator( upperBoundary ); } 
+    	static IndexIterator end() {
+    		// Todo: This if-else branching is quite slow? (~factor 2)
+    		if(linearNumberCellsInDomain == 0) return begin();
+    		else return ++IndexIterator( upperBoundary );
+    	}
 
 	private:
 		value_T _index;

@@ -117,7 +117,7 @@ private:
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = 
       new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells,_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
-    coupling::indexing::IndexingService<3>(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
+    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
     delete couetteSolverInterface;
   }
 
