@@ -294,7 +294,7 @@ class coupling::solvers::NumericalSolver: public coupling::solvers::AbstractCoue
     /** @brief create vtk plot if required */
     void plot() const {
       // only plot output if this is the correct timestep
-      if (_plotEveryTimestep==-1){ return;}
+      if (_plotEveryTimestep<1){ return;}
       if (_counter%_plotEveryTimestep!=0){return;}
       //const tarch::la::Vector<3,unsigned int> coords(getProcessCoordinates()); // offset of domain for MPI-parallel simulations
       int rank = 0; // rank in MPI-parallel simulations
