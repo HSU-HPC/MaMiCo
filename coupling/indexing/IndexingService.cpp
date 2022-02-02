@@ -300,8 +300,10 @@ void coupling::indexing::IndexingService<dim>::init(
 				tarch::la::Vector<dim, unsigned int> { CellIndex<dim, IndexTrait::vector>{ lowerBoundary }.get() })
 			 ) {
 			//sanity check: empty m2m domain
-			if(lowerBoundary == BaseIndex<dim>::upperBoundary)
-				throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
+			if(lowerBoundary == BaseIndex<dim>::upperBoundary){
+				std::cout << "IndexingService: WARNING: Empty MD-To-Macro domain!" << std::endl;
+				break;
+			}
 
 			//increment by one if above is too low to be in md-to-macro domain
 			++lowerBoundary;
@@ -311,8 +313,10 @@ void coupling::indexing::IndexingService<dim>::init(
 				tarch::la::Vector<dim, unsigned int> { CellIndex<dim, IndexTrait::vector>{ upperBoundary }.get() })
 			 ) {
 			//sanity check: empty m2m domain 
-			if(upperBoundary < lowerBoundary)
-				throw std::runtime_error("IndexingService: ERROR: Empty MD-To-Macro domain!");
+			if(upperBoundary < lowerBoundary){
+				std::cout << "IndexingService: WARNING: Empty MD-To-Macro domain!" << std::endl;
+				break;
+			}
 
 			//decrement by one if above is too high to be in md-to-macro domain
 			--upperBoundary;
