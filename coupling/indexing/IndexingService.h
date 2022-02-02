@@ -27,7 +27,7 @@ namespace coupling {
 #include "Operations.h"
 
 //enable/disable tests
-#define TEST_INDEXING
+//#define TEST_INDEXING
 
 #ifdef TEST_INDEXING
 //Inlcude index tests
