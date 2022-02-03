@@ -101,7 +101,8 @@ public:
         U.correctBoundaryConditions();
       }
       // runTime.write(); // writes the original OpenFOAM output
-      plottxt();
+      //plottxt();
+      plot();
       _timestepCounter++;
     }
   }
@@ -191,6 +192,7 @@ public:
 
 private:
   unsigned int getNumBoundaryPoints(){
+          if(_boundariesWithMD == tarch::la::Vector<12,unsigned int>{0}) return 0;
 	  unsigned int innerMDBoundaryIndex=0;
           while (_boundariesWithMD[innerMDBoundaryIndex] == 0) innerMDBoundaryIndex++;
           return 6*U.boundaryFieldRef()[innerMDBoundaryIndex].size();
@@ -220,7 +222,7 @@ private:
   /** create vtk plot if required */
   void plot() const {
     // only plot output if this is the correct timestep
-    if (_plotEveryTimestep==-1){ return;}
+    if (_plotEveryTimestep < 1){ return;}
     if (_timestepCounter%_plotEveryTimestep!=0){return;}
 
     std::stringstream ss; ss << "Continuum_Velocity_IcoFoam_" << _rank << "_" << _timestepCounter << ".vtk";
