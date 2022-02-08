@@ -101,8 +101,8 @@ public:
         U.correctBoundaryConditions();
       }
       // runTime.write(); // writes the original OpenFOAM output
-      plottxt();
       _timestepCounter++;
+      plottxt();
     }
   }
 
