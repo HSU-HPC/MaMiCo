@@ -2,45 +2,48 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
-#include <iostream>
-#include <cstdlib>
-#include <cstdio>
 #include "coupling/CouplingMDDefinitions.h"
-#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
-#include "coupling/tests/Test.h"
-#include "coupling/CouplingMDDefinitions.h"
-#include "tarch/configuration/ParseConfiguration.h"
-#include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/indexing/IndexingService.cpp"
+#include "coupling/solvers/CouetteSolverInterface.h"
+#include "coupling/tests/Test.h"
+#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+#include "tarch/configuration/ParseConfiguration.h"
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
 #include <sys/time.h>
-#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
 
-class CellIdxIterBench: public Test {
+class CellIdxIterBench : public Test {
 public:
   /** @brief simple constructor */
-  CellIdxIterBench(): Test("CellIdxIterBench") {}
+  CellIdxIterBench() : Test("CellIdxIterBench") {}
   /** @brief a dummy destructor */
-  virtual ~CellIdxIterBench(){}
+  virtual ~CellIdxIterBench() {}
 
-  virtual void run(){
+  virtual void run() {
     init();
     bench();
     shutdown();
   }
 
 private:
-  void init(){
+  void init() {
     _rank = 0;
-    #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD,&_rank);
-    #endif
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+#endif
 
     std::string fname = std::tmpnam(nullptr);
     std::ofstream file(fname.c_str());
-      if (!file.is_open()){std::cout << "ERROR CellIdxIterBench: Could not open file " << fname << "!" << std::endl; exit(EXIT_FAILURE);}
+    if (!file.is_open()) {
+      std::cout << "ERROR CellIdxIterBench: Could not open file " << fname
+                << "!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
     file << R"mdconf(
   <molecular-dynamics>
   <molecule-configuration
@@ -78,15 +81,26 @@ private:
     top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
     top-west="reflecting"          top="reflecting"          top-east="reflecting"
     top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
-  /> </molecular-dynamics>)mdconf" << std::endl;
+  /> </molecular-dynamics>)mdconf"
+         << std::endl;
     file.close();
-    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(fname,"molecular-dynamics",_simpleMDConfig);
+    tarch::configuration::ParseConfiguration::parseConfiguration<
+        simplemd::configurations::MolecularDynamicsConfiguration>(
+        fname, "molecular-dynamics", _simpleMDConfig);
     std::remove(fname.c_str());
-    if (!_simpleMDConfig.isValid()){std::cout << "ERROR CellIdxIterBench: Invalid SimpleMD config!" << std::endl; exit(EXIT_FAILURE);}
+    if (!_simpleMDConfig.isValid()) {
+      std::cout << "ERROR CellIdxIterBench: Invalid SimpleMD config!"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
     fname = std::tmpnam(nullptr);
     file.open(fname.c_str());
-      if (!file.is_open()){std::cout << "ERROR CellIdxIterBench: Could not open file " << fname << "!" << std::endl; exit(EXIT_FAILURE);}
+    if (!file.is_open()) {
+      std::cout << "ERROR CellIdxIterBench: Could not open file " << fname
+                << "!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
     file << R"mamicoconf(
     <mamico>
       <macroscopic-cell-configuration
@@ -104,92 +118,125 @@ private:
       <parallel-topology type="xyz" />
       <thermostat type='outerLayers' number-layers='1' />
     </mamico>
-    )mamicoconf" << std::endl;
+    )mamicoconf"
+         << std::endl;
     file.close();
-    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3> >(fname,"mamico",_mamicoConfig);
+    tarch::configuration::ParseConfiguration::parseConfiguration<
+        coupling::configurations::MaMiCoConfiguration<3>>(fname, "mamico",
+                                                          _mamicoConfig);
     std::remove(fname.c_str());
-    if (!_mamicoConfig.isValid()){ std::cout << "ERROR CellIdxIterBench: Invalid MaMiCo config!" << std::endl; exit(EXIT_FAILURE); }
+    if (!_mamicoConfig.isValid()) {
+      std::cout << "ERROR CellIdxIterBench: Invalid MaMiCo config!"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
-    tarch::la::Vector<3,unsigned int> globalNumberMacroscopicCells(0);
+    tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
     for (unsigned int d = 0; d < 3; d++)
-      globalNumberMacroscopicCells[d] = (unsigned int) floor(_simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] /
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[d] + 0.5);
-    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = 
-      new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells,_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+      globalNumberMacroscopicCells[d] = (unsigned int)floor(
+          _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] /
+              _mamicoConfig.getMacroscopicCellConfiguration()
+                  .getMacroscopicCellSize()[d] +
+          0.5);
+    coupling::interface::MacroscopicSolverInterface<3> *couetteSolverInterface =
+        new coupling::solvers::CouetteSolverInterface<3>(
+            globalNumberMacroscopicCells,
+            _mamicoConfig.getMomentumInsertionConfiguration()
+                .getInnerOverlap());
 
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int) _rank);
+    coupling::indexing::IndexingService<3>::getInstance().init(
+        _simpleMDConfig, _mamicoConfig, couetteSolverInterface,
+        (unsigned int)_rank);
     delete couetteSolverInterface;
   }
 
-  void shutdown(){
-  }
+  void shutdown() {}
 
-  void bench(){
+  void bench() {
     using namespace coupling::indexing;
-    using CellIndex_T = CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
-    using CellIndex_T_vec = CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
+    using CellIndex_T = CellIndex<3, IndexTrait::local, IndexTrait::md2macro,
+                                  IndexTrait::noGhost>;
+    using CellIndex_T_vec =
+        CellIndex<3, IndexTrait::vector, IndexTrait::local,
+                  IndexTrait::md2macro, IndexTrait::noGhost>;
     unsigned int numcells = CellIndex_T::linearNumberCellsInDomain;
     std::cout << "Number cells in test domain: " << numcells << std::endl;
-    std::cout << "lowerBoundary = " << CellIndex_T::lowerBoundary.get() << std::endl;
-    std::cout << "upperBoundary = " << CellIndex_T::upperBoundary.get() << std::endl;
+    std::cout << "lowerBoundary = " << CellIndex_T::lowerBoundary.get()
+              << std::endl;
+    std::cout << "upperBoundary = " << CellIndex_T::upperBoundary.get()
+              << std::endl;
     const int numcounts = 10000;
     timeval start, end;
 
     std::cout << std::endl << "Scalar benchmark ------------- " << std::endl;
-    tarch::la::Vector<3,long> result(0);
-    for(int count=0;count < numcounts; count++)
-      for(unsigned int i = 0; i < numcells; i++){
-        result[0] += i; // do something with i so that the compiler can not optimize this away ...
+    tarch::la::Vector<3, long> result(0);
+    for (int count = 0; count < numcounts; count++)
+      for (unsigned int i = 0; i < numcells; i++) {
+        result[0] += i; // do something with i so that the compiler can not
+                        // optimize this away ...
       }
     // (second try after warm-up phase)
-    gettimeofday(&start,NULL);
+    gettimeofday(&start, NULL);
     result = 0;
-    for(int count=0;count < numcounts; count++)
-      for(unsigned int i = 0; i < numcells; i++){
-        result[0] += i; // do something with i so that the compiler can not optimize this away ...
+    for (int count = 0; count < numcounts; count++)
+      for (unsigned int i = 0; i < numcells; i++) {
+        result[0] += i; // do something with i so that the compiler can not
+                        // optimize this away ...
       }
     std::cout << "Useless result: " << result[0] << std::endl;
-    gettimeofday(&end,NULL);
-    double runtime = (end.tv_sec - start.tv_sec)*1000000 + (end.tv_usec - start.tv_usec);
-    std::cout << "Raw loop: " << (int)(runtime/1000) << "ms" << std::endl;
+    gettimeofday(&end, NULL);
+    double runtime =
+        (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Raw loop: " << (int)(runtime / 1000) << "ms" << std::endl;
 
-    gettimeofday(&start,NULL);
+    gettimeofday(&start, NULL);
     result = 0;
-    for(int count=0;count < numcounts; count++)
-      for(auto idx : CellIndex_T()){
-        // do something with idx so that the compiler can not optimize this away (and to check if we do the same here)
-        result[0] += idx.get(); 
+    for (int count = 0; count < numcounts; count++)
+      for (auto idx : CellIndex_T()) {
+        // do something with idx so that the compiler can not optimize this away
+        // (and to check if we do the same here)
+        result[0] += idx.get();
       }
     std::cout << "Useless result: " << result[0] << std::endl;
-    gettimeofday(&end,NULL);
-    runtime = (end.tv_sec - start.tv_sec)*1000000 + (end.tv_usec - start.tv_usec);
-    std::cout << "Index range iterator: " << (int)(runtime/1000) << "ms" << std::endl;
+    gettimeofday(&end, NULL);
+    runtime =
+        (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Index range iterator: " << (int)(runtime / 1000) << "ms"
+              << std::endl;
 
     std::cout << std::endl << "Vector benchmark ------------- " << std::endl;
-    gettimeofday(&start,NULL);
+    gettimeofday(&start, NULL);
     result = 0;
-    for(int count=0;count < numcounts; count++)
-      for(unsigned int z = 0; z < CellIndex_T::numberCellsInDomain[2]; z++)
-        for(unsigned int y = 0; y < CellIndex_T::numberCellsInDomain[1]; y++)
-          for(unsigned int x = 0; x < CellIndex_T::numberCellsInDomain[0]; x++){
-            tarch::la::Vector<3,int> idx(x,y,z);
-            result[0] += idx[0];result[1] += idx[1];result[2] += idx[2];
+    for (int count = 0; count < numcounts; count++)
+      for (unsigned int z = 0; z < CellIndex_T::numberCellsInDomain[2]; z++)
+        for (unsigned int y = 0; y < CellIndex_T::numberCellsInDomain[1]; y++)
+          for (unsigned int x = 0; x < CellIndex_T::numberCellsInDomain[0];
+               x++) {
+            tarch::la::Vector<3, int> idx(x, y, z);
+            result[0] += idx[0];
+            result[1] += idx[1];
+            result[2] += idx[2];
           }
     std::cout << "Useless result: " << result << std::endl;
-    gettimeofday(&end,NULL);
-    runtime = (end.tv_sec - start.tv_sec)*1000000 + (end.tv_usec - start.tv_usec);
-    std::cout << "Raw loop: " << (int)(runtime/1000) << "ms" << std::endl;
+    gettimeofday(&end, NULL);
+    runtime =
+        (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Raw loop: " << (int)(runtime / 1000) << "ms" << std::endl;
 
-    gettimeofday(&start,NULL);
+    gettimeofday(&start, NULL);
     result = 0;
-    for(int count=0;count < numcounts; count++)
-      for(auto idx : CellIndex_T_vec()){
-            result[0] += idx.get()[0];result[1] += idx.get()[1];result[2] += idx.get()[2];
-          }
+    for (int count = 0; count < numcounts; count++)
+      for (auto idx : CellIndex_T_vec()) {
+        result[0] += idx.get()[0];
+        result[1] += idx.get()[1];
+        result[2] += idx.get()[2];
+      }
     std::cout << "Useless result: " << result << std::endl;
-    gettimeofday(&end,NULL);
-    runtime = (end.tv_sec - start.tv_sec)*1000000 + (end.tv_usec - start.tv_usec);
-    std::cout << "Index range iterator: " << (int)(runtime/1000) << "ms" << std::endl;
+    gettimeofday(&end, NULL);
+    runtime =
+        (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Index range iterator: " << (int)(runtime / 1000) << "ms"
+              << std::endl;
   }
 
   int _rank;
@@ -197,23 +244,24 @@ private:
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
 };
 
-void runTest(Test *test){
-  if (test==NULL){
-    std::cout << "ERROR executeTest: test==NULL!" << std::endl; exit(EXIT_FAILURE);
+void runTest(Test *test) {
+  if (test == NULL) {
+    std::cout << "ERROR executeTest: test==NULL!" << std::endl;
+    exit(EXIT_FAILURE);
   }
   test->run();
   delete test;
 }
 
-int main(int argc, char *argv[]){  
-#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-  MPI_Init(&argc,&argv);
+int main(int argc, char *argv[]) {
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  MPI_Init(&argc, &argv);
 #endif
 
   // run tests
   runTest(new CellIdxIterBench());
 
-#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();
 #endif
 
@@ -227,13 +275,13 @@ Number cells in test domain: 74088
 lowerBoundary = 4 , 4 , 4
 upperBoundary = 45 , 45 , 45
 
-Scalar benchmark ------------- 
+Scalar benchmark -------------
 Useless result: 27444788280000
 Raw loop: 191ms
 Useless result: 27444788280000
 Index range iterator: 119ms
 
-Vector benchmark ------------- 
+Vector benchmark -------------
 Useless result: 15188040000 , 15188040000 , 15188040000
 Raw loop: 147ms
 Useless result: 15188040000 , 15188040000 , 15188040000
