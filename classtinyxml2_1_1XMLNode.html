@@ -174,9 +174,7 @@ const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td
 <tr class="memitem:a5cbc1d7444770fb364a431441b81f21a"><td class="memItemLeft" align="right" valign="top"><a id="a5cbc1d7444770fb364a431441b81f21a" name="a5cbc1d7444770fb364a431441b81f21a"></a>
 <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>PreviousSibling</b> ()</td></tr>
 <tr class="separator:a5cbc1d7444770fb364a431441b81f21a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8195130fe48a176732d3d843a6b5990"><td class="memItemLeft" align="right" valign="top"><a id="ab8195130fe48a176732d3d843a6b5990" name="ab8195130fe48a176732d3d843a6b5990"></a>
-const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>PreviousSiblingElement</b> (const char *value=0) const</td></tr>
-<tr class="memdesc:ab8195130fe48a176732d3d843a6b5990"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the previous (left) sibling element of this node, with an opitionally supplied name. <br /></td></tr>
+<tr class="memitem:ab8195130fe48a176732d3d843a6b5990"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#ab8195130fe48a176732d3d843a6b5990">PreviousSiblingElement</a> (const char *value=0) const</td></tr>
 <tr class="separator:ab8195130fe48a176732d3d843a6b5990"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3290e213f5ae0b0fea66bfeec25ea9d"><td class="memItemLeft" align="right" valign="top"><a id="aa3290e213f5ae0b0fea66bfeec25ea9d" name="aa3290e213f5ae0b0fea66bfeec25ea9d"></a>
 <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>PreviousSiblingElement</b> (const char *value=0)</td></tr>
@@ -188,9 +186,7 @@ const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td
 <tr class="memitem:a05d04a9c06dc48ff8473c77774ee94eb"><td class="memItemLeft" align="right" valign="top"><a id="a05d04a9c06dc48ff8473c77774ee94eb" name="a05d04a9c06dc48ff8473c77774ee94eb"></a>
 <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NextSibling</b> ()</td></tr>
 <tr class="separator:a05d04a9c06dc48ff8473c77774ee94eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4691e8feb9cfc7dbf12a8a4e54f20d06"><td class="memItemLeft" align="right" valign="top"><a id="a4691e8feb9cfc7dbf12a8a4e54f20d06" name="a4691e8feb9cfc7dbf12a8a4e54f20d06"></a>
-const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NextSiblingElement</b> (const char *value=0) const</td></tr>
-<tr class="memdesc:a4691e8feb9cfc7dbf12a8a4e54f20d06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next (right) sibling element of this node, with an opitionally supplied name. <br /></td></tr>
+<tr class="memitem:a4691e8feb9cfc7dbf12a8a4e54f20d06"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a4691e8feb9cfc7dbf12a8a4e54f20d06">NextSiblingElement</a> (const char *value=0) const</td></tr>
 <tr class="separator:a4691e8feb9cfc7dbf12a8a4e54f20d06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a257e931a1784dd1ac04162be6e8b8a92"><td class="memItemLeft" align="right" valign="top"><a id="a257e931a1784dd1ac04162be6e8b8a92" name="a257e931a1784dd1ac04162be6e8b8a92"></a>
 <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NextSiblingElement</b> (const char *value=0)</td></tr>
@@ -278,16 +274,16 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>XMLElement</b></td><
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p ><a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> is a base class for every object that is in the XML Document Object Model (DOM), except XMLAttributes. Nodes have siblings, a parent, and children which can be navigated. A node is always in a <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a>. The type of a <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> can be queried, and it can be cast to its more defined type.</p>
 <p >A <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> allocates memory for all its Nodes. When the <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> gets deleted, all its Nodes will also be deleted.</p>
-<pre class="fragment">A Document can contain:	Element	(container or leaf)
-						Comment (leaf)
-						Unknown (leaf)
-						Declaration( leaf )
+<pre class="fragment">    A Document can contain:	Element	(container or leaf)
+                                                    Comment (leaf)
+                                                    Unknown (leaf)
+                                                    Declaration( leaf )
 
-An Element can contain:	Element (container or leaf)
-						Text	(leaf)
-						Attributes (not on tree)
-						Comment (leaf)
-						Unknown (leaf)</pre> </div><h2 class="groupheader">Member Function Documentation</h2>
+    An Element can contain:	Element (container or leaf)
+                                                    Text	(leaf)
+                                                    Attributes (not on tree)
+                                                    Comment (leaf)
+                                                    Unknown (leaf)</pre> </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a81e66df0a44c67a7af17f3b77a152785" name="a81e66df0a44c67a7af17f3b77a152785"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a81e66df0a44c67a7af17f3b77a152785">&#9670;&nbsp;</a></span>Accept()</h2>
 
@@ -319,10 +315,9 @@ An Element can contain:	Element (container or leaf)
 <li><a href="http://c2.com/cgi/wiki?HierarchicalVisitorPattern">http://c2.com/cgi/wiki?HierarchicalVisitorPattern</a></li>
 </ul>
 <p >Which are both good references for "visiting".</p>
-<p >An example of using <a class="el" href="classtinyxml2_1_1XMLNode.html#a81e66df0a44c67a7af17f3b77a152785">Accept()</a>: </p><pre class="fragment">TiXmlPrinter printer;
-tinyxmlDoc.Accept( &amp;printer );
-const char* xmlcstr = printer.CStr();
-</pre> 
+<p >An example of using <a class="el" href="classtinyxml2_1_1XMLNode.html#a81e66df0a44c67a7af17f3b77a152785">Accept()</a>: </p><pre class="fragment"> TiXmlPrinter printer;
+ tinyxmlDoc.Accept( &amp;printer );
+ const char* xmlcstr = printer.CStr();</pre> 
 <p>Implemented in <a class="el" href="classtinyxml2_1_1XMLText.html#a1b2c1448f1a21299d0a7913f18b55206">tinyxml2::XMLText</a>, <a class="el" href="classtinyxml2_1_1XMLComment.html#a4a33dc32fae0285b03f9cfcb3e43e122">tinyxml2::XMLComment</a>, <a class="el" href="classtinyxml2_1_1XMLDeclaration.html#a5f376019fb34752eb248548f42f32045">tinyxml2::XMLDeclaration</a>, <a class="el" href="classtinyxml2_1_1XMLUnknown.html#a70983aa1b1cff3d3aa6d4d0a80e5ee48">tinyxml2::XMLUnknown</a>, <a class="el" href="classtinyxml2_1_1XMLElement.html#a3ea8a40e788fb9ad876c28a32932c6d5">tinyxml2::XMLElement</a>, and <a class="el" href="classtinyxml2_1_1XMLDocument.html#a9efa54f7ecb37c17ab1fa2b3078ccca1">tinyxml2::XMLDocument</a>.</p>
 
 </div>
@@ -466,6 +461,44 @@ const char* xmlcstr = printer.CStr();
       </table>
 </div><div class="memdoc">
 <p >Get the last child element or optionally the last child element with the specified name. </p>
+
+</div>
+</div>
+<a id="a4691e8feb9cfc7dbf12a8a4e54f20d06" name="a4691e8feb9cfc7dbf12a8a4e54f20d06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4691e8feb9cfc7dbf12a8a4e54f20d06">&#9670;&nbsp;</a></span>NextSiblingElement()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> * tinyxml2::XMLNode::NextSiblingElement </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>value</em> = <code>0</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Get the next (right) sibling element of this node, with an opitionally supplied name. </p>
+
+</div>
+</div>
+<a id="ab8195130fe48a176732d3d843a6b5990" name="ab8195130fe48a176732d3d843a6b5990"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8195130fe48a176732d3d843a6b5990">&#9670;&nbsp;</a></span>PreviousSiblingElement()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> * tinyxml2::XMLNode::PreviousSiblingElement </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>value</em> = <code>0</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Get the previous (left) sibling element of this node, with an opitionally supplied name. </p>
 
 </div>
 </div>

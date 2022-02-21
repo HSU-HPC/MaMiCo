@@ -33,8 +33,8 @@ var searchData=
   ['applytolocalnonghostmacroscopiccellswithlinkedcells_30',['applyToLocalNonGhostMacroscopicCellsWithLinkedCells',['../classcoupling_1_1datastructures_1_1MacroscopicCells.html#a156cd063ab0af980ea345bb333c224ea',1,'coupling::datastructures::MacroscopicCells']]],
   ['applyxlayersofglobalnonghostcellswithlinkedcells_31',['applyXLayersOfGlobalNonGhostCellsWithLinkedCells',['../classcoupling_1_1datastructures_1_1MacroscopicCells.html#a66266c363c9da4105225872548246c66',1,'coupling::datastructures::MacroscopicCells']]],
   ['assign_32',['assign',['../classtarch_1_1la_1_1Vector.html#ac5b7ac1a89207651f96c7021f8177103',1,'tarch::la::Vector']]],
-  ['asymmetricalfilterjunction_33',['AsymmetricalFilterJunction',['../classcoupling_1_1AsymmetricalFilterJunction.html',1,'coupling']]],
-  ['asymmetricaljunctorinterface_34',['AsymmetricalJunctorInterface',['../classcoupling_1_1AsymmetricalJunctorInterface.html',1,'coupling']]],
+  ['asymmetricalfilterjunction_33',['AsymmetricalFilterJunction',['../classcoupling_1_1filtering_1_1AsymmetricalFilterJunction.html',1,'coupling::filtering']]],
+  ['asymmetricaljunctorinterface_34',['AsymmetricalJunctorInterface',['../classcoupling_1_1filtering_1_1AsymmetricalJunctorInterface.html',1,'coupling::filtering']]],
   ['attribute_35',['Attribute',['../classtinyxml2_1_1XMLElement.html#a48cf4a315cfbac7d74cd0d5ff2c5df51',1,'tinyxml2::XMLElement']]],
   ['averagingtransferstrategy_36',['AveragingTransferStrategy',['../classcoupling_1_1transferstrategies_1_1AveragingTransferStrategy.html#ab2d58c8f9f3a70481ab8aa626955cc82',1,'coupling::transferstrategies::AveragingTransferStrategy::AveragingTransferStrategy()'],['../classcoupling_1_1configurations_1_1TransferStrategyConfiguration.html#a2bd9fcbff9ddf66226d21303249f0b00a013d75fd638d21e6886c1b6ddfb84cc9',1,'coupling::configurations::TransferStrategyConfiguration::AveragingTransferStrategy()'],['../classcoupling_1_1transferstrategies_1_1AveragingTransferStrategy.html',1,'coupling::transferstrategies::AveragingTransferStrategy&lt; LinkedCell, dim &gt;']]]
 ];

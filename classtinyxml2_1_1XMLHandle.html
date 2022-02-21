@@ -78,9 +78,7 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9c240a35c18f053509b4b97ddccd9793"><td class="memItemLeft" align="right" valign="top"><a id="a9c240a35c18f053509b4b97ddccd9793" name="a9c240a35c18f053509b4b97ddccd9793"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>XMLHandle</b> (<a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *node)</td></tr>
-<tr class="memdesc:a9c240a35c18f053509b4b97ddccd9793"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a handle from any node (at any depth of the tree.) This can be a null pointer. <br /></td></tr>
+<tr class="memitem:a9c240a35c18f053509b4b97ddccd9793"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLHandle.html#a9c240a35c18f053509b4b97ddccd9793">XMLHandle</a> (<a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *node)</td></tr>
 <tr class="separator:a9c240a35c18f053509b4b97ddccd9793"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2edbc1c0d3e3e8259bd98de7f1cf500"><td class="memItemLeft" align="right" valign="top"><a id="aa2edbc1c0d3e3e8259bd98de7f1cf500" name="aa2edbc1c0d3e3e8259bd98de7f1cf500"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>XMLHandle</b> (<a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> &amp;node)</td></tr>
@@ -155,36 +153,60 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >A <a class="el" href="classtinyxml2_1_1XMLHandle.html">XMLHandle</a> is a class that wraps a node pointer with null checks; this is an incredibly useful thing. Note that <a class="el" href="classtinyxml2_1_1XMLHandle.html">XMLHandle</a> is not part of the TinyXML DOM structure. It is a separate utility class.</p>
-<p >Take an example: </p><pre class="fragment">&lt;Document&gt;
-	&lt;Element attributeA = "valueA"&gt;
-		&lt;Child attributeB = "value1" /&gt;
-		&lt;Child attributeB = "value2" /&gt;
-	&lt;/Element&gt;
-&lt;/Document&gt;
-</pre><p >Assuming you want the value of "attributeB" in the 2nd "Child" element, it's very easy to write a *lot* of code that looks like:</p>
-<pre class="fragment">XMLElement* root = document.FirstChildElement( "Document" );
-if ( root )
-{
-	XMLElement* element = root-&gt;FirstChildElement( "Element" );
-	if ( element )
-	{
-		XMLElement* child = element-&gt;FirstChildElement( "Child" );
-		if ( child )
-		{
-			XMLElement* child2 = child-&gt;NextSiblingElement( "Child" );
-			if ( child2 )
-			{
-				// Finally do something useful.
-</pre><p >And that doesn't even cover "else" cases. <a class="el" href="classtinyxml2_1_1XMLHandle.html">XMLHandle</a> addresses the verbosity of such code. A <a class="el" href="classtinyxml2_1_1XMLHandle.html">XMLHandle</a> checks for null pointers so it is perfectly safe and correct to use:</p>
-<pre class="fragment">XMLHandle docHandle( &amp;document );
-XMLElement* child2 = docHandle.FirstChild( "Document" ).FirstChild( "Element" ).FirstChild().NextSibling().ToElement();
-if ( child2 )
-{
-	// do something useful
-</pre><p >Which is MUCH more concise and useful.</p>
-<p >It is also safe to copy handles - internally they are nothing more than node pointers. </p><pre class="fragment">XMLHandle handleCopy = handle;
-</pre><p >See also <a class="el" href="classtinyxml2_1_1XMLConstHandle.html">XMLConstHandle</a>, which is the same as <a class="el" href="classtinyxml2_1_1XMLHandle.html">XMLHandle</a>, but operates on const objects. </p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+<p >Take an example: </p><pre class="fragment">     &lt;Document&gt;
+             &lt;Element attributeA = "valueA"&gt;
+                     &lt;Child attributeB = "value1" /&gt;
+                     &lt;Child attributeB = "value2" /&gt;
+             &lt;/Element&gt;
+     &lt;/Document&gt;</pre><p >Assuming you want the value of "attributeB" in the 2nd "Child" element, it's very easy to write a *lot* of code that looks like:</p>
+<pre class="fragment">     XMLElement* root = document.FirstChildElement( "Document" );
+     if ( root )
+     {
+             XMLElement* element = root-&gt;FirstChildElement( "Element" );
+             if ( element )
+             {
+                     XMLElement* child = element-&gt;FirstChildElement( "Child"
+); if ( child )
+                     {
+                             XMLElement* child2 = child-&gt;NextSiblingElement(
+"Child" ); if ( child2 )
+                             {
+                                     // Finally do something useful.</pre><p >And that doesn't even cover "else" cases. <a class="el" href="classtinyxml2_1_1XMLHandle.html">XMLHandle</a> addresses the verbosity of such code. A <a class="el" href="classtinyxml2_1_1XMLHandle.html">XMLHandle</a> checks for null pointers so it is perfectly safe and correct to use:</p>
+<pre class="fragment">     XMLHandle docHandle( &amp;document );
+     XMLElement* child2 = docHandle.FirstChild( "Document" ).FirstChild(
+"Element" ).FirstChild().NextSibling().ToElement(); if ( child2 )
+     {
+             // do something useful</pre><p >Which is MUCH more concise and useful.</p>
+<p >It is also safe to copy handles - internally they are nothing more than node pointers. </p><pre class="fragment">     XMLHandle handleCopy = handle;</pre><p >See also <a class="el" href="classtinyxml2_1_1XMLConstHandle.html">XMLConstHandle</a>, which is the same as <a class="el" href="classtinyxml2_1_1XMLHandle.html">XMLHandle</a>, but operates on const objects. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a9c240a35c18f053509b4b97ddccd9793" name="a9c240a35c18f053509b4b97ddccd9793"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c240a35c18f053509b4b97ddccd9793">&#9670;&nbsp;</a></span>XMLHandle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">tinyxml2::XMLHandle::XMLHandle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td>
+          <td class="paramname"><em>node</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Create a handle from any node (at any depth of the tree.) This can be a null pointer. </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>tarch/tinyxml2/<a class="el" href="tinyxml2_8h_source.html">tinyxml2.h</a></li>
 </ul>
 </div><!-- contents -->

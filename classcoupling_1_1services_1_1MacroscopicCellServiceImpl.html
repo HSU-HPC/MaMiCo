@@ -110,8 +110,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a7d31f017a7119dc02083e75b4ca5716d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35e64ce62d7453b81d1089a1a31e8a98"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a35e64ce62d7453b81d1089a1a31e8a98">getIndexConversion</a> () const</td></tr>
 <tr class="separator:a35e64ce62d7453b81d1089a1a31e8a98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae625be647b639624525c0800b4221f37"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcoupling_1_1FilterPipeline.html">coupling::FilterPipeline</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#ae625be647b639624525c0800b4221f37">getFilterPipeline</a> () const</td></tr>
-<tr class="separator:ae625be647b639624525c0800b4221f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fb791da286a1ba61421e113c98b8b14"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a9fb791da286a1ba61421e113c98b8b14">initFiltering</a> ()</td></tr>
+<tr class="separator:a9fb791da286a1ba61421e113c98b8b14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9d02e591e4ef75d6a25cb09ad88960e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcoupling_1_1filtering_1_1FilterPipeline.html">coupling::filtering::FilterPipeline</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#af9d02e591e4ef75d6a25cb09ad88960e">getFilterPipeline</a> () const</td></tr>
+<tr class="separator:af9d02e591e4ef75d6a25cb09ad88960e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af12ef60d0a3c9631fb9298c0adb1915b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">coupling::datastructures::MacroscopicCells</a>&lt; LinkedCell, dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#af12ef60d0a3c9631fb9298c0adb1915b">getMacroscopicCells</a> ()</td></tr>
 <tr class="separator:af12ef60d0a3c9631fb9298c0adb1915b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcoupling_1_1services_1_1MacroscopicCellService')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a></td></tr>
@@ -141,17 +143,19 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>plotEveryMacr
 <tr class="separator:a3d6132ca66087a7cc796912a46c0c915 inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52637d6f6c6de0d8f7318f85d419246b inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#a52637d6f6c6de0d8f7318f85d419246b">getIndexConversion</a> () const =0</td></tr>
 <tr class="separator:a52637d6f6c6de0d8f7318f85d419246b inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad33f2b05edaad0f509ec9c4ad9654845 inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memItemLeft" align="right" valign="top"><a id="ad33f2b05edaad0f509ec9c4ad9654845" name="ad33f2b05edaad0f509ec9c4ad9654845"></a>
-virtual const <a class="el" href="classcoupling_1_1FilterPipeline.html">coupling::FilterPipeline</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getFilterPipeline</b> () const</td></tr>
-<tr class="separator:ad33f2b05edaad0f509ec9c4ad9654845 inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa92c8d8f9c320e8f68bd17464eeaa82c inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#aa92c8d8f9c320e8f68bd17464eeaa82c">initFiltering</a> ()</td></tr>
+<tr class="separator:aa92c8d8f9c320e8f68bd17464eeaa82c inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66d2f4dc2345a3bb252950da61a23149 inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memItemLeft" align="right" valign="top"><a id="a66d2f4dc2345a3bb252950da61a23149" name="a66d2f4dc2345a3bb252950da61a23149"></a>
+virtual const <a class="el" href="classcoupling_1_1filtering_1_1FilterPipeline.html">coupling::filtering::FilterPipeline</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>getFilterPipeline</b> () const</td></tr>
+<tr class="separator:a66d2f4dc2345a3bb252950da61a23149 inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae50aa213f883aa36d6524fa00a1f83aa inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memItemLeft" align="right" valign="top"><a id="ae50aa213f883aa36d6524fa00a1f83aa" name="ae50aa213f883aa36d6524fa00a1f83aa"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>getID</b> () const</td></tr>
 <tr class="separator:ae50aa213f883aa36d6524fa00a1f83aa inherit pub_methods_classcoupling_1_1services_1_1MacroscopicCellService"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:aa34ad1e66fd2f210763fbc75714948a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#aa34ad1e66fd2f210763fbc75714948a1">initIndexConversion</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; macroscopicCellSize, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;numberProcesses, unsigned int rank, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; globalMDDomainSize, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; globalMDDomainOffset, <a class="el" href="namespacecoupling_1_1paralleltopology.html#ad59b0afbf0aa9de388db04cbd6c1c5d0">coupling::paralleltopology::ParallelTopologyType</a> parallelTopologyType, unsigned int topologyOffset) const</td></tr>
-<tr class="separator:aa34ad1e66fd2f210763fbc75714948a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99f4eeadcd451996d214d44e64a71003"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a99f4eeadcd451996d214d44e64a71003">initIndexConversion</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; macroscopicCellSize, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; numberProcesses, unsigned int rank, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; globalMDDomainSize, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; globalMDDomainOffset, <a class="el" href="namespacecoupling_1_1paralleltopology.html#ad59b0afbf0aa9de388db04cbd6c1c5d0">coupling::paralleltopology::ParallelTopologyType</a> parallelTopologyType, unsigned int topologyOffset) const</td></tr>
+<tr class="separator:a99f4eeadcd451996d214d44e64a71003"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4e072148a95fb10056fcc7de3bfbf04"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#ab4e072148a95fb10056fcc7de3bfbf04">initIndexVectors4Usher</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; numberLinkedCellsPerMacroscopicCell)</td></tr>
 <tr class="separator:ab4e072148a95fb10056fcc7de3bfbf04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56e47a3c18adfca246094b85fca8c019"><td class="memItemLeft" align="right" valign="top"><a id="a56e47a3c18adfca246094b85fca8c019" name="a56e47a3c18adfca246094b85fca8c019"></a>
@@ -167,49 +171,54 @@ Private Attributes</h2></td></tr>
 <tr class="separator:aa1c897284ff907bf1d955e81bb3f35a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe55546df54b39b490e86304b612eab1"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#afe55546df54b39b490e86304b612eab1">_numberMDTimestepsPerCouplingCycle</a></td></tr>
 <tr class="separator:afe55546df54b39b490e86304b612eab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a811e3f22075f460a94859d156c0fb473"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a811e3f22075f460a94859d156c0fb473">_mdSolverInterface</a></td></tr>
-<tr class="separator:a811e3f22075f460a94859d156c0fb473"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f3aa9f68a13f0179a97cf8e1368bc85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a5f3aa9f68a13f0179a97cf8e1368bc85">_mdSolverInterface</a></td></tr>
+<tr class="separator:a5f3aa9f68a13f0179a97cf8e1368bc85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d22a053881fd21bc0f7902e5fc75b3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a6d22a053881fd21bc0f7902e5fc75b3c">_macroscopicSolverInterface</a></td></tr>
 <tr class="separator:a6d22a053881fd21bc0f7902e5fc75b3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47da7eae91832ccf44c81514d0a7ec13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1sendrecv_1_1FromMacro2MD.html">coupling::sendrecv::FromMacro2MD</a>&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a47da7eae91832ccf44c81514d0a7ec13">_fromMacro2MD</a></td></tr>
-<tr class="separator:a47da7eae91832ccf44c81514d0a7ec13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae769116c8510c99b4e67cec8f1eace62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1sendrecv_1_1FromMacro2MD.html">coupling::sendrecv::FromMacro2MD</a>&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#ae769116c8510c99b4e67cec8f1eace62">_fromMacro2MD</a></td></tr>
+<tr class="separator:ae769116c8510c99b4e67cec8f1eace62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd3460cbcb7e845a53d3b9765ed7a25b"><td class="memItemLeft" align="right" valign="top"><a id="abd3460cbcb7e845a53d3b9765ed7a25b" name="abd3460cbcb7e845a53d3b9765ed7a25b"></a>
 <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html">coupling::sendrecv::DataExchangeFromMacro2MD</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_deFromMacro2MD</b></td></tr>
 <tr class="separator:abd3460cbcb7e845a53d3b9765ed7a25b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c7910f90152ce0be545c1f017cc6b2e"><td class="memItemLeft" align="right" valign="top"><a id="a9c7910f90152ce0be545c1f017cc6b2e" name="a9c7910f90152ce0be545c1f017cc6b2e"></a>
+<tr class="memitem:a99f3bb0f2933a72eb2302f829b8b8415"><td class="memItemLeft" align="right" valign="top"><a id="a99f3bb0f2933a72eb2302f829b8b8415" name="a99f3bb0f2933a72eb2302f829b8b8415"></a>
 <a class="el" href="classcoupling_1_1sendrecv_1_1FromMD2Macro.html">coupling::sendrecv::FromMD2Macro</a>&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt;, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_fromMD2Macro</b></td></tr>
-<tr class="separator:a9c7910f90152ce0be545c1f017cc6b2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a99f3bb0f2933a72eb2302f829b8b8415"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27e2b310e51186dc0e92d90db2151e6d"><td class="memItemLeft" align="right" valign="top"><a id="a27e2b310e51186dc0e92d90db2151e6d" name="a27e2b310e51186dc0e92d90db2151e6d"></a>
 <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_deFromMD2Macro</b></td></tr>
 <tr class="separator:a27e2b310e51186dc0e92d90db2151e6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeec4f5b2a6796f91a780bd5c7b3872a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">coupling::datastructures::MacroscopicCells</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#aeec4f5b2a6796f91a780bd5c7b3872a7">_macroscopicCells</a></td></tr>
-<tr class="separator:aeec4f5b2a6796f91a780bd5c7b3872a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd3c517d33ac509783a51a2aa76a5bae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1FilterPipeline.html">coupling::FilterPipeline</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#acd3c517d33ac509783a51a2aa76a5bae">_filterPipeline</a></td></tr>
-<tr class="separator:acd3c517d33ac509783a51a2aa76a5bae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d32a480a680bf23adec6775aaba9115"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a9d32a480a680bf23adec6775aaba9115">_momentumInsertion</a></td></tr>
-<tr class="separator:a9d32a480a680bf23adec6775aaba9115"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc38b9629cced56659781bc6cc0a5fa7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">coupling::datastructures::MacroscopicCells</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#acc38b9629cced56659781bc6cc0a5fa7">_macroscopicCells</a></td></tr>
+<tr class="separator:acc38b9629cced56659781bc6cc0a5fa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25f0cafab9acafecf541a444b270d921"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1filtering_1_1FilterPipeline.html">coupling::filtering::FilterPipeline</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a25f0cafab9acafecf541a444b270d921">_filterPipeline</a></td></tr>
+<tr class="separator:a25f0cafab9acafecf541a444b270d921"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeddfb27d456a09d68899d0fb7818f10c"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#aeddfb27d456a09d68899d0fb7818f10c">_filterPipelineConfiguration</a></td></tr>
+<tr class="separator:aeddfb27d456a09d68899d0fb7818f10c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abefc2d4eb399bb2d6303f98862cec094"><td class="memItemLeft" align="right" valign="top"><a id="abefc2d4eb399bb2d6303f98862cec094" name="abefc2d4eb399bb2d6303f98862cec094"></a>
+const <a class="el" href="classtarch_1_1utils_1_1MultiMDService.html">tarch::utils::MultiMDService</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_multiMDService</b></td></tr>
+<tr class="separator:abefc2d4eb399bb2d6303f98862cec094"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c3bddda3e379bbcf60f500c31a7b548"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a7c3bddda3e379bbcf60f500c31a7b548">_momentumInsertion</a></td></tr>
+<tr class="separator:a7c3bddda3e379bbcf60f500c31a7b548"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f9fa71c4b1ad9ada96cf105ceffef60"><td class="memItemLeft" align="right" valign="top"><a id="a4f9fa71c4b1ad9ada96cf105ceffef60" name="a4f9fa71c4b1ad9ada96cf105ceffef60"></a>
 <a class="el" href="classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#aae22d796ad110edcfc4ccb17c36869b5">coupling::configurations::MomentumInsertionConfiguration::MomentumInsertionType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_momentumInsertionType</b></td></tr>
 <tr class="separator:a4f9fa71c4b1ad9ada96cf105ceffef60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a25598c703452ef739010f4900a3df5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1ParticleInsertion.html">coupling::ParticleInsertion</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a3a25598c703452ef739010f4900a3df5">_particleInsertion</a></td></tr>
-<tr class="separator:a3a25598c703452ef739010f4900a3df5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada404e2d96176ec84bb085b9390e4b40"><td class="memItemLeft" align="right" valign="top"><a id="ada404e2d96176ec84bb085b9390e4b40" name="ada404e2d96176ec84bb085b9390e4b40"></a>
+<tr class="memitem:a3e6b2fe646dbbba98b2f2d6e60cfd969"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1ParticleInsertion.html">coupling::ParticleInsertion</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a3e6b2fe646dbbba98b2f2d6e60cfd969">_particleInsertion</a></td></tr>
+<tr class="separator:a3e6b2fe646dbbba98b2f2d6e60cfd969"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55dbf90be3f143369721a0890017a5e0"><td class="memItemLeft" align="right" valign="top"><a id="a55dbf90be3f143369721a0890017a5e0" name="a55dbf90be3f143369721a0890017a5e0"></a>
 const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_numberLinkedCellsPerMacroscopicCell</b></td></tr>
-<tr class="separator:ada404e2d96176ec84bb085b9390e4b40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a55dbf90be3f143369721a0890017a5e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b5a4a284bcb3f027bd785ba5c0579bf"><td class="memItemLeft" align="right" valign="top"><a id="a7b5a4a284bcb3f027bd785ba5c0579bf" name="a7b5a4a284bcb3f027bd785ba5c0579bf"></a>
 const <a class="el" href="classcoupling_1_1configurations_1_1ParticleInsertionConfiguration.html#ab537b6a31e0fe1f3a6e42a41f48bd261">coupling::configurations::ParticleInsertionConfiguration::ParticleInsertionType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_particleInsertionType</b></td></tr>
 <tr class="separator:a7b5a4a284bcb3f027bd785ba5c0579bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf77fe1eac6d93770a443f0119edae09"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#abf77fe1eac6d93770a443f0119edae09">_transferStrategy</a></td></tr>
-<tr class="separator:abf77fe1eac6d93770a443f0119edae09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1901bd4ee2ca7f63c026c591be27f49"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1KineticEnergyController.html">coupling::KineticEnergyController</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#ac1901bd4ee2ca7f63c026c591be27f49">_kineticEnergyController</a></td></tr>
-<tr class="separator:ac1901bd4ee2ca7f63c026c591be27f49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51539ee73c52fe92c5957c666af68ef0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1BoundaryForceController.html">coupling::BoundaryForceController</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a51539ee73c52fe92c5957c666af68ef0">_boundaryForceController</a></td></tr>
-<tr class="separator:a51539ee73c52fe92c5957c666af68ef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada50912dad71ac156b295c6cc3fa841e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#ada50912dad71ac156b295c6cc3fa841e">_momentumController</a></td></tr>
-<tr class="separator:ada50912dad71ac156b295c6cc3fa841e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66590460941bb450717906d56d370d53"><td class="memItemLeft" align="right" valign="top"><a id="a66590460941bb450717906d56d370d53" name="a66590460941bb450717906d56d370d53"></a>
+<tr class="memitem:a572dedff1ba8477bbde0bd4cadc30fa6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a572dedff1ba8477bbde0bd4cadc30fa6">_transferStrategy</a></td></tr>
+<tr class="separator:a572dedff1ba8477bbde0bd4cadc30fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a238c26b32787c6469bfc31e20a9a0ee2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1KineticEnergyController.html">coupling::KineticEnergyController</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a238c26b32787c6469bfc31e20a9a0ee2">_kineticEnergyController</a></td></tr>
+<tr class="separator:a238c26b32787c6469bfc31e20a9a0ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e2431fc4e52473f54b5acc06f88ff8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1BoundaryForceController.html">coupling::BoundaryForceController</a>&lt; LinkedCell, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a7e2431fc4e52473f54b5acc06f88ff8e">_boundaryForceController</a></td></tr>
+<tr class="separator:a7e2431fc4e52473f54b5acc06f88ff8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10fd5b6299473a2dc2034615eab44470"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt; LinkedCell, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a10fd5b6299473a2dc2034615eab44470">_momentumController</a></td></tr>
+<tr class="separator:a10fd5b6299473a2dc2034615eab44470"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abeade9d97ca4035f7554bd4f325a0bed"><td class="memItemLeft" align="right" valign="top"><a id="abeade9d97ca4035f7554bd4f325a0bed" name="abeade9d97ca4035f7554bd4f325a0bed"></a>
 std::function&lt; void(Wrapper &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_applyAccordingToConfiguration</b></td></tr>
-<tr class="separator:a66590460941bb450717906d56d370d53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:abeade9d97ca4035f7554bd4f325a0bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a517fa3a116882f5f93158fe29d9ec1f8"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a517fa3a116882f5f93158fe29d9ec1f8">_microscopicFilename</a></td></tr>
 <tr class="separator:a517fa3a116882f5f93158fe29d9ec1f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c33b4f3fbc0a434be34ba0b9e40115d"><td class="memItemLeft" align="right" valign="top"><a id="a4c33b4f3fbc0a434be34ba0b9e40115d" name="a4c33b4f3fbc0a434be34ba0b9e40115d"></a>
@@ -221,17 +230,17 @@ const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>_macrosc
 <tr class="memitem:ad95a29eec264a2d06099a14783821af5"><td class="memItemLeft" align="right" valign="top"><a id="ad95a29eec264a2d06099a14783821af5" name="ad95a29eec264a2d06099a14783821af5"></a>
 const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_writeEveryMacroscopicTimestep</b></td></tr>
 <tr class="separator:ad95a29eec264a2d06099a14783821af5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64e218540ef36ddc1dd6c9fe456bbfb6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a64e218540ef36ddc1dd6c9fe456bbfb6">_usherCellStart</a> [1&lt;&lt; dim]</td></tr>
-<tr class="separator:a64e218540ef36ddc1dd6c9fe456bbfb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af955145644d70acbc8bbe950a14ae222"><td class="memItemLeft" align="right" valign="top"><a id="af955145644d70acbc8bbe950a14ae222" name="af955145644d70acbc8bbe950a14ae222"></a>
+<tr class="memitem:a5f7e4c888f85165a2631bcd03228cd66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a5f7e4c888f85165a2631bcd03228cd66">_usherCellStart</a> [1&lt;&lt; dim]</td></tr>
+<tr class="separator:a5f7e4c888f85165a2631bcd03228cd66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62c1c974dba3c13c921d3ec3632fd4e5"><td class="memItemLeft" align="right" valign="top"><a id="a62c1c974dba3c13c921d3ec3632fd4e5" name="a62c1c974dba3c13c921d3ec3632fd4e5"></a>
 <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_usherCellEnd</b> [1&lt;&lt; dim]</td></tr>
-<tr class="separator:af955145644d70acbc8bbe950a14ae222"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bf70e188ce0a5054296776561c56348"><td class="memItemLeft" align="right" valign="top"><a id="a4bf70e188ce0a5054296776561c56348" name="a4bf70e188ce0a5054296776561c56348"></a>
+<tr class="separator:a62c1c974dba3c13c921d3ec3632fd4e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba463e1141727528d4cb3e16fa43790f"><td class="memItemLeft" align="right" valign="top"><a id="aba463e1141727528d4cb3e16fa43790f" name="aba463e1141727528d4cb3e16fa43790f"></a>
 <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_usherRange</b> [1&lt;&lt; dim]</td></tr>
-<tr class="separator:a4bf70e188ce0a5054296776561c56348"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac298789bbe08cfa2311a48debf02d0e2"><td class="memItemLeft" align="right" valign="top"><a id="ac298789bbe08cfa2311a48debf02d0e2" name="ac298789bbe08cfa2311a48debf02d0e2"></a>
+<tr class="separator:aba463e1141727528d4cb3e16fa43790f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1f5a0f48962d2e8dac85e2243ff7da6"><td class="memItemLeft" align="right" valign="top"><a id="ab1f5a0f48962d2e8dac85e2243ff7da6" name="ab1f5a0f48962d2e8dac85e2243ff7da6"></a>
 <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_usherCellOffset</b> [1&lt;&lt; dim]</td></tr>
-<tr class="separator:ac298789bbe08cfa2311a48debf02d0e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ab1f5a0f48962d2e8dac85e2243ff7da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -550,8 +559,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="ae625be647b639624525c0800b4221f37" name="ae625be647b639624525c0800b4221f37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae625be647b639624525c0800b4221f37">&#9670;&nbsp;</a></span>getFilterPipeline()</h2>
+<a id="af9d02e591e4ef75d6a25cb09ad88960e" name="af9d02e591e4ef75d6a25cb09ad88960e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9d02e591e4ef75d6a25cb09ad88960e">&#9670;&nbsp;</a></span>getFilterPipeline()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -562,7 +571,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcoupling_1_1FilterPipeline.html">coupling::FilterPipeline</a>&lt; dim &gt; &amp; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::getFilterPipeline </td>
+          <td class="memname">const <a class="el" href="classcoupling_1_1filtering_1_1FilterPipeline.html">coupling::filtering::FilterPipeline</a>&lt; dim &gt; * <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::getFilterPipeline </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -640,8 +649,38 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="aa34ad1e66fd2f210763fbc75714948a1" name="aa34ad1e66fd2f210763fbc75714948a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa34ad1e66fd2f210763fbc75714948a1">&#9670;&nbsp;</a></span>initIndexConversion()</h2>
+<a id="a9fb791da286a1ba61421e113c98b8b14" name="a9fb791da286a1ba61421e113c98b8b14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fb791da286a1ba61421e113c98b8b14">&#9670;&nbsp;</a></span>initFiltering()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::initFiltering </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Initialises the _filterPipeline member. Called from _multiMDCellService's constructFilterPipelines(). Make sure to delete _filterPipeline in <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a1052346315e8f4ce9c3f64a47fc00505">~MacroscopicCellServiceImpl()</a> </p>
+
+<p>Reimplemented from <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a99f4eeadcd451996d214d44e64a71003" name="a99f4eeadcd451996d214d44e64a71003"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99f4eeadcd451996d214d44e64a71003">&#9670;&nbsp;</a></span>initIndexConversion()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -912,8 +951,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a51539ee73c52fe92c5957c666af68ef0" name="a51539ee73c52fe92c5957c666af68ef0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51539ee73c52fe92c5957c666af68ef0">&#9670;&nbsp;</a></span>_boundaryForceController</h2>
+<a id="a7e2431fc4e52473f54b5acc06f88ff8e" name="a7e2431fc4e52473f54b5acc06f88ff8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e2431fc4e52473f54b5acc06f88ff8e">&#9670;&nbsp;</a></span>_boundaryForceController</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -924,7 +963,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1BoundaryForceController.html">coupling::BoundaryForceController</a>&lt;LinkedCell,dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_boundaryForceController</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1BoundaryForceController.html">coupling::BoundaryForceController</a>&lt;LinkedCell, dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_boundaryForceController</td>
         </tr>
       </table>
   </td>
@@ -937,8 +976,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="acd3c517d33ac509783a51a2aa76a5bae" name="acd3c517d33ac509783a51a2aa76a5bae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd3c517d33ac509783a51a2aa76a5bae">&#9670;&nbsp;</a></span>_filterPipeline</h2>
+<a id="a25f0cafab9acafecf541a444b270d921" name="a25f0cafab9acafecf541a444b270d921"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25f0cafab9acafecf541a444b270d921">&#9670;&nbsp;</a></span>_filterPipeline</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -949,7 +988,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1FilterPipeline.html">coupling::FilterPipeline</a>&lt;dim&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_filterPipeline</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1filtering_1_1FilterPipeline.html">coupling::filtering::FilterPipeline</a>&lt;dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_filterPipeline</td>
         </tr>
       </table>
   </td>
@@ -962,8 +1001,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a47da7eae91832ccf44c81514d0a7ec13" name="a47da7eae91832ccf44c81514d0a7ec13"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a47da7eae91832ccf44c81514d0a7ec13">&#9670;&nbsp;</a></span>_fromMacro2MD</h2>
+<a id="aeddfb27d456a09d68899d0fb7818f10c" name="aeddfb27d456a09d68899d0fb7818f10c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeddfb27d456a09d68899d0fb7818f10c">&#9670;&nbsp;</a></span>_filterPipelineConfiguration</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -974,7 +1013,32 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1sendrecv_1_1FromMacro2MD.html">coupling::sendrecv::FromMacro2MD</a>&lt;<a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt;dim&gt;,dim &gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_fromMacro2MD</td>
+          <td class="memname">const char* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_filterPipelineConfiguration</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >parameters needed in <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a9fb791da286a1ba61421e113c98b8b14">initFiltering()</a> </p>
+
+</div>
+</div>
+<a id="ae769116c8510c99b4e67cec8f1eace62" name="ae769116c8510c99b4e67cec8f1eace62"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae769116c8510c99b4e67cec8f1eace62">&#9670;&nbsp;</a></span>_fromMacro2MD</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1sendrecv_1_1FromMacro2MD.html">coupling::sendrecv::FromMacro2MD</a>&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt;dim&gt;, dim&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_fromMacro2MD</td>
         </tr>
       </table>
   </td>
@@ -1012,8 +1076,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="ac1901bd4ee2ca7f63c026c591be27f49" name="ac1901bd4ee2ca7f63c026c591be27f49"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1901bd4ee2ca7f63c026c591be27f49">&#9670;&nbsp;</a></span>_kineticEnergyController</h2>
+<a id="a238c26b32787c6469bfc31e20a9a0ee2" name="a238c26b32787c6469bfc31e20a9a0ee2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a238c26b32787c6469bfc31e20a9a0ee2">&#9670;&nbsp;</a></span>_kineticEnergyController</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1024,7 +1088,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1KineticEnergyController.html">coupling::KineticEnergyController</a>&lt;LinkedCell,dim&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_kineticEnergyController</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1KineticEnergyController.html">coupling::KineticEnergyController</a>&lt;LinkedCell, dim&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_kineticEnergyController</td>
         </tr>
       </table>
   </td>
@@ -1037,8 +1101,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="aeec4f5b2a6796f91a780bd5c7b3872a7" name="aeec4f5b2a6796f91a780bd5c7b3872a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeec4f5b2a6796f91a780bd5c7b3872a7">&#9670;&nbsp;</a></span>_macroscopicCells</h2>
+<a id="acc38b9629cced56659781bc6cc0a5fa7" name="acc38b9629cced56659781bc6cc0a5fa7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc38b9629cced56659781bc6cc0a5fa7">&#9670;&nbsp;</a></span>_macroscopicCells</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1049,7 +1113,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">coupling::datastructures::MacroscopicCells</a>&lt;LinkedCell,dim&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_macroscopicCells</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCells.html">coupling::datastructures::MacroscopicCells</a>&lt;LinkedCell, dim&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_macroscopicCells</td>
         </tr>
       </table>
   </td>
@@ -1087,8 +1151,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a811e3f22075f460a94859d156c0fb473" name="a811e3f22075f460a94859d156c0fb473"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a811e3f22075f460a94859d156c0fb473">&#9670;&nbsp;</a></span>_mdSolverInterface</h2>
+<a id="a5f3aa9f68a13f0179a97cf8e1368bc85" name="a5f3aa9f68a13f0179a97cf8e1368bc85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f3aa9f68a13f0179a97cf8e1368bc85">&#9670;&nbsp;</a></span>_mdSolverInterface</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1099,7 +1163,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt;LinkedCell,dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_mdSolverInterface</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt;LinkedCell, dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_mdSolverInterface</td>
         </tr>
       </table>
   </td>
@@ -1137,8 +1201,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="ada50912dad71ac156b295c6cc3fa841e" name="ada50912dad71ac156b295c6cc3fa841e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada50912dad71ac156b295c6cc3fa841e">&#9670;&nbsp;</a></span>_momentumController</h2>
+<a id="a10fd5b6299473a2dc2034615eab44470" name="a10fd5b6299473a2dc2034615eab44470"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10fd5b6299473a2dc2034615eab44470">&#9670;&nbsp;</a></span>_momentumController</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1149,7 +1213,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt;LinkedCell,dim&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_momentumController</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1MomentumController.html">coupling::MomentumController</a>&lt;LinkedCell, dim&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_momentumController</td>
         </tr>
       </table>
   </td>
@@ -1162,8 +1226,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a9d32a480a680bf23adec6775aaba9115" name="a9d32a480a680bf23adec6775aaba9115"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d32a480a680bf23adec6775aaba9115">&#9670;&nbsp;</a></span>_momentumInsertion</h2>
+<a id="a7c3bddda3e379bbcf60f500c31a7b548" name="a7c3bddda3e379bbcf60f500c31a7b548"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c3bddda3e379bbcf60f500c31a7b548">&#9670;&nbsp;</a></span>_momentumInsertion</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1174,7 +1238,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion</a>&lt;LinkedCell,dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_momentumInsertion</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion</a>&lt;LinkedCell, dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_momentumInsertion</td>
         </tr>
       </table>
   </td>
@@ -1212,8 +1276,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a3a25598c703452ef739010f4900a3df5" name="a3a25598c703452ef739010f4900a3df5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a25598c703452ef739010f4900a3df5">&#9670;&nbsp;</a></span>_particleInsertion</h2>
+<a id="a3e6b2fe646dbbba98b2f2d6e60cfd969" name="a3e6b2fe646dbbba98b2f2d6e60cfd969"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e6b2fe646dbbba98b2f2d6e60cfd969">&#9670;&nbsp;</a></span>_particleInsertion</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1224,7 +1288,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1ParticleInsertion.html">coupling::ParticleInsertion</a>&lt;LinkedCell,dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_particleInsertion</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1ParticleInsertion.html">coupling::ParticleInsertion</a>&lt;LinkedCell, dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_particleInsertion</td>
         </tr>
       </table>
   </td>
@@ -1237,8 +1301,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="abf77fe1eac6d93770a443f0119edae09" name="abf77fe1eac6d93770a443f0119edae09"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf77fe1eac6d93770a443f0119edae09">&#9670;&nbsp;</a></span>_transferStrategy</h2>
+<a id="a572dedff1ba8477bbde0bd4cadc30fa6" name="a572dedff1ba8477bbde0bd4cadc30fa6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a572dedff1ba8477bbde0bd4cadc30fa6">&#9670;&nbsp;</a></span>_transferStrategy</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1249,7 +1313,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy</a>&lt;LinkedCell,dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_transferStrategy</td>
+          <td class="memname"><a class="el" href="classcoupling_1_1transferstrategies_1_1TransferStrategy.html">coupling::transferstrategies::TransferStrategy</a>&lt;LinkedCell, dim&gt;* <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_transferStrategy</td>
         </tr>
       </table>
   </td>
@@ -1262,8 +1326,8 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a64e218540ef36ddc1dd6c9fe456bbfb6" name="a64e218540ef36ddc1dd6c9fe456bbfb6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64e218540ef36ddc1dd6c9fe456bbfb6">&#9670;&nbsp;</a></span>_usherCellStart</h2>
+<a id="a5f7e4c888f85165a2631bcd03228cd66" name="a5f7e4c888f85165a2631bcd03228cd66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f7e4c888f85165a2631bcd03228cd66">&#9670;&nbsp;</a></span>_usherCellStart</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1274,7 +1338,7 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;3,unsigned int&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_usherCellStart[1&lt;&lt; dim]</td>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt;3, unsigned int&gt; <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::_usherCellStart[1&lt;&lt; dim]</td>
         </tr>
       </table>
   </td>

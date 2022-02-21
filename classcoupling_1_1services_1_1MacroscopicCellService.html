@@ -106,9 +106,11 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>plotEveryMacr
 <tr class="separator:a3d6132ca66087a7cc796912a46c0c915"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52637d6f6c6de0d8f7318f85d419246b"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#a52637d6f6c6de0d8f7318f85d419246b">getIndexConversion</a> () const =0</td></tr>
 <tr class="separator:a52637d6f6c6de0d8f7318f85d419246b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad33f2b05edaad0f509ec9c4ad9654845"><td class="memItemLeft" align="right" valign="top"><a id="ad33f2b05edaad0f509ec9c4ad9654845" name="ad33f2b05edaad0f509ec9c4ad9654845"></a>
-virtual const <a class="el" href="classcoupling_1_1FilterPipeline.html">coupling::FilterPipeline</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getFilterPipeline</b> () const</td></tr>
-<tr class="separator:ad33f2b05edaad0f509ec9c4ad9654845"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa92c8d8f9c320e8f68bd17464eeaa82c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#aa92c8d8f9c320e8f68bd17464eeaa82c">initFiltering</a> ()</td></tr>
+<tr class="separator:aa92c8d8f9c320e8f68bd17464eeaa82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66d2f4dc2345a3bb252950da61a23149"><td class="memItemLeft" align="right" valign="top"><a id="a66d2f4dc2345a3bb252950da61a23149" name="a66d2f4dc2345a3bb252950da61a23149"></a>
+virtual const <a class="el" href="classcoupling_1_1filtering_1_1FilterPipeline.html">coupling::filtering::FilterPipeline</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>getFilterPipeline</b> () const</td></tr>
+<tr class="separator:a66d2f4dc2345a3bb252950da61a23149"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae50aa213f883aa36d6524fa00a1f83aa"><td class="memItemLeft" align="right" valign="top"><a id="ae50aa213f883aa36d6524fa00a1f83aa" name="ae50aa213f883aa36d6524fa00a1f83aa"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>getID</b> () const</td></tr>
 <tr class="separator:ae50aa213f883aa36d6524fa00a1f83aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -299,6 +301,35 @@ template&lt;unsigned int dim&gt; </div>
 </div><div class="memdoc">
 
 <p>Implemented in <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a35e64ce62d7453b81d1089a1a31e8a98">coupling::services::MacroscopicCellServiceImpl&lt; LinkedCell, dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="aa92c8d8f9c320e8f68bd17464eeaa82c" name="aa92c8d8f9c320e8f68bd17464eeaa82c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa92c8d8f9c320e8f68bd17464eeaa82c">&#9670;&nbsp;</a></span>initFiltering()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService</a>&lt; dim &gt;::initFiltering </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a9fb791da286a1ba61421e113c98b8b14">coupling::services::MacroscopicCellServiceImpl&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>

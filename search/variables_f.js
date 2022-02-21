@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['wallinitcycles_0',['wallInitCycles',['../structCouetteTest_1_1CouetteConfig.html#acc25c059fb2ba23fc84f07081f3ce139',1,'CouetteTest::CouetteConfig']]],
-  ['wallinitvelocity_1',['wallInitVelocity',['../structCouetteTest_1_1CouetteConfig.html#a88af4a21eaaca3b0f0c1e3eb96ebebc0',1,'CouetteTest::CouetteConfig']]],
-  ['walloscillations_2',['wallOscillations',['../structCouetteTest_1_1CouetteConfig.html#af7b2a7a8ef2b693bb187c4cf22139181',1,'CouetteTest::CouetteConfig']]],
-  ['wallvelocity_3',['wallVelocity',['../structcoupling_1_1configurations_1_1CouetteConfig.html#ac66251a7036c702bcf95364d78b839f6',1,'coupling::configurations::CouetteConfig::wallVelocity()'],['../structCouetteTest_1_1CouetteConfig.html#a5b2c7ad362cd6f783b40d587214b8a79',1,'CouetteTest::CouetteConfig::wallVelocity()']]]
+  ['upperboundary_0',['upperBoundary',['../classcoupling_1_1indexing_1_1CellIndex.html#a5a32d3fa3fa1a900e2d909ca19685a91',1,'coupling::indexing::CellIndex']]]
 ];
