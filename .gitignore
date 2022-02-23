@@ -38,3 +38,9 @@ cmake-build-debug/CMakeFiles/cmake.check_cache
 *.html
 *.dot
 docs/
+coupling/tests/build_couette/.gdb_history
+*.log
+coupling/tests/build_couette/couettecomp2.py
+coupling/tests/build_couette/gaussfiltercomp.py
+coupling/tests/build_couette/couette.xml.ls1
+coupling/tests/build_couette/FoamSetup/

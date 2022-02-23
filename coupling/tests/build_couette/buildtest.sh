@@ -43,12 +43,20 @@ includes="-I${MAMICO_PATH}"
 ### specify flags, includes, libraries,compiler for parallel or sequential build
 if [ "${parallel}" == "parallel" ]
 then
-    # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
-    # -DMDCoupledDebug"
-    includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
-    libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
-    compiler="mpicxx"
+    if [ -v MARDYN_PATH ]
+    then
+      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wno-unknown-pragmas -O3 -DMARDYN_DPDP -DENABLE_MPI -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK" # todo put -Werror, O0 for debug
+      includes="${includes} -I${LIB_EIGEN_PATH} -I${MARDYN_PATH}/src -I${MARDYN_PATH}/libs/rapidxml -I${MARDYN_PATH}/build/_deps/autopasfetch-src/src -I${MARDYN_PATH}/build/_deps/spdlog-src/include"
+      libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
+      compiler="mpicxx"
+    else
+      # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
+      FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
+      # -DMDCoupledDebug"
+      includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
+      libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
+      compiler="mpicxx"
+    fi
 else
     if [ -v MARDYN_PATH ]
     then
@@ -80,24 +88,40 @@ fi
 cd ${MAMICO_PATH}
 if [ "${parallel}" == "parallel" ]
 then
-        scons target=libsimplemd dim=3 build=release parallel=yes -j4
-        libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
-        FLAGS="${FLAGS} -DMDParallel"
+  if [ -v MARDYN_PATH ]
+  then
+    scons target=libsimplemd dim=3 build=release parallel=yes -j4
+    libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
+    FLAGS="${FLAGS} -DMDParallel"
+
+     ### ls1 mardyn
+      libraries="${libraries} -L${MARDYN_PATH}/build/src -l:libMarDyn.a"
+    ### autopas
+      libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/src/autopas -l:libautopas.a"
+    ### spdlog (for ls1)
+      libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlog.a -lpthread" #in debug, libspdlogd, else libspdlog
+    ### harmony (for autopas)
+      libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/libs/harmony/include/lib -l:libharmony.a"
+  else
+    scons target=libsimplemd dim=3 build=release parallel=yes -j4
+    libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
+    FLAGS="${FLAGS} -DMDParallel"
+  fi
 else
   if [ -v MARDYN_PATH ]
   then
-  scons target=libsimplemd dim=3 build=release parallel=no -j4
-  libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
-  ### tinyxml2
+    scons target=libsimplemd dim=3 build=release parallel=no -j4
+    libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+    ### tinyxml2
 
-  ### ls1 mardyn
-    libraries="${libraries} -L${MARDYN_PATH}/build/src -l:libMarDyn.a"
-  ### autopas
-    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/src/autopas -l:libautopas.a"
-  ### spdlog (for ls1)
-    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlog.a -lpthread" #in debug, libspdlogd, else libspdlog
-  ### harmony (for autopas)
-    libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/libs/harmony/include/lib -l:libharmony.a"
+    ### ls1 mardyn
+      libraries="${libraries} -L${MARDYN_PATH}/build/src -l:libMarDyn.a"
+    ### autopas
+      libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/src/autopas -l:libautopas.a"
+    ### spdlog (for ls1)
+      libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlog.a -lpthread" #in debug, libspdlogd, else libspdlog
+    ### harmony (for autopas)
+      libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/libs/harmony/include/lib -l:libharmony.a"
   else
     scons target=libsimplemd dim=3 build=release parallel=no -j4
     libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"

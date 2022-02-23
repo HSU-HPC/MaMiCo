@@ -37,6 +37,7 @@ def loadAvgDataFromNodeCsv(csv_file):
 	for i in range(4,10):
 		avg = 0
 		mass = 0
+		j = 0
 		for _,row in df[df[2] == i].iterrows():
 			avg += (row[3])
 			#break
@@ -68,7 +69,7 @@ plot_one_timestep(80, "blue", ax)
 plot_one_timestep(130, "cyan", ax)
 plot_one_timestep(250, "orange", ax)
 plot_one_timestep(500, "darkred", ax)
-plt.savefig("test.svg", format="svg")
+plt.savefig("test.png", format="png")
 plt.show()
  
 exit(0)
