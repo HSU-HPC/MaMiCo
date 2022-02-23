@@ -4,37 +4,35 @@
 // www5.in.tum.de/mamico
 #include "simplemd/molecule-mappings/VTKMoleculeWriter.h"
 
-
 simplemd::moleculemappings::VTKMoleculeWriter::VTKMoleculeWriter(
-const simplemd::services::ParallelTopologyService& parallelTopologyService,
-const simplemd::services::MoleculeService& moleculeService,
-const std::string& filename
-):
-_parallelTopologyService(parallelTopologyService),_moleculeService(moleculeService),
-_filename(filename), _timestep(0){}
+    const simplemd::services::ParallelTopologyService &parallelTopologyService,
+    const simplemd::services::MoleculeService &moleculeService,
+    const std::string &filename)
+    : _parallelTopologyService(parallelTopologyService),
+      _moleculeService(moleculeService), _filename(filename), _timestep(0) {}
 
+simplemd::moleculemappings::VTKMoleculeWriter::~VTKMoleculeWriter() {}
 
-simplemd::moleculemappings::VTKMoleculeWriter::~VTKMoleculeWriter(){}
-
-
-void simplemd::moleculemappings::VTKMoleculeWriter::setTimestep(const unsigned int &timestep){
+void simplemd::moleculemappings::VTKMoleculeWriter::setTimestep(
+    const unsigned int &timestep) {
   _timestep = timestep;
 }
 
-
-void simplemd::moleculemappings::VTKMoleculeWriter::beginMoleculeIteration(){
+void simplemd::moleculemappings::VTKMoleculeWriter::beginMoleculeIteration() {
 
   // open file
   std::stringstream ss;
   ss << _filename << "_";
-  #if (MD_PARALLEL==MD_YES)
+#if (MD_PARALLEL == MD_YES)
   ss << _parallelTopologyService.getRank() << "_";
-  #endif
-  ss  << _timestep;
+#endif
+  ss << _timestep;
   ss << ".vtk";
   _file.open(ss.str().c_str());
-  if (!_file.is_open()){
-    std::cout << "ERROR simplemd::moleculemappings::VTKMoleculeWriter: Could not open file " << ss.str() << "!" << std::endl;
+  if (!_file.is_open()) {
+    std::cout << "ERROR simplemd::moleculemappings::VTKMoleculeWriter: Could "
+                 "not open file "
+              << ss.str() << "!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -49,26 +47,28 @@ void simplemd::moleculemappings::VTKMoleculeWriter::beginMoleculeIteration(){
   _file << "ASCII" << std::endl << std::endl;
   _file << "DATASET UNSTRUCTURED_GRID" << std::endl;
 
-  _positions << "POINTS " << _moleculeService.getNumberMolecules() <<  " float" << std::endl;
-  _velocities << "POINT_DATA " << _moleculeService.getNumberMolecules() << std::endl;
+  _positions << "POINTS " << _moleculeService.getNumberMolecules() << " float"
+             << std::endl;
+  _velocities << "POINT_DATA " << _moleculeService.getNumberMolecules()
+              << std::endl;
   _velocities << "VECTORS velocities float" << std::endl;
   _forces << "VECTORS forces float" << std::endl;
   _fix << "SCALARS isFixed float" << std::endl;
   _fix << "LOOKUP_TABLE default" << std::endl;
 }
 
-
-void simplemd::moleculemappings::VTKMoleculeWriter::handleMolecule(Molecule &molecule){
-  for (unsigned int d = 0; d < MD_DIM; d++){
+void simplemd::moleculemappings::VTKMoleculeWriter::handleMolecule(
+    Molecule &molecule) {
+  for (unsigned int d = 0; d < MD_DIM; d++) {
     _positions << molecule.getConstPosition()[d] << " ";
     _velocities << molecule.getConstVelocity()[d] << " ";
     _forces << molecule.getConstForceOld()[d] << " ";
   }
-#if (MD_DIM==1)
+#if (MD_DIM == 1)
   _positions << "0.0 0.0";
   _forces << "0.0 0.0";
   _velocities << "0.0 0.0";
-#elif (MD_DIM==2)
+#elif (MD_DIM == 2)
   _positions << "0.0";
   _forces << "0.0";
   _velocities << "0.0";
@@ -79,10 +79,14 @@ void simplemd::moleculemappings::VTKMoleculeWriter::handleMolecule(Molecule &mol
   _fix << molecule.isFixed() << std::endl;
 }
 
-
-
-void simplemd::moleculemappings::VTKMoleculeWriter::endMoleculeIteration(){
-  _file << _positions.str() << std::endl << std::endl << _velocities.str() << std::endl << std::endl << _forces.str() << std::endl << _fix.str() << std::endl << std::endl;
+void simplemd::moleculemappings::VTKMoleculeWriter::endMoleculeIteration() {
+  _file << _positions.str() << std::endl
+        << std::endl
+        << _velocities.str() << std::endl
+        << std::endl
+        << _forces.str() << std::endl
+        << _fix.str() << std::endl
+        << std::endl;
   _positions.str("");
   _forces.str("");
   _velocities.str("");

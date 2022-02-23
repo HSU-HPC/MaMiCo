@@ -2,30 +2,32 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-template<unsigned int dim>
-void coupling::configurations::MaMiCoConfiguration<dim>::parseSubtag( tinyxml2::XMLElement* node ){
+template <unsigned int dim>
+void coupling::configurations::MaMiCoConfiguration<dim>::parseSubtag(
+    tinyxml2::XMLElement *node) {
 
-  for (tinyxml2::XMLElement* child = node->FirstChildElement(); child != NULL; child = child->NextSiblingElement()){
+  for (tinyxml2::XMLElement *child = node->FirstChildElement(); child != NULL;
+       child = child->NextSiblingElement()) {
     std::string nodename(child->Value());
 
-    if (nodename == _macroscopicCellConfiguration.getTag()){
+    if (nodename == _macroscopicCellConfiguration.getTag()) {
       _macroscopicCellConfiguration.parseSubtag(child);
-    } else if (nodename == _particleInsertionConfiguration.getTag()){
+    } else if (nodename == _particleInsertionConfiguration.getTag()) {
       _particleInsertionConfiguration.parseSubtag(child);
       _isDefinedParticleInsertion = true;
-    } else if (nodename == _momentumInsertionConfiguration.getTag()){
+    } else if (nodename == _momentumInsertionConfiguration.getTag()) {
       _momentumInsertionConfiguration.parseSubtag(child);
       _isDefinedMomentumInsertion = true;
-    } else if (nodename == _transferStrategyConfiguration.getTag()){
+    } else if (nodename == _transferStrategyConfiguration.getTag()) {
       _transferStrategyConfiguration.parseSubtag(child);
       _isDefinedTransferStrategy = true;
-    } else if ( nodename == _parallelTopologyConfiguration.getTag() ) {
+    } else if (nodename == _parallelTopologyConfiguration.getTag()) {
       _parallelTopologyConfiguration.parseSubtag(child);
       _isDefinedParallelTopology = true;
-    } else if ( nodename == _boundaryForceConfiguration.getTag() ){
+    } else if (nodename == _boundaryForceConfiguration.getTag()) {
       _boundaryForceConfiguration.parseSubtag(child);
       _isDefinedBoundaryForce = true;
-    } else if ( nodename == _thermostatConfiguration.getTag() ){
+    } else if (nodename == _thermostatConfiguration.getTag()) {
       _thermostatConfiguration.parseSubtag(child);
       _isDefinedThermostat = true;
     } else {
@@ -34,8 +36,10 @@ void coupling::configurations::MaMiCoConfiguration<dim>::parseSubtag( tinyxml2::
     }
   }
 
-  _isValid = _momentumInsertionConfiguration.isValid() && _particleInsertionConfiguration.isValid()
-    && _macroscopicCellConfiguration.isValid() && _transferStrategyConfiguration.isValid()
-    && _boundaryForceConfiguration.isValid()
-    && _parallelTopologyConfiguration.isValid();
+  _isValid = _momentumInsertionConfiguration.isValid() &&
+             _particleInsertionConfiguration.isValid() &&
+             _macroscopicCellConfiguration.isValid() &&
+             _transferStrategyConfiguration.isValid() &&
+             _boundaryForceConfiguration.isValid() &&
+             _parallelTopologyConfiguration.isValid();
 }

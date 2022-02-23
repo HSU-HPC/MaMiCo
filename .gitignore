@@ -44,3 +44,4 @@ coupling/tests/build_couette/couettecomp2.py
 coupling/tests/build_couette/gaussfiltercomp.py
 coupling/tests/build_couette/couette.xml.ls1
 coupling/tests/build_couette/FoamSetup/
+coupling/tests/test
