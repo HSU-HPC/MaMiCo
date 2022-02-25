@@ -5,65 +5,66 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_INTERFACE_MACROSCOPICSOLVERFACTORY_H_
 #define _MOLECULARDYNAMICS_COUPLING_INTERFACE_MACROSCOPICSOLVERFACTORY_H_
 
+#include "coupling/interface/impl/macroscopictestsolvers/UniformFlowSolverInterface.h"
 #include "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolver.h"
 #include "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolverInterface.h"
-#include "coupling/interface/impl/macroscopictestsolvers/UniformFlowSolverInterface.h"
 
 namespace coupling {
-  namespace interface {
-    class MacroscopicSolverFactory;
-  }
+namespace interface {
+class MacroscopicSolverFactory;
 }
-
+} // namespace coupling
 
 class coupling::interface::MacroscopicSolverFactory {
-  public:
-    enum SolverType {VOID_MACROSCOPIC_SOLVER=0, UNIFORM_FLOW_SOLVER=1};
+public:
+  enum SolverType { VOID_MACROSCOPIC_SOLVER = 0, UNIFORM_FLOW_SOLVER = 1 };
 
-    static coupling::interface::MacroscopicSolverFactory& getInstance(){
-      static coupling::interface::MacroscopicSolverFactory singleton;
-      return singleton;
+  static coupling::interface::MacroscopicSolverFactory &getInstance() {
+    static coupling::interface::MacroscopicSolverFactory singleton;
+    return singleton;
+  }
+
+  coupling::interface::TestMacroscopicSolver *
+  getTestMacroscopicSolver(SolverType type) {
+    switch (type) {
+    case VOID_MACROSCOPIC_SOLVER:
+      return new coupling::interface::VoidMacroscopicSolver();
+      break;
+    case UNIFORM_FLOW_SOLVER:
+      return new coupling::interface::VoidMacroscopicSolver();
+      break;
+    default:
+      break;
     }
 
-    coupling::interface::TestMacroscopicSolver* getTestMacroscopicSolver(SolverType type) {
-      switch(type){
-      case VOID_MACROSCOPIC_SOLVER:
-        return new coupling::interface::VoidMacroscopicSolver();
-        break;
-      case UNIFORM_FLOW_SOLVER:
-        return new coupling::interface::VoidMacroscopicSolver();
-        break;
-      default:
-        break;
-      }
+    return NULL;
+  }
 
-      return NULL;
-    }
-
-
-    template<unsigned int dim>
-    coupling::interface::TestMacroscopicSolverInterface<dim>* getTestMacroscopicSolverInterface(
+  template <unsigned int dim>
+  coupling::interface::TestMacroscopicSolverInterface<dim> *
+  getTestMacroscopicSolverInterface(
       SolverType type,
-      tarch::la::Vector<dim,unsigned int> globalNumberMacroscopicCells,
+      tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
       double massPerMacroscopicCell,
-      tarch::la::Vector<dim,double> momentumPerMacroscopicCell
-    ) {
-      switch(type){
-      case VOID_MACROSCOPIC_SOLVER:
-        return new coupling::interface::VoidMacroscopicSolverInterface<dim>();
-        break;
-      case UNIFORM_FLOW_SOLVER:
-        return new coupling::interface::UniformFlowSolverInterface<dim>(globalNumberMacroscopicCells,massPerMacroscopicCell,momentumPerMacroscopicCell);
-      default:
-        break;
-      }
-
-      return NULL;
+      tarch::la::Vector<dim, double> momentumPerMacroscopicCell) {
+    switch (type) {
+    case VOID_MACROSCOPIC_SOLVER:
+      return new coupling::interface::VoidMacroscopicSolverInterface<dim>();
+      break;
+    case UNIFORM_FLOW_SOLVER:
+      return new coupling::interface::UniformFlowSolverInterface<dim>(
+          globalNumberMacroscopicCells, massPerMacroscopicCell,
+          momentumPerMacroscopicCell);
+    default:
+      break;
     }
 
-  private:
-    MacroscopicSolverFactory(){}
-    ~MacroscopicSolverFactory(){}
+    return NULL;
+  }
+
+  private : MacroscopicSolverFactory() {
+  }
+  ~MacroscopicSolverFactory() {}
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_INTERFACE_MACROSCOPICSOLVERFACTORY_H_

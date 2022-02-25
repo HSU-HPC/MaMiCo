@@ -5,36 +5,35 @@
 #ifndef _MOLECULARDYNAMICS_SERVICES_EXTERNALFORCESERVICE_H_
 #define _MOLECULARDYNAMICS_SERVICES_EXTERNALFORCESERVICE_H_
 
-#include <iostream>
-#include <cstdlib>
-#include <vector>
-#include "simplemd/Molecule.h"
 #include "simplemd/MolecularDynamicsDefinitions.h"
+#include "simplemd/Molecule.h"
 #include "simplemd/configurations/ExternalForceConfiguration.h"
+#include <cstdlib>
+#include <iostream>
+#include <vector>
 
 namespace simplemd {
-  namespace services {
-    class ExternalForceService;
-  }
+namespace services {
+class ExternalForceService;
 }
-
+} // namespace simplemd
 
 /** adds external forces to the molecules
  *  @author Philipp Neumann
  */
 class simplemd::services::ExternalForceService {
-  public:
-     /** initialises the properties */
-     ExternalForceService(
-       const std::vector<simplemd::configurations::ExternalForceConfiguration>& configs
-     );
+public:
+  /** initialises the properties */
+  ExternalForceService(
+      const std::vector<simplemd::configurations::ExternalForceConfiguration>
+          &configs);
 
-      void addExternalForce(tarch::la::Vector<MD_DIM,double> &force);
+  void addExternalForce(tarch::la::Vector<MD_DIM, double> &force);
 
-    ~ExternalForceService(){}
+  ~ExternalForceService() {}
 
-  private:
-    const std::vector<simplemd::configurations::ExternalForceConfiguration> &_configurations;
+private:
+  const std::vector<simplemd::configurations::ExternalForceConfiguration>
+      &_configurations;
 };
 #endif // _MOLECULARDYNAMICS_SERVICES_EXTERNALFORCESERVICE_H_
-

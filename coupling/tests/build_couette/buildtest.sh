@@ -11,8 +11,8 @@ else
 fi
 
 ### build directory for library of SIMPLE_MD (currently specified for gnu compiler (intel variant: .../icc/..)
-SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_yes/gcc/gprof_no/
-SIMPLEMD_SEQUENTIAL_PATH=${MAMICO_PATH}/build/libsimplemd/release/dim3/parallel_no/gcc/gprof_no/
+SIMPLEMD_PARALLEL_PATH=${MAMICO_PATH}/build/libsimplemd/debug/dim3/parallel_yes/gcc/gprof_no/
+SIMPLEMD_SEQUENTIAL_PATH=${MAMICO_PATH}/build/libsimplemd/debug/dim3/parallel_no/gcc/gprof_no/
 ### name of lib for SIMPLE_MD
 LIBSIMPLEMD=simplemd
 
@@ -44,13 +44,13 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -Wfatal-errors -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -Wfatal-errors -O3"
     # -Werror
     includes="${includes} -I${LIB_EIGEN_PATH}" 
     compiler="g++"
@@ -85,11 +85,11 @@ fi
 cd ${MAMICO_PATH}
 if [ "${parallel}" == "parallel" ]
 then
-        scons target=libsimplemd dim=3 build=release parallel=yes -j4
+        scons target=libsimplemd dim=3 build=debug parallel=yes -j4
         libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
         FLAGS="${FLAGS} -DMDParallel"
 else
-        scons target=libsimplemd dim=3 build=release parallel=no -j4
+        scons target=libsimplemd dim=3 build=debug parallel=no -j4
         libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
 fi
 

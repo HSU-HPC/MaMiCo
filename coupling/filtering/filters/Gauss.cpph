@@ -6,161 +6,189 @@
  *  @author Felix Maurer
  */
 
-//Member functions of Gauss.h:
-template<unsigned int dim>
-//TODO: This is very much hardcoded for kernel radius = 1
-void coupling::Gauss<dim>::operator()(){	
-    #ifdef DEBUG_GAUSS
-    std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter...";
-    #endif 
+// Member functions of Gauss.h:
+template <unsigned int dim>
+// TODO: This is very much hardcoded for kernel radius = 1
+void coupling::filtering::Gauss<dim>::operator()() {
+#ifdef DEBUG_GAUSS
+  std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter..."
+            << std::endl;
+#endif
 
-	for(tarch::la::Vector<dim,unsigned int> index : this->_cellIndices) {
+  using namespace coupling::indexing;
 
-		auto indexAbove = getIndexAbove(index, _dim);
-		auto indexBelow = getIndexBelow(index, _dim);
+  ScalarIndex index;
+  ScalarIndex indexAbove;
+  ScalarIndex indexBelow;
 
-				
-		//Used when accessing cell vectors using operator[].
-		unsigned int indexLinear = _ic->getLocalCellIndex(index);
-		unsigned int indexAboveLinear = _ic->getLocalCellIndex(indexAbove);
-		unsigned int indexBelowLinear = _ic->getLocalCellIndex(indexBelow);
+  for (unsigned int raw_index = 0; raw_index < _inputCells.size();
+       raw_index++) {
 
-		//[0] = below, [1] = at index, [2] = above 
-		double weights[3] = {_kernel[0], _kernel[1], _kernel[2]};
+    // construct CellIndex using raw index
+    index = {raw_index};
 
-		//only one of these two cases can occur at once
-		if(indexBelow == index){
-			//set weight of out of bounds index to zero
-			weights[0] = 0;
+    // make use of implicit conversion between linear <-> vector indices
+    indexAbove = getIndexAbove(index, _dim);
+    indexBelow = getIndexBelow(index, _dim);
 
-			switch(_extrapolationStrategy){
-				case NONE : 
-					break;
-				case MIRROR : 
-					weights[2] *= 2;
-					break;
-				case REFLECT:
-					weights[1] *= 2;
-					break;
-			}
+    /*
+    std::cout << "INDEX: " << index << std::endl;
+    std::cout << "ABOVE: " << indexAbove << std::endl;
+    std::cout << "BELOW: " << indexBelow << std::endl;
+    */
 
-			//normalize the other two weights
-			double weightsSum = weights[1] + weights[2];
-			weights[1] /= weightsSum;
-			weights[2] /= weightsSum;
-		}
+    //[0] = below, [1] = at index, [2] = above
+    double weights[3] = {_kernel[0], _kernel[1], _kernel[2]};
 
-		//Since the domain has to be larger than one unit in all directions, not both the index above and below can be illegal at the same time.
-		else if(indexAbove == index){
-			//set weight of out of bounds index to zero
-			weights[2] = 0;
+    // only one of these two cases can occur at once
+    if (indexBelow == index) {
+      // set weight of out of bounds index to zero
+      weights[0] = 0;
 
-			switch(_extrapolationStrategy){
-				case NONE : 
-					break;
-				case MIRROR : 
-					weights[0] *= 2;
-					break;
-				case REFLECT:
-					weights[1] *= 2;
-					break;
-			}
+      switch (_extrapolationStrategy) {
+      case NONE:
+        break;
+      case MIRROR:
+        weights[2] *= 2;
+        break;
+      case REFLECT:
+        weights[1] *= 2;
+        break;
+      }
 
-			//normalize the other two weights
-			double weightsSum = weights[0] + weights[1];
-			weights[0] /= weightsSum;
-			weights[1] /= weightsSum;
-		}
+      // normalize the other two weights
+      double weightsSum = weights[1] + weights[2];
+      weights[1] /= weightsSum;
+      weights[2] /= weightsSum;
+    }
 
-		//apply to scalars
-		for(unsigned int si = 0; si < _scalarSetters.size(); si++){
-			(_outputCells[indexLinear]
-				->*(_scalarSetters[si]))
-					(
-						(_inputCells[indexBelowLinear]->*(_scalarGetters[si]))() * weights[0]
-						+
-						(_inputCells[indexLinear]->*(_scalarGetters[si]))() * weights[1]
-						+
-						(_inputCells[indexAboveLinear]->*(_scalarGetters[si]))() * weights[2]
-					);
-		}
-		//apply to vectors	
-		for(unsigned int vi = 0; vi < _vectorSetters.size(); vi++){
-			(_outputCells[indexLinear]
-				->*(_vectorSetters[vi]))
-					(		
-						(_inputCells[indexBelowLinear]->*(_vectorGetters[vi]))() * weights[0]
-						+
-						(_inputCells[indexLinear]->*(_vectorGetters[vi]))() * weights[1]
-						+
-						(_inputCells[indexAboveLinear]->*(_vectorGetters[vi]))() * weights[2]
-					);
-		}
-	}//index
-   
-    #ifdef DEBUG_GAUSS
-    std::cout << "done." << std::endl;
-    #endif
+    // Since the domain has to be larger than one unit in all directions, not
+    // both the index above and below can be illegal at the same time.
+    else if (indexAbove == index) {
+      // set weight of out of bounds index to zero
+      weights[2] = 0;
+
+      switch (_extrapolationStrategy) {
+      case NONE:
+        break;
+      case MIRROR:
+        weights[0] *= 2;
+        break;
+      case REFLECT:
+        weights[1] *= 2;
+        break;
+      }
+
+      // normalize the other two weights
+      double weightsSum = weights[0] + weights[1];
+      weights[0] /= weightsSum;
+      weights[1] /= weightsSum;
+    }
+
+    // apply to scalars
+    for (const auto scalarProperty : _scalarAccessFunctionPairs) {
+      (_outputCells[raw_index]->*scalarProperty.set)(
+          (_inputCells[indexBelow.get()]->*scalarProperty.get)() * weights[0] +
+          (_inputCells[raw_index]->*scalarProperty.get)() * weights[1] +
+          (_inputCells[indexAbove.get()]->*scalarProperty.get)() * weights[2]);
+    }
+    // apply to vectors
+    for (const auto vectorProperty : _vectorAccessFunctionPairs) {
+      (_outputCells[raw_index]->*vectorProperty.set)(
+          (_inputCells[indexBelow.get()]->*vectorProperty.get)() * weights[0] +
+          (_inputCells[raw_index]->*vectorProperty.get)() * weights[1] +
+          (_inputCells[indexAbove.get()]->*vectorProperty.get)() * weights[2]);
+    }
+  } // index
+
+#ifdef DEBUG_GAUSS
+  std::cout << "done." << std::endl;
+#endif
 }
 
-//Private functions of Gauss.h: 
-template<unsigned int dim>
-std::array<double, 1+2*GAUSS_KERNEL_RADIUS> coupling::Gauss<dim>::generateKernel() {
-	//std::cout << "gauss: kernel radius: " << GAUSS_KERNEL_RADIUS << std::endl;	
+// Private functions of Gauss.h:
+template <unsigned int dim>
+std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS>
+coupling::filtering::Gauss<dim>::generateKernel() {
+  // std::cout << "gauss: kernel radius: " << GAUSS_KERNEL_RADIUS << std::endl;
 
-	std::array<double, 1+2*GAUSS_KERNEL_RADIUS> kernel;
-	unsigned int i = 0; //index in kernel
-	double sum = 0; //used for normalization
+  std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS> kernel;
+  unsigned int i = 0; // index in kernel
+  double sum = 0;     // used for normalization
 
-	//fill kernel using Gaussian error function
-	for(int x = -GAUSS_KERNEL_RADIUS; x <= GAUSS_KERNEL_RADIUS; x++) {
-		kernel[i] = gaussianDensityFunction(x);
+  // fill kernel using Gaussian error function
+  for (int x = -GAUSS_KERNEL_RADIUS; x <= GAUSS_KERNEL_RADIUS; x++) {
+    kernel[i] = gaussianDensityFunction(x);
 
-		sum += kernel[i];
-		i++;
-	}
+    sum += kernel[i];
+    i++;
+  }
 
-	//normalize kernel. by definition, sum cannot be 0.
-	for(auto& k : kernel) { 
-		k *= 1/sum; 
+  // normalize kernel. by definition, sum cannot be 0.
+  for (auto &k : kernel) {
+    k *= 1 / sum;
 
-		#ifdef DEBUG_GAUSS
-    	std::cout << "		GAUSS(Dim: " << _dim << "): Add kernel entry: " << k;
-    	#endif 
-	}
+#ifdef DEBUG_GAUSS
+    std::cout << "		GAUSS(Dim: " << _dim
+              << "): Add kernel entry: " << k << std::endl;
+#endif
+  }
 
-	return kernel;
+  return kernel;
 }
 
-template<unsigned int dim>
-constexpr double coupling::Gauss<dim>::gaussianDensityFunction(int x) {
-    double ans = ( 1 / ( _sigma * sqrt(2*M_PI) ) ) * exp(-0.5 * (x/_sigma) * (x/_sigma));
-	return ans;
+template <unsigned int dim>
+constexpr double
+coupling::filtering::Gauss<dim>::gaussianDensityFunction(int x) {
+  double ans =
+      (1 / (_sigma * sqrt(2 * M_PI))) * exp(-0.5 * (x / _sigma) * (x / _sigma));
+  return ans;
 }
 
+template <unsigned int dim>
+typename coupling::filtering::Gauss<dim>::VectorIndex
+coupling::filtering::Gauss<dim>::getIndexAbove(
+    const coupling::filtering::Gauss<dim>::VectorIndex index, unsigned int d) {
+  // check for border indices
+  const coupling::indexing::BaseIndex<dim> boundary =
+      coupling::filtering::Gauss<dim>::VectorIndex::upperBoundary;
+  for (unsigned int d = 0; d < dim; d++) {
+    // convert index to BaseIndex and compare with boundary.
+    if ((coupling::indexing::BaseIndex<dim>{index}).get()[d] >=
+        boundary.get()[d])
+      // if index is out of bounds, return it unmodified. this gets detected in
+      // operator()'s boundary handling.
+      return index;
+  }
 
-template<unsigned int dim>
-tarch::la::Vector<dim, unsigned int> coupling::Gauss<dim>::getIndexAbove(const tarch::la::Vector<dim, unsigned int> index, unsigned int d){
-	//check for border indices
-	if(index[d] >= _lastIndex[d]) return index;
+  // get raw vector index
+  auto ans = index.get();
+  // get upper index in dimension d
+  ans[d] += 1;
 
-	//copy input index
-	auto ans = tarch::la::Vector<dim, unsigned int>(index);
-
-	//get upper index in dimension d
-	ans[d] += 1;
-	return ans;
+  return {ans};
 }
 
-template<unsigned int dim>
-tarch::la::Vector<dim, unsigned int> coupling::Gauss<dim>::getIndexBelow(const tarch::la::Vector<dim, unsigned int> index, unsigned int d){
-	//check for border indices
-	if(index[d] == 0) return index;
+template <unsigned int dim>
+typename coupling::filtering::Gauss<dim>::VectorIndex
+coupling::filtering::Gauss<dim>::getIndexBelow(
+    const coupling::filtering::Gauss<dim>::VectorIndex index, unsigned int d) {
+  // check for border indices
+  const coupling::indexing::BaseIndex<dim> boundary =
+      coupling::filtering::Gauss<dim>::VectorIndex::lowerBoundary;
+  for (unsigned int d = 0; d < dim; d++) {
+    // convert index to BaseIndex and compare with boundary.
+    if ((coupling::indexing::BaseIndex<dim>{index}).get()[d] <=
+        boundary.get()[d])
+      // if index is out of bounds, return it unmodified. this gets detected in
+      // operator()'s boundary handling.
+      return index;
+  }
 
-	//copy input index
-	auto ans = tarch::la::Vector<dim, unsigned int>(index);
+  // copy input index
+  auto ans = index.get();
+  // get lower index in dimension d
+  ans[d] -= 1;
 
-	//get lower index in dimension d
-	ans[d] -= 1;
-	return ans;
-} 
+  return {ans};
+}
