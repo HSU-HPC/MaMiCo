@@ -21,6 +21,7 @@
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/configurations/CouetteConfiguration.h"
 #include "coupling/MultiMDMediator.h"
+#include "coupling/ErrorEstimation.h"
 #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -41,7 +42,7 @@ public:
   DynamicMDTest(int argc, char ** argv) 
     : Test("DynamicMDTest"), _generator(std::chrono::system_clock::now().time_since_epoch().count()),
       _generatorForVaryMD(0),
-      _distributionForVaryMD(-65,50)
+      _distributionForVaryMD(-100,100)
 
   {
     if(argc >= 1) {
@@ -104,21 +105,36 @@ private:
   //enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
 
   void varyMD(int cycle) {
-    if(_varyMDStyle == REMOVAL) {
-      if(cycle >= 100 && cycle % 10 == 0) {
-        _multiMDMediator->rmMDSimulation();
-      }
-    } else if(_varyMDStyle == INSERTION) {
-      if(cycle == 100) {
-        _multiMDMediator->addNMDSimulations(100);
-      }
-    } else if(_varyMDStyle == RANDOM) {
+
       if(cycle < 9 || (cycle+1) % 10 != 0) return;
-      //else:
-      int target = 0;
+
+	int target = 0;
+
       if(_rank == 0) {
-        target = _distributionForVaryMD(_generatorForVaryMD);
+	
+	int cellIdx = 0;
+
+	tarch::la::Vector<3,double> vel(_buf.recvBuffer[cellIdx]->getMacroscopicMomentum());
+
+	double mamicoSoundSpeed = (1/std::sqrt(3))*(2.5/(50*0.005));
+        double mamicoCellVolume = 2.5*2.5*2.5;
+
+
+     coupling::error::ErrorEstimation errorControl(vel[0], _cfg.temp, _buf.recvBuffer[cellIdx]->getMacroscopicMass(), 
+         _simpleMDConfig.getMoleculeConfiguration().getMass(), mamicoSoundSpeed,_multiMDService->getTotalNumberOfMDSimulations(), mamicoCellVolume);
+
+	errorControl.setAbsVelocityError(0.05);
+
+	double NoMD = errorControl.getCorrectorNumberOfSamples(coupling::error::ErrorEstimation::Velocity, coupling::error::ErrorEstimation::Absolute);
+
+
+	target = NoMD-_multiMDService->getTotalNumberOfMDSimulations();
+
+	std::cout << NoMD << " ----- " << _multiMDService->getTotalNumberOfMDSimulations() << " ----- " << target << std::endl; 
       }
+
+
+
       #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
         MPI_Bcast(&target, 1, MPI_INT, 0, MPI_COMM_WORLD);
       #endif
@@ -134,7 +150,7 @@ private:
       else if(target > 0) {
         _multiMDMediator->addNMDSimulations(target);
       }
-    }
+    
   }
   
   void init(){
@@ -610,7 +626,7 @@ private:
     if(_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0 || recvBuffer.size() == 0) return;
     // form file name and open file
     std::stringstream ss;
-    ss << "CouetteAvgMultiMDCells_" << _rank << "_" << couplingCycle << ".csv";
+    ss << "out/CouetteAvgMultiMDCells_" << _rank << "_" << couplingCycle << ".csv";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << ss.str() << "!" << std::endl; exit(EXIT_FAILURE);}
 
@@ -620,7 +636,25 @@ private:
       tarch::la::Vector<3,double> vel(recvBuffer[i]->getMacroscopicMomentum());
       if (recvBuffer[i]->getMacroscopicMass()!=0.0){ vel = (1.0/recvBuffer[i]->getMacroscopicMass())*vel; }
       const tarch::la::Vector<3,unsigned int> counter(indexConversion.getGlobalVectorCellIndex(recvIndices[i]));
-      file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; " << recvBuffer[i]->getMacroscopicMass() << ";";
+
+	double mamicoSoundSpeed = (1/std::sqrt(3))*(2.5/(50*0.005));
+        double mamicoCellVolume = 2.5*2.5*2.5;
+
+        coupling::error::ErrorEstimation ErEs(vel[0], _cfg.temp, recvBuffer[i]->getMacroscopicMass(),
+                                                _simpleMDConfig.getMoleculeConfiguration().getMass(), mamicoSoundSpeed,
+						_multiMDService->getTotalNumberOfMDSimulations(), mamicoCellVolume);
+
+//        ErEs.setAbsVelocityError(0.04);
+
+        double error = ErEs.getError(coupling::error::ErrorEstimation::Density, coupling::error::ErrorEstimation::Absolute);
+
+ //       coupling::error::ErrorEstimation ErEs2(1, _cfg.temp, ((int)recvBuffer[i]->getMacroscopicMass()),
+   //                                             _simpleMDConfig.getMoleculeConfiguration().getMass(), mamicoSoundSpeed,1, mamicoCellVolume);
+
+        double error2 = ErEs.getError(coupling::error::ErrorEstimation::Density, coupling::error::ErrorEstimation::Relative);
+
+// std::cout << recvBuffer[i]->getTemperature() << error << " ; " << error2 << " ; " << recvBuffer[i]->getMacroscopicMass() << std::endl;
+      file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; " << recvBuffer[i]->getMacroscopicMass() << " ; " << error << " ; " << error2 << " ; " << recvBuffer[i]->getTemperature() << ";";
       file << std::endl;
     }
 
