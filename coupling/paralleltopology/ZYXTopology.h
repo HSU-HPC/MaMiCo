@@ -15,15 +15,21 @@ namespace coupling {
   }
 }
 
-
 /** In the ZYXTopology, the process coordinates convert to a rank as
  *  rank = x*ny*nz + y*nz + z = z + nz*(y+ny*x) (for 3D).
- *  topologyOffset is used for linearized access of multiple MD instances.
+ *  topologyOffset is used for linearized access of multiple MD instances. Derived class from the class ParallelTopology.
+ *  E.g. assuming ParallelTopologyType = XYZ and there is a cubic domain, splitted into 8 sub-domains (2 sub-domains in each dimension). Then the ordring of the MPI processes is: 
+ *	Rank=0 for x=0,y=0,z=0. Rank=1 for x=1,y=0,z=0. Rank=2 for x=0,y=1,z=0. Rank=3 for x=1,y=1,z=0.
+ *	Rank=4 for x=0,y=0,z=1. Rank=5 for x=1,y=0,z=1. Rank=6 for x=0,y=1,z=1. Rank=7 for x=1,y=1,z=1.
+ *	@brief The XYZTopology orders the ranks in z-y-x manner.
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
+ *	@todo Philipp could you please take a look on this class
  */
 template<unsigned int dim>
 class coupling::paralleltopology::ZYXTopology: public coupling::paralleltopology::ParallelTopology<dim> {
   public:
+	/** Constructor */
     ZYXTopology(tarch::la::Vector<dim,unsigned int> numberProcesses,unsigned int topologyOffset):
     coupling::paralleltopology::ParallelTopology<dim>(),
     _numberProcesses(numberProcesses),
@@ -31,6 +37,7 @@ class coupling::paralleltopology::ZYXTopology: public coupling::paralleltopology
     _topologyOffset(topologyOffset)
     {}
 
+	/** Destructor */
     virtual ~ZYXTopology(){}
 
     tarch::la::Vector<dim,unsigned int> getProcessCoordinates(unsigned int rank) const {

@@ -23,39 +23,45 @@ namespace coupling {
   }
 }
 
-/** parses all sub-tags for MaMiCo configuration.
+ /** parses all sub-tags for MaMiCo configuration. Derive from the class tarch::configuration::Configuration
+ *	@brief parses all sub-tags for MaMiCo configuration.
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<unsigned int dim>
 class coupling::configurations::MaMiCoConfiguration: public tarch::configuration::Configuration {
   public:
+	/** Constructor, initializes the class  */
     MaMiCoConfiguration(): _isValid(true),_isDefinedParticleInsertion(false),_isDefinedMomentumInsertion(false), _isDefinedBoundaryForce(false),
     _isDefinedTransferStrategy(false), _isDefinedNoiseReduction(false), _isDefinedParallelTopology(false){}
 
-    virtual ~MaMiCoConfiguration(){}
+    /** Destructor */
+	virtual ~MaMiCoConfiguration(){}
 
-    void parseSubtag( tinyxml2::XMLElement* node );
+    /** parseSubtag
+	 * 	@param node
+     */
+	void parseSubtag( tinyxml2::XMLElement* node );
 
-    /**
-     * Return name of xml tag that is associated to the configuration.
+    /** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
      */
     std::string getTag() const { return "mamico";}
 
-    /**
-     * Is config valid?
-     *
-     * This operation usually fails, if
-     *
-     * - parseSubtag() hasn't been called, i.e. configuration has not been
-     *   used, or
-     * - parseSubtag() failed due to a wrong file.
-     *
-     * If a tag ain't optional and parseSubtag() was not called (first case)
+    /** checks if the configuration is valid. This operation usually fails, if e.g.
+	 *	1. parseSubtag() hasn't been called, i.e. configuration has not been used, or 
+     *  2. parseSubtag() failed due to a wrong file.
+	 * 	@return _isValid
      */
     bool isValid() const { return _isValid;}
 
-    /** getters */
+    /** 
+	 * 	@return _macroscopicCellConfiguration
+     */
     const coupling::configurations::MacroscopicCellConfiguration<dim>& getMacroscopicCellConfiguration() const { return _macroscopicCellConfiguration;}
+	/** 
+	 * 	@return _particleInsertionConfiguration
+     */
     const coupling::configurations::ParticleInsertionConfiguration& getParticleInsertionConfiguration() const {
       if (!_isDefinedParticleInsertion){
         std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Particle insertion not defined!" << std::endl;
@@ -64,7 +70,10 @@ class coupling::configurations::MaMiCoConfiguration: public tarch::configuration
       return _particleInsertionConfiguration;
     }
 
-    const coupling::configurations::MomentumInsertionConfiguration& getMomentumInsertionConfiguration() const {
+    /** 
+	 * 	@return _momentumInsertionConfiguration
+     */
+	const coupling::configurations::MomentumInsertionConfiguration& getMomentumInsertionConfiguration() const {
       if (!_isDefinedMomentumInsertion){
         std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Momentum insertion not defined!" << std::endl;
         exit(EXIT_FAILURE);
@@ -72,7 +81,10 @@ class coupling::configurations::MaMiCoConfiguration: public tarch::configuration
       return _momentumInsertionConfiguration;
     }
 
-    const coupling::configurations::BoundaryForceConfiguration<dim>& getBoundaryForceConfiguration() const {
+    /** 
+	 * 	@return _boundaryForceConfiguration
+     */
+	const coupling::configurations::BoundaryForceConfiguration<dim>& getBoundaryForceConfiguration() const {
       if (!_isDefinedBoundaryForce){
         std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Boundary force not defined!" << std::endl;
         exit(EXIT_FAILURE);
@@ -80,7 +92,10 @@ class coupling::configurations::MaMiCoConfiguration: public tarch::configuration
       return _boundaryForceConfiguration;
     }
 
-    const coupling::configurations::TransferStrategyConfiguration<dim>& getTransferStrategyConfiguration() const {
+    /** 
+	 * 	@return _transferStrategyConfiguration
+     */
+	const coupling::configurations::TransferStrategyConfiguration<dim>& getTransferStrategyConfiguration() const {
       if (!_isDefinedTransferStrategy){
         std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Transfer-Strategy not defined!" << std::endl;
         exit(EXIT_FAILURE);
@@ -88,7 +103,10 @@ class coupling::configurations::MaMiCoConfiguration: public tarch::configuration
       return _transferStrategyConfiguration;
     }
 
-    const coupling::configurations::NoiseReductionConfiguration& getNoiseReductionConfiguration() const {
+    /** 
+	 * 	@return _noiseReductionConfiguration
+     */
+	const coupling::configurations::NoiseReductionConfiguration& getNoiseReductionConfiguration() const {
       if (!_isDefinedNoiseReduction){
         std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Noise-Reduction not defined!" << std::endl;
         exit(EXIT_FAILURE);
@@ -96,7 +114,10 @@ class coupling::configurations::MaMiCoConfiguration: public tarch::configuration
       return _noiseReductionConfiguration;
     }
 
-    const coupling::configurations::ParallelTopologyConfiguration& getParallelTopologyConfiguration() const {
+    /** 
+	 * 	@return _parallelTopologyConfiguration
+     */
+	const coupling::configurations::ParallelTopologyConfiguration& getParallelTopologyConfiguration() const {
       if (!_isDefinedParallelTopology){
         std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: Parallel-Topology not defined!" << std::endl;
         exit(EXIT_FAILURE);

@@ -12,7 +12,12 @@ namespace coupling {
         struct CouetteConfig;
     }
 }
-
+/** Configuration parameters for Couette flow scenario
+ *	@brief Configuration parameters for Couette flow scenario
+ *	
+ *
+ *	@author Philipp Neumann
+ */
 struct coupling::configurations::CouetteConfig {
 
 private:
@@ -20,10 +25,20 @@ private:
 
 public:
 
-    enum MacroSolverType{COUETTE_ANALYTICAL=0,COUETTE_LB=1,COUETTE_FD=2};
-    enum MicroSolverType{SIMPLEMD=0,SYNTHETIC=1};
+    /** Macroscopic solver types that are supported. 
+	 *	@enum MacroSolverType
+	 */
+	enum MacroSolverType{COUETTE_ANALYTICAL=0/**< Analytic solver @note only supports flow in x-direction, is only active on rank 0, and that it does not model viscous shear forces in the oscillating wall case.*/
+	,COUETTE_LB=1/**< Lattice Boltzmann solver @note can support flow in all direction (3D) and can be parallelized*/,COUETTE_FD=2/**< Finite difference solver*/};
+    /** Microscopic solver types that are supported. 
+	 *	@enum MicroSolverType
+	 */
+	enum MicroSolverType{SIMPLEMD=0/**< simple MD*/,SYNTHETIC=1/**< data from macroscopic plus gaussian noise*/};
 
-    CouetteConfig& operator=(const CouetteConfig & other) {
+    /** @brief operator overloading; declare a configuration (this)
+	 * 	@param other
+	 */
+	CouetteConfig& operator=(const CouetteConfig & other) {
 
         this->channelheight = other.channelheight;
         this->wallInitCycles = other.wallInitCycles;
@@ -56,7 +71,10 @@ public:
     }
     
 
-    static CouetteConfig parseCouetteConfiguration(const std::string & filename) {
+    /** @brief creates CouetteConfig if all elements exist and can be read
+	 * 	@param filename
+	 */
+	static CouetteConfig parseCouetteConfiguration(const std::string & filename) {
         CouetteConfig _cfg;
 
         tinyxml2::XMLDocument conffile;
@@ -206,14 +224,14 @@ public:
         return _cfg;
     }
 
-    // channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0)
+    /** channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0) */
     double channelheight;   
-    // velocity of moving wall (lower boundary moves)
+    /** velocity of moving wall (lower boundary moves)*/
     tarch::la::Vector<3,double> wallVelocity;
     int wallInitCycles;
     tarch::la::Vector<3,double> wallInitVelocity;
     double wallOscillations;
-    // number of coupling cycles, that is continuum time steps; MD/DPD: 1000
+    /** number of coupling cycles, that is continuum time steps; MD/DPD: 1000*/
     int couplingCycles;
     bool md2Macro, macro2Md, computeSNR, twoWayCoupling;   
     int filterInitCycles;
@@ -221,9 +239,9 @@ public:
     MacroSolverType maSolverType;
     MicroSolverType miSolverType;
     double density, kinVisc;
-    // only for LB couette solver: number of processes 
+    /** only for LB couette solver: number of processes */
     tarch::la::Vector<3,unsigned int> lbNumberProcesses; 
-    // only for LB couette solver: VTK plotting per time step
+    /** only for LB couette solver: VTK plotting per time step*/
     int plotEveryTimestep;
     int initAdvanceCycles;                           
     double temp;

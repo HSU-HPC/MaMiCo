@@ -15,19 +15,26 @@ namespace coupling {
   }
 }
 
-/** noise reduction configuration, i.e. smoothing algorithm to filter MD fluctuations
+/** noise reduction configuration, i.e. smoothing algorithm to filter MD fluctuations. Derive from the class tarch::configuration::Configuration
+ *	@brief noise reduction configuration, i.e. smoothing algorithm to filter MD fluctuations
  *  @author Piet Jarmatz
+ *	@ Piet could you please take a look on this class
  */
 class coupling::configurations::NoiseReductionConfiguration:
 public tarch::configuration::Configuration {
   public:
+	/** noise reduction types that are implemented. 
+	 *	@enum NoiseReductionType
+	 */
     enum NoiseReductionType{
-      IdentityTransform=0, GaussianFilter=1, POD=2, NLM=3
+      IdentityTransform=0/**< no filtering*/, GaussianFilter=1/**< Gaussian filter*/, POD=2/**< Proper orthogonal decomposition filter*/, NLM=3/**< non local means filter*/
     };
 
-    NoiseReductionConfiguration(): _type(IdentityTransform), _isValid(true){}
+    /** Constructor, initializes the class  */
+	NoiseReductionConfiguration(): _type(IdentityTransform), _isValid(true){}
 
-    virtual ~NoiseReductionConfiguration(){}
+    /** Destructor */
+	virtual ~NoiseReductionConfiguration(){}
 
     void parseSubtag( tinyxml2::XMLElement* node ){
       std::string value;
@@ -80,25 +87,27 @@ public tarch::configuration::Configuration {
       }
     }
 
-    /**
-     * Return name of xml tag that is associated to the configuration.
+    /** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
      */
     std::string getTag() const {return "noise-reduction";}
 
-    /**
-     * Is config valid?
-     *
-     * This operation usually fails, if
-     *
-     * - parseSubtag() hasn't been called, i.e. configuration has not been
-     *   used, or
-     * - parseSubtag() failed due to a wrong file.
-     *
-     * If a tag ain't optional and parseSubtag() was not called (first case)
+    /** checks if the configuration is valid. This operation usually fails, if e.g.
+	 *	1. parseSubtag() hasn't been called, i.e. configuration has not been used, or 
+     *  2. parseSubtag() failed due to a wrong file.
+	 * 	@return _isValid
      */
     bool isValid() const { return _isValid;}
 
-    // tws_param can be used to override XML configuration
+    
+	/** Returns noise reduction configuration.
+	 * 	@tparam dim Number of dimensions; it can be 1, 2 or 3
+	 * 	@param indexConversion
+	 * 	@param multiMDService
+	 * 	@param tws_param =0 by default
+	 * 	@return noise reduction config
+	 *	@note tws_param can be used to override XML configuration
+     */
     template<unsigned int dim>
     coupling::noisereduction::NoiseReduction<dim>* interpreteConfiguration(
       const coupling::IndexConversion<dim> &indexConversion,
@@ -119,7 +128,10 @@ public tarch::configuration::Configuration {
       }
     }
 
-    NoiseReductionType getNoiseReductionType() const {return _type;}
+    /** Returns the noise reduction type.
+	 * 	@return _type
+     */
+	NoiseReductionType getNoiseReductionType() const {return _type;}
 
   private:
     NoiseReductionType _type;

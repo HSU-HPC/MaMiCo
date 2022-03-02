@@ -17,18 +17,28 @@ namespace coupling {
   }
 }
 
-/** provides access to the macroscopic cells.
+
+/** 
+ *	@brief provides access to the macroscopic cells.
+ *	@tparam LinkedCell linked cells that build up the MacroscopicCellWithLinkedCells
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::datastructures::MacroscopicCells {
   public:
-    MacroscopicCells(
+    /** Constructor: initialises the macroscopic cell
+	 *	@param numberLinkedCellsPerMacroscopicCell 
+	 * 	@param indexConversion
+	 * 	@param mdSolverInterface
+     */
+	MacroscopicCells(
       tarch::la::Vector<dim,unsigned int> numberLinkedCellsPerMacroscopicCell,
       const coupling::IndexConversion<dim> &indexConversion,
       coupling::interface::MDSolverInterface<LinkedCell,dim> *mdSolverInterface
     );
-    ~MacroscopicCells();
+    /** Destructor */
+	~MacroscopicCells();
 
 
     /** returns the pointer to the macroscopic cells with access to linked cell structur. */
@@ -44,7 +54,9 @@ class coupling::datastructures::MacroscopicCells {
      */
     template<class A>
     void applyToLocalNonGhostMacroscopicCellsWithLinkedCells( A &a );
-    /** apply the function apply(MacroscopicCell&,const unsigned int&) of a generic class A to all local ghost macroscopic cells. */
+    /** apply the function apply(MacroscopicCell&,const unsigned int&) of a generic class A to all local ghost macroscopic cells.
+	 *	@tparam A 
+	 * 	@param a */
     template<class A>
     void applyToLocalGhostMacroscopicCellsWithLinkedCells(A &a );
     /** apply the function apply(MacroscopicCell&,const unsigned int&) of a generic class A to all local macroscopic cells.
@@ -57,6 +69,8 @@ class coupling::datastructures::MacroscopicCells {
      *  If a cell is a local ghost cell (due to parallelization, not due to being located outside MD domain!), it will not be handled by this method.
      *  If a cell is a local non-ghost cell and is not located at the boundary of the MD domain, it will not be handled by this method.
      *  We use this traversal, e.g., for applying boundary forces to molecules close to the outer boundary.
+	 *	@tparam A 
+	 * 	@param a
      */
     template<class A>
     void applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A &a);
@@ -65,6 +79,9 @@ class coupling::datastructures::MacroscopicCells {
   private:
     /** initialises the macroscopic cells: creates the buffer for the cells and embeds linked cells into the macroscopic
      *  cells.
+	 * 	@param numberLinkedCellsPerMacroscopicCell
+	 * 	@param indexConversion
+	 * 	@param mdSolverInterface
      */
     coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim>* initMacroscopicCellsWithLinkedCells(
       tarch::la::Vector<dim,unsigned int> numberLinkedCellsPerMacroscopicCell,
@@ -73,6 +90,7 @@ class coupling::datastructures::MacroscopicCells {
     ) const;
     /** initialises the macroscopic cells (without linked cells). This method needs to be used in the constructor
      *  AFTER initialising the _macroscopicCellsWithLinkedCells.
+	 * 	@param indexConversion
      */
     std::vector<coupling::datastructures::MacroscopicCell<dim>* > initMacroscopicCells(
       const coupling::IndexConversion<dim> &indexConversion

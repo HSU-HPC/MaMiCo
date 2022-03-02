@@ -34,34 +34,76 @@
 #endif
 
 
-/** interface for differend MD solvers.
+/** interface for different MD solvers.
  *  @author Philipp Neumann
  */
-
 namespace coupling {
 namespace interface {
+	
+/** 
+ *	@brief generic interface class for different microscopic (MD) solvers.
+ *  @author Philipp Neumann
+ */
 class MDSimulation {
   public:
+  
+	/** Destructor */
     virtual ~MDSimulation(){}
-    /** switches coupling on/off*/
+	
+    /** switches coupling off*/
     virtual void switchOffCoupling() = 0;
+	
+	/** switches coupling on*/
     virtual void switchOnCoupling() = 0;
-    /** simulates numberTimesteps time steps and starts at time step no. firstTimestep*/
+	
+    /** simulates numberTimesteps time steps and starts at time step no. firstTimestep
+	 *	@param numberTimesteps
+	 *	@param firstTimestep
+	 */
     virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep) = 0;
-    /** simulates a single time step*/
+	
+    // simulates a single time step
     //virtual void simulateTimestep(const unsigned int &thisTimestep ){const unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
-    virtual void sortMoleculesIntoCells() = 0;
+    
+	/** sortMoleculesIntoCells*/
+	virtual void sortMoleculesIntoCells() = 0;
 
-    virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) = 0;
-    virtual void init() = 0;
+    /** setMacroscopicCellService
+	 *	@param macroscopicCellService
+	 */
+	virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) = 0;
+    
+	/** initialises the _molecularDynamicsSimulation solver 
+	 *	@sa simplemd::MolecularDynamicsSimulation::initServices()
+	 *	@todo Philipp ??
+	 */
+	virtual void init() = 0;
+	
+	/** initialises the _molecularDynamicsSimulation solver 
+	 *	@param multiMDService
+	 *	@param localMDSimulation
+	 *	@sa simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::MultiMDService<MD_DIM>& multiMDService,unsigned int localMDSimulation)
+	 *	@todo Philipp ??
+	 */
     virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) = 0;
-    virtual void shutdown() = 0;
+    
+	/** shuts down the MD simulation*/
+	virtual void shutdown() = 0;
+	
+	/** Saves the simulation result as check point in the file filestem
+	 *	@param filestem
+	 *	@param t
+	 */
     virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t) = 0;
 };
 
 
 /** define MD simulation from default MD code */
 #if defined(SIMPLE_MD)
+/** defines MD simulation from default MD code. Derived from the class MDSimulation.
+ *	@brief defines MD simulation from default MD code.
+ *  @author Philipp Neumann
+ */
 class SimpleMDSimulation: public coupling::interface::MDSimulation {
   public:
     SimpleMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration):
@@ -554,13 +596,24 @@ class LammpsDPDSimulation: public coupling::interface::MDSimulation {
 #endif
 
 
-/** factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service */
+/** factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service using singleton pattern.
+ *	@brief factory to produced md simulation, md solver interface (for mamico) and the macroscopic cell service
+ *  @author Philipp Neumann
+ */
 class SimulationAndInterfaceFactory {
   public:
-    /** singleton pattern for factory */
+
+	/** @returns the SimulationAndInterfaceFactory object
+     *	@note singleton pattern
+	 */
     static SimulationAndInterfaceFactory& getInstance(){ static SimulationAndInterfaceFactory singleton; return singleton; }
 
-    /** returns a pointer to the md simulation. This will create a new simulation which needs to be deleted at the end */
+    /** returns a pointer to the md simulation.
+	 *  @param configuration
+	 *  @param mamicoConfiguration
+	 *  @param localComm
+	 *	@remark This will create a new simulation which needs to be deleted at the end
+	 */
     coupling::interface::MDSimulation* getMDSimulation(
       const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
       const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>&  mamicoConfiguration
@@ -590,6 +643,9 @@ class SimulationAndInterfaceFactory {
 
     /** returns the MD solver interface. This method should be called AFTER initialising the MD simulation AND AFTER the equilibration
      *  of MD. We thus expect that getMDSimulationInterface() and switchOnCoupling() of the MDSimulationInterface() have been called before.
+	 *  @param configuration
+	 *  @param mamicoConfiguration
+	 *  @param mdSimulation
      */
     coupling::interface::MDSolverInterface<MY_LINKEDCELL,MDSIMULATIONFACTORY_DIMENSION>* getMDSolverInterface(
       const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
@@ -642,7 +698,13 @@ class SimulationAndInterfaceFactory {
     }
 
   private:
-    SimulationAndInterfaceFactory(){}
+    /** Private constructor
+     *  @note singelton pattern
+     */
+	SimulationAndInterfaceFactory(){}
+	/** Private destructor
+	 *  @note singelton pattern
+     */
     ~SimulationAndInterfaceFactory(){}
 };
 

@@ -21,10 +21,11 @@ namespace coupling {
   }
 }
 
-// forward declaration for testing
+/** forward declaration for testing */
 class NieTest;
 
-/** reads momentum insertion tag.
+/** momentum insertion configuration. friend class: NieTest
+ *	@brief momentum insertion configuration. friend class: NieTest
  *  @author Philipp Neumann
  */
 class coupling::configurations::MomentumInsertionConfiguration:
@@ -33,16 +34,28 @@ public tarch::configuration::Configuration {
     // for testing: give access to variables; will only be used in the read-sense
     friend class ::NieTest;
 
-    enum MomentumInsertionType{
-      ADDITIVE_MOMENTUM_INSERTION=0,DIRECT_VELOCITY_INSERTION=1,VELOCITY_GRADIENT_RELAXATION=2,NO_INSERTION=3,
-      VELOCITY_GRADIENT_RELAXATION_TOPONLY=4,NIE_VELOCITY_IMPOSITION=5
+    /** momentum insertion types that are implemented. 
+	 *	@enum MomentumInsertionType
+	 */
+	enum MomentumInsertionType{
+      ADDITIVE_MOMENTUM_INSERTION=0 /**< ADDITIVE_MOMENTUM_INSERTION*/,
+	  DIRECT_VELOCITY_INSERTION=1 /**< DIRECT_VELOCITY_INSERTION*/,
+	  VELOCITY_GRADIENT_RELAXATION=2 /**< VELOCITY_GRADIENT_RELAXATION*/,
+	  NO_INSERTION=3 /**< NO_INSERTION*/,
+      VELOCITY_GRADIENT_RELAXATION_TOPONLY=4 /**< VELOCITY_GRADIENT_RELAXATION_TOPONLY*/,
+	  NIE_VELOCITY_IMPOSITION=5 /**< NIE_VELOCITY_IMPOSITION*/
     };
 
-    MomentumInsertionConfiguration(): _insertionType(ADDITIVE_MOMENTUM_INSERTION),_isValid(true){}
+    /** Constructor, initializes the class  */
+	MomentumInsertionConfiguration(): _insertionType(ADDITIVE_MOMENTUM_INSERTION),_isValid(true){}
 
-    virtual ~MomentumInsertionConfiguration(){}
+    /** Destructor */
+	virtual ~MomentumInsertionConfiguration(){}
 
-    void parseSubtag( tinyxml2::XMLElement* node ){
+    /** parseSubtag
+	 * 	@param node
+     */
+	void parseSubtag( tinyxml2::XMLElement* node ){
       std::string value;
       tarch::configuration::ParseConfiguration::readStringMandatory(value,node,"type");
       if (value=="additive-momentum-insertion"){
@@ -91,29 +104,39 @@ public tarch::configuration::Configuration {
       }
     }
 
-    /**
-     * Return name of xml tag that is associated to the configuration.
+    /** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
      */
     std::string getTag() const {return "momentum-insertion";}
 
-    /**
-     * Is config valid?
-     *
-     * This operation usually fails, if
-     *
-     * - parseSubtag() hasn't been called, i.e. configuration has not been
-     *   used, or
-     * - parseSubtag() failed due to a wrong file.
-     *
-     * If a tag ain't optional and parseSubtag() was not called (first case)
+    /** checks if the configuration is valid. This operation usually fails, if e.g.
+	 *	1. parseSubtag() hasn't been called, i.e. configuration has not been used, or 
+     *  2. parseSubtag() failed due to a wrong file.
+	 *  3. If a tag ain't optional and parseSubtag() was not called (first case)
+	 * 	@return _isValid
      */
     bool isValid() const { return _isValid;}
 
-    /** getters */
+    /** Returns momentum insertion type.
+	 * 	@return _insertionType
+     */
     const MomentumInsertionType& getMomentumInsertionType() const {return _insertionType;}
+	
+	/** 
+	 * 	@return _innerOverlap
+     */
     unsigned int getInnerOverlap() const {return _innerOverlap;}
 
-    template<class LinkedCell,unsigned int dim>
+    /** Returns momentum insertion configuration.
+	 * 	@tparam LinkedCell type of the cell
+	 * 	@tparam dim Number of dimensions; it can be 1, 2 or 3
+	 * 	@param mdSolverInterface
+	 * 	@param indexConversion
+	 * 	@param macroscopicCells
+	 * 	@param numberMDTimestepsPerCouplingCycle
+	 * 	@return momentum insertion config
+     */
+	template<class LinkedCell,unsigned int dim>
     MomentumInsertion<LinkedCell,dim>* interpreteConfiguration(
       coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface,
       const coupling::IndexConversion<dim>& indexConversion,

@@ -15,21 +15,28 @@ namespace coupling {
   }
 }
 
-
 /** the XYZTopology orders the ranks in x-y-z manner, i.e. we obtain the rank from process coordinates (x,y,z) by
  *  z*nx*ny + y*nx + x=x + nx*(y+ny*z), where nx,ny,nz are the numbers of processes in x,y,z-direction.
- *  topologyOffset can be used to shift the whole topology by an offset of ranks.
+ *  topologyOffset can be used to shift the whole topology by an offset of ranks. Derived class from the class ParallelTopology.
+ *  E.g. assuming ParallelTopologyType = XYZ and there is a cubic domain, splitted into 8 sub-domains (2 sub-domains in each dimension). Then the ordring of the MPI processes is: 
+ *	Rank=0 for x=0,y=0,z=0. Rank=1 for x=0,y=0,z=1. Rank=2 for x=0,y=1,z=0. Rank=3 for x=0,1=0,z=1.
+ *	Rank=4 for x=1,y=0,z=0. Rank=5 for x=1,y=0,z=1. Rank=6 for x=1,y=1,z=0. Rank=7 for x=1,y=1,z=1.
+ *	@brief The XYZTopology orders the ranks in x-y-z manner.
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
+ *	@todo Philipp could you please take a look on this class
  */
 template<unsigned int dim>
 class coupling::paralleltopology::XYZTopology: public coupling::paralleltopology::ParallelTopology<dim> {
   public:
+	/** Constructor */
     XYZTopology(tarch::la::Vector<dim,unsigned int> numberProcesses,unsigned int topologyOffset):
     coupling::paralleltopology::ParallelTopology<dim>(),
     _numberProcesses(numberProcesses),
     _divisionFactor4NumberProcesses(coupling::initDivisionFactor<dim>(numberProcesses)),
     _topologyOffset(topologyOffset){}
 
+	/** Destructor */
     virtual ~XYZTopology(){}
 
     tarch::la::Vector<dim,unsigned int> getProcessCoordinates(unsigned int rank) const {

@@ -5,13 +5,18 @@
 #ifndef _TARCH_LA_VECTOROPERATIONS_H_
 #define _TARCH_LA_VECTOROPERATIONS_H_
 
-/** this file contains some methods for vector types.
- *  @author Philipp Neumann
- */
-namespace tarch{
-namespace la {
 
-// adds two vectors and returns the result
+/**	namespace tarch */
+namespace tarch{
+	/** namespace la */
+namespace la {
+/** this file contains some methods for vector types.
+*	@brief adds two vectors and returns the result
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return result resulting vector
+*/
 template<int size, class T>
 tarch::la::Vector<size,T> operator+(
   const tarch::la::Vector<size,T> &l,
@@ -21,7 +26,13 @@ tarch::la::Vector<size,T> operator+(
   return result;
 }
 
-// subtracts two vectors and returns the result
+/** this file contains some methods for vector types.
+*	@brief subtracts two vectors and returns the result
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return result resulting vector
+*/
 template<int size, class T>
 tarch::la::Vector<size,T> operator-(
   const tarch::la::Vector<size,T> &l,
@@ -31,8 +42,13 @@ tarch::la::Vector<size,T> operator-(
   return result;
 }
 
-
-// multiplies a scalar and a vector and returns the resulting vector
+/** this file contains some methods for vector types.
+*	@brief multiplies a vector to a scalar and returns the resulting vector
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return result resulting vector
+*/
 template<int size,class T>
 tarch::la::Vector<size,T> operator*(
   const tarch::la::Vector<size,T>& v,
@@ -42,6 +58,14 @@ tarch::la::Vector<size,T> operator*(
   for (int i = 0; i < size; i++){ result[i] = v[i]*s; }
   return result;
 }
+
+/** this file contains some methods for vector types.
+*	@brief multiplies a scalar to a vector and returns the resulting vector 
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return result resulting vector
+*/
 template<int size,class T>
 tarch::la::Vector<size,T> operator*(
   const T& s,
@@ -51,6 +75,14 @@ tarch::la::Vector<size,T> operator*(
   for (int i = 0; i < size; i++){ result[i] = v[i]*s; }
   return result;
 }
+
+/** this file contains some methods for vector types.
+*	@brief devides a vector over a scaler, i.e. this operator devides all entries of vector over a scalar and returns the result. 
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return result resulting vector
+*/
 template<int size, class T>
 tarch::la::Vector<size,T> operator/(
   const tarch::la::Vector<size,T>& v,
@@ -61,8 +93,13 @@ tarch::la::Vector<size,T> operator/(
   return result;
 }
 
-
-// computes the inner product of two vectors
+/** this file contains some methods for vector types.
+*	@brief computes the inner product of two vectors 
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return t resulting scalar
+*/
 template<int size,class T>
 T dot(const tarch::la::Vector<size,T> &l, const tarch::la::Vector<size,T>& r){
   T t = l[0]*r[0];
@@ -70,26 +107,51 @@ T dot(const tarch::la::Vector<size,T> &l, const tarch::la::Vector<size,T>& r){
   return t;
 }
 
-// for comparison of two vectors
+/** This operator overloading compares two vectors and determins if they are equal.
+*	@brief for comparison of two vectors 
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return equal result; true: if they are equal, false otherwise.
+*/
 template<int size,class T>
 bool operator==(const Vector<size,T> &l, const Vector<size,T> &r){
   bool equal=true;
   for (int i = 0; i < size; i++){ equal = equal && (l[i]==r[i]); }
   return equal;
 }
+
+/** This operator overloading compares two vectors and determins if they are NOT equal.
+*	@brief for comparison of two vectors 
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return true: if they are NOT equal, false otherwise.
+*/
 template<int size,class T>
 bool operator!=(const Vector<size,T> &l, const Vector<size,T> &r){
   for (int i = 0; i < size; i++){ if (l[i] != r[i]) return true; }
   return false;
 }
 
-// computes the L2-norm
+/** this file contains some methods for vector types.
+*	@brief computes the L2-norm
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*	@return the square root of the inner product (dot product) of a vector with itself
+*/
 template<int size,class T>
 T norm2(const Vector<size,T> &v){
   return sqrt(tarch::la::dot(v,v));
 }
 
-/** for output purposes */
+/** this file contains some methods for vector types.
+*	@brief operator overloading for output purposes
+*  	@tparam T Data type
+*  	@tparam size Vector size 
+* 	@author Philipp Neumann
+*/
 template<int size,class T>
 std::ostream& operator<< (std::ostream &os,const tarch::la::Vector<size,T>& v) {
   for (int i = 0; i < size-1; i++){

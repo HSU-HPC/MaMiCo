@@ -19,12 +19,14 @@ namespace coupling {
   }
 }
 
-
-/** configuration for particle insertion algorithm (e.g.: USHER).
+ /** configuration for particle insertion algorithm (e.g.: USHER). Derive from the class tarch::configuration::Configuration
+ *	@brief configuration for particle insertion algorithm (e.g.: USHER).
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 class coupling::configurations::ParticleInsertionConfiguration: public tarch::configuration::Configuration {
   public:
+	/** Constructor, initializes the class  */
     ParticleInsertionConfiguration():
     _insertDeleteMassEveryTimestep(1),
     _rSigmaCoeff(0.0),
@@ -36,12 +38,16 @@ class coupling::configurations::ParticleInsertionConfiguration: public tarch::co
     _tolerance(0.0),
     _offsetFromOuterBoundary(0.0){}
 
-    virtual ~ParticleInsertionConfiguration(){}
+    /** Destructor */
+	virtual ~ParticleInsertionConfiguration(){}
 
-    void parseSubtag( tinyxml2::XMLElement* node );
+    /** parseSubtag
+	 * 	@param node
+     */
+	void parseSubtag( tinyxml2::XMLElement* node );
 
-    /**
-     * Return name of xml tag that is associated to the configuration.
+    /** Returns name of xml tag that is associated to the configuration.
+	 * 	@return name of xml tag that is associated to the configuration
      */
     std::string getTag() const;
 

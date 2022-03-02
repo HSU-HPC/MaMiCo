@@ -15,34 +15,47 @@ namespace coupling {
   }
 }
 
-
-/** sums up all force/velocity vectors and counts molecules inside a linked cell. Afterwards, the average force/velocity
- *  contribution is computed.
- *
+/** This class sums up all force and velocity vectors and counts molecules inside a linked cell. Afterwards, the average force/velocity contribution is computed.
+ *	@brief This class sums up all force/velocity vectors and counts molecules inside a linked cell
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::ComputeAvgForceAndVelocity {
   public:
+	/** Constructor
+	 *	@param mdSolverInterface
+	 */
     ComputeAvgForceAndVelocity(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
     _mdSolverInterface(mdSolverInterface), _force(0.0),_velocity(0.0),_particleCounter(0){}
 
-    ~ComputeAvgForceAndVelocity(){}
+    /** Destructor */
+	~ComputeAvgForceAndVelocity(){}
 
-    void beginCellIteration(){
+    /** sets force, velocity and moluce counter to zero, before the iteration process begins.
+	 */
+	void beginCellIteration(){
       _particleCounter = 0;
       _force = tarch::la::Vector<dim,double>(0.0);
       _velocity = tarch::la::Vector<dim,double>(0.0);
     }
 
-    void endCellIteration(){
+    /** the average force and velocity contribution incide a linked cell are computed,
+	 *	by dividing the summation calculated in endCellIteration() over number of the particles inside the cell.
+	 */
+	void endCellIteration(){
       if (_particleCounter!=0){
         _force = (1.0/_particleCounter)*_force;
         _velocity = (1.0/_particleCounter)*_velocity;
       }
     }
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** sums up all force and velocity vectors and counts molecules inside a linked cell.
+	 *	@param cell
+	 *	@param cellIndex
+	 */
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
       while(it->continueIteration()){
@@ -55,7 +68,14 @@ class coupling::cellmappings::ComputeAvgForceAndVelocity {
       delete it;
     }
 
-    tarch::la::Vector<dim,double> getAvgForce() const { return _force;}
+    /** returns the force vectors inside a linked cell
+	 *	@return _force
+	 */
+	tarch::la::Vector<dim,double> getAvgForce() const { return _force;}
+	
+	/** returns the velocity vectors inside a linked cell
+	 *	@return _velocity
+	 */
     tarch::la::Vector<dim,double> getAvgVelocity() const { return _velocity;}
 
   private:

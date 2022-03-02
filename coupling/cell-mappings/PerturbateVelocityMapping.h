@@ -13,18 +13,39 @@ namespace coupling {
   }
 }
 
+/** This class is used to superimpose a random perturbation to the mean velocity in all directions. It is use for Dynamic MD cases to launch new MD instances with independent molecular values (velocities)
+ *	@brief This class is used to superimpose a random perturbation to the mean velocity in all directions.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
+ *  @author Niklas Wittmer
+ */
 template<class LinkedCell, unsigned int dim>
 class coupling::cellmappings::PerturbateVelocityMapping {
 public:
+  
+	/** Constructor
+	 *	@param mdSolverInterface
+	 *	@param velocity
+	 *	@param temperature
+     */
   PerturbateVelocityMapping(coupling::interface::MDSolverInterface<LinkedCell, dim> * const mdSolverInterface, const tarch::la::Vector<dim, double> & velocity, const double & temperature)
     : _mdSolverInterface(mdSolverInterface), _molecularMass(mdSolverInterface->getMoleculeMass()), _kB(mdSolverInterface->getKB()), 
       _temperature(temperature), _velocity(velocity), _sigma(_mdSolverInterface->getMoleculeSigma()) {}
 
+  /** Destructor */
   ~PerturbateVelocityMapping() {}
 
+	/** empty function
+	 */
   void beginCellIteration() {}
+	/** empty function
+	 */
   void endCellIteration() {}
 
+	/** superimposes a random perturbation to the mean velocity in all directions
+	 *	@param cell
+	 *	@param cellIndex
+	 */
   void handleCell(LinkedCell &cell,const unsigned int &cellIndex) {
     
     double stdDeviation = std::sqrt(dim * _kB * _temperature / _molecularMass);

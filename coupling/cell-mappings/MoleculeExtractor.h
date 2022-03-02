@@ -16,22 +16,39 @@ namespace coupling {
 }
 
 
-
 /** extracts molecule information from a given macroscopic cell and stores all molecule positions in a vector.
  *  This class is only meant for testing purposes!
  *  If you need individual access to molecules + some functionality, please do so in a separate cell-mapping and
  *  call it from the respective transfer strategy instance.
+ *	@brief This class extracts molecule information from a given macroscopic cell and stores all molecule positions in a vector.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::MoleculeExtractor {
   public:
-    MoleculeExtractor(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
+    /** Constructor
+	 *	@param mdSolverInterface
+	 */
+	MoleculeExtractor(coupling::interface::MDSolverInterface<LinkedCell,dim> * const mdSolverInterface):
     _mdSolverInterface(mdSolverInterface){ _molecules.clear(); }
-    ~MoleculeExtractor(){}
+    
+	/** Destructor */
+	~MoleculeExtractor(){}
 
-    void beginCellIteration(){ _molecules.clear(); }
-    void endCellIteration(){}
+    /** clear the vector of the molecule position, to make sure it is empty before the iteration starts.
+	 */
+	void beginCellIteration(){ _molecules.clear(); }
+    
+	/** empty function
+	 */
+	void endCellIteration(){}
+	
+	/** This function stores all molecule positions in a vector
+	 *	@param cell
+	 *	@param cellIndex
+	 */	
     void handleCell(LinkedCell &cell, unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
@@ -42,7 +59,9 @@ class coupling::cellmappings::MoleculeExtractor {
       delete it;
     }
 
-    /** returns access to the extracted molecules. */
+    /** returns access to the extracted molecules.
+	 *	@return _molecules
+	 */
     const std::vector<tarch::la::Vector<dim,double> >& getExtractedMolecules() const{return _molecules; }
 
   private:

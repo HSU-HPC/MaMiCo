@@ -14,65 +14,92 @@ namespace tarch { namespace la {
 } }
 
 
-/** light-weight implementation of a vector class.
+/**	light-weight implementation of a vector class.
+ *  @tparam size Size
+ *  @tparam T Data type
  *  @author Philipp Neumann
  */
+
 template<int size, class T>
 class tarch::la::Vector {
   private:
     T _entries[size];
   public:
     Vector(){}
-    /** init. vector with a scalar value. */
+    /** @brief init. vector with a scalar value.
+    * 	@param t scalar value for the initialization
+	*/
+
     Vector(const T& t){
       for (int i = 0; i < size; i++){ _entries[i] = t; }
     }
-    /** special constructors for 2D and 3D; left empty for general purpose vector*/
+    /** @brief special constructor for 2D left empty for general purpose vector
+    * 	@param t0 scalar value for the initialization
+	* 	@param t1 scalar value for the initialization
+	*/
     Vector(const T& t0, const T& t1){
       static_assert(size==2, "ERROR Vector(t0,t1) only valid for 2D vectors!");
       _entries[0] = t0;
       _entries[1] = t1;
     }
+    /** @brief special constructor for 3D; left empty for general purpose vector
+    * 	@param t0 scalar value for the initialization
+	* 	@param t1 scalar value for the initialization
+	* 	@param t2 scalar value for the initialization
+	*/
     Vector(const T& t0, const T& t1, const T& t2){
       static_assert(size==3, "ERROR Vector(t0,t1,t2) only valid for 3D vectors!");
       _entries[0] = t0;
       _entries[1] = t1;
       _entries[2] = t2;
     }
-    /** init. vector from vector */
+    /** @brief constructor init. vector from vector
+    * 	@param v Vector for the initialization
+	*/
     Vector(const Vector<size,T>& v){
       for (int i = 0; i < size; i++){ _entries[i] = v[i]; }
     }
-    /** assigns a value to all vector entries. */
+    /** @brief assigns a value to all vector entries.
+    * 	@param t scalar value for the assignment
+	*/
     void assign(const T& t){
       for (int i = 0; i < size; i++){ _entries[i] = t; }
     }
-    /** assign vector */
+    /** @brief operator overloading for vector assignment
+    * 	@param v Vector for the assignment
+	*/
     Vector<size,T>& operator=(const Vector<size,T> &v){
       for (int i = 0; i < size; i++) { _entries[i] = v[i]; }
       return *this;
     }
-
-    /** access to vector entries; both () and [] are allowed */
+    /** @brief operator overloading; access to vector entries; both () and [] are allowed
+    * 	@param i index
+	*/
     T& operator[]( int i) {
       #if (TARCH_DEBUG==TARCH_YES)
       if(i<0 || i>size-1){std::cout << "ERROR Vector T& operator[]: i out of range!" << std::endl; exit(EXIT_FAILURE);}
       #endif
       return _entries[i];
     }
+    /** @brief operator overloading; access to vector entries; both () and [] are allowed; !!! Attention: const
+    * 	@param i index
+	*/
     const T& operator[](int i) const {
       #if (TARCH_DEBUG==TARCH_YES)
       if (i<0 || i>size-1){std::cout << "ERROR Vector const T& operator[]: i out of range!" << std::endl; exit(EXIT_FAILURE);}
       #endif
       return _entries[i];
     }
-
-    /** add a vector to this existing one */
+    /** @brief operator overloading; add a vector to this existing one (this)
+    * 	@param v vector that has to be added
+	*/
     Vector<size,T>& operator+=(const Vector<size,T> & v){
       for (int i = 0; i < size; i++){ _entries[i] += v[i];}
       return *this;
     }
-    /** subtracts a vector */
+    /** @brief operator overloading; subtracts a vector from the existing one (this)
+    * 	@param v vector that has to be subtracted
+	*/
     Vector<size,T>& operator-=(const Vector<size,T> &v){
       for (int i = 0; i < size; i++){ _entries[i] -= v[i];}
       return *this;

@@ -16,15 +16,23 @@ namespace coupling {
   }
 }
 
-
-/** writes molecule data to streams.
- *
+/** 
+ *	@brief This class writes molecule data to streams for .vtk file.
+ *	@tparam LinkedCell cell type
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template<class LinkedCell,unsigned int dim>
 class coupling::cellmappings::VTKMoleculePlotter {
   public:
-    VTKMoleculePlotter(
+    /** Constructor
+	 *	@param moleculeVelocities
+	 *	@param moleculePositions
+	 *	@param moleculePotentials
+	 *	@param appendFloatZeros
+	 *	@param mdSolverInterface
+	 */
+	VTKMoleculePlotter(
       std::stringstream &moleculeVelocities,
       std::stringstream &moleculePositions,
       std::stringstream &moleculePotentials,
@@ -35,15 +43,24 @@ class coupling::cellmappings::VTKMoleculePlotter {
     _moleculePotentials(moleculePotentials), _appendFloatZeros(appendFloatZeros),
     _particleCounter(0){}
 
-    ~VTKMoleculePlotter(){}
+    /** Destructor */
+	~VTKMoleculePlotter(){}
 
-    void beginCellIteration(){
+    /** sets the particle counter to zero, before the iteration process begins.
+	 */
+	void beginCellIteration(){
       _particleCounter = 0;
     }
 
-    void endCellIteration(){}
+    /** empty function
+	 */
+	void endCellIteration(){}
 
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
+    /** writes molecule data to the corresponding stringstreams.
+	 *	@param cell
+	 *	@param cellIndex
+	 */	
+	void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
       coupling::interface::MoleculeIterator<LinkedCell,dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
       it->begin();
       while(it->continueIteration()){
@@ -65,7 +82,10 @@ class coupling::cellmappings::VTKMoleculePlotter {
       delete it;
     }
 
-    const unsigned int& getParticleCounter() const { return _particleCounter;}
+    /** returns number if the particles
+	 *	@return _particleCounter
+	 */
+	const unsigned int& getParticleCounter() const { return _particleCounter;}
 
   private:
     coupling::interface::MDSolverInterface<LinkedCell,dim> * const _mdSolverInterface;
