@@ -47,7 +47,7 @@ class simplemd::cellmappings::LennardJonesForceMapping {
     const double _cutOffRadiusSquared;
     /** external forces*/
     simplemd::services::ExternalForceService &_externalForceService;
+    std::vector<tarch::la::Vector<MD_DIM,double> > _positions;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_LENNARDJONESFORCEMAPPING_H_
-

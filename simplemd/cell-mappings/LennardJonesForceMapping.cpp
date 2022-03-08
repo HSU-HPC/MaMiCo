@@ -3,6 +3,8 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
+#include <fstream>
+#include <sstream>
 
 
 simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simplemd::services::ExternalForceService &externalForceService,
@@ -12,8 +14,18 @@ _sigma6(molecularPropertiesService.getMolecularProperties().getSigma()*molecular
         molecularPropertiesService.getMolecularProperties().getSigma()*molecularPropertiesService.getMolecularProperties().getSigma()*
         molecularPropertiesService.getMolecularProperties().getSigma()*molecularPropertiesService.getMolecularProperties().getSigma()),
 _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius()*molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
-_externalForceService(externalForceService){}
-
+_externalForceService(externalForceService){
+  std::stringstream ss;
+   ss << "CheckpointSimpleMD_Eva_liquid_ghostLayer.checkpoint";
+  std::ifstream file(ss.str().c_str());
+  tarch::la::Vector<MD_DIM,double> position(0.0);
+  for (unsigned int i = 0; i < 66203; i++){
+    for (unsigned int d = 0; d < 3; d++){
+      file >> position[d];
+    }
+    _positions.push_back(position);
+  }
+}
 
 void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration(){}
 
@@ -45,6 +57,13 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
       force2 -= forceBuffer;
 
       m2++;
+    }
+    if(cellIndex<13448){
+      for (unsigned int i = 0; i < 66203; i++){
+        forceBuffer = getLennardJonesForce(position1,_positions[i]);
+        force1 += forceBuffer;
+      }
+
     }
   }
 }
