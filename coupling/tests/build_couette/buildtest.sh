@@ -44,13 +44,13 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -Wfatal-errors -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -Wfatal-errors -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O0"
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
     compiler="mpicxx"
 else
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -Wfatal-errors -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -Wfatal-errors -O0"
     # -Werror
     includes="${includes} -I${LIB_EIGEN_PATH}" 
     compiler="g++"
@@ -92,6 +92,8 @@ else
         scons target=libsimplemd dim=3 build=debug parallel=no -j4
         libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
 fi
+
+FLAGS="-g ${FLAGS}"
 
 cd ${BUILD_PATH}
 ${compiler} -c ${MAMICO_PATH}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp ${FLAGS} ${includes} -o ${BUILD_PATH}/CoupledMolecularDynamicsSimulation.o

@@ -16,8 +16,7 @@
 #include "coupling/solvers/FoamSolverInterface.h"
 #endif
 #if(BUILD_WITH_PRECICE)
-#include "coupling/solvers/PreciceSolver.h"
-#include "coupling/solvers/PreciceSolverInterface.h"
+#include "coupling/solvers/PreciceAdapter.h"
 #endif
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/indexing/IndexingService.cpp"
@@ -397,7 +396,6 @@ private:
                          _simpleMDConfig.getSimulationConfiguration().getDt() *
                              _simpleMDConfig.getSimulationConfiguration()
                                  .getNumberOfTimesteps());
-
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized
     // anyway, so that we can finally obtain getIndexConversion from
@@ -458,7 +456,7 @@ private:
       }
     }
 
-    coupling::interface::MacroscopicSolverInterface<3> *couetteSolverInterface =
+    coupling::interface::MacroscopicSolverInterface<3> * couetteSolverInterface =
         getCouetteSolverInterface(
             _couetteSolver,
             _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
@@ -510,6 +508,14 @@ private:
     coupling::indexing::IndexingService<3>::getInstance().init(
         _simpleMDConfig, _mamicoConfig, couetteSolverInterface,
         (unsigned int)_rank);
+        
+        
+#if(BUILD_WITH_PRECICE)
+	static_cast<coupling::solvers::PreciceAdapter<3> *>(_couetteSolver)->setCouplingMesh(
+		_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+		_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0]
+	 );
+#endif
 
     // init filtering for all md instances
     _multiMDCellService->constructFilterPipelines();
@@ -740,7 +746,7 @@ private:
           _cfg.initAdvanceCycles *
           _simpleMDConfig.getSimulationConfiguration().getDt() *
           _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
-
+	
     // finish time measurement for initialisation
     if (_rank == 0) {
       gettimeofday(&_tv.end, NULL);
@@ -1066,10 +1072,12 @@ private:
       delete couetteSolverInterface;
       couetteSolverInterface = NULL;
     }
+#if(!BUILD_WITH_PRECICE)
     if (_couetteSolver != NULL) {
       delete _couetteSolver;
       _couetteSolver = NULL;
     }
+#endif
     if (_multiMDCellService != NULL) {
       delete _multiMDCellService;
       _multiMDCellService = NULL;
@@ -1447,7 +1455,7 @@ private:
 #if (BUILD_WITH_PRECICE)
     else if(_cfg.maSolverType == COUETTE_PRECICE) {
       if(_rank==0){
-        solver = new coupling::solvers::PreciceSolver(_rank, _cfg.channelheight, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "preCICECouette");
+        solver = new coupling::solvers::PreciceAdapter<3>(_cfg.channelheight, dx, dt, _cfg.plotEveryTimestep, "preCICECouette", _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
         if (solver==NULL){
           std::cout << "ERROR CouetteTest::getCouetteSolver(): preCICE solver==NULL!" << std::endl;
           exit(EXIT_FAILURE);
@@ -1540,7 +1548,9 @@ private:
 #endif
 #if (BUILD_WITH_PRECICE)
     else if (_cfg.maSolverType == COUETTE_PRECICE){
-      interface = new coupling::solvers::PreciceSolverInterface<3>(globalNumberMacroscopicCells,outerRegion);
+		coupling::solvers::PreciceAdapter<3> *preciceInterface = static_cast<coupling::solvers::PreciceAdapter<3> *>(couetteSolver);
+		preciceInterface->setInterface(outerRegion);
+      	interface = preciceInterface;
     }
 #endif
     else if (_cfg.maSolverType == COUETTE_FD){
