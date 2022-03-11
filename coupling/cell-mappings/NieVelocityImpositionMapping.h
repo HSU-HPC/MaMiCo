@@ -13,6 +13,8 @@
 #include "tarch/la/Matrix.h"
 #include <iostream>
 
+#include <mpi.h>
+
 namespace coupling {
 namespace cellmappings {
 template <class LinkedCell, unsigned int dim>
@@ -82,6 +84,31 @@ public:
               (_mdSolverInterface->getMoleculeMass() /
                _mdSolverInterface->getDt()) *
                   (_avgMDVelocity - _continuumVelocity);
+      using std::isnan;
+      if(isnan(force[0])||isnan(force[1])||isnan(force[2]))
+      {
+        int rank;
+        #ifdef ENABLE_MPI
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        #endif
+        
+        bool b1 = wrapper.getPosition()[0] >= 12.5;
+        bool b2 = wrapper.getPosition()[0] <= 17.5;
+        bool b3 = wrapper.getPosition()[1] >= 12.5;
+        bool b4 = wrapper.getPosition()[1] <= 17.5;
+        bool b5 = wrapper.getPosition()[2] >= 5;
+        bool b6 = wrapper.getPosition()[2] <= 10;
+
+        bool b7 = wrapper.getPosition()[0] >= 32.5;
+        bool b8 = wrapper.getPosition()[0] <= 37.5;
+        bool b9 = wrapper.getPosition()[1] >= 32.5;
+        bool b10 = wrapper.getPosition()[1] <= 37.5;
+        bool b11 = wrapper.getPosition()[2] >= 25;
+        bool b12 = wrapper.getPosition()[2] <= 30;
+
+        std::cout << "nan force calculated for molecule: " << wrapper.getPosition()[0] << " " << wrapper.getPosition()[1] << " " << wrapper.getPosition()[2] << " rank " << rank << std::endl;
+        
+      }
       wrapper.setForce(force);
       it->next();
     }

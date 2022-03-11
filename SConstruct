@@ -173,8 +173,33 @@ elif compiler == 'fcc':
       ccflags.append('-O3')
    elif build == 'release':
       ccflags.append('-Ofast')
+
+   elif compiler == 'clang':
+   if(parallel=='parallel_no' or parallel=='no'):
+      cxx = 'clang++'
+   else:
+      cxx = 'mpicxx'
+
+   ccflags.append('-Wall')
+   ccflags.append('-Werror')
+   ccflags.append('-pedantic')
+   ccflags.append('-pedantic-errors')
+   ccflags.append('-Wstrict-aliasing')
+   ccflags.append('-fstrict-aliasing')
+   ccflags.append('-Wno-long-long')
+   ccflags.append('-Wno-unknown-pragmas')
+   ccflags.append('-Wconversion')
+   ccflags.append('-Wno-non-virtual-dtor')
+   ccflags.append('-Wno-sign-conversion')
+   ccflags.append('-Wno-unused-private-field')
+   ccflags.append('-Wno-gnu-array-member-paren-init')
+   if build == 'debug':
+      ccflags.append('-g')
+      ccflags.append('-O0')
+   elif build == 'release':
+      ccflags.append('-O3')
 else:
-   print("ERROR: compiler must be = 'gcc' or 'icc' or 'fcc'!")
+   print("ERROR: compiler must be = 'gcc' or 'icc' or 'fcc' or 'clang'!")
    sys.exit(1)
       
 ##### Determine build path

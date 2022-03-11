@@ -953,17 +953,18 @@ public:
     {
       //parse file
       const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
-      global_simulation->readConfigFile(filename);
+      simulation->readConfigFile(filename);
       //all the things
-      global_simulation->prepare_start();
-      global_simulation->preSimLoopSteps();
+      simulation->prepare_start();
+      simulation->preSimLoopSteps();
     }
     virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService,unsigned int localMDSimulation) { init(); }
     virtual void shutdown()
     {
-      global_simulation->markSimAsDone();
-      global_simulation->postSimLoopSteps();
-      global_simulation->finalize();
+      simulation->markSimAsDone();
+      simulation->postSimLoopSteps();
+      simulation->finalize();
+      delete simulation;
     }
     virtual void writeCheckpoint(const std::string & filestem, const unsigned int & t)
     {

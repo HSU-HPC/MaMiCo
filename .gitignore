@@ -45,3 +45,5 @@ coupling/tests/build_couette/gaussfiltercomp.py
 coupling/tests/build_couette/couette.xml.ls1
 coupling/tests/build_couette/FoamSetup/
 coupling/tests/test
+coupling/tests/build_couette/*.decomp
+coupling/tests/build_couette/decomp2vtkConverter.py

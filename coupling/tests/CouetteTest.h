@@ -1298,6 +1298,11 @@ private:
       // compute momentum
       tarch::la::Vector<3, double> momentum(
           mass * couetteSolver.getVelocity(cellMidPoint));
+      using std::isnan;
+      if(isnan(momentum[0]) || isnan(momentum[1]) || isnan(momentum[2]))
+      {
+        std::cout << "Momentum nan for cell " << globalIndex << " mass: " << mass << " recieved velocity " << couetteSolver.getVelocity(cellMidPoint) << std::endl;
+      }
       sendBuffer[i]->setMicroscopicMass(mass);
       sendBuffer[i]->setMicroscopicMomentum(momentum);
     }

@@ -45,7 +45,7 @@ if [ "${parallel}" == "parallel" ]
 then
     if [ -v MARDYN_PATH ]
     then
-      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wfatal-errors -Wno-unknown-pragmas -O3 -DMARDYN_DPDP -DENABLE_MPI -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK" # todo put -Werror, O0 for debug
+      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wfatal-errors -Wno-unknown-pragmas -O3 -DMARDYN_DPDP -DENABLE_MPI -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -Wno-sign-conversion -Wno-gnu-array-member-paren-init" # todo put -Werror, O0 for debug
       includes="${includes} -I${LIB_EIGEN_PATH} -I${MARDYN_PATH}/src -I${MARDYN_PATH}/libs/rapidxml -I${MARDYN_PATH}/build/_deps/autopasfetch-src/src -I${MARDYN_PATH}/build/_deps/spdlog-src/include"
       libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
       compiler="mpicxx"
@@ -60,7 +60,7 @@ then
 else
     if [ -v MARDYN_PATH ]
     then
-      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wfatal-errors -Wno-unknown-pragmas -O3 -DMARDYN_DPDP" # todo put -Werror
+      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wfatal-errors -Wno-unknown-pragmas -O3 -DMARDYN_DPDP -Wno-gnu-array-member-paren-init" # todo put -Werror
       includes="${includes} -I${LIB_EIGEN_PATH} -I${MARDYN_PATH}/src -I${MARDYN_PATH}/libs/rapidxml -I${MARDYN_PATH}/build/_deps/autopasfetch-src/src -I${MARDYN_PATH}/build/_deps/spdlog-src/include"
       compiler="g++"
     else
@@ -90,7 +90,7 @@ if [ "${parallel}" == "parallel" ]
 then
   if [ -v MARDYN_PATH ]
   then
-    scons target=libsimplemd dim=3 build=release parallel=yes -j4
+    scons compiler=clang target=libsimplemd dim=3 build=release parallel=yes -j4
     libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
     FLAGS="${FLAGS} -DMDParallel"
 
@@ -110,7 +110,7 @@ then
 else
   if [ -v MARDYN_PATH ]
   then
-    scons target=libsimplemd dim=3 build=release parallel=no -j4
+    scons compiler=clang target=libsimplemd dim=3 build=release parallel=no -j4
     libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
     ### tinyxml2
 
@@ -128,9 +128,11 @@ else
   fi
 fi
 
-FLAGS="${FLAGS} -pthread"
+#FLAGS="${FLAGS} -pthread"
 
 #FLAGS="${FLAGS} -g"
+#FLAGS="${FLAGS} -fsanitize=address"
+#libraries="${libraries} -fsanitize=address"
 
 cd ${BUILD_PATH}
 if ! [ -v MARDYN_PATH ]; then

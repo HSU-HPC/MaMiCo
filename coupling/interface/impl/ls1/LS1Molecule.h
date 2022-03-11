@@ -43,8 +43,16 @@ public:
     }
     virtual void setVelocity(const tarch::la::Vector<3,double>& velocity)
     {
+        using std::isnan;
         for(int i = 0; i < 3; i++)
         {
+            if(isnan(velocity[i]))
+            {
+                std::cout << "Velocity nan being set for molecule " << _myMolecule->getID() << std::endl
+                    << " old velocities " << _myMolecule->v(0) << " " << _myMolecule->v(1) << " " << _myMolecule->v(2)
+                    << " position " << _myMolecule->r(0) << " " << _myMolecule->r(1) << " " << _myMolecule->r(2) << std::endl;
+
+            }
             _myMolecule->setv(i, velocity[i]);
         }
     }
@@ -73,6 +81,7 @@ public:
      */
     virtual void setForce(const tarch::la::Vector<3,double>& force)
     {
+        using std::isnan;
         for(int i = 0; i < 3; i++)
         {
             _myMolecule->setF(i, force[i]);
@@ -110,7 +119,7 @@ public:
         double startRegion[] = {location1[0] - cutoff, location1[1] - cutoff, location1[2] - cutoff};
         double endRegion[] = {location1[0] + cutoff, location1[1] + cutoff, location1[2] + cutoff};
 
-        ls1::LS1RegionWrapper region(startRegion, endRegion);
+        ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
         double cutoff2 = cutoff * cutoff;
 
         //calculate lennard jones energy

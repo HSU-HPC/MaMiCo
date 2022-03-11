@@ -215,9 +215,18 @@ public:
       // cell. This interpolation is valid for FLUID-MD_BOUNDARY neighbouring
       // relations only. determine local velocity received from MaMiCo and
       // convert it to LB units; store the velocity in _vel
-      tarch::la::Vector<3, double> localVel(
-          (1.0 / recvBuffer[i]->getMacroscopicMass()) * (_dt / _dx) *
-          recvBuffer[i]->getMacroscopicMomentum());
+      //tarch::la::Vector<3, double> localVel(
+      //    (1.0 / recvBuffer[i]->getMacroscopicMass()) * (_dt / _dx) *
+      //    recvBuffer[i]->getMacroscopicMomentum());
+      tarch::la::Vector<3, double> localVel(recvBuffer[i]->getMacroscopicMomentum());
+      if (recvBuffer[i]->getMacroscopicMass() != 0.0) {
+        localVel = (1.0 / recvBuffer[i]->getMacroscopicMass()) * localVel;
+      }
+      using std::isnan;
+      //if(isnan(localVel[0]) || isnan(localVel[1]) || isnan(localVel[2]))
+      {
+        //std::cout << "localvel " << localVel << " , cell coords: " << globalCellCoords << " macroscopic mass " << recvBuffer[i]->getMacroscopicMass() << " macroscopic momentum " << recvBuffer[i]->getMacroscopicMomentum() << std::endl;
+      }
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
       }
@@ -284,6 +293,7 @@ public:
     std::cout << "Position " << pos << " corresponds to cell: " << coords
               << "; vel=" << vel << std::endl;
 #endif
+    //return tarch::la::Vector<3, double>({1.0,1.0,1.0});
     return vel;
   }
 
@@ -313,6 +323,7 @@ public:
       coords[d] = (unsigned int)((_dx + pos[d] - domainOffset[d]) / _dx);
     }
     const int index = get(coords[0], coords[1], coords[2]);
+    //return 0.8;
     return _density[index];
   }
 

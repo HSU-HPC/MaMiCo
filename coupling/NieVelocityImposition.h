@@ -113,6 +113,8 @@ private:
           outer || (globalCellIndex[d] < _outermostLayer ||
                     globalCellIndex[d] >
                         1 + globalNumberMacroscopicCells[d] - _outermostLayer);
+    //if(!inner && !outer)
+      //std::cout << "Cell index: " << globalCellIndex << " Global number: " << globalNumberMacroscopicCells << " innermost: " << _innermostLayer << " outermost: " << _outermostLayer << std::endl;
     return !inner && !outer;
   }
 

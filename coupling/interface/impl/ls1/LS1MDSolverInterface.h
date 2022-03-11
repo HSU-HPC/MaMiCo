@@ -56,9 +56,9 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       }
 
       //get bounds of current process
-      double bBoxMin[3];
-			double bBoxMax[3];
-      global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
+      //double bBoxMin[3];
+			//double bBoxMax[3];
+      //global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
 
       //size of the macroscopic cell
 			tarch::la::Vector<3,double> macroCellSize = indexConversion.getMacroscopicCellSize();
@@ -72,7 +72,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
         regionEndpoint[i] = regionOffset[i] + macroCellSize[i];
       }
 
-      ls1::LS1RegionWrapper *cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint); //temporary till ls1 offset is natively supported
+      ls1::LS1RegionWrapper *cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint, global_simulation); //temporary till ls1 offset is natively supported
       //when offset is supported, the offset min will need to be added to both regions
       return *cell;
     }
@@ -83,6 +83,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       auto up = global_simulation->getEnsemble()->domain()->rmax();
       auto down = global_simulation->getEnsemble()->domain()->rmin();
       tarch::la::Vector<3, double> globalSize = {up[0]-down[0], up[1]-down[1], up[2]-down[2]};
+      std::cout << " global size: " << globalSize << std::endl;
       return globalSize;
     }
 
@@ -95,6 +96,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
         coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(0),
         coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(1),
         coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(2));
+        std::cout << "global offset: " << globalOffset << std::endl;
       return globalOffset;
     }
 
@@ -143,7 +145,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
     { 
       auto up = global_simulation->getEnsemble()->domain()->rmax();
       auto down = global_simulation->getEnsemble()->domain()->rmin();
-      ls1::LS1RegionWrapper cell(down, up);
+      ls1::LS1RegionWrapper cell(down, up, global_simulation);
       cell.addMolecule(molecule);
     }
 
@@ -199,7 +201,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       double startRegion[] = {moleculePosition[0] - cutoff, moleculePosition[1] - cutoff, moleculePosition[2] - cutoff};
       double endRegion[] = {moleculePosition[0] + cutoff, moleculePosition[1] + cutoff, moleculePosition[2] + cutoff};
 
-      ls1::LS1RegionWrapper region(startRegion, endRegion);
+      ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
       double cutoff2 = cutoff * cutoff;
 
       //calculate lennard jones energy
@@ -235,7 +237,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
 
           region.iteratorNext();
       }
-
+      
       molecule.setForce(force);
       molecule.setPotentialEnergy(potentialEnergy);
     }
