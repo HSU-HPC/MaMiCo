@@ -60,7 +60,13 @@ public:
     {
     	_mdDomainOffset = mdDomainOffset;
     	_macroscopicCellSize = macroscopicCellSize;
-    	_interface = new precice::SolverInterface("mamico","../precice-config.xml",0,1);
+    	int rank = 0;
+    	int size = 1;
+    	#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+			MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+			MPI_Comm_size(MPI_COMM_WORLD, &size);
+		#endif
+    	_interface = new precice::SolverInterface("mamico","../precice-config.xml",rank,size);
 		_numberOfCells = 0;
 		tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
 		tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
@@ -109,14 +115,11 @@ public:
 		}
 		std::cout << "]" << std::endl;
 		*/
-		
 		int meshID = _interface->getMeshID("mamico-mesh");
 		_vertexIDs = new int[_numberOfCells];
 		_interface->setMeshVertices(meshID, _numberOfCells, _coords, _vertexIDs); 
 		_precice_dt = _interface->initialize();
-		
 		_velocities = new double[_numberOfCells*dim];
-		std::cout << "PreciceSolver constructor called" << std::endl;
     }
     
 	void setWallVelocity(const tarch::la::Vector<3,double> wallVelocity) override
@@ -126,23 +129,16 @@ public:
 	
 	tarch::la::Vector<3,double> getVelocity(tarch::la::Vector<3,double> pos) const override
 	{
-		std::cout << "getVelocity:" << pos << std::endl;
 		tarch::la::Vector<3,double> vel(0.0);
-		unsigned int cellIndex=0;
-		while (cellIndex < _numberOfCells && _coords[dim*cellIndex] != pos[0] && _coords[dim*cellIndex+1] != pos[1] && _coords[dim*cellIndex+2] != pos[2])
+		/*unsigned int cellIndex=0;
+		while (cellIndex < _numberOfCells && !(_coords[dim*cellIndex] == pos[0] && _coords[dim*cellIndex+1] == pos[1] && _coords[dim*cellIndex+2] == pos[2]))
 			cellIndex++;
-		if (cellIndex == _numberOfCells)
-		{
-			std::cout << "ERROR PreciceAdapter::getVelocity(): position " << pos << " not found in coupling mesh" << std::endl;
-      		//exit(EXIT_FAILURE);
-		} /*else 
+		if (cellIndex < _numberOfCells)
 		{
 			for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-				vel[dim] = _velocities[dim*cellIndex+currentDim];
+				vel[currentDim] = _velocities[dim*cellIndex+currentDim];
 			}
-			//std::cout << "precice Velocity:" << vel << " at point:" << pos << std::endl;
 		}*/
-		std::cout << "getVelocity:" << pos << std::endl;	
 		return vel;
 	}
 	
@@ -153,12 +149,11 @@ public:
 	
 	void advance(double dt) override 
 	{
-		std::cout << "PreciceSolver::advance called with dt = " << dt << std::endl;
 		if (_interface->isCouplingOngoing()) {
 			int meshID = _interface->getMeshID("mamico-mesh");
 			if (_interface->isReadDataAvailable())
 			{
-				std::cout << "Reading Velocity from MaMiCo !" << std::endl;
+				std::cout << "Reading external velocities in MaMiCo !" << std::endl;
 				// velocity from the conitnuum solver
 				int dataID = _interface->getDataID("Velocity", meshID);
 				_interface->readBlockVectorData(dataID, _numberOfCells, _vertexIDs, _velocities);
@@ -185,10 +180,11 @@ public:
 			
 			if (_interface->isWriteDataRequired(dt))
 			{
-				std::cout << "Writing MD Velocity from MaMiCo !" << std::endl;
+				/*std::cout << "Writing MD Velocity from MaMiCo !" << std::endl;
 				// Velocit from the md solver
 				int dataID = _interface->getDataID("MDVelocity", meshID);
 				_interface->writeBlockVectorData(dataID, _numberOfCells, _vertexIDs, mdVelocities);
+				*/
 			}
 			delete[] mdVelocities;
 			double computed_dt = std::min(_precice_dt, dt);
@@ -226,7 +222,7 @@ public:
 		return ranks;
 	  }
 
-private:    
+private:
     const double _channelHeight;
     const double _dx;
     const double _dt;

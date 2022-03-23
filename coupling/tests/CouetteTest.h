@@ -511,10 +511,13 @@ private:
         
         
 #if(BUILD_WITH_PRECICE)
-	static_cast<coupling::solvers::PreciceAdapter<3> *>(_couetteSolver)->setCouplingMesh(
-		_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-		_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0]
-	 );
+	if(_cfg.maSolverType == COUETTE_PRECICE)
+	{
+		static_cast<coupling::solvers::PreciceAdapter<3> *>(_couetteSolver)->setCouplingMesh(
+			_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+			_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0]
+		 );
+	 }
 #endif
 
     // init filtering for all md instances
@@ -1454,13 +1457,11 @@ private:
 #endif
 #if (BUILD_WITH_PRECICE)
     else if(_cfg.maSolverType == COUETTE_PRECICE) {
-      if(_rank==0){
         solver = new coupling::solvers::PreciceAdapter<3>(_cfg.channelheight, dx, dt, _cfg.plotEveryTimestep, "preCICECouette", _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
         if (solver==NULL){
           std::cout << "ERROR CouetteTest::getCouetteSolver(): preCICE solver==NULL!" << std::endl;
           exit(EXIT_FAILURE);
         }
-      }
     }
 #endif
     // LB solver: active on lbNumberProcesses
