@@ -19,23 +19,16 @@ template <class LinkedCell, unsigned int dim> class NoParticleInsertion;
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::NoParticleInsertion
-    : public coupling::ParticleInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::NoParticleInsertion : public coupling::ParticleInsertion<LinkedCell, dim> {
 public:
   /** @brief dummy function, doesn't change or do something
    *  @returns coupling::ParticleInsertion::NoAction since no mass is deleted or
    * inserted */
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-      const tarch::la::Vector<dim, double> &macroscopicCellSize,
-      const tarch::la::Vector<dim, double> &meanVelocity,
-      const double &temperature,
-      const coupling::BoundaryForceController<LinkedCell, dim>
-          &boundaryForceController) {
+  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                   const tarch::la::Vector<dim, double> &macroscopicCellPosition, const tarch::la::Vector<dim, double> &macroscopicCellSize,
+                   const tarch::la::Vector<dim, double> &meanVelocity, const double &temperature,
+                   const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController) {
     return coupling::ParticleInsertion<LinkedCell, dim>::NoAction;
   }
 

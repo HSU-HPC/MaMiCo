@@ -25,12 +25,9 @@ class UpdateLinkedCellListsMapping;
  */
 class simplemd::moleculemappings::UpdateLinkedCellListsMapping {
 public:
-  UpdateLinkedCellListsMapping(
-      const simplemd::services::ParallelTopologyService
-          &parallelTopologyService,
-      simplemd::services::LinkedCellService &linkedCellService)
-      : _parallelTopologyService(parallelTopologyService),
-        _linkedCellService(linkedCellService) {}
+  UpdateLinkedCellListsMapping(const simplemd::services::ParallelTopologyService &parallelTopologyService,
+                               simplemd::services::LinkedCellService &linkedCellService)
+      : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService) {}
   ~UpdateLinkedCellListsMapping() {}
 
   void beginMoleculeIteration();

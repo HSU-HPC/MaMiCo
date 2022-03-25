@@ -21,16 +21,13 @@ template <class LinkedCell, unsigned int dim> class ComputeMomentumMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::ComputeMomentumMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::ComputeMomentumMapping {
 public:
   /** Constructor
    *	@param mdSolverInterface
    */
-  ComputeMomentumMapping(coupling::interface::MDSolverInterface<LinkedCell, dim>
-                             *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface), _momentum(0.0),
-        _meanVelocity(0.0), _particleCounter(0) {}
+  ComputeMomentumMapping(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface), _momentum(0.0), _meanVelocity(0.0), _particleCounter(0) {}
 
   /** Destructor */
   ~ComputeMomentumMapping() {}
@@ -62,8 +59,7 @@ public:
    *	@param cellIndex
    */
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       const coupling::interface::Molecule<dim> &wrapper(it->getConst());
@@ -83,13 +79,10 @@ public:
   /** returns the mean velocity inside a linked cell
    *	@return _meanVelocity
    */
-  tarch::la::Vector<dim, double> getMeanVelocity() const {
-    return _meanVelocity;
-  }
+  tarch::la::Vector<dim, double> getMeanVelocity() const { return _meanVelocity; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   tarch::la::Vector<dim, double> _momentum;
   tarch::la::Vector<dim, double> _meanVelocity;
   unsigned int _particleCounter;

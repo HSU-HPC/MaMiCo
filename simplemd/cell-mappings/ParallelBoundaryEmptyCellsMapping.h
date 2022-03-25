@@ -23,13 +23,9 @@ class ParallelBoundaryEmptyCellsMapping;
  */
 class simplemd::cellmappings::ParallelBoundaryEmptyCellsMapping {
 public:
-  ParallelBoundaryEmptyCellsMapping(
-      simplemd::services::ParallelTopologyService &parallelTopologyService,
-      simplemd::services::MoleculeService &moleculeService,
-      const simplemd::services::LinkedCellService &linkedCellService)
-      : _parallelTopologyService(parallelTopologyService),
-        _moleculeService(moleculeService),
-        _linkedCellService(linkedCellService) {}
+  ParallelBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::MoleculeService &moleculeService,
+                                    const simplemd::services::LinkedCellService &linkedCellService)
+      : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService) {}
   ~ParallelBoundaryEmptyCellsMapping() {}
 
   void beginCellIteration() {}
@@ -37,11 +33,9 @@ public:
 
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
     // send molecules from this cell first...
-    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex,
-                                                          _linkedCellService)) {
+    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
       // ... and erase them afterwards
-      for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end();
-           it++) {
+      for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
         _moleculeService.deleteMolecule(*(*it));
       }
       cell.getList().clear();

@@ -12,11 +12,9 @@
 /** tests force and energy computation
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class TestLammpsCalculateForceEnergy : public TestLammps<dim> {
+template <unsigned int dim> class TestLammpsCalculateForceEnergy : public TestLammps<dim> {
 public:
-  TestLammpsCalculateForceEnergy(int argc, char **argv, std::string name)
-      : TestLammps<dim>(argc, argv, name) {}
+  TestLammpsCalculateForceEnergy(int argc, char **argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
   virtual ~TestLammpsCalculateForceEnergy() {}
 
   virtual void run() {
@@ -27,11 +25,9 @@ public:
 
     // initialise all interfaces and simulation parts
     if (dim == 2) {
-      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly2D.xyz",
-                                                   4);
+      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly2D.xyz", 4);
     } else {
-      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly3D.xyz",
-                                                   8);
+      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly3D.xyz", 8);
     }
     TestLammps<dim>::loadMacroscopicSolverConfiguration();
     TestLammps<dim>::loadMamicoTestConfiguration();
@@ -42,43 +38,29 @@ public:
 
     // get MD solver interface (required for sorting)
     LAMMPS_NS::MamicoLammpsMDSolverInterface<dim> *mdSolverInterface =
-        (LAMMPS_NS::MamicoLammpsMDSolverInterface<dim> *)
-            coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                         dim>::getInstance()
-                .getMDSolverInterface();
+        (LAMMPS_NS::MamicoLammpsMDSolverInterface<dim> *)coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance()
+            .getMDSolverInterface();
     if (mdSolverInterface == NULL) {
-      std::cout << "ERROR TestLammpsGhost: could not cast MD Solver interface!"
-                << std::endl;
+      std::cout << "ERROR TestLammpsGhost: could not cast MD Solver interface!" << std::endl;
       exit(EXIT_FAILURE);
     }
     const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                     dim>::getInstance()
-            .getMacroscopicCellService()
-            ->getIndexConversion();
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
 
     // compute LJ parameters (copy-paste from calculateForceAndEnergy)
     const double sigma6 = pow(mdSolverInterface->getMoleculeSigma(), 6.0);
     const double epsilon = mdSolverInterface->getMoleculeEpsilon();
     const double cutOffRadius = 2.5;
     const double cutOffRadiusSquared = cutOffRadius * cutOffRadius;
-    const double sigma6OverCutoff6 =
-        sigma6 /
-        (cutOffRadiusSquared * cutOffRadiusSquared * cutOffRadiusSquared);
-    const double cutOffEnergy =
-        4.0 * epsilon * sigma6OverCutoff6 * (sigma6OverCutoff6 - 1.0);
+    const double sigma6OverCutoff6 = sigma6 / (cutOffRadiusSquared * cutOffRadiusSquared * cutOffRadiusSquared);
+    const double cutOffEnergy = 4.0 * epsilon * sigma6OverCutoff6 * (sigma6OverCutoff6 - 1.0);
     // set tolerance in measurements
     const double tolerance = 1.0e-8;
 
     // compute LJ potential energy and force reference values
-    const double rij2 =
-        tarch::la::dot(tarch::la::Vector<dim, double>(4.0) - thisPosition,
-                       tarch::la::Vector<dim, double>(4.0) - thisPosition);
+    const double rij2 = tarch::la::dot(tarch::la::Vector<dim, double>(4.0) - thisPosition, tarch::la::Vector<dim, double>(4.0) - thisPosition);
     const double rij6 = rij2 * rij2 * rij2;
-    const double potEnergyRef =
-        pow(2.0, dim) * 0.5 *
-        (4.0 * epsilon * (sigma6 / rij6) * ((sigma6 / rij6) - 1.0) -
-         cutOffEnergy);
+    const double potEnergyRef = pow(2.0, dim) * 0.5 * (4.0 * epsilon * (sigma6 / rij6) * ((sigma6 / rij6) - 1.0) - cutOffEnergy);
     const tarch::la::Vector<dim, double> forceRef(0.0);
 
     // compute force/energy onto this molecule -> only do this on rank 0, since
@@ -92,8 +74,7 @@ public:
       if (fabs(potEnergy - potEnergyRef) > tolerance) {
         std::cout << "ERROR TestLammpsCalculateForceEnergy: potential Energies "
                      "do not match1! Potential energy ref.="
-                  << potEnergyRef << ", potential energy=" << potEnergy
-                  << std::endl;
+                  << potEnergyRef << ", potential energy=" << potEnergy << std::endl;
         exit(EXIT_FAILURE);
       }
       if (fabs(tarch::la::norm2(force - forceRef) > tolerance)) {
@@ -137,15 +118,13 @@ public:
       }
 
       // construct a lammps molecule
-      LAMMPS_NS::MamicoLammpsMolecule<dim> lammpsMolecule(
-          lammps->atom->x, lammps->atom->v, lammps->atom->f, n, cutOffRadius);
+      LAMMPS_NS::MamicoLammpsMolecule<dim> lammpsMolecule(lammps->atom->x, lammps->atom->v, lammps->atom->f, n, cutOffRadius);
       double potEnergy = lammpsMolecule.getPotentialEnergy();
 
       if (fabs(potEnergy - potEnergyRef) > tolerance) {
         std::cout << "ERROR TestLammpsCalculateForceEnergy: potential Energies "
                      "do not match2! Potential energy ref.="
-                  << potEnergyRef << ", potential energy=" << potEnergy
-                  << std::endl;
+                  << potEnergyRef << ", potential energy=" << potEnergy << std::endl;
         exit(EXIT_FAILURE);
       }
     }

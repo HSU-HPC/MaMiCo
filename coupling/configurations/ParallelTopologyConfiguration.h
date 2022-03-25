@@ -22,27 +22,23 @@ class ParallelTopologyConfiguration;
  *	@brief reads parallel topology configuration. XYZ and ZYX are supported.
  *  @author Philipp Neumann
  */
-class coupling::configurations::ParallelTopologyConfiguration
-    : public tarch::configuration::Configuration {
+class coupling::configurations::ParallelTopologyConfiguration : public tarch::configuration::Configuration {
 public:
   /** Constructor, initializes the class  */
-  ParallelTopologyConfiguration()
-      : _type(coupling::paralleltopology::UNDEFINED), _isValid(true) {}
+  ParallelTopologyConfiguration() : _type(coupling::paralleltopology::UNDEFINED), _isValid(true) {}
 
   /** Destructor */
   virtual ~ParallelTopologyConfiguration() {}
 
   void parseSubtag(tinyxml2::XMLElement *node) {
     std::string value;
-    tarch::configuration::ParseConfiguration::readStringMandatory(value, node,
-                                                                  "type");
+    tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "xyz") {
       _type = coupling::paralleltopology::XYZ;
     } else if (value == "zyx") {
       _type = coupling::paralleltopology::ZYX;
     } else {
-      std::cout << "ERROR coupling::ParallelTopologyConfiguration: Wrong type!"
-                << std::endl;
+      std::cout << "ERROR coupling::ParallelTopologyConfiguration: Wrong type!" << std::endl;
       _isValid = false;
       exit(EXIT_FAILURE);
     }
@@ -65,10 +61,7 @@ public:
   /** Returns the parallel topology type.
    * 	@return _type
    */
-  coupling::paralleltopology::ParallelTopologyType
-  getParallelTopologyType() const {
-    return _type;
-  }
+  coupling::paralleltopology::ParallelTopologyType getParallelTopologyType() const { return _type; }
 
 private:
   coupling::paralleltopology::ParallelTopologyType _type;

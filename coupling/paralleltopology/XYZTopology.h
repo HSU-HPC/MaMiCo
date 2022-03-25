@@ -29,57 +29,44 @@ template <unsigned int dim> class XYZTopology;
  *  @author Philipp Neumann
  *	@todo Philipp could you please take a look on this class
  */
-template <unsigned int dim>
-class coupling::paralleltopology::XYZTopology
-    : public coupling::paralleltopology::ParallelTopology<dim> {
+template <unsigned int dim> class coupling::paralleltopology::XYZTopology : public coupling::paralleltopology::ParallelTopology<dim> {
 public:
   /** Constructor */
-  XYZTopology(tarch::la::Vector<dim, unsigned int> numberProcesses,
-              unsigned int topologyOffset)
-      : coupling::paralleltopology::ParallelTopology<dim>(),
-        _numberProcesses(numberProcesses),
-        _divisionFactor4NumberProcesses(
-            coupling::initDivisionFactor<dim>(numberProcesses)),
-        _topologyOffset(topologyOffset) {}
+  XYZTopology(tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int topologyOffset)
+      : coupling::paralleltopology::ParallelTopology<dim>(), _numberProcesses(numberProcesses),
+        _divisionFactor4NumberProcesses(coupling::initDivisionFactor<dim>(numberProcesses)), _topologyOffset(topologyOffset) {}
 
   /** Destructor */
   virtual ~XYZTopology() {}
 
-  tarch::la::Vector<dim, unsigned int>
-  getProcessCoordinates(unsigned int rank) const {
+  tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     unsigned int intNumberProcesses = _numberProcesses[0];
     for (unsigned int d = 1; d < dim; d++) {
       intNumberProcesses = intNumberProcesses * _numberProcesses[d];
     }
-    if ((rank < _topologyOffset) ||
-        (rank > _topologyOffset + intNumberProcesses - 1)) {
+    if ((rank < _topologyOffset) || (rank > _topologyOffset + intNumberProcesses - 1)) {
       // TODO will be thrown on macroOnly services
       std::cout << "Warning "
                    "coupling::paralleltopology::XYZTopology::"
                    "getProcessCoordinates(): rank out of range!"
                 << std::endl;
-      std::cout << "Offset=" << _topologyOffset << ", rank=" << rank
-                << std::endl;
+      std::cout << "Offset=" << _topologyOffset << ", rank=" << rank << std::endl;
     }
-    std::cout << "Rank=" << rank << " corresponds to process coordinates="
-              << coupling::getVectorCellIndex<dim>(
-                     rank - _topologyOffset, _divisionFactor4NumberProcesses)
+    std::cout << "Rank=" << rank
+              << " corresponds to process coordinates=" << coupling::getVectorCellIndex<dim>(rank - _topologyOffset, _divisionFactor4NumberProcesses)
               << std::endl;
 #endif
-    return coupling::getVectorCellIndex<dim>(rank - _topologyOffset,
-                                             _divisionFactor4NumberProcesses);
+    return coupling::getVectorCellIndex<dim>(rank - _topologyOffset, _divisionFactor4NumberProcesses);
   }
 
-  unsigned int
-  getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
+  unsigned int getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
     unsigned int index = processCoordinates[dim - 1];
     for (int d = dim - 2; d > -1; d--) {
       index = _numberProcesses[d] * index + processCoordinates[d];
     }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Process coordinates=" << processCoordinates
-              << " correspond to rank=" << index + _topologyOffset << std::endl;
+    std::cout << "Process coordinates=" << processCoordinates << " correspond to rank=" << index + _topologyOffset << std::endl;
 #endif
     return index + _topologyOffset;
   }

@@ -18,12 +18,9 @@ class EspressoMDMoleculeIterator;
 /** molecule iterator.
  *  @author Rahul Arora
  */
-class coupling::interface::EspressoMDMoleculeIterator
-    : public coupling::interface::MoleculeIterator<ParticleList, 3> {
+class coupling::interface::EspressoMDMoleculeIterator : public coupling::interface::MoleculeIterator<ParticleList, 3> {
 public:
-  EspressoMDMoleculeIterator(ParticleList &cell)
-      : coupling::interface::MoleculeIterator<ParticleList, 3>(cell),
-        _buffer(NULL) {
+  EspressoMDMoleculeIterator(ParticleList &cell) : coupling::interface::MoleculeIterator<ParticleList, 3>(cell), _buffer(NULL) {
   }
 
   virtual ~EspressoMDMoleculeIterator() {

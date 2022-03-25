@@ -40,11 +40,8 @@ enum class Scope { perInstance, postMultiInstance };
  */
 template <unsigned int dim> class coupling::filtering::FilterPipeline {
 public:
-  FilterPipeline(
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCells,
-      const coupling::filtering::Scope scope,
-      const tarch::utils::MultiMDService<dim> &multiMDService,
-      const char *cfgpath);
+  FilterPipeline(std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCells, const coupling::filtering::Scope scope,
+                 const tarch::utils::MultiMDService<dim> &multiMDService, const char *cfgpath);
 
   ~FilterPipeline() {
     for (auto sequence : _sequences)
@@ -68,12 +65,8 @@ public:
    * Not that Junction is a subtype of Sequence, so this is how to get Junctions
    * as well.
    */
-  coupling::filtering::FilterSequence<dim> *
-  getSequence(const char *identifier) const;
-  std::vector<coupling::filtering::FilterSequence<dim> *>
-  getAllSequences() const {
-    return _sequences;
-  }
+  coupling::filtering::FilterSequence<dim> *getSequence(const char *identifier) const;
+  std::vector<coupling::filtering::FilterSequence<dim> *> getAllSequences() const { return _sequences; }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   /*

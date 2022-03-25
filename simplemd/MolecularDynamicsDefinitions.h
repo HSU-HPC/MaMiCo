@@ -33,14 +33,7 @@ namespace simplemd {
 // fetched from neighboring process GEOMETRY_BOUNDARY: No molecules are assumed
 // to be in these cells (geometry needs to be included via the respective
 //                    geometrical forms). -> currently not supported!
-enum BoundaryType {
-  NO_BOUNDARY = 0,
-  PERIODIC_BOUNDARY = 1,
-  OPEN_BOUNDARY = 2,
-  PARALLEL_BOUNDARY = 3,
-  GEOMETRY_BOUNDARY = 4,
-  REFLECTING_BOUNDARY = 5
-};
+enum BoundaryType { NO_BOUNDARY = 0, PERIODIC_BOUNDARY = 1, OPEN_BOUNDARY = 2, PARALLEL_BOUNDARY = 3, GEOMETRY_BOUNDARY = 4, REFLECTING_BOUNDARY = 5 };
 
 // static const tarch::la::Vector<MD_DIM,double> zero(0.0);
 

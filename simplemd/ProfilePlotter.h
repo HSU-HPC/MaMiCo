@@ -22,13 +22,9 @@ class ProfilePlotter;
  */
 class simplemd::ProfilePlotter {
 public:
-  ProfilePlotter(
-      const std::vector<simplemd::configurations::ProfilePlotterConfiguration>
-          &configurations,
-      const simplemd::services::ParallelTopologyService
-          &parallelTopologyService,
-      simplemd::services::LinkedCellService &linkedCellService,
-      const double &linkedCellVolume, const unsigned int &localMDSimulation);
+  ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration> &configurations,
+                 const simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::LinkedCellService &linkedCellService,
+                 const double &linkedCellVolume, const unsigned int &localMDSimulation);
   ~ProfilePlotter();
 
   /** accumulates information from the respective linked cells and - in case
@@ -44,9 +40,7 @@ private:
    * profile does not intersect the local domain, it is marked as inactive via
    * the _isValid variable.
    */
-  void
-  adjustProfilesInParallel(const simplemd::services::ParallelTopologyService
-                               &parallelTopologyService);
+  void adjustProfilesInParallel(const simplemd::services::ParallelTopologyService &parallelTopologyService);
 #endif
 
   std::vector<simplemd::cellmappings::ProfilePlotterMapping *> _plotters;

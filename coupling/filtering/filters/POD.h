@@ -21,22 +21,16 @@ template <unsigned int dim> class POD;
  *
  *  @author Piet Jarmatz, Felix Maurer
  */
-template <unsigned int dim>
-class coupling::filtering::POD
-    : public coupling::filtering::FilterInterface<dim> {
+template <unsigned int dim> class coupling::filtering::POD : public coupling::filtering::FilterInterface<dim> {
 public:
-  POD(const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &inputCellVector,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &outputCellVector,
+  POD(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
+      const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
       MPI_Comm comm,
 #endif
       const std::array<bool, 7> filteredValues, int tws, int kmax)
-      : coupling::filtering::FilterInterface<dim>(
-            inputCellVector, outputCellVector, filteredValues, "POD"),
-        _timeWindowSize(tws), _kMax(kmax), _cycleCounter(0), _spatialIndex(0),
-        _t(0), _data(NULL), _C(NULL), _A(NULL), _A_T(NULL) {
+      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "POD"), _timeWindowSize(tws), _kMax(kmax),
+        _cycleCounter(0), _spatialIndex(0), _t(0), _data(NULL), _C(NULL), _A(NULL), _A_T(NULL) {
     int spatialSize = inputCellVector.size();
     _data = new Eigen::MatrixXd[dim + 1]; // separate data matrices for: mass,
                                           // momentum0, momentum1, momentum2
@@ -44,8 +38,7 @@ public:
     _A = new Eigen::MatrixXd[dim + 1];
     _A_T = new Eigen::MatrixXd[dim + 1];
     for (unsigned int i = 0; i < dim + 1; i++) {
-      _data[i] = Eigen::MatrixXd::Constant(_timeWindowSize, spatialSize,
-                                           (i == 0) ? 1 : 0);
+      _data[i] = Eigen::MatrixXd::Constant(_timeWindowSize, spatialSize, (i == 0) ? 1 : 0);
     }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -56,9 +49,7 @@ public:
 #endif
 
 #ifdef DEBUG_POD
-    std::cout
-        << "		POD: Created Proper Orthogonal Decomposition instance."
-        << std::endl;
+    std::cout << "		POD: Created Proper Orthogonal Decomposition instance." << std::endl;
     // TODO selection of filtered properties
     std::cout << "			WARNING: Regardless of configuration, "
                  "POD always filters macroscopic mass and momentum."
@@ -85,9 +76,7 @@ public:
     }
 
 #ifdef DEBUG_POD
-    std::cout
-        << "		POD: Deleted Proper Orthogonal Decomposition instance."
-        << std::endl;
+    std::cout << "		POD: Deleted Proper Orthogonal Decomposition instance." << std::endl;
 #endif
   }
 
@@ -97,17 +86,17 @@ private:
   unsigned int _timeWindowSize; // number of snapshots / coupling cycles taken
                                 // into consideration for noise reduction
   const unsigned int _kMax;     // number of dominant eigenvalues
-  unsigned int _cycleCounter; // coupling cycle counter, indicates how many data
-                              // snapshots are available already
-  unsigned int _spatialIndex; // cell counter, should run from zero to
-                              // getLocalNumberMacroscopicCells()-1 within an
-                              // iteration of ProcessInnerMacroscopicCell
-  unsigned int _t; // active temporal index, iterates cyclic between zero and
-                   // _timeWindowSize
-  Eigen::MatrixXd *_data; // set of snapshots (sampled by transferStrategy)
-  Eigen::MatrixXd *_C;   // temporal auto-correlation covariance matrix of _data
-  Eigen::MatrixXd *_A;   // POD temporal modes / eigenvectors of C
-  Eigen::MatrixXd *_A_T; // Transpose of A
+  unsigned int _cycleCounter;   // coupling cycle counter, indicates how many data
+                                // snapshots are available already
+  unsigned int _spatialIndex;   // cell counter, should run from zero to
+                                // getLocalNumberMacroscopicCells()-1 within an
+                                // iteration of ProcessInnerMacroscopicCell
+  unsigned int _t;              // active temporal index, iterates cyclic between zero and
+                                // _timeWindowSize
+  Eigen::MatrixXd *_data;       // set of snapshots (sampled by transferStrategy)
+  Eigen::MatrixXd *_C;          // temporal auto-correlation covariance matrix of _data
+  Eigen::MatrixXd *_A;          // POD temporal modes / eigenvectors of C
+  Eigen::MatrixXd *_A_T;        // Transpose of A
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _comm;

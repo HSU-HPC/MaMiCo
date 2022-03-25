@@ -37,37 +37,28 @@ int main(int argc, char *argv[]) {
   // parse configuration
   simplemd::configurations::MolecularDynamicsConfiguration configuration;
   const std::string filename(argv[1]);
-  tarch::configuration::ParseConfiguration::parseConfiguration<
-      simplemd::configurations::MolecularDynamicsConfiguration>(
-      filename, "molecular-dynamics", configuration);
+  tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
+                                                                                                                         configuration);
   if (!configuration.isValid()) {
     std::cout << "Unvalid configuration!" << std::endl;
     return -1;
   }
 
   // initialise multiple MD simulations
-  const tarch::utils::MultiMDService<MD_DIM> multiMDService(
-      configuration.getMPIConfiguration().getNumberOfProcesses(),
-      totalNumberMDSimulations);
-  const unsigned int localNumberMDSimulations =
-      multiMDService.getLocalNumberOfMDSimulations();
+  const tarch::utils::MultiMDService<MD_DIM> multiMDService(configuration.getMPIConfiguration().getNumberOfProcesses(), totalNumberMDSimulations);
+  const unsigned int localNumberMDSimulations = multiMDService.getLocalNumberOfMDSimulations();
   std::vector<simplemd::MolecularDynamicsSimulation *> simulations;
   for (unsigned int i = 0; i < localNumberMDSimulations; i++) {
-    simulations.push_back(
-        new simplemd::MolecularDynamicsSimulation(configuration));
+    simulations.push_back(new simplemd::MolecularDynamicsSimulation(configuration));
     if (simulations[i] == NULL) {
-      std::cout << "ERROR main_multi.cpp: simulations[" << i << "]==NULL!"
-                << std::endl;
+      std::cout << "ERROR main_multi.cpp: simulations[" << i << "]==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    simulations[i]->initServices(
-        multiMDService, multiMDService.getGlobalNumberOfLocalMDSimulation(i));
+    simulations[i]->initServices(multiMDService, multiMDService.getGlobalNumberOfLocalMDSimulation(i));
   }
   // solve MD simulations
   for (unsigned int i = 0; i < localNumberMDSimulations; i++) {
-    for (unsigned int t = 0;
-         t < configuration.getSimulationConfiguration().getNumberOfTimesteps();
-         t++) {
+    for (unsigned int t = 0; t < configuration.getSimulationConfiguration().getNumberOfTimesteps(); t++) {
       simulations[i]->simulateOneTimestep(t);
     }
   }

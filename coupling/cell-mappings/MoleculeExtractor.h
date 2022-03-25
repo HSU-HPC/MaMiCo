@@ -25,15 +25,12 @@ template <class LinkedCell, unsigned int dim> class MoleculeExtractor;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::MoleculeExtractor {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::MoleculeExtractor {
 public:
   /** Constructor
    *	@param mdSolverInterface
    */
-  MoleculeExtractor(coupling::interface::MDSolverInterface<LinkedCell, dim>
-                        *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface) {
+  MoleculeExtractor(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {
     _molecules.clear();
   }
 
@@ -54,8 +51,7 @@ public:
    *	@param cellIndex
    */
   void handleCell(LinkedCell &cell, unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       _molecules.push_back(it->getConst().getPosition());
@@ -67,14 +63,10 @@ public:
   /** returns access to the extracted molecules.
    *	@return _molecules
    */
-  const std::vector<tarch::la::Vector<dim, double>> &
-  getExtractedMolecules() const {
-    return _molecules;
-  }
+  const std::vector<tarch::la::Vector<dim, double>> &getExtractedMolecules() const { return _molecules; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   std::vector<tarch::la::Vector<dim, double>> _molecules;
 };
 

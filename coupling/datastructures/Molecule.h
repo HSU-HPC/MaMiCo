@@ -21,9 +21,7 @@ template <unsigned int dim> class Molecule;
  *  @author Philipp Neumann
  */
 
-template <unsigned int dim>
-class coupling::datastructures::Molecule
-    : public coupling::interface::Molecule<dim> {
+template <unsigned int dim> class coupling::datastructures::Molecule : public coupling::interface::Molecule<dim> {
 public:
   /** Constructor: initialises the molecule;
    *	@param position
@@ -31,16 +29,11 @@ public:
    * 	@param force
    * 	@param potentialEnergy
    */
-  Molecule(const tarch::la::Vector<dim, double> &position,
-           const tarch::la::Vector<dim, double> &velocity,
-           const tarch::la::Vector<dim, double> &force,
+  Molecule(const tarch::la::Vector<dim, double> &position, const tarch::la::Vector<dim, double> &velocity, const tarch::la::Vector<dim, double> &force,
            const double &potentialEnergy)
-      : coupling::interface::Molecule<dim>(), _position(position),
-        _velocity(velocity), _force(force), _potentialEnergy(potentialEnergy) {
+      : coupling::interface::Molecule<dim>(), _position(position), _velocity(velocity), _force(force), _potentialEnergy(potentialEnergy) {
   } Molecule()
-      : coupling::interface::Molecule<dim>(),
-        _position(tarch::la::Vector<dim, double>(0.0)),
-        _velocity(tarch::la::Vector<dim, double>(0.0)),
+      : coupling::interface::Molecule<dim>(), _position(tarch::la::Vector<dim, double>(0.0)), _velocity(tarch::la::Vector<dim, double>(0.0)),
         _force(tarch::la::Vector<dim, double>(0.0)), _potentialEnergy(0.0) {
   }
 
@@ -53,18 +46,14 @@ public:
   tarch::la::Vector<dim, double> getVelocity() const { return _velocity; }
   /** sets the velocity of the molecule
    * @param velocity Velocity*/
-  void setVelocity(const tarch::la::Vector<dim, double> &velocity) {
-    _velocity = velocity;
-  }
+  void setVelocity(const tarch::la::Vector<dim, double> &velocity) { _velocity = velocity; }
 
   /** returns the velocity of the molecule
    * @return _position Position*/
   tarch::la::Vector<dim, double> getPosition() const { return _position; }
   /** sets the velocity of the molecule
    * @param position Position*/
-  void setPosition(const tarch::la::Vector<dim, double> &position) {
-    _position = position;
-  }
+  void setPosition(const tarch::la::Vector<dim, double> &position) { _position = position; }
 
   /** sets the force acting on this molecule. This function is called in the
    * USHER scheme so far only if the force of a newly created molecule should be
@@ -83,9 +72,7 @@ public:
   double getPotentialEnergy() const { return _potentialEnergy; }
   /** sets potential energy of the molecule
    * @param _potentialEnergy Potential energy of the molecule */
-  void setPotentialEnergy(const double &potentialEnergy) {
-    _potentialEnergy = potentialEnergy;
-  }
+  void setPotentialEnergy(const double &potentialEnergy) { _potentialEnergy = potentialEnergy; }
 
 private:
   /** Position of the molecule */

@@ -25,8 +25,7 @@
 class TestEspressoMDMolecule : public TestEspresso {
 private:
 public:
-  TestEspressoMDMolecule(std::string name, int argc, char **argv)
-      : TestEspresso(name, argc, argv) {}
+  TestEspressoMDMolecule(std::string name, int argc, char **argv) : TestEspresso(name, argc, argv) {}
   virtual ~TestEspressoMDMolecule() {}
 
   virtual void run() {
@@ -95,10 +94,9 @@ public:
       flag = 0;
     }
     if (listEspresso != listEspressoCouplingInterface) {
-      std::cout
-          << "ERROR: the particle positions and velocites obtianed by the "
-             "Coupling interfaces and Espresso simulation do not match "
-          << std::endl;
+      std::cout << "ERROR: the particle positions and velocites obtianed by the "
+                   "Coupling interfaces and Espresso simulation do not match "
+                << std::endl;
       flag = 0;
     }
   }

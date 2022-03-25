@@ -23,8 +23,7 @@
 
 class TestEspressoAddDeleteMolecule : public TestEspresso {
 public:
-  TestEspressoAddDeleteMolecule(std::string name, int argc, char **argv)
-      : TestEspresso(name, argc, argv) {}
+  TestEspressoAddDeleteMolecule(std::string name, int argc, char **argv) : TestEspresso(name, argc, argv) {}
   ~TestEspressoAddDeleteMolecule() {}
   virtual void run() {
 
@@ -65,8 +64,7 @@ private:
 
     // Call the method deleteMoleculeFromMDSimulation provided in
     // EspressoMDSolverInterface
-    delete_molecule_test.deleteMoleculeFromMDSimulation(coupling_part,
-                                                        temp_cell);
+    delete_molecule_test.deleteMoleculeFromMDSimulation(coupling_part, temp_cell);
 
     // Iterate over all the particles in the local domain (excluding ghost
     // cells) in Espresso
@@ -160,8 +158,7 @@ private:
     if (cnt > 56) {
       std::cout << "The test was successful with count " << cnt << std::endl;
     } else {
-      std::cout << "The test was not successful with count " << cnt
-                << std::endl;
+      std::cout << "The test was not successful with count " << cnt << std::endl;
     }
   }
 };

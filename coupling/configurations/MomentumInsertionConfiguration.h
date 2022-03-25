@@ -28,8 +28,7 @@ class NieTest;
  *	@brief momentum insertion configuration. friend class: NieTest
  *  @author Philipp Neumann
  */
-class coupling::configurations::MomentumInsertionConfiguration
-    : public tarch::configuration::Configuration {
+class coupling::configurations::MomentumInsertionConfiguration : public tarch::configuration::Configuration {
 public:
   // for testing: give access to variables; will only be used in the read-sense
   friend class ::NieTest;
@@ -42,14 +41,12 @@ public:
     DIRECT_VELOCITY_INSERTION = 1 /**< DIRECT_VELOCITY_INSERTION*/,
     VELOCITY_GRADIENT_RELAXATION = 2 /**< VELOCITY_GRADIENT_RELAXATION*/,
     NO_INSERTION = 3 /**< NO_INSERTION*/,
-    VELOCITY_GRADIENT_RELAXATION_TOPONLY =
-        4 /**< VELOCITY_GRADIENT_RELAXATION_TOPONLY*/,
+    VELOCITY_GRADIENT_RELAXATION_TOPONLY = 4 /**< VELOCITY_GRADIENT_RELAXATION_TOPONLY*/,
     NIE_VELOCITY_IMPOSITION = 5 /**< NIE_VELOCITY_IMPOSITION*/
   };
 
   /** Constructor, initializes the class  */
-  MomentumInsertionConfiguration()
-      : _insertionType(ADDITIVE_MOMENTUM_INSERTION), _isValid(true) {}
+  MomentumInsertionConfiguration() : _insertionType(ADDITIVE_MOMENTUM_INSERTION), _isValid(true) {}
 
   /** Destructor */
   virtual ~MomentumInsertionConfiguration() {}
@@ -59,8 +56,7 @@ public:
    */
   void parseSubtag(tinyxml2::XMLElement *node) {
     std::string value;
-    tarch::configuration::ParseConfiguration::readStringMandatory(value, node,
-                                                                  "type");
+    tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "additive-momentum-insertion") {
       _insertionType = ADDITIVE_MOMENTUM_INSERTION;
     } else if (value == "direct-velocity-insertion") {
@@ -82,10 +78,8 @@ public:
     }
 
     if (_insertionType == VELOCITY_GRADIENT_RELAXATION) {
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(
-          _velocityRelaxationFactor, node, "velocity-relaxation-factor");
-      if ((_velocityRelaxationFactor <= 0.0) ||
-          (_velocityRelaxationFactor > 1.0)) {
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(_velocityRelaxationFactor, node, "velocity-relaxation-factor");
+      if ((_velocityRelaxationFactor <= 0.0) || (_velocityRelaxationFactor > 1.0)) {
         std::cout << "ERROR coupling::MomentumInsertionConfiguration: "
                      "velocity-relaxation-factor="
                   << _velocityRelaxationFactor << "!";
@@ -94,10 +88,8 @@ public:
         exit(EXIT_FAILURE);
       }
     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION_TOPONLY) {
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(
-          _velocityRelaxationFactor, node, "velocity-relaxation-factor");
-      if ((_velocityRelaxationFactor <= 0.0) ||
-          (_velocityRelaxationFactor > 1.0)) {
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(_velocityRelaxationFactor, node, "velocity-relaxation-factor");
+      if ((_velocityRelaxationFactor <= 0.0) || (_velocityRelaxationFactor > 1.0)) {
         std::cout << "ERROR coupling::MomentumInsertionConfiguration: "
                      "velocity-relaxation-factor="
                   << _velocityRelaxationFactor << "!";
@@ -107,8 +99,7 @@ public:
       }
     } else if (_insertionType == NIE_VELOCITY_IMPOSITION) {
       int buf;
-      tarch::configuration::ParseConfiguration::readIntMandatory(
-          buf, node, "innermost-overlap-layer");
+      tarch::configuration::ParseConfiguration::readIntMandatory(buf, node, "innermost-overlap-layer");
       if (buf <= 0) {
         std::cout << "ERROR coupling::MomentumInsertionConfiguration: "
                      "innermost-overlap-layer="
@@ -117,8 +108,7 @@ public:
         exit(EXIT_FAILURE);
       }
       _innerOverlap = (unsigned int)buf;
-      tarch::configuration::ParseConfiguration::readIntMandatory(
-          buf, node, "outermost-overlap-layer");
+      tarch::configuration::ParseConfiguration::readIntMandatory(buf, node, "outermost-overlap-layer");
       if (((unsigned int)buf > _innerOverlap) || (buf <= 0)) {
         std::cout << "ERROR coupling::MomentumInsertionConfiguration: "
                      "outermost-overlap-layer="
@@ -148,9 +138,7 @@ public:
   /** Returns momentum insertion type.
    * 	@return _insertionType
    */
-  const MomentumInsertionType &getMomentumInsertionType() const {
-    return _insertionType;
-  }
+  const MomentumInsertionType &getMomentumInsertionType() const { return _insertionType; }
 
   /**
    * 	@return _innerOverlap
@@ -167,33 +155,23 @@ public:
    * 	@return momentum insertion config
    */
   template <class LinkedCell, unsigned int dim>
-  MomentumInsertion<LinkedCell, dim> *interpreteConfiguration(
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface,
-      const coupling::IndexConversion<dim> &indexConversion,
-      const coupling::datastructures::MacroscopicCellWithLinkedCells<
-          LinkedCell, dim> *const macroscopicCells,
-      unsigned int numberMDTimestepsPerCouplingCycle) const {
+  MomentumInsertion<LinkedCell, dim> *
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
+                          const coupling::IndexConversion<dim> &indexConversion,
+                          const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *const macroscopicCells,
+                          unsigned int numberMDTimestepsPerCouplingCycle) const {
     if (_insertionType == ADDITIVE_MOMENTUM_INSERTION) {
-      return new coupling::AdditiveMomentumInsertion<LinkedCell, dim>(
-          mdSolverInterface, numberMDTimestepsPerCouplingCycle);
+      return new coupling::AdditiveMomentumInsertion<LinkedCell, dim>(mdSolverInterface, numberMDTimestepsPerCouplingCycle);
     } else if (_insertionType == DIRECT_VELOCITY_INSERTION) {
-      return new coupling::SetGivenVelocity4MomentumInsertion<LinkedCell, dim>(
-          mdSolverInterface);
+      return new coupling::SetGivenVelocity4MomentumInsertion<LinkedCell, dim>(mdSolverInterface);
     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION) {
-      return new coupling::VelocityGradientRelaxation<LinkedCell, dim>(
-          _velocityRelaxationFactor, mdSolverInterface, indexConversion,
-          macroscopicCells);
+      return new coupling::VelocityGradientRelaxation<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, indexConversion, macroscopicCells);
     } else if (_insertionType == NO_INSERTION) {
-      return new coupling::NoMomentumInsertion<LinkedCell, dim>(
-          mdSolverInterface);
+      return new coupling::NoMomentumInsertion<LinkedCell, dim>(mdSolverInterface);
     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION_TOPONLY) {
-      return new coupling::VelocityGradientRelaxationTopOnly<LinkedCell, dim>(
-          _velocityRelaxationFactor, mdSolverInterface, indexConversion,
-          macroscopicCells);
+      return new coupling::VelocityGradientRelaxationTopOnly<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, indexConversion, macroscopicCells);
     } else if (_insertionType == NIE_VELOCITY_IMPOSITION) {
-      return new coupling::NieVelocityImposition<LinkedCell, dim>(
-          mdSolverInterface, indexConversion, _outerOverlap, _innerOverlap);
+      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, indexConversion, _outerOverlap, _innerOverlap);
     }
     return NULL;
   }
@@ -201,10 +179,10 @@ public:
 private:
   MomentumInsertionType _insertionType;
   double _velocityRelaxationFactor; // required by velocity relaxation schemes
-  unsigned int _innerOverlap; // innermost layer of overlap cells (required by
-                              // nie velocity imposition)
-  unsigned int _outerOverlap; // outermost layer of overlap cells (required by
-                              // nie velocity imposition)
+  unsigned int _innerOverlap;       // innermost layer of overlap cells (required by
+                                    // nie velocity imposition)
+  unsigned int _outerOverlap;       // outermost layer of overlap cells (required by
+                                    // nie velocity imposition)
   bool _isValid;
 };
 

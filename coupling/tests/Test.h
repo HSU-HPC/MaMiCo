@@ -10,9 +10,7 @@
 
 class Test {
 public:
-  Test(std::string testname) : _testname(testname) {
-    std::cout << "Run " << testname << "..." << std::endl;
-  }
+  Test(std::string testname) : _testname(testname) { std::cout << "Run " << testname << "..." << std::endl; }
   virtual ~Test() { std::cout << "Shut down " << _testname << std::endl; }
 
   virtual void run() = 0;

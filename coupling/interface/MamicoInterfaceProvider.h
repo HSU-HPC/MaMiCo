@@ -33,17 +33,14 @@ public:
   /** sets macroscopic solver interface
    *  @param macroscopicSolverInterface
    */
-  void setMacroscopicSolverInterface(
-      coupling::interface::MacroscopicSolverInterface<dim>
-          *macroscopicSolverInterface) {
+  void setMacroscopicSolverInterface(coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface) {
     _macroscopicSolverInterface = macroscopicSolverInterface;
   }
 
   /** returns acroscopic solver interface
    *  @return _macroscopicSolverInterface
    */
-  coupling::interface::MacroscopicSolverInterface<dim> *
-  getMacroscopicSolverInterface() {
+  coupling::interface::MacroscopicSolverInterface<dim> *getMacroscopicSolverInterface() {
     return _macroscopicSolverInterface;
   }
 
@@ -51,16 +48,14 @@ public:
    *  @param mdSolverInterface
    */
   void
-  setMDSolverInterface(coupling::interface::MDSolverInterface<LinkedCell, dim>
-                           *mdSolverInterface) {
+  setMDSolverInterface(coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface) {
     _mdSolverInterface = mdSolverInterface;
   }
 
   /** returns MD solver interface
    *  @return _mdSolverInterface
    */
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *
-  getMDSolverInterface() {
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *getMDSolverInterface() {
     return _mdSolverInterface;
   }
 
@@ -68,25 +63,20 @@ public:
    *  @return macroscopicCellService
    */
   void
-  setMacroscopicCellService(
-      coupling::services::MacroscopicCellService<dim> *macroscopicCellService) {
+  setMacroscopicCellService(coupling::services::MacroscopicCellService<dim> *macroscopicCellService) {
     _macroscopicCellService = macroscopicCellService;
   }
 
   /** returns macroscopic cell service
    *  @return _macroscopicCellService
    */
-  coupling::services::MacroscopicCellService<dim> *getMacroscopicCellService() {
-    return _macroscopicCellService;
-  }
+  coupling::services::MacroscopicCellService<dim> *getMacroscopicCellService() { return _macroscopicCellService; }
 
 private:
   /** Private constructor, creation throgh a pointer and set functions
    *  @note singelton pattern
    */
-  MamicoInterfaceProvider()
-      : _macroscopicSolverInterface(NULL), _mdSolverInterface(NULL),
-        _macroscopicCellService(NULL) {}
+  MamicoInterfaceProvider() : _macroscopicSolverInterface(NULL), _mdSolverInterface(NULL), _macroscopicCellService(NULL) {}
   /** Private destructor
    *  @note singelton pattern
    */
@@ -96,8 +86,7 @@ private:
     _macroscopicCellService = NULL;
   }
 
-  coupling::interface::MacroscopicSolverInterface<dim>
-      *_macroscopicSolverInterface;
+  coupling::interface::MacroscopicSolverInterface<dim> *_macroscopicSolverInterface;
   coupling::interface::MDSolverInterface<LinkedCell, dim> *_mdSolverInterface;
   coupling::services::MacroscopicCellService<dim> *_macroscopicCellService;
 };

@@ -25,8 +25,7 @@
  */
 class TestMarDynMolecule : public TestMarDyn {
 public:
-  TestMarDynMolecule(int argc, char **argv, std::string name)
-      : TestMarDyn(argc, argv, name) {}
+  TestMarDynMolecule(int argc, char **argv, std::string name) : TestMarDyn(argc, argv, name) {}
   virtual ~TestMarDynMolecule() {}
 
   virtual void run() {
@@ -42,16 +41,12 @@ public:
     if (errors == 0)
       std::cout << "TestMarDynMolecule - Test 1 was successful! " << std::endl;
     else {
-      std::cout << "TestMarDynMolecule - Test 1 not successful, " << errors
-                << " errors occurred. Test 2 will not be executed."
-                << std::endl;
+      std::cout << "TestMarDynMolecule - Test 1 not successful, " << errors << " errors occurred. Test 2 will not be executed." << std::endl;
       exit(1);
     }
 
     errors = 0;
-    std::cout
-        << "Test 2: Comparison of values from simulation and through interface:"
-        << std::endl;
+    std::cout << "Test 2: Comparison of values from simulation and through interface:" << std::endl;
     int currentCellIndex = 0;
     while (currentCellIndex < 2744) {
       compareMoleculeList(false, currentCellIndex, errors);
@@ -59,8 +54,7 @@ public:
     if (errors == 0)
       std::cout << "TestMarDynMolecule - Test 2 was successful! " << std::endl;
     else
-      std::cout << "TestMarDynMolecule - Test 2 was not successful, " << errors
-                << " errors occurred." << std::endl;
+      std::cout << "TestMarDynMolecule - Test 2 was not successful, " << errors << " errors occurred." << std::endl;
 
     std::cout << "Test 3: Potential Energy Test: " << std::endl;
     errors = 0;
@@ -68,16 +62,13 @@ public:
     if (errors == 0)
       std::cout << "TestMarDynMolecule - Test 3 was successful! " << std::endl;
     else
-      std::cout << "TestMarDynMolecule - Test 3 was not successful, " << errors
-                << " errors occurred." << std::endl;
+      std::cout << "TestMarDynMolecule - Test 3 was not successful, " << errors << " errors occurred." << std::endl;
   }
 
 protected:
   void potEnergyAndForceTest(bool detail, int &errors) {
     MarDynMDSolverInterface *mdsi =
-        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<
-            MarDynCell, 3>::getInstance()
-            .getMDSolverInterface();
+        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
     double potentialEnergy = 0.0;
 
     // get particle container from simulation
@@ -85,8 +76,7 @@ protected:
 
     Molecule *curMolecule;
     int counter = 0;
-    for (curMolecule = cells->begin(); curMolecule != cells->end();
-         curMolecule = cells->next()) {
+    for (curMolecule = cells->begin(); curMolecule != cells->end(); curMolecule = cells->next()) {
       counter++;
 
       //			std::cout << "cellIndex is: " <<
@@ -114,8 +104,7 @@ protected:
       }
       internalMolecule.setF(force);
       MarDynMoleculeWrapper molecule;
-      molecule.setMolecule(&internalMolecule,
-                           mdsi->getSimulation()->getcutoffRadius());
+      molecule.setMolecule(&internalMolecule, mdsi->getSimulation()->getcutoffRadius());
 
       // compute force and potential energy
       mdsi->calculateForceAndEnergy(molecule);
@@ -130,8 +119,7 @@ protected:
         errors++;
       if (detail)
         std::cout << "- force: " << molecule.getForce() << std::endl;
-      if (molecule.getForce()[0] == 0.0 && molecule.getForce()[1] == 0.0 &&
-          molecule.getForce()[2] == 0.0)
+      if (molecule.getForce()[0] == 0.0 && molecule.getForce()[1] == 0.0 && molecule.getForce()[2] == 0.0)
         errors++;
 
       // only test 1000 molecules
@@ -141,8 +129,7 @@ protected:
 
     //-------------------------------------------------------------------------
     // test getPotentialEnergy method for molecule that is not in the simulation
-    std::cout << "Testing getPotentialEnergy() for a new molecule.."
-              << std::endl;
+    std::cout << "Testing getPotentialEnergy() for a new molecule.." << std::endl;
 
     tarch::la::Vector<3, double> newPosition(23.0);
     tarch::la::Vector<3, double> newVelocity(1.0);
@@ -154,13 +141,11 @@ protected:
     }
     internalMolecule.setF(newForce);
     MarDynMoleculeWrapper newMolecule;
-    newMolecule.setMolecule(&internalMolecule,
-                            mdsi->getSimulation()->getcutoffRadius());
+    newMolecule.setMolecule(&internalMolecule, mdsi->getSimulation()->getcutoffRadius());
 
     potentialEnergy = newMolecule.getPotentialEnergy();
     if (detail)
-      std::cout << "potentialEnergy of the new molecule: " << potentialEnergy
-                << std::endl;
+      std::cout << "potentialEnergy of the new molecule: " << potentialEnergy << std::endl;
     if (potentialEnergy != potentialEnergy) {
       std::cout << "Potential energy fault for new molecule!" << std::endl;
       errors++;
@@ -182,8 +167,7 @@ protected:
     }
 
     if (detail)
-      std::cout << "Values of first molecule:     " << inputPosition << " | "
-                << inputVelocity << " | " << inputForce << std::endl;
+      std::cout << "Values of first molecule:     " << inputPosition << " | " << inputVelocity << " | " << inputForce << std::endl;
 
     // create MarDynMoleculeWrapper
     tarch::la::Vector<3, double> position(0.0);
@@ -208,22 +192,18 @@ protected:
     tarch::la::Vector<3, double> testVelocity = mdmw.getVelocity();
     tarch::la::Vector<3, double> testForce = mdmw.getForce();
     if (detail)
-      std::cout << "Values of interface molecule: " << inputPosition << " | "
-                << inputVelocity << " | " << inputForce << std::endl;
+      std::cout << "Values of interface molecule: " << inputPosition << " | " << inputVelocity << " | " << inputForce << std::endl;
 
     if (testPosition != inputPosition) {
-      std::cout << "ERROR: getPosition: " << testPosition << " should be "
-                << inputPosition << std::endl;
+      std::cout << "ERROR: getPosition: " << testPosition << " should be " << inputPosition << std::endl;
       errors++;
     }
     if (testVelocity != inputVelocity) {
-      std::cout << "ERROR: getVelocity: " << testVelocity << " should be "
-                << inputVelocity << std::endl;
+      std::cout << "ERROR: getVelocity: " << testVelocity << " should be " << inputVelocity << std::endl;
       errors++;
     }
     if (testForce != inputForce) {
-      std::cout << "ERROR: getForce: " << testForce << " should be "
-                << inputForce << std::endl;
+      std::cout << "ERROR: getForce: " << testForce << " should be " << inputForce << std::endl;
       errors++;
     }
 
@@ -238,22 +218,18 @@ protected:
     testForce = mdmw.getForce();
 
     if (detail)
-      std::cout << "Molecule values after set:    " << testPosition << " | "
-                << testVelocity << " | " << testForce << std::endl;
+      std::cout << "Molecule values after set:    " << testPosition << " | " << testVelocity << " | " << testForce << std::endl;
 
     if (testPosition != setValue) {
-      std::cout << "ERROR: setPosition: " << testPosition << " should be "
-                << setValue << std::endl;
+      std::cout << "ERROR: setPosition: " << testPosition << " should be " << setValue << std::endl;
       errors++;
     }
     if (testVelocity != setValue) {
-      std::cout << "ERROR: setVelocity: " << testVelocity << " should be "
-                << setValue << std::endl;
+      std::cout << "ERROR: setVelocity: " << testVelocity << " should be " << setValue << std::endl;
       errors++;
     }
     if (testForce != setValue) {
-      std::cout << "ERROR: setForce: " << testForce << " should be " << setValue
-                << std::endl;
+      std::cout << "ERROR: setForce: " << testForce << " should be " << setValue << std::endl;
       errors++;
     }
   }
@@ -268,8 +244,7 @@ protected:
     for (int i = currentCellIndex; i < 2744; i++) {
       pc = cells->getCell(i);
       if (pc.getMoleculeCount() > 0) {
-        std::cout << "Test 2 " << i << " " << pc.getMoleculeCount()
-                  << std::endl;
+        std::cout << "Test 2 " << i << " " << pc.getMoleculeCount() << std::endl;
         currentCellIndex = i + 1;
         cellFound = true;
         break;
@@ -305,8 +280,7 @@ protected:
       velocity = mdmi.get().getVelocity();
       force = mdmi.get().getForce();
       if (detail)
-        std::cout << "interface: " << position << " | " << velocity << " | "
-                  << force << std::endl;
+        std::cout << "interface: " << position << " | " << velocity << " | " << force << std::endl;
       listMarDynCouplingInterface.push_back(position);
       listMarDynCouplingInterface.push_back(velocity);
       listMarDynCouplingInterface.push_back(force);
@@ -318,8 +292,7 @@ protected:
         force[d] = moleculesInParticleCell[counter]->F(d);
       }
       if (detail)
-        std::cout << "cell_____: " << position << " | " << velocity << " | "
-                  << force << std::endl;
+        std::cout << "cell_____: " << position << " | " << velocity << " | " << force << std::endl;
       listMarDyn.push_back(position);
       listMarDyn.push_back(velocity);
       listMarDyn.push_back(force);
@@ -329,10 +302,9 @@ protected:
 
     if (listMarDyn != listMarDynCouplingInterface) {
       errors = 1;
-      std::cout
-          << "ERROR: the molecule values obtained from the MarDyn simulation "
-             "and through the Coupling interface do not match! (Cell #"
-          << currentCellIndex << ")" << std::endl;
+      std::cout << "ERROR: the molecule values obtained from the MarDyn simulation "
+                   "and through the Coupling interface do not match! (Cell #"
+                << currentCellIndex << ")" << std::endl;
     }
   }
 };

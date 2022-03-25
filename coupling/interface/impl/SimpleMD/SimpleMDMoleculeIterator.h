@@ -16,13 +16,9 @@ namespace interface {
 /** iterates over molecules in a SimpleMD linked cell.
  *  @author Philipp Neumann
  */
-class SimpleMDMoleculeIterator
-    : public MoleculeIterator<simplemd::LinkedCell, MD_DIM> {
+class SimpleMDMoleculeIterator : public MoleculeIterator<simplemd::LinkedCell, MD_DIM> {
 public:
-  SimpleMDMoleculeIterator(simplemd::LinkedCell &cell)
-      : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(
-            cell),
-        _buffer(NULL) {
+  SimpleMDMoleculeIterator(simplemd::LinkedCell &cell) : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(cell), _buffer(NULL) {
   } virtual ~SimpleMDMoleculeIterator() {
   }
 

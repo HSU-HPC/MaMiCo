@@ -25,15 +25,11 @@ template <unsigned int dim> class MaMiCoConfiguration;
 /** parses all sub-tags for MaMiCo configuration.
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class coupling::configurations::MaMiCoConfiguration
-    : public tarch::configuration::Configuration {
+template <unsigned int dim> class coupling::configurations::MaMiCoConfiguration : public tarch::configuration::Configuration {
 public:
   MaMiCoConfiguration()
-      : _isValid(true), _isDefinedParticleInsertion(false),
-        _isDefinedMomentumInsertion(false), _isDefinedBoundaryForce(false),
-        _isDefinedTransferStrategy(false), _isDefinedParallelTopology(false),
-        _isDefinedThermostat(false) {}
+      : _isValid(true), _isDefinedParticleInsertion(false), _isDefinedMomentumInsertion(false), _isDefinedBoundaryForce(false),
+        _isDefinedTransferStrategy(false), _isDefinedParallelTopology(false), _isDefinedThermostat(false) {}
 
   virtual ~MaMiCoConfiguration() {}
 
@@ -58,12 +54,8 @@ public:
   bool isValid() const { return _isValid; }
 
   /** getters */
-  const coupling::configurations::MacroscopicCellConfiguration<dim> &
-  getMacroscopicCellConfiguration() const {
-    return _macroscopicCellConfiguration;
-  }
-  const coupling::configurations::ParticleInsertionConfiguration &
-  getParticleInsertionConfiguration() const {
+  const coupling::configurations::MacroscopicCellConfiguration<dim> &getMacroscopicCellConfiguration() const { return _macroscopicCellConfiguration; }
+  const coupling::configurations::ParticleInsertionConfiguration &getParticleInsertionConfiguration() const {
     if (!_isDefinedParticleInsertion) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Particle insertion not defined!"
@@ -73,8 +65,7 @@ public:
     return _particleInsertionConfiguration;
   }
 
-  const coupling::configurations::MomentumInsertionConfiguration &
-  getMomentumInsertionConfiguration() const {
+  const coupling::configurations::MomentumInsertionConfiguration &getMomentumInsertionConfiguration() const {
     if (!_isDefinedMomentumInsertion) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Momentum insertion not defined!"
@@ -84,8 +75,7 @@ public:
     return _momentumInsertionConfiguration;
   }
 
-  const coupling::configurations::BoundaryForceConfiguration<dim> &
-  getBoundaryForceConfiguration() const {
+  const coupling::configurations::BoundaryForceConfiguration<dim> &getBoundaryForceConfiguration() const {
     if (!_isDefinedBoundaryForce) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Boundary force not defined!"
@@ -95,8 +85,7 @@ public:
     return _boundaryForceConfiguration;
   }
 
-  const coupling::configurations::TransferStrategyConfiguration<dim> &
-  getTransferStrategyConfiguration() const {
+  const coupling::configurations::TransferStrategyConfiguration<dim> &getTransferStrategyConfiguration() const {
     if (!_isDefinedTransferStrategy) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Transfer-Strategy not defined!"
@@ -106,8 +95,7 @@ public:
     return _transferStrategyConfiguration;
   }
 
-  const coupling::configurations::ParallelTopologyConfiguration &
-  getParallelTopologyConfiguration() const {
+  const coupling::configurations::ParallelTopologyConfiguration &getParallelTopologyConfiguration() const {
     if (!_isDefinedParallelTopology) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Parallel-Topology not defined!"
@@ -117,8 +105,7 @@ public:
     return _parallelTopologyConfiguration;
   }
 
-  const coupling::configurations::ThermostatConfiguration &
-  getThermostatConfiguration() const {
+  const coupling::configurations::ThermostatConfiguration &getThermostatConfiguration() const {
     if (!_isDefinedThermostat) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Thermostat not defined!"
@@ -130,18 +117,12 @@ public:
 
 private:
   bool _isValid;
-  coupling::configurations::MacroscopicCellConfiguration<dim>
-      _macroscopicCellConfiguration;
-  coupling::configurations::ParticleInsertionConfiguration
-      _particleInsertionConfiguration;
-  coupling::configurations::MomentumInsertionConfiguration
-      _momentumInsertionConfiguration;
-  coupling::configurations::BoundaryForceConfiguration<dim>
-      _boundaryForceConfiguration;
-  coupling::configurations::TransferStrategyConfiguration<dim>
-      _transferStrategyConfiguration;
-  coupling::configurations::ParallelTopologyConfiguration
-      _parallelTopologyConfiguration;
+  coupling::configurations::MacroscopicCellConfiguration<dim> _macroscopicCellConfiguration;
+  coupling::configurations::ParticleInsertionConfiguration _particleInsertionConfiguration;
+  coupling::configurations::MomentumInsertionConfiguration _momentumInsertionConfiguration;
+  coupling::configurations::BoundaryForceConfiguration<dim> _boundaryForceConfiguration;
+  coupling::configurations::TransferStrategyConfiguration<dim> _transferStrategyConfiguration;
+  coupling::configurations::ParallelTopologyConfiguration _parallelTopologyConfiguration;
   coupling::configurations::ThermostatConfiguration _thermostatConfiguration;
   bool _isDefinedParticleInsertion;
   bool _isDefinedMomentumInsertion;

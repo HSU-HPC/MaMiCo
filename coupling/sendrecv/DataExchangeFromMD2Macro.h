@@ -32,9 +32,7 @@ template <unsigned int dim> class DataExchangeFromMD2Macro;
  *  @author Philipp Neumann
  */
 template <unsigned int dim>
-class coupling::sendrecv::DataExchangeFromMD2Macro
-    : public coupling::sendrecv::DataExchange<
-          coupling::datastructures::MacroscopicCell<dim>, dim> {
+class coupling::sendrecv::DataExchangeFromMD2Macro : public coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim> {
 
 public:
   /** Constructor
@@ -42,14 +40,10 @@ public:
    * 	@param indexConversion index conversion
    * 	@param tagoffset 0 per default
    */
-  DataExchangeFromMD2Macro(
-      coupling::interface::MacroscopicSolverInterface<dim> *interface,
-      const coupling::IndexConversion<dim> &indexConversion,
-      unsigned int tagoffset = 0)
-      : coupling::sendrecv::DataExchange<
-            coupling::datastructures::MacroscopicCell<dim>, dim>(
-            TAG_FROM_MD2MACRO + tagoffset),
-        _interface(interface), _indexConversion(indexConversion) {
+  DataExchangeFromMD2Macro(coupling::interface::MacroscopicSolverInterface<dim> *interface, const coupling::IndexConversion<dim> &indexConversion,
+                           unsigned int tagoffset = 0)
+      : coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim>(TAG_FROM_MD2MACRO + tagoffset), _interface(interface),
+        _indexConversion(indexConversion) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "DataExchangeFromMD2Macro initialised..." << std::endl;
 #endif
@@ -63,8 +57,7 @@ public:
    *	@return the corresponding ranks via IndexConversion, if we need
    *information on MD side, otherwise empty vector
    */
-  virtual std::vector<unsigned int>
-  getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     // if we need information on macroscopic solver side, return the respective
     // ranks via interface
     if (_interface->receiveMacroscopicQuantityFromMDSolver(globalCellIndex)) {
@@ -81,12 +74,10 @@ public:
    *	@return the corresponding ranks via MacroscopicSolverInterface, if we
    *need information on MD side, otherwise empty vector
    */
-  virtual std::vector<unsigned int>
-  getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     std::vector<unsigned int> sourceRanks;
     if (_interface->receiveMacroscopicQuantityFromMDSolver(globalCellIndex)) {
-      sourceRanks.push_back(
-          _indexConversion.getUniqueRankForMacroscopicCell(globalCellIndex));
+      sourceRanks.push_back(_indexConversion.getUniqueRankForMacroscopicCell(globalCellIndex));
     }
     return sourceRanks;
   }
@@ -97,9 +88,7 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void
-  readFromCell(double *const buffer,
-               const coupling::datastructures::MacroscopicCell<dim> &cell) {
+  virtual void readFromCell(double *const buffer, const coupling::datastructures::MacroscopicCell<dim> &cell) {
     buffer[0] = cell.getMacroscopicMass();
     for (unsigned int d = 0; d < dim; d++) {
       buffer[d + 1] = cell.getMacroscopicMomentum()[d];
@@ -110,9 +99,7 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void
-  writeToCell(const double *const buffer,
-              coupling::datastructures::MacroscopicCell<dim> &cell) {
+  virtual void writeToCell(const double *const buffer, coupling::datastructures::MacroscopicCell<dim> &cell) {
     tarch::la::Vector<dim, double> macroscopicMomentum(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       macroscopicMomentum[d] = buffer[1 + d];

@@ -19,18 +19,14 @@ class LennardJonesPotentialEnergyMapping;
  */
 class simplemd::cellmappings::LennardJonesPotentialEnergyMapping {
 public:
-  LennardJonesPotentialEnergyMapping(
-      const simplemd::services::MolecularPropertiesService
-          &molecularPropertiesService);
+  LennardJonesPotentialEnergyMapping(const simplemd::services::MolecularPropertiesService &molecularPropertiesService);
   ~LennardJonesPotentialEnergyMapping() {}
 
   void beginCellIteration();
 
   void endCellIteration() {}
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex);
-  void handleCellPair(LinkedCell &cell1, LinkedCell &cell2,
-                      const unsigned int &cellIndex1,
-                      const unsigned int &cellIndex2);
+  void handleCellPair(LinkedCell &cell1, LinkedCell &cell2, const unsigned int &cellIndex1, const unsigned int &cellIndex2);
 
 private:
   /** epsilon */

@@ -52,22 +52,18 @@ public:
    * Filter Sequences are constructed in
    * coupling::FilterPipeline::loadSequencesFromXML(...).
    */
-  FilterSequence(
-      const char *name,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          inputCells,
+  FilterSequence(const char *name, const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCells,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      MPI_Comm comm,
+                 MPI_Comm comm,
 #endif
-      std::array<bool, 7> filteredValues = {true})
+                 std::array<bool, 7> filteredValues = {true})
       : _name(name), _inputCellVector(inputCells),
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         _comm(comm),
 #endif
-        _filteredValues(filteredValues),
-        _isOutput(false),    // potentially updated via loadSequencesFromXML
-                             // calling setAsOutput()
-        _isModifiable(true), // TODO: allow const sequences via XML attribute
+        _filteredValues(filteredValues), _isOutput(false), // potentially updated via loadSequencesFromXML
+                                                           // calling setAsOutput()
+        _isModifiable(true),                               // TODO: allow const sequences via XML attribute
         _timestepsElapsed(0) {
 #ifdef DEBUG_FILTER_PIPELINE
     std::cout << PRINT_PREFIX() << "Now initializing." << std::endl;
@@ -93,16 +89,10 @@ public:
 
   virtual ~FilterSequence() {
     // Output average application times for all filters
-    std::cout
-        << PRINT_PREFIX()
-        << "Average application times for filters in this sequence in \u03BCs:"
-        << std::endl;
+    std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
     for (auto filter : _filters) {
       std::cout << "	" << filter->getType() << ": "
-                << (double)std::accumulate(_filterTimes[filter].begin(),
-                                           _filterTimes[filter].end(), 0) /
-                       (double)_timestepsElapsed
-                << std::endl;
+                << (double)std::accumulate(_filterTimes[filter].begin(), _filterTimes[filter].end(), 0) / (double)_timestepsElapsed << std::endl;
     }
 
     for (auto v1 : _cellVector1)
@@ -144,14 +134,10 @@ public:
       gettimeofday(&after, NULL);
 
       // store time difference in usec in map
-      _filterTimes[filter].push_back(
-          (after.tv_sec * 1000000 + after.tv_usec) -
-          (before.tv_sec * 1000000 + before.tv_usec));
+      _filterTimes[filter].push_back((after.tv_sec * 1000000 + after.tv_usec) - (before.tv_sec * 1000000 + before.tv_usec));
 
 #ifdef DEBUG_FILTER_PIPELINE
-      std::cout << PRINT_PREFIX() << "Applied filter " << filter->getType()
-                << ". Application time: " << _filterTimes[filter].back()
-                << "\u03BCs" << std::endl;
+      std::cout << PRINT_PREFIX() << "Applied filter " << filter->getType() << ". Application time: " << _filterTimes[filter].back() << "\u03BCs" << std::endl;
 #endif
     }
     _timestepsElapsed++;
@@ -164,8 +150,7 @@ public:
 
   bool isOutputToMacro() { return _isOutput; }
   void setAsOutputToMacro() {
-    std::cout << PRINT_PREFIX()
-              << " Setting as pipeline to macro solver output." << std::endl;
+    std::cout << PRINT_PREFIX() << " Setting as pipeline to macro solver output." << std::endl;
     _isOutput = true;
   }
 
@@ -176,9 +161,7 @@ public:
   bool isModifiable() { return _isModifiable; }
   void makeUnmodifiable() { _isModifiable = false; }
 
-  std::vector<coupling::filtering::FilterInterface<dim> *> getFilters() {
-    return _filters;
-  }
+  std::vector<coupling::filtering::FilterInterface<dim> *> getFilters() { return _filters; }
 
   /*
    * All virtual functions below are redefined in case this sequence is actually
@@ -207,29 +190,20 @@ public:
    * implies appending.
    */
   virtual void addFilter(
-      const std::function<std::vector<double>(
-          std::vector<double>, std::vector<std::array<unsigned int, dim>>)>
-          *applyScalar,
-      const std::function<std::vector<std::array<double, dim>>(
-          std::vector<std::array<double, dim>>,
-          std::vector<std::array<unsigned int, dim>>)> *applyVector,
+      const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)> *applyScalar,
+      const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> *applyVector,
       int filterIndex = -1);
 
   /*
    * Registers existence of a child sequence, i.e. a sequence using this
    * sequence's output as its input.
    */
-  virtual void
-  addChildSequence(coupling::filtering::FilterSequence<dim> *childSequence) {
-    _childSequences.push_back(childSequence);
-  }
+  virtual void addChildSequence(coupling::filtering::FilterSequence<dim> *childSequence) { _childSequences.push_back(childSequence); }
 
   /*
    * Allows changing the input cells after init.
    */
-  virtual void updateInputCellVector(
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          newInputCellVector) {
+  virtual void updateInputCellVector(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> newInputCellVector) {
     _inputCellVector = newInputCellVector; // call copy constructor
 
     // cc this change to this sequence's first vector.
@@ -246,8 +220,7 @@ public:
    * Some sequences have more than one output, thus the optional parameter. Has
    * no effect on a basic FilterSequence.
    */
-  virtual const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &
-  getOutputCellVector(unsigned int outputIndex = 0) const {
+  virtual const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &getOutputCellVector(unsigned int outputIndex = 0) const {
     if (_filters.empty())
       return _inputCellVector;
 
@@ -287,11 +260,7 @@ public:
     std::cout << std::endl;
   }
 
-  virtual std::string PRINT_PREFIX() const {
-    return std::string("	FS(")
-        .std::string::append(_name)
-        .std::string::append("): ");
-  }
+  virtual std::string PRINT_PREFIX() const { return std::string("	FS(").std::string::append(_name).std::string::append("): "); }
 
 private:
   /*
@@ -307,12 +276,9 @@ private:
 protected:
   const char *_name;
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-      _inputCellVector; // points to (foreign) input vector
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-      _cellVector1; // allocated for this sequence only
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-      _cellVector2; // allocated for this sequence only
+  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _inputCellVector; // points to (foreign) input vector
+  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _cellVector1;     // allocated for this sequence only
+  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _cellVector2;     // allocated for this sequence only
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _comm;
@@ -320,16 +286,14 @@ protected:
 
   std::array<bool, 7> _filteredValues;
 
-  bool _isOutput; // true if this sequence's output vector (see above) is the
-                  // Filter Pipeline's output
+  bool _isOutput;     // true if this sequence's output vector (see above) is the
+                      // Filter Pipeline's output
   bool _isModifiable; // true while filters can be added to sequence
 
   std::vector<coupling::filtering::FilterInterface<dim> *> _filters;
 
   // stores application times for all filters
-  std::map<coupling::filtering::FilterInterface<dim> *,
-           std::vector<unsigned int>>
-      _filterTimes;
+  std::map<coupling::filtering::FilterInterface<dim> *, std::vector<unsigned int>> _filterTimes;
 
   // there must be some other place to get this from
   unsigned int _timestepsElapsed;

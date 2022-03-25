@@ -38,16 +38,13 @@ class MolecularDynamicsSimulation;
  */
 class simplemd::MolecularDynamicsSimulation {
 public:
-  MolecularDynamicsSimulation(
-      const simplemd::configurations::MolecularDynamicsConfiguration
-          &configuration);
+  MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration &configuration);
   virtual ~MolecularDynamicsSimulation() {}
 
   /** initialises all services */
   void initServices();
   /** variant for multi-MD simulations */
-  void initServices(const tarch::utils::MultiMDService<MD_DIM> &multiMDService,
-                    unsigned int localMDSimulation);
+  void initServices(const tarch::utils::MultiMDService<MD_DIM> &multiMDService, unsigned int localMDSimulation);
 
   /** simulates one MD timestep. It's a virtual function as we (will definitely)
    * need to extend this method when going to coupled LB-MD simulations.
@@ -66,18 +63,14 @@ private:
   /** computes the number density for molecules given per direction and a
    * certain domain size. This is only used during initialisation.
    */
-  double
-  getNumberDensity(unsigned int numberMolecules,
-                   const tarch::la::Vector<MD_DIM, double> &domainSize) const;
+  double getNumberDensity(unsigned int numberMolecules, const tarch::la::Vector<MD_DIM, double> &domainSize) const;
 
 protected:
-  const simplemd::configurations::MolecularDynamicsConfiguration
-      &_configuration;
+  const simplemd::configurations::MolecularDynamicsConfiguration &_configuration;
 
   // molecule mappings
   simplemd::moleculemappings::VelocityStoermerVerletMapping *_timeIntegrator;
-  simplemd::moleculemappings::UpdateLinkedCellListsMapping
-      *_updateLinkedCellListsMapping;
+  simplemd::moleculemappings::UpdateLinkedCellListsMapping *_updateLinkedCellListsMapping;
   simplemd::moleculemappings::VTKMoleculeWriter *_vtkMoleculeWriter;
   std::string _vtkFilestem;
 
@@ -88,8 +81,7 @@ protected:
 
   // boundary treatment
   simplemd::BoundaryTreatment *_boundaryTreatment;
-  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>
-      _localBoundary;
+  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> _localBoundary;
 
   // number of this MD simulation on this local rank
   unsigned int _localMDSimulation;

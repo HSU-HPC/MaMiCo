@@ -57,13 +57,11 @@ public:
   const T &operator()(int i, int j) const {
 #if (TARCH_DEBUG == TARCH_YES)
     if (i < 0 || i > rows - 1) {
-      std::cout << "ERROR Matrix const T& operator(): i out of range!"
-                << std::endl;
+      std::cout << "ERROR Matrix const T& operator(): i out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
     if (j < 0 || j > cols - 1) {
-      std::cout << "ERROR Matrix const T& operator(): j out of range!"
-                << std::endl;
+      std::cout << "ERROR Matrix const T& operator(): j out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif

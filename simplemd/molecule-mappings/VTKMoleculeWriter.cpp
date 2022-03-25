@@ -4,19 +4,13 @@
 // www5.in.tum.de/mamico
 #include "simplemd/molecule-mappings/VTKMoleculeWriter.h"
 
-simplemd::moleculemappings::VTKMoleculeWriter::VTKMoleculeWriter(
-    const simplemd::services::ParallelTopologyService &parallelTopologyService,
-    const simplemd::services::MoleculeService &moleculeService,
-    const std::string &filename)
-    : _parallelTopologyService(parallelTopologyService),
-      _moleculeService(moleculeService), _filename(filename), _timestep(0) {}
+simplemd::moleculemappings::VTKMoleculeWriter::VTKMoleculeWriter(const simplemd::services::ParallelTopologyService &parallelTopologyService,
+                                                                 const simplemd::services::MoleculeService &moleculeService, const std::string &filename)
+    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _filename(filename), _timestep(0) {}
 
 simplemd::moleculemappings::VTKMoleculeWriter::~VTKMoleculeWriter() {}
 
-void simplemd::moleculemappings::VTKMoleculeWriter::setTimestep(
-    const unsigned int &timestep) {
-  _timestep = timestep;
-}
+void simplemd::moleculemappings::VTKMoleculeWriter::setTimestep(const unsigned int &timestep) { _timestep = timestep; }
 
 void simplemd::moleculemappings::VTKMoleculeWriter::beginMoleculeIteration() {
 
@@ -47,18 +41,15 @@ void simplemd::moleculemappings::VTKMoleculeWriter::beginMoleculeIteration() {
   _file << "ASCII" << std::endl << std::endl;
   _file << "DATASET UNSTRUCTURED_GRID" << std::endl;
 
-  _positions << "POINTS " << _moleculeService.getNumberMolecules() << " float"
-             << std::endl;
-  _velocities << "POINT_DATA " << _moleculeService.getNumberMolecules()
-              << std::endl;
+  _positions << "POINTS " << _moleculeService.getNumberMolecules() << " float" << std::endl;
+  _velocities << "POINT_DATA " << _moleculeService.getNumberMolecules() << std::endl;
   _velocities << "VECTORS velocities float" << std::endl;
   _forces << "VECTORS forces float" << std::endl;
   _fix << "SCALARS isFixed float" << std::endl;
   _fix << "LOOKUP_TABLE default" << std::endl;
 }
 
-void simplemd::moleculemappings::VTKMoleculeWriter::handleMolecule(
-    Molecule &molecule) {
+void simplemd::moleculemappings::VTKMoleculeWriter::handleMolecule(Molecule &molecule) {
   for (unsigned int d = 0; d < MD_DIM; d++) {
     _positions << molecule.getConstPosition()[d] << " ";
     _velocities << molecule.getConstVelocity()[d] << " ";

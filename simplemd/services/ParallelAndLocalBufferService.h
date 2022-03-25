@@ -40,8 +40,7 @@ public:
     ~SimpleBuffer();
 
     /** allocate storage */
-    bool initialise(const unsigned int doublesPerMolecule,
-                    const unsigned int upperBoundOnNumberOfMolecules);
+    bool initialise(const unsigned int doublesPerMolecule, const unsigned int upperBoundOnNumberOfMolecules);
 
     void shutdown();
 
@@ -51,10 +50,8 @@ public:
      * function returns true
      * otherwise - false
      */
-    bool pushData(const tarch::la::Vector<MD_DIM, double> position,
-                  const tarch::la::Vector<MD_DIM, double> velocity,
-                  const tarch::la::Vector<MD_DIM, double> force,
-                  const double isFixed, const bool permitReallocation);
+    bool pushData(const tarch::la::Vector<MD_DIM, double> position, const tarch::la::Vector<MD_DIM, double> velocity,
+                  const tarch::la::Vector<MD_DIM, double> force, const double isFixed, const bool permitReallocation);
 
     /** clear buffer values for use at next iteration
      * capacity is preserved
@@ -96,44 +93,25 @@ public:
   /** allocate all necessary buffers
    * return false if allocation of a buffer fails
    */
-  bool initialise(const unsigned int numUniqueNeighbours,
-                  const unsigned int numCellsPerBuffer[],
-                  const double avMoleculesPerCell);
+  bool initialise(const unsigned int numUniqueNeighbours, const unsigned int numCellsPerBuffer[], const double avMoleculesPerCell);
 
   void shutdown();
 
-  bool
-  pushMoleculeToLocalBuffer(const tarch::la::Vector<MD_DIM, double> &position,
-                            const Molecule *mol);
+  bool pushMoleculeToLocalBuffer(const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol);
 
-  unsigned int getLocalBufferLength(unsigned int i_buf) const {
-    return _localBuffer.getLength();
-  }
+  unsigned int getLocalBufferLength(unsigned int i_buf) const { return _localBuffer.getLength(); }
 
   SimpleBuffer *getLocalBuffer() { return &_localBuffer; }
 
 #if (MD_PARALLEL == MD_YES)
-  bool
-  pushMoleculeToSendBuffer(const tarch::la::Vector<MD_DIM, double> &position,
-                           const Molecule *mol, const unsigned int i_buffer);
+  bool pushMoleculeToSendBuffer(const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol, const unsigned int i_buffer);
 
-  unsigned int getBufferCapacity(unsigned int i_buf) const {
-    return _sendBuffers[i_buf].getCapacity();
-  }
-  unsigned int getSendBufferLength(unsigned int i_buf) const {
-    return _sendBuffers[i_buf].getLength();
-  }
-  SimpleBuffer *getSendBuffer(const unsigned int &i_buf) {
-    return &(_sendBuffers[i_buf]);
-  }
-  SimpleBuffer *getReceiveBuffer(const unsigned int &i_buf) {
-    return &(_receiveBuffers[i_buf]);
-  }
+  unsigned int getBufferCapacity(unsigned int i_buf) const { return _sendBuffers[i_buf].getCapacity(); }
+  unsigned int getSendBufferLength(unsigned int i_buf) const { return _sendBuffers[i_buf].getLength(); }
+  SimpleBuffer *getSendBuffer(const unsigned int &i_buf) { return &(_sendBuffers[i_buf]); }
+  SimpleBuffer *getReceiveBuffer(const unsigned int &i_buf) { return &(_receiveBuffers[i_buf]); }
 
-  void setReceiveBufferLength(const unsigned int i_buf,
-                              const unsigned int count) {
-    _receiveBuffers[i_buf].setLength(count);
-  };
+  void setReceiveBufferLength(const unsigned int i_buf, const unsigned int count) { _receiveBuffers[i_buf].setLength(count); };
 #endif
 
 private:
@@ -157,8 +135,7 @@ private:
    * 4. A - monotonically decreasing
    *
    */
-  unsigned int computeBufferUpperBound(const unsigned int numCells,
-                                       const double avMoleculesPerCell) const;
+  unsigned int computeBufferUpperBound(const unsigned int numCells, const double avMoleculesPerCell) const;
 
   /* Fields */
 

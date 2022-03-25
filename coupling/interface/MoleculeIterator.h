@@ -21,8 +21,7 @@ template <class LinkedCell, unsigned int dim> class MoleculeIterator;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::interface::MoleculeIterator {
+template <class LinkedCell, unsigned int dim> class coupling::interface::MoleculeIterator {
 protected:
   LinkedCell &_cell;
 

@@ -40,8 +40,7 @@ int main(int argc, char **argv) {
   runTest(new TestMarDynMolecule(argc, argv, "MarDyn Molecule Test"));
 
   // Test for molecule insertion/deletion
-  runTest(new TestMarDynAddDeleteMolecule(argc, argv,
-                                          "MarDyn Deletion/Insertion Test"));
+  runTest(new TestMarDynAddDeleteMolecule(argc, argv, "MarDyn Deletion/Insertion Test"));
 
   std::cout << "Finished!" << std::endl;
 

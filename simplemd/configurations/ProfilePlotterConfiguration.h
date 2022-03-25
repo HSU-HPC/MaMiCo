@@ -19,8 +19,7 @@ class ProfilePlotterConfiguration;
  * sub-set of the linked cell data structure.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::ProfilePlotterConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::ProfilePlotterConfiguration : public tarch::configuration::Configuration {
 public:
   ProfilePlotterConfiguration();
   virtual ~ProfilePlotterConfiguration() {}
@@ -46,18 +45,10 @@ public:
   bool isValid() const { return _isValid; }
 
   /** getters for all parsed and computed quantities */
-  const tarch::la::Vector<MD_DIM, unsigned int> &getStartCell() const {
-    return _startCell;
-  }
-  const tarch::la::Vector<MD_DIM, unsigned int> &getRange() const {
-    return _range;
-  }
-  const unsigned int &getWriteEveryTimestep() const {
-    return _writeEveryTimestep;
-  }
-  const unsigned int &getSampleEveryTimestep() const {
-    return _sampleEveryTimestep;
-  }
+  const tarch::la::Vector<MD_DIM, unsigned int> &getStartCell() const { return _startCell; }
+  const tarch::la::Vector<MD_DIM, unsigned int> &getRange() const { return _range; }
+  const unsigned int &getWriteEveryTimestep() const { return _writeEveryTimestep; }
+  const unsigned int &getSampleEveryTimestep() const { return _sampleEveryTimestep; }
   const unsigned int &getStartAtTimestep() const { return _startAtTimestep; }
 
 private:

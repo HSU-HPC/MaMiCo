@@ -4,16 +4,11 @@
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.h"
 
-void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::
-    handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
+void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
   // size of the local domain
-  const tarch::la::Vector<MD_DIM, unsigned int> size(
-      _linkedCellService.getLocalNumberOfCells() +
-      2u * _linkedCellService.getLocalIndexOfFirstCell());
+  const tarch::la::Vector<MD_DIM, unsigned int> size(_linkedCellService.getLocalNumberOfCells() + 2u * _linkedCellService.getLocalIndexOfFirstCell());
   // first: send molecules to neighboring ghost cells, if needed.
-  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex =
-      _parallelTopologyService.broadcastInnerCellViaBuffer(cell, cellIndex,
-                                                           _linkedCellService);
+  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex = _parallelTopologyService.broadcastInnerCellViaBuffer(cell, cellIndex, _linkedCellService);
 
   // now: run over the local periodic boundaries and update those
   const unsigned int localIndexSize = (unsigned int)localIndex.size();
@@ -29,8 +24,7 @@ void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::
       }
     }
     // iterate over cell's molecules and add molecules to local ghost cell
-    for (std::list<Molecule *>::const_iterator it = cell.begin();
-         it != cell.end(); it++) {
+    for (std::list<Molecule *>::const_iterator it = cell.begin(); it != cell.end(); it++) {
       positionBuffer = (*it)->getConstPosition();
       positionBuffer += shift;
       Molecule myMolecule(positionBuffer, (*it)->getConstVelocity());

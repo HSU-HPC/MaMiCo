@@ -25,38 +25,26 @@ template <unsigned int dim> class MacroscopicCellServiceMacroOnly;
  * data exchange objects from sendrecv).
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class coupling::services::MacroscopicCellServiceMacroOnly
-    : public coupling::services::MacroscopicCellService<dim> {
+template <unsigned int dim> class coupling::services::MacroscopicCellServiceMacroOnly : public coupling::services::MacroscopicCellService<dim> {
 public:
   MacroscopicCellServiceMacroOnly(
       unsigned int ID,
-      coupling::interface::MacroscopicSolverInterface<dim>
-          *macroscopicSolverInterface, // interface to macroscopic solver
-      tarch::la::Vector<dim, unsigned int>
-          numberProcesses, // number of processes in all directions
-      unsigned int rank,   // current rank
-      tarch::la::Vector<dim, double>
-          globalMDDomainSize, // domain size of MD simulation -> required for
-                              // index conversion
-      tarch::la::Vector<dim, double>
-          globalMDDomainOffset, // domain offset of MD simulation -> required
-                                // for index conversion
-      const coupling::configurations::ParallelTopologyConfiguration
-          &parallelTopologyConfiguration, // configuration for parallel topology
-      const coupling::configurations::MacroscopicCellConfiguration<dim>
-          &macroscopicCellConfiguration, // configuration for macroscopic cells
-                                         // and respective plotting
+      coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface,                // interface to macroscopic solver
+      tarch::la::Vector<dim, unsigned int> numberProcesses,                                            // number of processes in all directions
+      unsigned int rank,                                                                               // current rank
+      tarch::la::Vector<dim, double> globalMDDomainSize,                                               // domain size of MD simulation -> required for
+                                                                                                       // index conversion
+      tarch::la::Vector<dim, double> globalMDDomainOffset,                                             // domain offset of MD simulation -> required
+                                                                                                       // for index conversion
+      const coupling::configurations::ParallelTopologyConfiguration &parallelTopologyConfiguration,    // configuration for parallel topology
+      const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells
+                                                                                                       // and respective plotting
       unsigned int topologyOffset)
       : coupling::services::MacroscopicCellService<dim>(ID),
         // index conversion should be the very first thing getting initialised!
-        _indexConversion(initIndexConversion(
-            macroscopicCellConfiguration.getMacroscopicCellSize(),
-            numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset,
-            parallelTopologyConfiguration.getParallelTopologyType(),
-            topologyOffset)),
-        _macroscopicSolverInterface(macroscopicSolverInterface),
-        _deFromMacro2MD(_macroscopicSolverInterface, *_indexConversion, ID),
+        _indexConversion(initIndexConversion(macroscopicCellConfiguration.getMacroscopicCellSize(), numberProcesses, rank, globalMDDomainSize,
+                                             globalMDDomainOffset, parallelTopologyConfiguration.getParallelTopologyType(), topologyOffset)),
+        _macroscopicSolverInterface(macroscopicSolverInterface), _deFromMacro2MD(_macroscopicSolverInterface, *_indexConversion, ID),
         _deFromMD2Macro(_macroscopicSolverInterface, *_indexConversion, ID) {
     if (_macroscopicSolverInterface == NULL) {
       std::cout << "ERROR "
@@ -75,21 +63,13 @@ public:
     }
   }
 
-  virtual void sendFromMacro2MD(
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &macroscopicCellsFromMacroscopicSolver,
-      const unsigned int *const globalCellIndicesFromMacroscopicSolver) {
-    _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD,
-                                   macroscopicCellsFromMacroscopicSolver,
-                                   globalCellIndicesFromMacroscopicSolver);
+  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &macroscopicCellsFromMacroscopicSolver,
+                                const unsigned int *const globalCellIndicesFromMacroscopicSolver) {
+    _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
   }
-  virtual double sendFromMD2Macro(
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &macroscopicCellsFromMacroscopicSolver,
-      const unsigned int *const globalCellIndicesFromMacroscopicSolver) {
-    _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro,
-                                   macroscopicCellsFromMacroscopicSolver,
-                                   globalCellIndicesFromMacroscopicSolver);
+  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &macroscopicCellsFromMacroscopicSolver,
+                                  const unsigned int *const globalCellIndicesFromMacroscopicSolver) {
+    _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return 0;
   }
   virtual void processInnerMacroscopicCellAfterMDTimestep() {}
@@ -100,34 +80,27 @@ public:
   virtual void applyBoundaryForce(unsigned int t) {}
   virtual void plotEveryMicroscopicTimestep(unsigned int t) {}
   virtual void plotEveryMacroscopicTimestep(unsigned int t) {}
-  virtual const coupling::IndexConversion<dim> &getIndexConversion() const {
-    return *_indexConversion;
-  }
+  virtual const coupling::IndexConversion<dim> &getIndexConversion() const { return *_indexConversion; }
 
 private:
   /** this is currently a copy-paste version of MacroscopicCellService's
    * initIndexConversion */
-  coupling::IndexConversion<dim> *initIndexConversion(
-      tarch::la::Vector<dim, double> macroscopicCellSize,
-      tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
-      tarch::la::Vector<dim, double> globalMDDomainSize,
-      tarch::la::Vector<dim, double> globalMDDomainOffset,
-      coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-      unsigned int topologyOffset) const {
+  coupling::IndexConversion<dim> *initIndexConversion(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> numberProcesses,
+                                                      unsigned int rank, tarch::la::Vector<dim, double> globalMDDomainSize,
+                                                      tarch::la::Vector<dim, double> globalMDDomainOffset,
+                                                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                                                      unsigned int topologyOffset) const {
     tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
     for (unsigned int d = 0; d < dim; d++) {
-      globalNumberMacroscopicCells[d] = (unsigned int)floor(
-          globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
-      if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] -
-               globalMDDomainSize[d]) > 1e-13) {
+      globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
+      if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13) {
         std::cout << "coupling::services::MacroscopicCellServiceMacroOnly::"
                      "initIndexConversion(): Deviation of domain size > 1e-13!"
                   << std::endl;
       }
     }
-    coupling::IndexConversion<dim> *ic = new coupling::IndexConversion<dim>(
-        globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,
-        globalMDDomainOffset, parallelTopologyType, topologyOffset);
+    coupling::IndexConversion<dim> *ic = new coupling::IndexConversion<dim>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,
+                                                                            globalMDDomainOffset, parallelTopologyType, topologyOffset);
     if (ic == NULL) {
       std::cout << "coupling::services::MacroscopicCellServiceImpl::"
                    "initIndexConversion(): ic==NULL!"
@@ -141,17 +114,12 @@ private:
   coupling::IndexConversion<dim> *_indexConversion;
 
   /** interface for macroscopic solver */
-  coupling::interface::MacroscopicSolverInterface<dim>
-      *_macroscopicSolverInterface;
+  coupling::interface::MacroscopicSolverInterface<dim> *_macroscopicSolverInterface;
 
   /** for quantity transfer between solvers */
-  coupling::sendrecv::FromMacro2MDSendOnly<
-      coupling::datastructures::MacroscopicCell<dim>, dim>
-      _fromMacro2MD;
+  coupling::sendrecv::FromMacro2MDSendOnly<coupling::datastructures::MacroscopicCell<dim>, dim> _fromMacro2MD;
   coupling::sendrecv::DataExchangeFromMacro2MD<dim> _deFromMacro2MD;
-  coupling::sendrecv::FromMD2MacroRecvOnly<
-      coupling::datastructures::MacroscopicCell<dim>, dim>
-      _fromMD2Macro;
+  coupling::sendrecv::FromMD2MacroRecvOnly<coupling::datastructures::MacroscopicCell<dim>, dim> _fromMD2Macro;
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;
 };
 

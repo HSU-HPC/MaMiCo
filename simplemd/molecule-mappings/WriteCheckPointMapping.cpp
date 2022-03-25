@@ -6,8 +6,7 @@
 
 #include "simplemd/MolecularDynamicsDefinitions.h"
 
-void simplemd::moleculemappings::WriteCheckPointMapping::
-    beginMoleculeIteration() {
+void simplemd::moleculemappings::WriteCheckPointMapping::beginMoleculeIteration() {
   std::stringstream ss;
   ss << _filestem << "_" << _t << "_";
 #if (MD_PARALLEL == MD_YES)
@@ -22,8 +21,7 @@ void simplemd::moleculemappings::WriteCheckPointMapping::
   }
   _file = new std::ofstream(ss.str().c_str());
   if (!_file->is_open()) {
-    std::cout << "ERROR WriteCheckPointMapping: Could not open file "
-              << ss.str() << "!" << std::endl;
+    std::cout << "ERROR WriteCheckPointMapping: Could not open file " << ss.str() << "!" << std::endl;
     exit(EXIT_FAILURE);
   }
   _file->precision(30);
@@ -33,8 +31,7 @@ void simplemd::moleculemappings::WriteCheckPointMapping::
   _particleCounter = 0;
 }
 
-void simplemd::moleculemappings::WriteCheckPointMapping::
-    endMoleculeIteration() {
+void simplemd::moleculemappings::WriteCheckPointMapping::endMoleculeIteration() {
   *_file << _particleCounter << " " << MD_DIM << std::endl;
   *_file << _moleculedata.str() << std::endl;
   _moleculedata.clear();
@@ -44,10 +41,8 @@ void simplemd::moleculemappings::WriteCheckPointMapping::
   _file = NULL;
 }
 
-void simplemd::moleculemappings::WriteCheckPointMapping::handleMolecule(
-    Molecule &molecule) {
-  const tarch::la::Vector<MD_DIM, double> &forceOld =
-      molecule.getConstForceOld();
+void simplemd::moleculemappings::WriteCheckPointMapping::handleMolecule(Molecule &molecule) {
+  const tarch::la::Vector<MD_DIM, double> &forceOld = molecule.getConstForceOld();
   const tarch::la::Vector<MD_DIM, double> &vel = molecule.getConstVelocity();
   const tarch::la::Vector<MD_DIM, double> &pos = molecule.getConstPosition();
   for (unsigned int d = 0; d < MD_DIM; d++) {

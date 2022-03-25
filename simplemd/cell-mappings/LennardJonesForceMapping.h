@@ -21,27 +21,22 @@ class LennardJonesForceMapping;
  */
 class simplemd::cellmappings::LennardJonesForceMapping {
 public:
-  LennardJonesForceMapping(
-      simplemd::services::ExternalForceService &externalForceService,
-      const simplemd::services::MolecularPropertiesService
-          &molecularPropertiesService);
+  LennardJonesForceMapping(simplemd::services::ExternalForceService &externalForceService,
+                           const simplemd::services::MolecularPropertiesService &molecularPropertiesService);
   ~LennardJonesForceMapping() {}
 
   void beginCellIteration();
 
   void endCellIteration() {}
   void handleCell(const LinkedCell &cell, const unsigned int &cellIndex) const;
-  void handleCellPair(const LinkedCell &cell1, const LinkedCell &cell2,
-                      const unsigned int &cellIndex1,
-                      const unsigned int &cellIndex2) const;
+  void handleCellPair(const LinkedCell &cell1, const LinkedCell &cell2, const unsigned int &cellIndex1, const unsigned int &cellIndex2) const;
 
   /** returns the force acting on a particle placed at position1, resulting from
    * an interaction of the particles at positions position1 and position2.
    * Remark: The force on the particle at position2 is just (-1.0)*returnValue.
    */
-  tarch::la::Vector<MD_DIM, double> getLennardJonesForce(
-      const tarch::la::Vector<MD_DIM, double> &position1,
-      const tarch::la::Vector<MD_DIM, double> &position2) const;
+  tarch::la::Vector<MD_DIM, double> getLennardJonesForce(const tarch::la::Vector<MD_DIM, double> &position1,
+                                                         const tarch::la::Vector<MD_DIM, double> &position2) const;
 
 private:
   /** epsilon */

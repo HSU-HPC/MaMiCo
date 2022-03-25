@@ -16,9 +16,8 @@ namespace indexing {
 template <unsigned int dim> class IndexingService;
 
 template <unsigned int dim>
-std::vector<unsigned int> getRanksForGlobalIndex(
-    const BaseIndex<dim> &globalCellIndex,
-    const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
+std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex,
+                                                 const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells);
 
 } // namespace indexing
 } // namespace coupling
@@ -53,12 +52,9 @@ public:
     return singleton;
   }
 
-  void
-  init(const simplemd::configurations::MolecularDynamicsConfiguration
-           &simpleMDConfig,
-       const coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig,
-       coupling::interface::MacroscopicSolverInterface<dim> *msi,
-       const unsigned int rank);
+  void init(const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig,
+            const coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig, coupling::interface::MacroscopicSolverInterface<dim> *msi,
+            const unsigned int rank);
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   /**
@@ -70,8 +66,7 @@ public:
    * domain EXCLUDING global ghost layer cells.
    * @returns vector of all cells which contain the index
    */
-  std::vector<unsigned int>
-  getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex) const;
+  std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex) const;
 #endif
 
   unsigned int getRank() const { return _rank; }
@@ -82,13 +77,10 @@ private:
    * Helper function used by getRanksForGlobalIndex().
    */
   // TODO inline in getRanksForGlobalIndex()
-  unsigned int getUniqueRankForMacroscopicCell(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex,
-      const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells)
-      const;
+  unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
+                                               const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const;
 
-  /*const*/ tarch::la::Vector<dim, unsigned int>
-      _numberProcesses; // TODO: make const
+  /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   const coupling::paralleltopology::ParallelTopology<dim> *_parallelTopology;
 #endif
 

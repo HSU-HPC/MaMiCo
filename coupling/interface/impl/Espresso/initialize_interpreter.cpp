@@ -69,20 +69,16 @@
 int tclcommand_bin(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** Implementation of the Tcl command blockfile. Allows to read and write
     blockfile comfortably from Tcl. See \ref blockfile_tcl.cpp */
-int tclcommand_blockfile(ClientData data, Tcl_Interp *interp, int argc,
-                         char **argv);
+int tclcommand_blockfile(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** implementation of the Tcl command cellsystem. See \ref cells_tcl.cpp */
-int tclcommand_cellsystem(ClientData data, Tcl_Interp *interp, int argc,
-                          char **argv);
+int tclcommand_cellsystem(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** replaces one of TCLs standart channels with a named pipe. See \ref
  * channels_tcl.cpp */
-int tclcommand_replacestdchannel(ClientData clientData, Tcl_Interp *interp,
-                                 int argc, char **argv);
+int tclcommand_replacestdchannel(ClientData clientData, Tcl_Interp *interp, int argc, char **argv);
 /** Implements the Tcl command code_info.  It provides information on the
     Version, Compilation status and the debug status of the used
     code. See \ref config_tcl.cpp */
-int tclcommand_code_info(ClientData data, Tcl_Interp *interp, int argc,
-                         char **argv);
+int tclcommand_code_info(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** Set the CUDA device to use or retrieve information
     available devices. See \ref cuda_init_tcl.cpp */
 int tclcommand_cuda(ClientData data, Tcl_Interp *interp, int argc, char **argv);
@@ -93,14 +89,12 @@ int tclcommand_imd(ClientData data, Tcl_Interp *interp, int argc, char **argv);
     see also \ref tclcommand_nemd. See \ref nemd_tcl.cpp */
 int tclcommand_nemd(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** Collision detection. See \ref collision_tcl.cpp */
-int tclcommand_on_collision(ClientData data, Tcl_Interp *interp, int argc,
-                            char **argv);
+int tclcommand_on_collision(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** Implementation of the tcl command "part". This command allows to
     modify particle data. See \ref particle_data_tcl.cpp */
 int tclcommand_part(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** The C implementation of the tcl function uwerr. See \ref uwerr_tcl.cpp */
-int tclcommand_uwerr(ClientData data, Tcl_Interp *interp, int argc,
-                     char *argv[]);
+int tclcommand_uwerr(ClientData data, Tcl_Interp *interp, int argc, char *argv[]);
 /** callback for \ref timing_samples. See \ref tuning_tcl.cpp */
 int tclcallback_timings(Tcl_Interp *interp, void *data);
 
@@ -108,15 +102,13 @@ int tclcallback_timings(Tcl_Interp *interp, void *data);
 char *get_default_scriptsdir();
 
 /** Returns runtime of the integration loop in seconds. From tuning_tcl.cpp **/
-int tclcommand_time_integration(ClientData data, Tcl_Interp *interp, int argc,
-                                char *argv[]);
+int tclcommand_time_integration(ClientData data, Tcl_Interp *interp, int argc, char *argv[]);
 
 /****************************************
  * Registration functions
  *****************************************/
 
-#define REGISTER_COMMAND(name, routine)                                        \
-  Tcl_CreateCommand(interp, name, (Tcl_CmdProc *)routine, 0, NULL);
+#define REGISTER_COMMAND(name, routine) Tcl_CreateCommand(interp, name, (Tcl_CmdProc *)routine, 0, NULL);
 
 // MODIFICATION FOR MAMICO -> REMOVE static from function definition
 void register_tcl_commands(Tcl_Interp *interp) {
@@ -262,13 +254,11 @@ int appinit(Tcl_Interp *interp) {
     exit(1);
   }
   if (Tcl_EvalFile(interp, "init.tcl") == TCL_ERROR) {
-    fprintf(stderr, "\n\nerror in initialization script: %s\n\n\n",
-            Tcl_GetStringResult(interp));
+    fprintf(stderr, "\n\nerror in initialization script: %s\n\n\n", Tcl_GetStringResult(interp));
     exit(1);
   }
   if (chdir(cwd) != 0) {
-    fprintf(stderr, "\n\ncould not change back to execution dir %s ????\n\n\n",
-            cwd);
+    fprintf(stderr, "\n\ncould not change back to execution dir %s ????\n\n\n", cwd);
     exit(1);
   }
 

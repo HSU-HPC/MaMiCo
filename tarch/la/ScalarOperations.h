@@ -20,10 +20,7 @@ namespace la {
  *  @author Philipp Neumann
  */
 
-template <class T>
-inline bool equals(const T &l, const T &r, const T &tolerance) {
-  return std::abs(l - r) <= tolerance;
-}
+template <class T> inline bool equals(const T &l, const T &r, const T &tolerance) { return std::abs(l - r) <= tolerance; }
 
 } // namespace la
 } // namespace tarch

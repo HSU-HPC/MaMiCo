@@ -35,23 +35,19 @@ public:
    *  @param lowestRankInComm the lowest rank in the mpi communicator
    */
   IndexConversionMD2Macro(const coupling::IndexConversion<dim> *indexConversion,
-                          coupling::interface::MacroscopicSolverInterface<dim>
-                              *macroscopicSolverInterface
+                          coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                           ,
-                          const MPI_Comm comm = MPI_COMM_WORLD,
-                          const int lowestRankInComm = 0
+                          const MPI_Comm comm = MPI_COMM_WORLD, const int lowestRankInComm = 0
 #endif
                           /** @todo @felix adapt the params comm and
                              lowestRankInComm for case multimd */
                           )
-      : _ic(indexConversion), _msi(macroscopicSolverInterface),
-        _lowerBoundaryAllRanks(nullptr), _upperBoundaryAllRanks(nullptr),
+      : _ic(indexConversion), _msi(macroscopicSolverInterface), _lowerBoundaryAllRanks(nullptr), _upperBoundaryAllRanks(nullptr),
         _lowerBoundaryThisRank(nullptr), _upperBoundaryThisRank(nullptr)
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         ,
-        _comm(comm), _lowestRank((int)lowestRankInComm),
-        _myRank(_ic != nullptr ? _ic->getThisRank() : -1)
+        _comm(comm), _lowestRank((int)lowestRankInComm), _myRank(_ic != nullptr ? _ic->getThisRank() : -1)
 #endif
   {
     if (_ic == nullptr)
@@ -61,8 +57,7 @@ public:
       throw std::runtime_error("IndexConversionMD2Macro: Constructor called "
                                "with nullptr as MacroscopicSolverInterface.");
 #ifdef DEBUG_ICM2M
-    std::cout << "ICM2M: Created new instance at location " << this
-              << " using IC at " << _ic << " and MSI at " << _msi << std::endl;
+    std::cout << "ICM2M: Created new instance at location " << this << " using IC at " << _ic << " and MSI at " << _msi << std::endl;
 #endif
   }
 
@@ -94,12 +89,10 @@ public:
    *  @param outerCells Vector containing all outer cells.
    *  @param outerIndices Vector containing all outer indices.
    */
-  void initMD2MacroDomain(
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          m2mDomainCells,
-      std::vector<tarch::la::Vector<dim, unsigned int>> m2mGlobalCellIndices,
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outerCells,
-      std::vector<tarch::la::Vector<dim, unsigned int>> &outerIndices);
+  void initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> m2mDomainCells,
+                          std::vector<tarch::la::Vector<dim, unsigned int>> m2mGlobalCellIndices,
+                          std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outerCells,
+                          std::vector<tarch::la::Vector<dim, unsigned int>> &outerIndices);
 
   /** This alternative chooses a subspace of the cell (and index) input based on
    * what will be transfered to the macro solver. This subspace is referred to
@@ -118,13 +111,11 @@ public:
    *  @param m2mIndices Output vector where indices of those outer cells shall
    * be placed.
    */
-  void initMD2MacroDomain(
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCells,
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &m2mDomainCells,
-      std::vector<tarch::la::Vector<dim, unsigned int>> &m2mIndices,
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outerCells,
-      std::vector<tarch::la::Vector<dim, unsigned int>> &outerIndices);
+  void initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCells,
+                          std::vector<coupling::datastructures::MacroscopicCell<dim> *> &m2mDomainCells,
+                          std::vector<tarch::la::Vector<dim, unsigned int>> &m2mIndices,
+                          std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outerCells,
+                          std::vector<tarch::la::Vector<dim, unsigned int>> &outerIndices);
 
   /** For all d < dim, lowerBoundaries[d] < upperBoundaries[d].
    *  If M2M-domain is not yet defined, this does nothing.
@@ -133,9 +124,7 @@ public:
    *  @param lowerBoundaries Index to write lower boundaries to.
    *  @param upperBoundaries Index to write upper boundaries to.
    * */
-  void getMD2MacroDomainBoundariesAllRanks(
-      tarch::la::Vector<dim, unsigned int> &lowerBoundaries,
-      tarch::la::Vector<dim, unsigned int> &upperBoundaries) const {
+  void getMD2MacroDomainBoundariesAllRanks(tarch::la::Vector<dim, unsigned int> &lowerBoundaries, tarch::la::Vector<dim, unsigned int> &upperBoundaries) const {
     if (_lowerBoundaryAllRanks != _upperBoundaryAllRanks) {
       lowerBoundaries = *_lowerBoundaryAllRanks;
       upperBoundaries = *_upperBoundaryAllRanks;
@@ -161,9 +150,7 @@ public:
    *  @param lowerBoundaries Index to write lower boundaries to.
    *  @param upperBoundaries Index to write upper boundaries to.
    * */
-  void getMD2MacroDomainBoundariesThisRank(
-      tarch::la::Vector<dim, unsigned int> &lowerBoundaries,
-      tarch::la::Vector<dim, unsigned int> &upperBoundaries) const {
+  void getMD2MacroDomainBoundariesThisRank(tarch::la::Vector<dim, unsigned int> &lowerBoundaries, tarch::la::Vector<dim, unsigned int> &upperBoundaries) const {
     if (_lowerBoundaryThisRank != _upperBoundaryThisRank) {
       lowerBoundaries = *_lowerBoundaryThisRank;
       upperBoundaries = *_upperBoundaryThisRank;
@@ -207,18 +194,15 @@ public:
    *
    *  @return global MD-To-Macro domain offset 		 */
   tarch::la::Vector<dim, double> getGlobalMD2MacroDomainOffset() const {
-    tarch::la::Vector<dim, double> offset =
-        _ic->getGlobalMDDomainOffset(); // standard MD offset
+    tarch::la::Vector<dim, double> offset = _ic->getGlobalMDDomainOffset(); // standard MD offset
 
     if (_lowerBoundaryAllRanks == nullptr)
-      throw std::runtime_error(
-          "ERROR: Calling while _lowerBoundaryAllRanks is uninitialized!");
+      throw std::runtime_error("ERROR: Calling while _lowerBoundaryAllRanks is uninitialized!");
 
     // offset of md2macro domain relative to MD domain
     for (unsigned int d = 0; d < dim; d++) {
-      offset[d] += _ic->getMacroscopicCellSize()[d] *
-                   (*_lowerBoundaryAllRanks)[d]; // offset of md2macro domain
-                                                 // relative to MD domain
+      offset[d] += _ic->getMacroscopicCellSize()[d] * (*_lowerBoundaryAllRanks)[d]; // offset of md2macro domain
+                                                                                    // relative to MD domain
     }
 
     // std::cout << offset << std::endl << std::endl;
@@ -234,9 +218,7 @@ public:
    *  @param globalCellIndex Linear global index to be converted to vector
    *  @param noGL True, iff Ghost Layer indices shall be set to INT_MAX
    *  @return Converted vector index 		 */
-  tarch::la::Vector<dim, unsigned int>
-  getGlobalVectorCellIndex(unsigned int globalCellIndex,
-                           bool noGL = true) const;
+  tarch::la::Vector<dim, unsigned int> getGlobalVectorCellIndex(unsigned int globalCellIndex, bool noGL = true) const;
 
   /** Same as getLocalVectorCellIndex of base class, but converts in terms of to
    * MD-To-Macro indexing. Has the option to "ignore" Ghost Layer cells, i.e.
@@ -247,8 +229,7 @@ public:
    *  @param localCellIndex Linear local index to be converted to vector
    *  @param noGL True, iff Ghost Layer indices shall be set to INT_MAX
    *  @return Converted vector index 		 */
-  tarch::la::Vector<dim, unsigned int>
-  getLocalVectorCellIndex(unsigned int localCellIndex, bool noGL = true) const;
+  tarch::la::Vector<dim, unsigned int> getLocalVectorCellIndex(unsigned int localCellIndex, bool noGL = true) const;
 
   /** In a lot of cases, you want instances of this to be indentical to a
    * coupling::IndexConversion. This way you can access this class' underlying
@@ -262,8 +243,7 @@ public:
    *  @brief Conversion function: Local vector index -> Linear local index
    *  @param Local vector index to be converted to linear representation.
    *  @return Converted linear index 		 */
-  unsigned int
-  getLocalCellIndex(tarch::la::Vector<dim, unsigned int> localCellIndex) const {
+  unsigned int getLocalCellIndex(tarch::la::Vector<dim, unsigned int> localCellIndex) const {
     auto numberCells = getLocalMD2MacroDomainSize();
     unsigned int index = localCellIndex[dim - 1];
     for (int d = dim - 2; d > -1; d--)

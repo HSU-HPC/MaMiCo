@@ -24,8 +24,7 @@ public:
   void beginCellIteration() {}
   void endCellIteration() {}
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    for (std::list<Molecule *>::const_iterator it = cell.begin();
-         it != cell.end(); it++) {
+    for (std::list<Molecule *>::const_iterator it = cell.begin(); it != cell.end(); it++) {
       (*it)->setPotentialEnergy(_zero);
     }
   }

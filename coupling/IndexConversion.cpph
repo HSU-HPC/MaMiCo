@@ -4,21 +4,16 @@
 // www5.in.tum.de/mamico
 
 template <unsigned int dim>
-coupling::IndexConversion<dim>::IndexConversion(
-    tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
-    tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
-    tarch::la::Vector<dim, double> globalMDDomainSize,
-    tarch::la::Vector<dim, double> globalMDDomainOffset,
-    coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-    unsigned int topologyOffset)
+coupling::IndexConversion<dim>::IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
+                                                tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
+                                                tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim, double> globalMDDomainOffset,
+                                                coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                                                unsigned int topologyOffset)
     : // DO NOT CHANGE ORDERING OF THESE PARAMETERS
       // parallel-topology and type need to be initialised first (independent of
       // other class-members in init.)
       _parallelTopologyType(parallelTopologyType),
-      _parallelTopology(
-          coupling::paralleltopology::ParallelTopologyFactory::
-              getParallelTopology<dim>(parallelTopologyType, numberProcesses,
-                                       topologyOffset)),
+      _parallelTopology(coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, numberProcesses, topologyOffset)),
       // independent from other members in init.
       _numberProcesses(numberProcesses), _rank(rank),
       // depends on parallel-topology
@@ -26,31 +21,18 @@ coupling::IndexConversion<dim>::IndexConversion(
       // independent from other members in init.
       _globalNumberMacroscopicCells(globalNumberMacroscopicCells),
       // independent from other members in init.
-      _averageLocalNumberMacroscopicCells(
-          initAverageLocalNumberMacroscopicCells(globalNumberMacroscopicCells,
-                                                 numberProcesses)),
+      _averageLocalNumberMacroscopicCells(initAverageLocalNumberMacroscopicCells(globalNumberMacroscopicCells, numberProcesses)),
       // requires parallel-topology to be init.
-      _localNumberMacroscopicCells(initLocalNumberMacroscopicCells(
-          globalNumberMacroscopicCells, numberProcesses, rank)),
+      _localNumberMacroscopicCells(initLocalNumberMacroscopicCells(globalNumberMacroscopicCells, numberProcesses, rank)),
       // no dependen.
-      _divisionFactor4GlobalNumberMacroscopicCells(
-          coupling::initDivisionFactor<dim>(
-              _globalNumberMacroscopicCells +
-              tarch::la::Vector<dim, unsigned int>(2))),
+      _divisionFactor4GlobalNumberMacroscopicCells(coupling::initDivisionFactor<dim>(_globalNumberMacroscopicCells + tarch::la::Vector<dim, unsigned int>(2))),
       // no dependen.
-      _divisionFactor4LocalNumberMacroscopicCells(
-          coupling::initDivisionFactor<dim>(
-              _localNumberMacroscopicCells +
-              tarch::la::Vector<dim, unsigned int>(2))),
+      _divisionFactor4LocalNumberMacroscopicCells(coupling::initDivisionFactor<dim>(_localNumberMacroscopicCells + tarch::la::Vector<dim, unsigned int>(2))),
       // no dependen.
-      _globalMDDomainSize(globalMDDomainSize),
-      _globalMDDomainOffset(globalMDDomainOffset),
-      _macroscopicCellSize(initMacroscopicCellSize(
-          globalMDDomainSize, globalNumberMacroscopicCells)) {
+      _globalMDDomainSize(globalMDDomainSize), _globalMDDomainOffset(globalMDDomainOffset),
+      _macroscopicCellSize(initMacroscopicCellSize(globalMDDomainSize, globalNumberMacroscopicCells)) {
   if (_parallelTopology == NULL) {
-    std::cout
-        << "ERROR IndexConversion::IndexConversion(): _parallelTopology==NULL!"
-        << std::endl;
+    std::cout << "ERROR IndexConversion::IndexConversion(): _parallelTopology==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
 }
@@ -62,214 +44,145 @@ template <unsigned int dim> coupling::IndexConversion<dim>::~IndexConversion() {
   }
 }
 
-template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::getGlobalCellIndex(
-    tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+template <unsigned int dim> unsigned int coupling::IndexConversion<dim>::getGlobalCellIndex(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   if (!isValidGlobalVectorCellIndex(globalCellIndex)) {
-    std::cout << "ERROR IndexConversion::getGlobalCellIndex(...): Index "
-              << globalCellIndex << " out of range!" << std::endl;
+    std::cout << "ERROR IndexConversion::getGlobalCellIndex(...): Index " << globalCellIndex << " out of range!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
   return getCellIndex(globalCellIndex, _globalNumberMacroscopicCells);
 }
 
-template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::getLocalCellIndex(
-    tarch::la::Vector<dim, unsigned int> localCellIndex) const {
+template <unsigned int dim> unsigned int coupling::IndexConversion<dim>::getLocalCellIndex(tarch::la::Vector<dim, unsigned int> localCellIndex) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   if (!isValidLocalVectorCellIndex(localCellIndex)) {
-    std::cout << "ERROR IndexConversion::getLocalCellIndex(): Index "
-              << localCellIndex << " out of range!" << std::endl;
+    std::cout << "ERROR IndexConversion::getLocalCellIndex(): Index " << localCellIndex << " out of range!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
   return getCellIndex(localCellIndex, _localNumberMacroscopicCells);
 }
 
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getGlobalVectorCellIndex(
-    unsigned int globalCellIndex) const {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getGlobalVectorCellIndex(unsigned int globalCellIndex) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  if (!isValidGlobalVectorCellIndex(coupling::getVectorCellIndex<dim>(
-          globalCellIndex, _divisionFactor4GlobalNumberMacroscopicCells))) {
-    std::cout << "ERROR IndexConversion::getGlobalVectorCellIndex(...): Index "
-              << globalCellIndex << " out of range!" << std::endl;
+  if (!isValidGlobalVectorCellIndex(coupling::getVectorCellIndex<dim>(globalCellIndex, _divisionFactor4GlobalNumberMacroscopicCells))) {
+    std::cout << "ERROR IndexConversion::getGlobalVectorCellIndex(...): Index " << globalCellIndex << " out of range!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
-  return coupling::getVectorCellIndex<dim>(
-      globalCellIndex, _divisionFactor4GlobalNumberMacroscopicCells);
+  return coupling::getVectorCellIndex<dim>(globalCellIndex, _divisionFactor4GlobalNumberMacroscopicCells);
 }
 
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getLocalVectorCellIndex(
-    unsigned int localCellIndex) const {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getLocalVectorCellIndex(unsigned int localCellIndex) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  if (!isValidLocalVectorCellIndex(coupling::getVectorCellIndex<dim>(
-          localCellIndex, _divisionFactor4LocalNumberMacroscopicCells))) {
-    std::cout << "ERROR IndexConversion::getLocalVectorCellIndex(...): Index "
-              << localCellIndex << " out of range!" << std::endl;
+  if (!isValidLocalVectorCellIndex(coupling::getVectorCellIndex<dim>(localCellIndex, _divisionFactor4LocalNumberMacroscopicCells))) {
+    std::cout << "ERROR IndexConversion::getLocalVectorCellIndex(...): Index " << localCellIndex << " out of range!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
-  return coupling::getVectorCellIndex<dim>(
-      localCellIndex, _divisionFactor4LocalNumberMacroscopicCells);
+  return coupling::getVectorCellIndex<dim>(localCellIndex, _divisionFactor4LocalNumberMacroscopicCells);
 }
 
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getProcessCoordinates(unsigned int rank) const {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getProcessCoordinates(unsigned int rank) const {
   return _parallelTopology->getProcessCoordinates(rank);
 }
 
-template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::getRank(
-    tarch::la::Vector<dim, unsigned int> processCoordinates) const {
+template <unsigned int dim> unsigned int coupling::IndexConversion<dim>::getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
   return _parallelTopology->getRank(processCoordinates);
 }
 
 template <unsigned int dim>
 tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::convertLocalToGlobalVectorCellIndex(
-    tarch::la::Vector<dim, unsigned int> localCellIndex) const {
+coupling::IndexConversion<dim>::convertLocalToGlobalVectorCellIndex(tarch::la::Vector<dim, unsigned int> localCellIndex) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   if (!isValidLocalVectorCellIndex(localCellIndex)) {
-    std::cout
-        << "ERROR IndexConversion::convertLocalToGlobalVectorCellIndex(...): "
-           "Index "
-        << localCellIndex << " out of range!" << std::endl;
+    std::cout << "ERROR IndexConversion::convertLocalToGlobalVectorCellIndex(...): "
+                 "Index "
+              << localCellIndex << " out of range!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
   tarch::la::Vector<dim, unsigned int> globalCellIndex(0);
   for (unsigned int d = 0; d < dim; d++) {
-    globalCellIndex[d] =
-        localCellIndex[d] +
-        _thisProcess[d] * _averageLocalNumberMacroscopicCells[d];
+    globalCellIndex[d] = localCellIndex[d] + _thisProcess[d] * _averageLocalNumberMacroscopicCells[d];
   }
   return globalCellIndex;
 }
 
 template <unsigned int dim>
 tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::convertGlobalToLocalVectorCellIndex(
-    tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+coupling::IndexConversion<dim>::convertGlobalToLocalVectorCellIndex(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   if (!isValidGlobalVectorCellIndex(globalCellIndex)) {
-    std::cout
-        << "ERROR IndexConversion::convertGlobalToLocalVectorCellIndex(...): "
-           "Index "
-        << globalCellIndex << " out of range!" << std::endl;
+    std::cout << "ERROR IndexConversion::convertGlobalToLocalVectorCellIndex(...): "
+                 "Index "
+              << globalCellIndex << " out of range!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
   tarch::la::Vector<dim, unsigned int> localCellIndex(0);
   for (unsigned int d = 0; d < dim; d++) {
-    localCellIndex[d] =
-        globalCellIndex[d] -
-        _thisProcess[d] * _averageLocalNumberMacroscopicCells[d];
+    localCellIndex[d] = globalCellIndex[d] - _thisProcess[d] * _averageLocalNumberMacroscopicCells[d];
   }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   if (!isValidLocalVectorCellIndex(localCellIndex)) {
-    std::cout
-        << "ERROR IndexConversion::convertGlobalToLocalVectorCellIndex(...): "
-           "Index "
-        << localCellIndex << " out of range!" << std::endl;
+    std::cout << "ERROR IndexConversion::convertGlobalToLocalVectorCellIndex(...): "
+                 "Index "
+              << localCellIndex << " out of range!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
   return localCellIndex;
 }
 
-template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::convertLocalToGlobalCellIndex(
-    unsigned int localCellIndex) const {
+template <unsigned int dim> unsigned int coupling::IndexConversion<dim>::convertLocalToGlobalCellIndex(unsigned int localCellIndex) const {
   // convert linearised index to vector index
-  tarch::la::Vector<dim, unsigned int> vec =
-      getLocalVectorCellIndex(localCellIndex);
+  tarch::la::Vector<dim, unsigned int> vec = getLocalVectorCellIndex(localCellIndex);
   // convert local to global vector index
   vec = convertLocalToGlobalVectorCellIndex(vec);
   // return linearised global index
   return getGlobalCellIndex(vec);
 }
 
-template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::convertGlobalToLocalCellIndex(
-    unsigned int globalCellIndex) const {
+template <unsigned int dim> unsigned int coupling::IndexConversion<dim>::convertGlobalToLocalCellIndex(unsigned int globalCellIndex) const {
   // convert linearised index to vector index
-  tarch::la::Vector<dim, unsigned int> vec =
-      getGlobalVectorCellIndex(globalCellIndex);
+  tarch::la::Vector<dim, unsigned int> vec = getGlobalVectorCellIndex(globalCellIndex);
   // convert local to global vector index
   vec = convertGlobalToLocalVectorCellIndex(vec);
   // return linearised global index
   return getLocalCellIndex(vec);
 }
 
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getAverageLocalNumberMacroscopicCells() const {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getAverageLocalNumberMacroscopicCells() const {
   return _averageLocalNumberMacroscopicCells;
 }
 
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getLocalNumberMacroscopicCells() const {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getLocalNumberMacroscopicCells() const {
   return _localNumberMacroscopicCells;
 }
 
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getGlobalNumberMacroscopicCells() const {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getGlobalNumberMacroscopicCells() const {
   return _globalNumberMacroscopicCells;
 }
 
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getThisProcess() const {
-  return _thisProcess;
-}
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getThisProcess() const { return _thisProcess; }
+
+template <unsigned int dim> unsigned int coupling::IndexConversion<dim>::getThisRank() const { return _rank; }
+
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getNumberProcesses() const { return _numberProcesses; }
+
+template <unsigned int dim> tarch::la::Vector<dim, double> coupling::IndexConversion<dim>::getGlobalMDDomainSize() const { return _globalMDDomainSize; }
+
+template <unsigned int dim> tarch::la::Vector<dim, double> coupling::IndexConversion<dim>::getGlobalMDDomainOffset() const { return _globalMDDomainOffset; }
+
+template <unsigned int dim> tarch::la::Vector<dim, double> coupling::IndexConversion<dim>::getMacroscopicCellSize() const { return _macroscopicCellSize; }
 
 template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::getThisRank() const {
-  return _rank;
-}
-
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getNumberProcesses() const {
-  return _numberProcesses;
-}
-
-template <unsigned int dim>
-tarch::la::Vector<dim, double>
-coupling::IndexConversion<dim>::getGlobalMDDomainSize() const {
-  return _globalMDDomainSize;
-}
-
-template <unsigned int dim>
-tarch::la::Vector<dim, double>
-coupling::IndexConversion<dim>::getGlobalMDDomainOffset() const {
-  return _globalMDDomainOffset;
-}
-
-template <unsigned int dim>
-tarch::la::Vector<dim, double>
-coupling::IndexConversion<dim>::getMacroscopicCellSize() const {
-  return _macroscopicCellSize;
-}
-
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::getGlobalVectorCellIndex(
-    tarch::la::Vector<dim, double> position) const {
+tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getGlobalVectorCellIndex(tarch::la::Vector<dim, double> position) const {
   tarch::la::Vector<dim, unsigned int> globalIndex(0);
   for (unsigned int d = 0; d < dim; d++) {
-    const double buf =
-        position[d] - (_globalMDDomainOffset[d] - _macroscopicCellSize[d]);
+    const double buf = position[d] - (_globalMDDomainOffset[d] - _macroscopicCellSize[d]);
     globalIndex[d] = (unsigned int)(buf / _macroscopicCellSize[d]);
   }
 
@@ -277,8 +190,7 @@ coupling::IndexConversion<dim>::getGlobalVectorCellIndex(
   if (!isValidGlobalVectorCellIndex(globalIndex)) {
     std::cout << "ERROR IndexConversion::getGlobalVectorCellIndex(...): "
                  "Invalid conversion for position "
-              << position << " to global vector cell index " << globalIndex
-              << "!" << std::endl;
+              << position << " to global vector cell index " << globalIndex << "!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
@@ -286,21 +198,15 @@ coupling::IndexConversion<dim>::getGlobalVectorCellIndex(
   return globalIndex;
 }
 
-template <unsigned int dim>
-bool coupling::IndexConversion<dim>::isValidGlobalVectorCellIndex(
-    tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+template <unsigned int dim> bool coupling::IndexConversion<dim>::isValidGlobalVectorCellIndex(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
   return isValidVectorCellIndex(globalCellIndex, _globalNumberMacroscopicCells);
 }
 
-template <unsigned int dim>
-bool coupling::IndexConversion<dim>::isValidLocalVectorCellIndex(
-    tarch::la::Vector<dim, unsigned int> localCellIndex) const {
+template <unsigned int dim> bool coupling::IndexConversion<dim>::isValidLocalVectorCellIndex(tarch::la::Vector<dim, unsigned int> localCellIndex) const {
   return isValidVectorCellIndex(localCellIndex, _localNumberMacroscopicCells);
 }
 
-template <unsigned int dim>
-bool coupling::IndexConversion<dim>::isValidGlobalCellIndex(
-    unsigned int globalIndex) const {
+template <unsigned int dim> bool coupling::IndexConversion<dim>::isValidGlobalCellIndex(unsigned int globalIndex) const {
   unsigned int range = _globalNumberMacroscopicCells[0] + 2;
   for (unsigned int d = 1; d < dim; d++) {
     range = range * (_globalNumberMacroscopicCells[d] + 2);
@@ -308,9 +214,7 @@ bool coupling::IndexConversion<dim>::isValidGlobalCellIndex(
   return isValidCellIndex(globalIndex, range);
 }
 
-template <unsigned int dim>
-bool coupling::IndexConversion<dim>::isValidLocalCellIndex(
-    unsigned int localIndex) const {
+template <unsigned int dim> bool coupling::IndexConversion<dim>::isValidLocalCellIndex(unsigned int localIndex) const {
   unsigned int range = _localNumberMacroscopicCells[0] + 2;
   for (unsigned int d = 1; d < dim; d++) {
     range = range * (_localNumberMacroscopicCells[d] + 2);
@@ -319,9 +223,8 @@ bool coupling::IndexConversion<dim>::isValidLocalCellIndex(
 }
 
 template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::getCellIndex(
-    tarch::la::Vector<dim, unsigned int> vectorCellIndex,
-    const tarch::la::Vector<dim, unsigned int> &numberCells) const {
+unsigned int coupling::IndexConversion<dim>::getCellIndex(tarch::la::Vector<dim, unsigned int> vectorCellIndex,
+                                                          const tarch::la::Vector<dim, unsigned int> &numberCells) const {
   unsigned int index = vectorCellIndex[dim - 1];
   for (int d = dim - 2; d > -1; d--) {
     index = (numberCells[d] + 2) * index + vectorCellIndex[d];
@@ -331,9 +234,8 @@ unsigned int coupling::IndexConversion<dim>::getCellIndex(
 
 template <unsigned int dim>
 tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::initAverageLocalNumberMacroscopicCells(
-    tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
-    tarch::la::Vector<dim, unsigned int> numberProcesses) const {
+coupling::IndexConversion<dim>::initAverageLocalNumberMacroscopicCells(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
+                                                                       tarch::la::Vector<dim, unsigned int> numberProcesses) const {
   tarch::la::Vector<dim, unsigned int> avg(0);
   for (unsigned int d = 0; d < dim; d++) {
     avg[d] = globalNumberMacroscopicCells[d] / numberProcesses[d];
@@ -343,16 +245,11 @@ coupling::IndexConversion<dim>::initAverageLocalNumberMacroscopicCells(
 
 template <unsigned int dim>
 tarch::la::Vector<dim, unsigned int>
-coupling::IndexConversion<dim>::initLocalNumberMacroscopicCells(
-    tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
-    tarch::la::Vector<dim, unsigned int> numberProcesses,
-    unsigned int rank) const {
+coupling::IndexConversion<dim>::initLocalNumberMacroscopicCells(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
+                                                                tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank) const {
   tarch::la::Vector<dim, unsigned int> local(0);
-  const tarch::la::Vector<dim, unsigned int> avgNumberCells =
-      initAverageLocalNumberMacroscopicCells(globalNumberMacroscopicCells,
-                                             numberProcesses);
-  const tarch::la::Vector<dim, unsigned int> thisProcess =
-      getProcessCoordinates(rank);
+  const tarch::la::Vector<dim, unsigned int> avgNumberCells = initAverageLocalNumberMacroscopicCells(globalNumberMacroscopicCells, numberProcesses);
+  const tarch::la::Vector<dim, unsigned int> thisProcess = getProcessCoordinates(rank);
 
   for (unsigned int d = 0; d < dim; d++) {
     // if this process is not the "last" one along one dimension, we use the
@@ -361,17 +258,15 @@ coupling::IndexConversion<dim>::initLocalNumberMacroscopicCells(
       local[d] = avgNumberCells[d];
       // ... otherwise (=last process), we fill up with the rest of the cells
     } else {
-      local[d] =
-          globalNumberMacroscopicCells[d] - thisProcess[d] * avgNumberCells[d];
+      local[d] = globalNumberMacroscopicCells[d] - thisProcess[d] * avgNumberCells[d];
     }
   }
   return local;
 }
 
 template <unsigned int dim>
-bool coupling::IndexConversion<dim>::isValidVectorCellIndex(
-    tarch::la::Vector<dim, unsigned int> index,
-    const tarch::la::Vector<dim, unsigned int> &range) const {
+bool coupling::IndexConversion<dim>::isValidVectorCellIndex(tarch::la::Vector<dim, unsigned int> index,
+                                                            const tarch::la::Vector<dim, unsigned int> &range) const {
   bool valid = true;
   for (unsigned int d = 0; d < dim; d++) {
     valid = valid && (index[d] < range[d] + 2);
@@ -379,18 +274,14 @@ bool coupling::IndexConversion<dim>::isValidVectorCellIndex(
   return valid;
 }
 
-template <unsigned int dim>
-bool coupling::IndexConversion<dim>::isValidCellIndex(
-    unsigned int index, const unsigned int &range) const {
+template <unsigned int dim> bool coupling::IndexConversion<dim>::isValidCellIndex(unsigned int index, const unsigned int &range) const {
   return (index < range);
 }
 
 template <unsigned int dim>
 tarch::la::Vector<dim, double>
-coupling::IndexConversion<dim>::initMacroscopicCellSize(
-    const tarch::la::Vector<dim, double> &globalMDDomainSize,
-    const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells)
-    const {
+coupling::IndexConversion<dim>::initMacroscopicCellSize(const tarch::la::Vector<dim, double> &globalMDDomainSize,
+                                                        const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
   tarch::la::Vector<dim, double> cellsize = globalMDDomainSize;
   for (unsigned int d = 0; d < dim; d++) {
     cellsize[d] = cellsize[d] / globalNumberMacroscopicCells[d];
@@ -399,22 +290,19 @@ coupling::IndexConversion<dim>::initMacroscopicCellSize(
 }
 
 template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::getUniqueRankForMacroscopicCell(
-    tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+unsigned int coupling::IndexConversion<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
   tarch::la::Vector<dim, unsigned int> processCoords(0);
   for (unsigned int d = 0; d < dim; d++) {
     // special case: cell in first section
     if (globalCellIndex[d] < _averageLocalNumberMacroscopicCells[d] + 1) {
       processCoords[d] = 0;
       // special case: cell in last section
-    } else if (globalCellIndex[d] > _averageLocalNumberMacroscopicCells[d] *
-                                        (_numberProcesses[d] - 1)) {
+    } else if (globalCellIndex[d] > _averageLocalNumberMacroscopicCells[d] * (_numberProcesses[d] - 1)) {
       processCoords[d] = _numberProcesses[d] - 1;
       // all other cases
     } else {
       // remove ghost layer contribution from vector index (...-1)
-      processCoords[d] =
-          (globalCellIndex[d] - 1) / _averageLocalNumberMacroscopicCells[d];
+      processCoords[d] = (globalCellIndex[d] - 1) / _averageLocalNumberMacroscopicCells[d];
     }
   }
 
@@ -422,9 +310,7 @@ unsigned int coupling::IndexConversion<dim>::getUniqueRankForMacroscopicCell(
 }
 
 template <unsigned int dim>
-std::vector<unsigned int>
-coupling::IndexConversion<dim>::getRanksForMacroscopicCell(
-    tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+std::vector<unsigned int> coupling::IndexConversion<dim>::getRanksForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
   std::vector<unsigned int> ranks;
 
   // start and end coordinates of neighboured cells.
@@ -457,8 +343,7 @@ coupling::IndexConversion<dim>::getRanksForMacroscopicCell(
         }
 
         // determine the unique rank for this cell
-        const unsigned int rank =
-            getUniqueRankForMacroscopicCell(thisGlobalCellIndex);
+        const unsigned int rank = getUniqueRankForMacroscopicCell(thisGlobalCellIndex);
 
         // add this rank to the vector with all ranks if we did not add this one
         // before

@@ -23,8 +23,7 @@ class LBCouetteSolverInterface;
  * from MD.
  *  @brief interface for the LBCouetteSolver
  *  @author Philipp Neumann  */
-class coupling::solvers::LBCouetteSolverInterface
-    : public coupling::interface::MacroscopicSolverInterface<3> {
+class coupling::solvers::LBCouetteSolverInterface : public coupling::interface::MacroscopicSolverInterface<3> {
 public:
   /** @brief a simple constructor
    *  @param avgNumberLBCells the average number of cells per process of the
@@ -36,14 +35,10 @@ public:
    *  @param globalNumberMacroscopicCells the total number of macroscopic cells
    *  @param outerRegion defines, how many cell layers will be sent to the macro
    * solver */
-  LBCouetteSolverInterface(
-      tarch::la::Vector<3, unsigned int> avgNumberLBCells,
-      tarch::la::Vector<3, unsigned int> numberProcesses,
-      tarch::la::Vector<3, unsigned int> offsetMDDomain,
-      tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
-      unsigned int outerRegion = 1)
-      : _avgNumberLBCells(avgNumberLBCells), _numberProcesses(numberProcesses),
-        _offsetMDDomain(offsetMDDomain), _outerRegion(outerRegion),
+  LBCouetteSolverInterface(tarch::la::Vector<3, unsigned int> avgNumberLBCells, tarch::la::Vector<3, unsigned int> numberProcesses,
+                           tarch::la::Vector<3, unsigned int> offsetMDDomain, tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
+                           unsigned int outerRegion = 1)
+      : _avgNumberLBCells(avgNumberLBCells), _numberProcesses(numberProcesses), _offsetMDDomain(offsetMDDomain), _outerRegion(outerRegion),
         _globalNumberMacroscopicCells(globalNumberMacroscopicCells) {}
   ~LBCouetteSolverInterface() {}
 
@@ -54,13 +49,10 @@ public:
    * (true) ro not (false)
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns a bool, which indicates if the cell will be received*/
-  bool receiveMacroscopicQuantityFromMDSolver(
-      tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     bool recv = true;
     for (unsigned int d = 0; d < 3; d++) {
-      recv = recv && (globalCellIndex[d] > _outerRegion) &&
-             (globalCellIndex[d] <
-              _globalNumberMacroscopicCells[d] + 1 - _outerRegion);
+      recv = recv && (globalCellIndex[d] > _outerRegion) && (globalCellIndex[d] < _globalNumberMacroscopicCells[d] + 1 - _outerRegion);
     }
     return recv;
   }
@@ -71,32 +63,26 @@ public:
    * (false)
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns a bool, which indicates if the cell will be send */
-  bool sendMacroscopicQuantityToMDSolver(
-      tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     bool outer = false;
     for (unsigned int d = 0; d < 3; d++) {
-      outer = outer || (globalCellIndex[d] < 1) ||
-              (globalCellIndex[d] > _globalNumberMacroscopicCells[d]);
+      outer = outer || (globalCellIndex[d] < 1) || (globalCellIndex[d] > _globalNumberMacroscopicCells[d]);
     }
-    return (!outer) &&
-           (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
+    return (!outer) && (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
   }
 
   /** @brief returns for a given macroscopic cell index, which rank holds the
    * correct data
    *  @oaram globalCellIndex global dimensioned cell index to check for
    *  @returns a vector containing all correct ranks  */
-  virtual std::vector<unsigned int>
-  getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     std::vector<unsigned int> ranks;
     // determine global index of cell in LB simulation
-    tarch::la::Vector<3, unsigned int> globalLBCellIndex(globalCellIndex +
-                                                         _offsetMDDomain);
+    tarch::la::Vector<3, unsigned int> globalLBCellIndex(globalCellIndex + _offsetMDDomain);
     // modify global LB cell index due to ghost layer
     for (int d = 0; d < 3; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "LB cell index for global cell index " << globalCellIndex
-                << ": " << globalLBCellIndex << std::endl;
+      std::cout << "LB cell index for global cell index " << globalCellIndex << ": " << globalLBCellIndex << std::endl;
 #endif
       if (globalLBCellIndex[d] > 0) {
         globalLBCellIndex[d]--;
@@ -109,20 +95,12 @@ public:
       for (int y = -1; y < 2; y++) {
         for (int x = -1; x < 2; x++) {
           // neighbour cell index
-          const tarch::la::Vector<3, unsigned int> nbIndex(
-              globalLBCellIndex[0] + x, globalLBCellIndex[1] + y,
-              globalLBCellIndex[2] + z);
+          const tarch::la::Vector<3, unsigned int> nbIndex(globalLBCellIndex[0] + x, globalLBCellIndex[1] + y, globalLBCellIndex[2] + z);
           // coordinates of process of neighbour celll
-          const tarch::la::Vector<3, unsigned int> processCoordinates(
-              (nbIndex[0] / _avgNumberLBCells[0]),
-              (nbIndex[1] / _avgNumberLBCells[1]),
-              (nbIndex[2] / _avgNumberLBCells[2]));
+          const tarch::la::Vector<3, unsigned int> processCoordinates((nbIndex[0] / _avgNumberLBCells[0]), (nbIndex[1] / _avgNumberLBCells[1]),
+                                                                      (nbIndex[2] / _avgNumberLBCells[2]));
           // corresponding rank
-          const unsigned int rank =
-              processCoordinates[0] +
-              _numberProcesses[0] *
-                  (processCoordinates[1] +
-                   processCoordinates[2] * _numberProcesses[1]);
+          const unsigned int rank = processCoordinates[0] + _numberProcesses[0] * (processCoordinates[1] + processCoordinates[2] * _numberProcesses[1]);
 
           // if this rank is not part of the vector, push it back
           bool found = false;
@@ -155,35 +133,26 @@ public:
    * the correct data
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns the vector of the correct rank  */
-  virtual std::vector<unsigned int>
-  getSourceRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     // determine global index of cell in LB simulation
-    tarch::la::Vector<3, unsigned int> globalLBCellIndex(globalCellIndex +
-                                                         _offsetMDDomain);
+    tarch::la::Vector<3, unsigned int> globalLBCellIndex(globalCellIndex + _offsetMDDomain);
     // modify global LB cell index due to ghost layer
     for (int d = 0; d < 3; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "LB cell index for global cell index " << globalCellIndex
-                << ": " << globalLBCellIndex << std::endl;
+      std::cout << "LB cell index for global cell index " << globalCellIndex << ": " << globalLBCellIndex << std::endl;
 #endif
       if (globalLBCellIndex[d] > 0) {
         globalLBCellIndex[d]--;
       }
     }
     // determine process coordinates and respective rank
-    const tarch::la::Vector<3, unsigned int> processCoordinates(
-        globalLBCellIndex[0] / _avgNumberLBCells[0],
-        globalLBCellIndex[1] / _avgNumberLBCells[1],
-        globalLBCellIndex[2] / _avgNumberLBCells[2]);
-    const unsigned int rank =
-        processCoordinates[0] +
-        _numberProcesses[0] * (processCoordinates[1] +
-                               processCoordinates[2] * _numberProcesses[1]);
+    const tarch::la::Vector<3, unsigned int> processCoordinates(globalLBCellIndex[0] / _avgNumberLBCells[0], globalLBCellIndex[1] / _avgNumberLBCells[1],
+                                                                globalLBCellIndex[2] / _avgNumberLBCells[2]);
+    const unsigned int rank = processCoordinates[0] + _numberProcesses[0] * (processCoordinates[1] + processCoordinates[2] * _numberProcesses[1]);
     std::vector<unsigned int> ranks;
     ranks.push_back(rank);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Source rank for cell " << globalCellIndex << ": " << ranks[0]
-              << std::endl;
+    std::cout << "Source rank for cell " << globalCellIndex << ": " << ranks[0] << std::endl;
 #endif
     return ranks;
   }

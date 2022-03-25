@@ -4,15 +4,11 @@
 // www5.in.tum.de/mamico
 #include "coupling/solvers/CoupledMolecularDynamicsSimulation.h"
 
-coupling::solvers::CoupledMolecularDynamicsSimulation::
-    CoupledMolecularDynamicsSimulation(
-        const simplemd::configurations::MolecularDynamicsConfiguration
-            &configuration)
-    : simplemd::MolecularDynamicsSimulation(configuration),
-      _macroscopicCellService(NULL), _couplingSwitchedOn(true) {}
+coupling::solvers::CoupledMolecularDynamicsSimulation::CoupledMolecularDynamicsSimulation(
+    const simplemd::configurations::MolecularDynamicsConfiguration &configuration)
+    : simplemd::MolecularDynamicsSimulation(configuration), _macroscopicCellService(NULL), _couplingSwitchedOn(true) {}
 
-void coupling::solvers::CoupledMolecularDynamicsSimulation::
-    simulateOneCouplingTimestep(const unsigned int &t) {
+void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingTimestep(const unsigned int &t) {
   // if coupling is switched off, perform "normal" MD timestep
   if (!_couplingSwitchedOn) {
     simulateOneTimestep(t);
@@ -22,8 +18,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::
     return;
   }
 
-  _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(
-      _localBoundary, *_parallelTopologyService);
+  _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
 
   // call to synchronise data in cells; needs to be at this point of the
   // coupling algorithm as the particles need to be placed inside the correct
@@ -58,30 +53,20 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::
   _boundaryTreatment->emptyGhostBoundaryCells();
 
   // plot VTK output
-  if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) &&
-      (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
+  if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
     _vtkMoleculeWriter->setTimestep(t);
     _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false);
   }
   // write checkpoint
-  if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() !=
-       0) &&
-      (t % _configuration.getCheckpointConfiguration()
-               .getWriteEveryTimestep() ==
-       0)) {
-    _moleculeService->writeCheckPoint(
-        *_parallelTopologyService,
-        _configuration.getCheckpointConfiguration().getFilename(), t);
+  if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
+      (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
+    _moleculeService->writeCheckPoint(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
   }
 
   // reorganise memory if needed
-  if ((_configuration.getSimulationConfiguration()
-           .getReorganiseMemoryEveryTimestep() != 0) &&
-      (t % _configuration.getSimulationConfiguration()
-               .getReorganiseMemoryEveryTimestep() ==
-       0)) {
-    _moleculeService->reorganiseMemory(*_parallelTopologyService,
-                                       *_linkedCellService);
+  if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
+      (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
+    _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
   }
 
   // plot also macroscopic cell information
@@ -96,8 +81,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::
   // sort molecules into linked cells
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
 
-  if (_parallelTopologyService->getProcessCoordinates() ==
-      tarch::la::Vector<MD_DIM, unsigned int>(0)) {
+  if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
     // if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
   }
 }

@@ -22,10 +22,8 @@ using Log::global_log;
 class LinkedCellsForCoupling : public LinkedCells {
 
 public:
-  LinkedCellsForCoupling(
-      tarch::la::Vector<3, double> mamicoCellSize,
-      tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell,
-      double bBoxMin[3], double bBoxMax[3], double cutoffRadius) {
+  LinkedCellsForCoupling(tarch::la::Vector<3, double> mamicoCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell, double bBoxMin[3],
+                         double bBoxMax[3], double cutoffRadius) {
     _cutoffRadius = cutoffRadius;
     _LJCutoffRadius = cutoffRadius;
 
@@ -43,8 +41,7 @@ public:
       _cellLength[d] = mamicoCellSize[d] / linkedCellsPerMacroscopicCell[d];
 
       // set number of cells
-      _boxWidthInNumCells[d] =
-          (_boundingBoxMax[d] - _boundingBoxMin[d]) / _cellLength[d];
+      _boxWidthInNumCells[d] = (_boundingBoxMax[d] - _boundingBoxMin[d]) / _cellLength[d];
       if (_boxWidthInNumCells[d] == 0)
         _boxWidthInNumCells[d] = 1;
 
@@ -54,26 +51,20 @@ public:
       _haloBoundingBoxMin[d] = _boundingBoxMin[d] - _haloLength[d];
       _haloBoundingBoxMax[d] = _boundingBoxMax[d] + _haloLength[d];
 
-      _cellsPerDimension[d] =
-          _boxWidthInNumCells[d] + 2 * _haloWidthInNumCells[d];
+      _cellsPerDimension[d] = _boxWidthInNumCells[d] + 2 * _haloWidthInNumCells[d];
 
       cellCount *= _cellsPerDimension[d];
       assert(cellCount > 0);
     }
-    global_log->debug() << "Cell size (" << _cellLength[0] << ", "
-                        << _cellLength[1] << ", " << _cellLength[2] << ")"
+    global_log->debug() << "Cell size (" << _cellLength[0] << ", " << _cellLength[1] << ", " << _cellLength[2] << ")" << std::endl;
+    global_log->debug() << "Cells per dimension (incl. halo): " << _cellsPerDimension[0] << ", " << _cellsPerDimension[1] << ", " << _cellsPerDimension[2]
                         << std::endl;
-    global_log->debug() << "Cells per dimension (incl. halo): "
-                        << _cellsPerDimension[0] << ", "
-                        << _cellsPerDimension[1] << ", "
-                        << _cellsPerDimension[2] << std::endl;
 
     _cellsInCutoff = floor(_cellLength[0] / cutoffRadius);
     if (_cellsInCutoff < 1) {
-      global_log->error()
-          << "LinkedCellsForCoupling (constructor): cellsInCutOff < 1! cell "
-             "length should be >= cutoff radius"
-          << std::endl;
+      global_log->error() << "LinkedCellsForCoupling (constructor): cellsInCutOff < 1! cell "
+                             "length should be >= cutoff radius"
+                          << std::endl;
       exit(1);
     }
 
@@ -83,18 +74,14 @@ public:
     // region a parallelization is not possible (with the used algorithms). If a
     // particle leaves the box, it would need to be communicated to the two next
     // neighbors.
-    if (_boxWidthInNumCells[0] < 2 * _haloWidthInNumCells[0] ||
-        _boxWidthInNumCells[1] < 2 * _haloWidthInNumCells[1] ||
+    if (_boxWidthInNumCells[0] < 2 * _haloWidthInNumCells[0] || _boxWidthInNumCells[1] < 2 * _haloWidthInNumCells[1] ||
         _boxWidthInNumCells[2] < 2 * _haloWidthInNumCells[2]) {
       global_log->error() << "LinkedCellsForCoupling (constructor): width of "
                              "inner region is less than the width of halo."
                           << std::endl;
-      global_log->error() << "_cellsPerDimension: " << _cellsPerDimension[0]
-                          << " / " << _cellsPerDimension[1] << " / "
-                          << _cellsPerDimension[2] << std::endl;
-      global_log->error() << "_haloWidthInNumCells: " << _haloWidthInNumCells[0]
-                          << " / " << _haloWidthInNumCells[1] << " / "
-                          << _haloWidthInNumCells[2] << std::endl;
+      global_log->error() << "_cellsPerDimension: " << _cellsPerDimension[0] << " / " << _cellsPerDimension[1] << " / " << _cellsPerDimension[2] << std::endl;
+      global_log->error() << "_haloWidthInNumCells: " << _haloWidthInNumCells[0] << " / " << _haloWidthInNumCells[1] << " / " << _haloWidthInNumCells[2]
+                          << std::endl;
       exit(5);
     }
     this->_localInsertionsMinusDeletions = 0;

@@ -28,9 +28,7 @@ class VTKMoleculeWriter;
  */
 class simplemd::moleculemappings::VTKMoleculeWriter {
 public:
-  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService
-                        &parallelTopologyService,
-                    const simplemd::services::MoleculeService &moleculeService,
+  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService &parallelTopologyService, const simplemd::services::MoleculeService &moleculeService,
                     const std::string &filename);
   ~VTKMoleculeWriter();
   void setTimestep(const unsigned int &timestep);

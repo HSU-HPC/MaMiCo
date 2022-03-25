@@ -19,8 +19,7 @@ class MoleculeConfiguration;
 /** reads properties for a single molecule.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::MoleculeConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::MoleculeConfiguration : public tarch::configuration::Configuration {
 public:
   MoleculeConfiguration();
   virtual ~MoleculeConfiguration() {}
@@ -46,9 +45,7 @@ public:
   bool isValid() const;
 
   /** getters for all parsed and computed quantities */
-  const tarch::la::Vector<MD_DIM, double> &getMeanVelocity() const {
-    return _meanVelocity;
-  }
+  const tarch::la::Vector<MD_DIM, double> &getMeanVelocity() const { return _meanVelocity; }
   const double &getTemperature() const { return _temperature; }
   const double &getMass() const { return _mass; }
   const double &getEpsilon() const { return _epsilon; }

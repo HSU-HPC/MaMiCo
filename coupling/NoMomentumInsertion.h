@@ -18,14 +18,11 @@ template <class LinkedCell, unsigned int dim> class NoMomentumInsertion;
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::NoMomentumInsertion
-    : public coupling::MomentumInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::NoMomentumInsertion : public coupling::MomentumInsertion<LinkedCell, dim> {
 public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface to the md solver */
-  NoMomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim>
-                          *const mdSolverInterface)
+  NoMomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
       : MomentumInsertion<LinkedCell, dim>(mdSolverInterface) {}
   /** @brief a simple destructor */
   virtual ~NoMomentumInsertion() {}
@@ -39,10 +36,8 @@ public:
   /** @brief a dummy function, which doesn't do anything
    * @param cell the macroscopic cell to not change
    * @param currentMacroscopicCellIndex the local linearised index of the cell*/
-  virtual void insertMomentum(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const unsigned int &currentMacroscopicCellIndex) const {}
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                              const unsigned int &currentMacroscopicCellIndex) const {}
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_NOMOMENTUMINSERTION_H_

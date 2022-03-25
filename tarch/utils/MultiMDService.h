@@ -26,16 +26,12 @@ template <unsigned int dim> class MultiMDService;
  */
 template <unsigned int dim> class tarch::utils::MultiMDService {
 public:
-  MultiMDService(const tarch::la::Vector<dim, unsigned int> &numberProcesses,
-                 const unsigned int &totalNumberMDSimulations);
+  MultiMDService(const tarch::la::Vector<dim, unsigned int> &numberProcesses, const unsigned int &totalNumberMDSimulations);
   ~MultiMDService();
 
-  unsigned int
-  getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const;
+  unsigned int getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const;
 
-  unsigned int getLocalNumberOfMDSimulations() const {
-    return _thisNumberMDSimulations;
-  }
+  unsigned int getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
 
 #if (TARCH_PARALLEL == TARCH_YES)
   MPI_Comm getLocalCommunicator() const { return _localComm; }

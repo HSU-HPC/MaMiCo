@@ -28,32 +28,23 @@ public:
    *  domainOffset - starting coordinate of local domain (lowerLeftFront point)
    *  numberOfCells - local number of cells
    */
-  LinkedCellService(const tarch::la::Vector<MD_DIM, double> &domainSize,
-                    const tarch::la::Vector<MD_DIM, double> &domainOffset,
-                    const simplemd::services::ParallelTopologyService
-                        &parallelTopologyService,
-                    simplemd::services::MoleculeService &moleculeService);
+  LinkedCellService(const tarch::la::Vector<MD_DIM, double> &domainSize, const tarch::la::Vector<MD_DIM, double> &domainOffset,
+                    const simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::MoleculeService &moleculeService);
 
   /** shuts down the service, frees memory and resets all variables */
   void shutdown();
 
   /** puts the molecule into the cell defined by the local index (vector)
    * coordinates localCellIndex */
-  void addMoleculeToLinkedCell(
-      Molecule &molecule,
-      const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
+  void addMoleculeToLinkedCell(Molecule &molecule, const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
   /** puts the molecule into the cell defined by the local index (scalar)
    * coordinates localCellIndex */
-  void addMoleculeToLinkedCell(Molecule &molecule,
-                               const unsigned int &localCellIndex);
+  void addMoleculeToLinkedCell(Molecule &molecule, const unsigned int &localCellIndex);
 
-  void deleteMoleculeFromLinkedCell(
-      Molecule &molecule,
-      const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
+  void deleteMoleculeFromLinkedCell(Molecule &molecule, const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
 
   /** returns the linked cell at the respective coordinates */
-  LinkedCell &
-  getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
+  LinkedCell &getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
 
   /** iterates over all cells in the range defined by the lower left front
    * corner cell lowerLeftFrontCell and the size of the domain cellRange.
@@ -62,10 +53,8 @@ public:
    * coordinates.
    */
   template <class A>
-  void iterateCells(
-      A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell,
-      const tarch::la::Vector<MD_DIM, unsigned int> &cellRange,
-      const bool &useOpenMP);
+  void iterateCells(A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int> &cellRange,
+                    const bool &useOpenMP);
 
   /** iterates over all cells in the inner part (i.e. does not consider the
    * ghost layer) */
@@ -82,14 +71,11 @@ public:
    * (0,0,0),(1,1,1)).
    */
   template <class A>
-  void iterateCellPairs(
-      A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell,
-      const tarch::la::Vector<MD_DIM, unsigned int> &cellRange,
-      const bool &useOpenMP) const;
+  void iterateCellPairs(A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int> &cellRange,
+                        const bool &useOpenMP) const;
 
   /** returns the index of the first (non-ghost) cell */
-  const tarch::la::Vector<MD_DIM, unsigned int> &
-  getLocalIndexOfFirstCell() const;
+  const tarch::la::Vector<MD_DIM, unsigned int> &getLocalIndexOfFirstCell() const;
 
   /** returns the number of (non-ghost) cells */
   const tarch::la::Vector<MD_DIM, unsigned int> &getLocalNumberOfCells() const;
@@ -108,12 +94,10 @@ public:
   bool isGhostCell(const unsigned int &cellIndex) const;
 
   /** returns the local cell index vector for the local cell index cellIndex */
-  tarch::la::Vector<MD_DIM, unsigned int>
-  getLocalCellIndexVector(const unsigned int cellIndex) const;
+  tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const unsigned int cellIndex) const;
 
   /** returns the local cell index from the local cell index vector */
-  unsigned int getLocalCellIndex(
-      const tarch::la::Vector<MD_DIM, unsigned int> &cellIndexVector) const;
+  unsigned int getLocalCellIndex(const tarch::la::Vector<MD_DIM, unsigned int> &cellIndexVector) const;
 
   ~LinkedCellService() {
     if (_cells != NULL) {
@@ -132,13 +116,11 @@ private:
   void initCellStructure();
 
   /** returns local index from (local) coordinate vector */
-  unsigned int getLocalIndexFromLocalVector(
-      const tarch::la::Vector<MD_DIM, unsigned int> &coords) const;
+  unsigned int getLocalIndexFromLocalVector(const tarch::la::Vector<MD_DIM, unsigned int> &coords) const;
 
   /** computes the mesh width from domain size and local number of grid cells */
-  tarch::la::Vector<MD_DIM, double> getMeshwidth(
-      const tarch::la::Vector<MD_DIM, double> &domainSize,
-      const tarch::la::Vector<MD_DIM, unsigned int> &localNumberCells) const {
+  tarch::la::Vector<MD_DIM, double> getMeshwidth(const tarch::la::Vector<MD_DIM, double> &domainSize,
+                                                 const tarch::la::Vector<MD_DIM, unsigned int> &localNumberCells) const {
     tarch::la::Vector<MD_DIM, double> meshWidth(0.0);
     for (unsigned int d = 0; d < MD_DIM; d++) {
       meshWidth[d] = domainSize[d] / localNumberCells[d];
@@ -171,10 +153,8 @@ private:
 };
 
 template <class A>
-void simplemd::services::LinkedCellService::iterateCells(
-    A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell,
-    const tarch::la::Vector<MD_DIM, unsigned int> &cellRange,
-    const bool &useOpenMP) {
+void simplemd::services::LinkedCellService::iterateCells(A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell,
+                                                         const tarch::la::Vector<MD_DIM, unsigned int> &cellRange, const bool &useOpenMP) {
   unsigned int index = 0;
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -184,12 +164,10 @@ void simplemd::services::LinkedCellService::iterateCells(
                 << d << ")==0!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    if (lowerLeftFrontCell[d] + cellRange[d] >
-        2 * _indexOffset[d] + _numberOfCells[d]) {
-      std::cout
-          << "ERROR simplemd::services::LinkedCellService::iterateCells(): "
-             "defined Range does not fit into local sub-domain!"
-          << std::endl;
+    if (lowerLeftFrontCell[d] + cellRange[d] > 2 * _indexOffset[d] + _numberOfCells[d]) {
+      std::cout << "ERROR simplemd::services::LinkedCellService::iterateCells(): "
+                   "defined Range does not fit into local sub-domain!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -200,11 +178,8 @@ void simplemd::services::LinkedCellService::iterateCells(
 
 #if (MD_OPENMP == MD_YES)
   if (useOpenMP) {
-    const tarch::la::Vector<MD_DIM, unsigned int> size(
-        simplemd::services::LinkedCellService::getInstance()
-            .getLocalNumberOfCells() +
-        2 * simplemd::services::LinkedCellService::getInstance()
-                .getLocalIndexOfFirstCell());
+    const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
+                                                       2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
     const int length = cellRange(0)
 #if (MD_DIM > 1)
                        * cellRange(1)
@@ -256,15 +231,12 @@ void simplemd::services::LinkedCellService::iterateCells(
     tarch::la::Vector<MD_DIM, unsigned int> coords(0);
 // loop over domain
 #if (MD_DIM > 2)
-    for (coords[2] = lowerLeftFrontCell[2];
-         coords[2] < lowerLeftFrontCell[2] + cellRange[2]; coords[2]++) {
+    for (coords[2] = lowerLeftFrontCell[2]; coords[2] < lowerLeftFrontCell[2] + cellRange[2]; coords[2]++) {
 #endif
 #if (MD_DIM > 1)
-      for (coords[1] = lowerLeftFrontCell[1];
-           coords[1] < lowerLeftFrontCell[1] + cellRange[1]; coords[1]++) {
+      for (coords[1] = lowerLeftFrontCell[1]; coords[1] < lowerLeftFrontCell[1] + cellRange[1]; coords[1]++) {
 #endif
-        for (coords[0] = lowerLeftFrontCell[0];
-             coords[0] < lowerLeftFrontCell[0] + cellRange[0]; coords[0]++) {
+        for (coords[0] = lowerLeftFrontCell[0]; coords[0] < lowerLeftFrontCell[0] + cellRange[0]; coords[0]++) {
 #if (MD_DEBUG == MD_YES)
           std::cout << "Handle cell " << coords << std::endl;
 #endif
@@ -286,19 +258,14 @@ void simplemd::services::LinkedCellService::iterateCells(
   a.endCellIteration();
 }
 
-template <class A>
-void simplemd::services::LinkedCellService::iterateCells(
-    A &a, const bool &useOpenMP) {
+template <class A> void simplemd::services::LinkedCellService::iterateCells(A &a, const bool &useOpenMP) {
   iterateCells(a, _indexOffset, _numberOfCells, useOpenMP);
 }
 
 template <class A>
-void simplemd::services::LinkedCellService::iterateCellPairs(
-    A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell,
-    const tarch::la::Vector<MD_DIM, unsigned int> &cellRange,
-    const bool &useOpenMP) const {
-  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int>
-      neighbourOffset;
+void simplemd::services::LinkedCellService::iterateCellPairs(A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell,
+                                                             const tarch::la::Vector<MD_DIM, unsigned int> &cellRange, const bool &useOpenMP) const {
+  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int> neighbourOffset;
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int> indexOffset;
 #if (MD_DIM == 1)
   neighbourOffset[0] = 1;
@@ -324,19 +291,16 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
   indexOffset[4] = 0;
   neighbourOffset[4] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2) + 1;
   indexOffset[5] = 0;
-  neighbourOffset[5] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2) +
-                       (_numberOfCells[0] + 2);
+  neighbourOffset[5] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2) + (_numberOfCells[0] + 2);
   indexOffset[6] = 0;
-  neighbourOffset[6] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2) +
-                       (_numberOfCells[0] + 2) + 1;
+  neighbourOffset[6] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2) + (_numberOfCells[0] + 2) + 1;
 
   indexOffset[7] = 1;
   neighbourOffset[7] = _numberOfCells[0] + 2;
   indexOffset[8] = 1;
   neighbourOffset[8] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2);
   indexOffset[9] = 1;
-  neighbourOffset[9] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2) +
-                       (_numberOfCells[0] + 2);
+  neighbourOffset[9] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2) + (_numberOfCells[0] + 2);
 
   indexOffset[10] = _numberOfCells[0] + 2;
   neighbourOffset[10] = (_numberOfCells[0] + 2) * (_numberOfCells[1] + 2);
@@ -350,10 +314,9 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (cellRange[d] > 2 * _indexOffset[d] + _numberOfCells[d] - 1) {
-      std::cout
-          << "ERROR simplemd::services::LinkedCellService::iterateCellPairs(): "
-             "defined Range does not fit into local sub-domain!"
-          << std::endl;
+      std::cout << "ERROR simplemd::services::LinkedCellService::iterateCellPairs(): "
+                   "defined Range does not fit into local sub-domain!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -364,11 +327,8 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
 
 #if (MD_OPENMP == MD_YES)
   if (useOpenMP) {
-    const tarch::la::Vector<MD_DIM, unsigned int> size(
-        simplemd::services::LinkedCellService::getInstance()
-            .getLocalNumberOfCells() +
-        2 * simplemd::services::LinkedCellService::getInstance()
-                .getLocalIndexOfFirstCell());
+    const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
+                                                       2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
 
 // iterate over the domain in a red-black manner
 #if (MD_DIM > 2)
@@ -382,15 +342,14 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
           // For odd block sizes, we need to do some more work in the
           // x/y/z==0-traversals. The second x/y/z==1-traversals are reduced by
           // the normal integer-rounding in this case.
-          const tarch::la::Vector<MD_DIM, unsigned int> lengthVector(
-              (cellRange[0] + (cellRange[0] % 2) * (x == 0)) / 2
+          const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((cellRange[0] + (cellRange[0] % 2) * (x == 0)) / 2
 #if (MD_DIM > 1)
-              ,
-              (cellRange[1] + (cellRange[1] % 2) * (y == 0)) / 2
+                                                                     ,
+                                                                     (cellRange[1] + (cellRange[1] % 2) * (y == 0)) / 2
 #endif
 #if (MD_DIM > 2)
-              ,
-              (cellRange[2] + (cellRange[2] % 2) * (z == 0)) / 2
+                                                                     ,
+                                                                     (cellRange[2] + (cellRange[2] % 2) * (z == 0)) / 2
 #endif
           );
           const int length = lengthVector[0]
@@ -418,11 +377,9 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
             // determine plane within traversed block
             helpIndex2 = helpIndex1 / (lengthVector[0] * lengthVector[1]);
             // save rest of index in helpIndex1
-            helpIndex1 =
-                helpIndex1 - helpIndex2 * (lengthVector[0] * lengthVector[1]);
+            helpIndex1 = helpIndex1 - helpIndex2 * (lengthVector[0] * lengthVector[1]);
             // compute contribution to index
-            index += (lowerLeftFrontCell[2] + 2 * helpIndex2 + z) * size[0] *
-                     size[1];
+            index += (lowerLeftFrontCell[2] + 2 * helpIndex2 + z) * size[0] * size[1];
 #endif
 #if (MD_DIM > 1)
             // determine plane within traversed block
@@ -444,15 +401,11 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
             // handle pairs (lower,left,back-oriented cells)
             for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)
-              std::cout << "iterateCellPairs: Pair index "
-                        << index + indexOffset[i] << ","
-                        << index + neighbourOffset[i] << std::endl;
+              std::cout << "iterateCellPairs: Pair index " << index + indexOffset[i] << "," << index + neighbourOffset[i] << std::endl;
 #endif
               coordsCell1Buffer = index + indexOffset[i];
               coordsCell2Buffer = index + neighbourOffset[i];
-              a.handleCellPair(_cells[coordsCell1Buffer],
-                               _cells[coordsCell2Buffer], coordsCell1Buffer,
-                               coordsCell2Buffer);
+              a.handleCellPair(_cells[coordsCell1Buffer], _cells[coordsCell2Buffer], coordsCell1Buffer, coordsCell2Buffer);
             }
           } // j
         }   // x
@@ -473,15 +426,12 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
 
 // loop over domain
 #if (MD_DIM > 2)
-    for (coords[2] = lowerLeftFrontCell[2];
-         coords[2] < lowerLeftFrontCell[2] + cellRange[2]; coords[2]++) {
+    for (coords[2] = lowerLeftFrontCell[2]; coords[2] < lowerLeftFrontCell[2] + cellRange[2]; coords[2]++) {
 #endif
 #if (MD_DIM > 1)
-      for (coords[1] = lowerLeftFrontCell[1];
-           coords[1] < lowerLeftFrontCell[1] + cellRange[1]; coords[1]++) {
+      for (coords[1] = lowerLeftFrontCell[1]; coords[1] < lowerLeftFrontCell[1] + cellRange[1]; coords[1]++) {
 #endif
-        for (coords[0] = lowerLeftFrontCell[0];
-             coords[0] < lowerLeftFrontCell[0] + cellRange[0]; coords[0]++) {
+        for (coords[0] = lowerLeftFrontCell[0]; coords[0] < lowerLeftFrontCell[0] + cellRange[0]; coords[0]++) {
           // handle cell itself
           index = getLocalIndexFromLocalVector(coords);
 #if (MD_DEBUG == MD_YES)
@@ -492,16 +442,12 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
           // handle pairs (lower,left,back-oriented cells)
           for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)
-            std::cout << "iterateCellPairs: Pair index "
-                      << index + indexOffset[i] << ","
-                      << index + neighbourOffset[i] << std::endl;
+            std::cout << "iterateCellPairs: Pair index " << index + indexOffset[i] << "," << index + neighbourOffset[i] << std::endl;
 #endif
 
             coordsCell1Buffer = index + indexOffset[i];
             coordsCell2Buffer = index + neighbourOffset[i];
-            a.handleCellPair(_cells[coordsCell1Buffer],
-                             _cells[coordsCell2Buffer], coordsCell1Buffer,
-                             coordsCell2Buffer);
+            a.handleCellPair(_cells[coordsCell1Buffer], _cells[coordsCell2Buffer], coordsCell1Buffer, coordsCell2Buffer);
           }
         } // coords(0)
 #if (MD_DIM > 1)
@@ -519,12 +465,9 @@ void simplemd::services::LinkedCellService::iterateCellPairs(
   a.endCellIteration();
 }
 
-template <class A>
-void simplemd::services::LinkedCellService::iterateCellPairs(
-    A &a, const bool &useOpenMP) const {
+template <class A> void simplemd::services::LinkedCellService::iterateCellPairs(A &a, const bool &useOpenMP) const {
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(0);
-  const tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(
-      getLocalNumberOfCells() + getLocalIndexOfFirstCell());
+  const tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(getLocalNumberOfCells() + getLocalIndexOfFirstCell());
   iterateCellPairs(a, pairIterationStart, pairIterationLength, useOpenMP);
 }
 

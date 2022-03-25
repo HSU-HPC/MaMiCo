@@ -22,10 +22,7 @@ public:
    *config
    *	@tparam Configuration
    */
-  template <class Configuration>
-  static void parseConfiguration(const std::string filename,
-                                 const std::string topleveltag,
-                                 Configuration &config) {
+  template <class Configuration> static void parseConfiguration(const std::string filename, const std::string topleveltag, Configuration &config) {
     tinyxml2::XMLDocument conffile;
     tinyxml2::XMLElement *node = NULL;
     conffile.LoadFile(filename.c_str());
@@ -44,13 +41,10 @@ public:
    *	@param node
    *	@param tag
    */
-  static void readDoubleMandatory(double &storage, tinyxml2::XMLElement *node,
-                                  std::string tag) {
+  static void readDoubleMandatory(double &storage, tinyxml2::XMLElement *node, std::string tag) {
     double value;
-    if (node->QueryDoubleAttribute(tag.c_str(), &value) !=
-        tinyxml2::XML_NO_ERROR) {
-      std::cout << "Error while reading mandatory argument " << tag
-                << " of XML element " << node->Name() << std::endl;
+    if (node->QueryDoubleAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR) {
+      std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
       storage = value;
@@ -64,15 +58,13 @@ public:
    *	@param node
    *	@param tag
    */
-  static void readDoubleOptional(double &storage, tinyxml2::XMLElement *node,
-                                 std::string tag) {
+  static void readDoubleOptional(double &storage, tinyxml2::XMLElement *node, std::string tag) {
     double value;
     int result = node->QueryDoubleAttribute(tag.c_str(), &value);
     if (result == tinyxml2::XML_NO_ATTRIBUTE) {
       // nop
     } else if (result == tinyxml2::XML_WRONG_ATTRIBUTE_TYPE) {
-      std::cout << "Error while reading optional argument " << tag
-                << " of XML element " << node->Name() << std::endl;
+      std::cout << "Error while reading optional argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
       storage = value;
@@ -85,13 +77,10 @@ public:
    *	@param node
    *	@param tag
    */
-  static void readIntMandatory(int &storage, tinyxml2::XMLElement *node,
-                               std::string tag) {
+  static void readIntMandatory(int &storage, tinyxml2::XMLElement *node, std::string tag) {
     int value;
-    if (node->QueryIntAttribute(tag.c_str(), &value) !=
-        tinyxml2::XML_NO_ERROR) {
-      std::cout << "Error while reading mandatory argument " << tag
-                << " of XML element " << node->Name() << std::endl;
+    if (node->QueryIntAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR) {
+      std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
       storage = value;
@@ -105,15 +94,13 @@ public:
    *	@param node
    *	@param tag
    */
-  static void readIntOptional(int &storage, tinyxml2::XMLElement *node,
-                              std::string tag) {
+  static void readIntOptional(int &storage, tinyxml2::XMLElement *node, std::string tag) {
     int value;
     int result = node->QueryIntAttribute(tag.c_str(), &value);
     if (result == tinyxml2::XML_NO_ATTRIBUTE) {
       // nop
     } else if (result == tinyxml2::XML_WRONG_ATTRIBUTE_TYPE) {
-      std::cout << "Error while reading optional argument " << tag
-                << " of XML element " << node->Name() << std::endl;
+      std::cout << "Error while reading optional argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
       storage = value;
@@ -126,12 +113,10 @@ public:
    *	@param node
    *	@param tag
    */
-  static void readBoolMandatory(bool &storage, tinyxml2::XMLElement *node,
-                                std::string tag) {
+  static void readBoolMandatory(bool &storage, tinyxml2::XMLElement *node, std::string tag) {
     const char *myTextChar = node->Attribute(tag.c_str());
     if (myTextChar == NULL) {
-      std::cout << "Error: mandatory bool " << tag << " could not be found!"
-                << std::endl;
+      std::cout << "Error: mandatory bool " << tag << " could not be found!" << std::endl;
       exit(EXIT_FAILURE);
     }
     std::string myText(myTextChar);
@@ -154,8 +139,7 @@ public:
    *	@param node
    *	@param tag
    */
-  static void readBoolOptional(bool &storage, tinyxml2::XMLElement *node,
-                               std::string tag) {
+  static void readBoolOptional(bool &storage, tinyxml2::XMLElement *node, std::string tag) {
     const char *myTextChar = node->Attribute(tag.c_str());
     if (myTextChar == NULL) {
       return;
@@ -179,12 +163,10 @@ public:
    *	@param node
    *	@param tag
    */
-  static void readStringMandatory(std::string &storage,
-                                  tinyxml2::XMLElement *node, std::string tag) {
+  static void readStringMandatory(std::string &storage, tinyxml2::XMLElement *node, std::string tag) {
     const char *myText = node->Attribute(tag.c_str());
     if (myText == NULL) {
-      std::cout << "Error while reading mandatory argument " << tag
-                << " of XML element " << node->Name() << std::endl;
+      std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
       storage = std::string(myText);
@@ -198,8 +180,7 @@ public:
    *	@param node
    *	@param tag
    */
-  static void readStringOptional(std::string &storage,
-                                 tinyxml2::XMLElement *node, std::string tag) {
+  static void readStringOptional(std::string &storage, tinyxml2::XMLElement *node, std::string tag) {
     const char *myText = node->Attribute(tag.c_str());
     if (myText != NULL) {
       storage = std::string(myText);
@@ -214,13 +195,10 @@ public:
    *	@param node
    *	@param tag
    */
-  template <unsigned int size, class T>
-  static void readVector(tarch::la::Vector<size, T> &result,
-                         tinyxml2::XMLElement *node, std::string tag) {
+  template <unsigned int size, class T> static void readVector(tarch::la::Vector<size, T> &result, tinyxml2::XMLElement *node, std::string tag) {
     const char *myText = node->Attribute(tag.c_str());
     if (myText == NULL) {
-      std::cout << "Error while reading mandatory argument " << tag
-                << " of XML element " << node->Name() << std::endl;
+      std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
     std::string input(myText);

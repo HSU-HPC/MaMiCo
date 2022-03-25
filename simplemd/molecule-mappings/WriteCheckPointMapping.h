@@ -25,11 +25,8 @@ class WriteCheckPointMapping;
  */
 class simplemd::moleculemappings::WriteCheckPointMapping {
 public:
-  WriteCheckPointMapping(const simplemd::services::ParallelTopologyService
-                             &parallelTopologyService,
-                         const std::string &filestem, const unsigned int &t)
-      : _parallelTopologyService(parallelTopologyService), _file(NULL),
-        _filestem(filestem), _t(t) {}
+  WriteCheckPointMapping(const simplemd::services::ParallelTopologyService &parallelTopologyService, const std::string &filestem, const unsigned int &t)
+      : _parallelTopologyService(parallelTopologyService), _file(NULL), _filestem(filestem), _t(t) {}
   ~WriteCheckPointMapping() {}
 
   void beginMoleculeIteration();

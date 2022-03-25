@@ -12,8 +12,7 @@
 
 namespace coupling {
 template <class LinkedCell, unsigned int dim> class VelocityGradientRelaxation;
-template <class LinkedCell, unsigned int dim>
-class VelocityGradientRelaxationTopOnly;
+template <class LinkedCell, unsigned int dim> class VelocityGradientRelaxationTopOnly;
 } // namespace coupling
 
 /** In this particular case, however, the velocity is relaxed within a one
@@ -34,9 +33,7 @@ class VelocityGradientRelaxationTopOnly;
  * linked cells in the molecular dynamics simulation
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3 */
-template <class LinkedCell, unsigned int dim>
-class coupling::VelocityGradientRelaxation
-    : public coupling::MomentumInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::VelocityGradientRelaxation : public coupling::MomentumInsertion<LinkedCell, dim> {
 public:
   /** @brief a simple constructor
    *  @param relaxationParam defines the strength of the relaxation; 1 means the
@@ -47,15 +44,10 @@ public:
    * simulation
    *  @param macroscopicCells the macroscopic cells to apply the velocity
    * gradient relaxation */
-  VelocityGradientRelaxation(
-      double relaxationParam,
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface,
-      const coupling::IndexConversion<dim> &indexConversion,
-      const coupling::datastructures::MacroscopicCellWithLinkedCells<
-          LinkedCell, dim> *const macroscopicCells)
-      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface),
-        _indexConversion(indexConversion), _macroscopicCells(macroscopicCells),
+  VelocityGradientRelaxation(double relaxationParam, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
+                             const coupling::IndexConversion<dim> &indexConversion,
+                             const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *const macroscopicCells)
+      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _indexConversion(indexConversion), _macroscopicCells(macroscopicCells),
         _relaxationParam(relaxationParam) {}
   /** @brief a dummy destructor */
   virtual ~VelocityGradientRelaxation() {}
@@ -72,24 +64,18 @@ public:
    * velocity gradient relaxation method
    *  @param cell the macroscopic cell to insert momentum to
    *  @param currentLocalCellIndex the macroscopic cell's index */
-  virtual void insertMomentum(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const unsigned int &currentLocalMacroscopicCellIndex) const {
-    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim>
-        momentumMapping(
-            coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                              const unsigned int &currentLocalMacroscopicCellIndex) const {
+    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     tarch::la::Vector<dim, double> oldVelocity(0.0);
     cell.iterateConstCells(momentumMapping);
     // set current average velocity within this cell
     oldVelocity = momentumMapping.getMeanVelocity();
     // set new momentum (based on velocity stored in microscopic
     // momentum-buffer)
-    coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>
-        velocityGradientRelaxation(
-            _relaxationParam, oldVelocity, currentLocalMacroscopicCellIndex,
-            coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface,
-            _indexConversion, _macroscopicCells);
+    coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim> velocityGradientRelaxation(
+        _relaxationParam, oldVelocity, currentLocalMacroscopicCellIndex, coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface, _indexConversion,
+        _macroscopicCells);
     cell.iterateCells(velocityGradientRelaxation);
   }
 
@@ -97,8 +83,7 @@ protected:
   /** instance of the indexConversion for the current simulation */
   const coupling::IndexConversion<dim> &_indexConversion;
   /** the macroscopic cells to apply the velocity gradient relaxation */
-  const coupling::datastructures::MacroscopicCellWithLinkedCells<
-      LinkedCell, dim> *const _macroscopicCells;
+  const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *const _macroscopicCells;
   /** defines the strength of the relaxation; 1 means the molecules velocity is
    * set to the new velocity;
    *                         O.5 -> the velocity will be set to the avaerage of
@@ -125,21 +110,13 @@ protected:
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3
  *  @todo Don't know what this does, just copied the comments from above*/
-template <class LinkedCell, unsigned int dim>
-class coupling::VelocityGradientRelaxationTopOnly
-    : public coupling::VelocityGradientRelaxation<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::VelocityGradientRelaxationTopOnly : public coupling::VelocityGradientRelaxation<LinkedCell, dim> {
 public:
   /** @brief a simple constructor*/
-  VelocityGradientRelaxationTopOnly(
-      double relaxationParam,
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface,
-      const coupling::IndexConversion<dim> &indexConversion,
-      const coupling::datastructures::MacroscopicCellWithLinkedCells<
-          LinkedCell, dim> *const macroscopicCells)
-      : coupling::VelocityGradientRelaxation<LinkedCell, dim>(
-            relaxationParam, mdSolverInterface, indexConversion,
-            macroscopicCells) {}
+  VelocityGradientRelaxationTopOnly(double relaxationParam, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
+                                    const coupling::IndexConversion<dim> &indexConversion,
+                                    const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *const macroscopicCells)
+      : coupling::VelocityGradientRelaxation<LinkedCell, dim>(relaxationParam, mdSolverInterface, indexConversion, macroscopicCells) {}
 
   /** @brief a dummy destructor */
   virtual ~VelocityGradientRelaxationTopOnly() {}
@@ -151,13 +128,9 @@ public:
    * velocity gradient relaxation method
    *  @param cell the macroscopic cell to insert momentum to
    *  @param currentLocalCellIndex the macroscopic cell's index */
-  virtual void insertMomentum(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const unsigned int &currentLocalMacroscopicCellIndex) const {
-    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim>
-        momentumMapping(
-            coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                              const unsigned int &currentLocalMacroscopicCellIndex) const {
+    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     tarch::la::Vector<dim, double> oldVelocity(0.0);
     cell.iterateConstCells(momentumMapping);
     // set current average velocity within this cell
@@ -165,17 +138,10 @@ public:
 
     // set new momentum (based on velocity stored in microscopic
     // momentum-buffer)
-    coupling::cellmappings::VelocityGradientRelaxationTopOnlyMapping<LinkedCell,
-                                                                     dim>
-        velocityGradientRelaxation(
-            coupling::VelocityGradientRelaxation<LinkedCell,
-                                                 dim>::_relaxationParam,
-            oldVelocity, currentLocalMacroscopicCellIndex,
-            coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface,
-            coupling::VelocityGradientRelaxation<LinkedCell,
-                                                 dim>::_indexConversion,
-            coupling::VelocityGradientRelaxation<LinkedCell,
-                                                 dim>::_macroscopicCells);
+    coupling::cellmappings::VelocityGradientRelaxationTopOnlyMapping<LinkedCell, dim> velocityGradientRelaxation(
+        coupling::VelocityGradientRelaxation<LinkedCell, dim>::_relaxationParam, oldVelocity, currentLocalMacroscopicCellIndex,
+        coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface, coupling::VelocityGradientRelaxation<LinkedCell, dim>::_indexConversion,
+        coupling::VelocityGradientRelaxation<LinkedCell, dim>::_macroscopicCells);
     cell.iterateCells(velocityGradientRelaxation);
   }
 };

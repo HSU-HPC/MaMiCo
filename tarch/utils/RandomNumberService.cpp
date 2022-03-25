@@ -8,8 +8,7 @@
 #include <mpi.h>
 #endif
 
-tarch::utils::RandomNumberService &
-tarch::utils::RandomNumberService::getInstance() {
+tarch::utils::RandomNumberService &tarch::utils::RandomNumberService::getInstance() {
   static tarch::utils::RandomNumberService singleton;
   return singleton;
 }

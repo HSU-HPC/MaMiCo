@@ -18,46 +18,31 @@ template <unsigned int dim> class UniformFlowSolverInterface;
  * solver are assumed to be located on rank 0.
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class coupling::interface::UniformFlowSolverInterface
-    : public coupling::interface::TestMacroscopicSolverInterface<dim> {
+template <unsigned int dim> class coupling::interface::UniformFlowSolverInterface : public coupling::interface::TestMacroscopicSolverInterface<dim> {
 public:
-  UniformFlowSolverInterface(
-      tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
-      double massPerMacroscopicCell,
-      tarch::la::Vector<dim, double> momentumPerMacroscopicCell)
-      : TestMacroscopicSolverInterface<dim>(),
-        _totalNumberMacroscopicCells(
-            initTotalNumberMacroscopicCells(globalNumberMacroscopicCells)),
-        _massPerMacroscopicCell(massPerMacroscopicCell),
-        _momentumPerMacroscopicCell(momentumPerMacroscopicCell) {}
+  UniformFlowSolverInterface(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, double massPerMacroscopicCell,
+                             tarch::la::Vector<dim, double> momentumPerMacroscopicCell)
+      : TestMacroscopicSolverInterface<dim>(), _totalNumberMacroscopicCells(initTotalNumberMacroscopicCells(globalNumberMacroscopicCells)),
+        _massPerMacroscopicCell(massPerMacroscopicCell), _momentumPerMacroscopicCell(momentumPerMacroscopicCell) {}
   virtual ~UniformFlowSolverInterface() {}
 
   /** no values are received. */
-  virtual bool receiveMacroscopicQuantityFromMDSolver(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    return false;
-  }
+  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return false; }
 
   /** In every grid cell, values are sent.
    */
-  virtual bool sendMacroscopicQuantityToMDSolver(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    return true;
-  }
+  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return true; }
 
   /** all cells are located on rank 0.
    */
-  virtual std::vector<unsigned int>
-  getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     std::vector<unsigned int> result;
     result.push_back(0);
     return result;
   }
 
   /** add every macroscopic cell with mass and momentum to the send buffer */
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-  getMacroscopicCells4Sending() {
+  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *> getMacroscopicCells4Sending() {
     std::vector<coupling::datastructures::MacroscopicCell<dim> *> result;
     for (unsigned int i = 0; i < _totalNumberMacroscopicCells; i++) {
       result.push_back(new coupling::datastructures::MacroscopicCell<dim>());
@@ -88,8 +73,7 @@ public:
   }
 
   /** nothing is received */
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-  getMacroscopicCells4Receiving() {
+  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *> getMacroscopicCells4Receiving() {
     std::vector<coupling::datastructures::MacroscopicCell<dim> *> result;
     return result;
   }
@@ -104,11 +88,9 @@ private:
   const tarch::la::Vector<dim, double> _momentumPerMacroscopicCell;
 
   /** returns the total number of macroscopic cells incl. ghost layers */
-  unsigned int initTotalNumberMacroscopicCells(
-      tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells) const {
+  unsigned int initTotalNumberMacroscopicCells(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells) const {
     // total number cells = global number cells + ghost layers
-    tarch::la::Vector<dim, unsigned int> totalNumberCells =
-        globalNumberMacroscopicCells + tarch::la::Vector<dim, unsigned int>(2);
+    tarch::la::Vector<dim, unsigned int> totalNumberCells = globalNumberMacroscopicCells + tarch::la::Vector<dim, unsigned int>(2);
     unsigned int num = totalNumberCells[0];
     for (unsigned int d = 1; d < dim; d++) {
       num = num * totalNumberCells[d];

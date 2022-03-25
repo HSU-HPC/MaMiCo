@@ -9,8 +9,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim, std::size_t inputc, std::size_t outputc>
-class JunctorInterface;
+template <unsigned int dim, std::size_t inputc, std::size_t outputc> class JunctorInterface;
 }
 } // namespace coupling
 
@@ -27,61 +26,41 @@ class JunctorInterface;
  * @author Felix Maurer
  */
 template <unsigned int dim, std::size_t inputc, std::size_t outputc>
-class coupling::filtering::JunctorInterface
-    : public coupling::filtering::FilterInterface<dim> {
+class coupling::filtering::JunctorInterface : public coupling::filtering::FilterInterface<dim> {
 public:
-  JunctorInterface(
-      const std::array<
-          std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc>
-          inputCellVectors,
-      const std::array<
-          std::vector<coupling::datastructures::MacroscopicCell<dim> *>,
-          outputc>
-          outputCellVectors,
-      const std::array<bool, 7> filteredValues, const char *type)
+  JunctorInterface(const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> inputCellVectors,
+                   const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, outputc> outputCellVectors,
+                   const std::array<bool, 7> filteredValues, const char *type)
       : // This assumes the array of cell vectors to be nonempty. Suboptimal.
         // NOTE: Avoid using FI's cell vectors. Use
         // _inputCellVectors/_outputCellVectors instead.
-        coupling::filtering::FilterInterface<dim>(
-            inputCellVectors[0], outputCellVectors[0], filteredValues, type),
-        _inputCellVectors(inputCellVectors),
+        coupling::filtering::FilterInterface<dim>(inputCellVectors[0], outputCellVectors[0], filteredValues, type), _inputCellVectors(inputCellVectors),
         _outputCellVectors(outputCellVectors) {
 #ifdef DEBUG_JUNCTOR_INTERFACE
     // check input partition sizes
     for (unsigned int i = 0; i < inputc; i++)
-      std::cout << "			FJ: Size of input cell vector at index "
-                << i << ": " << inputCellVectors[i].size() << std::endl;
+      std::cout << "			FJ: Size of input cell vector at index " << i << ": " << inputCellVectors[i].size() << std::endl;
     for (unsigned int i = 0; i < outputc; i++)
-      std::cout
-          << "			FJ: Size of output cell vector at index " << i
-          << ": " << outputCellVectors[i].size() << std::endl;
+      std::cout << "			FJ: Size of output cell vector at index " << i << ": " << outputCellVectors[i].size() << std::endl;
 
 #endif
   }
 
-  void updateCellData(
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          new_inputCellVectors[inputc],
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          new_outputCellVectors[outputc],
-      std::vector<tarch::la::Vector<dim, unsigned int>> &new_cellIndices) {
+  void updateCellData(std::vector<coupling::datastructures::MacroscopicCell<dim> *> new_inputCellVectors[inputc],
+                      std::vector<coupling::datastructures::MacroscopicCell<dim> *> new_outputCellVectors[outputc],
+                      std::vector<tarch::la::Vector<dim, unsigned int>> &new_cellIndices) {
     std::cout << "		JI: Updating cell data." << std::endl;
     _inputCellVectors = new_inputCellVectors;
     _outputCellVectors = new_outputCellVectors;
 
     // Assumes the input c-style vectors to be nonempty. May be problematic.
-    coupling::filtering::FilterInterface<dim>::updateCellData(
-        new_inputCellVectors[0], new_outputCellVectors[0]);
+    coupling::filtering::FilterInterface<dim>::updateCellData(new_inputCellVectors[0], new_outputCellVectors[0]);
   }
 
 protected:
   /**
    * Unlike regular filters, junctors allow for multiple input- and output-sets
    */
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>,
-             inputc>
-      _inputCellVectors;
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>,
-             outputc>
-      _outputCellVectors;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> _inputCellVectors;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, outputc> _outputCellVectors;
 };

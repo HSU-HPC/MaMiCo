@@ -6,8 +6,7 @@
 
 template <unsigned int dim>
 int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
-    tinyxml2::XMLElement
-        *sequenceNode) { // in our case "junctionNode" would be more precise
+    tinyxml2::XMLElement *sequenceNode) { // in our case "junctionNode" would be more precise
   if (!sequenceNode)
     return EXIT_FAILURE;
 
@@ -16,15 +15,10 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
 
   // These four are not to be confused with member variables of similar names.
   // Watch out for the "_" in front of member variables.
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-      inputCellVector_primary =
-          coupling::filtering::FilterSequence<dim>::_inputCellVector;
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-      outputCellVector_primary =
-          coupling::filtering::FilterSequence<dim>::_cellVector2;
+  std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_inputCellVector;
+  std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector2;
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-      inputCellVector_secondary = _inputCellVector_secondary;
+  std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_secondary = _inputCellVector_secondary;
   // Note: To prevent counter intuitive design, secondary output has been
   // disabled, i.e. all junctors in an AFJ take the same secondary input.
   // There
@@ -34,9 +28,7 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
   // outputCellVector_secondary = _cellVector2_secondary;
 
 #ifdef DEBUG_FILTER_PIPELINE
-  std::cout << PRINT_PREFIX()
-            << "Initializing junctor objects of asymmetrical junction."
-            << std::endl;
+  std::cout << PRINT_PREFIX() << "Initializing junctor objects of asymmetrical junction." << std::endl;
 #endif
 
   // Keep track of this for each indivial input partition.
@@ -58,43 +50,31 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
       // Check "overwrite" property for both underlying WriteToFile instances.
       std::array<bool, 2> overwrite = {false};
       if (currJunctorNode->Attribute("wtf1-overwrite"))
-        if (std::strcmp(currJunctorNode->Attribute("wtf1-overwrite"), "true") ==
-            0)
+        if (std::strcmp(currJunctorNode->Attribute("wtf1-overwrite"), "true") == 0)
           overwrite[0] = true;
       if (currJunctorNode->Attribute("wtf2-overwrite"))
-        if (std::strcmp(currJunctorNode->Attribute("wtf2-overwrite"), "true") ==
-            0)
+        if (std::strcmp(currJunctorNode->Attribute("wtf2-overwrite"), "true") == 0)
           overwrite[1] = true;
 
       // Check "one-cell-only" property for both underlying WriteToFile
       // instances.
       // TODO: replace std::couts with proper exceptions
       std::array<int, 2> oco = {-1, -1};
-      tarch::configuration::ParseConfiguration::readIntOptional(
-          oco[0], currJunctorNode, "wtf1-one-cell-only");
+      tarch::configuration::ParseConfiguration::readIntOptional(oco[0], currJunctorNode, "wtf1-one-cell-only");
       if (oco[0] < -1 || oco[0] >= (int)inputCellVector_primary.size()) {
-        std::cout << "ERROR: XML config file references undefined cell index "
-                  << oco[0]
-                  << " for primary write-to-file in write-to-file-junctor."
-                  << std::endl;
+        std::cout << "ERROR: XML config file references undefined cell index " << oco[0] << " for primary write-to-file in write-to-file-junctor." << std::endl;
         exit(EXIT_FAILURE);
       }
-      tarch::configuration::ParseConfiguration::readIntOptional(
-          oco[1], currJunctorNode, "wtf2-one-cell-only");
+      tarch::configuration::ParseConfiguration::readIntOptional(oco[1], currJunctorNode, "wtf2-one-cell-only");
       if (oco[1] < -1 || oco[1] >= (int)inputCellVector_secondary.size()) {
-        std::cout << "ERROR: XML config file references undefined cell index "
-                  << oco[1]
-                  << " for secondary write-to-file in write-to-file-junctor."
+        std::cout << "ERROR: XML config file references undefined cell index " << oco[1] << " for secondary write-to-file in write-to-file-junctor."
                   << std::endl;
         exit(EXIT_FAILURE);
       }
 
       newjunctor = new coupling::filtering::WriteToFileJunctor<dim>(
-          inputCellVector_primary, outputCellVector_primary,
-          inputCellVector_secondary, this->_filteredValues,
-          {currJunctorNode->Attribute("wtf1-location"),
-           currJunctorNode->Attribute("wtf2-location")},
-          overwrite, oco);
+          inputCellVector_primary, outputCellVector_primary, inputCellVector_secondary, this->_filteredValues,
+          {currJunctorNode->Attribute("wtf1-location"), currJunctorNode->Attribute("wtf2-location")}, overwrite, oco);
     }
 
     //###############################################################
@@ -108,8 +88,7 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
     }
 
     if (firstIteration) {
-      inputCellVector_primary =
-          coupling::filtering::FilterSequence<dim>::_cellVector1;
+      inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector1;
       inputCellVector_secondary = _cellVector1_secondary;
       firstIteration = false;
     }

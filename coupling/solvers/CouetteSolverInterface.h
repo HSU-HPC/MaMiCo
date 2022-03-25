@@ -25,20 +25,14 @@ template <unsigned int dim> class CouetteSolverInterface;
  *  @author Philipp Neumann
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3 */
-template <unsigned int dim>
-class coupling::solvers::CouetteSolverInterface
-    : public coupling::interface::MacroscopicSolverInterface<dim> {
+template <unsigned int dim> class coupling::solvers::CouetteSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
 public:
   /** @brief a simple constructor
    *  @param globalNumberMacroscopicCells the total number of macroscopic cells
    *  @param outerRegion defines, how many cell layers will be sent to the macro
    * solver */
-  CouetteSolverInterface(
-      tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
-      unsigned int outerRegion = 1)
-      : coupling::interface::MacroscopicSolverInterface<dim>(),
-        _outerRegion(outerRegion),
-        _globalNumberMacroscopicCells(globalNumberMacroscopicCells) {
+  CouetteSolverInterface(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, unsigned int outerRegion = 1)
+      : coupling::interface::MacroscopicSolverInterface<dim>(), _outerRegion(outerRegion), _globalNumberMacroscopicCells(globalNumberMacroscopicCells) {
   }
 
   /** @brief a dummy destructor */
@@ -53,13 +47,10 @@ public:
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns a bool, which indicates if a cell will be received (true) or not
    * (false) */
-  virtual bool receiveMacroscopicQuantityFromMDSolver(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     bool recv = true;
     for (unsigned int d = 0; d < dim; d++) {
-      recv = recv && (globalCellIndex[d] > _outerRegion) &&
-             (globalCellIndex[d] <
-              _globalNumberMacroscopicCells[d] + 1 - _outerRegion);
+      recv = recv && (globalCellIndex[d] > _outerRegion) && (globalCellIndex[d] < _globalNumberMacroscopicCells[d] + 1 - _outerRegion);
     }
     return recv;
   }
@@ -70,22 +61,18 @@ public:
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns a bool, which indicates if a cell will be send (true) or not
    * (false)  */
-  virtual bool sendMacroscopicQuantityToMDSolver(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     bool outer = false;
     for (unsigned int d = 0; d < dim; d++) {
-      outer = outer || (globalCellIndex[d] < 1) ||
-              (globalCellIndex[d] > _globalNumberMacroscopicCells[d]);
+      outer = outer || (globalCellIndex[d] < 1) || (globalCellIndex[d] > _globalNumberMacroscopicCells[d]);
     }
-    return (!outer) &&
-           (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
+    return (!outer) && (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
   }
 
   /** @brief calculates for a macroscopic cell index, which rank holds it
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns returns the rank on which the data is located */
-  virtual std::vector<unsigned int>
-  getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     std::vector<unsigned int> ranks;
     ranks.push_back(0);
     return ranks;

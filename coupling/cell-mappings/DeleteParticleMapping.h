@@ -22,21 +22,15 @@ template <class LinkedCell, unsigned int dim> class DeleteParticleMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::DeleteParticleMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::DeleteParticleMapping {
 public:
   /** Constructor
    *	@param particle
    *	@param mdSolverInterface
    */
-  DeleteParticleMapping(const unsigned int &particle,
-                        coupling::interface::MDSolverInterface<LinkedCell, dim>
-                            *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface), _particle(particle),
-        _particleCounter(0),
-        _deletedMoleculeCopy(tarch::la::Vector<dim, double>(0.0),
-                             tarch::la::Vector<dim, double>(0.0),
-                             tarch::la::Vector<dim, double>(0.0), 0.0) {}
+  DeleteParticleMapping(const unsigned int &particle, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface), _particle(particle), _particleCounter(0),
+        _deletedMoleculeCopy(tarch::la::Vector<dim, double>(0.0), tarch::la::Vector<dim, double>(0.0), tarch::la::Vector<dim, double>(0.0), 0.0) {}
 
   /** Destructor */
   ~DeleteParticleMapping() {}
@@ -62,8 +56,7 @@ public:
     }
 
     // otherwise: loop over particles
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       // if we reached the respective particle, delete it
@@ -71,14 +64,11 @@ public:
         const coupling::interface::Molecule<dim> &myMolecule(it->getConst());
 
         // save copy of particle
-        const tarch::la::Vector<dim, double> position =
-            myMolecule.getPosition();
-        const tarch::la::Vector<dim, double> velocity =
-            myMolecule.getVelocity();
+        const tarch::la::Vector<dim, double> position = myMolecule.getPosition();
+        const tarch::la::Vector<dim, double> velocity = myMolecule.getVelocity();
         const tarch::la::Vector<dim, double> force = myMolecule.getForce();
         const double potentialEnergy = myMolecule.getPotentialEnergy();
-        _deletedMoleculeCopy = coupling::datastructures::Molecule<dim>(
-            position, velocity, force, potentialEnergy);
+        _deletedMoleculeCopy = coupling::datastructures::Molecule<dim>(position, velocity, force, potentialEnergy);
 
         // delete molecule from MD simulation
         _mdSolverInterface->deleteMoleculeFromMDSimulation(myMolecule, cell);
@@ -95,13 +85,10 @@ public:
   /** returns a copy of the deleted molecule.
    *	@return _deletedMoleculeCopy
    */
-  coupling::datastructures::Molecule<dim> getDeletedMolecule() const {
-    return _deletedMoleculeCopy;
-  }
+  coupling::datastructures::Molecule<dim> getDeletedMolecule() const { return _deletedMoleculeCopy; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   const unsigned int _particle;
   unsigned int _particleCounter;
   coupling::datastructures::Molecule<dim> _deletedMoleculeCopy;

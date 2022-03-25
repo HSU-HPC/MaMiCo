@@ -33,9 +33,7 @@ template <class LinkedCell, unsigned int dim> class UsherParticleInsertion;
  * linked cells in the molecular dynamics simulation
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3 */
-template <class LinkedCell, unsigned int dim>
-class coupling::UsherParticleInsertion
-    : public coupling::ParticleInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::UsherParticleInsertion : public coupling::ParticleInsertion<LinkedCell, dim> {
 public:
   /** @brief a simple constructor
    *  @param insertDeleteMassAtTimestep the interval of time steps for the
@@ -54,13 +52,9 @@ public:
    *  @param offsetFromOuterBoundary offset of the md domain (difference between
    * the left, lower, front corner to 0,0,0)
    *  @param mdSolverInterface interface for the md solver */
-  UsherParticleInsertion(unsigned int insertDeleteMassEveryTimestep,
-                         double rSigmaCoeff, double meanPotentialEnergyFactor,
-                         double uOverlapCoeff, double stepRefCoeff,
-                         unsigned int iterMax, unsigned int restartMax,
-                         double tolerance, double offsetFromOuterBoundary,
-                         coupling::interface::MDSolverInterface<LinkedCell, dim>
-                             *const mdSolverInterface);
+  UsherParticleInsertion(unsigned int insertDeleteMassEveryTimestep, double rSigmaCoeff, double meanPotentialEnergyFactor, double uOverlapCoeff,
+                         double stepRefCoeff, unsigned int iterMax, unsigned int restartMax, double tolerance, double offsetFromOuterBoundary,
+                         coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface);
   /** @brief a dummy destructor*/
   virtual ~UsherParticleInsertion() {}
 
@@ -81,15 +75,10 @@ public:
    *  @returns the type of action which was applied
    * (coupling::ParticleInsertion::Action) */
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-      const tarch::la::Vector<dim, double> &macroscopicCellSize,
-      const tarch::la::Vector<dim, double> &meanVelocity,
-      const double &temperature,
-      const coupling::BoundaryForceController<LinkedCell, dim>
-          &boundaryForceController);
+  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                   const tarch::la::Vector<dim, double> &macroscopicCellPosition, const tarch::la::Vector<dim, double> &macroscopicCellSize,
+                   const tarch::la::Vector<dim, double> &meanVelocity, const double &temperature,
+                   const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController);
 
   /** @brief since the Usher algorithm requires the potential energy landscape,
    * the function returns true
@@ -125,15 +114,10 @@ private:
    * controller in application
    *  @returns NoAction or Insertion, depending on the applied action
    *  (coupling::ParticleInsertion::Action) */
-  typename coupling::ParticleInsertion<LinkedCell, dim>::Action insertParticle(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-      const tarch::la::Vector<dim, double> &macroscopicCellSize,
-      const tarch::la::Vector<dim, double> &meanVelocity,
-      const double &temperature,
-      const coupling::BoundaryForceController<LinkedCell, dim>
-          &boundaryForceController);
+  typename coupling::ParticleInsertion<LinkedCell, dim>::Action
+  insertParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const tarch::la::Vector<dim, double> &macroscopicCellPosition,
+                 const tarch::la::Vector<dim, double> &macroscopicCellSize, const tarch::la::Vector<dim, double> &meanVelocity, const double &temperature,
+                 const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController);
 
   /** Returns Deletion on success and NoAction otherwise.
    *  @brief tries to delete a particle from the macroscopic cell.
@@ -142,11 +126,9 @@ private:
    * controller in application
    *  @returns NoAction or Deletion, depending on the action applied
    *  (coupling::ParticleInsertion::Action)*/
-  typename coupling::ParticleInsertion<LinkedCell, dim>::Action deleteParticle(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const coupling::BoundaryForceController<LinkedCell, dim>
-          &boundaryForceController);
+  typename coupling::ParticleInsertion<LinkedCell, dim>::Action
+  deleteParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                 const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController);
 
 protected:
   /** the result is stored in the position entry of the molecule 'molecule'.
@@ -163,14 +145,9 @@ protected:
    *  @returns NoAction or Insertion, depending on the result of the Usher
    * method applied here (coupling::ParticleInsertion::Action)*/
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  findParticlePosition(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &thisCell,
-      const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-      const tarch::la::Vector<dim, double> &macroscopicCellSize,
-      coupling::datastructures::Molecule<dim> &molecule,
-      const coupling::BoundaryForceController<LinkedCell, dim>
-          &boundaryForceController);
+  findParticlePosition(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &thisCell,
+                       const tarch::la::Vector<dim, double> &macroscopicCellPosition, const tarch::la::Vector<dim, double> &macroscopicCellSize,
+                       coupling::datastructures::Molecule<dim> &molecule, const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController);
 
   /** @brief collects all the parameters necessary for the Usher algorithm
    *  @author Philipp Neumann */
@@ -197,15 +174,10 @@ protected:
     double _offsetFromOuterBoundary;
 
     /** @brief a simple destructor */
-    UsherParams(double rSigmaCoeff, double meanPotentialEnergyFactor,
-                double uOverlapCoeff, double stepRefCoeff, unsigned int iterMax,
-                unsigned int restartMax, double tolerance,
-                double offsetFromOuterBoundary)
-        : _rSigmaCoeff(rSigmaCoeff),
-          _meanPotentialEnergyFactor(meanPotentialEnergyFactor),
-          _uOverlapCoeff(uOverlapCoeff), _stepRefCoeff(stepRefCoeff),
-          _iterMax(iterMax), _restartMax(restartMax), _tolerance(tolerance),
-          _offsetFromOuterBoundary(offsetFromOuterBoundary) {}
+    UsherParams(double rSigmaCoeff, double meanPotentialEnergyFactor, double uOverlapCoeff, double stepRefCoeff, unsigned int iterMax, unsigned int restartMax,
+                double tolerance, double offsetFromOuterBoundary)
+        : _rSigmaCoeff(rSigmaCoeff), _meanPotentialEnergyFactor(meanPotentialEnergyFactor), _uOverlapCoeff(uOverlapCoeff), _stepRefCoeff(stepRefCoeff),
+          _iterMax(iterMax), _restartMax(restartMax), _tolerance(tolerance), _offsetFromOuterBoundary(offsetFromOuterBoundary) {}
     /** @brief a dummy destructor*/
     ~UsherParams() {}
 
@@ -225,8 +197,7 @@ protected:
   };
 
   /** @brief interface to the md solver */
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   /** @brief instance of the UsherParams, stores all necessary parameters*/
   const UsherParams _usherParams;
 };

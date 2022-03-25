@@ -22,9 +22,7 @@ class MolecularPropertiesService;
 class simplemd::services::MolecularPropertiesService {
 public:
   /** initialises the properties */
-  MolecularPropertiesService(const double &mass, const double &epsilon,
-                             const double &sigma, const double &cutOffRadius,
-                             const double &kB);
+  MolecularPropertiesService(const double &mass, const double &epsilon, const double &sigma, const double &cutOffRadius, const double &kB);
 
   /** returns the properties */
   const MolecularProperties &getMolecularProperties() const;

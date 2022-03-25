@@ -20,8 +20,7 @@ class ThermostatConfiguration;
 /** reads the configuartion for the domain of the thermostat.
  *  @author Helene Wittenberg
  */
-class coupling::configurations::ThermostatConfiguration
-    : public tarch::configuration::Configuration {
+class coupling::configurations::ThermostatConfiguration : public tarch::configuration::Configuration {
 public:
   enum ThermostatRegion { onlyOutestLayer, outerLayers, all, nowhere, none };
   ThermostatConfiguration() : _type{none}, _isValid(true) {}
@@ -30,15 +29,13 @@ public:
 
   void parseSubtag(tinyxml2::XMLElement *node) {
     std::string value;
-    tarch::configuration::ParseConfiguration::readStringMandatory(value, node,
-                                                                  "type");
+    tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "onlyOutestLayer") {
       _type = onlyOutestLayer;
     } else if (value == "outerLayers") {
       _type = outerLayers;
       int cellsTemp = 0;
-      tarch::configuration::ParseConfiguration::readIntOptional(
-          cellsTemp, node, "number-layers");
+      tarch::configuration::ParseConfiguration::readIntOptional(cellsTemp, node, "number-layers");
       if (cellsTemp <= 0) {
         std::cout << "ERROR coupling::ThermostatConfiguration: Wrong number of "
                      "cells to use!"
@@ -52,8 +49,7 @@ public:
     } else if (value == "nowhere") {
       _type = nowhere;
     } else {
-      std::cout << "ERROR coupling::ThermostatConfiguration: Wrong type!"
-                << std::endl;
+      std::cout << "ERROR coupling::ThermostatConfiguration: Wrong type!" << std::endl;
       _isValid = false;
       exit(EXIT_FAILURE);
     }

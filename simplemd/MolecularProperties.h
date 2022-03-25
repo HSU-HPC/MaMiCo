@@ -15,11 +15,8 @@ class MolecularProperties;
 class simplemd::MolecularProperties {
 
 public:
-  MolecularProperties(const double &mass, const double &epsilon,
-                      const double &sigma, const double &cutoffRadius,
-                      const double &kB)
-      : _mass(mass), _epsilon(epsilon), _sigma(sigma),
-        _cutoffRadius(cutoffRadius), _kB(kB) {}
+  MolecularProperties(const double &mass, const double &epsilon, const double &sigma, const double &cutoffRadius, const double &kB)
+      : _mass(mass), _epsilon(epsilon), _sigma(sigma), _cutoffRadius(cutoffRadius), _kB(kB) {}
   ~MolecularProperties() {}
 
   const double &getMass() const { return _mass; }

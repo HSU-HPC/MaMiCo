@@ -7,25 +7,19 @@
 #include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MoleculeService.h"
 
-simplemd::services::ParallelTopologyService::ParallelTopologyService(
-    const tarch::la::Vector<MD_DIM, double> &domainSize,
-    const tarch::la::Vector<MD_DIM, double> &domainOffset,
-    const tarch::la::Vector<MD_DIM, double> &meshWidth,
-    const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>
-        &boundary
+simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch::la::Vector<MD_DIM, double> &domainSize,
+                                                                     const tarch::la::Vector<MD_DIM, double> &domainOffset,
+                                                                     const tarch::la::Vector<MD_DIM, double> &meshWidth,
+                                                                     const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
+                                                                     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary
 #if (MD_PARALLEL == MD_YES)
-    ,
-    MPI_Comm communicator
+                                                                     ,
+                                                                     MPI_Comm communicator
 #endif
-    )
-    : _domainSize(domainSize), _domainOffset(domainOffset),
-      _meshWidth(computeMeshwidth(meshWidth, numberProcesses, domainSize)),
-      _numberProcesses(numberProcesses),
-      _localNumberOfCells(
-          computeNumberOfCells(meshWidth, numberProcesses, domainSize)),
-      _globalNumberOfCells(
-          computeGlobalNumberOfCells(meshWidth, numberProcesses, domainSize))
+                                                                     )
+    : _domainSize(domainSize), _domainOffset(domainOffset), _meshWidth(computeMeshwidth(meshWidth, numberProcesses, domainSize)),
+      _numberProcesses(numberProcesses), _localNumberOfCells(computeNumberOfCells(meshWidth, numberProcesses, domainSize)),
+      _globalNumberOfCells(computeGlobalNumberOfCells(meshWidth, numberProcesses, domainSize))
 #if (MD_PARALLEL == MD_YES)
       ,
       _communicator(communicator)
@@ -39,9 +33,7 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(
   _rank = 0;
 #endif
   if (_rank < 0) {
-    std::cout
-        << "ERROR simplemd::services::ParallelTopologyService::init: Rank < 0!"
-        << std::endl;
+    std::cout << "ERROR simplemd::services::ParallelTopologyService::init: Rank < 0!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -49,8 +41,7 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(
   help = (unsigned int)_rank;
 #if (MD_DIM > 2)
   _processCoordinates[2] = help / (_numberProcesses[0] * _numberProcesses[1]);
-  help = help -
-         _processCoordinates[2] * (_numberProcesses[0] * _numberProcesses[1]);
+  help = help - _processCoordinates[2] * (_numberProcesses[0] * _numberProcesses[1]);
 #endif
 #if (MD_DIM > 1)
   _processCoordinates[1] = help / _numberProcesses[0];
@@ -58,16 +49,12 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(
 #endif
   _processCoordinates[0] = help;
   // determine local information on periodic boundary
-  _boundary = computeLocalBoundaryInformation(boundary, _processCoordinates,
-                                              _numberProcesses);
+  _boundary = computeLocalBoundaryInformation(boundary, _processCoordinates, _numberProcesses);
   // determine ranks of possible communication neighbours
-  createNeighbourRanks(_processCoordinates, _boundary, _numberProcesses,
-                       _neighbourRanks, _neighbourRanksUnique,
-                       _numUniqueNeighbours, _numberOfCellsPerBuffer);
+  createNeighbourRanks(_processCoordinates, _boundary, _numberProcesses, _neighbourRanks, _neighbourRanksUnique, _numUniqueNeighbours, _numberOfCellsPerBuffer);
   // compute global index of first cell
   for (unsigned int d = 0; d < MD_DIM; d++) {
-    _globalIndexOfFirstCell[d] =
-        _processCoordinates[d] * _localNumberOfCells[d];
+    _globalIndexOfFirstCell[d] = _processCoordinates[d] * _localNumberOfCells[d];
   }
 
 #if (MD_PARALLEL == MD_YES)
@@ -82,10 +69,8 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(
 #endif
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "ParallelTopologyService: Rank=" << _rank
-            << ", process coords: " << _processCoordinates << std::endl;
-  std::cout << "No. processes: " << _numberProcesses
-            << ", boundary: " << _boundary << std::endl;
+  std::cout << "ParallelTopologyService: Rank=" << _rank << ", process coords: " << _processCoordinates << std::endl;
+  std::cout << "No. processes: " << _numberProcesses << ", boundary: " << _boundary << std::endl;
   std::cout << "Parallel neighbours:";
   for (unsigned int i = 0; i < _neighbourRanks.size(); i++) {
     std::cout << _neighbourRanks[i] << "  ";
@@ -96,8 +81,7 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(
     std::cout << _neighbourRanksUnique[i] << " ";
   }
   std::cout << std::endl;
-  std::cout << "Rank " << _rank
-            << " will be sending the following numbers of cells: ";
+  std::cout << "Rank " << _rank << " will be sending the following numbers of cells: ";
   for (unsigned int i = 0; i < _numUniqueNeighbours; i++) {
     std::cout << _numberOfCellsPerBuffer[i] << " ";
   }
@@ -105,8 +89,7 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::initBuffers(
-    const unsigned int &localNumberOfMolecules) {
+void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int &localNumberOfMolecules) {
 
   // idle processors should not enter this function, but still put a check:
   if (isIdle())
@@ -118,19 +101,13 @@ void simplemd::services::ParallelTopologyService::initBuffers(
   }
 
   // compute average number of molecules per linked cell
-  double averageNumberOfMoleculesPerLinkedCell =
-      (double)localNumberOfMolecules / (double)totalNumberOfLocalCells;
+  double averageNumberOfMoleculesPerLinkedCell = (double)localNumberOfMolecules / (double)totalNumberOfLocalCells;
 
   // initialize ParallelAndLocalBufferService
   bool isOk;
-  isOk =
-      _bufferService.initialise(_numUniqueNeighbours, _numberOfCellsPerBuffer,
-                                averageNumberOfMoleculesPerLinkedCell);
+  isOk = _bufferService.initialise(_numUniqueNeighbours, _numberOfCellsPerBuffer, averageNumberOfMoleculesPerLinkedCell);
   if (!isOk) {
-    std::cout
-        << "Rank " << _rank
-        << " could not initialise ParallelAndLocalBufferService. Terminating."
-        << std::endl;
+    std::cout << "Rank " << _rank << " could not initialise ParallelAndLocalBufferService. Terminating." << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -162,14 +139,9 @@ void simplemd::services::ParallelTopologyService::shutdown() {
   _rank = 0;
 }
 
-int simplemd::services::ParallelTopologyService::getRank() const {
-  return _rank;
-}
+int simplemd::services::ParallelTopologyService::getRank() const { return _rank; }
 
-const tarch::la::Vector<MD_DIM, unsigned int> &
-simplemd::services::ParallelTopologyService::getProcessCoordinates() const {
-  return _processCoordinates;
-}
+const tarch::la::Vector<MD_DIM, unsigned int> &simplemd::services::ParallelTopologyService::getProcessCoordinates() const { return _processCoordinates; }
 
 bool simplemd::services::ParallelTopologyService::isIdle() const {
   int processes = 1;
@@ -180,19 +152,15 @@ bool simplemd::services::ParallelTopologyService::isIdle() const {
 }
 
 std::vector<tarch::la::Vector<MD_DIM, unsigned int>>
-simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
-    LinkedCell &cell, const unsigned int &cellIndex,
-    const simplemd::services::LinkedCellService &linkedCellService) {
+simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedCell &cell, const unsigned int &cellIndex,
+                                                                         const simplemd::services::LinkedCellService &linkedCellService) {
 
   std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex;
 
   // determine cell index in vector form
   tarch::la::Vector<MD_DIM, int> cellCoords(0);
-  tarch::la::Vector<MD_DIM, unsigned int> size(
-      linkedCellService.getLocalNumberOfCells() +
-      2u * linkedCellService.getLocalIndexOfFirstCell());
-  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, tarch::la::Vector<MD_DIM, int>>
-      neighbours(0);
+  tarch::la::Vector<MD_DIM, unsigned int> size(linkedCellService.getLocalNumberOfCells() + 2u * linkedCellService.getLocalIndexOfFirstCell());
+  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, tarch::la::Vector<MD_DIM, int>> neighbours(0);
   int help = (int)cellIndex;
 
 #if (MD_DIM > 2)
@@ -205,8 +173,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
 #endif
   cellCoords[0] = help;
 #if (MD_DEBUG == MD_YES)
-  std::cout << "broadcastInnerCellViaBuffers: rank " << _rank
-            << " cellCoords=" << cellCoords << std::endl;
+  std::cout << "broadcastInnerCellViaBuffers: rank " << _rank << " cellCoords=" << cellCoords << std::endl;
 #endif
 
 #if (MD_DIM == 1)
@@ -227,8 +194,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
   neighbours[2] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, 0, 0);
 
   neighbours[3] = tarch::la::Vector<MD_DIM, int>(0, cellCoords[1], 0);
-  neighbours[4] =
-      tarch::la::Vector<MD_DIM, int>(cellCoords[0], cellCoords[1], 0);
+  neighbours[4] = tarch::la::Vector<MD_DIM, int>(cellCoords[0], cellCoords[1], 0);
   neighbours[5] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, cellCoords[1], 0);
 
   neighbours[6] = tarch::la::Vector<MD_DIM, int>(0, size[1] - 1, 0);
@@ -236,41 +202,28 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
   neighbours[8] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, size[1] - 1, 0);
 
   neighbours[9] = tarch::la::Vector<MD_DIM, int>(0, 0, cellCoords[2]);
-  neighbours[10] =
-      tarch::la::Vector<MD_DIM, int>(cellCoords[0], 0, cellCoords[2]);
-  neighbours[11] =
-      tarch::la::Vector<MD_DIM, int>(size[0] - 1, 0, cellCoords[2]);
+  neighbours[10] = tarch::la::Vector<MD_DIM, int>(cellCoords[0], 0, cellCoords[2]);
+  neighbours[11] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, 0, cellCoords[2]);
 
-  neighbours[12] =
-      tarch::la::Vector<MD_DIM, int>(0, cellCoords[1], cellCoords[2]);
+  neighbours[12] = tarch::la::Vector<MD_DIM, int>(0, cellCoords[1], cellCoords[2]);
 
-  neighbours[13] =
-      tarch::la::Vector<MD_DIM, int>(size[0] - 1, cellCoords[1], cellCoords[2]);
+  neighbours[13] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, cellCoords[1], cellCoords[2]);
 
-  neighbours[14] =
-      tarch::la::Vector<MD_DIM, int>(0, size[1] - 1, cellCoords[2]);
-  neighbours[15] =
-      tarch::la::Vector<MD_DIM, int>(cellCoords[0], size[1] - 1, cellCoords[2]);
-  neighbours[16] =
-      tarch::la::Vector<MD_DIM, int>(size[0] - 1, size[1] - 1, cellCoords[2]);
+  neighbours[14] = tarch::la::Vector<MD_DIM, int>(0, size[1] - 1, cellCoords[2]);
+  neighbours[15] = tarch::la::Vector<MD_DIM, int>(cellCoords[0], size[1] - 1, cellCoords[2]);
+  neighbours[16] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, size[1] - 1, cellCoords[2]);
 
   neighbours[17] = tarch::la::Vector<MD_DIM, int>(0, 0, size[2] - 1);
-  neighbours[18] =
-      tarch::la::Vector<MD_DIM, int>(cellCoords[0], 0, size[2] - 1);
+  neighbours[18] = tarch::la::Vector<MD_DIM, int>(cellCoords[0], 0, size[2] - 1);
   neighbours[19] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, 0, size[2] - 1);
 
-  neighbours[20] =
-      tarch::la::Vector<MD_DIM, int>(0, cellCoords[1], size[2] - 1);
-  neighbours[21] =
-      tarch::la::Vector<MD_DIM, int>(cellCoords[0], cellCoords[1], size[2] - 1);
-  neighbours[22] =
-      tarch::la::Vector<MD_DIM, int>(size[0] - 1, cellCoords[1], size[2] - 1);
+  neighbours[20] = tarch::la::Vector<MD_DIM, int>(0, cellCoords[1], size[2] - 1);
+  neighbours[21] = tarch::la::Vector<MD_DIM, int>(cellCoords[0], cellCoords[1], size[2] - 1);
+  neighbours[22] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, cellCoords[1], size[2] - 1);
 
   neighbours[23] = tarch::la::Vector<MD_DIM, int>(0, size[1] - 1, size[2] - 1);
-  neighbours[24] =
-      tarch::la::Vector<MD_DIM, int>(cellCoords[0], size[1] - 1, size[2] - 1);
-  neighbours[25] =
-      tarch::la::Vector<MD_DIM, int>(size[0] - 1, size[1] - 1, size[2] - 1);
+  neighbours[24] = tarch::la::Vector<MD_DIM, int>(cellCoords[0], size[1] - 1, size[2] - 1);
+  neighbours[25] = tarch::la::Vector<MD_DIM, int>(size[0] - 1, size[1] - 1, size[2] - 1);
 #endif
 
   help = 0;
@@ -298,47 +251,34 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
           }
           // if this cell is close to a boundary and this boundary requires
           // communication...
-          if (isNearBoundary && ((_boundary[help] == PERIODIC_BOUNDARY) ||
-                                 (_boundary[help] == PARALLEL_BOUNDARY))) {
+          if (isNearBoundary && ((_boundary[help] == PERIODIC_BOUNDARY) || (_boundary[help] == PARALLEL_BOUNDARY))) {
 #if (MD_DEBUG == MD_YES)
             std::cout << "Cell is near boundary " << help << " ";
 #endif
-            int neighbourRank = ((x + ((int)_processCoordinates[0]) +
-                                  ((int)_numberProcesses[0])) %
-                                 _numberProcesses[0])
+            int neighbourRank =
+                ((x + ((int)_processCoordinates[0]) + ((int)_numberProcesses[0])) % _numberProcesses[0])
 #if (MD_DIM > 1)
-                                + ((y + ((int)_processCoordinates[1]) +
-                                    ((int)_numberProcesses[1])) %
-                                   _numberProcesses[1]) *
-                                      _numberProcesses[0]
+                + ((y + ((int)_processCoordinates[1]) + ((int)_numberProcesses[1])) % _numberProcesses[1]) * _numberProcesses[0]
 #endif
 #if (MD_DIM > 2)
-                                + ((z + ((int)_processCoordinates[2]) +
-                                    ((int)_numberProcesses[2])) %
-                                   _numberProcesses[2]) *
-                                      _numberProcesses[0] * _numberProcesses[1]
+                + ((z + ((int)_processCoordinates[2]) + ((int)_numberProcesses[2])) % _numberProcesses[2]) * _numberProcesses[0] * _numberProcesses[1]
 #endif
                 ;
 // if this is not the identity rank, do sending
 #if (MD_DEBUG == MD_YES)
-            std::cout << "NeighbourRank: " << neighbourRank
-                      << " this rank: " << _rank << std::endl;
+            std::cout << "NeighbourRank: " << neighbourRank << " this rank: " << _rank << std::endl;
 #endif
             if (neighbourRank != _rank) {
 #if (MD_PARALLEL == MD_YES)
               // seek out current index for buffering
-              int bufferIndex =
-                  getCurrentBufferIndexFromNeighbourRank(neighbourRank);
+              int bufferIndex = getCurrentBufferIndexFromNeighbourRank(neighbourRank);
 #if (MD_DEBUG == MD_YES)
-              std::cout << "Pack " << cell.getList().size()
-                        << " molecules in buffer " << bufferIndex << std::endl;
+              std::cout << "Pack " << cell.getList().size() << " molecules in buffer " << bufferIndex << std::endl;
 #endif
               // push molecules into buffer
-              for (std::list<Molecule *>::iterator it = cell.begin();
-                   it != cell.end(); it++) {
+              for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
                 // for periodic boundaries: adapt position vector
-                tarch::la::Vector<MD_DIM, double> position(
-                    (*it)->getConstPosition());
+                tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
 #if (MD_DIM > 1)
                                                    ,
@@ -351,8 +291,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
                 );
 
 #if (MD_DEBUG == MD_YES)
-                std::cout << "Send molecule at position " << position
-                          << ", velocity " << (*it)->getVelocity() << std::endl;
+                std::cout << "Send molecule at position " << position << ", velocity " << (*it)->getVelocity() << std::endl;
 #endif
                 // set correct position and push molecule
                 pushMoleculeToSendBuffer(bufferIndex, *it, position);
@@ -368,15 +307,12 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
               // needs to be handled locally:
             } else if (neighbourRank == _rank && isInBoundary == true) {
 #if (MD_DEBUG == MD_YES)
-              std::cout << "Pack " << cell.getList().size()
-                        << " molecules in local buffer " << std::endl;
+              std::cout << "Pack " << cell.getList().size() << " molecules in local buffer " << std::endl;
 #endif
               // push molecules into buffer
-              for (std::list<Molecule *>::iterator it = cell.begin();
-                   it != cell.end(); it++) {
+              for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
                 // for periodic boundaries: adapt position vector
-                tarch::la::Vector<MD_DIM, double> position(
-                    (*it)->getConstPosition());
+                tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
 #if (MD_DIM > 1)
                                                    ,
@@ -389,9 +325,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
                 );
 
 #if (MD_DEBUG == MD_YES)
-                std::cout << "Put molecule at position " << position
-                          << ", velocity " << (*it)->getVelocity()
-                          << ", forceOld" << (*it)->getForceOld()
+                std::cout << "Put molecule at position " << position << ", velocity " << (*it)->getVelocity() << ", forceOld" << (*it)->getForceOld()
                           << " in local buffer" << std::endl;
 #endif
                 // set correct position and push molecule
@@ -413,12 +347,10 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
               // to be copied to
               tarch::la::Vector<MD_DIM, unsigned int> serialNeighbour(0);
               for (unsigned int d = 0; d < MD_DIM; d++) {
-                serialNeighbour[d] = (unsigned int)
-                    neighbours[MD_LINKED_CELL_NEIGHBOURS - 1 - help][d];
+                serialNeighbour[d] = (unsigned int)neighbours[MD_LINKED_CELL_NEIGHBOURS - 1 - help][d];
               }
 #if (MD_DEBUG == MD_YES)
-              std::cout << "Serial neighbour found: Ghost cell coordinate: "
-                        << serialNeighbour << std::endl;
+              std::cout << "Serial neighbour found: Ghost cell coordinate: " << serialNeighbour << std::endl;
 #endif
               localIndex.push_back(serialNeighbour);
             }
@@ -438,9 +370,8 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(
   return localIndex;
 }
 
-bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(
-    LinkedCell &cell, const unsigned int &cellIndex,
-    const simplemd::services::LinkedCellService &linkedCellService) {
+bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell &cell, const unsigned int &cellIndex,
+                                                                           const simplemd::services::LinkedCellService &linkedCellService) {
 #if (MD_PARALLEL == MD_YES)
   // determine neighbour rank (from position of the respective ghost cell
   // cellIndex)
@@ -448,20 +379,13 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(
   unsigned int help = cellIndex;
   int neighbourRank = 0;
 #if (MD_DIM > 2)
-  cellCoords = help / ((linkedCellService.getLocalNumberOfCells()[1] +
-                        2 * linkedCellService.getLocalIndexOfFirstCell()[1]) *
-                       (linkedCellService.getLocalNumberOfCells()[0] +
-                        2 * linkedCellService.getLocalIndexOfFirstCell()[0]));
-  help = help - ((unsigned int)cellCoords) *
-                    ((linkedCellService.getLocalNumberOfCells()[1] +
-                      2 * linkedCellService.getLocalIndexOfFirstCell()[1]) *
-                     (linkedCellService.getLocalNumberOfCells()[0] +
-                      2 * linkedCellService.getLocalIndexOfFirstCell()[0]));
+  cellCoords = help / ((linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1]) *
+                       (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]));
+  help = help - ((unsigned int)cellCoords) * ((linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1]) *
+                                              (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]));
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords ==
-             (int)(linkedCellService.getLocalNumberOfCells()[2] +
-                   2 * linkedCellService.getLocalIndexOfFirstCell()[2] - 1)) {
+  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[2] + 2 * linkedCellService.getLocalIndexOfFirstCell()[2] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
@@ -472,44 +396,31 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(
   // imply negative coordinates that cannot be handled by the modulo operator
   // correctly, we further shift everything by _numberProcesses(2) into the
   // positive range.
-  cellCoords =
-      (((int)(_processCoordinates[2] + _numberProcesses[2])) + cellCoords) %
-      _numberProcesses[2];
+  cellCoords = (((int)(_processCoordinates[2] + _numberProcesses[2])) + cellCoords) % _numberProcesses[2];
   neighbourRank += cellCoords * _numberProcesses[0] * _numberProcesses[1];
 #endif
 #if (MD_DIM > 1)
-  cellCoords = help / (linkedCellService.getLocalNumberOfCells()[0] +
-                       2 * linkedCellService.getLocalIndexOfFirstCell()[0]);
-  help =
-      help - cellCoords * (linkedCellService.getLocalNumberOfCells()[0] +
-                           2 * linkedCellService.getLocalIndexOfFirstCell()[0]);
+  cellCoords = help / (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]);
+  help = help - cellCoords * (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]);
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords ==
-             (int)(linkedCellService.getLocalNumberOfCells()[1] +
-                   2 * linkedCellService.getLocalIndexOfFirstCell()[1] - 1)) {
+  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
   }
-  cellCoords =
-      (((int)(_processCoordinates[1] + _numberProcesses[1])) + cellCoords) %
-      _numberProcesses[1];
+  cellCoords = (((int)(_processCoordinates[1] + _numberProcesses[1])) + cellCoords) % _numberProcesses[1];
   neighbourRank += cellCoords * _numberProcesses[0];
 #endif
   cellCoords = help;
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords ==
-             (int)(linkedCellService.getLocalNumberOfCells()[0] +
-                   2 * linkedCellService.getLocalIndexOfFirstCell()[0] - 1)) {
+  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
   }
-  cellCoords =
-      (((int)(_processCoordinates[0] + _numberProcesses[0])) + cellCoords) %
-      _numberProcesses[0];
+  cellCoords = (((int)(_processCoordinates[0] + _numberProcesses[0])) + cellCoords) % _numberProcesses[0];
   neighbourRank += cellCoords;
 
   // if this is the same process, return false
@@ -522,11 +433,9 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(
 
     // determine appropriate buffer index
     int bufferIndex = getCurrentBufferIndexFromNeighbourRank(neighbourRank);
-    for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end();
-         it++) {
+    for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
 #if (MD_DEBUG == MD_YES)
-      std::cout << "Reduce molecule at position " << (*it)->getConstPosition()
-                << ", velocity " << (*it)->getConstVelocity() << std::endl;
+      std::cout << "Reduce molecule at position " << (*it)->getConstPosition() << ", velocity " << (*it)->getConstVelocity() << std::endl;
 #endif
       pushMoleculeToSendBuffer(bufferIndex, *it, (*it)->getConstPosition());
     }
@@ -539,35 +448,27 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::unpackLocalBuffer(
-    simplemd::services::MoleculeService &moleculeService,
-    simplemd::services::LinkedCellService &linkedCellService) {
-  unpackBuffer(_bufferService.getLocalBuffer(), moleculeService,
-               linkedCellService);
+void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::services::MoleculeService &moleculeService,
+                                                                    simplemd::services::LinkedCellService &linkedCellService) {
+  unpackBuffer(_bufferService.getLocalBuffer(), moleculeService, linkedCellService);
 }
 
 void simplemd::services::ParallelTopologyService::communicationSteps_1_2() {
 #if (MD_PARALLEL == MD_YES)
   // issue all Irecv calls
-  for (unsigned int bufferIndex = 0; bufferIndex < _numUniqueNeighbours;
-       bufferIndex++) {
-    bufferIrecv(_bufferService.getReceiveBuffer(bufferIndex),
-                _neighbourRanksUnique[bufferIndex],
-                _receiveRequests[bufferIndex]);
+  for (unsigned int bufferIndex = 0; bufferIndex < _numUniqueNeighbours; bufferIndex++) {
+    bufferIrecv(_bufferService.getReceiveBuffer(bufferIndex), _neighbourRanksUnique[bufferIndex], _receiveRequests[bufferIndex]);
   }
 
   // issue all Isend calls
-  for (unsigned int bufferIndex = 0; bufferIndex < _numUniqueNeighbours;
-       bufferIndex++) {
-    bufferIsend(_bufferService.getSendBuffer(bufferIndex),
-                _neighbourRanksUnique[bufferIndex], _sendRequests[bufferIndex]);
+  for (unsigned int bufferIndex = 0; bufferIndex < _numUniqueNeighbours; bufferIndex++) {
+    bufferIsend(_bufferService.getSendBuffer(bufferIndex), _neighbourRanksUnique[bufferIndex], _sendRequests[bufferIndex]);
   }
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::communicationSteps_3_4(
-    simplemd::services::MoleculeService &moleculeService,
-    simplemd::services::LinkedCellService &linkedCellService) {
+void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::services::MoleculeService &moleculeService,
+                                                                         simplemd::services::LinkedCellService &linkedCellService) {
 #if (MD_PARALLEL == MD_YES)
   // Steps 3 and 4 together:
 
@@ -597,8 +498,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(
       if (!sendCompleted[i_buf]) {
         result = MPI_Test(&(_sendRequests[i_buf]), &flag, &stat);
         if (result != MPI_SUCCESS) {
-          std::cout << "rank " << _rank << " was not able to test send request "
-                    << i_buf << std::endl;
+          std::cout << "rank " << _rank << " was not able to test send request " << i_buf << std::endl;
           exit(EXIT_FAILURE);
         }
         // if flag == 1, this means message request has just been completed
@@ -607,10 +507,8 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(
           (_bufferService.getSendBuffer(i_buf))->clearBuffer();
           sendCompleted[i_buf] = true;
 #if (MD_DEBUG == MD_YES)
-          std::cout << "Rank " << _rank << " sent "
-                    << _bufferService.getSendBufferLength(i_buf) / MD_DIM / 3
-                    << " molecules to " << _neighbourRanksUnique[i_buf]
-                    << std::endl;
+          std::cout << "Rank " << _rank << " sent " << _bufferService.getSendBufferLength(i_buf) / MD_DIM / 3 << " molecules to "
+                    << _neighbourRanksUnique[i_buf] << std::endl;
 #endif
         }
       }
@@ -620,9 +518,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(
       if (!recvCompleted[i_buf]) {
         result = MPI_Test(&(_receiveRequests[i_buf]), &flag, &stat);
         if (result != MPI_SUCCESS) {
-          std::cout << "rank " << _rank
-                    << " was not able to test receive request " << i_buf
-                    << std::endl;
+          std::cout << "rank " << _rank << " was not able to test receive request " << i_buf << std::endl;
           exit(EXIT_FAILURE);
         }
         // if flag == 1, this means message request has just been completed
@@ -641,9 +537,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(
           // repository
           recvCompleted[i_buf] = true;
 #if (MD_DEBUG == MD_YES)
-          std::cout << "Rank " << _rank << " received " << count / MD_DIM / 3
-                    << " molecules from " << _neighbourRanksUnique[i_buf]
-                    << std::endl;
+          std::cout << "Rank " << _rank << " received " << count / MD_DIM / 3 << " molecules from " << _neighbourRanksUnique[i_buf] << std::endl;
 #endif
         }
       }
@@ -654,18 +548,16 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(
 
   // now unpack all buffers in a fixed order:
   for (i_buf = 0; i_buf < _numUniqueNeighbours; i_buf++) {
-    unpackBuffer(_bufferService.getReceiveBuffer(i_buf), moleculeService,
-                 linkedCellService);
+    unpackBuffer(_bufferService.getReceiveBuffer(i_buf), moleculeService, linkedCellService);
   }
 
 #endif
 }
 
-bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
-    const tarch::la::Vector<MD_DIM, unsigned int> &globalStartCell,
-    const tarch::la::Vector<MD_DIM, unsigned int> &globalRange,
-    tarch::la::Vector<MD_DIM, unsigned int> &localStartCell,
-    tarch::la::Vector<MD_DIM, unsigned int> &localRange) const {
+bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(const tarch::la::Vector<MD_DIM, unsigned int> &globalStartCell,
+                                                                                const tarch::la::Vector<MD_DIM, unsigned int> &globalRange,
+                                                                                tarch::la::Vector<MD_DIM, unsigned int> &localStartCell,
+                                                                                tarch::la::Vector<MD_DIM, unsigned int> &localRange) const {
 
   bool isIntersecting = true;
   int help; // need an int because some entries will be negative
@@ -683,8 +575,7 @@ bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
 
     // compute start point
 
-    help = (int)globalStartCell[d] -
-           (int)(_processCoordinates[d] * _localNumberOfCells[d]);
+    help = (int)globalStartCell[d] - (int)(_processCoordinates[d] * _localNumberOfCells[d]);
     // first, set negative entries to 0
     help = std::max(help, 0);
     // now if entry is 0, but process is not on boundary,
@@ -702,8 +593,7 @@ bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
     localStartCell[d] = (unsigned int)help;
 
     // compute end point
-    help = (int)globalEndCell[d] -
-           (int)(_processCoordinates[d] * _localNumberOfCells[d]);
+    help = (int)globalEndCell[d] - (int)(_processCoordinates[d] * _localNumberOfCells[d]);
     // first, set values larger than the number of cells along the dimension +1
     // to the number of cells +1 (+1 is needed because of ghost layer)
     help = std::min(help, (int)(_localNumberOfCells[d] + 1));
@@ -711,8 +601,7 @@ bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
     // on boundary, then this cell in fact belongs to the next process along the
     // same dimension so set to _localNumberOfCells(d). (in order for regions to
     // be non-overlapping)
-    if ((help == (int)(_localNumberOfCells[d] + 1)) &&
-        _processCoordinates[d] != (_numberProcesses[d] - 1))
+    if ((help == (int)(_localNumberOfCells[d] + 1)) && _processCoordinates[d] != (_numberProcesses[d] - 1))
       help = _localNumberOfCells[d];
     // this is now the correct value in the local frame of reference.
     // now if the end point is not inside the domain, there is no intersection
@@ -739,24 +628,18 @@ bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
 }
 
 tarch::la::Vector<MD_DIM, unsigned int>
-simplemd::services::ParallelTopologyService::localToGlobalCellIndexVector(
-    const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndexVector) const {
+simplemd::services::ParallelTopologyService::localToGlobalCellIndexVector(const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndexVector) const {
   tarch::la::Vector<MD_DIM, unsigned int> globalCellIndexVector;
   for (unsigned int d = 0; d < MD_DIM; d++) {
-    globalCellIndexVector[d] = localCellIndexVector[d] +
-                               _processCoordinates[d] * _localNumberOfCells[d];
+    globalCellIndexVector[d] = localCellIndexVector[d] + _processCoordinates[d] * _localNumberOfCells[d];
   }
   return globalCellIndexVector;
 }
 
 void simplemd::services::ParallelTopologyService::createNeighbourRanks(
     const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates,
-    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>
-        &localBoundary,
-    const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-    std::vector<int> &neighbourRanks, std::vector<int> &neighbourRanksUnique,
-    unsigned int &numUniqueNeighbours,
-    unsigned int numberOfCellsPerBuffer[]) const {
+    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &localBoundary, const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
+    std::vector<int> &neighbourRanks, std::vector<int> &neighbourRanksUnique, unsigned int &numUniqueNeighbours, unsigned int numberOfCellsPerBuffer[]) const {
   unsigned int neighbourCounter = 0;
   tarch::la::Vector<MD_DIM, int> tmpCoords(0);
   // empty ranks vector and reset number of transferred linked cells
@@ -804,9 +687,7 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
           // if this neighbour corresponds to a periodic-boundary-process or an
           // inner process, add the rank and the respective number of
           // transferred cells
-          if ((isBoundary && (localBoundary[neighbourCounter] ==
-                              simplemd::PERIODIC_BOUNDARY)) ||
-              (!isBoundary)) {
+          if ((isBoundary && (localBoundary[neighbourCounter] == simplemd::PERIODIC_BOUNDARY)) || (!isBoundary)) {
             // compute and add rank
             tmpRank = tmpCoords[0]
 #if (MD_DIM > 1)
@@ -820,8 +701,7 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
             // if this is not the same process, add respective information
             if (tmpRank != _rank) {
               neighbourRanks.push_back(tmpRank);
-              addNeighbourToNeighbourRanksUnique(neighbourRanksUnique,
-                                                 numUniqueNeighbours, tmpRank);
+              addNeighbourToNeighbourRanksUnique(neighbourRanksUnique, numUniqueNeighbours, tmpRank);
 
               int bufIndex = getCurrentBufferIndexFromNeighbourRank(tmpRank);
               // compute and add cells to be transferred from this neighbour
@@ -865,10 +745,8 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
 }
 
 // add ranks one by one, skipping repeating ones
-void simplemd::services::ParallelTopologyService::
-    addNeighbourToNeighbourRanksUnique(std::vector<int> &neighbourRanksUnique,
-                                       unsigned int &numUniqueNeighbours,
-                                       const int &addedNeighbour) const {
+void simplemd::services::ParallelTopologyService::addNeighbourToNeighbourRanksUnique(std::vector<int> &neighbourRanksUnique, unsigned int &numUniqueNeighbours,
+                                                                                     const int &addedNeighbour) const {
   // note that due to functionality of createNeighbourRanks, _rank cannot appear
   // in this vector
   bool repetitionFound = false;
@@ -884,16 +762,13 @@ void simplemd::services::ParallelTopologyService::
   }
 }
 
-tarch::la::Vector<MD_DIM, double>
-simplemd::services::ParallelTopologyService::computeMeshwidth(
-    const tarch::la::Vector<MD_DIM, double> &prescribedWidth,
-    const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-    const tarch::la::Vector<MD_DIM, double> &domainSize) const {
+tarch::la::Vector<MD_DIM, double> simplemd::services::ParallelTopologyService::computeMeshwidth(const tarch::la::Vector<MD_DIM, double> &prescribedWidth,
+                                                                                                const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
+                                                                                                const tarch::la::Vector<MD_DIM, double> &domainSize) const {
   tarch::la::Vector<MD_DIM, double> meshWidth;
   for (unsigned int d = 0; d < MD_DIM; d++) {
     // compute approx. number of cells in d-direction
-    unsigned int cells = static_cast<unsigned int>(
-        floor((domainSize[d] / numberProcesses[d]) / prescribedWidth[d] + 0.5));
+    unsigned int cells = static_cast<unsigned int>(floor((domainSize[d] / numberProcesses[d]) / prescribedWidth[d] + 0.5));
     // determine correct mesh width in d-direction when using "cells" cells
     meshWidth[d] = (domainSize[d] / numberProcesses[d]) / cells;
   }
@@ -904,20 +779,17 @@ simplemd::services::ParallelTopologyService::computeMeshwidth(
 }
 
 tarch::la::Vector<MD_DIM, unsigned int>
-simplemd::services::ParallelTopologyService::computeNumberOfCells(
-    const tarch::la::Vector<MD_DIM, double> &meshWidth,
-    const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-    const tarch::la::Vector<MD_DIM, double> &domainSize) const {
+simplemd::services::ParallelTopologyService::computeNumberOfCells(const tarch::la::Vector<MD_DIM, double> &meshWidth,
+                                                                  const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
+                                                                  const tarch::la::Vector<MD_DIM, double> &domainSize) const {
   tarch::la::Vector<MD_DIM, unsigned int> numberOfCells(0);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     // compute approx. number of cells in d-direction
-    unsigned int cells = static_cast<unsigned int>(
-        floor((domainSize[d] / numberProcesses[d]) / meshWidth[d] + 0.5));
+    unsigned int cells = static_cast<unsigned int>(floor((domainSize[d] / numberProcesses[d]) / meshWidth[d] + 0.5));
     // determine correct mesh width in d-direction when using "cells" cells
     double tmpWidth = (domainSize[d] / numberProcesses[d]) / cells;
     // compute real number of cells
-    numberOfCells[d] = static_cast<unsigned int>(
-        floor((domainSize[d] / numberProcesses[d]) / tmpWidth + 0.5));
+    numberOfCells[d] = static_cast<unsigned int>(floor((domainSize[d] / numberProcesses[d]) / tmpWidth + 0.5));
   }
 #if (MD_DEBUG == MD_YES)
   std::cout << "Number cells: " << numberOfCells << std::endl;
@@ -926,20 +798,17 @@ simplemd::services::ParallelTopologyService::computeNumberOfCells(
 }
 
 tarch::la::Vector<MD_DIM, unsigned int>
-simplemd::services::ParallelTopologyService::computeGlobalNumberOfCells(
-    const tarch::la::Vector<MD_DIM, double> &meshWidth,
-    const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-    const tarch::la::Vector<MD_DIM, double> &domainSize) const {
-  tarch::la::Vector<MD_DIM, unsigned int> globalCells =
-      computeNumberOfCells(meshWidth, numberProcesses, domainSize);
+simplemd::services::ParallelTopologyService::computeGlobalNumberOfCells(const tarch::la::Vector<MD_DIM, double> &meshWidth,
+                                                                        const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
+                                                                        const tarch::la::Vector<MD_DIM, double> &domainSize) const {
+  tarch::la::Vector<MD_DIM, unsigned int> globalCells = computeNumberOfCells(meshWidth, numberProcesses, domainSize);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     globalCells[d] *= numberProcesses[d];
   }
   return globalCells;
 }
 
-bool simplemd::services::ParallelTopologyService::isParallelNeighbour(
-    const int &neighbourRank) const {
+bool simplemd::services::ParallelTopologyService::isParallelNeighbour(const int &neighbourRank) const {
   for (unsigned int i = 0; i < _numUniqueNeighbours; i++) {
     if (neighbourRank == _neighbourRanksUnique[i]) {
       return true;
@@ -948,18 +817,13 @@ bool simplemd::services::ParallelTopologyService::isParallelNeighbour(
   return false;
 }
 
-tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>
-simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
-    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>
-        &boundary,
-    const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates,
+tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
+    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary, const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates,
     const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses) {
-  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>
-      localBoundary(PARALLEL_BOUNDARY);
+  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> localBoundary(PARALLEL_BOUNDARY);
   unsigned int counter = 0;
 #if (MD_DIM == 1)
-  for (int x = ((int)processCoordinates[0]) - 1;
-       x < ((int)processCoordinates[0]) + 2; x++) {
+  for (int x = ((int)processCoordinates[0]) - 1; x < ((int)processCoordinates[0]) + 2; x++) {
     if (!(x == (int)processCoordinates[0])) {
       tarch::la::Vector<MD_DIM, int> nextProcess(x);
       // left boundary
@@ -977,27 +841,21 @@ simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
     }
   }
 #elif (MD_DIM == 2)
-  for (int y = ((int)processCoordinates[1]) - 1;
-       y < ((int)processCoordinates[1]) + 2; y++) {
-    for (int x = ((int)processCoordinates[0]) - 1;
-         x < ((int)processCoordinates[0]) + 2; x++) {
-      if (!((y == (int)processCoordinates[1]) &&
-            (x == (int)processCoordinates[0]))) {
+  for (int y = ((int)processCoordinates[1]) - 1; y < ((int)processCoordinates[1]) + 2; y++) {
+    for (int x = ((int)processCoordinates[0]) - 1; x < ((int)processCoordinates[0]) + 2; x++) {
+      if (!((y == (int)processCoordinates[1]) && (x == (int)processCoordinates[0]))) {
         tarch::la::Vector<MD_DIM, int> nextProcess(x, y);
 
         // lower left corner
         if ((nextProcess[0] == -1) && (nextProcess[1] == -1)) {
           localBoundary[counter] = boundary[0];
           // lower right corner
-        } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                   (nextProcess[1] == -1)) {
+        } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[1] == -1)) {
           localBoundary[counter] = boundary[2];
           // upper left corner
-        } else if ((nextProcess[0] == -1) &&
-                   (nextProcess[1] == (int)numberProcesses[1])) {
+        } else if ((nextProcess[0] == -1) && (nextProcess[1] == (int)numberProcesses[1])) {
           localBoundary[counter] = boundary[5];
-        } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                   (nextProcess[1] == (int)numberProcesses[1])) {
+        } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[1] == (int)numberProcesses[1])) {
           localBoundary[counter] = boundary[7];
           // left edge
         } else if (nextProcess[0] == -1) {
@@ -1021,54 +879,37 @@ simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
     }
   }
 #elif (MD_DIM == 3)
-  for (int z = ((int)processCoordinates[2]) - 1;
-       z < ((int)processCoordinates[2]) + 2; z++) {
-    for (int y = ((int)processCoordinates[1]) - 1;
-         y < ((int)processCoordinates[1]) + 2; y++) {
-      for (int x = ((int)processCoordinates[0]) - 1;
-           x < ((int)processCoordinates[0]) + 2; x++) {
-        if (!((z == (int)processCoordinates[2]) &&
-              (y == (int)processCoordinates[1]) &&
-              (x == (int)processCoordinates[0]))) {
+  for (int z = ((int)processCoordinates[2]) - 1; z < ((int)processCoordinates[2]) + 2; z++) {
+    for (int y = ((int)processCoordinates[1]) - 1; y < ((int)processCoordinates[1]) + 2; y++) {
+      for (int x = ((int)processCoordinates[0]) - 1; x < ((int)processCoordinates[0]) + 2; x++) {
+        if (!((z == (int)processCoordinates[2]) && (y == (int)processCoordinates[1]) && (x == (int)processCoordinates[0]))) {
           tarch::la::Vector<MD_DIM, int> nextProcess(x, y, z);
 
           // -------------- corners -------------------------
 
           // lower left front corner
-          if ((nextProcess[0] == -1) && (nextProcess[1] == -1) &&
-              (nextProcess[2] == -1)) {
+          if ((nextProcess[0] == -1) && (nextProcess[1] == -1) && (nextProcess[2] == -1)) {
             localBoundary[counter] = boundary[0];
             // lower right front corner
-          } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                     (nextProcess[1] == -1) && (nextProcess[2] == -1)) {
+          } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[1] == -1) && (nextProcess[2] == -1)) {
             localBoundary[counter] = boundary[2];
             // lower left back corner
-          } else if ((nextProcess[0] == -1) &&
-                     (nextProcess[1] == (int)numberProcesses[1]) &&
-                     (nextProcess[2] == -1)) {
+          } else if ((nextProcess[0] == -1) && (nextProcess[1] == (int)numberProcesses[1]) && (nextProcess[2] == -1)) {
             localBoundary[counter] = boundary[6];
             // lower right back corner
-          } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                     (nextProcess[1] == (int)numberProcesses[1]) &&
-                     (nextProcess[2] == -1)) {
+          } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[1] == (int)numberProcesses[1]) && (nextProcess[2] == -1)) {
             localBoundary[counter] = boundary[8];
             // upper left front corner
-          } else if ((nextProcess[0] == -1) && (nextProcess[1] == -1) &&
-                     (nextProcess[2] == (int)numberProcesses[2])) {
+          } else if ((nextProcess[0] == -1) && (nextProcess[1] == -1) && (nextProcess[2] == (int)numberProcesses[2])) {
             localBoundary[counter] = boundary[17];
             // upper right front corner
-          } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                     (nextProcess[1] == -1) &&
-                     (nextProcess[2] == (int)numberProcesses[2])) {
+          } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[1] == -1) && (nextProcess[2] == (int)numberProcesses[2])) {
             localBoundary[counter] = boundary[19];
             // upper left back corner
-          } else if ((nextProcess[0] == -1) &&
-                     (nextProcess[1] == (int)numberProcesses[1]) &&
-                     (nextProcess[2] == (int)numberProcesses[2])) {
+          } else if ((nextProcess[0] == -1) && (nextProcess[1] == (int)numberProcesses[1]) && (nextProcess[2] == (int)numberProcesses[2])) {
             localBoundary[counter] = boundary[23];
             // upper right back corner
-          } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                     (nextProcess[1] == (int)numberProcesses[1]) &&
+          } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[1] == (int)numberProcesses[1]) &&
                      (nextProcess[2] == (int)numberProcesses[2])) {
             localBoundary[counter] = boundary[25];
           }
@@ -1079,16 +920,13 @@ simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
           else if ((nextProcess[0] == -1) && (nextProcess[1] == -1)) {
             localBoundary[counter] = boundary[9];
             // right front edge
-          } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                     (nextProcess[1] == -1)) {
+          } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[1] == -1)) {
             localBoundary[counter] = boundary[11];
             // left back edge
-          } else if ((nextProcess[0] == -1) &&
-                     (nextProcess[1] == (int)numberProcesses[1])) {
+          } else if ((nextProcess[0] == -1) && (nextProcess[1] == (int)numberProcesses[1])) {
             localBoundary[counter] = boundary[14];
             // right back edge
-          } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                     (nextProcess[1] == (int)numberProcesses[1])) {
+          } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[1] == (int)numberProcesses[1])) {
             localBoundary[counter] = boundary[16];
           }
           // ----------- y-aligned ------------
@@ -1096,16 +934,13 @@ simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
           else if ((nextProcess[0] == -1) && (nextProcess[2] == -1)) {
             localBoundary[counter] = boundary[3];
             // lower right edge
-          } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                     (nextProcess[2] == -1)) {
+          } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[2] == -1)) {
             localBoundary[counter] = boundary[5];
             // upper left edge
-          } else if ((nextProcess[0] == -1) &&
-                     (nextProcess[2] == (int)numberProcesses[2])) {
+          } else if ((nextProcess[0] == -1) && (nextProcess[2] == (int)numberProcesses[2])) {
             localBoundary[counter] = boundary[20];
             // upper right edge
-          } else if ((nextProcess[0] == (int)numberProcesses[0]) &&
-                     (nextProcess[2] == (int)numberProcesses[2])) {
+          } else if ((nextProcess[0] == (int)numberProcesses[0]) && (nextProcess[2] == (int)numberProcesses[2])) {
             localBoundary[counter] = boundary[22];
           }
           // ----------- x-aligned ------------
@@ -1113,16 +948,13 @@ simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
           else if ((nextProcess[1] == -1) && (nextProcess[2] == -1)) {
             localBoundary[counter] = boundary[1];
             // lower back edge
-          } else if ((nextProcess[1] == (int)numberProcesses[1]) &&
-                     (nextProcess[2] == -1)) {
+          } else if ((nextProcess[1] == (int)numberProcesses[1]) && (nextProcess[2] == -1)) {
             localBoundary[counter] = boundary[7];
             // upper front edge
-          } else if ((nextProcess[1] == -1) &&
-                     (nextProcess[2] == (int)numberProcesses[2])) {
+          } else if ((nextProcess[1] == -1) && (nextProcess[2] == (int)numberProcesses[2])) {
             localBoundary[counter] = boundary[18];
             // upper back edge
-          } else if ((nextProcess[1] == (int)numberProcesses[1]) &&
-                     (nextProcess[2] == (int)numberProcesses[2])) {
+          } else if ((nextProcess[1] == (int)numberProcesses[1]) && (nextProcess[2] == (int)numberProcesses[2])) {
             localBoundary[counter] = boundary[24];
           }
 
@@ -1159,16 +991,14 @@ simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
   return localBoundary;
 }
 
-unsigned int
-simplemd::services::ParallelTopologyService::getNumberOfTransferredCells(
-    const int &x
+unsigned int simplemd::services::ParallelTopologyService::getNumberOfTransferredCells(const int &x
 #if (MD_DIM > 1)
-    ,
-    const int &y
+                                                                                      ,
+                                                                                      const int &y
 #endif
 #if (MD_DIM > 2)
-    ,
-    const int &z
+                                                                                      ,
+                                                                                      const int &z
 #endif
 ) const {
   unsigned int cells = 0;
@@ -1209,16 +1039,13 @@ simplemd::services::ParallelTopologyService::getNumberOfTransferredCells(
   if (abs(x) + abs(y) + abs(z) == 3) {
     return 1;
     // x-axis aligned edges
-  } else if ((x == 0) && (((y == -1) && (z == -1)) || ((y == -1) && (z == 1)) ||
-                          ((y == 1) && (z == -1)) || ((y == 1) && (z == 1)))) {
+  } else if ((x == 0) && (((y == -1) && (z == -1)) || ((y == -1) && (z == 1)) || ((y == 1) && (z == -1)) || ((y == 1) && (z == 1)))) {
     return _localNumberOfCells[0];
     // y-axis aligned edges
-  } else if ((y == 0) && (((x == -1) && (z == -1)) || ((x == -1) && (z == 1)) ||
-                          ((x == 1) && (z == -1)) || ((x == 1) && (z == 1)))) {
+  } else if ((y == 0) && (((x == -1) && (z == -1)) || ((x == -1) && (z == 1)) || ((x == 1) && (z == -1)) || ((x == 1) && (z == 1)))) {
     return _localNumberOfCells[1];
     // z-axis aligned edges
-  } else if ((z == 0) && (((y == -1) && (x == -1)) || ((y == -1) && (x == 1)) ||
-                          ((y == 1) && (x == -1)) || ((y == 1) && (x == 1)))) {
+  } else if ((z == 0) && (((y == -1) && (x == -1)) || ((y == -1) && (x == 1)) || ((y == 1) && (x == -1)) || ((y == 1) && (x == 1)))) {
     return _localNumberOfCells[2];
     // left/ right plane
   } else if ((y == 0) && (z == 0) && ((x == -1) || (x == 1))) {
@@ -1243,19 +1070,17 @@ simplemd::services::ParallelTopologyService::getNumberOfTransferredCells(
   return cells;
 }
 
-void simplemd::services::ParallelTopologyService::
-    adaptPositionForPeriodicBoundaries(
-        tarch::la::Vector<MD_DIM, double> &position,
-        const simplemd::BoundaryType &boundaryType, const int &x
+void simplemd::services::ParallelTopologyService::adaptPositionForPeriodicBoundaries(tarch::la::Vector<MD_DIM, double> &position,
+                                                                                     const simplemd::BoundaryType &boundaryType, const int &x
 #if (MD_DIM > 1)
-        ,
-        const int &y
+                                                                                     ,
+                                                                                     const int &y
 #endif
 #if (MD_DIM > 2)
-        ,
-        const int &z
+                                                                                     ,
+                                                                                     const int &z
 #endif
-    ) const {
+) const {
 
   if (boundaryType == PERIODIC_BOUNDARY) {
     if (((int)_processCoordinates[0]) + x < 0) {
@@ -1286,8 +1111,7 @@ void simplemd::services::ParallelTopologyService::
 }
 
 // get current index of buffer arrays from neighbourRank
-unsigned int simplemd::services::ParallelTopologyService::
-    getCurrentBufferIndexFromNeighbourRank(const int &neighbourRank) const {
+unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexFromNeighbourRank(const int &neighbourRank) const {
   unsigned int bufferIndex;
   bool found = false;
   for (bufferIndex = 0; bufferIndex < _numUniqueNeighbours; bufferIndex++) {
@@ -1310,10 +1134,9 @@ unsigned int simplemd::services::ParallelTopologyService::
   }
 }
 
-void simplemd::services::ParallelTopologyService::unpackBuffer(
-    ParallelAndLocalBufferService::SimpleBuffer *buf,
-    simplemd::services::MoleculeService &moleculeService,
-    simplemd::services::LinkedCellService &linkedCellService) {
+void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer *buf,
+                                                               simplemd::services::MoleculeService &moleculeService,
+                                                               simplemd::services::LinkedCellService &linkedCellService) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> forceOld(0.0);
@@ -1362,14 +1185,10 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(
       cell += (int)linkedCellService.getLocalIndexOfFirstCell()[d];
 #if (MD_ERROR == MD_YES)
       if (cell < 0) {
-        std::cout
-            << "ERROR "
-               "simplemd::services::ParallelTopologyService::unpackBuffer:";
-        std::cout << " Molecule out of range: Position=" << position
-                  << ", cell=" << cell;
-        std::cout << " _processCoords=" << _processCoordinates
-                  << ", loc.num=" << _localNumberOfCells
-                  << ", domOff=" << _domainOffset;
+        std::cout << "ERROR "
+                     "simplemd::services::ParallelTopologyService::unpackBuffer:";
+        std::cout << " Molecule out of range: Position=" << position << ", cell=" << cell;
+        std::cout << " _processCoords=" << _processCoordinates << ", loc.num=" << _localNumberOfCells << ", domOff=" << _domainOffset;
         std::cout << ", mesh=" << _meshWidth << std::endl;
         exit(EXIT_FAILURE);
       }
@@ -1385,9 +1204,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(
 
     Molecule *mPtr = moleculeService.addMolecule(myMolecule);
 #if (MD_DEBUG == MD_YES)
-    std::cout << "Rank " << _rank
-              << ": unpacked molecule from buffer into cell " << cellIndex
-              << std::endl;
+    std::cout << "Rank " << _rank << ": unpacked molecule from buffer into cell " << cellIndex << std::endl;
 #endif
     linkedCellService.addMoleculeToLinkedCell(*mPtr, cellIndex);
   }
@@ -1396,8 +1213,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(
   buf->clearBuffer();
 }
 
-void simplemd::services::ParallelTopologyService::pushMoleculeToLocalBuffer(
-    const Molecule *mol, const tarch::la::Vector<MD_DIM, double> &pos) {
+void simplemd::services::ParallelTopologyService::pushMoleculeToLocalBuffer(const Molecule *mol, const tarch::la::Vector<MD_DIM, double> &pos) {
 #if (MD_ERROR == MD_YES)
   bool isOk;
   isOk =
@@ -1406,27 +1222,21 @@ void simplemd::services::ParallelTopologyService::pushMoleculeToLocalBuffer(
 #if (MD_ERROR == MD_YES)
   // if errors are off, application will terminate earlier
   if (!isOk) {
-    std::cout << "Rank " << _rank
-              << " was unable to push molecule to local buffer. " << std::endl;
+    std::cout << "Rank " << _rank << " was unable to push molecule to local buffer. " << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
 
 #if (MD_DEBUG == MD_YES)
-  std::cout
-      << "rank " << _rank
-      << " pushed molecule to local buffer successfully, buffer length is "
-      << _bufferService.getLocalBuffer()->getLength() << std::endl;
-  std::cout << "pushed molecule with position " << pos << ", velocity "
-            << mol->getConstVelocity() << ", forceOld"
-            << mol->getConstForceOld() << std::endl;
+  std::cout << "rank " << _rank << " pushed molecule to local buffer successfully, buffer length is " << _bufferService.getLocalBuffer()->getLength()
+            << std::endl;
+  std::cout << "pushed molecule with position " << pos << ", velocity " << mol->getConstVelocity() << ", forceOld" << mol->getConstForceOld() << std::endl;
 #endif
 }
 
 #if (MD_PARALLEL == MD_YES)
-void simplemd::services::ParallelTopologyService::pushMoleculeToSendBuffer(
-    const unsigned int &bufferIndex, const Molecule *mol,
-    const tarch::la::Vector<MD_DIM, double> &pos) {
+void simplemd::services::ParallelTopologyService::pushMoleculeToSendBuffer(const unsigned int &bufferIndex, const Molecule *mol,
+                                                                           const tarch::la::Vector<MD_DIM, double> &pos) {
 #if (MD_ERROR == MD_YES)
   bool isOk;
   isOk =
@@ -1435,11 +1245,8 @@ void simplemd::services::ParallelTopologyService::pushMoleculeToSendBuffer(
 #if (MD_ERROR == MD_YES)
   // if errors are off, application will terminate earlier
   if (!isOk) {
-    std::cout << "Rank " << _rank
-              << " was unable to push molecule to send buffer " << bufferIndex
-              << ". " << std::endl;
-    std::cout << "Upper bound of buffer ("
-              << _bufferService.getBufferCapacity(bufferIndex)
+    std::cout << "Rank " << _rank << " was unable to push molecule to send buffer " << bufferIndex << ". " << std::endl;
+    std::cout << "Upper bound of buffer (" << _bufferService.getBufferCapacity(bufferIndex)
               << ") exceeded. Fatal error. Please contact developers as this "
                  "is a principal issue."
               << std::endl;
@@ -1448,61 +1255,48 @@ void simplemd::services::ParallelTopologyService::pushMoleculeToSendBuffer(
 #endif
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "Rank " << _rank << " pushed molecule to send buffer "
-            << bufferIndex << " successfully, buffer length is "
+  std::cout << "Rank " << _rank << " pushed molecule to send buffer " << bufferIndex << " successfully, buffer length is "
             << _bufferService.getSendBufferLength(bufferIndex) << std::endl;
-  std::cout << "pushed molecule at position " << pos << ", velocity "
-            << mol->getConstVelocity() << ", forceOld"
-            << mol->getConstForceOld() << std::endl;
+  std::cout << "pushed molecule at position " << pos << ", velocity " << mol->getConstVelocity() << ", forceOld" << mol->getConstForceOld() << std::endl;
 #endif
 }
 #endif
 
 #if (MD_PARALLEL == MD_YES)
-void simplemd::services::ParallelTopologyService::bufferIsend(
-    ParallelAndLocalBufferService::SimpleBuffer *buffer,
-    const int &neighbourRank, MPI_Request &request) const {
+void simplemd::services::ParallelTopologyService::bufferIsend(ParallelAndLocalBufferService::SimpleBuffer *buffer, const int &neighbourRank,
+                                                              MPI_Request &request) const {
   int result;
 
   // send only as much values as we need to
-  result = MPI_Isend(buffer->getValues(), buffer->getLength(), MPI_DOUBLE,
-                     neighbourRank, _bufferTag, _communicator, &request);
+  result = MPI_Isend(buffer->getValues(), buffer->getLength(), MPI_DOUBLE, neighbourRank, _bufferTag, _communicator, &request);
 
   if (result != MPI_SUCCESS) {
-    std::cout << "rank " << _rank << " was not able to Isend buffer to "
-              << neighbourRank << ": " << std::endl;
+    std::cout << "rank " << _rank << " was not able to Isend buffer to " << neighbourRank << ": " << std::endl;
     // std::cout << tarch::parallel::MPIReturnValueToString(result);
     exit(EXIT_FAILURE);
   }
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "Rank " << _rank << " is sending "
-            << buffer->getLength() / 3 / MD_DIM << " molecules to "
-            << neighbourRank << std::endl;
+  std::cout << "Rank " << _rank << " is sending " << buffer->getLength() / 3 / MD_DIM << " molecules to " << neighbourRank << std::endl;
 #endif
 }
 #endif
 
 #if (MD_PARALLEL == MD_YES)
-void simplemd::services::ParallelTopologyService::bufferIrecv(
-    ParallelAndLocalBufferService::SimpleBuffer *buffer,
-    const int &neighbourRank, MPI_Request &request) const {
+void simplemd::services::ParallelTopologyService::bufferIrecv(ParallelAndLocalBufferService::SimpleBuffer *buffer, const int &neighbourRank,
+                                                              MPI_Request &request) const {
   int result;
 
   // receive as many molecules as the upper bound is
-  result = MPI_Irecv(buffer->getValues(), buffer->getCapacity(), MPI_DOUBLE,
-                     neighbourRank, _bufferTag, _communicator, &request);
+  result = MPI_Irecv(buffer->getValues(), buffer->getCapacity(), MPI_DOUBLE, neighbourRank, _bufferTag, _communicator, &request);
 
   if (result != MPI_SUCCESS) {
-    std::cout << "rank " << _rank << " was not able to Irecv buffer from "
-              << neighbourRank << ": " << std::endl;
+    std::cout << "rank " << _rank << " was not able to Irecv buffer from " << neighbourRank << ": " << std::endl;
     exit(EXIT_FAILURE);
   }
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "Rank " << _rank << " is receiving "
-            << buffer->getLength() / 3 / MD_DIM << " molecules from "
-            << neighbourRank << std::endl;
+  std::cout << "Rank " << _rank << " is receiving " << buffer->getLength() / 3 / MD_DIM << " molecules from " << neighbourRank << std::endl;
 #endif
 }
 #endif

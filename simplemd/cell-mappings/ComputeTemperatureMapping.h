@@ -23,16 +23,11 @@ class ComputeTemperatureMapping;
  */
 class simplemd::cellmappings::ComputeTemperatureMapping {
 public:
-  ComputeTemperatureMapping(
-      simplemd::services::ParallelTopologyService &parallelTopologyService,
-      const simplemd::services::MolecularPropertiesService
-          &molecularPropertiesService,
-      const tarch::la::Vector<MD_DIM, double> &meanVelocity,
-      const unsigned int &localMDSimulation, const bool &writeToFile = true)
-      : _parallelTopologyService(parallelTopologyService),
-        _molecularPropertiesService(molecularPropertiesService),
-        _meanVelocity(meanVelocity), _localMDSimulation(localMDSimulation),
-        _writeToFile(writeToFile) {}
+  ComputeTemperatureMapping(simplemd::services::ParallelTopologyService &parallelTopologyService,
+                            const simplemd::services::MolecularPropertiesService &molecularPropertiesService,
+                            const tarch::la::Vector<MD_DIM, double> &meanVelocity, const unsigned int &localMDSimulation, const bool &writeToFile = true)
+      : _parallelTopologyService(parallelTopologyService), _molecularPropertiesService(molecularPropertiesService), _meanVelocity(meanVelocity),
+        _localMDSimulation(localMDSimulation), _writeToFile(writeToFile) {}
   ~ComputeTemperatureMapping() {}
 
   void beginCellIteration() {
@@ -44,31 +39,23 @@ public:
 #if (MD_PARALLEL == MD_YES)
     // reduce number of particles separately from temperature. See comment in
     // cell-mappings/computeMeanVelocityMapping.h
-    _parallelTopologyService.MD_Allreduce(MPI_IN_PLACE, &_particleCounter, 1,
-                                          MPI_UNSIGNED, MPI_SUM);
-    _parallelTopologyService.MD_Allreduce(MPI_IN_PLACE, &_temperature, 1,
-                                          MPI_DOUBLE, MPI_SUM);
+    _parallelTopologyService.MD_Allreduce(MPI_IN_PLACE, &_particleCounter, 1, MPI_UNSIGNED, MPI_SUM);
+    _parallelTopologyService.MD_Allreduce(MPI_IN_PLACE, &_temperature, 1, MPI_DOUBLE, MPI_SUM);
 #endif
-    _temperature =
-        _temperature *
-        _molecularPropertiesService.getMolecularProperties().getMass() /
-        (((double)MD_DIM) * _particleCounter *
-         _molecularPropertiesService.getMolecularProperties().getKB());
+    _temperature = _temperature * _molecularPropertiesService.getMolecularProperties().getMass() /
+                   (((double)MD_DIM) * _particleCounter * _molecularPropertiesService.getMolecularProperties().getKB());
 
     if (_writeToFile == false)
       return;
 
 #if (MD_PARALLEL == MD_YES)
-    if (_parallelTopologyService.getProcessCoordinates() ==
-        tarch::la::Vector<MD_DIM, unsigned int>(0)) {
+    if (_parallelTopologyService.getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
 #endif
       std::stringstream ss;
-      ss << "Temperature_" << _localMDSimulation << "_"
-         << _parallelTopologyService.getRank() << ".dat";
+      ss << "Temperature_" << _localMDSimulation << "_" << _parallelTopologyService.getRank() << ".dat";
       std::ofstream file(ss.str().c_str(), std::ios::app);
       if (!file.is_open()) {
-        std::cout << "ERROR ComputeTemperatureMapping: Could not open file!"
-                  << std::endl;
+        std::cout << "ERROR ComputeTemperatureMapping: Could not open file!" << std::endl;
         exit(EXIT_FAILURE);
       }
       file << _temperature << std::endl;
@@ -80,25 +67,20 @@ public:
 
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
     double buffer;
-    for (std::list<Molecule *>::const_iterator m1 = cell.begin();
-         m1 != cell.end(); m1++) {
-      buffer = tarch::la::dot(_meanVelocity - (*m1)->getConstVelocity(),
-                              _meanVelocity - (*m1)->getConstVelocity());
+    for (std::list<Molecule *>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
+      buffer = tarch::la::dot(_meanVelocity - (*m1)->getConstVelocity(), _meanVelocity - (*m1)->getConstVelocity());
       _temperature += buffer;
       _particleCounter++;
     }
   }
 
-  void handleCellPair(LinkedCell &cell1, LinkedCell &cell2,
-                      const unsigned int &cellIndex1,
-                      const unsigned int &cellIndex2) {}
+  void handleCellPair(LinkedCell &cell1, LinkedCell &cell2, const unsigned int &cellIndex1, const unsigned int &cellIndex2) {}
 
   const double &getTemperature() const { return _temperature; }
 
 private:
   simplemd::services::ParallelTopologyService &_parallelTopologyService;
-  const simplemd::services::MolecularPropertiesService
-      &_molecularPropertiesService;
+  const simplemd::services::MolecularPropertiesService &_molecularPropertiesService;
   /** counts the global number of molecules */
   unsigned int _particleCounter;
   /** stores the temperature */

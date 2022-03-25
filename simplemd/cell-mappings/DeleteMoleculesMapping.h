@@ -25,8 +25,7 @@ class DeleteMoleculesMapping;
  */
 class simplemd::cellmappings::DeleteMoleculesMapping {
 public:
-  DeleteMoleculesMapping(simplemd::services::MoleculeService &moleculeService)
-      : _moleculeService(moleculeService) {}
+  DeleteMoleculesMapping(simplemd::services::MoleculeService &moleculeService) : _moleculeService(moleculeService) {}
   ~DeleteMoleculesMapping() {}
 
   void beginCellIteration() {}

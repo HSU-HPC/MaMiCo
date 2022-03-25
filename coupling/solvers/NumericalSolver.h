@@ -29,8 +29,7 @@ class NumericalSolver;
  *  @brief is a virtual base class for the interface for a numerical fluid
  * solver for the Couette scenario
  *  @author Philipp Neumann & Helene Wittenberg  */
-class coupling::solvers::NumericalSolver
-    : public coupling::solvers::AbstractCouetteSolver<3> {
+class coupling::solvers::NumericalSolver : public coupling::solvers::AbstractCouetteSolver<3> {
 public:
   /** @brief a simple constructor
    *  @param channelheight the width and height of the channel in y and z
@@ -43,20 +42,13 @@ public:
    *  @param filestem the name of the plotted file
    *  @param processes defines on how many processes the solver will run;
    *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes  */
-  NumericalSolver(const double channelheight, const double dx, const double dt,
-                  const double kinVisc, const int plotEveryTimestep,
-                  const std::string filestem,
+  NumericalSolver(const double channelheight, const double dx, const double dt, const double kinVisc, const int plotEveryTimestep, const std::string filestem,
                   const tarch::la::Vector<3, unsigned int> processes)
-      : coupling::solvers::AbstractCouetteSolver<3>(),
-        _channelheight(channelheight), _dx(dx), _dt(dt), _kinVisc(kinVisc),
-        _processes(processes), _plotEveryTimestep(plotEveryTimestep),
-        _filestem(filestem) {
-    _vel = new double[3 * (_domainSizeX + 2) * (_domainSizeY + 2) *
-                      (_domainSizeZ + 2)];
-    _density = new double[(_domainSizeX + 2) * (_domainSizeY + 2) *
-                          (_domainSizeZ + 2)];
-    _flag =
-        new Flag[(_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
+      : coupling::solvers::AbstractCouetteSolver<3>(), _channelheight(channelheight), _dx(dx), _dt(dt), _kinVisc(kinVisc), _processes(processes),
+        _plotEveryTimestep(plotEveryTimestep), _filestem(filestem) {
+    _vel = new double[3 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
+    _density = new double[(_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
+    _flag = new Flag[(_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     _sendBufferX = new double[5 * (_domainSizeY + 2) * (_domainSizeZ + 2)];
     _recvBufferX = new double[5 * (_domainSizeY + 2) * (_domainSizeZ + 2)];
@@ -66,9 +58,7 @@ public:
     _recvBufferZ = new double[5 * (_domainSizeX + 2) * (_domainSizeY + 2)];
 #endif
     // zero velocity, unit density; flags are set to FLUID
-    for (int i = 0;
-         i < (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2);
-         i++) {
+    for (int i = 0; i < (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2); i++) {
       for (int d = 0; d < 3; d++) {
         _vel[i * 3 + d] = (double)0.0;
       }
@@ -83,9 +73,7 @@ public:
       _flag[i] = MOVING_WALL;
     }
     // top - noslip
-    for (int i = (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 1);
-         i < (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2);
-         i++) {
+    for (int i = (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 1); i < (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2); i++) {
       _flag[i] = NO_SLIP;
     }
     // front - periodic
@@ -166,11 +154,8 @@ public:
    *  @param indexConversion instance of the indexConversion
    *  @param recvIndice the macroscopic indices that will be received
    *  @param size the number of cells that will be received */
-  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset,
-                     tarch::la::Vector<3, double> mdDomainSize,
-                     unsigned int overlapStrip,
-                     const coupling::IndexConversion<3> &indexConversion,
-                     const unsigned int *const recvIndice, unsigned int size) {
+  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
+                     const coupling::IndexConversion<3> &indexConversion, const unsigned int *const recvIndice, unsigned int size) {
     if (skipRank()) {
       return;
     }
@@ -178,14 +163,11 @@ public:
     for (int d = 0; d < 3; d++) {
       _offset[d] = (floor(mdDomainOffset[d] / _dx + 0.5));
       if (fabs(_offset[d] * _dx - mdDomainOffset[d]) / _dx > 1.0e-8) {
-        std::cout
-            << "ERROR NumericalSolver::setMDBoundary(): offset does not match!"
-            << std::endl;
+        std::cout << "ERROR NumericalSolver::setMDBoundary(): offset does not match!" << std::endl;
         exit(EXIT_FAILURE);
       }
       _globalNumberMacroscopicCells[d] = (floor(mdDomainSize[d] / _dx + 0.5));
-      if (fabs(_globalNumberMacroscopicCells[d] * _dx - mdDomainSize[d]) / _dx >
-          1.0e-8) {
+      if (fabs(_globalNumberMacroscopicCells[d] * _dx - mdDomainSize[d]) / _dx > 1.0e-8) {
         std::cout << "ERROR NumericalSolver::setMDBoundary(): globalNumber "
                      "does not match!"
                   << std::endl;
@@ -197,17 +179,12 @@ public:
       for (int y = 0; y < _domainSizeY + 2; y++) {
         for (int x = 0; x < _domainSizeX + 2; x++) {
           // determine global cell coordinates of the process-local (sub)domain
-          tarch::la::Vector<3, int> globalCoords(
-              x - 1 + _coords[0] * _avgDomainSizeX,
-              y - 1 + _coords[1] * _avgDomainSizeY,
-              z - 1 + _coords[2] * _avgDomainSizeZ);
+          tarch::la::Vector<3, int> globalCoords(x - 1 + _coords[0] * _avgDomainSizeX, y - 1 + _coords[1] * _avgDomainSizeY,
+                                                 z - 1 + _coords[2] * _avgDomainSizeZ);
           bool isMDCell = true;
           for (int d = 0; d < 3; d++) {
-            isMDCell = isMDCell &&
-                       (globalCoords[d] > _offset[d] + (int)overlapStrip - 1) &&
-                       (globalCoords[d] < _offset[d] +
-                                              _globalNumberMacroscopicCells[d] -
-                                              (int)overlapStrip);
+            isMDCell = isMDCell && (globalCoords[d] > _offset[d] + (int)overlapStrip - 1) &&
+                       (globalCoords[d] < _offset[d] + _globalNumberMacroscopicCells[d] - (int)overlapStrip);
           }
           if (isMDCell) {
             _flag[get(x, y, z)] = MD_BOUNDARY;
@@ -223,22 +200,17 @@ public:
    *  @param recvIndice the indices to connect the data from the buffer with
    * macroscopic cells
    *  @param indexConversion instance of the indexConversion */
-  virtual void setMDBoundaryValues(
-      std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer,
-      const unsigned int *const recvIndices,
-      const coupling::IndexConversion<3> &indexConversion) = 0;
+  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const unsigned int *const recvIndices,
+                                   const coupling::IndexConversion<3> &indexConversion) = 0;
 
   /** @brief returns the number of process, regards parallel runs
    *  @returns the number of processes */
-  tarch::la::Vector<3, unsigned int> getNumberProcesses() const {
-    return _processes;
-  }
+  tarch::la::Vector<3, unsigned int> getNumberProcesses() const { return _processes; }
 
   /** @brief returns the average number of cells on each process
    *  @returns the average number of cells */
   tarch::la::Vector<3, unsigned int> getAvgNumberLBCells() const {
-    tarch::la::Vector<3, unsigned int> avgCells(
-        _avgDomainSizeX, _avgDomainSizeY, _avgDomainSizeZ);
+    tarch::la::Vector<3, unsigned int> avgCells(_avgDomainSizeX, _avgDomainSizeY, _avgDomainSizeZ);
     return avgCells;
   }
 
@@ -249,8 +221,7 @@ public:
 
   /** @brief changes the velocity at the moving wall (z=0)
    *  @param wallVelocity new wall velocity to apply */
-  virtual void
-  setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) = 0;
+  virtual void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) = 0;
 
 private:
   /** @brief determines the process coordinates
@@ -262,12 +233,8 @@ private:
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     // determine rank coordinates
     coords[2] = ((unsigned int)rank) / (_processes[0] * _processes[1]);
-    coords[1] =
-        (((unsigned int)rank) - coords[2] * _processes[0] * _processes[1]) /
-        _processes[0];
-    coords[0] = ((unsigned int)rank) -
-                coords[2] * _processes[0] * _processes[1] -
-                coords[1] * _processes[0];
+    coords[1] = (((unsigned int)rank) - coords[2] * _processes[0] * _processes[1]) / _processes[0];
+    coords[0] = ((unsigned int)rank) - coords[2] * _processes[0] * _processes[1] - coords[1] * _processes[0];
 #endif
     return coords;
   }
@@ -288,36 +255,22 @@ private:
     }
     // neighbour dependencies based on Couette problem
     // left,right: periodic
-    _parallelNeighbours[LEFT] =
-        ((_coords[0] + _processes[0] - 1) % _processes[0]) +
-        _processes[0] * (_coords[1] + _processes[1] * _coords[2]);
-    _parallelNeighbours[RIGHT] =
-        ((_coords[0] + _processes[0] + 1) % _processes[0]) +
-        _processes[0] * (_coords[1] + _processes[1] * _coords[2]);
+    _parallelNeighbours[LEFT] = ((_coords[0] + _processes[0] - 1) % _processes[0]) + _processes[0] * (_coords[1] + _processes[1] * _coords[2]);
+    _parallelNeighbours[RIGHT] = ((_coords[0] + _processes[0] + 1) % _processes[0]) + _processes[0] * (_coords[1] + _processes[1] * _coords[2]);
     // back,front: periodic
-    _parallelNeighbours[FRONT] =
-        _coords[0] +
-        _processes[0] * (((_coords[1] + _processes[1] - 1) % _processes[1]) +
-                         _processes[1] * _coords[2]);
-    _parallelNeighbours[BACK] =
-        _coords[0] +
-        _processes[0] * (((_coords[1] + _processes[1] + 1) % _processes[1]) +
-                         _processes[1] * _coords[2]);
+    _parallelNeighbours[FRONT] = _coords[0] + _processes[0] * (((_coords[1] + _processes[1] - 1) % _processes[1]) + _processes[1] * _coords[2]);
+    _parallelNeighbours[BACK] = _coords[0] + _processes[0] * (((_coords[1] + _processes[1] + 1) % _processes[1]) + _processes[1] * _coords[2]);
     // top: either neighbour or MPI_PROC_NULL
     if (_coords[2] == _processes[2] - 1) {
       _parallelNeighbours[TOP] = MPI_PROC_NULL;
     } else {
-      _parallelNeighbours[TOP] =
-          _coords[0] +
-          _processes[0] * (_coords[1] + _processes[1] * (_coords[2] + 1));
+      _parallelNeighbours[TOP] = _coords[0] + _processes[0] * (_coords[1] + _processes[1] * (_coords[2] + 1));
     }
     // bottom either neighbour or MPI_PROC_NULL
     if (_coords[2] == 0) {
       _parallelNeighbours[BOTTOM] = MPI_PROC_NULL;
     } else {
-      _parallelNeighbours[BOTTOM] =
-          _coords[0] +
-          _processes[0] * (_coords[1] + _processes[1] * (_coords[2] - 1));
+      _parallelNeighbours[BOTTOM] = _coords[0] + _processes[0] * (_coords[1] + _processes[1] * (_coords[2] - 1));
     }
 // std::cout << "Parallel neighbours for rank " << rank << ": " <<
 // _parallelNeighbours << std::endl;
@@ -335,9 +288,7 @@ private:
     }
     // top - noslip
     if (_coords[2] != _processes[2] - 1) {
-      for (int i = (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 1);
-           i < (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2);
-           i++) {
+      for (int i = (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 1); i < (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2); i++) {
         _flag[get(i)] = PARALLEL_BOUNDARY;
       }
     }
@@ -372,8 +323,7 @@ private:
   /** @brief determines the local domain size on this rank where channelheight
    * is the domain length in direction d.
    *  @returns the size of the domain */
-  int getDomainSize(double channelheight, double dx,
-                    tarch::la::Vector<3, unsigned int> processes, int d) const {
+  int getDomainSize(double channelheight, double dx, tarch::la::Vector<3, unsigned int> processes, int d) const {
     int globalDomainSize = floor((channelheight + 0.5) / dx);
     tarch::la::Vector<3, unsigned int> coords(0);
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -387,11 +337,8 @@ private:
     }
     // determine rank coordinates
     coords[2] = ((unsigned int)rank) / (processes[0] * processes[1]);
-    coords[1] =
-        (((unsigned int)rank) - coords[2] * processes[0] * processes[1]) /
-        processes[0];
-    coords[0] = ((unsigned int)rank) - coords[2] * processes[0] * processes[1] -
-                coords[1] * processes[0];
+    coords[1] = (((unsigned int)rank) - coords[2] * processes[0] * processes[1]) / processes[0];
+    coords[0] = ((unsigned int)rank) - coords[2] * processes[0] * processes[1] - coords[1] * processes[0];
 #endif
     // if this is not the last process along this direction: just return avg.
     // number of cells
@@ -406,9 +353,7 @@ private:
   /** determines the "avg" domain size which is the domain size on each MPI
    * process, except for potentially the last one (the last one may include
    * additional cells) */
-  int getAvgDomainSize(double channelheight, double dx,
-                       tarch::la::Vector<3, unsigned int> processes,
-                       int d) const {
+  int getAvgDomainSize(double channelheight, double dx, tarch::la::Vector<3, unsigned int> processes, int d) const {
     int globalDomainSize = floor((channelheight + 0.5) / dx);
     return globalDomainSize / processes[d];
   }
@@ -439,8 +384,7 @@ protected:
       exit(EXIT_FAILURE);
     }
     if (x > _domainSizeX + 1) {
-      std::cout << "ERROR NumericalSolver::get(x,y,z): x>max. Value!"
-                << std::endl;
+      std::cout << "ERROR NumericalSolver::get(x,y,z): x>max. Value!" << std::endl;
       exit(EXIT_FAILURE);
     }
     if (y < 0) {
@@ -448,8 +392,7 @@ protected:
       exit(EXIT_FAILURE);
     }
     if (y > _domainSizeY + 1) {
-      std::cout << "ERROR NumericalSolver::get(x,y,z): y>max. Value!"
-                << std::endl;
+      std::cout << "ERROR NumericalSolver::get(x,y,z): y>max. Value!" << std::endl;
       exit(EXIT_FAILURE);
     }
     if (z < 0) {
@@ -457,8 +400,7 @@ protected:
       exit(EXIT_FAILURE);
     }
     if (z > _domainSizeZ + 1) {
-      std::cout << "ERROR NumericalSolver::get(x,y,z): z>max. Value!"
-                << std::endl;
+      std::cout << "ERROR NumericalSolver::get(x,y,z): z>max. Value!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif
@@ -471,13 +413,11 @@ protected:
   int getParBuf(int x, int y, int lengthx, int lengthy) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     if (x < 0 || x > lengthx + 1) {
-      std::cout << "ERROR NumericalSolver::getParBuf(...): x out of range!"
-                << std::endl;
+      std::cout << "ERROR NumericalSolver::getParBuf(...): x out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
     if (y < 0 || y > lengthy + 1) {
-      std::cout << "ERROR NumericalSolver::getParBuf(...): y out of range!"
-                << std::endl;
+      std::cout << "ERROR NumericalSolver::getParBuf(...): y out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif
@@ -503,8 +443,7 @@ protected:
     ss << _filestem << "_" << rank << "_" << _counter << ".vtk";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()) {
-      std::cout << "ERROR NumericalSolver::plot(): Could not open file "
-                << ss.str() << "!" << std::endl;
+      std::cout << "ERROR NumericalSolver::plot(): Could not open file " << ss.str() << "!" << std::endl;
       exit(EXIT_FAILURE);
     }
     std::stringstream flag, density, velocity;
@@ -513,16 +452,10 @@ protected:
     file << "MaMiCo NumericalSolver" << std::endl;
     file << "ASCII" << std::endl << std::endl;
     file << "DATASET STRUCTURED_GRID" << std::endl;
-    file << "DIMENSIONS " << _domainSizeX + 3 << " " << _domainSizeY + 3 << " "
-         << _domainSizeZ + 3
-         << std::endl; // everything +1 cause of change in index
-    file << "POINTS "
-         << (_domainSizeX + 3) * (_domainSizeY + 3) * (_domainSizeZ + 3)
-         << " float" << std::endl;
+    file << "DIMENSIONS " << _domainSizeX + 3 << " " << _domainSizeY + 3 << " " << _domainSizeZ + 3 << std::endl; // everything +1 cause of change in index
+    file << "POINTS " << (_domainSizeX + 3) * (_domainSizeY + 3) * (_domainSizeZ + 3) << " float" << std::endl;
 
-    flag << "CELL_DATA "
-         << (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)
-         << std::endl;
+    flag << "CELL_DATA " << (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2) << std::endl;
     flag << "SCALARS flag float 1" << std::endl;
     flag << "LOOKUP_TABLE default" << std::endl;
 
@@ -536,8 +469,7 @@ protected:
     for (int z = -1; z < _domainSizeZ + 2; z++) {
       for (int y = -1; y < _domainSizeY + 2; y++) {
         for (int x = -1; x < _domainSizeX + 2; x++) {
-          file << ((int)(_coords[0] * _avgDomainSizeX) + x) * _dx << " "
-               << ((int)(_coords[1] * _avgDomainSizeY) + y) * _dx << " "
+          file << ((int)(_coords[0] * _avgDomainSizeX) + x) * _dx << " " << ((int)(_coords[1] * _avgDomainSizeY) + y) * _dx << " "
                << ((int)(_coords[2] * _avgDomainSizeZ) + z) * _dx << std::endl;
         }
       }
@@ -545,14 +477,12 @@ protected:
     // loop over domain (incl. boundary)
     for (int z = 0; z < _domainSizeZ + 1 + 1; z++) {
       for (int y = 0; y < _domainSizeY + 1 + 1; y++) {
-        for (int x = 0; x < _domainSizeX + 1 + 1;
-             x++) { // CHANGE: start index used to be one
+        for (int x = 0; x < _domainSizeX + 1 + 1; x++) { // CHANGE: start index used to be one
           const int index = get(x, y, z);
           // write information to streams
           flag << _flag[index] << std::endl;
           density << _density[index] << std::endl;
-          velocity << _vel[3 * index] << " " << _vel[3 * index + 1] << " "
-                   << _vel[3 * index + 2] << std::endl;
+          velocity << _vel[3 * index] << " " << _vel[3 * index + 1] << " " << _vel[3 * index + 2] << std::endl;
         }
       }
     }
@@ -575,8 +505,7 @@ protected:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
-    return ((unsigned int)rank >
-            _processes[0] * _processes[1] * _processes[2] - 1);
+    return ((unsigned int)rank > _processes[0] * _processes[1] * _processes[2] - 1);
   }
 
   /** @brief for every cell exists a flag entry, upon this is defined how the
@@ -622,14 +551,11 @@ protected:
   /** @brief domain size in z-direction */
   const int _domainSizeZ{getDomainSize(_channelheight, _dx, _processes, 2)};
   /** @brief avg. domain size in MPI-parallel simulation in x-direction */
-  const int _avgDomainSizeX{
-      getAvgDomainSize(_channelheight, _dx, _processes, 0)};
+  const int _avgDomainSizeX{getAvgDomainSize(_channelheight, _dx, _processes, 0)};
   /** @brief avg. domain size in MPI-parallel simulation in y-direction */
-  const int _avgDomainSizeY{
-      getAvgDomainSize(_channelheight, _dx, _processes, 1)}; //
+  const int _avgDomainSizeY{getAvgDomainSize(_channelheight, _dx, _processes, 1)}; //
   /** @brief avg. domain size in MPI-parallel simulation in z-direction */
-  const int _avgDomainSizeZ{
-      getAvgDomainSize(_channelheight, _dx, _processes, 2)}; //
+  const int _avgDomainSizeZ{getAvgDomainSize(_channelheight, _dx, _processes, 2)}; //
   /** @brief coordinates of this process (=1,1,1, unless parallel run of the
    * solver )*/
   const tarch::la::Vector<3, unsigned int> _coords{getProcessCoordinates()};

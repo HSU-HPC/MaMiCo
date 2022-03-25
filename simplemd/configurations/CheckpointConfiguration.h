@@ -14,8 +14,7 @@ class CheckpointConfiguration;
 } // namespace simplemd
 
 /** data for checkpoint writing */
-class simplemd::configurations::CheckpointConfiguration
-    : public simplemd::configurations::VTKConfiguration {
+class simplemd::configurations::CheckpointConfiguration : public simplemd::configurations::VTKConfiguration {
 public:
   CheckpointConfiguration() : simplemd::configurations::VTKConfiguration() {}
   virtual ~CheckpointConfiguration() {}

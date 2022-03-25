@@ -13,20 +13,17 @@
  */
 template <unsigned int dim> class TestLammpsGhost : public TestLammps<dim> {
 public:
-  TestLammpsGhost(int argc, char **argv, std::string name)
-      : TestLammps<dim>(argc, argv, name) {}
+  TestLammpsGhost(int argc, char **argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
   virtual ~TestLammpsGhost() {}
 
   virtual void run() {
     // initialise all interfaces and simulation parts
     if (dim == 2) {
-      TestLammps<dim>::loadLammpsTestConfiguration(
-          "inputpositionsonly2D.xyz",
-          4); //"inputpositions2D_moleculeiterator.xyz",24);
+      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly2D.xyz",
+                                                   4); //"inputpositions2D_moleculeiterator.xyz",24);
     } else {
-      TestLammps<dim>::loadLammpsTestConfiguration(
-          "inputpositionsonly3D.xyz",
-          8); //"inputpositions3D_moleculeiterator.xyz",96);
+      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly3D.xyz",
+                                                   8); //"inputpositions3D_moleculeiterator.xyz",96);
     }
     // extend cut-off radius
     // TestLammps<dim>::_lammps->input->one("pair_coeff 1 1 1.0 1.0 2.5");
@@ -35,20 +32,14 @@ public:
 
     // get MD solver interface (required for sorting)
     LAMMPS_NS::MamicoLammpsMDSolverInterface<dim> *mdSolverInterface =
-        (LAMMPS_NS::MamicoLammpsMDSolverInterface<dim> *)
-            coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                         dim>::getInstance()
-                .getMDSolverInterface();
+        (LAMMPS_NS::MamicoLammpsMDSolverInterface<dim> *)coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance()
+            .getMDSolverInterface();
     if (mdSolverInterface == NULL) {
-      std::cout << "ERROR TestLammpsGhost: could not cast MD Solver interface!"
-                << std::endl;
+      std::cout << "ERROR TestLammpsGhost: could not cast MD Solver interface!" << std::endl;
       exit(EXIT_FAILURE);
     }
     const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                     dim>::getInstance()
-            .getMacroscopicCellService()
-            ->getIndexConversion();
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
 
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -61,11 +52,9 @@ public:
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank == i) {
         std::cout << "Print molecules in inner cells:" << std::endl;
-        mdSolverInterface->printMolecules(
-            indexConversion, LAMMPS_NS::Sorting<dim>::PRINT_INNER_CELLS);
+        mdSolverInterface->printMolecules(indexConversion, LAMMPS_NS::Sorting<dim>::PRINT_INNER_CELLS);
         std::cout << "Print molecules in ghost cells: " << std::endl;
-        mdSolverInterface->printMolecules(
-            indexConversion, LAMMPS_NS::Sorting<dim>::PRINT_GHOST_CELLS);
+        mdSolverInterface->printMolecules(indexConversion, LAMMPS_NS::Sorting<dim>::PRINT_GHOST_CELLS);
       }
       MPI_Barrier(MPI_COMM_WORLD);
     }

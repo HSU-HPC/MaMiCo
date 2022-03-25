@@ -24,9 +24,7 @@ template <unsigned int dim> class BoundaryForceConfiguration;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class coupling::configurations::BoundaryForceConfiguration
-    : public tarch::configuration::Configuration {
+template <unsigned int dim> class coupling::configurations::BoundaryForceConfiguration : public tarch::configuration::Configuration {
 public:
   /** boundary force types that are implemented.
    *	@enum BoundaryForceType
@@ -37,9 +35,7 @@ public:
   };
 
   /** Constructor, initializes the class  */
-  BoundaryForceConfiguration()
-      : _insertionType(NO_BOUNDARYFORCE), _density(0.0), _temperature(0.0),
-        _isValid(true) {}
+  BoundaryForceConfiguration() : _insertionType(NO_BOUNDARYFORCE), _density(0.0), _temperature(0.0), _isValid(true) {}
 
   /** Destructor */
   virtual ~BoundaryForceConfiguration() {}
@@ -49,19 +45,15 @@ public:
    */
   void parseSubtag(tinyxml2::XMLElement *node) {
     std::string value;
-    tarch::configuration::ParseConfiguration::readStringMandatory(value, node,
-                                                                  "type");
-    const std::string boundaries[6] = {"west",  "east",   "south",
-                                       "north", "bottom", "top"};
+    tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
+    const std::string boundaries[6] = {"west", "east", "south", "north", "bottom", "top"};
 
     if (value == "zhou-boundary-force") {
       _insertionType = ZHOU;
     } else if (value == "none") {
       _insertionType = NO_BOUNDARYFORCE;
     } else {
-      std::cout
-          << "ERROR coupling::BoundaryForceConfiguration: Wrong insertion type!"
-          << std::endl;
+      std::cout << "ERROR coupling::BoundaryForceConfiguration: Wrong insertion type!" << std::endl;
       _isValid = false;
       exit(EXIT_FAILURE);
     }
@@ -72,13 +64,11 @@ public:
     // case, to e.g. determine a setup with boundary forcing using external
     // implementations
     for (unsigned int d = 0; d < 2 * dim; d++) {
-      tarch::configuration::ParseConfiguration::readBoolMandatory(
-          _boundary[d], node, boundaries[d]);
+      tarch::configuration::ParseConfiguration::readBoolMandatory(_boundary[d], node, boundaries[d]);
     }
 
     if (_insertionType == ZHOU) {
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(
-          _density, node, "density");
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(_density, node, "density");
       if (_density <= 0.0) {
         std::cout << "ERROR coupling::BoundaryForceConfiguration: density is "
                      "smaller than zero! Density="
@@ -87,8 +77,7 @@ public:
         exit(EXIT_FAILURE);
       }
 
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(
-          _temperature, node, "temperature");
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(_temperature, node, "temperature");
       if (_temperature <= 0.0) {
         std::cout << "ERROR coupling::BoundaryForceConfiguration: temperature "
                      "is smaller than zero! Temperature="
@@ -117,16 +106,12 @@ public:
   /** Returns boundary force type.
    * 	@return _insertionType
    */
-  const BoundaryForceType &getBoundaryForceType() const {
-    return _insertionType;
-  }
+  const BoundaryForceType &getBoundaryForceType() const { return _insertionType; }
 
   /** Returns boundary ??
    * 	@return _boundary
    */
-  const tarch::la::Vector<2 * dim, bool> &getBoundary() const {
-    return _boundary;
-  }
+  const tarch::la::Vector<2 * dim, bool> &getBoundary() const { return _boundary; }
 
   /** Returns boundary force configuration.
    * 	@tparam LinkedCell type of the cell
@@ -134,9 +119,8 @@ public:
    * 	@return boundary force config
    */
   template <class LinkedCell>
-  coupling::BoundaryForceController<LinkedCell, dim> *interpreteConfiguration(
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface) const {
+  coupling::BoundaryForceController<LinkedCell, dim> *
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) const {
     if (_insertionType == ZHOU) {
       if (dim != 3) {
         std::cout << "ERROR "
@@ -146,8 +130,7 @@ public:
                   << std::endl;
         exit(EXIT_FAILURE);
       }
-      return new coupling::ZhouBoundaryForceController<LinkedCell, dim>(
-          _density, _temperature, _boundary, mdSolverInterface);
+      return new coupling::ZhouBoundaryForceController<LinkedCell, dim>(_density, _temperature, _boundary, mdSolverInterface);
     } else if (_insertionType == NO_BOUNDARYFORCE) {
       return new coupling::NoBoundaryForce<LinkedCell, dim>(mdSolverInterface);
     }

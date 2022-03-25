@@ -27,12 +27,10 @@ public:
   /** @brief returns the current velocity at the given position
    *  @param pos position to return the velocity for
    *  @returns a velocity vector */
-  virtual tarch::la::Vector<dim, double>
-  getVelocity(tarch::la::Vector<dim, double> pos) const = 0;
+  virtual tarch::la::Vector<dim, double> getVelocity(tarch::la::Vector<dim, double> pos) const = 0;
   /** @brief changes the velocity at the moving for, refers to Couette scenario
    *  @param wallVelocity value to which the veloctiy will be set */
-  virtual void
-  setWallVelocity(const tarch::la::Vector<dim, double> wallVelocity) = 0;
+  virtual void setWallVelocity(const tarch::la::Vector<dim, double> wallVelocity) = 0;
 };
 
 template <unsigned int dim> class CouetteSolver;
@@ -45,19 +43,15 @@ template <unsigned int dim> class CouetteSolver;
  *  @author Philipp Neumann
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3 */
-template <unsigned int dim>
-class coupling::solvers::CouetteSolver
-    : public coupling::solvers::AbstractCouetteSolver<dim> {
+template <unsigned int dim> class coupling::solvers::CouetteSolver : public coupling::solvers::AbstractCouetteSolver<dim> {
 public:
   /** @brief a simple constructor
    *  @param channelheight the height and width of the channel in y and z
    * direction
    *  @param wallVelocity the velocity at the moving wall
    *  @param kinVisc the kinematic viscosity of the fluid  */
-  CouetteSolver(const double &channelheight, const double &wallVelocity,
-                const double kinVisc)
-      : AbstractCouetteSolver<dim>(), _channelheight(channelheight),
-        _wallVelocity(wallVelocity), _kinVisc(kinVisc), _time(0.0) {}
+  CouetteSolver(const double &channelheight, const double &wallVelocity, const double kinVisc)
+      : AbstractCouetteSolver<dim>(), _channelheight(channelheight), _wallVelocity(wallVelocity), _kinVisc(kinVisc), _time(0.0) {}
 
   /** @brief a dummy destructor */
   virtual ~CouetteSolver() {}
@@ -72,16 +66,13 @@ public:
    *  @brief returns the velocity vector at a certain channel position
    *  @param pos the position to return the velocity for
    *  @returns a velocity vector */
-  virtual tarch::la::Vector<dim, double>
-  getVelocity(tarch::la::Vector<dim, double> pos) const {
+  virtual tarch::la::Vector<dim, double> getVelocity(tarch::la::Vector<dim, double> pos) const {
     tarch::la::Vector<dim, double> v(0.0);
     v[0] = _wallVelocity * (1.0 - pos[dim - 1] / _channelheight);
     const double pi = 3.141592653589793238;
     double sum = 0.0;
     for (int k = 1; k < 30; k++) {
-      sum += 1.0 / k * sin(k * pi * pos[dim - 1] / _channelheight) *
-             exp(-k * k * pi * pi / (_channelheight * _channelheight) *
-                 _kinVisc * _time);
+      sum += 1.0 / k * sin(k * pi * pos[dim - 1] / _channelheight) * exp(-k * k * pi * pi / (_channelheight * _channelheight) * _kinVisc * _time);
     }
     v[0] = v[0] - 2.0 * _wallVelocity / pi * sum;
     return v;
@@ -89,10 +80,7 @@ public:
 
   /** @brief changes the velocity at the moving for, refers to Couette scenario
    *  @param wallVelocity value to which the veloctiy will be set */
-  virtual void
-  setWallVelocity(const tarch::la::Vector<dim, double> wallVelocity) {
-    _wallVelocity = wallVelocity[0];
-  }
+  virtual void setWallVelocity(const tarch::la::Vector<dim, double> wallVelocity) { _wallVelocity = wallVelocity[0]; }
 
 private:
   /** @brief height of couette channel */

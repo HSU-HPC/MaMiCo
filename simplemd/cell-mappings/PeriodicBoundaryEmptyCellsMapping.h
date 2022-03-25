@@ -24,21 +24,17 @@ class PeriodicBoundaryEmptyCellsMapping;
  */
 class simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping {
 public:
-  PeriodicBoundaryEmptyCellsMapping(
-      simplemd::services::ParallelTopologyService &parallelTopologyService,
-      simplemd::services::MoleculeService &moleculeService,
-      simplemd::services::LinkedCellService &linkedCellService);
+  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::MoleculeService &moleculeService,
+                                    simplemd::services::LinkedCellService &linkedCellService);
   ~PeriodicBoundaryEmptyCellsMapping() {}
 
   /** sets the global domain size (hopefully received from the
    * ParallelTopologyService...) */
   void setDomainSize(const tarch::la::Vector<MD_DIM, double> &domainSize);
 
-  void setProcessCoordinates(
-      const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates);
+  void setProcessCoordinates(const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates);
 
-  void setNumberOfProcesses(
-      const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses);
+  void setNumberOfProcesses(const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses);
 
   void beginCellIteration() {}
   void endCellIteration() {}

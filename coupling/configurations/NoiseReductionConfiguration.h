@@ -24,8 +24,7 @@ class NoiseReductionConfiguration;
  *  @author Piet Jarmatz
  *	@todo Piet could you please take a look on this class
  */
-class coupling::configurations::NoiseReductionConfiguration
-    : public tarch::configuration::Configuration {
+class coupling::configurations::NoiseReductionConfiguration : public tarch::configuration::Configuration {
 public:
   /** noise reduction types that are implemented.
    *	@enum NoiseReductionType
@@ -45,8 +44,7 @@ public:
 
   void parseSubtag(tinyxml2::XMLElement *node) {
     std::string value;
-    tarch::configuration::ParseConfiguration::readStringMandatory(value, node,
-                                                                  "type");
+    tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "none") {
       _type = IdentityTransform;
     } else if (value == "gaussian-filter") {
@@ -56,12 +54,10 @@ public:
 
       int buf = -1;
 
-      tarch::configuration::ParseConfiguration::readIntMandatory(
-          buf, node, "time-window-size");
+      tarch::configuration::ParseConfiguration::readIntMandatory(buf, node, "time-window-size");
       if (buf <= 2) {
-        std::cout
-            << "ERROR "
-               "coupling::configurations::ParticleInsertionConfiguration::";
+        std::cout << "ERROR "
+                     "coupling::configurations::ParticleInsertionConfiguration::";
         std::cout << "parseSubtag(): "
                   << "time-window-size"
                   << " smaller than or equal two!" << std::endl;
@@ -70,12 +66,10 @@ public:
         _tws = buf;
       }
 
-      tarch::configuration::ParseConfiguration::readIntMandatory(buf, node,
-                                                                 "kmax");
+      tarch::configuration::ParseConfiguration::readIntMandatory(buf, node, "kmax");
       if (buf <= 0) {
-        std::cout
-            << "ERROR "
-               "coupling::configurations::ParticleInsertionConfiguration::";
+        std::cout << "ERROR "
+                     "coupling::configurations::ParticleInsertionConfiguration::";
         std::cout << "parseSubtag(): "
                   << "kmax"
                   << " smaller or equal zero!" << std::endl;
@@ -89,12 +83,10 @@ public:
 
       int buf = -1;
 
-      tarch::configuration::ParseConfiguration::readIntMandatory(
-          buf, node, "time-window-size");
+      tarch::configuration::ParseConfiguration::readIntMandatory(buf, node, "time-window-size");
       if (buf <= 2) {
-        std::cout
-            << "ERROR "
-               "coupling::configurations::ParticleInsertionConfiguration::";
+        std::cout << "ERROR "
+                     "coupling::configurations::ParticleInsertionConfiguration::";
         std::cout << "parseSubtag(): "
                   << "time-window-size"
                   << " smaller than or equal two!" << std::endl;
@@ -135,25 +127,17 @@ public:
    *	@note tws_param can be used to override XML configuration
    */
   template <unsigned int dim>
-  coupling::noisereduction::NoiseReduction<dim> *interpreteConfiguration(
-      const coupling::IndexConversion<dim> &indexConversion,
-      const tarch::utils::MultiMDService<dim> &multiMDService,
-      int tws_param = 0) const {
+  coupling::noisereduction::NoiseReduction<dim> *interpreteConfiguration(const coupling::IndexConversion<dim> &indexConversion,
+                                                                         const tarch::utils::MultiMDService<dim> &multiMDService, int tws_param = 0) const {
     if (_type == IdentityTransform) {
-      return new coupling::noisereduction::IdentityTransform<dim>(
-          indexConversion, multiMDService);
+      return new coupling::noisereduction::IdentityTransform<dim>(indexConversion, multiMDService);
     } else if (_type == GaussianFilter) {
-      std::cout
-          << "ERROR coupling::NoiseReductionConfiguration: not implemented"
-          << std::endl;
+      std::cout << "ERROR coupling::NoiseReductionConfiguration: not implemented" << std::endl;
       exit(EXIT_FAILURE);
     } else if (_type == POD) {
-      return new coupling::noisereduction::POD<dim>(
-          indexConversion, multiMDService, tws_param == 0 ? _tws : tws_param,
-          _kmax);
+      return new coupling::noisereduction::POD<dim>(indexConversion, multiMDService, tws_param == 0 ? _tws : tws_param, _kmax);
     } else if (_type == NLM) {
-      return new coupling::noisereduction::NLM<dim>(indexConversion,
-                                                    multiMDService, _tws);
+      return new coupling::noisereduction::NLM<dim>(indexConversion, multiMDService, _tws);
     } else {
       return NULL;
     }

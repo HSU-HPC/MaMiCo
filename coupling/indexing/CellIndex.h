@@ -28,9 +28,7 @@ namespace TraitOperations {
  * Returns true iff the template and runtime argument match. Curried operator==
  * for above enum class.
  */
-template <IndexTrait t1> constexpr bool is_same(const IndexTrait &t2) {
-  return t1 == t2;
-}
+template <IndexTrait t1> constexpr bool is_same(const IndexTrait &t2) { return t1 == t2; }
 
 /**
  * Checks if a given parameter pack of at least two IndexTrait entries is in the
@@ -44,8 +42,7 @@ template <IndexTrait t1> constexpr bool is_same(const IndexTrait &t2) {
  * @tparam Parameter pack of at least two IndexTraits
  * @return true iff the parameter pack is ordered correctly.
  */
-template <IndexTrait t1, IndexTrait t2, IndexTrait... rest>
-constexpr bool is_ordered() {
+template <IndexTrait t1, IndexTrait t2, IndexTrait... rest> constexpr bool is_ordered() {
   if constexpr (sizeof...(rest) == 0) {
     return t1 < t2;
   } else {
@@ -64,15 +61,13 @@ template <IndexTrait t> constexpr std::string_view print_trait() {
     return "noGhost";
 }
 
-template <IndexTrait t1, IndexTrait... rest>
-constexpr std::string_view print_traitlist() {
+template <IndexTrait t1, IndexTrait... rest> constexpr std::string_view print_traitlist() {
   using namespace std::string_literals;
 
   if constexpr (sizeof...(rest) == 0) {
     return print_trait<t1>();
   } else {
-    return std::string_view{print_trait<t1>().data() + ", "s +
-                            print_traitlist<rest...>().data()};
+    return std::string_view{print_trait<t1>().data() + ", "s + print_traitlist<rest...>().data()};
   }
 }
 } // namespace TraitOperations
@@ -98,20 +93,16 @@ template <unsigned int dim, IndexTrait... traits> class CellIndex;
 /**
  * Base CellIndex specialisation (mainly) used for conversions.
  */
-template <unsigned int dim>
-using BaseIndex = CellIndex<dim, IndexTrait::vector>;
+template <unsigned int dim> using BaseIndex = CellIndex<dim, IndexTrait::vector>;
 
 // TODO: refactor as member functions
-template <unsigned int dim, IndexTrait... traits>
-unsigned int convertToScalar(const CellIndex<dim, traits...> &);
+template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(const CellIndex<dim, traits...> &);
 
-template <unsigned int dim, IndexTrait... traits>
-tarch::la::Vector<dim, int> convertToVector(const CellIndex<dim, traits...> &);
+template <unsigned int dim, IndexTrait... traits> tarch::la::Vector<dim, int> convertToVector(const CellIndex<dim, traits...> &);
 } // namespace indexing
 } // namespace coupling
 
-template <unsigned int dim, coupling::indexing::IndexTrait... traits>
-class coupling::indexing::CellIndex {
+template <unsigned int dim, coupling::indexing::IndexTrait... traits> class coupling::indexing::CellIndex {
 public:
   /**
    * Check at compile time wether traits... is in proper order, i.e.
@@ -130,19 +121,15 @@ public:
       return true;
     }
   }
-  static_assert(checkIndexTraitOrder(),
-                "Invalid order in IndexTrait parameter pack! Correct oder: "
-                "IndexTrait::vector < IndexTrait::local < IndexTrait::md2macro "
-                "< IndexTrait::noGhost");
+  static_assert(checkIndexTraitOrder(), "Invalid order in IndexTrait parameter pack! Correct oder: "
+                                        "IndexTrait::vector < IndexTrait::local < IndexTrait::md2macro "
+                                        "< IndexTrait::noGhost");
 
   /**
    * The type of this CellIndex's underlying index representation.
    */
-  using value_T =
-      std::conditional_t<(coupling::indexing::TraitOperations::is_same<
-                              coupling::indexing::IndexTrait::vector>(traits) or
-                          ...),
-                         tarch::la::Vector<dim, int>, unsigned int>;
+  using value_T = std::conditional_t<(coupling::indexing::TraitOperations::is_same<coupling::indexing::IndexTrait::vector>(traits) or ...),
+                                     tarch::la::Vector<dim, int>, unsigned int>;
 
   /**
    * Constructors
@@ -159,8 +146,7 @@ public:
    * convert to
    * @return CellIndex of different template parametrisation.
    */
-  template <coupling::indexing::IndexTrait... converted_traits>
-  operator CellIndex<dim, converted_traits...>() const;
+  template <coupling::indexing::IndexTrait... converted_traits> operator CellIndex<dim, converted_traits...>() const;
 
   /**
    * Access to primive value_T of this index.
@@ -223,30 +209,17 @@ public:
    */
   bool operator==(const CellIndex &i) const { return _index == i.get(); }
   bool operator!=(const CellIndex &i) const { return not(i == *this); }
-  bool operator<(const CellIndex &i) const {
-    return convertToScalar<dim, traits...>(*this) <
-           convertToScalar<dim, traits...>(i);
-  };
-  bool operator<=(const CellIndex &i) const {
-    return convertToScalar<dim, traits...>(*this) <=
-           convertToScalar<dim, traits...>(i);
-  };
-  bool operator>(const CellIndex &i) const {
-    return convertToScalar<dim, traits...>(*this) >
-           convertToScalar<dim, traits...>(i);
-  };
-  bool operator>=(const CellIndex &i) const {
-    return convertToScalar<dim, traits...>(*this) >=
-           convertToScalar<dim, traits...>(i);
-  };
+  bool operator<(const CellIndex &i) const { return convertToScalar<dim, traits...>(*this) < convertToScalar<dim, traits...>(i); };
+  bool operator<=(const CellIndex &i) const { return convertToScalar<dim, traits...>(*this) <= convertToScalar<dim, traits...>(i); };
+  bool operator>(const CellIndex &i) const { return convertToScalar<dim, traits...>(*this) > convertToScalar<dim, traits...>(i); };
+  bool operator>=(const CellIndex &i) const { return convertToScalar<dim, traits...>(*this) >= convertToScalar<dim, traits...>(i); };
 
   /**
    * Initialises all static members dependant only on upperBoundary and
    * lowerBoundary
    */
   static void setDomainParameters() {
-    auto cellnum = upperBoundary.get() - lowerBoundary.get() +
-                   tarch::la::Vector<dim, int>{1};
+    auto cellnum = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector<dim, int>{1};
     for (unsigned int d = 0; d < dim; d++)
       cellnum[d] = std::max(0, cellnum[d]);
     numberCellsInDomain = tarch::la::Vector<dim, unsigned int>{cellnum};
@@ -311,8 +284,7 @@ public:
    */
   static tarch::la::Vector<dim, unsigned int> divisionFactor;
 
-  class IndexIterator
-      : public std::iterator<std::input_iterator_tag, CellIndex> {
+  class IndexIterator : public std::iterator<std::input_iterator_tag, CellIndex> {
   public:
     IndexIterator(CellIndex x) : _idx(x) {}
     IndexIterator(const IndexIterator &a) : _idx(a._idx) {}
@@ -333,12 +305,8 @@ public:
       return tmp;
     }
 
-    friend bool operator==(const IndexIterator &a, const IndexIterator &b) {
-      return a._idx == b._idx;
-    };
-    friend bool operator!=(const IndexIterator &a, const IndexIterator &b) {
-      return a._idx != b._idx;
-    };
+    friend bool operator==(const IndexIterator &a, const IndexIterator &b) { return a._idx == b._idx; };
+    friend bool operator!=(const IndexIterator &a, const IndexIterator &b) { return a._idx != b._idx; };
 
   private:
     CellIndex _idx;
@@ -355,9 +323,7 @@ public:
 private:
   value_T _index;
 
-  template <coupling::indexing::IndexTrait T1,
-            coupling::indexing::IndexTrait... other_traits>
-  CellIndex<dim, other_traits...> getScalarCellIndex(int value) {
+  template <coupling::indexing::IndexTrait T1, coupling::indexing::IndexTrait... other_traits> CellIndex<dim, other_traits...> getScalarCellIndex(int value) {
     static_assert(T1 == coupling::indexing::IndexTrait::vector);
     return CellIndex<dim, other_traits...>(value);
   }

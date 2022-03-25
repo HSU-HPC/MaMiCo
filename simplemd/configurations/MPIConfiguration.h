@@ -20,8 +20,7 @@ class MPIConfiguration;
  * the splitting of the processes for the domain.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::MPIConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::MPIConfiguration : public tarch::configuration::Configuration {
 public:
   MPIConfiguration();
   virtual ~MPIConfiguration() {}
@@ -47,9 +46,7 @@ public:
   bool isValid() const;
 
   /** getters */
-  const tarch::la::Vector<MD_DIM, unsigned int> &getNumberOfProcesses() const {
-    return _numberOfProcesses;
-  }
+  const tarch::la::Vector<MD_DIM, unsigned int> &getNumberOfProcesses() const { return _numberOfProcesses; }
 
 private:
   static const std::string NUMBER_OF_PROCESSES;

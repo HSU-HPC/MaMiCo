@@ -20,8 +20,7 @@ class SimulationConfiguration;
  * timestepping only.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::SimulationConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::SimulationConfiguration : public tarch::configuration::Configuration {
 public:
   SimulationConfiguration();
   virtual ~SimulationConfiguration() {}
@@ -48,19 +47,11 @@ public:
 
   /** getters for all parsed and computed quantities */
   const double &getDt() const { return _dt; }
-  const unsigned int &getNumberOfTimesteps() const {
-    return _numberOfTimesteps;
-  }
-  const unsigned int &getReorganiseMemoryEveryTimestep() const {
-    return _reorganiseMemoryEveryTimestep;
-  }
-  const unsigned int &computeMacroscopicQuantitiesEveryTimestep() const {
-    return _computeMacroscopicQuantitiesEveryTimestep;
-  }
+  const unsigned int &getNumberOfTimesteps() const { return _numberOfTimesteps; }
+  const unsigned int &getReorganiseMemoryEveryTimestep() const { return _reorganiseMemoryEveryTimestep; }
+  const unsigned int &computeMacroscopicQuantitiesEveryTimestep() const { return _computeMacroscopicQuantitiesEveryTimestep; }
   const bool &fixSeed() const { return _fixSeed; }
-  const bool &useOverlappingCommunicationWithForceComputation() const {
-    return _overlapCommWithForceComputation;
-  }
+  const bool &useOverlappingCommunicationWithForceComputation() const { return _overlapCommWithForceComputation; }
 
 private:
   static const std::string DT;

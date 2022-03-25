@@ -25,15 +25,12 @@ class ParticleInsertionConfiguration;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-class coupling::configurations::ParticleInsertionConfiguration
-    : public tarch::configuration::Configuration {
+class coupling::configurations::ParticleInsertionConfiguration : public tarch::configuration::Configuration {
 public:
   /** Constructor, initializes the class  */
   ParticleInsertionConfiguration()
-      : _insertDeleteMassEveryTimestep(1), _rSigmaCoeff(0.0),
-        _meanPotentialEnergyFactor(0.0), _uOverlapCoeff(0.0),
-        _stepRefCoeff(0.0), _iterMax(0), _restartMax(0), _tolerance(0.0),
-        _offsetFromOuterBoundary(0.0) {}
+      : _insertDeleteMassEveryTimestep(1), _rSigmaCoeff(0.0), _meanPotentialEnergyFactor(0.0), _uOverlapCoeff(0.0), _stepRefCoeff(0.0), _iterMax(0),
+        _restartMax(0), _tolerance(0.0), _offsetFromOuterBoundary(0.0) {}
 
   /** Destructor */
   virtual ~ParticleInsertionConfiguration() {}
@@ -65,14 +62,12 @@ public:
    * 	@return particle insertion config
    */
   template <class LinkedCell, unsigned int dim>
-  coupling::ParticleInsertion<LinkedCell, dim> *interpreteConfiguration(
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface) const {
+  coupling::ParticleInsertion<LinkedCell, dim> *
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) const {
     if (_particleInsertionType == USHER) {
-      return new coupling::UsherParticleInsertion<LinkedCell, dim>(
-          _insertDeleteMassEveryTimestep, _rSigmaCoeff,
-          _meanPotentialEnergyFactor, _uOverlapCoeff, _stepRefCoeff, _iterMax,
-          _restartMax, _tolerance, _offsetFromOuterBoundary, mdSolverInterface);
+      return new coupling::UsherParticleInsertion<LinkedCell, dim>(_insertDeleteMassEveryTimestep, _rSigmaCoeff, _meanPotentialEnergyFactor, _uOverlapCoeff,
+                                                                   _stepRefCoeff, _iterMax, _restartMax, _tolerance, _offsetFromOuterBoundary,
+                                                                   mdSolverInterface);
     } else if (_particleInsertionType == NO_INSERTION) {
       return new coupling::NoParticleInsertion<LinkedCell, dim>();
     }
@@ -92,9 +87,7 @@ public:
   /** Returns the particle insertion type.
    * 	@return _particleInsertionType
    */
-  ParticleInsertionType getParticleInsertionType() const {
-    return _particleInsertionType;
-  }
+  ParticleInsertionType getParticleInsertionType() const { return _particleInsertionType; }
 
 private:
   static const std::string INSERT_DELETE_MASS_EVERY_TIMESTEP;

@@ -21,16 +21,12 @@ template <unsigned int dim> class MacroscopicCellConfiguration;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class coupling::configurations::MacroscopicCellConfiguration
-    : public tarch::configuration::Configuration {
+template <unsigned int dim> class coupling::configurations::MacroscopicCellConfiguration : public tarch::configuration::Configuration {
 public:
   /** Constructor, initializes the class  */
   MacroscopicCellConfiguration()
-      : _isValid(true), _macroscopicCellSize(0.0),
-        _linkedCellsPerMacroscopicCell(0), _writeEveryMicroscopicTimestep(0),
-        _microscopicFilename(""), _writeEveryMacroscopicTimestep(0),
-        _macroscopicFilename("") {}
+      : _isValid(true), _macroscopicCellSize(0.0), _linkedCellsPerMacroscopicCell(0), _writeEveryMicroscopicTimestep(0), _microscopicFilename(""),
+        _writeEveryMacroscopicTimestep(0), _macroscopicFilename("") {}
 
   /** Destructor */
   ~MacroscopicCellConfiguration() {}
@@ -57,24 +53,17 @@ public:
   /** Returns the macroscopic cell size
    * 	@return _macroscopicCellSize
    */
-  tarch::la::Vector<dim, double> getMacroscopicCellSize() const {
-    return _macroscopicCellSize;
-  }
+  tarch::la::Vector<dim, double> getMacroscopicCellSize() const { return _macroscopicCellSize; }
 
   /** Returns the number of linked cell encapsulated within a macroscopic cell
    * 	@return _linkedCellsPerMacroscopicCell
    */
-  tarch::la::Vector<dim, unsigned int>
-  getNumberLinkedCellsPerMacroscopicCell() const {
-    return _linkedCellsPerMacroscopicCell;
-  }
+  tarch::la::Vector<dim, unsigned int> getNumberLinkedCellsPerMacroscopicCell() const { return _linkedCellsPerMacroscopicCell; }
 
   /** Returns step interval, at which the micro infos is to be written out
    * 	@return _writeEveryMicroscopicTimestep
    */
-  unsigned int getWriteEveryMicroscopicTimestep() const {
-    return _writeEveryMicroscopicTimestep;
-  }
+  unsigned int getWriteEveryMicroscopicTimestep() const { return _writeEveryMicroscopicTimestep; }
   /** Returns the microscopic file name
    * 	@return _microscopicFilename
    */
@@ -83,9 +72,7 @@ public:
   /** Returns step interval, at which the macro infos is to be written out
    * 	@return _writeEveryMacroscopicTimestep
    */
-  unsigned int getWriteEveryMacroscopicTimestep() const {
-    return _writeEveryMacroscopicTimestep;
-  }
+  unsigned int getWriteEveryMacroscopicTimestep() const { return _writeEveryMacroscopicTimestep; }
   /** Returns the macroscopic file name
    * 	@return _maroscopicFilename
    */

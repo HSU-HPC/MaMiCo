@@ -22,8 +22,7 @@ class EspressoMDMolecule;
 /** interface for espresso molecule access.
  *  @author Rahul Arora, Philipp Neumann
  */
-class coupling::interface::EspressoMDMolecule
-    : public coupling::interface::Molecule<3> {
+class coupling::interface::EspressoMDMolecule : public coupling::interface::Molecule<3> {
 public:
   EspressoMDMolecule(Particle *myMolecule) : _myMolecule(myMolecule) {}
   EspressoMDMolecule() : _myMolecule(NULL) {}
@@ -100,9 +99,7 @@ public:
     }
 
     if (!pl) {
-      std::cout
-          << "ERROR: The particle is loacted outside the simulation domian"
-          << std::endl;
+      std::cout << "ERROR: The particle is loacted outside the simulation domian" << std::endl;
       exit(EXIT_FAILURE);
       return 0.0;
     }
@@ -122,18 +119,14 @@ public:
       np2 = neighbor->pList->n;
       for (unsigned int j = 0; j < np2; j++) {
         dist2 = distance2vec(_myMolecule->r.p, p2[j].r.p, vec21);
-        IA_parameters *ia_params =
-            get_ia_param(_myMolecule->p.type, p2->p.type);
+        IA_parameters *ia_params = get_ia_param(_myMolecule->p.type, p2->p.type);
         Particle *temp = &(p2[j]);
-        potentialEnergy += calc_non_bonded_pair_energy(
-            _myMolecule, temp, ia_params, vec21, sqrt(dist2), dist2);
+        potentialEnergy += calc_non_bonded_pair_energy(_myMolecule, temp, ia_params, vec21, sqrt(dist2), dist2);
       }
     }
     return potentialEnergy;
   }
-  virtual void setPotentialEnergy(const double &potentialEnergy) {
-    _potentialEnergy = potentialEnergy;
-  }
+  virtual void setPotentialEnergy(const double &potentialEnergy) { _potentialEnergy = potentialEnergy; }
 
 private:
   Particle *_myMolecule;

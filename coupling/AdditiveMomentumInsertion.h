@@ -27,21 +27,15 @@ template <class LinkedCell, unsigned int dim> class AdditiveMomentumInsertion;
  * simulation, can be 1, 2, or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::AdditiveMomentumInsertion
-    : public coupling::MomentumInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::AdditiveMomentumInsertion : public coupling::MomentumInsertion<LinkedCell, dim> {
 public:
   /** @brief A simple constructor
    *   @param mdSolverInterface The interface of the molecular dynamics solver
    * in application
    *   @param numberMDTimestepsPerCouplingCycle The number of molecular dynamics
    * timesteps within one coupling cycle */
-  AdditiveMomentumInsertion(
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface,
-      unsigned int numberMDTimestepsPerCouplingCycle)
-      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface),
-        _numberMDTimestepsPerCouplingCycle(numberMDTimestepsPerCouplingCycle) {}
+  AdditiveMomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface, unsigned int numberMDTimestepsPerCouplingCycle)
+      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _numberMDTimestepsPerCouplingCycle(numberMDTimestepsPerCouplingCycle) {}
 
   /** @brief A simple destructor*/
   ~AdditiveMomentumInsertion() {}
@@ -58,41 +52,29 @@ public:
    *  @brief inserts momentum to the cell
    *  @param cell macroscopic cell to insert momentum to
    *  @param currentMacroscopicCellIndex macroscopic cell index of the cell */
-  virtual void insertMomentum(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const unsigned int &currentMacroscopicCellIndex) const {
-    const unsigned int timeIntervalMomentumInsertion =
-        getTimeIntervalPerMomentumInsertion();
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                              const unsigned int &currentMacroscopicCellIndex) const {
+    const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();
     // determine fraction of momentum that is to be inserted in this frame
-    double fraction =
-        1.0 /
-        ((_numberMDTimestepsPerCouplingCycle / timeIntervalMomentumInsertion) +
-         (_numberMDTimestepsPerCouplingCycle % timeIntervalMomentumInsertion !=
-          0));
-    tarch::la::Vector<dim, double> momentum(fraction *
-                                            cell.getMicroscopicMomentum());
+    double fraction = 1.0 / ((_numberMDTimestepsPerCouplingCycle / timeIntervalMomentumInsertion) +
+                             (_numberMDTimestepsPerCouplingCycle % timeIntervalMomentumInsertion != 0));
+    tarch::la::Vector<dim, double> momentum(fraction * cell.getMicroscopicMomentum());
     tarch::la::Vector<dim, double> zeroMomentum(0.0);
 
     // if there is some momentum to be transferred, do so
     if (tarch::la::dot(momentum, momentum) != 0.0) {
-      coupling::cellmappings::ComputeMassMapping<LinkedCell, dim>
-          computeMassMapping(
-              coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
+      coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> computeMassMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
       cell.iterateConstCells(computeMassMapping);
       unsigned int numberParticles = computeMassMapping.getNumberOfParticles();
-      coupling::cellmappings::SetMomentumMapping<LinkedCell, dim>
-          setMomentumMapping(
-              zeroMomentum, momentum, numberParticles,
-              coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
+      coupling::cellmappings::SetMomentumMapping<LinkedCell, dim> setMomentumMapping(zeroMomentum, momentum, numberParticles,
+                                                                                     coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
       cell.iterateCells(setMomentumMapping);
     }
   }
 
 private:
-  const unsigned int
-      _numberMDTimestepsPerCouplingCycle; ///< The number of molecular dynamics
-                                          ///< timesteps within one coupling
-                                          ///< cycle */
+  const unsigned int _numberMDTimestepsPerCouplingCycle; ///< The number of molecular dynamics
+                                                         ///< timesteps within one coupling
+                                                         ///< cycle */
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_ADDITIVEMOMENTUMINSERTION_H_

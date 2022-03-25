@@ -22,8 +22,7 @@ template <class LinkedCell, unsigned int dim> class VTKMoleculePlotter;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::VTKMoleculePlotter {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::VTKMoleculePlotter {
 public:
   /** Constructor
    *	@param moleculeVelocities
@@ -32,17 +31,10 @@ public:
    *	@param appendFloatZeros
    *	@param mdSolverInterface
    */
-  VTKMoleculePlotter(std::stringstream &moleculeVelocities,
-                     std::stringstream &moleculePositions,
-                     std::stringstream &moleculePotentials,
-                     const std::string &appendFloatZeros,
-                     coupling::interface::MDSolverInterface<LinkedCell, dim>
-                         *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface),
-        _moleculeVelocities(moleculeVelocities),
-        _moleculePositions(moleculePositions),
-        _moleculePotentials(moleculePotentials),
-        _appendFloatZeros(appendFloatZeros), _particleCounter(0) {}
+  VTKMoleculePlotter(std::stringstream &moleculeVelocities, std::stringstream &moleculePositions, std::stringstream &moleculePotentials,
+                     const std::string &appendFloatZeros, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface), _moleculeVelocities(moleculeVelocities), _moleculePositions(moleculePositions),
+        _moleculePotentials(moleculePotentials), _appendFloatZeros(appendFloatZeros), _particleCounter(0) {}
 
   /** Destructor */
   ~VTKMoleculePlotter() {}
@@ -60,8 +52,7 @@ public:
    *	@param cellIndex
    */
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       const coupling::interface::Molecule<dim> &wrapper(it->getConst());
@@ -88,8 +79,7 @@ public:
   const unsigned int &getParticleCounter() const { return _particleCounter; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   std::stringstream &_moleculeVelocities;
   std::stringstream &_moleculePositions;
   std::stringstream &_moleculePotentials;

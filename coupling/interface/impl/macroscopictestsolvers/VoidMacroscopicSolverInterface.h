@@ -16,9 +16,7 @@ template <unsigned int dim> class VoidMacroscopicSolverInterface;
 /** no operations in send/recv process.
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class coupling::interface::VoidMacroscopicSolverInterface
-    : public coupling::interface::TestMacroscopicSolverInterface<dim> {
+template <unsigned int dim> class coupling::interface::VoidMacroscopicSolverInterface : public coupling::interface::TestMacroscopicSolverInterface<dim> {
 public:
   VoidMacroscopicSolverInterface() : TestMacroscopicSolverInterface<dim>() {}
   virtual ~VoidMacroscopicSolverInterface() {}
@@ -27,39 +25,30 @@ public:
    * from the MD solver. This function does not send the cell, but only steers
    * the process.
    */
-  virtual bool receiveMacroscopicQuantityFromMDSolver(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    return false;
-  }
+  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return false; }
 
   /** returns true if the cell at position globalCellIndex shall be sent to the
    * MD solver. This function does not send the cell, but only steers the
    * process.
    */
-  virtual bool sendMacroscopicQuantityToMDSolver(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    return false;
-  }
+  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return false; }
 
   /** returns the ranks on which the macroscopic solver holds/requires data of
    * the macroscopic cell at index globalCellIndex.
    */
-  virtual std::vector<unsigned int>
-  getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     std::vector<unsigned int> result;
     result.push_back(0);
     return result;
   }
 
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-  getMacroscopicCells4Sending() {
+  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *> getMacroscopicCells4Sending() {
     std::vector<coupling::datastructures::MacroscopicCell<dim> *> result;
     return result;
   }
   virtual unsigned int *getMacroscopicCellIndices4Sending() { return NULL; }
 
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-  getMacroscopicCells4Receiving() {
+  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *> getMacroscopicCells4Receiving() {
     std::vector<coupling::datastructures::MacroscopicCell<dim> *> result;
     return result;
   }

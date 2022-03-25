@@ -18,12 +18,9 @@ template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
   // process: first traversal
   for (unsigned int index = 0; index < this->_inputCells.size(); index++) {
     // save data into snapshot matrix
-    _data[0](_t, _spatialIndex) =
-        this->_inputCells[index]->getMacroscopicMass();
-    for (unsigned int d = 0; d < dim;
-         d++) { // (optimized compiler will unroll this loop)
-      _data[d + 1](_t, _spatialIndex) =
-          this->_inputCells[index]->getMacroscopicMomentum()[d];
+    _data[0](_t, _spatialIndex) = this->_inputCells[index]->getMacroscopicMass();
+    for (unsigned int d = 0; d < dim; d++) { // (optimized compiler will unroll this loop)
+      _data[d + 1](_t, _spatialIndex) = this->_inputCells[index]->getMacroscopicMomentum()[d];
     }
     _spatialIndex++;
   } // index
@@ -40,10 +37,8 @@ template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     for (unsigned int rank = 0; rank < _commSize; rank++) {
       if (rank == _rank) {
-        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter
-                  << ": _data[" << d << "] = " << _data[d] << std::endl;
-        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter
-                  << ": _C[" << d << "] = " << _C[d] << std::endl;
+        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter << ": _data[" << d << "] = " << _data[d] << std::endl;
+        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter << ": _C[" << d << "] = " << _C[d] << std::endl;
       }
       MPI_Barrier(_comm);
     }
@@ -64,9 +59,7 @@ template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
       send_data[index++] = _C[d].data()[i];
   MPI_Allreduce(send_data, recv_data, count, MPI_DOUBLE, MPI_SUM, _comm);
   for (unsigned int d = 0; d < dim + 1; d++) {
-    Eigen::Map<Eigen::MatrixXd> map(
-        &recv_data[d * _timeWindowSize * _timeWindowSize], _timeWindowSize,
-        _timeWindowSize);
+    Eigen::Map<Eigen::MatrixXd> map(&recv_data[d * _timeWindowSize * _timeWindowSize], _timeWindowSize, _timeWindowSize);
     _C[d] = map; // copy assignment
   }
   delete[] send_data;
@@ -78,10 +71,8 @@ template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     for (unsigned int rank = 0; rank < _commSize; rank++) {
       if (rank == _rank) {
-        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter
-                  << ": Communication finished" << std::endl;
-        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter
-                  << ": _C[" << d << "] = " << _C[d] << std::endl;
+        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter << ": Communication finished" << std::endl;
+        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter << ": _C[" << d << "] = " << _C[d] << std::endl;
       }
       MPI_Barrier(_comm);
     }
@@ -97,16 +88,13 @@ template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
   for (unsigned int index = 0; index < this->_inputCells.size(); index++) {
     // compute and store smoothed result
     Eigen::VectorXd phi_x = _A_T[0] * _data[0].col(_spatialIndex);
-    coupling::filtering::FilterInterface<dim>::_outputCells[index]
-        ->setMacroscopicMass((_A[0].row(_t) * phi_x).value());
+    coupling::filtering::FilterInterface<dim>::_outputCells[index]->setMacroscopicMass((_A[0].row(_t) * phi_x).value());
     tarch::la::Vector<dim, double> mo_smooth;
-    for (unsigned int d = 0; d < dim;
-         d++) { // (optimized compiler will unroll this loop)
+    for (unsigned int d = 0; d < dim; d++) { // (optimized compiler will unroll this loop)
       phi_x = _A_T[d + 1] * _data[d + 1].col(_spatialIndex);
       mo_smooth[d] = (_A[d + 1].row(_t) * phi_x).value();
     }
-    coupling::filtering::FilterInterface<dim>::_outputCells[index]
-        ->setMacroscopicMomentum(mo_smooth);
+    coupling::filtering::FilterInterface<dim>::_outputCells[index]->setMacroscopicMomentum(mo_smooth);
     _spatialIndex++;
   } // index
   // endProcess: second traversal

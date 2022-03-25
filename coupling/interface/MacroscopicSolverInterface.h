@@ -20,8 +20,7 @@ template <unsigned int dim> class MacroscopicSolverInterface;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class coupling::interface::MacroscopicSolverInterface {
+template <unsigned int dim> class coupling::interface::MacroscopicSolverInterface {
 
 public:
   /** Costructor */
@@ -36,8 +35,7 @@ public:
    *	@returns true if the cell at position globalCellIndex shall be received
    *from the MD solver, false otherwise.
    */
-  virtual bool receiveMacroscopicQuantityFromMDSolver(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
   /** This function specifies if the cell at position globalCellIndex shall be
    *sent to the MD solver. It does not send the cell, but only steers the
@@ -46,8 +44,7 @@ public:
    *	@returns true if the cell at position globalCellIndex shall be sent to
    *the MD solver, false otherwise.
    */
-  virtual bool sendMacroscopicQuantityToMDSolver(
-      tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
   /** This function determines all the ranks on which the macroscopic solver
    *holds data of the macroscopic cell at index globalCellIndex. By default,
@@ -65,8 +62,7 @@ public:
    *	@return all the ranks on which the macroscopic solver holds data of the
    *macroscopic cell at index globalCellIndex.
    */
-  virtual std::vector<unsigned int>
-  getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
   /** This function determines the source ranks for the global macroscopic cell
    *at index globalCellIndex. A "source rank" is defined as a rank of the
@@ -78,10 +74,7 @@ public:
    *	@return the source ranks for the global macroscopic cell at index
    *globalCellIndex.
    */
-  virtual std::vector<unsigned int>
-  getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    return getRanks(globalCellIndex);
-  }
+  virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return getRanks(globalCellIndex); }
 
   /** This function determines the target ranks for the global macroscopic cell
    *at index globalCellIndex. A "target rank" is defined as a rank of the
@@ -92,9 +85,6 @@ public:
    *	@return the target ranks for the global macroscopic cell at index
    *globalCellIndex
    */
-  virtual std::vector<unsigned int>
-  getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    return getRanks(globalCellIndex);
-  }
+  virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return getRanks(globalCellIndex); }
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_INTERFACE_MACROSCOPICSOLVERINTERFACE_H_

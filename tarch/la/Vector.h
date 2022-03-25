@@ -51,8 +51,7 @@ public:
    * 	@param t2 scalar value for the initialization
    */
   Vector(const T &t0, const T &t1, const T &t2) {
-    static_assert(size == 3,
-                  "ERROR Vector(t0,t1,t2) only valid for 3D vectors!");
+    static_assert(size == 3, "ERROR Vector(t0,t1,t2) only valid for 3D vectors!");
     _entries[0] = t0;
     _entries[1] = t1;
     _entries[2] = t2;
@@ -102,8 +101,7 @@ public:
   const T &operator[](int i) const {
 #if (TARCH_DEBUG == TARCH_YES)
     if (i < 0 || i > size - 1) {
-      std::cout << "ERROR Vector const T& operator[]: i out of range!"
-                << std::endl;
+      std::cout << "ERROR Vector const T& operator[]: i out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif
@@ -130,8 +128,7 @@ public:
   }
 
   /** cast Vector<size, T> to Vector<size, convert_to_T> */
-  template <class convert_to_T>
-  explicit operator Vector<size, convert_to_T>() const {
+  template <class convert_to_T> explicit operator Vector<size, convert_to_T>() const {
     Vector<size, convert_to_T> ans;
     for (unsigned int i = 0; i < size; i++) {
       ans[i] = static_cast<convert_to_T>(_entries[i]);
