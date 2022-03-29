@@ -174,7 +174,7 @@ elif compiler == 'fcc':
    elif build == 'release':
       ccflags.append('-Ofast')
 
-   elif compiler == 'clang':
+elif compiler == 'clang':
    if(parallel=='parallel_no' or parallel=='no'):
       cxx = 'clang++'
    else:
