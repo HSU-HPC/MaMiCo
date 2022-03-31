@@ -9,10 +9,13 @@ class ErrorEstimation;
 }
 } // namespace coupling
 
-/** This class provides the basic eqations for analytical error estimation based in the statistical mechanic.
- * 	There are two typs of error estimation in this class bases on velocity ans density fluctuation.
- *	Also it can be used to estimate the required number of MD-simulations as a function of required maximum error.
- *	@brief This class is used to analyse the error and predict the required number of instances.
+/** This class provides the basic eqations for analytical error estimation based
+ *in the statistical mechanic. There are two typs of error estimation in this
+ *class bases on velocity ans density fluctuation. Also it can be used to
+ *estimate the required number of MD-simulations as a function of required
+ *maximum error.
+ *	@brief This class is used to analyse the error and predict the required
+ *number of instances.
  *  @author Vahid Jafarittmer
  */
 class coupling::error::ErrorEstimation {
@@ -52,9 +55,13 @@ public:
   /** relative/absolute error
    *	@enum errorType
    */
-  enum errorType { Relative = 0 /**< Relative error */, Absolute = 1 /**< Absolute error */ };
+  enum errorType {
+    Relative = 0 /**< Relative error */,
+    Absolute = 1 /**< Absolute error */
+  };
 
-  /** This function predict the relative or absolute error of the quantites veocty, density, tempetature or pressure based on its arguments.
+  /** This function predict the relative or absolute error of the quantites
+   *veocty, density, tempetature or pressure based on its arguments.
    *	 @param errorBaseQuantity
    *	 @param errorType
    */
@@ -87,8 +94,10 @@ public:
     return error;
   }
 
-  /** This function predict the required number of MD instances to keep the relative or absolute error of the quantites veocty, density, tempetature or pressure
-   *based on its arguments under a certain value. The desired error value has to be set before, this function is called.
+  /** This function predict the required number of MD instances to keep the
+   *relative or absolute error of the quantites veocty, density, tempetature or
+   *pressure based on its arguments under a certain value. The desired error
+   *value has to be set before, this function is called.
    *	 @param errorBaseQuantity
    *	 @param errorType
    */
@@ -142,7 +151,8 @@ public:
     double refSP = referenceSoundSpeed(temperature, particleMass);
     double Ac = acousticNumber(soundSpeed, refSP);
     double error = 1 / std::sqrt(numberOfParticle * numberOfSamples) / Ac;
-    //	std::cout << "numberOfParticle "  << numberOfParticle << "numberOfSamples  " << numberOfSamples << "Ac  "  << Ac <<  std::endl;
+    //	std::cout << "numberOfParticle "  << numberOfParticle <<
+    //"numberOfSamples  " << numberOfSamples << "Ac  "  << Ac <<  std::endl;
     return error;
   }
 
@@ -180,7 +190,9 @@ public:
     return error;
   }
 
-  /** This function estimates the number of MD instances required to keep the error of the veloctiy under _desiredAbsErrorVelocity or _desiredrelErrorVelocity
+  /** This function estimates the number of MD instances required to keep the
+   *error of the veloctiy under _desiredAbsErrorVelocity or
+   *_desiredrelErrorVelocity
    *	 @param desiredError
    *	 @param temperature
    *	 @param soundSpeed
@@ -198,7 +210,9 @@ public:
     return desiredNumber;
   }
 
-  /** This function estimates the number of MD instances required to keep the error of the density under _desiredAbsErrorDensity or _desiredrelErrorDensity
+  /** This function estimates the number of MD instances required to keep the
+   *error of the density under _desiredAbsErrorDensity or
+   *_desiredrelErrorDensity
    *	 @param desiredError
    *	 @param temperature
    *	 @param soundSpeed
@@ -215,7 +229,8 @@ public:
     return desiredNumber;
   }
 
-  /** This function estimates the number of MD instances required to keep the error of the temperature under _desiredAbsErrorTemperature or
+  /** This function estimates the number of MD instances required to keep the
+   *error of the temperature under _desiredAbsErrorTemperature or
    *_desiredrelErrorTemperature
    *	 @param desiredError
    *	 @param temperature
@@ -232,7 +247,8 @@ public:
     return desiredNumber;
   }
 
-  /** signal-to-noise ratio as the average fluid velocity over the standard deviation (square root of the veloyity fluctuation=
+  /** signal-to-noise ratio as the average fluid velocity over the standard
+   *deviation (square root of the veloyity fluctuation=
    *	 @param velocity
    *	 @param temperature
    *	 @param numberOfParticle
@@ -308,8 +324,10 @@ private:
 
   double acousticNumber(double soundSpeed, double soundSpeed_ref) { return (soundSpeed / soundSpeed_ref); }
 
-  //------------------------- Reference Properties ---------------------------------------------------
-  /** calculates the sound speed of a reference ideal gas at the same temperature
+  //------------------------- Reference Properties
+  //---------------------------------------------------
+  /** calculates the sound speed of a reference ideal gas at the same
+   * temperature
    * 	@param temperature
    * 	@param particleMass
    * 	@return referenc sound speed
