@@ -84,10 +84,12 @@ public:
 
     // if myMolecule is not in the particle container yet (check id):
     //		the molecule was initialized by the coupling part
-    //		thus the correct molecule in the simulation has to be found before
+    //		thus the correct molecule in the simulation has to be found
+    // before
     // computing the energy
     // else
-    //		the molecule was initialized using a pointer to the molecule in the
+    //		the molecule was initialized using a pointer to the molecule in
+    // the
     // simulation, no search needed
     if (_myMolecule->id() < 1 || _myMolecule->id() > global_simulation->getMaxID()) {
       int cellIndex;

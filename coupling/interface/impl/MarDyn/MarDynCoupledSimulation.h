@@ -41,13 +41,14 @@
 
 using Log::global_log;
 
-/*	Extends Mardyns Simulation class in order to be used in coupled simulation.
+/*	Extends Mardyns Simulation class in order to be used in coupled
+ * simulation.
  * 	- initConfigOldStyle: extended for LinkedCellsForCoupling, new
  * DomainDecomposition and removed some none-relevant parts
  * 	- setInitValuesForCoupling(): additional initialization for coupled
  * simulation
- * 	- simulateOneMDTimestep: adapted from the simulate() method to simulate one
- * MD timestep
+ * 	- simulateOneMDTimestep: adapted from the simulate() method to simulate
+ * one MD timestep
  * 	- added some get()-methods for Simulation parameters
  * 	- method to remove a molecule from the molecule container
  * 	@author Hanno Flohr
@@ -88,8 +89,8 @@ public:
 
   /* adapted from MarDyn Simulation.cpp, enhanced with search for
  'LinkedCellsForCoupling'
-         * and new domain decomposition initialization; some parts not relevant for
- the coupling removed
+         * and new domain decomposition initialization; some parts not relevant
+ for the coupling removed
          */
   void initConfigOldstyle(const std::string &inputfilename) {
     global_log->info() << "init oldstyle config file: " << inputfilename << std::endl;
@@ -402,8 +403,8 @@ public:
     advanceSimulationTime(_integrator->getTimestepLength());
 
     /* BEGIN PHYSICAL SECTION
-                 * the system is in a consistent state, so the global variables can be
-  updated
+                 * the system is in a consistent state, so the global variables
+  can be updated
                  */
     ensemble->updateGlobalVariable(NUM_PARTICLES);
     global_log->debug() << "Number of particles in the ensemble: " << ensemble->N() << std::endl;

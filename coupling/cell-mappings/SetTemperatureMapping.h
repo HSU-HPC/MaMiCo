@@ -71,8 +71,8 @@ private:
          *	@param oldTemperature
          *	@param newTemperature
          *	@return newTemperature
-         *	@remark only allow re-scaling if the original temperature was not zero (can
-happen in empty cells that just became populated)
+         *	@remark only allow re-scaling if the original temperature was
+not zero (can happen in empty cells that just became populated)
          */
   double getScalingFactor(const double &oldTemperature, const double &newTemperature) const {
 

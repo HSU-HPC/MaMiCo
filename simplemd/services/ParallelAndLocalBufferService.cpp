@@ -12,7 +12,8 @@ simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::SimpleBuffer() 
   _capacity = 0;
 }
 
-simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::~SimpleBuffer() { /* memory freed during shutdown */ }
+simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::~SimpleBuffer() { /* memory freed during shutdown */
+}
 
 bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise(const unsigned int doublesPerMolecule,
                                                                                  const unsigned int upperBoundOnNumberOfMolecules) {

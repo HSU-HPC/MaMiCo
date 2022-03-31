@@ -84,8 +84,8 @@ protected:
       //			std::cout << "cellIndex is: " <<
       // cells->getCellIndexOfMolecule(curMolecule) << std::endl;
       //			std::cout << "pos       : ";
-      //			for(int d=0; d<3; d++) std::cout << curMolecule->r(d) << ", ";
-      //			std::cout << std::endl;
+      //			for(int d=0; d<3; d++) std::cout <<
+      // curMolecule->r(d) << ", "; 			std::cout << std::endl;
 
       // molecule values
       tarch::la::Vector<3, double> position(0.0);

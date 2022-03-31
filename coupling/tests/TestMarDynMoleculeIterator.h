@@ -14,8 +14,8 @@
  * 	Test for the MarDynMoleculeIterator interface:
  * 	Loops through all ParticleCells of the simulation, sets an
  * MarDynMoleculeIterator interface for each one,
- * 	then compares the number of molecules of each ParticleCell with the number
- * of molecules obtained through the interface.
+ * 	then compares the number of molecules of each ParticleCell with the
+ * number of molecules obtained through the interface.
  * 	@author Hanno Flohr
  */
 class TestMarDynMoleculeIterator : public TestMarDyn {

@@ -72,7 +72,7 @@ public:
                                                      // MD/DPD: 1000
     const unsigned int totalNumberMDSimulations = 8; // total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD
                                                      // scalability), 144 (MD)
-    const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
+    const SolverType solverType = COUETTE_LB;        // LB or analytical couette solver
     // const bool twoWayCoupling = true;
     const int initCycles = 100;
 
@@ -148,8 +148,8 @@ public:
       gettimeofday(&end, NULL);
       // double runtime = (end.tv_sec-start.tv_sec)*1000000 +
       //(end.tv_usec-start.tv_usec);
-      // std::cout << "NieTest-Equilibration: " << (int)(runtime/1000) << "ms" <<
-      // std::endl;
+      // std::cout << "NieTest-Equilibration: " << (int)(runtime/1000) << "ms"
+      // << std::endl;
     }
 
     // allocate coupling interfaces
@@ -236,7 +236,8 @@ public:
       // index-conversion object)
       fillSendBuffer(density, *couetteSolver2, multiMDCellService.getMacroscopicCellService(0).getIndexConversion(), sendBuffer, globalCellIndices4SendBuffer);
       multiMDCellService.sendFromMacro2MD(sendBuffer, globalCellIndices4SendBuffer);
-      // std::cout << "Finish multiMDCellService.sendFromMacro2MD " << std::endl;
+      // std::cout << "Finish multiMDCellService.sendFromMacro2MD " <<
+      // std::endl;
       //  run MD instances
       for (unsigned int i = 0; i < mdInstances; i++) {
         //  // set macroscopic cell service and interfaces in
@@ -258,7 +259,8 @@ public:
       }
       // send back data from MD instances and merge it
       multiMDCellService.sendFromMD2Macro(recvBuffer, globalCellIndices4RecvBuffer);
-      // std::cout << "Finish multiMDCellService.sendFromMD2Macro " << std::endl;
+      // std::cout << "Finish multiMDCellService.sendFromMD2Macro " <<
+      // std::endl;
 
       if (cycles >= initCycles)
         std::cout << cycles - initCycles << ", ";

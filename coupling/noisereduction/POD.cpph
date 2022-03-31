@@ -6,7 +6,8 @@ coupling::noisereduction::POD<dim>::POD(const coupling::IndexConversion<dim> &in
     : coupling::noisereduction::NoiseReduction<dim>(indexConversion, multiMDService, true), _timeWindowSize(tws), _kMax(kmax), _cycleCounter(0),
       _spatialIndex(0), _t(0), _data(NULL), _C(NULL), _A(NULL), _A_T(NULL), _firstTraversal(true) {
   int spatialSize = getLocalNumberMacroscopicCells(indexConversion);
-  _data = new Eigen::MatrixXd[dim + 1]; // separate data matrices for: mass, momentum0, momentum1, momentum2
+  _data = new Eigen::MatrixXd[dim + 1]; // separate data matrices for: mass,
+                                        // momentum0, momentum1, momentum2
   _C = new Eigen::MatrixXd[dim + 1];
   _A = new Eigen::MatrixXd[dim + 1];
   _A_T = new Eigen::MatrixXd[dim + 1];

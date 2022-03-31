@@ -152,8 +152,8 @@ public:
   virtual double getMoleculeMass() const { return _mySimulation->getEnsemble()->component(0)->m(); }
 
   /* returns Boltzmann's constant
-         * The Boltzmann's constant is not stored in MarDyn. When needed, the value
- 1.0 is used.
+         * The Boltzmann's constant is not stored in MarDyn. When needed, the
+ value 1.0 is used.
          * Therefore this method just returns 1.0 for now.
          */
   virtual double getKB() const { return 1.0; }
@@ -318,8 +318,8 @@ public:
           break;
         }
       }
-      // if no molecule at this position was found create new mardyn molecule and
-      // compute force for it
+      // if no molecule at this position was found create new mardyn molecule
+      // and compute force for it
       if (!moleculeFound) {
         global_log->debug() << "MarDynMDSolverInterface::calculateForceAndEnergy(): Molecule "
                                "not found, creating new molecule..."
@@ -379,7 +379,8 @@ public:
     return new MarDynMoleculeIterator(cell);
   }
 
-  // returns a pointer to the MarDynCoupledSimulation belonging to this interface
+  // returns a pointer to the MarDynCoupledSimulation belonging to this
+  // interface
   MarDynCoupledSimulation *
   getSimulation() {
     return _mySimulation;
@@ -441,9 +442,10 @@ protected:
   // the tolerance value for position comparisons
   const double _tolerance;
 
-  /*	Used in the getLinkedCell() method to store the created MarDynCell pointers
-         * 	to avoid memory leak the pointers are stored and this vector cleared in
- the Destructor
+  /*	Used in the getLinkedCell() method to store the created MarDynCell
+ pointers
+         * 	to avoid memory leak the pointers are stored and this vector
+ cleared in the Destructor
          */
   std::vector<MarDynCell *> _marDynCellPtrStorage;
 };

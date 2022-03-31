@@ -32,8 +32,8 @@ public:
 received from the MD solver
      *  It does not send the cell, but only steers the process.
          *	@param globalCellIndex
-         *	@returns true if the cell at position globalCellIndex shall be received from
-the MD solver, false otherwise.
+         *	@returns true if the cell at position globalCellIndex shall be
+received from the MD solver, false otherwise.
      */
   virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
@@ -41,8 +41,8 @@ the MD solver, false otherwise.
 sent to the MD solver.
      *  It does not send the cell, but only steers the process.
          *	@param globalCellIndex
-         *	@returns true if the cell at position globalCellIndex shall be sent to the
-MD solver, false otherwise.
+         *	@returns true if the cell at position globalCellIndex shall be
+sent to the MD solver, false otherwise.
      */
   virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
@@ -62,8 +62,8 @@ cell instance (e.g., if this cell is part of a ghost layer).
      *  For this case, the method getSourceRanks() and getTargetRanks() can be
 implemented accordingly.
          *	@param globalCellIndex
-         *	@return all the ranks on which the macroscopic solver holds data of the
-macroscopic cell at index globalCellIndex.
+         *	@return all the ranks on which the macroscopic solver holds data
+of the macroscopic cell at index globalCellIndex.
      */
   virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
@@ -76,8 +76,8 @@ a valid copy.
      *  Default: return all ranks that the cell at globalCellIndex is associated
 to.
          *	@param globalCellIndex
-         *	@return the source ranks for the global macroscopic cell at index
-globalCellIndex.
+         *	@return the source ranks for the global macroscopic cell at
+index globalCellIndex.
      */
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return getRanks(globalCellIndex); }
 
@@ -89,8 +89,8 @@ tool. You may have multiple target ranks. Default: return all ranks that the
 cell
      *  at globalCellIndex is associated to.
          *	@param globalCellIndex
-         *	@return the target ranks for the global macroscopic cell at index
-globalCellIndex
+         *	@return the target ranks for the global macroscopic cell at
+index globalCellIndex
      */
   virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return getRanks(globalCellIndex); }
 };

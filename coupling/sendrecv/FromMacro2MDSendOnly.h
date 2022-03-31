@@ -20,11 +20,9 @@ template <class MacroscopicCell, unsigned int dim> class FromMacro2MDSendOnly;
  * only sends data but expects
  *  not to receive any data, e.g. due to MD running on different ranks. Derived
  * from the class coupling::sendrecv::SendReceiveBuffer
- *	@brief SendReceiveBuffer for transfer of quantities from a macroscopic solver
- * to
- *  the macroscopic cells. Only sends data but expects
- *  not to receive any data. Derived from the class
- * coupling::sendrecv::SendReceiveBuffer
+ *	@brief SendReceiveBuffer for transfer of quantities from a macroscopic
+ *solver to the macroscopic cells. Only sends data but expects not to receive
+ *any data. Derived from the class coupling::sendrecv::SendReceiveBuffer
  *	@tparam MacroscopicCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann

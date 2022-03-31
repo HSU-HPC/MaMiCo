@@ -743,8 +743,8 @@ private:
 
 /** factory to produced md simulation, md solver interface (for mamico) and the
  * macroscopic cell service using singleton pattern.
- *	@brief factory to produced md simulation, md solver interface (for mamico)
- * and the macroscopic cell service
+ *	@brief factory to produced md simulation, md solver interface (for
+ *mamico) and the macroscopic cell service
  *  @author Philipp Neumann
  */
 class SimulationAndInterfaceFactory {
@@ -761,8 +761,8 @@ public:
          *  @param configuration
          *  @param mamicoConfiguration
          *  @param localComm
-         *	@remark This will create a new simulation which needs to be deleted at the
-end
+         *	@remark This will create a new simulation which needs to be
+deleted at the end
          */
   coupling::interface::MDSimulation *getMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration &configuration,
                                                      const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION> &mamicoConfiguration

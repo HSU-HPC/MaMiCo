@@ -13,15 +13,13 @@ namespace coupling {
 namespace paralleltopology {
 class ParallelTopologyFactory;
 /** parallel topology types that are supported.
-         *	@enum ParallelTopologyType specifies the ordering of the MPI processes (for
-domain decomposition).
-         *	As an example: assuming ParallelTopologyType = XYZ and there is a cubic
-domain, splitted into 8 sub-domains (2 sub-domains in each dimension). Then the
-ordring of the MPI processes is:
-         *	Rank=0 for x=0,y=0,z=0. Rank=1 for x=0,y=0,z=1. Rank=2 for x=0,y=1,z=0.
-Rank=3 for x=0,1=0,z=1.
-         *	Rank=4 for x=1,y=0,z=0. Rank=5 for x=1,y=0,z=1. Rank=6 for x=1,y=1,z=0.
-Rank=7 for x=1,y=1,z=1.
+         *	@enum ParallelTopologyType specifies the ordering of the MPI
+processes (for domain decomposition). *	As an example: assuming
+ParallelTopologyType = XYZ and there is a cubic domain, splitted into 8
+sub-domains (2 sub-domains in each dimension). Then the ordring of the MPI
+processes is: *	Rank=0 for x=0,y=0,z=0. Rank=1 for x=0,y=0,z=1. Rank=2 for
+x=0,y=1,z=0. Rank=3 for x=0,1=0,z=1. *	Rank=4 for x=1,y=0,z=0. Rank=5 for
+x=1,y=0,z=1. Rank=6 for x=1,y=1,z=0. Rank=7 for x=1,y=1,z=1.
          */
 enum ParallelTopologyType {
   UNDEFINED = 0 /**< gherghere gher */
@@ -45,8 +43,8 @@ enum ParallelTopologyType {
  * Rank=3 for x=0,1=0,z=1.
  *	Rank=4 for x=1,y=0,z=0. Rank=5 for x=1,y=0,z=1. Rank=6 for x=1,y=1,z=0.
  * Rank=7 for x=1,y=1,z=1.
- *	@brief creates the parallel topology from a given topology type and a number
- * of processes
+ *	@brief creates the parallel topology from a given topology type and a
+ *number of processes
  *  @author Philipp Neumann
  */
 class coupling::paralleltopology::ParallelTopologyFactory {

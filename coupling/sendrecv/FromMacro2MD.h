@@ -17,9 +17,8 @@ template <class MacroscopicCell, unsigned int dim> class FromMacro2MD;
 /** extends the generic SendReceiveBuffer for transfer of quantities from a
  * macroscopic solver to
  *  the macroscopic cells of the coupling tool (incl. ghost cells).
- *	@brief SendReceiveBuffer for transfer of quantities from a macroscopic solver
- * to
- *  the macroscopic cells. Derived from the class
+ *	@brief SendReceiveBuffer for transfer of quantities from a macroscopic
+ *solver to the macroscopic cells. Derived from the class
  * coupling::sendrecv::SendReceiveBuffer
  *	@tparam MacroscopicCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3

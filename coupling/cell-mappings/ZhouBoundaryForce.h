@@ -32,8 +32,8 @@ template <class LinkedCell, unsigned int dim> class ZhouBoundaryForce;
  *  runs at different temperature and density values. The investigated range is:
  *  0.4*m*sigma-3<density<0.9*m*sigma-3, 1.3*eps/kB<temperature<3.9*eps/kB.
  *  Moreover, only 3D simulations have been considered in this study.
- *	@brief This class applies the Zhou boundary force to all molecules assuming a
- * cut-off radius r_c=2.5.
+ *	@brief This class applies the Zhou boundary force to all molecules
+ *assuming a cut-off radius r_c=2.5.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann

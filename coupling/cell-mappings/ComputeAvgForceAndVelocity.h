@@ -17,8 +17,8 @@ template <class LinkedCell, unsigned int dim> class ComputeAvgForceAndVelocity;
 /** This class sums up all force and velocity vectors and counts molecules
  * inside a linked cell. Afterwards, the average force/velocity contribution is
  * computed.
- *	@brief This class sums up all force/velocity vectors and counts molecules
- * inside a linked cell
+ *	@brief This class sums up all force/velocity vectors and counts
+ *molecules inside a linked cell
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
@@ -45,8 +45,8 @@ process begins.
 
   /** the average force and velocity contribution incide a linked cell are
 computed,
-         *	by dividing the summation calculated in endCellIteration() over number of
-the particles inside the cell.
+         *	by dividing the summation calculated in endCellIteration() over
+number of the particles inside the cell.
          */
   void endCellIteration() {
     if (_particleCounter != 0) {

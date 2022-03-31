@@ -16,8 +16,8 @@ template <class LinkedCell, unsigned int dim> class PerturbateVelocityMapping;
 /** This class is used to superimpose a random perturbation to the mean velocity
  * in all directions. It is use for Dynamic MD cases to launch new MD instances
  * with independent molecular values (velocities)
- *	@brief This class is used to superimpose a random perturbation to the mean
- * velocity in all directions.
+ *	@brief This class is used to superimpose a random perturbation to the
+ *mean velocity in all directions.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Niklas Wittmer

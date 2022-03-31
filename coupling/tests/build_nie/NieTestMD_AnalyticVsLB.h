@@ -62,7 +62,7 @@ public:
                                                      // 1000
     const unsigned int totalNumberMDSimulations = 1; // total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD
                                                      // scalability), 144 (MD)
-    const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
+    const SolverType solverType = COUETTE_LB;        // LB or analytical couette solver
     const bool twoWayCoupling = true;
     const int twoWayCouplingInitCycles = 0;
 

@@ -77,9 +77,10 @@ protected:
 
     /* Flag that is used to break the mpi_loop() in Espresso communications.cpp,
    in order to run the coupling test, I require a start stop
-        * functionality in Espresso, however in espresso the slave processors are
-   always in a loop and wait for instructions from the master 		* processor,
-   thus we have to break this loop in order!!*/
+        * functionality in Espresso, however in espresso the slave processors
+   are
+   always in a loop and wait for instructions from the master 		*
+   processor, thus we have to break this loop in order!!*/
     break_flag = 1;
 
     // I do initilaization of Espresso here and then stop Espresso such that all
@@ -221,12 +222,12 @@ protected:
           std::cout << "Temperature is " << KE / (1.5 * n_part) << std::endl;
           /*
                                         double value = total_energy.data.e[0];
-                                        for (int j = 1; j < total_energy.data.n; j++){
-                                        value += total_energy.data.e[j];
+                                        for (int j = 1; j < total_energy.data.n;
+             j++){ value += total_energy.data.e[j];
                                         }
 
-                                        for (int j = 0; j < n_external_potentials; j++) {
-                                        value+=external_potentials[j].energy;
+                                        for (int j = 0; j <
+             n_external_potentials; j++) { value+=external_potentials[j].energy;
                                         }
           */
           std::ofstream outfile;

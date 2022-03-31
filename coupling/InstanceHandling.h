@@ -16,20 +16,20 @@ template <class LinkedCell, unsigned int dim> class InstanceHandling;
 /** holds one vector of MDSimulation and one vector for MDSolverInterface.
  * Initialization, execution of MD time steps and shutdown are abstracted into
  * this class.
- *	In order to launch a new MF simulatio, a slot has to be chosen first (either
- * manualy or using coupling::MultiMDMediator). Then MultiMDCellService
+ *	In order to launch a new MF simulatio, a slot has to be chosen first
+ *(either manualy or using coupling::MultiMDMediator). Then MultiMDCellService
  *	initializes a new MacroscopicCellService via MultiMDMediator. In the
  * activated slot, a new MD simulation is launched. The new MD instance has to
  * be
- *	equilibrated first and then it can be coupled to the simulation. In order to
- * remove a MD simulation, the MD simulation and its corresponding
+ *	equilibrated first and then it can be coupled to the simulation. In
+ *order to remove a MD simulation, the MD simulation and its corresponding
  * MDSolverInterface are shut down.
  *	Then, the respective instance of the MacroscopicCellService is removed.
  * Finally, the selected slot will be set to inactive.
- *	This slot is now available again for the launch of a new MD instance in the
- * future.
- *	@brief Simulation slots are managed (i.e., added/removed) via this class.
- * Works and interacts with the class coupling::MultiMDMediator closely.
+ *	This slot is now available again for the launch of a new MD instance in
+ *the future.
+ *	@brief Simulation slots are managed (i.e., added/removed) via this
+ *class. Works and interacts with the class coupling::MultiMDMediator closely.
  * 	@tparam LinkedCell type of the cell
  * 	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *	@sa see also coupling::MultiMDMediator

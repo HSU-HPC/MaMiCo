@@ -18,8 +18,8 @@ class MarDynMoleculeIterator : public coupling::interface::MoleculeIterator<MarD
 public:
   /*	Constructor setting the iterator for the input MarDynCell,
          * 	the cutoff radius to the value of the input cell and
-         * 	the MarDynMolecule '_mdMolecule' to NULL (prevents memory leaks in
- get-methods)
+         * 	the MarDynMolecule '_mdMolecule' to NULL (prevents memory leaks
+ in get-methods)
          */
   MarDynMoleculeIterator(MarDynCell &cell) : coupling::interface::MoleculeIterator<MarDynCell, 3>(cell), _cutoffRadius(cell.getCutoffRadius()) {
   }

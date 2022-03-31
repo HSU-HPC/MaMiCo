@@ -125,9 +125,8 @@ all neighboured linked cells
      *  and the cell itself to determine potential energy and forces acting on
 the molecule at position 'position'.
          *	@param position
-         *	@return the local index vector for the linked cell that the position
-'position' belongs to
-         *	@sa getLinkedCell()
+         *	@return the local index vector for the linked cell that the
+position 'position' belongs to *	@sa getLinkedCell()
      */
   virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double> &position) = 0;
 

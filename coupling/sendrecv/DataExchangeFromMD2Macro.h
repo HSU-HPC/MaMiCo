@@ -27,8 +27,8 @@ template <unsigned int dim> class DataExchangeFromMD2Macro;
  * IndexConversion. We only allow transfer of
  *  non-ghost macroscopic cells to the macroscopic solver, i.e. cells which are
  * completely embedded into the MD domain.
- *	@brief data exchange from the MD solver to the macroscopic solver. Derived
- * from the class coupling::sendrecv::DataExchange
+ *	@brief data exchange from the MD solver to the macroscopic solver.
+ *Derived from the class coupling::sendrecv::DataExchange
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *	@sa  DataExchangeFromMacro2MD
  *  @author Philipp Neumann
@@ -56,8 +56,8 @@ public:
   /** returns the ranks to which a particular cell (at index globalCellIndex)
 should be sent.
          * 	@param  globalCellIndex
-         *	@return the corresponding ranks via IndexConversion, if we need information
-on MD side, otherwise empty vector
+         *	@return the corresponding ranks via IndexConversion, if we need
+information on MD side, otherwise empty vector
          */
   virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     // if we need information on macroscopic solver side, return the respective
@@ -73,8 +73,8 @@ on MD side, otherwise empty vector
   /** returns all ranks from which a particular cell (at index globalCellIndex)
  is sent.
          * 	@param  globalCellIndex
-         *	@return the corresponding ranks via MacroscopicSolverInterface, if we need
- information on MD side, otherwise empty vector
+         *	@return the corresponding ranks via MacroscopicSolverInterface,
+ if we need information on MD side, otherwise empty vector
          */
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     std::vector<unsigned int> sourceRanks;

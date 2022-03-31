@@ -127,10 +127,11 @@ public:
 
   /** checks if the configuration is valid. This operation usually fails, if
 e.g.
-         *	1. parseSubtag() hasn't been called, i.e. configuration has not been used,
-or
+         *	1. parseSubtag() hasn't been called, i.e. configuration has not
+been used, or
      *  2. parseSubtag() failed due to a wrong file.
-         *  3. If a tag ain't optional and parseSubtag() was not called (first case)
+         *  3. If a tag ain't optional and parseSubtag() was not called (first
+case)
          * 	@return _isValid
      */
   bool isValid() const { return _isValid; }

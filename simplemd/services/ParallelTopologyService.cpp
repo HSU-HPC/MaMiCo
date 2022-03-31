@@ -128,7 +128,8 @@ void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int
 void simplemd::services::ParallelTopologyService::shutdown() {
   // All processors enter this function, but Idle processors do not have mpi
   // requests allocated
-  //  and their buffer services are not initialised, hence must not be shut down.
+  //  and their buffer services are not initialised, hence must not be shut
+  //  down.
   if (!isIdle()) {
     // terminate Buffer services
     _bufferService.shutdown();

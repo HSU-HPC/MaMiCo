@@ -9,10 +9,9 @@ class ErrorEstimation;
 
 /** This class provides the basic eqations for analytical error estimation based
  * in the statistical mechanic.
- * 	There are two typs of error estimation in this class bases on velocity ans
- * density fluctuation.
- *	Also it can be used to estimate the required number of MD-simulations as a
- * function of required maximum error.
+ * 	There are two typs of error estimation in this class bases on velocity
+ *ans density fluctuation. Also it can be used to estimate the required number
+ *of MD-simulations as a function of required maximum error.
  *	@brief This class is used to analyse the error and predict the required
  * number of instances.
  *  @author Vahid Jafarittmer
@@ -96,9 +95,8 @@ veocty, density, tempetature or pressure based on its arguments.
   /** This function predict the required number of MD instances to keep the
 relative or absolute error of the quantites veocty, density, tempetature or
 pressure based on its arguments under a certain value.
-          *	 The desired error value has to be set before, this function is called.
-          *	 @param errorBaseQuantity
-          *	 @param errorType
+          *	 The desired error value has to be set before, this function is
+called. *	 @param errorBaseQuantity *	 @param errorType
           */
   double getCorrectorNumberOfSamples(errorBaseQuantity BaseQuantity, errorType Type) {
 
@@ -150,8 +148,8 @@ pressure based on its arguments under a certain value.
     double refSP = referenceSoundSpeed(temperature, particleMass);
     double Ac = acousticNumber(soundSpeed, refSP);
     double error = 1 / std::sqrt(numberOfParticle * numberOfSamples) / Ac;
-    //	std::cout << "numberOfParticle "  << numberOfParticle << "numberOfSamples
-    //" << numberOfSamples << "Ac  "  << Ac <<  std::endl;
+    //	std::cout << "numberOfParticle "  << numberOfParticle <<
+    //"numberOfSamples " << numberOfSamples << "Ac  "  << Ac <<  std::endl;
     return error;
   }
 

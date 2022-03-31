@@ -17,8 +17,8 @@ class NoiseReductionConfiguration;
 
 /** noise reduction configuration, i.e. smoothing algorithm to filter MD
  * fluctuations. Derive from the class tarch::configuration::Configuration
- *	@brief noise reduction configuration, i.e. smoothing algorithm to filter MD
- * fluctuations
+ *	@brief noise reduction configuration, i.e. smoothing algorithm to filter
+ *MD fluctuations
  *  @author Piet Jarmatz
  *	@ Piet could you please take a look on this class
  */
@@ -109,8 +109,8 @@ public:
 
   /** checks if the configuration is valid. This operation usually fails, if
 e.g.
-         *	1. parseSubtag() hasn't been called, i.e. configuration has not been used,
-or
+         *	1. parseSubtag() hasn't been called, i.e. configuration has not
+been used, or
      *  2. parseSubtag() failed due to a wrong file.
          * 	@return _isValid
      */

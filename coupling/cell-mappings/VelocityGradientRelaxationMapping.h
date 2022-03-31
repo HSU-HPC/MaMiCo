@@ -28,8 +28,8 @@ template <class LinkedCell, unsigned int dim> class VelocityGradientRelaxationTo
  *  Currently, a second-order interpolation of the molecules in the outer
  * boundary strip is used (that is the first layer with three macroscopic cells
  *  needs to be initialised with valid LB velocities).
- *	@brief This class relaxes velocities of molecules towards an interpolated
- * avergaged velocity value.
+ *	@brief This class relaxes velocities of molecules towards an
+ *interpolated avergaged velocity value.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
@@ -76,10 +76,9 @@ the relaxation shall be done
 
   /** computes the current velocity directly from macroscopic cell and the new
 velocity (microscopicMomentum) with second-order interpolation
-         *	multiplies the difference between the two with the velocity relaxation
-factor add it to the velocity of the molecule and applies it to the molecule.
-         *	@param cell
-         *	@param cellIndex
+         *	multiplies the difference between the two with the velocity
+relaxation factor add it to the velocity of the molecule and applies it to the
+molecule. *	@param cell *	@param cellIndex
          */
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
     // if this macroscopic cell is not interesting, skip it immediately
@@ -162,8 +161,9 @@ factor add it to the velocity of the molecule and applies it to the molecule.
 protected:
   /**
          *	@param position
-         *	@returns true, if the position 'position' is within the respective boundary
-strip that is spanned by the two outermost macroscopic cell midpoints
+         *	@returns true, if the position 'position' is within the
+respective boundary strip that is spanned by the two outermost macroscopic cell
+midpoints
          */
   virtual bool relaxMolecule(const tarch::la::Vector<dim, double> &position) const {
     // check if molecule is in the respective boundary strip
@@ -178,8 +178,8 @@ strip that is spanned by the two outermost macroscopic cell midpoints
 
   /**
          *	@param currentLocalMacroscopicCellIndex
-         *	@returns true if all molecules in this macroscopic cell do not require any
-velocity relaxation (-> used to speed up the code)
+         *	@returns true if all molecules in this macroscopic cell do not
+require any velocity relaxation (-> used to speed up the code)
      */
   bool ignoreThisCell(const unsigned int &currentLocalMacroscopicCellIndex) const {
     const tarch::la::Vector<dim, unsigned int> globalIndex =
@@ -469,8 +469,8 @@ protected:
   /** returns true, if the position 'position' is within the respective boundary
 strip that is spanned by the two outermost macroscopic cell midpoints
          *	@param position
-         *  @return true, if the position 'position' is within the respective boundary
-strip that is spanned by the two outermost macroscopic cell midpoints
+         *  @return true, if the position 'position' is within the respective
+boundary strip that is spanned by the two outermost macroscopic cell midpoints
          */
   virtual bool relaxMolecule(const tarch::la::Vector<dim, double> &position) const {
     // check if molecule is in the respective boundary strip (only upper part is

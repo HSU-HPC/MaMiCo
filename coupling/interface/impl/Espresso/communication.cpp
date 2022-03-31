@@ -80,27 +80,28 @@ typedef void(SlaveCallback)(int node, int param);
 // if you want to add a callback, add it here, and here only
 #define CALLBACK_LIST                                                                                                                                          \
   CB(mpi_stop_slave)                                                                                                                                           \
-  CB(mpi_bcast_parameter_slave) CB(mpi_who_has_slave) CB(mpi_bcast_event_slave) CB(mpi_place_particle_slave) CB(mpi_send_v_slave) CB(mpi_send_f_slave)         \
-      CB(mpi_send_q_slave) CB(mpi_send_type_slave) CB(mpi_send_bond_slave) CB(mpi_recv_part_slave) CB(mpi_integrate_slave) CB(mpi_bcast_ia_params_slave)       \
-          CB(mpi_bcast_n_particle_types_slave) CB(mpi_gather_stats_slave) CB(mpi_set_time_step_slave) CB(mpi_get_particles_slave)                              \
-              CB(mpi_bcast_coulomb_params_slave) CB(mpi_bcast_collision_params_slave) CB(mpi_send_ext_force_slave) CB(mpi_send_ext_torque_slave)               \
-                  CB(mpi_place_new_particle_slave) CB(mpi_remove_particle_slave) CB(mpi_bcast_constraint_slave) CB(mpi_random_seed_slave)                      \
-                      CB(mpi_random_stat_slave) CB(mpi_cap_forces_slave) CB(mpi_bit_random_seed_slave) CB(mpi_bit_random_stat_slave)                           \
-                          CB(mpi_get_constraint_force_slave) CB(mpi_rescale_particles_slave) CB(mpi_bcast_cell_structure_slave) CB(mpi_send_quat_slave)        \
-                              CB(mpi_send_omega_slave) CB(mpi_send_torque_slave) CB(mpi_send_mol_id_slave) CB(mpi_bcast_nptiso_geom_slave)                     \
-                                  CB(mpi_update_mol_ids_slave) CB(mpi_sync_topo_part_info_slave) CB(mpi_send_mass_slave) CB(mpi_send_solvation_slave)          \
-                                      CB(mpi_gather_runtime_errors_slave) CB(mpi_send_exclusion_slave) CB(mpi_bcast_lb_params_slave)                           \
-                                          CB(mpi_bcast_cuda_global_part_vars_slave) CB(mpi_send_dip_slave) CB(mpi_send_dipm_slave) CB(mpi_send_fluid_slave)    \
-                                              CB(mpi_recv_fluid_slave) CB(mpi_local_stress_tensor_slave) CB(mpi_send_virtual_slave)                            \
-                                                  CB(mpi_iccp3m_iteration_slave) CB(mpi_iccp3m_init_slave) CB(mpi_send_rotational_inertia_slave)               \
-                                                      CB(mpi_bcast_lbboundary_slave) CB(mpi_send_mu_E_slave) CB(mpi_bcast_max_mu_slave)                        \
-                                                          CB(mpi_send_vs_relative_slave) CB(mpi_recv_fluid_populations_slave)                                  \
-                                                              CB(mpi_send_fluid_populations_slave) CB(mpi_recv_fluid_boundary_flag_slave)                      \
-                                                                  CB(mpi_set_particle_temperature_slave) CB(mpi_set_particle_gamma_slave)                      \
-                                                                      CB(mpi_kill_particle_motion_slave) CB(mpi_kill_particle_forces_slave)                    \
-                                                                          CB(mpi_system_CMS_slave) CB(mpi_system_CMS_velocity_slave)                           \
-                                                                              CB(mpi_galilei_transform_slave) CB(mpi_setup_reaction_slave)                     \
-                                                                                  CB(mpi_send_rotation_slave)
+  CB(mpi_bcast_parameter_slave)                                                                                                                                \
+  CB(mpi_who_has_slave)                                                                                                                                        \
+  CB(mpi_bcast_event_slave)                                                                                                                                    \
+  CB(mpi_place_particle_slave) CB(mpi_send_v_slave) CB(mpi_send_f_slave) CB(mpi_send_q_slave) CB(mpi_send_type_slave) CB(mpi_send_bond_slave)                  \
+      CB(mpi_recv_part_slave) CB(mpi_integrate_slave) CB(mpi_bcast_ia_params_slave) CB(mpi_bcast_n_particle_types_slave) CB(mpi_gather_stats_slave)            \
+          CB(mpi_set_time_step_slave) CB(mpi_get_particles_slave) CB(mpi_bcast_coulomb_params_slave) CB(mpi_bcast_collision_params_slave)                      \
+              CB(mpi_send_ext_force_slave) CB(mpi_send_ext_torque_slave) CB(mpi_place_new_particle_slave) CB(mpi_remove_particle_slave)                        \
+                  CB(mpi_bcast_constraint_slave) CB(mpi_random_seed_slave) CB(mpi_random_stat_slave) CB(mpi_cap_forces_slave) CB(mpi_bit_random_seed_slave)    \
+                      CB(mpi_bit_random_stat_slave) CB(mpi_get_constraint_force_slave) CB(mpi_rescale_particles_slave) CB(mpi_bcast_cell_structure_slave)      \
+                          CB(mpi_send_quat_slave) CB(mpi_send_omega_slave) CB(mpi_send_torque_slave) CB(mpi_send_mol_id_slave) CB(mpi_bcast_nptiso_geom_slave) \
+                              CB(mpi_update_mol_ids_slave) CB(mpi_sync_topo_part_info_slave) CB(mpi_send_mass_slave) CB(mpi_send_solvation_slave)              \
+                                  CB(mpi_gather_runtime_errors_slave) CB(mpi_send_exclusion_slave) CB(mpi_bcast_lb_params_slave)                               \
+                                      CB(mpi_bcast_cuda_global_part_vars_slave) CB(mpi_send_dip_slave) CB(mpi_send_dipm_slave) CB(mpi_send_fluid_slave)        \
+                                          CB(mpi_recv_fluid_slave) CB(mpi_local_stress_tensor_slave) CB(mpi_send_virtual_slave) CB(mpi_iccp3m_iteration_slave) \
+                                              CB(mpi_iccp3m_init_slave) CB(mpi_send_rotational_inertia_slave) CB(mpi_bcast_lbboundary_slave)                   \
+                                                  CB(mpi_send_mu_E_slave) CB(mpi_bcast_max_mu_slave) CB(mpi_send_vs_relative_slave)                            \
+                                                      CB(mpi_recv_fluid_populations_slave) CB(mpi_send_fluid_populations_slave)                                \
+                                                          CB(mpi_recv_fluid_boundary_flag_slave) CB(mpi_set_particle_temperature_slave)                        \
+                                                              CB(mpi_set_particle_gamma_slave) CB(mpi_kill_particle_motion_slave)                              \
+                                                                  CB(mpi_kill_particle_forces_slave) CB(mpi_system_CMS_slave)                                  \
+                                                                      CB(mpi_system_CMS_velocity_slave) CB(mpi_galilei_transform_slave)                        \
+                                                                          CB(mpi_setup_reaction_slave) CB(mpi_send_rotation_slave)
 
 // create the forward declarations
 #define CB(name) void name(int node, int param);

@@ -26,8 +26,8 @@ template <unsigned int dim> class DataExchangeFromMacro2MD;
  *  and returns a vector with all required ranks (see also documentation of
  * IndexConversion). The source ranks
  *  are determined via the macroscopic solver interface's method getRanks()
- *	@brief data exchange from the macroscopic solver to the MD solver. Derived
- * from the class coupling::sendrecv::DataExchange
+ *	@brief data exchange from the macroscopic solver to the MD solver.
+ *Derived from the class coupling::sendrecv::DataExchange
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *	@sa  DataExchangeFromMD2Macro
  *  @author Philipp Neumann
@@ -55,8 +55,8 @@ public:
   /** returns the ranks to which a particular cell (at index globalCellIndex)
 should be sent.
          * 	@param  globalCellIndex
-         *	@return the corresponding ranks via IndexConversion, if we need information
-on MD side, otherwise empty vector
+         *	@return the corresponding ranks via IndexConversion, if we need
+information on MD side, otherwise empty vector
          */
   virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     // if we need information on MD side, return the respective ranks via
@@ -71,8 +71,8 @@ on MD side, otherwise empty vector
   /** returns all ranks from which a particular cell (at index globalCellIndex)
 is sent.
          * 	@param  globalCellIndex
-         *	@return the corresponding ranks via MacroscopicSolverInterface, if we need
-information on MD side, otherwise empty vector
+         *	@return the corresponding ranks via MacroscopicSolverInterface,
+if we need information on MD side, otherwise empty vector
          */
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     if (_interface->sendMacroscopicQuantityToMDSolver(globalCellIndex)) {

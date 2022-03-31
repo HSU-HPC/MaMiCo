@@ -75,8 +75,8 @@ private:
          *	@param numberParticles
          *	@param momentum
          *	@return correctionFactor
-         *	@remark no correction possible if the correction factor would tend to
-infinity; I just hard-coded 1e-7 for this case
+         *	@remark no correction possible if the correction factor would
+tend to infinity; I just hard-coded 1e-7 for this case
          */
   double getCorrectionFactor(const double &oldKineticEnergy, const double &newKineticEnergy, const unsigned int &numberParticles,
                              const tarch::la::Vector<dim, double> &meanVelocity) const {

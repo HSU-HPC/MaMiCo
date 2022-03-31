@@ -562,10 +562,9 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
 template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommunicationIndependentCells(const bool useOpenMP, Mapping &myMapping) const {
   // starting point and range of cells, on which we can (for example) compute
   // forces before the messages carrying boundary and process-leaving particles
-  //  have arrived. Due to handling of iterateCellParis, we need to leave 1 inner
-  //  cell on the "left" and 2 on the "right".
-  //  Or, counting from ghost cells, we leave 2 cells on the "left" and 3 on the
-  //  "right".
+  //  have arrived. Due to handling of iterateCellParis, we need to leave 1
+  //  inner cell on the "left" and 2 on the "right". Or, counting from ghost
+  //  cells, we leave 2 cells on the "left" and 3 on the "right".
   tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(_linkedCellService.getLocalIndexOfFirstCell());
   tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(_linkedCellService.getLocalNumberOfCells());
   for (unsigned int d = 0; d < MD_DIM; d++) {

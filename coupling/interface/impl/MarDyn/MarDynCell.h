@@ -8,7 +8,8 @@
 #include "molecules/Molecule.h"
 #include "particleContainer/ParticleCell.h"
 
-/*	Helper class for the iteration over the elements of a Mardyn ParticleCell
+/*	Helper class for the iteration over the elements of a Mardyn
+ * ParticleCell
  * 	@author Hanno Flohr
  */
 class MarDynCell {

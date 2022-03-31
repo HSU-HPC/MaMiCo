@@ -70,8 +70,8 @@ template <int size, class T> tarch::la::Vector<size, T> operator*(const T &s, co
 }
 
 /** this file contains some methods for vector types.
- *	@brief devides a vector over a scaler, i.e. this operator devides all entries
- * of vector over a scalar and returns the result.
+ *	@brief devides a vector over a scaler, i.e. this operator devides all
+ *entries of vector over a scalar and returns the result.
  *  	@tparam T Data type
  *  	@tparam size Vector size
  * 	@author Philipp Neumann
@@ -137,8 +137,8 @@ template <int size, class T> bool operator!=(const Vector<size, T> &l, const Vec
  *  	@tparam T Data type
  *  	@tparam size Vector size
  * 	@author Philipp Neumann
- *	@return the square root of the inner product (dot product) of a vector with
- * itself
+ *	@return the square root of the inner product (dot product) of a vector
+ *with itself
  */
 template <int size, class T> T norm2(const Vector<size, T> &v) { return sqrt(tarch::la::dot(v, v)); }
 

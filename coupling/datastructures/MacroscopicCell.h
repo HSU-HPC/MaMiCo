@@ -22,8 +22,8 @@ template <class LinkedCell, unsigned int dim> class MacroscopicCellWithLinkedCel
 /** describes a quadratic/ cubic macroscopic cell filled with fluid (no linked
  * cells). Base class for the class
  * coupling::datastructures::MacroscopicCellWithLinkedCells
- *	@brief defines the cell type with cell-averaged quantities only (no linked
- * cells).
+ *	@brief defines the cell type with cell-averaged quantities only (no
+ *linked cells).
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
@@ -134,8 +134,8 @@ public:
  *  We can use the MacroscopicCell-structure to evaluate macroscopic quantities
  *  over a certain MD volume and then map macroscopic conserved quantities
  *  between macro- and microscopic simulations.
- *	@brief defines the cell type with cell-averaged quantities. Derived from the
- * class coupling::datastructures::MacroscopicCell
+ *	@brief defines the cell type with cell-averaged quantities. Derived from
+ *the class coupling::datastructures::MacroscopicCell
  *	@tparam LinkedCell linked cells that build up the
  * MacroscopicCellWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
@@ -178,8 +178,8 @@ public:
   /** adds a linked cell to the macroscopic cell and puts it at position index.
 We refer to the lexicographic
      *  ordering of the linked cells here.
-         * @param cell the linked cell that should be inserted into the macroscopic
-cell
+         * @param cell the linked cell that should be inserted into the
+macroscopic cell
          * @param index specifies the position, at which cell shoeld be inserted
      */
   void addLinkedCell(LinkedCell &cell, const unsigned int &index) { _linkedCells[index] = &cell; }

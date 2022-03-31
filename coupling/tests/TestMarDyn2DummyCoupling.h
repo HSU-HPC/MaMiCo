@@ -35,8 +35,8 @@
 
 using Log::global_log;
 
-/*	Test class. Provides an implementation of the coupling of Mardyn with input
- * values created by a Dummy solver.
+/*	Test class. Provides an implementation of the coupling of Mardyn with
+ * input values created by a Dummy solver.
  * 	@author Hanno Flohr
  */
 class TestMarDyn2DummyCoupling : public Test {
@@ -168,10 +168,9 @@ private:
     //		//print the decomposition to file "decomp_test"
     //		marDynSimulation->domainDecomposition().printDecomp("decomp_test",marDynSimulation->getDomain());
     //
-    //		//set the number of processes using the same method as done in MarDyn
-    //(MPI_Dims_create)
-    //		int gridSize [3];
-    //		for(int d=0;d<3;d++) gridSize[d] = 0;
+    //		//set the number of processes using the same method as done in
+    // MarDyn (MPI_Dims_create) 		int gridSize [3]; 		for(int d=0;d<3;d++)
+    // gridSize[d] = 0;
     //		MPI_CHECK( 	MPI_Dims_create(size,3,(int*) &gridSize ) );
     //		for(int d=0;d<3;d++) numberProcesses[d] = gridSize[d];
     //		std::cout << "nP: " << numberProcesses << std::endl;

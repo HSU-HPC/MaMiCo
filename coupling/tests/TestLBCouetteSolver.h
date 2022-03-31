@@ -51,7 +51,8 @@ public:
                                                        0,                                     // current rank of MD -> should not matter
                                                        mdDomainSize,                          // MD domain size
                                                        mdDomainOffset,                        // MD domain offset
-                                                       coupling::paralleltopology::XYZ,       // parallel topology of MD/MaMico -> should not play a role
+                                                       coupling::paralleltopology::XYZ,       // parallel topology of MD/MaMico ->
+                                                                                              // should not play a role
                                                        0                                      // topology offset -> should not play a role
     );
     const tarch::la::Vector<3, unsigned int> mdCellOffset(floor(mdDomainOffset[0] / dx + 0.5), floor(mdDomainOffset[1] / dx + 0.5),

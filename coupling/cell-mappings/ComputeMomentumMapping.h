@@ -42,8 +42,9 @@ the iteration process begins.
   }
 
   /** computes the mean velocity, momentum in a linked cell,
-         *	by dividing and multiplying the summation of the velocities computed in
-handleCell(...) over the number if particle and in particle mass respectively.
+         *	by dividing and multiplying the summation of the velocities
+computed in handleCell(...) over the number if particle and in particle mass
+respectively.
          */
   void endCellIteration() {
     if (_particleCounter != 0) {

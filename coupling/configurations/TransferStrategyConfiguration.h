@@ -25,8 +25,9 @@ template <unsigned int dim> class TransferStrategyConfiguration;
 /** transfer strategy configuration, i.e. algorithm/combin. of quantity transfer
  * steps and quantity interpretation (e.g. momentum vs. velocity). Derive from
  * the class tarch::configuration::Configuration
- *	@brief transfer strategy configuration, i.e. algorithm/combin. of quantity
- * transfer steps and quantity interpretation (e.g. momentum vs. velocity).
+ *	@brief transfer strategy configuration, i.e. algorithm/combin. of
+ *quantity transfer steps and quantity interpretation (e.g. momentum vs.
+ *velocity).
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
@@ -98,10 +99,11 @@ public:
 
   /** checks if the configuration is valid. This operation usually fails, if
 e.g.
-         *	1. parseSubtag() hasn't been called, i.e. configuration has not been used,
-or
+         *	1. parseSubtag() hasn't been called, i.e. configuration has not
+been used, or
      *  2. parseSubtag() failed due to a wrong file.
-         *  3. If a tag ain't optional and parseSubtag() was not called (first case)
+         *  3. If a tag ain't optional and parseSubtag() was not called (first
+case)
          * 	@return _isValid
      */
   bool isValid() const { return _isValid; }

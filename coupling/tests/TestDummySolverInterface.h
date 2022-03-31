@@ -15,9 +15,9 @@
 
 /** test class for dummy solver interface and dummy solver interface service.
  * Here I test all the functions defined in the dummy
- *	solver interface and interface service for a test scenario, consisting of
- * 18*18*18 mesh and allocate send and receive buffers
- *  and try to measure their size and check if they are performing as desired.
+ *	solver interface and interface service for a test scenario, consisting
+ *of 18*18*18 mesh and allocate send and receive buffers and try to measure
+ *their size and check if they are performing as desired.
  *  @author Rahul Arora
  */
 

@@ -15,7 +15,8 @@ namespace interface {
 /** This is a singleton which returns and stores the interface implementations.
  *  It can be used if there is no other way to share access to a particular
  * interface object between MaMiCo and the MD simulation
- *	@brief a singleton which returns and stores the interface implementations.
+ *	@brief a singleton which returns and stores the interface
+ *implementations.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann

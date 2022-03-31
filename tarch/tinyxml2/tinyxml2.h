@@ -363,24 +363,23 @@ private:
 };
 
 /**
-        Implements the interface to the "Visitor pattern" (see the Accept() method.)
-        If you call the Accept() method, it requires being passed a XMLVisitor
+        Implements the interface to the "Visitor pattern" (see the Accept()
+method.) If you call the Accept() method, it requires being passed a XMLVisitor
         class to handle callbacks. For nodes that contain other nodes (Document,
 Element)
-        you will get called with a VisitEnter/VisitExit pair. Nodes that are always
-leafs
-        are simply called with Visit().
+        you will get called with a VisitEnter/VisitExit pair. Nodes that are
+always leafs are simply called with Visit().
 
-        If you return 'true' from a Visit method, recursive parsing will continue. If
-you return
-        false, <b>no children of this node or its sibilings</b> will be visited.
+        If you return 'true' from a Visit method, recursive parsing will
+continue. If you return false, <b>no children of this node or its sibilings</b>
+will be visited.
 
-        All flavors of Visit methods have a default implementation that returns 'true'
-(continue
-        visiting). You need to only override methods that are interesting to you.
+        All flavors of Visit methods have a default implementation that returns
+'true' (continue visiting). You need to only override methods that are
+interesting to you.
 
-        Generally Accept() is called on the TiXmlDocument, although all nodes support
-visiting.
+        Generally Accept() is called on the TiXmlDocument, although all nodes
+support visiting.
 
         You should never change the document from a callback.
 
@@ -652,11 +651,9 @@ public:
         XML tree will be conditionally visited and the host will be called back
         via the TiXmlVisitor interface.
 
-        This is essentially a SAX interface for TinyXML. (Note however it doesn't
-  re-parse
-        the XML for the callbacks, so the performance of TinyXML is unchanged by
-  using this
-        interface versus any other.)
+        This is essentially a SAX interface for TinyXML. (Note however it
+  doesn't re-parse the XML for the callbacks, so the performance of TinyXML is
+  unchanged by using this interface versus any other.)
 
         The interface has been based on ideas from:
 
@@ -706,9 +703,9 @@ private:
         @endverbatim
 
         A text node can have 2 ways to output the next. "normal" output
-        and CDATA. It will default to the mode it was parsed from the XML file and
-        you generally want to leave it alone, but you can change the output mode with
-        SetCDATA() and query it with CDATA().
+        and CDATA. It will default to the mode it was parsed from the XML file
+   and you generally want to leave it alone, but you can change the output mode
+   with SetCDATA() and query it with CDATA().
 */
 class XMLText : public XMLNode {
   friend class XMLBase;
@@ -902,8 +899,8 @@ public:
 
   /** QueryIntAttribute interprets the attribute as an integer, and returns the
   value
-        in the provided paremeter. The function will return XML_NO_ERROR on success,
-        and XML_WRONG_ATTRIBUTE_TYPE if the conversion is not successful.
+        in the provided paremeter. The function will return XML_NO_ERROR on
+  success, and XML_WRONG_ATTRIBUTE_TYPE if the conversion is not successful.
   */
   XMLError QueryIntValue(int *value) const;
   /// See QueryIntAttribute
@@ -983,7 +980,8 @@ public:
         rather than:
         @verbatim
         if ( ele->Attribute( "foo" ) ) {
-                if ( strcmp( ele->Attribute( "foo" ), "bar" ) == 0 ) callFooIsBar();
+                if ( strcmp( ele->Attribute( "foo" ), "bar" ) == 0 )
+     callFooIsBar();
         }
         @endverbatim
     */
@@ -1034,8 +1032,8 @@ public:
 
         @verbatim
         int value = 10;
-        QueryIntAttribute( "foo", &value );		// if "foo" isn't found, value will
-  still be 10
+        QueryIntAttribute( "foo", &value );		// if "foo" isn't found,
+  value will still be 10
         @endverbatim
     */
   XMLError QueryIntAttribute(const char *name, int *value) const {
@@ -1092,8 +1090,8 @@ public:
 
         @verbatim
         int value = 10;
-        QueryAttribute( "foo", &value );		// if "foo" isn't found, value will still
-be 10
+        QueryAttribute( "foo", &value );		// if "foo" isn't found,
+value will still be 10
         @endverbatim
     */
   int QueryAttribute(const char *name, int *value) const { return QueryIntAttribute(name, value); }
@@ -1144,8 +1142,8 @@ be 10
 
   /** Convenience function for easy access to the text inside an element.
   Although easy
-        and concise, GetText() is limited compared to getting the TiXmlText child
-        and accessing it directly.
+        and concise, GetText() is limited compared to getting the TiXmlText
+  child and accessing it directly.
 
         If the first child of 'this' is a TiXmlText, the GetText()
         returns the character string of the Text node, else null is returned.
@@ -1159,9 +1157,8 @@ be 10
 
         'str' will be a pointer to "This is text".
 
-        Note that this function can be misleading. If the element foo was created
-  from
-        this XML:
+        Note that this function can be misleading. If the element foo was
+  created from this XML:
         @verbatim
                 <foo><b>This is text</b></foo>
         @endverbatim
@@ -1187,23 +1184,21 @@ be 10
                 </point>
         @endverbatim
 
-        The QueryIntText() and similar functions provide a safe and easier way to
-  get to the
-        "value" of x and y.
+        The QueryIntText() and similar functions provide a safe and easier way
+  to get to the "value" of x and y.
 
         @verbatim
                 int x = 0;
                 float y = 0;	// types of x and y are contrived for example
-                const XMLElement* xElement = pointElement->FirstChildElement( "x" );
-                const XMLElement* yElement = pointElement->FirstChildElement( "y" );
+                const XMLElement* xElement = pointElement->FirstChildElement(
+  "x" ); const XMLElement* yElement = pointElement->FirstChildElement( "y" );
                 xElement->QueryIntText( &x );
                 yElement->QueryFloatText( &y );
         @endverbatim
 
-        @returns XML_SUCCESS (0) on success, XML_CAN_NOT_CONVERT_TEXT if the text
-  cannot be converted
-                         to the requested type, and XML_NO_TEXT_NODE if there is no child text
-  to query.
+        @returns XML_SUCCESS (0) on success, XML_CAN_NOT_CONVERT_TEXT if the
+  text cannot be converted to the requested type, and XML_NO_TEXT_NODE if there
+  is no child text to query.
 
     */
   XMLError QueryIntText(int *ival) const;
@@ -1425,8 +1420,8 @@ private:
 };
 
 /**
-        A XMLHandle is a class that wraps a node pointer with null checks; this is
-        an incredibly useful thing. Note that XMLHandle is not part of the TinyXML
+        A XMLHandle is a class that wraps a node pointer with null checks; this
+is an incredibly useful thing. Note that XMLHandle is not part of the TinyXML
         DOM structure. It is a separate utility class.
 
         Take an example:
@@ -1439,9 +1434,8 @@ private:
         </Document>
         @endverbatim
 
-        Assuming you want the value of "attributeB" in the 2nd "Child" element, it's
-very
-        easy to write a *lot* of code that looks like:
+        Assuming you want the value of "attributeB" in the 2nd "Child" element,
+it's very easy to write a *lot* of code that looks like:
 
         @verbatim
         XMLElement* root = document.FirstChildElement( "Document" );
@@ -1450,22 +1444,23 @@ very
                 XMLElement* element = root->FirstChildElement( "Element" );
                 if ( element )
                 {
-                        XMLElement* child = element->FirstChildElement( "Child" );
-                        if ( child )
+                        XMLElement* child = element->FirstChildElement( "Child"
+); if ( child )
                         {
-                                XMLElement* child2 = child->NextSiblingElement( "Child" );
-                                if ( child2 )
+                                XMLElement* child2 = child->NextSiblingElement(
+"Child" ); if ( child2 )
                                 {
                                         // Finally do something useful.
         @endverbatim
 
-        And that doesn't even cover "else" cases. XMLHandle addresses the verbosity
-        of such code. A XMLHandle checks for null pointers so it is perfectly safe
-        and correct to use:
+        And that doesn't even cover "else" cases. XMLHandle addresses the
+verbosity of such code. A XMLHandle checks for null pointers so it is perfectly
+safe and correct to use:
 
         @verbatim
         XMLHandle docHandle( &document );
-        XMLElement* child2 = docHandle.FirstChild( "Document" ).FirstChild( "Element"
+        XMLElement* child2 = docHandle.FirstChild( "Document" ).FirstChild(
+"Element"
 ).FirstChild().NextSibling().ToElement();
         if ( child2 )
         {
@@ -1474,14 +1469,14 @@ very
 
         Which is MUCH more concise and useful.
 
-        It is also safe to copy handles - internally they are nothing more than node
-pointers.
+        It is also safe to copy handles - internally they are nothing more than
+node pointers.
         @verbatim
         XMLHandle handleCopy = handle;
         @endverbatim
 
-        See also XMLConstHandle, which is the same as XMLHandle, but operates on const
-objects.
+        See also XMLConstHandle, which is the same as XMLHandle, but operates on
+const objects.
 */
 class XMLHandle {
 public:
@@ -1531,9 +1526,9 @@ private:
 };
 
 /**
-        A variant of the XMLHandle class for working with const XMLNodes and Documents.
-It is the
-        same in all regards, except for the 'const' qualifiers. See XMLHandle for API.
+        A variant of the XMLHandle class for working with const XMLNodes and
+Documents. It is the same in all regards, except for the 'const' qualifiers. See
+XMLHandle for API.
 */
 class XMLConstHandle {
 public:

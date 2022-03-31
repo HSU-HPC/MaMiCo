@@ -20,8 +20,8 @@ template <class LinkedCell, unsigned int dim> class MoleculeExtractor;
  *  If you need individual access to molecules + some functionality, please do
  * so in a separate cell-mapping and
  *  call it from the respective transfer strategy instance.
- *	@brief This class extracts molecule information from a given macroscopic cell
- * and stores all molecule positions in a vector.
+ *	@brief This class extracts molecule information from a given macroscopic
+ *cell and stores all molecule positions in a vector.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann

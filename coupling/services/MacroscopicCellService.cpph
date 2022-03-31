@@ -29,7 +29,9 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::MacroscopicCell
       _mdSolverInterface(mdSolverInterface), _macroscopicSolverInterface(macroscopicSolverInterface),
       _deFromMacro2MD(_macroscopicSolverInterface, _indexConversion, ID), _deFromMD2Macro(_macroscopicSolverInterface, _indexConversion, ID),
       _macroscopicCells(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface), _filterPipeline(nullptr),
-      //      _filterPipeline(_macroscopicCells.getMacroscopicCells(), _indexConversion, multiMDService, false, filterPipelineConfiguration),
+      //      _filterPipeline(_macroscopicCells.getMacroscopicCells(),
+      //      _indexConversion, multiMDService, false,
+      //      filterPipelineConfiguration),
       _filterPipelineConfiguration(filterPipelineConfiguration), _multiMDService(multiMDService),
       _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(
           mdSolverInterface, *_indexConversion, _macroscopicCells.getMacroscopicCellsWithLinkedCells(), numberMDTimestepsPerCouplingCycle)),
@@ -322,9 +324,8 @@ linear_index++){
                 outOfBounds = false;
                 convertedIndex =
 _indexConversion->getGlobalInnerVectorCellIndex(linear_index);
-                for(unsigned int d = 0; d < dim; d++) if(convertedIndex[d] == INT_MAX)
-outOfBounds = true;
-                if(!outOfBounds){
+                for(unsigned int d = 0; d < dim; d++) if(convertedIndex[d] ==
+INT_MAX) outOfBounds = true; if(!outOfBounds){
                         _innerMacroscopicCells.push_back(cells[linear_index]);
                         _innerMacroscopicCellIndices.push_back(convertedIndex);
                 }

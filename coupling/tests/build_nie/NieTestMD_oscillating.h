@@ -72,8 +72,8 @@ public:
                                                        // MD/DPD: 1000
       const unsigned int totalNumberMDSimulations = 1; // total number of MD simulations; MD/DPD: 64 (DPD), 128 (MD
                                                        // scalability), 144 (MD)
-      const SolverType solverType = COUETTE_LB; // LB or analytical couette solver
-                                                // const bool twoWayCoupling = true;
+      const SolverType solverType = COUETTE_LB;        // LB or analytical couette solver
+                                                       // const bool twoWayCoupling = true;
       const int initCycles = 100;
 
       // for time measurements
@@ -108,10 +108,11 @@ public:
                            "Couette2", lbNumberProcesses, COUETTE_ANALYTICAL, rank);
 
       tarch::utils::MultiMDService<3> multiMDService(simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), totalNumberMDSimulations);
-      const unsigned int mdInstances = multiMDService.getLocalNumberOfMDSimulations(); // local number of MD simulations
+      const unsigned int mdInstances = multiMDService.getLocalNumberOfMDSimulations(); // local number of MD
+                                                                                       // simulations
       // std::cout << "Rank: " << rank << " # total MD instances: " <<
-      // totalNumberMDSimulations << ", # local MD instances: " << mdInstances <<
-      // std::endl;
+      // totalNumberMDSimulations << ", # local MD instances: " << mdInstances
+      // << std::endl;
 
       std::vector<coupling::interface::MDSimulation *> simpleMD;
       for (unsigned int i = 0; i < mdInstances; i++) {

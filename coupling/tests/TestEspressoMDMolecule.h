@@ -50,8 +50,8 @@ public:
   }
 
   /* compareParticleList() compares the list of particles in each cell, one
-   * directly read from Espresso Simulation and other from the list 	sent to the
-   * coupling tool (EspressoMDMolecule) */
+   * directly read from Espresso Simulation and other from the list 	sent to
+   * the coupling tool (EspressoMDMolecule) */
 
   void compareParticleLists(int c, int &flag) {
     int j = 0;

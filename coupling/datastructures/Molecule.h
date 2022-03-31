@@ -15,8 +15,8 @@ template <unsigned int dim> class Molecule;
 } // namespace coupling
 
 /**
- *	@brief molecule representation for coupling component. Dericed from the class
- * coupling::interface::Molecule
+ *	@brief molecule representation for coupling component. Dericed from the
+ *class coupling::interface::Molecule
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */

@@ -31,7 +31,8 @@ public:
   void setMolecule(Particle *newMolecule) { _myMolecule = newMolecule; }
 
   /** returns/ sets the velocity of the molecule
-        The velocity of the particles have been scaled in Espresso with time_step */
+        The velocity of the particles have been scaled in Espresso with
+     time_step */
   virtual tarch::la::Vector<3, double> getVelocity() const {
     tarch::la::Vector<3, double> velocity(0.0);
     for (int i = 0; i < 3; i++) {

@@ -74,7 +74,8 @@ public:
   tarch::la::Vector<dim, unsigned int> getGlobalVectorCellIndex(unsigned int globalCellIndex) const;
 
   /** Does the same as getGlobalVectorCellIndex() but
-   * 		* non-inner cells (i.e. outside of the MD domain) are converted to MAX_INT
+   * 		* non-inner cells (i.e. outside of the MD domain) are converted to
+   * MAX_INT
    * 		* (0, ... , 0) is the first cell in the MD domain etc.
    */
   tarch::la::Vector<dim, unsigned int> getGlobalInnerVectorCellIndex(unsigned int globalCellIndex) const;

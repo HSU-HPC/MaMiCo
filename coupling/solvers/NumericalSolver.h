@@ -513,7 +513,7 @@ protected:
   const int _xO{_domainSizeX + 2};                        // offset for y-direction (lexicographic grid ordering)
   const int _yO{(_domainSizeX + 2) * (_domainSizeY + 2)}; // offset for z-direction
   tarch::la::Vector<6, int> _parallelNeighbours{(-1)};    // neighbour ranks
-                                                       // for coupling with MD
+                                                          // for coupling with MD
   tarch::la::Vector<3, int> _offset{(-1)};
   tarch::la::Vector<3, int> _globalNumberMacroscopicCells{(-1)}; // OH
 };
