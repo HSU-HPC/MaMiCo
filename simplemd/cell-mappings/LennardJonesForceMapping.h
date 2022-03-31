@@ -11,43 +11,46 @@
 #include "tarch/la/ScalarOperations.h"
 
 namespace simplemd {
-  namespace cellmappings {
-    class LennardJonesForceMapping;
-  }
+namespace cellmappings { class LennardJonesForceMapping; }
 }
-
 
 /** applies the Lennard-Jones force to all particle pairs.
  *  @author Philipp Neumann
  */
 class simplemd::cellmappings::LennardJonesForceMapping {
-  public:
-    LennardJonesForceMapping(simplemd::services::ExternalForceService &externalForceService,const simplemd::services::MolecularPropertiesService &molecularPropertiesService);
-    ~LennardJonesForceMapping(){}
+public:
+  LennardJonesForceMapping(
+      simplemd::services::ExternalForceService &externalForceService,
+      const simplemd::services::MolecularPropertiesService &
+          molecularPropertiesService);
+  ~LennardJonesForceMapping() {}
 
-    void beginCellIteration();
+  void beginCellIteration();
 
-    void endCellIteration(){}
-    void handleCell(const LinkedCell& cell,const unsigned int& cellIndex) const;
-    void handleCellPair(const LinkedCell& cell1, const LinkedCell& cell2,const unsigned int& cellIndex1, const unsigned int& cellIndex2) const;
+  void endCellIteration() {}
+  void handleCell(const LinkedCell &cell, const unsigned int &cellIndex) const;
+  void handleCellPair(const LinkedCell &cell1, const LinkedCell &cell2,
+                      const unsigned int &cellIndex1,
+                      const unsigned int &cellIndex2) const;
 
-    /** returns the force acting on a particle placed at position1, resulting from an interaction of the particles at
-     *  positions position1 and position2. Remark: The force on the particle at position2 is just (-1.0)*returnValue.
-     */
-    tarch::la::Vector<MD_DIM,double> getLennardJonesForce(
-      const tarch::la::Vector<MD_DIM,double>& position1,const tarch::la::Vector<MD_DIM,double>& position2
-    ) const;
+  /** returns the force acting on a particle placed at position1, resulting from
+   * an interaction of the particles at
+   *  positions position1 and position2. Remark: The force on the particle at
+   * position2 is just (-1.0)*returnValue.
+   */
+  tarch::la::Vector<MD_DIM, double> getLennardJonesForce(
+      const tarch::la::Vector<MD_DIM, double> &position1,
+      const tarch::la::Vector<MD_DIM, double> &position2) const;
 
-  private:
-    /** epsilon */
-    const double _epsilon;
-    /** sigma^6 */
-    const double _sigma6;
-    /** cutOffRadius*cutOffRadius */
-    const double _cutOffRadiusSquared;
-    /** external forces*/
-    simplemd::services::ExternalForceService &_externalForceService;
+private:
+  /** epsilon */
+  const double _epsilon;
+  /** sigma^6 */
+  const double _sigma6;
+  /** cutOffRadius*cutOffRadius */
+  const double _cutOffRadiusSquared;
+  /** external forces*/
+  simplemd::services::ExternalForceService &_externalForceService;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_LENNARDJONESFORCEMAPPING_H_
-

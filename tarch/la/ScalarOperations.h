@@ -6,11 +6,12 @@
 #define _TARCH_LA_SCALAROPERATIONS_H_
 #include <cmath>
 /**	namespace tarch */
-namespace tarch{
-	/** namespace la */
-namespace la{
-	
-/**	This function template checks if the difference of two given numbers is smaller than a given tolerance
+namespace tarch {
+/** namespace la */
+namespace la {
+
+/**	This function template checks if the difference of two given numbers is
+ * smaller than a given tolerance
  *	i.e. if they are mathematically equal.
  *  @tparam T data type
  *  @param l First number
@@ -20,11 +21,11 @@ namespace la{
  *  @author Philipp Neumann
  */
 
-template<class T>
-inline bool equals(const T& l, const T& r, const T& tolerance){
-  return std::abs(l-r) <= tolerance;
+template <class T>
+inline bool equals(const T &l, const T &r, const T &tolerance) {
+  return std::abs(l - r) <= tolerance;
 }
 
 }
 }
-#endif 
+#endif

@@ -1,0 +1,343 @@
+// Implementation of coupling::indexing::CellIndex
+
+// TODO: scope these
+using coupling::indexing::CellIndex;
+using coupling::indexing::IndexTrait;
+
+template <unsigned int dim> void coupling::indexing::testing::printAllBoundaries(std::ostream &os) {
+  using coupling::indexing::CellIndex;
+  using coupling::indexing::IndexTrait;
+
+  /*
+   * NON-MD-TO-MACRO aka MAMICO INDEXING, INCL GHOST LAYER
+   */
+
+  // scalar, global, !md2macro, !noGhost
+  os << "CellIndex<dim>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim>::numberCellsInDomain;
+  os << " / " << CellIndex<dim>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // vector, global, !md2macro, !noGhost
+  os << "CellIndex<dim, vector>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::vector>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::vector>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::vector>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::vector>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // scalar, local, !md2macro, !noGhost
+  os << "CellIndex<dim, local>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::local>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::local>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::local>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // vector, local, !md2macro, !noGhost
+  os << "CellIndex<dim, vector, local>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::vector, IndexTrait::local>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  /*
+   * MD TO MACRO, INCL GHOST LAYER
+   */
+
+  // scalar, global, md2macro, !noGhost
+  os << "CellIndex<dim, md2macro>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::md2macro>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::md2macro>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::md2macro>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::md2macro>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // vector, global, md2macro, !noGhost
+  os << "CellIndex<dim, vector, md2macro>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // scalar, local, md2macro, !noGhost
+  os << "CellIndex<dim, local, md2macro>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // vector, local, md2macro, !noGhost
+  os << "CellIndex<dim, vector, local, md2macro>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  /*
+   * NON-MD-TO-MACRO aka MAMICO INDEXING, EXCL GHOST LAYER
+   */
+
+  // scalar, global, !md2macro, noGhost
+  os << "CellIndex<dim, noGhost>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::noGhost>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::noGhost>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::noGhost>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::noGhost>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // vector, global, !md2macro, noGhost
+  os << "CellIndex<dim, vector, noGhost>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // scalar, local, !md2macro, noGhost
+  os << "CellIndex<dim, local, noGhost>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // vector, local, !md2macro, noGhost
+  os << "CellIndex<dim, vector, local, noGhost>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  /*
+   * MD TO MACRO, EXCL GHOST LAYER
+   */
+
+  // scalar, global, md2macro, noGhost
+  os << "CellIndex<dim, md2macro, noGhost>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // vector, global, md2macro, noGhost
+  os << "CellIndex<dim, vector, md2macro, noGhost>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // scalar, local, md2macro, noGhost
+  os << "CellIndex<dim, local, md2macro, noGhost>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+
+  // vector, local, md2macro, noGhost
+  os << "CellIndex<dim, vector, local, md2macro, noGhost>: " << std::endl;
+  os << "	Lowest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary << std::endl;
+  os << "	Highest: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary << std::endl;
+  os << "	#Cells: " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain;
+  os << " / " << CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain << std::endl;
+  os << std::endl;
+}
+
+template <unsigned int dim> void coupling::indexing::testing::printAllDomains(std::ostream &os) {
+  using coupling::indexing::CellIndex;
+  using coupling::indexing::IndexTrait;
+
+  /*
+   * NON-MD-TO-MACRO aka MAMICO INDEXING, INCL GHOST LAYER
+   */
+
+  // scalar, global, !md2macro, !noGhost
+  os << "CellIndex<dim>: " << std::endl;
+  printIndexDomain<dim>(os);
+  os << std::endl;
+
+  // vector, global, !md2macro, !noGhost
+  os << "CellIndex<dim, vector>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::vector>(os);
+  os << std::endl;
+
+  // scalar, local, !md2macro, !noGhost
+  os << "CellIndex<dim, local>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::local>(os);
+  os << std::endl;
+
+  // vector, local, !md2macro, !noGhost
+  os << "CellIndex<dim, vector, local>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::vector, IndexTrait::local>(os);
+  os << std::endl;
+
+  /*
+   * MD TO MACRO, INCL GHOST LAYER
+   */
+
+  // scalar, global, md2macro, !noGhost
+  os << "CellIndex<dim, md2macro>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::md2macro>(os);
+  os << std::endl;
+
+  // vector, global, md2macro, !noGhost
+  os << "CellIndex<dim, vector, md2macro>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::vector, IndexTrait::md2macro>(os);
+  os << std::endl;
+
+  // scalar, local, md2macro, !noGhost
+  os << "CellIndex<dim, local, md2macro>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::local, IndexTrait::md2macro>(os);
+  os << std::endl;
+
+  // vector, local, md2macro, !noGhost
+  os << "CellIndex<dim, vector, local, md2macro>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>(os);
+  os << std::endl;
+
+  /*
+   * NON-MD-TO-MACRO aka MAMICO INDEXING, EXCL GHOST LAYER
+   */
+
+  // scalar, global, !md2macro, noGhost
+  os << "CellIndex<dim, noGhost>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::noGhost>(os);
+  os << std::endl;
+
+  // vector, global, !md2macro, noGhost
+  os << "CellIndex<dim, vector, noGhost>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::vector, IndexTrait::noGhost>(os);
+  os << std::endl;
+
+  // scalar, local, !md2macro, noGhost
+  os << "CellIndex<dim, local, noGhost>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::local, IndexTrait::noGhost>(os);
+  os << std::endl;
+
+  // vector, local, !md2macro, noGhost
+  os << "CellIndex<dim, vector, local, noGhost>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>(os);
+  os << std::endl;
+
+  /*
+   * MD TO MACRO, EXCL GHOST LAYER
+   */
+
+  // scalar, global, md2macro, noGhost
+  os << "CellIndex<dim, md2macro, noGhost>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::md2macro, IndexTrait::noGhost>(os);
+  os << std::endl;
+
+  // vector, global, md2macro, noGhost
+  os << "CellIndex<dim, vector, md2macro, noGhost>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>(os);
+  os << std::endl;
+
+  // scalar, local, md2macro, noGhost
+  os << "CellIndex<dim, local, md2macro, noGhost>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(os);
+  os << std::endl;
+
+  // vector, local, md2macro, noGhost
+  os << "CellIndex<dim, vector, local, md2macro, noGhost>: " << std::endl;
+  printIndexDomain<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(os);
+  os << std::endl;
+}
+
+template <unsigned int dim, coupling::indexing::IndexTrait... traits> void coupling::indexing::testing::printIndexDomain(std::ostream &os) {
+  for (const auto &index : CellIndex<dim, traits...>())
+    os << coupling::indexing::BaseIndex<dim>(index) << std::endl;
+}
+
+template <unsigned int dim, coupling::indexing::IndexTrait... traits> void coupling::indexing::testing::checkAllTrivialConversions() {
+  using namespace coupling::indexing::TraitOperations;
+  using coupling::indexing::CellIndex;
+  using coupling::indexing::IndexTrait;
+
+  for (const auto &i : CellIndex<dim, traits...>()) { // for each valid global index
+    // check trivial conversion: tested index -> some other index -> tested
+    // index == tested index
+    try {
+      using I = CellIndex<dim, traits...>;
+
+      checkTrivialConversion<dim, I>(i);
+      checkTrivialConversion<dim, I, IndexTrait::vector>(i);
+      checkTrivialConversion<dim, I, IndexTrait::local>(i);
+      checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local>(i);
+
+      checkTrivialConversion<dim, I, IndexTrait::md2macro>(i);
+      checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::md2macro>(i);
+      checkTrivialConversion<dim, I, IndexTrait::local, IndexTrait::md2macro>(i);
+      checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>(i);
+
+      checkTrivialConversion<dim, I, IndexTrait::noGhost>(i);
+      checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::noGhost>(i);
+      checkTrivialConversion<dim, I, IndexTrait::local, IndexTrait::noGhost>(i);
+      checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>(i);
+
+      checkTrivialConversion<dim, I, IndexTrait::md2macro, IndexTrait::noGhost>(i);
+      checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>(i);
+      checkTrivialConversion<dim, I, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(i);
+      checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(i);
+    } catch (std::runtime_error &e) {
+      using namespace std::string_literals;
+
+      if constexpr (sizeof...(traits) > 0)
+        throw std::runtime_error("("s + print_traitlist<traits...>().data() + ") -> ("s + e.what() + ") -> ("s + print_traitlist<traits...>().data() + ")"s);
+      else
+        throw std::runtime_error("() -> ("s + e.what() + ") -> ()"s);
+    }
+  }
+}
+
+template <unsigned int dim, class Index, IndexTrait... convert_to_traits> void coupling::indexing::testing::checkTrivialConversion(Index i) {
+  // check for illegal out-of-bounds conversions. these need no testing
+  for (unsigned int d = 0; d < dim; d++) {
+    if (static_cast<coupling::indexing::BaseIndex<dim>>(i).get()[d] < CellIndex<dim, convert_to_traits...>::lowerBoundary.get()[d])
+      return;
+    if (static_cast<coupling::indexing::BaseIndex<dim>>(i).get()[d] > CellIndex<dim, convert_to_traits...>::upperBoundary.get()[d])
+      return;
+  }
+
+  Index conv_i{};
+  // try "back and forth" conversion
+  try {
+    conv_i = CellIndex<dim, convert_to_traits...>{i};
+  } catch (std::runtime_error &e) {
+    std::cout << static_cast<coupling::indexing::BaseIndex<dim>>(i) << std::endl;
+    std::cout << CellIndex<dim, convert_to_traits...>::lowerBoundary << std::endl;
+
+    // output error
+    std::cout << e.what() << std::endl;
+
+    // throw where (i.e. for what traits) this error occured
+    if constexpr (sizeof...(convert_to_traits) > 0)
+      throw std::runtime_error(std::string{coupling::indexing::TraitOperations::print_traitlist<convert_to_traits...>()});
+    else
+      throw std::runtime_error("");
+  }
+
+  if (conv_i != i) {
+    // output faulty conversion
+    std::cout << "ERROR: Faulty index conversion: " << i           // original index
+              << " -> " << CellIndex<dim, convert_to_traits...>{i} // after first conversion
+              << " -> " << conv_i                                  // after second conversion
+              << std::endl;
+
+    // output where (i.e. for what traits) this conversion occured
+    if constexpr (sizeof...(convert_to_traits) > 0)
+      throw std::runtime_error(std::string{coupling::indexing::TraitOperations::print_traitlist<convert_to_traits...>()});
+    else
+      throw std::runtime_error("");
+  }
+}

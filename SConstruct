@@ -67,8 +67,8 @@ else:
 #
 machine = ARGUMENTS.get('machine', 'generic') # Read command line parameter
 mpiLibrary='mpi'
-mpiIncludePath='/usr/lib/openmpi/include'
-mpiLibraryPath='/usr/lib/openmpi/lib'
+mpiIncludePath='/home/hsu/opt/include'
+mpiLibraryPath='/home/hsu/opt/lib'
 pthreadLibrary='pthread'
 
 if machine== 'hww-cluster':
@@ -123,7 +123,7 @@ if compiler == 'gcc':
    if(parallel=='parallel_no' or parallel=='no'):
      cxx = 'g++'
    else:
-     cxx = 'mpicxx'
+     cxx = '/home/hsu/opt/bin/mpicxx'
 
    ccflags.append('-Wall')
    ccflags.append('-Werror')

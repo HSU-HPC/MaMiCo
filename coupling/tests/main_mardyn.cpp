@@ -17,40 +17,41 @@
 
 #include "TestMarDyn2DummyCoupling.h"
 
-
 /* executes a newly created test and deletes it immediately again. */
 void runTest(Test *test) {
-	if(test==NULL) {
-		std::cout << "ERROR: test==NULL !" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	test->run();
-	delete test;
+  if (test == NULL) {
+    std::cout << "ERROR: test==NULL !" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  test->run();
+  delete test;
 }
 
 int main(int argc, char **argv) {
-	MPI_Init(&argc, &argv);
+  MPI_Init(&argc, &argv);
 
- 	std::cout << "Testing MarDyn coupling interfaces: " << std::endl;
+  std::cout << "Testing MarDyn coupling interfaces: " << std::endl;
 
-	//Test for simple get methods of the MD solver interface
-	runTest(new TestMarDyn(argc,argv,"MarDyn Test"));
+  //Test for simple get methods of the MD solver interface
+  runTest(new TestMarDyn(argc, argv, "MarDyn Test"));
 
-	//Test for the Molecule iterator interface
-	runTest(new TestMarDynMoleculeIterator(argc,argv,"MarDyn Iterator Test"));
+  //Test for the Molecule iterator interface
+  runTest(new TestMarDynMoleculeIterator(argc, argv, "MarDyn Iterator Test"));
 
-	//Test for the Molecule interface
-	runTest(new TestMarDynMolecule(argc,argv,"MarDyn Molecule Test"));
+  //Test for the Molecule interface
+  runTest(new TestMarDynMolecule(argc, argv, "MarDyn Molecule Test"));
 
-	//Test for molecule insertion/deletion
-	runTest(new TestMarDynAddDeleteMolecule(argc,argv,"MarDyn Deletion/Insertion Test"));
+  //Test for molecule insertion/deletion
+  runTest(new TestMarDynAddDeleteMolecule(argc, argv,
+                                          "MarDyn Deletion/Insertion Test"));
 
- 	//Test MarDyn coupling with Dummy macroscopic solver
- 	runTest(new TestMarDyn2DummyCoupling("Test MarDyn Coupling with Dummy Solver",argc,argv) );
+  //Test MarDyn coupling with Dummy macroscopic solver
+  runTest(new TestMarDyn2DummyCoupling("Test MarDyn Coupling with Dummy Solver",
+                                       argc, argv));
 
-	std::cout << "Finished!" << std::endl;
+  std::cout << "Finished!" << std::endl;
 
-	MPI_Finalize();
+  MPI_Finalize();
 
-	return 0;
+  return 0;
 }

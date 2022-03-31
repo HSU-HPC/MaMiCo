@@ -59,7 +59,7 @@ then
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
-    compiler="mpicxx"
+    compiler="/home/hsu/opt/bin/mpic++"
 else
     FLAGS="-D${mdSim} -DMDDim3 -std=c++1z -pedantic -Wall -Wno-unknown-pragmas -O3"
     # -Werror

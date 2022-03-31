@@ -9,32 +9,30 @@
 #include <cstdlib>
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/tests/TestLBCouetteSolver.h"
-#if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
 
-
 /** executes a newly created test and deletes it immediately again. */
-void runTest(Test *test){
-  if (test==NULL){
-    std::cout << "ERROR executeTest: test==NULL!" << std::endl; exit(EXIT_FAILURE);
+void runTest(Test *test) {
+  if (test == NULL) {
+    std::cout << "ERROR executeTest: test==NULL!" << std::endl;
+    exit(EXIT_FAILURE);
   }
   test->run();
   delete test;
 }
 
-
-
-int main(int argc, char *argv[]){
-  #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-  MPI_Init(&argc,&argv);
-  #endif
+int main(int argc, char *argv[]) {
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  MPI_Init(&argc, &argv);
+#endif
   // run tests
   runTest(new TestLBCouetteSolver());
 
-  #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();
-  #endif
+#endif
   return 0;
 }
 

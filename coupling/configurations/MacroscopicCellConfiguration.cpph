@@ -4,79 +4,98 @@
 // www5.in.tum.de/mamico
 #include "tarch/configuration/ParseConfiguration.h"
 
-template<unsigned int dim>
-const std::string coupling::configurations::MacroscopicCellConfiguration<dim>::MACROSCOPIC_CELL_SIZE("cell-size");
+template <unsigned int dim>
+const std::string coupling::configurations::MacroscopicCellConfiguration<
+    dim>::MACROSCOPIC_CELL_SIZE("cell-size");
 
-template<unsigned int dim>
-const std::string coupling::configurations::MacroscopicCellConfiguration<dim>::LINKED_CELLS_PER_MACROSCOPIC_CELL("linked-cells-per-macroscopic-cell");
+template <unsigned int dim>
+const std::string coupling::configurations::MacroscopicCellConfiguration<
+    dim>::LINKED_CELLS_PER_MACROSCOPIC_CELL(
+    "linked-cells-per-macroscopic-cell");
 
-template<unsigned int dim>
-const std::string coupling::configurations::MacroscopicCellConfiguration<dim>::WRITE_EVERY_MICROSCOPIC_TIMESTEP("write-every-microscopic-timestep");
-template<unsigned int dim>
-const std::string coupling::configurations::MacroscopicCellConfiguration<dim>::MICROSCOPIC_FILENAME("microscopic-filename");
+template <unsigned int dim>
+const std::string coupling::configurations::MacroscopicCellConfiguration<
+    dim>::WRITE_EVERY_MICROSCOPIC_TIMESTEP("write-every-microscopic-timestep");
+template <unsigned int dim>
+const std::string coupling::configurations::MacroscopicCellConfiguration<
+    dim>::MICROSCOPIC_FILENAME("microscopic-filename");
 
-template<unsigned int dim>
-const std::string coupling::configurations::MacroscopicCellConfiguration<dim>::WRITE_EVERY_MACROSCOPIC_TIMESTEP("write-every-macroscopic-timestep");
-template<unsigned int dim>
-const std::string coupling::configurations::MacroscopicCellConfiguration<dim>::MACROSCOPIC_FILENAME("macroscopic-filename");
+template <unsigned int dim>
+const std::string coupling::configurations::MacroscopicCellConfiguration<
+    dim>::WRITE_EVERY_MACROSCOPIC_TIMESTEP("write-every-macroscopic-timestep");
+template <unsigned int dim>
+const std::string coupling::configurations::MacroscopicCellConfiguration<
+    dim>::MACROSCOPIC_FILENAME("macroscopic-filename");
 
-
-template<unsigned int dim>
-void coupling::configurations::MacroscopicCellConfiguration<dim>::parseSubtag(tinyxml2::XMLElement* node){
-  tarch::la::Vector<dim,int> getCells(-1);
+template <unsigned int dim>
+void coupling::configurations::MacroscopicCellConfiguration<dim>::parseSubtag(
+    tinyxml2::XMLElement *node) {
+  tarch::la::Vector<dim, int> getCells(-1);
   int buffer = -1;
 
   // parse macroscopic cell size
-  tarch::configuration::ParseConfiguration::readVector<dim,double>(_macroscopicCellSize,node,MACROSCOPIC_CELL_SIZE);
-  for (unsigned int d = 0; d < dim; d++){
-    if (_macroscopicCellSize[d] <= 0.0){
-      std::cout << "ERROR coupling::configurations::MacroscopicCellConfiguration: ";
-      std::cout << "Macroscopic cell size " << d << " is smaller than or equal zero!" << std::endl;
+  tarch::configuration::ParseConfiguration::readVector<dim, double>(
+      _macroscopicCellSize, node, MACROSCOPIC_CELL_SIZE);
+  for (unsigned int d = 0; d < dim; d++) {
+    if (_macroscopicCellSize[d] <= 0.0) {
+      std::cout
+          << "ERROR coupling::configurations::MacroscopicCellConfiguration: ";
+      std::cout << "Macroscopic cell size " << d
+                << " is smaller than or equal zero!" << std::endl;
       _isValid = false;
       exit(EXIT_FAILURE);
     }
   }
 
   // parse linked cells per macroscopic cell
-  tarch::configuration::ParseConfiguration::readVector<dim,int>(getCells,node,LINKED_CELLS_PER_MACROSCOPIC_CELL);
-  for (unsigned int d = 0; d < dim; d++){
-    if (getCells[d] <= 0){
-      std::cout << "ERROR coupling::configurations::MacroscopicCellConfiguration: ";
-      std::cout << LINKED_CELLS_PER_MACROSCOPIC_CELL << " is smaller or equal zero in component " << d << "!" << std::endl;
+  tarch::configuration::ParseConfiguration::readVector<dim, int>(
+      getCells, node, LINKED_CELLS_PER_MACROSCOPIC_CELL);
+  for (unsigned int d = 0; d < dim; d++) {
+    if (getCells[d] <= 0) {
+      std::cout
+          << "ERROR coupling::configurations::MacroscopicCellConfiguration: ";
+      std::cout << LINKED_CELLS_PER_MACROSCOPIC_CELL
+                << " is smaller or equal zero in component " << d << "!"
+                << std::endl;
       _isValid = false;
       exit(EXIT_FAILURE);
     }
     _linkedCellsPerMacroscopicCell[d] = (unsigned int) getCells[d];
   }
 
-
   // parse write-every-microscopic-timestep
-  tarch::configuration::ParseConfiguration::readIntMandatory(buffer,node,WRITE_EVERY_MICROSCOPIC_TIMESTEP);
-  if (buffer < 0){
-    std::cout << WRITE_EVERY_MICROSCOPIC_TIMESTEP << " is smaller than zero: " << buffer << std::endl;
+  tarch::configuration::ParseConfiguration::readIntMandatory(
+      buffer, node, WRITE_EVERY_MICROSCOPIC_TIMESTEP);
+  if (buffer < 0) {
+    std::cout << WRITE_EVERY_MICROSCOPIC_TIMESTEP
+              << " is smaller than zero: " << buffer << std::endl;
     _isValid = false;
     exit(EXIT_FAILURE);
   }
-  _writeEveryMicroscopicTimestep = (unsigned int) (buffer);
+  _writeEveryMicroscopicTimestep = (unsigned int)(buffer);
 
   // parse microscopic file stem
-  tarch::configuration::ParseConfiguration::readStringMandatory(_microscopicFilename,node,MICROSCOPIC_FILENAME);
+  tarch::configuration::ParseConfiguration::readStringMandatory(
+      _microscopicFilename, node, MICROSCOPIC_FILENAME);
 
   // parse write-every-macroscopic-timestep
-  tarch::configuration::ParseConfiguration::readIntMandatory(buffer,node,WRITE_EVERY_MACROSCOPIC_TIMESTEP);
-  if (buffer < 0){
-    std::cout << WRITE_EVERY_MACROSCOPIC_TIMESTEP << " is smaller than zero: " << buffer << std::endl;
+  tarch::configuration::ParseConfiguration::readIntMandatory(
+      buffer, node, WRITE_EVERY_MACROSCOPIC_TIMESTEP);
+  if (buffer < 0) {
+    std::cout << WRITE_EVERY_MACROSCOPIC_TIMESTEP
+              << " is smaller than zero: " << buffer << std::endl;
     _isValid = false;
     exit(EXIT_FAILURE);
   }
-  _writeEveryMacroscopicTimestep = (unsigned int) (buffer);
+  _writeEveryMacroscopicTimestep = (unsigned int)(buffer);
 
   // parse macroscopic file stem
-  tarch::configuration::ParseConfiguration::readStringMandatory(_macroscopicFilename,node,MACROSCOPIC_FILENAME);
+  tarch::configuration::ParseConfiguration::readStringMandatory(
+      _macroscopicFilename, node, MACROSCOPIC_FILENAME);
 }
 
-
-template<unsigned int dim>
-std::string coupling::configurations::MacroscopicCellConfiguration<dim>::getTag() const {
+template <unsigned int dim>
+std::string
+coupling::configurations::MacroscopicCellConfiguration<dim>::getTag() const {
   return "macroscopic-cell-configuration";
 }

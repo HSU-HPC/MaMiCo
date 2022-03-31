@@ -6,112 +6,102 @@
  *  @author Piet Jarmatz, Felix Maurer
  */
 
-//Member functions of POD.h:
+// Member functions of POD.h:
 
+template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
+#ifdef DEBUG_POD
+  std::cout << "		POD: Applying filter...";
+#endif
 
-template<unsigned int dim>
-void coupling::POD<dim>::operator()(){	
-    #ifdef DEBUG_POD
-    std::cout << "		POD: Applying filter...";
-    #endif 
+  // beginProcess: first traversal
+  _spatialIndex = 0;
+  // process: first traversal
+  for (unsigned int index = 0; index < this->_inputCells.size(); index++) {
+    // save data into snapshot matrix
+    _data[0](_t, _spatialIndex) = this->_inputCells[index]->getMacroscopicMass();
+    for (unsigned int d = 0; d < dim; d++) { // (optimized compiler will unroll this loop)
+      _data[d + 1](_t, _spatialIndex) = this->_inputCells[index]->getMacroscopicMomentum()[d];
+    }
+    _spatialIndex++;
+  } // index
+  // endProcess: first traversal
+  // beginProcess: second traversal
+  _spatialIndex = 0;
+  for (unsigned int d = 0; d < dim + 1; d++) {
+    // TODO write this in more efficient iterative form,
+    // updating just one single column instead of everything
+    // and compute only lower triangular part!
+    _C[d] = _data[d] * _data[d].transpose();
 
-//beginProcess: first traversal
-	_spatialIndex = 0;
-//process: first traversal
-	for(unsigned int index = 0; index < coupling::FilterInterface<dim>::_cellIndices.size(); index++){
-		// save data into snapshot matrix
-    	_data[0](_t, _spatialIndex) = coupling::FilterInterface<dim>::_inputCells[index]->getMacroscopicMass();
-    	for (unsigned int d = 0; d < dim; d++){    // (optimized compiler will unroll this loop)
-      		_data[d+1](_t, _spatialIndex) = coupling::FilterInterface<dim>::_inputCells[index]->getMacroscopicMomentum()[d];
-    	}
-		_spatialIndex++;
-	}//index
-//endProcess: first traversal
-//beginProcess: second traversal
-	_spatialIndex = 0;
-    for (unsigned int d = 0; d < dim+1; d++){
-      // TODO write this in more efficient iterative form, 
-      // updating just one single column instead of everything
-      // and compute only lower triangular part!
-      _C[d] = _data[d] * _data[d].transpose();
-
-      #ifdef DEBUG_POD
-      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      for(unsigned int rank = 0; rank<_multiMDService.getLocalSize(); rank++){
-        if(rank == _multiMDService.getLocalRank()){
-      #endif
-        std::cout << "Rank " << _multiMDService.getLocalRank()
-          << ", _cycleCounter " << _cycleCounter << ": _data["<<d<<"] = " << _data[d] << std::endl;
-        std::cout << "Rank " << _multiMDService.getLocalRank()
-          << ", _cycleCounter " << _cycleCounter << ": _C["<<d<<"] = " << _C[d] << std::endl;
-      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-        }
-        MPI_Barrier(_multiMDService.getLocalCommunicator());
+#ifdef DEBUG_POD
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    for (unsigned int rank = 0; rank < _commSize; rank++) {
+      if (rank == _rank) {
+        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter << ": _data[" << d << "] = " << _data[d] << std::endl;
+        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter << ": _C[" << d << "] = " << _C[d] << std::endl;
       }
-      #endif
-      #endif
+      MPI_Barrier(_comm);
     }
+#endif
+#endif
+  }
 
-    //TODO asynchronous allreduce! (but doesnt make sense currently, without interleaved computation)
-    #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-    const unsigned int count = _timeWindowSize*_timeWindowSize*(dim+1);
-    double *send_data = new double[count];
-    double *recv_data = new double[count];
-    // Fill one common send buffer for all dimensions
-    unsigned int index = 0;
-    for (unsigned int d = 0; d < dim+1; d++)
-      for(unsigned int i = 0; i < _timeWindowSize*_timeWindowSize; i++)
-        send_data[index++] = _C[d].data()[i];
-    MPI_Allreduce(send_data, recv_data, count, MPI_DOUBLE, MPI_SUM, _multiMDService.getLocalCommunicator());
-    for (unsigned int d = 0; d < dim+1; d++){
-      Eigen::Map<Eigen::MatrixXd> map(&recv_data[d*_timeWindowSize*_timeWindowSize], _timeWindowSize, _timeWindowSize);
-      _C[d] = map;  // copy assignment
-    }
-    delete [] send_data;
-    delete [] recv_data;
-    #endif
-  
-    for (unsigned int d = 0; d < dim+1; d++){
-      #ifdef DEBUG_POD
-      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-      for(unsigned int rank = 0; rank<_multiMDService.getLocalSize(); rank++){
-        if(rank == _multiMDService.getLocalRank()){
-      #endif
-          std::cout << "Rank " << _multiMDService.getLocalRank()
-            << ", _cycleCounter " << _cycleCounter << ": Communication finished" << std::endl;
-          std::cout << "Rank " << _multiMDService.getLocalRank()
-            << ", _cycleCounter " << _cycleCounter << ": _C["<<d<<"] = " << _C[d] << std::endl;
-      #if (COUPLING_MD_PARALLEL==COUPLING_MD_YES)
-        }
-        MPI_Barrier(_multiMDService.getLocalCommunicator());
+// TODO asynchronous allreduce! (but doesnt make sense currently, without
+// interleaved computation)
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  const unsigned int count = _timeWindowSize * _timeWindowSize * (dim + 1);
+  double *send_data = new double[count];
+  double *recv_data = new double[count];
+  // Fill one common send buffer for all dimensions
+  unsigned int index = 0;
+  for (unsigned int d = 0; d < dim + 1; d++)
+    for (unsigned int i = 0; i < _timeWindowSize * _timeWindowSize; i++)
+      send_data[index++] = _C[d].data()[i];
+  MPI_Allreduce(send_data, recv_data, count, MPI_DOUBLE, MPI_SUM, _comm);
+  for (unsigned int d = 0; d < dim + 1; d++) {
+    Eigen::Map<Eigen::MatrixXd> map(&recv_data[d * _timeWindowSize * _timeWindowSize], _timeWindowSize, _timeWindowSize);
+    _C[d] = map; // copy assignment
+  }
+  delete[] send_data;
+  delete[] recv_data;
+#endif
+
+  for (unsigned int d = 0; d < dim + 1; d++) {
+#ifdef DEBUG_POD
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    for (unsigned int rank = 0; rank < _commSize; rank++) {
+      if (rank == _rank) {
+        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter << ": Communication finished" << std::endl;
+        std::cout << "Rank " << _rank << ", _cycleCounter " << _cycleCounter << ": _C[" << d << "] = " << _C[d] << std::endl;
       }
-      #endif
-      #endif
-
-      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(_C[d]);
-
-      _A[d] = solver.eigenvectors().rightCols(_kMax);
-      _A_T[d] = _A[d].transpose();
+      MPI_Barrier(_comm);
     }
-//process: second traversal
-	for(unsigned int index = 0; index < coupling::FilterInterface<dim>::_cellIndices.size(); index++){
-		// compute and store smoothed result
-    	Eigen::VectorXd phi_x = _A_T[0] * _data[0].col(_spatialIndex);
-    	coupling::FilterInterface<dim>::_outputCells[index]->setMacroscopicMass((_A[0].row(_t) * phi_x).value());
-    	tarch::la::Vector<dim,double> mo_smooth;
-    	for (unsigned int d = 0; d < dim; d++){ // (optimized compiler will unroll this loop)
-			phi_x = _A_T[d+1] * _data[d+1].col(_spatialIndex);
-      		mo_smooth[d] = (_A[d+1].row(_t) * phi_x).value();
-    	}
-    	coupling::FilterInterface<dim>::_outputCells[index]->setMacroscopicMomentum(mo_smooth);
-		_spatialIndex++;
-	}//index
-//endProcess: second traversal
-	_cycleCounter++;
-	_t =_cycleCounter%_timeWindowSize;		
-   
-    #ifdef DEBUG_POD
-    std::cout << "done." << std::endl;
-    #endif
+#endif
+#endif
+
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(_C[d]);
+
+    _A[d] = solver.eigenvectors().rightCols(_kMax);
+    _A_T[d] = _A[d].transpose();
+  }
+  // process: second traversal
+  for (unsigned int index = 0; index < this->_inputCells.size(); index++) {
+    // compute and store smoothed result
+    Eigen::VectorXd phi_x = _A_T[0] * _data[0].col(_spatialIndex);
+    coupling::filtering::FilterInterface<dim>::_outputCells[index]->setMacroscopicMass((_A[0].row(_t) * phi_x).value());
+    tarch::la::Vector<dim, double> mo_smooth;
+    for (unsigned int d = 0; d < dim; d++) { // (optimized compiler will unroll this loop)
+      phi_x = _A_T[d + 1] * _data[d + 1].col(_spatialIndex);
+      mo_smooth[d] = (_A[d + 1].row(_t) * phi_x).value();
+    }
+    coupling::filtering::FilterInterface<dim>::_outputCells[index]->setMacroscopicMomentum(mo_smooth);
+    _spatialIndex++;
+  } // index
+  // endProcess: second traversal
+  _cycleCounter++;
+  _t = _cycleCounter % _timeWindowSize;
+
+#ifdef DEBUG_POD
+  std::cout << "done." << std::endl;
+#endif
 }
-

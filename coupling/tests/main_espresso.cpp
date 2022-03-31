@@ -12,42 +12,47 @@
 
 #include <mpi.h>
 
-void runTest(Test *test){
-  if (test==NULL){
-    std::cout << "ERROR executeTest: test==NULL!" << std::endl; exit(EXIT_FAILURE);
+void runTest(Test *test) {
+  if (test == NULL) {
+    std::cout << "ERROR executeTest: test==NULL!" << std::endl;
+    exit(EXIT_FAILURE);
   }
   test->run();
   delete test;
 }
 
-int main(int argc, char *argv[]){
-    int thisTest = atoi(argv[1]);
-    switch(thisTest){
-    case 0:
-      runTest(new TestEspresso("TestEspresso", argc, argv));
-      break;
-    case 1: 
-      runTest(new TestEspressoMDMolecule("TestEspressoMDMolecule", argc, argv));
-      break;
-    case 2:
-      runTest(new TestDummySolverInterface("TestDummySolverInterface", argc, argv));
-      break;
-    case 3:
-      runTest(new TestEspressoAddDeleteMolecule("TestEspressoAddDeleteMolecule", argc, argv));
-      break;
-    case 4:
-      runTest(new TestEspressoForceEnergyCalculation("TestEspressoForceEnergyCalculation", argc, argv));
-      break;
-    case 5:
-      runTest(new TestEspressoMoleculeIterator("TestEspressoMoleculeIterator", argc, argv));
-      break;
-    case 6:
-      runTest(new TestEspresso2DummyCoupling("TestEspresso2DummyCoupling", argc, argv));
-      break;
-    default:
-      std::cout << "Test number " << thisTest << " out of range..." << std::endl;
-    }
-   
-    return 0;
-}
+int main(int argc, char *argv[]) {
+  int thisTest = atoi(argv[1]);
+  switch (thisTest) {
+  case 0:
+    runTest(new TestEspresso("TestEspresso", argc, argv));
+    break;
+  case 1:
+    runTest(new TestEspressoMDMolecule("TestEspressoMDMolecule", argc, argv));
+    break;
+  case 2:
+    runTest(
+        new TestDummySolverInterface("TestDummySolverInterface", argc, argv));
+    break;
+  case 3:
+    runTest(new TestEspressoAddDeleteMolecule("TestEspressoAddDeleteMolecule",
+                                              argc, argv));
+    break;
+  case 4:
+    runTest(new TestEspressoForceEnergyCalculation(
+        "TestEspressoForceEnergyCalculation", argc, argv));
+    break;
+  case 5:
+    runTest(new TestEspressoMoleculeIterator("TestEspressoMoleculeIterator",
+                                             argc, argv));
+    break;
+  case 6:
+    runTest(new TestEspresso2DummyCoupling("TestEspresso2DummyCoupling", argc,
+                                           argv));
+    break;
+  default:
+    std::cout << "Test number " << thisTest << " out of range..." << std::endl;
+  }
 
+  return 0;
+}

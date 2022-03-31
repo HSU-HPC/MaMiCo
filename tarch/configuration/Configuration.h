@@ -10,39 +10,38 @@
 
 namespace tarch {
 /**	namespace tarch */
-  namespace configuration {
+namespace configuration {
 /**	namespace configuration */
-    class Configuration;
-  }
+class Configuration;
+}
 }
 
-/**	interface for configuration using tinyxml2 
+/**	interface for configuration using tinyxml2
  *  @author Philipp Neumann
  */
 class tarch::configuration::Configuration {
-  public:
-    /**
-     * Destructor
-     */
-    virtual ~Configuration() {}
+public:
+  /**
+   * Destructor
+   */
+  virtual ~Configuration() {}
 
-    /** Parses a XML-element.
+  /** Parses a XML-element.
 	 * @param node a pointer to the xml-element from tinyxml2 class
      */
-    virtual void parseSubtag( tinyxml2::XMLElement *node ) = 0;
+  virtual void parseSubtag(tinyxml2::XMLElement *node) = 0;
 
-    /**
-     * @return the name of the current xml-element
-     */
-    virtual std::string getTag() const = 0;
+  /**
+   * @return the name of the current xml-element
+   */
+  virtual std::string getTag() const = 0;
 
-    /**
-     *  @returns true if the configuration is valid; false otherwise.
-     *  This method is basically for debugging purposes and detection of invalid input.
-     */
-    virtual bool isValid() const = 0;
+  /**
+   *  @returns true if the configuration is valid; false otherwise.
+   *  This method is basically for debugging purposes and detection of invalid
+   * input.
+   */
+  virtual bool isValid() const = 0;
 };
 
-
 #endif
-

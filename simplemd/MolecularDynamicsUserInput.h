@@ -25,7 +25,8 @@
 #define MD_PARALLEL MD_NO
 #endif
 
-// debug mode (MD_YES/MD_NO). Prints very lot of stuff to the screen. Should only be used
+// debug mode (MD_YES/MD_NO). Prints very lot of stuff to the screen. Should
+// only be used
 // during debugging.
 #ifdef MDDebug
 #define MD_DEBUG MD_YES
@@ -43,7 +44,7 @@
 // OpenMP-Parallelisation (MD_YES/MD_NO)
 #define MD_OPENMP MD_NO
 
-// TEST_TCHIPEV (MD_YES/MD_NO). If no - two communication stages, if yes - one communication stage.
+// TEST_TCHIPEV (MD_YES/MD_NO). If no - two communication stages, if yes - one
+// communication stage.
 #define PARALLEL_GDB_DEBUG MD_NO
 #endif // _MOLECULARDYNAMICS_MOLECULARDYNAMICSUSERINPUT_H_
-

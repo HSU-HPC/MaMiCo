@@ -6,40 +6,49 @@
  *  @author Felix Maurer
  */
 
-//Member functions of WriteToFile.h:
-template<unsigned int dim>
-void coupling::WriteToFile<dim>::operator()(){	
-    #ifdef DEBUG_WRITE_TO_FILE
-    std::cout << "		WTF: Now writing data to: " << _location;
-    #endif 
+// Member functions of WriteToFile.h:
+template <unsigned int dim> void coupling::filtering::WriteToFile<dim>::operator()() {
+#ifdef DEBUG_WRITE_TO_FILE
+  std::cout << "		WTF: Now writing data to: " << _location;
+#endif
 
-    int indexCounter = 0;
-    if(!_overwrite) _file.open(_location, std::ios_base::app);
-	else {
-		_file.open(_location);
-	}
-	
-    for(auto cell : coupling::FilterInterface<dim>::_inputCells){
-        _file 
-		//TODO: Semicolons as seperators?
-		<< _iteration << " , "
-        << _localCellIndices[indexCounter] << " , "
-        << coupling::FilterInterface<dim>::_cellIndices[indexCounter] << " , ";
-		for(auto sGetter : coupling::FilterInterface<dim>::_scalarGetters)
-        	_file << (cell->*sGetter)() << " , ";
-		for(auto vGetter : coupling::FilterInterface<dim>::_vectorGetters)
-        	_file << (cell->*vGetter)() << " , ";
-		_file << std::endl;
-        indexCounter++;
-    }
-	_file << std::endl;
-    _file.close(); 
-	
-	coupling::FilterInterfaceReadOnly<dim>::copyInputToOutput();
+  if (!_overwrite)
+    _file.open(_location, std::ios_base::app);
+  else {
+    _file.open(_location);
+  }
 
-	_iteration++;
-    #ifdef DEBUG_WRITE_TO_FILE
-    std::cout << " ... done" << std::endl;
-    #endif
+  for (unsigned int ic_index = 0; ic_index < coupling::filtering::FilterInterface<dim>::_inputCells.size(); ic_index++) {
+    // case: only one cell
+    if (_oneCellOnly != -1)
+      ic_index = (unsigned int)_oneCellOnly;
+
+    _file << _iteration << " ; ";
+
+    // printing all scalar values
+    for (const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs)
+      _file << (coupling::filtering::FilterInterface<dim>::_inputCells[ic_index]->*scalarProperty.get)() << " ; ";
+
+    // printing all vectorized values
+    for (const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs)
+      for (unsigned int d = 0; d < dim; d++)
+        _file << (coupling::filtering::FilterInterface<dim>::_inputCells[ic_index]->*vectorProperty.get)()[d] << " ; ";
+
+    // case: only one cell
+    if (_oneCellOnly != -1)
+      break;
+    else
+      _file << std::endl; // spatial distinction between iteration in output
+                          // file. Unneccesary if OCO.
+  }
+
+  _file << std::endl;
+  _file.close();
+
+  coupling::filtering::FilterInterfaceReadOnly<dim>::copyInputToOutput();
+
+  _iteration++;
+#ifdef DEBUG_WRITE_TO_FILE
+  std::cout << " ... done" << std::endl;
+#endif
 }
- 

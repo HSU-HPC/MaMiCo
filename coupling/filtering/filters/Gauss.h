@@ -4,90 +4,130 @@
 
 #pragma once
 
+#include <cmath>
 #include <string>
 #include <vector>
 
 //#define DEBUG_GAUSS
-#include "coupling/filtering/FilterInterface.h"
+#include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling {
-    template<unsigned int dim>
-    class Gauss;
-}
+namespace filtering {
+template <unsigned int dim> class Gauss;
 
-//DISCLAIMER:
-//This filter always uses the following parameters for kernel generation:
-#define GAUSS_SIGMA 1
-#define GAUSS_KERNEL_SIZE 3
-//Which implies:
-#define GAUSS_OUTER_WEIGHT 0.27901
-#define GAUSS_INNER_WEIGHT (1- (GAUSS_OUTER_WEIGHT * 2))
+// cf. member variable in coupling::Gauss for more details
+enum GaussExtrapolationStrategy { NONE, MIRROR, REFLECT };
+} // namespace filtering
+} // namespace coupling
 
-template<unsigned int dim>
-class coupling::Gauss : public coupling::FilterInterface<dim>{
-    public:
-        Gauss(  const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& inputCellVector,
-				const std::vector<coupling::datastructures::MacroscopicCell<dim> *>& outputCellVector,
-				const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, //Use local indexing! (starting at (0,...,0))
-				bool filteredValues[7],
-				unsigned int dimension,
-				const char* extrapolationStrategy):
-				coupling::FilterInterface<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues),
-				_dim(dimension),
-				_lastIndex(coupling::FilterInterface<dim>::_cellIndices.back())
-				//TODO: function pointers
-		{
-			//TODO
-			std::cout << "WARNING: You're using a GAUSS-Filter. As this filter has not been tested thoroughly, caution is advised!" << std::endl;
+// Define kernel radius. e.g. radius = 1 means kernel size of 3
+#define GAUSS_KERNEL_RADIUS 1
 
-			if(coupling::FilterInterface<dim>::_cellIndices.back()[_dim] < 2){
-				std::cout << "ERROR: GAUSS: Invalid input domain." << std::endl;
-				exit(EXIT_FAILURE);
-			}
+/*
+ * Gaussian filter.
+ * Operates in one dimension: If you wish to use a multidimensional gaussian
+ * filter, simply chain multiple instances of this filter in one FilterSequence.
+ *
+ * @author Felix Maurer
+ */
+template <unsigned int dim> class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<dim> {
+  using coupling::filtering::FilterInterface<dim>::_inputCells;
+  using coupling::filtering::FilterInterface<dim>::_outputCells;
+  using coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs;
+  using coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs;
 
-			if(extrapolationStrategy == nullptr || std::strcmp(extrapolationStrategy, "none") == 0) _extrapolationStrategy = 0;
-			else if(std::strcmp(extrapolationStrategy, "linear") == 0) _extrapolationStrategy = 1;
-			else{
-				#ifdef DEBUG_GAUSS
-				std::cout << "ERROR: GAUSS: Unknown extrapolation strategy:" << extrapolationStrategy << std::endl;
-				#endif
-				exit(EXIT_FAILURE);
-			}
+  using ScalarIndex = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro,
+                                                    coupling::indexing::IndexTrait::noGhost>;
+  using VectorIndex = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::local,
+                                                    coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
 
-        	#ifdef DEBUG_GAUSS
-			std::cout << "		GAUSS (Dim: " << _dim << "): Created Gaussian filter." << std::endl;
-			if(_extrapolationStrategy == 0) std::cout << "		It will not use extrapolation." << std::endl;
-			if(_extrapolationStrategy == 1) std::cout << "		It will use linear extrapolation." << std::endl;
-       		#endif
-        }
+public:
+  Gauss(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
+        const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector, const std::array<bool, 7> filteredValues, unsigned int dimension,
+        int sigma, const char *extrapolationStrategy)
+      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"), _dim(dimension), _sigma(sigma),
+        _kernel(generateKernel()) {
+    // TODO
+    if (GAUSS_KERNEL_RADIUS != 1)
+      throw std::runtime_error("ERROR: GAUSS: Kernel radius != 1 currently not supported.");
 
-        ~Gauss(){
-        	#ifdef DEBUG_GAUSS
-            std::cout << "		GAUSS (Dim: " << _dim << "): Gaussian filter deconstructed" << std::endl;
-        	#endif
-        }
+    if (extrapolationStrategy == nullptr || std::strcmp(extrapolationStrategy, "none") == 0)
+      _extrapolationStrategy = NONE;
+    else if (std::strcmp(extrapolationStrategy, "mirror") == 0)
+      _extrapolationStrategy = MIRROR;
+    else if (std::strcmp(extrapolationStrategy, "reflect") == 0)
+      _extrapolationStrategy = REFLECT;
+    else {
+      std::cout << "Extrapolation strategy: " << extrapolationStrategy << std::endl;
+      throw std::runtime_error("ERROR: GAUSS: Unknown extrapolation strategy.");
+    }
 
-     
-	    void operator()();
-	private:
-		//on which axis this filter operates. 0 <= _dim <= dim
-		unsigned int _dim;
-		
-		/**
-		 * Determines how to apply filter to border cells:
-		 * 0 = only use existing cells and increase their weight accordingly
-		 * 1 = linear extrapolation //TODO
-		 */
-		unsigned int _extrapolationStrategy;
+#ifdef DEBUG_GAUSS
+    std::cout << "		GAUSS (Dim: " << _dim << "): Created Gaussian filter." << std::endl;
+    if (_extrapolationStrategy == NONE)
+      std::cout << "		It will not use extrapolation." << std::endl;
+    if (_extrapolationStrategy == MIRROR)
+      std::cout << "		It will use mirroring extrapolation." << std::endl;
+    if (_extrapolationStrategy == REFLECT)
+      std::cout << "		It will use reflecting extrapolation." << std::endl;
+#endif
+  }
 
-		//returns the cell that's above the cell at index on the d-axis
-		unsigned int getIndexBelow(unsigned int index, unsigned int d);
-		//returns the cell that's below the cell at index on the d-axis
-		unsigned int getIndexAbove(unsigned int index, unsigned int d);
+  ~Gauss() {
+#ifdef DEBUG_GAUSS
+    std::cout << "		GAUSS (Dim: " << _dim << "): Gaussian filter deconstructed" << std::endl;
+#endif
+  }
 
-		//TODO: Move to interface?
-		tarch::la::Vector<dim, unsigned int> _lastIndex;
+  void operator()();
+
+  using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::local,
+                                                    coupling::indexing::IndexTrait::md2macro>;
+
+private:
+  std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS> generateKernel();
+
+  constexpr double gaussianDensityFunction(int x);
+
+  /*
+   * Returns the index of the cell cell that's above the cell at index on the
+   * d-axis If no such index exists, index (the first parameter) is returned.
+   *
+   * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the
+   * lowest cell that gets sent from MD to Macro.
+   */
+
+  VectorIndex getIndexAbove(const VectorIndex index, unsigned int d);
+
+  /*
+   * Returns the index of the cell that's below the cell at index on the d-axis
+   * If no such index exists, index (the first parameter) is returned.
+   *
+   * Index is assumed to be in terms of the MD2Macro domain, i.e. (0,..0) is the
+   * lowest cell that gets sent from MD to Macro.
+   */
+
+  VectorIndex getIndexBelow(const VectorIndex index, unsigned int d);
+
+  // on which axis this filter operates. 0 <= _dim <= dim
+  const unsigned int _dim;
+
+  // standard deviation used
+  const double _sigma;
+
+  std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS> _kernel;
+
+  /**
+   * Determines how to apply filter to border cells:
+   * NONE = only use existing cells and normalize their weight accordingly
+   * MIRROR = b | a b c d | c
+   * REFLECT = a | a b c d | d
+   *
+   * The last two are congruent to SciPy's gaussian filter's respective
+   * extrapolation modes
+   */
+  coupling::filtering::GaussExtrapolationStrategy _extrapolationStrategy;
 };
 
-//include implementation of header
+// include implementation of header
 #include "Gauss.cpph"

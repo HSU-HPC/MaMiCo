@@ -5,17 +5,11 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_MPIINDEXCONVERSION_H_
 #define _MOLECULARDYNAMICS_COUPLING_MPIINDEXCONVERSION_H_
 
-
-namespace coupling {
-    template<unsigned int dim>
-    class MPIIndexConversion;
-}
+namespace coupling { template <unsigned int dim> class MPIIndexConversion; }
 
 #include "coupling/IndexConversion.h"
 
-template<unsigned int dim>
-class coupling::MPIIndexConversion : public coupling::IndexConversion {
-    
-}
+template <unsigned int dim>
+class coupling::MPIIndexConversion : public coupling::IndexConversion {}
 
 #endif

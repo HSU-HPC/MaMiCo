@@ -8,20 +8,16 @@
 #include "simplemd/configurations/VTKConfiguration.h"
 
 namespace simplemd {
-  namespace configurations {
-    class CheckpointConfiguration;
-  }
+namespace configurations { class CheckpointConfiguration; }
 }
 
-
 /** data for checkpoint writing */
-class simplemd::configurations::CheckpointConfiguration: public simplemd::configurations::VTKConfiguration {
-  public:
-    CheckpointConfiguration(): simplemd::configurations::VTKConfiguration(){}
-    virtual ~CheckpointConfiguration(){}
+class simplemd::configurations::CheckpointConfiguration
+    : public simplemd::configurations::VTKConfiguration {
+public:
+  CheckpointConfiguration() : simplemd::configurations::VTKConfiguration() {}
+  virtual ~CheckpointConfiguration() {}
 
-    virtual std::string getTag() const {
-      return "checkpoint-configuration";
-    }
+  virtual std::string getTag() const { return "checkpoint-configuration"; }
 };
 #endif // _MOLECULARDYNAMICS_CONFIGURATIONS_CHECKPOINTCONFIGURATION_H_

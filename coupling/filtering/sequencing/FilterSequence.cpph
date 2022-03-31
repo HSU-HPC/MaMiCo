@@ -1,0 +1,311 @@
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamic::o
+
+#include <typeinfo>
+
+// Member functions of coupling::filtering::FilterSequence
+
+template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement *sequenceNode) {
+  if (!sequenceNode)
+    return EXIT_FAILURE;
+  tinyxml2::XMLElement *currFilterNode = sequenceNode->FirstChildElement();
+
+  std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector = _inputCellVector;
+  std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector = _cellVector2;
+
+#ifdef DEBUG_FILTER_PIPELINE
+  std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
+#endif
+  bool firstIteration = true;
+
+  while (currFilterNode) {
+    coupling::filtering::FilterInterface<dim> *newfilter = nullptr;
+
+    //###############################################################
+    // This is where you have to define how to handle each filter individually.
+    // Write To File
+    if (std::strcmp(currFilterNode->Value(), "write-to-file") == 0) {
+      bool overwrite = false;
+      if (currFilterNode->Attribute("overwrite"))
+        if (std::strcmp(currFilterNode->Attribute("overwrite"), "true") == 0)
+          overwrite = true;
+
+      int oco = -1;
+      tarch::configuration::ParseConfiguration::readIntOptional(oco, currFilterNode, "one-cell-only");
+      if (oco < -1 || oco >= (int)inputCellVector.size()) {
+        std::cout << "ERROR: XML config file references undefined cell index " << oco << " for write-to-file." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      const std::string location = currFilterNode->Attribute("location");
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+      using namespace std::string_literals;
+      int rank;
+      MPI_Comm_rank(_comm, &rank);
+
+      newfilter =
+          new coupling::filtering::WriteToFile<dim>(inputCellVector, outputCellVector, _filteredValues, std::to_string(rank) + "_"s + location, overwrite, oco);
+#else
+      newfilter = new coupling::filtering::WriteToFile<dim>(inputCellVector, outputCellVector, _filteredValues, location, overwrite, oco);
+#endif
+    }
+
+    // Read From File
+    else if (std::strcmp(currFilterNode->Value(), "read-from-file") == 0) {
+
+      newfilter = new coupling::filtering::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, currFilterNode->Attribute("location"));
+      const std::string location = currFilterNode->Attribute("location");
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+      using namespace std::string_literals;
+      int rank;
+      MPI_Comm_rank(_comm, &rank);
+
+      newfilter = new coupling::filtering::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, std::to_string(rank) + "_"s + location);
+#else
+      newfilter = new coupling::filtering::ReadFromFile<dim>(inputCellVector, outputCellVector, _filteredValues, location);
+#endif
+
+    }
+
+    // Constant Filter
+    else if (std::strcmp(currFilterNode->Value(), "constant") == 0) {
+      double constant = 0.0; // by default, constant filter uses 0 as its constant.
+      tarch::configuration::ParseConfiguration::readDoubleOptional(constant, currFilterNode, "value");
+
+      tarch::la::Vector<dim, bool> filteredDims = {true}; // default: filter multidimensional properties in all dims
+      int dir = -1;
+      tarch::configuration::ParseConfiguration::readIntOptional(dir, currFilterNode, "dir");
+      if (dir >= 0 && (unsigned int)dir < dim) /*if d is within range...*/ {
+        /*... set all dims but d to false*/
+        filteredDims = {false};
+        filteredDims[dir] = true;
+      }
+
+      newfilter = new coupling::filtering::Constant<dim>(inputCellVector, outputCellVector, _filteredValues, filteredDims, constant);
+    }
+
+    // Gauss
+    else if (std::strcmp(currFilterNode->Value(), "gauss") == 0) {
+      // dimension the gauss filter operates on
+      int d;
+      if (currFilterNode->QueryIntAttribute("dim", &d)) {
+        std::cout << "ERROR: Gaussian filter misses attribute dim in config file." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      // standard deviation of the gauss filter
+      double sigma;
+      if (currFilterNode->QueryDoubleAttribute("sigma", &sigma)) {
+        std::cout << "ERROR: Gaussian filter misses attribute sigma in config file." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      //"extrapolation" is not mandatory
+      const char *extrapolation;
+      extrapolation = currFilterNode->Attribute("extrapolation");
+
+      newfilter = new coupling::filtering::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int)d, sigma, extrapolation);
+    }
+
+    // POD
+    else if (std::strcmp(currFilterNode->Value(), "POD") == 0) {
+      // In earlier implementations, it used to be possible to override tws via
+      // function parameter. This feature was removed. See:
+      // coupling::noisereduction::NoiseReductionConfiguration::interpreteConfiguration<dim>(...,
+      // int tws)
+      int tws;
+      if (currFilterNode->QueryIntAttribute("time-window-size", &tws)) {
+        std::cout << "ERROR: POD filter misses attribute time-window-size in "
+                     "config file."
+                  << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      if (tws <= 2) {
+        std::cout << "ERROR: POD: time-window-size must be greater than two." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      int kmax;
+      if (currFilterNode->QueryIntAttribute("kmax", &kmax)) {
+        std::cout << "ERROR: POD filter misses attribute kmax in config file." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      if (kmax <= 0) {
+        std::cout << "ERROR: POD: kmax must be greater than zero.";
+        exit(EXIT_FAILURE);
+      }
+
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+      newfilter = new coupling::filtering::POD<dim>(inputCellVector, outputCellVector, _comm, _filteredValues, tws, kmax);
+#else
+      newfilter = new coupling::filtering::POD<dim>(inputCellVector, outputCellVector, _filteredValues, tws, kmax);
+#endif
+    }
+
+    // TODO: refactor the following filters to fit to new type system
+    /*
+            //Strouhal
+            else if(std::strcmp(currFilterNode->Value(), "strouhal") == 0) {
+                    double d;
+                    if(currFilterNode->QueryDoubleAttribute("D", &d)){
+                            std::cout << "ERROR: Strouhal filter misses
+    attribute D in config file." << std::endl; exit(EXIT_FAILURE);
+                    }
+                    double u;
+                    if(currFilterNode->QueryDoubleAttribute("U", &u)){
+                            std::cout << "ERROR: Strouhal filter misses
+    attribute U in config file." << std::endl; exit(EXIT_FAILURE);
+                    }
+                    newfilter = new
+    coupling::filtering::Strouhal<dim>(inputCellVector, outputCellVector,
+    _sequenceDomainCellIndices, _filteredValues, u , d);
+    }
+    */
+
+    //###############################################################
+
+    // Unknown filter identifier
+    else {
+      std::cout << "ERROR: Filter-Sequence does not recognize filter called " << currFilterNode->Value() << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+// sequential filtering
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    if (const char *sequential = currFilterNode->Attribute("sequential")) {
+      if (std::strcmp(sequential, "true") == 0)
+        _filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, _comm));
+      else
+        _filters.push_back(newfilter);
+    } else
+#endif
+      _filters.push_back(newfilter);
+
+    if (firstIteration) {
+      inputCellVector = _cellVector1;
+      firstIteration = false;
+    }
+
+    inputCellVector.swap(outputCellVector);
+    currFilterNode = currFilterNode->NextSiblingElement();
+  }
+
+  // Check for modfiability. By default true.
+  if (const char *modifiable = sequenceNode->Attribute("modifiable")) {
+    if (std::strcmp(modifiable, "false") == 0)
+      _isModifiable = false;
+  }
+
+#ifdef DEBUG_FILTER_PIPELINE
+  std::cout << PRINT_PREFIX();
+  printOutputCellVector();
+#endif
+
+  return 0;
+}
+
+// TODO: restructure code: reduce code duplication
+template <unsigned int dim>
+void coupling::filtering::FilterSequence<dim>::addFilter(
+    const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)> *applyScalar,
+    const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> *applyVector,
+    int filterIndex // counting starts at 0, -1 is equivalent to EOL
+) {
+  // save state before tinkering with output cells
+  auto outputCellVectorBefore = getOutputCellVector();
+
+  if (_isModifiable) {
+    const unsigned int index = (filterIndex == -1 || filterIndex > (int)_filters.size()) ? _filters.size() : filterIndex;
+
+    // case: index 0
+    if (index == 0) {
+      // previous filter at index 0 won't use _inputCellVector any longer
+      if (!_filters.empty())
+        _filters[0]->setInputCells(_cellVector1);
+
+      _filters.insert(_filters.begin() + index,
+                      new coupling::filtering::FilterFromFunction<dim>(_inputCellVector, _cellVector2, _filteredValues, applyScalar, applyVector));
+
+      // add copy if no copy after index exists, else remove that copy
+      if (_filters.size() > 1) { // dont check if the newly added FFF is the
+                                 // only filter in the sequence
+        if (std::strcmp(_filters[1]->getType(), "COPY") == 0)
+          _filters.erase(_filters.begin() + 1);
+        else
+          _filters.insert(_filters.begin() + 1, new coupling::filtering::Copy<dim>(_cellVector2, _cellVector1, _filteredValues));
+      } else
+        _filters.insert(_filters.begin() + 1, new coupling::filtering::Copy<dim>(_cellVector2, _cellVector1, _filteredValues));
+#ifdef DEBUG_FILTER_PIPELINE
+      std::cout << PRINT_PREFIX() << "Inserted new filter at index 0" << std::endl;
+#endif
+    }
+
+    // case: appending to nonempty sequence
+    else if (index == _filters.size()) {
+      if (_filters.size() % 2 == 0)
+        _filters.push_back(new coupling::filtering::FilterFromFunction<dim>(_cellVector1, _cellVector2, _filteredValues, applyScalar, applyVector));
+      else
+        _filters.push_back(new coupling::filtering::FilterFromFunction<dim>(_cellVector2, _cellVector1, _filteredValues, applyScalar, applyVector));
+#ifdef DEBUG_FILTER_PIPELINE
+      std::cout << PRINT_PREFIX() << "Appended new filter to sequence." << std::endl;
+#endif
+    }
+
+    // case: inserting at nonzero index
+    else {
+      if (index % 2 == 0) {
+        _filters.insert(_filters.begin() + index,
+                        new coupling::filtering::FilterFromFunction<dim>(_cellVector1, _cellVector2, _filteredValues, applyScalar, applyVector));
+
+        // add copy if no copy after index exists, else remove that copy
+        if (std::strcmp(_filters[index + 1]->getType(), "COPY") == 0)
+          _filters.erase(_filters.begin() + index + 1);
+        else
+          _filters.insert(_filters.begin() + index + 1, new coupling::filtering::Copy<dim>(_cellVector2, _cellVector1, _filteredValues));
+      } else {
+        _filters.insert(_filters.begin() + index,
+                        new coupling::filtering::FilterFromFunction<dim>(_cellVector2, _cellVector1, _filteredValues, applyScalar, applyVector));
+
+        // add copy if no copy after index exists, else remove that copy
+        if (std::strcmp(_filters[index + 1]->getType(), "COPY") == 0)
+          _filters.erase(_filters.begin() + index + 1);
+        else
+          _filters.insert(_filters.begin() + index + 1, new coupling::filtering::Copy<dim>(_cellVector1, _cellVector2, _filteredValues));
+      }
+#ifdef DEBUG_FILTER_PIPELINE
+      std::cout << PRINT_PREFIX() << "Inserted new filter at index " << index << std::endl;
+#endif
+    }
+#ifdef DEBUG_FILTER_PIPELINE
+    std::cout << PRINT_PREFIX();
+    printOutputCellVector();
+#endif
+  } else
+    std::cout << "WARNING: Trying to add filter at runtime to non-modifiable "
+                 "filter sequence "
+              << _name << ". Refused." << std::endl; // exit()?
+
+  // Check if output vector has changed. Currently, this can only happen if the
+  // output vector was _inputCellVector before.
+  if (outputCellVectorBefore != getOutputCellVector()) {
+    for (auto child : _childSequences) {
+      child->updateInputCellVector(getOutputCellVector());
+#ifdef DEBUG_FILTER_PIPELINE
+      std::cout << PRINT_PREFIX() << "Reported change in output vector to child sequence " << child->getName() << std::endl;
+#endif
+    }
+  }
+}
+
+// Private functions of coupling::filtering::FilterSequence
+
+// TODO: inline in constructor
+template <unsigned int dim> void coupling::filtering::FilterSequence<dim>::initCellVectors() {
+  for (auto cell : _inputCellVector) {
+    _cellVector1.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+    _cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+  }
+#ifdef DEBUG_FILTER_PIPELINE
+  std::cout << PRINT_PREFIX() << "Initialized cell vectors." << std::endl;
+#endif
+}
