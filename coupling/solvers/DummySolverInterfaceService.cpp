@@ -5,21 +5,17 @@
 #include "DummySolverInterfaceService.h"
 #include <mpi.h>
 
-void DummySolverInterfaceService::init(
-    tarch::la::Vector<3, unsigned int> numberProcesses, unsigned int rank,
-    tarch::la::Vector<3, double> globalMDDomainSize,
-    tarch::la::Vector<3, double> globalMDDomainOffset,
-    tarch::la::Vector<3, double> macroscopicCellSize) {
+void DummySolverInterfaceService::init(tarch::la::Vector<3, unsigned int> numberProcesses, unsigned int rank, tarch::la::Vector<3, double> globalMDDomainSize,
+                                       tarch::la::Vector<3, double> globalMDDomainOffset, tarch::la::Vector<3, double> macroscopicCellSize) {
   _transferDomainSize = globalMDDomainSize + 2.0 * macroscopicCellSize;
   _transferDomainOffset = globalMDDomainOffset - macroscopicCellSize;
   _globalMacroscopicCellSize = macroscopicCellSize;
   for (unsigned int d = 0; d < 3; d++) {
-    _globalNumberMacroscopicCells[d] =
-        floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
-    if (fabs(_globalNumberMacroscopicCells[d] * macroscopicCellSize[d] -
-             globalMDDomainSize[d]) > 1e-13) {
+    _globalNumberMacroscopicCells[d] = floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
+    if (fabs(_globalNumberMacroscopicCells[d] * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13) {
       std::cout << "ERROR MacroscopicSolverInterfaceService::init(): "
-                   "globalNumberMacroscopicCells does not fit" << std::endl;
+                   "globalNumberMacroscopicCells does not fit"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -28,80 +24,66 @@ void DummySolverInterfaceService::init(
     delete _dummySolverInterface;
     _dummySolverInterface = NULL;
   }
-  _dummySolverInterface =
-      new DummySolverInterface(_globalNumberMacroscopicCells);
+  _dummySolverInterface = new DummySolverInterface(_globalNumberMacroscopicCells);
   if (_dummySolverInterface == NULL) {
     std::cout << "ERROR MacroscopicSolverInterfaceService::init(): Could not "
-                 "initialise _transferStrategy!" << std::endl;
+                 "initialise _transferStrategy!"
+              << std::endl;
     exit(EXIT_FAILURE);
   }
 
   allocateBuffers();
 }
 
-bool DummySolverInterfaceService::addToSendBuffer(
-    const double &density, const tarch::la::Vector<3, double> &velocity,
-    const tarch::la::Vector<3, unsigned int> &index) {
+bool DummySolverInterfaceService::addToSendBuffer(const double &density, const tarch::la::Vector<3, double> &velocity,
+                                                  const tarch::la::Vector<3, unsigned int> &index) {
   if (!isInsideTransferRegion(index)) {
     return false;
   }
 
   // check transfer strategy for send operations
-  const tarch::la::Vector<3, unsigned int> globalVectorIndex =
-      globalCellIndexfromLocalIndex(index);
-  if (_dummySolverInterface->sendMacroscopicQuantityToMDSolver(
-          globalVectorIndex)) {
+  const tarch::la::Vector<3, unsigned int> globalVectorIndex = globalCellIndexfromLocalIndex(index);
+  if (_dummySolverInterface->sendMacroscopicQuantityToMDSolver(globalVectorIndex)) {
     // if we have to send this cell, scale mass and momentum and write them into
     // cell buffer
-    double volume =
-        _globalMacroscopicCellSize[0] * _globalMacroscopicCellSize[1] *
-        _globalMacroscopicCellSize[2];
-    //volume = 1.0;
+    double volume = _globalMacroscopicCellSize[0] * _globalMacroscopicCellSize[1] * _globalMacroscopicCellSize[2];
+    // volume = 1.0;
     const double mass = density * volume;
     const tarch::la::Vector<3, double> momentum = mass * velocity;
     _sendBuffer[_sendBufferCounter]->setMicroscopicMass(mass);
     _sendBuffer[_sendBufferCounter]->setMicroscopicMomentum(momentum);
     // store global index and increment send buffer-counter
-    _globalIndices4SendBuffer[_sendBufferCounter] =
-        linearIndexFromVectorIndex(globalVectorIndex);
+    _globalIndices4SendBuffer[_sendBufferCounter] = linearIndexFromVectorIndex(globalVectorIndex);
     _sendBufferCounter++;
     return true;
   }
   return false;
 }
 
-bool DummySolverInterfaceService::getFromReceiveBuffer(
-    double &density, tarch::la::Vector<3, double> &velocity,
-    const tarch::la::Vector<3, unsigned int> &index) const {
+bool DummySolverInterfaceService::getFromReceiveBuffer(double &density, tarch::la::Vector<3, double> &velocity,
+                                                       const tarch::la::Vector<3, unsigned int> &index) const {
   if (!isInsideTransferRegion(index)) {
     return false;
   }
 
   // if we want to receive information of this cell...
-  const tarch::la::Vector<3, unsigned int> globalVectorIndex =
-      globalCellIndexfromLocalIndex(index);
-  if (_dummySolverInterface->receiveMacroscopicQuantityFromMDSolver(
-          globalVectorIndex)) {
+  const tarch::la::Vector<3, unsigned int> globalVectorIndex = globalCellIndexfromLocalIndex(index);
+  if (_dummySolverInterface->receiveMacroscopicQuantityFromMDSolver(globalVectorIndex)) {
     // ... search for cell in receive buffer...
-    const unsigned int linearIndex =
-        linearIndexFromVectorIndex(globalVectorIndex);
-    double volume =
-        _globalMacroscopicCellSize[0] * _globalMacroscopicCellSize[1] *
-        _globalMacroscopicCellSize[2];
-    //volume = 1.0;
+    const unsigned int linearIndex = linearIndexFromVectorIndex(globalVectorIndex);
+    double volume = _globalMacroscopicCellSize[0] * _globalMacroscopicCellSize[1] * _globalMacroscopicCellSize[2];
+    // volume = 1.0;
     for (unsigned int i = 0; i < _receiveBufferSize; i++) {
       // ... and if we find the cell, write data to lbMass,lbMomentum and return
       if (_globalIndices4ReceiveBuffer[i] == linearIndex) {
         density = _receiveBuffer[i]->getMacroscopicMass() / volume;
-        velocity = _receiveBuffer[i]->getMacroscopicMomentum() *
-                   (1.0 / (density * volume));
+        velocity = _receiveBuffer[i]->getMacroscopicMomentum() * (1.0 / (density * volume));
         return true;
       }
     }
-    std::cout
-        << "ERROR MacroscopicSolverInterfaceService::getFromReceiveBuffer(): "
-           "Cell information for global cell index " << globalVectorIndex
-        << " not found in buffer!" << std::endl;
+    std::cout << "ERROR MacroscopicSolverInterfaceService::getFromReceiveBuffer(): "
+                 "Cell information for global cell index "
+              << globalVectorIndex << " not found in buffer!" << std::endl;
     exit(EXIT_FAILURE);
   }
   return false;
@@ -125,9 +107,8 @@ void DummySolverInterfaceService::allocateBuffers() {
   for (loop[2] = 0; loop[2] < _transferDomainNumCells[2]; loop[2]++) {
     for (loop[1] = 0; loop[1] < _transferDomainNumCells[1]; loop[1]++) {
       for (loop[0] = 0; loop[0] < _transferDomainNumCells[0]; loop[0]++) {
-        const std::vector<unsigned int> ranks =
-            _dummySolverInterface->getRanks(loop);
-        const unsigned int sizeRanks = (unsigned int) ranks.size();
+        const std::vector<unsigned int> ranks = _dummySolverInterface->getRanks(loop);
+        const unsigned int sizeRanks = (unsigned int)ranks.size();
         bool cellOnThisProcess = false;
         for (unsigned int i = 0; i < sizeRanks; i++) {
           int thisRank;
@@ -141,15 +122,13 @@ void DummySolverInterfaceService::allocateBuffers() {
         // if the cell is on this process, find out if we need to receive/ send
         // information and increment buffers
         if (cellOnThisProcess) {
-          if (_dummySolverInterface->receiveMacroscopicQuantityFromMDSolver(
-                  loop)) {
+          if (_dummySolverInterface->receiveMacroscopicQuantityFromMDSolver(loop)) {
             receiveCellIndex.push_back(linearIndexFromVectorIndex(loop));
-            _receiveBuffer.push_back(
-                new coupling::datastructures::MacroscopicCell<3>());
+            _receiveBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
             if (_receiveBuffer[_receiveBufferSize] == NULL) {
-              std::cout
-                  << "ERROR DummySolverInterfaceService::allocateBuffers(): "
-                     "_receiveBuffer[i]==NULL!" << std::endl;
+              std::cout << "ERROR DummySolverInterfaceService::allocateBuffers(): "
+                           "_receiveBuffer[i]==NULL!"
+                        << std::endl;
               exit(EXIT_FAILURE);
             }
             _receiveBufferSize++;
@@ -157,12 +136,11 @@ void DummySolverInterfaceService::allocateBuffers() {
 
           if (_dummySolverInterface->sendMacroscopicQuantityToMDSolver(loop)) {
             sendCellIndex.push_back(linearIndexFromVectorIndex(loop));
-            _sendBuffer.push_back(
-                new coupling::datastructures::MacroscopicCell<3>());
+            _sendBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
             if (_sendBuffer[_sendBufferSize] == NULL) {
-              std::cout
-                  << "ERROR DummySolverInterfaceService::allocateBuffers(): "
-                     "_sendBuffer[i]==NULL!" << std::endl;
+              std::cout << "ERROR DummySolverInterfaceService::allocateBuffers(): "
+                           "_sendBuffer[i]==NULL!"
+                        << std::endl;
               exit(EXIT_FAILURE);
             }
             _sendBufferSize++;
@@ -178,7 +156,8 @@ void DummySolverInterfaceService::allocateBuffers() {
     _globalIndices4ReceiveBuffer = new unsigned int[_receiveBufferSize];
     if (_globalIndices4ReceiveBuffer == NULL) {
       std::cout << "ERROR DummySolverInterfaceService::allocateBuffers(): "
-                   "_globalIndices4ReceiveBuffer==NULL" << std::endl;
+                   "_globalIndices4ReceiveBuffer==NULL"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
     for (unsigned int i = 0; i < _receiveBufferSize; i++) {
@@ -191,7 +170,8 @@ void DummySolverInterfaceService::allocateBuffers() {
     _globalIndices4SendBuffer = new unsigned int[_sendBufferSize];
     if (_globalIndices4SendBuffer == NULL) {
       std::cout << "ERROR DummySolverInterfaceService::allocateBuffers(): "
-                   "_globalIndices4SendBuffer==NULL" << std::endl;
+                   "_globalIndices4SendBuffer==NULL"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
     for (unsigned int i = 0; i < _sendBufferSize; i++) {

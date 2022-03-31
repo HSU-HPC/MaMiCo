@@ -5,8 +5,8 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_
 #define _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_
 
-#include "coupling/interface/MDSolverInterface.h"
 #include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/interface/MDSolverInterface.h"
 
 namespace coupling {
 template <class LinkedCell, unsigned int dim> class BoundaryForceController;
@@ -20,31 +20,19 @@ template <class LinkedCell, unsigned int dim> class BoundaryForceController;
  * macroscopic cells).
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::BoundaryForceController {
+template <class LinkedCell, unsigned int dim> class coupling::BoundaryForceController {
 public:
-  BoundaryForceController(coupling::interface::MDSolverInterface<
-      LinkedCell, dim> *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface) {}
+  BoundaryForceController(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {}
   virtual ~BoundaryForceController() {}
 
-  virtual void applyBoundaryForce(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &currentLocalMacroscopicCellIndex) = 0;
+  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                  const unsigned int &currentLocalMacroscopicCellIndex) = 0;
 
-  virtual double
-  getPotentialEnergy(const tarch::la::Vector<dim, double> &position) const {
-    return 0;
-  }
+  virtual double getPotentialEnergy(const tarch::la::Vector<dim, double> &position) const { return 0; }
 
-  virtual tarch::la::Vector<dim, double>
-  getForce(const tarch::la::Vector<dim, double> &position) const {
-    return tarch::la::Vector<dim, double>(0.0);
-  }
+  virtual tarch::la::Vector<dim, double> getForce(const tarch::la::Vector<dim, double> &position) const { return tarch::la::Vector<dim, double>(0.0); }
 
 protected:
-  coupling::interface::MDSolverInterface<LinkedCell,
-                                         dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_

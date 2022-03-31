@@ -11,14 +11,15 @@
 #include <iostream>
 
 namespace simplemd {
-namespace configurations { class VTKConfiguration; }
+namespace configurations {
+class VTKConfiguration;
 }
+} // namespace simplemd
 
 /** configuration input for VTK output.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::VTKConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::VTKConfiguration : public tarch::configuration::Configuration {
 public:
   VTKConfiguration();
   virtual ~VTKConfiguration() {}
@@ -45,9 +46,7 @@ public:
 
   /** getters for all parsed and computed quantities */
   const std::string &getFilename() const { return _filename; }
-  const unsigned int &getWriteEveryTimestep() const {
-    return _writeEveryTimestep;
-  }
+  const unsigned int &getWriteEveryTimestep() const { return _writeEveryTimestep; }
 
 private:
   static const std::string FILENAME;

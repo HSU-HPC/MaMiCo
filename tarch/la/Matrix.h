@@ -7,8 +7,10 @@
 #include "tarch/TarchDefinitions.h"
 
 namespace tarch {
-namespace la { template <int rows, int cols, class T> class Matrix; }
+namespace la {
+template <int rows, int cols, class T> class Matrix;
 }
+} // namespace tarch
 
 /**	used to define 2-D matrices of arbitrary types.
  *  @tparam rows defines the number f rows
@@ -25,7 +27,7 @@ public:
   /** @brief Two constructors, a default one and a constructor, which
 initializes all elemnet of the matrix with entry t
     * 	@param t the initial value for all elemnts of the matrix.
-	*/
+        */
   Matrix() {}
   Matrix(const T &t) {
     for (int i = 0; i < rows; i++) {
@@ -36,9 +38,9 @@ initializes all elemnet of the matrix with entry t
   }
 
   /** @brief operator(i, j) gives back the the element (i, j)
-    * 	@param i row index
-	* 	@param j column index
-	*/
+   * 	@param i row index
+   * 	@param j column index
+   */
   T &operator()(int i, int j) {
 #if (TARCH_DEBUG == TARCH_YES)
     if (i < 0 || i > rows - 1) {
@@ -55,13 +57,11 @@ initializes all elemnet of the matrix with entry t
   const T &operator()(int i, int j) const {
 #if (TARCH_DEBUG == TARCH_YES)
     if (i < 0 || i > rows - 1) {
-      std::cout << "ERROR Matrix const T& operator(): i out of range!"
-                << std::endl;
+      std::cout << "ERROR Matrix const T& operator(): i out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
     if (j < 0 || j > cols - 1) {
-      std::cout << "ERROR Matrix const T& operator(): j out of range!"
-                << std::endl;
+      std::cout << "ERROR Matrix const T& operator(): j out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif

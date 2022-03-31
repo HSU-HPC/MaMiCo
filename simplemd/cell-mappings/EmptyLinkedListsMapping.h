@@ -8,8 +8,10 @@
 #include "simplemd/LinkedCell.h"
 
 namespace simplemd {
-namespace cellmappings { class EmptyLinkedListsMapping; }
+namespace cellmappings {
+class EmptyLinkedListsMapping;
 }
+} // namespace simplemd
 
 /** deletes all molecules from the list within the cells. The molecules are only
  * removed from the lists in the cells,
@@ -31,9 +33,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    cell.getList().clear();
-  }
+  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) { cell.getList().clear(); }
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_EMPTYLINKEDLISTSMAPPING_H_

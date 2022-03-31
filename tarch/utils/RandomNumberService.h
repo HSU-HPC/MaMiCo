@@ -5,15 +5,17 @@
 #ifndef _MOLECULARDYNAMICS_SERVICES_RANDOMNUMBERSERVICE_H_
 #define _MOLECULARDYNAMICS_SERVICES_RANDOMNUMBERSERVICE_H_
 
-#include "tarch/la/Vector.h"
 #include "tarch/TarchDefinitions.h"
+#include "tarch/la/Vector.h"
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
-#include <cmath>
 
 namespace tarch {
-namespace utils { class RandomNumberService; }
+namespace utils {
+class RandomNumberService;
 }
+} // namespace tarch
 
 /** creates random numbers.
  *  @author Philipp Neumann

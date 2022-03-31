@@ -13,12 +13,9 @@ template <class LinkedCell, unsigned int dim> class NoMomentumInsertion;
 /** does not do anything with the momentum. Empty insertion mechanism.
  * @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::NoMomentumInsertion
-    : public coupling::MomentumInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::NoMomentumInsertion : public coupling::MomentumInsertion<LinkedCell, dim> {
 public:
-  NoMomentumInsertion(coupling::interface::MDSolverInterface<
-      LinkedCell, dim> *const mdSolverInterface)
+  NoMomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
       : MomentumInsertion<LinkedCell, dim>(mdSolverInterface) {}
   virtual ~NoMomentumInsertion() {}
 
@@ -33,10 +30,8 @@ public:
    *  the energy as well, see the description of MomentumController on details
    * how to do that.
    */
-  virtual void
-  insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<
-                     LinkedCell, dim> &cell,
-                 const unsigned int &currentMacroscopicCellIndex) const {}
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                              const unsigned int &currentMacroscopicCellIndex) const {}
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_NOMOMENTUMINSERTION_H_

@@ -6,8 +6,8 @@
 #define _TARCH_UTILS_MULTIMDSERVICE_H_
 
 #include "tarch/TarchDefinitions.h"
-#include <cstdlib>
 #include "tarch/la/Vector.h"
+#include <cstdlib>
 #include <numeric>
 #include <vector>
 #if (TARCH_PARALLEL == TARCH_YES)
@@ -15,8 +15,10 @@
 #endif
 
 namespace tarch {
-namespace utils { template <unsigned int dim> class MultiMDService; }
+namespace utils {
+template <unsigned int dim> class MultiMDService;
 }
+} // namespace tarch
 
 /** maps a number of MD simulations onto the total number of available ranks.
  *  For each MD simulation, a regular domain decomposition into n0 x n1 x ... x
@@ -27,27 +29,18 @@ namespace utils { template <unsigned int dim> class MultiMDService; }
  */
 template <unsigned int dim> class tarch::utils::MultiMDService {
 public:
-  MultiMDService(const tarch::la::Vector<dim, unsigned int> &numberProcesses,
-                 const unsigned int &totalNumberMDSimulations);
+  MultiMDService(const tarch::la::Vector<dim, unsigned int> &numberProcesses, const unsigned int &totalNumberMDSimulations);
   ~MultiMDService();
 
-  unsigned int
-      getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const;
+  unsigned int getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const;
 
   int getLocalNumberOfGlobalMDSimulation(unsigned int globalMDSimulation) const;
 
-  unsigned int getLocalNumberOfMDSimulations() const {
-    return _thisNumberMDSimulations;
-  }
+  unsigned int getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }
 
-  unsigned int getAvgNumberOfMDSimulations() const {
-    return _avgNumberMDSimulationsPerLocalComm;
-  }
+  unsigned int getAvgNumberOfMDSimulations() const { return _avgNumberMDSimulationsPerLocalComm; }
 
-  tarch::la::Vector<dim, unsigned int>
-  getNumberProcessesPerMDSimulation() const {
-    return _numberProcessesPerMDSimulation;
-  }
+  tarch::la::Vector<dim, unsigned int> getNumberProcessesPerMDSimulation() const { return _numberProcessesPerMDSimulation; }
 
 #if (TARCH_PARALLEL == TARCH_YES)
   MPI_Comm getLocalCommunicator() const { return _localComm; }
@@ -61,21 +54,14 @@ public:
   unsigned int getGlobalRank() const { return _globalRank; }
   unsigned int getGlobalSize() const { return _globalSize; }
 
-  void setTotalNumberMDSimulations(unsigned int n) {
-    _totalNumberMDSimulations = n;
-  }
-  unsigned int getTotalNumberOfMDSimulations() {
-    return _totalNumberMDSimulations;
-  }
+  void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
+  unsigned int getTotalNumberOfMDSimulations() { return _totalNumberMDSimulations; }
 
   void addMDSimulationBlock() {
     _totalNumberMDSimulations += _numberLocalComms;
-    _avgNumberMDSimulationsPerLocalComm =
-        _totalNumberMDSimulations / _numberLocalComms;
+    _avgNumberMDSimulationsPerLocalComm = _totalNumberMDSimulations / _numberLocalComms;
     if ((unsigned int)(_globalRank / _localSize + 1) == _numberLocalComms) {
-      _thisNumberMDSimulations =
-          _totalNumberMDSimulations -
-          _avgNumberMDSimulationsPerLocalComm * (_numberLocalComms - 1);
+      _thisNumberMDSimulations = _totalNumberMDSimulations - _avgNumberMDSimulationsPerLocalComm * (_numberLocalComms - 1);
     } else {
       _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
     }
@@ -83,12 +69,9 @@ public:
 
   void removeMDSimulationBlock() {
     _totalNumberMDSimulations -= _numberLocalComms;
-    _avgNumberMDSimulationsPerLocalComm =
-        _totalNumberMDSimulations / _numberLocalComms;
+    _avgNumberMDSimulationsPerLocalComm = _totalNumberMDSimulations / _numberLocalComms;
     if ((unsigned int)(_globalRank / _localSize + 1) == _numberLocalComms) {
-      _thisNumberMDSimulations =
-          _totalNumberMDSimulations -
-          _avgNumberMDSimulationsPerLocalComm * (_numberLocalComms - 1);
+      _thisNumberMDSimulations = _totalNumberMDSimulations - _avgNumberMDSimulationsPerLocalComm * (_numberLocalComms - 1);
     } else {
       _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
     }

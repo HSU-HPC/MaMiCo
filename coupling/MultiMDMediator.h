@@ -25,21 +25,12 @@ template <class LinkedCell, unsigned int> class MultiMDMediator;
  */
 template <class LinkedCell, unsigned int dim> class coupling::MultiMDMediator {
 public:
-
-  MultiMDMediator(coupling::services::MultiMDCellService<LinkedCell, dim> &
-                      multiMDCellService,
-                  coupling::InstanceHandling<LinkedCell, dim> &instanceHandling,
-                  tarch::utils::MultiMDService<dim> &multiMDService,
-                  coupling::interface::MacroscopicSolverInterface<dim> *
-                      macroscopicSolverInterface)
-      : _multiMDCellService(multiMDCellService),
-        _instanceHandling(instanceHandling), _multiMDService(multiMDService),
-        _listActiveMDSimulations(_multiMDService.getNumberLocalComms(),
-                                 std::vector<bool>()),
-        _macroscopicSolverInterface(macroscopicSolverInterface) {
+  MultiMDMediator(coupling::services::MultiMDCellService<LinkedCell, dim> &multiMDCellService, coupling::InstanceHandling<LinkedCell, dim> &instanceHandling,
+                  tarch::utils::MultiMDService<dim> &multiMDService, coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface)
+      : _multiMDCellService(multiMDCellService), _instanceHandling(instanceHandling), _multiMDService(multiMDService),
+        _listActiveMDSimulations(_multiMDService.getNumberLocalComms(), std::vector<bool>()), _macroscopicSolverInterface(macroscopicSolverInterface) {
     for (auto &group : _listActiveMDSimulations) {
-      group = std::vector<bool>(_multiMDService.getLocalNumberOfMDSimulations(),
-                                true);
+      group = std::vector<bool>(_multiMDService.getLocalNumberOfMDSimulations(), true);
     }
   }
 
@@ -63,11 +54,10 @@ public:
    *  @param communicator
    *  @param N number of new MD
    */
-  void addNMDSimulations(const unsigned int &communicator,
-                         const unsigned int &N);
+  void addNMDSimulations(const unsigned int &communicator, const unsigned int &N);
 
   /** Automatically remove one MD simulation trying to keep the number of MD
-* simulations across communicator balanced.
+   * simulations across communicator balanced.
    */
   void rmMDSimulation();
 
@@ -76,8 +66,7 @@ public:
    *  @param index global identifier
    *  @todo How to handle removal of empty places?
    */
-  void rmMDSimulation(const unsigned int &communicator,
-                      const unsigned int &index);
+  void rmMDSimulation(const unsigned int &communicator, const unsigned int &index);
 
   /** Remove MD Simulation on specific communicator
    *  @param communicator
@@ -106,7 +95,6 @@ public:
   unsigned int getNumberOfActiveMDSimulations();
 
 private:
-
   /** Add one block of free simulations which is evenly sliced over communicator
    * groups. */
   void addMDSimulationBlock();
@@ -153,11 +141,9 @@ private:
   coupling::services::MultiMDCellService<LinkedCell, dim> &_multiMDCellService;
   coupling::InstanceHandling<LinkedCell, dim> &_instanceHandling;
   tarch::utils::MultiMDService<dim> &_multiMDService;
-  std::vector<std::vector<bool> >
-      _listActiveMDSimulations; // global list of active (true) and inactive
-                                // (false) simulations
-  coupling::interface::MacroscopicSolverInterface<dim> *
-      _macroscopicSolverInterface;
+  std::vector<std::vector<bool>> _listActiveMDSimulations; // global list of active (true) and inactive
+                                                           // (false) simulations
+  coupling::interface::MacroscopicSolverInterface<dim> *_macroscopicSolverInterface;
 };
 
 #include "coupling/MultiMDMediator.cpph"

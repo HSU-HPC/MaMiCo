@@ -13,8 +13,8 @@ namespace tarch {
 namespace configuration {
 /**	namespace configuration */
 class Configuration;
-}
-}
+} // namespace configuration
+} // namespace tarch
 
 /**	interface for configuration using tinyxml2
  *  @author Philipp Neumann
@@ -27,8 +27,8 @@ public:
   virtual ~Configuration() {}
 
   /** Parses a XML-element.
-	 * @param node a pointer to the xml-element from tinyxml2 class
-     */
+   * @param node a pointer to the xml-element from tinyxml2 class
+   */
   virtual void parseSubtag(tinyxml2::XMLElement *node) = 0;
 
   /**

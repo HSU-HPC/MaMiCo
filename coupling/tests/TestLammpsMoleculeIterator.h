@@ -5,11 +5,11 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TESTS_TESTLAMMPSMOLECULEITERATOR_H_
 #define _MOLECULARDYNAMICS_COUPLING_TESTS_TESTLAMMPSMOLECULEITERATOR_H_
 
-#include <vector>
-#include "coupling/tests/TestLammps.h"
 #include "coupling/cell-mappings/MoleculeExtractor.h"
+#include "coupling/tests/TestLammps.h"
 #include "mamico_cell.h"
 #include "sorting.h"
+#include <vector>
 
 /** this class is used to test the iterator over molecules in LAMMPS.
  *  We use two input files for molecule coordinates
@@ -42,21 +42,17 @@
  *
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class TestLammpsMoleculeIterator : public TestLammps<dim> {
+template <unsigned int dim> class TestLammpsMoleculeIterator : public TestLammps<dim> {
 public:
-  TestLammpsMoleculeIterator(int argc, char **argv, std::string name)
-      : TestLammps<dim>(argc, argv, name) {}
+  TestLammpsMoleculeIterator(int argc, char **argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
   virtual ~TestLammpsMoleculeIterator() {}
 
   virtual void run() {
     // initialise all interfaces and simulation parts
     if (dim == 2) {
-      TestLammps<dim>::loadLammpsTestConfiguration(
-          "inputpositions2D_moleculeiterator.xyz", 24);
+      TestLammps<dim>::loadLammpsTestConfiguration("inputpositions2D_moleculeiterator.xyz", 24);
     } else {
-      TestLammps<dim>::loadLammpsTestConfiguration(
-          "inputpositions3D_moleculeiterator.xyz", 96);
+      TestLammps<dim>::loadLammpsTestConfiguration("inputpositions3D_moleculeiterator.xyz", 96);
     }
     TestLammps<dim>::loadMacroscopicSolverConfiguration();
     TestLammps<dim>::loadMamicoTestConfiguration();
@@ -64,30 +60,21 @@ public:
     // extract information on current process -> required for exact evaluation
     // of quantities in respective,
     // subsequently called test methods
-    coupling::services::MacroscopicCellServiceImpl<
-        LAMMPS_NS::MamicoCell, dim> *macroscopicCellService = (
-        coupling::services::MacroscopicCellServiceImpl<
-            LAMMPS_NS::MamicoCell,
-            dim> *)coupling::interface::MamicoInterfaceProvider<
-        LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService();
+    coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim> *macroscopicCellService =
+        (coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim> *)
+            coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance()
+                .getMacroscopicCellService();
     if (macroscopicCellService == NULL) {
-      std::cout
-          << "ERROR: Could not cast pointer to MacroscopicCellServiceImpl!"
-          << std::endl;
+      std::cout << "ERROR: Could not cast pointer to MacroscopicCellServiceImpl!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    const coupling::IndexConversion<dim> &indexConversion =
-        macroscopicCellService->getIndexConversion();
-    coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim> &
-        macroscopicCells = macroscopicCellService->getMacroscopicCells();
-    const std::vector<tarch::la::Vector<2, unsigned int> >
-        numberMoleculesPerMacroscopicCell =
-            initNumberMoleculesPerMacroscopicCell(indexConversion);
+    const coupling::IndexConversion<dim> &indexConversion = macroscopicCellService->getIndexConversion();
+    coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim> &macroscopicCells = macroscopicCellService->getMacroscopicCells();
+    const std::vector<tarch::la::Vector<2, unsigned int>> numberMoleculesPerMacroscopicCell = initNumberMoleculesPerMacroscopicCell(indexConversion);
 
     // instantiate a molecule extractor
-    coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim>
-        moleculeExtractor(coupling::interface::MamicoInterfaceProvider<
-            LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface());
+    coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim> moleculeExtractor(
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface());
 
     // run one simulation time step; this is required so that molecules are
     // sorted into the respective cells once as sort-of start-up phase
@@ -96,19 +83,15 @@ public:
     std::cout << "Check cell sorting via molecule extraction..." << std::endl;
 
     // test all macroscopic cells and contained molecules on correctness
-    testMolecules(macroscopicCells, moleculeExtractor, indexConversion,
-                  numberMoleculesPerMacroscopicCell);
+    testMolecules(macroscopicCells, moleculeExtractor, indexConversion, numberMoleculesPerMacroscopicCell);
   }
 
 private:
   /** returns the pairs (global macroscopic cell index, number molecules in this
    * cell) in a vector. The number is hard-coded, oriented at the setup
    * described above. */
-  std::vector<tarch::la::Vector<2, unsigned int> >
-  initNumberMoleculesPerMacroscopicCell(
-      const coupling::IndexConversion<dim> &indexConversion) const {
-    std::vector<tarch::la::Vector<2, unsigned int> >
-        moleculesPerMacroscopicCell;
+  std::vector<tarch::la::Vector<2, unsigned int>> initNumberMoleculesPerMacroscopicCell(const coupling::IndexConversion<dim> &indexConversion) const {
+    std::vector<tarch::la::Vector<2, unsigned int>> moleculesPerMacroscopicCell;
     tarch::la::Vector<2, unsigned int> buffer(0);
     if (dim == 2) {
       buffer[0] = 7;
@@ -200,46 +183,31 @@ private:
   /** loops over all macroscopic cells on this process and checks for the number
    * of molecules in each cell. Further, we plot the molecule positions of each
    * cell. */
-  void testMolecules(coupling::datastructures::MacroscopicCells<
-                         LAMMPS_NS::MamicoCell, dim> &macroscopicCells,
-                     coupling::cellmappings::MoleculeExtractor<
-                         LAMMPS_NS::MamicoCell, dim> &moleculeExtractor,
+  void testMolecules(coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim> &macroscopicCells,
+                     coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim> &moleculeExtractor,
                      const coupling::IndexConversion<dim> &indexConversion,
-                     const std::vector<tarch::la::Vector<2, unsigned int> > &
-                         numberMoleculesPerMacroscopicCell) {
-    const tarch::la::Vector<dim, unsigned int> localCells =
-        indexConversion.getLocalNumberMacroscopicCells();
+                     const std::vector<tarch::la::Vector<2, unsigned int>> &numberMoleculesPerMacroscopicCell) {
+    const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberMacroscopicCells();
     tarch::la::Vector<dim, unsigned int> loop(0);
     if (dim == 2) {
       for (loop[1] = 1; loop[1] < localCells[1] + 1; loop[1]++) {
         for (loop[0] = 1; loop[0] < localCells[0] + 1; loop[0]++) {
           // determine linearised indices
-          const unsigned int localIndex =
-              indexConversion.getLocalCellIndex(loop);
-          const unsigned int globalIndex =
-              indexConversion.convertLocalToGlobalCellIndex(localIndex);
+          const unsigned int localIndex = indexConversion.getLocalCellIndex(loop);
+          const unsigned int globalIndex = indexConversion.convertLocalToGlobalCellIndex(localIndex);
           // determine number of molecules in this cell, based on cell structure
-          (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex]
-              .iterateConstCells(moleculeExtractor);
-          const unsigned int numberMoleculesFound =
-              (unsigned int) moleculeExtractor.getExtractedMolecules().size();
+          (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
+          const unsigned int numberMoleculesFound = (unsigned int)moleculeExtractor.getExtractedMolecules().size();
           // determine the number of molecules as it was expected
-          const unsigned int numberMoleculesExpected = findNumberMolecules(
-              globalIndex, numberMoleculesPerMacroscopicCell);
+          const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerMacroscopicCell);
           if (numberMoleculesFound != numberMoleculesExpected) {
-            std::cout << "ERROR TestLammpsMoleculeIterator: Found molecules="
-                      << numberMoleculesFound
-                      << ", expected=" << numberMoleculesExpected << std::endl;
-            std::cout << "This process: " << indexConversion.getThisProcess()
-                      << "; considered (global cell): " << globalIndex
-                      << std::endl;
+            std::cout << "ERROR TestLammpsMoleculeIterator: Found molecules=" << numberMoleculesFound << ", expected=" << numberMoleculesExpected << std::endl;
+            std::cout << "This process: " << indexConversion.getThisProcess() << "; considered (global cell): " << globalIndex << std::endl;
             exit(EXIT_FAILURE);
           }
-          std::cout << "Global cell index=" << globalIndex
-                    << ", molecule coordinates:" << std::endl;
+          std::cout << "Global cell index=" << globalIndex << ", molecule coordinates:" << std::endl;
           for (unsigned int i = 0; i < numberMoleculesFound; i++) {
-            std::cout << (moleculeExtractor.getExtractedMolecules())[i]
-                      << std::endl;
+            std::cout << (moleculeExtractor.getExtractedMolecules())[i] << std::endl;
           }
         }
       }
@@ -248,34 +216,23 @@ private:
         for (loop[1] = 1; loop[1] < localCells[1] + 1; loop[1]++) {
           for (loop[0] = 1; loop[0] < localCells[0] + 1; loop[0]++) {
             // determine linearised indices
-            const unsigned int localIndex =
-                indexConversion.getLocalCellIndex(loop);
-            const unsigned int globalIndex =
-                indexConversion.convertLocalToGlobalCellIndex(localIndex);
+            const unsigned int localIndex = indexConversion.getLocalCellIndex(loop);
+            const unsigned int globalIndex = indexConversion.convertLocalToGlobalCellIndex(localIndex);
             // determine number of molecules in this cell, based on cell
             // structure
-            (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex]
-                .iterateConstCells(moleculeExtractor);
-            const unsigned int numberMoleculesFound =
-                (unsigned int) moleculeExtractor.getExtractedMolecules().size();
+            (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
+            const unsigned int numberMoleculesFound = (unsigned int)moleculeExtractor.getExtractedMolecules().size();
             // determine the number of molecules as it was expected
-            const unsigned int numberMoleculesExpected = findNumberMolecules(
-                globalIndex, numberMoleculesPerMacroscopicCell);
+            const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerMacroscopicCell);
             if (numberMoleculesFound != numberMoleculesExpected) {
-              std::cout << "ERROR TestLammpsMoleculeIterator: Found molecules="
-                        << numberMoleculesFound
-                        << ", expected=" << numberMoleculesExpected
+              std::cout << "ERROR TestLammpsMoleculeIterator: Found molecules=" << numberMoleculesFound << ", expected=" << numberMoleculesExpected
                         << std::endl;
-              std::cout << "This process: " << indexConversion.getThisProcess()
-                        << "; considered (global cell): " << globalIndex
-                        << std::endl;
+              std::cout << "This process: " << indexConversion.getThisProcess() << "; considered (global cell): " << globalIndex << std::endl;
               exit(EXIT_FAILURE);
             }
-            std::cout << "Global cell index=" << globalIndex
-                      << ", molecule coordinates:" << std::endl;
+            std::cout << "Global cell index=" << globalIndex << ", molecule coordinates:" << std::endl;
             for (unsigned int i = 0; i < numberMoleculesFound; i++) {
-              std::cout << (moleculeExtractor.getExtractedMolecules())[i]
-                        << std::endl;
+              std::cout << (moleculeExtractor.getExtractedMolecules())[i] << std::endl;
             }
           }
         }
@@ -288,12 +245,9 @@ private:
    * respective
    *  global cell is found, an error is thrown.
    */
-  unsigned int
-  findNumberMolecules(const unsigned int &globalIndex,
-                      const std::vector<tarch::la::Vector<2, unsigned int> > &
-                          numberMoleculesPerMacroscopicCell) const {
-    const unsigned int size =
-        (unsigned int) numberMoleculesPerMacroscopicCell.size();
+  unsigned int findNumberMolecules(const unsigned int &globalIndex,
+                                   const std::vector<tarch::la::Vector<2, unsigned int>> &numberMoleculesPerMacroscopicCell) const {
+    const unsigned int size = (unsigned int)numberMoleculesPerMacroscopicCell.size();
     for (unsigned int i = 0; i < size; i++) {
       if (globalIndex == numberMoleculesPerMacroscopicCell[i][0]) {
         return numberMoleculesPerMacroscopicCell[i][1];

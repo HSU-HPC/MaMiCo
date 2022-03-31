@@ -5,10 +5,10 @@
 #ifndef _MOLECULARDYNAMIC_COUPLING_INTERFACE_SIMPLEMDMOLECULEITERATOR_CPP_
 #define _MOLECULARDYNAMIC_COUPLING_INTERFACE_SIMPLEMDMOLECULEITERATOR_CPP_
 
-#include "simplemd/Molecule.h"
-#include "simplemd/LinkedCell.h"
 #include "coupling/interface/MoleculeIterator.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDMolecule.h"
+#include "simplemd/LinkedCell.h"
+#include "simplemd/Molecule.h"
 
 namespace coupling {
 namespace interface {
@@ -16,14 +16,11 @@ namespace interface {
 /** iterates over molecules in a SimpleMD linked cell.
  *  @author Philipp Neumann
  */
-class SimpleMDMoleculeIterator
-    : public MoleculeIterator<simplemd::LinkedCell, MD_DIM> {
+class SimpleMDMoleculeIterator : public MoleculeIterator<simplemd::LinkedCell, MD_DIM> {
 public:
-  SimpleMDMoleculeIterator(simplemd::LinkedCell &cell)
-      : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(
-            cell),
-        _buffer(NULL) {}
-  virtual ~SimpleMDMoleculeIterator() {}
+  SimpleMDMoleculeIterator(simplemd::LinkedCell &cell) : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(cell), _buffer(NULL) {
+  } virtual ~SimpleMDMoleculeIterator() {
+  }
 
   /** sets the iterator to the first element */
   void begin() { _it = _cell.begin(); }
@@ -45,18 +42,19 @@ public:
     return _buffer;
   }
 
-  const coupling::interface::Molecule<MD_DIM> &getConst() {
+  const coupling::interface::Molecule<MD_DIM> &
+  getConst() {
     _buffer.setMolecule(*_it);
     return _buffer;
   }
 
-private:
+  private :
 
-  std::list<simplemd::Molecule *>::iterator _it;
+      std::list<simplemd::Molecule *>::iterator _it;
   coupling::interface::SimpleMDMolecule _buffer;
 };
 
-}
-}
+} // namespace interface
+} // namespace coupling
 
 #endif // _MOLECULARDYNAMIC_COUPLING_INTERFACE_SIMPLEMDMOLECULEITERATOR_CPP_

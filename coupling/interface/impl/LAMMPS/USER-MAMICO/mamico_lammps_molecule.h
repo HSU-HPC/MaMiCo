@@ -6,34 +6,32 @@
 #define MAMICO_LMP_LAMMPS_MOLECULE_H
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/interface/Molecule.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
-#include "mamico_lammps_md_solver_interface.h"
+#include "coupling/interface/Molecule.h"
 #include "mamico_cell.h"
+#include "mamico_lammps_md_solver_interface.h"
 
 namespace LAMMPS_NS {
 
 /** gives access to one particular LAMMPS molecule/atom.
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class MamicoLammpsMolecule : public coupling::interface::Molecule<dim> {
+template <unsigned int dim> class MamicoLammpsMolecule : public coupling::interface::Molecule<dim> {
 public:
   MamicoLammpsMolecule(double **x, double **v, double **f, int n, double cutoff)
-      : coupling::interface::Molecule<dim>(), _x(x), _v(v), _f(f), _n(n),
-        _cutOffRadiusSquared(cutoff * cutoff), _tolerance(1.0e-8) {
+      : coupling::interface::Molecule<dim>(), _x(x), _v(v), _f(f), _n(n), _cutOffRadiusSquared(cutoff * cutoff), _tolerance(1.0e-8) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Allocate MamicoLammpsMolecule for molecule " << _n
-              << std::endl;
+    std::cout << "Allocate MamicoLammpsMolecule for molecule " << _n << std::endl;
 #endif
   }
 
   // default constructor; no access possible, only null pointers
   MamicoLammpsMolecule()
-      : coupling::interface::Molecule<dim>(), _x(NULL), _v(NULL), _f(NULL),
-        _n(-1) {}
+      : coupling::interface::Molecule<dim>(), _x(NULL), _v(NULL), _f(NULL), _n(-1) {
+  }
 
-  virtual tarch::la::Vector<dim, double> getVelocity() const {
+  virtual tarch::la::Vector<dim, double>
+  getVelocity() const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     if (_v == NULL) {
       std::cout << "ERROR getVelocity(): _v==NULL!" << std::endl;
@@ -98,26 +96,19 @@ public:
   virtual double getPotentialEnergy() const {
     // helper variables and molecule position
     const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                     dim>::getInstance()
-            .getMacroscopicCellService()->getIndexConversion();
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
     const tarch::la::Vector<dim, double> position1 = getPosition();
     const tarch::la::Vector<dim, unsigned int> linkedCellInMacroscopicCell(0);
     const tarch::la::Vector<dim, unsigned int> linkedCellsPerMacroscopicCell(1);
-    coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim> *
-        mdSolverInterface = coupling::interface::MamicoInterfaceProvider<
-            LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface();
-    const tarch::la::Vector<dim, unsigned int> cellIndex =
-        mdSolverInterface->getLinkedCellIndexForMoleculePosition(position1);
+    coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim> *mdSolverInterface =
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface();
+    const tarch::la::Vector<dim, unsigned int> cellIndex = mdSolverInterface->getLinkedCellIndexForMoleculePosition(position1);
 
     // lennard jones parameters
     const double sigma6 = pow(mdSolverInterface->getMoleculeSigma(), 6.0);
     const double epsilon = mdSolverInterface->getMoleculeEpsilon();
-    const double sigma6OverCutoff6 =
-        sigma6 /
-        (_cutOffRadiusSquared * _cutOffRadiusSquared * _cutOffRadiusSquared);
-    const double cutOffEnergy =
-        4.0 * epsilon * sigma6OverCutoff6 * (sigma6OverCutoff6 - 1.0);
+    const double sigma6OverCutoff6 = sigma6 / (_cutOffRadiusSquared * _cutOffRadiusSquared * _cutOffRadiusSquared);
+    const double cutOffEnergy = 4.0 * epsilon * sigma6OverCutoff6 * (sigma6OverCutoff6 - 1.0);
 
     // set energy to zero
     double potEnergy = 0.0;
@@ -142,8 +133,7 @@ public:
     for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
       for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
         for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-          const tarch::la::Vector<dim, unsigned int> macroscopicCellIndex =
-              coupling::initDimVector<dim>(loop);
+          const tarch::la::Vector<dim, unsigned int> macroscopicCellIndex = coupling::initDimVector<dim>(loop);
           // we take a copy instead of a reference since we do not want to have
           // conflicts
           // in the access of the underlying molecule iterators;
@@ -152,14 +142,11 @@ public:
           //                       -> using another reference dereferences the
           // molecule that
           //                          the "outer" VTK cell iterator points to
-          LAMMPS_NS::MamicoCell cell = mdSolverInterface->getLinkedCell(
-              macroscopicCellIndex, linkedCellInMacroscopicCell,
-              linkedCellsPerMacroscopicCell, indexConversion);
-          coupling::interface::MoleculeIterator<MamicoCell, dim> *it =
-              mdSolverInterface->getMoleculeIterator(cell);
+          LAMMPS_NS::MamicoCell cell =
+              mdSolverInterface->getLinkedCell(macroscopicCellIndex, linkedCellInMacroscopicCell, linkedCellsPerMacroscopicCell, indexConversion);
+          coupling::interface::MoleculeIterator<MamicoCell, dim> *it = mdSolverInterface->getMoleculeIterator(cell);
           for (it->begin(); it->continueIteration(); it->next()) {
-            const tarch::la::Vector<dim, double> rij =
-                it->getConst().getPosition() - position1;
+            const tarch::la::Vector<dim, double> rij = it->getConst().getPosition() - position1;
             const double rij2 = tarch::la::dot(rij, rij);
 
             // compute LJ force/energy and add the contributions, only if center
@@ -176,8 +163,7 @@ public:
                         << it->getConst().getPosition() << std::endl;
 #endif
               const double rij6 = rij2 * rij2 * rij2;
-              potEnergy += 0.5 * (4.0 * epsilon * (sigma6 / rij6) *
-                                      ((sigma6 / rij6) - 1.0) - cutOffEnergy);
+              potEnergy += 0.5 * (4.0 * epsilon * (sigma6 / rij6) * ((sigma6 / rij6) - 1.0) - cutOffEnergy);
             }
           }
           delete it;
@@ -202,5 +188,5 @@ private:
   double _tolerance;
 };
 
-}
+} // namespace LAMMPS_NS
 #endif // MAMICO_LMP_LAMMPS_MOLECULE_H

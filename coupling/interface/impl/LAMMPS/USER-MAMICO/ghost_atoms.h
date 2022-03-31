@@ -5,8 +5,8 @@
 #ifndef LMP_MAMICO_GHOSTATOMS_H
 #define LMP_MAMICO_GHOSTATOMS_H
 
-#include "lammps.h"
 #include "atom.h"
+#include "lammps.h"
 #include "memory.h"
 
 #include "coupling/CouplingMDDefinitions.h"
@@ -19,8 +19,7 @@ namespace LAMMPS_NS {
  */
 template <unsigned int dim> class GhostAtoms {
 public:
-  GhostAtoms(LAMMPS_NS::LAMMPS *lmp)
-      : _lmp(lmp), _ghostX(NULL), _nghost(0), _nghostBufferSize(0) {}
+  GhostAtoms(LAMMPS_NS::LAMMPS *lmp) : _lmp(lmp), _ghostX(NULL), _nghost(0), _nghostBufferSize(0) {}
   ~GhostAtoms() {
     if (_ghostX != NULL)
       _lmp->memory->destroy(_ghostX);
@@ -51,7 +50,8 @@ public:
       _ghostX = _lmp->memory->grow(_ghostX, _nghost, dim, "mamico:ghostX");
       if (_ghostX == NULL) {
         std::cout << "ERROR Sorting::extractGhostAtoms: Could not reallocate "
-                     "buffer for " << _nghost << " atoms!" << std::endl;
+                     "buffer for "
+                  << _nghost << " atoms!" << std::endl;
         exit(EXIT_FAILURE);
       }
       // set buffer size
@@ -74,13 +74,12 @@ public:
   }
 
 private:
-  LAMMPS_NS::LAMMPS *_lmp; // pointer to lammps instance
-  double **_ghostX; // stores the positions of the ghost atoms; allocated using
-                    // Lammps memory class
-  unsigned int _nghost;    // number of ghost atoms in the buffer
-  unsigned int
-      _nghostBufferSize; // size of the buffer; this value is always >= _nghost
+  LAMMPS_NS::LAMMPS *_lmp;        // pointer to lammps instance
+  double **_ghostX;               // stores the positions of the ghost atoms; allocated using
+                                  // Lammps memory class
+  unsigned int _nghost;           // number of ghost atoms in the buffer
+  unsigned int _nghostBufferSize; // size of the buffer; this value is always >= _nghost
 };
 
-}
+} // namespace LAMMPS_NS
 #endif // LMP_MAMICO_GHOSTATOMS_H

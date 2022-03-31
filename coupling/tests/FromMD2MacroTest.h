@@ -5,15 +5,15 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TESTS_FROMMD2MACROTEST_H_
 #define _MOLECULARDYNAMICS_COUPLING_TESTS_FROMMD2MACROTEST_H_
 
-#include <unistd.h>
-#include "coupling/tests/Test.h"
-#include "coupling/sendrecv/FromMD2Macro.h"
-#include "coupling/tests/TestCell.h"
-#include "coupling/tests/TestDataExchangeFromMD2Macro.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/IndexConversion.h"
-#include <vector>
+#include "coupling/sendrecv/FromMD2Macro.h"
+#include "coupling/tests/Test.h"
+#include "coupling/tests/TestCell.h"
+#include "coupling/tests/TestDataExchangeFromMD2Macro.h"
 #include <cmath>
+#include <unistd.h>
+#include <vector>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -25,7 +25,6 @@
  */
 class FromMD2MacroTest : public Test {
 private:
-
   template <unsigned int dim> void test() {
     // define current rank, total size (only allowed to be cubic)
     int rank = 0;
@@ -35,44 +34,34 @@ private:
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
 
-    const unsigned int oneDir = (unsigned int)
-        floor(pow(((double) size), (1.0 / ((double) dim))) + 0.5);
+    const unsigned int oneDir = (unsigned int)floor(pow(((double)size), (1.0 / ((double)dim))) + 0.5);
     if (pow(oneDir, dim) != size) {
-      std::cout
-          << "FromMD2MacroTest::test: this is not a cubic domain decomposition!"
-          << std::endl;
-      std::cout << "Size=" << size << ", in each direction: " << oneDir
-                << std::endl;
+      std::cout << "FromMD2MacroTest::test: this is not a cubic domain decomposition!" << std::endl;
+      std::cout << "Size=" << size << ", in each direction: " << oneDir << std::endl;
       std::cout << dim << "D case is not carried out." << std::endl;
       return;
     }
 
     // define domain sizes for cells and MD
-    const tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(
-        5 * oneDir + 2);
+    const tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(5 * oneDir + 2);
     unsigned int numberCellsInclBoundary = globalNumberMacroscopicCells[0] + 2;
     for (unsigned int d = 1; d < dim; d++) {
-      numberCellsInclBoundary =
-          numberCellsInclBoundary * (globalNumberMacroscopicCells[d] + 2);
+      numberCellsInclBoundary = numberCellsInclBoundary * (globalNumberMacroscopicCells[d] + 2);
     }
     const tarch::la::Vector<dim, unsigned int> numberProcesses(oneDir);
     const tarch::la::Vector<dim, double> mdDomainSize(1.0);
     const tarch::la::Vector<dim, double> mdDomainOffset(0.0);
     // output information
     if (rank == 0) {
-      std::cout
-          << "Global number macroscopic cells: " << globalNumberMacroscopicCells
-          << std::endl;
+      std::cout << "Global number macroscopic cells: " << globalNumberMacroscopicCells << std::endl;
       std::cout << "Number processes: " << numberProcesses << std::endl;
     }
 
     // define functional objects
-    coupling::IndexConversion<dim> indexConversion(
-        globalNumberMacroscopicCells, numberProcesses, rank, mdDomainSize,
-        mdDomainOffset, coupling::paralleltopology::XYZ);
+    coupling::IndexConversion<dim> indexConversion(globalNumberMacroscopicCells, numberProcesses, rank, mdDomainSize, mdDomainOffset,
+                                                   coupling::paralleltopology::XYZ);
     coupling::sendrecv::FromMD2Macro<TestCell<dim>, dim> fromMD2Macro;
-    TestDataExchangeFromMD2Macro<dim> testDataExchangeFromMD2Macro(
-        10, indexConversion);
+    TestDataExchangeFromMD2Macro<dim> testDataExchangeFromMD2Macro(10, indexConversion);
 
     // initialise the test cells of MaMiCo
     std::cout << "Init test cells of mamico on rank " << rank << std::endl;
@@ -80,8 +69,7 @@ private:
     for (unsigned int i = 0; i < numberCellsInclBoundary; i++) {
       cellsMamico.push_back(new TestCell<dim>());
       if (cellsMamico[i] == NULL) {
-        std::cout << "ERROR FromMD2Macro::test(): cellsMamico[i]==NULL!"
-                  << std::endl;
+        std::cout << "ERROR FromMD2Macro::test(): cellsMamico[i]==NULL!" << std::endl;
         exit(EXIT_FAILURE);
       }
       cellsMamico[i]->setBuffer1(tarch::la::Vector<dim, double>(i));
@@ -93,12 +81,10 @@ private:
     std::vector<TestCell<dim> *> receivedCells;
     unsigned int *receivedGlobalIndices = NULL;
     unsigned int numberReceivedCells = 0;
-    testDataExchangeFromMD2Macro.getBuffer4MacroscopicSolverCells(
-        numberReceivedCells, receivedCells, receivedGlobalIndices);
+    testDataExchangeFromMD2Macro.getBuffer4MacroscopicSolverCells(numberReceivedCells, receivedCells, receivedGlobalIndices);
     // INCLUDE THE FOLLOWING LINES FOR BETTER OUTPUT
     sleep(indexConversion.getThisRank());
-    std::cout << "Init receive cells on rank " << indexConversion.getThisRank()
-              << ": " << std::endl;
+    std::cout << "Init receive cells on rank " << indexConversion.getThisRank() << ": " << std::endl;
     for (unsigned int i = 0; i < numberReceivedCells; i++) {
       std::cout << "Cell " << receivedGlobalIndices[i] << std::endl;
     }
@@ -107,22 +93,17 @@ private:
 #endif
 
     // exchange quantities from MD to macro
-    fromMD2Macro.sendFromMD2Macro(indexConversion, testDataExchangeFromMD2Macro,
-                                  cellsMamico, receivedCells,
-                                  receivedGlobalIndices);
+    fromMD2Macro.sendFromMD2Macro(indexConversion, testDataExchangeFromMD2Macro, cellsMamico, receivedCells, receivedGlobalIndices);
 
     // INCLUDE THE FOLLOWING LINES FOR BETTER OUTPUT
     sleep(indexConversion.getThisRank());
-    std::cout << "Received information on rank "
-              << indexConversion.getThisRank() << ": " << std::endl;
+    std::cout << "Received information on rank " << indexConversion.getThisRank() << ": " << std::endl;
     for (unsigned int i = 0; i < numberReceivedCells; i++) {
-      std::cout << "Cell " << receivedGlobalIndices[i] << ": "
-                << receivedCells[i]->getBuffer1() << " , "
-                << receivedCells[i]->getBuffer2() << std::endl;
+      std::cout << "Cell " << receivedGlobalIndices[i] << ": " << receivedCells[i]->getBuffer1() << " , " << receivedCells[i]->getBuffer2() << std::endl;
     }
 
     // free memory
-    for (unsigned int i = 0; i < (unsigned int) receivedCells.size(); i++) {
+    for (unsigned int i = 0; i < (unsigned int)receivedCells.size(); i++) {
       if (receivedCells[i] != NULL) {
         delete receivedCells[i];
         receivedCells[i] = NULL;
@@ -132,7 +113,7 @@ private:
       delete[] receivedGlobalIndices;
       receivedGlobalIndices = NULL;
     }
-    for (unsigned int i = 0; i < (unsigned int) cellsMamico.size(); i++) {
+    for (unsigned int i = 0; i < (unsigned int)cellsMamico.size(); i++) {
       if (cellsMamico[i] != NULL) {
         delete cellsMamico[i];
         cellsMamico[i] = NULL;
@@ -150,6 +131,5 @@ public:
     std::cout << "FromMD2MacroTest: Test 3D..." << std::endl;
     test<3>();
   }
-
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_TESTS_FROMMD2MACROTEST_H_

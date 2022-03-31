@@ -12,7 +12,7 @@ namespace coupling {
 namespace sendrecv {
 template <class MacroscopicCell, unsigned int dim> class FromMacro2MDSendOnly;
 }
-}
+} // namespace coupling
 
 /** extends the generic SendReceiveBuffer for transfer of quantities from a
  * macroscopic solver to
@@ -30,14 +30,12 @@ template <class MacroscopicCell, unsigned int dim> class FromMacro2MDSendOnly;
  *  @author Philipp Neumann
  */
 template <class MacroscopicCell, unsigned int dim>
-class coupling::sendrecv::FromMacro2MDSendOnly
-    : public coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim> {
+class coupling::sendrecv::FromMacro2MDSendOnly : public coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim> {
 
 public:
   /** Constructor, just calling the constructor of the
    * coupling::sendrecv::SendReceiveBuffer  */
-  FromMacro2MDSendOnly()
-      : coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>() {}
+  FromMacro2MDSendOnly() : coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>() {}
   /** Destructor */
   virtual ~FromMacro2MDSendOnly() {}
 
@@ -50,58 +48,48 @@ terms of an array of macroscopic cells including the
      *  respective global cell indices.
      *  Basically calls sendFromMacro2MDNonBlocking(...) and
 wait4SendFromMacro2MD(...) in a row.
-	 * 	@param indexConversion
-	 * 	@param dataExchange
-	 * 	@param macroscopicCellsFromMacroscopicSolver
-	 * 	@param globalCellIndicesFromMacroscopicSolver
+         * 	@param indexConversion
+         * 	@param dataExchange
+         * 	@param macroscopicCellsFromMacroscopicSolver
+         * 	@param globalCellIndicesFromMacroscopicSolver
      */
-  void sendFromMacro2MD(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
-      const std::vector<MacroscopicCell *> &
-          macroscopicCellsFromMacroscopicSolver,
-      const unsigned int *const globalCellIndicesFromMacroscopicSolver);
+  void sendFromMacro2MD(const coupling::IndexConversion<dim> &indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
+                        const std::vector<MacroscopicCell *> &macroscopicCellsFromMacroscopicSolver,
+                        const unsigned int *const globalCellIndicesFromMacroscopicSolver);
 
   /** sends data from macro to MD. After returning, the data transfer may not be
 completely finished, similar to a IRecv/ISend-call by MPI. Please use
 wait4SendFromMacro2MD(...) to guarantee
      *  that the data transfer has been finished.
-	 * 	@param indexConversion
-	 * 	@param dataExchange
-	 * 	@param macroscopicCellsFromMacroscopicSolver
-	 * 	@param globalCellIndicesFromMacroscopicSolver
-	 *	@sa  descriptions of same function of class FromMacro2MD.
+         * 	@param indexConversion
+         * 	@param dataExchange
+         * 	@param macroscopicCellsFromMacroscopicSolver
+         * 	@param globalCellIndicesFromMacroscopicSolver
+         *	@sa  descriptions of same function of class FromMacro2MD.
      */
-  void sendFromMacro2MDNonBlocking(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
-      const std::vector<MacroscopicCell *> &
-          macroscopicCellsFromMacroscopicSolver,
-      const unsigned int *const globalCellIndicesFromMacroscopicSolver);
+  void sendFromMacro2MDNonBlocking(const coupling::IndexConversion<dim> &indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
+                                   const std::vector<MacroscopicCell *> &macroscopicCellsFromMacroscopicSolver,
+                                   const unsigned int *const globalCellIndicesFromMacroscopicSolver);
 
   /** waits for the data transfer--instantiated by
 sendFromMacro2MDNonBlocking(..)--to be finished and fills the information into
 the macroscopic cells from Mamico.
-	 * 	@param indexConversion
-	 *	@sa class FromMacro2MD.
-	 */
-  void wait4SendFromMacro2MD(
-      const coupling::IndexConversion<dim> &indexConversion);
+         * 	@param indexConversion
+         *	@sa class FromMacro2MD.
+         */
+  void wait4SendFromMacro2MD(const coupling::IndexConversion<dim> &indexConversion);
 
 protected:
   /** given a list of macroscopic cells (from the macroscopic solver), the data
 from these cells are written
      *  to the send buffer.
-	 * 	@param indexConversion
-	 * 	@param dataExchange
-	 * 	@param macroscopicCells
-	 * 	@param globalCellIndices
+         * 	@param indexConversion
+         * 	@param dataExchange
+         * 	@param macroscopicCells
+         * 	@param globalCellIndices
      */
-  void writeToSendBuffer(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
-      const std::vector<MacroscopicCell *> &macroscopicCells,
-      const unsigned int *const globalCellIndices);
+  void writeToSendBuffer(const coupling::IndexConversion<dim> &indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
+                         const std::vector<MacroscopicCell *> &macroscopicCells, const unsigned int *const globalCellIndices);
 };
 
 #include "FromMacro2MDSendOnly.cpph"

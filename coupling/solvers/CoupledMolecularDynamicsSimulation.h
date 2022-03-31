@@ -5,12 +5,14 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SOLVERS_COUPLEDMOLECULARDYNAMICSSIMULATION_H_
 #define _MOLECULARDYNAMICS_COUPLING_SOLVERS_COUPLEDMOLECULARDYNAMICSSIMULATION_H_
 
-#include "simplemd/MolecularDynamicsSimulation.h"
 #include "coupling/services/MacroscopicCellService.h"
+#include "simplemd/MolecularDynamicsSimulation.h"
 
 namespace coupling {
-namespace solvers { class CoupledMolecularDynamicsSimulation; }
+namespace solvers {
+class CoupledMolecularDynamicsSimulation;
 }
+} // namespace coupling
 
 /** simulation class for coupled MD simulations; thus, the implementation of one
  * timestep slightly
@@ -18,12 +20,9 @@ namespace solvers { class CoupledMolecularDynamicsSimulation; }
  *
  *  @author Philipp Neumann
  */
-class coupling::solvers::CoupledMolecularDynamicsSimulation
-    : public simplemd::MolecularDynamicsSimulation {
+class coupling::solvers::CoupledMolecularDynamicsSimulation : public simplemd::MolecularDynamicsSimulation {
 public:
-  CoupledMolecularDynamicsSimulation(
-      const simplemd::configurations::MolecularDynamicsConfiguration &
-          configuration);
+  CoupledMolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration &configuration);
   virtual ~CoupledMolecularDynamicsSimulation() {}
 
   void simulateOneCouplingTimestep(const unsigned int &t);
@@ -31,8 +30,7 @@ public:
   void switchOnCoupling() { _couplingSwitchedOn = true; }
   void switchOffCoupling() { _couplingSwitchedOn = false; }
 
-  void setMacroscopicCellService(coupling::services::MacroscopicCellService<
-      MD_DIM> *macroscopicCellService) {
+  void setMacroscopicCellService(coupling::services::MacroscopicCellService<MD_DIM> *macroscopicCellService) {
     _macroscopicCellService = macroscopicCellService;
   }
 
@@ -41,27 +39,16 @@ public:
    *  in boundary regions and on different processes after mass insertion/
    * deletion.
    */
-  simplemd::BoundaryTreatment &getBoundaryTreatment() {
-    return *_boundaryTreatment;
-  }
+  simplemd::BoundaryTreatment &getBoundaryTreatment() { return *_boundaryTreatment; }
 
   /** returns the parallel topology service; this is needed by the MD solver
    * interface in coupling. */
-  simplemd::services::ParallelTopologyService &getParallelTopologyService() {
-    return *_parallelTopologyService;
-  }
+  simplemd::services::ParallelTopologyService &getParallelTopologyService() { return *_parallelTopologyService; }
   /** returns the molecule service; this is needed by the MD solver interface in
    * coupling. */
-  simplemd::services::MoleculeService &getMoleculeService() {
-    return *_moleculeService;
-  }
-  simplemd::services::LinkedCellService &getLinkedCellService() {
-    return *_linkedCellService;
-  }
-  const simplemd::services::MolecularPropertiesService &
-  getMolecularPropertiesService() {
-    return *_molecularPropertiesService;
-  }
+  simplemd::services::MoleculeService &getMoleculeService() { return *_moleculeService; }
+  simplemd::services::LinkedCellService &getLinkedCellService() { return *_linkedCellService; }
+  const simplemd::services::MolecularPropertiesService &getMolecularPropertiesService() { return *_molecularPropertiesService; }
 
 private:
   coupling::services::MacroscopicCellService<MD_DIM> *_macroscopicCellService;

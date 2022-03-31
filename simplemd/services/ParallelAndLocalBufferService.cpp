@@ -6,48 +6,41 @@
 
 /* Public methods: */
 
-simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::
-    SimpleBuffer() {
+simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::SimpleBuffer() {
   _values = NULL;
   _length = 0;
   _capacity = 0;
 }
 
-simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::
-    ~SimpleBuffer() {
-  /* memory freed during shutdown */
-}
+simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::~SimpleBuffer() { /* memory freed during shutdown */ }
 
-bool
-simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise(
-    const unsigned int doublesPerMolecule,
-    const unsigned int upperBoundOnNumberOfMolecules) {
+bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise(const unsigned int doublesPerMolecule,
+                                                                                 const unsigned int upperBoundOnNumberOfMolecules) {
   _capacity = upperBoundOnNumberOfMolecules * doublesPerMolecule;
 
   _values = (double *)malloc(_capacity * sizeof(double));
   if (_values == NULL) {
     std::cout << "_values of SimpleBuffer, part of the "
                  "ParallelAndLocalBufferService, could not be allocated. "
-                 "Terminating..." << std::endl;
+                 "Terminating..."
+              << std::endl;
     return false;
   }
   _length = 0;
   return true;
 }
 
-void
-simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::shutdown() {
+void simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::shutdown() {
   free(_values);
   _length = 0;
   _capacity = 0;
   _values = NULL;
 }
 
-bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::pushData(
-    const tarch::la::Vector<MD_DIM, double> position,
-    const tarch::la::Vector<MD_DIM, double> velocity,
-    const tarch::la::Vector<MD_DIM, double> force, const double isFixed,
-    const bool permitReallocation) {
+bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::pushData(const tarch::la::Vector<MD_DIM, double> position,
+                                                                               const tarch::la::Vector<MD_DIM, double> velocity,
+                                                                               const tarch::la::Vector<MD_DIM, double> force, const double isFixed,
+                                                                               const bool permitReallocation) {
   // check if buffer has enough storage for new data
   // we want to add position, velocity and forceOld, so we need 3 * MD_DIM more
   // places
@@ -56,13 +49,14 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::pushData(
   // if send/receive buffers are exhausted, we need to terminate in any case!
   if (_length + 3 * MD_DIM + 1 > _capacity) {
     if (permitReallocation == true) {
-      //increase buffer capacity via realloc and proceed
+      // increase buffer capacity via realloc and proceed
       reallocate();
     } else {
       std::cout << "Capacity of buffer was exceeded when reallocation is not "
-                   "permitted. Terminating..." << std::endl;
-#if (MD_ERROR == MD_NO) // if MD_ERROR is off, exit here; if it is on, more checks are    
-            // made, giving info on which processor failed
+                   "permitted. Terminating..."
+                << std::endl;
+#if (MD_ERROR == MD_NO) // if MD_ERROR is off, exit here; if it is on, more checks are
+                        // made, giving info on which processor failed
       exit(EXIT_FAILURE);
 #endif
       return false;
@@ -105,8 +99,7 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::pushData(
 
 /* Private methods: */
 
-bool
-simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::reallocate() {
+bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::reallocate() {
   double *temp = NULL;
 
   unsigned int newsize = _capacity * 2;
@@ -115,13 +108,11 @@ simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::reallocate() {
     _values = temp;
     _capacity = newsize;
 #if (MD_DEBUG == MD_YES)
-    std::cout << "Local buffer reallocated. Buffer capacity is now "
-              << _capacity << " doubles " << std::endl;
+    std::cout << "Local buffer reallocated. Buffer capacity is now " << _capacity << " doubles " << std::endl;
 #endif
     return true;
   } else {
-    std::cout << "Simple buffer could not be reallocated. Terminating..."
-              << std::endl;
+    std::cout << "Simple buffer could not be reallocated. Terminating..." << std::endl;
     return false;
   }
 }
@@ -130,9 +121,8 @@ simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::reallocate() {
 
 /* Public methods: */
 
-bool simplemd::services::ParallelAndLocalBufferService::initialise(
-    const unsigned int numUniqueNeighbours,
-    const unsigned int numCellsPerBuffer[], const double avMoleculesPerCell) {
+bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigned int numUniqueNeighbours, const unsigned int numCellsPerBuffer[],
+                                                                   const double avMoleculesPerCell) {
   bool isOk = true;
   unsigned int doublesPerMolecule = MD_DIM * 3 + 1;
   /* Reallocation of local buffer is permitted, so initialize it with a small
@@ -141,9 +131,7 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(
 
   isOk = _localBuffer.initialise(doublesPerMolecule, buffUpperBound);
   if (!isOk) {
-    std::cout << "Allocation of local buffer with "
-              << buffUpperBound *doublesPerMolecule
-              << " doubles failed. Terminating..." << std::endl;
+    std::cout << "Allocation of local buffer with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..." << std::endl;
     return false;
   }
 
@@ -151,35 +139,26 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(
   _numberActiveParallelBuffers = numUniqueNeighbours;
   unsigned int i_buffer;
   for (i_buffer = 0; i_buffer < _numberActiveParallelBuffers; i_buffer++) {
-    buffUpperBound = computeBufferUpperBound(numCellsPerBuffer[i_buffer],
-                                             avMoleculesPerCell);
+    buffUpperBound = computeBufferUpperBound(numCellsPerBuffer[i_buffer], avMoleculesPerCell);
 
-    isOk =
-        _sendBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
+    isOk = _sendBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
     if (!isOk) {
-      std::cout << "Allocation of send buffer " << i_buffer << " with "
-                << buffUpperBound *doublesPerMolecule
-                << " doubles failed. Terminating..." << std::endl;
+      std::cout << "Allocation of send buffer " << i_buffer << " with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..."
+                << std::endl;
       return false;
     }
 #if (MD_DEBUG == MD_YES)
-    std::cout << "Send buffer " << i_buffer
-              << " was successfully allocated with an upper bound of "
-              << buffUpperBound << std::endl;
+    std::cout << "Send buffer " << i_buffer << " was successfully allocated with an upper bound of " << buffUpperBound << std::endl;
 #endif
 
-    isOk = _receiveBuffers[i_buffer]
-        .initialise(doublesPerMolecule, buffUpperBound);
+    isOk = _receiveBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
     if (!isOk) {
-      std::cout << "Allocation of receive buffer " << i_buffer << " with "
-                << buffUpperBound *doublesPerMolecule
-                << " doubles failed. Terminating..." << std::endl;
+      std::cout << "Allocation of receive buffer " << i_buffer << " with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..."
+                << std::endl;
       return false;
     }
 #if (MD_DEBUG == MD_YES)
-    std::cout << "Receive buffer " << i_buffer
-              << " was successfully allocated with an upper bound of "
-              << buffUpperBound << std::endl;
+    std::cout << "Receive buffer " << i_buffer << " was successfully allocated with an upper bound of " << buffUpperBound << std::endl;
 #endif
   }
 #endif
@@ -199,21 +178,16 @@ void simplemd::services::ParallelAndLocalBufferService::shutdown() {
 #endif
 }
 
-bool
-simplemd::services::ParallelAndLocalBufferService::pushMoleculeToLocalBuffer(
-    const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol) {
+bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToLocalBuffer(const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol) {
   const bool permitReallocation = true;
 #if (MD_ERROR == MD_YES)
   bool isOk;
   isOk =
 #endif
-      _localBuffer.pushData(position, mol->getConstVelocity(),
-                            mol->getConstForceOld(), (double) mol->isFixed(),
-                            permitReallocation);
+      _localBuffer.pushData(position, mol->getConstVelocity(), mol->getConstForceOld(), (double)mol->isFixed(), permitReallocation);
 #if (MD_ERROR == MD_YES)
   if (!isOk) {
-    std::cout << "Pushing molecule to local buffer failed. Terminating..."
-              << std::endl;
+    std::cout << "Pushing molecule to local buffer failed. Terminating..." << std::endl;
     return false;
   }
 #endif
@@ -221,22 +195,17 @@ simplemd::services::ParallelAndLocalBufferService::pushMoleculeToLocalBuffer(
 }
 
 #if (MD_PARALLEL == MD_YES)
-bool
-simplemd::services::ParallelAndLocalBufferService::pushMoleculeToSendBuffer(
-    const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol,
-    const unsigned int i_buffer) {
+bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToSendBuffer(const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol,
+                                                                                 const unsigned int i_buffer) {
   const bool permitReallocation = false;
 #if (MD_ERROR == MD_YES)
   bool isOk;
   isOk =
 #endif
-      _sendBuffers[i_buffer]
-          .pushData(position, mol->getConstVelocity(), mol->getConstForceOld(),
-                    (double) mol->isFixed(), permitReallocation);
+      _sendBuffers[i_buffer].pushData(position, mol->getConstVelocity(), mol->getConstForceOld(), (double)mol->isFixed(), permitReallocation);
 #if (MD_ERROR == MD_YES)
   if (!isOk) {
-    std::cout << "Pushing molecule to send buffer " << i_buffer
-              << " failed. Terminating..." << std::endl;
+    std::cout << "Pushing molecule to send buffer " << i_buffer << " failed. Terminating..." << std::endl;
     return false;
   }
 #endif
@@ -246,10 +215,7 @@ simplemd::services::ParallelAndLocalBufferService::pushMoleculeToSendBuffer(
 
 /* Private methods */
 
-unsigned int
-simplemd::services::ParallelAndLocalBufferService::computeBufferUpperBound(
-    const unsigned int numCells, const double avMoleculesPerCell) const {
+unsigned int simplemd::services::ParallelAndLocalBufferService::computeBufferUpperBound(const unsigned int numCells, const double avMoleculesPerCell) const {
   // modeling a function of the type A(x) = c * x^-alpha + d
-  return (unsigned int) std::ceil((double) numCells * avMoleculesPerCell *
-                                  (4.0 / std::sqrt((double) numCells) + 1.5));
+  return (unsigned int)std::ceil((double)numCells * avMoleculesPerCell * (4.0 / std::sqrt((double)numCells) + 1.5));
 }

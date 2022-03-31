@@ -5,8 +5,8 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_ZHOUBOUNDARYFORCECONTROLLER_H_
 #define _MOLECULARDYNAMICS_COUPLING_ZHOUBOUNDARYFORCECONTROLLER_H_
 
-#include "coupling/cell-mappings/ZhouBoundaryForce.h"
 #include "coupling/BoundaryForceController.h"
+#include "coupling/cell-mappings/ZhouBoundaryForce.h"
 
 namespace coupling {
 template <class LinkedCell, unsigned int dim> class ZhouBoundaryForceController;
@@ -17,39 +17,24 @@ template <class LinkedCell, unsigned int dim> class ZhouBoundaryForceController;
  *  check out the descriptions in cell-mappings/ZhouBoundaryForce.
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::ZhouBoundaryForceController
-    : public coupling::BoundaryForceController<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::ZhouBoundaryForceController : public coupling::BoundaryForceController<LinkedCell, dim> {
 public:
-  ZhouBoundaryForceController(const double &density, const double &temperature,
-                              const tarch::la::Vector<2 * dim, bool> &boundary,
-                              coupling::interface::MDSolverInterface<
-                                  LinkedCell, dim> *const mdSolverInterface)
-      : coupling::BoundaryForceController<LinkedCell, dim>(mdSolverInterface),
-        _density(density), _temperature(temperature), _boundary(boundary),
-        _zhouBoundaryForce(density, temperature,
-                           mdSolverInterface->getMoleculeEpsilon(),
-                           mdSolverInterface->getMoleculeSigma(), boundary,
-                           mdSolverInterface->getGlobalMDDomainOffset(),
-                           mdSolverInterface->getGlobalMDDomainSize(),
-                           mdSolverInterface) {}
+  ZhouBoundaryForceController(const double &density, const double &temperature, const tarch::la::Vector<2 * dim, bool> &boundary,
+                              coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+      : coupling::BoundaryForceController<LinkedCell, dim>(mdSolverInterface), _density(density), _temperature(temperature), _boundary(boundary),
+        _zhouBoundaryForce(density, temperature, mdSolverInterface->getMoleculeEpsilon(), mdSolverInterface->getMoleculeSigma(), boundary,
+                           mdSolverInterface->getGlobalMDDomainOffset(), mdSolverInterface->getGlobalMDDomainSize(), mdSolverInterface) {}
 
   virtual ~ZhouBoundaryForceController() {}
 
-  virtual void
-  applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<
-                         LinkedCell, dim> &cell,
-                     const unsigned int &currentLocalMacroscopicCellIndex) {
+  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                  const unsigned int &currentLocalMacroscopicCellIndex) {
     cell.iterateCells(_zhouBoundaryForce);
   }
 
-  virtual double
-  getPotentialEnergy(const tarch::la::Vector<dim, double> &position) const {
-    return _zhouBoundaryForce.getPotentialEnergy(position);
-  }
+  virtual double getPotentialEnergy(const tarch::la::Vector<dim, double> &position) const { return _zhouBoundaryForce.getPotentialEnergy(position); }
 
-  virtual tarch::la::Vector<dim, double>
-  getForce(const tarch::la::Vector<dim, double> &position) const {
+  virtual tarch::la::Vector<dim, double> getForce(const tarch::la::Vector<dim, double> &position) const {
     return _zhouBoundaryForce.getBoundaryForces(position);
   }
 

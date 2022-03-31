@@ -11,14 +11,15 @@
 #include <iostream>
 
 namespace simplemd {
-namespace configurations { class RDFConfiguration; }
+namespace configurations {
+class RDFConfiguration;
 }
+} // namespace simplemd
 
 /** configuration input for RDF sampling.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::RDFConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::RDFConfiguration : public tarch::configuration::Configuration {
 public:
   RDFConfiguration();
   virtual ~RDFConfiguration() {}
@@ -46,12 +47,8 @@ public:
   /** getters for all parsed and computed quantities */
   const bool &isDefined() const { return _isDefined; }
   const unsigned int &getStartAtTimestep() const { return _startAtTimestep; }
-  const unsigned int &getEvaluateEveryTimestep() const {
-    return _evaluateEveryTimestep;
-  }
-  const unsigned int &getWriteEveryTimestep() const {
-    return _writeEveryTimestep;
-  }
+  const unsigned int &getEvaluateEveryTimestep() const { return _evaluateEveryTimestep; }
+  const unsigned int &getWriteEveryTimestep() const { return _writeEveryTimestep; }
   const unsigned int &getNumberOfPoints() const { return _numberPoints; }
 
 private:

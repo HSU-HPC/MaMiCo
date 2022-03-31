@@ -8,14 +8,15 @@
 #include "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolver.h"
 
 namespace coupling {
-namespace interface { class VoidMacroscopicSolver; }
+namespace interface {
+class VoidMacroscopicSolver;
 }
+} // namespace coupling
 
 /** empty solver, does not do anything.
  * @author Philipp Neumann
  */
-class coupling::interface::VoidMacroscopicSolver
-    : public coupling::interface::TestMacroscopicSolver {
+class coupling::interface::VoidMacroscopicSolver : public coupling::interface::TestMacroscopicSolver {
 public:
   VoidMacroscopicSolver() : TestMacroscopicSolver() {}
   virtual ~VoidMacroscopicSolver() {}

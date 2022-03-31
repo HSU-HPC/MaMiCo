@@ -8,8 +8,10 @@
 #include "simplemd/LinkedCell.h"
 
 namespace simplemd {
-namespace cellmappings { class ResetPotentialEnergyMapping; }
+namespace cellmappings {
+class ResetPotentialEnergyMapping;
 }
+} // namespace simplemd
 
 /** resets the potential energy for all molecules within a certain linked cell.
  *  @author Philipp Neumann
@@ -22,8 +24,7 @@ public:
   void beginCellIteration() {}
   void endCellIteration() {}
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    for (std::list<Molecule *>::const_iterator it = cell.begin();
-         it != cell.end(); it++) {
+    for (std::list<Molecule *>::const_iterator it = cell.begin(); it != cell.end(); it++) {
       (*it)->setPotentialEnergy(_zero);
     }
   }

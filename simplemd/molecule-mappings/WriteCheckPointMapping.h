@@ -8,14 +8,16 @@
 #include "simplemd/Molecule.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include <cstdlib>
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <sstream>
 
 namespace simplemd {
-namespace moleculemappings { class WriteCheckPointMapping; }
+namespace moleculemappings {
+class WriteCheckPointMapping;
 }
+} // namespace simplemd
 
 /** writes checkpoint data for e.g. restarts.
  *
@@ -23,11 +25,8 @@ namespace moleculemappings { class WriteCheckPointMapping; }
  */
 class simplemd::moleculemappings::WriteCheckPointMapping {
 public:
-  WriteCheckPointMapping(const simplemd::services::ParallelTopologyService &
-                             parallelTopologyService,
-                         const std::string &filestem, const unsigned int &t)
-      : _parallelTopologyService(parallelTopologyService), _file(NULL),
-        _filestem(filestem), _t(t) {}
+  WriteCheckPointMapping(const simplemd::services::ParallelTopologyService &parallelTopologyService, const std::string &filestem, const unsigned int &t)
+      : _parallelTopologyService(parallelTopologyService), _file(NULL), _filestem(filestem), _t(t) {}
   ~WriteCheckPointMapping() {}
 
   void beginMoleculeIteration();

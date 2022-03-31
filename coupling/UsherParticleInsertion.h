@@ -5,6 +5,8 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_USHERPARTICLEINSERTION_H_
 #define _MOLECULARDYNAMICS_COUPLING_USHERPARTICLEINSERTION_H_
 
+#include "coupling/CouplingMDDefinitions.h"
+#include "coupling/ParticleInsertion.h"
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/ComputeTemperatureMapping.h"
@@ -12,8 +14,6 @@
 #include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/datastructures/Molecule.h"
 #include "coupling/interface/MDSolverInterface.h"
-#include "coupling/CouplingMDDefinitions.h"
-#include "coupling/ParticleInsertion.h"
 #include "tarch/utils/RandomNumberService.h"
 
 //#define USHER_DEBUG
@@ -29,40 +29,24 @@ template <class LinkedCell, unsigned int dim> class UsherParticleInsertion;
  *
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::UsherParticleInsertion
-    : public coupling::ParticleInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::UsherParticleInsertion : public coupling::ParticleInsertion<LinkedCell, dim> {
 public:
-
-  UsherParticleInsertion(unsigned int insertDeleteMassEveryTimestep,
-                         double rSigmaCoeff, double meanPotentialEnergyFactor,
-                         double uOverlapCoeff, double stepRefCoeff,
-                         unsigned int iterMax, unsigned int restartMax,
-                         double tolerance, double offsetFromOuterBoundary,
-                         coupling::interface::MDSolverInterface<
-                             LinkedCell, dim> *const mdSolverInterface);
+  UsherParticleInsertion(unsigned int insertDeleteMassEveryTimestep, double rSigmaCoeff, double meanPotentialEnergyFactor, double uOverlapCoeff,
+                         double stepRefCoeff, unsigned int iterMax, unsigned int restartMax, double tolerance, double offsetFromOuterBoundary,
+                         coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface);
   virtual ~UsherParticleInsertion() {}
 
   /** this state is returned by the insertDeleteMass() function and tells the
    * user, if mass was inserted/deleted
    *  or if nothing happened at all.
    */
-  enum Action {
-    NoAction = 0,
-    Insertion = 1,
-    Deletion = 2
-  };
+  enum Action { NoAction = 0, Insertion = 1, Deletion = 2 };
 
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-      insertDeleteMass(
-          coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                                   dim> &cell,
-          const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-          const tarch::la::Vector<dim, double> &macroscopicCellSize,
-          const tarch::la::Vector<dim, double> &meanVelocity,
-          const double &temperature,
-          const coupling::BoundaryForceController<LinkedCell, dim> &
-              boundaryForceController);
+  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                   const tarch::la::Vector<dim, double> &macroscopicCellPosition, const tarch::la::Vector<dim, double> &macroscopicCellSize,
+                   const tarch::la::Vector<dim, double> &meanVelocity, const double &temperature,
+                   const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController);
 
   virtual bool requiresPotentialEnergyLandscape() { return true; }
 
@@ -78,22 +62,16 @@ public:
 private:
   /** inserts a particle in the respective macroscopic cell. Returns Insertion
    * on success and NoAction otherwise. */
-  typename coupling::ParticleInsertion<LinkedCell, dim>::Action insertParticle(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-      const tarch::la::Vector<dim, double> &macroscopicCellSize,
-      const tarch::la::Vector<dim, double> &meanVelocity,
-      const double &temperature, const coupling::BoundaryForceController<
-                                     LinkedCell, dim> &boundaryForceController);
+  typename coupling::ParticleInsertion<LinkedCell, dim>::Action
+  insertParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const tarch::la::Vector<dim, double> &macroscopicCellPosition,
+                 const tarch::la::Vector<dim, double> &macroscopicCellSize, const tarch::la::Vector<dim, double> &meanVelocity, const double &temperature,
+                 const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController);
 
   /** deletes a particle from the macroscopic cell. Returns Deletion on success
    * and NoAction otherwise. */
   typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-      deleteParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<
-                         LinkedCell, dim> &cell,
-                     const coupling::BoundaryForceController<LinkedCell, dim> &
-                         boundaryForceController);
+  deleteParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                 const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController);
 
   /** determines the position of a new particle within the macroscopic cell
    * thisCell and stores the result
@@ -103,14 +81,9 @@ private:
    */
 protected:
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-      findParticlePosition(
-          coupling::datastructures::MacroscopicCellWithLinkedCells<
-              LinkedCell, dim> &thisCell,
-          const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-          const tarch::la::Vector<dim, double> &macroscopicCellSize,
-          coupling::datastructures::Molecule<dim> &molecule,
-          const coupling::BoundaryForceController<LinkedCell, dim> &
-              boundaryForceController);
+  findParticlePosition(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &thisCell,
+                       const tarch::la::Vector<dim, double> &macroscopicCellPosition, const tarch::la::Vector<dim, double> &macroscopicCellSize,
+                       coupling::datastructures::Molecule<dim> &molecule, const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController);
 
   class UsherParams {
   public:
@@ -123,15 +96,10 @@ protected:
     double _tolerance;
     double _offsetFromOuterBoundary;
 
-    UsherParams(double rSigmaCoeff, double meanPotentialEnergyFactor,
-                double uOverlapCoeff, double stepRefCoeff, unsigned int iterMax,
-                unsigned int restartMax, double tolerance,
-                double offsetFromOuterBoundary)
-        : _rSigmaCoeff(rSigmaCoeff),
-          _meanPotentialEnergyFactor(meanPotentialEnergyFactor),
-          _uOverlapCoeff(uOverlapCoeff), _stepRefCoeff(stepRefCoeff),
-          _iterMax(iterMax), _restartMax(restartMax), _tolerance(tolerance),
-          _offsetFromOuterBoundary(offsetFromOuterBoundary) {}
+    UsherParams(double rSigmaCoeff, double meanPotentialEnergyFactor, double uOverlapCoeff, double stepRefCoeff, unsigned int iterMax, unsigned int restartMax,
+                double tolerance, double offsetFromOuterBoundary)
+        : _rSigmaCoeff(rSigmaCoeff), _meanPotentialEnergyFactor(meanPotentialEnergyFactor), _uOverlapCoeff(uOverlapCoeff), _stepRefCoeff(stepRefCoeff),
+          _iterMax(iterMax), _restartMax(restartMax), _tolerance(tolerance), _offsetFromOuterBoundary(offsetFromOuterBoundary) {}
     ~UsherParams() {}
 
     double getStepRef(double numberDensity, double sigma) const {
@@ -147,8 +115,7 @@ protected:
     }
   };
 
-  coupling::interface::MDSolverInterface<LinkedCell,
-                                         dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   const UsherParams _usherParams;
 };
 #include "coupling/UsherParticleInsertion.cpph"

@@ -5,16 +5,16 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_DIRECTTRANSFERSTRATEGY_H_
 #define _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_DIRECTTRANSFERSTRATEGY_H_
 
-#include "coupling/transferstrategies/TransferStrategy.h"
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
+#include "coupling/transferstrategies/TransferStrategy.h"
 #include "tarch/la/Vector.h"
 
 namespace coupling {
 namespace transferstrategies {
 template <class LinkedCell, unsigned int dim> class DirectTransferStrategy;
 }
-}
+} // namespace coupling
 
 /** transfers and introduces mass and momentum directly into MD and to
  * macroscopic solver.
@@ -24,41 +24,32 @@ template <class LinkedCell, unsigned int dim> class DirectTransferStrategy;
  *  @author Philipp Neumann
  */
 template <class LinkedCell, unsigned int dim>
-class coupling::transferstrategies::DirectTransferStrategy
-    : public coupling::transferstrategies::TransferStrategy<LinkedCell, dim> {
+class coupling::transferstrategies::DirectTransferStrategy : public coupling::transferstrategies::TransferStrategy<LinkedCell, dim> {
 public:
-  DirectTransferStrategy(coupling::interface::MDSolverInterface<
-                             LinkedCell, dim> *const mdSolverInterface,
+  DirectTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
                          const coupling::IndexConversion<dim> &indexConversion)
-      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(
-            mdSolverInterface, indexConversion),
-        _massMapping(mdSolverInterface), _momentumMapping(mdSolverInterface) {}
+      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion), _massMapping(mdSolverInterface),
+        _momentumMapping(mdSolverInterface) {}
   virtual ~DirectTransferStrategy() {}
 
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                               const unsigned int &index) {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
     cell.setMicroscopicMass(0.0);
     cell.setMicroscopicMomentum(zero);
   }
 
-  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {
+  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                               const unsigned int &index) {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
     cell.setMicroscopicMass(0.0);
     cell.setMicroscopicMomentum(zero);
   }
 
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {
+  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                    const unsigned int &index) {
     cell.iterateConstCells(_massMapping);
     cell.iterateConstCells(_momentumMapping);
     cell.setMacroscopicMass(_massMapping.getMass());
@@ -67,7 +58,6 @@ public:
 
 private:
   coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> _massMapping;
-  coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim>
-      _momentumMapping;
+  coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> _momentumMapping;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_DIRECTTRANSFERSTRATEGY_H_

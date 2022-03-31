@@ -12,35 +12,27 @@
  *  @author Rahul Arora
  */
 
-class DummySolverInterface
-    : public coupling::interface::MacroscopicSolverInterface<3> {
+class DummySolverInterface : public coupling::interface::MacroscopicSolverInterface<3> {
 public:
-  DummySolverInterface(
-      tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells)
-      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells),
-        _numberOfBoundaryCells(3) {}
+  DummySolverInterface(tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells)
+      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _numberOfBoundaryCells(3) {}
 
   ~DummySolverInterface() {}
 
-  bool receiveMacroscopicQuantityFromMDSolver(
-      tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     bool isInside = true;
     for (int d = 0; d < 3; d++) {
       isInside =
-          isInside && (globalCellIndex[d] > _numberOfBoundaryCells - 1) &&
-          (globalCellIndex[d] <
-           _globalNumberMacroscopicCells[d] + 2 - _numberOfBoundaryCells);
+          isInside && (globalCellIndex[d] > _numberOfBoundaryCells - 1) && (globalCellIndex[d] < _globalNumberMacroscopicCells[d] + 2 - _numberOfBoundaryCells);
     }
     return isInside;
   }
 
-  bool sendMacroscopicQuantityToMDSolver(
-      tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     return (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
   }
 
-  std::vector<unsigned int>
-  getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  std::vector<unsigned int> getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     std::vector<unsigned int> ranks;
     ranks.push_back(0);
     return ranks;

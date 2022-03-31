@@ -5,12 +5,14 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_PARALLELTOPOLOGY_ZYXTOPOLOGY_H_
 #define _MOLECULARDYNAMICS_COUPLING_PARALLELTOPOLOGY_ZYXTOPOLOGY_H_
 
-#include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/CouplingMDDefinitions.h"
+#include "coupling/paralleltopology/ParallelTopology.h"
 
 namespace coupling {
-namespace paralleltopology { template <unsigned int dim> class ZYXTopology; }
+namespace paralleltopology {
+template <unsigned int dim> class ZYXTopology;
 }
+} // namespace coupling
 
 /** In the ZYXTopology, the process coordinates convert to a rank as
  *  rank = x*ny*nz + y*nz + z = z + nz*(y+ny*x) (for 3D).
@@ -28,35 +30,28 @@ namespace paralleltopology { template <unsigned int dim> class ZYXTopology; }
  *  @author Philipp Neumann
  *	@todo Philipp could you please take a look on this class
  */
-template <unsigned int dim>
-class coupling::paralleltopology::ZYXTopology
-    : public coupling::paralleltopology::ParallelTopology<dim> {
+template <unsigned int dim> class coupling::paralleltopology::ZYXTopology : public coupling::paralleltopology::ParallelTopology<dim> {
 public:
   /** Constructor */
-  ZYXTopology(tarch::la::Vector<dim, unsigned int> numberProcesses,
-              unsigned int topologyOffset)
-      : coupling::paralleltopology::ParallelTopology<dim>(),
-        _numberProcesses(numberProcesses),
-        _divisionFactor4NumberProcesses(initDivisionFactor(numberProcesses)),
-        _topologyOffset(topologyOffset) {}
+  ZYXTopology(tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int topologyOffset)
+      : coupling::paralleltopology::ParallelTopology<dim>(), _numberProcesses(numberProcesses),
+        _divisionFactor4NumberProcesses(initDivisionFactor(numberProcesses)), _topologyOffset(topologyOffset) {}
 
   /** Destructor */
   virtual ~ZYXTopology() {}
 
-  tarch::la::Vector<dim, unsigned int>
-  getProcessCoordinates(unsigned int rank) const {
+  tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     unsigned int intNumberProcesses = _numberProcesses[0];
     for (unsigned int d = 1; d < dim; d++) {
       intNumberProcesses = intNumberProcesses * _numberProcesses[d];
     }
-    if ((rank < _topologyOffset) ||
-        (rank > _topologyOffset + intNumberProcesses - 1)) {
+    if ((rank < _topologyOffset) || (rank > _topologyOffset + intNumberProcesses - 1)) {
       std::cout << "Warning "
                    "coupling::paralleltopology::ZYXTopology::getProcessCoordina"
-                   "tes(): rank out of range!" << std::endl;
-      std::cout << "Offset=" << _topologyOffset << ", rank=" << rank
+                   "tes(): rank out of range!"
                 << std::endl;
+      std::cout << "Offset=" << _topologyOffset << ", rank=" << rank << std::endl;
     }
 #endif
     tarch::la::Vector<dim, unsigned int> processCoordinates(0);
@@ -70,8 +65,7 @@ public:
 
   /** computes the rank as shown above, see second formula of class definition
    */
-  unsigned int
-  getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
+  unsigned int getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
     unsigned int rank = processCoordinates[0];
     for (unsigned int d = 1; d < dim; d++) {
       rank = rank * _numberProcesses[d] + processCoordinates[d];
@@ -82,8 +76,7 @@ public:
 private:
   /** sets the division factor for each vector entry. For ZYX, this corresponds
    * to (in 3D) (ny*nz,nz,1) and to (2D) (ny,1). */
-  tarch::la::Vector<dim, unsigned int> initDivisionFactor(
-      tarch::la::Vector<dim, unsigned int> numberProcesses) const {
+  tarch::la::Vector<dim, unsigned int> initDivisionFactor(tarch::la::Vector<dim, unsigned int> numberProcesses) const {
     tarch::la::Vector<dim, unsigned int> div(1);
     for (int d = dim - 2; d > -1; d--) {
       div[d] = div[d + 1] * numberProcesses[d + 1];

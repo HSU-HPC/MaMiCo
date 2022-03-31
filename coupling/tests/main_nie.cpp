@@ -5,10 +5,10 @@
 #ifndef _MAIN_NIE_CPP_
 #define _MAIN_NIE_CPP_
 
-#include <iostream>
-#include <cstdlib>
-#include "coupling/tests/NieTest.h"
 #include "coupling/CouplingMDDefinitions.h"
+#include "coupling/tests/NieTest.h"
+#include <cstdlib>
+#include <iostream>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif

@@ -5,19 +5,21 @@
 #ifndef _MOLECULARDYNAMICS_MOLECULEMAPPINGS_VTKMOLECULEWRITER_H_
 #define _MOLECULARDYNAMICS_MOLECULEMAPPINGS_VTKMOLECULEWRITER_H_
 
-#include <string>
+#include "simplemd/MolecularDynamicsDefinitions.h"
 #include "simplemd/Molecule.h"
 #include "simplemd/services/MoleculeService.h"
-#include "simplemd/MolecularDynamicsDefinitions.h"
 #include "simplemd/services/ParallelTopologyService.h"
-#include <sstream>
-#include <iostream>
-#include <fstream>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 namespace simplemd {
-namespace moleculemappings { class VTKMoleculeWriter; }
+namespace moleculemappings {
+class VTKMoleculeWriter;
 }
+} // namespace simplemd
 
 /** writes molecule data to a vtk file.
  *  In case of parallel computations, the rank of the respective process is
@@ -26,9 +28,7 @@ namespace moleculemappings { class VTKMoleculeWriter; }
  */
 class simplemd::moleculemappings::VTKMoleculeWriter {
 public:
-  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService &
-                        parallelTopologyService,
-                    const simplemd::services::MoleculeService &moleculeService,
+  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService &parallelTopologyService, const simplemd::services::MoleculeService &moleculeService,
                     const std::string &filename);
   ~VTKMoleculeWriter();
   void setTimestep(const unsigned int &timestep);

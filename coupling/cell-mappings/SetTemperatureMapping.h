@@ -5,16 +5,16 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_SETTEMPERATUREMAPPING_H_
 #define _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_SETTEMPERATUREMAPPING_H_
 
-#include <iostream>
-#include <cmath>
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
+#include <cmath>
+#include <iostream>
 
 namespace coupling {
 namespace cellmappings {
 template <class LinkedCell, unsigned int dim> class SetTemperatureMapping;
 }
-}
+} // namespace coupling
 
 /**
  *	@brief This class sets a certain temperature over several linked cells.
@@ -22,45 +22,38 @@ template <class LinkedCell, unsigned int dim> class SetTemperatureMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::SetTemperatureMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::SetTemperatureMapping {
 public:
   /** Constructor: obtains the old temperature over the region of interest.
 Besides,
      *  obtains the new temperature.
-	 *	@param oldTemperature
-	 *	@param newTemperature
-	 *	@param meanVelocity
-	 *	@param mdSolverInterface
+         *	@param oldTemperature
+         *	@param newTemperature
+         *	@param meanVelocity
+         *	@param mdSolverInterface
      */
-  SetTemperatureMapping(const double &oldTemperature,
-                        const double &newTemperature,
-                        const tarch::la::Vector<dim, double> &meanVelocity,
-                        coupling::interface::MDSolverInterface<
-                            LinkedCell, dim> *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface),
-        _factor(getScalingFactor(oldTemperature, newTemperature)),
-        _meanVelocity(meanVelocity) {}
+  SetTemperatureMapping(const double &oldTemperature, const double &newTemperature, const tarch::la::Vector<dim, double> &meanVelocity,
+                        coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface), _factor(getScalingFactor(oldTemperature, newTemperature)), _meanVelocity(meanVelocity) {}
 
   /** Destructor */
   ~SetTemperatureMapping() {}
 
   /** empty function
-	 */
+   */
   void beginCellIteration() {}
 
   /** empty function
-	 */
+   */
   void endCellIteration() {}
 
   /** applies a certain temperature over several linked cells, by changing the
 velocity (velocity fluctuation).
-	 *	@param cell
-	 *	@param cellIndex
-	 */
+         *	@param cell
+         *	@param cellIndex
+         */
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       coupling::interface::Molecule<dim> &wrapper(it->get());
@@ -75,14 +68,13 @@ velocity (velocity fluctuation).
 
 private:
   /** calculates the scaling factor between the old and new temperatures.
-	 *	@param oldTemperature
-	 *	@param newTemperature
-	 *	@return newTemperature
-	 *	@remark only allow re-scaling if the original temperature was not zero (can
+         *	@param oldTemperature
+         *	@param newTemperature
+         *	@return newTemperature
+         *	@remark only allow re-scaling if the original temperature was not zero (can
 happen in empty cells that just became populated)
-	 */
-  double getScalingFactor(const double &oldTemperature,
-                          const double &newTemperature) const {
+         */
+  double getScalingFactor(const double &oldTemperature, const double &newTemperature) const {
 
     if (oldTemperature != 0.0) {
       return sqrt(newTemperature / oldTemperature);
@@ -91,8 +83,7 @@ happen in empty cells that just became populated)
     }
   }
 
-  coupling::interface::MDSolverInterface<LinkedCell,
-                                         dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   const double _factor;
   const tarch::la::Vector<dim, double> _meanVelocity;
 };

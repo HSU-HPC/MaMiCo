@@ -11,7 +11,7 @@ namespace coupling {
 namespace interface {
 template <class LinkedCell, unsigned int dim> class MoleculeIterator;
 }
-}
+} // namespace coupling
 
 /** This class provides some iterator scheme for traversing the molecules within
  * a linked cell.
@@ -21,13 +21,11 @@ template <class LinkedCell, unsigned int dim> class MoleculeIterator;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::interface::MoleculeIterator {
+template <class LinkedCell, unsigned int dim> class coupling::interface::MoleculeIterator {
 protected:
   LinkedCell &_cell;
 
 public:
-
   /** Constructor */
   MoleculeIterator(LinkedCell &cell) : _cell(cell) {}
 

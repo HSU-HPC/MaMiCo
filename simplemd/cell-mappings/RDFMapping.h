@@ -6,15 +6,17 @@
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_RDFMAPPING_H_
 
 #include "simplemd/LinkedCell.h"
-#include "simplemd/services/MolecularPropertiesService.h"
 #include "simplemd/services/LinkedCellService.h"
+#include "simplemd/services/MolecularPropertiesService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include <iostream>
 #include <sstream>
 
 namespace simplemd {
-namespace cellmappings { class RDFMapping; }
+namespace cellmappings {
+class RDFMapping;
 }
+} // namespace simplemd
 
 /** computes the radial distribution function for the molecules.
  *  Should be called using the iterateCellPairs()-method from the
@@ -24,9 +26,7 @@ namespace cellmappings { class RDFMapping; }
  */
 class simplemd::cellmappings::RDFMapping {
 public:
-  RDFMapping(const simplemd::services::ParallelTopologyService &
-                 parallelTopologyService,
-             simplemd::services::LinkedCellService &linkedCellService,
+  RDFMapping(const simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::LinkedCellService &linkedCellService,
              const double &cutoffRadius, const unsigned int &numberIntervals);
 
   ~RDFMapping();
@@ -38,9 +38,7 @@ public:
   void evaluateRDF(const unsigned int &localMDSimulation);
 
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex);
-  void handleCellPair(LinkedCell &cell1, LinkedCell &cell2,
-                      const unsigned int &cellIndex1,
-                      const unsigned int &cellIndex2);
+  void handleCellPair(LinkedCell &cell1, LinkedCell &cell2, const unsigned int &cellIndex1, const unsigned int &cellIndex2);
 
 private:
   const simplemd::services::ParallelTopologyService &_parallelTopologyService;

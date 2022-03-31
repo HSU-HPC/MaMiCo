@@ -5,18 +5,18 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TESTS_TESTLAMMPS_H_
 #define _MOLECULARDYNAMICS_COUPLING_TESTS_TESTLAMMPS_H_
 
-#include <sstream>
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
-#include "tarch/configuration/ParseConfiguration.h"
-#include "coupling/services/MacroscopicCellService.h"
-#include "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolverInterface.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
+#include "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolverInterface.h"
+#include "coupling/services/MacroscopicCellService.h"
 #include "coupling/tests/Test.h"
+#include "tarch/configuration/ParseConfiguration.h"
+#include <sstream>
 
+#include "atom.h"
 #include "input.h"
 #include "lammps.h"
-#include "atom.h"
 #include "mamico_cell.h"
 #include "mpi.h"
 
@@ -29,8 +29,7 @@
 template <unsigned int dim> class TestLammps : public Test {
 public:
   TestLammps(int argc, char **argv, std::string name)
-      : Test(name), _lammps(NULL), _macroSolverInterface(NULL),
-        _macroscopicCellService(NULL), _argc(argc), _argv(argv) {}
+      : Test(name), _lammps(NULL), _macroSolverInterface(NULL), _macroscopicCellService(NULL), _argc(argc), _argv(argv) {}
 
   /** if existent, deletes test configuration */
   virtual ~TestLammps() {
@@ -42,14 +41,9 @@ public:
       delete _macroSolverInterface;
       _macroSolverInterface = NULL;
     }
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                 dim>::getInstance()
-        .setMacroscopicSolverInterface(NULL);
-    coupling::interface::MamicoInterfaceProvider<
-        LAMMPS_NS::MamicoCell, dim>::getInstance().setMDSolverInterface(NULL);
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                 dim>::getInstance()
-        .setMacroscopicCellService(NULL);
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicSolverInterface(NULL);
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMDSolverInterface(NULL);
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicCellService(NULL);
     if (_lammps != NULL) {
       delete _lammps;
       _lammps = NULL;
@@ -81,65 +75,48 @@ public:
     }
     std::cout << "Load void macroscopic solver configuration..." << std::endl;
     loadMacroscopicSolverConfiguration();
-    std::cout
-        << "Load MaMiCo configuration and init macroscopic cell service..."
-        << std::endl;
+    std::cout << "Load MaMiCo configuration and init macroscopic cell service..." << std::endl;
     loadMamicoTestConfiguration();
     // test molecule mass
-    tmp = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                       dim>::getInstance()
-        .getMDSolverInterface()->getMoleculeMass();
+    tmp = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getMoleculeMass();
     std::cout << "Molecule mass: " << tmp << std::endl;
     if (tmp != 2.0) {
-      std::cout << "Wrong mass value, mass=" << tmp << ", instead of 2.0!"
-                << std::endl;
+      std::cout << "Wrong mass value, mass=" << tmp << ", instead of 2.0!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // test Boltzmann constant kB
-    tmp = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                       dim>::getInstance()
-        .getMDSolverInterface()->getKB();
+    tmp = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getKB();
     std::cout << "Boltzmann constant: " << tmp << std::endl;
     if (tmp != 1.0) {
-      std::cout << "Wrong boltzmann constant, kB=" << tmp << ", should be 1.0!"
-                << std::endl;
+      std::cout << "Wrong boltzmann constant, kB=" << tmp << ", should be 1.0!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // TODO put tests for sigma+epsilon here
     // test time step dt
-    tmp = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                       dim>::getInstance()
-        .getMDSolverInterface()->getDt();
+    tmp = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getDt();
     std::cout << "Time step: " << tmp << std::endl;
     if (tmp != 1.0e-14) {
-      std::cout << "Wrong time step, time step=" << tmp
-                << ", should be 1.0e-14!" << std::endl;
+      std::cout << "Wrong time step, time step=" << tmp << ", should be 1.0e-14!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // test domain size
-    tmpVec = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                          dim>::getInstance()
-        .getMDSolverInterface()->getGlobalMDDomainSize();
+    tmpVec = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getGlobalMDDomainSize();
     valid = (tmpVec[0] == 10.0);
     for (int d = 1; d < dim; d++) {
       valid = valid && (tmpVec[d] == 10.0);
     }
     if (!valid) {
-      std::cout << "Wrong domain size " << tmpVec
-                << ", should be 10.0 in each component!" << std::endl;
+      std::cout << "Wrong domain size " << tmpVec << ", should be 10.0 in each component!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // test domain offset
-    tmpVec = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                          dim>::getInstance()
-        .getMDSolverInterface()->getGlobalMDDomainOffset();
+    tmpVec = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getGlobalMDDomainOffset();
     valid = (tmpVec[0] == 1.0);
     for (int d = 1; d < dim; d++) {
       valid = valid && (tmpVec[d] == 1.0);
     }
     if (!valid) {
-      std::cout << "Wrong domain offset " << tmpVec
-                << ", should be 1.0 in each component!" << std::endl;
+      std::cout << "Wrong domain offset " << tmpVec << ", should be 1.0 in each component!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -152,14 +129,14 @@ protected:
    *  The arguments correspond to the file containing the molecule setup and the
    * number of atoms contained.
    */
-  void loadLammpsTestConfiguration(std::string inputmoleculeconfiguration,
-                                   int numberAtoms) {
+  void loadLammpsTestConfiguration(std::string inputmoleculeconfiguration, int numberAtoms) {
     int size = -1;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     if ((dim != 2) && (dim != 3)) {
       std::cout << "ERROR TestLammps::loadLammpsTestConfiguration: only dim=2 "
-                   "or dim=3 supported!" << std::endl;
+                   "or dim=3 supported!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
     // allocate lammps
@@ -170,7 +147,8 @@ protected:
     _lammps = new LAMMPS_NS::LAMMPS(_argc, _argv, MPI_COMM_WORLD);
     if (_lammps == NULL) {
       std::cout << "ERROR TestLammps::loadLammpsTestConfiguration: Could not "
-                   "allocate _lammps!" << std::endl;
+                   "allocate _lammps!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
     // read input -> this should also initialise the md solver interface
@@ -193,8 +171,7 @@ protected:
       _lammps->input->one(ss.str().c_str());
       ss.str("");
       ss.clear();
-      ss << "read_dump " << inputmoleculeconfiguration
-         << " 0 x y replace yes box no format xyz";
+      ss << "read_dump " << inputmoleculeconfiguration << " 0 x y replace yes box no format xyz";
       _lammps->input->one(ss.str().c_str());
     } else {
       std::stringstream ss;
@@ -202,8 +179,7 @@ protected:
       _lammps->input->one(ss.str().c_str());
       ss.str("");
       ss.clear();
-      ss << "read_dump " << inputmoleculeconfiguration
-         << " 0 x y z replace yes box no format xyz";
+      ss << "read_dump " << inputmoleculeconfiguration << " 0 x y z replace yes box no format xyz";
       _lammps->input->one(ss.str().c_str());
     }
     _lammps->input->one("mass 1 2.0");
@@ -217,7 +193,7 @@ protected:
     _lammps->input->one("neighbor 0.5 bin");
     _lammps->input->one("neigh_modify delay 0 every 20 check no");
     //_lammps->input->one("dump myDump all custom 100 atom*.dat id type x y z vx
-    //vy vz");
+    // vy vz");
     //_lammps->input->one("restart 100 checkpoint1 checkpoint2");
     _lammps->input->one("fix 1 all nve");
     // always use a minimal number of local mamico cells in fix mamico. This
@@ -234,8 +210,7 @@ protected:
         _lammps->input->one("fix 2 all mamico  9 123456 2.5");
         break;
       default:
-        std::cout << "ERROR TestLammps: only 1,4,16 procs supported in 2D!"
-                  << std::endl;
+        std::cout << "ERROR TestLammps: only 1,4,16 procs supported in 2D!" << std::endl;
         exit(EXIT_FAILURE);
         break;
       }
@@ -251,8 +226,7 @@ protected:
         _lammps->input->one("fix 2 all mamico  27 123456 2.5");
         break;
       default:
-        std::cout << "ERROR TestLammps: only 1,8,64 procs supported in 3D!"
-                  << std::endl;
+        std::cout << "ERROR TestLammps: only 1,8,64 procs supported in 3D!" << std::endl;
         exit(EXIT_FAILURE);
         break;
       }
@@ -295,8 +269,7 @@ protected:
         }
         break;
       default:
-        std::cout << "ERROR TestLammps: only 1,4,16 procs supported in 2D!"
-                  << std::endl;
+        std::cout << "ERROR TestLammps: only 1,4,16 procs supported in 2D!" << std::endl;
         exit(EXIT_FAILURE);
         break;
       }
@@ -318,52 +291,37 @@ protected:
         }
         break;
       default:
-        std::cout << "ERROR TestLammps: only 1,8,64 procs supported in 3D!"
-                  << std::endl;
+        std::cout << "ERROR TestLammps: only 1,8,64 procs supported in 3D!" << std::endl;
         exit(EXIT_FAILURE);
         break;
       }
     } else {
       std::cout << "ERROR TestLammps::loadMamicoTestConfiguration: only 2D and "
-                   "3D supported!" << std::endl;
+                   "3D supported!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
     const unsigned int numberMDTimestepsPerCouplingCycle = 100000;
     coupling::configurations::MaMiCoConfiguration<dim> config;
     std::cout << "Parse config " << mamicoLammpsTestConfiguration << std::endl;
-    tarch::configuration::ParseConfiguration::parseConfiguration<
-        coupling::configurations::MaMiCoConfiguration<dim> >(
-        mamicoLammpsTestConfiguration, "mamico", config);
+    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<dim>>(mamicoLammpsTestConfiguration, "mamico",
+                                                                                                                     config);
     std::cout << "Init macroscopic cell service..." << std::endl;
     if (_macroscopicCellService != NULL) {
       delete _macroscopicCellService;
       _macroscopicCellService = NULL;
     }
-    _macroscopicCellService =
-        new coupling::services::MacroscopicCellServiceImpl<
-            LAMMPS_NS::MamicoCell, dim>(
-            0, coupling::interface::MamicoInterfaceProvider<
-                   LAMMPS_NS::MamicoCell, dim>::getInstance()
-                   .getMDSolverInterface(),
-            coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                         dim>::getInstance()
-                   .getMacroscopicSolverInterface(),
-            numberProcesses, rank, config.getParticleInsertionConfiguration(),
-            config.getMomentumInsertionConfiguration(),
-            config.getTransferStrategyConfiguration(),
-            config.getParallelTopologyConfiguration(),
-            numberMDTimestepsPerCouplingCycle,
-            config.getMacroscopicCellConfiguration());
+    _macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>(
+        0, coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface(),
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicSolverInterface(), numberProcesses, rank,
+        config.getParticleInsertionConfiguration(), config.getMomentumInsertionConfiguration(), config.getTransferStrategyConfiguration(),
+        config.getParallelTopologyConfiguration(), numberMDTimestepsPerCouplingCycle, config.getMacroscopicCellConfiguration());
     if (_macroscopicCellService == NULL) {
-      std::cout << "ERROR TestLammps: _macroscopicCellService==NULL!"
-                << std::endl;
+      std::cout << "ERROR TestLammps: _macroscopicCellService==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    std::cout << "Set macroscopic cell service in MamicoInterfaceProvider..."
-              << std::endl;
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                 dim>::getInstance()
-        .setMacroscopicCellService(_macroscopicCellService);
+    std::cout << "Set macroscopic cell service in MamicoInterfaceProvider..." << std::endl;
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicCellService(_macroscopicCellService);
   }
 
   /** this loads some dummy solver interface which basically does nothing at
@@ -374,15 +332,12 @@ protected:
       delete _macroSolverInterface;
       _macroSolverInterface = NULL;
     }
-    _macroSolverInterface =
-        new coupling::interface::VoidMacroscopicSolverInterface<dim>();
+    _macroSolverInterface = new coupling::interface::VoidMacroscopicSolverInterface<dim>();
     if (_macroSolverInterface == NULL) {
       std::cout << "ERROR TestLammps: macroSolverInterface==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell,
-                                                 dim>::getInstance()
-        .setMacroscopicSolverInterface(_macroSolverInterface);
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicSolverInterface(_macroSolverInterface);
   }
 
   /** prints the molecule information to the screen. If "printGhostMolecules" is
@@ -403,9 +358,8 @@ protected:
     for (int r = 0; r < size; r++) {
       if (r == rank) {
         for (int i = 0; i < numberAtoms; i++) {
-          std::cout << "Rank " << rank << ": molecule " << i << ": "
-                    << _lammps->atom->x[i][0] << "," << _lammps->atom->x[i][1]
-                    << "," << _lammps->atom->x[i][2] << std::endl;
+          std::cout << "Rank " << rank << ": molecule " << i << ": " << _lammps->atom->x[i][0] << "," << _lammps->atom->x[i][1] << "," << _lammps->atom->x[i][2]
+                    << std::endl;
         }
       }
       MPI_Barrier(MPI_COMM_WORLD);
@@ -415,8 +369,7 @@ protected:
   /** test configuration for LAMMPS runs */
   LAMMPS_NS::LAMMPS *_lammps;
   /** test solver interface */
-  coupling::interface::VoidMacroscopicSolverInterface<dim> *
-      _macroSolverInterface;
+  coupling::interface::VoidMacroscopicSolverInterface<dim> *_macroSolverInterface;
   coupling::services::MacroscopicCellService<dim> *_macroscopicCellService;
   /** arguments from commandline */
   int _argc;

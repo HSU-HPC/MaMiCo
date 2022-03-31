@@ -6,8 +6,8 @@
 #define _MAMICO_H
 
 #include <iostream>
-#include <string>
 #include <mpi.h>
+#include <string>
 
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/interface/impl/Espresso/EspressoMDSolverInterface.h"
@@ -16,15 +16,14 @@
 #include "coupling/solvers/DummySolverInterfaceService.h"
 #include "tarch/configuration/ParseConfiguration.h"
 
-#include "particle_data.hpp"
-#include "domain_decomposition.hpp"
 #include "cells.hpp"
+#include "domain_decomposition.hpp"
+#include "particle_data.hpp"
 
-static coupling::interface::EspressoMDSolverInterface *
-    _espressoMDSolverInterface;
+static coupling::interface::EspressoMDSolverInterface *_espressoMDSolverInterface;
 static coupling::services::MacroscopicCellService<3> *_macroscopicCellService;
 static DummySolver _dummySolver(18, 18, 18, 0.48);
-//static DummySolverInterfaceService *_dummySolverInterfaceService;
+// static DummySolverInterfaceService *_dummySolverInterfaceService;
 
 void initialize() {
   // Initialize an instance of MDSolverInterface
@@ -32,8 +31,7 @@ void initialize() {
     delete _espressoMDSolverInterface;
     _espressoMDSolverInterface = NULL;
   }
-  _espressoMDSolverInterface =
-      new coupling::interface::EspressoMDSolverInterface();
+  _espressoMDSolverInterface = new coupling::interface::EspressoMDSolverInterface();
 
   // Initialize an instance of MacroscopicSolverInterfaceService
   tarch::la::Vector<3, unsigned int> numberProcesses(2, 2, 1);
@@ -46,21 +44,18 @@ void initialize() {
   tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(2);
   for (unsigned int d = 0; d < 3; d++) {
     globalMDDomainSize[d] = box_l[d];
-    //globalMDDomainOffset(d) = my_left[d];
+    // globalMDDomainOffset(d) = my_left[d];
     globalMDDomainOffset[d] = 0.0;
     macroscopicCellSize[d] = dd.cell_size[d] * linkedCellsPerMacroscopicCell[d];
   }
   tarch::la::Vector<3, unsigned int> nP(1);
-  DummySolverInterfaceService::getInstance().init(
-      numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset,
-      macroscopicCellSize);
+  DummySolverInterfaceService::getInstance().init(numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset, macroscopicCellSize);
 
   // Initialize configurations for MacroscopicCellService
   const std::string filenameMamico = "mamico_espresso_test_configuration.xml";
   coupling::configurations::MaMiCoConfiguration<3> _configurationMamico;
-  tarch::configuration::ParseConfiguration::parseConfiguration<
-      coupling::configurations::MaMiCoConfiguration<3> >(
-      filenameMamico, "mamico", _configurationMamico);
+  tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>(filenameMamico, "mamico",
+                                                                                                                 _configurationMamico);
 
   unsigned int numberOfTimesteps = 20;
 
@@ -69,23 +64,15 @@ void initialize() {
     delete _macroscopicCellService;
     _macroscopicCellService = NULL;
   }
-  _macroscopicCellService =
-      new coupling::services::MacroscopicCellServiceImpl<ParticleList, 3>(
-          0, _espressoMDSolverInterface,
-          DummySolverInterfaceService::getInstance().getInterface(),
-          numberProcesses, rank,
-          _configurationMamico.getParticleInsertionConfiguration(),
-          _configurationMamico.getMomentumInsertionConfiguration(),
-          _configurationMamico.getBoundaryForceConfiguration(),
-          _configurationMamico.getTransferStrategyConfiguration(),
-          _configurationMamico.getParallelTopologyConfiguration(),
-          numberOfTimesteps,
-          _configurationMamico.getMacroscopicCellConfiguration());
+  _macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<ParticleList, 3>(
+      0, _espressoMDSolverInterface, DummySolverInterfaceService::getInstance().getInterface(), numberProcesses, rank,
+      _configurationMamico.getParticleInsertionConfiguration(), _configurationMamico.getMomentumInsertionConfiguration(),
+      _configurationMamico.getBoundaryForceConfiguration(), _configurationMamico.getTransferStrategyConfiguration(),
+      _configurationMamico.getParallelTopologyConfiguration(), numberOfTimesteps, _configurationMamico.getMacroscopicCellConfiguration());
 
   // Read Temperature from the configuration file and set the temperature for
   // the coupled simulation
   _macroscopicCellService->computeAndStoreTemperature(1.8);
-
 }
 
 void shutdown() {
@@ -108,15 +95,10 @@ void storeDummySolverDataInSendBuffer() {
   for (loop[2] = 2; loop[2] < 16; loop[2]++) {
     for (loop[1] = 2; loop[1] < 16; loop[1]++) {
       for (loop[0] = 2; loop[0] < 16; loop[0]++) {
-        const tarch::la::Vector<3, unsigned int> index =
-            coupling::initDimVector<3>(loop);
-        const double mass =
-            _dummySolver.getDensity(index[0], index[1], index[2]);
-        const tarch::la::Vector<3, double> momentum =
-            _dummySolver.getVelocity(index[0], index[1], index[2]);
-        bool flagsend =
-            DummySolverInterfaceService::getInstance().addToSendBuffer(
-                mass, momentum, index);
+        const tarch::la::Vector<3, unsigned int> index = coupling::initDimVector<3>(loop);
+        const double mass = _dummySolver.getDensity(index[0], index[1], index[2]);
+        const tarch::la::Vector<3, double> momentum = _dummySolver.getVelocity(index[0], index[1], index[2]);
+        bool flagsend = DummySolverInterfaceService::getInstance().addToSendBuffer(mass, momentum, index);
         if (flagsend == true) {
           sendCounter++;
         }
@@ -129,16 +111,12 @@ void storeDummySolverDataInSendBuffer() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::cout << "On rank " << rank << std::endl;
   std::cout << sendCounter << std::endl;
-  const std::vector<coupling::datastructures::MacroscopicCell<3> *>
-      _sendBuffer = DummySolverInterfaceService::getInstance().getSendBuffer();
+  const std::vector<coupling::datastructures::MacroscopicCell<3> *> _sendBuffer = DummySolverInterfaceService::getInstance().getSendBuffer();
   std::cout << _sendBuffer.size() << std::endl;
-  const unsigned int *_globalIndices4SendBuffer =
-      DummySolverInterfaceService::getInstance()
-          .getGlobalCellIndices4SendBuffer();
+  const unsigned int *_globalIndices4SendBuffer = DummySolverInterfaceService::getInstance().getGlobalCellIndices4SendBuffer();
   for (unsigned int i = 0; i < 2232; i++) {
     std::cout << _globalIndices4SendBuffer[i] << std::endl;
-    std::cout << _sendBuffer[i]->getMicroscopicMass() << " "
-              << _sendBuffer[i]->getMicroscopicMomentum() << std::endl;
+    std::cout << _sendBuffer[i]->getMicroscopicMass() << " " << _sendBuffer[i]->getMicroscopicMomentum() << std::endl;
   }
 #endif
 }
@@ -152,30 +130,22 @@ void writeReceiveBufferDataToDummySolver() {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::cout << "On rank " << rank << std::endl;
-  const std::vector<coupling::datastructures::MacroscopicCell<3> *>
-      _recvBuffer =
-          DummySolverInterfaceService::getInstance().getReceiveBuffer();
+  const std::vector<coupling::datastructures::MacroscopicCell<3> *> _recvBuffer = DummySolverInterfaceService::getInstance().getReceiveBuffer();
   std::cout << _recvBuffer.size() << std::endl;
-  unsigned int *_globalIndices4ReceiveBuffer =
-      DummySolverInterfaceService::getInstance()
-          .getGlobalCellIndices4ReceiveBuffer();
+  unsigned int *_globalIndices4ReceiveBuffer = DummySolverInterfaceService::getInstance().getGlobalCellIndices4ReceiveBuffer();
   for (unsigned int i = 0; i < 512; i++) {
     std::cout << _globalIndices4ReceiveBuffer[i] << std::endl;
-    std::cout << _recvBuffer[i]->getMacroscopicMass() << " "
-              << _recvBuffer[511]->getMacroscopicMomentum() << std::endl;
+    std::cout << _recvBuffer[i]->getMacroscopicMass() << " " << _recvBuffer[511]->getMacroscopicMomentum() << std::endl;
   }
 #endif
 
   for (loop[2] = 2; loop[2] < 16; loop[2]++) {
     for (loop[1] = 2; loop[1] < 16; loop[1]++) {
       for (loop[0] = 2; loop[0] < 16; loop[0]++) {
-        const tarch::la::Vector<3, unsigned int> index =
-            coupling::initDimVector<3>(loop);
+        const tarch::la::Vector<3, unsigned int> index = coupling::initDimVector<3>(loop);
         double density;
         tarch::la::Vector<3, double> velocity;
-        bool flagrecv =
-            DummySolverInterfaceService::getInstance().getFromReceiveBuffer(
-                density, velocity, index);
+        bool flagrecv = DummySolverInterfaceService::getInstance().getFromReceiveBuffer(density, velocity, index);
         if (flagrecv == true) {
           recvCounter++;
           _dummySolver.setDensity(density, index[0], index[1], index[2]);

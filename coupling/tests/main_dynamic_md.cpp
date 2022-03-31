@@ -4,10 +4,10 @@
 #ifndef _MAIN_DYNAMICMD_CPP_
 #define _MAIN_DYNAMICMD_CPP_
 
-#include <iostream>
-#include <cstdlib>
-#include "coupling/tests/DynamicMDTest.h"
 #include "coupling/CouplingMDDefinitions.h"
+#include "coupling/tests/DynamicMDTest.h"
+#include <cstdlib>
+#include <iostream>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif

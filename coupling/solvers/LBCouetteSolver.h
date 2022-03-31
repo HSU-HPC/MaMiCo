@@ -11,8 +11,10 @@
 #include "coupling/solvers/NumericalSolver.h"
 
 namespace coupling {
-namespace solvers { class LBCouetteSolver; }
+namespace solvers {
+class LBCouetteSolver;
 }
+} // namespace coupling
 
 /** implements an analytic Couette flow solver.
  *  In our scenario, the lower wall is accelerated and the upper wall stands
@@ -20,57 +22,44 @@ namespace solvers { class LBCouetteSolver; }
  *  The lower wall is located at zero height.
  *  @author Philipp Neumann
  */
-class coupling::solvers::LBCouetteSolver
-    : public coupling::solvers::NumericalSolver {
+class coupling::solvers::LBCouetteSolver : public coupling::solvers::NumericalSolver {
 public:
-  LBCouetteSolver(const double channelheight,
-                  tarch::la::Vector<3, double> wallVelocity,
-                  const double kinVisc, const double dx, const double dt,
-                  const int plotEveryTimestep, const std::string filestem,
-                  const tarch::la::Vector<3, unsigned int> processes,
+  LBCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
+                  const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
                   const unsigned int numThreads = 1)
-      : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc,
-                                           plotEveryTimestep, filestem,
-                                           processes),
-        _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)),
-        _wallVelocity((dt / dx) * wallVelocity) {
+      : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes),
+        _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity) {
     // return if required
     if (skipRank()) {
       return;
     }
 
-    _pdf1 = new double[19 * (_domainSizeX + 2) * (_domainSizeY + 2) *
-                       (_domainSizeZ + 2)];
-    _pdf2 = new double[19 * (_domainSizeX + 2) * (_domainSizeY + 2) *
-                       (_domainSizeZ + 2)];
+    _pdf1 = new double[19 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
+    _pdf2 = new double[19 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
 
 #if defined(_OPENMP)
     omp_set_num_threads(numThreads);
 #endif
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Domain size=" << _domainSizeX << "," << _domainSizeY << ","
-              << _domainSizeZ << std::endl;
+    std::cout << "Domain size=" << _domainSizeX << "," << _domainSizeY << "," << _domainSizeZ << std::endl;
     std::cout << "tau=" << 1.0 / _omega << std::endl;
     std::cout << "wallVelocity=" << _wallVelocity << std::endl;
     for (int z = 0; z < _domainSizeZ + 2; z++) {
       for (int y = 0; y < _domainSizeY + 2; y++) {
         for (int x = 0; x < _domainSizeX + 2; x++) {
-          std::cout << x << "," << y << "," << z
-                    << "FLAG=" << _flag[get(x, y, z)] << std::endl;
+          std::cout << x << "," << y << "," << z << "FLAG=" << _flag[get(x, y, z)] << std::endl;
         }
       }
     }
 #endif
     // check pointers
-    if ((_pdf1 == NULL) || (_pdf2 == NULL) || (_vel == NULL) ||
-        (_density == NULL) || (_flag == NULL)) {
+    if ((_pdf1 == NULL) || (_pdf2 == NULL) || (_vel == NULL) || (_density == NULL) || (_flag == NULL)) {
       std::cout << "ERROR LBCouetteSolver: NULL ptr!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    if ((_sendBufferX == NULL) || (_recvBufferX == NULL) ||
-        (_sendBufferY == NULL) || (_recvBufferY == NULL) ||
-        (_sendBufferZ == NULL) || (_recvBufferZ == NULL)) {
+    if ((_sendBufferX == NULL) || (_recvBufferX == NULL) || (_sendBufferY == NULL) || (_recvBufferY == NULL) || (_sendBufferZ == NULL) ||
+        (_recvBufferZ == NULL)) {
       std::cout << "ERROR LBCouetteSolver: NULL ptr in send/recv!" << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -78,9 +67,7 @@ public:
 
 // init everything with lattice weights
 #pragma omp parallel for
-    for (int i = 0;
-         i < (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2);
-         i++) {
+    for (int i = 0; i < (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2); i++) {
       for (int q = 0; q < 19; q++) {
         _pdf1[get(i) * 19 + q] = _W[q];
         _pdf2[get(i) * 19 + q] = _W[q];
@@ -144,9 +131,7 @@ public:
     }
     const int timesteps = floor(dt / _dt + 0.5);
     if (fabs(timesteps * _dt - dt) / _dt > 1.0e-8) {
-      std::cout
-          << "ERROR LBCouetteSolver::advance(): time steps and dt do not match!"
-          << std::endl;
+      std::cout << "ERROR LBCouetteSolver::advance(): time steps and dt do not match!" << std::endl;
       exit(EXIT_FAILURE);
     }
     for (int i = 0; i < timesteps; i++) {
@@ -157,38 +142,28 @@ public:
     }
   }
 
-  void setMDBoundaryValues(
-      std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer,
-      const unsigned int *const recvIndices,
-      const coupling::IndexConversion<3> &indexConversion) override {
+  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const unsigned int *const recvIndices,
+                           const coupling::IndexConversion<3> &indexConversion) override {
     if (skipRank()) {
       return;
     }
 
     // loop over all received cells
-    const unsigned int size = (unsigned int) recvBuffer.size();
+    const unsigned int size = (unsigned int)recvBuffer.size();
     for (unsigned int i = 0; i < size; i++) {
       // determine cell index of this cell in LB domain
-      tarch::la::Vector<3, unsigned int> globalCellCoords =
-          indexConversion.getGlobalVectorCellIndex(recvIndices[i]);
-      globalCellCoords[0] =
-          (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
-      globalCellCoords[1] =
-          (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
-      globalCellCoords[2] =
-          (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;
+      tarch::la::Vector<3, unsigned int> globalCellCoords = indexConversion.getGlobalVectorCellIndex(recvIndices[i]);
+      globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
+      globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
+      globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout
-          << "Process coords: " << _coords << ":  GlobalCellCoords for index "
-          << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": "
-          << globalCellCoords << std::endl;
+      std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": "
+                << globalCellCoords << std::endl;
 #endif
-      const int index =
-          get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);
+      const int index = get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       if (_flag[index] != MD_BOUNDARY) {
-        std::cout << "ERROR LBCouetteSolver::setMDBoundaryValues(): Cell "
-                  << index << " is no MD boundary cell!" << std::endl;
+        std::cout << "ERROR LBCouetteSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl;
         exit(EXIT_FAILURE);
       }
 #endif
@@ -198,9 +173,7 @@ public:
       // FLUID-MD_BOUNDARY neighbouring relations only.
       // determine local velocity received from MaMiCo and convert it to LB
       // units; store the velocity in _vel
-      tarch::la::Vector<3, double> localVel(
-          (1.0 / recvBuffer[i]->getMacroscopicMass()) * (_dt / _dx) *
-          recvBuffer[i]->getMacroscopicMomentum());
+      tarch::la::Vector<3, double> localVel((1.0 / recvBuffer[i]->getMacroscopicMass()) * (_dt / _dx) * recvBuffer[i]->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
       }
@@ -208,47 +181,30 @@ public:
       // conditions
       for (unsigned int q = 0; q < 19; q++) {
         // index of neighbour cell; only if cell is located inside local domain
-        if (((int) globalCellCoords[0] + _C[q][0] > 0) &&
-            ((int) globalCellCoords[0] + _C[q][0] < _domainSizeX + 1) &&
-            ((int) globalCellCoords[1] + _C[q][1] > 0) &&
-            ((int) globalCellCoords[1] + _C[q][1] < _domainSizeY + 1) &&
-            ((int) globalCellCoords[2] + _C[q][2] > 0) &&
-            ((int) globalCellCoords[2] + _C[q][2] < _domainSizeZ + 1)) {
-          const int nbIndex = get((_C[q][0] + globalCellCoords[0]),
-                                  (_C[q][1] + globalCellCoords[1]),
-                                  (_C[q][2] + globalCellCoords[2]));
-          const tarch::la::Vector<3, double> interpolVel(
-              0.5 * (_vel[3 * index] + _vel[3 * nbIndex]),
-              0.5 * (_vel[3 * index + 1] + _vel[3 * nbIndex + 1]),
-              0.5 * (_vel[3 * index + 2] + _vel[3 * nbIndex + 2]));
-          _pdf1[19 * index + q] = _pdf1[19 * nbIndex + 18 - q] -
-                                  6.0 * _W[q] * _density[nbIndex] *
-                                      (_C[18 - q][0] * interpolVel[0] +
-                                       _C[18 - q][1] * interpolVel[1] +
-                                       _C[18 - q][2] * interpolVel[2]);
+        if (((int)globalCellCoords[0] + _C[q][0] > 0) && ((int)globalCellCoords[0] + _C[q][0] < _domainSizeX + 1) &&
+            ((int)globalCellCoords[1] + _C[q][1] > 0) && ((int)globalCellCoords[1] + _C[q][1] < _domainSizeY + 1) &&
+            ((int)globalCellCoords[2] + _C[q][2] > 0) && ((int)globalCellCoords[2] + _C[q][2] < _domainSizeZ + 1)) {
+          const int nbIndex = get((_C[q][0] + globalCellCoords[0]), (_C[q][1] + globalCellCoords[1]), (_C[q][2] + globalCellCoords[2]));
+          const tarch::la::Vector<3, double> interpolVel(0.5 * (_vel[3 * index] + _vel[3 * nbIndex]), 0.5 * (_vel[3 * index + 1] + _vel[3 * nbIndex + 1]),
+                                                         0.5 * (_vel[3 * index + 2] + _vel[3 * nbIndex + 2]));
+          _pdf1[19 * index + q] =
+              _pdf1[19 * nbIndex + 18 - q] -
+              6.0 * _W[q] * _density[nbIndex] * (_C[18 - q][0] * interpolVel[0] + _C[18 - q][1] * interpolVel[1] + _C[18 - q][2] * interpolVel[2]);
         }
       }
     }
   }
 
   /*returns velocity at a certain position.*/
-  tarch::la::Vector<3, double>
-  getVelocity(tarch::la::Vector<3, double> pos) const override {
+  tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const override {
     tarch::la::Vector<3, unsigned int> coords;
-    const tarch::la::Vector<3, double> domainOffset(
-        _coords[0] * _dx * _avgDomainSizeX, _coords[1] * _dx * _avgDomainSizeY,
-        _coords[2] * _dx * _avgDomainSizeZ);
+    const tarch::la::Vector<3, double> domainOffset(_coords[0] * _dx * _avgDomainSizeX, _coords[1] * _dx * _avgDomainSizeY, _coords[2] * _dx * _avgDomainSizeZ);
 
     // check pos-data for process locality (todo: put this in debug mode in
     // future releases)
-    if ((pos[0] < domainOffset[0]) ||
-        (pos[0] > domainOffset[0] + _domainSizeX * _dx) ||
-        (pos[1] < domainOffset[1]) ||
-        (pos[1] > domainOffset[1] + _domainSizeY * _dx) ||
-        (pos[2] < domainOffset[2]) ||
-        (pos[2] > domainOffset[2] + _domainSizeZ * _dx)) {
-      std::cout << "ERROR LBCouetteSolver::getVelocity(): Position " << pos
-                << " out of range!" << std::endl;
+    if ((pos[0] < domainOffset[0]) || (pos[0] > domainOffset[0] + _domainSizeX * _dx) || (pos[1] < domainOffset[1]) ||
+        (pos[1] > domainOffset[1] + _domainSizeY * _dx) || (pos[2] < domainOffset[2]) || (pos[2] > domainOffset[2] + _domainSizeZ * _dx)) {
+      std::cout << "ERROR LBCouetteSolver::getVelocity(): Position " << pos << " out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // compute index for respective cell (_dx+... for ghost cells); use coords
@@ -263,28 +219,20 @@ public:
       vel[d] = _dx / _dt * _vel[3 * index + d];
     }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Position " << pos << " corresponds to cell: " << coords
-              << "; vel=" << vel << std::endl;
+    std::cout << "Position " << pos << " corresponds to cell: " << coords << "; vel=" << vel << std::endl;
 #endif
     return vel;
   }
 
   double getDensity(tarch::la::Vector<3, double> pos) const override {
     tarch::la::Vector<3, unsigned int> coords;
-    const tarch::la::Vector<3, double> domainOffset(
-        _coords[0] * _dx * _avgDomainSizeX, _coords[1] * _dx * _avgDomainSizeY,
-        _coords[2] * _dx * _avgDomainSizeZ);
+    const tarch::la::Vector<3, double> domainOffset(_coords[0] * _dx * _avgDomainSizeX, _coords[1] * _dx * _avgDomainSizeY, _coords[2] * _dx * _avgDomainSizeZ);
 
     // check pos-data for process locality (todo: put this in debug mode in
     // future releases)
-    if ((pos[0] < domainOffset[0]) ||
-        (pos[0] > domainOffset[0] + _domainSizeX * _dx) ||
-        (pos[1] < domainOffset[1]) ||
-        (pos[1] > domainOffset[1] + _domainSizeY * _dx) ||
-        (pos[2] < domainOffset[2]) ||
-        (pos[2] > domainOffset[2] + _domainSizeZ * _dx)) {
-      std::cout << "ERROR LBCouetteSolver::getDensity(): Position " << pos
-                << " out of range!" << std::endl;
+    if ((pos[0] < domainOffset[0]) || (pos[0] > domainOffset[0] + _domainSizeX * _dx) || (pos[1] < domainOffset[1]) ||
+        (pos[1] > domainOffset[1] + _domainSizeY * _dx) || (pos[2] < domainOffset[2]) || (pos[2] > domainOffset[2] + _domainSizeZ * _dx)) {
+      std::cout << "ERROR LBCouetteSolver::getDensity(): Position " << pos << " out of range!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // compute index for respective cell (_dx+... for ghost cells); use coords
@@ -296,10 +244,7 @@ public:
     return _density[index];
   }
 
-  virtual void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity)
-      override {
-    _wallVelocity = (_dt / _dx) * wallVelocity;
-  }
+  virtual void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) override { _wallVelocity = (_dt / _dx) * wallVelocity; }
 
 private:
   /** collide-stream algorithm */
@@ -343,8 +288,7 @@ private:
     computeDensityAndVelocity(vel, _density[index], &_pdf2[pI]);
 
     // collide (BGK); always handle pdfs no. q and inv(q)=18-q in one step
-    const double u2 =
-        1.0 - 1.5 * (vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
+    const double u2 = 1.0 - 1.5 * (vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
     // pdf 0,18
     double cu = -vel[1] - vel[2];
     int nb = -_xO - _yO;
@@ -435,8 +379,7 @@ private:
   // cell,
   // q - distribution function no., flag - boundary flag of neighbouring cell,
   // nbIndex - index of neighbouring cell
-  void boundary(double *const pdf, int index, int x, int y, int z, int q,
-                const Flag &flag, int nbIndex) {
+  void boundary(double *const pdf, int index, int x, int y, int z, int q, const Flag &flag, int nbIndex) {
     if (flag != FLUID) {
       if (flag == NO_SLIP) {
         // half-way bounce back
@@ -445,13 +388,10 @@ private:
         // half-way bounce back + moving wall acceleration (only x-direction for
         // wall supported at the moment)
         pdf[nbIndex + 18 - q] =
-            pdf[index + q] -
-            6.0 * _W[q] * _density[index / 19] *
-                (_C[q][0] * _wallVelocity[0] + _C[q][1] * _wallVelocity[1] +
-                 _C[q][2] * _wallVelocity[2]);
+            pdf[index + q] - 6.0 * _W[q] * _density[index / 19] * (_C[q][0] * _wallVelocity[0] + _C[q][1] * _wallVelocity[1] + _C[q][2] * _wallVelocity[2]);
       } else if (flag == PERIODIC) {
         // periodic treatment
-        int target[3] = { x, y, z };
+        int target[3] = {x, y, z};
         if (target[0] + _C[q][0] == 0) {
           target[0] = _domainSizeX + 1;
         } else if (target[0] + _C[q][0] == _domainSizeX + 1) {
@@ -467,27 +407,20 @@ private:
         } else if (target[2] + _C[q][2] == _domainSizeZ + 1) {
           target[2] = 0;
         }
-        const int periodicNb =
-            target[0] +
-            (_domainSizeX + 2) * (target[1] + (_domainSizeY + 2) * target[2]);
+        const int periodicNb = target[0] + (_domainSizeX + 2) * (target[1] + (_domainSizeY + 2) * target[2]);
         pdf[19 * periodicNb + q] = pdf[index + q];
       }
     }
   }
 
-  //compute density and velocity on pdf
-  void computeDensityAndVelocity(double *const vel, double &density,
-                                 const double *const pdf) {
+  // compute density and velocity on pdf
+  void computeDensityAndVelocity(double *const vel, double &density, const double *const pdf) {
     vel[0] = -(pdf[1] + pdf[5] + pdf[8] + pdf[11] + pdf[15]);
     density = pdf[3] + pdf[7] + pdf[10] + pdf[13] + pdf[17];
-    vel[1] = (pdf[4] + pdf[11] + pdf[12] + pdf[13] + pdf[18]) -
-             (pdf[0] + pdf[5] + pdf[6] + pdf[7] + pdf[14]);
+    vel[1] = (pdf[4] + pdf[11] + pdf[12] + pdf[13] + pdf[18]) - (pdf[0] + pdf[5] + pdf[6] + pdf[7] + pdf[14]);
     vel[0] = density + vel[0];
-    density =
-        density + pdf[0] + pdf[1] + pdf[2] + pdf[4] + pdf[5] + pdf[6] + pdf[8] +
-        pdf[9] + pdf[11] + pdf[12] + pdf[14] + pdf[15] + pdf[16] + pdf[18];
-    vel[2] = (pdf[14] + pdf[15] + pdf[16] + pdf[17] + pdf[18]) -
-             (pdf[0] + pdf[1] + pdf[2] + pdf[3] + pdf[4]);
+    density = density + pdf[0] + pdf[1] + pdf[2] + pdf[4] + pdf[5] + pdf[6] + pdf[8] + pdf[9] + pdf[11] + pdf[12] + pdf[14] + pdf[15] + pdf[16] + pdf[18];
+    vel[2] = (pdf[14] + pdf[15] + pdf[16] + pdf[17] + pdf[18]) - (pdf[0] + pdf[1] + pdf[2] + pdf[3] + pdf[4]);
     vel[0] = vel[0] / density;
     vel[1] = vel[1] / density;
     vel[2] = vel[2] / density;
@@ -503,17 +436,11 @@ private:
    *  startRecv,endRecv - 3-d coordinates that define a range to be received
    * from neighbouring process
    */
-  void communicatePart(double *pdf, double *sendBuffer, double *recvBuffer,
-                       NbFlag nbFlagTo, NbFlag nbFlagFrom,
-                       tarch::la::Vector<3, int> startSend,
-                       tarch::la::Vector<3, int> endSend,
-                       tarch::la::Vector<3, int> startRecv,
-                       tarch::la::Vector<3, int> endRecv) {
+  void communicatePart(double *pdf, double *sendBuffer, double *recvBuffer, NbFlag nbFlagTo, NbFlag nbFlagFrom, tarch::la::Vector<3, int> startSend,
+                       tarch::la::Vector<3, int> endSend, tarch::la::Vector<3, int> startRecv, tarch::la::Vector<3, int> endRecv) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     // directions that point to LEFT/RIGHT,... -> same ordering as enums!
-    const int directions[6][5] = { { 1, 5, 8, 11, 15 }, { 3, 7, 10, 13, 17 },
-                                   { 4, 11, 12, 13, 18 }, { 0, 5, 6, 7, 14 },
-                                   { 0, 1, 2, 3, 4 }, { 14, 15, 16, 17, 18 } };
+    const int directions[6][5] = {{1, 5, 8, 11, 15}, {3, 7, 10, 13, 17}, {4, 11, 12, 13, 18}, {0, 5, 6, 7, 14}, {0, 1, 2, 3, 4}, {14, 15, 16, 17, 18}};
     MPI_Request requests[2];
     MPI_Status status[2];
     tarch::la::Vector<2, int> plane;
@@ -535,8 +462,7 @@ private:
       domainSize[0] = _domainSizeX;
       domainSize[1] = _domainSizeY;
     } else {
-      std::cout << "ERROR LBCouetteSolver::communicatePart: d >2 or d < 0!"
-                << std::endl;
+      std::cout << "ERROR LBCouetteSolver::communicatePart: d >2 or d < 0!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // extract data and write to send buffer
@@ -545,21 +471,15 @@ private:
       for (coords[1] = startSend[1]; coords[1] < endSend[1]; coords[1]++) {
         for (coords[0] = startSend[0]; coords[0] < endSend[0]; coords[0]++) {
           for (int q = 0; q < 5; q++) {
-            sendBuffer[q + 5 * getParBuf(coords[plane[0]], coords[plane[1]],
-                                         domainSize[0], domainSize[1])] =
-                pdf[directions[nbFlagTo][q] +
-                    19 * get(coords[0], coords[1], coords[2])];
+            sendBuffer[q + 5 * getParBuf(coords[plane[0]], coords[plane[1]], domainSize[0], domainSize[1])] =
+                pdf[directions[nbFlagTo][q] + 19 * get(coords[0], coords[1], coords[2])];
           }
         }
       }
     }
     // send and receive data
-    MPI_Irecv(recvBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5,
-              MPI_DOUBLE, _parallelNeighbours[nbFlagFrom], 1000, MPI_COMM_WORLD,
-              &requests[0]);
-    MPI_Isend(sendBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5,
-              MPI_DOUBLE, _parallelNeighbours[nbFlagTo], 1000, MPI_COMM_WORLD,
-              &requests[1]);
+    MPI_Irecv(recvBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagFrom], 1000, MPI_COMM_WORLD, &requests[0]);
+    MPI_Isend(sendBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagTo], 1000, MPI_COMM_WORLD, &requests[1]);
     MPI_Waitall(2, requests, status);
     // write data back to pdf field
     if (_parallelNeighbours[nbFlagFrom] != MPI_PROC_NULL) {
@@ -567,12 +487,9 @@ private:
         for (coords[1] = startRecv[1]; coords[1] < endRecv[1]; coords[1]++) {
           for (coords[0] = startRecv[0]; coords[0] < endRecv[0]; coords[0]++) {
             for (int q = 0; q < 5; q++) {
-              if (_flag[get(coords[0], coords[1], coords[2])] ==
-                  PARALLEL_BOUNDARY) {
-                pdf[directions[nbFlagTo][q] +
-                    19 * get(coords[0], coords[1], coords[2])] = recvBuffer[
-                    q + 5 * getParBuf(coords[plane[0]], coords[plane[1]],
-                                      domainSize[0], domainSize[1])];
+              if (_flag[get(coords[0], coords[1], coords[2])] == PARALLEL_BOUNDARY) {
+                pdf[directions[nbFlagTo][q] + 19 * get(coords[0], coords[1], coords[2])] =
+                    recvBuffer[q + 5 * getParBuf(coords[plane[0]], coords[plane[1]], domainSize[0], domainSize[1])];
               }
             }
           }
@@ -585,92 +502,40 @@ private:
   void communicate() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     // send from right to left
-    communicatePart(
-        _pdf1, _sendBufferX, _recvBufferX, LEFT, RIGHT,
-        tarch::la::Vector<3, int>(1, 1, 1),
-        tarch::la::Vector<3, int>(2, _domainSizeY + 1, _domainSizeZ + 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 1, 1, 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 1,
-                                  _domainSizeZ + 1));
+    communicatePart(_pdf1, _sendBufferX, _recvBufferX, LEFT, RIGHT, tarch::la::Vector<3, int>(1, 1, 1),
+                    tarch::la::Vector<3, int>(2, _domainSizeY + 1, _domainSizeZ + 1), tarch::la::Vector<3, int>(_domainSizeX + 1, 1, 1),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 1, _domainSizeZ + 1));
     // send from left to right
-    communicatePart(
-        _pdf1, _sendBufferX, _recvBufferX, RIGHT, LEFT,
-        tarch::la::Vector<3, int>(_domainSizeX, 1, 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 1, _domainSizeY + 1,
-                                  _domainSizeZ + 1),
-        tarch::la::Vector<3, int>(0, 1, 1),
-        tarch::la::Vector<3, int>(1, _domainSizeY + 1, _domainSizeZ + 1));
+    communicatePart(_pdf1, _sendBufferX, _recvBufferX, RIGHT, LEFT, tarch::la::Vector<3, int>(_domainSizeX, 1, 1),
+                    tarch::la::Vector<3, int>(_domainSizeX + 1, _domainSizeY + 1, _domainSizeZ + 1), tarch::la::Vector<3, int>(0, 1, 1),
+                    tarch::la::Vector<3, int>(1, _domainSizeY + 1, _domainSizeZ + 1));
     // send from back to front
-    communicatePart(
-        _pdf1, _sendBufferY, _recvBufferY, FRONT, BACK,
-        tarch::la::Vector<3, int>(0, 1, 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, 2, _domainSizeZ + 1),
-        tarch::la::Vector<3, int>(0, _domainSizeY + 1, 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2,
-                                  _domainSizeZ + 1));
+    communicatePart(_pdf1, _sendBufferY, _recvBufferY, FRONT, BACK, tarch::la::Vector<3, int>(0, 1, 1),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, 2, _domainSizeZ + 1), tarch::la::Vector<3, int>(0, _domainSizeY + 1, 1),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2, _domainSizeZ + 1));
     // send from front to back
-    communicatePart(
-        _pdf1, _sendBufferY, _recvBufferY, BACK, FRONT,
-        tarch::la::Vector<3, int>(0, _domainSizeY, 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 1,
-                                  _domainSizeZ + 1),
-        tarch::la::Vector<3, int>(0, 0, 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, 1, _domainSizeZ + 1));
+    communicatePart(_pdf1, _sendBufferY, _recvBufferY, BACK, FRONT, tarch::la::Vector<3, int>(0, _domainSizeY, 1),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 1, _domainSizeZ + 1), tarch::la::Vector<3, int>(0, 0, 1),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, 1, _domainSizeZ + 1));
     // send from top to bottom
-    communicatePart(
-        _pdf1, _sendBufferZ, _recvBufferZ, BOTTOM, TOP,
-        tarch::la::Vector<3, int>(0, 0, 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2, 2),
-        tarch::la::Vector<3, int>(0, 0, _domainSizeZ + 1),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2,
-                                  _domainSizeZ + 2));
+    communicatePart(_pdf1, _sendBufferZ, _recvBufferZ, BOTTOM, TOP, tarch::la::Vector<3, int>(0, 0, 1),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2, 2), tarch::la::Vector<3, int>(0, 0, _domainSizeZ + 1),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2, _domainSizeZ + 2));
     // send from bottom to top
-    communicatePart(
-        _pdf1, _sendBufferZ, _recvBufferZ, TOP, BOTTOM,
-        tarch::la::Vector<3, int>(0, 0, _domainSizeZ),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2,
-                                  _domainSizeZ + 1),
-        tarch::la::Vector<3, int>(0, 0, 0),
-        tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2, 1));
+    communicatePart(_pdf1, _sendBufferZ, _recvBufferZ, TOP, BOTTOM, tarch::la::Vector<3, int>(0, 0, _domainSizeZ),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2, _domainSizeZ + 1), tarch::la::Vector<3, int>(0, 0, 0),
+                    tarch::la::Vector<3, int>(_domainSizeX + 2, _domainSizeY + 2, 1));
 #endif
   }
 
-  const double _omega; // relaxation frequency
-  tarch::la::Vector<3, double>
-      _wallVelocity;   // velocity of moving wall of Couette flow
-  double *_pdf1 { NULL }
-  ; // field 1
-  double *_pdf2 { NULL }
-  ; // field 2
-  const int _C[19][3] {
-    { 0, -1, -1 }
-    , { -1, 0, -1 }
-    , { 0, 0, -1 }
-    , { 1, 0, -1 }
-    , { 0, 1, -1 }
-    , { -1, -1, 0 }
-    , { 0, -1, 0 }
-    , { 1, -1, 0 }
-    , { -1, 0, 0 }
-    , { 0, 0, 0 }
-    , { 1, 0, 0 }
-    , { -1, 1, 0 }
-    , { 0, 1, 0 }
-    , { 1, 1, 0 }
-    , { 0, -1, 1 }
-    , { -1, 0, 1 }
-    , { 0, 0, 1 }
-    , { 1, 0, 1 }
-    , { 0, 1, 1 }
-  }
-  ; // lattice velocities
-  const double _W[19] {
-    1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0,
-        1.0 / 18.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 3.0, 1.0 / 18.0, 1.0 / 36.0,
-        1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0,
-        1.0 / 36.0
-  }
-  ; // lattice weights
+  const double _omega;                        // relaxation frequency
+  tarch::la::Vector<3, double> _wallVelocity; // velocity of moving wall of Couette flow
+  double *_pdf1{NULL};                        // field 1
+  double *_pdf2{NULL};                        // field 2
+  const int _C[19][3]{{0, -1, -1}, {-1, 0, -1}, {0, 0, -1}, {1, 0, -1}, {0, 1, -1}, {-1, -1, 0}, {0, -1, 0}, {1, -1, 0}, {-1, 0, 0}, {0, 0, 0},
+                      {1, 0, 0},   {-1, 1, 0},  {0, 1, 0},  {1, 1, 0},  {0, -1, 1}, {-1, 0, 1},  {0, 0, 1},  {1, 0, 1},  {0, 1, 1}}; // lattice velocities
+  const double _W[19]{1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 3.0,
+                      1.0 / 18.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0}; // lattice weights
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_

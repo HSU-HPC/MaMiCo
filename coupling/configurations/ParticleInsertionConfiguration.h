@@ -5,45 +5,44 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_PARTICLEINSERTIONCONFIGURATION_H_
 #define _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_PARTICLEINSERTIONCONFIGURATION_H_
 
+#include "coupling/NoParticleInsertion.h"
+#include "coupling/UsherParticleInsertion.h"
+#include "coupling/interface/MDSolverInterface.h"
 #include "tarch/configuration/Configuration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/la/Vector.h"
-#include "coupling/interface/MDSolverInterface.h"
-#include "coupling/UsherParticleInsertion.h"
-#include "coupling/NoParticleInsertion.h"
 #include <iostream>
 
 namespace coupling {
-namespace configurations { class ParticleInsertionConfiguration; }
+namespace configurations {
+class ParticleInsertionConfiguration;
 }
+} // namespace coupling
 
 /** configuration for particle insertion algorithm (e.g.: USHER). Derive from
-* the class tarch::configuration::Configuration
-*	@brief configuration for particle insertion algorithm (e.g.: USHER).
-*	@tparam dim Number of dimensions; it can be 1, 2 or 3
-*  @author Philipp Neumann
-*/
-class coupling::configurations::ParticleInsertionConfiguration
-    : public tarch::configuration::Configuration {
+ * the class tarch::configuration::Configuration
+ *	@brief configuration for particle insertion algorithm (e.g.: USHER).
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
+ *  @author Philipp Neumann
+ */
+class coupling::configurations::ParticleInsertionConfiguration : public tarch::configuration::Configuration {
 public:
   /** Constructor, initializes the class  */
   ParticleInsertionConfiguration()
-      : _insertDeleteMassEveryTimestep(1), _rSigmaCoeff(0.0),
-        _meanPotentialEnergyFactor(0.0), _uOverlapCoeff(0.0),
-        _stepRefCoeff(0.0), _iterMax(0), _restartMax(0), _tolerance(0.0),
-        _offsetFromOuterBoundary(0.0) {}
+      : _insertDeleteMassEveryTimestep(1), _rSigmaCoeff(0.0), _meanPotentialEnergyFactor(0.0), _uOverlapCoeff(0.0), _stepRefCoeff(0.0), _iterMax(0),
+        _restartMax(0), _tolerance(0.0), _offsetFromOuterBoundary(0.0) {}
 
   /** Destructor */
   virtual ~ParticleInsertionConfiguration() {}
 
   /** parseSubtag
-	 * 	@param node
-     */
+   * 	@param node
+   */
   void parseSubtag(tinyxml2::XMLElement *node);
 
   /** Returns name of xml tag that is associated to the configuration.
-	 * 	@return name of xml tag that is associated to the configuration
-     */
+   * 	@return name of xml tag that is associated to the configuration
+   */
   std::string getTag() const;
 
   /**
@@ -61,13 +60,11 @@ public:
 
   template <class LinkedCell, unsigned int dim>
   coupling::ParticleInsertion<LinkedCell, dim> *
-  interpreteConfiguration(coupling::interface::MDSolverInterface<
-      LinkedCell, dim> *const mdSolverInterface) const {
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) const {
     if (_particleInsertionType == USHER) {
-      return new coupling::UsherParticleInsertion<LinkedCell, dim>(
-          _insertDeleteMassEveryTimestep, _rSigmaCoeff,
-          _meanPotentialEnergyFactor, _uOverlapCoeff, _stepRefCoeff, _iterMax,
-          _restartMax, _tolerance, _offsetFromOuterBoundary, mdSolverInterface);
+      return new coupling::UsherParticleInsertion<LinkedCell, dim>(_insertDeleteMassEveryTimestep, _rSigmaCoeff, _meanPotentialEnergyFactor, _uOverlapCoeff,
+                                                                   _stepRefCoeff, _iterMax, _restartMax, _tolerance, _offsetFromOuterBoundary,
+                                                                   mdSolverInterface);
     } else if (_particleInsertionType == NO_INSERTION) {
       return new coupling::NoParticleInsertion<LinkedCell, dim>();
     }
@@ -76,13 +73,8 @@ public:
     return NULL;
   }
 
-  enum ParticleInsertionType {
-    USHER = 0,
-    NO_INSERTION = 1
-  };
-  ParticleInsertionType getParticleInsertionType() const {
-    return _particleInsertionType;
-  }
+  enum ParticleInsertionType { USHER = 0, NO_INSERTION = 1 };
+  ParticleInsertionType getParticleInsertionType() const { return _particleInsertionType; }
 
 private:
   static const std::string INSERT_DELETE_MASS_EVERY_TIMESTEP;

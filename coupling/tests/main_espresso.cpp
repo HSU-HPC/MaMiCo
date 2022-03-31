@@ -2,12 +2,12 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#include "coupling/tests/TestEspresso.h"
-#include "coupling/tests/TestEspressoMDMolecule.h"
 #include "coupling/tests/TestDummySolverInterface.h"
+#include "coupling/tests/TestEspresso.h"
+#include "coupling/tests/TestEspresso2DummyCoupling.h"
 #include "coupling/tests/TestEspressoAddDeleteMolecule.h"
 #include "coupling/tests/TestEspressoForceEnergyCalculation.h"
-#include "coupling/tests/TestEspresso2DummyCoupling.h"
+#include "coupling/tests/TestEspressoMDMolecule.h"
 #include "coupling/tests/TestEspressoMoleculeIterator.h"
 
 #include <mpi.h>
@@ -31,24 +31,19 @@ int main(int argc, char *argv[]) {
     runTest(new TestEspressoMDMolecule("TestEspressoMDMolecule", argc, argv));
     break;
   case 2:
-    runTest(
-        new TestDummySolverInterface("TestDummySolverInterface", argc, argv));
+    runTest(new TestDummySolverInterface("TestDummySolverInterface", argc, argv));
     break;
   case 3:
-    runTest(new TestEspressoAddDeleteMolecule("TestEspressoAddDeleteMolecule",
-                                              argc, argv));
+    runTest(new TestEspressoAddDeleteMolecule("TestEspressoAddDeleteMolecule", argc, argv));
     break;
   case 4:
-    runTest(new TestEspressoForceEnergyCalculation(
-        "TestEspressoForceEnergyCalculation", argc, argv));
+    runTest(new TestEspressoForceEnergyCalculation("TestEspressoForceEnergyCalculation", argc, argv));
     break;
   case 5:
-    runTest(new TestEspressoMoleculeIterator("TestEspressoMoleculeIterator",
-                                             argc, argv));
+    runTest(new TestEspressoMoleculeIterator("TestEspressoMoleculeIterator", argc, argv));
     break;
   case 6:
-    runTest(new TestEspresso2DummyCoupling("TestEspresso2DummyCoupling", argc,
-                                           argv));
+    runTest(new TestEspresso2DummyCoupling("TestEspresso2DummyCoupling", argc, argv));
     break;
   default:
     std::cout << "Test number " << thisTest << " out of range..." << std::endl;

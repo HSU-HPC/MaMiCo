@@ -5,14 +5,16 @@
 #ifndef _MOLECULARDYNAMICS_SERVICES_MOLECULARPROPERTIESSERVICE_H_
 #define _MOLECULARDYNAMICS_SERVICES_MOLECULARPROPERTIESSERVICE_H_
 
-#include <iostream>
-#include <cstdlib>
-#include "simplemd/MolecularProperties.h"
 #include "simplemd/MolecularDynamicsDefinitions.h"
+#include "simplemd/MolecularProperties.h"
+#include <cstdlib>
+#include <iostream>
 
 namespace simplemd {
-namespace services { class MolecularPropertiesService; }
+namespace services {
+class MolecularPropertiesService;
 }
+} // namespace simplemd
 
 /** access to the molecular properties.
  *  @author Philipp Neumann
@@ -20,9 +22,7 @@ namespace services { class MolecularPropertiesService; }
 class simplemd::services::MolecularPropertiesService {
 public:
   /** initialises the properties */
-  MolecularPropertiesService(const double &mass, const double &epsilon,
-                             const double &sigma, const double &cutOffRadius,
-                             const double &kB);
+  MolecularPropertiesService(const double &mass, const double &epsilon, const double &sigma, const double &cutOffRadius, const double &kB);
 
   /** returns the properties */
   const MolecularProperties &getMolecularProperties() const;

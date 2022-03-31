@@ -5,29 +5,25 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_STRATEGY_H_
 #define _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_STRATEGY_H_
 
+#include "coupling/IndexConversion.h"
 #include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/interface/MDSolverInterface.h"
-#include "coupling/IndexConversion.h"
 
 namespace coupling {
 namespace transferstrategies {
 template <class LinkedCell, unsigned int dim> class TransferStrategy;
 }
-}
+} // namespace coupling
 
 /** interface for transfer strategy, that is for macroscopic cell operations
  * that are carried out before/after send/recv-operations between
  *  the two solvers, or in each MD step for sampling purposes.
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::transferstrategies::TransferStrategy {
+template <class LinkedCell, unsigned int dim> class coupling::transferstrategies::TransferStrategy {
 public:
-  TransferStrategy(coupling::interface::MDSolverInterface<
-                       LinkedCell, dim> *const mdSolverInterface,
-                   const coupling::IndexConversion<dim> &indexConversion)
-      : _mdSolverInterface(mdSolverInterface),
-        _indexConversion(indexConversion) {}
+  TransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface, const coupling::IndexConversion<dim> &indexConversion)
+      : _mdSolverInterface(mdSolverInterface), _indexConversion(indexConversion) {}
   virtual ~TransferStrategy() {}
 
   /** is called before macroscopic cell information is transferred from the
@@ -42,14 +38,10 @@ public:
    *  The methods begin...() and end..() are called write before/after the
    * traversal of the local cells.
    */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {}
-  virtual void
-  beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
-  virtual void
-  endProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                               const unsigned int &index) {}
+  virtual void beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
+  virtual void endProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
 
   /** is called before macroscopic cell information is transferred from the
    * macroscopic solver to the macroscopic
@@ -60,14 +52,10 @@ public:
    *  This method is only applied to outer macroscopic cells, that is cells that
    * are located outside the MD domain.
    */
-  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {}
-  virtual void
-  beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
-  virtual void
-  endProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
+  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                               const unsigned int &index) {}
+  virtual void beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
+  virtual void endProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
 
   /** is called for every macroscopic cell right after the microscopicMass and
    * -Momentum-values
@@ -83,22 +71,14 @@ public:
    * MD domain; it is not applied
    *  in the outer macroscopic cells.
    */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {}
-  virtual void
-  beginProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
-  virtual void
-  endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
-  virtual void processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {}
-  virtual void
-  beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
-  virtual void
-  endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
+  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                              const unsigned int &index) {}
+  virtual void beginProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
+  virtual void endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
+  virtual void processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                              const unsigned int &index) {}
+  virtual void beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
+  virtual void endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
 
   /** is called for every macroscopic cell before sending the macroscopicMass
    * and -Momentum
@@ -111,10 +91,8 @@ public:
    * MD domain; it is not applied
    *  in the outer macroscopic cells.
    */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {}
+  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                    const unsigned int &index) {}
   virtual void beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData() {}
   virtual void endProcessInnerMacroscopicCellsBeforeSendingMDSolverData() {}
 
@@ -128,10 +106,8 @@ public:
    *  This method is only applied to outer macroscopic cells, that is cells that
    * are located outside the MD domain.
    */
-  virtual void processOuterMacroscopicCellBeforeSendingMDSolverData(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {}
+  virtual void processOuterMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                                    const unsigned int &index) {}
   virtual void beginProcessOuterMacroscopicCellsBeforeSendingMDSolverData() {}
   virtual void endProcessOuterMacroscopicCellsBeforeSendingMDSolverData() {}
 
@@ -144,16 +120,13 @@ public:
    * MD domain; it is not applied
    *  in the outer macroscopic cells.
    */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const unsigned int &index) {}
+  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                                                          const unsigned int &index) {}
   virtual void beginProcessInnerMacroscopicCellsAfterMDTimestep() {}
   virtual void endProcessInnerMacroscopicCellsAfterMDTimestep() {}
 
 protected:
-  coupling::interface::MDSolverInterface<LinkedCell,
-                                         dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   const coupling::IndexConversion<dim> &_indexConversion;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_STRATEGY_H_

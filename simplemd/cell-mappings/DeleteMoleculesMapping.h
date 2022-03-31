@@ -9,8 +9,10 @@
 #include "simplemd/services/MoleculeService.h"
 
 namespace simplemd {
-namespace cellmappings { class DeleteMoleculesMapping; }
+namespace cellmappings {
+class DeleteMoleculesMapping;
 }
+} // namespace simplemd
 
 /** deletes all molecules within the cells. The molecules are not only removed
  * from the lists in the cells,
@@ -25,8 +27,7 @@ namespace cellmappings { class DeleteMoleculesMapping; }
  */
 class simplemd::cellmappings::DeleteMoleculesMapping {
 public:
-  DeleteMoleculesMapping(simplemd::services::MoleculeService &moleculeService)
-      : _moleculeService(moleculeService) {}
+  DeleteMoleculesMapping(simplemd::services::MoleculeService &moleculeService) : _moleculeService(moleculeService) {}
   ~DeleteMoleculesMapping() {}
 
   void beginCellIteration() {}

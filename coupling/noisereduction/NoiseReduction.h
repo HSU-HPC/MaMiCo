@@ -1,13 +1,15 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_NOISEREDUCTION_H_
 #define _MOLECULARDYNAMICS_COUPLING_NOISEREDUCTION_NOISEREDUCTION_H_
 
-#include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/IndexConversion.h"
+#include "coupling/datastructures/MacroscopicCell.h"
 #include "tarch/utils/MultiMDService.h"
 
 namespace coupling {
-namespace noisereduction { template <unsigned int dim> class NoiseReduction; }
+namespace noisereduction {
+template <unsigned int dim> class NoiseReduction;
 }
+} // namespace coupling
 
 /**
  *  Interface for noise reduction algorithm, that is for smoothing operations to
@@ -17,11 +19,9 @@ namespace noisereduction { template <unsigned int dim> class NoiseReduction; }
  */
 template <unsigned int dim> class coupling::noisereduction::NoiseReduction {
 public:
-  NoiseReduction(const coupling::IndexConversion<dim> &indexConversion,
-                 const tarch::utils::MultiMDService<dim> &multiMDService,
+  NoiseReduction(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim> &multiMDService,
                  const bool doubleTraversal = false)
-      : _doubleTraversal(doubleTraversal), _indexConversion(indexConversion),
-        _multiMDService(multiMDService) {}
+      : _doubleTraversal(doubleTraversal), _indexConversion(indexConversion), _multiMDService(multiMDService) {}
   virtual ~NoiseReduction() {}
 
   /** Is called for every macroscopic cell right before sending the
@@ -32,9 +32,7 @@ public:
    * MD domain; it is not applied
    *  in the outer macroscopic cells.
    */
-  virtual void processInnerMacroscopicCell(
-      coupling::datastructures::MacroscopicCell<dim> &cell,
-      const unsigned int &index) {}
+  virtual void processInnerMacroscopicCell(coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index) {}
   virtual void beginProcessInnerMacroscopicCells() {}
   virtual void endProcessInnerMacroscopicCells() {}
 
@@ -45,9 +43,7 @@ public:
    *  This method is only applied to outer macroscopic cells, that is cells that
    * are located outside the MD domain.
    */
-  virtual void processOuterMacroscopicCell(
-      coupling::datastructures::MacroscopicCell<dim> &cell,
-      const unsigned int &index) {}
+  virtual void processOuterMacroscopicCell(coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index) {}
   virtual void beginProcessOuterMacroscopicCells() {}
   virtual void endProcessOuterMacroscopicCells() {}
 

@@ -5,14 +5,14 @@
 #ifndef _MAIN_CPP_
 #define _MAIN_CPP_
 
-#include <iostream>
-#include <cstdlib>
-#include "coupling/tests/IndexConversionTest.h"
+#include "coupling/CouplingMDDefinitions.h"
+#include "coupling/tests/CompileTest.h"
 #include "coupling/tests/FromMD2MacroTest.h"
 #include "coupling/tests/FromMacro2MDTest.h"
-#include "coupling/tests/CompileTest.h"
+#include "coupling/tests/IndexConversionTest.h"
 #include "coupling/tests/MacroscopicCellsTest.h"
-#include "coupling/CouplingMDDefinitions.h"
+#include <cstdlib>
+#include <iostream>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif

@@ -6,18 +6,19 @@
 #define _MOLECULARDYNAMICS_CONFIGURATIONS_EXTERNALFORCECONFIGURATION_H_
 
 #include "simplemd/MolecularDynamicsUserInput.h"
-#include "tarch/la/Vector.h"
 #include "tarch/configuration/Configuration.h"
+#include "tarch/la/Vector.h"
 
 namespace simplemd {
-namespace configurations { class ExternalForceConfiguration; }
+namespace configurations {
+class ExternalForceConfiguration;
 }
+} // namespace simplemd
 
 /** parses a constant, external force term.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::ExternalForceConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::ExternalForceConfiguration : public tarch::configuration::Configuration {
 public:
   ExternalForceConfiguration() : _externalForce(0.0), _isValid(false) {}
   virtual ~ExternalForceConfiguration() {}
@@ -43,9 +44,7 @@ public:
   bool isValid() const { return _isValid; }
 
   /** getters for all parsed and computed quantities */
-  const tarch::la::Vector<MD_DIM, double> &getExternalForce() const {
-    return _externalForce;
-  }
+  const tarch::la::Vector<MD_DIM, double> &getExternalForce() const { return _externalForce; }
 
 private:
   static const std::string VALUE;

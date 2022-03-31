@@ -5,14 +5,14 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_ESPRESSOMDSOLVERINTERFACE_H_
 #define _MOLECULARDYNAMICS_COUPLING_ESPRESSOMDSOLVERINTERFACE_H_
 
-#include <cstdlib>
-#include "tarch/la/Vector.h"
+#include "cells.hpp"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMoleculeIterator.h"
-#include "particle_data.hpp"
 #include "domain_decomposition.hpp"
-#include "cells.hpp"
 #include "forces.hpp"
+#include "particle_data.hpp"
+#include "tarch/la/Vector.h"
+#include <cstdlib>
 
 namespace coupling {
 namespace interface {
@@ -24,11 +24,9 @@ class EspressoMDSolverInterface : public MDSolverInterface<ParticleList, 3> {
 public:
   ~EspressoMDSolverInterface() {}
 
-  ParticleList &getLinkedCell(
-      const tarch::la::Vector<3, unsigned int> &macroscopicCellIndex,
-      const tarch::la::Vector<3, unsigned int> &linkedCellInMacroscopicCell,
-      const tarch::la::Vector<3, unsigned int> &linkedCellsPerMacroscopicCell,
-      const coupling::IndexConversion<3> &indexConversion) {
+  ParticleList &getLinkedCell(const tarch::la::Vector<3, unsigned int> &macroscopicCellIndex,
+                              const tarch::la::Vector<3, unsigned int> &linkedCellInMacroscopicCell,
+                              const tarch::la::Vector<3, unsigned int> &linkedCellsPerMacroscopicCell, const coupling::IndexConversion<3> &indexConversion) {
     for (unsigned int d = 0; d < 3; d++) {
       if (macroscopicCellIndex[d] == 0) {
         std::cout << "ERROR EspressoMDSolverInterface::getLinkedCell(): "
@@ -40,12 +38,9 @@ public:
     tarch::la::Vector<3, unsigned int> index(0);
 
     for (unsigned int d = 0; d < 3; d++) {
-      index[d] = index[d] + (macroscopicCellIndex[d] - 1) *
-                                linkedCellsPerMacroscopicCell[d] +
-                 linkedCellInMacroscopicCell[d];
+      index[d] = index[d] + (macroscopicCellIndex[d] - 1) * linkedCellsPerMacroscopicCell[d] + linkedCellInMacroscopicCell[d];
     }
-    int id =
-        (index[0] + dd.cell_grid[0] * (index[1] + dd.cell_grid[1] * index[2]));
+    int id = (index[0] + dd.cell_grid[0] * (index[1] + dd.cell_grid[1] * index[2]));
 
     ParticleList *cell;
     cell = local_cells.cell[id];
@@ -63,8 +58,8 @@ public:
   tarch::la::Vector<3, double> getGlobalMDDomainOffset() const {
     tarch::la::Vector<3, double> domainoffset(0.0);
     /*        	for(int i=0; i<3; i++) {
-    			domainoffset[i]=my_left[i];
-    		}*/
+                        domainoffset[i]=my_left[i];
+                }*/
     return domainoffset;
   }
   double getMoleculeMass() const { return 1.0; }
@@ -75,8 +70,7 @@ public:
 
   double getMoleculeEpsilon() const { return 1.0; }
 
-  void getInitialVelocity(const tarch::la::Vector<3, double> &meanVelocity,
-                          const double &kB, const double &temperature,
+  void getInitialVelocity(const tarch::la::Vector<3, double> &meanVelocity, const double &kB, const double &temperature,
                           tarch::la::Vector<3, double> &initialVelocity) const {
     tarch::la::Vector<3, double> randomNumbers(0.0);
     double mass = 1.0; // use getMoleculeMass() when it will be defined
@@ -84,8 +78,8 @@ public:
     double u, v, r, c, num;
     num = 0.0;
     while (r > 0 && r < 1) {
-      u = ((double) rand() / (RAND_MAX)) * 2 - 1;
-      v = ((double) rand() / (RAND_MAX)) * 2 - 1;
+      u = ((double)rand() / (RAND_MAX)) * 2 - 1;
+      v = ((double)rand() / (RAND_MAX)) * 2 - 1;
       r = u * u + v * v;
       c = sqrt(-2 * log(r) / r);
       num = u * c;
@@ -94,30 +88,19 @@ public:
     randomNumbers[0] = num;
     double stdDeviation = std::sqrt(3 * kB * temperature / mass);
     for (unsigned int d = 1; d < 3; d++) {
-      randomNumbers[d] = 2.0 * PI * ((double) rand()) / ((double) RAND_MAX);
+      randomNumbers[d] = 2.0 * PI * ((double)rand()) / ((double)RAND_MAX);
     }
 
-    initialVelocity[0] =
-        meanVelocity[0] +
-        stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) *
-                        std::cos(randomNumbers[2]));
-    initialVelocity[1] =
-        meanVelocity[1] +
-        stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) *
-                        std::sin(randomNumbers[2]));
-    initialVelocity[2] =
-        meanVelocity[2] +
-        stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));
+    initialVelocity[0] = meanVelocity[0] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::cos(randomNumbers[2]));
+    initialVelocity[1] = meanVelocity[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::sin(randomNumbers[2]));
+    initialVelocity[2] = meanVelocity[2] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));
   }
 
-  void deleteMoleculeFromMDSimulation(
-      const coupling::interface::Molecule<3> &molecule, ParticleList &cell) {
+  void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<3> &molecule, ParticleList &cell) {
     int cnt = 0;
     int number = cell.n;
     if (number == 0) {
-      std::cout
-          << "ERROR: Cell contains no particle, cannot delete the particle "
-          << std::endl;
+      std::cout << "ERROR: Cell contains no particle, cannot delete the particle " << std::endl;
       exit(EXIT_FAILURE);
       return;
     }
@@ -136,9 +119,7 @@ public:
         int id = part.p.identity;
         int flag = remove_particle(id);
         if (flag == 1) {
-          std::cout
-              << "ERROR: remove_particle could not delete molecule at position "
-              << moleculePosition << "!" << std::endl;
+          std::cout << "ERROR: remove_particle could not delete molecule at position " << moleculePosition << "!" << std::endl;
           exit(EXIT_FAILURE);
         }
         return;
@@ -146,14 +127,11 @@ public:
       cnt++;
     }
 
-    std::cout << "ERROR: Could not delete molecule at position "
-              << moleculePosition << "!" << std::endl;
+    std::cout << "ERROR: Could not delete molecule at position " << moleculePosition << "!" << std::endl;
     exit(EXIT_FAILURE);
-
   }
 
-  void
-  addMoleculeToMDSimulation(const coupling::interface::Molecule<3> &molecule) {
+  void addMoleculeToMDSimulation(const coupling::interface::Molecule<3> &molecule) {
     tarch::la::Vector<3, double> position = molecule.getPosition();
     tarch::la::Vector<3, double> velocity = molecule.getVelocity();
     tarch::la::Vector<3, double> force = molecule.getForce();
@@ -185,21 +163,19 @@ public:
     }
   }
 
-  void setupPotentialEnergyLandscape(
-      const tarch::la::Vector<3, unsigned int> &indexOfFirstMacroscopicCell,
-      const tarch::la::Vector<3, unsigned int> &rangeMacroscopicCells,
-      const tarch::la::Vector<3, unsigned int> &linkedCellsPerMacroscopicCell) {
+  void setupPotentialEnergyLandscape(const tarch::la::Vector<3, unsigned int> &indexOfFirstMacroscopicCell,
+                                     const tarch::la::Vector<3, unsigned int> &rangeMacroscopicCells,
+                                     const tarch::la::Vector<3, unsigned int> &linkedCellsPerMacroscopicCell) {
     // Empty
   }
 
   // Returns the index of the linked cell the particle is located in
-  tarch::la::Vector<3, unsigned int> getLinkedCellIndexForMoleculePosition(
-      const tarch::la::Vector<3, double> &position) {
+  tarch::la::Vector<3, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<3, double> &position) {
     double lpos;
     tarch::la::Vector<3, unsigned int> cpos(0);
     for (unsigned int i = 0; i < 3; i++) {
       lpos = position[i] - my_left[i];
-      //cpos[i] = (int)(lpos*dd.inv_cell_size[i])+1;
+      // cpos[i] = (int)(lpos*dd.inv_cell_size[i])+1;
       cpos[i] = ceil(lpos * dd.inv_cell_size[i]);
     }
     std::cout << "Position " << position << " Index " << cpos << std::endl;
@@ -233,16 +209,11 @@ public:
     }
 
     // Get the linked cell the particle is located in
-    tarch::la::Vector<3, unsigned int> linkedCellIndex =
-        getLinkedCellIndexForMoleculePosition(pos);
-    unsigned int c =
-        ((linkedCellIndex[0] - 1) +
-         dd.cell_grid[0] * ((linkedCellIndex[1] - 1) +
-                            dd.cell_grid[1] * (linkedCellIndex[2] - 1)));
+    tarch::la::Vector<3, unsigned int> linkedCellIndex = getLinkedCellIndexForMoleculePosition(pos);
+    unsigned int c = ((linkedCellIndex[0] - 1) + dd.cell_grid[0] * ((linkedCellIndex[1] - 1) + dd.cell_grid[1] * (linkedCellIndex[2] - 1)));
 
     if ((c < 0) || (c > local_cells.n)) {
-      std::cout << "ERROR: could not find the cell the particle is located in"
-                << std::endl;
+      std::cout << "ERROR: could not find the cell the particle is located in" << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -278,10 +249,8 @@ public:
         IA_parameters *ia_params = get_ia_param(temp_part.p.type, p2->p.type);
         Particle *temp = &(p2[j]);
         Particle *p = &temp_part;
-        potentialEnergy += calc_non_bonded_pair_energy(
-            p, temp, ia_params, vec21, sqrt(dist2), dist2);
-        calc_non_bonded_pair_force(p, temp, ia_params, vec21, sqrt(dist2),
-                                   dist2, force, t1, t2);
+        potentialEnergy += calc_non_bonded_pair_energy(p, temp, ia_params, vec21, sqrt(dist2), dist2);
+        calc_non_bonded_pair_force(p, temp, ia_params, vec21, sqrt(dist2), dist2, force, t1, t2);
       }
     }
 
@@ -304,12 +273,10 @@ public:
   double getDt() { return time_step; }
 
   // Returns a molecule iterator to the given cell
-  coupling::interface::MoleculeIterator<ParticleList, 3> *
-  getMoleculeIterator(ParticleList &cell) {
+  coupling::interface::MoleculeIterator<ParticleList, 3> *getMoleculeIterator(ParticleList &cell) {
     return new coupling::interface::EspressoMDMoleculeIterator(cell);
   }
-
 };
-}
-}
+} // namespace interface
+} // namespace coupling
 #endif // _MOLECULARDYNAMICS_COUPLING_ESPRESSOMDSOLVERINTERFACE_H_

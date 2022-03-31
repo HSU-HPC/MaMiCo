@@ -9,8 +9,10 @@
 #include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {
-namespace moleculemappings { class UpdateLinkedCellListsMapping; }
+namespace moleculemappings {
+class UpdateLinkedCellListsMapping;
 }
+} // namespace simplemd
 
 /** cell mapping used to sort molecules into the respective linked cells.
  *  This step is done twice in the algorithm:
@@ -25,12 +27,9 @@ namespace moleculemappings { class UpdateLinkedCellListsMapping; }
  */
 class simplemd::moleculemappings::UpdateLinkedCellListsMapping {
 public:
-  UpdateLinkedCellListsMapping(
-      const simplemd::services::ParallelTopologyService &
-          parallelTopologyService,
-      simplemd::services::LinkedCellService &linkedCellService)
-      : _parallelTopologyService(parallelTopologyService),
-        _linkedCellService(linkedCellService) {}
+  UpdateLinkedCellListsMapping(const simplemd::services::ParallelTopologyService &parallelTopologyService,
+                               simplemd::services::LinkedCellService &linkedCellService)
+      : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService) {}
   ~UpdateLinkedCellListsMapping() {}
 
   void beginMoleculeIteration();

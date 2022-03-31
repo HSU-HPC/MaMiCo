@@ -42,19 +42,14 @@
 #include "tarch/la/Vector.h"
 
 namespace coupling {
-enum MacroscopicSolverID {
-  PEANO_LATTICEBOLTZMANN_ID = 0,
-  TEST_LOCAL_MACROSCOPIC_SOLVER_ID = 1
-};
+enum MacroscopicSolverID { PEANO_LATTICEBOLTZMANN_ID = 0, TEST_LOCAL_MACROSCOPIC_SOLVER_ID = 1 };
 
 // --------------------------- HELPER FUNCTIONS
 // ----------------------------------------
 
 /** inits the range for looping over Cartesian grid for general case (1D/2D/3D
  * support).*/
-template <unsigned int dim>
-tarch::la::Vector<3, unsigned int>
-initRange(tarch::la::Vector<dim, unsigned int> vec) {
+template <unsigned int dim> tarch::la::Vector<3, unsigned int> initRange(tarch::la::Vector<dim, unsigned int> vec) {
   tarch::la::Vector<3, unsigned int> range(1);
   for (unsigned int d = 0; d < dim; d++) {
     range[d] = vec[d];
@@ -64,9 +59,7 @@ initRange(tarch::la::Vector<dim, unsigned int> vec) {
 
 /** reduces three-dimensional vector to vector of size dim (assumes that dim<=
  * 3). */
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-initDimVector(tarch::la::Vector<3, unsigned int> vec) {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> initDimVector(tarch::la::Vector<3, unsigned int> vec) {
   tarch::la::Vector<dim, unsigned int> smallVec;
   for (unsigned int d = 0; d < dim; d++) {
     smallVec[d] = vec[d];
@@ -76,9 +69,7 @@ initDimVector(tarch::la::Vector<3, unsigned int> vec) {
 
 /** computes a vectorwise division factor for the conversion of linearised to
  * vector indices */
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-initDivisionFactor(tarch::la::Vector<dim, unsigned int> numberCells) {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> initDivisionFactor(tarch::la::Vector<dim, unsigned int> numberCells) {
   tarch::la::Vector<dim, unsigned int> divFactor(1);
   for (unsigned int d = 1; d < dim; d++) {
     divFactor[d] = divFactor[d - 1] * (numberCells[d - 1]);
@@ -92,9 +83,7 @@ initDivisionFactor(tarch::la::Vector<dim, unsigned int> numberCells) {
  * variables, cf. initDivisionFactor()-method.
  */
 template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-getVectorCellIndex(unsigned int cellIndex,
-                   const tarch::la::Vector<dim, unsigned int> &divisionFactor) {
+tarch::la::Vector<dim, unsigned int> getVectorCellIndex(unsigned int cellIndex, const tarch::la::Vector<dim, unsigned int> &divisionFactor) {
   tarch::la::Vector<dim, unsigned int> myVector(0);
   unsigned int help = cellIndex;
   for (int d = dim - 1; d > 0; d--) {
@@ -106,5 +95,5 @@ getVectorCellIndex(unsigned int cellIndex,
   return myVector;
 }
 
-}
+} // namespace coupling
 #endif // _MOLECULARDYNAMICS_COUPLING_COUPLINGMDDEFINITIONS_H_

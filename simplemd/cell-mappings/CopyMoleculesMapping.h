@@ -9,8 +9,10 @@
 #include <list>
 
 namespace simplemd {
-namespace cellmappings { class CopyMoleculesMapping; }
+namespace cellmappings {
+class CopyMoleculesMapping;
 }
+} // namespace simplemd
 
 /** creates a copy of all molecules and stores the molecules in a std-list.
  *  The molecules are sorted according to the linked cells that they belong to.
@@ -31,8 +33,7 @@ public:
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
     // append molecules to list. Doing so, the molecules are sorted w.r.t. their
     // linked cell structure
-    for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end();
-         it++) {
+    for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
       _molecules.push_back(*(*it));
       // reset pointer to this molecule in the linked cell
       (*it) = NULL;

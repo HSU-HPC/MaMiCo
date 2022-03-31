@@ -1,27 +1,20 @@
 //#define POD_DEBUG
 
 template <unsigned int dim>
-coupling::noisereduction::POD<dim>::POD(
-    const coupling::IndexConversion<dim> &indexConversion,
-    const tarch::utils::MultiMDService<dim> &multiMDService, int tws, int kmax)
-    : coupling::noisereduction::NoiseReduction<dim>(indexConversion,
-                                                    multiMDService, true),
-      _timeWindowSize(tws), _kMax(kmax), _cycleCounter(0), _spatialIndex(0),
-      _t(0), _data(NULL), _C(NULL), _A(NULL), _A_T(NULL),
-      _firstTraversal(true) {
+coupling::noisereduction::POD<dim>::POD(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim> &multiMDService, int tws,
+                                        int kmax)
+    : coupling::noisereduction::NoiseReduction<dim>(indexConversion, multiMDService, true), _timeWindowSize(tws), _kMax(kmax), _cycleCounter(0),
+      _spatialIndex(0), _t(0), _data(NULL), _C(NULL), _A(NULL), _A_T(NULL), _firstTraversal(true) {
   int spatialSize = getLocalNumberMacroscopicCells(indexConversion);
-  _data = new Eigen::MatrixXd[
-      dim +
-      1]; // separate data matrices for: mass, momentum0, momentum1, momentum2
+  _data = new Eigen::MatrixXd[dim + 1]; // separate data matrices for: mass, momentum0, momentum1, momentum2
   _C = new Eigen::MatrixXd[dim + 1];
   _A = new Eigen::MatrixXd[dim + 1];
   _A_T = new Eigen::MatrixXd[dim + 1];
   for (unsigned int i = 0; i < dim + 1; i++) {
-    _data[i] = Eigen::MatrixXd::Constant(_timeWindowSize, spatialSize,
-                                         (i == 0) ? 1 : 0);
+    _data[i] = Eigen::MatrixXd::Constant(_timeWindowSize, spatialSize, (i == 0) ? 1 : 0);
   }
-  //std::cout << "POD kmax = " << _kMax << ", and tws = " << _timeWindowSize <<
-  //std::endl;
+  // std::cout << "POD kmax = " << _kMax << ", and tws = " << _timeWindowSize <<
+  // std::endl;
 }
 
 template <unsigned int dim> coupling::noisereduction::POD<dim>::~POD() {
@@ -43,8 +36,7 @@ template <unsigned int dim> coupling::noisereduction::POD<dim>::~POD() {
   }
 }
 
-template <unsigned int dim>
-void coupling::noisereduction::POD<dim>::beginProcessInnerMacroscopicCells() {
+template <unsigned int dim> void coupling::noisereduction::POD<dim>::beginProcessInnerMacroscopicCells() {
   _spatialIndex = 0;
 
   if (!_firstTraversal) {
@@ -56,29 +48,16 @@ void coupling::noisereduction::POD<dim>::beginProcessInnerMacroscopicCells() {
 
 #ifdef POD_DEBUG
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      for (unsigned int rank = 0;
-           rank < coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                      .getLocalSize();
-           rank++) {
-        if (rank ==
-            coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                .getLocalRank()) {
+      for (unsigned int rank = 0; rank < coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalSize(); rank++) {
+        if (rank == coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank()) {
 #endif
-          std::cout
-              << "Rank "
-              << coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                     .getLocalRank() << ", _cycleCounter " << _cycleCounter
-              << ": _data[" << d << "] = " << _data[d] << std::endl;
-          std::cout
-              << "Rank "
-              << coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                     .getLocalRank() << ", _cycleCounter " << _cycleCounter
-              << ": _C[" << d << "] = " << _C[d] << std::endl;
+          std::cout << "Rank " << coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank() << ", _cycleCounter " << _cycleCounter
+                    << ": _data[" << d << "] = " << _data[d] << std::endl;
+          std::cout << "Rank " << coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank() << ", _cycleCounter " << _cycleCounter
+                    << ": _C[" << d << "] = " << _C[d] << std::endl;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         }
-        MPI_Barrier(
-            coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                .getLocalCommunicator());
+        MPI_Barrier(coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalCommunicator());
       }
 #endif
 #endif
@@ -95,13 +74,9 @@ void coupling::noisereduction::POD<dim>::beginProcessInnerMacroscopicCells() {
     for (unsigned int d = 0; d < dim + 1; d++)
       for (unsigned int i = 0; i < _timeWindowSize * _timeWindowSize; i++)
         send_data[index++] = _C[d].data()[i];
-    MPI_Allreduce(send_data, recv_data, count, MPI_DOUBLE, MPI_SUM,
-                  coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                      .getLocalCommunicator());
+    MPI_Allreduce(send_data, recv_data, count, MPI_DOUBLE, MPI_SUM, coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalCommunicator());
     for (unsigned int d = 0; d < dim + 1; d++) {
-      Eigen::Map<Eigen::MatrixXd> map(
-          &recv_data[d * _timeWindowSize * _timeWindowSize], _timeWindowSize,
-          _timeWindowSize);
+      Eigen::Map<Eigen::MatrixXd> map(&recv_data[d * _timeWindowSize * _timeWindowSize], _timeWindowSize, _timeWindowSize);
       _C[d] = map; // copy assignment
     }
     delete[] send_data;
@@ -111,29 +86,16 @@ void coupling::noisereduction::POD<dim>::beginProcessInnerMacroscopicCells() {
     for (unsigned int d = 0; d < dim + 1; d++) {
 #ifdef POD_DEBUG
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      for (unsigned int rank = 0;
-           rank < coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                      .getLocalSize();
-           rank++) {
-        if (rank ==
-            coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                .getLocalRank()) {
+      for (unsigned int rank = 0; rank < coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalSize(); rank++) {
+        if (rank == coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank()) {
 #endif
-          std::cout
-              << "Rank "
-              << coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                     .getLocalRank() << ", _cycleCounter " << _cycleCounter
-              << ": Communication finished" << std::endl;
-          std::cout
-              << "Rank "
-              << coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                     .getLocalRank() << ", _cycleCounter " << _cycleCounter
-              << ": _C[" << d << "] = " << _C[d] << std::endl;
+          std::cout << "Rank " << coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank() << ", _cycleCounter " << _cycleCounter
+                    << ": Communication finished" << std::endl;
+          std::cout << "Rank " << coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalRank() << ", _cycleCounter " << _cycleCounter
+                    << ": _C[" << d << "] = " << _C[d] << std::endl;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         }
-        MPI_Barrier(
-            coupling::noisereduction::NoiseReduction<dim>::_multiMDService
-                .getLocalCommunicator());
+        MPI_Barrier(coupling::noisereduction::NoiseReduction<dim>::_multiMDService.getLocalCommunicator());
       }
 #endif
 #endif
@@ -146,14 +108,11 @@ void coupling::noisereduction::POD<dim>::beginProcessInnerMacroscopicCells() {
 }
 
 template <unsigned int dim>
-void coupling::noisereduction::POD<dim>::processInnerMacroscopicCell(
-    coupling::datastructures::MacroscopicCell<dim> &cell,
-    const unsigned int &index) {
+void coupling::noisereduction::POD<dim>::processInnerMacroscopicCell(coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index) {
   if (_firstTraversal) {
     // save data into snapshot matrix
     _data[0](_t, _spatialIndex) = cell.getMacroscopicMass();
-    for (unsigned int d = 0; d < dim;
-         d++) { // (optimized compiler will unroll this loop)
+    for (unsigned int d = 0; d < dim; d++) { // (optimized compiler will unroll this loop)
       _data[d + 1](_t, _spatialIndex) = cell.getMacroscopicMomentum()[d];
     }
   } else {
@@ -161,8 +120,7 @@ void coupling::noisereduction::POD<dim>::processInnerMacroscopicCell(
     Eigen::VectorXd phi_x = _A_T[0] * _data[0].col(_spatialIndex);
     cell.setMacroscopicMass((_A[0].row(_t) * phi_x).value());
     tarch::la::Vector<dim, double> mo_smooth;
-    for (unsigned int d = 0; d < dim;
-         d++) { // (optimized compiler will unroll this loop)
+    for (unsigned int d = 0; d < dim; d++) { // (optimized compiler will unroll this loop)
       phi_x = _A_T[d + 1] * _data[d + 1].col(_spatialIndex);
       mo_smooth[d] = (_A[d + 1].row(_t) * phi_x).value();
     }
@@ -171,8 +129,7 @@ void coupling::noisereduction::POD<dim>::processInnerMacroscopicCell(
   _spatialIndex++;
 }
 
-template <unsigned int dim>
-void coupling::noisereduction::POD<dim>::endProcessInnerMacroscopicCells() {
+template <unsigned int dim> void coupling::noisereduction::POD<dim>::endProcessInnerMacroscopicCells() {
   if (!_firstTraversal) {
     _cycleCounter++;
     _t = _cycleCounter % _timeWindowSize;
@@ -180,22 +137,20 @@ void coupling::noisereduction::POD<dim>::endProcessInnerMacroscopicCells() {
   _firstTraversal = !_firstTraversal;
 }
 
-//TODO
+// TODO
 /*template<unsigned int dim>
 void coupling::noisereduction::POD<dim>::
 apply(){
-	beginProcessInnerMacroscopicCells();
-	for(unsigned int i = 0; i < outputCellVector.size(); i++)
+        beginProcessInnerMacroscopicCells();
+        for(unsigned int i = 0; i < outputCellVector.size(); i++)
 processInnerMacroscopicCell(*(_domainCells[i]), i); //TODO: Change POD to use
 vector incides, i.e _domainCellIndices[i].
-	endProcessInnerMacroscopicCells();
+        endProcessInnerMacroscopicCells();
 } */
 
 template <unsigned int dim>
-unsigned int coupling::noisereduction::POD<dim>::getLocalNumberMacroscopicCells(
-    const coupling::IndexConversion<dim> &indexConversion) const {
-  const tarch::la::Vector<dim, unsigned int> localCells(
-      indexConversion.getLocalNumberMacroscopicCells());
+unsigned int coupling::noisereduction::POD<dim>::getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const {
+  const tarch::la::Vector<dim, unsigned int> localCells(indexConversion.getLocalNumberMacroscopicCells());
   unsigned int num = localCells[0];
   for (unsigned int d = 1; d < dim; d++) {
     num = num * localCells[d];

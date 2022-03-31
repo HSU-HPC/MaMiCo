@@ -1,33 +1,35 @@
 /*
   Copyright (C) 2012,2013 The ESPResSo project
-  
+
   This file is part of ESPResSo.
-  
+
   ESPResSo is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <tcl.h>
-#include <unistd.h>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cstdio>
+#include <tcl.h>
+#include <unistd.h>
 
-#include "global.hpp"
 #include "binary_file_tcl.hpp"
 #include "constraint_tcl.hpp"
 #include "domain_decomposition_tcl.hpp"
 #include "dpd_tcl.hpp"
+#include "electrokinetics_tcl.hpp"
 #include "galilei_tcl.hpp"
+#include "ghmc_tcl.hpp"
+#include "global.hpp"
 #include "global_tcl.hpp"
 #include "grid_tcl.hpp"
 #include "iccp3m_tcl.hpp"
@@ -50,10 +52,8 @@
 #include "statistics_observable_tcl.hpp"
 #include "statistics_tcl.hpp"
 #include "thermostat_tcl.hpp"
-#include "virtual_sites_com_tcl.hpp"
-#include "ghmc_tcl.hpp"
 #include "tuning.hpp"
-#include "electrokinetics_tcl.hpp"
+#include "virtual_sites_com_tcl.hpp"
 
 #ifdef TK
 #include <tk.h>
@@ -69,20 +69,16 @@
 int tclcommand_bin(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** Implementation of the Tcl command blockfile. Allows to read and write
     blockfile comfortably from Tcl. See \ref blockfile_tcl.cpp */
-int tclcommand_blockfile(ClientData data, Tcl_Interp *interp, int argc,
-                         char **argv);
+int tclcommand_blockfile(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** implementation of the Tcl command cellsystem. See \ref cells_tcl.cpp */
-int tclcommand_cellsystem(ClientData data, Tcl_Interp *interp, int argc,
-                          char **argv);
+int tclcommand_cellsystem(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** replaces one of TCLs standart channels with a named pipe. See \ref
  * channels_tcl.cpp */
-int tclcommand_replacestdchannel(ClientData clientData, Tcl_Interp *interp,
-                                 int argc, char **argv);
+int tclcommand_replacestdchannel(ClientData clientData, Tcl_Interp *interp, int argc, char **argv);
 /** Implements the Tcl command code_info.  It provides information on the
     Version, Compilation status and the debug status of the used
     code. See \ref config_tcl.cpp */
-int tclcommand_code_info(ClientData data, Tcl_Interp *interp, int argc,
-                         char **argv);
+int tclcommand_code_info(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** Set the CUDA device to use or retrieve information
     available devices. See \ref cuda_init_tcl.cpp */
 int tclcommand_cuda(ClientData data, Tcl_Interp *interp, int argc, char **argv);
@@ -93,14 +89,12 @@ int tclcommand_imd(ClientData data, Tcl_Interp *interp, int argc, char **argv);
     see also \ref tclcommand_nemd. See \ref nemd_tcl.cpp */
 int tclcommand_nemd(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** Collision detection. See \ref collision_tcl.cpp */
-int tclcommand_on_collision(ClientData data, Tcl_Interp *interp, int argc,
-                            char **argv);
+int tclcommand_on_collision(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** Implementation of the tcl command "part". This command allows to
     modify particle data. See \ref particle_data_tcl.cpp */
 int tclcommand_part(ClientData data, Tcl_Interp *interp, int argc, char **argv);
 /** The C implementation of the tcl function uwerr. See \ref uwerr_tcl.cpp */
-int tclcommand_uwerr(ClientData data, Tcl_Interp *interp, int argc,
-                     char *argv[]);
+int tclcommand_uwerr(ClientData data, Tcl_Interp *interp, int argc, char *argv[]);
 /** callback for \ref timing_samples. See \ref tuning_tcl.cpp */
 int tclcallback_timings(Tcl_Interp *interp, void *data);
 
@@ -108,15 +102,13 @@ int tclcallback_timings(Tcl_Interp *interp, void *data);
 char *get_default_scriptsdir();
 
 /** Returns runtime of the integration loop in seconds. From tuning_tcl.cpp **/
-int tclcommand_time_integration(ClientData data, Tcl_Interp *interp, int argc,
-                                char *argv[]);
+int tclcommand_time_integration(ClientData data, Tcl_Interp *interp, int argc, char *argv[]);
 
 /****************************************
  * Registration functions
  *****************************************/
 
-#define REGISTER_COMMAND(name, routine)                                        \
-  Tcl_CreateCommand(interp, name, (Tcl_CmdProc *)routine, 0, NULL);
+#define REGISTER_COMMAND(name, routine) Tcl_CreateCommand(interp, name, (Tcl_CmdProc *)routine, 0, NULL);
 
 // MODIFICATION FOR MAMICO -> REMOVE static from function definition
 void register_tcl_commands(Tcl_Interp *interp) {
@@ -255,19 +247,18 @@ int appinit(Tcl_Interp *interp) {
 
   char cwd[1024];
   if ((getcwd(cwd, 1024) == NULL) || (chdir(scriptdir) != 0)) {
-    fprintf(stderr, "\n\ncould not change to script dir %s, please check "
-                    "ESPRESSO_SCRIPTS.\n\n\n",
+    fprintf(stderr,
+            "\n\ncould not change to script dir %s, please check "
+            "ESPRESSO_SCRIPTS.\n\n\n",
             scriptdir);
     exit(1);
   }
   if (Tcl_EvalFile(interp, "init.tcl") == TCL_ERROR) {
-    fprintf(stderr, "\n\nerror in initialization script: %s\n\n\n",
-            Tcl_GetStringResult(interp));
+    fprintf(stderr, "\n\nerror in initialization script: %s\n\n\n", Tcl_GetStringResult(interp));
     exit(1);
   }
   if (chdir(cwd) != 0) {
-    fprintf(stderr, "\n\ncould not change back to execution dir %s ????\n\n\n",
-            cwd);
+    fprintf(stderr, "\n\ncould not change back to execution dir %s ????\n\n\n", cwd);
     exit(1);
   }
 

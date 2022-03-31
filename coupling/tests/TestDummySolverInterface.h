@@ -5,13 +5,13 @@
 #ifndef _TESTS_TESTDUMMYSOLVERINTERFACE_H_
 #define _TESTS_TESTDUMMYSOLVERINTERFACE_H_
 
-#include "coupling/tests/Test.h"
-#include "tarch/la/Vector.h"
+#include "coupling/CouplingMDDefinitions.h"
+#include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/solvers/DummySolver.h"
 #include "coupling/solvers/DummySolverInterface.h"
 #include "coupling/solvers/DummySolverInterfaceService.h"
-#include "coupling/CouplingMDDefinitions.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/tests/Test.h"
+#include "tarch/la/Vector.h"
 
 /** test class for dummy solver interface and dummy solver interface service.
  * Here I test all the functions defined in the dummy
@@ -27,8 +27,7 @@ private:
   char **_argv;
 
 public:
-  TestDummySolverInterface(std::string name, int argc, char **argv)
-      : Test(name), _argc(argc), _argv(argv) {}
+  TestDummySolverInterface(std::string name, int argc, char **argv) : Test(name), _argc(argc), _argv(argv) {}
   virtual ~TestDummySolverInterface() {}
 
   virtual void run() {
@@ -39,8 +38,7 @@ public:
     testDummySolverInterface();
 
     // Run dummy solver interface service test
-    std::cout << "Running test  for dummy solver interface service "
-              << std::endl;
+    std::cout << "Running test  for dummy solver interface service " << std::endl;
     testDummySolverInterfaceService();
     MPI_Finalize();
   }
@@ -54,8 +52,7 @@ public:
     tarch::la::Vector<3, unsigned int> id1(6);
     tarch::la::Vector<3, unsigned int> id2(1);
 
-    bool flag1 =
-        _dummysolverinterface.receiveMacroscopicQuantityFromMDSolver(id1);
+    bool flag1 = _dummysolverinterface.receiveMacroscopicQuantityFromMDSolver(id1);
     bool flag2 = _dummysolverinterface.sendMacroscopicQuantityToMDSolver(id2);
 
     if (flag1 == true && flag2 == true) {
@@ -82,9 +79,7 @@ public:
     }
 
     // Initialize the dummy solver interface
-    DummySolverInterfaceService::getInstance().init(
-        numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset,
-        macroscopicCellSize);
+    DummySolverInterfaceService::getInstance().init(numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset, macroscopicCellSize);
 
     tarch::la::Vector<3, unsigned int> loop(2);
     unsigned int sendCounter = 0;
@@ -95,23 +90,16 @@ public:
     for (loop[2] = 2; loop[2] < 16; loop[2]++) {
       for (loop[1] = 2; loop[1] < 16; loop[1]++) {
         for (loop[0] = 2; loop[0] < 16; loop[0]++) {
-          const tarch::la::Vector<3, unsigned int> index =
-              coupling::initDimVector<3>(loop);
-          const double mass =
-              _dummySolver.getDensity(index[0], index[1], index[2]);
-          const tarch::la::Vector<3, double> momentum =
-              _dummySolver.getVelocity(index[0], index[1], index[2]);
-          bool flagsend =
-              DummySolverInterfaceService::getInstance().addToSendBuffer(
-                  mass, momentum, index);
+          const tarch::la::Vector<3, unsigned int> index = coupling::initDimVector<3>(loop);
+          const double mass = _dummySolver.getDensity(index[0], index[1], index[2]);
+          const tarch::la::Vector<3, double> momentum = _dummySolver.getVelocity(index[0], index[1], index[2]);
+          bool flagsend = DummySolverInterfaceService::getInstance().addToSendBuffer(mass, momentum, index);
           if (flagsend == true) {
             sendCounter++;
           }
           double massr = 1.0;
           tarch::la::Vector<3, double> momentumr(1.0);
-          bool flagrecv =
-              DummySolverInterfaceService::getInstance().getFromReceiveBuffer(
-                  massr, momentumr, index);
+          bool flagrecv = DummySolverInterfaceService::getInstance().getFromReceiveBuffer(massr, momentumr, index);
           if (flagrecv == true) {
             recvCounter++;
           }

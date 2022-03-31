@@ -5,14 +5,14 @@
 #ifndef _MAIN_CPP_
 #define _MAIN_CPP_
 
-#include <iostream>
-#include <cstdlib>
 #include "coupling/tests/TestLammps.h"
-#include "coupling/tests/TestLammpsMoleculeIterator.h"
 #include "coupling/tests/TestLammpsAddDeleteAtom.h"
-#include "coupling/tests/TestLammpsInitialVelocity.h"
-#include "coupling/tests/TestLammpsGhost.h"
 #include "coupling/tests/TestLammpsCalculateForceEnergy.h"
+#include "coupling/tests/TestLammpsGhost.h"
+#include "coupling/tests/TestLammpsInitialVelocity.h"
+#include "coupling/tests/TestLammpsMoleculeIterator.h"
+#include <cstdlib>
+#include <iostream>
 #include <mpi.h>
 
 /** executes a newly created test and deletes it immediately again. */
@@ -39,25 +39,19 @@ int main(int argc, char **argv) {
     runTest(new TestLammps<2>(argc, argv, "TestLammps2D"));
 
   if (valid3D)
-    runTest(new TestLammpsMoleculeIterator<3>(argc, argv,
-                                              "TestLammpsMoleculeIterator3D"));
+    runTest(new TestLammpsMoleculeIterator<3>(argc, argv, "TestLammpsMoleculeIterator3D"));
   if (valid2D)
-    runTest(new TestLammpsMoleculeIterator<2>(argc, argv,
-                                              "TestLammpsMoleculeIterator2D"));
+    runTest(new TestLammpsMoleculeIterator<2>(argc, argv, "TestLammpsMoleculeIterator2D"));
 
   if (valid3D)
-    runTest(new TestLammpsAddDeleteAtom<3>(argc, argv,
-                                           "TestLammpsAddDeleteAtom3D"));
+    runTest(new TestLammpsAddDeleteAtom<3>(argc, argv, "TestLammpsAddDeleteAtom3D"));
   if (valid2D)
-    runTest(new TestLammpsAddDeleteAtom<2>(argc, argv,
-                                           "TestLammpsAddDeleteAtom2D"));
+    runTest(new TestLammpsAddDeleteAtom<2>(argc, argv, "TestLammpsAddDeleteAtom2D"));
 
   if (valid3D)
-    runTest(new TestLammpsInitialVelocity<3>(argc, argv,
-                                             "TestLammpsInitialVelocity3D"));
+    runTest(new TestLammpsInitialVelocity<3>(argc, argv, "TestLammpsInitialVelocity3D"));
   if (valid2D)
-    runTest(new TestLammpsInitialVelocity<2>(argc, argv,
-                                             "TestLammpsInitialVelocity2D"));
+    runTest(new TestLammpsInitialVelocity<2>(argc, argv, "TestLammpsInitialVelocity2D"));
 
   if (valid3D)
     runTest(new TestLammpsGhost<3>(argc, argv, "TestLammpsGhost3D"));
@@ -65,11 +59,9 @@ int main(int argc, char **argv) {
     runTest(new TestLammpsGhost<2>(argc, argv, "TestLammpsGhost2D"));
 
   if (valid3D)
-    runTest(new TestLammpsCalculateForceEnergy<3>(
-        argc, argv, "TestLammpsCalculateForceEnergy3D"));
+    runTest(new TestLammpsCalculateForceEnergy<3>(argc, argv, "TestLammpsCalculateForceEnergy3D"));
   if (valid2D)
-    runTest(new TestLammpsCalculateForceEnergy<2>(
-        argc, argv, "TestLammpsCalculateForceEnergy2D"));
+    runTest(new TestLammpsCalculateForceEnergy<2>(argc, argv, "TestLammpsCalculateForceEnergy2D"));
 
   MPI_Finalize();
 

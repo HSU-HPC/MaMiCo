@@ -5,14 +5,14 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEMASSMAPPING_H_
 #define _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEMASSMAPPING_H_
 
-#include <iostream>
 #include "coupling/interface/MDSolverInterface.h"
+#include <iostream>
 
 namespace coupling {
 namespace cellmappings {
 template <class LinkedCell, unsigned int dim> class ComputeMassMapping;
 }
-}
+} // namespace coupling
 
 /**
  *	@brief This class computes the mass over certain linked cells.
@@ -20,23 +20,20 @@ template <class LinkedCell, unsigned int dim> class ComputeMassMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::ComputeMassMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::ComputeMassMapping {
 public:
   /** Constructor
-	 *	@param mdSolverInterface
-	 */
-  ComputeMassMapping(coupling::interface::MDSolverInterface<
-      LinkedCell, dim> *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface), _mass(0.0), _particleCounter(0) {
-  }
+   *	@param mdSolverInterface
+   */
+  ComputeMassMapping(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface), _mass(0.0), _particleCounter(0) {}
 
   /** Destructor */
   ~ComputeMassMapping() {}
 
   /** sets the mass and the particlee counter to zero, before the iteration
 process begins.
-	 */
+         */
   void beginCellIteration() {
     _mass = 0.0;
     _particleCounter = 0;
@@ -44,18 +41,15 @@ process begins.
 
   /** computes the mass in a linked cell, by multiplying the number of particles
 inside the cell with the particel mass(which is assuemd to be constant).
-	 */
-  void endCellIteration() {
-    _mass = _mdSolverInterface->getMoleculeMass() * _particleCounter;
-  }
+         */
+  void endCellIteration() { _mass = _mdSolverInterface->getMoleculeMass() * _particleCounter; }
 
   /** counts the molecules inside a linked cell.
-	 *	@param cell
-	 *	@param cellIndex
-	 */
+   *	@param cell
+   *	@param cellIndex
+   */
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       _particleCounter++;
@@ -65,17 +59,16 @@ inside the cell with the particel mass(which is assuemd to be constant).
   }
 
   /** returns the mass inside a linked cell
-	 *	@return _mass
-	 */
+   *	@return _mass
+   */
   double getMass() const { return _mass; }
   /** returns the number of particles inside a linked cell
- 	 *	@return _particleCounter
- 	 */
+   *	@return _particleCounter
+   */
   unsigned int getNumberOfParticles() const { return _particleCounter; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell,
-                                         dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
   double _mass;
   unsigned int _particleCounter;
 };

@@ -5,8 +5,8 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_MOMENTUMINSERTION_H_
 #define _MOLECULARDYNAMICS_COUPLING_MOMENTUMINSERTION_H_
 
-#include "tarch/la/Vector.h"
 #include "coupling/datastructures/MacroscopicCell.h"
+#include "tarch/la/Vector.h"
 
 namespace coupling {
 template <class LinkedCell, unsigned int dim> class MomentumInsertion;
@@ -17,12 +17,9 @@ template <class LinkedCell, unsigned int dim> class MomentumInsertion;
  *
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::MomentumInsertion {
+template <class LinkedCell, unsigned int dim> class coupling::MomentumInsertion {
 public:
-  MomentumInsertion(coupling::interface::MDSolverInterface<
-      LinkedCell, dim> *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface) {}
+  MomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {}
   virtual ~MomentumInsertion() {}
 
   /** returns the number of MD steps between subsequent momentum insertions */
@@ -36,14 +33,11 @@ public:
    *  the energy as well, see the description of MomentumController on details
    * how to do that.
    */
-  virtual void
-      insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<
-                         LinkedCell, dim> &cell,
-                     const unsigned int &currentMacroscopicCellIndex) const = 0;
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                              const unsigned int &currentMacroscopicCellIndex) const = 0;
 
 protected:
-  coupling::interface::MDSolverInterface<LinkedCell,
-                                         dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_MOMENTUMINSERTION_H_

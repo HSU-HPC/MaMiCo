@@ -11,9 +11,9 @@
 #include "coupling/tests/Test.h"
 
 #include "TestMarDyn.h"
-#include "TestMarDynMoleculeIterator.h"
-#include "TestMarDynMolecule.h"
 #include "TestMarDynAddDeleteMolecule.h"
+#include "TestMarDynMolecule.h"
+#include "TestMarDynMoleculeIterator.h"
 
 #include "TestMarDyn2DummyCoupling.h"
 
@@ -32,22 +32,20 @@ int main(int argc, char **argv) {
 
   std::cout << "Testing MarDyn coupling interfaces: " << std::endl;
 
-  //Test for simple get methods of the MD solver interface
+  // Test for simple get methods of the MD solver interface
   runTest(new TestMarDyn(argc, argv, "MarDyn Test"));
 
-  //Test for the Molecule iterator interface
+  // Test for the Molecule iterator interface
   runTest(new TestMarDynMoleculeIterator(argc, argv, "MarDyn Iterator Test"));
 
-  //Test for the Molecule interface
+  // Test for the Molecule interface
   runTest(new TestMarDynMolecule(argc, argv, "MarDyn Molecule Test"));
 
-  //Test for molecule insertion/deletion
-  runTest(new TestMarDynAddDeleteMolecule(argc, argv,
-                                          "MarDyn Deletion/Insertion Test"));
+  // Test for molecule insertion/deletion
+  runTest(new TestMarDynAddDeleteMolecule(argc, argv, "MarDyn Deletion/Insertion Test"));
 
-  //Test MarDyn coupling with Dummy macroscopic solver
-  runTest(new TestMarDyn2DummyCoupling("Test MarDyn Coupling with Dummy Solver",
-                                       argc, argv));
+  // Test MarDyn coupling with Dummy macroscopic solver
+  runTest(new TestMarDyn2DummyCoupling("Test MarDyn Coupling with Dummy Solver", argc, argv));
 
   std::cout << "Finished!" << std::endl;
 

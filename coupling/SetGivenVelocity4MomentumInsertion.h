@@ -12,8 +12,7 @@
 #include "coupling/interface/MDSolverInterface.h"
 
 namespace coupling {
-template <class LinkedCell, unsigned int dim>
-class SetGivenVelocity4MomentumInsertion;
+template <class LinkedCell, unsigned int dim> class SetGivenVelocity4MomentumInsertion;
 }
 
 /** interpretes the vector in the microscopicMomentum-buffer as velocity and
@@ -22,12 +21,9 @@ class SetGivenVelocity4MomentumInsertion;
  *
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::SetGivenVelocity4MomentumInsertion
-    : public coupling::MomentumInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::SetGivenVelocity4MomentumInsertion : public coupling::MomentumInsertion<LinkedCell, dim> {
 public:
-  SetGivenVelocity4MomentumInsertion(coupling::interface::MDSolverInterface<
-      LinkedCell, dim> *const mdSolverInterface)
+  SetGivenVelocity4MomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
       : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface) {}
   virtual ~SetGivenVelocity4MomentumInsertion() {}
 
@@ -42,15 +38,10 @@ public:
    *  the energy as well, see the description of MomentumController on details
    * how to do that.
    */
-  virtual void
-  insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<
-                     LinkedCell, dim> &cell,
-                 const unsigned int &currentMacroscopicCellIndex) const {
-    coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> massMapping(
-        coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
-    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim>
-        momentumMapping(
-            coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                              const unsigned int &currentMacroscopicCellIndex) const {
+    coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> massMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
+    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
 
     // old and new momentum
     tarch::la::Vector<dim, double> oldMomentum(0.0);
@@ -67,10 +58,8 @@ public:
 
     // set new momentum (based on velocity stored in microscopic
     // momentum-buffer)
-    coupling::cellmappings::SetMomentumMapping<LinkedCell, dim>
-        setMomentumMapping(
-            oldMomentum, newMomentum, particleCounter,
-            coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
+    coupling::cellmappings::SetMomentumMapping<LinkedCell, dim> setMomentumMapping(oldMomentum, newMomentum, particleCounter,
+                                                                                   coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     cell.iterateCells(setMomentumMapping);
   }
 };

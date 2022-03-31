@@ -6,12 +6,9 @@
 
 #include "tarch/configuration/ParseConfiguration.h"
 
-const std::string
-    simplemd::configurations::ExternalForceConfiguration::VALUE("value");
+const std::string simplemd::configurations::ExternalForceConfiguration::VALUE("value");
 
-void simplemd::configurations::ExternalForceConfiguration::parseSubtag(
-    tinyxml2::XMLElement *node) {
+void simplemd::configurations::ExternalForceConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
   _isValid = true;
-  tarch::configuration::ParseConfiguration::readVector<MD_DIM, double>(
-      _externalForce, node, VALUE);
+  tarch::configuration::ParseConfiguration::readVector<MD_DIM, double>(_externalForce, node, VALUE);
 }

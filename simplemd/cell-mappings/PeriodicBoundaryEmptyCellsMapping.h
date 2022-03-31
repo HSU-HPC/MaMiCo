@@ -5,13 +5,15 @@
 #ifndef _MOLECULARDYNAMICS_CELLMAPPINGS_PERIODICBOUNDARYEMPTYCELLSMAPPING_H_
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PERIODICBOUNDARYEMPTYCELLSMAPPING_H_
 
-#include "simplemd/services/ParallelTopologyService.h"
 #include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MoleculeService.h"
+#include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {
-namespace cellmappings { class PeriodicBoundaryEmptyCellsMapping; }
+namespace cellmappings {
+class PeriodicBoundaryEmptyCellsMapping;
 }
+} // namespace simplemd
 
 /** this class is used to handle periodic boundaries. It takes all particles in
  * outer (ghost) cells,
@@ -24,21 +26,17 @@ namespace cellmappings { class PeriodicBoundaryEmptyCellsMapping; }
  */
 class simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping {
 public:
-  PeriodicBoundaryEmptyCellsMapping(
-      simplemd::services::ParallelTopologyService &parallelTopologyService,
-      simplemd::services::MoleculeService &moleculeService,
-      simplemd::services::LinkedCellService &linkedCellService);
+  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::MoleculeService &moleculeService,
+                                    simplemd::services::LinkedCellService &linkedCellService);
   ~PeriodicBoundaryEmptyCellsMapping() {}
 
   /** sets the global domain size (hopefully received from the
    * ParallelTopologyService...) */
   void setDomainSize(const tarch::la::Vector<MD_DIM, double> &domainSize);
 
-  void setProcessCoordinates(
-      const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates);
+  void setProcessCoordinates(const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates);
 
-  void setNumberOfProcesses(
-      const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses);
+  void setNumberOfProcesses(const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses);
 
   void beginCellIteration() {}
   void endCellIteration() {}

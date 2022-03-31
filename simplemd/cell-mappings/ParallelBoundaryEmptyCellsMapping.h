@@ -5,13 +5,15 @@
 #ifndef _MOLECULARDYNAMICS_CELLMAPPINGS_PARALLELBOUNDARYEMPTYCELLSMAPPING_H_
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PARALLELBOUNDARYEMPTYCELLSMAPPING_H_
 
-#include "simplemd/services/ParallelTopologyService.h"
-#include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/LinkedCellService.h"
+#include "simplemd/services/MoleculeService.h"
+#include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {
-namespace cellmappings { class ParallelBoundaryEmptyCellsMapping; }
+namespace cellmappings {
+class ParallelBoundaryEmptyCellsMapping;
 }
+} // namespace simplemd
 
 /** shall only be applied to PARALLEL_BOUNDARY ghost cells. All particles of
  * each cell are sent to the
@@ -23,13 +25,9 @@ namespace cellmappings { class ParallelBoundaryEmptyCellsMapping; }
  */
 class simplemd::cellmappings::ParallelBoundaryEmptyCellsMapping {
 public:
-  ParallelBoundaryEmptyCellsMapping(
-      simplemd::services::ParallelTopologyService &parallelTopologyService,
-      simplemd::services::MoleculeService &moleculeService,
-      const simplemd::services::LinkedCellService &linkedCellService)
-      : _parallelTopologyService(parallelTopologyService),
-        _moleculeService(moleculeService),
-        _linkedCellService(linkedCellService) {}
+  ParallelBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::MoleculeService &moleculeService,
+                                    const simplemd::services::LinkedCellService &linkedCellService)
+      : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService) {}
   ~ParallelBoundaryEmptyCellsMapping() {}
 
   void beginCellIteration() {}
@@ -37,11 +35,9 @@ public:
 
   void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
     // send molecules from this cell first...
-    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex,
-                                                          _linkedCellService)) {
+    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
       // ... and erase them afterwards
-      for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end();
-           it++) {
+      for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
         _moleculeService.deleteMolecule(*(*it));
       }
       cell.getList().clear();

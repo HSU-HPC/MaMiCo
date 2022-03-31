@@ -5,22 +5,23 @@
 #ifndef _MOLECULARDYNAMICS_CONFIGURATIONS_MPICONFIGURATION_H_
 #define _MOLECULARDYNAMICS_CONFIGURATIONS_MPICONFIGURATION_H_
 
+#include "simplemd/MolecularDynamicsDefinitions.h"
 #include "tarch/configuration/Configuration.h"
 #include "tarch/la/Vector.h"
-#include "simplemd/MolecularDynamicsDefinitions.h"
 #include <iostream>
 
 namespace simplemd {
-namespace configurations { class MPIConfiguration; }
+namespace configurations {
+class MPIConfiguration;
 }
+} // namespace simplemd
 
 /** configuration for distributed MPI MD simulations. Currently only contains
  * the splitting of the processes for
  *  the domain.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::MPIConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::MPIConfiguration : public tarch::configuration::Configuration {
 public:
   MPIConfiguration();
   virtual ~MPIConfiguration() {}
@@ -46,9 +47,7 @@ public:
   bool isValid() const;
 
   /** getters */
-  const tarch::la::Vector<MD_DIM, unsigned int> &getNumberOfProcesses() const {
-    return _numberOfProcesses;
-  }
+  const tarch::la::Vector<MD_DIM, unsigned int> &getNumberOfProcesses() const { return _numberOfProcesses; }
 
 private:
   static const std::string NUMBER_OF_PROCESSES;

@@ -5,13 +5,13 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TESTS_TESTESPRESSOFORCEENERGYCALCULATION_H_
 #define _MOLECULARDYNAMICS_COUPLING_TESTS_TESTESPRESSOFORCEENERGYCALCULATION_H_
 
-#include "particle_data.hpp"
-#include "coupling/tests/TestEspresso.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMolecule.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMoleculeIterator.h"
 #include "coupling/interface/impl/Espresso/EspressoMDSolverInterface.h"
-#include "tarch/la/Vector.h"
+#include "coupling/tests/TestEspresso.h"
 #include "integrate_tcl.hpp"
+#include "particle_data.hpp"
+#include "tarch/la/Vector.h"
 
 /** test class for force and potential energy calculation methods provided
  * inside the EspressoMDSolverInterface.
@@ -27,8 +27,7 @@
 
 class TestEspressoForceEnergyCalculation : public TestEspresso {
 public:
-  TestEspressoForceEnergyCalculation(std::string name, int argc, char **argv)
-      : TestEspresso(name, argc, argv) {}
+  TestEspressoForceEnergyCalculation(std::string name, int argc, char **argv) : TestEspresso(name, argc, argv) {}
   ~TestEspressoForceEnergyCalculation() {}
   virtual void run() {
     loadEspressoTestConfiguration();
@@ -72,9 +71,7 @@ private:
       part = list->part;
       int number = list->n;
       for (int j = 0; j < number; j++) {
-        std::cout << "Positon of particle " << j << " in cell " << c << " is "
-                  << part[j].r.p[0] << " " << part[j].r.p[1] << " "
-                  << part[j].r.p[2] << std::endl;
+        std::cout << "Positon of particle " << j << " in cell " << c << " is " << part[j].r.p[0] << " " << part[j].r.p[1] << " " << part[j].r.p[2] << std::endl;
       }
     }
 
@@ -84,8 +81,7 @@ private:
 
     tarch::la::Vector<3, double> force(0.0);
     force = new_part.getForce();
-    std::cout << "the force acting on the particle " << force[0] << " "
-              << force[1] << " " << force[2] << std::endl;
+    std::cout << "the force acting on the particle " << force[0] << " " << force[1] << " " << force[2] << std::endl;
   }
 
   /* This function calcultes the linked cell index for each molecule in the
@@ -106,12 +102,9 @@ private:
     // EspressoMDSolverInterface
     index = test.getLinkedCellIndexForMoleculePosition(position);
     if ((index[0] == 1) && (index[1] == 1) && (index[2] == 1)) {
-      std::cout << "getLinkedCellIndexForMoleculePositionTest was successful "
-                << std::endl;
+      std::cout << "getLinkedCellIndexForMoleculePositionTest was successful " << std::endl;
     } else {
-      std::cout
-          << "getLinkedCellIndexForMoleculePositionTest was not successful"
-          << std::endl;
+      std::cout << "getLinkedCellIndexForMoleculePositionTest was not successful" << std::endl;
     }
   }
 };

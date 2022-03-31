@@ -1,29 +1,24 @@
 
 template <unsigned int dim>
-coupling::noisereduction::NLM<dim>::NLM(
-    const coupling::IndexConversion<dim> &indexConversion,
-    const tarch::utils::MultiMDService<dim> &multiMDService, int tws)
-    : coupling::noisereduction::NoiseReduction<dim>(indexConversion,
-                                                    multiMDService, true),
-      _timeWindowSize(tws), _M(2), _d(1), _cycleCounter(0), _t(0),
+coupling::noisereduction::NLM<dim>::NLM(const coupling::IndexConversion<dim> &indexConversion, const tarch::utils::MultiMDService<dim> &multiMDService, int tws)
+    : coupling::noisereduction::NoiseReduction<dim>(indexConversion, multiMDService, true), _timeWindowSize(tws), _M(2), _d(1), _cycleCounter(0), _t(0),
       _firstTraversal(true),
       //_flowfield(indexConversion.getLocalNumberMacroscopicCells() +
-      //tarch::la::Vector<dim,unsigned int>(2)*_d, tws),
+      // tarch::la::Vector<dim,unsigned int>(2)*_d, tws),
       //_patchfield(indexConversion.getLocalNumberMacroscopicCells(), tws)
       _flowfield(tarch::la::Vector<dim, unsigned int>(6, 6, 6), tws), // TODO
       _patchfield(tarch::la::Vector<dim, unsigned int>(4, 4, 4), tws)
 
-      //_flowfield(tarch::la::Vector<dim,unsigned int>(6,6), tws),
-      //_patchfield(tarch::la::Vector<dim,unsigned int>(4,4), tws)
-      {
+//_flowfield(tarch::la::Vector<dim,unsigned int>(6,6), tws),
+//_patchfield(tarch::la::Vector<dim,unsigned int>(4,4), tws)
+{
 
   for (int t = 0; t < tws; t++)
     for (unsigned int x = 0; x < 6; x++)
       for (unsigned int y = 0; y < 6; y++)
         for (unsigned int z = 0; z < 6; z++) {
-          coupling::noisereduction::Quantities<dim> &q =
-              _flowfield(tarch::la::Vector<3, unsigned int>(x, y, z), t);
-          //coupling::noisereduction::Quantities<dim>& q =
+          coupling::noisereduction::Quantities<dim> &q = _flowfield(tarch::la::Vector<3, unsigned int>(x, y, z), t);
+          // coupling::noisereduction::Quantities<dim>& q =
           //_flowfield(tarch::la::Vector<2,unsigned int>(x,y), t);
           q[0] = 1;
           q[1] = 0;
@@ -110,27 +105,24 @@ coupling::noisereduction::NLM<dim>::NLM(
 }
 
 template <unsigned int dim> coupling::noisereduction::NLM<dim>::~NLM() {
-  //if (_data!=NULL){ delete [] _data; _data=NULL;}
+  // if (_data!=NULL){ delete [] _data; _data=NULL;}
 }
 
-template <unsigned int dim>
-void coupling::noisereduction::NLM<dim>::beginProcessInnerMacroscopicCells() {}
+template <unsigned int dim> void coupling::noisereduction::NLM<dim>::beginProcessInnerMacroscopicCells() {}
 
 // TODO
 inline unsigned int posmod(int i, int n) { return (i % n + n) % n; }
 
 template <unsigned int dim>
-void coupling::noisereduction::NLM<dim>::processInnerMacroscopicCell(
-    coupling::datastructures::MacroscopicCell<dim> &cell,
-    const unsigned int &index) {
+void coupling::noisereduction::NLM<dim>::processInnerMacroscopicCell(coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index) {
   /*
     const double sigsq = 1000;
     const double hsq = 1000;
-  
+
     tarch::la::Vector<3,unsigned int>
     idx(coupling::noisereduction::NLM<dim>::_indexConversion.getGlobalVectorCellIndex(index));
     idx += tarch::la::Vector<3,unsigned int>(-4, -4, -4);  // TODO
-  
+
     if(_firstTraversal){
       // save data
       coupling::noisereduction::Quantities<dim>& q = _flowfield(idx, _t);
@@ -146,12 +138,12 @@ void coupling::noisereduction::NLM<dim>::processInnerMacroscopicCell(
     idx[2] < 5){ // denoise here
         coupling::noisereduction::Patch<dim>& me = _patchfield(idx -
     tarch::la::Vector<3,unsigned int>(1), _t);
-  
+
         double C = 0;
         coupling::noisereduction::Quantities<dim> res(0);
-  
+
         int tdist = std::min((int)_timeWindowSize,(int)_cycleCounter+1);
-  
+
         // TODO restrict loops to bouncing V_i
         for(int offset_t = 0; offset_t > -tdist; offset_t--){
           t = posmod(_t + offset_t, _timeWindowSize);
@@ -160,9 +152,9 @@ void coupling::noisereduction::NLM<dim>::processInnerMacroscopicCell(
               for(unsigned int z = 0; z<4; z++){
                 coupling::noisereduction::Patch<dim>& other =
     _patchfield(tarch::la::Vector<3,unsigned int>(x,y,z), t);
-  
+
                 double dist = me.distance(other);
-  
+
                 //std::cout << "dist = " << dist << std::endl;
                 double weight = std::exp(-  std::max(dist - sigsq ,0.0) / hsq) *
     1/(-offset_t +1);
@@ -181,8 +173,7 @@ void coupling::noisereduction::NLM<dim>::processInnerMacroscopicCell(
     }*/
 }
 
-template <unsigned int dim>
-void coupling::noisereduction::NLM<dim>::endProcessInnerMacroscopicCells() {
+template <unsigned int dim> void coupling::noisereduction::NLM<dim>::endProcessInnerMacroscopicCells() {
 
   if (!_firstTraversal) {
     _cycleCounter++;
@@ -202,9 +193,7 @@ void coupling::noisereduction::NLM<dim>::endProcessInnerMacroscopicCells() {
 }
 
 template <unsigned int dim>
-void coupling::noisereduction::NLM<dim>::processOuterMacroscopicCell(
-    coupling::datastructures::MacroscopicCell<dim> &cell,
-    const unsigned int &index) {
+void coupling::noisereduction::NLM<dim>::processOuterMacroscopicCell(coupling::datastructures::MacroscopicCell<dim> &cell, const unsigned int &index) {
   if (_firstTraversal) {
     // save data
     //_data[_t*_spatialSize + index]._mass = cell.getMacroscopicMass();
@@ -212,11 +201,9 @@ void coupling::noisereduction::NLM<dim>::processOuterMacroscopicCell(
   }
 }
 
-template <unsigned int dim>
-void coupling::noisereduction::NLM<dim>::beginProcessOuterMacroscopicCells() {}
+template <unsigned int dim> void coupling::noisereduction::NLM<dim>::beginProcessOuterMacroscopicCells() {}
 
-template <unsigned int dim>
-void coupling::noisereduction::NLM<dim>::endProcessOuterMacroscopicCells() {
+template <unsigned int dim> void coupling::noisereduction::NLM<dim>::endProcessOuterMacroscopicCells() {
   /*if(_firstTraversal)
    // todo compute here _localMean and _localStandardDeviation
    // for all cells for this _t

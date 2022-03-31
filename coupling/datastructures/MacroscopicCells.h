@@ -6,7 +6,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_MACROSCOPICCELLS_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-		#include "coupling/IndexConversion.h"							 
+#include "coupling/IndexConversion.h"
 #include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 
@@ -26,12 +26,12 @@ template <class LinkedCell, unsigned int dim> class MacroscopicCells;
 template <class LinkedCell, unsigned int dim> class coupling::datastructures::MacroscopicCells {
 public:
   /** Constructor: initialises the macroscopic cell
-	 *	@param numberLinkedCellsPerMacroscopicCell
-	 * 	@param indexConversion
-	 * 	@param mdSolverInterface
-     */
+   *	@param numberLinkedCellsPerMacroscopicCell
+   * 	@param indexConversion
+   * 	@param mdSolverInterface
+   */
   MacroscopicCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell, const coupling::IndexConversion<dim> &indexConversion,
-				   coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface);
+                   coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface);
   /** Destructor */
   ~MacroscopicCells();
 
@@ -41,7 +41,7 @@ public:
   /** returns vector-of-pointers to macroscopic cells without access to linked
    * cells.
    *  We use this structure for data exchange between macroscopic and MD solver.
-			
+
    */
   const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &getMacroscopicCells() const;
 
@@ -54,8 +54,8 @@ public:
   template <class A> void applyToLocalNonGhostMacroscopicCellsWithLinkedCells(A &a);
   /** apply the function apply(MacroscopicCell&,const unsigned int&) of a
 generic class A to all local ghost macroscopic cells.
-	 *	@tparam A
-	 * 	@param a */
+         *	@tparam A
+         * 	@param a */
   template <class A> void applyToLocalGhostMacroscopicCellsWithLinkedCells(A &a);
   /** apply the function apply(MacroscopicCell&,const unsigned int&) of a
    * generic class A to all local macroscopic cells.
@@ -73,8 +73,8 @@ being located outside MD domain!), it will not be handled by this method.
 of the MD domain, it will not be handled by this method.
      *  We use this traversal, e.g., for applying boundary forces to molecules
 close to the outer boundary.
-	 *	@tparam A
-	 * 	@param a
+         *	@tparam A
+         * 	@param a
      */
   template <class A> void applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A &a);
 
@@ -86,27 +86,28 @@ private:
   /** initialises the macroscopic cells: creates the buffer for the cells and
 embeds linked cells into the macroscopic
      *  cells.
-	 * 	@param numberLinkedCellsPerMacroscopicCell
-	 * 	@param indexConversion
-	 * 	@param mdSolverInterface
+         * 	@param numberLinkedCellsPerMacroscopicCell
+         * 	@param indexConversion
+         * 	@param mdSolverInterface
      */
-  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *initMacroscopicCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell,
-																											   
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface) const;
+  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *
+  initMacroscopicCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell,
+
+                                      const coupling::IndexConversion<dim> &indexConversion,
+                                      coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface) const;
   /** initialises the macroscopic cells (without linked cells). This method
 needs to be used in the constructor
      *  AFTER initialising the _macroscopicCellsWithLinkedCells.
-	 * 	@param indexConversion
+         * 	@param indexConversion
      */
   std::vector<coupling::datastructures::MacroscopicCell<dim> *> initMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const;
 
   /** holds the macroscopic cells with linked cells. */
-  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> * _macroscopicCellsWithLinkedCells;
+  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *_macroscopicCellsWithLinkedCells;
   /** holds pointers to all macroscopic cells with linked cells, but without
    * access to linked cells.
    *  This is used for interfacing to send-recv operations.
-				
+
    */
   std::vector<coupling::datastructures::MacroscopicCell<dim> *> _macroscopicCells;
   /** needed for index conversion. */
@@ -115,4 +116,3 @@ needs to be used in the constructor
 #include "MacroscopicCells.cpph"
 
 #endif // _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_MACROSCOPICCELLS_H_
-

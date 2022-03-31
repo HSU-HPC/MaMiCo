@@ -5,25 +5,26 @@
 #ifndef _MOLECULARDYNAMIC_COUPLING_INTERFACE_SIMPLEMDMOLECULEITERATOR_CPP_
 #define _MOLECULARDYNAMIC_COUPLING_INTERFACE_SIMPLEMDMOLECULEITERATOR_CPP_
 
-#include "coupling/interface/MoleculeIterator.h"
 #include "EspressoMDMolecule.h"
+#include "coupling/interface/MoleculeIterator.h"
 #include "particle_data.hpp"
 
 namespace coupling {
-namespace interface { class EspressoMDMoleculeIterator; }
+namespace interface {
+class EspressoMDMoleculeIterator;
 }
+} // namespace coupling
 
 /** molecule iterator.
  *  @author Rahul Arora
  */
-class coupling::interface::EspressoMDMoleculeIterator
-    : public coupling::interface::MoleculeIterator<ParticleList, 3> {
+class coupling::interface::EspressoMDMoleculeIterator : public coupling::interface::MoleculeIterator<ParticleList, 3> {
 public:
-  EspressoMDMoleculeIterator(ParticleList &cell)
-      : coupling::interface::MoleculeIterator<ParticleList, 3>(cell),
-        _buffer(NULL) {}
+  EspressoMDMoleculeIterator(ParticleList &cell) : coupling::interface::MoleculeIterator<ParticleList, 3>(cell), _buffer(NULL) {
+  }
 
-  virtual ~EspressoMDMoleculeIterator() {}
+  virtual ~EspressoMDMoleculeIterator() {
+  }
 
   /** sets the iterator to the first element */
   void begin() {
@@ -50,13 +51,14 @@ public:
     return _buffer;
   }
 
-  const coupling::interface::Molecule<3> &getConst() {
+  const coupling::interface::Molecule<3> &
+  getConst() {
     _buffer.setMolecule(_it);
     return _buffer;
   }
 
-private:
-  int _number, _counter;
+  private : int _number,
+            _counter;
   Particle *_it;
   coupling::interface::EspressoMDMolecule _buffer;
 };

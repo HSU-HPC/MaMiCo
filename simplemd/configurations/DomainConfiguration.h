@@ -8,19 +8,20 @@
 #include "simplemd/MolecularDynamicsDefinitions.h"
 #include "tarch/configuration/Configuration.h"
 #include "tarch/la/Vector.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 namespace simplemd {
-namespace configurations { class DomainConfiguration; }
+namespace configurations {
+class DomainConfiguration;
 }
+} // namespace simplemd
 
 /** configuration input for domain description, including domain offset, domain
  * size, boundary types etc.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::DomainConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::DomainConfiguration : public tarch::configuration::Configuration {
 public:
   DomainConfiguration();
   virtual ~DomainConfiguration() {}
@@ -46,44 +47,21 @@ public:
   bool isValid() const;
 
   /** getters for all parsed and computed quantities */
-  const tarch::la::Vector<MD_DIM, unsigned int> &
-  getMoleculesPerDirection() const {
-    return _moleculesPerDirection;
-  }
-  const tarch::la::Vector<MD_DIM, double> &getGlobalDomainSize() const {
-    return _domainSize;
-  }
-  const tarch::la::Vector<MD_DIM, double> &getGlobalDomainOffset() const {
-    return _domainOffset;
-  }
+  const tarch::la::Vector<MD_DIM, unsigned int> &getMoleculesPerDirection() const { return _moleculesPerDirection; }
+  const tarch::la::Vector<MD_DIM, double> &getGlobalDomainSize() const { return _domainSize; }
+  const tarch::la::Vector<MD_DIM, double> &getGlobalDomainOffset() const { return _domainOffset; }
   const double &getCutoffRadius() const { return _cutoffRadius; }
-  const tarch::la::Vector<MD_DIM, double> &getMeshWidth() const {
-    return _meshWidth;
-  }
+  const tarch::la::Vector<MD_DIM, double> &getMeshWidth() const { return _meshWidth; }
   const double &getKB() const { return _kB; }
   const unsigned int &getBlockSize() const { return _blockSize; }
-  const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &
-  getBoundary() const {
-    return _boundary;
-  }
-  const std::string &getCheckpointFilestem() const {
-    return _checkpointFilestem;
-  }
+  const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &getBoundary() const { return _boundary; }
+  const std::string &getCheckpointFilestem() const { return _checkpointFilestem; }
   const bool &initFromCheckpoint() const { return _initFromCheckpoint; }
-  const bool &initFromSequentialCheckpoint() const {
-    return _initFromSequentialCheckpoint;
-  }
+  const bool &initFromSequentialCheckpoint() const { return _initFromSequentialCheckpoint; }
 
-  void setCheckpointFilestem(const std::string &filestem) {
-    _checkpointFilestem = filestem;
-  }
-  void setInitFromCheckpoint(const bool &initFromCheckpoint) {
-    _initFromCheckpoint = initFromCheckpoint;
-  }
-  void
-  setInitFromSequentialCheckpoint(const bool &initFromSequentialCheckpoint) {
-    _initFromSequentialCheckpoint = initFromSequentialCheckpoint;
-  }
+  void setCheckpointFilestem(const std::string &filestem) { _checkpointFilestem = filestem; }
+  void setInitFromCheckpoint(const bool &initFromCheckpoint) { _initFromCheckpoint = initFromCheckpoint; }
+  void setInitFromSequentialCheckpoint(const bool &initFromSequentialCheckpoint) { _initFromSequentialCheckpoint = initFromSequentialCheckpoint; }
 
   unsigned int getNumberOfMolecules() const;
 
@@ -130,8 +108,7 @@ private:
   unsigned int _blockSize;
 
   /** boundary types for all outer boundaries */
-  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>
-      _boundary;
+  tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> _boundary;
 
   std::string _checkpointFilestem;
   bool _initFromCheckpoint;

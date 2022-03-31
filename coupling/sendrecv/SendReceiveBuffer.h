@@ -5,12 +5,12 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SENDRECV_SENDRECEIVEBUFFER_H_
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_SENDRECEIVEBUFFER_H_
 
-#include <string.h>
-#include <map>
-#include "tarch/la/Vector.h"
+#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/IndexConversion.h"
 #include "coupling/sendrecv/DataExchange.h"
-#include "coupling/CouplingMDDefinitions.h"
+#include "tarch/la/Vector.h"
+#include <map>
+#include <string.h>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -19,7 +19,7 @@ namespace coupling {
 namespace sendrecv {
 template <class MacroscopicCell, unsigned int dim> class SendReceiveBuffer;
 }
-}
+} // namespace coupling
 
 /** generic class for send-/ receive methodology including buffer
  * implementations. The access to the buffers is prescribed by the DataExchange
@@ -29,8 +29,7 @@ template <class MacroscopicCell, unsigned int dim> class SendReceiveBuffer;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class MacroscopicCell, unsigned int dim>
-class coupling::sendrecv::SendReceiveBuffer {
+template <class MacroscopicCell, unsigned int dim> class coupling::sendrecv::SendReceiveBuffer {
 public:
   /** Constructor */
   SendReceiveBuffer();
@@ -43,67 +42,55 @@ protected:
 
   /** @brief fills all information that needs to be sent from a macroscopic cell
 into the send-buffer.
-	 * 	@param indexConversion
-	 * 	@param dataExchange
-	 * 	@param cell
-	 * 	@param globalVectorIndex
-	 */
-  void writeToSendBuffer(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
-      const MacroscopicCell &cell,
-      tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+         * 	@param indexConversion
+         * 	@param dataExchange
+         * 	@param cell
+         * 	@param globalVectorIndex
+         */
+  void writeToSendBuffer(const coupling::IndexConversion<dim> &indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
+                         const MacroscopicCell &cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
   /** reads the information from the receive-buffer and fills it into a
 macroscopic cell.
-	 * 	@param indexConversion
-	 * 	@param dataExchange
-	 * 	@param macroscopicCell
-	 * 	@param globalVectorIndex
-	 */
-  void readFromReceiveBuffer(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
-      MacroscopicCell &macroscopicCell,
-      tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+         * 	@param indexConversion
+         * 	@param dataExchange
+         * 	@param macroscopicCell
+         * 	@param globalVectorIndex
+         */
+  void readFromReceiveBuffer(const coupling::IndexConversion<dim> &indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
+                             MacroscopicCell &macroscopicCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
   /** according to rule by dataExchange, the receive buffers are allocated. This
 function adds a contribution for the cell at globalVectorIndex.
-	 * 	@param indexConversion
-	 * 	@param dataExchange
-	 * 	@param globalVectorIndex
+         * 	@param indexConversion
+         * 	@param dataExchange
+         * 	@param globalVectorIndex
      */
-  void allocateReceiveBuffers(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
-      tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void allocateReceiveBuffers(const coupling::IndexConversion<dim> &indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
+                              tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
   /** triggers the MPI-sending on the respective buffers. No sending for
 information transfer from/ to this rank.
-	 * 	@param indexConversion
-	 * 	@param dataExchange
-	 */
-  void triggerSending(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange);
+         * 	@param indexConversion
+         * 	@param dataExchange
+         */
+  void triggerSending(const coupling::IndexConversion<dim> &indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange);
 
   /** triggers the MPI-receiving on the respective buffers. No receiving of
 information from/to this rank.
-	 * 	@param indexConversion
-	 * 	@param dataExchange
-	 */
-  void triggerReceiving(
-      const coupling::IndexConversion<dim> &indexConversion,
-      coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange);
+         * 	@param indexConversion
+         * 	@param dataExchange
+         */
+  void triggerReceiving(const coupling::IndexConversion<dim> &indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange);
 
   /** wait for all send and receive operations to complete.
-	 * 	@param indexConversion
-	 */
+   * 	@param indexConversion
+   */
   void waitAllOperations(const coupling::IndexConversion<dim> &indexConversion);
 
   /** allocates send and receive requests
-	 * 	@param indexConversion
-	 */
+   * 	@param indexConversion
+   */
   void allocateRequests(const coupling::IndexConversion<dim> &indexConversion);
 
 private:
@@ -116,8 +103,8 @@ private:
   };
 
   /** deletes everything inside a given buffer
-	 * 	@param buffer
-	 */
+   * 	@param buffer
+   */
   void deleteBuffer(std::map<unsigned int, BufferWithID> &buffer);
 
   /** buffer for storing all received messages from MD. Each map entry is

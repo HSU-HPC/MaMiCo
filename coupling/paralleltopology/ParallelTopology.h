@@ -12,8 +12,8 @@ namespace coupling {
 namespace paralleltopology {
 /** namespace paralleltopology */
 template <unsigned int dim> class ParallelTopology;
-}
-}
+} // namespace paralleltopology
+} // namespace coupling
 
 /** interface for different parallel topologies. This can be adapted to the
  * respective Cartesian topology
@@ -31,18 +31,16 @@ public:
   virtual ~ParallelTopology() {}
   /** This function takes process coordinates as input and returns the
 correpsponding rank.
-	 *	@brief converts process coordinates into a rank.
-	 *	@param processCoordinates Process coordinates
-	 */
-  virtual unsigned int getRank(
-      tarch::la::Vector<dim, unsigned int> processCoordinates) const = 0;
+         *	@brief converts process coordinates into a rank.
+         *	@param processCoordinates Process coordinates
+         */
+  virtual unsigned int getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const = 0;
   /** This function takes rank as input and return the correpsponding process
 coordinates.
-	 *	@brief converts rank into process coordinates.
-	 *	@param rank Rank
-	 */
-  virtual tarch::la::Vector<dim, unsigned int>
-      getProcessCoordinates(unsigned int rank) const = 0;
+         *	@brief converts rank into process coordinates.
+         *	@param rank Rank
+         */
+  virtual tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const = 0;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_PARALLELTOPOLOGY_PARALLELTOPOLOGY_H_

@@ -5,28 +5,26 @@
 #ifndef _MOLECULARDYNAMICS_PROFILEPLOTTER_H_
 #define _MOLECULARDYNAMICS_PROFILEPLOTTER_H_
 
-#include <vector>
-#include "tarch/la/Vector.h"
 #include "simplemd/MolecularDynamicsUserInput.h"
-#include "simplemd/configurations/ProfilePlotterConfiguration.h"
 #include "simplemd/cell-mappings/ProfilePlotterMapping.h"
+#include "simplemd/configurations/ProfilePlotterConfiguration.h"
 #include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/ParallelTopologyService.h"
+#include "tarch/la/Vector.h"
+#include <vector>
 
-namespace simplemd { class ProfilePlotter; }
+namespace simplemd {
+class ProfilePlotter;
+}
 
 /** computes and evaluates flow profiles, such as density,momentum.
  *  @author Philipp Neumann
  */
 class simplemd::ProfilePlotter {
 public:
-  ProfilePlotter(
-      const std::vector<simplemd::configurations::ProfilePlotterConfiguration> &
-          configurations,
-      const simplemd::services::ParallelTopologyService &
-          parallelTopologyService,
-      simplemd::services::LinkedCellService &linkedCellService,
-      const double &linkedCellVolume, const unsigned int &localMDSimulation);
+  ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration> &configurations,
+                 const simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::LinkedCellService &linkedCellService,
+                 const double &linkedCellVolume, const unsigned int &localMDSimulation);
   ~ProfilePlotter();
 
   /** accumulates information from the respective linked cells and - in case
@@ -44,14 +42,12 @@ private:
    * it is marked as inactive
    *  via the _isValid variable.
    */
-  void adjustProfilesInParallel(
-      const simplemd::services::ParallelTopologyService &
-          parallelTopologyService);
+  void adjustProfilesInParallel(const simplemd::services::ParallelTopologyService &parallelTopologyService);
 #endif
 
   std::vector<simplemd::cellmappings::ProfilePlotterMapping *> _plotters;
-  std::vector<tarch::la::Vector<MD_DIM, unsigned int> > _startCells;
-  std::vector<tarch::la::Vector<MD_DIM, unsigned int> > _ranges;
+  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> _startCells;
+  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> _ranges;
 
 #if (MD_PARALLEL == MD_YES)
   /** in parallel, some profiles may not intersect the local domain of a

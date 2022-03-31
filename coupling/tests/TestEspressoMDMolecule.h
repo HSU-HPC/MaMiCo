@@ -5,14 +5,14 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TESTS_TESTESPRESSOMDMOLECULE_H_
 #define _MOLECULARDYNAMICS_COUPLING_TESTS_TESTESPRESSOMDMOLECULE_H_
 
-#include <tcl.h>
-#include <iostream>
 #include "coupling/interface/impl/Espresso/EspressoMDMolecule.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMoleculeIterator.h"
 #include "coupling/interface/impl/Espresso/EspressoMDSolverInterface.h"
 #include "coupling/tests/TestEspresso.h"
-#include "tarch/la/Vector.h"
 #include "particle_data.hpp"
+#include "tarch/la/Vector.h"
+#include <iostream>
+#include <tcl.h>
 
 /** Test class for EspressoMDMolecule class and functions, tries to check if the
  * datastaructures defined
@@ -26,8 +26,7 @@
 class TestEspressoMDMolecule : public TestEspresso {
 private:
 public:
-  TestEspressoMDMolecule(std::string name, int argc, char **argv)
-      : TestEspresso(name, argc, argv) {}
+  TestEspressoMDMolecule(std::string name, int argc, char **argv) : TestEspresso(name, argc, argv) {}
   virtual ~TestEspressoMDMolecule() {}
 
   virtual void run() {
@@ -68,8 +67,8 @@ public:
 
     // I define two lists, listEspresso and listEspressoCouplingInterface and
     // add the respective data to them
-    std::vector<tarch::la::Vector<3, double> > listEspresso;
-    std::vector<tarch::la::Vector<3, double> > listEspressoCouplingInterface;
+    std::vector<tarch::la::Vector<3, double>> listEspresso;
+    std::vector<tarch::la::Vector<3, double>> listEspressoCouplingInterface;
     tarch::la::Vector<3, double> velocity(0.0);
     tarch::la::Vector<3, double> position(0.0);
 
@@ -91,15 +90,14 @@ public:
       counter++;
     }
 
-    if (listEspresso.size() != (unsigned int) 2 * number) {
+    if (listEspresso.size() != (unsigned int)2 * number) {
       std::cout << "ERROR: particle list has wrong size!" << std::endl;
       flag = 0;
     }
     if (listEspresso != listEspressoCouplingInterface) {
-      std::cout
-          << "ERROR: the particle positions and velocites obtianed by the "
-             "Coupling interfaces and Espresso simulation do not match "
-          << std::endl;
+      std::cout << "ERROR: the particle positions and velocites obtianed by the "
+                   "Coupling interfaces and Espresso simulation do not match "
+                << std::endl;
       flag = 0;
     }
   }

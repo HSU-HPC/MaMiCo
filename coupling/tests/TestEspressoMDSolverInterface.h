@@ -16,6 +16,6 @@ public:
 public:
   void run() {
     TestFactory _factory.getReferenceSetup();
-    //TODO rest of test case
+    // TODO rest of test case
   }
 }

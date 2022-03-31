@@ -8,8 +8,10 @@
 #include "simplemd/Molecule.h"
 
 namespace simplemd {
-namespace moleculemappings { class SetMeanVelocityMapping; }
+namespace moleculemappings {
+class SetMeanVelocityMapping;
 }
+} // namespace simplemd
 
 /** sets a certain new mean velocity.
  *  oldVelocity corresponds to the old avg. velocity, newVelocity is the new
@@ -19,8 +21,7 @@ namespace moleculemappings { class SetMeanVelocityMapping; }
  */
 class simplemd::moleculemappings::SetMeanVelocityMapping {
 public:
-  SetMeanVelocityMapping(const tarch::la::Vector<MD_DIM, double> &oldVelocity,
-                         const tarch::la::Vector<MD_DIM, double> &newVelocity)
+  SetMeanVelocityMapping(const tarch::la::Vector<MD_DIM, double> &oldVelocity, const tarch::la::Vector<MD_DIM, double> &newVelocity)
       : _oldVelocity(oldVelocity), _newVelocity(newVelocity) {}
   ~SetMeanVelocityMapping() {}
 

@@ -13,11 +13,8 @@
 
 class DummySolverInterfaceService {
 public:
-
-  void init(tarch::la::Vector<3, unsigned int> numberProcesses,
-            unsigned int rank, tarch::la::Vector<3, double> globalMDDomainSize,
-            tarch::la::Vector<3, double> globalMDDomainOffset,
-            tarch::la::Vector<3, double> macroscopicCellSize);
+  void init(tarch::la::Vector<3, unsigned int> numberProcesses, unsigned int rank, tarch::la::Vector<3, double> globalMDDomainSize,
+            tarch::la::Vector<3, double> globalMDDomainOffset, tarch::la::Vector<3, double> macroscopicCellSize);
 
   void shutdown();
 
@@ -29,42 +26,27 @@ public:
   DummySolverInterface *getInterface() { return _dummySolverInterface; }
 
   /** add values to send buffer */
-  bool addToSendBuffer(const double &density,
-                       const tarch::la::Vector<3, double> &velocity,
-                       const tarch::la::Vector<3, unsigned int> &index);
+  bool addToSendBuffer(const double &density, const tarch::la::Vector<3, double> &velocity, const tarch::la::Vector<3, unsigned int> &index);
 
   /** receives values from receive buffer */
-  bool getFromReceiveBuffer(
-      double &density, tarch::la::Vector<3, double> &velocity,
-      const tarch::la::Vector<3, unsigned int> &index) const;
+  bool getFromReceiveBuffer(double &density, tarch::la::Vector<3, double> &velocity, const tarch::la::Vector<3, unsigned int> &index) const;
 
-  const unsigned int *getGlobalCellIndices4SendBuffer() const {
-    return _globalIndices4SendBuffer;
-  }
-  unsigned int *getGlobalCellIndices4ReceiveBuffer() {
-    return _globalIndices4ReceiveBuffer;
-  }
-  const std::vector<coupling::datastructures::MacroscopicCell<3> *> &
-  getSendBuffer() const {
-    return _sendBuffer;
-  }
-  const std::vector<coupling::datastructures::MacroscopicCell<3> *> &
-  getReceiveBuffer() {
-    return _receiveBuffer;
-  }
+  const unsigned int *getGlobalCellIndices4SendBuffer() const { return _globalIndices4SendBuffer; }
+  unsigned int *getGlobalCellIndices4ReceiveBuffer() { return _globalIndices4ReceiveBuffer; }
+  const std::vector<coupling::datastructures::MacroscopicCell<3> *> &getSendBuffer() const { return _sendBuffer; }
+  const std::vector<coupling::datastructures::MacroscopicCell<3> *> &getReceiveBuffer() { return _receiveBuffer; }
 
   void resetSendBufferCounter() { _sendBufferCounter = 0; }
 
 private:
   DummySolverInterfaceService()
-      : _dummySolverInterface(NULL), _sendBufferSize(0), _receiveBufferSize(0),
-        _globalIndices4SendBuffer(NULL), _globalIndices4ReceiveBuffer(NULL) {}
+      : _dummySolverInterface(NULL), _sendBufferSize(0), _receiveBufferSize(0), _globalIndices4SendBuffer(NULL), _globalIndices4ReceiveBuffer(NULL) {}
   ~DummySolverInterfaceService() {}
 
   /** loops over all macroscopic cells in the transfer region and allocates
-    * buffers for all respective cells
-    *  that are used in recv/send-operations.
-    */
+   * buffers for all respective cells
+   *  that are used in recv/send-operations.
+   */
   void allocateBuffers();
 
   void deleteBuffersAndIndices();
@@ -73,8 +55,7 @@ private:
   DummySolverInterface *_dummySolverInterface;
 
   /** Returns true if the index is inside the transfer region */
-  bool isInsideTransferRegion(
-      const tarch::la::Vector<3, unsigned int> &index) const {
+  bool isInsideTransferRegion(const tarch::la::Vector<3, unsigned int> &index) const {
     bool isInside = true;
     tarch::la::Vector<3, unsigned int> _transferDomainOffsetIndex(2);
     tarch::la::Vector<3, unsigned int> _transferDomainNumCells(0);
@@ -82,17 +63,14 @@ private:
       _transferDomainNumCells[d] = _globalNumberMacroscopicCells[d] + 2;
     }
     for (unsigned int d = 0; d < 3; d++) {
-      isInside = isInside && (index[d] >= _transferDomainOffsetIndex[d]) &&
-                 (index[d] <
-                  _transferDomainOffsetIndex[d] + _transferDomainNumCells[d]);
+      isInside = isInside && (index[d] >= _transferDomainOffsetIndex[d]) && (index[d] < _transferDomainOffsetIndex[d] + _transferDomainNumCells[d]);
     }
     return isInside;
   }
 
   /** Returns global cell index (MaMiCo index) from the local index (dummy
    * solver index) */
-  tarch::la::Vector<3, unsigned int> globalCellIndexfromLocalIndex(
-      const tarch::la::Vector<3, unsigned int> _localIndex) const {
+  tarch::la::Vector<3, unsigned int> globalCellIndexfromLocalIndex(const tarch::la::Vector<3, unsigned int> _localIndex) const {
     tarch::la::Vector<3, unsigned int> _globalIndex(0);
     bool flag = isInsideTransferRegion(_localIndex);
     tarch::la::Vector<3, unsigned int> _transferDomainOffsetIndex(2);
@@ -102,19 +80,14 @@ private:
       }
       return _globalIndex;
     } else {
-      std::cout << "ERROR this cell does not lie in the transfer region"
-                << std::endl;
+      std::cout << "ERROR this cell does not lie in the transfer region" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
   /** Returns Linearised cell index from global vector index*/
-  unsigned int linearIndexFromVectorIndex(
-      const tarch::la::Vector<3, unsigned int> globalVectorIndex) const {
-    unsigned int linearIndex =
-        globalVectorIndex[0] +
-        globalVectorIndex[1] * (_globalNumberMacroscopicCells[0] + 2) +
-        globalVectorIndex[2] * (_globalNumberMacroscopicCells[0] + 2) *
-            (_globalNumberMacroscopicCells[1] + 2);
+  unsigned int linearIndexFromVectorIndex(const tarch::la::Vector<3, unsigned int> globalVectorIndex) const {
+    unsigned int linearIndex = globalVectorIndex[0] + globalVectorIndex[1] * (_globalNumberMacroscopicCells[0] + 2) +
+                               globalVectorIndex[2] * (_globalNumberMacroscopicCells[0] + 2) * (_globalNumberMacroscopicCells[1] + 2);
     return linearIndex;
   }
 

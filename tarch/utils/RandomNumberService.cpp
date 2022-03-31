@@ -8,8 +8,7 @@
 #include <mpi.h>
 #endif
 
-tarch::utils::RandomNumberService &
-tarch::utils::RandomNumberService::getInstance() {
+tarch::utils::RandomNumberService &tarch::utils::RandomNumberService::getInstance() {
   static tarch::utils::RandomNumberService singleton;
   return singleton;
 }
@@ -38,7 +37,7 @@ double tarch::utils::RandomNumberService::getUniformRandomNumber() const {
   // method
   // in order to generate valid positions within the local subdomain, which only
   // the lower edge is part of, but not the upper edge.
-  return (0.5 * (double) rand()) / (0.5 * (double) RAND_MAX + 1.0);
+  return (0.5 * (double)rand()) / (0.5 * (double)RAND_MAX + 1.0);
 }
 
 double tarch::utils::RandomNumberService::getGaussianRandomNumber() {
@@ -52,8 +51,8 @@ double tarch::utils::RandomNumberService::getGaussianRandomNumber() {
     tarch::la::Vector<2, double> v(0.0);
 
     while (s >= 1.0) {
-      _randomNumbers[0] = ((double) rand()) / ((double) RAND_MAX);
-      _randomNumbers[1] = ((double) rand()) / ((double) RAND_MAX);
+      _randomNumbers[0] = ((double)rand()) / ((double)RAND_MAX);
+      _randomNumbers[1] = ((double)rand()) / ((double)RAND_MAX);
       v[0] = (2.0 * _randomNumbers[0] - 1.0);
       v[1] = (2.0 * _randomNumbers[1] - 1.0);
       s = v[0] * v[0] + v[1] * v[1];

@@ -6,8 +6,10 @@
 #define _TARCH_UTILS_UNCOPYABLE_H_
 
 namespace tarch {
-namespace utils { class Uncopyable; }
+namespace utils {
+class Uncopyable;
 }
+} // namespace tarch
 
 // class to prevent copying; just inherit "privately" from this and copying will
 // not work anymore (see Item6 of Effective C++, S. Meyers)

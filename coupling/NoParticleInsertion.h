@@ -14,21 +14,13 @@ template <class LinkedCell, unsigned int dim> class NoParticleInsertion;
 /** empty implementation of particle insertion (no particle insertion/removal).
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::NoParticleInsertion
-    : public coupling::ParticleInsertion<LinkedCell, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::NoParticleInsertion : public coupling::ParticleInsertion<LinkedCell, dim> {
 public:
-
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,
-                                                               dim> &cell,
-      const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-      const tarch::la::Vector<dim, double> &macroscopicCellSize,
-      const tarch::la::Vector<dim, double> &meanVelocity,
-      const double &temperature,
-      const coupling::BoundaryForceController<LinkedCell, dim> &
-          boundaryForceController) {
+  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
+                   const tarch::la::Vector<dim, double> &macroscopicCellPosition, const tarch::la::Vector<dim, double> &macroscopicCellSize,
+                   const tarch::la::Vector<dim, double> &meanVelocity, const double &temperature,
+                   const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController) {
     return coupling::ParticleInsertion<LinkedCell, dim>::NoAction;
   }
 
@@ -36,6 +28,5 @@ public:
 
   NoParticleInsertion() : coupling::ParticleInsertion<LinkedCell, dim>(1) {}
   virtual ~NoParticleInsertion() {}
-
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_NOPARTICLEINSERTION_H_

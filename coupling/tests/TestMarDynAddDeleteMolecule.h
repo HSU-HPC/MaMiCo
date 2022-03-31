@@ -11,8 +11,8 @@
 #include "particleContainer/ParticleCell.h"
 
 #include "coupling/interface/Molecule.h"
-#include "coupling/interface/impl/MarDyn/MarDynCoupledSimulation.h"
 #include "coupling/interface/impl/MarDyn/MarDynCell.h"
+#include "coupling/interface/impl/MarDyn/MarDynCoupledSimulation.h"
 
 /**
  * 	test class for the MarDyn MD coupling interface
@@ -22,8 +22,7 @@
  */
 class TestMarDynAddDeleteMolecule : public TestMarDyn {
 public:
-  TestMarDynAddDeleteMolecule(int argc, char **argv, std::string name)
-      : TestMarDyn(argc, argv, name) {}
+  TestMarDynAddDeleteMolecule(int argc, char **argv, std::string name) : TestMarDyn(argc, argv, name) {}
 
   virtual ~TestMarDynAddDeleteMolecule() {}
 
@@ -44,31 +43,29 @@ public:
 private:
   void deleteMoleculeTest() {
     MarDynMDSolverInterface *mdsi =
-        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<
-            MarDynCell, 3>::getInstance().getMDSolverInterface();
+        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
 
     MarDynCoupledSimulation *sim = mdsi->getSimulation();
 
-    //molecule count before deletion
-    unsigned long int moleculeCountBefore =
-        sim->getMolecules()->getNumberOfParticles();
+    // molecule count before deletion
+    unsigned long int moleculeCountBefore = sim->getMolecules()->getNumberOfParticles();
     std::cout << "Test moleculeCount " << moleculeCountBefore << std::endl;
 
     LinkedCells *lc = (LinkedCells *)mdsi->getSimulation()->getMolecules();
 
     Molecule *molecule = lc->begin();
 
-    //molecule values
+    // molecule values
     tarch::la::Vector<3, double> position(0.0);
     tarch::la::Vector<3, double> velocity(0.0);
-    double force[3] = { 0.0, 0.0, 0.0 };
+    double force[3] = {0.0, 0.0, 0.0};
     for (int d = 0; d < 3; d++) {
       position[d] = molecule->r(d);
       velocity[d] = molecule->v(d);
       force[d] = molecule->F(d);
     }
 
-    //create interface molecule
+    // create interface molecule
     Molecule internalMolecule;
     for (int d = 0; d < 3; d++) {
       internalMolecule.setr(d, position[d]);
@@ -79,33 +76,26 @@ private:
     testMolecule.setMolecule(&internalMolecule, sim->getcutoffRadius());
 
     coupling::services::MacroscopicCellService<3> *macroCellService =
-        coupling::interface::MamicoInterfaceProvider<
-            MarDynCell, 3>::getInstance().getMacroscopicCellService();
+        coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMacroscopicCellService();
 
     const tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(1);
     const tarch::la::Vector<3, unsigned int> linkedCellInMacroscopicCell(0);
     tarch::la::Vector<3, unsigned int> deleteCellIndexVector(1);
 
-    //macroscopic cell index
+    // macroscopic cell index
     tarch::la::Vector<3, unsigned int> macroCellIndex(1);
     for (int d = 0; d < 3; d++)
-      macroCellIndex[d] = 1 + (int) floor(position[d] / 2.5);
+      macroCellIndex[d] = 1 + (int)floor(position[d] / 2.5);
 
     std::cout << "macro cell index: " << macroCellIndex << std::endl;
 
-    MarDynCell &mc = mdsi->getLinkedCell(
-        macroCellIndex, linkedCellInMacroscopicCell,
-        linkedCellsPerMacroscopicCell, macroCellService->getIndexConversion());
+    MarDynCell &mc = mdsi->getLinkedCell(macroCellIndex, linkedCellInMacroscopicCell, linkedCellsPerMacroscopicCell, macroCellService->getIndexConversion());
 
     mdsi->deleteMoleculeFromMDSimulation(testMolecule, mc);
-    std::cout << "molecule count in cell after: "
-              << mc.getParticleCell()->getParticlePointers().size()
-              << std::endl;
+    std::cout << "molecule count in cell after: " << mc.getParticleCell()->getParticlePointers().size() << std::endl;
 
-    unsigned long int moleculeCountAfter =
-        sim->getMolecules()->getNumberOfParticles();
-    std::cout << "moleculeCount: " << moleculeCountBefore << " >? "
-              << moleculeCountAfter << std::endl;
+    unsigned long int moleculeCountAfter = sim->getMolecules()->getNumberOfParticles();
+    std::cout << "moleculeCount: " << moleculeCountBefore << " >? " << moleculeCountAfter << std::endl;
     if (moleculeCountBefore != (moleculeCountAfter + 1))
       std::cout << "Molecule deletion test failed!" << std::endl;
     else
@@ -113,24 +103,21 @@ private:
 
     std::cout << "synchronize testing..." << std::endl;
     mdsi->synchronizeMoleculesAfterMassModification();
-    unsigned long int moleculeCountAfterSync =
-        sim->getMolecules()->getNumberOfParticles();
+    unsigned long int moleculeCountAfterSync = sim->getMolecules()->getNumberOfParticles();
     if (moleculeCountAfter == moleculeCountAfterSync)
       std::cout << "synchronize test successfull!" << std::endl;
     else
-      std::cout << "synchronize test failed: " << moleculeCountAfterSync
-                << "in particleContainer after synchronize." << std::endl;
+      std::cout << "synchronize test failed: " << moleculeCountAfterSync << "in particleContainer after synchronize." << std::endl;
   }
 
   void addMoleculeTest() {
-    //the md solver interface
+    // the md solver interface
     MarDynMDSolverInterface *mdsi =
-        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<
-            MarDynCell, 3>::getInstance().getMDSolverInterface();
+        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
 
-    //molecule values
+    // molecule values
     tarch::la::Vector<3, double> position(0.0);
-    double dummy[3] = { 0.0, 0.0, 0.0 };
+    double dummy[3] = {0.0, 0.0, 0.0};
     for (int d = 0; d < 3; d++)
       position[d] = 15.0;
     Molecule internalMolecule;
@@ -140,22 +127,18 @@ private:
     }
     internalMolecule.setF(dummy);
 
-    //the molecule that will be inserted
+    // the molecule that will be inserted
     MarDynMoleculeWrapper testMolecule;
-    testMolecule.setMolecule(&internalMolecule,
-                             mdsi->getSimulation()->getcutoffRadius());
+    testMolecule.setMolecule(&internalMolecule, mdsi->getSimulation()->getcutoffRadius());
 
-    unsigned long int moleculesBefore =
-        mdsi->getSimulation()->getMolecules()->getNumberOfParticles();
+    unsigned long int moleculesBefore = mdsi->getSimulation()->getMolecules()->getNumberOfParticles();
 
-    //add molecule to md sim via simulation interface
+    // add molecule to md sim via simulation interface
     mdsi->addMoleculeToMDSimulation(testMolecule);
 
-    unsigned long int moleculesAfter =
-        mdsi->getSimulation()->getMolecules()->getNumberOfParticles();
+    unsigned long int moleculesAfter = mdsi->getSimulation()->getMolecules()->getNumberOfParticles();
 
-    std::cout << "moleculeCount before: " << moleculesBefore
-              << " | after: " << moleculesAfter << std::endl;
+    std::cout << "moleculeCount before: " << moleculesBefore << " | after: " << moleculesAfter << std::endl;
     if (moleculesBefore != (moleculesAfter - 1))
       std::cout << "Molecule insertion test failed!" << std::endl;
     else

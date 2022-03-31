@@ -5,11 +5,11 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TESTS_TESTESPRESSOADDDELETEMOLECULE_H
 #define _MOLECULARDYNAMICS_COUPLING_TESTS_TESTESPRESSOADDDELETEMOLECULE_H
 
-#include "particle_data.hpp"
-#include "coupling/tests/TestEspresso.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMolecule.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMoleculeIterator.h"
 #include "coupling/interface/impl/Espresso/EspressoMDSolverInterface.h"
+#include "coupling/tests/TestEspresso.h"
+#include "particle_data.hpp"
 #include "tarch/la/Vector.h"
 
 /** test class to check addition and deletion of molecule in espresso. It
@@ -24,8 +24,7 @@
 
 class TestEspressoAddDeleteMolecule : public TestEspresso {
 public:
-  TestEspressoAddDeleteMolecule(std::string name, int argc, char **argv)
-      : TestEspresso(name, argc, argv) {}
+  TestEspressoAddDeleteMolecule(std::string name, int argc, char **argv) : TestEspresso(name, argc, argv) {}
   ~TestEspressoAddDeleteMolecule() {}
   virtual void run() {
 
@@ -50,7 +49,6 @@ public:
   }
 
 private:
-
   /* This test function delete the first molecule in cell 0 at time t = 0 and
    * then iterates over all the molecules, and counts the number of remaining
    * molecules */
@@ -65,8 +63,7 @@ private:
 
     // Call the method deleteMoleculeFromMDSimulation provided in
     // EspressoMDSolverInterface
-    delete_molecule_test.deleteMoleculeFromMDSimulation(coupling_part,
-                                                        temp_cell);
+    delete_molecule_test.deleteMoleculeFromMDSimulation(coupling_part, temp_cell);
 
     // Iterate over all the particles in the local domain (excluding ghost
     // cells) in Espresso
@@ -84,7 +81,6 @@ private:
     } else {
       std::cout << "The test was not successful" << std::endl;
     }
-
   }
 
   /* This test function adds a molecule to the simulation domain at time t=0 and
@@ -161,11 +157,9 @@ private:
     if (cnt > 56) {
       std::cout << "The test was successful with count " << cnt << std::endl;
     } else {
-      std::cout << "The test was not successful with count " << cnt
-                << std::endl;
+      std::cout << "The test was not successful with count " << cnt << std::endl;
     }
   }
-
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_TESTS_TESTESPRESSOADDDELETEMOLECULE_H
