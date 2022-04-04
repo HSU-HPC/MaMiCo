@@ -5,6 +5,7 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "coupling/indexing/IndexingService.h"
 
 #include "tarch/utils/RandomNumberService.h"
 
@@ -56,19 +57,26 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       }
 
       //get bounds of current process
-      //double bBoxMin[3];
-			//double bBoxMax[3];
-      //global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
+      double bBoxMin[3];
+			double bBoxMax[3];
+      global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
 
       //size of the macroscopic cell
 			tarch::la::Vector<3,double> macroCellSize = indexConversion.getMacroscopicCellSize();
+
+      //conversion to global 
+      using coupling::indexing::CellIndex;
+      using coupling::indexing::IndexTrait;
+      CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({macroscopicCellIndex[0], macroscopicCellIndex[1], macroscopicCellIndex[2]});
+      CellIndex<3, IndexTrait::vector> globalIndex(localIndex);
+
 
       //We have unbroken MD domain, which we will divide into region iterators
       //So we split the MD into the same grid as the macro, and give the macroscopic cell the corresponding region
       double regionOffset[3], regionEndpoint[3];
       for(int i = 0; i < 3; i++)
       {
-        regionOffset[i] = (macroscopicCellIndex[i] - 1) * macroCellSize[i];
+        regionOffset[i] = (globalIndex.get()[i] - 1) * macroCellSize[i];
         regionEndpoint[i] = regionOffset[i] + macroCellSize[i];
       }
 
@@ -83,7 +91,6 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       auto up = global_simulation->getEnsemble()->domain()->rmax();
       auto down = global_simulation->getEnsemble()->domain()->rmin();
       tarch::la::Vector<3, double> globalSize = {up[0]-down[0], up[1]-down[1], up[2]-down[2]};
-      std::cout << " global size: " << globalSize << std::endl;
       return globalSize;
     }
 
@@ -96,7 +103,6 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
         coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(0),
         coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(1),
         coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(2));
-        std::cout << "global offset: " << globalOffset << std::endl;
       return globalOffset;
     }
 
@@ -167,7 +173,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      */
     virtual tarch::la::Vector<3,unsigned int> getLinkedCellIndexForMoleculePosition(
       const tarch::la::Vector<3,double>& position
-    ) { return tarch::la::Vector<3, unsigned int> {1,1,1}; }
+    ) { return tarch::la::Vector<3, unsigned int> {0,0,0}; }
 
 
     /** assumes that a molecule is placed somewhere inside the linked cell at index
@@ -237,7 +243,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
 
           region.iteratorNext();
       }
-      
+
       molecule.setForce(force);
       molecule.setPotentialEnergy(potentialEnergy);
     }

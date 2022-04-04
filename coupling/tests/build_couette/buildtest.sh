@@ -45,10 +45,14 @@ if [ "${parallel}" == "parallel" ]
 then
     if [ -v MARDYN_PATH ]
     then
-      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wfatal-errors -Wno-unknown-pragmas -O0 -DMARDYN_DPDP -DENABLE_MPI -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -Wno-sign-conversion -Wno-gnu-array-member-paren-init" # todo put -Werror, O0 for debug
+      FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMARDYN_AUTOPAS -DMDDim3 -std=c++17 -Wall -Wfatal-errors -Wno-unknown-pragmas -O3 -DMARDYN_DPDP -DENABLE_MPI -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -Wno-sign-conversion -Wno-gnu-array-member-paren-init" # todo put -Werror, O0 for debug
       includes="${includes} -I${LIB_EIGEN_PATH} -I${MARDYN_PATH}/src -I${MARDYN_PATH}/libs/rapidxml -I${MARDYN_PATH}/build/_deps/autopasfetch-src/src -I${MARDYN_PATH}/build/_deps/spdlog-src/include"
       libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
       compiler="mpicxx"
+      #FLAGS="-DLS1_MARDYN -DMAMICO_COUPLING -DMDDim3 -std=c++17 -Wall -Wfatal-errors -Wno-unknown-pragmas -O3 -DMARDYN_DPDP -DENABLE_MPI -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -Wno-sign-conversion -Wno-gnu-array-member-paren-init" # todo put -Werror, O0 for debug
+      #includes="${includes} -I${LIB_EIGEN_PATH} -I${MARDYN_PATH}/src -I${MARDYN_PATH}/libs/rapidxml -I${MARDYN_PATH}/build/_deps/spdlog-src/include"
+      #libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
+      #compiler="mpicxx"
     else
       # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
       FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -Wfatal-errors -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
@@ -90,7 +94,7 @@ if [ "${parallel}" == "parallel" ]
 then
   if [ -v MARDYN_PATH ]
   then
-    scons compiler=clang target=libsimplemd dim=3 build=debug parallel=yes -j4
+    scons compiler=clang target=libsimplemd dim=3 build=release parallel=yes -j4
     libraries="${libraries} -L${SIMPLEMD_PARALLEL_PATH} -l${LIBSIMPLEMD}"
     FLAGS="${FLAGS} -DMDParallel"
 
@@ -99,7 +103,7 @@ then
     ### autopas
       libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/src/autopas -l:libautopas.a"
     ### spdlog (for ls1)
-      libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlogd.a -lpthread" #in debug, libspdlogd, else libspdlog
+      libraries="${libraries} -L${MARDYN_PATH}/build/_deps/spdlog-build -l:libspdlog.a -lpthread" #in debug, libspdlogd, else libspdlog
     ### harmony (for autopas)
       libraries="${libraries} -L${MARDYN_PATH}/build/_deps/autopasfetch-build/libs/harmony/include/lib -l:libharmony.a"
   else
@@ -133,6 +137,7 @@ fi
 #FLAGS="${FLAGS} -g"
 #FLAGS="${FLAGS} -fsanitize=address"
 #libraries="${libraries} -fsanitize=address"
+libraries="${libraries} -lxerces-c"
 
 cd ${BUILD_PATH}
 if ! [ -v MARDYN_PATH ]; then

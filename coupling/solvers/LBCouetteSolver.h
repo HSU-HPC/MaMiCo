@@ -219,9 +219,9 @@ public:
       //    (1.0 / recvBuffer[i]->getMacroscopicMass()) * (_dt / _dx) *
       //    recvBuffer[i]->getMacroscopicMomentum());
       tarch::la::Vector<3, double> localVel(recvBuffer[i]->getMacroscopicMomentum());
-      if (recvBuffer[i]->getMacroscopicMass() != 0.0) {
+      //if (recvBuffer[i]->getMacroscopicMass() != 0.0) {
         localVel = (1.0 / recvBuffer[i]->getMacroscopicMass()) * localVel;
-      }
+      //}
       using std::isnan;
       //if(isnan(localVel[0]) || isnan(localVel[1]) || isnan(localVel[2]))
       {

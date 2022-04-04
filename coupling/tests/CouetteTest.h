@@ -461,7 +461,7 @@ private:
       getGlobalNumberMacroscopicCells(_simpleMDConfig,_mamicoConfig),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
     );
 
-
+     coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
     if(_cfg.twsLoop){
       // initialise macroscopic cell service for multi-MD case and set single cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL,3>(
@@ -480,6 +480,10 @@ private:
         _mamicoConfig.getMacroscopicCellConfiguration(), "couette.xml", *_multiMDService
       );
     }
+   
+ 
+    // init filtering for all md instances
+    _multiMDCellService->constructFilterPipelines();
     if(_cfg.miSolverType == SIMPLEMD || _cfg.miSolverType ==LS1){
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
