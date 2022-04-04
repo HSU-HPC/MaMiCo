@@ -13,14 +13,14 @@ simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::SimpleBuffer(){
 }
 
 simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::~SimpleBuffer(){
-  /* memory freed during shutdown */  
+  /* memory freed during shutdown */
 }
 
 bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise(
-  const unsigned int doublesPerMolecule, 
+  const unsigned int doublesPerMolecule,
   const unsigned int upperBoundOnNumberOfMolecules)
 {
-  _capacity = upperBoundOnNumberOfMolecules * doublesPerMolecule;
+  _capacity = 3*upperBoundOnNumberOfMolecules * doublesPerMolecule;
 
   _values = (double *) malloc(_capacity * sizeof(double));
   if(_values == NULL) {
@@ -128,8 +128,8 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::reallocate
 /* Public methods: */
 
 bool simplemd::services::ParallelAndLocalBufferService::initialise(
-  const unsigned int numUniqueNeighbours, 
-  const unsigned int numCellsPerBuffer[], 
+  const unsigned int numUniqueNeighbours,
+  const unsigned int numCellsPerBuffer[],
   const double avMoleculesPerCell)
 {
   bool isOk = true;
@@ -213,7 +213,7 @@ bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToSendBuffer
   const bool permitReallocation = false;
   #if (MD_ERROR == MD_YES)
   bool isOk;
-  isOk = 
+  isOk =
   #endif
    _sendBuffers[i_buffer].pushData(position, mol->getConstVelocity(), mol->getConstForceOld(), (double)mol->isFixed(), permitReallocation);
   #if (MD_ERROR == MD_YES)
@@ -230,11 +230,9 @@ bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToSendBuffer
 /* Private methods */
 
 unsigned int simplemd::services::ParallelAndLocalBufferService::computeBufferUpperBound(
-  const unsigned int numCells, 
-  const double avMoleculesPerCell) const 
+  const unsigned int numCells,
+  const double avMoleculesPerCell) const
 {
   // modeling a function of the type A(x) = c * x^-alpha + d
   return (unsigned int)std::ceil( (double)numCells * avMoleculesPerCell * (4.0/std::sqrt((double)numCells) + 1.5) );
 }
-
-
