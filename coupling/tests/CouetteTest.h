@@ -1143,6 +1143,7 @@ private:
         }
       }
     }
+    std::cout << "allocateSendBuffer::numCellsSent" << numCellsSent << std::endl;
     // allocate array for cell indices
     unsigned int *indices = new unsigned int[numCellsSent];
     if (indices == NULL) {
@@ -1220,6 +1221,7 @@ private:
         }
       }
     }
+    std::cout << "allocateRecvBuffer::numCellsRecv" << numCellsRecv << std::endl;
     // allocate array for cell indices
     unsigned int *indices = new unsigned int[numCellsRecv];
     if (indices == NULL) {

@@ -68,21 +68,9 @@ public:
 		#endif
     	_interface = new precice::SolverInterface("mamico","../precice-config.xml",rank,size);
 		_numberOfCells = 0;
-		tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
-		tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
 		for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) 
 		{
-			tarch::la::Vector<3, int> cellVectorIndex = cellIndex.get();
-			bool isInnerCell = true;
-			bool isGhostCell = false;
-			for (unsigned int currentDim = 0; currentDim < dim; currentDim++) 
-			{
-				isInnerCell &= cellVectorIndex[currentDim] >= lowerBoundary[currentDim] + (int)_overlap + 1;
-				isInnerCell &= cellVectorIndex[currentDim] <= upperBoundary[currentDim] - (int)_overlap - 1 ;
-				isGhostCell |= cellVectorIndex[currentDim] < 1;
-				isGhostCell |= cellVectorIndex[currentDim] >= upperBoundary[currentDim] ;				
-			}
-			if (!isInnerCell && !isGhostCell)
+			if (sendMacroscopicQuantityToMDSolver(static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get())))
 				_numberOfCells++;
 		}
 		std::cout << "Number of coupling volumes: " << _numberOfCells << std::endl;
@@ -90,17 +78,8 @@ public:
 		unsigned int interfaceCellIndex=0;
 		for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) 
 		{
-			tarch::la::Vector<3, int> cellVectorIndex = cellIndex.get();
-			bool isInnerCell = true;
-			bool isGhostCell = false;
-			for (unsigned int currentDim = 0; currentDim < dim; currentDim++) 
-			{
-				isInnerCell &= cellVectorIndex[currentDim] >= lowerBoundary[currentDim] + (int)_overlap + 1;
-				isInnerCell &= cellVectorIndex[currentDim] <= upperBoundary[currentDim] - (int)_overlap - 1 ;
-				isGhostCell |= cellVectorIndex[currentDim] < 1;
-				isGhostCell |= cellVectorIndex[currentDim] >= upperBoundary[currentDim] ;				
-			}
-			if (!isInnerCell && !isGhostCell)
+			tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get());
+			if (sendMacroscopicQuantityToMDSolver(cellVectorIndex))
 			{
 				for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
 					_coords[dim*interfaceCellIndex+currentDim]=mdDomainOffset[currentDim] + cellVectorIndex[currentDim]*_dx - _dx + 0.5*macroscopicCellSize[currentDim];
@@ -130,7 +109,7 @@ public:
 	tarch::la::Vector<3,double> getVelocity(tarch::la::Vector<3,double> pos) const override
 	{
 		tarch::la::Vector<3,double> vel(0.0);
-		/*unsigned int cellIndex=0;
+		unsigned int cellIndex=0;
 		while (cellIndex < _numberOfCells && !(_coords[dim*cellIndex] == pos[0] && _coords[dim*cellIndex+1] == pos[1] && _coords[dim*cellIndex+2] == pos[2]))
 			cellIndex++;
 		if (cellIndex < _numberOfCells)
@@ -138,7 +117,8 @@ public:
 			for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
 				vel[currentDim] = _velocities[dim*cellIndex+currentDim];
 			}
-		}*/
+		}
+		std::cout << "pos:" << pos << ", vel:" << vel << std::endl;
 		return vel;
 	}
 	
@@ -194,24 +174,27 @@ public:
 	
 	bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override
 	{
-		const tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells = CellIndex<dim>().numberCellsInDomain;
-		bool recv = true;
-		for (unsigned int d = 0; d < dim; d++) {		
-		  recv = recv && (globalCellIndex[d] > _overlap) &&
-		         (globalCellIndex[d] < globalNumberMacroscopicCells[d] + 1 - _overlap);
+		tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
+		tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
+		bool isInnerCell = true;
+		for (unsigned int currentDim = 0; currentDim < dim; currentDim++) 
+		{
+			isInnerCell &= (int)globalCellIndex[currentDim] >= lowerBoundary[currentDim] + (int)_overlap + 1;
+			isInnerCell &= (int)globalCellIndex[currentDim] <= upperBoundary[currentDim] - (int)_overlap - 1 ;
 		}
-		return recv;
+		return isInnerCell;
 	}
 	
 	bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) 
 	{
-		const tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells = CellIndex<dim>().numberCellsInDomain;
-		bool ghost = false;
-		for (unsigned int d = 0; d < 3; d++) {
-		  ghost = ghost || (globalCellIndex[d] < 1) ||
-		          (globalCellIndex[d] > globalNumberMacroscopicCells[d]);
+		tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
+		bool isGhostCell = false;
+		for (unsigned int currentDim = 0; currentDim < dim; currentDim++) 
+		{
+			isGhostCell |= globalCellIndex[currentDim] < 1;
+			isGhostCell |= (int)globalCellIndex[currentDim] >= upperBoundary[currentDim] ;
 		}
-		return (!ghost) &&
+		return (!isGhostCell) &&
 		       (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
 	}
   
