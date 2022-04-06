@@ -1,62 +1,123 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 3.19) 
-PROJECT (MAMICO_CTEST LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.13)
+project(mamico VERSION 2.0 LANGUAGES CXX)
 
-set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
-
-#--- Define target ---
-
-#NOTE: You are expected to pass USE_PYBIND11=True when executing this cmake script to compile a pybind11 library.
-#	   The default is a standard Couette scenario (C++).
-
-if(USE_PYBIND11)
-	find_package(Python COMPONENTS Interpreter Development REQUIRED)
-	find_package(pybind11 REQUIRED)
-
-	#Case: pybind11
-	message("Now compiling pybind11 library...")
-	pybind11_add_module( mamico_ctest
-	${CMAKE_CURRENT_SOURCE_DIR}/coupling/python-binding/mamico.cpp
-	)
-	#Currently, KVS is not supported in non-parallel mode
-	set(MAMICO_PARALLEL TRUE)
-else()
-	#Case: Couette
-	message("Now compiling CouetteTest...")
-	add_library(mamico_ctest
-		${CMAKE_CURRENT_SOURCE_DIR}/coupling/solvers/CoupledMolecularDynamicsSimulation.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/coupling/configurations/ParticleInsertionConfiguration.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/coupling/tests/main_couette.cpp
-	)
-	#If you wish to compile a parallelized version of Couette, define this upon calling Cmake
-	if(PARALLEL)
-		set(MAMICO_PARALLEL TRUE)
-	endif()
+# CMake Policies
+# CMP0074
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
+# CMP0075
+if(POLICY CMP0075)
+  cmake_policy(SET CMP0075 NEW)
 endif()
 
-#enforce c++17 in order to support the use of modern C++ features
-target_compile_features(mamico_ctest PRIVATE cxx_std_17)
+#
+# Setup Options
+#
+# Build type
+if(NOT CMAKE_BUILD_TYPE)
+  message(WARNING "CMAKE_BUILD_TYPE was not specified. Debug build is assumed.")
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release)
+endif()
+message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
+# Automatically add the current source and build directories to the include path
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Parallel build, default is OFF
+option(BUILD_WITH_MPI "Build with MPI." OFF)
+message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
+# Dimension for MD build, default is MDDim3
+set(MD_DIM MDDim3 CACHE STRING "Set to MDDim3 (default) or MDDim2.")
+message(STATUS ">> SimpleMD dimension variable : " ${MD_DIM})
+mark_as_advanced(MD_DIM)
+set_property(CACHE MD_DIM PROPERTY STRINGS MDDim3 MDDim2)
 
-#Add SimpleMD's scons build script to target ---
-add_custom_target(
-	TARGET mamico_ctest
-	#TODO: make this customizable? (dim, parallel...)
-	COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && scons target=libsimplemd dim=3 build=release parallel=yes -j4 || exit $?
+#
+# Find dependencies
+#
+find_package(Eigen3 3.3 REQUIRED)
+IF(BUILD_WITH_MPI)
+	find_package(MPI REQUIRED)
+	message(STATUS ">> MPI_INCLUDE_PATH : ${MPI_INCLUDE_PATH}")
+	message(STATUS ">> MPI_LIBRARIES : ${MPI_LIBRARIES}")
+	message(STATUS ">> MPI_CXX_INCLUDE_PATH : ${MPI_CXX_INCLUDE_PATH}")
+	message(STATUS ">> MPI_CXX_INCLUDE_DIRS : ${MPI_CXX_INCLUDE_DIRS}")
+	message(STATUS ">> MPI_CXX_LIBRARIES : ${MPI_CXX_LIBRARIES}")
+	message(STATUS ">> MPI_CXX_FOUND : ${MPI_CXX_FOUND}")
+endif()
+
+#
+# simpleMD target
+#
+set(SIMPLE_MD_SOURCES 
+        "simplemd/BoundaryTreatment.cpp"
+        "simplemd/MolecularDynamicsSimulation.cpp"
+        "simplemd/ProfilePlotter.cpp"
+        "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
+		"simplemd/cell-mappings/LennardJonesForceMapping.cpp"
+		"simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
+		"simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
+		"simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.cpp"
+		"simplemd/cell-mappings/RDFMapping.cpp"
+		"simplemd/configurations/DomainConfiguration.cpp"
+		"simplemd/configurations/ExternalForceConfiguration.cpp"
+		"simplemd/configurations/MolecularDynamicsConfiguration.cpp"
+		"simplemd/configurations/MoleculeConfiguration.cpp"
+		"simplemd/configurations/MPIConfiguration.cpp"
+		"simplemd/configurations/ProfilePlotterConfiguration.cpp"
+		"simplemd/configurations/RDFConfiguration.cpp"
+		"simplemd/configurations/SimulationConfiguration.cpp"
+		"simplemd/configurations/VTKConfiguration.cpp"
+		"simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
+		"simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
+		"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
+		"simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
+		"simplemd/services/ExternalForceService.cpp"
+		"simplemd/services/LinkedCellService.cpp"
+		"simplemd/services/MolecularPropertiesService.cpp"
+		"simplemd/services/MoleculeService.cpp"
+		"simplemd/services/ParallelAndLocalBufferService.cpp"
+		"simplemd/services/ParallelTopologyService.cpp"
+        "tarch/tinyxml2/tinyxml2.cpp"
+        "tarch/utils/RandomNumberService.cpp"
 )
-
-#set simplemd macros
-set_property(
-	TARGET mamico_ctest
-	PROPERTY COMPILE_DEFINITIONS MDDim3 MDError SIMPLE_MD
-	)
-
-if(MAMICO_PARALLEL)
-	set_property(
-		TARGET mamico_ctest
-   		APPEND PROPERTY COMPILE_DEFINITIONS MDParallel Parallel MDCoupledParallel TarchParallel
-   	)
+add_library(simplemd ${SIMPLE_MD_SOURCES})
+set_property(TARGET simplemd PROPERTY CXX_STANDARD 17)
+target_compile_definitions(simplemd PUBLIC ${MD_DIM})
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	target_compile_definitions(simplemd PUBLIC MDError)
+endif()
+IF(BUILD_WITH_MPI)
+    target_compile_definitions(simplemd PUBLIC MDParallel TarchParallel)
+    target_link_libraries(simplemd PUBLIC MPI::MPI_CXX)
+ENDIF()
+# Check the CXX compiler ID. IDs are defined here: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
+message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
+message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	target_compile_options(simplemd PUBLIC -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -O3)
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(simplemd PUBLIC -g3)
+	endif()
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+	target_compile_options(simplemd PUBLIC -fstrict-aliasing -qpack_semantic=gnu -ipo)
+	target_link_options(simplemd PUBLIC -ipo)
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(simplemd PUBLIC -O3)
+	else()
+		target_compile_options(simplemd PUBLIC -fast -w -Werror-all -align -ansi-alias)
+	endif()
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Fujitsu")
+	target_compile_options(simplemd PUBLIC -Nclang -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
+	target_link_options(simplemd PUBLIC -ipo)
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(simplemd PUBLIC -g3 -O3)
+	else()
+		target_compile_options(simplemd PUBLIC -Ofast)
+	endif()
+else()
+	message(STATUS ">> Unsupported compiler. Check the CXX variable value.")
 endif()
 
-#If thesee include directories do not suffice, you can add more manually via -DCMAKE_CXX_FLAGS
-target_include_directories (mamico_ctest PUBLIC /usr/include/ )
-target_include_directories (mamico_ctest PUBLIC /usr/lib/ )
+
+
