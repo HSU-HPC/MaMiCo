@@ -23,27 +23,40 @@ endif()
 message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
 # Automatically add the current source and build directories to the include path
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Parallel build, default is OFF
-option(BUILD_WITH_MPI "Build with MPI." OFF)
+# Enable the MPI library for parallel build, default is OFF
+option(BUILD_WITH_MPI "Enable the MPI library for parallel build, default is OFF." OFF)
 message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 # Dimension for MD build, default is MDDim3
-set(MD_DIM MDDim3 CACHE STRING "Set to MDDim3 (default) or MDDim2.")
+set(MD_DIM MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")
 message(STATUS ">> SimpleMD dimension variable : " ${MD_DIM})
 mark_as_advanced(MD_DIM)
 set_property(CACHE MD_DIM PROPERTY STRINGS MDDim3 MDDim2)
+# Enable the Eigen library used (so far) only for POD filtering, default is off
+option(BUILD_WITH_EIGEN "Enable the Eigen library used (so far) only for POD filtering, default is off." OFF)
+message(STATUS ">> Build with Eigen : " ${BUILD_WITH_EIGEN})
+# Enable MaMiCo python bindings
+option(BUILD_WITH_PYBIND11 "Enable the MaMiCo python binding, default is off." OFF)
+message(STATUS ">> Build with pybind11 : " ${BUILD_WITH_PYBIND11})
+if (BUILD_WITH_PYBIND11 AND NOT BUILD_WITH_MPI)
+	message(STATUS ">> Build with pybind11 was enabled but build with MPI was not. Enabling build with MPI.")
+	set(BUILD_WITH_MPI "ON")
+	message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
+endif()
 
 #
 # Find dependencies
 #
-find_package(Eigen3 3.3 REQUIRED)
-IF(BUILD_WITH_MPI)
+if(BUILD_WITH_EIGEN)
+	find_package(Eigen3 REQUIRED)
+endif()
+
+if(BUILD_WITH_MPI)
 	find_package(MPI REQUIRED)
-	message(STATUS ">> MPI_INCLUDE_PATH : ${MPI_INCLUDE_PATH}")
-	message(STATUS ">> MPI_LIBRARIES : ${MPI_LIBRARIES}")
-	message(STATUS ">> MPI_CXX_INCLUDE_PATH : ${MPI_CXX_INCLUDE_PATH}")
-	message(STATUS ">> MPI_CXX_INCLUDE_DIRS : ${MPI_CXX_INCLUDE_DIRS}")
-	message(STATUS ">> MPI_CXX_LIBRARIES : ${MPI_CXX_LIBRARIES}")
-	message(STATUS ">> MPI_CXX_FOUND : ${MPI_CXX_FOUND}")
+endif()
+
+if(BUILD_WITH_PYBIND11)
+	find_package(Python COMPONENTS Interpreter Development REQUIRED)
+	find_package(pybind11 REQUIRED)
 endif()
 
 #
@@ -82,42 +95,83 @@ set(SIMPLE_MD_SOURCES
         "tarch/utils/RandomNumberService.cpp"
 )
 add_library(simplemd ${SIMPLE_MD_SOURCES})
-set_property(TARGET simplemd PROPERTY CXX_STANDARD 17)
-target_compile_definitions(simplemd PUBLIC ${MD_DIM})
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	target_compile_definitions(simplemd PUBLIC MDError)
+set_target_properties(simplemd PROPERTIES CXX_STANDARD 17)
+target_compile_definitions(simplemd PRIVATE ${MD_DIM})
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	target_compile_definitions(simplemd PRIVATE MDError)
 endif()
-IF(BUILD_WITH_MPI)
-    target_compile_definitions(simplemd PUBLIC MDParallel TarchParallel)
-    target_link_libraries(simplemd PUBLIC MPI::MPI_CXX)
-ENDIF()
+if(BUILD_WITH_MPI)
+    target_compile_definitions(simplemd PRIVATE MDParallel TarchParallel)
+    target_link_libraries(simplemd PRIVATE MPI::MPI_CXX)
+endif()
 # Check the CXX compiler ID. IDs are defined here: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
 message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
 message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(simplemd PUBLIC -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -O3)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	target_compile_options(simplemd PRIVATE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -O3)
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(simplemd PUBLIC -g3)
+		target_compile_options(simplemd PRIVATE -g3)
 	endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-	target_compile_options(simplemd PUBLIC -fstrict-aliasing -qpack_semantic=gnu -ipo)
-	target_link_options(simplemd PUBLIC -ipo)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(simplemd PUBLIC -O3)
+	target_compile_options(simplemd PRIVATE -fstrict-aliasing -qpack_semantic=gnu -ipo)
+	target_link_options(simplemd PRIVATE -ipo)
+	if (CMAKE_BUILD_TYPE PRIVATE "Debug")
+		target_compile_options(simplemd PRIVATE -O3)
 	else()
-		target_compile_options(simplemd PUBLIC -fast -w -Werror-all -align -ansi-alias)
+		target_compile_options(simplemd PRIVATE -fast -w -Werror-all -align -ansi-alias)
 	endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Fujitsu")
-	target_compile_options(simplemd PUBLIC -Nclang -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
-	target_link_options(simplemd PUBLIC -ipo)
+	target_compile_options(simplemd PRIVATE -Nclang -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
+	target_link_options(simplemd PRIVATE -ipo)
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(simplemd PUBLIC -g3 -O3)
+		target_compile_options(simplemd PRIVATE -g3 -O3)
 	else()
-		target_compile_options(simplemd PUBLIC -Ofast)
+		target_compile_options(simplemd PRIVATE -Ofast)
 	endif()
 else()
-	message(STATUS ">> Unsupported compiler. Check the CXX variable value.")
+	message(STATUS ">> Unsupported compiler.")
 endif()
 
+#
+# MaMiCo target
+#
+add_library(mamico INTERFACE)
+set_target_properties(mamico PROPERTIES CXX_STANDARD 17)
+target_link_libraries(mamico INTERFACE simplemd)
+if(BUILD_WITH_EIGEN)
+	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
+	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
+endif()
+target_compile_definitions(mamico INTERFACE SIMPLE_MD MDDim3)
+target_compile_options(mamico INTERFACE -Wall -Wno-unknown-pragmas -Wfatal-errors -O3)
+if(BUILD_WITH_MPI)
+    target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
+    target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context -Wno-maybe-uninitialized)
+    target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
+endif()
 
+#
+# Couette target
+#
+set(COUETTE_SOURCES
+		"coupling/configurations/ParticleInsertionConfiguration.cpp"
+        "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+        "coupling/tests/main_couette.cpp"
+)
+add_executable(couette ${COUETTE_SOURCES})
+set_target_properties(couette PROPERTIES CXX_STANDARD 17)
+target_link_libraries(couette PUBLIC mamico)
+
+#
+# pybind target
+#
+if(BUILD_WITH_PYBIND11)
+	set(PYBIND_SOURCES11
+			"coupling/python-binding/mamico.cpp"
+	)
+	pybind11_add_module(pybind11
+		${PYBIND_SOURCES11}
+	)
+	target_link_libraries(pybind11 PUBLIC mamico)
+endif()
 
