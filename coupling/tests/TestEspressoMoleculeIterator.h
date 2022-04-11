@@ -29,24 +29,24 @@
  *  @author Rahul Arora
  */
 
-void register_tcl_commands(Tcl_Interp *interp);
-void register_global_variables(Tcl_Interp *interp);
-int tclcommand_cellsystem(ClientData data, Tcl_Interp *interp, int argc, char **argv);
-int tclcommand_blockfile(ClientData data, Tcl_Interp *interp, int argc, char *argv[]);
-int tclcommand_part(ClientData data, Tcl_Interp *interp, int argc, char **argv);
+void register_tcl_commands(Tcl_Interp* interp);
+void register_global_variables(Tcl_Interp* interp);
+int tclcommand_cellsystem(ClientData data, Tcl_Interp* interp, int argc, char** argv);
+int tclcommand_blockfile(ClientData data, Tcl_Interp* interp, int argc, char* argv[]);
+int tclcommand_part(ClientData data, Tcl_Interp* interp, int argc, char** argv);
 
 class TestEspressoMoleculeIterator : public Test {
 private:
   int _argc;
-  char **_argv;
+  char** _argv;
 
 public:
-  TestEspressoMoleculeIterator(std::string name, int argc, char **argv) : Test(name), _argc(argc), _argv(argv) {}
+  TestEspressoMoleculeIterator(std::string name, int argc, char** argv) : Test(name), _argc(argc), _argv(argv) {}
   virtual ~TestEspressoMoleculeIterator() {}
 
   virtual void run() {
     // Initialize the Tcl interpreter to read tcl commands in C++
-    Tcl_Interp *interp;
+    Tcl_Interp* interp;
     interp = Tcl_CreateInterp();
     if (TCL_OK != Tcl_Init(interp)) {
       std::cout << "Tcl_Init error: " << Tcl_GetStringResult(interp) << std::endl;
@@ -126,9 +126,9 @@ private:
     unsigned int flag = 1;
     for (unsigned int i = 0; i < local_cells.n; i++) {
       unsigned int numberOfMoleculesFound = 0;
-      ParticleList *list = local_cells.cell[i];
+      ParticleList* list = local_cells.cell[i];
       coupling::interface::EspressoMDMoleculeIterator it(*list);
-      Particle *part;
+      Particle* part;
       part = list->part;
       unsigned int numberOfMoleculesInCurrentCell = list->n;
       for (it.begin(); it.continueIteration(); it.next()) {

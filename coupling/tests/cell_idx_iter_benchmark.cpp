@@ -129,7 +129,7 @@ private:
       globalNumberMacroscopicCells[d] = (unsigned int)floor(_simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] /
                                                                 _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[d] +
                                                             0.5);
-    coupling::interface::MacroscopicSolverInterface<3> *couetteSolverInterface =
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface =
         new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells, _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
@@ -218,7 +218,7 @@ private:
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
 };
 
-void runTest(Test *test) {
+void runTest(Test* test) {
   if (test == NULL) {
     std::cout << "ERROR executeTest: test==NULL!" << std::endl;
     exit(EXIT_FAILURE);
@@ -227,7 +227,7 @@ void runTest(Test *test) {
   delete test;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Init(&argc, &argv);
 #endif

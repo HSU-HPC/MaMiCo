@@ -42,9 +42,9 @@ template <unsigned int dim> class coupling::filtering::Gauss : public coupling::
                                                     coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
 
 public:
-  Gauss(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
-        const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector, const std::array<bool, 7> filteredValues, unsigned int dimension,
-        int sigma, const char *extrapolationStrategy)
+  Gauss(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+        const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues, unsigned int dimension,
+        int sigma, const char* extrapolationStrategy)
       : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"), _dim(dimension), _sigma(sigma),
         _kernel(generateKernel()) {
     // TODO

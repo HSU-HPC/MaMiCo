@@ -38,7 +38,7 @@ public:
   /** parseSubtag
    * 	@param node
    */
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
 
   /** Returns name of xml tag that is associated to the configuration.
    * 	@return name of xml tag that is associated to the configuration
@@ -62,8 +62,8 @@ public:
    * 	@return particle insertion config
    */
   template <class LinkedCell, unsigned int dim>
-  coupling::ParticleInsertion<LinkedCell, dim> *
-  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) const {
+  coupling::ParticleInsertion<LinkedCell, dim>*
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) const {
     if (_particleInsertionType == USHER) {
       return new coupling::UsherParticleInsertion<LinkedCell, dim>(_insertDeleteMassEveryTimestep, _rSigmaCoeff, _meanPotentialEnergyFactor, _uOverlapCoeff,
                                                                    _stepRefCoeff, _iterMax, _restartMax, _tolerance, _offsetFromOuterBoundary,

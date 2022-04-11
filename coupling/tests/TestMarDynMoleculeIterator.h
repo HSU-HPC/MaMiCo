@@ -20,7 +20,7 @@
  */
 class TestMarDynMoleculeIterator : public TestMarDyn {
 public:
-  TestMarDynMoleculeIterator(int argc, char **argv, std::string name) : TestMarDyn(argc, argv, name) {}
+  TestMarDynMoleculeIterator(int argc, char** argv, std::string name) : TestMarDyn(argc, argv, name) {}
   virtual ~TestMarDynMoleculeIterator() {}
 
   virtual void run() {
@@ -36,7 +36,7 @@ protected:
   void testIterator() {
     unsigned int errors = 0;
     // get particle container from simulation
-    LinkedCells *cells = (LinkedCells *)this->_marDyn->getMolecules();
+    LinkedCells* cells = (LinkedCells*)this->_marDyn->getMolecules();
 
     ParticleCell pc;
     for (int i = 0; i < 2744; i++) {

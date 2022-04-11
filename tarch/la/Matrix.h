@@ -29,7 +29,7 @@ public:
    * 	@param t the initial value for all elemnts of the matrix.
    */
   Matrix() {}
-  Matrix(const T &t) {
+  Matrix(const T& t) {
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         _entries[i][j] = t;
@@ -41,7 +41,7 @@ public:
    * 	@param i row index
    * 	@param j column index
    */
-  T &operator()(int i, int j) {
+  T& operator()(int i, int j) {
 #if (TARCH_DEBUG == TARCH_YES)
     if (i < 0 || i > rows - 1) {
       std::cout << "ERROR Matrix T& operator(): i out of range!" << std::endl;
@@ -54,7 +54,7 @@ public:
 #endif
     return _entries[i][j];
   }
-  const T &operator()(int i, int j) const {
+  const T& operator()(int i, int j) const {
 #if (TARCH_DEBUG == TARCH_YES)
     if (i < 0 || i > rows - 1) {
       std::cout << "ERROR Matrix const T& operator(): i out of range!" << std::endl;

@@ -50,8 +50,8 @@ template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
 // interleaved computation)
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   const unsigned int count = _timeWindowSize * _timeWindowSize * (dim + 1);
-  double *send_data = new double[count];
-  double *recv_data = new double[count];
+  double* send_data = new double[count];
+  double* recv_data = new double[count];
   // Fill one common send buffer for all dimensions
   unsigned int index = 0;
   for (unsigned int d = 0; d < dim + 1; d++)

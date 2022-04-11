@@ -4,7 +4,7 @@
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.h"
 
-void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
+void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
   // size of the local domain
   const tarch::la::Vector<MD_DIM, unsigned int> size(_linkedCellService.getLocalNumberOfCells() + 2u * _linkedCellService.getLocalIndexOfFirstCell());
   // first: send molecules to neighboring ghost cells, if needed.
@@ -24,14 +24,14 @@ void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handle
       }
     }
     // iterate over cell's molecules and add molecules to local ghost cell
-    for (std::list<Molecule *>::const_iterator it = cell.begin(); it != cell.end(); it++) {
+    for (std::list<Molecule*>::const_iterator it = cell.begin(); it != cell.end(); it++) {
       positionBuffer = (*it)->getConstPosition();
       positionBuffer += shift;
       Molecule myMolecule(positionBuffer, (*it)->getConstVelocity());
       myMolecule.setForceOld((*it)->getConstForceOld());
       if ((*it)->isFixed())
         myMolecule.fix();
-      Molecule *myPtr = _moleculeService.addMolecule(myMolecule);
+      Molecule* myPtr = _moleculeService.addMolecule(myMolecule);
       _linkedCellService.addMoleculeToLinkedCell(*myPtr, localIndex[i]);
     }
   }

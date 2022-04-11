@@ -14,7 +14,7 @@ namespace indexing {
  *
  * @author Felix Maurer
  */
-template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(const CellIndex<dim, traits...> &index) {
+template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(const CellIndex<dim, traits...>& index) {
   if constexpr (std::is_same_v<unsigned int, typename CellIndex<dim, traits...>::value_T>) {
     return index.get();
   } else {
@@ -50,7 +50,7 @@ template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(c
  *
  * @author Felix Maurer
  */
-template <unsigned int dim, IndexTrait... traits> tarch::la::Vector<dim, int> convertToVector(const CellIndex<dim, traits...> &index) {
+template <unsigned int dim, IndexTrait... traits> tarch::la::Vector<dim, int> convertToVector(const CellIndex<dim, traits...>& index) {
   if constexpr (std::is_same_v<tarch::la::Vector<dim, int>, typename CellIndex<dim, traits...>::value_T>) {
     // trivial case: convert vector to vector
     return index.get();

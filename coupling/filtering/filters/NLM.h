@@ -28,9 +28,9 @@ public:
   using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::local,
                                                     coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
 
-  NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_unfiltered,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_prefiltered,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector, const std::array<bool, 7> filteredValues, int tws, double sigsq,
+  NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_unfiltered,
+      const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_prefiltered,
+      const std::vector<coupling::datastructures::MacroscopicCell<dim>*> outputCellVector, const std::array<bool, 7> filteredValues, int tws, double sigsq,
       double sigsq_rel, double hsq, double hsq_rel, int M = 2, int d = 1)
       : coupling::filtering::JunctorInterface<dim, 2, 1>({inputCellVector_unfiltered, inputCellVector_prefiltered}, {outputCellVector}, filteredValues, "NLM"),
         _timeWindowSize(tws), _M(M), _d(d), _sigsq(sigsq), _sigsq_rel(sigsq_rel), _hsq(hsq), _hsq_rel(hsq_rel), _cycleCounter(0), _t(0),
@@ -40,11 +40,11 @@ public:
     for (int t = 0; t < tws; ++t)
       for (auto idx : CellIndex_T()) {
         tarch::la::Vector<dim, unsigned int> idxv(idx.get());
-        coupling::filtering::Quantities<dim> &q = _flowfield(idxv, t);
+        coupling::filtering::Quantities<dim>& q = _flowfield(idxv, t);
         q[0] = 1;
         for (unsigned int d = 1; d <= dim; ++d)
           q[d] = 0;
-        coupling::filtering::Quantities<dim> &qp = _flowfield_prefiltered(idxv, t);
+        coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(idxv, t);
         qp[0] = 1;
         for (unsigned int d = 1; d <= dim; ++d)
           qp[d] = 0;
@@ -103,7 +103,7 @@ private:
    * @return Relative offsets, of all neighboring boundary cells and this cell
    * itself
    */
-  std::vector<tarch::la::Vector<dim, int>> compute_boundary_neighbors(const tarch::la::Vector<dim, unsigned int> &);
+  std::vector<tarch::la::Vector<dim, int>> compute_boundary_neighbors(const tarch::la::Vector<dim, unsigned int>&);
 
   /**
    * Must be called to indicate that one coupling cycle is finished and timestep

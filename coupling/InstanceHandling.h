@@ -40,8 +40,8 @@ public:
    * 	@param mamicoConfig
    * 	@param multiMDService
    */
-  InstanceHandling(simplemd::configurations::MolecularDynamicsConfiguration &mdConfig, coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig,
-                   tarch::utils::MultiMDService<dim> &multiMDService)
+  InstanceHandling(simplemd::configurations::MolecularDynamicsConfiguration& mdConfig, coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig,
+                   tarch::utils::MultiMDService<dim>& multiMDService)
       : _simpleMD(), _mdSolverInterface(), _mdConfig(mdConfig), _mamicoConfig(mamicoConfig), _multiMDService(multiMDService) {
     for (unsigned int i = 0; i < multiMDService.getLocalNumberOfMDSimulations(); i++) {
       _simpleMD.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(_mdConfig, _mamicoConfig
@@ -73,7 +73,7 @@ public:
       _mdSolverInterface[i] = coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().getMDSolverInterface();
     }
     _simpleMD.clear();
-    for (auto &solverInterface : _mdSolverInterface) {
+    for (auto& solverInterface : _mdSolverInterface) {
       if (solverInterface != nullptr) {
         delete solverInterface;
         solverInterface = nullptr;
@@ -88,8 +88,8 @@ public:
    * 	@param T
    * 	@param t
    */
-  void equilibrate(const unsigned int &t, const unsigned int &T) {
-    for (auto &md : _simpleMD) {
+  void equilibrate(const unsigned int& t, const unsigned int& T) {
+    for (auto& md : _simpleMD) {
       md->switchOffCoupling();
       md->simulateTimesteps(t, T);
     }
@@ -98,7 +98,7 @@ public:
   /** returns the vector of MD simulations
    *  @return  _simpleMD
    */
-  auto &getSimpleMD() const { return _simpleMD; }
+  auto& getSimpleMD() const { return _simpleMD; }
 
   /** Allocates Coupling interfaces
    * 	This method has to be called after switchOnCoupling()
@@ -118,14 +118,14 @@ public:
   /** Returns the MD solver onterface
    * 	@return _mdSolverInterface
    */
-  auto &getMDSolverInterface() const { return _mdSolverInterface; }
+  auto& getMDSolverInterface() const { return _mdSolverInterface; }
 
   /** switches on the coupling between ALL new MD simulations and Macroscopic
    *solver after the new MD instances are equilibrated. It should be called
    *right after equilibrate() and before setMDSolverInterface()
    */
   void switchOnCoupling() {
-    for (auto &simpleMD : _simpleMD) {
+    for (auto& simpleMD : _simpleMD) {
       simpleMD->switchOnCoupling();
     }
   }
@@ -135,13 +135,13 @@ public:
    *equilibrate() and before setMDSolverInterface()
    * 	@param i
    */
-  void switchOnCoupling(const unsigned int &i) { _simpleMD[i]->switchOnCoupling(); }
+  void switchOnCoupling(const unsigned int& i) { _simpleMD[i]->switchOnCoupling(); }
 
   /** switches off the coupling between All new MD simulations and Macroscopic
    * solver.
    */
   void switchOffCoupling() {
-    for (auto &simpleMD : _simpleMD) {
+    for (auto& simpleMD : _simpleMD) {
       simpleMD->switchOffCoupling();
     }
   }
@@ -150,14 +150,14 @@ public:
    * Macroscopic solver.
    * 	@param i index number of the MD simulation
    */
-  void switchOffCoupling(const unsigned int &i) { _simpleMD[i]->switchOffCoupling(); }
+  void switchOffCoupling(const unsigned int& i) { _simpleMD[i]->switchOffCoupling(); }
 
   /** Simulates t timesteps starting from current timestep T on all instances.
    * 	@param T
    * 	@param t
    */
-  void simulateTimesteps(const unsigned int &t, unsigned int &T) {
-    for (auto &simpleMD : _simpleMD) {
+  void simulateTimesteps(const unsigned int& t, unsigned int& T) {
+    for (auto& simpleMD : _simpleMD) {
       simpleMD->simulateTimesteps(t, T);
     }
   }
@@ -167,7 +167,7 @@ public:
    * 	@param filestem
    * 	@param T
    */
-  void writeCheckpoint(const std::string &filestem, const unsigned int &T) const {
+  void writeCheckpoint(const std::string& filestem, const unsigned int& T) const {
     if (_simpleMD.size() > 0 && _simpleMD[0] != nullptr) {
       _simpleMD[0]->writeCheckpoint(filestem, T);
     }
@@ -179,7 +179,7 @@ public:
    * 	@param T
    * 	@param multiMDCellService
    */
-  void simulateTimesteps(const unsigned int &t, unsigned int &T, coupling::services::MultiMDCellService<LinkedCell, dim> &multiMDCellService) {
+  void simulateTimesteps(const unsigned int& t, unsigned int& T, coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {
     for (unsigned int i = 0; i < _simpleMD.size(); ++i) {
       coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setMacroscopicCellService(&multiMDCellService.getMacroscopicCellService(i));
       coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
@@ -196,7 +196,7 @@ public:
    * 	@param T
    * 	@param i
    */
-  void simulateTimesteps(const unsigned int &t, unsigned int &T, const unsigned int &i) { _simpleMD[i]->simulateTimesteps(t, T); }
+  void simulateTimesteps(const unsigned int& t, unsigned int& T, const unsigned int& i) { _simpleMD[i]->simulateTimesteps(t, T); }
 
   /** add a nullptr to the MD simulation vector and the vector of the MD solver
    * interface.
@@ -222,8 +222,8 @@ public:
    * 	@param localIndex
    * 	@return _mdSolverInterface[localIndex]
    */
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *addMDSimulation(unsigned int slot, unsigned int localIndex) {
-    auto *mdSim = coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(_mdConfig, _mamicoConfig
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* addMDSimulation(unsigned int slot, unsigned int localIndex) {
+    auto* mdSim = coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(_mdConfig, _mamicoConfig
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                                                                     ,
                                                                                                     _multiMDService.getLocalCommunicator()
@@ -251,7 +251,7 @@ public:
    * 	@param index
    */
   void
-  rmMDSimulation(const unsigned int &index) {
+  rmMDSimulation(const unsigned int& index) {
     if (_simpleMD[index] != nullptr) {
       _simpleMD[index]->shutdown();
       delete _simpleMD[index];
@@ -278,20 +278,20 @@ public:
    * macroscopic cell service for multi-MD case
    * 	@param multiMDCellService
    */
-  void setMacroscopicCellServices(coupling::services::MultiMDCellService<LinkedCell, dim> &multiMDCellService) {
+  void setMacroscopicCellServices(coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {
     for (unsigned int i = 0; i < _simpleMD.size(); ++i) {
       _simpleMD[i]->setMacroscopicCellService(&(multiMDCellService.getMacroscopicCellService(i)));
     }
   }
 
 private:
-  std::vector<coupling::interface::MDSimulation *> _simpleMD;
-  std::vector<coupling::interface::MDSolverInterface<LinkedCell, dim> *> _mdSolverInterface;
+  std::vector<coupling::interface::MDSimulation*> _simpleMD;
+  std::vector<coupling::interface::MDSolverInterface<LinkedCell, dim>*> _mdSolverInterface;
 
-  simplemd::configurations::MolecularDynamicsConfiguration &_mdConfig;
-  coupling::configurations::MaMiCoConfiguration<dim> &_mamicoConfig;
+  simplemd::configurations::MolecularDynamicsConfiguration& _mdConfig;
+  coupling::configurations::MaMiCoConfiguration<dim>& _mamicoConfig;
 
-  const tarch::utils::MultiMDService<dim> &_multiMDService;
+  const tarch::utils::MultiMDService<dim>& _multiMDService;
 };
 
 #endif //_INSTANCE_HANDLING_H_

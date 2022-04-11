@@ -54,7 +54,7 @@ public:
   /** parseSubtag
    * 	@param node
    */
-  void parseSubtag(tinyxml2::XMLElement *node) {
+  void parseSubtag(tinyxml2::XMLElement* node) {
     std::string value;
     tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "direct-transfer") {
@@ -115,9 +115,9 @@ public:
    * 	@return transfer strategy config
    */
   template <class LinkedCell>
-  coupling::transferstrategies::TransferStrategy<LinkedCell, dim> *
-  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
-                          const coupling::IndexConversion<dim> &indexConversion, unsigned int numberOfMDTimesteps) const {
+  coupling::transferstrategies::TransferStrategy<LinkedCell, dim>*
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                          const coupling::IndexConversion<dim>& indexConversion, unsigned int numberOfMDTimesteps) const {
     if (_type == DirectTransferStrategy) {
       return new coupling::transferstrategies::DirectTransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion);
     } else if (_type == DifferenceTransferStrategy) {

@@ -41,7 +41,7 @@ public:
         phi(Foam::IOobject("phi", runTime.timeName(), mesh, Foam::IOobject::READ_IF_PRESENT, Foam::IOobject::AUTO_WRITE), Foam::fvc::flux(U)), piso(mesh),
         _boundariesWithMD(boundariesWithMD), _dx(std::cbrt(Foam::max(mesh.cellVolumes()))), _channelheight(channelheight),
         _numberBoundaryPoints(getNumBoundaryPoints()), _boundary2RecvBufferIndicesOuter(new unsigned int[_numberBoundaryPoints]),
-        _boundary2RecvBufferIndicesInner(new unsigned int[_numberBoundaryPoints]), _boundaryIndices(new Foam::vector *[_numberBoundaryPoints]), _rank(rank),
+        _boundary2RecvBufferIndicesInner(new unsigned int[_numberBoundaryPoints]), _boundaryIndices(new Foam::vector*[_numberBoundaryPoints]), _rank(rank),
         _plotEveryTimestep(plotEveryTimestep) {
     if (skipRank()) {
       return;
@@ -153,8 +153,8 @@ public:
 
   // Applies the MD data (just velocities) as boundary condition, the mapping
   // between the conntinuum and the MD is provided by the setMDBoundary()
-  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const unsigned int *const recvIndices,
-                           const coupling::IndexConversion<3> &indexConversion) {
+  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+                           const coupling::IndexConversion<3>& indexConversion) {
     if (skipRank()) {
       return;
     }
@@ -175,7 +175,7 @@ public:
   // index of every cell that data is necessary from. This indices will be
   // stored in two arrays.
   void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
-                     const coupling::IndexConversion<3> &indexConversion, const unsigned int *const recvIndice, unsigned int size) {
+                     const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size) {
     if (skipRank()) {
       return;
     }
@@ -322,11 +322,11 @@ private:
   double _channelheight;                          // overall height of the Couette channel
   unsigned int _numberBoundaryPoints;             // the number of CFD boundary points which
                                                   // need data from the MD
-  unsigned int *_boundary2RecvBufferIndicesOuter; // pointer to an array with
+  unsigned int* _boundary2RecvBufferIndicesOuter; // pointer to an array with
                                                   // data for communication
-  unsigned int *_boundary2RecvBufferIndicesInner; // pointer to an array with
+  unsigned int* _boundary2RecvBufferIndicesInner; // pointer to an array with
                                                   // data for communication
-  Foam::vector **_boundaryIndices;                // pointer to OpenFOAM data for communication
+  Foam::vector** _boundaryIndices;                // pointer to OpenFOAM data for communication
   int _rank;                                      // rank of the actual process
   int _plotEveryTimestep;                         // every n-th time step should be plotted
   int _timestepCounter{0};                        // actual time step number

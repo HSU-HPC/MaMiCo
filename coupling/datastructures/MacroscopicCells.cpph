@@ -5,8 +5,8 @@
 
 template <class LinkedCell, unsigned int dim>
 coupling::datastructures::MacroscopicCells<LinkedCell, dim>::MacroscopicCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell,
-                                                                              const coupling::IndexConversion<dim> &indexConversion,
-                                                                              coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface)
+                                                                              const coupling::IndexConversion<dim>& indexConversion,
+                                                                              coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface)
     : _macroscopicCellsWithLinkedCells(initMacroscopicCellsWithLinkedCells(numberLinkedCellsPerMacroscopicCell, indexConversion, mdSolverInterface)),
       _macroscopicCells(initMacroscopicCells(indexConversion)), _indexConversion(indexConversion) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -24,7 +24,7 @@ template <class LinkedCell, unsigned int dim> coupling::datastructures::Macrosco
   if (_macroscopicCellsWithLinkedCells != NULL) {
     // call all destructors explicitly
     for (unsigned int i = 0; i < size; i++) {
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *cell = &_macroscopicCellsWithLinkedCells[i];
+      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* cell = &_macroscopicCellsWithLinkedCells[i];
       cell->~MacroscopicCellWithLinkedCells();
     }
     // free memory
@@ -34,21 +34,21 @@ template <class LinkedCell, unsigned int dim> coupling::datastructures::Macrosco
 }
 
 template <class LinkedCell, unsigned int dim>
-coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *
+coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>*
 coupling::datastructures::MacroscopicCells<LinkedCell, dim>::getMacroscopicCellsWithLinkedCells() {
   return _macroscopicCellsWithLinkedCells;
 }
 
 template <class LinkedCell, unsigned int dim>
-const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &coupling::datastructures::MacroscopicCells<LinkedCell, dim>::getMacroscopicCells() const {
+const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& coupling::datastructures::MacroscopicCells<LinkedCell, dim>::getMacroscopicCells() const {
   return _macroscopicCells;
 }
 
 template <class LinkedCell, unsigned int dim>
-coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *
+coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>*
 coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCellsWithLinkedCells(
-    tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell, const coupling::IndexConversion<dim> &indexConversion,
-    coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface) const {
+    tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell, const coupling::IndexConversion<dim>& indexConversion,
+    coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const {
   // determine local number of macroscopic cells
   unsigned int numberMacroscopicCells = 1;
   for (unsigned int d = 0; d < dim; d++) {
@@ -65,8 +65,8 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCell
   const tarch::la::Vector<3, unsigned int> endInnerLoop = coupling::initRange<dim>(numberLinkedCellsPerMacroscopicCell);
 
   // allocate macroscopic cells
-  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *cells =
-      (coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *)malloc(
+  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* cells =
+      (coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>*)malloc(
           sizeof(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>) * numberMacroscopicCells);
   if (cells == NULL) {
     std::cout << "ERROR "
@@ -79,7 +79,7 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCell
   // call constructor on each macroscopic cell
   for (unsigned int i = 0; i < numberMacroscopicCells; i++) {
     // initialise macroscopic cell
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *newCell =
+    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* newCell =
         new (&cells[i]) coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>(numberLinkedCellsPerMacroscopicCell);
     if (newCell == NULL) {
       std::cout << "ERROR "
@@ -122,7 +122,7 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCell
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToLocalNonGhostMacroscopicCellsWithLinkedCells(A &a) {
+void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToLocalNonGhostMacroscopicCellsWithLinkedCells(A& a) {
   const tarch::la::Vector<3, unsigned int> start(1);
   const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(_indexConversion.getLocalNumberMacroscopicCells());
   tarch::la::Vector<3, unsigned int> loop(0);
@@ -142,7 +142,7 @@ void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToLocalNo
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToLocalGhostMacroscopicCellsWithLinkedCells(A &a) {
+void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToLocalGhostMacroscopicCellsWithLinkedCells(A& a) {
   const tarch::la::Vector<dim, unsigned int> totalNumberCells = _indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2);
   tarch::la::Vector<dim, unsigned int> loop(0);
   unsigned int index = 0;
@@ -227,7 +227,7 @@ void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToLocalGh
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToAllLocalMacroscopicCellsWithLinkedCells(A &a) {
+void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToAllLocalMacroscopicCellsWithLinkedCells(A& a) {
   const tarch::la::Vector<3, unsigned int> end =
       coupling::initRange<dim>(_indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
   tarch::la::Vector<3, unsigned int> loop(0);
@@ -249,7 +249,7 @@ void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToAllLoca
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A &a) {
+void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A& a) {
   // global coordinate of first non-ghost cell
   const tarch::la::Vector<dim, unsigned int> globalLowerLeftCorner(1);
   // global coordinate of last non-ghost cell
@@ -281,7 +281,7 @@ void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToFirstLa
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyXLayersOfGlobalNonGhostCellsWithLinkedCells(A &a, unsigned int layers2Use) {
+void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyXLayersOfGlobalNonGhostCellsWithLinkedCells(A& a, unsigned int layers2Use) {
   // global coordinate of first non-ghost cell
   const tarch::la::Vector<dim, unsigned int> globalLowerLeftCorner(1 + layers2Use);
   // global coordinate of last non-ghost cell
@@ -313,8 +313,8 @@ void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyXLayersOf
 }
 
 template <class LinkedCell, unsigned int dim>
-std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const {
+std::vector<coupling::datastructures::MacroscopicCell<dim>*>
+coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCells(const coupling::IndexConversion<dim>& indexConversion) const {
   // determine total number of cells
   const tarch::la::Vector<dim, unsigned int> localNumberCells = indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2);
   unsigned int numberCells = localNumberCells[0];
@@ -323,9 +323,9 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCell
   }
 
   // init vector with pointers to cells-with-linked-cells
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> macroscopicCells;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> macroscopicCells;
   for (unsigned int i = 0; i < numberCells; i++) {
-    coupling::datastructures::MacroscopicCell<dim> *cell = dynamic_cast<coupling::datastructures::MacroscopicCell<dim> *>(&_macroscopicCellsWithLinkedCells[i]);
+    coupling::datastructures::MacroscopicCell<dim>* cell = dynamic_cast<coupling::datastructures::MacroscopicCell<dim>*>(&_macroscopicCellsWithLinkedCells[i]);
     if (cell == NULL) {
       std::cout << "ERROR "
                    "coupling::datastructures::MacroscopicCells::"

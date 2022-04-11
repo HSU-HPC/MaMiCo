@@ -20,8 +20,8 @@ template <unsigned int dim> class Copy;
 
 template <unsigned int dim> class coupling::filtering::Copy : public coupling::filtering::FilterInterfaceReadOnly<dim> {
 public:
-  Copy(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
-       const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector, const std::array<bool, 7> filteredValues)
+  Copy(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+       const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues)
       : coupling::filtering::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, filteredValues, "COPY") {}
 
   void operator()() {

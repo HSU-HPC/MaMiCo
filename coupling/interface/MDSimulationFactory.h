@@ -59,7 +59,7 @@ public:
    *	@param numberTimesteps
    *	@param firstTimestep
    */
-  virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep) = 0;
+  virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) = 0;
 
   // simulates a single time step
   // virtual void simulateTimestep(const unsigned int &thisTimestep ){const
@@ -71,7 +71,7 @@ public:
   /** setMacroscopicCellService
    *	@param macroscopicCellService
    */
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) = 0;
+  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) = 0;
 
   /** initialises the _molecularDynamicsSimulation solver
    *	@sa simplemd::MolecularDynamicsSimulation::initServices()
@@ -87,7 +87,7 @@ public:
    *localMDSimulation)
    *	@todo Philipp ??
    */
-  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION> &multiMDService, unsigned int localMDSimulation) = 0;
+  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) = 0;
 
   /** shuts down the MD simulation*/
   virtual void shutdown() = 0;
@@ -96,7 +96,7 @@ public:
    *	@param filestem
    *	@param t
    */
-  virtual void writeCheckpoint(const std::string &filestem, const unsigned int &t) = 0;
+  virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) = 0;
 };
 
 /** define MD simulation from default MD code */
@@ -108,13 +108,13 @@ public:
  */
 class SimpleMDSimulation : public coupling::interface::MDSimulation {
 public:
-  SimpleMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration &configuration)
+  SimpleMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
       : coupling::interface::MDSimulation(), _molecularDynamicsSimulation(configuration) {}
   virtual ~SimpleMDSimulation() {}
 
   virtual void switchOffCoupling() { _molecularDynamicsSimulation.switchOffCoupling(); }
   virtual void switchOnCoupling() { _molecularDynamicsSimulation.switchOnCoupling(); }
-  virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep) {
+  virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) {
     for (unsigned int t = firstTimestep; t < firstTimestep + numberTimesteps; t++) {
       _molecularDynamicsSimulation.simulateOneCouplingTimestep(t);
     }
@@ -123,7 +123,7 @@ public:
     // nop required, since the linked cells are very tightly linked to mamico
   }
 
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) {
+  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
     _molecularDynamicsSimulation.setMacroscopicCellService(macroscopicCellService);
     // set the cell service also in singleton of mamico interface provider ->
     // typically not required in coupling, but makes the simulation state more
@@ -132,22 +132,22 @@ public:
         macroscopicCellService);
   }
   virtual void init() { _molecularDynamicsSimulation.initServices(); }
-  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION> &multiMDService, unsigned int localMDSimulation) {
+  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) {
     _molecularDynamicsSimulation.initServices(multiMDService, localMDSimulation);
   }
   virtual void shutdown() { _molecularDynamicsSimulation.shutdownServices(); }
 
-  virtual void writeCheckpoint(const std::string &filestem, const unsigned int &t) {
+  virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) {
     getMoleculeService().writeCheckPoint(getParallelTopologyService(), filestem, t);
   }
 
   // function particularly needed to init MD solver interface -> should only be
   // called from factory
-  simplemd::BoundaryTreatment &getBoundaryTreatment() { return _molecularDynamicsSimulation.getBoundaryTreatment(); }
-  simplemd::services::ParallelTopologyService &getParallelTopologyService() { return _molecularDynamicsSimulation.getParallelTopologyService(); }
-  simplemd::services::MoleculeService &getMoleculeService() { return _molecularDynamicsSimulation.getMoleculeService(); }
-  simplemd::services::LinkedCellService &getLinkedCellService() { return _molecularDynamicsSimulation.getLinkedCellService(); }
-  const simplemd::services::MolecularPropertiesService &getMolecularPropertiesService() { return _molecularDynamicsSimulation.getMolecularPropertiesService(); }
+  simplemd::BoundaryTreatment& getBoundaryTreatment() { return _molecularDynamicsSimulation.getBoundaryTreatment(); }
+  simplemd::services::ParallelTopologyService& getParallelTopologyService() { return _molecularDynamicsSimulation.getParallelTopologyService(); }
+  simplemd::services::MoleculeService& getMoleculeService() { return _molecularDynamicsSimulation.getMoleculeService(); }
+  simplemd::services::LinkedCellService& getLinkedCellService() { return _molecularDynamicsSimulation.getLinkedCellService(); }
+  const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() { return _molecularDynamicsSimulation.getMolecularPropertiesService(); }
 
 private:
   coupling::solvers::CoupledMolecularDynamicsSimulation _molecularDynamicsSimulation;
@@ -158,14 +158,14 @@ private:
 #if defined(LAMMPS_MD)
 class LammpsMDSimulation : public coupling::interface::MDSimulation {
 private:
-  LAMMPS_NS::LAMMPS *_lmp;
-  const simplemd::configurations::MolecularDynamicsConfiguration &_configuration;
-  const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION> &_mamicoConfiguration;
+  LAMMPS_NS::LAMMPS* _lmp;
+  const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
+  const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>& _mamicoConfiguration;
   const double _tolerance; // tolerance for checks of configs
 
 public:
-  LammpsMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration &configuration,
-                     const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION> &mamicoConfiguration
+  LammpsMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
+                     const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>& mamicoConfiguration
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                      ,
                      MPI_Comm localComm
@@ -175,7 +175,7 @@ public:
         _mamicoConfiguration(mamicoConfiguration), _tolerance(1.0e-8) {
   }
 
-  virtual void writeCheckpoint(const std::string &filestem, const unsigned int &t) {
+  virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) {
     std::stringstream command;
     command << "write_dump all atom restart_checkpoint.dump";
     _lmp->input->one(command.str().c_str());
@@ -214,22 +214,22 @@ public:
   }
 
   // execute LAMMPS time steps
-  virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep) {
+  virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) {
     std::stringstream ss;
     ss << "run " << numberTimesteps << " post no";
     _lmp->input->one(ss.str().c_str());
   }
 
   virtual void sortMoleculesIntoCells() {
-    LAMMPS_NS::MamicoLammpsMDSolverInterface<MDSIMULATIONFACTORY_DIMENSION> *interface =
-        (LAMMPS_NS::MamicoLammpsMDSolverInterface<MDSIMULATIONFACTORY_DIMENSION> *)
+    LAMMPS_NS::MamicoLammpsMDSolverInterface<MDSIMULATIONFACTORY_DIMENSION>* interface =
+        (LAMMPS_NS::MamicoLammpsMDSolverInterface<MDSIMULATIONFACTORY_DIMENSION>*)
             coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance()
                 .getMDSolverInterface();
     if (interface == NULL) {
       std::cout << "ERROR sortMoleculesIntoCells(): interface==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService =
+    coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService =
         coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMacroscopicCellService();
     if (macroscopicCellService == NULL) {
       std::cout << "ERROR sortMoleculesIntoCells(): macroscopicCellService==NULL!" << std::endl;
@@ -239,7 +239,7 @@ public:
   }
 
   // set macroscopic cell service to MamicoInterfaceProvider
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) {
+  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
     coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
         macroscopicCellService);
   }
@@ -247,7 +247,7 @@ public:
   // init LAMMPS simulation for LJ as provided in xml-config
   virtual void init() { initSingleSimulation(MPI_COMM_WORLD, 0); }
 
-  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION> &multiMDService, unsigned int localMDSimulation) {
+  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) {
     initSingleSimulation(multiMDService.getLocalCommunicator(), localMDSimulation);
   }
 
@@ -432,14 +432,14 @@ private:
 #if defined(LAMMPS_DPD)
 class LammpsDPDSimulation : public coupling::interface::MDSimulation {
 private:
-  LAMMPS_NS::LAMMPS *_lmp;
-  const simplemd::configurations::MolecularDynamicsConfiguration &_configuration;
-  const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION> &_mamicoConfiguration;
+  LAMMPS_NS::LAMMPS* _lmp;
+  const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
+  const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>& _mamicoConfiguration;
   const double _tolerance; // tolerance for checks of configs
 
 public:
-  LammpsDPDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration &configuration,
-                      const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION> &mamicoConfiguration
+  LammpsDPDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
+                      const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>& mamicoConfiguration
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                       ,
                       MPI_Comm localComm
@@ -482,22 +482,22 @@ public:
   }
 
   // execute LAMMPS time steps
-  virtual void simulateTimesteps(const unsigned int &numberTimesteps, const unsigned int &firstTimestep) {
+  virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) {
     std::stringstream ss;
     ss << "run " << numberTimesteps << " post no";
     _lmp->input->one(ss.str().c_str());
   }
 
   virtual void sortMoleculesIntoCells() {
-    LAMMPS_NS::MamicoLammpsMDSolverInterface<MDSIMULATIONFACTORY_DIMENSION> *interface =
-        (LAMMPS_NS::MamicoLammpsMDSolverInterface<MDSIMULATIONFACTORY_DIMENSION> *)
+    LAMMPS_NS::MamicoLammpsMDSolverInterface<MDSIMULATIONFACTORY_DIMENSION>* interface =
+        (LAMMPS_NS::MamicoLammpsMDSolverInterface<MDSIMULATIONFACTORY_DIMENSION>*)
             coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance()
                 .getMDSolverInterface();
     if (interface == NULL) {
       std::cout << "ERROR sortMoleculesIntoCells(): interface==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService =
+    coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService =
         coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMacroscopicCellService();
     if (macroscopicCellService == NULL) {
       std::cout << "ERROR sortMoleculesIntoCells(): macroscopicCellService==NULL!" << std::endl;
@@ -507,7 +507,7 @@ public:
   }
 
   // set macroscopic cell service to MamicoInterfaceProvider
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION> *macroscopicCellService) {
+  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
     coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
         macroscopicCellService);
   }
@@ -515,7 +515,7 @@ public:
   // init LAMMPS simulation for LJ as provided in xml-config
   virtual void init() { initSingleSimulation(MPI_COMM_WORLD, 0); }
 
-  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION> &multiMDService, unsigned int localMDSimulation) {
+  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) {
     initSingleSimulation(multiMDService.getLocalCommunicator(), localMDSimulation);
   }
 
@@ -751,7 +751,7 @@ public:
   /** @returns the SimulationAndInterfaceFactory object
    *	@note singleton pattern
    */
-  static SimulationAndInterfaceFactory &getInstance() {
+  static SimulationAndInterfaceFactory& getInstance() {
     static SimulationAndInterfaceFactory singleton;
     return singleton;
   }
@@ -763,8 +763,8 @@ public:
    *	@remark This will create a new simulation which needs to be deleted at
    *the end
    */
-  coupling::interface::MDSimulation *getMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration &configuration,
-                                                     const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION> &mamicoConfiguration
+  coupling::interface::MDSimulation* getMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
+                                                     const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>& mamicoConfiguration
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                      ,
                                                      MPI_Comm localComm
@@ -803,16 +803,16 @@ public:
    *  @param mamicoConfiguration
    *  @param mdSimulation
    */
-  coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION> *
-  getMDSolverInterface(const simplemd::configurations::MolecularDynamicsConfiguration &configuration,
-                       const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION> &mamicoConfiguration,
-                       coupling::interface::MDSimulation *mdSimulation) {
-    coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION> *mdSolverInterface = NULL;
+  coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>*
+  getMDSolverInterface(const simplemd::configurations::MolecularDynamicsConfiguration& configuration,
+                       const coupling::configurations::MaMiCoConfiguration<MDSIMULATIONFACTORY_DIMENSION>& mamicoConfiguration,
+                       coupling::interface::MDSimulation* mdSimulation) {
+    coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>* mdSolverInterface = NULL;
 #if defined(SIMPLE_MD)
     // for the simple MD code, we create a new md solver interface and also add
     // it to the mamico interface provider (the latter is not really required,
     // but makes the simulation state more consistent in the overall simulation)
-    coupling::interface::SimpleMDSimulation *simpleMDSimulation = (coupling::interface::SimpleMDSimulation *)mdSimulation;
+    coupling::interface::SimpleMDSimulation* simpleMDSimulation = (coupling::interface::SimpleMDSimulation*)mdSimulation;
     if (simpleMDSimulation == NULL) {
       std::cout << "ERROR MDSimulationFactory::getMDSolverInterface(): Could "
                    "not cast to SimpleMDSimulation!"
@@ -848,7 +848,7 @@ public:
   void
   shutdownMDSolverInterface() {
 #if defined(SIMPLE_MD)
-    coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION> *interface =
+    coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>* interface =
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
     if (interface != NULL) {
       delete interface;

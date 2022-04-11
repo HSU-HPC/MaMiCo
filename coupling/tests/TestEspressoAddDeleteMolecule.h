@@ -23,7 +23,7 @@
 
 class TestEspressoAddDeleteMolecule : public TestEspresso {
 public:
-  TestEspressoAddDeleteMolecule(std::string name, int argc, char **argv) : TestEspresso(name, argc, argv) {}
+  TestEspressoAddDeleteMolecule(std::string name, int argc, char** argv) : TestEspresso(name, argc, argv) {}
   ~TestEspressoAddDeleteMolecule() {}
   virtual void run() {
 
@@ -34,7 +34,7 @@ public:
 
     if (type == 1) {
       loadEspressoTestConfiguration();
-      Cell *cell;
+      Cell* cell;
       cell = local_cells.cell[0];
       deleteParticleTest(cell);
     }
@@ -54,9 +54,9 @@ private:
    * then iterates over all the molecules, and counts the number of remaining
    * molecules */
 
-  void deleteParticleTest(ParticleList *cell) {
-    ParticleList &temp_cell = *cell;
-    Particle *part;
+  void deleteParticleTest(ParticleList* cell) {
+    ParticleList& temp_cell = *cell;
+    Particle* part;
     part = cell->part;
 
     coupling::interface::EspressoMDSolverInterface delete_molecule_test;
@@ -68,7 +68,7 @@ private:
 
     // Iterate over all the particles in the local domain (excluding ghost
     // cells) in Espresso
-    Cell *celltemp;
+    Cell* celltemp;
     int c, i, np, cnt = 0;
     for (c = 0; c < local_cells.n; c++) {
       celltemp = local_cells.cell[c];
@@ -112,7 +112,7 @@ private:
 
     // Iterate over all the particles in the local domain (excluding ghost
     // cells) in Espresso
-    Cell *cell;
+    Cell* cell;
     int c, i, np, cnt = 0;
     for (c = 0; c < local_cells.n; c++) {
       cell = local_cells.cell[c];
@@ -139,9 +139,9 @@ private:
     // function
     _test.synchronizeMoleculesAfterMassModification();
 
-    Cell *cell;
+    Cell* cell;
     int c, i, np, cnt = 0;
-    Particle *part;
+    Particle* part;
 
     std::cout << ghost_cells.n << " " << local_cells.n << std::endl;
 

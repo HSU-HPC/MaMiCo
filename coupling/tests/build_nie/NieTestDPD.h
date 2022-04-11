@@ -87,7 +87,7 @@ public:
     }
 
     // allocate solvers
-    coupling::solvers::AbstractCouetteSolver<3> *couetteSolver = NULL;
+    coupling::solvers::AbstractCouetteSolver<3>* couetteSolver = NULL;
     couetteSolver = getCouetteSolver(channelheight, wallVelocity, kinVisc, mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
                                      simpleMDConfig.getSimulationConfiguration().getDt() * simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
                                      plotEveryTimestep, "LBCouette", lbNumberProcesses, solverType, rank);
@@ -98,7 +98,7 @@ public:
     // totalNumberMDSimulations << ", # local MD instances: " << mdInstances <<
     // std::endl;
 
-    std::vector<coupling::interface::MDSimulation *> simpleMD;
+    std::vector<coupling::interface::MDSimulation*> simpleMD;
     for (unsigned int i = 0; i < mdInstances; i++) {
       simpleMD.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(simpleMDConfig, mamicoConfig
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -137,7 +137,7 @@ public:
     }
 
     // allocate coupling interfaces
-    std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL, 3> *> mdSolverInterface;
+    std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL, 3>*> mdSolverInterface;
     for (unsigned int i = 0; i < mdInstances; i++) {
       // switch on coupling; in case of LAMMPS: initialse MDSolverInterface and
       // buffer result in MamicoInterfaceProvider; it will be delivered to
@@ -150,7 +150,7 @@ public:
         exit(EXIT_FAILURE);
       }
     }
-    coupling::interface::MacroscopicSolverInterface<3> *couetteSolverInterface = getCouetteSolverInterface(
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
         couetteSolver, simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
         getGlobalNumberMacroscopicCells(simpleMDConfig, mamicoConfig), mamicoConfig.getMomentumInsertionConfiguration()._innerOverlap, solverType, rank);
 
@@ -164,7 +164,7 @@ public:
     // set couette solver interface in MamicoInterfaceProvider
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
     if ((solverType == COUETTE_LB) && twoWayCoupling) {
-      static_cast<coupling::solvers::LBCouetteSolver *>(couetteSolver)
+      static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver)
           ->setMDBoundary(simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
                           mamicoConfig.getMomentumInsertionConfiguration()._innerOverlap);
     }
@@ -177,11 +177,11 @@ public:
     }
 
     // allocate buffers for send/recv operations
-    std::vector<coupling::datastructures::MacroscopicCell<3> *> sendBuffer;
-    unsigned int *globalCellIndices4SendBuffer =
+    std::vector<coupling::datastructures::MacroscopicCell<3>*> sendBuffer;
+    unsigned int* globalCellIndices4SendBuffer =
         allocateSendBuffer(sendBuffer, multiMDCellService.getMacroscopicCellService(0).getIndexConversion(), rank, *couetteSolverInterface);
-    std::vector<coupling::datastructures::MacroscopicCell<3> *> recvBuffer;
-    unsigned int *globalCellIndices4RecvBuffer =
+    std::vector<coupling::datastructures::MacroscopicCell<3>*> recvBuffer;
+    unsigned int* globalCellIndices4RecvBuffer =
         allocateRecvBuffer(recvBuffer, multiMDCellService.getMacroscopicCellService(0).getIndexConversion(), rank, *couetteSolverInterface);
 
     // coupling
@@ -219,7 +219,7 @@ public:
       multiMDCellService.sendFromMD2Macro(recvBuffer, globalCellIndices4RecvBuffer);
 
       if ((solverType == COUETTE_LB) && twoWayCoupling) {
-        static_cast<coupling::solvers::LBCouetteSolver *>(couetteSolver)
+        static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver)
             ->setMDBoundaryValues(recvBuffer, globalCellIndices4RecvBuffer, multiMDCellService.getMacroscopicCellService(0).getIndexConversion());
       }
       // write data to csv-compatible file for evaluation
@@ -288,8 +288,8 @@ public:
 private:
   /** computes global number of macroscopic cells from configs. Required by
    * couette solver interface before MacroscopicCellService is initialised! */
-  tarch::la::Vector<3, unsigned int> getGlobalNumberMacroscopicCells(const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig,
-                                                                     const coupling::configurations::MaMiCoConfiguration<3> &mamicoConfig) const {
+  tarch::la::Vector<3, unsigned int> getGlobalNumberMacroscopicCells(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
+                                                                     const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig) const {
     tarch::la::Vector<3, double> domainSize(simpleMDConfig.getDomainConfiguration().getGlobalDomainSize());
     tarch::la::Vector<3, double> dx(mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
     tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
@@ -302,8 +302,8 @@ private:
 
   /** allocates the send buffer (with values for all macroscopic cells) and
    * returns indices. This is only done on rank 0. */
-  unsigned int *allocateSendBuffer(std::vector<coupling::datastructures::MacroscopicCell<3> *> &sendBuffer, const coupling::IndexConversion<3> &indexConversion,
-                                   int rank, coupling::interface::MacroscopicSolverInterface<3> &couetteSolverInterface) const {
+  unsigned int* allocateSendBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& sendBuffer, const coupling::IndexConversion<3>& indexConversion,
+                                   int rank, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) const {
     // determine global number of cells
     const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
     const unsigned int num = cells[0] * cells[1] * cells[2];
@@ -330,7 +330,7 @@ private:
     }
 
     // allocate array for cell indices
-    unsigned int *indices = new unsigned int[numCellsSent];
+    unsigned int* indices = new unsigned int[numCellsSent];
     if (indices == NULL) {
       std::cout << "ERROR NieTest::allocateSendBuffer(): indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
@@ -371,8 +371,8 @@ private:
   /** allocates the recv-buffer. This buffer contains all global inner
    * macroscopic cells, but only on rank 0. On all other ranks, no cells are
    * stored and a NULL ptr is returned */
-  unsigned int *allocateRecvBuffer(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const coupling::IndexConversion<3> &indexConversion,
-                                   int rank, coupling::interface::MacroscopicSolverInterface<3> &couetteSolverInterface) const {
+  unsigned int* allocateRecvBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const coupling::IndexConversion<3>& indexConversion,
+                                   int rank, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) const {
 
     // determine global number of cells
     const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
@@ -396,7 +396,7 @@ private:
       }
     }
     // allocate array for cell indices
-    unsigned int *indices = new unsigned int[numCellsRecv];
+    unsigned int* indices = new unsigned int[numCellsRecv];
     if (indices == NULL) {
       std::cout << "ERROR NieTest::allocateRecvBuffer(): indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
@@ -436,8 +436,8 @@ private:
   }
 
   /** write cells that have been received from MD to csv file */
-  void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const unsigned int *const recvIndices,
-                 const coupling::IndexConversion<3> &indexConversion, int rank, int couplingCycle) const {
+  void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+                 const coupling::IndexConversion<3>& indexConversion, int rank, int couplingCycle) const {
     // form file name and open file
     std::stringstream ss;
     ss << "CouetteAvgMultiMDCells_" << rank << "_" << couplingCycle << ".csv";
@@ -466,7 +466,7 @@ private:
   }
 
   /** deletes the send buffer */
-  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3> *> &sendBuffer) const {
+  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& sendBuffer) const {
     // delete all potential entries of sendBuffer
     for (unsigned int i = 0; i < sendBuffer.size(); i++) {
       if (sendBuffer[i] != NULL) {
@@ -478,9 +478,9 @@ private:
   }
 
   /** fills send buffer with data from couette solver */
-  void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3> &couetteSolver,
-                      const coupling::IndexConversion<3> &indexConversion, std::vector<coupling::datastructures::MacroscopicCell<3> *> &sendBuffer,
-                      const unsigned int *const globalCellIndices4SendBuffer) const {
+  void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,
+                      const coupling::IndexConversion<3>& indexConversion, std::vector<coupling::datastructures::MacroscopicCell<3>*>& sendBuffer,
+                      const unsigned int* const globalCellIndices4SendBuffer) const {
     const unsigned int size = sendBuffer.size();
     const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
     const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
@@ -501,11 +501,11 @@ private:
     }
   }
 
-  coupling::solvers::AbstractCouetteSolver<3> *getCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc,
+  coupling::solvers::AbstractCouetteSolver<3>* getCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc,
                                                                 const double dx, const double dt, const int plotEveryTimestep, const std::string filestem,
                                                                 const tarch::la::Vector<3, unsigned int> processes, const SolverType solverType,
                                                                 const int rank) {
-    coupling::solvers::AbstractCouetteSolver<3> *solver = NULL;
+    coupling::solvers::AbstractCouetteSolver<3>* solver = NULL;
     // analytical solver: is only active on rank 0
     if (solverType == COUETTE_ANALYTICAL) {
       if (rank == 0) {
@@ -530,16 +530,16 @@ private:
     return solver;
   }
 
-  coupling::interface::MacroscopicSolverInterface<3> *getCouetteSolverInterface(coupling::solvers::AbstractCouetteSolver<3> *couetteSolver,
+  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(coupling::solvers::AbstractCouetteSolver<3>* couetteSolver,
                                                                                 tarch::la::Vector<3, double> mdOffset,
                                                                                 tarch::la::Vector<3, double> mamicoMeshsize,
                                                                                 tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
                                                                                 unsigned int outerRegion, const SolverType solverType, const int rank) {
-    coupling::interface::MacroscopicSolverInterface<3> *interface = NULL;
+    coupling::interface::MacroscopicSolverInterface<3>* interface = NULL;
     if (solverType == COUETTE_ANALYTICAL) {
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells, outerRegion);
     } else if (solverType == COUETTE_LB) {
-      coupling::solvers::LBCouetteSolver *lbSolver = static_cast<coupling::solvers::LBCouetteSolver *>(couetteSolver);
+      coupling::solvers::LBCouetteSolver* lbSolver = static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver);
       if (lbSolver == NULL) {
         std::cout << "ERROR NieTest::getCouetteSolverInterface(...), rank=" << rank << ": Could not convert abstract to LB solver!" << std::endl;
         exit(EXIT_FAILURE);

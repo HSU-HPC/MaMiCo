@@ -164,9 +164,9 @@ static_assert(false, "IndexingService only available for dim=2 or dim=3.");
 
 // impl of IndexingService
 template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::init(const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig,
-                                                    const coupling::configurations::MaMiCoConfiguration<dim> &mamicoConfig,
-                                                    coupling::interface::MacroscopicSolverInterface<dim> *msi, const unsigned int rank) {
+void coupling::indexing::IndexingService<dim>::init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
+                                                    const coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig,
+                                                    coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank) {
   // init members
   _simpleMDConfig = simpleMDConfig;
   _mamicoConfig = mamicoConfig;
@@ -420,7 +420,7 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
   }
   try {
     testing::printAllBoundaries<dim>(of);
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     std::cout << _rank << ": WARNING: IndexingService: Failed to call printAllBoundaries() " << e.what() << std::endl;
   }
   of.close();
@@ -431,7 +431,7 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
   }
   try {
     testing::printAllDomains<dim>(of);
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     std::cout << _rank << ": WARNING: IndexingService: Failed to call printAllDomains() " << e.what() << std::endl;
   }
   of.close();
@@ -456,7 +456,7 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
     testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>();
     testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
     testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     std::cout << _rank << ": WARNING: IndexingService: Test indicated faulty conversion: " << e.what() << std::endl;
   }
 
@@ -469,7 +469,7 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
  * This was in large parts stolen from IndexConversion.
  */
 template <unsigned int dim>
-std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim> &globalCellIndex) const {
+std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const {
   std::vector<unsigned int> ranks;
   // using the old meaning of 'globalNumberMacroscopicCells' from
   // IndexConversion
@@ -537,7 +537,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 template <unsigned int dim>
 unsigned int
 coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
-                                                                          const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
+                                                                          const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const {
   // vector containing avg number of macro cells, not counting global GL.
   tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells{0};
   for (unsigned int d = 0; d < dim; d++) {

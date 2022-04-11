@@ -33,8 +33,8 @@ template <unsigned int dim> class ReadFromFile;
  */
 template <unsigned int dim> class coupling::filtering::ReadFromFile : public coupling::filtering::FilterInterface<dim> {
 public:
-  ReadFromFile(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
-               const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector, const std::array<bool, 7> filteredValues,
+  ReadFromFile(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+               const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
                std::string location)
       : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "RFF"), _location(location), _iteration(0) {
 #ifdef DEBUG_READ_FROM_FILE

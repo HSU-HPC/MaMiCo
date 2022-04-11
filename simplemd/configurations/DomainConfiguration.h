@@ -26,7 +26,7 @@ public:
   DomainConfiguration();
   virtual ~DomainConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
 
   /**
    * Return name of xml tag that is associated to the configuration.
@@ -47,17 +47,17 @@ public:
   bool isValid() const;
 
   /** getters for all parsed and computed quantities */
-  const tarch::la::Vector<MD_DIM, unsigned int> &getMoleculesPerDirection() const { return _moleculesPerDirection; }
-  const tarch::la::Vector<MD_DIM, double> &getGlobalDomainSize() const { return _domainSize; }
-  const tarch::la::Vector<MD_DIM, double> &getGlobalDomainOffset() const { return _domainOffset; }
-  const double &getCutoffRadius() const { return _cutoffRadius; }
-  const tarch::la::Vector<MD_DIM, double> &getMeshWidth() const { return _meshWidth; }
-  const double &getKB() const { return _kB; }
-  const unsigned int &getBlockSize() const { return _blockSize; }
-  const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &getBoundary() const { return _boundary; }
-  const std::string &getCheckpointFilestem() const { return _checkpointFilestem; }
-  const bool &initFromCheckpoint() const { return _initFromCheckpoint; }
-  const bool &initFromSequentialCheckpoint() const { return _initFromSequentialCheckpoint; }
+  const tarch::la::Vector<MD_DIM, unsigned int>& getMoleculesPerDirection() const { return _moleculesPerDirection; }
+  const tarch::la::Vector<MD_DIM, double>& getGlobalDomainSize() const { return _domainSize; }
+  const tarch::la::Vector<MD_DIM, double>& getGlobalDomainOffset() const { return _domainOffset; }
+  const double& getCutoffRadius() const { return _cutoffRadius; }
+  const tarch::la::Vector<MD_DIM, double>& getMeshWidth() const { return _meshWidth; }
+  const double& getKB() const { return _kB; }
+  const unsigned int& getBlockSize() const { return _blockSize; }
+  const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& getBoundary() const { return _boundary; }
+  const std::string& getCheckpointFilestem() const { return _checkpointFilestem; }
+  const bool& initFromCheckpoint() const { return _initFromCheckpoint; }
+  const bool& initFromSequentialCheckpoint() const { return _initFromSequentialCheckpoint; }
 
   unsigned int getNumberOfMolecules() const;
 

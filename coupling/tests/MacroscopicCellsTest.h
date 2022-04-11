@@ -48,10 +48,10 @@ private:
     } virtual ~TestMDSolverInterface() {
     }
 
-    virtual simplemd::LinkedCell &getLinkedCell(const tarch::la::Vector<dim, unsigned int> &macroscopicCellIndex,
-                                                const tarch::la::Vector<dim, unsigned int> &linkedCellInMacroscopicCell,
-                                                const tarch::la::Vector<dim, unsigned int> &linkedCellsPerMacroscopicCell,
-                                                const coupling::IndexConversion<dim> &indexConversion) {
+    virtual simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& macroscopicCellIndex,
+                                                const tarch::la::Vector<dim, unsigned int>& linkedCellInMacroscopicCell,
+                                                const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell,
+                                                const coupling::IndexConversion<dim>& indexConversion) {
       return _linkedcell;
     }
 
@@ -65,21 +65,21 @@ private:
     virtual double getKB() const { return 1.0; }
     virtual double getMoleculeSigma() const { return 1.0; }
     virtual double getMoleculeEpsilon() const { return 1.0; }
-    virtual void getInitialVelocity(const tarch::la::Vector<dim, double> &meanVelocity, const double &kB, const double &temperature,
-                                    tarch::la::Vector<dim, double> &initialVelocity) const {}
-    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim> &molecule, simplemd::LinkedCell &cell) {}
-    virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim> &molecule) {}
-    virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int> &indexOfFirstMacroscopicCell,
-                                               const tarch::la::Vector<dim, unsigned int> &rangeMacroscopicCells,
-                                               const tarch::la::Vector<dim, unsigned int> &linkedCellsPerMacroscopicCell) {}
-    virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double> &position) {
+    virtual void getInitialVelocity(const tarch::la::Vector<dim, double>& meanVelocity, const double& kB, const double& temperature,
+                                    tarch::la::Vector<dim, double>& initialVelocity) const {}
+    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, simplemd::LinkedCell& cell) {}
+    virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) {}
+    virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstMacroscopicCell,
+                                               const tarch::la::Vector<dim, unsigned int>& rangeMacroscopicCells,
+                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell) {}
+    virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double>& position) {
       return tarch::la::Vector<dim, unsigned int>(0);
     }
-    virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim> &molecule) {}
+    virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim>& molecule) {}
     virtual void synchronizeMoleculesAfterMassModification() {}
     virtual void synchronizeMoleculesAfterMomentumModification() {}
     virtual double getDt() { return 1.0; }
-    virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, dim> *getMoleculeIterator(simplemd::LinkedCell &cell) {
+    virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, dim>* getMoleculeIterator(simplemd::LinkedCell& cell) {
       return NULL;
     }
 
@@ -91,11 +91,11 @@ private:
    */
   template <unsigned int dim> class WriteIndex {
   public:
-    WriteIndex(const coupling::IndexConversion<dim> &indexConversion) : _indexConversion(indexConversion) {}
+    WriteIndex(const coupling::IndexConversion<dim>& indexConversion) : _indexConversion(indexConversion) {}
     ~WriteIndex() {}
     void beginCellIteration() {}
     void endCellIteration() {}
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<simplemd::LinkedCell, dim> &cell, const unsigned int &index) {
+    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
       tarch::la::Vector<dim, unsigned int> localIndex = _indexConversion.getLocalVectorCellIndex(index);
       tarch::la::Vector<dim, double> convertLocal(0.0);
       for (unsigned int d = 0; d < dim; d++) {
@@ -105,7 +105,7 @@ private:
     }
 
   private:
-    const coupling::IndexConversion<dim> &_indexConversion;
+    const coupling::IndexConversion<dim>& _indexConversion;
   };
   /** test class to print local cell index (-> microscopic momentum buffer) of
    * macroscopic cells */
@@ -115,13 +115,13 @@ private:
     ~PrintIndex() {}
     void beginCellIteration() {}
     void endCellIteration() {}
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<simplemd::LinkedCell, dim> &cell, const unsigned int &index) {
+    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
       std::cout << cell.getMicroscopicMomentum() << std::endl;
     }
   };
 
   template <unsigned int dim> void testMacroscopicCells() {
-    TestMDSolverInterface<dim> *testInterface = new TestMDSolverInterface<dim>();
+    TestMDSolverInterface<dim>* testInterface = new TestMDSolverInterface<dim>();
     if (testInterface == NULL) {
       std::cout << "ERROR MacroscopicCellsTest::testMacroscopicCells(): "
                    "testInterface==NULL!"

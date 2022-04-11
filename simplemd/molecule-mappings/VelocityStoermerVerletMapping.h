@@ -20,18 +20,18 @@ class VelocityStoermerVerletMapping;
  */
 class simplemd::moleculemappings::VelocityStoermerVerletMapping {
 public:
-  VelocityStoermerVerletMapping(const double &kB, const double &dt, const double &mass,
-                                const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-                                const tarch::la::Vector<MD_DIM, double> &domainOffset, const tarch::la::Vector<MD_DIM, double> &domainSize);
+  VelocityStoermerVerletMapping(const double& kB, const double& dt, const double& mass,
+                                const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+                                const tarch::la::Vector<MD_DIM, double>& domainOffset, const tarch::la::Vector<MD_DIM, double>& domainSize);
   ~VelocityStoermerVerletMapping();
 
   void beginMoleculeIteration();
   void endMoleculeIteration();
 
-  void handleMolecule(Molecule &molecule);
+  void handleMolecule(Molecule& molecule);
 
 private:
-  tarch::la::Vector<2 * MD_DIM, bool> initReflectingBoundary(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary) const;
+  tarch::la::Vector<2 * MD_DIM, bool> initReflectingBoundary(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary) const;
 
   /** timestep */
   const double _dt;

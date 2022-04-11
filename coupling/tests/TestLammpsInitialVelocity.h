@@ -10,7 +10,7 @@
 
 template <unsigned int dim> class TestLammpsInitialVelocity : public TestLammps<dim> {
 public:
-  TestLammpsInitialVelocity(int argc, char **argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
+  TestLammpsInitialVelocity(int argc, char** argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
   virtual ~TestLammpsInitialVelocity() {}
 
   virtual void run() {
@@ -22,7 +22,7 @@ public:
     }
     TestLammps<dim>::loadMacroscopicSolverConfiguration();
     TestLammps<dim>::loadMamicoTestConfiguration();
-    coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim> *mdInterface =
+    coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim>* mdInterface =
         coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface();
 
     const double kB = mdInterface->getKB();                 // value for kB

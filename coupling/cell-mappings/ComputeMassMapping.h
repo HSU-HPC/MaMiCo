@@ -25,7 +25,7 @@ public:
   /** Constructor
    *	@param mdSolverInterface
    */
-  ComputeMassMapping(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+  ComputeMassMapping(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
       : _mdSolverInterface(mdSolverInterface), _mass(0.0), _particleCounter(0) {}
 
   /** Destructor */
@@ -48,8 +48,8 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       _particleCounter++;
@@ -68,7 +68,7 @@ public:
   unsigned int getNumberOfParticles() const { return _particleCounter; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   double _mass;
   unsigned int _particleCounter;
 };

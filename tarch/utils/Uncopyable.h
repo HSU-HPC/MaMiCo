@@ -19,8 +19,8 @@ protected:
   ~Uncopyable() {}
 
 private:
-  Uncopyable(const tarch::utils::Uncopyable &);
-  Uncopyable &operator=(const tarch::utils::Uncopyable &);
+  Uncopyable(const tarch::utils::Uncopyable&);
+  Uncopyable& operator=(const tarch::utils::Uncopyable&);
 };
 
 #endif //

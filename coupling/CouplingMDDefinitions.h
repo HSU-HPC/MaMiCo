@@ -105,7 +105,7 @@ template <unsigned int dim> tarch::la::Vector<dim, unsigned int> initDivisionFac
  * or 3
  *  @returns the dimensionized index for a given cell */
 template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int> getVectorCellIndex(unsigned int cellIndex, const tarch::la::Vector<dim, unsigned int> &divisionFactor) {
+tarch::la::Vector<dim, unsigned int> getVectorCellIndex(unsigned int cellIndex, const tarch::la::Vector<dim, unsigned int>& divisionFactor) {
   tarch::la::Vector<dim, unsigned int> myVector(0);
   unsigned int help = cellIndex;
   for (int d = dim - 1; d > 0; d--) {

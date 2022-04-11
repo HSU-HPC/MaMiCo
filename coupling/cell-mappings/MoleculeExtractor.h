@@ -30,7 +30,7 @@ public:
   /** Constructor
    *	@param mdSolverInterface
    */
-  MoleculeExtractor(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {
+  MoleculeExtractor(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {
     _molecules.clear();
   }
 
@@ -50,8 +50,8 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       _molecules.push_back(it->getConst().getPosition());
@@ -63,10 +63,10 @@ public:
   /** returns access to the extracted molecules.
    *	@return _molecules
    */
-  const std::vector<tarch::la::Vector<dim, double>> &getExtractedMolecules() const { return _molecules; }
+  const std::vector<tarch::la::Vector<dim, double>>& getExtractedMolecules() const { return _molecules; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   std::vector<tarch::la::Vector<dim, double>> _molecules;
 };
 

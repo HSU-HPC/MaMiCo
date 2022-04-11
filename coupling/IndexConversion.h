@@ -246,7 +246,7 @@ private:
    *  @param vectorCellIndex vector cell index
    *  @param numberCells total number of cells
    *  @returns a linearised cell index  */
-  unsigned int getCellIndex(tarch::la::Vector<dim, unsigned int> vectorCellIndex, const tarch::la::Vector<dim, unsigned int> &numberCells) const;
+  unsigned int getCellIndex(tarch::la::Vector<dim, unsigned int> vectorCellIndex, const tarch::la::Vector<dim, unsigned int>& numberCells) const;
 
   /** Example: we have 31x46x50 macroscopic cells split onto 10x12x5 processes.
    *  Then, this method will return the floor (cells/processes), which in our
@@ -280,25 +280,25 @@ private:
    *  @param index vector index of a cell
    *  @param range vector range of cells
    *  @returns a bool indicating if index is valid (true) or not (false) */
-  bool isValidVectorCellIndex(tarch::la::Vector<dim, unsigned int> index, const tarch::la::Vector<dim, unsigned int> &range) const;
+  bool isValidVectorCellIndex(tarch::la::Vector<dim, unsigned int> index, const tarch::la::Vector<dim, unsigned int>& range) const;
 
   /** @brief returns true, if the index is smaller than the range.
    *  @param index continuous/linearised index of a cell
    *  @param range continuous/linearised range of cells
    *  @returns a bool indicating if index is valid (true) or not (false) */
-  bool isValidCellIndex(unsigned int index, const unsigned int &range) const;
+  bool isValidCellIndex(unsigned int index, const unsigned int& range) const;
 
   /** @brief initialises the size of macroscopic cells
    *  @param globalMDDomainSize the total size of the md domain as a vector
    *  @param globalNumberMacroscopicCells the global number of macroscopic cells
    *  @returns the macroscopic cell size for the setup */
-  tarch::la::Vector<dim, double> initMacroscopicCellSize(const tarch::la::Vector<dim, double> &globalMDDomainSize,
-                                                         const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const;
+  tarch::la::Vector<dim, double> initMacroscopicCellSize(const tarch::la::Vector<dim, double>& globalMDDomainSize,
+                                                         const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const;
 
   /** type of parallel topology used in the simulation */
   const coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;
   /** a pointer to the parallel topology */
-  const coupling::paralleltopology::ParallelTopology<dim> *_parallelTopology;
+  const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;
   /** the total number of processes. We assume a block-domain decomposition. */
   const tarch::la::Vector<dim, unsigned int> _numberProcesses;
   /** rank of current process */

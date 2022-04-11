@@ -49,9 +49,9 @@ public:
    *	@param domainSize
    *	@param mdSolverInterface
    */
-  ZhouBoundaryForce(const double &density, const double &temperature, const double &epsilon, const double &sigma,
-                    const tarch::la::Vector<2 * dim, bool> &boundary, const tarch::la::Vector<dim, double> &domainOffset,
-                    const tarch::la::Vector<dim, double> &domainSize, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+  ZhouBoundaryForce(const double& density, const double& temperature, const double& epsilon, const double& sigma,
+                    const tarch::la::Vector<2 * dim, bool>& boundary, const tarch::la::Vector<dim, double>& domainOffset,
+                    const tarch::la::Vector<dim, double>& domainSize, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
       : _boundary(boundary), _domainLowerLeft(domainOffset), _domainUpperRight(domainSize + domainOffset), _mdSolverInterface(mdSolverInterface),
         _p1(getP1(density, temperature)), _p2(getP2(density, temperature)), _p3(getP3(density, temperature)), _q1(getQ1(density)), _q2(getQ2(density)),
         _q3(getQ3(density)), _forceFactor(epsilon / sigma), _sigma(sigma),
@@ -93,11 +93,11 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
-      coupling::interface::Molecule<dim> &wrapper(it->get());
+      coupling::interface::Molecule<dim>& wrapper(it->get());
       // std::cout << "apply force to Molecule " << wrapper.getPosition() <<
       // std::endl;
 
@@ -117,7 +117,7 @@ public:
    *	@param position
    *	@return energy
    */
-  double getPotentialEnergy(const tarch::la::Vector<dim, double> &position) const {
+  double getPotentialEnergy(const tarch::la::Vector<dim, double>& position) const {
     double energy(0);
     const double distance = 2.5 * _sigma;
     for (unsigned int d = 0; d < dim; d++) {
@@ -138,7 +138,7 @@ public:
    *	@param position
    *	@return force
    */
-  tarch::la::Vector<dim, double> getBoundaryForces(const tarch::la::Vector<dim, double> &position) const {
+  tarch::la::Vector<dim, double> getBoundaryForces(const tarch::la::Vector<dim, double>& position) const {
     tarch::la::Vector<dim, double> force(0.0);
     const double distance = 2.5 * _sigma;
 
@@ -186,7 +186,7 @@ private:
    *	@param temperature
    *	@return p1
    */
-  double getP1(const double &density, const double &temperature) const {
+  double getP1(const double& density, const double& temperature) const {
     const double logrho = log(density);
     const double T2 = temperature * temperature;
     const double T3 = T2 * temperature;
@@ -203,7 +203,7 @@ private:
    *	@param temperature
    *	@return p2
    */
-  double getP2(const double &density, const double &temperature) const {
+  double getP2(const double& density, const double& temperature) const {
     const double logrho = log(density);
     const double T2 = temperature * temperature;
     const double T3 = T2 * temperature;
@@ -218,7 +218,7 @@ private:
    *	@param temperature
    *	@return p3
    */
-  double getP3(const double &density, const double &temperature) const {
+  double getP3(const double& density, const double& temperature) const {
     const double T394 = pow(temperature, 0.394);
     const double rho17437 = pow(density, 17.437);
     const double p3 = 3.934 + 0.099 * T394 - 0.097 * rho17437 + 0.075 * T394 * rho17437;
@@ -229,7 +229,7 @@ private:
    *	@param density
    *	@return q1
    */
-  double getQ1(const double &density) const {
+  double getQ1(const double& density) const {
     const double rho2 = density * density;
     const double rho3 = rho2 * density;
     const double rho4 = rho2 * rho2;
@@ -240,7 +240,7 @@ private:
    *	@param density
    *	@return q2
    */
-  double getQ2(const double &density) const {
+  double getQ2(const double& density) const {
     const double rho2 = density * density;
     const double rho3 = rho2 * density;
     const double rho4 = rho2 * rho2;
@@ -251,7 +251,7 @@ private:
    *	@param density
    *	@return q3
    */
-  double getQ3(const double &density) const {
+  double getQ3(const double& density) const {
     const double rho2 = density * density;
     const double rho3 = rho2 * density;
     const double rho4 = rho2 * rho2;
@@ -266,7 +266,7 @@ private:
   /** upper right corner of MD domain */
   const tarch::la::Vector<dim, double> _domainUpperRight;
 
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   // helper variables to speed up evaluation, see Zhou paper
   const double _p1;
   const double _p2;
@@ -281,6 +281,6 @@ private:
   const double _sigma;
 
   const unsigned int _energyResolution;
-  double *_energyTable;
+  double* _energyTable;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_ZHOUBOUNDARYFORCE_H_

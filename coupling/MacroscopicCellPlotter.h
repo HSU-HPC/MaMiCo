@@ -36,9 +36,9 @@ public:
    *  @param indexConversion indexConversion instance of the current simulation
    *  @param cells macroscopic cells to plot
    *  @param mdSolverInterface interface of the md solver */
-  MacroscopicCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, const coupling::IndexConversion<dim> &indexConversion,
-                         coupling::datastructures::MacroscopicCells<LinkedCell, dim> &cells,
-                         coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) {
+  MacroscopicCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, const coupling::IndexConversion<dim>& indexConversion,
+                         coupling::datastructures::MacroscopicCells<LinkedCell, dim>& cells,
+                         coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     plotMoleculeFile(ID, filename, rank, t, cells, mdSolverInterface);
     plotMacroscopicCellFile(ID, filename, rank, t, indexConversion, cells, mdSolverInterface);
   }
@@ -57,8 +57,8 @@ private:
    *  @param cells macroscopic cells to plot
    *  @param mdSolverInterface interface of the md solver */
   void plotMoleculeFile(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,
-                        coupling::datastructures::MacroscopicCells<LinkedCell, dim> &cells,
-                        coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) {
+                        coupling::datastructures::MacroscopicCells<LinkedCell, dim>& cells,
+                        coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     // open files
     std::ofstream moleculeFile;
     // store positions and velocities of molecules
@@ -114,9 +114,9 @@ private:
    *  @param indexConversion indexConversion instance of the current simulation
    *  @param cells macroscopic cells to plot
    *  @param mdSolverInterface interface of the md solver */
-  void plotMacroscopicCellFile(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, const coupling::IndexConversion<dim> &indexConversion,
-                               coupling::datastructures::MacroscopicCells<LinkedCell, dim> &cells,
-                               coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) {
+  void plotMacroscopicCellFile(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, const coupling::IndexConversion<dim>& indexConversion,
+                               coupling::datastructures::MacroscopicCells<LinkedCell, dim>& cells,
+                               coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     // stringstreams for all cell properties of interest
     std::stringstream microscopicMasses;
     microscopicMasses << "SCALARS microscopicMassBuffer float 1" << std::endl;
@@ -224,7 +224,7 @@ private:
    *  @param rank mpi rank of the current process
    *  @param t number of time step to plot
    *  @param of this is the stream, where it will be written to */
-  void open(unsigned int ID, std::string filename, std::string fileType, unsigned int rank, unsigned int t, std::ofstream &of) {
+  void open(unsigned int ID, std::string filename, std::string fileType, unsigned int rank, unsigned int t, std::ofstream& of) {
     std::stringstream ss;
     ss << filename << "_" << fileType << "_" << ID << "_" << rank << "_" << t << ".vtk";
     of.open(ss.str().c_str());
@@ -251,10 +251,10 @@ private:
      * or 2d
      *  @param indexConversion instance of the indexConversion class
      *  @param mdSolverInterface interface of the md solver */
-    Writer4Cells(std::stringstream &microscopicMasses, std::stringstream &macroscopicMasses, std::stringstream &microscopicMomenta,
-                 std::stringstream &macroscopicMomenta, std::stringstream &meanVelocities, std::stringstream &masses, std::stringstream &energies,
-                 std::stringstream &temperatures, const std::string &appendFloatZeros, const coupling::IndexConversion<dim> &indexConversion,
-                 coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+    Writer4Cells(std::stringstream& microscopicMasses, std::stringstream& macroscopicMasses, std::stringstream& microscopicMomenta,
+                 std::stringstream& macroscopicMomenta, std::stringstream& meanVelocities, std::stringstream& masses, std::stringstream& energies,
+                 std::stringstream& temperatures, const std::string& appendFloatZeros, const coupling::IndexConversion<dim>& indexConversion,
+                 coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
         : _microscopicMasses(microscopicMasses), _macroscopicMasses(macroscopicMasses), _microscopicMomenta(microscopicMomenta),
           _macroscopicMomenta(macroscopicMomenta), _meanVelocities(meanVelocities), _masses(masses), _energies(energies), _temperatures(temperatures),
           _appendFloatZeros(appendFloatZeros), _computeMassMapping(mdSolverInterface), _computeMomentumMapping(mdSolverInterface),
@@ -274,7 +274,7 @@ private:
     /** @brief writes the data from the cell to the stringstreams
      *  @param cell macroscopic cell
      *  @param index linearised index of the macroscopic cell*/
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const unsigned int &index) {
+    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
       // compute local quantities from molecules, if this is an inner cell
       const tarch::la::Vector<dim, unsigned int> end = _indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1);
       const tarch::la::Vector<dim, unsigned int> localIndex = _indexConversion.getLocalVectorCellIndex(index);
@@ -313,24 +313,24 @@ private:
   private:
     /** stream containing the microscopic mass of the cells (buffer to transfer
      * mass from macro to md)*/
-    std::stringstream &_microscopicMasses;
+    std::stringstream& _microscopicMasses;
     /** stream containing the macroscopic mass of the cells (buffer to transfer
      * mass from md to macro)*/
-    std::stringstream &_macroscopicMasses;
+    std::stringstream& _macroscopicMasses;
     /** stream containing the microscopic momenta of the cells (buffer to
      * transfer momenta from macro to md)*/
-    std::stringstream &_microscopicMomenta;
+    std::stringstream& _microscopicMomenta;
     /** stream containing the macroscopic momenta of the cells (buffer to
      * transfer momenta from md to macro )*/
-    std::stringstream &_macroscopicMomenta;
+    std::stringstream& _macroscopicMomenta;
     /** stream containing the mean velocity of the cells*/
-    std::stringstream &_meanVelocities;
+    std::stringstream& _meanVelocities;
     /** stream containing the total mass in the cells*/
-    std::stringstream &_masses;
+    std::stringstream& _masses;
     /** stream containing the total energy in the cells*/
-    std::stringstream &_energies;
+    std::stringstream& _energies;
     /** stream containing the mean temperature in the cells*/
-    std::stringstream &_temperatures;
+    std::stringstream& _temperatures;
     /** string containing '0' to add in the case of 1d or 2d */
     const std::string _appendFloatZeros;
     /** instance of the computeMassMapping*/
@@ -340,7 +340,7 @@ private:
     /** instance of the KineticEnergyController*/
     coupling::KineticEnergyController<LinkedCell, dim> _kineticEnergyController;
     /** instance of the indexConversion*/
-    const coupling::IndexConversion<dim> &_indexConversion;
+    const coupling::IndexConversion<dim>& _indexConversion;
   };
 
   /** We make use of the traversal callback pattern of MacroscopicCells.
@@ -355,8 +355,8 @@ private:
      *  @param appendFloatZeros string containing '0' to add in the case of 1d
      * or 2d
      *  @param mdSolverInterface interface of the md solver */
-    Writer4Molecules(std::stringstream &moleculeVelocities, std::stringstream &moleculePositions, std::stringstream &moleculePotentials,
-                     const std::string &appendFloatZeros, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+    Writer4Molecules(std::stringstream& moleculeVelocities, std::stringstream& moleculePositions, std::stringstream& moleculePotentials,
+                     const std::string& appendFloatZeros, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
         : _moleculeVelocities(moleculeVelocities), _moleculePositions(moleculePositions), _moleculePotentials(moleculePotentials),
           _appendFloatZeros(appendFloatZeros), _mdSolverInterface(mdSolverInterface), _moleculeCounter(0) {}
 
@@ -369,7 +369,7 @@ private:
     void endCellIteration() {}
 
     /** @brief aplication of the vtkMoleculePlotter to the macroscopic cells*/
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const unsigned int &index) {
+    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
       coupling::cellmappings::VTKMoleculePlotter<LinkedCell, dim> vtkMoleculePlotter(_moleculeVelocities, _moleculePositions, _moleculePotentials,
                                                                                      _appendFloatZeros, _mdSolverInterface);
       cell.iterateConstCells(vtkMoleculePlotter);
@@ -382,15 +382,15 @@ private:
 
   private:
     /** stringstream for the velocities of the molecules*/
-    std::stringstream &_moleculeVelocities;
+    std::stringstream& _moleculeVelocities;
     /** stringstream for the positions of the molecules*/
-    std::stringstream &_moleculePositions;
+    std::stringstream& _moleculePositions;
     /** stringstream for the potentials of the molecules*/
-    std::stringstream &_moleculePotentials;
+    std::stringstream& _moleculePotentials;
     /** string containing '0' to add in the case of 1d or 2d */
     const std::string _appendFloatZeros;
     /** interface to the md solver*/
-    coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+    coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
     /** counter for the molecules that have been plotted*/
     unsigned int _moleculeCounter;
   };

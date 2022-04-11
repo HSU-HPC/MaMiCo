@@ -31,7 +31,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) { cell.getList().clear(); }
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) { cell.getList().clear(); }
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_EMPTYLINKEDLISTSMAPPING_H_

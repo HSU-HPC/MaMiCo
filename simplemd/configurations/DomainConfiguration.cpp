@@ -62,7 +62,7 @@ simplemd::configurations::DomainConfiguration::DomainConfiguration()
     : _moleculesPerDirection(0), _domainSize(0.0), _domainOffset(0.0), _cutoffRadius(0.0), _meshWidth(0.0), _kB(0.0), _blockSize(0),
       _boundary(simplemd::PERIODIC_BOUNDARY), _checkpointFilestem(""), _initFromCheckpoint(false), _initFromSequentialCheckpoint(false), _isValid(true) {}
 
-void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   std::string strBuf = "";
   int intBuf = -1;
 

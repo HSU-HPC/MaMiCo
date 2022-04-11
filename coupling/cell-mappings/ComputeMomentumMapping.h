@@ -26,7 +26,7 @@ public:
   /** Constructor
    *	@param mdSolverInterface
    */
-  ComputeMomentumMapping(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+  ComputeMomentumMapping(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
       : _mdSolverInterface(mdSolverInterface), _momentum(0.0), _meanVelocity(0.0), _particleCounter(0) {}
 
   /** Destructor */
@@ -58,11 +58,11 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
-      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
+      const coupling::interface::Molecule<dim>& wrapper(it->getConst());
       _momentum += wrapper.getVelocity();
       _particleCounter++;
 
@@ -82,7 +82,7 @@ public:
   tarch::la::Vector<dim, double> getMeanVelocity() const { return _meanVelocity; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   tarch::la::Vector<dim, double> _momentum;
   tarch::la::Vector<dim, double> _meanVelocity;
   unsigned int _particleCounter;

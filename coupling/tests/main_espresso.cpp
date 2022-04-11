@@ -10,7 +10,7 @@
 
 #include <mpi.h>
 
-void runTest(Test *test) {
+void runTest(Test* test) {
   if (test == NULL) {
     std::cout << "ERROR executeTest: test==NULL!" << std::endl;
     exit(EXIT_FAILURE);
@@ -19,7 +19,7 @@ void runTest(Test *test) {
   delete test;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   int thisTest = atoi(argv[1]);
   switch (thisTest) {
   case 0:

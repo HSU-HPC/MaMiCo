@@ -17,7 +17,7 @@ template <unsigned int dim>
 const std::string coupling::configurations::MacroscopicCellConfiguration<dim>::WRITE_EVERY_MACROSCOPIC_TIMESTEP("write-every-macroscopic-timestep");
 template <unsigned int dim> const std::string coupling::configurations::MacroscopicCellConfiguration<dim>::MACROSCOPIC_FILENAME("macroscopic-filename");
 
-template <unsigned int dim> void coupling::configurations::MacroscopicCellConfiguration<dim>::parseSubtag(tinyxml2::XMLElement *node) {
+template <unsigned int dim> void coupling::configurations::MacroscopicCellConfiguration<dim>::parseSubtag(tinyxml2::XMLElement* node) {
   tarch::la::Vector<dim, int> getCells(-1);
   int buffer = -1;
 

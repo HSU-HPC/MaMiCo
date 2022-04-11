@@ -42,7 +42,7 @@ public:
   /** Destructor */
   virtual ~NoiseReductionConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node) {
+  void parseSubtag(tinyxml2::XMLElement* node) {
     std::string value;
     tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "none") {
@@ -127,8 +127,8 @@ public:
    *	@note tws_param can be used to override XML configuration
    */
   template <unsigned int dim>
-  coupling::noisereduction::NoiseReduction<dim> *interpreteConfiguration(const coupling::IndexConversion<dim> &indexConversion,
-                                                                         const tarch::utils::MultiMDService<dim> &multiMDService, int tws_param = 0) const {
+  coupling::noisereduction::NoiseReduction<dim>* interpreteConfiguration(const coupling::IndexConversion<dim>& indexConversion,
+                                                                         const tarch::utils::MultiMDService<dim>& multiMDService, int tws_param = 0) const {
     if (_type == IdentityTransform) {
       return new coupling::noisereduction::IdentityTransform<dim>(indexConversion, multiMDService);
     } else if (_type == GaussianFilter) {

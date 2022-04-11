@@ -30,7 +30,7 @@ public:
   /** Destructor */
   virtual ~ParallelTopologyConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node) {
+  void parseSubtag(tinyxml2::XMLElement* node) {
     std::string value;
     tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "xyz") {

@@ -19,10 +19,10 @@ public:
   TestMacroscopicSolverInterface() : MacroscopicSolverInterface<dim>() {}
   virtual ~TestMacroscopicSolverInterface() {}
 
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *> getMacroscopicCells4Sending() = 0;
-  virtual unsigned int *getMacroscopicCellIndices4Sending() = 0;
+  virtual std::vector<coupling::datastructures::MacroscopicCell<dim>*> getMacroscopicCells4Sending() = 0;
+  virtual unsigned int* getMacroscopicCellIndices4Sending() = 0;
 
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim> *> getMacroscopicCells4Receiving() = 0;
-  virtual unsigned int *getMacroscopicCellIndices4Receiving() = 0;
+  virtual std::vector<coupling::datastructures::MacroscopicCell<dim>*> getMacroscopicCells4Receiving() = 0;
+  virtual unsigned int* getMacroscopicCellIndices4Receiving() = 0;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_INTERFACE_TESTMACROSCOPICSOLVERINTERFACE_H_

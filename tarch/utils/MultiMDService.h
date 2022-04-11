@@ -26,7 +26,7 @@ template <unsigned int dim> class MultiMDService;
  */
 template <unsigned int dim> class tarch::utils::MultiMDService {
 public:
-  MultiMDService(const tarch::la::Vector<dim, unsigned int> &numberProcesses, const unsigned int &totalNumberMDSimulations);
+  MultiMDService(const tarch::la::Vector<dim, unsigned int>& numberProcesses, const unsigned int& totalNumberMDSimulations);
   ~MultiMDService();
 
   unsigned int getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const;

@@ -19,7 +19,7 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise
                                                                                  const unsigned int upperBoundOnNumberOfMolecules) {
   _capacity = upperBoundOnNumberOfMolecules * doublesPerMolecule;
 
-  _values = (double *)malloc(_capacity * sizeof(double));
+  _values = (double*)malloc(_capacity * sizeof(double));
   if (_values == NULL) {
     std::cout << "_values of SimpleBuffer, part of the "
                  "ParallelAndLocalBufferService, could not be allocated. "
@@ -101,10 +101,10 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::pushData(c
 /* Private methods: */
 
 bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::reallocate() {
-  double *temp = NULL;
+  double* temp = NULL;
 
   unsigned int newsize = _capacity * 2;
-  temp = (double *)realloc(_values, newsize * sizeof(double));
+  temp = (double*)realloc(_values, newsize * sizeof(double));
   if (temp != NULL) {
     _values = temp;
     _capacity = newsize;
@@ -179,7 +179,7 @@ void simplemd::services::ParallelAndLocalBufferService::shutdown() {
 #endif
 }
 
-bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToLocalBuffer(const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol) {
+bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToLocalBuffer(const tarch::la::Vector<MD_DIM, double>& position, const Molecule* mol) {
   const bool permitReallocation = true;
 #if (MD_ERROR == MD_YES)
   bool isOk;
@@ -196,7 +196,7 @@ bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToLocalBuffe
 }
 
 #if (MD_PARALLEL == MD_YES)
-bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToSendBuffer(const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol,
+bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToSendBuffer(const tarch::la::Vector<MD_DIM, double>& position, const Molecule* mol,
                                                                                  const unsigned int i_buffer) {
   const bool permitReallocation = false;
 #if (MD_ERROR == MD_YES)

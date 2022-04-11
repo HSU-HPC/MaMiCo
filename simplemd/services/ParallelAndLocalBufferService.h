@@ -62,7 +62,7 @@ public:
 
     unsigned int getLength() const { return _length; }
     unsigned int getCapacity() const { return _capacity; }
-    double *getValues() const { return _values; }
+    double* getValues() const { return _values; }
 
   private:
     /* METHODS */
@@ -73,7 +73,7 @@ public:
     /* FIELDS */
 
     /** the values */
-    double *_values;
+    double* _values;
 
     /** the number of values currently stored */
     unsigned int _length;
@@ -97,19 +97,19 @@ public:
 
   void shutdown();
 
-  bool pushMoleculeToLocalBuffer(const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol);
+  bool pushMoleculeToLocalBuffer(const tarch::la::Vector<MD_DIM, double>& position, const Molecule* mol);
 
   unsigned int getLocalBufferLength(unsigned int i_buf) const { return _localBuffer.getLength(); }
 
-  SimpleBuffer *getLocalBuffer() { return &_localBuffer; }
+  SimpleBuffer* getLocalBuffer() { return &_localBuffer; }
 
 #if (MD_PARALLEL == MD_YES)
-  bool pushMoleculeToSendBuffer(const tarch::la::Vector<MD_DIM, double> &position, const Molecule *mol, const unsigned int i_buffer);
+  bool pushMoleculeToSendBuffer(const tarch::la::Vector<MD_DIM, double>& position, const Molecule* mol, const unsigned int i_buffer);
 
   unsigned int getBufferCapacity(unsigned int i_buf) const { return _sendBuffers[i_buf].getCapacity(); }
   unsigned int getSendBufferLength(unsigned int i_buf) const { return _sendBuffers[i_buf].getLength(); }
-  SimpleBuffer *getSendBuffer(const unsigned int &i_buf) { return &(_sendBuffers[i_buf]); }
-  SimpleBuffer *getReceiveBuffer(const unsigned int &i_buf) { return &(_receiveBuffers[i_buf]); }
+  SimpleBuffer* getSendBuffer(const unsigned int& i_buf) { return &(_sendBuffers[i_buf]); }
+  SimpleBuffer* getReceiveBuffer(const unsigned int& i_buf) { return &(_receiveBuffers[i_buf]); }
 
   void setReceiveBufferLength(const unsigned int i_buf, const unsigned int count) { _receiveBuffers[i_buf].setLength(count); };
 #endif

@@ -22,7 +22,7 @@ template <class LinkedCell, unsigned int dim> class coupling::NoBoundaryForce : 
 public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface to the md solver*/
-  NoBoundaryForce(coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface)
+  NoBoundaryForce(coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface)
       : coupling::BoundaryForceController<LinkedCell, dim>(mdSolverInterface) {}
   /** @brief a simple destructor*/
   virtual ~NoBoundaryForce() {}
@@ -31,7 +31,7 @@ public:
    *  @param cell the macroscopic cell to apply no force
    *  @param currentLocalMacroscopicCellIndex the linearised local index of the
    * macroscopic cell*/
-  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                  const unsigned int &currentLocalMacroscopicCellIndex) {}
+  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                  const unsigned int& currentLocalMacroscopicCellIndex) {}
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_NOBOUNDARYFORCE_H_

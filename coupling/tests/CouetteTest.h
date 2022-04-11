@@ -153,7 +153,7 @@ private:
    * stores the data in variables */
   void parseCouetteTestConfiguration() {
     tinyxml2::XMLDocument conffile;
-    tinyxml2::XMLElement *node = NULL;
+    tinyxml2::XMLElement* node = NULL;
     conffile.LoadFile("couette.xml");
     node = conffile.FirstChildElement("couette-test");
     if (node == NULL) {
@@ -162,31 +162,31 @@ private:
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n_mamico = node->NextSiblingElement();
+    tinyxml2::XMLElement* n_mamico = node->NextSiblingElement();
     if (n_mamico == NULL) {
       std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n_md = n_mamico->NextSiblingElement();
+    tinyxml2::XMLElement* n_md = n_mamico->NextSiblingElement();
     if (n_md == NULL) {
       std::cout << "Could not read input file couette.xml: missing element "
                    "<molecular-dynamics>"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n_fp = n_md->NextSiblingElement();
+    tinyxml2::XMLElement* n_fp = n_md->NextSiblingElement();
     if (n_fp == NULL) {
       std::cout << "Could not read input file couette.xml: missing element "
                    "<filter-pipeline>"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
+    tinyxml2::XMLElement* n_unexpected = n_fp->NextSiblingElement();
     if (n_unexpected != NULL) {
       std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *subtag = node->FirstChildElement("domain");
+    tinyxml2::XMLElement* subtag = node->FirstChildElement("domain");
     if (subtag == NULL) {
       std::cout << "Could not read input file couette.xml: Missing subtag: domain" << std::endl;
       exit(EXIT_FAILURE);
@@ -388,7 +388,7 @@ private:
       }
     }
 
-    coupling::interface::MacroscopicSolverInterface<3> *couetteSolverInterface = getCouetteSolverInterface(
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
         _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
         _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
@@ -487,7 +487,7 @@ private:
                         // std::cout << "Entering synthetic MD scalar..." <<
                         // std::endl;
                         // TODO: replace usage of deprecated IndexConversion
-                        const coupling::IndexConversion<3> &indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+                        const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
                         const unsigned int size = inputScalars.size();
                         const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
                         const double mass = (_cfg.density) * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
@@ -517,7 +517,7 @@ private:
                         // std::cout << "Entering synthetic MD vector." <<
                         // std::endl;
 
-                        const coupling::IndexConversion<3> &indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+                        const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
                         const unsigned int size = inputVectors.size();
                         const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
                         const double mass = (_cfg.density) * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
@@ -561,7 +561,7 @@ private:
                       }},
                   0 // filterIndex
               );
-      } catch (std::runtime_error &e) {
+      } catch (std::runtime_error& e) {
         auto expectedError = std::string("ERROR: Could not find Filter Sequence named ").append(SYNTHETICMD_SEQUENCE);
         if (expectedError.compare(e.what()) == 0) {
           std::cout << "ERROR: Synthetic MD solver selected without providing "
@@ -711,7 +711,7 @@ private:
   void computeSNR(int cycle) {
     if (_cfg.computeSNR && cycle >= _cfg.filterInitCycles) {
       std::cout << cycle - _cfg.filterInitCycles << ", ";
-      const coupling::IndexConversion<3> &indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
       const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
       const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
       const double mass = _cfg.density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
@@ -742,26 +742,26 @@ private:
    *  @param cycle current time step of the coupled simulation */
   void twoWayCoupling(int cycle) {
     if ((_cfg.maSolverType == COUETTE_LB || _cfg.maSolverType == COUETTE_FD) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles) {
-      static_cast<coupling::solvers::LBCouetteSolver *>(_couetteSolver)
+      static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
           ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
                           _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
                           _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
     }
 #if (BUILD_WITH_OPENFOAM)
     else if ((_cfg.maSolverType == COUETTE_FOAM) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
-      static_cast<coupling::solvers::IcoFoam *>(_couetteSolver)
+      static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)
           ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
                           _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
                           _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
     }
 #endif
     if ((_cfg.maSolverType == COUETTE_LB || _cfg.maSolverType == COUETTE_FD) && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles) {
-      static_cast<coupling::solvers::LBCouetteSolver *>(_couetteSolver)
+      static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
           ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == COUETTE_FOAM && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles && _couetteSolver != NULL) {
-      static_cast<coupling::solvers::IcoFoam *>(_couetteSolver)
+      static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)
           ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     }
 #endif
@@ -820,7 +820,7 @@ private:
     }
     _mdSolverInterface.clear();
 
-    coupling::interface::MacroscopicSolverInterface<3> *couetteSolverInterface =
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface =
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().getMacroscopicSolverInterface();
 
     if (_multiMDService != NULL) {
@@ -845,8 +845,8 @@ private:
 
   /** computes global number of macroscopic cells from configs. Required by
    * couette solver interface before MacroscopicCellService is initialised! */
-  tarch::la::Vector<3, unsigned int> getGlobalNumberMacroscopicCells(const simplemd::configurations::MolecularDynamicsConfiguration &simpleMDConfig,
-                                                                     const coupling::configurations::MaMiCoConfiguration<3> &mamicoConfig) const {
+  tarch::la::Vector<3, unsigned int> getGlobalNumberMacroscopicCells(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
+                                                                     const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig) const {
     tarch::la::Vector<3, double> domainSize(simpleMDConfig.getDomainConfiguration().getGlobalDomainSize());
     tarch::la::Vector<3, double> dx(mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
     tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
@@ -861,7 +861,7 @@ private:
    *  @brief allocates the send buffer (with values for all macroscopic cells).
    *  @param indexConversion instance of the indexConversion
    *  @param couetteSolverInterface interface for the continuum solver */
-  void allocateSendBuffer(const coupling::IndexConversion<3> &indexConversion, coupling::interface::MacroscopicSolverInterface<3> &couetteSolverInterface) {
+  void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) {
     // determine global number of cells
     const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
     const unsigned int num = cells[0] * cells[1] * cells[2];
@@ -885,7 +885,7 @@ private:
       }
     }
     // allocate array for cell indices
-    unsigned int *indices = new unsigned int[numCellsSent];
+    unsigned int* indices = new unsigned int[numCellsSent];
     if (indices == NULL) {
       std::cout << "ERROR CouetteTest::allocateSendBuffer(): indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
@@ -924,7 +924,7 @@ private:
   /** allocates the recv-buffer. This buffer contains all global inner
    * macroscopic cells, but only on rank 0. On all other ranks, no cells are
    * stored and a NULL ptr is returned */
-  void allocateRecvBuffer(const coupling::IndexConversion<3> &indexConversion, coupling::interface::MacroscopicSolverInterface<3> &couetteSolverInterface) {
+  void allocateRecvBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) {
 
     // determine global number of cells
     const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
@@ -946,7 +946,7 @@ private:
       }
     }
     // allocate array for cell indices
-    unsigned int *indices = new unsigned int[numCellsRecv];
+    unsigned int* indices = new unsigned int[numCellsRecv];
     if (indices == NULL) {
       std::cout << "ERROR CouetteTest::allocateRecvBuffer(): indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
@@ -989,8 +989,8 @@ private:
    *  @param recvIndices the indices for the macr cells in the buffer
    *  @param indexConversion an instance of the indexConversion
    *  @param couplingCycle the current number of coupling cycle */
-  void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const unsigned int *const recvIndices,
-                 const coupling::IndexConversion<3> &indexConversion, int couplingCycle) const {
+  void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+                 const coupling::IndexConversion<3>& indexConversion, int couplingCycle) const {
     if (recvBuffer.size() == 0)
       return;
     if (_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0)
@@ -1024,7 +1024,7 @@ private:
 
   /** @brief deletes the data in the buffer for the macro to md transfer
    *  @param sendBuffer the buffer to be cleaned */
-  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3> *> &sendBuffer) const {
+  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& sendBuffer) const {
     // delete all potential entries of sendBuffer
     for (unsigned int i = 0; i < sendBuffer.size(); i++) {
       if (sendBuffer[i] != NULL) {
@@ -1042,9 +1042,9 @@ private:
    *  @param sendBuffer the bufffer to send data from macro to micro
    *  @param globalCellIndices4SendBuffer the global linearized indices of the
    * macroscopic cells in the buffer  */
-  void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3> &couetteSolver,
-                      const coupling::IndexConversion<3> &indexConversion, std::vector<coupling::datastructures::MacroscopicCell<3> *> &sendBuffer,
-                      const unsigned int *const globalCellIndices4SendBuffer) const {
+  void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,
+                      const coupling::IndexConversion<3>& indexConversion, std::vector<coupling::datastructures::MacroscopicCell<3>*>& sendBuffer,
+                      const unsigned int* const globalCellIndices4SendBuffer) const {
     const unsigned int size = sendBuffer.size();
     const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
     const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
@@ -1060,7 +1060,7 @@ private:
 
       double mass = density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
       if (_cfg.maSolverType == COUETTE_LB || _cfg.maSolverType == COUETTE_FD)
-        mass *= static_cast<const coupling::solvers::LBCouetteSolver *>(&couetteSolver)->getDensity(cellMidPoint);
+        mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
 
       // compute momentum
       tarch::la::Vector<3, double> momentum(mass * couetteSolver.getVelocity(cellMidPoint));
@@ -1077,9 +1077,9 @@ private:
    *  @param sendBuffer the bufffer to send data from macro to micro
    *  @param globalCellIndices4SendBuffer the global linearized indices of the
    * macroscopic cells in the buffer  */
-  void fillRecvBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3> &couetteSolver,
-                      const coupling::IndexConversion<3> &indexConversion, std::vector<coupling::datastructures::MacroscopicCell<3> *> &sendBuffer,
-                      const unsigned int *const globalCellIndices4SendBuffer) {
+  void fillRecvBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,
+                      const coupling::IndexConversion<3>& indexConversion, std::vector<coupling::datastructures::MacroscopicCell<3>*>& sendBuffer,
+                      const unsigned int* const globalCellIndices4SendBuffer) {
     const unsigned int size = sendBuffer.size();
     const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
     const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
@@ -1105,8 +1105,8 @@ private:
   /** @returns the correct marco/continuum solver for the given setup
    *  @param dx the grid size (equidistant mesh)
    *  @param dt the time step  */
-  coupling::solvers::AbstractCouetteSolver<3> *getCouetteSolver(const double dx, const double dt) {
-    coupling::solvers::AbstractCouetteSolver<3> *solver = NULL;
+  coupling::solvers::AbstractCouetteSolver<3>* getCouetteSolver(const double dx, const double dt) {
+    coupling::solvers::AbstractCouetteSolver<3>* solver = NULL;
     tarch::la::Vector<3, double> vel = _cfg.wallInitCycles > 0 ? _cfg.wallInitVelocity : _cfg.wallVelocity;
     // analytical solver: is only active on rank 0
     if (_cfg.maSolverType == COUETTE_ANALYTICAL) {
@@ -1160,16 +1160,16 @@ private:
    * the whole domain
    *  @param outerRegion
    *  @todo piet, what is the mamicoMeshsize & the outer layer  */
-  coupling::interface::MacroscopicSolverInterface<3> *getCouetteSolverInterface(coupling::solvers::AbstractCouetteSolver<3> *couetteSolver,
+  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(coupling::solvers::AbstractCouetteSolver<3>* couetteSolver,
                                                                                 tarch::la::Vector<3, double> mdOffset,
                                                                                 tarch::la::Vector<3, double> mamicoMeshsize,
                                                                                 tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
                                                                                 unsigned int outerRegion) {
-    coupling::interface::MacroscopicSolverInterface<3> *interface = NULL;
+    coupling::interface::MacroscopicSolverInterface<3>* interface = NULL;
     if (_cfg.maSolverType == COUETTE_ANALYTICAL) {
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells, outerRegion);
     } else if (_cfg.maSolverType == COUETTE_LB) {
-      coupling::solvers::LBCouetteSolver *lbSolver = static_cast<coupling::solvers::LBCouetteSolver *>(couetteSolver);
+      coupling::solvers::LBCouetteSolver* lbSolver = static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver);
       if (lbSolver == NULL) {
         std::cout << "ERROR CouetteTest::getCouetteSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl;
         exit(EXIT_FAILURE);
@@ -1198,7 +1198,7 @@ private:
     }
 #endif
     else if (_cfg.maSolverType == COUETTE_FD) {
-      coupling::solvers::FiniteDifferenceSolver *fdSolver = static_cast<coupling::solvers::FiniteDifferenceSolver *>(couetteSolver);
+      coupling::solvers::FiniteDifferenceSolver* fdSolver = static_cast<coupling::solvers::FiniteDifferenceSolver*>(couetteSolver);
       if (fdSolver == NULL) {
         std::cout << "ERROR CouetteTest::getCouetteSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl;
         exit(EXIT_FAILURE);
@@ -1304,13 +1304,13 @@ private:
    *  @brief holds the buffers for the data transfer */
   struct CouplingBuffer {
     /** @brief the buffer for data transfer from macro to md */
-    std::vector<coupling::datastructures::MacroscopicCell<3> *> sendBuffer;
+    std::vector<coupling::datastructures::MacroscopicCell<3>*> sendBuffer;
     /** @brief the global indices of the macroscopic cells in the sendBuffer */
-    unsigned int *globalCellIndices4SendBuffer;
+    unsigned int* globalCellIndices4SendBuffer;
     /** @brief the buffer for data transfer from md to macro */
-    std::vector<coupling::datastructures::MacroscopicCell<3> *> recvBuffer;
+    std::vector<coupling::datastructures::MacroscopicCell<3>*> recvBuffer;
     /** @brief the global indices of the macroscopic cells in the recvBuffer*/
-    unsigned int *globalCellIndices4RecvBuffer;
+    unsigned int* globalCellIndices4RecvBuffer;
   };
 
   /** @brief holds all the variables for the time measurement of a simulation
@@ -1360,19 +1360,19 @@ private:
   /** @brief the counter for the time steps, which are done within the md */
   unsigned int _mdStepCounter;
   /** @brief the current macro/continuum solver */
-  coupling::solvers::AbstractCouetteSolver<3> *_couetteSolver;
+  coupling::solvers::AbstractCouetteSolver<3>* _couetteSolver;
   /** @todo piet */
-  tarch::utils::MultiMDService<3> *_multiMDService;
+  tarch::utils::MultiMDService<3>* _multiMDService;
   /** @todo piet */
-  coupling::services::MultiMDCellService<MY_LINKEDCELL, 3> *_multiMDCellService;
+  coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
   /** @brief the current buffer for the coupling */
   CouplingBuffer _buf;
   /** @todo piet */
   unsigned int _localMDInstances;
   /** @brief the interface to the md solver */
-  std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL, 3> *> _mdSolverInterface;
+  std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL, 3>*> _mdSolverInterface;
   /** @brief the md solver */
-  std::vector<coupling::interface::MDSimulation *> _simpleMD;
+  std::vector<coupling::interface::MDSimulation*> _simpleMD;
   /** @todo piet */
   std::default_random_engine _generator;
   /** @todo piet */

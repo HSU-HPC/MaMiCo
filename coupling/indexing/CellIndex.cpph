@@ -44,14 +44,14 @@ CellIndex<dim, traits...>::operator CellIndex<dim, converted_traits...>() const 
 }
 
 // Overloading operator<< for CellIndex
-template <unsigned int dim, IndexTrait... traits> std::ostream &operator<<(std::ostream &os, const CellIndex<dim, traits...> &i) {
+template <unsigned int dim, IndexTrait... traits> std::ostream& operator<<(std::ostream& os, const CellIndex<dim, traits...>& i) {
   os << i.get();
   return os;
 }
 
 // Overloading arithmetic operators for CellIndex
 template <unsigned int dim, IndexTrait... traits>
-CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...> &i1, const CellIndex<dim, traits...> &i2) {
+CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...>& i1, const CellIndex<dim, traits...>& i2) {
   if constexpr (std::is_same_v<CellIndex<dim, traits...>, BaseIndex<dim>>)
     return BaseIndex<dim>{i1.get() + i2.get()};
   else
@@ -59,7 +59,7 @@ CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...> &i1, const C
 }
 
 template <unsigned int dim, IndexTrait... traits>
-coupling::indexing::CellIndex<dim, traits...> operator-(const CellIndex<dim, traits...> &i1, const CellIndex<dim, traits...> &i2) {
+coupling::indexing::CellIndex<dim, traits...> operator-(const CellIndex<dim, traits...>& i1, const CellIndex<dim, traits...>& i2) {
   if constexpr (std::is_same_v<CellIndex<dim, traits...>, BaseIndex<dim>>)
     return BaseIndex<dim>{i1.get() - i2.get()};
   else
@@ -67,12 +67,12 @@ coupling::indexing::CellIndex<dim, traits...> operator-(const CellIndex<dim, tra
 }
 
 template <unsigned int dim, IndexTrait... traits>
-CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...> &i1, const typename CellIndex<dim, traits...>::value_T &raw_i) {
+CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...>& i1, const typename CellIndex<dim, traits...>::value_T& raw_i) {
   return CellIndex<dim, traits...>{i1.get() + raw_i};
 }
 
 template <unsigned int dim, IndexTrait... traits>
-coupling::indexing::CellIndex<dim, traits...> operator-(const CellIndex<dim, traits...> &i1, const typename CellIndex<dim, traits...>::value_T &raw_i) {
+coupling::indexing::CellIndex<dim, traits...> operator-(const CellIndex<dim, traits...>& i1, const typename CellIndex<dim, traits...>::value_T& raw_i) {
   return CellIndex<dim, traits...>{i1.get() - raw_i};
 }
 

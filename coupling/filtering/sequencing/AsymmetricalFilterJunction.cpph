@@ -6,19 +6,19 @@
 
 template <unsigned int dim>
 int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
-    tinyxml2::XMLElement *sequenceNode) { // in our case "junctionNode" would be more precise
+    tinyxml2::XMLElement* sequenceNode) { // in our case "junctionNode" would be more precise
   if (!sequenceNode)
     return EXIT_FAILURE;
 
   // null if junction is empty
-  tinyxml2::XMLElement *currJunctorNode = sequenceNode->FirstChildElement();
+  tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
 
   // These four are not to be confused with member variables of similar names.
   // Watch out for the "_" in front of member variables.
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_inputCellVector;
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector2;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_inputCellVector;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> outputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector2;
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector_secondary = _inputCellVector_secondary;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_secondary = _inputCellVector_secondary;
   // Note: To prevent counter intuitive design, secondary output has been
   // disabled, i.e. all junctors in an AFJ take the same secondary input.
   // There
@@ -38,7 +38,7 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
 
     // All Junctors must implement one of the {X,Y}-Junctor interfaces, each of
     // which implement FilterInterface.
-    coupling::filtering::FilterInterface<dim> *newjunctor = nullptr;
+    coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 
     //###############################################################
     // This is where you have to define how to handle each junctor individually.

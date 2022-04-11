@@ -27,7 +27,7 @@ namespace conversion {
 
 // Converts 3-dimensional double vectors to numpy arrays
 // template<class T>
-py::array_t<double> stlVectorToNumpyArray_Scalar(const std::vector<double> &stl_vector, const std::vector<std::array<unsigned int, 3>> &indices) {
+py::array_t<double> stlVectorToNumpyArray_Scalar(const std::vector<double>& stl_vector, const std::vector<std::array<unsigned int, 3>>& indices) {
   if (indices.empty() || stl_vector.empty())
     throw std::runtime_error("One or more input vector is empty");
 
@@ -47,8 +47,8 @@ py::array_t<double> stlVectorToNumpyArray_Scalar(const std::vector<double> &stl_
 }
 
 // template<class T>
-py::array_t<double> stlVectorToNumpyArray_Vector(const std::vector<std::array<double, 3>> &stl_vector,
-                                                 const std::vector<std::array<unsigned int, 3>> &indices) {
+py::array_t<double> stlVectorToNumpyArray_Vector(const std::vector<std::array<double, 3>>& stl_vector,
+                                                 const std::vector<std::array<unsigned int, 3>>& indices) {
   if (indices.empty() || stl_vector.empty())
     throw std::runtime_error("One or more input vector is empty");
 
@@ -71,7 +71,7 @@ py::array_t<double> stlVectorToNumpyArray_Vector(const std::vector<std::array<do
 
 // Other way around. Still restricted to 3 dimensions and double.
 // template<class T>
-std::vector<double> numpyArrayToStlVector_Scalar(const py::array_t<double> &numpy_array) {
+std::vector<double> numpyArrayToStlVector_Scalar(const py::array_t<double>& numpy_array) {
   if (numpy_array.ndim() != 3)
     throw std::runtime_error("Input array must be of exactly 3 dimensions.");
 
@@ -87,7 +87,7 @@ std::vector<double> numpyArrayToStlVector_Scalar(const py::array_t<double> &nump
 }
 
 // template<class T>
-std::vector<std::array<double, 3>> numpyArrayToStlVector_Vector(const py::array_t<double> &numpy_array) {
+std::vector<std::array<double, 3>> numpyArrayToStlVector_Vector(const py::array_t<double>& numpy_array) {
   if (numpy_array.ndim() != 4)
     throw std::runtime_error("Input array must be of exactly 4 dimensions.");
   if (numpy_array.shape(3) != 3)
@@ -107,8 +107,8 @@ std::vector<std::array<double, 3>> numpyArrayToStlVector_Vector(const py::array_
 }
 
 // template<class T>
-std::function<std::vector<double>(std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)> *
-functionWrapper_Scalar(std::function<py::array_t<double>(py::array_t<double>)> *py_func_ptr) {
+std::function<std::vector<double>(std::vector<double> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>*
+functionWrapper_Scalar(std::function<py::array_t<double>(py::array_t<double>)>* py_func_ptr) {
   // case: py_func exists
   if (py_func_ptr) {
     // create copy at current scope
@@ -127,8 +127,8 @@ functionWrapper_Scalar(std::function<py::array_t<double>(py::array_t<double>)> *
 }
 
 // template<class T>
-std::function<std::vector<std::array<double, 3>>(std::vector<std::array<double, 3>> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)> *
-functionWrapper_Vector(std::function<py::array_t<double>(py::array_t<double>)> *py_func_ptr) {
+std::function<std::vector<std::array<double, 3>>(std::vector<std::array<double, 3>> /*stl_vector*/, std::vector<std::array<unsigned int, 3>> /*indices*/)>*
+functionWrapper_Vector(std::function<py::array_t<double>(py::array_t<double>)>* py_func_ptr) {
   // case: py_func exists
   if (py_func_ptr) {
     // create copy at current scope

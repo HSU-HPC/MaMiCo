@@ -6,13 +6,13 @@
 
 // Member functions of coupling::filtering::FilterSequence
 
-template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement *sequenceNode) {
+template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) {
   if (!sequenceNode)
     return EXIT_FAILURE;
-  tinyxml2::XMLElement *currFilterNode = sequenceNode->FirstChildElement();
+  tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector = _inputCellVector;
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> outputCellVector = _cellVector2;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector = _inputCellVector;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> outputCellVector = _cellVector2;
 
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
@@ -20,7 +20,7 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
   bool firstIteration = true;
 
   while (currFilterNode) {
-    coupling::filtering::FilterInterface<dim> *newfilter = nullptr;
+    coupling::filtering::FilterInterface<dim>* newfilter = nullptr;
 
     //###############################################################
     // This is where you have to define how to handle each filter individually.
@@ -102,7 +102,7 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
       }
 
       //"extrapolation" is not mandatory
-      const char *extrapolation;
+      const char* extrapolation;
       extrapolation = currFilterNode->Attribute("extrapolation");
 
       newfilter = new coupling::filtering::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int)d, sigma, extrapolation);
@@ -172,7 +172,7 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
 
 // sequential filtering
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    if (const char *sequential = currFilterNode->Attribute("sequential")) {
+    if (const char* sequential = currFilterNode->Attribute("sequential")) {
       if (std::strcmp(sequential, "true") == 0)
         _filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, _comm));
       else
@@ -191,7 +191,7 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
   }
 
   // Check for modfiability. By default true.
-  if (const char *modifiable = sequenceNode->Attribute("modifiable")) {
+  if (const char* modifiable = sequenceNode->Attribute("modifiable")) {
     if (std::strcmp(modifiable, "false") == 0)
       _isModifiable = false;
   }
@@ -207,8 +207,8 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
 // TODO: restructure code: reduce code duplication
 template <unsigned int dim>
 void coupling::filtering::FilterSequence<dim>::addFilter(
-    const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)> *applyScalar,
-    const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> *applyVector,
+    const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
+    const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
     int filterIndex // counting starts at 0, -1 is equivalent to EOL
 ) {
   // save state before tinkering with output cells

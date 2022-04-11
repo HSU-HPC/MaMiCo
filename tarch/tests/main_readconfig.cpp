@@ -9,7 +9,7 @@ int main() {
   std::string filename = "config.xml";
   tinyxml2::XMLDocument file;
   file.LoadFile(filename.c_str());
-  tinyxml2::XMLElement *node = file.FirstChildElement("mytag");
+  tinyxml2::XMLElement* node = file.FirstChildElement("mytag");
   double mydouble;
   int myint;
   tarch::la::Vector<3, int> myIntVec;

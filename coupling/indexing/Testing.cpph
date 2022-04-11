@@ -4,7 +4,7 @@
 using coupling::indexing::CellIndex;
 using coupling::indexing::IndexTrait;
 
-template <unsigned int dim> void coupling::indexing::testing::printAllBoundaries(std::ostream &os) {
+template <unsigned int dim> void coupling::indexing::testing::printAllBoundaries(std::ostream& os) {
   using coupling::indexing::CellIndex;
   using coupling::indexing::IndexTrait;
 
@@ -153,7 +153,7 @@ template <unsigned int dim> void coupling::indexing::testing::printAllBoundaries
   os << std::endl;
 }
 
-template <unsigned int dim> void coupling::indexing::testing::printAllDomains(std::ostream &os) {
+template <unsigned int dim> void coupling::indexing::testing::printAllDomains(std::ostream& os) {
   using coupling::indexing::CellIndex;
   using coupling::indexing::IndexTrait;
 
@@ -254,8 +254,8 @@ template <unsigned int dim> void coupling::indexing::testing::printAllDomains(st
   os << std::endl;
 }
 
-template <unsigned int dim, coupling::indexing::IndexTrait... traits> void coupling::indexing::testing::printIndexDomain(std::ostream &os) {
-  for (const auto &index : CellIndex<dim, traits...>())
+template <unsigned int dim, coupling::indexing::IndexTrait... traits> void coupling::indexing::testing::printIndexDomain(std::ostream& os) {
+  for (const auto& index : CellIndex<dim, traits...>())
     os << coupling::indexing::BaseIndex<dim>(index) << std::endl;
 }
 
@@ -264,7 +264,7 @@ template <unsigned int dim, coupling::indexing::IndexTrait... traits> void coupl
   using coupling::indexing::CellIndex;
   using coupling::indexing::IndexTrait;
 
-  for (const auto &i : CellIndex<dim, traits...>()) { // for each valid global index
+  for (const auto& i : CellIndex<dim, traits...>()) { // for each valid global index
     // check trivial conversion: tested index -> some other index -> tested
     // index == tested index
     try {
@@ -289,7 +289,7 @@ template <unsigned int dim, coupling::indexing::IndexTrait... traits> void coupl
       checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>(i);
       checkTrivialConversion<dim, I, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(i);
       checkTrivialConversion<dim, I, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(i);
-    } catch (std::runtime_error &e) {
+    } catch (std::runtime_error& e) {
       using namespace std::string_literals;
 
       if constexpr (sizeof...(traits) > 0)
@@ -313,7 +313,7 @@ template <unsigned int dim, class Index, IndexTrait... convert_to_traits> void c
   // try "back and forth" conversion
   try {
     conv_i = CellIndex<dim, convert_to_traits...>{i};
-  } catch (std::runtime_error &e) {
+  } catch (std::runtime_error& e) {
     std::cout << static_cast<coupling::indexing::BaseIndex<dim>>(i) << std::endl;
     std::cout << CellIndex<dim, convert_to_traits...>::lowerBoundary << std::endl;
 

@@ -14,7 +14,7 @@ const std::string coupling::configurations::ParticleInsertionConfiguration::REST
 const std::string coupling::configurations::ParticleInsertionConfiguration::TOLERANCE("tolerance");
 const std::string coupling::configurations::ParticleInsertionConfiguration::OFFSET_FROM_OUTER_BOUNDARY("offset-from-outer-boundary");
 
-void coupling::configurations::ParticleInsertionConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void coupling::configurations::ParticleInsertionConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   int buf = -1;
 
   // specify the type of insertion

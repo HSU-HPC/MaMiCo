@@ -25,15 +25,15 @@ class DeleteMoleculesMapping;
  */
 class simplemd::cellmappings::DeleteMoleculesMapping {
 public:
-  DeleteMoleculesMapping(simplemd::services::MoleculeService &moleculeService) : _moleculeService(moleculeService) {}
+  DeleteMoleculesMapping(simplemd::services::MoleculeService& moleculeService) : _moleculeService(moleculeService) {}
   ~DeleteMoleculesMapping() {}
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
 
 private:
-  simplemd::services::MoleculeService &_moleculeService;
+  simplemd::services::MoleculeService& _moleculeService;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_DELETEMOLECULESMAPPING_H_

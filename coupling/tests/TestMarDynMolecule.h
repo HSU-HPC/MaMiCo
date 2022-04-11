@@ -25,7 +25,7 @@
  */
 class TestMarDynMolecule : public TestMarDyn {
 public:
-  TestMarDynMolecule(int argc, char **argv, std::string name) : TestMarDyn(argc, argv, name) {}
+  TestMarDynMolecule(int argc, char** argv, std::string name) : TestMarDyn(argc, argv, name) {}
   virtual ~TestMarDynMolecule() {}
 
   virtual void run() {
@@ -66,15 +66,14 @@ public:
   }
 
 protected:
-  void potEnergyAndForceTest(bool detail, int &errors) {
-    MarDynMDSolverInterface *mdsi =
-        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
+  void potEnergyAndForceTest(bool detail, int& errors) {
+    MarDynMDSolverInterface* mdsi = (MarDynMDSolverInterface*)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
     double potentialEnergy = 0.0;
 
     // get particle container from simulation
-    LinkedCells *cells = (LinkedCells *)mdsi->getSimulation()->getMolecules();
+    LinkedCells* cells = (LinkedCells*)mdsi->getSimulation()->getMolecules();
 
-    Molecule *curMolecule;
+    Molecule* curMolecule;
     int counter = 0;
     for (curMolecule = cells->begin(); curMolecule != cells->end(); curMolecule = cells->next()) {
       counter++;
@@ -152,9 +151,9 @@ protected:
     }
   }
 
-  void getSetTest(bool detail, int &errors) {
+  void getSetTest(bool detail, int& errors) {
     // get the first molecule from the simulation
-    Molecule *molecule = this->_marDyn->getMolecules()->begin();
+    Molecule* molecule = this->_marDyn->getMolecules()->begin();
 
     // input values
     tarch::la::Vector<3, double> inputPosition(0.0);
@@ -234,9 +233,9 @@ protected:
     }
   }
 
-  void compareMoleculeList(bool detail, int &currentCellIndex, int &errors) {
+  void compareMoleculeList(bool detail, int& currentCellIndex, int& errors) {
     // get particle container from simulation
-    LinkedCells *cells = (LinkedCells *)this->_marDyn->getMolecules();
+    LinkedCells* cells = (LinkedCells*)this->_marDyn->getMolecules();
 
     // for testing get first cell and create MarDynCell
     ParticleCell pc;
@@ -257,7 +256,7 @@ protected:
     MarDynCell cell = MarDynCell(&pc, cells->getCutoff());
 
     // vector containing all molecules of the particle cell
-    std::vector<Molecule *> moleculesInParticleCell = pc.getParticlePointers();
+    std::vector<Molecule*> moleculesInParticleCell = pc.getParticlePointers();
 
     // set up molecule iterator for testing
     MarDynMoleculeIterator mdmi(cell);

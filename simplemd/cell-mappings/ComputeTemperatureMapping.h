@@ -23,9 +23,9 @@ class ComputeTemperatureMapping;
  */
 class simplemd::cellmappings::ComputeTemperatureMapping {
 public:
-  ComputeTemperatureMapping(simplemd::services::ParallelTopologyService &parallelTopologyService,
-                            const simplemd::services::MolecularPropertiesService &molecularPropertiesService,
-                            const tarch::la::Vector<MD_DIM, double> &meanVelocity, const unsigned int &localMDSimulation, const bool &writeToFile = true)
+  ComputeTemperatureMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
+                            const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                            const tarch::la::Vector<MD_DIM, double>& meanVelocity, const unsigned int& localMDSimulation, const bool& writeToFile = true)
       : _parallelTopologyService(parallelTopologyService), _molecularPropertiesService(molecularPropertiesService), _meanVelocity(meanVelocity),
         _localMDSimulation(localMDSimulation), _writeToFile(writeToFile) {}
   ~ComputeTemperatureMapping() {}
@@ -65,22 +65,22 @@ public:
 #endif
   }
 
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
     double buffer;
-    for (std::list<Molecule *>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
+    for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
       buffer = tarch::la::dot(_meanVelocity - (*m1)->getConstVelocity(), _meanVelocity - (*m1)->getConstVelocity());
       _temperature += buffer;
       _particleCounter++;
     }
   }
 
-  void handleCellPair(LinkedCell &cell1, LinkedCell &cell2, const unsigned int &cellIndex1, const unsigned int &cellIndex2) {}
+  void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {}
 
-  const double &getTemperature() const { return _temperature; }
+  const double& getTemperature() const { return _temperature; }
 
 private:
-  simplemd::services::ParallelTopologyService &_parallelTopologyService;
-  const simplemd::services::MolecularPropertiesService &_molecularPropertiesService;
+  simplemd::services::ParallelTopologyService& _parallelTopologyService;
+  const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
   /** counts the global number of molecules */
   unsigned int _particleCounter;
   /** stores the temperature */

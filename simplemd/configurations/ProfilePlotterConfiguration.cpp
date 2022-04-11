@@ -14,7 +14,7 @@ const std::string simplemd::configurations::ProfilePlotterConfiguration::START_A
 simplemd::configurations::ProfilePlotterConfiguration::ProfilePlotterConfiguration()
     : _writeEveryTimestep(0), _sampleEveryTimestep(0), _startAtTimestep(0), _startCell(0), _range(0), _isValid(false) {}
 
-void simplemd::configurations::ProfilePlotterConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void simplemd::configurations::ProfilePlotterConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   _isValid = true;
   tarch::la::Vector<MD_DIM, int> buf(-1);
   int intBuf = -1;

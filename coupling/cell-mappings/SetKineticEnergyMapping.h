@@ -32,8 +32,8 @@ public:
    *	@param meanVelocity
    *	@param mdSolverInterface
    */
-  SetKineticEnergyMapping(const double &oldKineticEnergy, const double &newKineticEnergy, const unsigned int &numberParticles,
-                          const tarch::la::Vector<dim, double> &meanVelocity, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+  SetKineticEnergyMapping(const double& oldKineticEnergy, const double& newKineticEnergy, const unsigned int& numberParticles,
+                          const tarch::la::Vector<dim, double>& meanVelocity, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
       : _mdSolverInterface(mdSolverInterface), _meanVelocity(meanVelocity),
         _correctionFactor(getCorrectionFactor(oldKineticEnergy, newKineticEnergy, numberParticles, meanVelocity)) {}
 
@@ -53,11 +53,11 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
-      coupling::interface::Molecule<dim> &wrapper(it->get());
+      coupling::interface::Molecule<dim>& wrapper(it->get());
       tarch::la::Vector<dim, double> velocity = wrapper.getVelocity();
 
       // set new velocity: still with same mean, but re-scale the deviation for
@@ -78,8 +78,8 @@ private:
    *	@remark no correction possible if the correction factor would tend to
    *infinity; I just hard-coded 1e-7 for this case
    */
-  double getCorrectionFactor(const double &oldKineticEnergy, const double &newKineticEnergy, const unsigned int &numberParticles,
-                             const tarch::la::Vector<dim, double> &meanVelocity) const {
+  double getCorrectionFactor(const double& oldKineticEnergy, const double& newKineticEnergy, const unsigned int& numberParticles,
+                             const tarch::la::Vector<dim, double>& meanVelocity) const {
     const double mass = _mdSolverInterface->getMoleculeMass();
 
     // no correction possible if the correction factor would tend to infinity; I
@@ -94,7 +94,7 @@ private:
     return correctionFactor;
   }
 
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   const tarch::la::Vector<dim, double> _meanVelocity;
   const double _correctionFactor;
 };

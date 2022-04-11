@@ -10,7 +10,7 @@ const std::string simplemd::configurations::VTKConfiguration::WRITE_EVERY_TIMEST
 
 simplemd::configurations::VTKConfiguration::VTKConfiguration() : _filename(""), _writeEveryTimestep(0), _isValid(true) {}
 
-void simplemd::configurations::VTKConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void simplemd::configurations::VTKConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   int buffer = -1;
   // parse write-every-timestep
   tarch::configuration::ParseConfiguration::readIntMandatory(buffer, node, WRITE_EVERY_TIMESTEP);

@@ -16,7 +16,7 @@ namespace la {
  * 	@author Philipp Neumann
  *	@return result resulting vector
  */
-template <int size, class T> tarch::la::Vector<size, T> operator+(const tarch::la::Vector<size, T> &l, const tarch::la::Vector<size, T> &r) {
+template <int size, class T> tarch::la::Vector<size, T> operator+(const tarch::la::Vector<size, T>& l, const tarch::la::Vector<size, T>& r) {
   tarch::la::Vector<size, T> result;
   for (int i = 0; i < size; i++) {
     result[i] = l[i] + r[i];
@@ -31,7 +31,7 @@ template <int size, class T> tarch::la::Vector<size, T> operator+(const tarch::l
  * 	@author Philipp Neumann
  *	@return result resulting vector
  */
-template <int size, class T> tarch::la::Vector<size, T> operator-(const tarch::la::Vector<size, T> &l, const tarch::la::Vector<size, T> &r) {
+template <int size, class T> tarch::la::Vector<size, T> operator-(const tarch::la::Vector<size, T>& l, const tarch::la::Vector<size, T>& r) {
   tarch::la::Vector<size, T> result;
   for (int i = 0; i < size; i++) {
     result[i] = l[i] - r[i];
@@ -46,7 +46,7 @@ template <int size, class T> tarch::la::Vector<size, T> operator-(const tarch::l
  * 	@author Philipp Neumann
  *	@return result resulting vector
  */
-template <int size, class T> tarch::la::Vector<size, T> operator*(const tarch::la::Vector<size, T> &v, const T &s) {
+template <int size, class T> tarch::la::Vector<size, T> operator*(const tarch::la::Vector<size, T>& v, const T& s) {
   tarch::la::Vector<size, T> result;
   for (int i = 0; i < size; i++) {
     result[i] = v[i] * s;
@@ -61,7 +61,7 @@ template <int size, class T> tarch::la::Vector<size, T> operator*(const tarch::l
  * 	@author Philipp Neumann
  *	@return result resulting vector
  */
-template <int size, class T> tarch::la::Vector<size, T> operator*(const T &s, const tarch::la::Vector<size, T> &v) {
+template <int size, class T> tarch::la::Vector<size, T> operator*(const T& s, const tarch::la::Vector<size, T>& v) {
   tarch::la::Vector<size, T> result;
   for (int i = 0; i < size; i++) {
     result[i] = v[i] * s;
@@ -76,7 +76,7 @@ template <int size, class T> tarch::la::Vector<size, T> operator*(const T &s, co
  * 	@author Philipp Neumann
  *	@return t resulting scalar
  */
-template <int size, class T> T dot(const tarch::la::Vector<size, T> &l, const tarch::la::Vector<size, T> &r) {
+template <int size, class T> T dot(const tarch::la::Vector<size, T>& l, const tarch::la::Vector<size, T>& r) {
   T t = l[0] * r[0];
   for (int i = 1; i < size; i++) {
     t += l[i] * r[i];
@@ -92,7 +92,7 @@ template <int size, class T> T dot(const tarch::la::Vector<size, T> &l, const ta
  * 	@author Philipp Neumann
  *	@return equal result; true: if they are equal, false otherwise.
  */
-template <int size, class T> bool operator==(const Vector<size, T> &l, const Vector<size, T> &r) {
+template <int size, class T> bool operator==(const Vector<size, T>& l, const Vector<size, T>& r) {
   bool equal = true;
   for (int i = 0; i < size; i++) {
     equal = equal && (l[i] == r[i]);
@@ -108,7 +108,7 @@ template <int size, class T> bool operator==(const Vector<size, T> &l, const Vec
  * 	@author Philipp Neumann
  *	@return true: if they are NOT equal, false otherwise.
  */
-template <int size, class T> bool operator!=(const Vector<size, T> &l, const Vector<size, T> &r) {
+template <int size, class T> bool operator!=(const Vector<size, T>& l, const Vector<size, T>& r) {
   for (int i = 0; i < size; i++) {
     if (l[i] != r[i])
       return true;
@@ -124,7 +124,7 @@ template <int size, class T> bool operator!=(const Vector<size, T> &l, const Vec
  *	@return the square root of the inner product (dot product) of a vector
  *with itself
  */
-template <int size, class T> T norm2(const Vector<size, T> &v) { return sqrt(tarch::la::dot(v, v)); }
+template <int size, class T> T norm2(const Vector<size, T>& v) { return sqrt(tarch::la::dot(v, v)); }
 
 /** this file contains some methods for vector types.
  *	@brief operator overloading for output purposes
@@ -132,7 +132,7 @@ template <int size, class T> T norm2(const Vector<size, T> &v) { return sqrt(tar
  *  	@tparam size Vector size
  * 	@author Philipp Neumann
  */
-template <int size, class T> std::ostream &operator<<(std::ostream &os, const tarch::la::Vector<size, T> &v) {
+template <int size, class T> std::ostream& operator<<(std::ostream& os, const tarch::la::Vector<size, T>& v) {
   for (int i = 0; i < size - 1; i++) {
     os << v[i] << " , ";
   }

@@ -34,7 +34,7 @@ public:
   /** parseSubtag
    * 	@param node
    */
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
 
   /** Returns name of xml tag that is associated to the configuration.
    * 	@return name of xml tag that is associated to the configuration

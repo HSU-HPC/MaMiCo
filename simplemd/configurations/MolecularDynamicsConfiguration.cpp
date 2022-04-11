@@ -4,11 +4,11 @@
 // www5.in.tum.de/mamico
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 
-void simplemd::configurations::MolecularDynamicsConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void simplemd::configurations::MolecularDynamicsConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   const simplemd::configurations::ProfilePlotterConfiguration tagProfilePlotter;
   const simplemd::configurations::ExternalForceConfiguration externalForce;
 
-  for (tinyxml2::XMLElement *child = node->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
+  for (tinyxml2::XMLElement* child = node->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
     std::string nodename(child->Value());
     if (nodename == _domainConfiguration.getTag()) {
       _domainConfiguration.parseSubtag(child);

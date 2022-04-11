@@ -16,7 +16,7 @@
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 // initialise parallel environment
 #if (MD_PARALLEL == MD_YES)
   MPI_Init(&argc, &argv);
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   // initialise multiple MD simulations
   const tarch::utils::MultiMDService<MD_DIM> multiMDService(configuration.getMPIConfiguration().getNumberOfProcesses(), totalNumberMDSimulations);
   const unsigned int localNumberMDSimulations = multiMDService.getLocalNumberOfMDSimulations();
-  std::vector<simplemd::MolecularDynamicsSimulation *> simulations;
+  std::vector<simplemd::MolecularDynamicsSimulation*> simulations;
   for (unsigned int i = 0; i < localNumberMDSimulations; i++) {
     simulations.push_back(new simplemd::MolecularDynamicsSimulation(configuration));
     if (simulations[i] == NULL) {

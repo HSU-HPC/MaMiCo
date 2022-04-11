@@ -52,10 +52,10 @@ public:
   }
   virtual ~MacroscopicCellService() {}
 
-  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &macroscopicCellsFromMacroscopicSolver,
-                                const unsigned int *const globalCellIndicesFromMacroscopicSolver) = 0;
-  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &macroscopicCellsFromMacroscopicSolver,
-                                  const unsigned int *const globalCellIndicesFromMacroscopicSolver) = 0;
+  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+                                const unsigned int* const globalCellIndicesFromMacroscopicSolver) = 0;
+  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+                                  const unsigned int* const globalCellIndicesFromMacroscopicSolver) = 0;
   virtual void processInnerMacroscopicCellAfterMDTimestep() = 0;
   virtual void computeAndStoreTemperature(double temperature) = 0;
   virtual void applyTemperatureToMolecules(unsigned int t) = 0;
@@ -64,13 +64,13 @@ public:
   virtual void applyBoundaryForce(unsigned int t) = 0;
   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
   virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
-  virtual const coupling::IndexConversion<dim> &getIndexConversion() const = 0;
+  virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
   virtual void initFiltering() {
     throw std::runtime_error("MacroscopicCellService: Error: Called "
                              "initFiltering for non-Impl object.");
   } /*Note: This is not pure virtual, because some implementations of this
        interface don't have a FilterPipeline. */
-  virtual const coupling::filtering::FilterPipeline<dim> *getFilterPipeline() const {
+  virtual const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const {
     throw std::runtime_error("MacroscopicCellService: Error: Called getFilterPipeline() in instance "
                              "without FilterPipeline.");
   } /*Note: This is not pure virtual, because some implementations of this
@@ -111,44 +111,44 @@ public:
    * routines may use those as well.
    */
   MacroscopicCellServiceImpl(
-      unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface,       // interface to MD simulation
-      coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface,                  // interface to macroscopic solver
+      unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,       // interface to MD simulation
+      coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,                  // interface to macroscopic solver
       tarch::la::Vector<dim, unsigned int> numberProcesses,                                              // number of processes in all directions
       unsigned int rank,                                                                                 // current rank
-      const coupling::configurations::ParticleInsertionConfiguration &particleInsertionConfiguration,    // configuration for particle
+      const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,    // configuration for particle
                                                                                                          // insertion
-      const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,    // configuration for momentum
+      const coupling::configurations::MomentumInsertionConfiguration& momentumInsertionConfiguration,    // configuration for momentum
                                                                                                          // insertion
-      const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,       // configuration for boundary forces
-      const coupling::configurations::TransferStrategyConfiguration<dim> &transferStrategyConfiguration, // configuration for transfer strategy
-      const coupling::configurations::ParallelTopologyConfiguration &parallelTopologyConfiguration,      // configuration for parallel topology
-      const coupling::configurations::ThermostatConfiguration &thermostatConfiguration,
+      const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,       // configuration for boundary forces
+      const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration, // configuration for transfer strategy
+      const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,      // configuration for parallel topology
+      const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling
                                                                                                        // cycle (required to initialise
                                                                                                        // transfer strategy)
-      const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells
+      const coupling::configurations::MacroscopicCellConfiguration<dim>& macroscopicCellConfiguration, // configuration for macroscopic cells
                                                                                                        // and respective plotting
-      const char *filterPipelineConfiguration, const tarch::utils::MultiMDService<dim> &multiMDService, unsigned int topologyOffset, int tws = 0);
+      const char* filterPipelineConfiguration, const tarch::utils::MultiMDService<dim>& multiMDService, unsigned int topologyOffset, int tws = 0);
 
   MacroscopicCellServiceImpl(
-      unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim> *mdSolverInterface,       // interface to MD simulation
-      coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface,                  // interface to macroscopic solver
+      unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,       // interface to MD simulation
+      coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,                  // interface to macroscopic solver
       tarch::la::Vector<dim, unsigned int> numberProcesses,                                              // number of processes in all directions
       unsigned int rank,                                                                                 // current rank
-      const coupling::configurations::ParticleInsertionConfiguration &particleInsertionConfiguration,    // configuration for particle
+      const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,    // configuration for particle
                                                                                                          // insertion
-      const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,    // configuration for momentum
+      const coupling::configurations::MomentumInsertionConfiguration& momentumInsertionConfiguration,    // configuration for momentum
                                                                                                          // insertion
-      const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,       // configuration for boundary forces
-      const coupling::configurations::TransferStrategyConfiguration<dim> &transferStrategyConfiguration, // configuration for transfer strategy
-      const coupling::configurations::ParallelTopologyConfiguration &parallelTopologyConfiguration,      // configuration for parallel topology
-      const coupling::configurations::ThermostatConfiguration &thermostatConfiguration,
+      const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,       // configuration for boundary forces
+      const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration, // configuration for transfer strategy
+      const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,      // configuration for parallel topology
+      const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,                                                  // number MD timesteps per coupling
                                                                                                        // cycle (required to initialise
                                                                                                        // transfer strategy)
-      const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration, // configuration for macroscopic cells
+      const coupling::configurations::MacroscopicCellConfiguration<dim>& macroscopicCellConfiguration, // configuration for macroscopic cells
                                                                                                        // and respective plotting
-      const char *filterPipelineConfiguration, const tarch::utils::MultiMDService<dim> &multiMDService)
+      const char* filterPipelineConfiguration, const tarch::utils::MultiMDService<dim>& multiMDService)
       : MacroscopicCellServiceImpl<LinkedCell, dim>(ID, mdSolverInterface, macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,
                                                     momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration,
                                                     parallelTopologyConfiguration, thermostatConfiguration, numberMDTimestepsPerCouplingCycle,
@@ -166,8 +166,8 @@ public:
    *  parallelisation via MPI) and writes the respective information to the
    * macroscopic cells of the tool
    */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &macroscopicCellsFromMacroscopicSolver,
-                        const unsigned int *const globalCellIndicesFromMacroscopicSolver);
+  void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+                        const unsigned int* const globalCellIndicesFromMacroscopicSolver);
 
   /** sends information from MD to the macroscopic solver. After the
    * send/recv-operations (this also comprises the distributed memory
@@ -176,8 +176,8 @@ public:
    * the respective global cell indices
    *  (-> globalCellIndicesFromMacroscopicSolver).
    */
-  double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &macroscopicCellsFromMacroscopicSolver,
-                          const unsigned int *const globalCellIndicesFromMacroscopicSolver);
+  double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+                          const unsigned int* const globalCellIndicesFromMacroscopicSolver);
 
   /** carries out coupling-dependent operations (such as sampling) on the
    * non-ghost macroscopic cells after each MD time step. This method needs thus
@@ -220,7 +220,7 @@ public:
    * easily accessed. This is thus not required by the internal mechanisms of
    * the coupling tool.
    */
-  const coupling::IndexConversion<dim> &getIndexConversion() const { return *_indexConversion; }
+  const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 
   /**
    * Initialises the _filterPipeline member. Called from _multiMDCellService's
@@ -232,7 +232,7 @@ public:
                                                                    _multiMDService, _filterPipelineConfiguration);
   }
 
-  const coupling::filtering::FilterPipeline<dim> *getFilterPipeline() const { return _filterPipeline; }
+  const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const { return _filterPipeline; }
 
   /**
    * Creates a new filter from scratch and appends it to a sequence that is part
@@ -256,7 +256,7 @@ public:
 
   /** returns the macroscopic cells. This functions is meant to be used in test
    * scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
-  coupling::datastructures::MacroscopicCells<LinkedCell, dim> &getMacroscopicCells() { return _macroscopicCells; }
+  coupling::datastructures::MacroscopicCells<LinkedCell, dim>& getMacroscopicCells() { return _macroscopicCells; }
 
 private:
 // ------------------- INCLUDE WRAPPER DEFINITIONS
@@ -266,7 +266,7 @@ private:
    * thing to be done in the constructor since nearly all subsequent operations
    * depend on indexing of cells.
    */
-  coupling::IndexConversion<dim> *initIndexConversion(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> numberProcesses,
+  coupling::IndexConversion<dim>* initIndexConversion(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> numberProcesses,
                                                       unsigned int rank, tarch::la::Vector<dim, double> globalMDDomainSize,
                                                       tarch::la::Vector<dim, double> globalMDDomainOffset,
                                                       coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset) const;
@@ -276,29 +276,29 @@ private:
 
   tarch::la::Vector<dim, double> getPositionOfFirstLocalGhostCell() const;
 
-  std::function<void(Wrapper &)> initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration &thermostatConfiguration) {
+  std::function<void(Wrapper&)> initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration& thermostatConfiguration) {
     if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::all)
-      return [this](Wrapper &wrapper) { _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper); };
+      return [this](Wrapper& wrapper) { _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper); };
     else if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::outerLayers)
-      return [this, &thermostatConfiguration](Wrapper &wrapper) {
+      return [this, &thermostatConfiguration](Wrapper& wrapper) {
         _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCells(wrapper, thermostatConfiguration.getCells2Use());
       };
     else if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::onlyOutestLayer)
-      return [this](Wrapper &wrapper) { _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper); };
+      return [this](Wrapper& wrapper) { _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper); };
     else
-      return [](Wrapper &wrapper) {};
+      return [](Wrapper& wrapper) {};
   }
 
   /** needed to determine cell range, ranks etc. */
-  const coupling::IndexConversion<dim> *_indexConversion;
+  const coupling::IndexConversion<dim>* _indexConversion;
   /** number of MD time steps in each coupling cycle */
   const unsigned int _numberMDTimestepsPerCouplingCycle;
 
   /** interface for MD solver */
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *_mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* _mdSolverInterface;
 
   /** interface for macroscopic solver */
-  coupling::interface::MacroscopicSolverInterface<dim> *_macroscopicSolverInterface;
+  coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
 
   /** for quantity transfer between solvers */
   coupling::sendrecv::FromMacro2MD<coupling::datastructures::MacroscopicCell<dim>, dim> _fromMacro2MD;
@@ -310,32 +310,32 @@ private:
   coupling::datastructures::MacroscopicCells<LinkedCell, dim> _macroscopicCells;
 
   /** filter pipeline, used to apply filters in sendFromMD2Macro */
-  coupling::filtering::FilterPipeline<dim> *_filterPipeline;
+  coupling::filtering::FilterPipeline<dim>* _filterPipeline;
 
   /**parameters needed in initFiltering() */
-  const char *_filterPipelineConfiguration;
+  const char* _filterPipelineConfiguration;
   const tarch::utils::MultiMDService<dim> _multiMDService;
 
   /** needed for insertion of momentum */
-  coupling::MomentumInsertion<LinkedCell, dim> *_momentumInsertion;
+  coupling::MomentumInsertion<LinkedCell, dim>* _momentumInsertion;
   coupling::configurations::MomentumInsertionConfiguration::MomentumInsertionType _momentumInsertionType;
   /** needed for insertion of particles, e.g. USHER */
-  coupling::ParticleInsertion<LinkedCell, dim> *_particleInsertion;
+  coupling::ParticleInsertion<LinkedCell, dim>* _particleInsertion;
   const tarch::la::Vector<dim, unsigned int> _numberLinkedCellsPerMacroscopicCell;
   const coupling::configurations::ParticleInsertionConfiguration::ParticleInsertionType _particleInsertionType;
   /** coupling strategy */
-  coupling::transferstrategies::TransferStrategy<LinkedCell, dim> *_transferStrategy;
+  coupling::transferstrategies::TransferStrategy<LinkedCell, dim>* _transferStrategy;
 
   /** controls the kinetic energy of the system, i.e. maintains temperature in
    * case of changing mass/momentum. */
   coupling::KineticEnergyController<LinkedCell, dim> _kineticEnergyController;
   /** controls and apply boundary forces to molecules close to open
    * boundaries.*/
-  coupling::BoundaryForceController<LinkedCell, dim> *_boundaryForceController;
+  coupling::BoundaryForceController<LinkedCell, dim>* _boundaryForceController;
   /** controls/ maintains momentum, e.g. after particle insertion */
   coupling::MomentumController<LinkedCell, dim> _momentumController;
 
-  std::function<void(Wrapper &)> _applyAccordingToConfiguration;
+  std::function<void(Wrapper&)> _applyAccordingToConfiguration;
 
   /** information for plotting */
   const std::string _microscopicFilename;

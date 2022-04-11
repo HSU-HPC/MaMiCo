@@ -4,14 +4,14 @@
 // www5.in.tum.de/mamico
 #include "simplemd/MolecularDynamicsSimulation.h"
 
-simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration &configuration)
+simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
     : _configuration(configuration), _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL), _lennardJonesForce(NULL),
       _emptyLinkedListsMapping(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL), _parallelTopologyService(NULL),
       _moleculeService(NULL), _linkedCellService(NULL), _molecularPropertiesService(NULL),
       // initialise external forces
       _externalForceService(configuration.getExternalForceConfigurations()) {}
 
-double simplemd::MolecularDynamicsSimulation::getNumberDensity(unsigned int numberMolecules, const tarch::la::Vector<MD_DIM, double> &domainSize) const {
+double simplemd::MolecularDynamicsSimulation::getNumberDensity(unsigned int numberMolecules, const tarch::la::Vector<MD_DIM, double>& domainSize) const {
   double density = 1.0;
   for (unsigned int d = 0; d < MD_DIM; d++) {
     density = density / domainSize[d];
@@ -223,7 +223,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
   } // end is process not idle
 }
 
-void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::MultiMDService<MD_DIM> &multiMDService, unsigned int localMDSimulation) {
+void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::MultiMDService<MD_DIM>& multiMDService, unsigned int localMDSimulation) {
   // set vtk file stem and checkpoint filestem;
   _localMDSimulation = localMDSimulation;
   std::stringstream filestems;
@@ -499,7 +499,7 @@ void simplemd::MolecularDynamicsSimulation::shutdownServices() {
   }
 }
 
-void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned int &t) {
+void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned int& t) {
   // nop for idle processes
   if (_parallelTopologyService->isIdle()) {
     return;
@@ -593,7 +593,7 @@ void simplemd::MolecularDynamicsSimulation::runSimulation() {
   }
 }
 
-void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned int &t) {
+void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned int& t) {
   const unsigned int timeInterval = _configuration.getSimulationConfiguration().computeMacroscopicQuantitiesEveryTimestep();
 
   if (_configuration.getRDFConfiguration().isDefined()) {

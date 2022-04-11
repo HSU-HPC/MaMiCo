@@ -29,8 +29,8 @@ public:
    *	@param mdSolverInterface
    *	@param boundaryForceController
    */
-  ComputeMeanPotentialEnergyMapping(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
-                                    const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController)
+  ComputeMeanPotentialEnergyMapping(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                                    const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController)
       : _mdSolverInterface(mdSolverInterface), _meanPotentialEnergy(0.0), _particleCounter(0), _boundaryForceController(boundaryForceController) {}
 
   /** Destructor */
@@ -59,11 +59,11 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
-      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
+      const coupling::interface::Molecule<dim>& wrapper(it->getConst());
       _meanPotentialEnergy += wrapper.getPotentialEnergy();
       _meanPotentialEnergy += _boundaryForceController.getPotentialEnergy(wrapper.getPosition());
       _particleCounter++;
@@ -79,9 +79,9 @@ public:
   double getPotentialEnergy() const { return _meanPotentialEnergy; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   double _meanPotentialEnergy;
   unsigned int _particleCounter;
-  const coupling::BoundaryForceController<LinkedCell, dim> &_boundaryForceController;
+  const coupling::BoundaryForceController<LinkedCell, dim>& _boundaryForceController;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEMEANPOTENTIALENERGYMAPPING_H_

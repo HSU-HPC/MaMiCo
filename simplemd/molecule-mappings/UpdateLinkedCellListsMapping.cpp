@@ -20,9 +20,9 @@ void simplemd::moleculemappings::UpdateLinkedCellListsMapping::beginMoleculeIter
   }
 }
 
-void simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule(Molecule &molecule) {
+void simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule(Molecule& molecule) {
 
-  const tarch::la::Vector<MD_DIM, double> &position(molecule.getConstPosition());
+  const tarch::la::Vector<MD_DIM, double>& position(molecule.getConstPosition());
   for (unsigned int d = 0; d < MD_DIM; d++) {
 #if (MD_ERROR == MD_YES)
     if ((position[d] < _domainOffset[d] - _meshWidth[d]) || (position[d] > _domainOffset[d] + _domainSize[d] + _meshWidth[d])) {

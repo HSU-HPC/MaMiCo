@@ -34,8 +34,8 @@ public:
    *  @param comm the mpi communicator to use
    *  @param lowestRankInComm the lowest rank in the mpi communicator
    */
-  IndexConversionMD2Macro(const coupling::IndexConversion<dim> *indexConversion,
-                          coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface
+  IndexConversionMD2Macro(const coupling::IndexConversion<dim>* indexConversion,
+                          coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                           ,
                           const MPI_Comm comm = MPI_COMM_WORLD, const int lowestRankInComm = 0
@@ -89,10 +89,10 @@ public:
    *  @param outerCells Vector containing all outer cells.
    *  @param outerIndices Vector containing all outer indices.
    */
-  void initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> m2mDomainCells,
+  void initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim>*> m2mDomainCells,
                           std::vector<tarch::la::Vector<dim, unsigned int>> m2mGlobalCellIndices,
-                          std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outerCells,
-                          std::vector<tarch::la::Vector<dim, unsigned int>> &outerIndices);
+                          std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outerCells,
+                          std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices);
 
   /** This alternative chooses a subspace of the cell (and index) input based on
    * what will be transfered to the macro solver. This subspace is referred to
@@ -111,11 +111,11 @@ public:
    *  @param m2mIndices Output vector where indices of those outer cells shall
    * be placed.
    */
-  void initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCells,
-                          std::vector<coupling::datastructures::MacroscopicCell<dim> *> &m2mDomainCells,
-                          std::vector<tarch::la::Vector<dim, unsigned int>> &m2mIndices,
-                          std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outerCells,
-                          std::vector<tarch::la::Vector<dim, unsigned int>> &outerIndices);
+  void initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCells,
+                          std::vector<coupling::datastructures::MacroscopicCell<dim>*>& m2mDomainCells,
+                          std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
+                          std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outerCells,
+                          std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices);
 
   /** For all d < dim, lowerBoundaries[d] < upperBoundaries[d].
    *  If M2M-domain is not yet defined, this does nothing.
@@ -124,7 +124,7 @@ public:
    *  @param lowerBoundaries Index to write lower boundaries to.
    *  @param upperBoundaries Index to write upper boundaries to.
    * */
-  void getMD2MacroDomainBoundariesAllRanks(tarch::la::Vector<dim, unsigned int> &lowerBoundaries, tarch::la::Vector<dim, unsigned int> &upperBoundaries) const {
+  void getMD2MacroDomainBoundariesAllRanks(tarch::la::Vector<dim, unsigned int>& lowerBoundaries, tarch::la::Vector<dim, unsigned int>& upperBoundaries) const {
     if (_lowerBoundaryAllRanks != _upperBoundaryAllRanks) {
       lowerBoundaries = *_lowerBoundaryAllRanks;
       upperBoundaries = *_upperBoundaryAllRanks;
@@ -150,7 +150,7 @@ public:
    *  @param lowerBoundaries Index to write lower boundaries to.
    *  @param upperBoundaries Index to write upper boundaries to.
    * */
-  void getMD2MacroDomainBoundariesThisRank(tarch::la::Vector<dim, unsigned int> &lowerBoundaries, tarch::la::Vector<dim, unsigned int> &upperBoundaries) const {
+  void getMD2MacroDomainBoundariesThisRank(tarch::la::Vector<dim, unsigned int>& lowerBoundaries, tarch::la::Vector<dim, unsigned int>& upperBoundaries) const {
     if (_lowerBoundaryThisRank != _upperBoundaryThisRank) {
       lowerBoundaries = *_lowerBoundaryThisRank;
       upperBoundaries = *_upperBoundaryThisRank;
@@ -236,7 +236,7 @@ public:
    * IC element with ease.
    *
    *  @return the IndexConversion this wrapper class is used for */
-  const coupling::IndexConversion<dim> *getBaseIC() const { return _ic; }
+  const coupling::IndexConversion<dim>* getBaseIC() const { return _ic; }
 
   /** Same as getLocalCellIndex, but converts in terms of MD-To-Macro indexing.
    *
@@ -257,30 +257,30 @@ private:
   void initGlobalMD2MacroDomainBoundaries();
   /** IndexConversionMD2Macro is a wrapper class for IndexConversion. This is
    * the underlying IndexConversion. */
-  const coupling::IndexConversion<dim> *_ic;
+  const coupling::IndexConversion<dim>* _ic;
   /** Used to determine which cell indices are received by the Macroscopic
    * Solver. */
-  coupling::interface::MacroscopicSolverInterface<dim> *_msi;
+  coupling::interface::MacroscopicSolverInterface<dim>* _msi;
   /** Indices of the first cell of the MD-To-Macro domain on all ranks.
    *  Initialised during first call of getMD2MacroDomainBoundaries.
    *  Indexing here is relative to the entire MD-Domain (i.e. what is sometimes
    * referred to as MD-Indexing/MaMiCo-Indexing) */
-  tarch::la::Vector<dim, unsigned int> *_lowerBoundaryAllRanks;
+  tarch::la::Vector<dim, unsigned int>* _lowerBoundaryAllRanks;
   /** Indices of the last cell of the MD-To-Macro domain on all ranks.
    *  Initialised during first call of getMD2MacroDomainBoundaries.
    *  Indexing here is relative to the entire MD-Domain (i.e. what is sometimes
    * referred to as MD-Indexing/MaMiCo-Indexing) */
-  tarch::la::Vector<dim, unsigned int> *_upperBoundaryAllRanks;
+  tarch::la::Vector<dim, unsigned int>* _upperBoundaryAllRanks;
   /** Indices of the first cell of the MD-To-Macro domain on this rank.
    *  Initialised during first call of getMD2MacroDomainBoundaries.
    *  Indexing here is relative to the entire MD-Domain (i.e. what is sometimes
    * referred to as MD-Indexing/MaMiCo-Indexing) */
-  tarch::la::Vector<dim, unsigned int> *_lowerBoundaryThisRank;
+  tarch::la::Vector<dim, unsigned int>* _lowerBoundaryThisRank;
   /** Indices of the first last cell of the MD-To-Macro domain on this rank.
    *  Initialised during first call of getMD2MacroDomainBoundaries.
    *  Indexing here is relative to the entire MD-Domain (i.e. what is sometimes
    * referred to as MD-Indexing/MaMiCo-Indexing) */
-  tarch::la::Vector<dim, unsigned int> *_upperBoundaryThisRank;
+  tarch::la::Vector<dim, unsigned int>* _upperBoundaryThisRank;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   /** mpi communicator */
   const MPI_Comm _comm;

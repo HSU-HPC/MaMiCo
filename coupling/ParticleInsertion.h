@@ -43,10 +43,10 @@ public:
    *  @returns the type of coupling::ParticleInsertion::Action that was applied
    */
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                   const tarch::la::Vector<dim, double> &macroscopicCellPosition, const tarch::la::Vector<dim, double> &macroscopicCellSize,
-                   const tarch::la::Vector<dim, double> &meanVelocity, const double &temperature,
-                   const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController) = 0;
+  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                   const tarch::la::Vector<dim, double>& macroscopicCellPosition, const tarch::la::Vector<dim, double>& macroscopicCellSize,
+                   const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
+                   const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController) = 0;
 
   /** returns true, if the particle insertion requires information on the
    * potential energy landscape. The USHER algorithm requires it. Other

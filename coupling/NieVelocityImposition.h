@@ -30,8 +30,8 @@ public:
    * simulation
    *  @param outermostLayer the index of the outermost cell layer
    *  @param innermostLayer the index of the innermost cell layer */
-  NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface, const coupling::IndexConversion<dim> &indexConversion,
-                        const unsigned int &outermostLayer, const unsigned int &innermostLayer)
+  NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const coupling::IndexConversion<dim>& indexConversion,
+                        const unsigned int& outermostLayer, const unsigned int& innermostLayer)
       : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _indexConversion(indexConversion), _outermostLayer(outermostLayer),
         _innermostLayer(innermostLayer) {}
 
@@ -46,8 +46,8 @@ public:
    *  @param cell to the macroscopic cell will the momentum be inserted
    *  @param currentLocalMacroscopicCell local linearised index for the
    * macroscopic cell */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                              const unsigned int &currentLocalMacroscopicCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                              const unsigned int& currentLocalMacroscopicCellIndex) const {
     // nop if this is not an imposition cell
     if (!isInsideImpositionLayer(currentLocalMacroscopicCellIndex)) {
       return;
@@ -79,7 +79,7 @@ private:
    * cell to check
    *  @returns a bool, that indicates if the given cell index is located in the
    * imposition layer (true) or not (false) */
-  bool isInsideImpositionLayer(const unsigned int &currentLocalMacroscopicCellIndex) const {
+  bool isInsideImpositionLayer(const unsigned int& currentLocalMacroscopicCellIndex) const {
     const tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(_indexConversion.getGlobalNumberMacroscopicCells());
     const tarch::la::Vector<dim, unsigned int> globalCellIndex(
         _indexConversion.getGlobalVectorCellIndex(_indexConversion.convertLocalToGlobalCellIndex(currentLocalMacroscopicCellIndex)));
@@ -93,7 +93,7 @@ private:
   }
 
   /** @brief a instance of the indexConversion */
-  const coupling::IndexConversion<dim> &_indexConversion;
+  const coupling::IndexConversion<dim>& _indexConversion;
   /** @brief the index of the outermost cell layer*/
   const unsigned int _outermostLayer;
   /** @brief the index of the innermost cell layer*/

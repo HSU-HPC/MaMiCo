@@ -26,7 +26,7 @@ template <class LinkedCell, unsigned int dim> class coupling::SetGivenVelocity4M
 public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface for the md solver */
-  SetGivenVelocity4MomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+  SetGivenVelocity4MomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
       : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface) {}
 
   /** @brief a simple destructor */
@@ -44,8 +44,8 @@ public:
    *  @param cell macroscopic cell
    *  @param currentMacroscopicCellIndex index of the macroscopic cell
    */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                              const unsigned int &currentMacroscopicCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                              const unsigned int& currentMacroscopicCellIndex) const {
     coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> massMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
 

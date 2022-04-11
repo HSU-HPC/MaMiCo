@@ -22,7 +22,7 @@
  */
 class TestMarDynAddDeleteMolecule : public TestMarDyn {
 public:
-  TestMarDynAddDeleteMolecule(int argc, char **argv, std::string name) : TestMarDyn(argc, argv, name) {}
+  TestMarDynAddDeleteMolecule(int argc, char** argv, std::string name) : TestMarDyn(argc, argv, name) {}
 
   virtual ~TestMarDynAddDeleteMolecule() {}
 
@@ -42,18 +42,17 @@ public:
 
 private:
   void deleteMoleculeTest() {
-    MarDynMDSolverInterface *mdsi =
-        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
+    MarDynMDSolverInterface* mdsi = (MarDynMDSolverInterface*)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
 
-    MarDynCoupledSimulation *sim = mdsi->getSimulation();
+    MarDynCoupledSimulation* sim = mdsi->getSimulation();
 
     // molecule count before deletion
     unsigned long int moleculeCountBefore = sim->getMolecules()->getNumberOfParticles();
     std::cout << "Test moleculeCount " << moleculeCountBefore << std::endl;
 
-    LinkedCells *lc = (LinkedCells *)mdsi->getSimulation()->getMolecules();
+    LinkedCells* lc = (LinkedCells*)mdsi->getSimulation()->getMolecules();
 
-    Molecule *molecule = lc->begin();
+    Molecule* molecule = lc->begin();
 
     // molecule values
     tarch::la::Vector<3, double> position(0.0);
@@ -75,7 +74,7 @@ private:
     MarDynMoleculeWrapper testMolecule;
     testMolecule.setMolecule(&internalMolecule, sim->getcutoffRadius());
 
-    coupling::services::MacroscopicCellService<3> *macroCellService =
+    coupling::services::MacroscopicCellService<3>* macroCellService =
         coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMacroscopicCellService();
 
     const tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(1);
@@ -89,7 +88,7 @@ private:
 
     std::cout << "macro cell index: " << macroCellIndex << std::endl;
 
-    MarDynCell &mc = mdsi->getLinkedCell(macroCellIndex, linkedCellInMacroscopicCell, linkedCellsPerMacroscopicCell, macroCellService->getIndexConversion());
+    MarDynCell& mc = mdsi->getLinkedCell(macroCellIndex, linkedCellInMacroscopicCell, linkedCellsPerMacroscopicCell, macroCellService->getIndexConversion());
 
     mdsi->deleteMoleculeFromMDSimulation(testMolecule, mc);
     std::cout << "molecule count in cell after: " << mc.getParticleCell()->getParticlePointers().size() << std::endl;
@@ -112,8 +111,7 @@ private:
 
   void addMoleculeTest() {
     // the md solver interface
-    MarDynMDSolverInterface *mdsi =
-        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
+    MarDynMDSolverInterface* mdsi = (MarDynMDSolverInterface*)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
 
     // molecule values
     tarch::la::Vector<3, double> position(0.0);

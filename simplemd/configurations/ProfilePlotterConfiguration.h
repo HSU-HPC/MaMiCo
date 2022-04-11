@@ -24,7 +24,7 @@ public:
   ProfilePlotterConfiguration();
   virtual ~ProfilePlotterConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
 
   /**
    * Return name of xml tag that is associated to the configuration.
@@ -45,11 +45,11 @@ public:
   bool isValid() const { return _isValid; }
 
   /** getters for all parsed and computed quantities */
-  const tarch::la::Vector<MD_DIM, unsigned int> &getStartCell() const { return _startCell; }
-  const tarch::la::Vector<MD_DIM, unsigned int> &getRange() const { return _range; }
-  const unsigned int &getWriteEveryTimestep() const { return _writeEveryTimestep; }
-  const unsigned int &getSampleEveryTimestep() const { return _sampleEveryTimestep; }
-  const unsigned int &getStartAtTimestep() const { return _startAtTimestep; }
+  const tarch::la::Vector<MD_DIM, unsigned int>& getStartCell() const { return _startCell; }
+  const tarch::la::Vector<MD_DIM, unsigned int>& getRange() const { return _range; }
+  const unsigned int& getWriteEveryTimestep() const { return _writeEveryTimestep; }
+  const unsigned int& getSampleEveryTimestep() const { return _sampleEveryTimestep; }
+  const unsigned int& getStartAtTimestep() const { return _startAtTimestep; }
 
 private:
   static const std::string START_CELL;

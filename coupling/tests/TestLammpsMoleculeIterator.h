@@ -39,7 +39,7 @@
  */
 template <unsigned int dim> class TestLammpsMoleculeIterator : public TestLammps<dim> {
 public:
-  TestLammpsMoleculeIterator(int argc, char **argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
+  TestLammpsMoleculeIterator(int argc, char** argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
   virtual ~TestLammpsMoleculeIterator() {}
 
   virtual void run() {
@@ -54,16 +54,16 @@ public:
 
     // extract information on current process -> required for exact evaluation
     // of quantities in respective, subsequently called test methods
-    coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim> *macroscopicCellService =
-        (coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim> *)
+    coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>* macroscopicCellService =
+        (coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>*)
             coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance()
                 .getMacroscopicCellService();
     if (macroscopicCellService == NULL) {
       std::cout << "ERROR: Could not cast pointer to MacroscopicCellServiceImpl!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    const coupling::IndexConversion<dim> &indexConversion = macroscopicCellService->getIndexConversion();
-    coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim> &macroscopicCells = macroscopicCellService->getMacroscopicCells();
+    const coupling::IndexConversion<dim>& indexConversion = macroscopicCellService->getIndexConversion();
+    coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells = macroscopicCellService->getMacroscopicCells();
     const std::vector<tarch::la::Vector<2, unsigned int>> numberMoleculesPerMacroscopicCell = initNumberMoleculesPerMacroscopicCell(indexConversion);
 
     // instantiate a molecule extractor
@@ -84,7 +84,7 @@ private:
   /** returns the pairs (global macroscopic cell index, number molecules in this
    * cell) in a vector. The number is hard-coded, oriented at the setup
    * described above. */
-  std::vector<tarch::la::Vector<2, unsigned int>> initNumberMoleculesPerMacroscopicCell(const coupling::IndexConversion<dim> &indexConversion) const {
+  std::vector<tarch::la::Vector<2, unsigned int>> initNumberMoleculesPerMacroscopicCell(const coupling::IndexConversion<dim>& indexConversion) const {
     std::vector<tarch::la::Vector<2, unsigned int>> moleculesPerMacroscopicCell;
     tarch::la::Vector<2, unsigned int> buffer(0);
     if (dim == 2) {
@@ -177,10 +177,10 @@ private:
   /** loops over all macroscopic cells on this process and checks for the number
    * of molecules in each cell. Further, we plot the molecule positions of each
    * cell. */
-  void testMolecules(coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim> &macroscopicCells,
-                     coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim> &moleculeExtractor,
-                     const coupling::IndexConversion<dim> &indexConversion,
-                     const std::vector<tarch::la::Vector<2, unsigned int>> &numberMoleculesPerMacroscopicCell) {
+  void testMolecules(coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells,
+                     coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim>& moleculeExtractor,
+                     const coupling::IndexConversion<dim>& indexConversion,
+                     const std::vector<tarch::la::Vector<2, unsigned int>>& numberMoleculesPerMacroscopicCell) {
     const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberMacroscopicCells();
     tarch::la::Vector<dim, unsigned int> loop(0);
     if (dim == 2) {
@@ -238,8 +238,8 @@ private:
    * cell index "globalIndex" and returns this number from the vector. If no
    * respective global cell is found, an error is thrown.
    */
-  unsigned int findNumberMolecules(const unsigned int &globalIndex,
-                                   const std::vector<tarch::la::Vector<2, unsigned int>> &numberMoleculesPerMacroscopicCell) const {
+  unsigned int findNumberMolecules(const unsigned int& globalIndex,
+                                   const std::vector<tarch::la::Vector<2, unsigned int>>& numberMoleculesPerMacroscopicCell) const {
     const unsigned int size = (unsigned int)numberMoleculesPerMacroscopicCell.size();
     for (unsigned int i = 0; i < size; i++) {
       if (globalIndex == numberMoleculesPerMacroscopicCell[i][0]) {

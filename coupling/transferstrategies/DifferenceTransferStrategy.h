@@ -32,8 +32,8 @@ public:
    *  @param mdSolverInterface interface for the md solver
    *  @param indexConversion instance of the indexConversion
    *  @param numberMDSteps number of md steps within one coupling time step */
-  DifferenceTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
-                             const coupling::IndexConversion<dim> &indexConversion, unsigned int numberMDsteps)
+  DifferenceTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                             const coupling::IndexConversion<dim>& indexConversion, unsigned int numberMDsteps)
       : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion), _numberMDsteps(numberMDsteps), _zero(0.0),
         _massMapping(mdSolverInterface), _momentumMapping(mdSolverInterface) {}
 
@@ -43,8 +43,8 @@ public:
   /** @brief
    *  @param cell macroscopic cell to process
    *  @param index index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                                               const unsigned int &index) {
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                               const unsigned int& index) {
     // reset quantities
     cell.setMicroscopicMass(0.0);
     cell.setMicroscopicMomentum(_zero);
@@ -53,8 +53,8 @@ public:
   /** @brief the microscopicMass and -Momentum are reseted to zero
    *  @param cell macroscopic cell to process
    *  @param index index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                                               const unsigned int &index) {
+  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                               const unsigned int& index) {
     // reset quantities
     cell.setMicroscopicMass(0.0);
     cell.setMicroscopicMomentum(_zero);
@@ -64,8 +64,8 @@ public:
    * and stored in the macroscopic quantity
    *  @param cell macroscopic cell to process
    *  @param index index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                                              const unsigned int &index) {
+  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                              const unsigned int& index) {
     // compute difference between macroscopic and microscopic mass and momentum
     // values; this value is set in the microscopic data buffer of the
     // macroscopic cell.
@@ -82,8 +82,8 @@ public:
    * amount of md time steps)
    *  @param cell macroscopic cell to process
    *  @param index index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                                    const unsigned int &index) {
+  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    const unsigned int& index) {
     // average quantities
     const double mass = cell.getMacroscopicMass() / ((double)_numberMDsteps);
     const tarch::la::Vector<dim, double> momentum = cell.getMacroscopicMomentum() * (1.0 / ((double)_numberMDsteps));
@@ -95,8 +95,8 @@ public:
    * value
    *  @param cell macroscopic cell to process
    *  @param index index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                          const unsigned int &index) {
+  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                          const unsigned int& index) {
     cell.iterateConstCells(_massMapping);
     const double mass = _massMapping.getMass();
     cell.iterateConstCells(_momentumMapping);

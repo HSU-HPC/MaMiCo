@@ -33,8 +33,8 @@ public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface for the md solver
    *  @param indexConversion instance of the indexConversion*/
-  AveragingTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
-                            const coupling::IndexConversion<dim> &indexConversion)
+  AveragingTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                            const coupling::IndexConversion<dim>& indexConversion)
       : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion), _massMapping(mdSolverInterface),
         _momentumMapping(mdSolverInterface), _sampleCounter(0), _rank(indexConversion.getThisRank()) {}
 
@@ -51,8 +51,8 @@ public:
    * macro solver is transferred
    *  @param cell the macroscopic cell to process
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                                               const unsigned int &index) {
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                               const unsigned int& index) {
     // reset buffers for sampling mass and momentum in each inner macroscopic
     // cell
     cell.setMacroscopicMass(0.0);
@@ -77,8 +77,8 @@ public:
    *  @brief the averaging operation is applied to the cell
    *  @param cell the macroscopic cell to process
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                          const unsigned int &index) {
+  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                          const unsigned int& index) {
     // compute total mass/momentum from previous samples
     const double oldMass = (_sampleCounter - 1) * cell.getMacroscopicMass();
     const tarch::la::Vector<dim, double> oldMomentum = ((double)(_sampleCounter - 1)) * cell.getMacroscopicMomentum();

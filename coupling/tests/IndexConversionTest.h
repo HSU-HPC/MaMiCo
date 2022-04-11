@@ -42,8 +42,8 @@ public:
   }
 
 private:
-  void test3D(const tarch::la::Vector<3, unsigned int> &testGlobalNumberCells, const tarch::la::Vector<3, unsigned int> &testNumberProcesses,
-              const tarch::la::Vector<3, double> &size, const tarch::la::Vector<3, double> &offset) {
+  void test3D(const tarch::la::Vector<3, unsigned int>& testGlobalNumberCells, const tarch::la::Vector<3, unsigned int>& testNumberProcesses,
+              const tarch::la::Vector<3, double>& size, const tarch::la::Vector<3, double>& offset) {
     // loop over all global number cell-configurations
     for (unsigned int zg = 1; zg < testGlobalNumberCells[2]; zg++) {
       for (unsigned int yg = 1; yg < testGlobalNumberCells[1]; yg++) {
@@ -121,8 +121,8 @@ private:
     } // global number of macroscopic cells
   }
 
-  void test2D(const tarch::la::Vector<2, unsigned int> &testGlobalNumberCells, const tarch::la::Vector<2, unsigned int> &testNumberProcesses,
-              const tarch::la::Vector<2, double> &size, const tarch::la::Vector<2, double> &offset) {
+  void test2D(const tarch::la::Vector<2, unsigned int>& testGlobalNumberCells, const tarch::la::Vector<2, unsigned int>& testNumberProcesses,
+              const tarch::la::Vector<2, double>& size, const tarch::la::Vector<2, double>& offset) {
     // loop over all global number cell-configurations
     for (unsigned int yg = 1; yg < testGlobalNumberCells[1]; yg++) {
       for (unsigned int xg = 1; xg < testGlobalNumberCells[0]; xg++) {
@@ -193,8 +193,8 @@ private:
   }
 
   template <unsigned int dim>
-  void testUniqueRanks(const tarch::la::Vector<dim, unsigned int> &testGlobalNumberCells, const tarch::la::Vector<dim, unsigned int> &testNumberProcesses,
-                       const tarch::la::Vector<dim, double> &size, const tarch::la::Vector<dim, double> &offset) {
+  void testUniqueRanks(const tarch::la::Vector<dim, unsigned int>& testGlobalNumberCells, const tarch::la::Vector<dim, unsigned int>& testNumberProcesses,
+                       const tarch::la::Vector<dim, double>& size, const tarch::la::Vector<dim, double>& offset) {
     const coupling::IndexConversion<dim> indexConversion(testGlobalNumberCells, testNumberProcesses, 0, size, offset, coupling::paralleltopology::XYZ);
     const tarch::la::Vector<3, unsigned int> end = coupling::initRange<dim>(testGlobalNumberCells + tarch::la::Vector<dim, unsigned int>(2));
     tarch::la::Vector<3, unsigned int> loop(0);

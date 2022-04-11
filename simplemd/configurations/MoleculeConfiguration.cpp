@@ -15,7 +15,7 @@ const std::string simplemd::configurations::MoleculeConfiguration::SIGMA("sigma"
 simplemd::configurations::MoleculeConfiguration::MoleculeConfiguration()
     : _meanVelocity(0.0), _temperature(0.0), _mass(0.0), _epsilon(0.0), _sigma(0.0), _isValid(true) {}
 
-void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   // read mean velocity
   tarch::configuration::ParseConfiguration::readVector<MD_DIM, double>(_meanVelocity, node, MEAN_VELOCITY);
 

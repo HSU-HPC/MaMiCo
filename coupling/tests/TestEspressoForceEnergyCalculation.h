@@ -26,7 +26,7 @@
 
 class TestEspressoForceEnergyCalculation : public TestEspresso {
 public:
-  TestEspressoForceEnergyCalculation(std::string name, int argc, char **argv) : TestEspresso(name, argc, argv) {}
+  TestEspressoForceEnergyCalculation(std::string name, int argc, char** argv) : TestEspresso(name, argc, argv) {}
   ~TestEspressoForceEnergyCalculation() {}
   virtual void run() {
     loadEspressoTestConfiguration();
@@ -65,8 +65,8 @@ private:
     new_part.setPosition(pos);
 
     for (int c = 0; c < local_cells.n; c++) {
-      ParticleList *list = local_cells.cell[c];
-      Particle *part;
+      ParticleList* list = local_cells.cell[c];
+      Particle* part;
       part = list->part;
       int number = list->n;
       for (int j = 0; j < number; j++) {
@@ -86,8 +86,8 @@ private:
   /* This function calcultes the linked cell index for each molecule in the
    * domain (for local cells only, no ghosts) and prints it out */
   void getLinkedCellIndexForMoleculePositionTest() {
-    Cell *cell;
-    Particle *part;
+    Cell* cell;
+    Particle* part;
     cell = local_cells.cell[0];
     part = cell->part;
     coupling::interface::EspressoMDMolecule coupling_part(part);

@@ -25,8 +25,8 @@ template <unsigned int dim> class Strouhal;
  */
 template <unsigned int dim> class coupling::filtering::Strouhal : public coupling::filtering::FilterInterfaceReadOnly<dim> {
 public:
-  Strouhal(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
-           const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector,
+  Strouhal(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+           const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector,
            const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, std::array<bool, 7> filteredValues, double u, double d)
       : coupling::filtering::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "STROUHALCPP"), _U(u), _D(d) {
     if (dim < 2) {

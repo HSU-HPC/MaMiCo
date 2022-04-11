@@ -27,7 +27,7 @@ public:
 
   virtual ~ThermostatConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node) {
+  void parseSubtag(tinyxml2::XMLElement* node) {
     std::string value;
     tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "onlyOutestLayer") {
