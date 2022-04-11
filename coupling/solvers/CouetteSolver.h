@@ -30,6 +30,7 @@ namespace coupling {
         /** @brief changes the velocity at the moving for, refers to Couette scenario
          *  @param wallVelocity value to which the veloctiy will be set */
         virtual void setWallVelocity(const tarch::la::Vector<dim,double> wallVelocity);
+        virtual void writeError(tarch::la::Vector<3,double>& lowerLeftCorner, tarch::la::Vector<3,double>& upperRightCorner)const{}
     };
 
     template<unsigned int dim>

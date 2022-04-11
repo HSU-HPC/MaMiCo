@@ -12,8 +12,8 @@
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/LBCouetteSolver.h"
 #if(BUILD_WITH_OPENFOAM)
-#include "coupling/solvers/FoamClass.h"
-#include "coupling/solvers/FoamSolverInterface.h"
+#include "coupling/solvers/IcoFoamInterface.h"
+#include "coupling/solvers/IcoFoamBufferSetup.h"
 #endif
 #include "coupling/solvers/FDCouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
@@ -576,6 +576,8 @@ private:
       if (_rank==0){
         gettimeofday(&_tv.end,NULL);
         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
+        writeMDError(cycle);
+
       }
 
       // send back data from MD instances and merge it
@@ -648,7 +650,7 @@ private:
     }
     #if(BUILD_WITH_OPENFOAM)
     else if ( (_cfg.maSolverType==COUETTE_FOAM) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles){
-      static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+      static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
       _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
       _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),  _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
     }
@@ -658,7 +660,7 @@ private:
     }
     #if(BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType==COUETTE_FOAM && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles){
-      static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+      static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer,_buf.globalCellIndices4RecvBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
     }
     #endif
     // write data to csv-compatible file for evaluation
@@ -869,6 +871,56 @@ private:
     file.close();
   }
 
+  void writeMDError(int cycle)const{
+    // form file name and open file
+    std::string filename = "couetteError_MD.txt";
+    std::ofstream file(filename, std::ios_base::app );
+    if (!file.is_open()){std::cout << "ERROR CouetteTest::write2CSV(): Could not open file " << filename << "!" << std::endl; exit(EXIT_FAILURE);}
+
+    // loop over received cells; read macroscopic mass+momentum buffers and write cell index, mass and velocity to one line in the csv-file
+    double actualError = 0.0;
+    double error = 0.0;
+    double errorRMS = 0.0;
+    double maxError = 0.0;
+    double overlapError = 0.0;
+    double maxOverlapError = 0.0;
+    const double pi = 3.141592653589793238;
+    int elements = 0;
+    int overlapElements = 0;
+    const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+    const tarch::la::Vector<3,double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+    const tarch::la::Vector<3,unsigned int> domainSize(indexConversion.getGlobalNumberMacroscopicCells() -tarch::la::Vector<3,unsigned int>(2.0));
+    const double cellSize(indexConversion.getMacroscopicCellSize()[2]);
+    const unsigned int numCellsRecv = _buf.recvBuffer.size();
+    for (unsigned int i = 0; i < numCellsRecv; i++){
+      const tarch::la::Vector<3,unsigned int> counter(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
+      const double velSim =_buf.recvBuffer[i]->getMacroscopicMass()!=0.0? _buf.recvBuffer[i]->getMacroscopicMomentum()[0]/_buf.recvBuffer[i]->getMacroscopicMass() : 0.0;
+      double velAna = 0.0;
+      const double pos = domainOffset[2]+(counter[2]-1)*cellSize+0.5*cellSize;
+      for (int k = 1; k < 30; k++){
+        velAna += 1.0/k * sin(k*pi*pos/_cfg.channelheight) * exp(-k*k * pi*pi/(_cfg.channelheight*_cfg.channelheight) * _cfg.kinVisc * cycle *_simpleMDConfig.getSimulationConfiguration().getDt()*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
+      }
+      velAna = _cfg.wallVelocity[0]*(1.0-pos/_cfg.channelheight - 2.0/pi * velAna);
+      actualError = std::abs(velAna-velSim);
+      if((counter[0]>3) & (counter[1]>3) & (counter[2]>3) & (counter[0]<domainSize[0]) & (counter[1]<domainSize[1]) & (counter[2]<domainSize[2]) ){
+        error += actualError;
+        errorRMS += actualError*actualError;
+        maxError = actualError>maxError? actualError: maxError;
+        elements++;
+      }
+      else{
+        overlapError += actualError;
+        maxOverlapError = actualError>maxOverlapError? actualError: maxOverlapError;
+        overlapElements++;
+      }
+    }
+    error /= elements;
+    overlapError /= overlapElements;
+    errorRMS = std::sqrt(errorRMS/elements);
+    file << cycle << " " << error << " "<< errorRMS << " " << maxError<< " "<< overlapError << " " << maxOverlapError <<std::endl;
+    file.close();
+  }
+
 
   /** @brief deletes the data in the buffer for the macro to md transfer
    *  @param sendBuffer the buffer to be cleaned */
@@ -968,9 +1020,9 @@ private:
     }
     #if(BUILD_WITH_OPENFOAM)
     else if(_cfg.maSolverType == COUETTE_FOAM){
-      solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD);
+      solver = new coupling::solvers::IcoFoamInterface(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _foam.directory, _foam.folder, _foam.boundariesWithMD, _cfg.wallVelocity);
       if (solver==NULL){
-        std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
+        std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoamInterface solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
       }
     }
