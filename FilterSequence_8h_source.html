@@ -123,7 +123,7 @@ $(function() {
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment">   * Filter Sequences are constructed in</span></div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment">   * coupling::FilterPipeline::loadSequencesFromXML(...).</span></div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment">   */</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  <a class="code hl_class" href="classcoupling_1_1filtering_1_1FilterSequence.html">FilterSequence</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *name, <span class="keyword">const</span> std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell&lt;dim&gt;</a> *&gt; inputCells,</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  <a class="code hl_class" href="classcoupling_1_1filtering_1_1FilterSequence.html">FilterSequence</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* name, <span class="keyword">const</span> std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell&lt;dim&gt;</a>*&gt; inputCells,</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>#<span class="keywordflow">if</span> (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>                 MPI_Comm comm,</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>#endif</div>
@@ -217,7 +217,7 @@ $(function() {
 <div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>  <span class="comment">/*</span></div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="comment">   * Returns unique name identifier of this sequence.</span></div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="comment">   */</span></div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *getName() { <span class="keywordflow">return</span> _name; }</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>  <span class="keyword">const</span> <span class="keywordtype">char</span>* getName() { <span class="keywordflow">return</span> _name; }</div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span> </div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>  <span class="keywordtype">bool</span> isOutputToMacro() { <span class="keywordflow">return</span> _isOutput; }</div>
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>  <span class="keywordtype">void</span> setAsOutputToMacro() {</div>
@@ -232,7 +232,7 @@ $(function() {
 <div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>  <span class="keywordtype">bool</span> isModifiable() { <span class="keywordflow">return</span> _isModifiable; }</div>
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  <span class="keywordtype">void</span> makeUnmodifiable() { _isModifiable = <span class="keyword">false</span>; }</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>  std::vector&lt;coupling::filtering::FilterInterface&lt;dim&gt; *&gt; getFilters() { <span class="keywordflow">return</span> _filters; }</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>  std::vector&lt;coupling::filtering::FilterInterface&lt;dim&gt;*&gt; getFilters() { <span class="keywordflow">return</span> _filters; }</div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
 <div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>  <span class="comment">/*</span></div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="comment">   * All virtual functions below are redefined in case this sequence is actually</span></div>
@@ -253,7 +253,7 @@ $(function() {
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="comment">   * In addition to that, if this sequence is declared as unmodifibale, this</span></div>
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="comment">   * gets also detected in here.</span></div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="comment">   */</span></div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>  <span class="keyword">virtual</span> <span class="keywordtype">int</span> loadFiltersFromXML(<a class="code hl_class" href="classtinyxml2_1_1XMLElement.html">tinyxml2::XMLElement</a> *sequenceNode);</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>  <span class="keyword">virtual</span> <span class="keywordtype">int</span> loadFiltersFromXML(<a class="code hl_class" href="classtinyxml2_1_1XMLElement.html">tinyxml2::XMLElement</a>* sequenceNode);</div>
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span> </div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>  <span class="comment">/*</span></div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="comment">   * This member function allows appendance and insertion of filters defined by</span></div>
@@ -261,20 +261,20 @@ $(function() {
 <div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="comment">   * implies appending.</span></div>
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span><span class="comment">   */</span></div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> addFilter(</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>      <span class="keyword">const</span> std::function&lt;std::vector&lt;double&gt;(std::vector&lt;double&gt;, std::vector&lt;std::array&lt;unsigned int, dim&gt;&gt;)&gt; *applyScalar,</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>      <span class="keyword">const</span> std::function&lt;std::vector&lt;std::array&lt;double, dim&gt;&gt;(std::vector&lt;std::array&lt;double, dim&gt;&gt;, std::vector&lt;std::array&lt;unsigned int, dim&gt;&gt;)&gt; *applyVector,</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>      <span class="keyword">const</span> std::function&lt;std::vector&lt;double&gt;(std::vector&lt;double&gt;, std::vector&lt;std::array&lt;unsigned int, dim&gt;&gt;)&gt;* applyScalar,</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>      <span class="keyword">const</span> std::function&lt;std::vector&lt;std::array&lt;double, dim&gt;&gt;(std::vector&lt;std::array&lt;double, dim&gt;&gt;, std::vector&lt;std::array&lt;unsigned int, dim&gt;&gt;)&gt;* applyVector,</div>
 <div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>      <span class="keywordtype">int</span> filterIndex = -1);</div>
 <div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span> </div>
 <div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>  <span class="comment">/*</span></div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="comment">   * Registers existence of a child sequence, i.e. a sequence using this</span></div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="comment">   * sequence&#39;s output as its input.</span></div>
 <div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span><span class="comment">   */</span></div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> addChildSequence(<a class="code hl_class" href="classcoupling_1_1filtering_1_1FilterSequence.html">coupling::filtering::FilterSequence&lt;dim&gt;</a> *childSequence) { _childSequences.push_back(childSequence); }</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> addChildSequence(<a class="code hl_class" href="classcoupling_1_1filtering_1_1FilterSequence.html">coupling::filtering::FilterSequence&lt;dim&gt;</a>* childSequence) { _childSequences.push_back(childSequence); }</div>
 <div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span> </div>
 <div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>  <span class="comment">/*</span></div>
 <div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="comment">   * Allows changing the input cells after init.</span></div>
 <div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span><span class="comment">   */</span></div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> updateInputCellVector(<span class="keyword">const</span> std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell&lt;dim&gt;</a> *&gt; newInputCellVector) {</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> updateInputCellVector(<span class="keyword">const</span> std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell&lt;dim&gt;</a>*&gt; newInputCellVector) {</div>
 <div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>    _inputCellVector = newInputCellVector; <span class="comment">// call copy constructor</span></div>
 <div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span> </div>
 <div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    <span class="comment">// cc this change to this sequence&#39;s first vector.</span></div>
@@ -291,7 +291,7 @@ $(function() {
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span><span class="comment">   * Some sequences have more than one output, thus the optional parameter. Has</span></div>
 <div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span><span class="comment">   * no effect on a basic FilterSequence.</span></div>
 <div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="comment">   */</span></div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>  <span class="keyword">virtual</span> <span class="keyword">const</span> std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt; *&gt; &amp;getOutputCellVector(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> outputIndex = 0)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>  <span class="keyword">virtual</span> <span class="keyword">const</span> std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; getOutputCellVector(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> outputIndex = 0)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>    <span class="keywordflow">if</span> (_filters.empty())</div>
 <div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>      <span class="keywordflow">return</span> _inputCellVector;</div>
 <div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
@@ -345,11 +345,11 @@ $(function() {
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>  <span class="keywordtype">void</span> initCellVectors();</div>
 <div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
 <div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="keyword">protected</span>:</div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>  <span class="keyword">const</span> <span class="keywordtype">char</span> *_name;</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>  <span class="keyword">const</span> <span class="keywordtype">char</span>* _name;</div>
 <div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span> </div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>  std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt; *&gt; _inputCellVector; <span class="comment">// points to (foreign) input vector</span></div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>  std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt; *&gt; _cellVector1;     <span class="comment">// allocated for this sequence only</span></div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>  std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt; *&gt; _cellVector2;     <span class="comment">// allocated for this sequence only</span></div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>  std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _inputCellVector; <span class="comment">// points to (foreign) input vector</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>  std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _cellVector1;     <span class="comment">// allocated for this sequence only</span></div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>  std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _cellVector2;     <span class="comment">// allocated for this sequence only</span></div>
 <div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span> </div>
 <div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="preprocessor">#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</span></div>
 <div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>  MPI_Comm _comm;</div>
@@ -361,17 +361,17 @@ $(function() {
 <div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>                      <span class="comment">// Filter Pipeline&#39;s output</span></div>
 <div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>  <span class="keywordtype">bool</span> _isModifiable; <span class="comment">// true while filters can be added to sequence</span></div>
 <div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span> </div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>  std::vector&lt;coupling::filtering::FilterInterface&lt;dim&gt; *&gt; _filters;</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>  std::vector&lt;coupling::filtering::FilterInterface&lt;dim&gt;*&gt; _filters;</div>
 <div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span> </div>
 <div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>  <span class="comment">// stores application times for all filters</span></div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>  std::map&lt;coupling::filtering::FilterInterface&lt;dim&gt; *, std::vector&lt;unsigned int&gt;&gt; _filterTimes;</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>  std::map&lt;coupling::filtering::FilterInterface&lt;dim&gt;*, std::vector&lt;unsigned int&gt;&gt; _filterTimes;</div>
 <div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span> </div>
 <div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>  <span class="comment">// there must be some other place to get this from</span></div>
 <div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _timestepsElapsed;</div>
 <div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span> </div>
 <div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>  <span class="comment">// stores pointers to all sequences that use this sequence&#39;s output as their</span></div>
 <div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>  <span class="comment">// input.</span></div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>  std::vector&lt;coupling::filtering::FilterSequence&lt;dim&gt; *&gt; _childSequences;</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>  std::vector&lt;coupling::filtering::FilterSequence&lt;dim&gt;*&gt; _childSequences;</div>
 <div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>};</div>
 <div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span> </div>
 <div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="comment">// inlcude implementation</span></div>

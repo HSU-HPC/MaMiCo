@@ -94,24 +94,24 @@ $(function() {
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &quot;coupling/interface/impl/Espresso/EspressoMDMoleculeIterator.h&quot;</span></div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &quot;coupling/tests/Test.h&quot;</span></div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keywordtype">void</span> register_tcl_commands(Tcl_Interp *interp);</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keywordtype">void</span> register_global_variables(Tcl_Interp *interp);</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="keywordtype">int</span> tclcommand_cellsystem(ClientData data, Tcl_Interp *interp, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv);</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="keywordtype">int</span> tclcommand_blockfile(ClientData data, Tcl_Interp *interp, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[]);</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="keywordtype">int</span> tclcommand_part(ClientData data, Tcl_Interp *interp, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keywordtype">void</span> register_tcl_commands(Tcl_Interp* interp);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keywordtype">void</span> register_global_variables(Tcl_Interp* interp);</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="keywordtype">int</span> tclcommand_cellsystem(ClientData data, Tcl_Interp* interp, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="keywordtype">int</span> tclcommand_blockfile(ClientData data, Tcl_Interp* interp, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[]);</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="keywordtype">int</span> tclcommand_part(ClientData data, Tcl_Interp* interp, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv);</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classTestEspressoMoleculeIterator.html">   38</a></span><span class="keyword">class </span><a class="code hl_class" href="classTestEspressoMoleculeIterator.html">TestEspressoMoleculeIterator</a> : <span class="keyword">public</span> <a class="code hl_class" href="classTest.html">Test</a> {</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keyword">private</span>:</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  <span class="keywordtype">int</span> _argc;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  <span class="keywordtype">char</span> **_argv;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  <span class="keywordtype">char</span>** _argv;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  <a class="code hl_class" href="classTestEspressoMoleculeIterator.html">TestEspressoMoleculeIterator</a>(std::string name, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv) : <a class="code hl_class" href="classTest.html">Test</a>(name), _argc(argc), _argv(argv) {}</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  <a class="code hl_class" href="classTestEspressoMoleculeIterator.html">TestEspressoMoleculeIterator</a>(std::string name, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) : <a class="code hl_class" href="classTest.html">Test</a>(name), _argc(argc), _argv(argv) {}</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  <span class="keyword">virtual</span> <a class="code hl_class" href="classTestEspressoMoleculeIterator.html">~TestEspressoMoleculeIterator</a>() {}</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> run() {</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="comment">// Initialize the Tcl interpreter to read tcl commands in C++</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    Tcl_Interp *interp;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    Tcl_Interp* interp;</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    interp = Tcl_CreateInterp();</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordflow">if</span> (TCL_OK != Tcl_Init(interp)) {</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Tcl_Init error: &quot;</span> &lt;&lt; Tcl_GetStringResult(interp) &lt;&lt; std::endl;</div>
@@ -189,9 +189,9 @@ $(function() {
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> flag = 1;</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; local_cells.n; i++) {</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>      <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numberOfMoleculesFound = 0;</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>      ParticleList *list = local_cells.cell[i];</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>      ParticleList* list = local_cells.cell[i];</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>      coupling::interface::EspressoMDMoleculeIterator it(*list);</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>      Particle *part;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>      Particle* part;</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>      part = list-&gt;part;</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>      <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numberOfMoleculesInCurrentCell = list-&gt;n;</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>      <span class="keywordflow">for</span> (it.begin(); it.continueIteration(); it.next()) {</div>

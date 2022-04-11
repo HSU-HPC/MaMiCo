@@ -98,7 +98,7 @@ $(function() {
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment">// Converts 3-dimensional double vectors to numpy arrays</span></div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment">// template&lt;class T&gt;</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>py::array_t&lt;double&gt; stlVectorToNumpyArray_Scalar(<span class="keyword">const</span> std::vector&lt;double&gt; &amp;stl_vector, <span class="keyword">const</span> std::vector&lt;std::array&lt;unsigned int, 3&gt;&gt; &amp;indices) {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>py::array_t&lt;double&gt; stlVectorToNumpyArray_Scalar(<span class="keyword">const</span> std::vector&lt;double&gt;&amp; stl_vector, <span class="keyword">const</span> std::vector&lt;std::array&lt;unsigned int, 3&gt;&gt;&amp; indices) {</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  <span class="keywordflow">if</span> (indices.empty() || stl_vector.empty())</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;One or more input vector is empty&quot;</span>);</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
@@ -118,8 +118,8 @@ $(function() {
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>}</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment">// template&lt;class T&gt;</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>py::array_t&lt;double&gt; stlVectorToNumpyArray_Vector(<span class="keyword">const</span> std::vector&lt;std::array&lt;double, 3&gt;&gt; &amp;stl_vector,</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                                                 <span class="keyword">const</span> std::vector&lt;std::array&lt;unsigned int, 3&gt;&gt; &amp;indices) {</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>py::array_t&lt;double&gt; stlVectorToNumpyArray_Vector(<span class="keyword">const</span> std::vector&lt;std::array&lt;double, 3&gt;&gt;&amp; stl_vector,</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                                                 <span class="keyword">const</span> std::vector&lt;std::array&lt;unsigned int, 3&gt;&gt;&amp; indices) {</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  <span class="keywordflow">if</span> (indices.empty() || stl_vector.empty())</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;One or more input vector is empty&quot;</span>);</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
@@ -142,7 +142,7 @@ $(function() {
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment">// Other way around. Still restricted to 3 dimensions and double.</span></div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment">// template&lt;class T&gt;</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>std::vector&lt;double&gt; numpyArrayToStlVector_Scalar(<span class="keyword">const</span> py::array_t&lt;double&gt; &amp;numpy_array) {</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>std::vector&lt;double&gt; numpyArrayToStlVector_Scalar(<span class="keyword">const</span> py::array_t&lt;double&gt;&amp; numpy_array) {</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  <span class="keywordflow">if</span> (numpy_array.ndim() != 3)</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Input array must be of exactly 3 dimensions.&quot;</span>);</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
@@ -158,7 +158,7 @@ $(function() {
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>}</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment">// template&lt;class T&gt;</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>std::vector&lt;std::array&lt;double, 3&gt;&gt; numpyArrayToStlVector_Vector(<span class="keyword">const</span> py::array_t&lt;double&gt; &amp;numpy_array) {</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>std::vector&lt;std::array&lt;double, 3&gt;&gt; numpyArrayToStlVector_Vector(<span class="keyword">const</span> py::array_t&lt;double&gt;&amp; numpy_array) {</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>  <span class="keywordflow">if</span> (numpy_array.ndim() != 4)</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Input array must be of exactly 4 dimensions.&quot;</span>);</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>  <span class="keywordflow">if</span> (numpy_array.shape(3) != 3)</div>
@@ -178,8 +178,8 @@ $(function() {
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>}</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment">// template&lt;class T&gt;</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>std::function&lt;std::vector&lt;double&gt;(std::vector&lt;double&gt; <span class="comment">/*stl_vector*/</span>, std::vector&lt;std::array&lt;unsigned int, 3&gt;&gt; <span class="comment">/*indices*/</span>)&gt; *</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>functionWrapper_Scalar(std::function&lt;py::array_t&lt;double&gt;(py::array_t&lt;double&gt;)&gt; *py_func_ptr) {</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>std::function&lt;std::vector&lt;double&gt;(std::vector&lt;double&gt; <span class="comment">/*stl_vector*/</span>, std::vector&lt;std::array&lt;unsigned int, 3&gt;&gt; <span class="comment">/*indices*/</span>)&gt;*</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>functionWrapper_Scalar(std::function&lt;py::array_t&lt;double&gt;(py::array_t&lt;double&gt;)&gt;* py_func_ptr) {</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>  <span class="comment">// case: py_func exists</span></div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  <span class="keywordflow">if</span> (py_func_ptr) {</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="comment">// create copy at current scope</span></div>
@@ -198,8 +198,8 @@ $(function() {
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>}</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="comment">// template&lt;class T&gt;</span></div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>std::function&lt;std::vector&lt;std::array&lt;double, 3&gt;&gt;(std::vector&lt;std::array&lt;double, 3&gt;&gt; <span class="comment">/*stl_vector*/</span>, std::vector&lt;std::array&lt;unsigned int, 3&gt;&gt; <span class="comment">/*indices*/</span>)&gt; *</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>functionWrapper_Vector(std::function&lt;py::array_t&lt;double&gt;(py::array_t&lt;double&gt;)&gt; *py_func_ptr) {</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>std::function&lt;std::vector&lt;std::array&lt;double, 3&gt;&gt;(std::vector&lt;std::array&lt;double, 3&gt;&gt; <span class="comment">/*stl_vector*/</span>, std::vector&lt;std::array&lt;unsigned int, 3&gt;&gt; <span class="comment">/*indices*/</span>)&gt;*</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>functionWrapper_Vector(std::function&lt;py::array_t&lt;double&gt;(py::array_t&lt;double&gt;)&gt;* py_func_ptr) {</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  <span class="comment">// case: py_func exists</span></div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>  <span class="keywordflow">if</span> (py_func_ptr) {</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="comment">// create copy at current scope</span></div>

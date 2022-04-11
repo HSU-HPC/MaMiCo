@@ -89,7 +89,7 @@ $(function() {
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="keyword">public</span>:</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classtarch_1_1la_1_1Matrix.html#aa620c6ec76aa32749a197649274bec9a">   31</a></span>  <a class="code hl_function" href="classtarch_1_1la_1_1Matrix.html#aa620c6ec76aa32749a197649274bec9a">Matrix</a>() {}</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  <a class="code hl_function" href="classtarch_1_1la_1_1Matrix.html#aa620c6ec76aa32749a197649274bec9a">Matrix</a>(<span class="keyword">const</span> T &amp;t) {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  <a class="code hl_function" href="classtarch_1_1la_1_1Matrix.html#aa620c6ec76aa32749a197649274bec9a">Matrix</a>(<span class="keyword">const</span> T&amp; t) {</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; rows; i++) {</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; cols; j++) {</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        _entries[i][j] = t;</div>
@@ -97,7 +97,7 @@ $(function() {
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    }</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  }</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classtarch_1_1la_1_1Matrix.html#ac1db25e0ed84e99ebffdc7cc64697357">   44</a></span>  T &amp;<a class="code hl_function" href="classtarch_1_1la_1_1Matrix.html#ac1db25e0ed84e99ebffdc7cc64697357">operator()</a>(<span class="keywordtype">int</span> i, <span class="keywordtype">int</span> j) {</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classtarch_1_1la_1_1Matrix.html#ac1db25e0ed84e99ebffdc7cc64697357">   44</a></span>  T&amp; <a class="code hl_function" href="classtarch_1_1la_1_1Matrix.html#ac1db25e0ed84e99ebffdc7cc64697357">operator()</a>(<span class="keywordtype">int</span> i, <span class="keywordtype">int</span> j) {</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#if (TARCH_DEBUG == TARCH_YES)</span></div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordflow">if</span> (i &lt; 0 || i &gt; rows - 1) {</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR Matrix T&amp; operator(): i out of range!&quot;</span> &lt;&lt; std::endl;</div>
@@ -110,7 +110,7 @@ $(function() {
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordflow">return</span> _entries[i][j];</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>  }</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  <span class="keyword">const</span> T &amp;<a class="code hl_function" href="classtarch_1_1la_1_1Matrix.html#ac1db25e0ed84e99ebffdc7cc64697357">operator()</a>(<span class="keywordtype">int</span> i, <span class="keywordtype">int</span> j)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  <span class="keyword">const</span> T&amp; <a class="code hl_function" href="classtarch_1_1la_1_1Matrix.html#ac1db25e0ed84e99ebffdc7cc64697357">operator()</a>(<span class="keywordtype">int</span> i, <span class="keywordtype">int</span> j)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#if (TARCH_DEBUG == TARCH_YES)</span></div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keywordflow">if</span> (i &lt; 0 || i &gt; rows - 1) {</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR Matrix const T&amp; operator(): i out of range!&quot;</span> &lt;&lt; std::endl;</div>

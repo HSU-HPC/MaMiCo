@@ -90,8 +90,8 @@ $(function() {
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classcoupling_1_1filtering_1_1POD.html">   24</a></span><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dim&gt; <span class="keyword">class </span><a class="code hl_class" href="classcoupling_1_1filtering_1_1POD.html">coupling::filtering::POD</a> : <span class="keyword">public</span> <a class="code hl_class" href="classcoupling_1_1filtering_1_1FilterInterface.html">coupling::filtering::FilterInterface</a>&lt;dim&gt; {</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  <a class="code hl_class" href="classcoupling_1_1filtering_1_1POD.html">POD</a>(<span class="keyword">const</span> std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell&lt;dim&gt;</a> *&gt; &amp;inputCellVector,</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>      <span class="keyword">const</span> std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell&lt;dim&gt;</a> *&gt; &amp;outputCellVector,</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  <a class="code hl_class" href="classcoupling_1_1filtering_1_1POD.html">POD</a>(<span class="keyword">const</span> std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell&lt;dim&gt;</a>*&gt;&amp; inputCellVector,</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>      <span class="keyword">const</span> std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell&lt;dim&gt;</a>*&gt;&amp; outputCellVector,</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>#<span class="keywordflow">if</span> (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>      MPI_Comm comm,</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>#endif</div>
@@ -111,8 +111,8 @@ $(function() {
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</span></div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="comment">// get MPI parameters</span></div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    _comm = comm;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    MPI_Comm_rank(comm, (<span class="keywordtype">int</span> *)&amp;_rank);</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    MPI_Comm_size(comm, (<span class="keywordtype">int</span> *)&amp;_commSize);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    MPI_Comm_rank(comm, (<span class="keywordtype">int</span>*)&amp;_rank);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    MPI_Comm_size(comm, (<span class="keywordtype">int</span>*)&amp;_commSize);</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#ifdef DEBUG_POD</span></div>
@@ -160,10 +160,10 @@ $(function() {
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                                <span class="comment">// iteration of ProcessInnerMacroscopicCell</span></div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _t;              <span class="comment">// active temporal index, iterates cyclic between zero and</span></div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>                                <span class="comment">// _timeWindowSize</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  Eigen::MatrixXd *_data;       <span class="comment">// set of snapshots (sampled by transferStrategy)</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>  Eigen::MatrixXd *_C;          <span class="comment">// temporal auto-correlation covariance matrix of _data</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>  Eigen::MatrixXd *_A;          <span class="comment">// POD temporal modes / eigenvectors of C</span></div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>  Eigen::MatrixXd *_A_T;        <span class="comment">// Transpose of A</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  Eigen::MatrixXd* _data;       <span class="comment">// set of snapshots (sampled by transferStrategy)</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>  Eigen::MatrixXd* _C;          <span class="comment">// temporal auto-correlation covariance matrix of _data</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>  Eigen::MatrixXd* _A;          <span class="comment">// POD temporal modes / eigenvectors of C</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>  Eigen::MatrixXd* _A_T;        <span class="comment">// Transpose of A</span></div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="preprocessor">#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</span></div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>  MPI_Comm _comm;</div>
