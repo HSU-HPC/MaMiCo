@@ -543,6 +543,9 @@ private:
         gettimeofday(&_tv.end,NULL);
         _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec)*1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
         //std::cout << "Finish _couetteSolver->advance " << std::endl;
+	tarch::la::Vector<3,double> lowerLeftCorner(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion().getGlobalMDDomainOffset());
+        tarch::la::Vector<3,double> upperRightCorner(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion().getGlobalMDDomainSize()+lowerLeftCorner);
+        _couetteSolver->writeError(lowerLeftCorner, upperRightCorner);
       }
     }
 
