@@ -44,8 +44,8 @@ public:
         // index conversion should be the very first thing getting initialised!
         _indexConversion(initIndexConversion(macroscopicCellConfiguration.getMacroscopicCellSize(), numberProcesses, rank, globalMDDomainSize,
                                              globalMDDomainOffset, parallelTopologyConfiguration.getParallelTopologyType(), topologyOffset)),
-        _macroscopicSolverInterface(macroscopicSolverInterface), _deFromMacro2MD(_macroscopicSolverInterface, *_indexConversion, ID),
-        _deFromMD2Macro(_macroscopicSolverInterface, *_indexConversion, ID) {
+        _macroscopicSolverInterface(macroscopicSolverInterface), _deFromMacro2MD(_macroscopicSolverInterface, _indexConversion, ID),
+        _deFromMD2Macro(_macroscopicSolverInterface, _indexConversion, ID) {
     if (_macroscopicSolverInterface == NULL) {
       std::cout << "ERROR "
                    "coupling::services::MacroscopicCellServiceMacroOnly::"
@@ -77,10 +77,23 @@ public:
   virtual void applyTemperatureToMolecules(unsigned int t) {}
   virtual void distributeMass(unsigned int t) {}
   virtual void distributeMomentum(unsigned int t) {}
+  virtual void perturbateVelocity() {}
   virtual void applyBoundaryForce(unsigned int t) {}
   virtual void plotEveryMicroscopicTimestep(unsigned int t) {}
   virtual void plotEveryMacroscopicTimestep(unsigned int t) {}
   virtual const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
+
+  virtual void updateIndexConversion(const unsigned int& topologyOffset) {
+    auto* newIndexConversion = initIndexConversion(_indexConversion->getMacroscopicCellSize(), _indexConversion->getNumberProcesses(),
+                                                   _indexConversion->getThisRank(), _indexConversion->getGlobalMDDomainSize(),
+                                                   _indexConversion->getGlobalMDDomainOffset(), _indexConversion->getParallelTopologyType(), topologyOffset);
+
+    delete _indexConversion;
+    _indexConversion = newIndexConversion;
+
+    _deFromMacro2MD.setIndexConversion(_indexConversion);
+    _deFromMD2Macro.setIndexConversion(_indexConversion);
+  }
 
 private:
   /** this is currently a copy-paste version of MacroscopicCellService's

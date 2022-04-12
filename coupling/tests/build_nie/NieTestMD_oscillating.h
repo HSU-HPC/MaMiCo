@@ -29,7 +29,7 @@ oscillating couette + gaussian noise test
 no coupling
 SNR calculation
 !
-*////////////////////////////////////////////
+*/ ///////////////////////////////////////////
 
 /** tests couette flow for Nie coupling scheme. We therefore establish one-way
  * coupling to an analytical Couette flow solver.

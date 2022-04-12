@@ -3,6 +3,7 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 #include "simplemd/MolecularDynamicsSimulation.h"
+#include "simplemd/cell-mappings/VaryCheckpointMapping.h"
 
 simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
     : _configuration(configuration), _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL), _lennardJonesForce(NULL),
@@ -564,6 +565,14 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
       (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
     _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
+  }
+
+  if (t % 500 == 0) {
+    cellmappings::VaryCheckpointMapping varyCheckpointMapping(
+        _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getKB(),
+        _configuration.getMoleculeConfiguration().getTemperature(), _configuration.getMoleculeConfiguration().getSigma(),
+        _configuration.getDomainConfiguration().getMeshWidth());
+    _linkedCellService->iterateCells(varyCheckpointMapping, false);
   }
 
   // empty linked lists

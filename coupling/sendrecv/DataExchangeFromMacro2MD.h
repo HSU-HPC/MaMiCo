@@ -40,7 +40,7 @@ public:
    * 	@param indexConversion index conversion
    * 	@param tagoffset 0 per default
    */
-  DataExchangeFromMacro2MD(coupling::interface::MacroscopicSolverInterface<dim>* interface, const coupling::IndexConversion<dim>& indexConversion,
+  DataExchangeFromMacro2MD(coupling::interface::MacroscopicSolverInterface<dim>* interface, coupling::IndexConversion<dim>* indexConversion,
                            unsigned int tagoffset = 0)
       : coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim>(TAG_FROM_MACRO2MD + tagoffset), _interface(interface),
         _indexConversion(indexConversion) {
@@ -61,7 +61,7 @@ public:
     // if we need information on MD side, return the respective ranks via
     // IndexConversion
     if (_interface->sendMacroscopicQuantityToMDSolver(globalCellIndex)) {
-      return _indexConversion.getRanksForMacroscopicCell(globalCellIndex);
+      return _indexConversion->getRanksForMacroscopicCell(globalCellIndex);
       // otherwise return empty vector
     }
     return std::vector<unsigned int>();
@@ -113,8 +113,10 @@ public:
     return 1 + dim;
   }
 
+  void setIndexConversion(coupling::IndexConversion<dim>* indexConversion) { _indexConversion = indexConversion; }
+
 private:
   coupling::interface::MacroscopicSolverInterface<dim>* _interface;
-  const coupling::IndexConversion<dim>& _indexConversion;
+  coupling::IndexConversion<dim>* _indexConversion;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGEFROMMACRO2MD_H_

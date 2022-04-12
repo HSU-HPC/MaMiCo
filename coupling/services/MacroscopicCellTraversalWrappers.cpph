@@ -191,6 +191,27 @@ private:
   const double _temperature;
 };
 
+class Wrapper4PerturbateVelocity : public Wrapper {
+public:
+  Wrapper4PerturbateVelocity(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
+
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(Wrapper::_thisPtr->_mdSolverInterface);
+    cell.iterateConstCells(computeMomentumMapping);
+
+    coupling::cellmappings::ComputeTemperatureMapping<LinkedCell, dim> computeTemperatureMapping(computeMomentumMapping.getMeanVelocity(),
+                                                                                                 Wrapper::_thisPtr->_mdSolverInterface);
+    cell.iterateConstCells(computeTemperatureMapping);
+
+    coupling::cellmappings::PerturbateVelocityMapping<LinkedCell, dim> perturbateVelocity(
+        Wrapper::_thisPtr->_mdSolverInterface, computeMomentumMapping.getMeanVelocity(), computeTemperatureMapping.getTemperature());
+
+    cell.iterateCells(perturbateVelocity);
+  }
+};
+
 /** applies the thermostat in all non-ghost cells */
 class Wrapper4ApplyTemperature : public Wrapper {
 public:

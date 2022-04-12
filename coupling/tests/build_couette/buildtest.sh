@@ -31,6 +31,8 @@ else
     exit -1
 fi
 
+
+
 rm ${BUILD_PATH}/test;
 rm ${BUILD_PATH}/*.o;
 
@@ -44,7 +46,7 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -Wfatal-errors -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wno-unknown-pragmas -Wno-int-in-bool-context -Wno-maybe-uninitialized -Wall -Wfatal-errors -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3"
     # -DMDCoupledDebug"
     includes="${includes} -I${MPI_INCLUDE_PATH} -I${LIB_EIGEN_PATH}"
     libraries="-L${MPI_LIB_PATH} -l${LIB_MPI}"
@@ -79,6 +81,21 @@ then
 else
         scons target=libsimplemd dim=3 build=debug parallel=no -j4
         libraries="${libraries} -L${SIMPLEMD_SEQUENTIAL_PATH} -l${LIBSIMPLEMD}"
+fi
+
+mpifail=
+if [ $# -eq 2 ]; then
+    mpifail=$2
+    if [ "${mpifail}" == "sudden" ] || [ "${mpifail}" == "successive" ]; then
+        echo "With MPI Fail test mode: ${mpifail}"
+        if [ "${mpifail}" == "sudden" ]; then
+            FLAGS="${FLAGS} -DCOUPLING_DYNAMIC_MD_SUDDEN"
+        else
+            FLAGS="${FLAGS} -DCOUPLING_DYNAMIC_MD_SUCCESSIVE"
+        fi
+    else 
+        echo "ERROR! ./test parallel/sequential [sudden/successive]"
+    fi
 fi
 
 cd ${BUILD_PATH}

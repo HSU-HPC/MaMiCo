@@ -10,6 +10,17 @@ out/
 coupling/tests/build_nie/test
 coupling/tests/build_nie/out/
 coupling/tests/build_couette/test
+stuff/
+.idea/.gitignore
+.idea/.name
+.idea/mamico-dev.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+cmake*/
+compile_commands.json
 coupling/tests/build_couette/*.xml
 stuff/
 personal_settings
@@ -23,3 +34,4 @@ coupling/tests/kvs-lbmpy/*.ini
 *.dot
 docs/
 coupling/tests/test
+*.checkpoint

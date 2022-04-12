@@ -34,7 +34,7 @@
 // -> use LAMMPS_SMALLSMALL or so as compiler flag to build library
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
-#define MAXBIGINT INT_MAX
+//#define MAXBIGINT INT_MAX
 
 #include <iomanip>
 #include <iostream>
@@ -468,11 +468,11 @@ public:
       _lmp->comm->borders();
       if (_lmp->domain->triclinic)
         _lmp->domain->lamda2x(_lmp->atom->nlocal + _lmp->atom->nghost);
-      _lmp->timer->stamp(TIME_COMM);
+      _lmp->timer->stamp(Timer::COMM);
       if (_lmp->modify->n_pre_neighbor)
         _lmp->modify->pre_neighbor();
-      _lmp->neighbor->build();
-      _lmp->timer->stamp(TIME_NEIGHBOR);
+      _lmp->neighbor->build(1);
+      _lmp->timer->stamp(Timer::NEB);
     }
 
     // one more sorting for all cells, since the molecules might have been

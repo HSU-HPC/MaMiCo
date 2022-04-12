@@ -16,7 +16,7 @@ struct CouetteConfig;
  *	@brief Configuration parameters for Couette flow scenario
  *
  *
- *	@author Philipp Neumann
+ *	@author Niklas Wittmer
  */
 struct coupling::configurations::CouetteConfig {
 
@@ -24,61 +24,21 @@ private:
   // CouetteConfig(){}
 
 public:
-  /** Macroscopic solver types that are supported.
-   *	@enum MacroSolverType
-   */
+  /** Defines the type of continuum solver for the coupled simulation  */
   enum MacroSolverType {
-    COUETTE_ANALYTICAL = 0 /**< Analytic solver @note only supports flow in x-direction, is only
-                              active on rank 0, and that it does not model viscous shear forces
-                              in the oscillating wall case.*/
-    ,
-    COUETTE_LB = 1 /**< Lattice Boltzmann solver @note can support flow in all
-                      direction (3D) and can be parallelized*/
-    ,
-    COUETTE_FD = 2 /**< Finite difference solver*/
+    COUETTE_ANALYTICAL = 0, ///< the analytical couette solver is used
+                            ///< (coupling::solvers::CouetteSolver)
+    COUETTE_LB = 1,         ///< the Lattice-Bolzmann solver is used
+                            ///< (coupling::solvers::LBCouetteSolver)
+    COUETTE_FD = 2,         ///< the 1d finite-difference solver is used
+                            ///< (coupling::solvers::FiniteDifferenceSolver)
+    COUETTE_FOAM = 3        ///< the IcoFoam solver is used (coupling::solvers::IcoFoam)
   };
-  /** Microscopic solver types that are supported.
-   *	@enum MicroSolverType
-   */
+  /** Defines the type of md solver for the coupled simulation  */
   enum MicroSolverType {
-    SIMPLEMD = 0 /**< simple MD*/,
-    SYNTHETIC = 1 /**< data from macroscopic plus gaussian noise*/
+    SIMPLEMD = 0, ///< the SimpleMD solver is used
+    SYNTHETIC = 1 ///< the synthetic solver is used
   };
-
-  /** @brief operator overloading; declare a configuration (this)
-   * 	@param other
-   */
-  CouetteConfig& operator=(const CouetteConfig& other) {
-
-    this->channelheight = other.channelheight;
-    this->wallInitCycles = other.wallInitCycles;
-    this->wallVelocity = other.wallVelocity;
-    this->wallOscillations = other.wallOscillations;
-    this->couplingCycles = other.couplingCycles;
-    this->md2Macro = other.md2Macro;
-    this->macro2Md = other.macro2Md;
-    this->computeSNR = other.computeSNR;
-    this->twoWayCoupling = other.twoWayCoupling;
-    this->filterInitCycles = other.filterInitCycles;
-    this->csvEveryTimestep = other.csvEveryTimestep;
-    this->maSolverType = other.maSolverType;
-    this->miSolverType = other.miSolverType;
-    this->density = other.density;
-    this->kinVisc = other.kinVisc;
-    this->lbNumberProcesses = other.lbNumberProcesses;
-    this->plotEveryTimestep = other.plotEveryTimestep;
-    this->initAdvanceCycles = other.initAdvanceCycles;
-    this->temp = other.temp;
-    this->equSteps = other.equSteps;
-    this->totalNumberMDSimulations = other.totalNumberMDSimulations;
-    this->noiseSigma = other.noiseSigma;
-    this->twsLoop = other.twsLoop;
-    this->twsLoopMax = other.twsLoopMax;
-    this->twsLoopMin = other.twsLoopMin;
-    this->twsLoopStep = other.twsLoopStep;
-
-    return *this;
-  }
 
   /** @brief creates CouetteConfig if all elements exist and can be read
    * 	@param filename
@@ -88,10 +48,11 @@ public:
 
     tinyxml2::XMLDocument conffile;
     tinyxml2::XMLElement* node = NULL;
-    conffile.LoadFile("couette.xml");
+    conffile.LoadFile(filename.c_str());
     node = conffile.FirstChildElement("couette-test");
     if (node == NULL) {
-      std::cout << "Could not read input file couette.xml: missing element "
+      std::cout << "Could not read input file " << filename
+                << ": missing element "
                    "<couette-test>"
                 << std::endl;
       exit(EXIT_FAILURE);
@@ -99,32 +60,34 @@ public:
 
     tinyxml2::XMLElement* n_mamico = node->NextSiblingElement();
     if (n_mamico == NULL) {
-      std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
+      std::cout << "Could not read input file " << filename << ": missing element <mamico>" << std::endl;
       exit(EXIT_FAILURE);
     }
     tinyxml2::XMLElement* n_md = n_mamico->NextSiblingElement();
     if (n_md == NULL) {
-      std::cout << "Could not read input file couette.xml: missing element "
+      std::cout << "Could not read input file " << filename
+                << ": missing element "
                    "<molecular-dynamics>"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
     tinyxml2::XMLElement* n_fp = n_md->NextSiblingElement();
     if (n_fp == NULL) {
-      std::cout << "Could not read input file couette.xml: missing element "
+      std::cout << "Could not read input file " << filename
+                << ": missing element "
                    "<filter-pipeline>"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
     tinyxml2::XMLElement* n_unexpected = n_fp->NextSiblingElement();
-    if (n_unexpected == NULL) {
-      std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
+    if (n_unexpected != NULL) {
+      std::cout << "Could not read input file " << filename << ": unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
 
     tinyxml2::XMLElement* subtag = node->FirstChildElement("domain");
     if (subtag == NULL) {
-      std::cout << "Could not read input file couette.xml: Missing subtag: domain" << std::endl;
+      std::cout << "Could not read input file " << filename << ": Missing subtag: domain" << std::endl;
       exit(EXIT_FAILURE);
     }
     tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.channelheight, subtag, "channelheight");
@@ -151,7 +114,8 @@ public:
 
     subtag = node->FirstChildElement("microscopic-solver");
     if (subtag == NULL) {
-      std::cout << "Could not read input file couette.xml: Missing subtag: "
+      std::cout << "Could not read input file " << filename
+                << ": Missing subtag: "
                    "microscopic-solver"
                 << std::endl;
       exit(EXIT_FAILURE);
@@ -162,12 +126,24 @@ public:
       _cfg.miSolverType = SIMPLEMD;
       tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp, subtag, "temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps, subtag, "equilibration-steps");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
-      if (_cfg.totalNumberMDSimulations < 1) {
-        std::cout << "Could not read input file couette.xml: "
-                     "number-md-simulations < 1"
-                  << std::endl;
-        exit(EXIT_FAILURE);
+
+      std::string num_MD;
+      tarch::configuration::ParseConfiguration::readStringMandatory(num_MD, subtag, "number-md-simulations");
+      if (num_MD == "dynamic") {
+        _cfg.totalNumberMDSimulations = -1;
+        _cfg.lowerBoundNumberMDSimulations = 1;
+        tarch::configuration::ParseConfiguration::readIntOptional(_cfg.lowerBoundNumberMDSimulations, subtag, "min-number-md");
+        tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.absVelErrStart, subtag, "error-start");
+        tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.absVelErrEnd, subtag, "error-end");
+      } else {
+        tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
+        if (_cfg.totalNumberMDSimulations < 1) {
+          std::cout << "Could not read input file " << filename
+                    << ": "
+                       "number-md-simulations < 1"
+                    << std::endl;
+          exit(EXIT_FAILURE);
+        }
       }
     } else if (type == "synthetic") {
       _cfg.miSolverType = SYNTHETIC;
@@ -175,7 +151,8 @@ public:
       _cfg.totalNumberMDSimulations = 1;
       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
     } else {
-      std::cout << "Could not read input file couette.xml: Unknown microscopic "
+      std::cout << "Could not read input file " << filename
+                << ": Unknown microscopic "
                    "solver type!"
                 << std::endl;
       exit(EXIT_FAILURE);
@@ -184,7 +161,8 @@ public:
 
     subtag = node->FirstChildElement("macroscopic-solver");
     if (subtag == NULL) {
-      std::cout << "Could not read input file couette.xml: Missing subtag: "
+      std::cout << "Could not read input file " << filename
+                << ": Missing subtag: "
                    "macroscopic-solver"
                 << std::endl;
       exit(EXIT_FAILURE);
@@ -199,14 +177,31 @@ public:
       _cfg.maSolverType = COUETTE_FD;
       tarch::configuration::ParseConfiguration::readVector<3, unsigned int>(_cfg.lbNumberProcesses, subtag, "number-of-processes");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, "plot-every-timestep");
-    } else if (type == "analytical") {
+    }
+#if (BUILD_WITH_OPENFOAM)
+    else if (type == "foam") {
+      _cfg.maSolverType = COUETTE_FOAM;
+      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, "plot-every-timestep");
+      tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.directory, subtag, "foam-setup-directory");
+      tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.folder, subtag, "foam-setup-folder");
+      tarch::configuration::ParseConfiguration::readVector<12, unsigned int>(_cfg.foam.boundariesWithMD, subtag, "boundaries-with-MD");
+      if (!_cfg.twoWayCoupling && _cfg.foam.boundariesWithMD != tarch::la::Vector<12, unsigned int>{0}) {
+        std::cout << "ERROR: Two-way coupling is disabled, but boundaries with "
+                     "MD for openfoam were defined"
+                  << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
+#endif
+    else if (type == "analytical") {
       _cfg.maSolverType = COUETTE_ANALYTICAL;
       if (!(_cfg.wallVelocity[1] == 0.0 && _cfg.wallVelocity[2] == 0.0)) {
         std::cout << "analytic solver only supports flow in x-direction" << std::endl;
         exit(EXIT_FAILURE);
       }
     } else {
-      std::cout << "Could not read input file couette.xml: Unknown macroscopic "
+      std::cout << "Could not read input file " << filename
+                << ": Unknown macroscopic "
                    "solver type!"
                 << std::endl;
       exit(EXIT_FAILURE);
@@ -228,7 +223,7 @@ public:
     }
 
     if (_cfg.miSolverType == SYNTHETIC) {
-      if (_cfg.md2Macro || _cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 || _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 ||
+      if (_cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 || _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 ||
           _cfg.lbNumberProcesses[2] != 1) {
         std::cout << "Invalid configuration: Synthetic MD runs sequentially on "
                      "rank 0 only. "
@@ -250,33 +245,99 @@ public:
     return _cfg;
   }
 
-  /** channel is always expected to have origin at (0.0,0.0,0.0) and to be cubic
-   * (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0) */
+#if (BUILD_WITH_OPENFOAM)
+  /** @brief holds the variables necessary for the interface to the IcoFoam
+   * solver  */
+  struct FoamConfig {
+    /** @brief the path to the directory, where the folder with the IcoFoam
+     * OpenFOAM setup files are */
+    std::string directory;
+    /** @brief the name of the OpenFOAM folder */
+    std::string folder;
+    /** @brief the cubic mesh with a cubic hole has 12 boundaries, this vector
+     * tells which of them
+     *         shall be coupled with the md; The order has to be the same as in
+     * the blockMeshDict */
+    tarch::la::Vector<12, unsigned int> boundariesWithMD;
+  };
+#endif
+
+  /** @brief channel is always expected to have origin at (0.0,0.0,0.0) and to
+   * be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0) */
   double channelheight;
-  /** velocity of moving wall (lower boundary moves)*/
+  /** @brief velocity of moving wall (lower boundary moves) */
   tarch::la::Vector<3, double> wallVelocity;
+  /** @brief number of coupling cycles that will be done, while the wall
+   * velocity is the wallInitVelocity */
   int wallInitCycles;
+  /** @brief the velocity at the moving wall (z=0) while the wallInitCycles*/
   tarch::la::Vector<3, double> wallInitVelocity;
+  /** @brief total number of oscillation periods of the oscillating wall
+   * velocity*/
   double wallOscillations;
-  /** number of coupling cycles, that is continuum time steps; MD/DPD: 1000*/
+  /** @brief number of coupling cycles, that is continuum time steps; MD/DPD:
+   * 1000 */
   int couplingCycles;
-  bool md2Macro, macro2Md, computeSNR, twoWayCoupling;
+  /** @brief true if data will be send & received from the md to the continuum
+   * solver */
+  bool md2Macro;
+  /** @brief true if data will be send & received from the continuum to the md
+   * solver  */
+  bool macro2Md;
+  /** @brief true if the signal to noise ratio shall be evaluated */
+  bool computeSNR;
+  /** @brief true if from the md solver will be applied as boundary condition
+   * for the continuum solver */
+  bool twoWayCoupling;
+  /** @brief number of coupling cycles before a filter is applied*/
   int filterInitCycles;
+  /** @brief the time step interval for writing the md data to csv files  */
   int csvEveryTimestep;
+  /** @brief the type of continuum solver */
   MacroSolverType maSolverType;
+  /** @brief the type of md solver */
   MicroSolverType miSolverType;
-  double density, kinVisc;
-  /** only for LB couette solver: number of processes */
+  /** @brief the general density of the fluid under consideration */
+  double density;
+  /** @brief the kinematic viscosity of the fluid under consideration */
+  double kinVisc;
+  /** @brief only for LB couette solver: number of processes */
   tarch::la::Vector<3, unsigned int> lbNumberProcesses;
-  /** only for LB couette solver: VTK plotting per time step*/
+  /** @brief  only for LB couette solver: VTK plotting per time step */
   int plotEveryTimestep;
+  /** @brief number of cycles the continuum solver is advanced before the
+   * coupling is enabled */
   int initAdvanceCycles;
+  /** @brief the start temperature for the fluid under consideration */
   double temp;
+  /** @brief number of equilibartion time steps = number of time steps that
+   * the md will run before the coupling is enabled */
   int equSteps;
+  /** @brief the number of md simulation instances in a multi-instance
+   * coupling, -1 = dynamic */
   int totalNumberMDSimulations;
+  /** @brief the minimum number of md simulation instances in dynamic MD coupling  */
+  int lowerBoundNumberMDSimulations;
+  /** @brief only for dynamic MD: target absolute velocity error at start of all coupling cycles */
+  double absVelErrStart;
+  /** @brief only for dynamic MD: target absolute velocity error at end of all coupling cycles */
+  double absVelErrEnd;
+  /** @brief the sigma for the random noise in the case of synthetic md solver
+   */
   double noiseSigma;
+  /** @todo piet */
   bool twsLoop;
-  int twsLoopMin, twsLoopMax, twsLoopStep;
+  /** @todo piet*/
+  int twsLoopMin;
+  /** @todo piet */
+  int twsLoopMax;
+  /** @todo piet */
+  int twsLoopStep;
+
+#if (BUILD_WITH_OPENFOAM)
+  /** @brief the configurations for the OpenFoam solver */
+  FoamConfig foam;
+#endif
 };
 
 #endif
