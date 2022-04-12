@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['filterinitcycles_0',['filterInitCycles',['../structCouetteTest_1_1CouetteConfig.html#a1dd76ebd4e755e0e9140f55fbf48d35d',1,'CouetteTest::CouetteConfig']]]
+  ['equsteps_0',['equSteps',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a21913bc621f0067726c4773417822f76',1,'coupling::configurations::CouetteConfig']]]
 ];

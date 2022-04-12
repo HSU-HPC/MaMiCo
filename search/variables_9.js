@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['macro2md_0',['macro2Md',['../structCouetteTest_1_1CouetteConfig.html#a44531808127c41faacc06e37f8b8e51e',1,'CouetteTest::CouetteConfig']]],
-  ['masolvertype_1',['maSolverType',['../structCouetteTest_1_1CouetteConfig.html#affa3b74fde56bb4bf364bc3c4f36157e',1,'CouetteTest::CouetteConfig']]],
-  ['md2macro_2',['md2Macro',['../structCouetteTest_1_1CouetteConfig.html#aac4e84d54736bd3be3348dd8c6ee464b',1,'CouetteTest::CouetteConfig']]],
-  ['misolvertype_3',['miSolverType',['../structCouetteTest_1_1CouetteConfig.html#aead2f6f9b2faff895c9ec44a43440d42',1,'CouetteTest::CouetteConfig']]]
+  ['lbnumberprocesses_0',['lbNumberProcesses',['../structcoupling_1_1configurations_1_1CouetteConfig.html#aa3b0ff352dcd1c888846bf5f1937e16f',1,'coupling::configurations::CouetteConfig']]],
+  ['linearnumbercellsindomain_1',['linearNumberCellsInDomain',['../classcoupling_1_1indexing_1_1CellIndex.html#a0464a6f3789895eed0818f82137434f1',1,'coupling::indexing::CellIndex']]],
+  ['lowerboundary_2',['lowerBoundary',['../classcoupling_1_1indexing_1_1CellIndex.html#a0beda362945cf512b97a59229a82fe74',1,'coupling::indexing::CellIndex']]],
+  ['lowerboundnumbermdsimulations_3',['lowerBoundNumberMDSimulations',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a4e0f37d22510a6afd3d503a310560da3',1,'coupling::configurations::CouetteConfig']]]
 ];

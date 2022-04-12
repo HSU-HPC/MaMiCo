@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sendbuffer_0',['sendBuffer',['../structCouetteTest_1_1CouplingBuffer.html#af76e2af50f9cc00ec5743fe193ffdf2d',1,'CouetteTest::CouplingBuffer']]]
+  ['recvbuffer_0',['recvBuffer',['../structCouetteTest_1_1CouplingBuffer.html#a0c2de5b42e8f01d8ae7cdeba963eb787',1,'CouetteTest::CouplingBuffer']]]
 ];

@@ -12,7 +12,7 @@ var searchData=
   ['configuration_9',['Configuration',['../classtarch_1_1configuration_1_1Configuration.html',1,'tarch::configuration']]],
   ['constant_10',['Constant',['../classcoupling_1_1filtering_1_1Constant.html',1,'coupling::filtering']]],
   ['copy_11',['Copy',['../classcoupling_1_1filtering_1_1Copy.html',1,'coupling::filtering']]],
-  ['couetteconfig_12',['CouetteConfig',['../structCouetteTest_1_1CouetteConfig.html',1,'CouetteTest::CouetteConfig'],['../structcoupling_1_1configurations_1_1CouetteConfig.html',1,'coupling::configurations::CouetteConfig']]],
+  ['couetteconfig_12',['CouetteConfig',['../structcoupling_1_1configurations_1_1CouetteConfig.html',1,'coupling::configurations']]],
   ['couettesolver_13',['CouetteSolver',['../classcoupling_1_1solvers_1_1CouetteSolver.html',1,'coupling::solvers']]],
   ['couettesolverinterface_14',['CouetteSolverInterface',['../classcoupling_1_1solvers_1_1CouetteSolverInterface.html',1,'coupling::solvers']]],
   ['couettetest_15',['CouetteTest',['../classCouetteTest.html',1,'']]],

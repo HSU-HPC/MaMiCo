@@ -30,13 +30,14 @@ var searchData=
   ['continueiteration_27',['continueIteration',['../classcoupling_1_1interface_1_1MoleculeIterator.html#a1a8a867d51b384c6d4bc4dcc9baf1f4b',1,'coupling::interface::MoleculeIterator']]],
   ['convertglobaltolocalcellindex_28',['convertGlobalToLocalCellIndex',['../classcoupling_1_1IndexConversion.html#a92becac4ec6bca43c86a6769afe4d343',1,'coupling::IndexConversion']]],
   ['convertglobaltolocalvectorcellindex_29',['convertGlobalToLocalVectorCellIndex',['../classcoupling_1_1IndexConversion.html#aa50c3d40812f53de6cb30e66cee89b0d',1,'coupling::IndexConversion']]],
-  ['convertlocaltoglobalcellindex_30',['convertLocalToGlobalCellIndex',['../classcoupling_1_1IndexConversion.html#a148097bc028bda3500ca3495a73be824',1,'coupling::IndexConversion']]],
-  ['convertlocaltoglobalvectorcellindex_31',['convertLocalToGlobalVectorCellIndex',['../classcoupling_1_1IndexConversion.html#adf0de408bb709c8dc16c25f1ac0fbb49',1,'coupling::IndexConversion']]],
-  ['couettesolver_32',['CouetteSolver',['../classcoupling_1_1solvers_1_1CouetteSolver.html#a95fa9141ac0aeb76eef0d1e2dbafc5c3',1,'coupling::solvers::CouetteSolver']]],
-  ['couettesolverinterface_33',['CouetteSolverInterface',['../classcoupling_1_1solvers_1_1CouetteSolverInterface.html#aced85d303c45922443250b1ab5d50efe',1,'coupling::solvers::CouetteSolverInterface']]],
-  ['couettetest_34',['CouetteTest',['../classCouetteTest.html#adfd5aff778cbe3f7e324a3bcad644eb9',1,'CouetteTest']]],
-  ['coupledmoleculardynamicssimulation_35',['CoupledMolecularDynamicsSimulation',['../classcoupling_1_1solvers_1_1CoupledMolecularDynamicsSimulation.html#a574d7625fb513ac31881debdbd99577b',1,'coupling::solvers::CoupledMolecularDynamicsSimulation']]],
-  ['createmacroscopiccellindex4secondorderinterpolation_36',['createMacroscopicCellIndex4SecondOrderInterpolation',['../classcoupling_1_1cellmappings_1_1VelocityGradientRelaxationMapping.html#ac6bfde9f9ee2547320ad3cfb785171d1',1,'coupling::cellmappings::VelocityGradientRelaxationMapping']]],
-  ['cstr_37',['CStr',['../classtinyxml2_1_1XMLPrinter.html#abfa772366c44a17cdeb8aea294d57f78',1,'tinyxml2::XMLPrinter']]],
-  ['cstrsize_38',['CStrSize',['../classtinyxml2_1_1XMLPrinter.html#a3256cf3523d4898b91abb18b924be04c',1,'tinyxml2::XMLPrinter']]]
+  ['convertinnervectorcellindextoglobal_30',['convertInnerVectorCellIndexToGlobal',['../classcoupling_1_1IndexConversion.html#a08aefbd6e43bfd9a763a679b8312215b',1,'coupling::IndexConversion']]],
+  ['convertlocaltoglobalcellindex_31',['convertLocalToGlobalCellIndex',['../classcoupling_1_1IndexConversion.html#a148097bc028bda3500ca3495a73be824',1,'coupling::IndexConversion']]],
+  ['convertlocaltoglobalvectorcellindex_32',['convertLocalToGlobalVectorCellIndex',['../classcoupling_1_1IndexConversion.html#adf0de408bb709c8dc16c25f1ac0fbb49',1,'coupling::IndexConversion']]],
+  ['couettesolver_33',['CouetteSolver',['../classcoupling_1_1solvers_1_1CouetteSolver.html#a95fa9141ac0aeb76eef0d1e2dbafc5c3',1,'coupling::solvers::CouetteSolver']]],
+  ['couettesolverinterface_34',['CouetteSolverInterface',['../classcoupling_1_1solvers_1_1CouetteSolverInterface.html#aced85d303c45922443250b1ab5d50efe',1,'coupling::solvers::CouetteSolverInterface']]],
+  ['couettetest_35',['CouetteTest',['../classCouetteTest.html#adfd5aff778cbe3f7e324a3bcad644eb9',1,'CouetteTest']]],
+  ['coupledmoleculardynamicssimulation_36',['CoupledMolecularDynamicsSimulation',['../classcoupling_1_1solvers_1_1CoupledMolecularDynamicsSimulation.html#a574d7625fb513ac31881debdbd99577b',1,'coupling::solvers::CoupledMolecularDynamicsSimulation']]],
+  ['createmacroscopiccellindex4secondorderinterpolation_37',['createMacroscopicCellIndex4SecondOrderInterpolation',['../classcoupling_1_1cellmappings_1_1VelocityGradientRelaxationMapping.html#ac6bfde9f9ee2547320ad3cfb785171d1',1,'coupling::cellmappings::VelocityGradientRelaxationMapping']]],
+  ['cstr_38',['CStr',['../classtinyxml2_1_1XMLPrinter.html#abfa772366c44a17cdeb8aea294d57f78',1,'tinyxml2::XMLPrinter']]],
+  ['cstrsize_39',['CStrSize',['../classtinyxml2_1_1XMLPrinter.html#a3256cf3523d4898b91abb18b924be04c',1,'tinyxml2::XMLPrinter']]]
 ];

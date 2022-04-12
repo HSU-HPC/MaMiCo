@@ -65,7 +65,6 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-types">Private Types</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classCouetteTest-members.html">List of all members</a>  </div>
@@ -82,9 +81,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCouetteTest_1_1CouetteConfig.html">CouetteConfig</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">all the variables necessary to define the couette scenario are stored in here  <a href="structCouetteTest_1_1CouetteConfig.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCouetteTest_1_1CouplingBuffer.html">CouplingBuffer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">holds the buffers for the data transfer  <a href="structCouetteTest_1_1CouplingBuffer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -112,19 +108,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~CouetteTest</b> (
 <tr class="memitem:a7e98fbe7ebf3acede5ee3fed91de3c6a inherit pub_methods_classTest"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTest.html#a7e98fbe7ebf3acede5ee3fed91de3c6a">run</a> ()=0</td></tr>
 <tr class="separator:a7e98fbe7ebf3acede5ee3fed91de3c6a inherit pub_methods_classTest"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-types" name="pri-types"></a>
-Private Types</h2></td></tr>
-<tr class="memitem:a76bcf7f2b0bbf1d951bee6bd396d3e24"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a76bcf7f2b0bbf1d951bee6bd396d3e24">MacroSolverType</a> { <a class="el" href="classCouetteTest.html#a76bcf7f2b0bbf1d951bee6bd396d3e24a07076b25b3747dbd55f641b09fae711b">COUETTE_ANALYTICAL</a> = 0
-, <a class="el" href="classCouetteTest.html#a76bcf7f2b0bbf1d951bee6bd396d3e24a323c1432715b6ddc5c09d9b1f321bb61">COUETTE_LB</a> = 1
-, <a class="el" href="classCouetteTest.html#a76bcf7f2b0bbf1d951bee6bd396d3e24ab2090ada4dcc0887973a69b7ecda9939">COUETTE_FD</a> = 2
-, <a class="el" href="classCouetteTest.html#a76bcf7f2b0bbf1d951bee6bd396d3e24a22154cfd70507c899a598f21a789d9d1">COUETTE_FOAM</a> = 3
- }</td></tr>
-<tr class="separator:a76bcf7f2b0bbf1d951bee6bd396d3e24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1be6dbd366d9e95716e29b7b59ebb2a5"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a1be6dbd366d9e95716e29b7b59ebb2a5">MicroSolverType</a> { <a class="el" href="classCouetteTest.html#a1be6dbd366d9e95716e29b7b59ebb2a5af116bbe71f98ff1e566b54ee8becdee7">SIMPLEMD</a> = 0
-, <a class="el" href="classCouetteTest.html#a1be6dbd366d9e95716e29b7b59ebb2a5a918730c741a607a11ab9fb79165cb563">SYNTHETIC</a> = 1
- }</td></tr>
-<tr class="separator:a1be6dbd366d9e95716e29b7b59ebb2a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:a3459e8fa33cab67112664531abf7997c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a3459e8fa33cab67112664531abf7997c">init</a> ()</td></tr>
@@ -137,16 +120,14 @@ Private Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>initMPI</b> ()</td></tr>
 <tr class="memdesc:ac81370bec060f8d09ab92ea1215a3d27"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialises all MPI variables <br /></td></tr>
 <tr class="separator:ac81370bec060f8d09ab92ea1215a3d27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03ed7ba5923445c75bee6f2c5e1bee86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a03ed7ba5923445c75bee6f2c5e1bee86">twsLoop</a> ()</td></tr>
+<tr class="memitem:a03ed7ba5923445c75bee6f2c5e1bee86"><td class="memItemLeft" align="right" valign="top"><a id="a03ed7ba5923445c75bee6f2c5e1bee86" name="a03ed7ba5923445c75bee6f2c5e1bee86"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>twsLoop</b> ()</td></tr>
+<tr class="memdesc:a03ed7ba5923445c75bee6f2c5e1bee86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the entire test several times for a range of time-window-size parameters. <br /></td></tr>
 <tr class="separator:a03ed7ba5923445c75bee6f2c5e1bee86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65c0ce888daad339345a226c7ef8384c"><td class="memItemLeft" align="right" valign="top"><a id="a65c0ce888daad339345a226c7ef8384c" name="a65c0ce888daad339345a226c7ef8384c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>parseConfigurations</b> ()</td></tr>
-<tr class="memdesc:a65c0ce888daad339345a226c7ef8384c"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads the configuration from the xml file and calls <a class="el" href="classCouetteTest.html#a108fbfe24eafe9f3ffa0d946c000dd5b" title="reads the configuartion, checks that mandatory data is provided and stores the data in variables">parseCouetteTestConfiguration()</a> <br /></td></tr>
+<tr class="memdesc:a65c0ce888daad339345a226c7ef8384c"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads the configuration from the xml file and calls parseCouetteTestConfiguration() <br /></td></tr>
 <tr class="separator:a65c0ce888daad339345a226c7ef8384c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a108fbfe24eafe9f3ffa0d946c000dd5b"><td class="memItemLeft" align="right" valign="top"><a id="a108fbfe24eafe9f3ffa0d946c000dd5b" name="a108fbfe24eafe9f3ffa0d946c000dd5b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>parseCouetteTestConfiguration</b> ()</td></tr>
-<tr class="memdesc:a108fbfe24eafe9f3ffa0d946c000dd5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads the configuartion, checks that mandatory data is provided and stores the data in variables <br /></td></tr>
-<tr class="separator:a108fbfe24eafe9f3ffa0d946c000dd5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8eda40878c37591411e9f189c0b3f04"><td class="memItemLeft" align="right" valign="top"><a id="af8eda40878c37591411e9f189c0b3f04" name="af8eda40878c37591411e9f189c0b3f04"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>initSolvers</b> ()</td></tr>
 <tr class="memdesc:af8eda40878c37591411e9f189c0b3f04"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialises the macro and micro solver according to the setup from the xml file and pre-proccses them <br /></td></tr>
@@ -154,10 +135,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>initSolvers</b> ()</t
 <tr class="memitem:a96671c2025527946e7cc0b02f598698d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a96671c2025527946e7cc0b02f598698d">advanceMacro</a> (int cycle)</td></tr>
 <tr class="memdesc:a96671c2025527946e7cc0b02f598698d"><td class="mdescLeft">&#160;</td><td class="mdescRight">advances the continuum solver and collects data to send to md (<a class="el" href="classCouetteTest.html#a013629fb293a67ae16d9464cc941eb17" title="fills send buffer with data from macro/continuum solver">fillSendBuffer()</a>)  <a href="classCouetteTest.html#a96671c2025527946e7cc0b02f598698d">More...</a><br /></td></tr>
 <tr class="separator:a96671c2025527946e7cc0b02f598698d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae507d234cd7252ed332b450ac37a0dd5"><td class="memItemLeft" align="right" valign="top"><a id="ae507d234cd7252ed332b450ac37a0dd5" name="ae507d234cd7252ed332b450ac37a0dd5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>varyMD</b> (int cycle)</td></tr>
+<tr class="separator:ae507d234cd7252ed332b450ac37a0dd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bcd4c33f686acc2b859dd2de76bbb9a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a2bcd4c33f686acc2b859dd2de76bbb9a">advanceMicro</a> (int cycle)</td></tr>
 <tr class="memdesc:a2bcd4c33f686acc2b859dd2de76bbb9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">advances the md solver for one coupling time step and collect the data for the coupling  <a href="classCouetteTest.html#a2bcd4c33f686acc2b859dd2de76bbb9a">More...</a><br /></td></tr>
 <tr class="separator:a2bcd4c33f686acc2b859dd2de76bbb9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2461b066d5c9500c6d5df564d85d6cea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a2461b066d5c9500c6d5df564d85d6cea">computeSNR</a> (int cycle)</td></tr>
+<tr class="memdesc:a2461b066d5c9500c6d5df564d85d6cea"><td class="mdescLeft">&#160;</td><td class="mdescRight">used to compute signal-to-noise ratio, stores values in _sum_noise and _sum_signal  <a href="classCouetteTest.html#a2461b066d5c9500c6d5df564d85d6cea">More...</a><br /></td></tr>
 <tr class="separator:a2461b066d5c9500c6d5df564d85d6cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae558b5edb4ddd5b51a0105b6d7c8b168"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168">twoWayCoupling</a> (int cycle)</td></tr>
 <tr class="memdesc:ae558b5edb4ddd5b51a0105b6d7c8b168"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets up the boundaries in the macro solver for the coupling and applies the values from the md in the macro solver  <a href="classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168">More...</a><br /></td></tr>
@@ -182,9 +167,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>shutdown</b> ()</td><
 <tr class="memitem:a013629fb293a67ae16d9464cc941eb17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a013629fb293a67ae16d9464cc941eb17">fillSendBuffer</a> (const double density, const <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver</a>&lt; 3 &gt; &amp;couetteSolver, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; 3 &gt; &amp;indexConversion, std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; 3 &gt; * &gt; &amp;sendBuffer, const unsigned int *const globalCellIndices4SendBuffer) const</td></tr>
 <tr class="memdesc:a013629fb293a67ae16d9464cc941eb17"><td class="mdescLeft">&#160;</td><td class="mdescRight">fills send buffer with data from macro/continuum solver  <a href="classCouetteTest.html#a013629fb293a67ae16d9464cc941eb17">More...</a><br /></td></tr>
 <tr class="separator:a013629fb293a67ae16d9464cc941eb17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a6e37644d08c12b73cae421d631bf65"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a2a6e37644d08c12b73cae421d631bf65">fillRecvBuffer</a> (const double density, const <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver</a>&lt; 3 &gt; &amp;couetteSolver, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; 3 &gt; &amp;indexConversion, std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; 3 &gt; * &gt; &amp;sendBuffer, const unsigned int *const globalCellIndices4SendBuffer)</td></tr>
-<tr class="memdesc:a2a6e37644d08c12b73cae421d631bf65"><td class="mdescLeft">&#160;</td><td class="mdescRight">fills the buffer with the velocity values from the analytical couette solution with additional random noise  <a href="classCouetteTest.html#a2a6e37644d08c12b73cae421d631bf65">More...</a><br /></td></tr>
-<tr class="separator:a2a6e37644d08c12b73cae421d631bf65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c9486a4a0006425921164bc1c6eaadd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver</a>&lt; 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a1c9486a4a0006425921164bc1c6eaadd">getCouetteSolver</a> (const double dx, const double dt)</td></tr>
 <tr class="separator:a1c9486a4a0006425921164bc1c6eaadd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c987f0e451f6e589c12d13a1fb07ef5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a0c987f0e451f6e589c12d13a1fb07ef5">getCouetteSolverInterface</a> (<a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver</a>&lt; 3 &gt; *couetteSolver, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; mdOffset, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; mamicoMeshsize, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; globalNumberMacroscopicCells, unsigned int outerRegion)</td></tr>
@@ -206,10 +188,10 @@ simplemd::configurations::MolecularDynamicsConfiguration&#160;</td><td class="me
 <a class="el" href="classcoupling_1_1configurations_1_1MaMiCoConfiguration.html">coupling::configurations::MaMiCoConfiguration</a>&lt; 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_mamicoConfig</b></td></tr>
 <tr class="memdesc:a22217c3e07e8745d572ab5543ee44022"><td class="mdescLeft">&#160;</td><td class="mdescRight">the config data and information for MaMiCo <br /></td></tr>
 <tr class="separator:a22217c3e07e8745d572ab5543ee44022"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89522ad896da6701c8704d4437285778"><td class="memItemLeft" align="right" valign="top"><a id="a89522ad896da6701c8704d4437285778" name="a89522ad896da6701c8704d4437285778"></a>
-<a class="el" href="structCouetteTest_1_1CouetteConfig.html">CouetteConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_cfg</b></td></tr>
-<tr class="memdesc:a89522ad896da6701c8704d4437285778"><td class="mdescLeft">&#160;</td><td class="mdescRight">the <a class="el" href="structCouetteTest_1_1CouetteConfig.html" title="all the variables necessary to define the couette scenario are stored in here">CouetteConfig</a> for the current setup <br /></td></tr>
-<tr class="separator:a89522ad896da6701c8704d4437285778"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a636c437618f9ce365d23997cb887c52f"><td class="memItemLeft" align="right" valign="top"><a id="a636c437618f9ce365d23997cb887c52f" name="a636c437618f9ce365d23997cb887c52f"></a>
+<a class="el" href="structcoupling_1_1configurations_1_1CouetteConfig.html">coupling::configurations::CouetteConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_cfg</b></td></tr>
+<tr class="memdesc:a636c437618f9ce365d23997cb887c52f"><td class="mdescLeft">&#160;</td><td class="mdescRight">the CouetteConfig for the current setup <br /></td></tr>
+<tr class="separator:a636c437618f9ce365d23997cb887c52f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7604ece14b9e64956d3eac7ba82c25ce"><td class="memItemLeft" align="right" valign="top"><a id="a7604ece14b9e64956d3eac7ba82c25ce" name="a7604ece14b9e64956d3eac7ba82c25ce"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_mdStepCounter</b></td></tr>
 <tr class="memdesc:a7604ece14b9e64956d3eac7ba82c25ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">the counter for the time steps, which are done within the md <br /></td></tr>
@@ -226,16 +208,13 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_mdStepCounte
 <a class="el" href="structCouetteTest_1_1CouplingBuffer.html">CouplingBuffer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_buf</b></td></tr>
 <tr class="memdesc:af6c016fde6dcb74c3b368c37b756178f"><td class="mdescLeft">&#160;</td><td class="mdescRight">the current buffer for the coupling <br /></td></tr>
 <tr class="separator:af6c016fde6dcb74c3b368c37b756178f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1d52d9f0ca34546c8b4cd2d203a014c"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#aa1d52d9f0ca34546c8b4cd2d203a014c">_localMDInstances</a></td></tr>
-<tr class="separator:aa1d52d9f0ca34546c8b4cd2d203a014c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3bc61c68c4181feec9accc200f348f64"><td class="memItemLeft" align="right" valign="top"><a id="a3bc61c68c4181feec9accc200f348f64" name="a3bc61c68c4181feec9accc200f348f64"></a>
 std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; MY_LINKEDCELL, 3 &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_mdSolverInterface</b></td></tr>
 <tr class="memdesc:a3bc61c68c4181feec9accc200f348f64"><td class="mdescLeft">&#160;</td><td class="mdescRight">the interface to the md solver <br /></td></tr>
 <tr class="separator:a3bc61c68c4181feec9accc200f348f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af46fcd7be11b5ccf892c78bd8dcfb1a9"><td class="memItemLeft" align="right" valign="top"><a id="af46fcd7be11b5ccf892c78bd8dcfb1a9" name="af46fcd7be11b5ccf892c78bd8dcfb1a9"></a>
-std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.html">coupling::interface::MDSimulation</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_simpleMD</b></td></tr>
-<tr class="memdesc:af46fcd7be11b5ccf892c78bd8dcfb1a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">the md solver <br /></td></tr>
-<tr class="separator:af46fcd7be11b5ccf892c78bd8dcfb1a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a256dc132511603ed4f6d0157589d41ea"><td class="memItemLeft" align="right" valign="top"><a id="a256dc132511603ed4f6d0157589d41ea" name="a256dc132511603ed4f6d0157589d41ea"></a>
+<a class="el" href="classcoupling_1_1InstanceHandling.html">coupling::InstanceHandling</a>&lt; MY_LINKEDCELL, 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_instanceHandling</b></td></tr>
+<tr class="separator:a256dc132511603ed4f6d0157589d41ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16e761134b1e5452c4c97f2ffb9c5d98"><td class="memItemLeft" align="right" valign="top">std::default_random_engine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#a16e761134b1e5452c4c97f2ffb9c5d98">_generator</a></td></tr>
 <tr class="separator:a16e761134b1e5452c4c97f2ffb9c5d98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae31497af2a4aa05c547d7aa928d4cec5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCouetteTest.html#ae31497af2a4aa05c547d7aa928d4cec5">_sum_signal</a></td></tr>
@@ -246,74 +225,14 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
 <a class="el" href="structCouetteTest_1_1TimingValues.html">TimingValues</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_tv</b></td></tr>
 <tr class="memdesc:a3de515e223c30e2a8467ee3e2001706f"><td class="mdescLeft">&#160;</td><td class="mdescRight">a instance of the timingValues <br /></td></tr>
 <tr class="separator:a3de515e223c30e2a8467ee3e2001706f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f33e64c9af10bc27edf83bea8e3ce8d"><td class="memItemLeft" align="right" valign="top"><a id="a3f33e64c9af10bc27edf83bea8e3ce8d" name="a3f33e64c9af10bc27edf83bea8e3ce8d"></a>
+<a class="el" href="classcoupling_1_1MultiMDMediator.html">coupling::MultiMDMediator</a>&lt; MY_LINKEDCELL, 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_multiMDMediator</b></td></tr>
+<tr class="separator:a3f33e64c9af10bc27edf83bea8e3ce8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Versatile configurable Couette flow test for noise-filtered multi-instance Nie coupling. </p>
-<p >Features, depending on couette.xml config file: -&gt; one-way or two-way coupling -&gt; statup or oscillating flow scenario -&gt; using analytical or Lattice Bolzmann Couette flow solver -&gt; using (multi-instance) SimpleMD or synthetic MD data (with Gaussian noise) -&gt; CSV output option for filtered data -&gt; ability to delay scenario startup or two-way coupling for filter initialisation time -&gt; signal-to-noise ratio (SNR) computation (between filter output and macroscopic solver) -&gt; runtime measurements and logging separately for coupled simulation components -&gt; 'tws-loop' feature for testing many POD time-window-size parameters in a single run </p><dl class="section author"><dt>Author</dt><dd>Piet Jarmatz </dd></dl>
-</div><h2 class="groupheader">Member Enumeration Documentation</h2>
-<a id="a76bcf7f2b0bbf1d951bee6bd396d3e24" name="a76bcf7f2b0bbf1d951bee6bd396d3e24"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76bcf7f2b0bbf1d951bee6bd396d3e24">&#9670;&nbsp;</a></span>MacroSolverType</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="classCouetteTest.html#a76bcf7f2b0bbf1d951bee6bd396d3e24">CouetteTest::MacroSolverType</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Defines the type of continuum solver for the coupled simulation </p>
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a76bcf7f2b0bbf1d951bee6bd396d3e24a07076b25b3747dbd55f641b09fae711b" name="a76bcf7f2b0bbf1d951bee6bd396d3e24a07076b25b3747dbd55f641b09fae711b"></a>COUETTE_ANALYTICAL&#160;</td><td class="fielddoc"><p >the analytical couette solver is used (<a class="el" href="classcoupling_1_1solvers_1_1CouetteSolver.html" title="implements an analytic Couette flow solver.">coupling::solvers::CouetteSolver</a>) </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a76bcf7f2b0bbf1d951bee6bd396d3e24a323c1432715b6ddc5c09d9b1f321bb61" name="a76bcf7f2b0bbf1d951bee6bd396d3e24a323c1432715b6ddc5c09d9b1f321bb61"></a>COUETTE_LB&#160;</td><td class="fielddoc"><p >the Lattice-Bolzmann solver is used (<a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html" title="implements a three-dimensional Lattice-Boltzmann Couette flow solver.">coupling::solvers::LBCouetteSolver</a>) </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a76bcf7f2b0bbf1d951bee6bd396d3e24ab2090ada4dcc0887973a69b7ecda9939" name="a76bcf7f2b0bbf1d951bee6bd396d3e24ab2090ada4dcc0887973a69b7ecda9939"></a>COUETTE_FD&#160;</td><td class="fielddoc"><p >the 1d finite-difference solver is used (<a class="el" href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html" title="implements a simple one-dimensional finite-diffference solver for the Couette flow.">coupling::solvers::FiniteDifferenceSolver</a>) </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a76bcf7f2b0bbf1d951bee6bd396d3e24a22154cfd70507c899a598f21a789d9d1" name="a76bcf7f2b0bbf1d951bee6bd396d3e24a22154cfd70507c899a598f21a789d9d1"></a>COUETTE_FOAM&#160;</td><td class="fielddoc"><p >the IcoFoam solver is used (<a class="el" href="classcoupling_1_1solvers_1_1IcoFoam.html">coupling::solvers::IcoFoam</a>) </p>
-</td></tr>
-</table>
-
-</div>
-</div>
-<a id="a1be6dbd366d9e95716e29b7b59ebb2a5" name="a1be6dbd366d9e95716e29b7b59ebb2a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1be6dbd366d9e95716e29b7b59ebb2a5">&#9670;&nbsp;</a></span>MicroSolverType</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="classCouetteTest.html#a1be6dbd366d9e95716e29b7b59ebb2a5">CouetteTest::MicroSolverType</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Defines the type of md solver for the coupled simulation </p>
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1be6dbd366d9e95716e29b7b59ebb2a5af116bbe71f98ff1e566b54ee8becdee7" name="a1be6dbd366d9e95716e29b7b59ebb2a5af116bbe71f98ff1e566b54ee8becdee7"></a>SIMPLEMD&#160;</td><td class="fielddoc"><p >the SimpleMD solver is used </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a1be6dbd366d9e95716e29b7b59ebb2a5a918730c741a607a11ab9fb79165cb563" name="a1be6dbd366d9e95716e29b7b59ebb2a5a918730c741a607a11ab9fb79165cb563"></a>SYNTHETIC&#160;</td><td class="fielddoc"><p >the synthetic solver is used </p>
-</td></tr>
-</table>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+<p >Features, depending on couette.xml config file: -&gt; one-way or two-way coupling -&gt; statup or oscillating flow scenario -&gt; using analytical or Lattice Bolzmann Couette flow solver -&gt; using (multi-instance) SimpleMD or synthetic MD data (with Gaussian noise) -&gt; CSV output option for filtered data -&gt; ability to delay scenario startup or two-way coupling for filter initialisation time -&gt; signal-to-noise ratio (SNR) computation (between filter output and macroscopic solver) -&gt; runtime measurements and logging separately for coupled simulation components -&gt; 'tws-loop' feature for testing many POD time-window-size parameters in a single run -&gt; dynamic multi-instance MD, adapt number of MD instances according to defined error </p><dl class="section author"><dt>Author</dt><dd>Piet Jarmatz </dd></dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a96671c2025527946e7cc0b02f598698d" name="a96671c2025527946e7cc0b02f598698d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a96671c2025527946e7cc0b02f598698d">&#9670;&nbsp;</a></span>advanceMacro()</h2>
 
@@ -487,7 +406,8 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000018">Todo:</a></b></dt><dd>@Piet </dd></dl>
+
+<p>used to compute signal-to-noise ratio, stores values in _sum_noise and _sum_signal </p>
 <p >todo@ use more cells </p>
 
 </div>
@@ -520,72 +440,6 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">sendBuffer</td><td>the buffer to be cleaned </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a2a6e37644d08c12b73cae421d631bf65" name="a2a6e37644d08c12b73cae421d631bf65"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a6e37644d08c12b73cae421d631bf65">&#9670;&nbsp;</a></span>fillRecvBuffer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CouetteTest::fillRecvBuffer </td>
-          <td>(</td>
-          <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>density</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver</a>&lt; 3 &gt; &amp;&#160;</td>
-          <td class="paramname"><em>couetteSolver</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; 3 &gt; &amp;&#160;</td>
-          <td class="paramname"><em>indexConversion</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; 3 &gt; * &gt; &amp;&#160;</td>
-          <td class="paramname"><em>sendBuffer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const unsigned int *const&#160;</td>
-          <td class="paramname"><em>globalCellIndices4SendBuffer</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>fills the buffer with the velocity values from the analytical couette solution with additional random noise </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">density</td><td>the general density of the fluid </td></tr>
-    <tr><td class="paramname">couetteSolver</td><td>the continuum solver </td></tr>
-    <tr><td class="paramname">indexConversion</td><td>an instance of the indexConversion </td></tr>
-    <tr><td class="paramname">sendBuffer</td><td>the bufffer to send data from macro to micro </td></tr>
-    <tr><td class="paramname">globalCellIndices4SendBuffer</td><td>the global linearized indices of the macroscopic cells in the buffer </td></tr>
   </table>
   </dd>
 </dl>
@@ -691,7 +545,7 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>the correct marco/continuum solver for the given setup </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the correct macro/continuum solver for the given setup </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">dx</td><td>the grid size (equidistant mesh) </td></tr>
@@ -764,7 +618,7 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
   </table>
   </dd>
 </dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000019">Todo:</a></b></dt><dd>piet, what is the mamicoMeshsize &amp; the outer layer </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000020">Todo:</a></b></dt><dd>piet, what is the mamicoMeshsize &amp; the outer layer </dd></dl>
 
 </div>
 </div>
@@ -888,7 +742,7 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
 </div><div class="memdoc">
 
 <p>combines the functioniality necessary for a cycle of the coupled simulation </p>
-<p >it advances the macro (<a class="el" href="classCouetteTest.html#a96671c2025527946e7cc0b02f598698d" title="advances the continuum solver and collects data to send to md (fillSendBuffer())">advanceMacro()</a>) and micro solver (advanceMicro), computes the signal to noise ratio (<a class="el" href="classCouetteTest.html#a2461b066d5c9500c6d5df564d85d6cea">computeSNR()</a>) and sends the data from the macro to the micro solver (<a class="el" href="classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168" title="sets up the boundaries in the macro solver for the coupling and applies the values from the md in the...">twoWayCoupling()</a>) </p>
+<p >it advances the macro (<a class="el" href="classCouetteTest.html#a96671c2025527946e7cc0b02f598698d" title="advances the continuum solver and collects data to send to md (fillSendBuffer())">advanceMacro()</a>) and micro solver (advanceMicro), computes the signal to noise ratio (<a class="el" href="classCouetteTest.html#a2461b066d5c9500c6d5df564d85d6cea" title="used to compute signal-to-noise ratio, stores values in _sum_noise and _sum_signal">computeSNR()</a>) and sends the data from the macro to the micro solver (<a class="el" href="classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168" title="sets up the boundaries in the macro solver for the coupling and applies the values from the md in the...">twoWayCoupling()</a>) </p>
 
 </div>
 </div>
@@ -923,32 +777,6 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="a03ed7ba5923445c75bee6f2c5e1bee86" name="a03ed7ba5923445c75bee6f2c5e1bee86"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03ed7ba5923445c75bee6f2c5e1bee86">&#9670;&nbsp;</a></span>twsLoop()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CouetteTest::twsLoop </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000017">Todo:</a></b></dt><dd>@Piet write comment </dd></dl>
 
 </div>
 </div>
@@ -1035,29 +863,6 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
 
 </div>
 </div>
-<a id="aa1d52d9f0ca34546c8b4cd2d203a014c" name="aa1d52d9f0ca34546c8b4cd2d203a014c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1d52d9f0ca34546c8b4cd2d203a014c">&#9670;&nbsp;</a></span>_localMDInstances</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int CouetteTest::_localMDInstances</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000024">Todo:</a></b></dt><dd>piet </dd></dl>
-
-</div>
-</div>
 <a id="a6cf359825fafb0dbe0ce9e6d81424cfe" name="a6cf359825fafb0dbe0ce9e6d81424cfe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6cf359825fafb0dbe0ce9e6d81424cfe">&#9670;&nbsp;</a></span>_multiMDCellService</h2>
 
@@ -1077,7 +882,7 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000023">Todo:</a></b></dt><dd>piet </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000024">Todo:</a></b></dt><dd>piet </dd></dl>
 
 </div>
 </div>
@@ -1100,7 +905,7 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000022">Todo:</a></b></dt><dd>piet </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000023">Todo:</a></b></dt><dd>piet </dd></dl>
 
 </div>
 </div>
@@ -1169,7 +974,7 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSimulation.h
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000021">Todo:</a></b></dt><dd>Piet </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000022">Todo:</a></b></dt><dd>Piet </dd></dl>
 
 </div>
 </div>

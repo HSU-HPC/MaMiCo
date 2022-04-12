@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['recvbuffer_0',['recvBuffer',['../structCouetteTest_1_1CouplingBuffer.html#a0c2de5b42e8f01d8ae7cdeba963eb787',1,'CouetteTest::CouplingBuffer']]]
+  ['ploteverytimestep_0',['plotEveryTimestep',['../structcoupling_1_1configurations_1_1CouetteConfig.html#af03077aebac8f701e728a1bd1f1a374f',1,'coupling::configurations::CouetteConfig']]]
 ];

@@ -81,6 +81,8 @@ $(function() {
 <p><code>#include &lt;<a class="el" href="IndexConversion_8h_source.html">IndexConversion.h</a>&gt;</code></p>
 
 <p>Inherits <a class="el" href="classtarch_1_1utils_1_1Uncopyable.html">tarch::utils::Uncopyable</a>.</p>
+
+<p>Inherited by <a class="el" href="classcoupling_1_1MPIIndexConversion.html">coupling::MPIIndexConversion&lt; dim &gt;</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -103,6 +105,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab83f0687ae81867e36f110ecb459870b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1IndexConversion.html#ab83f0687ae81867e36f110ecb459870b">getGlobalVectorCellIndex</a> (unsigned int globalCellIndex) const</td></tr>
 <tr class="memdesc:ab83f0687ae81867e36f110ecb459870b"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the global vector cell index from a linearised index.  <a href="classcoupling_1_1IndexConversion.html#ab83f0687ae81867e36f110ecb459870b">More...</a><br /></td></tr>
 <tr class="separator:ab83f0687ae81867e36f110ecb459870b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cf2c39cbf48a01ab0887012e57b3199"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1IndexConversion.html#a3cf2c39cbf48a01ab0887012e57b3199">getGlobalInnerVectorCellIndex</a> (unsigned int globalCellIndex) const</td></tr>
+<tr class="separator:a3cf2c39cbf48a01ab0887012e57b3199"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08aefbd6e43bfd9a763a679b8312215b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1IndexConversion.html#a08aefbd6e43bfd9a763a679b8312215b">convertInnerVectorCellIndexToGlobal</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; cellIndexVectorMDContext) const</td></tr>
+<tr class="separator:a08aefbd6e43bfd9a763a679b8312215b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4679d41cef901348695f5effc0454ffd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1IndexConversion.html#a4679d41cef901348695f5effc0454ffd">getLocalVectorCellIndex</a> (unsigned int localCellIndex) const</td></tr>
 <tr class="memdesc:a4679d41cef901348695f5effc0454ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the local vector cell index from a linearised index.  <a href="classcoupling_1_1IndexConversion.html#a4679d41cef901348695f5effc0454ffd">More...</a><br /></td></tr>
 <tr class="separator:a4679d41cef901348695f5effc0454ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -144,6 +150,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acdb52554ea2c20332f2f4b6c969f7247"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1IndexConversion.html#acdb52554ea2c20332f2f4b6c969f7247">getMacroscopicCellSize</a> () const</td></tr>
 <tr class="memdesc:acdb52554ea2c20332f2f4b6c969f7247"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the vector size of each macroscopic cell.  <a href="classcoupling_1_1IndexConversion.html#acdb52554ea2c20332f2f4b6c969f7247">More...</a><br /></td></tr>
 <tr class="separator:acdb52554ea2c20332f2f4b6c969f7247"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae58e799a016ec8b71eea8862e7a92d35"><td class="memItemLeft" align="right" valign="top"><a id="ae58e799a016ec8b71eea8862e7a92d35" name="ae58e799a016ec8b71eea8862e7a92d35"></a>
+<a class="el" href="namespacecoupling_1_1paralleltopology.html#ad59b0afbf0aa9de388db04cbd6c1c5d0">coupling::paralleltopology::ParallelTopologyType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getParallelTopologyType</b> () const</td></tr>
+<tr class="separator:ae58e799a016ec8b71eea8862e7a92d35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71ad84cee84dcb00e41941b386a8a8d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1IndexConversion.html#a71ad84cee84dcb00e41941b386a8a8d5">getGlobalVectorCellIndex</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; position) const</td></tr>
 <tr class="memdesc:a71ad84cee84dcb00e41941b386a8a8d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the global vector cell index of the macroscopic cell in which a point is  <a href="classcoupling_1_1IndexConversion.html#a71ad84cee84dcb00e41941b386a8a8d5">More...</a><br /></td></tr>
 <tr class="separator:a71ad84cee84dcb00e41941b386a8a8d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -224,7 +233,7 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
 class coupling::IndexConversion&lt; dim &gt;</div><p >handles the index conversion </p>
-<p >... from vector to linearised indices as well as from local to global indices. This class inherits privately from Uncopyable (see CouplingMDDefinitions). We do this in order to hold the pointer to the ParallelTopology consistent in exactly one instance of <a class="el" href="classcoupling_1_1IndexConversion.html" title="handles the index conversion">IndexConversion</a> (or require to have valid initialisation via the IndexConversion(...) constructor. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p >Handles the index conversion from vector to linearised indices as well as from local to global indices. This class inherits privately from Uncopyable (see CouplingMDDefinitions). We do this in order to hold the pointer to the ParallelTopology consistent in exactly one instance of <a class="el" href="classcoupling_1_1IndexConversion.html" title="handles the index conversion">IndexConversion</a> (or require to have valid initialisation via the IndexConversion(...) constructor. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">dim</td><td>refers to the spacial dimension of the simulation, can be 1, 2, or 3 </td></tr>
   </table>
@@ -439,6 +448,27 @@ template&lt;unsigned int dim&gt; </div>
 
 </div>
 </div>
+<a id="a08aefbd6e43bfd9a763a679b8312215b" name="a08aefbd6e43bfd9a763a679b8312215b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08aefbd6e43bfd9a763a679b8312215b">&#9670;&nbsp;</a></span>convertInnerVectorCellIndexToGlobal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt;::convertInnerVectorCellIndexToGlobal </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td>
+          <td class="paramname"><em>cellIndexVectorMDContext</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Translates index vector of inner cell to make it usable in global context </p>
+
+</div>
+</div>
 <a id="a148097bc028bda3500ca3495a73be824" name="a148097bc028bda3500ca3495a73be824"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a148097bc028bda3500ca3495a73be824">&#9670;&nbsp;</a></span>convertLocalToGlobalCellIndex()</h2>
 
@@ -593,6 +623,27 @@ template&lt;unsigned int dim&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the linearised global cell index for the given dimensional index </dd></dl>
+
+</div>
+</div>
+<a id="a3cf2c39cbf48a01ab0887012e57b3199" name="a3cf2c39cbf48a01ab0887012e57b3199"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cf2c39cbf48a01ab0887012e57b3199">&#9670;&nbsp;</a></span>getGlobalInnerVectorCellIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt;::getGlobalInnerVectorCellIndex </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>globalCellIndex</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >Does the same as <a class="el" href="classcoupling_1_1IndexConversion.html#ab83f0687ae81867e36f110ecb459870b" title="returns the global vector cell index from a linearised index.">getGlobalVectorCellIndex()</a> but * non-inner cells (i.e. outside of the MD domain) are converted to MAX_INT * (0, ... , 0) is the first cell in the MD domain etc. </p>
 
 </div>
 </div>

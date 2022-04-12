@@ -3,7 +3,7 @@ var searchData=
   ['configuration_0',['configuration',['../namespacetarch_1_1configuration.html',1,'tarch']]],
   ['la_1',['la',['../namespacetarch_1_1la.html',1,'tarch']]],
   ['tarch_2',['tarch',['../namespacetarch.html',1,'']]],
-  ['temp_3',['temp',['../structCouetteTest_1_1CouetteConfig.html#a576c939d14a12c1f0425b0e76c011ec8',1,'CouetteTest::CouetteConfig']]],
+  ['temp_3',['temp',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a27e838b08768b7fb74a0c56ccacd051c',1,'coupling::configurations::CouetteConfig']]],
   ['temperature_4',['Temperature',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967aaa8359ac43a16edd905af999cff354a37',1,'coupling::error::ErrorEstimation']]],
   ['test_5',['Test',['../classTest.html',1,'']]],
   ['test_5flocal_5fmacroscopic_5fsolver_5fid_6',['TEST_LOCAL_MACROSCOPIC_SOLVER_ID',['../namespacecoupling.html#a6d56a3a8dd5094eba68e6ffdf1782f66ab0e0f8a62d16eee48ad023110a44861d',1,'coupling']]],
@@ -38,7 +38,7 @@ var searchData=
   ['toelement_35',['ToElement',['../classtinyxml2_1_1XMLNode.html#a9417e1f8a9787ae27741605493514b18',1,'tinyxml2::XMLNode::ToElement()'],['../classtinyxml2_1_1XMLHandle.html#ab2371c4adb8b04afe04ed216bf9b0676',1,'tinyxml2::XMLHandle::ToElement()'],['../classtinyxml2_1_1XMLElement.html#abade4c59bd6f16c85caa42d3c9eb617d',1,'tinyxml2::XMLElement::ToElement()']]],
   ['tonode_36',['ToNode',['../classtinyxml2_1_1XMLHandle.html#a689453c96dd3d4016437d2298d1de691',1,'tinyxml2::XMLHandle']]],
   ['top_37',['TOP',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a84f11769e98cd2a7ca834deb019491c7ade06c09e08a732ef7198784bbbf10a0e',1,'coupling::solvers::NumericalSolver']]],
-  ['totalnumbermdsimulations_38',['totalNumberMDSimulations',['../structCouetteTest_1_1CouetteConfig.html#abca24a78282ca42bd13e9d6ce2b9ded2',1,'CouetteTest::CouetteConfig']]],
+  ['totalnumbermdsimulations_38',['totalNumberMDSimulations',['../structcoupling_1_1configurations_1_1CouetteConfig.html#ac334b4731305952eff8f1333d9271899',1,'coupling::configurations::CouetteConfig']]],
   ['totext_39',['ToText',['../classtinyxml2_1_1XMLNode.html#a0aea8c9c5853c35a06da1988486abc60',1,'tinyxml2::XMLNode::ToText()'],['../classtinyxml2_1_1XMLText.html#aa5f022b8424f270302ff281c0b9c360b',1,'tinyxml2::XMLText::ToText()'],['../classtinyxml2_1_1XMLHandle.html#accc80bcbd81e816f13a23c172587c288',1,'tinyxml2::XMLHandle::ToText()']]],
   ['tounknown_40',['ToUnknown',['../classtinyxml2_1_1XMLHandle.html#add97784cbe14ef42bb36e158ad6e6082',1,'tinyxml2::XMLHandle::ToUnknown()'],['../classtinyxml2_1_1XMLUnknown.html#a7724b3762750762aa7582322f7047086',1,'tinyxml2::XMLUnknown::ToUnknown()'],['../classtinyxml2_1_1XMLNode.html#aa8a2dd38b786c3b8d406c2047753cbfd',1,'tinyxml2::XMLNode::ToUnknown()']]],
   ['transferstrategy_41',['TransferStrategy',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html',1,'coupling::transferstrategies::TransferStrategy&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a8b289edb95ae3d7a071cb3b313c8c085',1,'coupling::transferstrategies::TransferStrategy::TransferStrategy()']]],
@@ -48,9 +48,9 @@ var searchData=
   ['transferstrategyconfiguration_45',['TransferStrategyConfiguration',['../classcoupling_1_1configurations_1_1TransferStrategyConfiguration.html',1,'coupling::configurations::TransferStrategyConfiguration&lt; dim &gt;'],['../classcoupling_1_1configurations_1_1TransferStrategyConfiguration.html#ade8ab7551a02e11f86623ea836dab703',1,'coupling::configurations::TransferStrategyConfiguration::TransferStrategyConfiguration()']]],
   ['triggerreceiving_46',['triggerReceiving',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a5685ebdb7b1c89cca733641164a4fb8c',1,'coupling::sendrecv::SendReceiveBuffer']]],
   ['triggersending_47',['triggerSending',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ac98cde3865a7c34a6a0a3447e23689cc',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['twowaycoupling_48',['twoWayCoupling',['../structCouetteTest_1_1CouetteConfig.html#a3b4c9511159b4e99744b7bdbfddab8d6',1,'CouetteTest::CouetteConfig::twoWayCoupling()'],['../classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168',1,'CouetteTest::twoWayCoupling()']]],
-  ['twsloop_49',['twsLoop',['../structCouetteTest_1_1CouetteConfig.html#ab18c720afb956417da04aa36aeaba938',1,'CouetteTest::CouetteConfig::twsLoop()'],['../classCouetteTest.html#a03ed7ba5923445c75bee6f2c5e1bee86',1,'CouetteTest::twsLoop()']]],
-  ['twsloopmax_50',['twsLoopMax',['../structCouetteTest_1_1CouetteConfig.html#a9d4e4ce9e6f2fd2e85918c0fb1ea6e93',1,'CouetteTest::CouetteConfig']]],
-  ['twsloopmin_51',['twsLoopMin',['../structCouetteTest_1_1CouetteConfig.html#aef7efe54234ed04393df11ab4d984806',1,'CouetteTest::CouetteConfig']]],
-  ['twsloopstep_52',['twsLoopStep',['../structCouetteTest_1_1CouetteConfig.html#a4bf7530f2fd229604c1d49381b403b9d',1,'CouetteTest::CouetteConfig']]]
+  ['twowaycoupling_48',['twoWayCoupling',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a15c2aa811d8ec19fad2900f16fc73188',1,'coupling::configurations::CouetteConfig::twoWayCoupling()'],['../classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168',1,'CouetteTest::twoWayCoupling()']]],
+  ['twsloop_49',['twsLoop',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a567534e7cf3f594a6de51d15966291be',1,'coupling::configurations::CouetteConfig::twsLoop()'],['../classCouetteTest.html#a03ed7ba5923445c75bee6f2c5e1bee86',1,'CouetteTest::twsLoop()']]],
+  ['twsloopmax_50',['twsLoopMax',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a8073ff18b3f5cffdbe550968d110bf08',1,'coupling::configurations::CouetteConfig']]],
+  ['twsloopmin_51',['twsLoopMin',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a1d1e6c2a90aa4d3111ec1df0a427949b',1,'coupling::configurations::CouetteConfig']]],
+  ['twsloopstep_52',['twsLoopStep',['../structcoupling_1_1configurations_1_1CouetteConfig.html#acfb9ffbca50bccbc60597144b754723b',1,'coupling::configurations::CouetteConfig']]]
 ];

@@ -99,6 +99,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a8cb864d98cc3116fc755b0c8f8dfd7ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f23d7aac3ddb132dc9348104935e62f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#a7f23d7aac3ddb132dc9348104935e62f">applyBoundaryForce</a> (unsigned int t)=0</td></tr>
 <tr class="separator:a7f23d7aac3ddb132dc9348104935e62f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a713a14ad46c129c9b2a63b129eedca64"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#a713a14ad46c129c9b2a63b129eedca64">perturbateVelocity</a> ()=0</td></tr>
+<tr class="separator:a713a14ad46c129c9b2a63b129eedca64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b4ed8e40e4079d71d1dde88cd7aef9b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#a2b4ed8e40e4079d71d1dde88cd7aef9b">plotEveryMicroscopicTimestep</a> (unsigned int t)=0</td></tr>
 <tr class="separator:a2b4ed8e40e4079d71d1dde88cd7aef9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d6132ca66087a7cc796912a46c0c915"><td class="memItemLeft" align="right" valign="top"><a id="a3d6132ca66087a7cc796912a46c0c915" name="a3d6132ca66087a7cc796912a46c0c915"></a>
@@ -106,6 +108,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>plotEveryMacr
 <tr class="separator:a3d6132ca66087a7cc796912a46c0c915"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52637d6f6c6de0d8f7318f85d419246b"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#a52637d6f6c6de0d8f7318f85d419246b">getIndexConversion</a> () const =0</td></tr>
 <tr class="separator:a52637d6f6c6de0d8f7318f85d419246b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09e27d161783b3595a5f84d7f0948438"><td class="memItemLeft" align="right" valign="top"><a id="a09e27d161783b3595a5f84d7f0948438" name="a09e27d161783b3595a5f84d7f0948438"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>updateIndexConversion</b> (const unsigned int &amp;topologyOffset)=0</td></tr>
+<tr class="separator:a09e27d161783b3595a5f84d7f0948438"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa92c8d8f9c320e8f68bd17464eeaa82c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html#aa92c8d8f9c320e8f68bd17464eeaa82c">initFiltering</a> ()</td></tr>
 <tr class="separator:aa92c8d8f9c320e8f68bd17464eeaa82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66d2f4dc2345a3bb252950da61a23149"><td class="memItemLeft" align="right" valign="top"><a id="a66d2f4dc2345a3bb252950da61a23149" name="a66d2f4dc2345a3bb252950da61a23149"></a>
@@ -330,6 +335,35 @@ template&lt;unsigned int dim&gt; </div>
 </div><div class="memdoc">
 
 <p>Reimplemented in <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a9fb791da286a1ba61421e113c98b8b14">coupling::services::MacroscopicCellServiceImpl&lt; LinkedCell, dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a713a14ad46c129c9b2a63b129eedca64" name="a713a14ad46c129c9b2a63b129eedca64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a713a14ad46c129c9b2a63b129eedca64">&#9670;&nbsp;</a></span>perturbateVelocity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService</a>&lt; dim &gt;::perturbateVelocity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#aad5a648c93e9d1ff55a1855dd2358cb9">coupling::services::MacroscopicCellServiceImpl&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>

@@ -9,6 +9,6 @@ var searchData=
   ['operator_2b_3d_6',['operator+=',['../classtarch_1_1la_1_1Vector.html#a294a7d8f3713413c9ec031c7ef32b597',1,'tarch::la::Vector']]],
   ['operator_2d_2d_7',['operator--',['../classcoupling_1_1indexing_1_1CellIndex.html#aa71e1666895d94277d1d992aed35ace7',1,'coupling::indexing::CellIndex']]],
   ['operator_2d_3d_8',['operator-=',['../classtarch_1_1la_1_1Vector.html#a77664176b2eb66cfdece0a48a7ebddf3',1,'tarch::la::Vector']]],
-  ['operator_3d_9',['operator=',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a1d30607cfb5cd0ec8bddc66c0b62bfa9',1,'coupling::configurations::CouetteConfig::operator=()'],['../classtarch_1_1la_1_1Vector.html#a4d8a0af080145a5fb2b4fb4586e67e4a',1,'tarch::la::Vector::operator=()'],['../classtinyxml2_1_1XMLHandle.html#aa07c9a53f78d7b2dc1018668641521d8',1,'tinyxml2::XMLHandle::operator=()']]],
+  ['operator_3d_9',['operator=',['../classtarch_1_1la_1_1Vector.html#a4d8a0af080145a5fb2b4fb4586e67e4a',1,'tarch::la::Vector::operator=()'],['../classtinyxml2_1_1XMLHandle.html#aa07c9a53f78d7b2dc1018668641521d8',1,'tinyxml2::XMLHandle::operator=()']]],
   ['operator_5b_5d_10',['operator[]',['../classtarch_1_1la_1_1Vector.html#a2115b064610248e7d6dbf47042070222',1,'tarch::la::Vector::operator[](int i)'],['../classtarch_1_1la_1_1Vector.html#a811fd53483b615592fcdd4fb473dae6e',1,'tarch::la::Vector::operator[](int i) const']]]
 ];

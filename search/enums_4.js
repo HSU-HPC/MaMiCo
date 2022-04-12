@@ -1,7 +1,7 @@
 var searchData=
 [
   ['macroscopicsolverid_0',['MacroscopicSolverID',['../namespacecoupling.html#a6d56a3a8dd5094eba68e6ffdf1782f66',1,'coupling']]],
-  ['macrosolvertype_1',['MacroSolverType',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a734d5c0ba1b3469bfebfd97f8d600d24',1,'coupling::configurations::CouetteConfig::MacroSolverType()'],['../classCouetteTest.html#a76bcf7f2b0bbf1d951bee6bd396d3e24',1,'CouetteTest::MacroSolverType()']]],
-  ['microsolvertype_2',['MicroSolverType',['../structcoupling_1_1configurations_1_1CouetteConfig.html#aef04cb07afb10e80bbc425c30de71ee9',1,'coupling::configurations::CouetteConfig::MicroSolverType()'],['../classCouetteTest.html#a1be6dbd366d9e95716e29b7b59ebb2a5',1,'CouetteTest::MicroSolverType()']]],
+  ['macrosolvertype_1',['MacroSolverType',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a734d5c0ba1b3469bfebfd97f8d600d24',1,'coupling::configurations::CouetteConfig']]],
+  ['microsolvertype_2',['MicroSolverType',['../structcoupling_1_1configurations_1_1CouetteConfig.html#aef04cb07afb10e80bbc425c30de71ee9',1,'coupling::configurations::CouetteConfig']]],
   ['momentuminsertiontype_3',['MomentumInsertionType',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#aae22d796ad110edcfc4ccb17c36869b5',1,'coupling::configurations::MomentumInsertionConfiguration']]]
 ];

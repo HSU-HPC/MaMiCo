@@ -10,7 +10,7 @@ var searchData=
   ['endprocessoutermacroscopiccellsbeforesendingmdsolverdata_7',['endProcessOuterMacroscopicCellsBeforeSendingMDSolverData',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#ad7c1b00b68e9e3cf38ab90061899e72e',1,'coupling::transferstrategies::TransferStrategy']]],
   ['equals_8',['equals',['../namespacetarch_1_1la.html#a8bbd66d3a6348329fb8449f7307e187a',1,'tarch::la']]],
   ['equilibrate_9',['equilibrate',['../classcoupling_1_1InstanceHandling.html#a7ddf0b99e9b6fe4184079172d1915c85',1,'coupling::InstanceHandling']]],
-  ['equsteps_10',['equSteps',['../structCouetteTest_1_1CouetteConfig.html#a50000a099f12318a694a0054115d252d',1,'CouetteTest::CouetteConfig']]],
+  ['equsteps_10',['equSteps',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a21913bc621f0067726c4773417822f76',1,'coupling::configurations::CouetteConfig']]],
   ['error_11',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
   ['errorbasequantity_12',['errorBaseQuantity',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967a',1,'coupling::error::ErrorEstimation']]],
   ['errorestimation_13',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html',1,'coupling::error::ErrorEstimation'],['../classcoupling_1_1error_1_1ErrorEstimation.html#aa6dc6094b824b3574f3910c31d2da20b',1,'coupling::error::ErrorEstimation::ErrorEstimation()']]],
