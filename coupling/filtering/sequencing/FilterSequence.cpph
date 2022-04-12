@@ -110,6 +110,7 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
 
     // POD
     else if (std::strcmp(currFilterNode->Value(), "POD") == 0) {
+#ifdef BUILD_WITH_EIGEN
       // In earlier implementations, it used to be possible to override tws via
       // function parameter. This feature was removed. See:
       // coupling::noisereduction::NoiseReductionConfiguration::interpreteConfiguration<dim>(...,
@@ -139,6 +140,10 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
       newfilter = new coupling::filtering::POD<dim>(inputCellVector, outputCellVector, _comm, _filteredValues, tws, kmax);
 #else
       newfilter = new coupling::filtering::POD<dim>(inputCellVector, outputCellVector, _filteredValues, tws, kmax);
+#endif
+#else
+		std::cout << "ERROR: BUILD_WITH_EIGEN was not defined but filter node was set to POD." << std::endl;
+		exit(EXIT_FAILURE);
 #endif
     }
 

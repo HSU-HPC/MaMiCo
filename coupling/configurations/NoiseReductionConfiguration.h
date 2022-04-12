@@ -4,7 +4,9 @@
 #include "coupling/noisereduction/IdentityTransform.h"
 #include "coupling/noisereduction/NLM.h"
 #include "coupling/noisereduction/NoiseReduction.h"
+#ifdef BUILD_WITH_EIGEN
 #include "coupling/noisereduction/POD.h"
+#endif
 #include "tarch/configuration/Configuration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include <iostream>

@@ -15,7 +15,9 @@
 // INCLUDE ALL FILTER HEADERS HERE
 #include "coupling/filtering/filters/Constant.h"
 #include "coupling/filtering/filters/Gauss.h"
+#ifdef BUILD_WITH_EIGEN
 #include "coupling/filtering/filters/POD.h"
+#endif
 #include "coupling/filtering/filters/ReadFromFile.h"
 #include "coupling/filtering/filters/WriteToFile.h"
 /*

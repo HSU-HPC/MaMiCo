@@ -32,12 +32,6 @@
 #define TAG_FROM_MD2MACRO 100000
 #define TAG_FROM_MACRO2MD 500000
 
-#if defined(MDCoupled)
-#define COUPLING_MD_WITH_TEST_SOLVER COUPLING_MD_YES
-#else
-#define COUPLING_MD_WITH_TEST_SOLVER COUPLING_MD_NO
-#endif
-
 #include "tarch/la/Vector.h"
 
 namespace coupling {
