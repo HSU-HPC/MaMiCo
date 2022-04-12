@@ -5,7 +5,7 @@
 #include "simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.h"
 
 simplemd::cellmappings::LennardJonesPotentialEnergyMapping::LennardJonesPotentialEnergyMapping(
-    const simplemd::services::MolecularPropertiesService &molecularPropertiesService)
+    const simplemd::services::MolecularPropertiesService& molecularPropertiesService)
     : _epsilon(molecularPropertiesService.getMolecularProperties().getEpsilon()),
       _sigma6(molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
               molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
@@ -17,14 +17,14 @@ simplemd::cellmappings::LennardJonesPotentialEnergyMapping::LennardJonesPotentia
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::beginCellIteration() {}
 
-void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
+void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
 
   // iterate over all molecules
-  const std::list<Molecule *>::const_iterator itEnd = cell.end();
-  const std::list<Molecule *>::const_iterator itBegin = cell.begin();
-  for (std::list<Molecule *>::const_iterator m1 = itBegin; m1 != itEnd; m1++) {
-    std::list<Molecule *>::const_iterator m2 = m1;
-    double &potentialEnergy1 = (*m1)->getPotentialEnergy();
+  const std::list<Molecule*>::const_iterator itEnd = cell.end();
+  const std::list<Molecule*>::const_iterator itBegin = cell.begin();
+  for (std::list<Molecule*>::const_iterator m1 = itBegin; m1 != itEnd; m1++) {
+    std::list<Molecule*>::const_iterator m2 = m1;
+    double& potentialEnergy1 = (*m1)->getPotentialEnergy();
 
     // iterate over all other molecules not touched so far
     m2++;
@@ -33,7 +33,7 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
       std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif
 
-      double &potentialEnergy2 = (*m2)->getPotentialEnergy();
+      double& potentialEnergy2 = (*m2)->getPotentialEnergy();
       const double rij2 = tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {
@@ -57,23 +57,23 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
   }
 }
 
-void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(LinkedCell &cell1, LinkedCell &cell2, const unsigned int &cellIndex1,
-                                                                                const unsigned int &cellIndex2) {
+void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1,
+                                                                                const unsigned int& cellIndex2) {
 
   // iterate over pairs of molecules
-  const std::list<Molecule *>::const_iterator m1End = cell1.end();
-  const std::list<Molecule *>::const_iterator m2End = cell2.end();
-  const std::list<Molecule *>::const_iterator m1Begin = cell1.begin();
-  const std::list<Molecule *>::const_iterator m2Begin = cell2.begin();
-  for (std::list<Molecule *>::const_iterator m1 = m1Begin; m1 != m1End; m1++) {
-    double &potentialEnergy1 = (*m1)->getPotentialEnergy();
+  const std::list<Molecule*>::const_iterator m1End = cell1.end();
+  const std::list<Molecule*>::const_iterator m2End = cell2.end();
+  const std::list<Molecule*>::const_iterator m1Begin = cell1.begin();
+  const std::list<Molecule*>::const_iterator m2Begin = cell2.begin();
+  for (std::list<Molecule*>::const_iterator m1 = m1Begin; m1 != m1End; m1++) {
+    double& potentialEnergy1 = (*m1)->getPotentialEnergy();
 
-    for (std::list<Molecule *>::const_iterator m2 = m2Begin; m2 != m2End; m2++) {
+    for (std::list<Molecule*>::const_iterator m2 = m2Begin; m2 != m2End; m2++) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif
 
-      double &potentialEnergy2 = (*m2)->getPotentialEnergy();
+      double& potentialEnergy2 = (*m2)->getPotentialEnergy();
       const double rij2 = tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {

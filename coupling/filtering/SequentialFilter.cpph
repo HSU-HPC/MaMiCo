@@ -6,7 +6,7 @@
 
 // CONSTRUCTOR
 template <unsigned int dim>
-coupling::filtering::SequentialFilter<dim>::SequentialFilter(coupling::filtering::FilterInterface<dim> *filter, const MPI_Comm comm)
+coupling::filtering::SequentialFilter<dim>::SequentialFilter(coupling::filtering::FilterInterface<dim>* filter, const MPI_Comm comm)
     : coupling::filtering::FilterInterface<dim>("SEQUENTIALIZED_FILTER"), _filter(filter), _comm(comm), _processingRank(0), // TODO: Make this customizable.
       _cellbuf() {
   MPI_Comm_rank(_comm, &_myRank);
@@ -95,7 +95,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
 #endif
         // copy all cell data to global data structures. TODO: use std list and
         // concat
-        for (const auto &index : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>()) {
+        for (const auto& index : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>()) {
           // determine corresponding global index
           indexbuf = CellIndex<dim, /*global*/ IndexTrait::md2macro,
                                IndexTrait::noGhost>(index).get(); // then convert back to unsigned int
@@ -155,7 +155,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
     MPI_Send(&numberOfCellsFromThisRank, 1, MPI_UNSIGNED, _processingRank, 0, _comm);
 
     // send that many cells (and indices)
-    for (auto &i : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro,
+    for (auto& i : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro,
                              IndexTrait::noGhost>()) { // TODO: send all cells at once
       // fill buffer
       macroscopicCellToBuffer(_cellbuf, _filter->getInputCells()[i.get()]);
@@ -170,7 +170,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
     // the processing rank now processes...
 
     // receive output data
-    for (auto &i [[maybe_unused]] : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro,
+    for (auto& i [[maybe_unused]] : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro,
                                               IndexTrait::noGhost>()) { // TODO: receive all cells at once
       // receive cell
       MPI_Recv(_cellbuf.data(), 4 + 3 * dim, MPI_DOUBLE, _processingRank, 0, _comm, MPI_STATUS_IGNORE);
@@ -246,7 +246,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::pro
 }
 
 template <unsigned int dim>
-void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::vector<double> &buf, const coupling::datastructures::MacroscopicCell<dim> *cell) {
+void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell) {
   // Resize if buffer is too small to contain cell data
   if (buf.capacity() < 4 + 3 * dim) {
     buf.resize(4 + 3 * dim);
@@ -281,7 +281,7 @@ void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::ve
 }
 
 template <unsigned int dim>
-void coupling::filtering::SequentialFilter<dim>::bufferToMacroscopicCell(const std::vector<double> &buf, coupling::datastructures::MacroscopicCell<dim> *cell) {
+void coupling::filtering::SequentialFilter<dim>::bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell) {
   if (buf.capacity() < 4 + 3 * dim)
     throw std::runtime_error("Buffer too small for cell data!");
 

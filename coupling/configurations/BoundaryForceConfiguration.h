@@ -43,7 +43,7 @@ public:
   /** parseSubtag
    * 	@param node
    */
-  void parseSubtag(tinyxml2::XMLElement *node) {
+  void parseSubtag(tinyxml2::XMLElement* node) {
     std::string value;
     tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     const std::string boundaries[6] = {"west", "east", "south", "north", "bottom", "top"};
@@ -106,12 +106,12 @@ public:
   /** Returns boundary force type.
    * 	@return _insertionType
    */
-  const BoundaryForceType &getBoundaryForceType() const { return _insertionType; }
+  const BoundaryForceType& getBoundaryForceType() const { return _insertionType; }
 
   /** Returns boundary ??
    * 	@return _boundary
    */
-  const tarch::la::Vector<2 * dim, bool> &getBoundary() const { return _boundary; }
+  const tarch::la::Vector<2 * dim, bool>& getBoundary() const { return _boundary; }
 
   /** Returns boundary force configuration.
    * 	@tparam LinkedCell type of the cell
@@ -119,8 +119,8 @@ public:
    * 	@return boundary force config
    */
   template <class LinkedCell>
-  coupling::BoundaryForceController<LinkedCell, dim> *
-  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) const {
+  coupling::BoundaryForceController<LinkedCell, dim>*
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) const {
     if (_insertionType == ZHOU) {
       if (dim != 3) {
         std::cout << "ERROR "

@@ -28,8 +28,8 @@ public:
    *	@param meanVelocity
    *	@param mdSolverInterface
    */
-  ComputeTemperatureMapping(const tarch::la::Vector<dim, double> &meanVelocity,
-                            coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface)
+  ComputeTemperatureMapping(const tarch::la::Vector<dim, double>& meanVelocity,
+                            coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
       : _mdSolverInterface(mdSolverInterface), _meanVelocity(meanVelocity), _temperature(0.0), _particleCounter(0) {}
 
   /** Destructor */
@@ -58,11 +58,11 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it = _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
-      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
+      const coupling::interface::Molecule<dim>& wrapper(it->getConst());
       _temperature += tarch::la::dot((wrapper.getVelocity() - _meanVelocity), (wrapper.getVelocity() - _meanVelocity));
       _particleCounter++;
 
@@ -77,7 +77,7 @@ public:
   double getTemperature() const { return _temperature; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   const tarch::la::Vector<dim, double> _meanVelocity;
   double _temperature;
   unsigned int _particleCounter;

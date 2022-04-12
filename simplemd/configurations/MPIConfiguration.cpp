@@ -9,7 +9,7 @@ const std::string simplemd::configurations::MPIConfiguration::NUMBER_OF_PROCESSE
 
 simplemd::configurations::MPIConfiguration::MPIConfiguration() : _numberOfProcesses(1), _isValid(true) {}
 
-void simplemd::configurations::MPIConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void simplemd::configurations::MPIConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   // parse number of processes
   tarch::la::Vector<MD_DIM, int> buffer(-1);
   tarch::configuration::ParseConfiguration::readVector<MD_DIM, int>(buffer, node, NUMBER_OF_PROCESSES);

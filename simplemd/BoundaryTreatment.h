@@ -29,8 +29,8 @@ class BoundaryTreatment;
 
 class simplemd::BoundaryTreatment {
 public:
-  BoundaryTreatment(simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::MoleculeService &moleculeService,
-                    simplemd::services::LinkedCellService &linkedCellService)
+  BoundaryTreatment(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
+                    simplemd::services::LinkedCellService& linkedCellService)
       : _moleculeService(moleculeService), _linkedCellService(linkedCellService),
         _periodicBoundaryMapping(parallelTopologyService, moleculeService, linkedCellService), _deleteMoleculesMapping(moleculeService),
 #if (MD_PARALLEL == MD_YES)
@@ -52,32 +52,32 @@ public:
    * in time, some molecules might enter the ghost layer. So, we need to send
    * those molecules back into the original domain.
    */
-  void putBoundaryParticlesToInnerCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-                                        simplemd::services::ParallelTopologyService &parallelTopologyService);
+  void putBoundaryParticlesToInnerCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+                                        simplemd::services::ParallelTopologyService& parallelTopologyService);
 
   /** take all molecules from an inner cell and copy them to each periodic/
    * parallel ghost cell for the next timestep. This function is triggered right
    * before the force evaluation between all particle pairs.
    */
-  void fillBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-                         simplemd::services::ParallelTopologyService &parallelTopologyService);
+  void fillBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+                         simplemd::services::ParallelTopologyService& parallelTopologyService);
 
   /** combined version of the two forementioned functions. Needed to reduce
    * communication calls in half in the parallel case.
    *  @see putBoundaryParticlesToInnerCells
    *  @see fillBoundaryCells
    */
-  void putBoundaryParticlesToInnerCellsAndFillBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-                                                            simplemd::services::ParallelTopologyService &parallelTopologyService);
+  void putBoundaryParticlesToInnerCellsAndFillBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+                                                            simplemd::services::ParallelTopologyService& parallelTopologyService);
 
   /** overlaps waiting for communication requests to be fulfilled with force
    * computations on inner part of domain.
    *  @see putBoundaryParticlesToInnerCellsAndFillBoundaryCells
    */
   void putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(
-      const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-      simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::cellmappings::LennardJonesForceMapping &lennardJonesForce,
-      const bool &useOpenMP);
+      const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+      simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce,
+      const bool& useOpenMP);
 
   /** returns a list with all molecules from the open boundary cells */
   std::list<simplemd::Molecule> getEscapedMolecules() const;
@@ -88,26 +88,26 @@ private:
    * traversed.
    */
   template <class Mapping>
-  void applyMappingToBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-                                   const simplemd::BoundaryType boundaryType, const bool useOpenMP, Mapping &myMapping) const;
+  void applyMappingToBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+                                   const simplemd::BoundaryType boundaryType, const bool useOpenMP, Mapping& myMapping) const;
 
   /** applies the mapping myMapping to all cells which lie on the outermost
    * layer of inner cells
    */
-  template <class Mapping> void applyMappingToOutermostNonBoundaryCells(const bool useOpenMP, Mapping &myMapping) const;
+  template <class Mapping> void applyMappingToOutermostNonBoundaryCells(const bool useOpenMP, Mapping& myMapping) const;
 
   /** applies the mapping myMapping to all cells which are not directly
    * influenced by communication at the current iteration
    */
-  template <class Mapping> void applyMappingToCommunicationIndependentCells(const bool useOpenMP, Mapping &myMapping) const;
+  template <class Mapping> void applyMappingToCommunicationIndependentCells(const bool useOpenMP, Mapping& myMapping) const;
 
   /** applies the mapping myMapping to all cells which are directly influenced
    * by communication
    */
-  template <class Mapping> void applyMappingToCommunicationDependentCells(const bool useOpenMP, Mapping &myMapping) const;
+  template <class Mapping> void applyMappingToCommunicationDependentCells(const bool useOpenMP, Mapping& myMapping) const;
 
-  simplemd::services::MoleculeService &_moleculeService;
-  simplemd::services::LinkedCellService &_linkedCellService;
+  simplemd::services::MoleculeService& _moleculeService;
+  simplemd::services::LinkedCellService& _linkedCellService;
   simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping _periodicBoundaryMapping;
   simplemd::cellmappings::DeleteMoleculesMapping _deleteMoleculesMapping;
 #if (MD_PARALLEL == MD_YES)
@@ -118,8 +118,8 @@ private:
 };
 
 template <class Mapping>
-void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-                                                              const simplemd::BoundaryType boundaryType, const bool useOpenMP, Mapping &myMapping) const {
+void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+                                                              const simplemd::BoundaryType boundaryType, const bool useOpenMP, Mapping& myMapping) const {
   tarch::la::Vector<MD_DIM, unsigned int> startOuter;
   tarch::la::Vector<MD_DIM, unsigned int> numberCellsOuter;
 
@@ -455,7 +455,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
 #endif
 }
 
-template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermostNonBoundaryCells(const bool useOpenMP, Mapping &myMapping) const {
+template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermostNonBoundaryCells(const bool useOpenMP, Mapping& myMapping) const {
   tarch::la::Vector<MD_DIM, unsigned int> startOuter;
   tarch::la::Vector<MD_DIM, unsigned int> numberCellsOuter;
   bool emptySweep = true;
@@ -547,7 +547,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
 #endif
 }
 
-template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommunicationIndependentCells(const bool useOpenMP, Mapping &myMapping) const {
+template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommunicationIndependentCells(const bool useOpenMP, Mapping& myMapping) const {
   // starting point and range of cells, on which we can (for example) compute
   // forces before the messages carrying boundary and process-leaving particles
   //  have arrived. Due to handling of iterateCellParis, we need to leave 1
@@ -569,7 +569,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
 }
 
-template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommunicationDependentCells(const bool useOpenMP, Mapping &myMapping) const {
+template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommunicationDependentCells(const bool useOpenMP, Mapping& myMapping) const {
   // apply mapping to all cell-pairs, not processed by the above function
 
   tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(_linkedCellService.getLocalIndexOfFirstCell());

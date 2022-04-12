@@ -22,11 +22,11 @@ simplemd::services::MoleculeService::~MoleculeService() {
   _blockSize = 0;
 }
 
-simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double> &domainSize, const tarch::la::Vector<MD_DIM, double> &domainOffset,
-                                                     const tarch::la::Vector<MD_DIM, unsigned int> &moleculesPerDirection,
-                                                     const tarch::la::Vector<MD_DIM, double> &meanVelocity, const double &kB, const double &temperature,
-                                                     const unsigned int &blockSize,
-                                                     const simplemd::services::MolecularPropertiesService &molecularPropertiesService) {
+simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
+                                                     const tarch::la::Vector<MD_DIM, unsigned int>& moleculesPerDirection,
+                                                     const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
+                                                     const unsigned int& blockSize,
+                                                     const simplemd::services::MolecularPropertiesService& molecularPropertiesService) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   unsigned int indexNumberMolecules = 0;
@@ -57,8 +57,8 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
 
   // allocate memory and initialise it
   for (unsigned int i = 0; i < numberBlocks; i++) {
-    _molecules.push_back((Molecule *)NULL);
-    _molecules[i] = (Molecule *)malloc(sizeof(Molecule) * _blockSize);
+    _molecules.push_back((Molecule*)NULL);
+    _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[i] == NULL) {
       std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
                    "_molecules == NULL!"
@@ -83,7 +83,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
         // get initial velocity
         getInitialVelocity(meanVelocity, kB, temperature, molecularPropertiesService, velocity);
         // initialise molecule in memory block and set ID
-        Molecule *myNewMolecule = NULL;
+        Molecule* myNewMolecule = NULL;
         unsigned int blockId = indexNumberMolecules / _blockSize;
         unsigned int blockIndex = indexNumberMolecules % _blockSize;
         myNewMolecule = new (&_molecules[blockId][blockIndex]) Molecule(position, velocity);
@@ -118,9 +118,9 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   resetMeanVelocity();
 }
 
-simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double> &domainSize, const tarch::la::Vector<MD_DIM, double> &domainOffset,
-                                                     const std::string &checkPointFileStem, const unsigned int &blockSize,
-                                                     const simplemd::services::ParallelTopologyService &parallelTopologyService) {
+simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
+                                                     const std::string& checkPointFileStem, const unsigned int& blockSize,
+                                                     const simplemd::services::ParallelTopologyService& parallelTopologyService) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> force(0.0);
@@ -164,8 +164,8 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
 
   // allocate memory and initialise it
   for (unsigned int i = 0; i < numberBlocks; i++) {
-    _molecules.push_back((Molecule *)NULL);
-    _molecules[i] = (Molecule *)malloc(sizeof(Molecule) * _blockSize);
+    _molecules.push_back((Molecule*)NULL);
+    _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[i] == NULL) {
       std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
                    "_molecules == NULL!"
@@ -186,7 +186,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
       file >> force[d];
     }
 
-    Molecule *myNewMolecule = NULL;
+    Molecule* myNewMolecule = NULL;
     unsigned int blockId = idCounter / _blockSize;
     unsigned int blockIndex = idCounter % _blockSize;
     myNewMolecule = new (&_molecules[blockId][blockIndex]) Molecule(position, velocity);
@@ -212,9 +212,9 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   // resetMeanVelocity();
 }
 
-simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double> &localDomainSize,
-                                                     const tarch::la::Vector<MD_DIM, double> &localDomainOffset, const std::string &checkPointFileStem,
-                                                     const unsigned int &blockSize) {
+simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& localDomainSize,
+                                                     const tarch::la::Vector<MD_DIM, double>& localDomainOffset, const std::string& checkPointFileStem,
+                                                     const unsigned int& blockSize) {
   // buffer for single molecule
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
@@ -284,8 +284,8 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
 
   // allocate memory and initialise it
   for (unsigned int i = 0; i < numberBlocks; i++) {
-    _molecules.push_back((Molecule *)NULL);
-    _molecules[i] = (Molecule *)malloc(sizeof(Molecule) * _blockSize);
+    _molecules.push_back((Molecule*)NULL);
+    _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[i] == NULL) {
       std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
                    "_molecules == NULL!"
@@ -301,7 +301,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     velocity = velocities[i];
     force = forces[i];
 
-    Molecule *myNewMolecule = NULL;
+    Molecule* myNewMolecule = NULL;
     unsigned int blockId = idCounter / _blockSize;
     unsigned int blockIndex = idCounter % _blockSize;
     myNewMolecule = new (&_molecules[blockId][blockIndex]) Molecule(position, velocity);
@@ -331,9 +331,9 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   // resetMeanVelocity();
 }
 
-void simplemd::services::MoleculeService::getInitialVelocity(const tarch::la::Vector<MD_DIM, double> &meanVelocity, const double &kB, const double &temperature,
-                                                             const simplemd::services::MolecularPropertiesService &molecularPropertiesService,
-                                                             tarch::la::Vector<MD_DIM, double> &initialVelocity) const {
+void simplemd::services::MoleculeService::getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
+                                                             const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                                                             tarch::la::Vector<MD_DIM, double>& initialVelocity) const {
   tarch::la::Vector<MD_DIM, double> randomNumbers(0.0);
   // standard deviation for fluctuation of velocity around meanVelocity
   double stdDeviation = std::sqrt(MD_DIM * kB * temperature / molecularPropertiesService.getMolecularProperties().getMass());
@@ -372,7 +372,7 @@ void simplemd::services::MoleculeService::shutdown() {
   _blockSize = 0;
 }
 
-simplemd::Molecule *simplemd::services::MoleculeService::addMolecule(const Molecule &molecule) {
+simplemd::Molecule* simplemd::services::MoleculeService::addMolecule(const Molecule& molecule) {
   _numberMolecules++;
 
   // if there is a free position within the available memory, just put molecule
@@ -392,8 +392,8 @@ simplemd::Molecule *simplemd::services::MoleculeService::addMolecule(const Molec
     // _freeMoleculePositions respectively. Besides, set ID of the added
     // molecule.
   } else {
-    _molecules.push_back((Molecule *)NULL);
-    _molecules[_molecules.size() - 1] = (Molecule *)malloc(sizeof(Molecule) * _blockSize);
+    _molecules.push_back((Molecule*)NULL);
+    _molecules[_molecules.size() - 1] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[_molecules.size() - 1] == NULL) {
       std::cout << "ERROR simplemd::services::MoleculeService::addMolecule(): malloc!" << std::endl;
       exit(EXIT_FAILURE);
@@ -410,16 +410,16 @@ simplemd::Molecule *simplemd::services::MoleculeService::addMolecule(const Molec
   }
 }
 
-const unsigned int &simplemd::services::MoleculeService::getNumberMolecules() const { return _numberMolecules; }
+const unsigned int& simplemd::services::MoleculeService::getNumberMolecules() const { return _numberMolecules; }
 
-void simplemd::services::MoleculeService::deleteMolecule(Molecule &molecule) {
+void simplemd::services::MoleculeService::deleteMolecule(Molecule& molecule) {
   // add free position at the front
   _freeMoleculePositions.push_front(molecule.getID());
   _numberMolecules--;
 }
 
-void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::services::ParallelTopologyService &parallelTopologyService,
-                                                           simplemd::services::LinkedCellService &linkedCellService) {
+void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::services::ParallelTopologyService& parallelTopologyService,
+                                                           simplemd::services::LinkedCellService& linkedCellService) {
   unsigned int numberBlocks = 0;
   // loop counter
   unsigned int i = 0;
@@ -427,7 +427,7 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
   simplemd::moleculemappings::UpdateLinkedCellListsMapping updateLinkedCellListsMapping(parallelTopologyService, linkedCellService);
 
   // create copy of molecules and store the copies in a std::list
-  std::list<simplemd::Molecule> &copyBuffer = copyMoleculesMapping.getCopyOfMolecules();
+  std::list<simplemd::Molecule>& copyBuffer = copyMoleculesMapping.getCopyOfMolecules();
   linkedCellService.iterateCells(copyMoleculesMapping, false);
   // std::cout <<  "Number molecules: " << copyBuffer.size() << std::endl;
 
@@ -445,8 +445,8 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
   // create new memory
   numberBlocks = _numberMolecules / _blockSize + (_numberMolecules % _blockSize != 0);
   for (i = 0; i < numberBlocks; i++) {
-    _molecules.push_back((Molecule *)NULL);
-    _molecules[i] = (Molecule *)malloc(sizeof(Molecule) * _blockSize);
+    _molecules.push_back((Molecule*)NULL);
+    _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[i] == NULL) {
       std::cout << "ERROR simplemd::services::MoleculeService::reorganiseMemory(): "
                    "_molecules == NULL!"
@@ -461,7 +461,7 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
     const unsigned int block = i / _blockSize;
     const unsigned int blockEntry = i % _blockSize;
     // initialise object structure and memory
-    simplemd::Molecule *myMolecule = new (&_molecules[block][blockEntry]) Molecule();
+    simplemd::Molecule* myMolecule = new (&_molecules[block][blockEntry]) Molecule();
     *myMolecule = (*it);
     // set current molecule ID
     myMolecule->setID(i);
@@ -480,8 +480,8 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
   iterateMolecules(updateLinkedCellListsMapping, false);
 }
 
-void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService &parallelTopologyService,
-                                                          const std::string &filestem, const unsigned int &t) {
+void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService,
+                                                          const std::string& filestem, const unsigned int& t) {
   simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(parallelTopologyService, filestem, t);
   iterateMolecules(writeCheckPointMapping, false);
 }

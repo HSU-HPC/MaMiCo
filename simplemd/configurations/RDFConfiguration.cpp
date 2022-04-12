@@ -13,7 +13,7 @@ const std::string simplemd::configurations::RDFConfiguration::NUMBER_OF_POINTS("
 simplemd::configurations::RDFConfiguration::RDFConfiguration()
     : _startAtTimestep(0), _evaluateEveryTimestep(0), _writeEveryTimestep(0), _numberPoints(0), _isDefined(false), _isValid(true) {}
 
-void simplemd::configurations::RDFConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void simplemd::configurations::RDFConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   // set is-defined
   _isDefined = true;
   int intBuf = -1;

@@ -31,8 +31,8 @@ template <unsigned int dim, std::size_t inputc> class FilterJunction;
 
 template <unsigned int dim, std::size_t inputc> class coupling::filtering::FilterJunction : public coupling::filtering::FilterSequence<dim> {
 public:
-  FilterJunction(const char *name,
-                 const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector, // concatenation of numberImput input cell vectors
+  FilterJunction(const char* name,
+                 const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector, // concatenation of numberImput input cell vectors
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                  MPI_Comm comm,
 #endif
@@ -54,7 +54,7 @@ public:
 
     for (unsigned int p = 0; p < inputc; p++) {
       //_inputCellVector
-      _inputCellVector_parted[p] = std::vector<coupling::datastructures::MacroscopicCell<dim> *>(
+      _inputCellVector_parted[p] = std::vector<coupling::datastructures::MacroscopicCell<dim>*>(
           coupling::filtering::FilterSequence<dim>::_inputCellVector.begin() + (p * partitionSize),
           coupling::filtering::FilterSequence<dim>::_inputCellVector.begin() + ((p + 1) * partitionSize));
 #ifdef DEBUG_FILTER_JUNCTION
@@ -62,7 +62,7 @@ public:
 #endif
 
       //_cellVector1
-      _cellVector1_parted[p] = std::vector<coupling::datastructures::MacroscopicCell<dim> *>(
+      _cellVector1_parted[p] = std::vector<coupling::datastructures::MacroscopicCell<dim>*>(
           coupling::filtering::FilterSequence<dim>::_cellVector1.begin() + (p * partitionSize),
           coupling::filtering::FilterSequence<dim>::_cellVector1.begin() + ((p + 1) * partitionSize));
 #ifdef DEBUG_FILTER_JUNCTION
@@ -70,7 +70,7 @@ public:
 #endif
 
       //_cellVector2
-      _cellVector2_parted[p] = std::vector<coupling::datastructures::MacroscopicCell<dim> *>(
+      _cellVector2_parted[p] = std::vector<coupling::datastructures::MacroscopicCell<dim>*>(
           coupling::filtering::FilterSequence<dim>::_cellVector2.begin() + (p * partitionSize),
           coupling::filtering::FilterSequence<dim>::_cellVector2.begin() + ((p + 1) * partitionSize));
 #ifdef DEBUG_FILTER_JUNCTION
@@ -87,8 +87,8 @@ public:
    * implies appending.
    */
   void addFilter(
-      const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)> *applyScalar,
-      const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> *applyVector,
+      const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
+      const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
       int filterIndex = -1) override {
 // Do nothing, not yet supported.
 #ifdef DEBUG_FILTER_JUNCTION
@@ -103,13 +103,13 @@ public:
    * This function is very similar to the interface's. Check
    * coupling::FilterSequence for more details.
    */
-  int loadFiltersFromXML(tinyxml2::XMLElement *sequenceNode) override;
+  int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) override;
 
   /*
    * The first partition of _cellVector1/2 is the main partition. A junction's
    * default output is always its main partition.
    */
-  const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &getOutputCellVector(unsigned int outputIndex = 0) const override {
+  const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& getOutputCellVector(unsigned int outputIndex = 0) const override {
     if (outputIndex >= inputc) {
       std::cout << PRINT_PREFIX() << "ERROR: getOutputCellVector: Requested output index(" << outputIndex << ") too high. (partitions: )" << inputc
                 << std::endl;
@@ -137,9 +137,9 @@ public:
 
 private:
   // These must be parted for junction output and junctor in/output.
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> _inputCellVector_parted;
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> _cellVector1_parted;
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> _cellVector2_parted;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> _inputCellVector_parted;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> _cellVector1_parted;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> _cellVector2_parted;
 };
 
 // inlcude implementation

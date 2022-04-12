@@ -26,8 +26,8 @@ public:
   }
 
   template <unsigned int dim> void compileTest() {
-    coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim> *mdSolverInterface = NULL;
-    coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface = NULL;
+    coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>* mdSolverInterface = NULL;
+    coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface = NULL;
     tarch::la::Vector<dim, unsigned int> numberProcesses(1);
     unsigned int rank = 0;
     const coupling::configurations::ParticleInsertionConfiguration particleInsertionConfiguration;
@@ -37,10 +37,10 @@ public:
     const coupling::configurations::ParallelTopologyConfiguration parallelTopologyConfiguration;
     unsigned int numberMDTimestepsPerCouplingCycle = 100;
     const coupling::configurations::MacroscopicCellConfiguration<dim> macroscopicCellConfiguration;
-    std::vector<coupling::datastructures::MacroscopicCell<dim> *> cells;
-    unsigned int *globalCellIndices = NULL;
+    std::vector<coupling::datastructures::MacroscopicCell<dim>*> cells;
+    unsigned int* globalCellIndices = NULL;
 
-    coupling::services::MacroscopicCellService<dim> *macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>(
+    coupling::services::MacroscopicCellService<dim>* macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>(
         0, mdSolverInterface, macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration, momentumInsertionConfiguration,
         boundaryForceConfiguration, transferStrategyConfiguration, parallelTopologyConfiguration, numberMDTimestepsPerCouplingCycle,
         macroscopicCellConfiguration);

@@ -62,7 +62,7 @@ private:
     TestDataExchangeFromMacro2MD<dim> testDataExchangeFromMacro2MD(10, indexConversion);
 
     // initialise the test cells of MaMiCo and set all cell values to 0.0
-    std::vector<TestCell<dim> *> cellsMamico;
+    std::vector<TestCell<dim>*> cellsMamico;
     for (unsigned int i = 0; i < numberCellsInclBoundary; i++) {
       cellsMamico.push_back(new TestCell<dim>());
       if (cellsMamico[i] == NULL) {
@@ -76,8 +76,8 @@ private:
     }
 
     // get macroscopic solver buffers and initialise cells before sending
-    std::vector<TestCell<dim> *> sentCells;
-    unsigned int *sentGlobalIndices = NULL;
+    std::vector<TestCell<dim>*> sentCells;
+    unsigned int* sentGlobalIndices = NULL;
     unsigned int numberSentCells = 0;
     testDataExchangeFromMacro2MD.getBuffer4MacroscopicSolverCells(numberSentCells, sentCells, sentGlobalIndices);
     for (unsigned int i = 0; i < numberSentCells; i++) {

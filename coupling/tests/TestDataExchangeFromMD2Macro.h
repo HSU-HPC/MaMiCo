@@ -24,7 +24,7 @@
 template <unsigned int dim> class TestDataExchangeFromMD2Macro : public coupling::sendrecv::DataExchange<TestCell<dim>, dim> {
 
 public:
-  TestDataExchangeFromMD2Macro(unsigned int tag, const coupling::IndexConversion<dim> &indexConversion)
+  TestDataExchangeFromMD2Macro(unsigned int tag, const coupling::IndexConversion<dim>& indexConversion)
       : coupling::sendrecv::DataExchange<TestCell<dim>, dim>(tag), _indexConversion(indexConversion) {}
   virtual ~TestDataExchangeFromMD2Macro() {}
 
@@ -84,7 +84,7 @@ public:
 
   /** local rule to read from macroscopic cell and write data to (e.g. send)
    * buffer */
-  virtual void readFromCell(double *const buffer, const TestCell<dim> &cell) {
+  virtual void readFromCell(double* const buffer, const TestCell<dim>& cell) {
     tarch::la::Vector<dim, double> b1 = cell.getBuffer1();
     for (unsigned int d = 0; d < dim; d++) {
       buffer[d] = b1[d];
@@ -94,7 +94,7 @@ public:
 
   /** local rule to read from receive buffer and write data to macroscopic cell
    */
-  virtual void writeToCell(const double *const buffer, TestCell<dim> &cell) {
+  virtual void writeToCell(const double* const buffer, TestCell<dim>& cell) {
     tarch::la::Vector<dim, double> b1(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       b1[d] = buffer[d];
@@ -110,7 +110,7 @@ public:
    * are obtained from process coordinates (n,n,n).
    *
    */
-  virtual void getBuffer4MacroscopicSolverCells(unsigned int &numberCells, std::vector<TestCell<dim> *> &cells, unsigned int *&globalCellIndices) {
+  virtual void getBuffer4MacroscopicSolverCells(unsigned int& numberCells, std::vector<TestCell<dim>*>& cells, unsigned int*& globalCellIndices) {
     // for rank 0: expect data from last rank
     if (_indexConversion.getThisRank() == 0) {
       // determine number of cells on last rank (this only works for cubic
@@ -183,7 +183,7 @@ public:
   }
 
 protected:
-  const coupling::IndexConversion<dim> &_indexConversion;
+  const coupling::IndexConversion<dim>& _indexConversion;
 };
 
 /** same as TestDataExchangeFromMD2Macro, but with inverted target and source
@@ -193,7 +193,7 @@ protected:
  */
 template <unsigned int dim> class TestDataExchangeFromMacro2MD : public TestDataExchangeFromMD2Macro<dim> {
 public:
-  TestDataExchangeFromMacro2MD(unsigned int tag, const coupling::IndexConversion<dim> &indexConversion)
+  TestDataExchangeFromMacro2MD(unsigned int tag, const coupling::IndexConversion<dim>& indexConversion)
       : TestDataExchangeFromMD2Macro<dim>(tag, indexConversion) {}
   virtual ~TestDataExchangeFromMacro2MD() {}
 

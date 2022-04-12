@@ -14,7 +14,7 @@
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 // initialise parallel environment
 #if (MD_PARALLEL == MD_YES)
   MPI_Init(&argc, &argv);

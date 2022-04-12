@@ -16,7 +16,7 @@
 #include <mpi.h>
 
 /** executes a newly created test and deletes it immediately again. */
-void runTest(Test *test) {
+void runTest(Test* test) {
   if (test == NULL) {
     std::cout << "ERROR executeTest: test==NULL!" << std::endl;
     exit(EXIT_FAILURE);
@@ -25,7 +25,7 @@ void runTest(Test *test) {
   delete test;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   int size;
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &size);

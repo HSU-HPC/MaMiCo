@@ -4,8 +4,8 @@
 // www5.in.tum.de/mamico
 #include "simplemd/BoundaryTreatment.h"
 
-void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-                                                                   simplemd::services::ParallelTopologyService &parallelTopologyService) {
+void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+                                                                   simplemd::services::ParallelTopologyService& parallelTopologyService) {
   _periodicBoundaryMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
   _periodicBoundaryMapping.setProcessCoordinates(parallelTopologyService.getProcessCoordinates());
   _periodicBoundaryMapping.setNumberOfProcesses(parallelTopologyService.getNumberOfProcesses());
@@ -25,8 +25,8 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCells(const tarch::
 #endif
 }
 
-void simplemd::BoundaryTreatment::fillBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-                                                    simplemd::services::ParallelTopologyService &parallelTopologyService) {
+void simplemd::BoundaryTreatment::fillBoundaryCells(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+                                                    simplemd::services::ParallelTopologyService& parallelTopologyService) {
   tarch::la::Vector<MD_DIM, unsigned int> startOuter;
   tarch::la::Vector<MD_DIM, unsigned int> numberCellsOuter;
   _fillCellsMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
@@ -117,8 +117,8 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
 std::list<simplemd::Molecule> simplemd::BoundaryTreatment::getEscapedMolecules() const { return _collectMoleculesMapping.getCollectedMolecules(); }
 
 void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundaryCells(
-    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-    simplemd::services::ParallelTopologyService &parallelTopologyService) {
+    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+    simplemd::services::ParallelTopologyService& parallelTopologyService) {
 
   // putBoundaryParticlesToInnerCells
   _fillCellsMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
@@ -148,8 +148,8 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundar
 }
 
 void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(
-    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary, simplemd::services::ParallelTopologyService &parallelTopologyService,
-    simplemd::cellmappings::LennardJonesForceMapping &lennardJonesForce, const bool &useOpenMP) {
+    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary, simplemd::services::ParallelTopologyService& parallelTopologyService,
+    simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce, const bool& useOpenMP) {
   // prevent execution in case domain is too small
   const tarch::la::Vector<MD_DIM, unsigned int> localNumberOfCells(_linkedCellService.getLocalNumberOfCells());
   for (unsigned int d = 0; d < MD_DIM; d++) {

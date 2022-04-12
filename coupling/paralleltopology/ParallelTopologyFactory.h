@@ -54,7 +54,7 @@ public:
    *	@param numberProcesses number of processes
    */
   template <unsigned int dim>
-  static coupling::paralleltopology::ParallelTopology<dim> *getParallelTopology(coupling::paralleltopology::ParallelTopologyType type,
+  static coupling::paralleltopology::ParallelTopology<dim>* getParallelTopology(coupling::paralleltopology::ParallelTopologyType type,
                                                                                 tarch::la::Vector<dim, unsigned int> numberProcesses,
                                                                                 unsigned int topologyOffset) {
     if (type == XYZ) {

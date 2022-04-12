@@ -160,8 +160,8 @@ public:
    *  @param recvIndice the indices to connect the data from the buffer with
    * macroscopic cells
    *  @param indexConversion instance of the indexConversion */
-  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const unsigned int *const recvIndices,
-                           const coupling::IndexConversion<3> &indexConversion) override {
+  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+                           const coupling::IndexConversion<3>& indexConversion) override {
     if (skipRank()) {
       return;
     }
@@ -205,7 +205,7 @@ private:
 
   /** @brief update the velocity in the cells which are flagged as FLUID */
   void update() {
-    double *swap = _velold;
+    double* swap = _velold;
     _velold = _vel;
     _vel = swap;
 #pragma omp parallel for
@@ -221,6 +221,6 @@ private:
   /** @brief  velocity of moving wall of Couette flow */
   tarch::la::Vector<3, double> _wallVelocity;
   /** @brief the velocity field from the last time step  */
-  double *_velold{nullptr};
+  double* _velold{nullptr};
 };
 #endif

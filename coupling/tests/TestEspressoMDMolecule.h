@@ -25,7 +25,7 @@
 class TestEspressoMDMolecule : public TestEspresso {
 private:
 public:
-  TestEspressoMDMolecule(std::string name, int argc, char **argv) : TestEspresso(name, argc, argv) {}
+  TestEspressoMDMolecule(std::string name, int argc, char** argv) : TestEspresso(name, argc, argv) {}
   virtual ~TestEspressoMDMolecule() {}
 
   virtual void run() {
@@ -33,9 +33,9 @@ public:
 
     loadEspressoTestConfiguration();
 
-    Cell *cell;
+    Cell* cell;
     int j, c, np, cnt = 0;
-    Particle *part;
+    Particle* part;
     int flag = 1;
 
     for (c = 0; c < local_cells.n; c++) {
@@ -52,15 +52,15 @@ public:
    * directly read from Espresso Simulation and other from the list 	sent to
    * the coupling tool (EspressoMDMolecule) */
 
-  void compareParticleLists(int c, int &flag) {
+  void compareParticleLists(int c, int& flag) {
     int j = 0;
     int counter = 0;
 
     // Define a molecule iterator and iterate over all the molecules in that
     // particular cell
-    ParticleList *list = local_cells.cell[c];
+    ParticleList* list = local_cells.cell[c];
     coupling::interface::EspressoMDMoleculeIterator it(*list);
-    Particle *part;
+    Particle* part;
     part = list->part;
     int number = list->n;
 

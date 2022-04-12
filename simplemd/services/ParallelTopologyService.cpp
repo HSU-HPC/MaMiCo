@@ -7,11 +7,11 @@
 #include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MoleculeService.h"
 
-simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch::la::Vector<MD_DIM, double> &domainSize,
-                                                                     const tarch::la::Vector<MD_DIM, double> &domainOffset,
-                                                                     const tarch::la::Vector<MD_DIM, double> &meshWidth,
-                                                                     const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-                                                                     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary
+simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch::la::Vector<MD_DIM, double>& domainSize,
+                                                                     const tarch::la::Vector<MD_DIM, double>& domainOffset,
+                                                                     const tarch::la::Vector<MD_DIM, double>& meshWidth,
+                                                                     const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
+                                                                     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary
 #if (MD_PARALLEL == MD_YES)
                                                                      ,
                                                                      MPI_Comm communicator
@@ -89,7 +89,7 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int &localNumberOfMolecules) {
+void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int& localNumberOfMolecules) {
 
   // idle processors should not enter this function, but still put a check:
   if (isIdle())
@@ -141,7 +141,7 @@ void simplemd::services::ParallelTopologyService::shutdown() {
 
 int simplemd::services::ParallelTopologyService::getRank() const { return _rank; }
 
-const tarch::la::Vector<MD_DIM, unsigned int> &simplemd::services::ParallelTopologyService::getProcessCoordinates() const { return _processCoordinates; }
+const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::services::ParallelTopologyService::getProcessCoordinates() const { return _processCoordinates; }
 
 bool simplemd::services::ParallelTopologyService::isIdle() const {
   int processes = 1;
@@ -152,8 +152,8 @@ bool simplemd::services::ParallelTopologyService::isIdle() const {
 }
 
 std::vector<tarch::la::Vector<MD_DIM, unsigned int>>
-simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedCell &cell, const unsigned int &cellIndex,
-                                                                         const simplemd::services::LinkedCellService &linkedCellService) {
+simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
+                                                                         const simplemd::services::LinkedCellService& linkedCellService) {
 
   std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex;
 
@@ -276,7 +276,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
               std::cout << "Pack " << cell.getList().size() << " molecules in buffer " << bufferIndex << std::endl;
 #endif
               // push molecules into buffer
-              for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
+              for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
                 // for periodic boundaries: adapt position vector
                 tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
@@ -310,7 +310,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
               std::cout << "Pack " << cell.getList().size() << " molecules in local buffer " << std::endl;
 #endif
               // push molecules into buffer
-              for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
+              for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
                 // for periodic boundaries: adapt position vector
                 tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
@@ -370,8 +370,8 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
   return localIndex;
 }
 
-bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell &cell, const unsigned int &cellIndex,
-                                                                           const simplemd::services::LinkedCellService &linkedCellService) {
+bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
+                                                                           const simplemd::services::LinkedCellService& linkedCellService) {
 #if (MD_PARALLEL == MD_YES)
   // determine neighbour rank (from position of the respective ghost cell
   // cellIndex)
@@ -433,7 +433,7 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
 
     // determine appropriate buffer index
     int bufferIndex = getCurrentBufferIndexFromNeighbourRank(neighbourRank);
-    for (std::list<Molecule *>::iterator it = cell.begin(); it != cell.end(); it++) {
+    for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Reduce molecule at position " << (*it)->getConstPosition() << ", velocity " << (*it)->getConstVelocity() << std::endl;
 #endif
@@ -448,8 +448,8 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::services::MoleculeService &moleculeService,
-                                                                    simplemd::services::LinkedCellService &linkedCellService) {
+void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::services::MoleculeService& moleculeService,
+                                                                    simplemd::services::LinkedCellService& linkedCellService) {
   unpackBuffer(_bufferService.getLocalBuffer(), moleculeService, linkedCellService);
 }
 
@@ -467,8 +467,8 @@ void simplemd::services::ParallelTopologyService::communicationSteps_1_2() {
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::services::MoleculeService &moleculeService,
-                                                                         simplemd::services::LinkedCellService &linkedCellService) {
+void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::services::MoleculeService& moleculeService,
+                                                                         simplemd::services::LinkedCellService& linkedCellService) {
 #if (MD_PARALLEL == MD_YES)
   // Steps 3 and 4 together:
 
@@ -554,10 +554,10 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplem
 #endif
 }
 
-bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(const tarch::la::Vector<MD_DIM, unsigned int> &globalStartCell,
-                                                                                const tarch::la::Vector<MD_DIM, unsigned int> &globalRange,
-                                                                                tarch::la::Vector<MD_DIM, unsigned int> &localStartCell,
-                                                                                tarch::la::Vector<MD_DIM, unsigned int> &localRange) const {
+bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(const tarch::la::Vector<MD_DIM, unsigned int>& globalStartCell,
+                                                                                const tarch::la::Vector<MD_DIM, unsigned int>& globalRange,
+                                                                                tarch::la::Vector<MD_DIM, unsigned int>& localStartCell,
+                                                                                tarch::la::Vector<MD_DIM, unsigned int>& localRange) const {
 
   bool isIntersecting = true;
   int help; // need an int because some entries will be negative
@@ -628,7 +628,7 @@ bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
 }
 
 tarch::la::Vector<MD_DIM, unsigned int>
-simplemd::services::ParallelTopologyService::localToGlobalCellIndexVector(const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndexVector) const {
+simplemd::services::ParallelTopologyService::localToGlobalCellIndexVector(const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndexVector) const {
   tarch::la::Vector<MD_DIM, unsigned int> globalCellIndexVector;
   for (unsigned int d = 0; d < MD_DIM; d++) {
     globalCellIndexVector[d] = localCellIndexVector[d] + _processCoordinates[d] * _localNumberOfCells[d];
@@ -637,9 +637,9 @@ simplemd::services::ParallelTopologyService::localToGlobalCellIndexVector(const 
 }
 
 void simplemd::services::ParallelTopologyService::createNeighbourRanks(
-    const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates,
-    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &localBoundary, const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-    std::vector<int> &neighbourRanks, std::vector<int> &neighbourRanksUnique, unsigned int &numUniqueNeighbours, unsigned int numberOfCellsPerBuffer[]) const {
+    const tarch::la::Vector<MD_DIM, unsigned int>& processCoordinates,
+    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& localBoundary, const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
+    std::vector<int>& neighbourRanks, std::vector<int>& neighbourRanksUnique, unsigned int& numUniqueNeighbours, unsigned int numberOfCellsPerBuffer[]) const {
   unsigned int neighbourCounter = 0;
   tarch::la::Vector<MD_DIM, int> tmpCoords(0);
   // empty ranks vector and reset number of transferred linked cells
@@ -745,8 +745,8 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
 }
 
 // add ranks one by one, skipping repeating ones
-void simplemd::services::ParallelTopologyService::addNeighbourToNeighbourRanksUnique(std::vector<int> &neighbourRanksUnique, unsigned int &numUniqueNeighbours,
-                                                                                     const int &addedNeighbour) const {
+void simplemd::services::ParallelTopologyService::addNeighbourToNeighbourRanksUnique(std::vector<int>& neighbourRanksUnique, unsigned int& numUniqueNeighbours,
+                                                                                     const int& addedNeighbour) const {
   // note that due to functionality of createNeighbourRanks, _rank cannot appear
   // in this vector
   bool repetitionFound = false;
@@ -762,9 +762,9 @@ void simplemd::services::ParallelTopologyService::addNeighbourToNeighbourRanksUn
   }
 }
 
-tarch::la::Vector<MD_DIM, double> simplemd::services::ParallelTopologyService::computeMeshwidth(const tarch::la::Vector<MD_DIM, double> &prescribedWidth,
-                                                                                                const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-                                                                                                const tarch::la::Vector<MD_DIM, double> &domainSize) const {
+tarch::la::Vector<MD_DIM, double> simplemd::services::ParallelTopologyService::computeMeshwidth(const tarch::la::Vector<MD_DIM, double>& prescribedWidth,
+                                                                                                const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
+                                                                                                const tarch::la::Vector<MD_DIM, double>& domainSize) const {
   tarch::la::Vector<MD_DIM, double> meshWidth;
   for (unsigned int d = 0; d < MD_DIM; d++) {
     // compute approx. number of cells in d-direction
@@ -779,9 +779,9 @@ tarch::la::Vector<MD_DIM, double> simplemd::services::ParallelTopologyService::c
 }
 
 tarch::la::Vector<MD_DIM, unsigned int>
-simplemd::services::ParallelTopologyService::computeNumberOfCells(const tarch::la::Vector<MD_DIM, double> &meshWidth,
-                                                                  const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-                                                                  const tarch::la::Vector<MD_DIM, double> &domainSize) const {
+simplemd::services::ParallelTopologyService::computeNumberOfCells(const tarch::la::Vector<MD_DIM, double>& meshWidth,
+                                                                  const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
+                                                                  const tarch::la::Vector<MD_DIM, double>& domainSize) const {
   tarch::la::Vector<MD_DIM, unsigned int> numberOfCells(0);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     // compute approx. number of cells in d-direction
@@ -798,9 +798,9 @@ simplemd::services::ParallelTopologyService::computeNumberOfCells(const tarch::l
 }
 
 tarch::la::Vector<MD_DIM, unsigned int>
-simplemd::services::ParallelTopologyService::computeGlobalNumberOfCells(const tarch::la::Vector<MD_DIM, double> &meshWidth,
-                                                                        const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses,
-                                                                        const tarch::la::Vector<MD_DIM, double> &domainSize) const {
+simplemd::services::ParallelTopologyService::computeGlobalNumberOfCells(const tarch::la::Vector<MD_DIM, double>& meshWidth,
+                                                                        const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
+                                                                        const tarch::la::Vector<MD_DIM, double>& domainSize) const {
   tarch::la::Vector<MD_DIM, unsigned int> globalCells = computeNumberOfCells(meshWidth, numberProcesses, domainSize);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     globalCells[d] *= numberProcesses[d];
@@ -808,7 +808,7 @@ simplemd::services::ParallelTopologyService::computeGlobalNumberOfCells(const ta
   return globalCells;
 }
 
-bool simplemd::services::ParallelTopologyService::isParallelNeighbour(const int &neighbourRank) const {
+bool simplemd::services::ParallelTopologyService::isParallelNeighbour(const int& neighbourRank) const {
   for (unsigned int i = 0; i < _numUniqueNeighbours; i++) {
     if (neighbourRank == _neighbourRanksUnique[i]) {
       return true;
@@ -818,8 +818,8 @@ bool simplemd::services::ParallelTopologyService::isParallelNeighbour(const int 
 }
 
 tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> simplemd::services::ParallelTopologyService::computeLocalBoundaryInformation(
-    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary, const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates,
-    const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses) {
+    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary, const tarch::la::Vector<MD_DIM, unsigned int>& processCoordinates,
+    const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses) {
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> localBoundary(PARALLEL_BOUNDARY);
   unsigned int counter = 0;
 #if (MD_DIM == 1)
@@ -991,14 +991,14 @@ tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> simplemd::s
   return localBoundary;
 }
 
-unsigned int simplemd::services::ParallelTopologyService::getNumberOfTransferredCells(const int &x
+unsigned int simplemd::services::ParallelTopologyService::getNumberOfTransferredCells(const int& x
 #if (MD_DIM > 1)
                                                                                       ,
-                                                                                      const int &y
+                                                                                      const int& y
 #endif
 #if (MD_DIM > 2)
                                                                                       ,
-                                                                                      const int &z
+                                                                                      const int& z
 #endif
 ) const {
   unsigned int cells = 0;
@@ -1070,15 +1070,15 @@ unsigned int simplemd::services::ParallelTopologyService::getNumberOfTransferred
   return cells;
 }
 
-void simplemd::services::ParallelTopologyService::adaptPositionForPeriodicBoundaries(tarch::la::Vector<MD_DIM, double> &position,
-                                                                                     const simplemd::BoundaryType &boundaryType, const int &x
+void simplemd::services::ParallelTopologyService::adaptPositionForPeriodicBoundaries(tarch::la::Vector<MD_DIM, double>& position,
+                                                                                     const simplemd::BoundaryType& boundaryType, const int& x
 #if (MD_DIM > 1)
                                                                                      ,
-                                                                                     const int &y
+                                                                                     const int& y
 #endif
 #if (MD_DIM > 2)
                                                                                      ,
-                                                                                     const int &z
+                                                                                     const int& z
 #endif
 ) const {
 
@@ -1111,7 +1111,7 @@ void simplemd::services::ParallelTopologyService::adaptPositionForPeriodicBounda
 }
 
 // get current index of buffer arrays from neighbourRank
-unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexFromNeighbourRank(const int &neighbourRank) const {
+unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexFromNeighbourRank(const int& neighbourRank) const {
   unsigned int bufferIndex;
   bool found = false;
   for (bufferIndex = 0; bufferIndex < _numUniqueNeighbours; bufferIndex++) {
@@ -1134,9 +1134,9 @@ unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexF
   }
 }
 
-void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer *buf,
-                                                               simplemd::services::MoleculeService &moleculeService,
-                                                               simplemd::services::LinkedCellService &linkedCellService) {
+void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf,
+                                                               simplemd::services::MoleculeService& moleculeService,
+                                                               simplemd::services::LinkedCellService& linkedCellService) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> forceOld(0.0);
@@ -1145,7 +1145,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
 
   unsigned int iMol;
 
-  const double *const values = buf->getValues();
+  const double* const values = buf->getValues();
   const unsigned int len = buf->getLength();
 
   for (iMol = 0; iMol < len; iMol += (3 * MD_DIM + 1)) {
@@ -1202,7 +1202,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
     if (isFixed)
       myMolecule.fix();
 
-    Molecule *mPtr = moleculeService.addMolecule(myMolecule);
+    Molecule* mPtr = moleculeService.addMolecule(myMolecule);
 #if (MD_DEBUG == MD_YES)
     std::cout << "Rank " << _rank << ": unpacked molecule from buffer into cell " << cellIndex << std::endl;
 #endif
@@ -1213,7 +1213,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
   buf->clearBuffer();
 }
 
-void simplemd::services::ParallelTopologyService::pushMoleculeToLocalBuffer(const Molecule *mol, const tarch::la::Vector<MD_DIM, double> &pos) {
+void simplemd::services::ParallelTopologyService::pushMoleculeToLocalBuffer(const Molecule* mol, const tarch::la::Vector<MD_DIM, double>& pos) {
 #if (MD_ERROR == MD_YES)
   bool isOk;
   isOk =
@@ -1235,8 +1235,8 @@ void simplemd::services::ParallelTopologyService::pushMoleculeToLocalBuffer(cons
 }
 
 #if (MD_PARALLEL == MD_YES)
-void simplemd::services::ParallelTopologyService::pushMoleculeToSendBuffer(const unsigned int &bufferIndex, const Molecule *mol,
-                                                                           const tarch::la::Vector<MD_DIM, double> &pos) {
+void simplemd::services::ParallelTopologyService::pushMoleculeToSendBuffer(const unsigned int& bufferIndex, const Molecule* mol,
+                                                                           const tarch::la::Vector<MD_DIM, double>& pos) {
 #if (MD_ERROR == MD_YES)
   bool isOk;
   isOk =
@@ -1263,8 +1263,8 @@ void simplemd::services::ParallelTopologyService::pushMoleculeToSendBuffer(const
 #endif
 
 #if (MD_PARALLEL == MD_YES)
-void simplemd::services::ParallelTopologyService::bufferIsend(ParallelAndLocalBufferService::SimpleBuffer *buffer, const int &neighbourRank,
-                                                              MPI_Request &request) const {
+void simplemd::services::ParallelTopologyService::bufferIsend(ParallelAndLocalBufferService::SimpleBuffer* buffer, const int& neighbourRank,
+                                                              MPI_Request& request) const {
   int result;
 
   // send only as much values as we need to
@@ -1283,8 +1283,8 @@ void simplemd::services::ParallelTopologyService::bufferIsend(ParallelAndLocalBu
 #endif
 
 #if (MD_PARALLEL == MD_YES)
-void simplemd::services::ParallelTopologyService::bufferIrecv(ParallelAndLocalBufferService::SimpleBuffer *buffer, const int &neighbourRank,
-                                                              MPI_Request &request) const {
+void simplemd::services::ParallelTopologyService::bufferIrecv(ParallelAndLocalBufferService::SimpleBuffer* buffer, const int& neighbourRank,
+                                                              MPI_Request& request) const {
   int result;
 
   // receive as many molecules as the upper bound is

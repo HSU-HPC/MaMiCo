@@ -27,14 +27,14 @@ template <class LinkedCell, unsigned int dim> class coupling::KineticEnergyContr
 public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface to the md solver */
-  KineticEnergyController(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {}
+  KineticEnergyController(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {}
   /** @brief a simple destructor*/
   ~KineticEnergyController() {}
 
   /** @brief computes and returns the kinetic energy within a macroscopic cell
    *  @param cell macroscopic cell to compute the kinetic energy for
    *  @returns the kinetic energy in the cell */
-  double computeKineticEnergy(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell) const {
+  double computeKineticEnergy(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell) const {
     coupling::cellmappings::ComputeKineticEnergyMapping<LinkedCell, dim> computeKineticEnergyMapping(_mdSolverInterface);
     cell.iterateConstCells(computeKineticEnergyMapping);
     return computeKineticEnergyMapping.getKineticEnergy();
@@ -43,7 +43,7 @@ public:
   /** @brief computes and returns the temperature within a macroscopic cell
    *  @param cell macroscopic cell to compute the temperature in
    *  @returns the temperature in the cell */
-  double computeTemperature(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell) const {
+  double computeTemperature(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell) const {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(_mdSolverInterface);
     cell.iterateConstCells(computeMomentumMapping);
     tarch::la::Vector<dim, double> meanVelocity = computeMomentumMapping.getMeanVelocity();
@@ -59,7 +59,7 @@ public:
    * value.
    *  @param cell the macroscopic cell to set the kinetic energy in
    *  @param kineticEnergy the value the kinetic energy shall be set to*/
-  void setKineticEnergy(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const double &kineticEnergy) const {
+  void setKineticEnergy(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const double& kineticEnergy) const {
     // determine mass, momentum and old kinetic energy
     coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> computeMassMapping(_mdSolverInterface);
     cell.iterateConstCells(computeMassMapping);
@@ -81,7 +81,7 @@ public:
    *  @brief sets the temperature within the cell to 'temperature'.
    *  @param cell the macroscopic cell the temperature shall be applied in
    *  @param temperature the value the temperature shall be set at*/
-  void setTemperature(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const double &temperature) const {
+  void setTemperature(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const double& temperature) const {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(_mdSolverInterface);
     cell.iterateConstCells(computeMomentumMapping);
     tarch::la::Vector<dim, double> meanVelocity = computeMomentumMapping.getMeanVelocity();
@@ -96,6 +96,6 @@ public:
 
 private:
   /** interface of the md solver*/
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_KINETICENERGYCONTROLLER_H_

@@ -5,10 +5,10 @@
 #include "coupling/solvers/CoupledMolecularDynamicsSimulation.h"
 
 coupling::solvers::CoupledMolecularDynamicsSimulation::CoupledMolecularDynamicsSimulation(
-    const simplemd::configurations::MolecularDynamicsConfiguration &configuration)
+    const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
     : simplemd::MolecularDynamicsSimulation(configuration), _macroscopicCellService(NULL), _couplingSwitchedOn(true) {}
 
-void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingTimestep(const unsigned int &t) {
+void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingTimestep(const unsigned int& t) {
   // if coupling is switched off, perform "normal" MD timestep
   if (!_couplingSwitchedOn) {
     simulateOneTimestep(t);

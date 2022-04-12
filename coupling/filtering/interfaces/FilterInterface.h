@@ -35,9 +35,9 @@ public:
    * FilterSequence. You can customize parameterization in
    * coupling::FilterSequence::loadFiltersFromXML(...).
    */
-  FilterInterface(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
-                  const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector, const std::array<bool, 7> filteredValues,
-                  const char *type)
+  FilterInterface(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+                  const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
+                  const char* type)
       :
 
         _inputCells(inputCellVector), _outputCells(outputCellVector), _type(type) {
@@ -78,7 +78,7 @@ public:
     }
   }
 
-  FilterInterface(const char *type)
+  FilterInterface(const char* type)
       : _type(type) { /* Used by incomplete implementations of FilterInterface.
                          Should be redesigned via meta class.*/
   }
@@ -97,8 +97,8 @@ public:
    */
   virtual void operator()() = 0;
 
-  void updateCellData(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &new_inputCells,
-                      const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &new_outputCells) {
+  void updateCellData(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& new_inputCells,
+                      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& new_outputCells) {
     if (new_inputCells.size() != new_outputCells.size())
       throw std::runtime_error("New input-, output-, and indexing vectors must "
                                "be of identical size.");
@@ -114,16 +114,16 @@ public:
   /*
    * Basic Getters/Setters
    */
-  const char *getType() const { return _type; }
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> getInputCells() const { return _inputCells; }
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> getOutputCells() const { return _outputCells; }
+  const char* getType() const { return _type; }
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> getInputCells() const { return _inputCells; }
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> getOutputCells() const { return _outputCells; }
 
   using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro,
                                                     coupling::indexing::IndexTrait::noGhost>;
   /*
    * Advanced Getters/Setters
    */
-  coupling::datastructures::MacroscopicCell<dim> *getInputCellOfIndex(const CellIndex_T &index) {
+  coupling::datastructures::MacroscopicCell<dim>* getInputCellOfIndex(const CellIndex_T& index) {
     if (index.get() < _inputCells.size) {
       return _inputCells[index.get()];
     } else {
@@ -131,7 +131,7 @@ public:
       throw std::runtime_error("FilterInterface: getInputCellofIndex(): Could not find index.");
     }
   }
-  coupling::datastructures::MacroscopicCell<dim> *getOutputCellOfIndex(const CellIndex_T &index) {
+  coupling::datastructures::MacroscopicCell<dim>* getOutputCellOfIndex(const CellIndex_T& index) {
     if (index.get() < _outputCells.size) {
       return _outputCells[index.get()];
     } else {
@@ -147,7 +147,7 @@ public:
    * In that case, this was previously getting input from MD but won't be any
    * longer. The newly added filter will provide input for this one instead.
    */
-  void setInputCells(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &newInputCells) { _inputCells = newInputCells; }
+  void setInputCells(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& newInputCells) { _inputCells = newInputCells; }
 
   // Size = number of cells in this filter.
   int getSize() const { return _inputCells.size(); }
@@ -162,12 +162,12 @@ public:
    * filter.
    */
   struct ScalarAccessFunctionPair {
-    const double &(coupling::datastructures::MacroscopicCell<dim>::*get)() const; // getter function pointer
-    void (coupling::datastructures::MacroscopicCell<dim>::*set)(const double &);  // setter function pointer
+    const double& (coupling::datastructures::MacroscopicCell<dim>::*get)() const; // getter function pointer
+    void (coupling::datastructures::MacroscopicCell<dim>::*set)(const double&);   // setter function pointer
   };
   struct VectorAccessFunctionPair {
-    const tarch::la::Vector<dim, double> &(coupling::datastructures::MacroscopicCell<dim>::*get)() const;
-    void (coupling::datastructures::MacroscopicCell<dim>::*set)(const tarch::la::Vector<dim, double> &);
+    const tarch::la::Vector<dim, double>& (coupling::datastructures::MacroscopicCell<dim>::*get)() const;
+    void (coupling::datastructures::MacroscopicCell<dim>::*set)(const tarch::la::Vector<dim, double>&);
   };
 
 protected:
@@ -178,8 +178,8 @@ protected:
    *their respective input counterpart, i.e it is not mandatory to have any
    *output.
    */
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _inputCells;
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _outputCells;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCells;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _outputCells;
 
   // scalars getters/setters
   std::vector<ScalarAccessFunctionPair> _scalarAccessFunctionPairs;
@@ -188,5 +188,5 @@ protected:
   std::vector<VectorAccessFunctionPair> _vectorAccessFunctionPairs;
 
   // unique identifier per filter class
-  const char *_type;
+  const char* _type;
 };

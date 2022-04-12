@@ -25,10 +25,10 @@ public:
    *  @returns coupling::ParticleInsertion::NoAction since no mass is deleted or
    * inserted */
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                   const tarch::la::Vector<dim, double> &macroscopicCellPosition, const tarch::la::Vector<dim, double> &macroscopicCellSize,
-                   const tarch::la::Vector<dim, double> &meanVelocity, const double &temperature,
-                   const coupling::BoundaryForceController<LinkedCell, dim> &boundaryForceController) {
+  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                   const tarch::la::Vector<dim, double>& macroscopicCellPosition, const tarch::la::Vector<dim, double>& macroscopicCellSize,
+                   const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
+                   const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController) {
     return coupling::ParticleInsertion<LinkedCell, dim>::NoAction;
   }
 

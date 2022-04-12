@@ -5,10 +5,10 @@
 
 // Member functions of coupling::IndexConversionMD2Macro
 template <unsigned int dim>
-void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> m2mDomainCells,
+void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim>*> m2mDomainCells,
                                                                 std::vector<tarch::la::Vector<dim, unsigned int>> m2mDomainGlobalIndices,
-                                                                std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outerCells,
-                                                                std::vector<tarch::la::Vector<dim, unsigned int>> &outerIndices) {
+                                                                std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outerCells,
+                                                                std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices) {
   // In this case, we ~only~ have m2m cells!
   outerCells = {};
   outerIndices = {};
@@ -30,11 +30,11 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coup
 }
 
 template <unsigned int dim>
-void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCells,
-                                                                std::vector<coupling::datastructures::MacroscopicCell<dim> *> &m2mDomainCells,
-                                                                std::vector<tarch::la::Vector<dim, unsigned int>> &m2mIndices,
-                                                                std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outerCells,
-                                                                std::vector<tarch::la::Vector<dim, unsigned int>> &outerIndices) {
+void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCells,
+                                                                std::vector<coupling::datastructures::MacroscopicCell<dim>*>& m2mDomainCells,
+                                                                std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
+                                                                std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outerCells,
+                                                                std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices) {
   if (inputCells.empty()) {
     throw std::runtime_error("Input cell vector is emtpy.");
   }

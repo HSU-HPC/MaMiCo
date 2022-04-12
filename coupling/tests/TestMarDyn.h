@@ -31,7 +31,7 @@ using Log::global_log;
 class TestMarDyn : public Test {
 
 public:
-  TestMarDyn(int argc, char **argv, std::string name)
+  TestMarDyn(int argc, char** argv, std::string name)
       : Test(name),
         //_mamicoInterface(NULL),
         _marDyn(NULL), _marDynMDsolver(NULL), _macroSolverInterface(NULL), _macroscopicCellService(NULL), _argc(argc), _argv(argv) {}
@@ -61,8 +61,7 @@ public:
     loadMarDynTestConfiguration("mardyn_dummy_coupling.cfg", 10);
 
     std::cout << "Testing MD solver get methods: " << std::endl;
-    MarDynMDSolverInterface *mdsi =
-        (MarDynMDSolverInterface *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
+    MarDynMDSolverInterface* mdsi = (MarDynMDSolverInterface*)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface();
     if (mdsi == NULL) {
       std::cout << "ERROR: MD solver is null! Aborting." << std::endl;
       exit(EXIT_FAILURE);
@@ -225,21 +224,21 @@ protected:
     std::cout << "Set macroscopic cell service in MaMiCoInterfaceProvider.." << std::endl;
     coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().setMacroscopicCellService(_macroscopicCellService);
 
-    coupling::services::MacroscopicCellService<3> *macroCellService =
+    coupling::services::MacroscopicCellService<3>* macroCellService =
         coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMacroscopicCellService();
     std::cout << "init test macro cell service: " << (macroCellService == NULL) << std::endl;
   }
 
   // MarDyn simulation
-  MarDynCoupledSimulation *_marDyn;
+  MarDynCoupledSimulation* _marDyn;
   // MarDyn MD solver interface
-  MarDynMDSolverInterface *_marDynMDsolver;
+  MarDynMDSolverInterface* _marDynMDsolver;
   // test solver interface
-  coupling::interface::VoidMacroscopicSolverInterface<3> *_macroSolverInterface;
-  coupling::services::MacroscopicCellService<3> *_macroscopicCellService;
+  coupling::interface::VoidMacroscopicSolverInterface<3>* _macroSolverInterface;
+  coupling::services::MacroscopicCellService<3>* _macroscopicCellService;
   // command line arguments
   int _argc;
-  char **_argv;
+  char** _argv;
 };
 
 #endif /* TESTMARDYN_H_ */

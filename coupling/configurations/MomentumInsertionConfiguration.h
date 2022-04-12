@@ -54,7 +54,7 @@ public:
   /** parseSubtag
    * 	@param node
    */
-  void parseSubtag(tinyxml2::XMLElement *node) {
+  void parseSubtag(tinyxml2::XMLElement* node) {
     std::string value;
     tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "type");
     if (value == "additive-momentum-insertion") {
@@ -138,7 +138,7 @@ public:
   /** Returns momentum insertion type.
    * 	@return _insertionType
    */
-  const MomentumInsertionType &getMomentumInsertionType() const { return _insertionType; }
+  const MomentumInsertionType& getMomentumInsertionType() const { return _insertionType; }
 
   /**
    * 	@return _innerOverlap
@@ -155,10 +155,10 @@ public:
    * 	@return momentum insertion config
    */
   template <class LinkedCell, unsigned int dim>
-  MomentumInsertion<LinkedCell, dim> *
-  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
-                          const coupling::IndexConversion<dim> &indexConversion,
-                          const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *const macroscopicCells,
+  MomentumInsertion<LinkedCell, dim>*
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                          const coupling::IndexConversion<dim>& indexConversion,
+                          const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells,
                           unsigned int numberMDTimestepsPerCouplingCycle) const {
     if (_insertionType == ADDITIVE_MOMENTUM_INSERTION) {
       return new coupling::AdditiveMomentumInsertion<LinkedCell, dim>(mdSolverInterface, numberMDTimestepsPerCouplingCycle);

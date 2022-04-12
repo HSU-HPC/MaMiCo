@@ -25,17 +25,17 @@ class WriteCheckPointMapping;
  */
 class simplemd::moleculemappings::WriteCheckPointMapping {
 public:
-  WriteCheckPointMapping(const simplemd::services::ParallelTopologyService &parallelTopologyService, const std::string &filestem, const unsigned int &t)
+  WriteCheckPointMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService, const std::string& filestem, const unsigned int& t)
       : _parallelTopologyService(parallelTopologyService), _file(NULL), _filestem(filestem), _t(t) {}
   ~WriteCheckPointMapping() {}
 
   void beginMoleculeIteration();
   void endMoleculeIteration();
-  void handleMolecule(Molecule &molecule);
+  void handleMolecule(Molecule& molecule);
 
 private:
-  const simplemd::services::ParallelTopologyService &_parallelTopologyService;
-  std::ofstream *_file;
+  const simplemd::services::ParallelTopologyService& _parallelTopologyService;
+  std::ofstream* _file;
   const std::string _filestem;
   const unsigned int _t;
   unsigned int _particleCounter;

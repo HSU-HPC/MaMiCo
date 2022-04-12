@@ -28,23 +28,23 @@ public:
    *  domainOffset - starting coordinate of local domain (lowerLeftFront point)
    *  numberOfCells - local number of cells
    */
-  LinkedCellService(const tarch::la::Vector<MD_DIM, double> &domainSize, const tarch::la::Vector<MD_DIM, double> &domainOffset,
-                    const simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::MoleculeService &moleculeService);
+  LinkedCellService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
+                    const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService);
 
   /** shuts down the service, frees memory and resets all variables */
   void shutdown();
 
   /** puts the molecule into the cell defined by the local index (vector)
    * coordinates localCellIndex */
-  void addMoleculeToLinkedCell(Molecule &molecule, const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
+  void addMoleculeToLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex);
   /** puts the molecule into the cell defined by the local index (scalar)
    * coordinates localCellIndex */
-  void addMoleculeToLinkedCell(Molecule &molecule, const unsigned int &localCellIndex);
+  void addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex);
 
-  void deleteMoleculeFromLinkedCell(Molecule &molecule, const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
+  void deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex);
 
   /** returns the linked cell at the respective coordinates */
-  LinkedCell &getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int> &localCellIndex);
+  LinkedCell& getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex);
 
   /** iterates over all cells in the range defined by the lower left front
    * corner cell lowerLeftFrontCell and the size of the domain cellRange.
@@ -53,16 +53,16 @@ public:
    * coordinates.
    */
   template <class A>
-  void iterateCells(A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int> &cellRange,
-                    const bool &useOpenMP);
+  void iterateCells(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
+                    const bool& useOpenMP);
 
   /** iterates over all cells in the inner part (i.e. does not consider the
    * ghost layer) */
-  template <class A> void iterateCells(A &a, const bool &useOpenMP);
+  template <class A> void iterateCells(A& a, const bool& useOpenMP);
 
   /** iterates over all cell pairs for the cells in the inner region of each
    * local process */
-  template <class A> void iterateCellPairs(A &a, const bool &useOpenMP) const;
+  template <class A> void iterateCellPairs(A& a, const bool& useOpenMP) const;
 
   /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
    * described by lowerLeftFrontCell and cellRange; cell2 does not need to lie
@@ -71,33 +71,33 @@ public:
    * (0,0,0),(1,1,1)).
    */
   template <class A>
-  void iterateCellPairs(A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int> &cellRange,
-                        const bool &useOpenMP) const;
+  void iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
+                        const bool& useOpenMP) const;
 
   /** returns the index of the first (non-ghost) cell */
-  const tarch::la::Vector<MD_DIM, unsigned int> &getLocalIndexOfFirstCell() const;
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const;
 
   /** returns the number of (non-ghost) cells */
-  const tarch::la::Vector<MD_DIM, unsigned int> &getLocalNumberOfCells() const;
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells() const;
 
   /** returns the mesh width */
-  const tarch::la::Vector<MD_DIM, double> &getMeshWidth() const;
+  const tarch::la::Vector<MD_DIM, double>& getMeshWidth() const;
 
   /** returns the local domain offset (for the domain of this process) */
-  const tarch::la::Vector<MD_DIM, double> &getLocalDomainOffset() const;
+  const tarch::la::Vector<MD_DIM, double>& getLocalDomainOffset() const;
 
   /** returns the local domain size (for the domain of this process) */
-  const tarch::la::Vector<MD_DIM, double> &getLocalDomainSize() const;
+  const tarch::la::Vector<MD_DIM, double>& getLocalDomainSize() const;
 
   /** returns true if the local cell index cellIndex describes a linked cell
    * within the ghost layer */
-  bool isGhostCell(const unsigned int &cellIndex) const;
+  bool isGhostCell(const unsigned int& cellIndex) const;
 
   /** returns the local cell index vector for the local cell index cellIndex */
   tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const unsigned int cellIndex) const;
 
   /** returns the local cell index from the local cell index vector */
-  unsigned int getLocalCellIndex(const tarch::la::Vector<MD_DIM, unsigned int> &cellIndexVector) const;
+  unsigned int getLocalCellIndex(const tarch::la::Vector<MD_DIM, unsigned int>& cellIndexVector) const;
 
   ~LinkedCellService() {
     if (_cells != NULL) {
@@ -116,11 +116,11 @@ private:
   void initCellStructure();
 
   /** returns local index from (local) coordinate vector */
-  unsigned int getLocalIndexFromLocalVector(const tarch::la::Vector<MD_DIM, unsigned int> &coords) const;
+  unsigned int getLocalIndexFromLocalVector(const tarch::la::Vector<MD_DIM, unsigned int>& coords) const;
 
   /** computes the mesh width from domain size and local number of grid cells */
-  tarch::la::Vector<MD_DIM, double> getMeshwidth(const tarch::la::Vector<MD_DIM, double> &domainSize,
-                                                 const tarch::la::Vector<MD_DIM, unsigned int> &localNumberCells) const {
+  tarch::la::Vector<MD_DIM, double> getMeshwidth(const tarch::la::Vector<MD_DIM, double>& domainSize,
+                                                 const tarch::la::Vector<MD_DIM, unsigned int>& localNumberCells) const {
     tarch::la::Vector<MD_DIM, double> meshWidth(0.0);
     for (unsigned int d = 0; d < MD_DIM; d++) {
       meshWidth[d] = domainSize[d] / localNumberCells[d];
@@ -129,7 +129,7 @@ private:
   }
 
   /** contains all (local) linked cells */
-  LinkedCell *_cells;
+  LinkedCell* _cells;
   /** size of global domain */
   const tarch::la::Vector<MD_DIM, double> _domainSize;
   /** offset of local domain */
@@ -153,8 +153,8 @@ private:
 };
 
 template <class A>
-void simplemd::services::LinkedCellService::iterateCells(A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell,
-                                                         const tarch::la::Vector<MD_DIM, unsigned int> &cellRange, const bool &useOpenMP) {
+void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
+                                                         const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) {
   unsigned int index = 0;
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -258,13 +258,13 @@ void simplemd::services::LinkedCellService::iterateCells(A &a, const tarch::la::
   a.endCellIteration();
 }
 
-template <class A> void simplemd::services::LinkedCellService::iterateCells(A &a, const bool &useOpenMP) {
+template <class A> void simplemd::services::LinkedCellService::iterateCells(A& a, const bool& useOpenMP) {
   iterateCells(a, _indexOffset, _numberOfCells, useOpenMP);
 }
 
 template <class A>
-void simplemd::services::LinkedCellService::iterateCellPairs(A &a, const tarch::la::Vector<MD_DIM, unsigned int> &lowerLeftFrontCell,
-                                                             const tarch::la::Vector<MD_DIM, unsigned int> &cellRange, const bool &useOpenMP) const {
+void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
+                                                             const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) const {
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int> neighbourOffset;
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int> indexOffset;
 #if (MD_DIM == 1)
@@ -465,7 +465,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A &a, const tarch::
   a.endCellIteration();
 }
 
-template <class A> void simplemd::services::LinkedCellService::iterateCellPairs(A &a, const bool &useOpenMP) const {
+template <class A> void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const bool& useOpenMP) const {
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(0);
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(getLocalNumberOfCells() + getLocalIndexOfFirstCell());
   iterateCellPairs(a, pairIterationStart, pairIterationLength, useOpenMP);

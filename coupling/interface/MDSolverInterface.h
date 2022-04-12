@@ -43,10 +43,10 @@ public:
    *	@param indexConversion
    *	@returns a particular linked cell inside a macroscopic cell.
    */
-  virtual LinkedCell &getLinkedCell(const tarch::la::Vector<dim, unsigned int> &macroscopicCellIndex,
-                                    const tarch::la::Vector<dim, unsigned int> &linkedCellInMacroscopicCell,
-                                    const tarch::la::Vector<dim, unsigned int> &linkedCellsPerMacroscopicCell,
-                                    const coupling::IndexConversion<dim> &indexConversion) = 0;
+  virtual LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& macroscopicCellIndex,
+                                    const tarch::la::Vector<dim, unsigned int>& linkedCellInMacroscopicCell,
+                                    const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell,
+                                    const coupling::IndexConversion<dim>& indexConversion) = 0;
 
   /** This function specifies the global size of the box-shaped MD domain
    *  @returns the global size of the box-shaped MD domain */
@@ -81,19 +81,19 @@ public:
    *	@param temperature
    *	@param initialVelocity
    */
-  virtual void getInitialVelocity(const tarch::la::Vector<dim, double> &meanVelocity, const double &kB, const double &temperature,
-                                  tarch::la::Vector<dim, double> &initialVelocity) const = 0;
+  virtual void getInitialVelocity(const tarch::la::Vector<dim, double>& meanVelocity, const double& kB, const double& temperature,
+                                  tarch::la::Vector<dim, double>& initialVelocity) const = 0;
 
   /** This function deletes the molecule from the MD simulation
    *	@param molecule
    *	@param cell
    */
-  virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim> &molecule, LinkedCell &cell) = 0;
+  virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, LinkedCell& cell) = 0;
 
   /** This function adds the molecule to the MD simulation.
    *	@param molecule
    */
-  virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim> &molecule) = 0;
+  virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) = 0;
 
   /** This function sets up the potential energy landscape over the domain
    *spanned by indexOfFirstMacroscopicCell and rangeCoordinates. The first
@@ -104,9 +104,9 @@ public:
    *	@param rangeMacroscopicCells
    *	@param linkedCellsPerMacroscopicCell
    */
-  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int> &indexOfFirstMacroscopicCell,
-                                             const tarch::la::Vector<dim, unsigned int> &rangeMacroscopicCells,
-                                             const tarch::la::Vector<dim, unsigned int> &linkedCellsPerMacroscopicCell) = 0;
+  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstMacroscopicCell,
+                                             const tarch::la::Vector<dim, unsigned int>& rangeMacroscopicCells,
+                                             const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell) = 0;
 
   /** This function specifies the local index vector (w.r.t. lexicographic
    *ordering of the linked cells in the MD simulation, for the linked cell that
@@ -119,7 +119,7 @@ public:
    *'position' belongs to
    *	@sa getLinkedCell()
    */
-  virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double> &position) = 0;
+  virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double>& position) = 0;
 
   /** This function assumes that a molecule is placed somewhere inside the
    *linked cell at index 'linkedCellIndex' and computes the force and potential
@@ -130,7 +130,7 @@ public:
    *with "molecule". The results are stored within the molecule.
    *	@param molecule
    */
-  virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim> &molecule) = 0;
+  virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim>& molecule) = 0;
 
   /** This function is called each time when MaMiCo tried to insert/ delete
    * molecules from the MD simulation. As a consequence, a synchronization
@@ -162,7 +162,7 @@ public:
    *	@param cell
    *  @returns a new molecule iterator for a certain linked cell
    */
-  virtual coupling::interface::MoleculeIterator<LinkedCell, dim> *getMoleculeIterator(LinkedCell &cell) = 0;
+  virtual coupling::interface::MoleculeIterator<LinkedCell, dim>* getMoleculeIterator(LinkedCell& cell) = 0;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_MDSOLVERINTERFACE_H_

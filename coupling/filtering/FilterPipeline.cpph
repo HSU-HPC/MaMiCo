@@ -6,9 +6,9 @@
 
 // constructors of coupling::filtering::FilterPipeline
 template <unsigned int dim>
-coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCells,
-                                                         coupling::filtering::Scope scope, const tarch::utils::MultiMDService<dim> &multiMDService,
-                                                         const char *cfgpath)
+coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCells,
+                                                         coupling::filtering::Scope scope, const tarch::utils::MultiMDService<dim>& multiMDService,
+                                                         const char* cfgpath)
     :
 
       _scope(scope)
@@ -87,7 +87,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
 
 // member functions of coupling::filtering::FilterPipeline
 template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::operator()() {
-  for (coupling::filtering::FilterSequence<dim> *sequence : _sequences) {
+  for (coupling::filtering::FilterSequence<dim>* sequence : _sequences) {
     // finalize FS's filter vector
     if (sequence->isModifiable()) {
 #ifdef DEBUF_FILTER_PIPELINE
@@ -117,7 +117,7 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::opera
 }
 
 template <unsigned int dim>
-coupling::filtering::FilterSequence<dim> *coupling::filtering::FilterPipeline<dim>::getSequence(const char *sequenceIdentifier) const {
+coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<dim>::getSequence(const char* sequenceIdentifier) const {
   for (auto sequence : _sequences) {
     if (std::strcmp(sequence->getName(), sequenceIdentifier) == 0) {
       return sequence;
@@ -127,9 +127,9 @@ coupling::filtering::FilterSequence<dim> *coupling::filtering::FilterPipeline<di
 }
 
 // Private functions of coupling::filtering::FilterPipeline:
-template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument &cfgfile) {
+template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile) {
   // Check main node
-  tinyxml2::XMLElement *node = cfgfile.FirstChildElement("filter-pipeline");
+  tinyxml2::XMLElement* node = cfgfile.FirstChildElement("filter-pipeline");
   if (!node) {
     std::cout << "ERROR: Could not read config for Filter-Pipeline: missing "
                  "element <filter-pipeline>"
@@ -138,7 +138,7 @@ template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::confi
   }
 
   // verfiy per-instance subtag
-  tinyxml2::XMLElement *perInstanceTag = node->FirstChildElement("per-instance");
+  tinyxml2::XMLElement* perInstanceTag = node->FirstChildElement("per-instance");
   if (!perInstanceTag) {
     std::cout << "ERROR: Could not read config for Filter-Pipeline: missing "
                  "element <per-instance>"
@@ -152,7 +152,7 @@ template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::confi
   }
 
   // verify multi-instance subtag
-  tinyxml2::XMLElement *multiInstanceTag = node->FirstChildElement("post-multi-instance");
+  tinyxml2::XMLElement* multiInstanceTag = node->FirstChildElement("post-multi-instance");
   if (!multiInstanceTag) {
     std::cout << "ERROR: Could not read config for Filter-Pipeline: missing "
                  "element <post-multi-instance>"
@@ -177,7 +177,7 @@ template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::confi
   return true;
 }
 
-template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement *node) {
+template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* node) {
 
   if (_md2MacroCells.empty()) {
     switch (_scope) { /*TODO: print rank as well */
@@ -192,7 +192,7 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     }
   }
 
-  tinyxml2::XMLElement *currSequenceNode = node->FirstChildElement();
+  tinyxml2::XMLElement* currSequenceNode = node->FirstChildElement();
 
   // true once specified output sequence has been found
   bool outputDefined = false;
@@ -248,10 +248,10 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     }
 
     // For regular sequences, this holds just one element.
-    std::vector<FilterSequence<dim> *> inputSeqs;
+    std::vector<FilterSequence<dim>*> inputSeqs;
 
     // Holds all input cells for this sequence
-    std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCellVector;
+    std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector;
 
     // Iterate over all inputs specified in input string.
     // Note: If there are non-matching names in input String, they are ignored.
@@ -298,7 +298,7 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
 
     //"filtered-values" is not mandatory, default is false
     std::array<bool, 7> filteredValues = {false};
-    const char *fvStr = currSequenceNode->Attribute("filtered-values");
+    const char* fvStr = currSequenceNode->Attribute("filtered-values");
     if (fvStr) {
       if (strstr(fvStr, "all"))
         for (unsigned int i = 0; i < 7; i++)

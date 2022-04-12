@@ -30,21 +30,21 @@ class PeriodicAndParallelBoundaryFillCellsMapping;
  */
 class simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping {
 public:
-  PeriodicAndParallelBoundaryFillCellsMapping(simplemd::services::ParallelTopologyService &parallelTopologyService,
-                                              simplemd::services::MoleculeService &moleculeService, simplemd::services::LinkedCellService &linkedCellService)
+  PeriodicAndParallelBoundaryFillCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
+                                              simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService)
       : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService) {}
   ~PeriodicAndParallelBoundaryFillCellsMapping() {}
 
-  void setDomainSize(const tarch::la::Vector<MD_DIM, double> &domainSize) { _domainSize = domainSize; }
+  void setDomainSize(const tarch::la::Vector<MD_DIM, double>& domainSize) { _domainSize = domainSize; }
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
 
 private:
-  simplemd::services::ParallelTopologyService &_parallelTopologyService;
-  simplemd::services::MoleculeService &_moleculeService;
-  simplemd::services::LinkedCellService &_linkedCellService;
+  simplemd::services::ParallelTopologyService& _parallelTopologyService;
+  simplemd::services::MoleculeService& _moleculeService;
+  simplemd::services::LinkedCellService& _linkedCellService;
   /** domain size */
   tarch::la::Vector<MD_DIM, double> _domainSize;
 };

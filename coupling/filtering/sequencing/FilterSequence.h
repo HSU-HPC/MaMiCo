@@ -54,7 +54,7 @@ public:
    * Filter Sequences are constructed in
    * coupling::FilterPipeline::loadSequencesFromXML(...).
    */
-  FilterSequence(const char *name, const std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCells,
+  FilterSequence(const char* name, const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCells,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                  MPI_Comm comm,
 #endif
@@ -148,7 +148,7 @@ public:
   /*
    * Returns unique name identifier of this sequence.
    */
-  const char *getName() { return _name; }
+  const char* getName() { return _name; }
 
   bool isOutputToMacro() { return _isOutput; }
   void setAsOutputToMacro() {
@@ -163,7 +163,7 @@ public:
   bool isModifiable() { return _isModifiable; }
   void makeUnmodifiable() { _isModifiable = false; }
 
-  std::vector<coupling::filtering::FilterInterface<dim> *> getFilters() { return _filters; }
+  std::vector<coupling::filtering::FilterInterface<dim>*> getFilters() { return _filters; }
 
   /*
    * All virtual functions below are redefined in case this sequence is actually
@@ -184,7 +184,7 @@ public:
    * In addition to that, if this sequence is declared as unmodifibale, this
    * gets also detected in here.
    */
-  virtual int loadFiltersFromXML(tinyxml2::XMLElement *sequenceNode);
+  virtual int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode);
 
   /*
    * This member function allows appendance and insertion of filters defined by
@@ -192,20 +192,20 @@ public:
    * implies appending.
    */
   virtual void addFilter(
-      const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)> *applyScalar,
-      const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)> *applyVector,
+      const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
+      const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
       int filterIndex = -1);
 
   /*
    * Registers existence of a child sequence, i.e. a sequence using this
    * sequence's output as its input.
    */
-  virtual void addChildSequence(coupling::filtering::FilterSequence<dim> *childSequence) { _childSequences.push_back(childSequence); }
+  virtual void addChildSequence(coupling::filtering::FilterSequence<dim>* childSequence) { _childSequences.push_back(childSequence); }
 
   /*
    * Allows changing the input cells after init.
    */
-  virtual void updateInputCellVector(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> newInputCellVector) {
+  virtual void updateInputCellVector(const std::vector<coupling::datastructures::MacroscopicCell<dim>*> newInputCellVector) {
     _inputCellVector = newInputCellVector; // call copy constructor
 
     // cc this change to this sequence's first vector.
@@ -222,7 +222,7 @@ public:
    * Some sequences have more than one output, thus the optional parameter. Has
    * no effect on a basic FilterSequence.
    */
-  virtual const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &getOutputCellVector(unsigned int outputIndex = 0) const {
+  virtual const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& getOutputCellVector(unsigned int outputIndex = 0) const {
     if (_filters.empty())
       return _inputCellVector;
 
@@ -276,11 +276,11 @@ private:
   void initCellVectors();
 
 protected:
-  const char *_name;
+  const char* _name;
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _inputCellVector; // points to (foreign) input vector
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _cellVector1;     // allocated for this sequence only
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _cellVector2;     // allocated for this sequence only
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCellVector; // points to (foreign) input vector
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _cellVector1;     // allocated for this sequence only
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _cellVector2;     // allocated for this sequence only
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _comm;
@@ -292,17 +292,17 @@ protected:
                       // Filter Pipeline's output
   bool _isModifiable; // true while filters can be added to sequence
 
-  std::vector<coupling::filtering::FilterInterface<dim> *> _filters;
+  std::vector<coupling::filtering::FilterInterface<dim>*> _filters;
 
   // stores application times for all filters
-  std::map<coupling::filtering::FilterInterface<dim> *, std::vector<unsigned int>> _filterTimes;
+  std::map<coupling::filtering::FilterInterface<dim>*, std::vector<unsigned int>> _filterTimes;
 
   // there must be some other place to get this from
   unsigned int _timestepsElapsed;
 
   // stores pointers to all sequences that use this sequence's output as their
   // input.
-  std::vector<coupling::filtering::FilterSequence<dim> *> _childSequences;
+  std::vector<coupling::filtering::FilterSequence<dim>*> _childSequences;
 };
 
 // inlcude implementation

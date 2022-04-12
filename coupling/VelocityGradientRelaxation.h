@@ -44,9 +44,9 @@ public:
    * simulation
    *  @param macroscopicCells the macroscopic cells to apply the velocity
    * gradient relaxation */
-  VelocityGradientRelaxation(double relaxationParam, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
-                             const coupling::IndexConversion<dim> &indexConversion,
-                             const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *const macroscopicCells)
+  VelocityGradientRelaxation(double relaxationParam, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                             const coupling::IndexConversion<dim>& indexConversion,
+                             const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells)
       : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _indexConversion(indexConversion), _macroscopicCells(macroscopicCells),
         _relaxationParam(relaxationParam) {}
   /** @brief a dummy destructor */
@@ -64,8 +64,8 @@ public:
    * velocity gradient relaxation method
    *  @param cell the macroscopic cell to insert momentum to
    *  @param currentLocalCellIndex the macroscopic cell's index */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                              const unsigned int &currentLocalMacroscopicCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                              const unsigned int& currentLocalMacroscopicCellIndex) const {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     tarch::la::Vector<dim, double> oldVelocity(0.0);
     cell.iterateConstCells(momentumMapping);
@@ -81,9 +81,9 @@ public:
 
 protected:
   /** instance of the indexConversion for the current simulation */
-  const coupling::IndexConversion<dim> &_indexConversion;
+  const coupling::IndexConversion<dim>& _indexConversion;
   /** the macroscopic cells to apply the velocity gradient relaxation */
-  const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *const _macroscopicCells;
+  const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const _macroscopicCells;
   /** defines the strength of the relaxation; 1 means the molecules velocity is
    * set to the new velocity;
    *                         O.5 -> the velocity will be set to the avaerage of
@@ -113,9 +113,9 @@ protected:
 template <class LinkedCell, unsigned int dim> class coupling::VelocityGradientRelaxationTopOnly : public coupling::VelocityGradientRelaxation<LinkedCell, dim> {
 public:
   /** @brief a simple constructor*/
-  VelocityGradientRelaxationTopOnly(double relaxationParam, coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
-                                    const coupling::IndexConversion<dim> &indexConversion,
-                                    const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> *const macroscopicCells)
+  VelocityGradientRelaxationTopOnly(double relaxationParam, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                                    const coupling::IndexConversion<dim>& indexConversion,
+                                    const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells)
       : coupling::VelocityGradientRelaxation<LinkedCell, dim>(relaxationParam, mdSolverInterface, indexConversion, macroscopicCells) {}
 
   /** @brief a dummy destructor */
@@ -128,8 +128,8 @@ public:
    * velocity gradient relaxation method
    *  @param cell the macroscopic cell to insert momentum to
    *  @param currentLocalCellIndex the macroscopic cell's index */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                              const unsigned int &currentLocalMacroscopicCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                              const unsigned int& currentLocalMacroscopicCellIndex) const {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     tarch::la::Vector<dim, double> oldVelocity(0.0);
     cell.iterateConstCells(momentumMapping);

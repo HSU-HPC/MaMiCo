@@ -29,15 +29,15 @@
  */
 
 // Forward declaration of tcl commands, from src/tcl folder
-void register_tcl_commands(Tcl_Interp *interp);
-void register_global_variables(Tcl_Interp *interp);
-int tclcommand_cellsystem(ClientData data, Tcl_Interp *interp, int argc, char **argv);
-int tclcommand_blockfile(ClientData data, Tcl_Interp *interp, int argc, char *argv[]);
-int tclcommand_part(ClientData data, Tcl_Interp *interp, int argc, char **argv);
+void register_tcl_commands(Tcl_Interp* interp);
+void register_global_variables(Tcl_Interp* interp);
+int tclcommand_cellsystem(ClientData data, Tcl_Interp* interp, int argc, char** argv);
+int tclcommand_blockfile(ClientData data, Tcl_Interp* interp, int argc, char* argv[]);
+int tclcommand_part(ClientData data, Tcl_Interp* interp, int argc, char** argv);
 
 class TestEspresso : public Test {
 public:
-  TestEspresso(std::string name, int argc, char **argv) : Test(name), _argc(argc), _argv(argv) {}
+  TestEspresso(std::string name, int argc, char** argv) : Test(name), _argc(argc), _argv(argv) {}
 
   virtual ~TestEspresso(){};
 
@@ -49,12 +49,12 @@ public:
 
 private:
   int _argc;
-  char **_argv;
+  char** _argv;
 
 protected:
   void loadEspressoTestConfiguration() {
     // Installation of tcl commands
-    Tcl_Interp *interp;
+    Tcl_Interp* interp;
     interp = Tcl_CreateInterp();
     if (TCL_OK != Tcl_Init(interp)) {
       std::cout << "Tcl_Init error: " << Tcl_GetStringResult(interp) << std::endl;

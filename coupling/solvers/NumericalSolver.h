@@ -155,7 +155,7 @@ public:
    *  @param recvIndice the macroscopic indices that will be received
    *  @param size the number of cells that will be received */
   void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
-                     const coupling::IndexConversion<3> &indexConversion, const unsigned int *const recvIndice, unsigned int size) {
+                     const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size) {
     if (skipRank()) {
       return;
     }
@@ -200,8 +200,8 @@ public:
    *  @param recvIndice the indices to connect the data from the buffer with
    * macroscopic cells
    *  @param indexConversion instance of the indexConversion */
-  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const unsigned int *const recvIndices,
-                                   const coupling::IndexConversion<3> &indexConversion) = 0;
+  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+                                   const coupling::IndexConversion<3>& indexConversion) = 0;
 
   /** @brief returns the number of process, regards parallel runs
    *  @returns the number of processes */
@@ -562,24 +562,24 @@ protected:
   /** @brief time step counter */
   int _counter{0};
   /** @brief velocity field */
-  double *_vel{NULL};
+  double* _vel{NULL};
   /** @brief density field */
-  double *_density{NULL};
+  double* _density{NULL};
   /** @brief flag field */
-  Flag *_flag{NULL};
+  Flag* _flag{NULL};
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   /** @brief buffer to send data from left/right to right/left neighbour */
-  double *_sendBufferX{NULL};
+  double* _sendBufferX{NULL};
   /** @brief buffer to receive data from from left/right neighbour */
-  double *_recvBufferX{NULL};
+  double* _recvBufferX{NULL};
   /** @brief buffer to send data from front/back to front/back neighbour  */
-  double *_sendBufferY{NULL};
+  double* _sendBufferY{NULL};
   /** @brief buffer to receive data from from front/back neighbour */
-  double *_recvBufferY{NULL};
+  double* _recvBufferY{NULL};
   /** @brief buffer to send data from top/buttom to top/buttom neighbour */
-  double *_sendBufferZ{NULL};
+  double* _sendBufferZ{NULL};
   /** @brief  buffer to receive data from from top/buttom neighbour */
-  double *_recvBufferZ{NULL};
+  double* _recvBufferZ{NULL};
 #endif
   /** @brief  offset for y-direction (lexicographic grid ordering) */
   const int _xO{_domainSizeX + 2};

@@ -41,10 +41,10 @@ void simplemd::moleculemappings::WriteCheckPointMapping::endMoleculeIteration() 
   _file = NULL;
 }
 
-void simplemd::moleculemappings::WriteCheckPointMapping::handleMolecule(Molecule &molecule) {
-  const tarch::la::Vector<MD_DIM, double> &forceOld = molecule.getConstForceOld();
-  const tarch::la::Vector<MD_DIM, double> &vel = molecule.getConstVelocity();
-  const tarch::la::Vector<MD_DIM, double> &pos = molecule.getConstPosition();
+void simplemd::moleculemappings::WriteCheckPointMapping::handleMolecule(Molecule& molecule) {
+  const tarch::la::Vector<MD_DIM, double>& forceOld = molecule.getConstForceOld();
+  const tarch::la::Vector<MD_DIM, double>& vel = molecule.getConstVelocity();
+  const tarch::la::Vector<MD_DIM, double>& pos = molecule.getConstPosition();
   for (unsigned int d = 0; d < MD_DIM; d++) {
     _moleculedata << std::fixed << pos[d] << " ";
   }

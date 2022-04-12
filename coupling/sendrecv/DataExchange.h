@@ -55,13 +55,13 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void readFromCell(double *const buffer, const MacroscopicCell &cell) = 0;
+  virtual void readFromCell(double* const buffer, const MacroscopicCell& cell) = 0;
 
   /** local rule to read from receive buffer and write data to macroscopic cell
    * 	@param buffer
    * 	@param cell
    */
-  virtual void writeToCell(const double *const buffer, MacroscopicCell &cell) = 0;
+  virtual void writeToCell(const double* const buffer, MacroscopicCell& cell) = 0;
 
   /** returns the number of doubles that are sent per macroscopic cell. */
   virtual unsigned int getDoublesPerCell() const = 0;

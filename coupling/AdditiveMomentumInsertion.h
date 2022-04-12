@@ -34,7 +34,7 @@ public:
    * in application
    *   @param numberMDTimestepsPerCouplingCycle The number of molecular dynamics
    * timesteps within one coupling cycle */
-  AdditiveMomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface, unsigned int numberMDTimestepsPerCouplingCycle)
+  AdditiveMomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDTimestepsPerCouplingCycle)
       : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _numberMDTimestepsPerCouplingCycle(numberMDTimestepsPerCouplingCycle) {}
 
   /** @brief A simple destructor*/
@@ -52,8 +52,8 @@ public:
    *  @brief inserts momentum to the cell
    *  @param cell macroscopic cell to insert momentum to
    *  @param currentMacroscopicCellIndex macroscopic cell index of the cell */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                              const unsigned int &currentMacroscopicCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                              const unsigned int& currentMacroscopicCellIndex) const {
     const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();
     // determine fraction of momentum that is to be inserted in this frame
     double fraction = 1.0 / ((_numberMDTimestepsPerCouplingCycle / timeIntervalMomentumInsertion) +

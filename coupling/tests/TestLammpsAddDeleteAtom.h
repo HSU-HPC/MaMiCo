@@ -11,7 +11,7 @@
 
 template <unsigned int dim> class TestLammpsAddDeleteAtom : public TestLammps<dim> {
 public:
-  TestLammpsAddDeleteAtom(int argc, char **argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
+  TestLammpsAddDeleteAtom(int argc, char** argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
   virtual ~TestLammpsAddDeleteAtom() {}
 
   virtual void run() {
@@ -30,7 +30,7 @@ public:
     // ---------------------------------------------- helper variables
     const tarch::la::Vector<dim, unsigned int> linkedCellsPerMacroscopicCell(1);
     const tarch::la::Vector<dim, unsigned int> linkedCellInMacroscopicCell(0);
-    const coupling::IndexConversion<dim> &indexConversion = TestLammps<dim>::_macroscopicCellService->getIndexConversion();
+    const coupling::IndexConversion<dim>& indexConversion = TestLammps<dim>::_macroscopicCellService->getIndexConversion();
     const double tolerance = 1.0e-8; // this value should be the same as tolerance defined in
                                      // MDSolverInterface of LAMMPS
     int rank, size;
@@ -86,10 +86,10 @@ public:
       const int numberAtoms = TestLammps<dim>::_lammps->atom->nlocal;
       // convert global to local coordinate
       deleteCellIndex = indexConversion.convertGlobalToLocalVectorCellIndex(deleteCellIndex);
-      LAMMPS_NS::MamicoCell &deleteCell =
+      LAMMPS_NS::MamicoCell& deleteCell =
           coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getLinkedCell(
               deleteCellIndex, linkedCellInMacroscopicCell, linkedCellsPerMacroscopicCell, indexConversion);
-      coupling::interface::MoleculeIterator<LAMMPS_NS::MamicoCell, dim> *iterator =
+      coupling::interface::MoleculeIterator<LAMMPS_NS::MamicoCell, dim>* iterator =
           coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getMoleculeIterator(deleteCell);
       int cellCounterBeforeDeletion = 0;
       int cellCounterAfterDeletion = 0;
@@ -157,10 +157,10 @@ public:
       const int numberAtoms = TestLammps<dim>::_lammps->atom->nlocal;
       // convert global to local cell index
       addCellIndex = indexConversion.convertGlobalToLocalVectorCellIndex(addCellIndex);
-      LAMMPS_NS::MamicoCell &addCell =
+      LAMMPS_NS::MamicoCell& addCell =
           coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getLinkedCell(
               addCellIndex, linkedCellInMacroscopicCell, linkedCellsPerMacroscopicCell, indexConversion);
-      coupling::interface::MoleculeIterator<LAMMPS_NS::MamicoCell, dim> *iterator =
+      coupling::interface::MoleculeIterator<LAMMPS_NS::MamicoCell, dim>* iterator =
           coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getMoleculeIterator(addCell);
       int cellCounterBeforeAdding = 0;
       int cellCounterAfterAdding = 0;

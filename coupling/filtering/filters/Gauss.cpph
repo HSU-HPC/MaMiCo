@@ -119,7 +119,7 @@ template <unsigned int dim> std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS> coup
   }
 
   // normalize kernel. by definition, sum cannot be 0.
-  for (auto &k : kernel) {
+  for (auto& k : kernel) {
     k *= 1 / sum;
 
 #ifdef DEBUG_GAUSS

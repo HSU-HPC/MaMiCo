@@ -159,8 +159,8 @@ public:
    *  @param recvIndice the indices to connect the data from the buffer with
    * macroscopic cells
    *  @param indexConversion instance of the indexConversion */
-  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer, const unsigned int *const recvIndices,
-                           const coupling::IndexConversion<3> &indexConversion) override {
+  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+                           const coupling::IndexConversion<3>& indexConversion) override {
     if (skipRank()) {
       return;
     }
@@ -283,7 +283,7 @@ private:
       }
     }
     // swap fields
-    double *swap = _pdf1;
+    double* swap = _pdf1;
     _pdf1 = _pdf2;
     _pdf2 = swap;
   }
@@ -304,7 +304,7 @@ private:
     // index of start of cell-local pdfs in AoS
     const int pI = 19 * index;
     // compute and store density, velocity
-    double *vel = &_vel[3 * index];
+    double* vel = &_vel[3 * index];
     computeDensityAndVelocity(vel, _density[index], &_pdf2[pI]);
     // collide (BGK); always handle pdfs no. q and inv(q)=18-q in one step
     const double u2 = 1.0 - 1.5 * (vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
@@ -402,7 +402,7 @@ private:
    *  @param q distribution function number
    *  @param flag boundary flag of neighbouring cell
    *  @param nbIndex index of neighbouring cell */
-  void boundary(double *const pdf, int index, int x, int y, int z, int q, const Flag &flag, int nbIndex) {
+  void boundary(double* const pdf, int index, int x, int y, int z, int q, const Flag& flag, int nbIndex) {
     if (flag != FLUID) {
       if (flag == NO_SLIP) {
         // half-way bounce back
@@ -440,7 +440,7 @@ private:
    *  @param vel velocity
    *  @param density density
    *  @param pdf partial distribution function */
-  void computeDensityAndVelocity(double *const vel, double &density, const double *const pdf) {
+  void computeDensityAndVelocity(double* const vel, double& density, const double* const pdf) {
     vel[0] = -(pdf[1] + pdf[5] + pdf[8] + pdf[11] + pdf[15]);
     density = pdf[3] + pdf[7] + pdf[10] + pdf[13] + pdf[17];
     vel[1] = (pdf[4] + pdf[11] + pdf[12] + pdf[13] + pdf[18]) - (pdf[0] + pdf[5] + pdf[6] + pdf[7] + pdf[14]);
@@ -466,7 +466,7 @@ private:
    * received from neighbouring process
    *  @param endRecv 3d coordinates that define the end of the data to be
    * received from neighbouring process */
-  void communicatePart(double *pdf, double *sendBuffer, double *recvBuffer, NbFlag nbFlagTo, NbFlag nbFlagFrom, tarch::la::Vector<3, int> startSend,
+  void communicatePart(double* pdf, double* sendBuffer, double* recvBuffer, NbFlag nbFlagTo, NbFlag nbFlagFrom, tarch::la::Vector<3, int> startSend,
                        tarch::la::Vector<3, int> endSend, tarch::la::Vector<3, int> startRecv, tarch::la::Vector<3, int> endRecv) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     // directions that point to LEFT/RIGHT,... -> same ordering as enums!
@@ -565,9 +565,9 @@ private:
   /** @brief velocity of moving wall of Couette flow */
   tarch::la::Vector<3, double> _wallVelocity;
   /** @brief partical distribution function field */
-  double *_pdf1{NULL};
+  double* _pdf1{NULL};
   /** @brief partial distribution function field (stores the old time step)*/
-  double *_pdf2{NULL};
+  double* _pdf2{NULL};
   /** @brief lattice velocities*/
   const int _C[19][3]{{0, -1, -1}, {-1, 0, -1}, {0, 0, -1}, {1, 0, -1}, {0, 1, -1}, {-1, -1, 0}, {0, -1, 0}, {1, -1, 0}, {-1, 0, 0}, {0, 0, 0},
                       {1, 0, 0},   {-1, 1, 0},  {0, 1, 0},  {1, 1, 0},  {0, -1, 1}, {-1, 0, 1},  {0, 0, 1},  {1, 0, 1},  {0, 1, 1}};

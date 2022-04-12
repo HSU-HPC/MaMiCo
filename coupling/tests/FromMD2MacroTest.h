@@ -64,7 +64,7 @@ private:
 
     // initialise the test cells of MaMiCo
     std::cout << "Init test cells of mamico on rank " << rank << std::endl;
-    std::vector<TestCell<dim> *> cellsMamico;
+    std::vector<TestCell<dim>*> cellsMamico;
     for (unsigned int i = 0; i < numberCellsInclBoundary; i++) {
       cellsMamico.push_back(new TestCell<dim>());
       if (cellsMamico[i] == NULL) {
@@ -77,8 +77,8 @@ private:
 
     // get receive buffers
     std::cout << "Get receive buffers on rank " << rank << std::endl;
-    std::vector<TestCell<dim> *> receivedCells;
-    unsigned int *receivedGlobalIndices = NULL;
+    std::vector<TestCell<dim>*> receivedCells;
+    unsigned int* receivedGlobalIndices = NULL;
     unsigned int numberReceivedCells = 0;
     testDataExchangeFromMD2Macro.getBuffer4MacroscopicSolverCells(numberReceivedCells, receivedCells, receivedGlobalIndices);
     // INCLUDE THE FOLLOWING LINES FOR BETTER OUTPUT

@@ -26,7 +26,7 @@ template <class LinkedCell, unsigned int dim> class coupling::BoundaryForceContr
 public:
   /**@brief A simple constructor
    *  @param mdSolverInterface interface to the molecular dynamics solver*/
-  BoundaryForceController(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {}
+  BoundaryForceController(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {}
   /**@brief A simple destructor*/
   virtual ~BoundaryForceController() {}
 
@@ -36,21 +36,21 @@ public:
    * @param cell the macroscopic boundary cell to apply the boundary force
    * @param currentLocalMacroscopicCellIndex the index of the macroscopic cell
    */
-  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                  const unsigned int &currentLocalMacroscopicCellIndex) = 0;
+  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                  const unsigned int& currentLocalMacroscopicCellIndex) = 0;
 
   /** @brief calculates the potential energy for a given position
    *  @param position the position for which the potential energy will be
    * calculated
    *  @returns the potential energy for the given position  */
-  virtual double getPotentialEnergy(const tarch::la::Vector<dim, double> &position) const { return 0; }
+  virtual double getPotentialEnergy(const tarch::la::Vector<dim, double>& position) const { return 0; }
 
   /** @brief calculates the boundary force for the given particle position
    *  @param position particle position for the force calculation
    *  @returns the force for the given position */
-  virtual tarch::la::Vector<dim, double> getForce(const tarch::la::Vector<dim, double> &position) const { return tarch::la::Vector<dim, double>(0.0); }
+  virtual tarch::la::Vector<dim, double> getForce(const tarch::la::Vector<dim, double>& position) const { return tarch::la::Vector<dim, double>(0.0); }
 
 protected:
-  coupling::interface::MDSolverInterface<LinkedCell, dim> *const _mdSolverInterface; ///< interface of the molecular dynamics solver
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface; ///< interface of the molecular dynamics solver
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_

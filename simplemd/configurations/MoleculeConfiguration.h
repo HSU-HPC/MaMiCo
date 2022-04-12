@@ -24,7 +24,7 @@ public:
   MoleculeConfiguration();
   virtual ~MoleculeConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
 
   /**
    * Return name of xml tag that is associated to the configuration.
@@ -45,11 +45,11 @@ public:
   bool isValid() const;
 
   /** getters for all parsed and computed quantities */
-  const tarch::la::Vector<MD_DIM, double> &getMeanVelocity() const { return _meanVelocity; }
-  const double &getTemperature() const { return _temperature; }
-  const double &getMass() const { return _mass; }
-  const double &getEpsilon() const { return _epsilon; }
-  const double &getSigma() const { return _sigma; }
+  const tarch::la::Vector<MD_DIM, double>& getMeanVelocity() const { return _meanVelocity; }
+  const double& getTemperature() const { return _temperature; }
+  const double& getMass() const { return _mass; }
+  const double& getEpsilon() const { return _epsilon; }
+  const double& getSigma() const { return _sigma; }
 
 private:
   static const std::string MEAN_VELOCITY;

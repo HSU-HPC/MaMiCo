@@ -25,20 +25,20 @@ template <class LinkedCell, unsigned int dim> class MultiMDCellService;
  */
 template <class LinkedCell, unsigned int dim> class coupling::services::MultiMDCellService {
 public:
-  MultiMDCellService(std::vector<coupling::interface::MDSolverInterface<LinkedCell, dim> *> mdSolverInterfaces, // MD solver interfaces for each MD simulation
-                                                                                                                // (which uses this rank)
-                     coupling::interface::MacroscopicSolverInterface<dim> *macroscopicSolverInterface, tarch::la::Vector<dim, unsigned int> numberProcesses,
+  MultiMDCellService(std::vector<coupling::interface::MDSolverInterface<LinkedCell, dim>*> mdSolverInterfaces, // MD solver interfaces for each MD simulation
+                                                                                                               // (which uses this rank)
+                     coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface, tarch::la::Vector<dim, unsigned int> numberProcesses,
                      unsigned int rank, unsigned int totalNumberMDSimulations,
-                     const coupling::configurations::ParticleInsertionConfiguration &particleInsertionConfiguration,
-                     const coupling::configurations::MomentumInsertionConfiguration &momentumInsertionConfiguration,
-                     const coupling::configurations::BoundaryForceConfiguration<dim> &boundaryForceConfiguration,
-                     const coupling::configurations::TransferStrategyConfiguration<dim> &transferStrategyConfiguration,
-                     const coupling::configurations::ParallelTopologyConfiguration &parallelTopologyConfiguration,
-                     const coupling::configurations::ThermostatConfiguration &thermostatConfiguration, unsigned int numberMDTimestepsPerCouplingCycle,
-                     const coupling::configurations::MacroscopicCellConfiguration<dim> &macroscopicCellConfiguration,
-                     const char *filterPipelineConfiguration, // location of the .xml file containing
+                     const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,
+                     const coupling::configurations::MomentumInsertionConfiguration& momentumInsertionConfiguration,
+                     const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,
+                     const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
+                     const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
+                     const coupling::configurations::ThermostatConfiguration& thermostatConfiguration, unsigned int numberMDTimestepsPerCouplingCycle,
+                     const coupling::configurations::MacroscopicCellConfiguration<dim>& macroscopicCellConfiguration,
+                     const char* filterPipelineConfiguration, // location of the .xml file containing
                                                               // the static filter pipeline config
-                     const tarch::utils::MultiMDService<dim> &multiMDService, int tws = 0)
+                     const tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0)
       : _localNumberMDSimulations((unsigned int)mdSolverInterfaces.size()), _totalNumberMDSimulations(totalNumberMDSimulations), _macroscopicCellServices(NULL),
         _topologyOffset(computeTopologyOffset(numberProcesses, rank)), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses(numberProcesses)),
         _macroscopicSolverInterface(macroscopicSolverInterface), _filterPipelineConfiguration(filterPipelineConfiguration), _multiMDService(multiMDService),
@@ -65,7 +65,7 @@ public:
     // This yields that the variable _topologyOffset together with the local ID
     // of an MD simulation yields a unique global ID
     // - an MD simulation executes on one full block of ranks
-    _macroscopicCellServices = new coupling::services::MacroscopicCellService<dim> *[_totalNumberMDSimulations];
+    _macroscopicCellServices = new coupling::services::MacroscopicCellService<dim>*[_totalNumberMDSimulations];
     if (_macroscopicCellServices == NULL) {
       std::cout << "ERROR "
                    "coupling::services::MultiMDCellService::MultiMDCellService("
@@ -148,7 +148,7 @@ public:
   /** get access to macroscopic cell services. This is required potentially by
    * each MD simulation to incorporate cell-local thermostat, mass and momentum
    * transfer */
-  coupling::services::MacroscopicCellService<dim> &getMacroscopicCellService(unsigned int localIndex) {
+  coupling::services::MacroscopicCellService<dim>& getMacroscopicCellService(unsigned int localIndex) {
     if (localIndex < _localNumberMDSimulations) {
       return *(_macroscopicCellServices[_topologyOffset * _localNumberMDSimulations / _intNumberProcesses + localIndex]);
     } else {
@@ -159,11 +159,11 @@ public:
     }
   }
 
-  coupling::filtering::FilterPipeline<dim> &getPostMultiInstanceFilterPipeline() { return _postMultiInstanceFilterPipeline; }
+  coupling::filtering::FilterPipeline<dim>& getPostMultiInstanceFilterPipeline() { return _postMultiInstanceFilterPipeline; }
 
   /** broadcasts data from macroscopic solver to all MD simulations */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &macroscopicCellsFromMacroscopicSolver,
-                        const unsigned int *const globalCellIndicesFromMacroscopicSolver) {
+  void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+                        const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
     // just send information to all MD instances. This is currently
     // sequentialized inside MacroscopicCellService/SendRecvBuffer
     for (unsigned int i = 0; i < _totalNumberMDSimulations; i++) {
@@ -177,8 +177,8 @@ public:
   /** collects data from MD simulations, averages over them (only macroscopic
    * mass/momentum is considered) and writes the result back into
    * macroscopicCellsFromMacroscopicSolver. */
-  double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &macroscopicCellsFromMacroscopicSolver,
-                          const unsigned int *const globalCellIndicesFromMacroscopicSolver) {
+  double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+                          const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
     double res = 0;
     auto size = macroscopicCellsFromMacroscopicSolver.size(); // we assume globalCellIndicesFromMacroscopicSolver
                                                               // to be of identical size
@@ -267,10 +267,10 @@ public:
   void constructFilterPipelines() {
     for (unsigned int md = 0; md < _totalNumberMDSimulations; md++) {
       // get macroscopic cell service of instance
-      auto &mcs = _macroscopicCellServices[md];
+      auto& mcs = _macroscopicCellServices[md];
 
       // only Impl instances of MCS contain filtering
-      if (dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim> *>(mcs) == nullptr)
+      if (dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>*>(mcs) == nullptr)
         continue;
 
       if (mcs->getFilterPipeline() == nullptr) {
@@ -299,7 +299,7 @@ private:
                                                                                  rank. This can differ for different blocks,
                                                                                  i.e. different topologyOffset values. */
   const unsigned int _totalNumberMDSimulations;                               /** total number of MD simulations */
-  coupling::services::MacroscopicCellService<dim> **_macroscopicCellServices; /** pointers of MacroscopicCellService type,
+  coupling::services::MacroscopicCellService<dim>** _macroscopicCellServices; /** pointers of MacroscopicCellService type,
                                                                                  one for each MD simulation */
   const unsigned int _topologyOffset;                                         /** topology offset*/
   const int _tws;
@@ -307,22 +307,22 @@ private:
 
   // const coupling::IndexConversion<dim> _indexConversion; /* Used for index
   // conversions during filtering TODO after merge with dynamic-md*/
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _macroscopicCells; /** used to store in MD data in sendFromMDtoMacro */
-  std::vector<unsigned int> _cellIndices;                                          /** used to store in indexing of the above */
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _macroscopicCells; /** used to store in MD data in sendFromMDtoMacro */
+  std::vector<unsigned int> _cellIndices;                                         /** used to store in indexing of the above */
 
   /*
    * These are currently only stored in order to properly init the
    * post multi-instance FilterPipeline in sendFromMDToMacro's first invocation.
    */
-  coupling::interface::MacroscopicSolverInterface<dim> *_macroscopicSolverInterface;
+  coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
   const std::string _filterPipelineConfiguration;
-  const tarch::utils::MultiMDService<dim> &_multiMDService;
+  const tarch::utils::MultiMDService<dim>& _multiMDService;
   const unsigned int _rank;
 
   /*
    * Analogon to MacroscopicCellService's FilterPipeline.
    * Is applied during this->sendFromMD2Macro.
    */
-  coupling::filtering::FilterPipeline<dim> *_postMultiInstanceFilterPipeline;
+  coupling::filtering::FilterPipeline<dim>* _postMultiInstanceFilterPipeline;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_MULTIMDCELLSERVICE_H_

@@ -14,7 +14,7 @@
  */
 template <unsigned int dim> class TestLammpsCalculateForceEnergy : public TestLammps<dim> {
 public:
-  TestLammpsCalculateForceEnergy(int argc, char **argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
+  TestLammpsCalculateForceEnergy(int argc, char** argv, std::string name) : TestLammps<dim>(argc, argv, name) {}
   virtual ~TestLammpsCalculateForceEnergy() {}
 
   virtual void run() {
@@ -33,18 +33,18 @@ public:
     TestLammps<dim>::loadMamicoTestConfiguration();
 
     // run one time step to sort molecules into linked lists
-    LAMMPS_NS::LAMMPS *lammps = TestLammps<dim>::_lammps;
+    LAMMPS_NS::LAMMPS* lammps = TestLammps<dim>::_lammps;
     lammps->input->one("run 1");
 
     // get MD solver interface (required for sorting)
-    LAMMPS_NS::MamicoLammpsMDSolverInterface<dim> *mdSolverInterface =
-        (LAMMPS_NS::MamicoLammpsMDSolverInterface<dim> *)coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance()
+    LAMMPS_NS::MamicoLammpsMDSolverInterface<dim>* mdSolverInterface =
+        (LAMMPS_NS::MamicoLammpsMDSolverInterface<dim>*)coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance()
             .getMDSolverInterface();
     if (mdSolverInterface == NULL) {
       std::cout << "ERROR TestLammpsGhost: could not cast MD Solver interface!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    const coupling::IndexConversion<dim> &indexConversion =
+    const coupling::IndexConversion<dim>& indexConversion =
         coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
 
     // compute LJ parameters (copy-paste from calculateForceAndEnergy)

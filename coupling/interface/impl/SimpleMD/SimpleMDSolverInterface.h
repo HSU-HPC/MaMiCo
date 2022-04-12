@@ -26,15 +26,15 @@ namespace interface {
  */
 class SimpleMDSolverInterface : public MDSolverInterface<simplemd::LinkedCell, MD_DIM> {
 private:
-  simplemd::services::ParallelTopologyService &_parallelTopologyService;
-  simplemd::services::MoleculeService &_moleculeService;
-  simplemd::services::LinkedCellService &_linkedCellService;
-  const simplemd::services::MolecularPropertiesService &_molecularPropertiesService;
+  simplemd::services::ParallelTopologyService& _parallelTopologyService;
+  simplemd::services::MoleculeService& _moleculeService;
+  simplemd::services::LinkedCellService& _linkedCellService;
+  const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
   /** used for the synchronization of molecules in boundary regions and between
    * different processes when mass was inserted/ deleted by the coupling.
    */
-  simplemd::BoundaryTreatment &_boundaryTreatment;
-  const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &_localBoundaryInformation;
+  simplemd::BoundaryTreatment& _boundaryTreatment;
+  const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& _localBoundaryInformation;
 
   /** number of linked cells in each macroscopic cell */
   const tarch::la::Vector<MD_DIM, unsigned int> _numberOfLinkedCellsPerMacroscopicCell;
@@ -47,7 +47,7 @@ private:
   const double _dt;
 
   tarch::la::Vector<MD_DIM, unsigned int>
-  computeNumberOfLinkedCellsPerMacroscopicCells(const tarch::la::Vector<MD_DIM, unsigned int> &localNumberOfMacroscopicCells) const {
+  computeNumberOfLinkedCellsPerMacroscopicCells(const tarch::la::Vector<MD_DIM, unsigned int>& localNumberOfMacroscopicCells) const {
     tarch::la::Vector<MD_DIM, unsigned int> numberOfLinkedCells(0);
     for (unsigned int d = 0; d < MD_DIM; d++) {
       numberOfLinkedCells[d] = _linkedCellService.getLocalNumberOfCells()[d] / localNumberOfMacroscopicCells[d];
@@ -71,7 +71,7 @@ private:
    * parameters are changed over time; however for static simulations it just
    * slows down...
    */
-  double getPotentialEnergy(const tarch::la::Vector<MD_DIM, double> &position1, const tarch::la::Vector<MD_DIM, double> &position2) const {
+  double getPotentialEnergy(const tarch::la::Vector<MD_DIM, double>& position1, const tarch::la::Vector<MD_DIM, double>& position2) const {
     const tarch::la::Vector<MD_DIM, double> distance(position2 - position1);
     const double r2 = tarch::la::dot(distance, distance);
     // if we are in the near distance, do computation, otherwise return 0.0
@@ -84,8 +84,8 @@ private:
     }
   }
 
-  tarch::la::Vector<MD_DIM, double> getLennardJonesForce(const tarch::la::Vector<MD_DIM, double> &position1,
-                                                         const tarch::la::Vector<MD_DIM, double> &position2) const {
+  tarch::la::Vector<MD_DIM, double> getLennardJonesForce(const tarch::la::Vector<MD_DIM, double>& position1,
+                                                         const tarch::la::Vector<MD_DIM, double>& position2) const {
     const tarch::la::Vector<MD_DIM, double> rij(position2 - position1);
     const double rij2 = tarch::la::dot(rij, rij);
 #if (MD_ERROR == MD_YES)
@@ -107,11 +107,11 @@ private:
   }
 
 public:
-  SimpleMDSolverInterface(tarch::la::Vector<MD_DIM, unsigned int> numberLinkedCellsPerMacroscopicCell, simplemd::BoundaryTreatment &boundaryTreatment,
-                          simplemd::services::ParallelTopologyService &parallelTopologyService, simplemd::services::MoleculeService &moleculeService,
-                          simplemd::services::LinkedCellService &linkedCellService,
-                          const simplemd::services::MolecularPropertiesService &molecularPropertiesService,
-                          const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &localBoundaryInformation, const double &dt)
+  SimpleMDSolverInterface(tarch::la::Vector<MD_DIM, unsigned int> numberLinkedCellsPerMacroscopicCell, simplemd::BoundaryTreatment& boundaryTreatment,
+                          simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
+                          simplemd::services::LinkedCellService& linkedCellService,
+                          const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                          const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& localBoundaryInformation, const double& dt)
       : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService),
         _molecularPropertiesService(molecularPropertiesService), _boundaryTreatment(boundaryTreatment), _localBoundaryInformation(localBoundaryInformation),
         _numberOfLinkedCellsPerMacroscopicCell(numberLinkedCellsPerMacroscopicCell),
@@ -126,10 +126,10 @@ public:
         _dt(dt) {}
   ~SimpleMDSolverInterface() {}
 
-  simplemd::LinkedCell &getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int> &macroscopicCellIndex,
-                                      const tarch::la::Vector<MD_DIM, unsigned int> &linkedCellInMacroscopicCell,
-                                      const tarch::la::Vector<MD_DIM, unsigned int> &linkedCellsPerMacroscopicCell,
-                                      const coupling::IndexConversion<MD_DIM> &indexConversion) {
+  simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int>& macroscopicCellIndex,
+                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInMacroscopicCell,
+                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerMacroscopicCell,
+                                      const coupling::IndexConversion<MD_DIM>& indexConversion) {
     // no linked cells found in outer region!
     for (unsigned int d = 0; d < MD_DIM; d++) {
       if (macroscopicCellIndex[d] == 0) {
@@ -160,18 +160,18 @@ public:
 
   double getMoleculeEpsilon() const { return _molecularPropertiesService.getMolecularProperties().getEpsilon(); }
 
-  void getInitialVelocity(const tarch::la::Vector<MD_DIM, double> &meanVelocity, const double &kB, const double &temperature,
-                          tarch::la::Vector<MD_DIM, double> &initialVelocity) const {
+  void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
+                          tarch::la::Vector<MD_DIM, double>& initialVelocity) const {
     _moleculeService.getInitialVelocity(meanVelocity, kB, temperature, _molecularPropertiesService, initialVelocity);
   }
 
-  void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<MD_DIM> &molecule, simplemd::LinkedCell &cell) {
-    std::list<simplemd::Molecule *>::iterator it = cell.begin();
+  void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<MD_DIM>& molecule, simplemd::LinkedCell& cell) {
+    std::list<simplemd::Molecule*>::iterator it = cell.begin();
     const tarch::la::Vector<MD_DIM, double> moleculePosition = molecule.getPosition();
     while (it != cell.end()) {
-      const tarch::la::Vector<MD_DIM, double> &itPosition((*it)->getConstPosition());
+      const tarch::la::Vector<MD_DIM, double>& itPosition((*it)->getConstPosition());
       if (moleculePosition == itPosition) {
-        simplemd::Molecule *myMolecule = (*it);
+        simplemd::Molecule* myMolecule = (*it);
         cell.deleteMolecule(myMolecule);
         _moleculeService.deleteMolecule(*myMolecule);
         return;
@@ -183,7 +183,7 @@ public:
     exit(EXIT_FAILURE);
   }
 
-  void addMoleculeToMDSimulation(const coupling::interface::Molecule<MD_DIM> &molecule) {
+  void addMoleculeToMDSimulation(const coupling::interface::Molecule<MD_DIM>& molecule) {
     const tarch::la::Vector<MD_DIM, double> position = molecule.getPosition();
     const tarch::la::Vector<MD_DIM, double> velocity = molecule.getVelocity();
     const tarch::la::Vector<MD_DIM, double> force = molecule.getForce();
@@ -192,12 +192,12 @@ public:
     newMolecule.setForce(force);
     newMolecule.setPotentialEnergy(potentialEnergy);
     // add molecule to MoleculeService and LinkedCellService
-    simplemd::Molecule *myMolecule = _moleculeService.addMolecule(newMolecule);
+    simplemd::Molecule* myMolecule = _moleculeService.addMolecule(newMolecule);
     tarch::la::Vector<MD_DIM, unsigned int> linkedCellIndex(getLinkedCellIndexForMoleculePosition(myMolecule->getConstPosition()));
     _linkedCellService.addMoleculeToLinkedCell(*myMolecule, linkedCellIndex);
   }
 
-  tarch::la::Vector<MD_DIM, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<MD_DIM, double> &position) {
+  tarch::la::Vector<MD_DIM, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<MD_DIM, double>& position) {
     tarch::la::Vector<MD_DIM, double> domainOffset = _parallelTopologyService.getGlobalDomainOffset();
     tarch::la::Vector<MD_DIM, double> meshWidth = _parallelTopologyService.getMeshWidth();
     tarch::la::Vector<MD_DIM, unsigned int> globalIndexOfFirstCell = _parallelTopologyService.getGlobalIndexOfFirstCell();
@@ -239,9 +239,9 @@ public:
     return cellVectorIndex;
   }
 
-  void setupPotentialEnergyLandscape(const tarch::la::Vector<MD_DIM, unsigned int> &indexOfFirstMacroscopicCell,
-                                     const tarch::la::Vector<MD_DIM, unsigned int> &rangeMacroscopicCells,
-                                     const tarch::la::Vector<MD_DIM, unsigned int> &linkedCellsPerMacroscopicCell) {
+  void setupPotentialEnergyLandscape(const tarch::la::Vector<MD_DIM, unsigned int>& indexOfFirstMacroscopicCell,
+                                     const tarch::la::Vector<MD_DIM, unsigned int>& rangeMacroscopicCells,
+                                     const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerMacroscopicCell) {
     simplemd::cellmappings::ResetPotentialEnergyMapping resetPotentialEnergyMapping;
     simplemd::cellmappings::LennardJonesPotentialEnergyMapping potentialEnergyMapping(_molecularPropertiesService);
     tarch::la::Vector<MD_DIM, unsigned int> rangeLinkedCellsExtended(0);
@@ -271,7 +271,7 @@ public:
     _linkedCellService.iterateCellPairs(potentialEnergyMapping, firstLinkedCell, rangeLinkedCellsExtended, false);
   }
 
-  void calculateForceAndEnergy(coupling::interface::Molecule<MD_DIM> &molecule) {
+  void calculateForceAndEnergy(coupling::interface::Molecule<MD_DIM>& molecule) {
     const tarch::la::Vector<MD_DIM, double> position = molecule.getPosition();
     const tarch::la::Vector<MD_DIM, unsigned int> linkedCellIndex = getLinkedCellIndexForMoleculePosition(position);
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -304,8 +304,8 @@ public:
         for (loopIndex[0] = linkedCellIndex[0] - 1; loopIndex[0] < linkedCellIndex[0] + 2; loopIndex[0]++) {
 
           // loop over all molecules in each cell
-          const simplemd::LinkedCell &thisCell = _linkedCellService.getLinkedCell(loopIndex);
-          for (std::list<simplemd::Molecule *>::const_iterator it = thisCell.constBegin(); it != thisCell.constEnd(); it++) {
+          const simplemd::LinkedCell& thisCell = _linkedCellService.getLinkedCell(loopIndex);
+          for (std::list<simplemd::Molecule*>::const_iterator it = thisCell.constBegin(); it != thisCell.constEnd(); it++) {
             forceOld += getLennardJonesForce(position, (*it)->getConstPosition());
             energy += getPotentialEnergy(position, (*it)->getConstPosition());
           }
@@ -335,7 +335,7 @@ public:
 
   double getDt() { return _dt; }
 
-  coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM> *getMoleculeIterator(simplemd::LinkedCell &cell) {
+  coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>* getMoleculeIterator(simplemd::LinkedCell& cell) {
     return new coupling::interface::SimpleMDMoleculeIterator(cell);
   }
 };

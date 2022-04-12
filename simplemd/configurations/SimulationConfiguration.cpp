@@ -16,7 +16,7 @@ const std::string
 simplemd::configurations::SimulationConfiguration::SimulationConfiguration()
     : _dt(0.0), _numberOfTimesteps(0), _fixSeed(false), _overlapCommWithForceComputation(false), _isValid(true) {}
 
-void simplemd::configurations::SimulationConfiguration::parseSubtag(tinyxml2::XMLElement *node) {
+void simplemd::configurations::SimulationConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   int intBuf = -1;
 
   // get timestep size dt

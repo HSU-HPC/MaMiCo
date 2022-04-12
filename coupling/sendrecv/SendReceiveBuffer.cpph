@@ -22,7 +22,7 @@ template <class MacroscopicCell, unsigned int dim> coupling::sendrecv::SendRecei
 }
 
 template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::deleteBuffer(std::map<unsigned int, BufferWithID> &buffer) {
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::deleteBuffer(std::map<unsigned int, BufferWithID>& buffer) {
   for (typename std::map<unsigned int, BufferWithID>::iterator it = buffer.begin(); it != buffer.end(); it++) {
     if ((it->second).buffer != NULL) {
       free((it->second).buffer);
@@ -39,9 +39,9 @@ template <class MacroscopicCell, unsigned int dim> void coupling::sendrecv::Send
 }
 
 template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(const coupling::IndexConversion<dim> &indexConversion,
-                                                                                    coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
-                                                                                    const MacroscopicCell &macroscopicCell,
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                    coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                                                                    const MacroscopicCell& macroscopicCell,
                                                                                     tarch::la::Vector<dim, unsigned int> globalVectorIndex) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
@@ -73,7 +73,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuf
     // increment buffer size and realloc buffer
     const unsigned int firstPos = (thisBuffer->second).bufferSize * doublesPerCell;
     (thisBuffer->second).bufferSize++;
-    (thisBuffer->second).buffer = (double *)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
+    (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
     if ((thisBuffer->second).buffer == NULL) {
       std::cout << "ERROR coupling::SendReceiveBuffer::writeToSendBuffer(): "
                    "realloc yields NULL ptr!"
@@ -90,9 +90,9 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuf
 }
 
 template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(const coupling::IndexConversion<dim> &indexConversion,
-                                                                                        coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
-                                                                                        MacroscopicCell &macroscopicCell,
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                        coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                                                                        MacroscopicCell& macroscopicCell,
                                                                                         tarch::la::Vector<dim, unsigned int> globalVectorIndex) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   const unsigned int globalIndex = indexConversion.getGlobalCellIndex(globalVectorIndex);
@@ -125,8 +125,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiv
 }
 
 template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiveBuffers(const coupling::IndexConversion<dim> &indexConversion,
-                                                                                         coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange,
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiveBuffers(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                         coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                                                                                          tarch::la::Vector<dim, unsigned int> globalVectorIndex) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
@@ -156,7 +156,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiv
     // increment buffer size and realloc buffer
     const unsigned int firstPos = (thisBuffer->second).bufferSize * doublesPerCell;
     (thisBuffer->second).bufferSize++;
-    (thisBuffer->second).buffer = (double *)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
+    (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
     if ((thisBuffer->second).buffer == NULL) {
       std::cout << "ERROR coupling::SendReceiveBuffer::allocateReceiveBuffers(): "
                    "realloc yields NULL ptr!"
@@ -171,8 +171,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiv
 }
 
 template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(const coupling::IndexConversion<dim> &indexConversion,
-                                                                                 coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange) {
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                 coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange) {
   const unsigned int thisRank = indexConversion.getThisRank();
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
@@ -189,7 +189,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending
       int err = MPI_Isend((it->second).buffer, doublesPerCell * (it->second).bufferSize, MPI_DOUBLE, (it->first), dataExchange.getTag(), MPI_COMM_WORLD,
                           &_requests[counter]);
       if (err != MPI_SUCCESS) {
-        char *str = NULL;
+        char* str = NULL;
         int len = -1;
         MPI_Error_string(err, str, &len);
         std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerSending(): "
@@ -229,8 +229,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending
 }
 
 template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceiving(const coupling::IndexConversion<dim> &indexConversion,
-                                                                                   coupling::sendrecv::DataExchange<MacroscopicCell, dim> &dataExchange) {
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceiving(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                   coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   const unsigned int thisRank = indexConversion.getThisRank();
 
@@ -243,7 +243,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceivi
       int err = MPI_Irecv((it->second).buffer, (1 + dataExchange.getDoublesPerCell()) * (it->second).bufferSize, MPI_DOUBLE, (it->first), dataExchange.getTag(),
                           MPI_COMM_WORLD, &_requests[counter]);
       if (err != MPI_SUCCESS) {
-        char *str = NULL;
+        char* str = NULL;
         int len = -1;
         MPI_Error_string(err, str, &len);
         std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerReceiving(): "
@@ -259,7 +259,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceivi
 }
 
 template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests(const coupling::IndexConversion<dim> &indexConversion) {
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests(const coupling::IndexConversion<dim>& indexConversion) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   if (_requestsAllocated) {
     std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): "
@@ -300,7 +300,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReques
 }
 
 template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations(const coupling::IndexConversion<dim> &indexConversion) {
+void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations(const coupling::IndexConversion<dim>& indexConversion) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   // if no requests have been allocated, return immediately
   if (!_requestsAllocated && (_requests == NULL)) {
@@ -314,7 +314,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperati
   }
   int err = MPI_Waitall(_sendSize + _receiveSize, _requests, MPI_STATUSES_IGNORE);
   if (err != MPI_SUCCESS) {
-    char *str = NULL;
+    char* str = NULL;
     int len = -1;
     MPI_Error_string(err, str, &len);
     std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::waitAllOperations(): "

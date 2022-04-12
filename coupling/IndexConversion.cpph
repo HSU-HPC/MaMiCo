@@ -224,7 +224,7 @@ template <unsigned int dim> bool coupling::IndexConversion<dim>::isValidLocalCel
 
 template <unsigned int dim>
 unsigned int coupling::IndexConversion<dim>::getCellIndex(tarch::la::Vector<dim, unsigned int> vectorCellIndex,
-                                                          const tarch::la::Vector<dim, unsigned int> &numberCells) const {
+                                                          const tarch::la::Vector<dim, unsigned int>& numberCells) const {
   unsigned int index = vectorCellIndex[dim - 1];
   for (int d = dim - 2; d > -1; d--) {
     index = (numberCells[d] + 2) * index + vectorCellIndex[d];
@@ -266,7 +266,7 @@ coupling::IndexConversion<dim>::initLocalNumberMacroscopicCells(tarch::la::Vecto
 
 template <unsigned int dim>
 bool coupling::IndexConversion<dim>::isValidVectorCellIndex(tarch::la::Vector<dim, unsigned int> index,
-                                                            const tarch::la::Vector<dim, unsigned int> &range) const {
+                                                            const tarch::la::Vector<dim, unsigned int>& range) const {
   bool valid = true;
   for (unsigned int d = 0; d < dim; d++) {
     valid = valid && (index[d] < range[d] + 2);
@@ -274,14 +274,14 @@ bool coupling::IndexConversion<dim>::isValidVectorCellIndex(tarch::la::Vector<di
   return valid;
 }
 
-template <unsigned int dim> bool coupling::IndexConversion<dim>::isValidCellIndex(unsigned int index, const unsigned int &range) const {
+template <unsigned int dim> bool coupling::IndexConversion<dim>::isValidCellIndex(unsigned int index, const unsigned int& range) const {
   return (index < range);
 }
 
 template <unsigned int dim>
 tarch::la::Vector<dim, double>
-coupling::IndexConversion<dim>::initMacroscopicCellSize(const tarch::la::Vector<dim, double> &globalMDDomainSize,
-                                                        const tarch::la::Vector<dim, unsigned int> &globalNumberMacroscopicCells) const {
+coupling::IndexConversion<dim>::initMacroscopicCellSize(const tarch::la::Vector<dim, double>& globalMDDomainSize,
+                                                        const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const {
   tarch::la::Vector<dim, double> cellsize = globalMDDomainSize;
   for (unsigned int d = 0; d < dim; d++) {
     cellsize[d] = cellsize[d] / globalNumberMacroscopicCells[d];

@@ -23,8 +23,8 @@ template <unsigned int dim> class POD;
  */
 template <unsigned int dim> class coupling::filtering::POD : public coupling::filtering::FilterInterface<dim> {
 public:
-  POD(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector,
+  POD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
       MPI_Comm comm,
 #endif
@@ -44,8 +44,8 @@ public:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     // get MPI parameters
     _comm = comm;
-    MPI_Comm_rank(comm, (int *)&_rank);
-    MPI_Comm_size(comm, (int *)&_commSize);
+    MPI_Comm_rank(comm, (int*)&_rank);
+    MPI_Comm_size(comm, (int*)&_commSize);
 #endif
 
 #ifdef DEBUG_POD
@@ -93,10 +93,10 @@ private:
                                 // iteration of ProcessInnerMacroscopicCell
   unsigned int _t;              // active temporal index, iterates cyclic between zero and
                                 // _timeWindowSize
-  Eigen::MatrixXd *_data;       // set of snapshots (sampled by transferStrategy)
-  Eigen::MatrixXd *_C;          // temporal auto-correlation covariance matrix of _data
-  Eigen::MatrixXd *_A;          // POD temporal modes / eigenvectors of C
-  Eigen::MatrixXd *_A_T;        // Transpose of A
+  Eigen::MatrixXd* _data;       // set of snapshots (sampled by transferStrategy)
+  Eigen::MatrixXd* _C;          // temporal auto-correlation covariance matrix of _data
+  Eigen::MatrixXd* _A;          // POD temporal modes / eigenvectors of C
+  Eigen::MatrixXd* _A_T;        // Transpose of A
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _comm;

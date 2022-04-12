@@ -28,9 +28,9 @@ template <unsigned int dim, std::size_t inputc, std::size_t outputc> class Junct
 template <unsigned int dim, std::size_t inputc, std::size_t outputc>
 class coupling::filtering::JunctorInterface : public coupling::filtering::FilterInterface<dim> {
 public:
-  JunctorInterface(const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> inputCellVectors,
-                   const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, outputc> outputCellVectors,
-                   const std::array<bool, 7> filteredValues, const char *type)
+  JunctorInterface(const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> inputCellVectors,
+                   const std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, outputc> outputCellVectors,
+                   const std::array<bool, 7> filteredValues, const char* type)
       : // This assumes the array of cell vectors to be nonempty. Suboptimal.
         // NOTE: Avoid using FI's cell vectors. Use
         // _inputCellVectors/_outputCellVectors instead.
@@ -46,9 +46,9 @@ public:
 #endif
   }
 
-  void updateCellData(std::vector<coupling::datastructures::MacroscopicCell<dim> *> new_inputCellVectors[inputc],
-                      std::vector<coupling::datastructures::MacroscopicCell<dim> *> new_outputCellVectors[outputc],
-                      std::vector<tarch::la::Vector<dim, unsigned int>> &new_cellIndices) {
+  void updateCellData(std::vector<coupling::datastructures::MacroscopicCell<dim>*> new_inputCellVectors[inputc],
+                      std::vector<coupling::datastructures::MacroscopicCell<dim>*> new_outputCellVectors[outputc],
+                      std::vector<tarch::la::Vector<dim, unsigned int>>& new_cellIndices) {
     std::cout << "		JI: Updating cell data." << std::endl;
     _inputCellVectors = new_inputCellVectors;
     _outputCellVectors = new_outputCellVectors;
@@ -61,6 +61,6 @@ protected:
   /**
    * Unlike regular filters, junctors allow for multiple input- and output-sets
    */
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> _inputCellVectors;
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, outputc> _outputCellVectors;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> _inputCellVectors;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, outputc> _outputCellVectors;
 };

@@ -27,7 +27,7 @@
  */
 template <unsigned int dim> class TestLammps : public Test {
 public:
-  TestLammps(int argc, char **argv, std::string name)
+  TestLammps(int argc, char** argv, std::string name)
       : Test(name), _lammps(NULL), _macroSolverInterface(NULL), _macroscopicCellService(NULL), _argc(argc), _argv(argv) {}
 
   /** if existent, deletes test configuration */
@@ -361,13 +361,13 @@ protected:
   }
 
   /** test configuration for LAMMPS runs */
-  LAMMPS_NS::LAMMPS *_lammps;
+  LAMMPS_NS::LAMMPS* _lammps;
   /** test solver interface */
-  coupling::interface::VoidMacroscopicSolverInterface<dim> *_macroSolverInterface;
-  coupling::services::MacroscopicCellService<dim> *_macroscopicCellService;
+  coupling::interface::VoidMacroscopicSolverInterface<dim>* _macroSolverInterface;
+  coupling::services::MacroscopicCellService<dim>* _macroscopicCellService;
   /** arguments from commandline */
   int _argc;
-  char **_argv;
+  char** _argv;
 };
 
 #endif // _MOLECULARDYNMAMICS_COUPLING_TESTS_TESTLAMMPS_H_

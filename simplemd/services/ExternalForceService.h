@@ -24,13 +24,13 @@ class ExternalForceService;
 class simplemd::services::ExternalForceService {
 public:
   /** initialises the properties */
-  ExternalForceService(const std::vector<simplemd::configurations::ExternalForceConfiguration> &configs);
+  ExternalForceService(const std::vector<simplemd::configurations::ExternalForceConfiguration>& configs);
 
-  void addExternalForce(tarch::la::Vector<MD_DIM, double> &force);
+  void addExternalForce(tarch::la::Vector<MD_DIM, double>& force);
 
   ~ExternalForceService() {}
 
 private:
-  const std::vector<simplemd::configurations::ExternalForceConfiguration> &_configurations;
+  const std::vector<simplemd::configurations::ExternalForceConfiguration>& _configurations;
 };
 #endif // _MOLECULARDYNAMICS_SERVICES_EXTERNALFORCESERVICE_H_

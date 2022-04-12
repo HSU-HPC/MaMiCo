@@ -40,7 +40,7 @@ public:
    * 	@param indexConversion index conversion
    * 	@param tagoffset 0 per default
    */
-  DataExchangeFromMacro2MD(coupling::interface::MacroscopicSolverInterface<dim> *interface, const coupling::IndexConversion<dim> &indexConversion,
+  DataExchangeFromMacro2MD(coupling::interface::MacroscopicSolverInterface<dim>* interface, const coupling::IndexConversion<dim>& indexConversion,
                            unsigned int tagoffset = 0)
       : coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim>(TAG_FROM_MACRO2MD + tagoffset), _interface(interface),
         _indexConversion(indexConversion) {
@@ -86,7 +86,7 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void readFromCell(double *const buffer, const coupling::datastructures::MacroscopicCell<dim> &cell) {
+  virtual void readFromCell(double* const buffer, const coupling::datastructures::MacroscopicCell<dim>& cell) {
     buffer[0] = cell.getMicroscopicMass();
     for (unsigned int d = 0; d < dim; d++) {
       buffer[d + 1] = cell.getMicroscopicMomentum()[d];
@@ -97,7 +97,7 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void writeToCell(const double *const buffer, coupling::datastructures::MacroscopicCell<dim> &cell) {
+  virtual void writeToCell(const double* const buffer, coupling::datastructures::MacroscopicCell<dim>& cell) {
     tarch::la::Vector<dim, double> microscopicMomentum(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       microscopicMomentum[d] = buffer[1 + d];
@@ -114,7 +114,7 @@ public:
   }
 
 private:
-  coupling::interface::MacroscopicSolverInterface<dim> *_interface;
-  const coupling::IndexConversion<dim> &_indexConversion;
+  coupling::interface::MacroscopicSolverInterface<dim>* _interface;
+  const coupling::IndexConversion<dim>& _indexConversion;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGEFROMMACRO2MD_H_

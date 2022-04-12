@@ -48,7 +48,7 @@ public:
   /** @brief operator overloading; declare a configuration (this)
    * 	@param other
    */
-  CouetteConfig &operator=(const CouetteConfig &other) {
+  CouetteConfig& operator=(const CouetteConfig& other) {
 
     this->channelheight = other.channelheight;
     this->wallInitCycles = other.wallInitCycles;
@@ -83,11 +83,11 @@ public:
   /** @brief creates CouetteConfig if all elements exist and can be read
    * 	@param filename
    */
-  static CouetteConfig parseCouetteConfiguration(const std::string &filename) {
+  static CouetteConfig parseCouetteConfiguration(const std::string& filename) {
     CouetteConfig _cfg;
 
     tinyxml2::XMLDocument conffile;
-    tinyxml2::XMLElement *node = NULL;
+    tinyxml2::XMLElement* node = NULL;
     conffile.LoadFile("couette.xml");
     node = conffile.FirstChildElement("couette-test");
     if (node == NULL) {
@@ -97,32 +97,32 @@ public:
       exit(EXIT_FAILURE);
     }
 
-    tinyxml2::XMLElement *n_mamico = node->NextSiblingElement();
+    tinyxml2::XMLElement* n_mamico = node->NextSiblingElement();
     if (n_mamico == NULL) {
       std::cout << "Could not read input file couette.xml: missing element <mamico>" << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n_md = n_mamico->NextSiblingElement();
+    tinyxml2::XMLElement* n_md = n_mamico->NextSiblingElement();
     if (n_md == NULL) {
       std::cout << "Could not read input file couette.xml: missing element "
                    "<molecular-dynamics>"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n_fp = n_md->NextSiblingElement();
+    tinyxml2::XMLElement* n_fp = n_md->NextSiblingElement();
     if (n_fp == NULL) {
       std::cout << "Could not read input file couette.xml: missing element "
                    "<filter-pipeline>"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    tinyxml2::XMLElement *n_unexpected = n_fp->NextSiblingElement();
+    tinyxml2::XMLElement* n_unexpected = n_fp->NextSiblingElement();
     if (n_unexpected == NULL) {
       std::cout << "Could not read input file couette.xml: unknown element " << n_unexpected->Name() << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    tinyxml2::XMLElement *subtag = node->FirstChildElement("domain");
+    tinyxml2::XMLElement* subtag = node->FirstChildElement("domain");
     if (subtag == NULL) {
       std::cout << "Could not read input file couette.xml: Missing subtag: domain" << std::endl;
       exit(EXIT_FAILURE);

@@ -11,7 +11,7 @@ void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, 
 
 template <class LinkedCell, unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>::processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const unsigned int &index) {
+    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
   // convert momentum to velocity values for cont->MD transfer
   if (cell.getMicroscopicMass() == 0.0) {
     cell.setMicroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
@@ -30,7 +30,7 @@ void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, 
 
 template <class LinkedCell, unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>::processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const unsigned int &index) {
+    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
   if (cell.getMicroscopicMass() == 0.0) {
     cell.setMicroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
   } else {
@@ -46,7 +46,7 @@ void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, 
 
 template <class LinkedCell, unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>::processInnerMacroscopicCellBeforeSendingMDSolverData(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const unsigned int &index) {
+    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   std::cout << "processInnerMacroscopicCellBeforeSendingMDSolverData(): Data "
                "before averaging from cell "
@@ -72,7 +72,7 @@ void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, 
 
 template <class LinkedCell, unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>::processOuterMacroscopicCellBeforeSendingMDSolverData(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const unsigned int &index) {
+    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
   cell.setMacroscopicMass(0.0);
   cell.setMacroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
 }
@@ -87,7 +87,7 @@ void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, 
 
 template <class LinkedCell, unsigned int dim>
 void coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>::processInnerMacroscopicCellAfterMDTimestep(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell, const unsigned int &index) {
+    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
   // averaging: evaluate current state
   if (sample()) {
     cell.iterateConstCells(_massMapping);

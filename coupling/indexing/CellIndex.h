@@ -28,7 +28,7 @@ namespace TraitOperations {
  * Returns true iff the template and runtime argument match. Curried operator==
  * for above enum class.
  */
-template <IndexTrait t1> constexpr bool is_same(const IndexTrait &t2) { return t1 == t2; }
+template <IndexTrait t1> constexpr bool is_same(const IndexTrait& t2) { return t1 == t2; }
 
 /**
  * Checks if a given parameter pack of at least two IndexTrait entries is in the
@@ -96,9 +96,9 @@ template <unsigned int dim, IndexTrait... traits> class CellIndex;
 template <unsigned int dim> using BaseIndex = CellIndex<dim, IndexTrait::vector>;
 
 // TODO: refactor as member functions
-template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(const CellIndex<dim, traits...> &);
+template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(const CellIndex<dim, traits...>&);
 
-template <unsigned int dim, IndexTrait... traits> tarch::la::Vector<dim, int> convertToVector(const CellIndex<dim, traits...> &);
+template <unsigned int dim, IndexTrait... traits> tarch::la::Vector<dim, int> convertToVector(const CellIndex<dim, traits...>&);
 } // namespace indexing
 } // namespace coupling
 
@@ -135,8 +135,8 @@ public:
    * Constructors
    */
   CellIndex() = default;
-  CellIndex(const CellIndex &ci) = default;
-  CellIndex(const value_T &i) : _index(i) {}
+  CellIndex(const CellIndex& ci) = default;
+  CellIndex(const value_T& i) : _index(i) {}
 
   /**
    * Conversion function: Convert to CellIndex of same dim but different
@@ -162,7 +162,7 @@ public:
    * Note that this does NOT increment indices in vector representation in all
    * directions.
    */
-  CellIndex &operator++() {
+  CellIndex& operator++() {
     if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
       ++_index[0];
       if (_index[0] == (int)numberCellsInDomain[0]) {
@@ -183,7 +183,7 @@ public:
    * Note that this does NOT decrement indices in vector representation in all
    * directions.
    */
-  CellIndex &operator--() {
+  CellIndex& operator--() {
     if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
       --_index[0];
       if (_index[0] < 0) {
@@ -207,12 +207,12 @@ public:
    *
    * @param CellIndex index to compare this index to
    */
-  bool operator==(const CellIndex &i) const { return _index == i.get(); }
-  bool operator!=(const CellIndex &i) const { return not(i == *this); }
-  bool operator<(const CellIndex &i) const { return convertToScalar<dim, traits...>(*this) < convertToScalar<dim, traits...>(i); };
-  bool operator<=(const CellIndex &i) const { return convertToScalar<dim, traits...>(*this) <= convertToScalar<dim, traits...>(i); };
-  bool operator>(const CellIndex &i) const { return convertToScalar<dim, traits...>(*this) > convertToScalar<dim, traits...>(i); };
-  bool operator>=(const CellIndex &i) const { return convertToScalar<dim, traits...>(*this) >= convertToScalar<dim, traits...>(i); };
+  bool operator==(const CellIndex& i) const { return _index == i.get(); }
+  bool operator!=(const CellIndex& i) const { return not(i == *this); }
+  bool operator<(const CellIndex& i) const { return convertToScalar<dim, traits...>(*this) < convertToScalar<dim, traits...>(i); };
+  bool operator<=(const CellIndex& i) const { return convertToScalar<dim, traits...>(*this) <= convertToScalar<dim, traits...>(i); };
+  bool operator>(const CellIndex& i) const { return convertToScalar<dim, traits...>(*this) > convertToScalar<dim, traits...>(i); };
+  bool operator>=(const CellIndex& i) const { return convertToScalar<dim, traits...>(*this) >= convertToScalar<dim, traits...>(i); };
 
   /**
    * Initialises all static members dependant only on upperBoundary and
@@ -242,7 +242,7 @@ public:
    * @return true iff i is within the domain of this CellIndex template
    * specialisation.
    */
-  static bool contains(const coupling::indexing::BaseIndex<dim> &index) {
+  static bool contains(const coupling::indexing::BaseIndex<dim>& index) {
     for (unsigned int d = 0; d < dim; d++) {
       if (index.get()[d] < CellIndex::lowerBoundary.get()[d])
         return false;
@@ -287,13 +287,13 @@ public:
   class IndexIterator : public std::iterator<std::input_iterator_tag, CellIndex> {
   public:
     IndexIterator(CellIndex x) : _idx(x) {}
-    IndexIterator(const IndexIterator &a) : _idx(a._idx) {}
+    IndexIterator(const IndexIterator& a) : _idx(a._idx) {}
 
-    CellIndex &operator*() { return _idx; }
-    CellIndex *operator->() { return &_idx; }
+    CellIndex& operator*() { return _idx; }
+    CellIndex* operator->() { return &_idx; }
 
     // Prefix increment
-    IndexIterator &operator++() {
+    IndexIterator& operator++() {
       ++_idx;
       return *this;
     }
@@ -305,8 +305,8 @@ public:
       return tmp;
     }
 
-    friend bool operator==(const IndexIterator &a, const IndexIterator &b) { return a._idx == b._idx; };
-    friend bool operator!=(const IndexIterator &a, const IndexIterator &b) { return a._idx != b._idx; };
+    friend bool operator==(const IndexIterator& a, const IndexIterator& b) { return a._idx == b._idx; };
+    friend bool operator!=(const IndexIterator& a, const IndexIterator& b) { return a._idx != b._idx; };
 
   private:
     CellIndex _idx;

@@ -30,10 +30,10 @@ template <unsigned int dim> class AsymmetricalFilterJunction;
 
 template <unsigned int dim> class coupling::filtering::AsymmetricalFilterJunction : public coupling::filtering::FilterSequence<dim> {
 public:
-  AsymmetricalFilterJunction(const char *name,
-                             const std::vector<coupling::datastructures::MacroscopicCell<dim> *> primaryInputCellVector,   // primary input of sequence.
-                             const std::vector<coupling::datastructures::MacroscopicCell<dim> *> secondaryInputCellVector, // additional data, presented as
-                                                                                                                           // macro cells as well
+  AsymmetricalFilterJunction(const char* name,
+                             const std::vector<coupling::datastructures::MacroscopicCell<dim>*> primaryInputCellVector,   // primary input of sequence.
+                             const std::vector<coupling::datastructures::MacroscopicCell<dim>*> secondaryInputCellVector, // additional data, presented as
+                                                                                                                          // macro cells as well
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                              MPI_Comm comm,
 #endif
@@ -73,7 +73,7 @@ public:
    * This function is very similar to the interface's. Check
    * coupling::FilterSequence for more details.
    */
-  int loadFiltersFromXML(tinyxml2::XMLElement *sequenceNode) override;
+  int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) override;
 
   void printFilters() override {
     std::cout << "Junctors in asymmetrical junction " << coupling::filtering::FilterSequence<dim>::_name << ": ";
@@ -87,10 +87,10 @@ public:
   }
 
 private:
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _inputCellVector_secondary;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCellVector_secondary;
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _cellVector1_secondary;
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _cellVector2_secondary;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _cellVector1_secondary;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _cellVector2_secondary;
 };
 
 // inlcude implementation

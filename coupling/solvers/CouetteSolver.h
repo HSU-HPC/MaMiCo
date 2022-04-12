@@ -50,7 +50,7 @@ public:
    * direction
    *  @param wallVelocity the velocity at the moving wall
    *  @param kinVisc the kinematic viscosity of the fluid  */
-  CouetteSolver(const double &channelheight, const double &wallVelocity, const double kinVisc)
+  CouetteSolver(const double& channelheight, const double& wallVelocity, const double kinVisc)
       : AbstractCouetteSolver<dim>(), _channelheight(channelheight), _wallVelocity(wallVelocity), _kinVisc(kinVisc), _time(0.0) {}
 
   /** @brief a dummy destructor */

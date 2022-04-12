@@ -4,10 +4,10 @@
 // www5.in.tum.de/mamico
 #include "simplemd/ProfilePlotter.h"
 
-simplemd::ProfilePlotter::ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration> &configurations,
-                                         const simplemd::services::ParallelTopologyService &parallelTopologyService,
-                                         simplemd::services::LinkedCellService &linkedCellService, const double &linkedCellVolume,
-                                         const unsigned int &localMDSimulation)
+simplemd::ProfilePlotter::ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& configurations,
+                                         const simplemd::services::ParallelTopologyService& parallelTopologyService,
+                                         simplemd::services::LinkedCellService& linkedCellService, const double& linkedCellVolume,
+                                         const unsigned int& localMDSimulation)
     : _linkedCellService(linkedCellService) {
   for (unsigned int i = 0; i < _plotters.size(); i++) {
     if (_plotters[i] != NULL) {
@@ -41,7 +41,7 @@ simplemd::ProfilePlotter::~ProfilePlotter() {
 }
 
 #if (MD_PARALLEL == MD_YES)
-void simplemd::ProfilePlotter::adjustProfilesInParallel(const simplemd::services::ParallelTopologyService &parallelTopologyService) {
+void simplemd::ProfilePlotter::adjustProfilesInParallel(const simplemd::services::ParallelTopologyService& parallelTopologyService) {
   const unsigned int size = (unsigned int)_plotters.size();
   tarch::la::Vector<MD_DIM, unsigned int> localStartCell;
   tarch::la::Vector<MD_DIM, unsigned int> localRange;
@@ -53,7 +53,7 @@ void simplemd::ProfilePlotter::adjustProfilesInParallel(const simplemd::services
 }
 #endif
 
-void simplemd::ProfilePlotter::accumulateAndPlotInformation(const unsigned int &t) {
+void simplemd::ProfilePlotter::accumulateAndPlotInformation(const unsigned int& t) {
   const unsigned int size = (unsigned int)_plotters.size();
   for (unsigned int i = 0; i < size; i++) {
 #if (MD_PARALLEL == MD_YES)

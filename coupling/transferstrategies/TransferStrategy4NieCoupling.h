@@ -36,8 +36,8 @@ public:
    *  @param massFluxBoundary indicates at which boundary mass shall be
    * transferred (true) or not (false); in their order the entries refer to:
    * west, east, south, north, bottom, top boundary  */
-  TransferStrategy4NieCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim> *const mdSolverInterface,
-                               const coupling::IndexConversion<dim> &indexConversion, unsigned int numberMDSteps, double shiftTimestep,
+  TransferStrategy4NieCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                               const coupling::IndexConversion<dim>& indexConversion, unsigned int numberMDSteps, double shiftTimestep,
                                tarch::la::Vector<2 * dim, bool> massFluxBoundary);
 
   /** @brief a dummy destructor */
@@ -51,8 +51,8 @@ public:
    * microscopic mass buffer
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                                               const unsigned int &index);
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                               const unsigned int& index);
 
   /** stores velocity values in new cont.-velocity field solution and sets
    * correct velocity value for first MD time step in microscopic momentum
@@ -60,15 +60,15 @@ public:
    *  @brief converts momentum into velocity values;
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                                              const unsigned int &index);
+  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                              const unsigned int& index);
 
   // virtual void beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
 
   /** @brief divides accumulated mass and momentum values by time step counter.
    */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                                    const unsigned int &index);
+  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    const unsigned int& index);
 
   // virtual void endProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
 
@@ -79,24 +79,24 @@ public:
    * and accumulates mass/momentum for sampling
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim> &cell,
-                                                          const unsigned int &index);
+  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                          const unsigned int& index);
 
 private:
   /** returns the local number of macroscopic cells incl. ghost layers */
-  unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim> &indexConversion) const;
+  unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim>& indexConversion) const;
   /** computes the mass flux in the outermost inner macroscopic cells. For all
    * other cells, 0.0 is returned. */
-  double computeMassFlux(const double &mass, const tarch::la::Vector<dim, double> &velocity, const unsigned int index);
+  double computeMassFlux(const double& mass, const tarch::la::Vector<dim, double>& velocity, const unsigned int index);
   /** class to compute the amount of mass in every single cell*/
   coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> _massMapping;
   /** class to compute the amount of momentum in every single cell*/
   coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> _momentumMapping;
   /** solution of velocity field at the beginning of coupling cycle (=end of old
    * coupling cycle) */
-  tarch::la::Vector<dim, double> *_oldSolution;
+  tarch::la::Vector<dim, double>* _oldSolution;
   /** solution of velocity field at the end of coupling cycle */
-  tarch::la::Vector<dim, double> *_newSolution;
+  tarch::la::Vector<dim, double>* _newSolution;
   /** number of MD time steps per coupling cycle */
   const unsigned int _numberMDSteps;
   /** offset by which evaluation of time interval is shifted compared to
@@ -111,7 +111,7 @@ private:
    * _numberMDSteps) */
   unsigned int _timestepCounter;
   /** mass that was transferred in an earlier coupled step */
-  double *_excessMass;
+  double* _excessMass;
   /** true in each entry if west/east, south/north, bottom/top boundary is a
    * mass flux boundary */
   const tarch::la::Vector<2 * dim, bool> _massFluxBoundary;

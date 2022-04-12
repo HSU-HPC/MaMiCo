@@ -22,8 +22,8 @@ template <unsigned int dim> class Constant;
 
 template <unsigned int dim> class coupling::filtering::Constant : public coupling::filtering::FilterInterface<dim> {
 public:
-  Constant(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCellVector,
-           const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCellVector, const std::array<bool, 7> filteredValues,
+  Constant(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+           const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
            const tarch::la::Vector<dim, bool> filteredDims, const double constant)
       : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "Constant"), _constant(constant),
         _filteredDims(filteredDims) {}

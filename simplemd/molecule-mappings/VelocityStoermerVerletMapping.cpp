@@ -5,8 +5,8 @@
 #include "simplemd/molecule-mappings/VelocityStoermerVerletMapping.h"
 
 simplemd::moleculemappings::VelocityStoermerVerletMapping::VelocityStoermerVerletMapping(
-    const double &kB, const double &dt, const double &mass, const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary,
-    const tarch::la::Vector<MD_DIM, double> &domainOffset, const tarch::la::Vector<MD_DIM, double> &domainSize)
+    const double& kB, const double& dt, const double& mass, const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
+    const tarch::la::Vector<MD_DIM, double>& domainOffset, const tarch::la::Vector<MD_DIM, double>& domainSize)
     : _dt(dt), _a(_dt / (2.0 * mass)), _zero(0.0), _boundary(initReflectingBoundary(boundary)), _domainOffset(domainOffset), _domainSize(domainSize) {}
 
 simplemd::moleculemappings::VelocityStoermerVerletMapping::~VelocityStoermerVerletMapping() {}
@@ -15,19 +15,19 @@ void simplemd::moleculemappings::VelocityStoermerVerletMapping::beginMoleculeIte
 
 void simplemd::moleculemappings::VelocityStoermerVerletMapping::endMoleculeIteration() {}
 
-void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(Molecule &molecule) {
+void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(Molecule& molecule) {
   // if the molecule is fixed in space, return immediately:
   if (molecule.isFixed())
     return;
 
   // do time integration update (position and velocity)
   // ------------------------------
-  tarch::la::Vector<MD_DIM, double> &position = molecule.getPosition();
+  tarch::la::Vector<MD_DIM, double>& position = molecule.getPosition();
   const tarch::la::Vector<MD_DIM, double> oldPosition(molecule.getConstPosition());
 #if (MD_ERROR == MD_YES)
   const tarch::la::Vector<MD_DIM, double> oldVelocity(molecule.getConstVelocity());
 #endif
-  tarch::la::Vector<MD_DIM, double> &velocity = molecule.getVelocity();
+  tarch::la::Vector<MD_DIM, double>& velocity = molecule.getVelocity();
 
   // v_n = v_(n-1) + a*(f_n + f_(n-1))
   velocity += _a * (molecule.getConstForce() + molecule.getConstForceOld());
@@ -84,7 +84,7 @@ void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(M
 }
 
 tarch::la::Vector<2 * MD_DIM, bool> simplemd::moleculemappings::VelocityStoermerVerletMapping::initReflectingBoundary(
-    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> &boundary) const {
+    const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary) const {
   tarch::la::Vector<2 * MD_DIM, bool> reflect;
   for (unsigned int d = 0; d < 2 * MD_DIM; d++) {
     reflect[d] = false;

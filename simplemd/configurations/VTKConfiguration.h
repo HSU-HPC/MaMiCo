@@ -24,7 +24,7 @@ public:
   VTKConfiguration();
   virtual ~VTKConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
 
   /**
    * Return name of xml tag that is associated to the configuration.
@@ -45,8 +45,8 @@ public:
   bool isValid() const;
 
   /** getters for all parsed and computed quantities */
-  const std::string &getFilename() const { return _filename; }
-  const unsigned int &getWriteEveryTimestep() const { return _writeEveryTimestep; }
+  const std::string& getFilename() const { return _filename; }
+  const unsigned int& getWriteEveryTimestep() const { return _writeEveryTimestep; }
 
 private:
   static const std::string FILENAME;

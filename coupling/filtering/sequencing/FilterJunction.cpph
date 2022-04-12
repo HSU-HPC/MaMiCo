@@ -2,15 +2,15 @@
 
 template <unsigned int dim, std::size_t inputc>
 int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
-    tinyxml2::XMLElement *sequenceNode) { // in our case "junctionNode" would be more precise
+    tinyxml2::XMLElement* sequenceNode) { // in our case "junctionNode" would be more precise
   if (!sequenceNode)
     return EXIT_FAILURE;
 
   // null if junction is empty
-  tinyxml2::XMLElement *currJunctorNode = sequenceNode->FirstChildElement();
+  tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
 
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> inputCellVector = _inputCellVector_parted;
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>, inputc> outputCellVector = _cellVector2_parted;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> inputCellVector = _inputCellVector_parted;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> outputCellVector = _cellVector2_parted;
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initializing junctor objects." << std::endl;
 #endif
@@ -22,7 +22,7 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
 
     // All Junctors must implement one of the {X,Y}-Junctor interfaces, each of
     // which implement FilterInterface.
-    coupling::filtering::FilterInterface<dim> *newjunctor = nullptr;
+    coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 
     // TODO: reduce per-junctor customization: generalize!
     //###############################################################

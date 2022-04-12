@@ -36,8 +36,8 @@ template <unsigned int dim> class WriteToFile;
  */
 template <unsigned int dim> class coupling::filtering::WriteToFile : public coupling::filtering::FilterInterfaceReadOnly<dim> {
 public:
-  WriteToFile(const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &inputCells,
-              const std::vector<coupling::datastructures::MacroscopicCell<dim> *> &outputCells, const std::array<bool, 7> filteredValues,
+  WriteToFile(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCells,
+              const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCells, const std::array<bool, 7> filteredValues,
               std::string location, // output file location
               bool overwrite = false, int oneCellOnly = -1)
       :

@@ -22,7 +22,7 @@ class RandomNumberService;
  */
 class tarch::utils::RandomNumberService {
 public:
-  static RandomNumberService &getInstance();
+  static RandomNumberService& getInstance();
 
   void init(bool fixSeed = false);
 

@@ -58,8 +58,8 @@ public:
     const tarch::la::Vector<3, unsigned int> mdCellOffset(floor(mdDomainOffset[0] / dx + 0.5), floor(mdDomainOffset[1] / dx + 0.5),
                                                           floor(mdDomainOffset[2] / dx + 0.5));
     coupling::solvers::LBCouetteSolverInterface interface(solver.getAvgNumberLBCells(), processes, mdCellOffset, globalNumberMacroscopicCells, overlapStrip);
-    std::vector<coupling::datastructures::MacroscopicCell<3> *> recvBuffer;
-    unsigned int *globalCellIndices = initRecvBuffer(recvBuffer, globalNumberMacroscopicCells, interface, indexConversion, density, dx);
+    std::vector<coupling::datastructures::MacroscopicCell<3>*> recvBuffer;
+    unsigned int* globalCellIndices = initRecvBuffer(recvBuffer, globalNumberMacroscopicCells, interface, indexConversion, density, dx);
     if (rank == 0) {
       std::cout << "Introduce MD domain at offset=" << mdDomainOffset << " and with size " << mdDomainSize << std::endl;
     }
@@ -89,7 +89,7 @@ public:
   }
 
 private:
-  void outputRanks(coupling::solvers::LBCouetteSolverInterface &interface, const tarch::la::Vector<3, unsigned int> avgNumberLBCells,
+  void outputRanks(coupling::solvers::LBCouetteSolverInterface& interface, const tarch::la::Vector<3, unsigned int> avgNumberLBCells,
                    const tarch::la::Vector<3, unsigned int> processes, const tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
                    const tarch::la::Vector<3, unsigned int> mdCellOffset) {
 // only carry out tests for interface on rank 0 (these tests do not depend on
@@ -124,9 +124,9 @@ private:
     }
   }
 
-  unsigned int *initRecvBuffer(std::vector<coupling::datastructures::MacroscopicCell<3> *> &recvBuffer,
-                               tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells, coupling::solvers::LBCouetteSolverInterface &interface,
-                               const coupling::IndexConversion<3> &indexConversion, const double density, const double dx) {
+  unsigned int* initRecvBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer,
+                               tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells, coupling::solvers::LBCouetteSolverInterface& interface,
+                               const coupling::IndexConversion<3>& indexConversion, const double density, const double dx) {
     // compute avg. mass in this cell
     const double mass = density * dx * dx * dx;
     tarch::la::Vector<3, unsigned int> coords(0);
@@ -174,7 +174,7 @@ private:
       }
     }
     // allocate indices and copy entries from vector
-    unsigned int *indices = new unsigned int[recvBuffer.size()];
+    unsigned int* indices = new unsigned int[recvBuffer.size()];
     if (indices == NULL) {
       std::cout << "ERROR TestLBCouetteSolver::initRecvBuffer(): indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
