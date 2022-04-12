@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.0)
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
 # CMake Policies
+# TODO: check policies
 # CMP0074
 if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
@@ -155,7 +156,6 @@ endif()
 # MaMiCo target
 #
 add_library(mamico INTERFACE)
-set_target_properties(mamico PROPERTIES CXX_STANDARD 17)
 target_link_libraries(mamico INTERFACE simplemd)
 if(BUILD_WITH_EIGEN)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
