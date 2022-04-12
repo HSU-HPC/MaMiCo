@@ -74,6 +74,10 @@ if(BUILD_WITH_OPENFOAM)
 	endif()
 endif()
 
+if(BUILD_WITH_PRECICE)
+	find_package(precice REQUIRED)
+endif()
+
 #
 # simpleMD target
 #
@@ -159,9 +163,6 @@ if(BUILD_WITH_EIGEN)
 endif()
 target_compile_definitions(mamico INTERFACE SIMPLE_MD MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-pragmas -Wfatal-errors -O3)
-if(NOT BUILD_WITH_OPENFOAM)
-	target_compile_options(mamico INTERFACE -pedantic)
-endif()
 if(BUILD_WITH_MPI)
     target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
     target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context -Wno-maybe-uninitialized)
@@ -172,6 +173,10 @@ if(BUILD_WITH_OPENFOAM)
 	target_include_directories(mamico INTERFACE $ENV{FOAM_SRC}/OpenFOAM/lnInclude $ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude $ENV{FOAM_SRC}/finiteVolume/lnInclude $ENV{FOAM_SRC}/meshTools/lnInclude)
 	target_link_directories(mamico INTERFACE $ENV{FOAM_LIBBIN} $ENV{FOAM_LIBBIN}/dummy $ENV{FOAM_LIBBIN}/sys-openmpi)
 	target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m)
+endif()
+if(BUILD_WITH_PRECICE)
+	target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
+	target_link_libraries(mamico INTERFACE precice::precice)
 endif()
 
 #
