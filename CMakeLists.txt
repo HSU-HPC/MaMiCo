@@ -3,13 +3,8 @@ project(mamico VERSION 2.0 LANGUAGES CXX)
 
 # CMake Policies
 # TODO: check policies
-# CMP0074
-if(POLICY CMP0074)
-  cmake_policy(SET CMP0074 NEW)
-endif()
-# CMP0075
-if(POLICY CMP0075)
-  cmake_policy(SET CMP0075 NEW)
+if(POLICY CMP0057)
+  cmake_policy(SET CMP0057 NEW)
 endif()
 
 #
@@ -117,6 +112,7 @@ set(SIMPLE_MD_SOURCES
 add_library(simplemd ${SIMPLE_MD_SOURCES})
 set_target_properties(simplemd PROPERTIES CXX_STANDARD 17)
 target_compile_definitions(simplemd PRIVATE ${MD_DIM})
+target_compile_options(simplemd PRIVATE -fpic)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_compile_definitions(simplemd PRIVATE MDError)
 endif()
@@ -189,7 +185,7 @@ set(COUETTE_SOURCES
 )
 add_executable(couette ${COUETTE_SOURCES})
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
-target_link_libraries(couette PUBLIC mamico)
+target_link_libraries(couette PRIVATE mamico)
 
 #
 # pybind target
@@ -198,10 +194,11 @@ if(BUILD_WITH_PYBIND11)
 	set(PYBIND_SOURCES11
 			"coupling/python-binding/mamico.cpp"
 	)
-	pybind11_add_module(pybind11
+	pybind11_add_module(mamico_pybind
 		${PYBIND_SOURCES11}
 	)
-	target_link_libraries(pybind11 PUBLIC mamico)
+	target_compile_options(mamico_pybind PRIVATE -fPIC)
+	target_link_libraries(mamico_pybind PRIVATE mamico)
 endif()
 
 #
