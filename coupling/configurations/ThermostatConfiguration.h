@@ -37,9 +37,7 @@ public:
       int cellsTemp = 0;
       tarch::configuration::ParseConfiguration::readIntOptional(cellsTemp, node, "number-layers");
       if (cellsTemp <= 0) {
-        std::cout << "ERROR coupling::ThermostatConfiguration: Wrong number of "
-                     "cells to use!"
-                  << std::endl;
+        std::cout << "ERROR coupling::ThermostatConfiguration: Wrong number of cells to use!" << std::endl;
         _isValid = false;
         exit(EXIT_FAILURE);
       }

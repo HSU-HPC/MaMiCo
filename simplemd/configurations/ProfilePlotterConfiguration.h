@@ -15,8 +15,7 @@ class ProfilePlotterConfiguration;
 }
 } // namespace simplemd
 
-/** reads information for profile measurements. Each profile is evaluated on a
- * sub-set of the linked cell data structure.
+/** reads information for profile measurements. Each profile is evaluated on a sub-set of the linked cell data structure.
  *  @author Philipp Neumann
  */
 class simplemd::configurations::ProfilePlotterConfiguration : public tarch::configuration::Configuration {

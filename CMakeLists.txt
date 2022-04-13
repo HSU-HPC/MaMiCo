@@ -333,7 +333,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/configurations/BoundaryForceConfiguration.h"
   "coupling/configurations/CouetteConfiguration.h"
   "coupling/configurations/MaMiCoConfiguration.cpph"
-  "coupling/configurations/NoiseReductionConfiguration.h"
   "coupling/configurations/MomentumInsertionConfiguration.h"
   "coupling/configurations/ParallelTopologyConfiguration.h"
   "coupling/configurations/MacroscopicCellConfiguration.h"
@@ -360,13 +359,14 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/Molecule.h"
   "coupling/interface/MDSolverInterface.h"
   "coupling/KineticEnergyController.h"
+  "coupling/solvers/FiniteDifferenceSolver.h"
   "coupling/solvers/FDCouetteSolver.h"
+  "coupling/solvers/IcoFoamInterface.h"
   "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
   "coupling/solvers/LBCouetteSolver.h"
+  "coupling/solvers/IcoFoamBufferSetup.h"
   "coupling/solvers/CoupledMolecularDynamicsSimulation.h"
-  "coupling/solvers/FoamClass.h"
   "coupling/solvers/CouetteSolver.h"
-  "coupling/solvers/FoamSolverInterface.h"
   "coupling/solvers/CouetteSolverInterface.h"
   "coupling/solvers/LBCouetteSolverInterface.h"
   "coupling/solvers/NumericalSolver.h"
@@ -374,7 +374,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/tests/Test.h"
   "coupling/tests/MacroscopicCellsTest.h"
   "coupling/tests/TestEspressoAddDeleteMolecule.h"
-  "coupling/tests/main_nie.cpp"
   "coupling/tests/main_lbcouettesolver.cpp"
   "coupling/tests/TestLammpsCalculateForceEnergy.h"
   "coupling/tests/main_couette.cpp"
@@ -389,12 +388,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/tests/TestLammpsAddDeleteAtom.h"
   "coupling/tests/IndexConversionTest.h"
   "coupling/tests/main_mardyn.cpp"
-  "coupling/tests/build_nie/NieTestMD_oscillating.h"
-  "coupling/tests/build_nie/NieTestMD_normal.h"
-  "coupling/tests/build_nie/NieTestMD_AnalyticVsLB.h"
-  "coupling/tests/build_nie/NieTestDPD.h"
-  "coupling/tests/build_nie/NieTestMD.h"
-  "coupling/tests/build_nie/NieTestMD_old.h"
   "coupling/tests/TestCell.h"
   "coupling/tests/TestEspressoForceEnergyCalculation.h"
   "coupling/tests/TestLammps.h"
@@ -406,11 +399,11 @@ set(CLANGFORMAT_SOURCES
   "coupling/tests/main_espresso.cpp"
   "coupling/tests/TestEspresso.h"
   "coupling/tests/TestMarDyn.h"
-  "coupling/tests/NieTest.h"
   "coupling/tests/TestLammpsGhost.h"
   "coupling/tests/TestMarDynAddDeleteMolecule.h"
   "coupling/tests/TestEspressoMoleculeIterator.h"
   "coupling/tests/TestMarDynMoleculeIterator.h"
+  "coupling/MPIIndexConversion.h"
   "coupling/InstanceHandling.h"
   "coupling/MomentumInsertion.h"
   "simplemd/services/ExternalForceService.cpp"
@@ -439,6 +432,7 @@ set(CLANGFORMAT_SOURCES
   "simplemd/cell-mappings/ComputeTemperatureMapping.h"
   "simplemd/cell-mappings/ComputeMeanVelocityMapping.h"
   "simplemd/cell-mappings/CopyMoleculesMapping.h"
+  "simplemd/cell-mappings/VaryCheckpointMapping.h"
   "simplemd/cell-mappings/EmptyLinkedListsMapping.h"
   "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
   "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.h"
@@ -495,7 +489,18 @@ foreach(clangformat_source ${CLANGFORMAT_SOURCES})
 endforeach()
 add_custom_target(
   clangformat
-  COMMAND /usr/bin/env clang-format
+  COMMAND /usr/bin/env clang-format --verbose
   -i
   ${CLANGFORMAT_SOURCES_ABS}
+)
+
+#
+# compiletest target
+#
+set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
+get_filename_component(COMPILETEST_SCRIPT "tarch/tests/CompileTest.sh" ABSOLUTE)
+add_custom_target(
+  compiletest
+  COMMAND ${COMPILETEST_SCRIPT}
+  ${COMPILETEST_COMPILERS}
 )

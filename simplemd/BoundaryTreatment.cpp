@@ -10,16 +10,15 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCells(const tarch::
   _periodicBoundaryMapping.setProcessCoordinates(parallelTopologyService.getProcessCoordinates());
   _periodicBoundaryMapping.setNumberOfProcesses(parallelTopologyService.getNumberOfProcesses());
   applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, false, _periodicBoundaryMapping);
-  // collect molecules in open-boundary region and remove them from the
-  // simulation.
+  // collect molecules in open-boundary region and remove them from the simulation.
   _collectMoleculesMapping.reset();
   applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, false, _collectMoleculesMapping);
 
 #if (MD_PARALLEL == MD_YES)
   applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, false, _parallelBoundaryMapping);
 
-  // after data from periodic/ parallel boundaries have been sent, receive them
-  // and put them into the local data management systems
+  // after data from periodic/ parallel boundaries have been sent, receive them and put them into the local
+  // data management systems
   parallelTopologyService.communicationSteps_1_2();
   parallelTopologyService.communicationSteps_3_4(_moleculeService, _linkedCellService);
 #endif
@@ -123,11 +122,9 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundar
   // putBoundaryParticlesToInnerCells
   _fillCellsMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
 
-  // iterating with _fillCellsMapping, not _periodicBoundaryMapping or
-  // _parallelBoundaryMapping!
+  // iterating with _fillCellsMapping, not _periodicBoundaryMapping or _parallelBoundaryMapping!
   applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, false, _fillCellsMapping);
-  // collect molecules in open-boundary region and remove them from the
-  // simulation.
+  // collect molecules in open-boundary region and remove them from the simulation.
   _collectMoleculesMapping.reset();
   applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, false, _collectMoleculesMapping);
 
@@ -154,14 +151,9 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
   const tarch::la::Vector<MD_DIM, unsigned int> localNumberOfCells(_linkedCellService.getLocalNumberOfCells());
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (localNumberOfCells[d] < 3) {
-      std::cout << "Fatal Error: "
-                   "BoundaryTreatment::"
-                   "putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlap"
-                   "WithForceComputations: "
-                << std::endl;
-      std::cout << "in order for overlapping process communications with "
-                   "computations algorithm to work, there have to be at least 3 "
-                   "local linked cells along every dimension on every processor"
+      std::cout << "Fatal Error: BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations: " << std::endl;
+      std::cout << "in order for overlapping process communications with computations algorithm to work, there have to be at least 3 local linked cells along "
+                   "every dimension on every processor"
                 << std::endl;
       std::cout << "Current local number of linked cells: " << localNumberOfCells << std::endl;
       exit(EXIT_FAILURE);
@@ -172,8 +164,7 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
   _fillCellsMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
 
   applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, false, _fillCellsMapping);
-  // collect molecules in open-boundary region and remove them from the
-  // simulation.
+  // collect molecules in open-boundary region and remove them from the simulation.
   _collectMoleculesMapping.reset();
   applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, false, _collectMoleculesMapping);
 
@@ -187,9 +178,8 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
 // send out buffers, but don't wait for them
 #if (MD_PARALLEL == MD_YES)
 #if (MD_DEBUG == MD_YES)
-  std::cout << "BoundaryTreatment::"
-               "putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceC"
-               "omputations: issuing send and receive calls on communication buffers."
+  std::cout << "BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations: issuing send and receive calls on "
+               "communication buffers."
             << std::endl;
 #endif
   parallelTopologyService.communicationSteps_1_2();
@@ -197,23 +187,18 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
 
 // handle local periodic ghost cells, if any
 #if (MD_DEBUG == MD_YES)
-  std::cout << "BoundaryTreatment::"
-               "putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWith"
-               "ForceComputations: unpacking local buffer"
-            << std::endl;
+  std::cout << "BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations: unpacking local buffer" << std::endl;
 #endif
   parallelTopologyService.unpackLocalBuffer(_moleculeService, _linkedCellService);
 
-  // compute forces in inner cells, where boundary and process-leaving particles
-  // are not needed.
+  // compute forces in inner cells, where boundary and process-leaving particles are not needed.
   applyMappingToCommunicationIndependentCells(useOpenMP, lennardJonesForce);
 
 // wait for buffers
 #if (MD_PARALLEL == MD_YES)
 #if (MD_DEBUG == MD_YES)
-  std::cout << "BoundaryTreatment::"
-               "putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceC"
-               "omputations: begin waiting for buffer requests to be fulfilled."
+  std::cout << "BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations: begin waiting for buffer requests to be "
+               "fulfilled."
             << std::endl;
 #endif
   parallelTopologyService.communicationSteps_3_4(_moleculeService, _linkedCellService);

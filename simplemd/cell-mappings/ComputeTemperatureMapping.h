@@ -37,8 +37,7 @@ public:
 
   void endCellIteration() {
 #if (MD_PARALLEL == MD_YES)
-    // reduce number of particles separately from temperature. See comment in
-    // cell-mappings/computeMeanVelocityMapping.h
+    // reduce number of particles separately from temperature. See comment in cell-mappings/computeMeanVelocityMapping.h
     _parallelTopologyService.MD_Allreduce(MPI_IN_PLACE, &_particleCounter, 1, MPI_UNSIGNED, MPI_SUM);
     _parallelTopologyService.MD_Allreduce(MPI_IN_PLACE, &_temperature, 1, MPI_DOUBLE, MPI_SUM);
 #endif
@@ -90,8 +89,7 @@ private:
 
   /** number of local MD simulation */
   const unsigned int _localMDSimulation;
-  /** flag whether computed value should be written in file during
-   * endCellIteration */
+  /** flag whether computed value should be written in file during endCellIteration */
   const bool _writeToFile;
 };
 

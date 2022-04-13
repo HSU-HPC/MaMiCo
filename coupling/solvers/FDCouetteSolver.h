@@ -42,9 +42,7 @@ public:
       _processes[0] = 1;
       _processes[1] = 1;
       _processes[2] = 1;
-      std::cout << "The FiniteDifferenceSolver was requested in a parallel "
-                   "manner. It will be run sequentially, since it doesn't "
-                   "support parallel runs. "
+      std::cout << "The FiniteDifferenceSolver was requested in a parallel manner. It will be run sequentially, since it doesn't support parallel runs. "
                 << std::endl;
     }
     // return if required
@@ -90,9 +88,7 @@ public:
     }
     const int timesteps = floor(dt / _dt + 0.5);
     if (fabs(timesteps * _dt - dt) / _dt > 1.0e-8) {
-      std::cout << "ERROR FiniteDifferenceSolver::advance(): time steps and dt "
-                   "do not match!"
-                << std::endl;
+      std::cout << "ERROR FiniteDifferenceSolver::advance(): time steps and dt do not match!" << std::endl;
       exit(EXIT_FAILURE);
     }
     for (int i = 0; i < timesteps; i++) {
@@ -168,6 +164,7 @@ public:
     const unsigned int size = (unsigned int)recvBuffer.size();
 #pragma omp parallel for
     for (unsigned int i = 0; i < size; i++) {
+      // determine cell index of this cell in continuum domain
       tarch::la::Vector<3, unsigned int> globalCellCoords = indexConversion.getGlobalVectorCellIndex(recvIndices[i]);
       globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
       globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
@@ -183,6 +180,9 @@ public:
         exit(EXIT_FAILURE);
       }
 #endif
+      // set velocity value in MD boundary cell (before streaming); the boundary velocities are interpolated between the neighbouring and this cell. This
+      // interpolation is valid for FLUID-MD_BOUNDARY neighbouring relations only. determine local velocity received from MaMiCo and convert it to LB units;
+      // store the velocity in _vel
       tarch::la::Vector<3, double> localVel((1.0 / recvBuffer[i]->getMacroscopicMass()) * recvBuffer[i]->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];

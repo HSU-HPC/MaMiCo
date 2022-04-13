@@ -46,14 +46,12 @@ void coupling::sendrecv::FromMD2MacroRecvOnly<MacroscopicCell, dim>::sendFromMD2
   // allocate the receive buffers and trigger the MPI-recv
   allocateReceiveBuffers(indexConversion, dataExchange, globalCellIndicesFromMacroscopicSolver, numberCellsFromMacroscopicSolver);
   // fill the send buffers
-  // writeToSendBuffer(indexConversion,dataExchange,macroscopicCellsFromMamico);
-  // // no sending
+  // writeToSendBuffer(indexConversion,dataExchange,macroscopicCellsFromMamico); // no sending
 
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests(indexConversion);
 
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceiving(indexConversion, dataExchange);
-  // coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerSending(indexConversion,dataExchange);
-  // // no sending
+  // coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerSending(indexConversion,dataExchange); // no sending
 }
 
 template <class MacroscopicCell, unsigned int dim>

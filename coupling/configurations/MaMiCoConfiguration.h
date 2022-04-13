@@ -22,21 +22,29 @@ template <unsigned int dim> class MaMiCoConfiguration;
 }
 } // namespace coupling
 
-/** parses all sub-tags for MaMiCo configuration.
+/** parses all sub-tags for MaMiCo configuration. Derive from the class
+ * tarch::configuration::Configuration
+ *	@brief parses all sub-tags for MaMiCo configuration.
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template <unsigned int dim> class coupling::configurations::MaMiCoConfiguration : public tarch::configuration::Configuration {
 public:
+  /** Constructor, initializes the class  */
   MaMiCoConfiguration()
       : _isValid(true), _isDefinedParticleInsertion(false), _isDefinedMomentumInsertion(false), _isDefinedBoundaryForce(false),
         _isDefinedTransferStrategy(false), _isDefinedParallelTopology(false), _isDefinedThermostat(false) {}
 
+  /** Destructor */
   virtual ~MaMiCoConfiguration() {}
 
+  /** parseSubtag
+   *  @param node
+   */
   void parseSubtag(tinyxml2::XMLElement* node);
 
-  /**
-   * Return name of xml tag that is associated to the configuration.
+  /** Returns name of xml tag that is associated to the configuration.
+   *  @return name of xml tag that is associated to the configuration
    */
   std::string getTag() const { return "mamico"; }
 
@@ -50,11 +58,18 @@ public:
    * - parseSubtag() failed due to a wrong file.
    *
    * If a tag ain't optional and parseSubtag() was not called (first case)
+   *    @return _isValid
    */
   bool isValid() const { return _isValid; }
 
-  /** getters */
+  /**
+   *  @return _macroscopicCellConfiguration
+   */
   const coupling::configurations::MacroscopicCellConfiguration<dim>& getMacroscopicCellConfiguration() const { return _macroscopicCellConfiguration; }
+
+  /**
+   *  @return _particleInsertionConfiguration
+   */
   const coupling::configurations::ParticleInsertionConfiguration& getParticleInsertionConfiguration() const {
     if (!_isDefinedParticleInsertion) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
@@ -65,6 +80,9 @@ public:
     return _particleInsertionConfiguration;
   }
 
+  /**
+   * 	@return _momentumInsertionConfiguration
+   */
   const coupling::configurations::MomentumInsertionConfiguration& getMomentumInsertionConfiguration() const {
     if (!_isDefinedMomentumInsertion) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
@@ -75,6 +93,9 @@ public:
     return _momentumInsertionConfiguration;
   }
 
+  /**
+   * 	@return _boundaryForceConfiguration
+   */
   const coupling::configurations::BoundaryForceConfiguration<dim>& getBoundaryForceConfiguration() const {
     if (!_isDefinedBoundaryForce) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
@@ -85,6 +106,9 @@ public:
     return _boundaryForceConfiguration;
   }
 
+  /**
+   * 	@return _transferStrategyConfiguration
+   */
   const coupling::configurations::TransferStrategyConfiguration<dim>& getTransferStrategyConfiguration() const {
     if (!_isDefinedTransferStrategy) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
@@ -95,6 +119,9 @@ public:
     return _transferStrategyConfiguration;
   }
 
+  /**
+   *  @return _parallelTopologyConfiguration
+   */
   const coupling::configurations::ParallelTopologyConfiguration& getParallelTopologyConfiguration() const {
     if (!_isDefinedParallelTopology) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "

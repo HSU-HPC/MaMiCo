@@ -38,8 +38,7 @@ void coupling::sendrecv::FromMacro2MDSendOnly<MacroscopicCell, dim>::sendFromMac
 
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests(indexConversion);
 
-  // coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerReceiving(indexConversion,dataExchange);
-  // // not required since no data are received
+  // coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerReceiving(indexConversion,dataExchange); // not required since no data are received
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(indexConversion, dataExchange);
 }
 
@@ -47,7 +46,6 @@ template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MDSendOnly<MacroscopicCell, dim>::wait4SendFromMacro2MD(const coupling::IndexConversion<dim>& indexConversion) {
   // wait for all send- and receive operations to complete
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations(indexConversion);
-  // fill information from receive buffers into the macroscopic cells -> not
-  // required
+  // fill information from receive buffers into the macroscopic cells -> not required
   // readFromReceiveBuffer(indexConversion,dataExchange,macroscopicCellsFromMamico);
 }

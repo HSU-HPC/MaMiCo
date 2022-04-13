@@ -61,9 +61,7 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch
   _bufferTag = 1;
   if (!isIdle()) {
   } else {
-    std::cout << "ERROR simplemd::services::ParallelTopologyService::init(): "
-                 "Currently no idle processes are allowed!"
-              << std::endl;
+    std::cout << "ERROR simplemd::services::ParallelTopologyService::init(): Currently no idle processes are allowed!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
@@ -112,9 +110,7 @@ void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int
   }
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "ParallelTopologyService: computed average number of molecules "
-               "per linked cell: "
-            << averageNumberOfMoleculesPerLinkedCell << std::endl;
+  std::cout << "ParallelTopologyService: computed average number of molecules per linked cell: " << averageNumberOfMoleculesPerLinkedCell << std::endl;
 #if (MD_PARALLEL == MD_YES)
   std::cout << "Rank " << _rank << " has the following buffer upper bounds: ";
   for (unsigned int i = 0; i < _numUniqueNeighbours; i++) {
@@ -126,10 +122,8 @@ void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int
 }
 
 void simplemd::services::ParallelTopologyService::shutdown() {
-  // All processors enter this function, but Idle processors do not have mpi
-  // requests allocated
-  //  and their buffer services are not initialised, hence must not be shut
-  //  down.
+  // All processors enter this function, but Idle processors do not have mpi requests allocated
+  //  and their buffer services are not initialised, hence must not be shut down.
   if (!isIdle()) {
     // terminate Buffer services
     _bufferService.shutdown();
@@ -249,8 +243,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
             isNearBoundary = isNearBoundary && (abs(diff[d]) < 2);
             isInBoundary = isInBoundary && (diff[d] == 0);
           }
-          // if this cell is close to a boundary and this boundary requires
-          // communication...
+          // if this cell is close to a boundary and this boundary requires communication...
           if (isNearBoundary && ((_boundary[help] == PERIODIC_BOUNDARY) || (_boundary[help] == PARALLEL_BOUNDARY))) {
 #if (MD_DEBUG == MD_YES)
             std::cout << "Cell is near boundary " << help << " ";
@@ -297,14 +290,11 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
                 pushMoleculeToSendBuffer(bufferIndex, *it, position);
               }
 #else
-          std::cout << "ERROR "
-                       "simplemd::services::ParallelTopologyService::"
-                       "broadcastInnerCell: There is no MPI support";
+          std::cout << "ERROR simplemd::services::ParallelTopologyService::broadcastInnerCell: There is no MPI support";
           std::cout << " available in the serial version ;-)" << std::endl;
           exit(EXIT_FAILURE);
 #endif
-              // if this cell is a ghost cell and periodic boundary condition
-              // needs to be handled locally:
+              // if this cell is a ghost cell and periodic boundary condition needs to be handled locally:
             } else if (neighbourRank == _rank && isInBoundary == true) {
 #if (MD_DEBUG == MD_YES)
               std::cout << "Pack " << cell.getList().size() << " molecules in local buffer " << std::endl;
@@ -335,16 +325,11 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
             } else {
               // this is only supported for periodic boundaries...
               if (_boundary[help] != PERIODIC_BOUNDARY) {
-                std::cout << "ERROR: "
-                             "simplemd::services::ParallelTopologyService::"
-                             "broadcastInnerCellViaBuffers():";
-                std::cout << " Parallel boundary detected where serial "
-                             "boundary should be!"
-                          << std::endl;
+                std::cout << "ERROR: simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffers():";
+                std::cout << " Parallel boundary detected where serial boundary should be!" << std::endl;
                 exit(EXIT_FAILURE);
               }
-              // add local ghost cell coordinate where the molecules would need
-              // to be copied to
+              // add local ghost cell coordinate where the molecules would need to be copied to
               tarch::la::Vector<MD_DIM, unsigned int> serialNeighbour(0);
               for (unsigned int d = 0; d < MD_DIM; d++) {
                 serialNeighbour[d] = (unsigned int)neighbours[MD_LINKED_CELL_NEIGHBOURS - 1 - help][d];
@@ -373,8 +358,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
 bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
                                                                            const simplemd::services::LinkedCellService& linkedCellService) {
 #if (MD_PARALLEL == MD_YES)
-  // determine neighbour rank (from position of the respective ghost cell
-  // cellIndex)
+  // determine neighbour rank (from position of the respective ghost cell cellIndex)
   int cellCoords = 0;
   unsigned int help = cellIndex;
   int neighbourRank = 0;
@@ -390,12 +374,10 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
   } else {
     cellCoords = 0;
   }
-  // the neighbouring process has coords cellCoords+_processCoordinates(2) (in
-  // z-direction). To account for periodic boundaries, we apply the modulo
-  // operator on top. As periodic boundaries at the left/bottom,front would
-  // imply negative coordinates that cannot be handled by the modulo operator
-  // correctly, we further shift everything by _numberProcesses(2) into the
-  // positive range.
+  // the neighbouring process has coords cellCoords+_processCoordinates(2) (in z-direction). To account for periodic
+  // boundaries, we apply the modulo operator on top. As periodic boundaries at the left/bottom,front would imply negative
+  // coordinates that cannot be handled by the modulo operator correctly, we further shift everything by _numberProcesses(2)
+  // into the positive range.
   cellCoords = (((int)(_processCoordinates[2] + _numberProcesses[2])) + cellCoords) % _numberProcesses[2];
   neighbourRank += cellCoords * _numberProcesses[0] * _numberProcesses[1];
 #endif
@@ -526,15 +508,13 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplem
           // set length of receive buffer correctly
           MPI_Get_count(&stat, MPI_DOUBLE, &count);
           _bufferService.setReceiveBufferLength(i_buf, (unsigned int)count);
-          // DO NOT unpack buffer yet - this would indeed be an additional
-          // overlap of waiting time, but it makes the unpacking order random,
-          // which was observed to affect (change) roundoffs between subsequent
-          // runs for a fixed randomization seedpoint. Unpacking all buffers
-          // after reception has been completed gives a well defined insertion
+          // DO NOT unpack buffer yet - this would indeed be an additional overlap of waiting time,
+          // but it makes the unpacking order random, which was observed to
+          // affect (change) roundoffs between subsequent runs for a fixed randomization seedpoint.
+          // Unpacking all buffers after reception has been completed gives a well defined insertion
           // order and makes parallel runs comparable to each other
 
-          // An alternative implementation is present in older revisions of the
-          // repository
+          // An alternative implementation is present in older revisions of the repository
           recvCompleted[i_buf] = true;
 #if (MD_DEBUG == MD_YES)
           std::cout << "Rank " << _rank << " received " << count / MD_DIM / 3 << " molecules from " << _neighbourRanksUnique[i_buf] << std::endl;
@@ -579,13 +559,12 @@ bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
     // first, set negative entries to 0
     help = std::max(help, 0);
     // now if entry is 0, but process is not on boundary,
-    // then this cell in fact belongs to the previous process along the same
-    // dimension, so set to 1. (In order for regions to be non-overlapping)
+    // then this cell in fact belongs to the previous process along the same dimension,
+    // so set to 1. (In order for regions to be non-overlapping)
     if (help == 0 && _processCoordinates[d] != 0)
       help = 1;
     // this is now the correct value in the local frame of reference.
-    // now if the starting point is not inside the domain, there is no
-    // intersection
+    // now if the starting point is not inside the domain, there is no intersection
     if ((unsigned int)help > _localNumberOfCells[d]) {
       isIntersecting = false;
       break;
@@ -597,10 +576,9 @@ bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
     // first, set values larger than the number of cells along the dimension +1
     // to the number of cells +1 (+1 is needed because of ghost layer)
     help = std::min(help, (int)(_localNumberOfCells[d] + 1));
-    // now if entry is equal to _localNumberOfCells(d) + 1, but process is not
-    // on boundary, then this cell in fact belongs to the next process along the
-    // same dimension so set to _localNumberOfCells(d). (in order for regions to
-    // be non-overlapping)
+    // now if entry is equal to _localNumberOfCells(d) + 1, but process is not on boundary,
+    // then this cell in fact belongs to the next process along the same dimension
+    // so set to _localNumberOfCells(d). (in order for regions to be non-overlapping)
     if ((help == (int)(_localNumberOfCells[d] + 1)) && _processCoordinates[d] != (_numberProcesses[d] - 1))
       help = _localNumberOfCells[d];
     // this is now the correct value in the local frame of reference.
@@ -615,8 +593,7 @@ bool simplemd::services::ParallelTopologyService::globalToLocalRegionOfInterest(
     localRange[d] = localEndCell[d] - localStartCell[d] + 1;
   }
 
-  // at this point, if there is an intersection, everything is already
-  // calculated
+  // at this point, if there is an intersection, everything is already calculated
   if (isIntersecting)
     return true;
   else {
@@ -672,8 +649,8 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
                   )) {
           int tmpRank = 0;
           bool isBoundary = false;
-          // find out if this process would be outside the domain and correct
-          // its position in case of periodic boundaries
+          // find out if this process would be outside the domain and correct its position in case of
+          // periodic boundaries
           for (unsigned int d = 0; d < MD_DIM; d++) {
             if (tmpCoords[d] < 0) {
               tmpCoords[d] += numberProcesses[d];
@@ -684,9 +661,8 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
             }
           }
 
-          // if this neighbour corresponds to a periodic-boundary-process or an
-          // inner process, add the rank and the respective number of
-          // transferred cells
+          // if this neighbour corresponds to a periodic-boundary-process or an inner process,
+          // add the rank and the respective number of transferred cells
           if ((isBoundary && (localBoundary[neighbourCounter] == simplemd::PERIODIC_BOUNDARY)) || (!isBoundary)) {
             // compute and add rank
             tmpRank = tmpCoords[0]
@@ -715,8 +691,7 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
                                                          z
 #endif
               );
-              /*the following value should not be needed anymore, to be removed
-               * soon*/
+              /*the following value should not be needed anymore, to be removed soon*/
               numberOfCellsPerBuffer[bufIndex] += (unsigned int)numCells;
             }
           }
@@ -725,8 +700,8 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
           neighbourCounter++;
 
           // undo effects of loop that sets isBoundary -
-          //  otherwise we proceed subsequent checks with possibly modified
-          //  tmpCoords which leads to incorrect setting of isBoundary flag
+          //  otherwise we proceed subsequent checks with possibly modified tmpCoords
+          //  which leads to incorrect setting of isBoundary flag
           tmpCoords[0] = ((int)processCoordinates[0]) + x;
 #if (MD_DIM > 1)
           tmpCoords[1] = ((int)processCoordinates[1]) + y;
@@ -747,8 +722,7 @@ void simplemd::services::ParallelTopologyService::createNeighbourRanks(
 // add ranks one by one, skipping repeating ones
 void simplemd::services::ParallelTopologyService::addNeighbourToNeighbourRanksUnique(std::vector<int>& neighbourRanksUnique, unsigned int& numUniqueNeighbours,
                                                                                      const int& addedNeighbour) const {
-  // note that due to functionality of createNeighbourRanks, _rank cannot appear
-  // in this vector
+  // note that due to functionality of createNeighbourRanks, _rank cannot appear in this vector
   bool repetitionFound = false;
   for (unsigned int j = 0; j < numUniqueNeighbours; j++) {
     if (addedNeighbour == neighbourRanksUnique[j]) {
@@ -1005,10 +979,7 @@ unsigned int simplemd::services::ParallelTopologyService::getNumberOfTransferred
 #if (MD_DIM == 1)
 #if (MD_ERROR == MD_YES)
   if ((x != 1) && (x != -1)) {
-    std::cout << "ERROR "
-                 "simplemd::services::ParallelTopologyService::"
-                 "getNumberOfTransferredCells: x != 1 and x != -1"
-              << std::endl;
+    std::cout << "ERROR simplemd::services::ParallelTopologyService::getNumberOfTransferredCells: x != 1 and x != -1" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
@@ -1017,10 +988,7 @@ unsigned int simplemd::services::ParallelTopologyService::getNumberOfTransferred
 #if (MD_ERROR == MD_YES)
   int sum = abs(x) + abs(y);
   if ((sum != 1) && (sum != 2)) {
-    std::cout << "ERROR "
-                 "simplemd::services::ParallelTopologyService::"
-                 "getNumberOfTransferredCells: Unknown neighbour relation!"
-              << std::endl;
+    std::cout << "ERROR simplemd::services::ParallelTopologyService::getNumberOfTransferredCells: Unknown neighbour relation!" << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
@@ -1058,10 +1026,7 @@ unsigned int simplemd::services::ParallelTopologyService::getNumberOfTransferred
     return _localNumberOfCells[0] * _localNumberOfCells[1];
   } else {
 #if (MD_ERROR == MD_YES)
-    std::cout << "ERROR "
-                 "simplemd::services::ParallelTopologyService::"
-                 "getNumberOfTransferredCells: Unknown neighbour relation!"
-              << std::endl;
+    std::cout << "ERROR simplemd::services::ParallelTopologyService::getNumberOfTransferredCells: Unknown neighbour relation!" << std::endl;
     exit(EXIT_FAILURE);
 #endif
     return 0;
@@ -1122,11 +1087,7 @@ unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexF
   }
 
   if (!found) {
-    std::cout << "Problems: "
-                 "ParallelTopologyService.cpp::"
-                 "getCurrentBufferIndexFromNeighbourRank() no corresponding "
-                 "index found"
-              << std::endl;
+    std::cout << "Problems: ParallelTopologyService.cpp::getCurrentBufferIndexFromNeighbourRank() no corresponding index found" << std::endl;
     exit(EXIT_FAILURE);
     return 0;
   } else {
@@ -1185,8 +1146,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
       cell += (int)linkedCellService.getLocalIndexOfFirstCell()[d];
 #if (MD_ERROR == MD_YES)
       if (cell < 0) {
-        std::cout << "ERROR "
-                     "simplemd::services::ParallelTopologyService::unpackBuffer:";
+        std::cout << "ERROR simplemd::services::ParallelTopologyService::unpackBuffer:";
         std::cout << " Molecule out of range: Position=" << position << ", cell=" << cell;
         std::cout << " _processCoords=" << _processCoordinates << ", loc.num=" << _localNumberOfCells << ", domOff=" << _domainOffset;
         std::cout << ", mesh=" << _meshWidth << std::endl;
@@ -1247,9 +1207,7 @@ void simplemd::services::ParallelTopologyService::pushMoleculeToSendBuffer(const
   if (!isOk) {
     std::cout << "Rank " << _rank << " was unable to push molecule to send buffer " << bufferIndex << ". " << std::endl;
     std::cout << "Upper bound of buffer (" << _bufferService.getBufferCapacity(bufferIndex)
-              << ") exceeded. Fatal error. Please contact developers as this "
-                 "is a principal issue."
-              << std::endl;
+              << ") exceeded. Fatal error. Please contact developers as this is a principal issue." << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif

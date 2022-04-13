@@ -15,11 +15,10 @@ class PeriodicBoundaryEmptyCellsMapping;
 }
 } // namespace simplemd
 
-/** this class is used to handle periodic boundaries. It takes all particles in
- * outer (ghost) cells, puts them into the respective inner cells (w.r.t.
- * periodicity) and deletes them from the ghost cell. In case of (MPI-)parallel
- * computations, the molecules are automatically adapted in the positions and
- * sent to the respective neighboring process (w.r.t. periodicity).
+/** this class is used to handle periodic boundaries. It takes all particles in outer (ghost) cells,
+ *  puts them into the respective inner cells (w.r.t. periodicity) and deletes them from the ghost cell.
+ *  In case of (MPI-)parallel computations, the molecules are automatically adapted in the positions and sent
+ *  to the respective neighboring process (w.r.t. periodicity).
  *  @author Philipp Neumann
  */
 class simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping {
@@ -28,8 +27,7 @@ public:
                                     simplemd::services::LinkedCellService& linkedCellService);
   ~PeriodicBoundaryEmptyCellsMapping() {}
 
-  /** sets the global domain size (hopefully received from the
-   * ParallelTopologyService...) */
+  /** sets the global domain size (hopefully received from the ParallelTopologyService...) */
   void setDomainSize(const tarch::la::Vector<MD_DIM, double>& domainSize);
 
   void setProcessCoordinates(const tarch::la::Vector<MD_DIM, unsigned int>& processCoordinates);

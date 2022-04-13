@@ -27,18 +27,17 @@ public:
                  const double& linkedCellVolume, const unsigned int& localMDSimulation);
   ~ProfilePlotter();
 
-  /** accumulates information from the respective linked cells and - in case
-   * that this is the respective timestep - plots the information to a file.
+  /** accumulates information from the respective linked cells and - in case that this is the respective timestep -
+   *  plots the information to a file.
    */
   void accumulateAndPlotInformation(const unsigned int& t);
 
 private:
   simplemd::services::LinkedCellService& _linkedCellService;
 #if (MD_PARALLEL == MD_YES)
-  /** in parallel, the _startCell and _range need to be adjusted to the
-   * intersection of the global profile position with the local domain. If a
-   * profile does not intersect the local domain, it is marked as inactive via
-   * the _isValid variable.
+  /** in parallel, the _startCell and _range need to be adjusted to the intersection of the global profile position
+   *  with the local domain. If a profile does not intersect the local domain, it is marked as inactive
+   *  via the _isValid variable.
    */
   void adjustProfilesInParallel(const simplemd::services::ParallelTopologyService& parallelTopologyService);
 #endif
@@ -48,10 +47,9 @@ private:
   std::vector<tarch::la::Vector<MD_DIM, unsigned int>> _ranges;
 
 #if (MD_PARALLEL == MD_YES)
-  /** in parallel, some profiles may not intersect the local domain of a
-   * process. In that case, the ProfilePlotterMapping will be allocated, but the
-   * respective entry in this vector will be used to indicate that the profile
-   * is not active.
+  /** in parallel, some profiles may not intersect the local domain of a process.
+   *  In that case, the ProfilePlotterMapping will be allocated, but the respective entry in this vector will
+   *  be used to indicate that the profile is not active.
    */
   std::vector<bool> _isActive;
 #endif

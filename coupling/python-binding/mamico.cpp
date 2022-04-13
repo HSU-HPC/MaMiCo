@@ -673,15 +673,11 @@ PYBIND11_MODULE(mamico, mamico) {
   py::class_<coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>>(services, "MultiMDCellService")
       .def(py::init([](std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL, 3>*> mdSolverInterfaces,
                        coupling::interface::MacroscopicSolverInterface<3>* macroscopicSolverInterface,
-                       const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig, unsigned int rank, unsigned int totalNumberMDSimulations,
-                       const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig, const std::string filterPipelineConfiguration,
-                       const tarch::utils::MultiMDService<3>& multiMDService) {
-             return new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(
-                 mdSolverInterfaces, macroscopicSolverInterface, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), rank, totalNumberMDSimulations,
-                 mamicoConfig.getParticleInsertionConfiguration(), mamicoConfig.getMomentumInsertionConfiguration(),
-                 mamicoConfig.getBoundaryForceConfiguration(), mamicoConfig.getTransferStrategyConfiguration(), mamicoConfig.getParallelTopologyConfiguration(),
-                 mamicoConfig.getThermostatConfiguration(), simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-                 mamicoConfig.getMacroscopicCellConfiguration(), filterPipelineConfiguration.c_str(), multiMDService);
+                       simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig, unsigned int rank, unsigned int totalNumberMDSimulations,
+                       coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig, const std::string filterPipelineConfiguration,
+                       tarch::utils::MultiMDService<3>& multiMDService) {
+             return new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(mdSolverInterfaces, macroscopicSolverInterface, simpleMDConfig, mamicoConfig,
+                                                                                 filterPipelineConfiguration.c_str(), multiMDService);
            }),
            "mdSolverInterfaces"_a, "macroscopicSolverInterface"_a, "simpleMDConfig"_a, "rank"_a = 0, "totalNumberMDSimulations"_a = 1, "mamicoConfig"_a,
            "xmlConfigFilename"_a, "multiMDService"_a)

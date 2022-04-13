@@ -70,6 +70,22 @@ template <int size, class T> tarch::la::Vector<size, T> operator*(const T& s, co
 }
 
 /** this file contains some methods for vector types.
+ *	@brief devides a vector over a scaler, i.e. this operator devides all
+ * entries of vector over a scalar and returns the result.
+ *  @tparam T Data type
+ *  @tparam size Vector size
+ * 	@author Niklas Wittmer
+ *	@return result resulting vector
+ */
+template <int size, class T> tarch::la::Vector<size, T> operator/(const tarch::la::Vector<size, T>& v, const T& s) {
+  tarch::la::Vector<size, T> result;
+  for (int i = 0; i < size; i++) {
+    result[i] = v[i] / s;
+  }
+  return result;
+}
+
+/** this file contains some methods for vector types.
  *	@brief computes the inner product of two vectors
  *  	@tparam T Data type
  *  	@tparam size Vector size
@@ -84,8 +100,7 @@ template <int size, class T> T dot(const tarch::la::Vector<size, T>& l, const ta
   return t;
 }
 
-/** This operator overloading compares two vectors and determins if they are
- *equal.
+/** This operator overloading compares two vectors and determins if they are equal.
  *	@brief for comparison of two vectors
  *  	@tparam T Data type
  *  	@tparam size Vector size
@@ -100,8 +115,7 @@ template <int size, class T> bool operator==(const Vector<size, T>& l, const Vec
   return equal;
 }
 
-/** This operator overloading compares two vectors and determins if they are NOT
- *equal.
+/** This operator overloading compares two vectors and determins if they are NOT equal.
  *	@brief for comparison of two vectors
  *  	@tparam T Data type
  *  	@tparam size Vector size

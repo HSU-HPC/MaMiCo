@@ -16,6 +16,11 @@ tarch::utils::MultiMDService<dim>::MultiMDService(const tarch::la::Vector<dim, u
   MPI_Comm_size(MPI_COMM_WORLD, &_globalSize);
   MPI_Comm_rank(MPI_COMM_WORLD, &_globalRank);
 
+  /* Resilience TODOs
+   * Allow idle processes?
+   *   - allow any number of processes or only useful numbers?
+   */
+
   // test process distribution
   _localSize = numberProcessesPerMDSimulation[0];
   for (unsigned int d = 1; d < dim; d++) {
@@ -50,6 +55,7 @@ tarch::utils::MultiMDService<dim>::MultiMDService(const tarch::la::Vector<dim, u
   } else {
     _thisNumberMDSimulations = _avgNumberMDSimulationsPerLocalComm;
   }
+
 #endif
 }
 
@@ -57,4 +63,8 @@ template <unsigned int dim> tarch::utils::MultiMDService<dim>::~MultiMDService()
 
 template <unsigned int dim> unsigned int tarch::utils::MultiMDService<dim>::getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const {
   return (_globalRank / _localSize) * _avgNumberMDSimulationsPerLocalComm + localMDSimulation;
+}
+
+template <unsigned int dim> int tarch::utils::MultiMDService<dim>::getLocalNumberOfGlobalMDSimulation(unsigned int globalMDSimulation) const {
+  return globalMDSimulation - (_globalRank / _localSize) * _avgNumberMDSimulationsPerLocalComm;
 }

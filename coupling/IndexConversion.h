@@ -8,6 +8,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/la/Vector.h"
 #include "tarch/utils/Uncopyable.h"
+#include <climits>
 #include <cstdlib>
 #include <vector>
 // parallel topologies
@@ -18,7 +19,7 @@ namespace coupling {
 template <unsigned int dim> class IndexConversion;
 }
 
-/** ... from vector to linearised indices as well as from local to global
+/** Handles the index conversion from vector to linearised indices as well as from local to global
  * indices. This class inherits privately from Uncopyable (see
  * CouplingMDDefinitions). We do this in order to hold the pointer to the
  * ParallelTopology consistent in exactly one instance of IndexConversion (or
@@ -96,6 +97,18 @@ public:
    *  @returns the dimensional global index for the given linear index */
   tarch::la::Vector<dim, unsigned int> getGlobalVectorCellIndex(unsigned int globalCellIndex) const;
 
+  /** Does the same as getGlobalVectorCellIndex() but
+   *    * non-inner cells (i.e. outside of the MD domain) are converted to
+   * MAX_INT
+   *    * (0, ... , 0) is the first cell in the MD domain etc.
+   */
+  tarch::la::Vector<dim, unsigned int> getGlobalInnerVectorCellIndex(unsigned int globalCellIndex) const;
+
+  // TODO: unused function
+  /** Translates index vector of inner cell to make it usable in global
+   * context*/
+  tarch::la::Vector<dim, unsigned int> convertInnerVectorCellIndexToGlobal(tarch::la::Vector<dim, unsigned int> cellIndexVectorMDContext) const;
+
   /** This function just performs the inverse operation to
    * getLocalCellIndex(vectorIndex), i.e.
    * getLocalVectorCellIndex(getLocalCellIndex(somevector) ) should again return
@@ -170,6 +183,8 @@ public:
   /** @brief returns the vector size of each macroscopic cell.
    *  @returns the size of the macroscopic cells (dimensional) */
   tarch::la::Vector<dim, double> getMacroscopicCellSize() const;
+
+  coupling::paralleltopology::ParallelTopologyType getParallelTopologyType() const;
 
   // ---------------------------- GEOMETRY TO CELL INDEX
   // ----------------------------------

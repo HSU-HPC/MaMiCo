@@ -38,9 +38,8 @@ public:
   }
 
 private:
-  /** test interface; only implements the getLinkedCell method (required in
-   * initialisation of macroscopic cells) and strictly returns its only linked
-   * cell ;-) The MD domain is considered to be the unit square/box.
+  /** test interface; only implements the getLinkedCell method (required in initialisation of macroscopic cells) and
+   *  strictly returns its only linked cell ;-) The MD domain is considered to be the unit square/box.
    */
   template <unsigned int dim> class TestMDSolverInterface : public coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim> {
   public:
@@ -86,8 +85,8 @@ private:
     private : simplemd::LinkedCell _linkedcell;
   };
 
-  /** test class for loop over macroscopic cells; writes the local vector cell
-   * index into each cell's microscopic-momentum buffer.
+  /** test class for loop over macroscopic cells; writes the local vector cell index into each cell's microscopic-momentum
+   *  buffer.
    */
   template <unsigned int dim> class WriteIndex {
   public:
@@ -107,8 +106,7 @@ private:
   private:
     const coupling::IndexConversion<dim>& _indexConversion;
   };
-  /** test class to print local cell index (-> microscopic momentum buffer) of
-   * macroscopic cells */
+  /** test class to print local cell index (-> microscopic momentum buffer) of macroscopic cells */
   template <unsigned int dim> class PrintIndex {
   public:
     PrintIndex() {}
@@ -123,9 +121,7 @@ private:
   template <unsigned int dim> void testMacroscopicCells() {
     TestMDSolverInterface<dim>* testInterface = new TestMDSolverInterface<dim>();
     if (testInterface == NULL) {
-      std::cout << "ERROR MacroscopicCellsTest::testMacroscopicCells(): "
-                   "testInterface==NULL!"
-                << std::endl;
+      std::cout << "ERROR MacroscopicCellsTest::testMacroscopicCells(): testInterface==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
     const tarch::la::Vector<dim, unsigned int> globalNumberCells(3);

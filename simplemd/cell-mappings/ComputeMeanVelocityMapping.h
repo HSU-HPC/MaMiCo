@@ -33,10 +33,9 @@ public:
   }
   void endCellIteration() {
 #if (MD_PARALLEL == MD_YES)
-    // reduce number of particles separately from mean velocity. Datatypes
-    // differ and if the number of particles is extremely high, it may be
-    // inaccurately represented by floating point numbers. Hence, this solution
-    // is slower, but safer.
+    // reduce number of particles separately from mean velocity. Datatypes differ and if the number of
+    // particles is extremely high, it may be inaccurately represented by floating point numbers.
+    // Hence, this solution is slower, but safer.
     _parallelTopologyService.MD_Allreduce(MPI_IN_PLACE, &_particleCounter, 1, MPI_UNSIGNED, MPI_SUM);
     _parallelTopologyService.MD_Allreduce(MPI_IN_PLACE, &_meanVelocity, MD_DIM, MPI_DOUBLE, MPI_SUM);
 #endif
@@ -73,23 +72,20 @@ public:
 
   const tarch::la::Vector<MD_DIM, double>& getMeanVelocity() const { return _meanVelocity; }
 
-  /** returns the global number of particles. The local number can be retrieved
-   * from MoleculeService.getNumberMolecules(). */
+  /** returns the global number of particles. The local number can be retrieved from MoleculeService.getNumberMolecules(). */
   const unsigned int& getGlobalNumberMolecules() const { return _particleCounter; }
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   /** number of particles.
-   * After endCellIteration has been called, stores the global number of
-   * particles in the MD simulation.
+   * After endCellIteration has been called, stores the global number of particles in the MD simulation.
    */
   unsigned int _particleCounter;
   tarch::la::Vector<MD_DIM, double> _meanVelocity;
 
   /** number of local MD simulation */
   const unsigned int _localMDSimulation;
-  /** flag whether computed value should be written in file during
-   * endCellIteration */
+  /** flag whether computed value should be written in file during endCellIteration */
   const bool _writeToFile;
 };
 

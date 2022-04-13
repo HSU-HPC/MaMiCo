@@ -192,9 +192,8 @@ protected:
     coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().setMacroscopicSolverInterface(_macroSolverInterface);
   }
 
-  /** loads the MaMiCo configuration and initializes the macroscopic cells
-   *service; should be called after loadMarDynTestConfiguration() and
-   *loadMacroscopicSolverConfiguration().
+  /** loads the MaMiCo configuration and initializes the macroscopic cells service;
+   *	should be called after loadMarDynTestConfiguration() and loadMacroscopicSolverConfiguration().
    */
   void loadMamicoTestConfiguration() {
     const std::string mamicoTestConfig = "mamico_mardyn_test_configuration.xml";

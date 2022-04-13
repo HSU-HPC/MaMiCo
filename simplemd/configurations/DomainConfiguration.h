@@ -59,6 +59,10 @@ public:
   const bool& initFromCheckpoint() const { return _initFromCheckpoint; }
   const bool& initFromSequentialCheckpoint() const { return _initFromSequentialCheckpoint; }
 
+  void setCheckpointFilestem(const std::string& filestem) { _checkpointFilestem = filestem; }
+  void setInitFromCheckpoint(const bool& initFromCheckpoint) { _initFromCheckpoint = initFromCheckpoint; }
+  void setInitFromSequentialCheckpoint(const bool& initFromSequentialCheckpoint) { _initFromSequentialCheckpoint = initFromSequentialCheckpoint; }
+
   unsigned int getNumberOfMolecules() const;
 
 private:

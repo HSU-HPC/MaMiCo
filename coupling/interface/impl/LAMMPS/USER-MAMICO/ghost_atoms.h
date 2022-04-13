@@ -60,12 +60,12 @@ public:
 
     // extract positions of ghost atoms and write them to buffer
     for (int i = nlocal; i < nall; i++) {
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         _ghostX[i - nlocal][d] = _lmp->atom->x[i][d];
       }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       std::cout << "Rank " << rank << ": Ghost particle ";
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         std::cout << _ghostX[i - nlocal][d] << " ";
       }
       std::cout << std::endl;

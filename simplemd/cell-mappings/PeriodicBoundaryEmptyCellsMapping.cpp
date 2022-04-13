@@ -38,8 +38,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
   // now, coords and outerCell are identical
   outerCellCoords = coords;
 
-  // after this, coords contains the local coordinates of the inner cell on the
-  // respective process
+  // after this, coords contains the local coordinates of the inner cell on the respective process
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if ((coords[d] == 0) && (_processCoordinates[d] == 0)) {
       coords[d] = size[d] - 2;
@@ -60,8 +59,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
     }
   }
 
-  // if the molecules need to be sent, they are sent and deleted from the local
-  // molecule service
+  // if the molecules need to be sent, they are sent and deleted from the local molecule service
   if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
     for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
       _moleculeService.deleteMolecule(*(*it));
@@ -69,8 +67,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
     // if the molecules need to be placed somewhere on this process, do so...
   } else {
     innerCell = &_linkedCellService.getLinkedCell(coords);
-    // iterate over molecules and either send them to other process or put them
-    // locally in the right cell
+    // iterate over molecules and either send them to other process or put them locally in the right cell
     for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
       Molecule myMolecule((*it)->getConstPosition(), (*it)->getConstVelocity());
       myMolecule.setForceOld((*it)->getConstForceOld());

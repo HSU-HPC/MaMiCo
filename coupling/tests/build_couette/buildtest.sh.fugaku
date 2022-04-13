@@ -44,13 +44,13 @@ includes="-I${MAMICO_PATH}"
 if [ "${parallel}" == "parallel" ]
 then
     # note: we need to set MDDim3 for ALL Simulations since we use the configuration classes from SimpleMD
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wall -Wno-unknown-pragmas -Wno-uninitialized -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3 -mcpu=a64fx"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Werror -Wall -Wno-unknown-pragmas -Wno-uninitialized -DMDCoupledParallel -DTarchParallel -DMPICH_IGNORE_CXX_SEEK -O3 -mcpu=a64fx"
     # -DMDCoupledDebug"
     includes="${includes} -I${LIB_EIGEN_PATH}"
     libraries="-l${LIB_MPI}"
     compiler="mpiFCCpx -Nclang"
 else
-    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -DENABLE_POST_MULTI_INSTANCE_FILTERING -Ofast -mcpu=a64fx"
+    FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -Ofast -mcpu=a64fx"
     # -Werror
     includes="${includes} -I${LIB_EIGEN_PATH}" 
     compiler="FCCpx -Nclang"

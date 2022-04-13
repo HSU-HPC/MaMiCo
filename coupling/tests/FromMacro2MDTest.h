@@ -17,8 +17,7 @@
 #include <mpi.h>
 #endif
 
-/** tests the communication from a selection of cells (macroscopic solver) to a
- * block of cells (coupling tool).
+/** tests the communication from a selection of cells (macroscopic solver) to a block of cells (coupling tool).
  *  @author Philipp Neumann
  */
 class FromMacro2MDTest : public Test {
@@ -66,9 +65,7 @@ private:
     for (unsigned int i = 0; i < numberCellsInclBoundary; i++) {
       cellsMamico.push_back(new TestCell<dim>());
       if (cellsMamico[i] == NULL) {
-        std::cout << "ERROR FromMD2MacroTest::testSequential3D: cellsMamico[i] "
-                     "==NULL!"
-                  << std::endl;
+        std::cout << "ERROR FromMD2MacroTest::testSequential3D: cellsMamico[i] ==NULL!" << std::endl;
         exit(EXIT_FAILURE);
       }
       cellsMamico[i]->setBuffer1(tarch::la::Vector<dim, double>(0.0));

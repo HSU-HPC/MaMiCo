@@ -17,14 +17,12 @@ class PeriodicAndParallelBoundaryFillCellsMapping;
 }
 } // namespace simplemd
 
-/** This mapping is used at the very beginning of each MD timestep. In order to
- * populate the ghost cells of periodic and parallel boundaries, this mapping
- * triggers a broadcasting of inner cell information to the respective parallel
- * and periodic ghost cells. At this, the molecules are either directly
- * manipulated and sent to the respective process, or their position is locally
- * adapted according to the periodic boundary condition, and they are cloned and
- * put into the corresponding local ghost cells. This mapping is triggered from
- * the BoundaryTreatment class.
+/** This mapping is used at the very beginning of each MD timestep. In order to populate the ghost cells of
+ *  periodic and parallel boundaries, this mapping triggers a broadcasting of inner cell information to the respective
+ *  parallel and periodic ghost cells. At this, the molecules are either directly manipulated and sent to the
+ *  respective process, or their position is locally adapted according to the periodic boundary condition, and they
+ *  are cloned and put into the corresponding local ghost cells.
+ *  This mapping is triggered from the BoundaryTreatment class.
  *
  *  @author Philipp Neumann
  */

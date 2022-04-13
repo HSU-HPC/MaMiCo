@@ -34,9 +34,9 @@ public:
 
   virtual void setPosition(const tarch::la::Vector<MD_DIM, double>& position) { _myMolecule->setPosition(position); }
 
-  /** sets the force acting on this molecule. This function is only called in
-   * the USHER scheme so far If you want to set the force of a newly created
-   * molecule, you need to implement this function.
+  /** sets the force acting on this molecule. This function is only called in the USHER
+   *  scheme so far If you want to set the force of a newly created molecule,
+   *  you need to implement this function.
    */
   virtual void setForce(const tarch::la::Vector<MD_DIM, double>& force) { _myMolecule->setForce(force); }
   virtual tarch::la::Vector<MD_DIM, double> getForce() const { return _myMolecule->getConstForce(); }

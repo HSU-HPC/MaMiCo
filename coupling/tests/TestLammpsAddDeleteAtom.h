@@ -15,8 +15,7 @@ public:
   virtual ~TestLammpsAddDeleteAtom() {}
 
   virtual void run() {
-    // LOAD COUPLED SCENARIO
-    // ----------------------------------------------------------------------
+    // LOAD COUPLED SCENARIO ----------------------------------------------------------------------
     if (dim == 2) {
       TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly2D.xyz", 4);
     } else {
@@ -26,13 +25,12 @@ public:
     TestLammps<dim>::loadMamicoTestConfiguration();
     std::cout << "All configs, solvers and coupling loaded and initialised..." << std::endl;
 
-    // DEFINE PROPERTIES OF ATOM TO BE ADDED/DELETED
-    // ---------------------------------------------- helper variables
+    // DEFINE PROPERTIES OF ATOM TO BE ADDED/DELETED ----------------------------------------------
+    // helper variables
     const tarch::la::Vector<dim, unsigned int> linkedCellsPerMacroscopicCell(1);
     const tarch::la::Vector<dim, unsigned int> linkedCellInMacroscopicCell(0);
     const coupling::IndexConversion<dim>& indexConversion = TestLammps<dim>::_macroscopicCellService->getIndexConversion();
-    const double tolerance = 1.0e-8; // this value should be the same as tolerance defined in
-                                     // MDSolverInterface of LAMMPS
+    const double tolerance = 1.0e-8; // this value should be the same as tolerance defined in MDSolverInterface of LAMMPS
     int rank, size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -58,29 +56,24 @@ public:
     const tarch::la::Vector<dim, double> fAddAtom(10.0);
     const coupling::datastructures::Molecule<dim> addMolecule(posAddAtom, velAddAtom, fAddAtom, dummyEnergy);
     tarch::la::Vector<dim, unsigned int> addCellIndex(2); // global cell index for adding atom
-    // true, if this rank holds the respective domain containing the new
-    // molecule's position
+    // true, if this rank holds the respective domain containing the new molecule's position
     const bool performAdd =
         (size == 1) || ((size == 4) && (rank == 0)) || ((size == 16) && (rank == 5)) || ((size == 8) && (rank == 0)) || ((size == 64) && (rank == 21));
 
-    // set a very small time step (so that molecules hardly move and positions
-    // thus remain quasi identical) and run one time step to sort molecules into
-    // mamico cells
+    // set a very small time step (so that molecules hardly move and positions thus remain quasi identical) and run one time step to sort molecules into mamico
+    // cells
     // TestLammps<dim>::_lammps->input->one("timestep 1e-14");
     TestLammps<dim>::_lammps->input->one("run 1");
 
-    // for testing purposes, set cut-off radius to 2.5 (=mamico-cell-size); we
-    // can then check whether the newly inserted/deleted atoms are transferred
-    // to the neighbouring processes in the
-    // synchronizeMoleculesAfterMassModification()-method.
+    // for testing purposes, set cut-off radius to 2.5 (=mamico-cell-size); we can then check whether the newly inserted/deleted atoms are transferred to the
+    // neighbouring processes in the synchronizeMoleculesAfterMassModification()-method.
     // TestLammps<dim>::_lammps->input->one("pair_style lj/cut 2.5");
     // TestLammps<dim>::_lammps->input->one("pair_coeff 1 1 1.0 1.0 2.5");
 
     // print out all molecules for each rank (synchronised)
     TestLammps<dim>::printMolecules();
 
-    // PERFORM DELETION TEST
-    // -----------------------------------------------------------------------------------
+    // PERFORM DELETION TEST -----------------------------------------------------------------------------------
     // delete atom
     if (performDeletion) {
       const int numberAtoms = TestLammps<dim>::_lammps->atom->nlocal;
@@ -94,8 +87,7 @@ public:
       int cellCounterBeforeDeletion = 0;
       int cellCounterAfterDeletion = 0;
 
-      // determine number of molecules in this cell before deletion and plot
-      // molecule positions
+      // determine number of molecules in this cell before deletion and plot molecule positions
       std::cout << "Molecules before deletion:" << std::endl;
       for (iterator->begin(); iterator->continueIteration(); iterator->next()) {
         std::cout << iterator->getConst().getPosition() << std::endl;
@@ -108,9 +100,7 @@ public:
 
       // check if number of atoms has been decremented
       if (numberAtoms - 1 != TestLammps<dim>::_lammps->atom->nlocal) {
-        std::cout << "ERROR TestLammpsAddDeleteAtom::run(): Same number of "
-                     "atoms after deletion as before!"
-                  << std::endl;
+        std::cout << "ERROR TestLammpsAddDeleteAtom::run(): Same number of atoms after deletion as before!" << std::endl;
         exit(EXIT_FAILURE);
       }
       // check if deleted atom can be found in mamico cell
@@ -122,9 +112,7 @@ public:
       if (cellCounterAfterDeletion != cellCounterBeforeDeletion - 1) {
         int rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        std::cout << "Rank " << rank
-                  << ": ERROR TestLammpsAddDeleteAtom::run(): Did not reduce "
-                     "number of molecules in the respective mamico cell!"
+        std::cout << "Rank " << rank << ": ERROR TestLammpsAddDeleteAtom::run(): Did not reduce number of molecules in the respective mamico cell!"
                   << std::endl;
         exit(EXIT_FAILURE);
       }
@@ -136,9 +124,7 @@ public:
           found = found && tarch::la::equals(TestLammps<dim>::_lammps->atom->x[i][d], posDeleteAtom[d], tolerance);
         }
         if (found) {
-          std::cout << "ERROR TestLammpsAddDeleteAtom::run(): Found atom in "
-                       "LAMMPS though it should have been deleted!"
-                    << std::endl;
+          std::cout << "ERROR TestLammpsAddDeleteAtom::run(): Found atom in LAMMPS though it should have been deleted!" << std::endl;
           exit(EXIT_FAILURE);
         }
       }
@@ -151,8 +137,7 @@ public:
     }
     TestLammps<dim>::printMolecules();
 
-    // TEST ADDING A MOLECULE
-    // ---------------------------------------------------------
+    // TEST ADDING A MOLECULE ---------------------------------------------------------
     if (performAdd) {
       const int numberAtoms = TestLammps<dim>::_lammps->atom->nlocal;
       // convert global to local cell index
@@ -165,8 +150,7 @@ public:
       int cellCounterBeforeAdding = 0;
       int cellCounterAfterAdding = 0;
 
-      // determine number of molecules in this cell before adding new one and
-      // plot molecule positions
+      // determine number of molecules in this cell before adding new one and plot molecule positions
       std::cout << "Molecules before adding:" << std::endl;
       for (iterator->begin(); iterator->continueIteration(); iterator->next()) {
         std::cout << iterator->getConst().getPosition() << ", " << iterator->getConst().getVelocity() << ", " << iterator->getConst().getForce() << std::endl;
@@ -178,9 +162,7 @@ public:
 
       // check if number of atoms is now equal again
       if (numberAtoms + 1 != TestLammps<dim>::_lammps->atom->nlocal) {
-        std::cout << "ERROR TestLammpsAddDeleteAtom::run(): Same number of "
-                     "atoms after adding new molecule as before!"
-                  << std::endl;
+        std::cout << "ERROR TestLammpsAddDeleteAtom::run(): Same number of atoms after adding new molecule as before!" << std::endl;
         exit(EXIT_FAILURE);
       }
       // check if deleted atom can be found in mamico cell
@@ -192,9 +174,7 @@ public:
       if (cellCounterAfterAdding != cellCounterBeforeAdding + 1) {
         int rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        std::cout << "Rank " << rank
-                  << ": ERROR TestLammpsAddDeleteAtom::run(): Did not increase "
-                     "number of molecules in the respective mamico cell!"
+        std::cout << "Rank " << rank << ": ERROR TestLammpsAddDeleteAtom::run(): Did not increase number of molecules in the respective mamico cell!"
                   << std::endl;
         exit(EXIT_FAILURE);
       }
@@ -214,9 +194,7 @@ public:
         }
       }
       if (!foundMolecule) {
-        std::cout << "ERROR TestLammpsAddDeleteAtom::run(): Could not find new "
-                     "atom in LAMMPS!"
-                  << std::endl;
+        std::cout << "ERROR TestLammpsAddDeleteAtom::run(): Could not find new atom in LAMMPS!" << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -243,9 +221,8 @@ public:
           ->synchronizeMoleculesAfterMassModification();
       const int totalNumberAtomsAfterInsertion = TestLammps<dim>::_lammps->atom->natoms;
       if (totalNumberAtomsAfterInsertion != totalNumberAtoms) {
-        std::cout << "ERROR TestLammpsAddDeleteAtom: total number of atoms has "
-                     "changed; new total number of atoms: "
-                  << totalNumberAtomsAfterInsertion << "!" << std::endl;
+        std::cout << "ERROR TestLammpsAddDeleteAtom: total number of atoms has changed; new total number of atoms: " << totalNumberAtomsAfterInsertion << "!"
+                  << std::endl;
         exit(EXIT_FAILURE);
       }
     }

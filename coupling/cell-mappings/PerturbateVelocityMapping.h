@@ -6,6 +6,7 @@
 #define _COUPLING_CELLMAPPINGS_PERTURBATEVELOCITYMAPPING_H_
 
 #include "coupling/interface/MDSolverInterface.h"
+#include "tarch/utils/RandomNumberService.h"
 
 namespace coupling {
 namespace cellmappings {

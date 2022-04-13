@@ -30,8 +30,8 @@ private:
   simplemd::services::MoleculeService& _moleculeService;
   simplemd::services::LinkedCellService& _linkedCellService;
   const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
-  /** used for the synchronization of molecules in boundary regions and between
-   * different processes when mass was inserted/ deleted by the coupling.
+  /** used for the synchronization of molecules in boundary regions and between different processes when
+   *  mass was inserted/ deleted by the coupling.
    */
   simplemd::BoundaryTreatment& _boundaryTreatment;
   const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& _localBoundaryInformation;
@@ -53,9 +53,7 @@ private:
       numberOfLinkedCells[d] = _linkedCellService.getLocalNumberOfCells()[d] / localNumberOfMacroscopicCells[d];
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
       if (numberOfLinkedCells[d] * localNumberOfMacroscopicCells[d] != _linkedCellService.getLocalNumberOfCells()[d]) {
-        std::cout << "ERROR coupling::interface::SimpleMDSolverInterface: Number of "
-                     "linked cells is not a multiple of the macroscopic cells!"
-                  << std::endl;
+        std::cout << "ERROR coupling::interface::SimpleMDSolverInterface: Number of linked cells is not a multiple of the macroscopic cells!" << std::endl;
         std::cout << "Number linked cells: " << numberOfLinkedCells << ", macroscopic cells: " << localNumberOfMacroscopicCells << std::endl;
         std::cout << "Local number of linked cells: " << _linkedCellService.getLocalNumberOfCells() << std::endl;
         exit(EXIT_FAILURE);
@@ -65,11 +63,10 @@ private:
     return numberOfLinkedCells;
   }
 
-  /** Though this method is available in LennardJonesPotentialEnergyMapping, I
-   * re-implemented it at this stage, as the latter always fetches the
-   * epsilon,sigma-parameters first. This is nice for simulations where
-   * parameters are changed over time; however for static simulations it just
-   * slows down...
+  /** Though this method is available in LennardJonesPotentialEnergyMapping, I re-implemented it at
+   *  this stage, as the latter always fetches the epsilon,sigma-parameters first. This is nice for
+   *  simulations where parameters are changed over time; however for static simulations it just slows
+   *  down...
    */
   double getPotentialEnergy(const tarch::la::Vector<MD_DIM, double>& position1, const tarch::la::Vector<MD_DIM, double>& position2) const {
     const tarch::la::Vector<MD_DIM, double> distance(position2 - position1);
@@ -90,10 +87,7 @@ private:
     const double rij2 = tarch::la::dot(rij, rij);
 #if (MD_ERROR == MD_YES)
     if (rij2 == 0.0) {
-      std::cout << "ERROR "
-                   "cellmappings::LennardJonesForceMapping::"
-                   "getLennardJonesForce(): Particle positions are identical!"
-                << std::endl;
+      std::cout << "ERROR cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif
@@ -133,9 +127,7 @@ public:
     // no linked cells found in outer region!
     for (unsigned int d = 0; d < MD_DIM; d++) {
       if (macroscopicCellIndex[d] == 0) {
-        std::cout << "ERROR SimpleMDSolverInterface::getLinkedCell(): "
-                     "macroscopic cell outside range for linked cells!"
-                  << std::endl;
+        std::cout << "ERROR SimpleMDSolverInterface::getLinkedCell(): macroscopic cell outside range for linked cells!" << std::endl;
         exit(EXIT_FAILURE);
       }
     }
@@ -207,9 +199,7 @@ public:
     const tarch::la::Vector<MD_DIM, double> domainSize = _parallelTopologyService.getGlobalDomainSize();
     for (unsigned int d = 0; d < MD_DIM; d++) {
       if ((position[d] < domainOffset[d] - meshWidth[d]) || (position[d] > domainOffset[d] + domainSize[d] + meshWidth[d])) {
-        std::cout << "ERROR "
-                     "coupling::interface::impl::MDSolverInterface::"
-                     "addMoleculeToLinkedCell: Position ";
+        std::cout << "ERROR coupling::interface::impl::MDSolverInterface::addMoleculeToLinkedCell: Position ";
         std::cout << d << " is out of range!" << std::endl;
         std::cout << "Position: " << position << std::endl;
         exit(EXIT_FAILURE);
@@ -226,9 +216,7 @@ public:
       index = index - globalIndexOfFirstCell[d] + localIndexOfFirstCell[d];
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
       if (index < 0) {
-        std::cout << "ERROR "
-                     "coupling::interfaces::impl::SimpleMD::"
-                     "SimpleMDSolverInterface: index < 0: index=";
+        std::cout << "ERROR coupling::interfaces::impl::SimpleMD::SimpleMDSolverInterface: index < 0: index=";
         std::cout << index << std::endl;
         exit(EXIT_FAILURE);
       }
@@ -246,8 +234,7 @@ public:
     simplemd::cellmappings::LennardJonesPotentialEnergyMapping potentialEnergyMapping(_molecularPropertiesService);
     tarch::la::Vector<MD_DIM, unsigned int> rangeLinkedCellsExtended(0);
     tarch::la::Vector<MD_DIM, unsigned int> firstLinkedCell(0);
-    // compute coordinates of the first linked cell and the range of linked
-    // cells to be considered
+    // compute coordinates of the first linked cell and the range of linked cells to be considered
     for (unsigned int d = 0; d < MD_DIM; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       if (indexOfFirstMacroscopicCell[d] == 0) {
@@ -257,14 +244,12 @@ public:
 #endif
 
       firstLinkedCell[d] = (indexOfFirstMacroscopicCell[d] - 1) * linkedCellsPerMacroscopicCell[d];
-      // we need to loop over one more layer of linked cells since
-      // firstLinkedCell(d) already starts one linked cell earlier (e.g. already
-      // in linked cell ghost layer)
+      // we need to loop over one more layer of linked cells since firstLinkedCell(d) already starts one linked cell earlier
+      // (e.g. already in linked cell ghost layer)
       rangeLinkedCellsExtended[d] = rangeMacroscopicCells[d] * linkedCellsPerMacroscopicCell[d] + _linkedCellService.getLocalIndexOfFirstCell()[d];
     }
 
-    // reset potential energy first for the molecules in all relevant linked
-    // cells
+    // reset potential energy first for the molecules in all relevant linked cells
     _linkedCellService.iterateCells(resetPotentialEnergyMapping, firstLinkedCell, rangeLinkedCellsExtended, false);
 
     // compute potential energy in these cells
@@ -277,11 +262,7 @@ public:
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     for (unsigned int d = 0; d < MD_DIM; d++) {
       if ((linkedCellIndex[d] < 1) || (linkedCellIndex[d] > _linkedCellService.getLocalNumberOfCells()[d])) {
-        std::cout << "ERROR "
-                     "coupling::interface/impl/SimpleMD/"
-                     "SimpleMDSolverInterface::calculateForceAndEnergy(): "
-                     "linkedCellIndex out of range!"
-                  << std::endl;
+        std::cout << "ERROR coupling::interface/impl/SimpleMD/SimpleMDSolverInterface::calculateForceAndEnergy(): linkedCellIndex out of range!" << std::endl;
         std::cout << "LinkedCellIndex=" << linkedCellIndex << std::endl;
         exit(EXIT_FAILURE);
       }
@@ -293,8 +274,7 @@ public:
 
     tarch::la::Vector<MD_DIM, unsigned int> loopIndex(0);
 
-// loop over all relevant linked cells and compute force and energy
-// contributions
+// loop over all relevant linked cells and compute force and energy contributions
 #if (MD_DIM > 2)
     for (loopIndex[2] = linkedCellIndex[2] - 1; loopIndex[2] < linkedCellIndex[2] + 2; loopIndex[2]++) {
 #endif

@@ -21,10 +21,7 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise
 
   _values = (double*)malloc(_capacity * sizeof(double));
   if (_values == NULL) {
-    std::cout << "_values of SimpleBuffer, part of the "
-                 "ParallelAndLocalBufferService, could not be allocated. "
-                 "Terminating..."
-              << std::endl;
+    std::cout << "_values of SimpleBuffer, part of the ParallelAndLocalBufferService, could not be allocated. Terminating..." << std::endl;
     return false;
   }
   _length = 0;
@@ -43,21 +40,16 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::pushData(c
                                                                                const tarch::la::Vector<MD_DIM, double> force, const double isFixed,
                                                                                const bool permitReallocation) {
   // check if buffer has enough storage for new data
-  // we want to add position, velocity and forceOld, so we need 3 * MD_DIM more
-  // places
+  // we want to add position, velocity and forceOld, so we need 3 * MD_DIM more places
 
-  // check is not in MD_ERROR, because the local buffer can be reallocated and
-  // if send/receive buffers are exhausted, we need to terminate in any case!
+  // check is not in MD_ERROR, because the local buffer can be reallocated and if send/receive buffers are exhausted, we need to terminate in any case!
   if (_length + 3 * MD_DIM + 1 > _capacity) {
     if (permitReallocation == true) {
       // increase buffer capacity via realloc and proceed
       reallocate();
     } else {
-      std::cout << "Capacity of buffer was exceeded when reallocation is not "
-                   "permitted. Terminating..."
-                << std::endl;
-#if (MD_ERROR == MD_NO) // if MD_ERROR is off, exit here; if it is on, more checks are made,
-                        // giving info on which processor failed
+      std::cout << "Capacity of buffer was exceeded when reallocation is not permitted. Terminating..." << std::endl;
+#if (MD_ERROR == MD_NO) // if MD_ERROR is off, exit here; if it is on, more checks are made, giving info on which processor failed
       exit(EXIT_FAILURE);
 #endif
       return false;

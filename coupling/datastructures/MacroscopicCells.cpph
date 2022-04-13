@@ -60,8 +60,7 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCell
   const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells());
   tarch::la::Vector<3, unsigned int> macroLoop(0);
 
-  // determine end coordinate for inner loop over linked cells (contained in
-  // each macroscopic cell)
+  // determine end coordinate for inner loop over linked cells (contained in each macroscopic cell)
   const tarch::la::Vector<3, unsigned int> endInnerLoop = coupling::initRange<dim>(numberLinkedCellsPerMacroscopicCell);
 
   // allocate macroscopic cells
@@ -69,10 +68,7 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCell
       (coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>*)malloc(
           sizeof(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>) * numberMacroscopicCells);
   if (cells == NULL) {
-    std::cout << "ERROR "
-                 "coupling::datastructures::MacroscopicCells::"
-                 "initMacroscopicCells(): cells==NULL!"
-              << std::endl;
+    std::cout << "ERROR coupling::datastructures::MacroscopicCells::initMacroscopicCells(): cells==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -82,10 +78,7 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCell
     coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* newCell =
         new (&cells[i]) coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>(numberLinkedCellsPerMacroscopicCell);
     if (newCell == NULL) {
-      std::cout << "ERROR "
-                   "coupling::datastructures::MacroscopicCells::"
-                   "initMacroscopicCellsWithLinkedCells(): newCell==NULL"
-                << std::endl;
+      std::cout << "ERROR coupling::datastructures::MacroscopicCells::initMacroscopicCellsWithLinkedCells(): newCell==NULL" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -215,11 +208,7 @@ void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToLocalGh
     }
     break;
   default:
-    std::cout << "ERROR "
-                 "coupling::datastructures::MacroscopicCells::"
-                 "applyToLocalGhostMacroscopicCellsWithLinkedCells(): Only "
-                 "1D/2D/3D supported!"
-              << std::endl;
+    std::cout << "ERROR coupling::datastructures::MacroscopicCells::applyToLocalGhostMacroscopicCellsWithLinkedCells(): Only 1D/2D/3D supported!" << std::endl;
     exit(EXIT_FAILURE);
   }
   a.endCellIteration();
@@ -232,8 +221,7 @@ void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyToAllLoca
       coupling::initRange<dim>(_indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
   tarch::la::Vector<3, unsigned int> loop(0);
 
-  // we assume a lexicographic ordering of the cells. We can then just increment
-  // the linearIndex counter in each cellwise operation.
+  // we assume a lexicographic ordering of the cells. We can then just increment the linearIndex counter in each cellwise operation.
   a.beginCellIteration();
   unsigned int linearIndex = 0;
   for (loop[2] = 0; loop[2] < end[2]; loop[2]++) {
@@ -327,10 +315,7 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::initMacroscopicCell
   for (unsigned int i = 0; i < numberCells; i++) {
     coupling::datastructures::MacroscopicCell<dim>* cell = dynamic_cast<coupling::datastructures::MacroscopicCell<dim>*>(&_macroscopicCellsWithLinkedCells[i]);
     if (cell == NULL) {
-      std::cout << "ERROR "
-                   "coupling::datastructures::MacroscopicCells::"
-                   "initMacroscopicCells(): dynamic_cast failed!"
-                << std::endl;
+      std::cout << "ERROR coupling::datastructures::MacroscopicCells::initMacroscopicCells(): dynamic_cast failed!" << std::endl;
       exit(EXIT_FAILURE);
     }
     macroscopicCells.push_back(cell);

@@ -13,9 +13,8 @@ template <unsigned int dim> class UniformFlowSolverInterface;
 }
 } // namespace coupling
 
-/** accelerates the fluid along x-direction with values provided everywhere. No
- * values are sent back from MD to this (kind of) flow solver. The cells of this
- * solver are assumed to be located on rank 0.
+/** accelerates the fluid along x-direction with values provided everywhere. No values are sent back from MD to this (kind of) flow solver.
+ *  The cells of this solver are assumed to be located on rank 0.
  *  @author Philipp Neumann
  */
 template <unsigned int dim> class coupling::interface::UniformFlowSolverInterface : public coupling::interface::TestMacroscopicSolverInterface<dim> {
@@ -47,9 +46,7 @@ public:
     for (unsigned int i = 0; i < _totalNumberMacroscopicCells; i++) {
       result.push_back(new coupling::datastructures::MacroscopicCell<dim>());
       if (result[i] == NULL) {
-        std::cout << "ERROR coupling::interface::UniformFlowSolverInterface: "
-                     "result[i]==NULL!"
-                  << std::endl;
+        std::cout << "ERROR coupling::interface::UniformFlowSolverInterface: result[i]==NULL!" << std::endl;
         exit(EXIT_FAILURE);
       }
       result[i]->setMicroscopicMass(_massPerMacroscopicCell);
@@ -61,9 +58,7 @@ public:
   virtual unsigned int* getMacroscopicCellIndices4Sending() {
     unsigned int* indices = new unsigned int[_totalNumberMacroscopicCells];
     if (indices == NULL) {
-      std::cout << "ERROR coupling::interface::UniformFlowSolverInterface: "
-                   "indices==NULL!"
-                << std::endl;
+      std::cout << "ERROR coupling::interface::UniformFlowSolverInterface: indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
     for (unsigned int i = 0; i < _totalNumberMacroscopicCells; i++) {
@@ -82,8 +77,7 @@ public:
 private:
   /** total number of macroscopic cells incl. ghost layers */
   const unsigned int _totalNumberMacroscopicCells;
-  /** mass and momentum that is assumed to be placed in each macroscopic cell on
-   * this solver's side. */
+  /** mass and momentum that is assumed to be placed in each macroscopic cell on this solver's side. */
   const double _massPerMacroscopicCell;
   const tarch::la::Vector<dim, double> _momentumPerMacroscopicCell;
 

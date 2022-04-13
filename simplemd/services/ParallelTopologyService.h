@@ -39,11 +39,11 @@ class LinkedCellService;
 class simplemd::services::ParallelTopologyService {
 public:
   /** initialise the service with global domain size and offset,
-   *  predefined meshwidth for the linked cells (which is to be adopted such
-   * that it fits to the local process properties), the number of processes to
-   * be used in each spatial direction, the rank of the current process, the
-   * global description of the outer boundaries, the number of molecules per
-   * direction and initialises the ParallelAndLocalBufferService.
+   *  predefined meshwidth for the linked cells (which is to be adopted such that
+   *  it fits to the local process properties), the number of processes to be used
+   *  in each spatial direction, the rank of the current process, the global
+   *  description of the outer boundaries, the number of molecules per direction
+   *  and initialises the ParallelAndLocalBufferService.
    *
    *  Needs to be called before the local services are initialised.
    */
@@ -75,22 +75,19 @@ public:
   /** returns local information on boundary relations */
   const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& getLocalBoundaryInformation() const { return _boundary; }
 
-  /** returns the mesh width for the linked cells in the current simulation.
-   * Depending on the meshwidth handed over during initialisation, this
-   * meshwidth might be different; we try to choose it as close to the meshwidth
-   * defined by the user, but big enough so that we have the same (integer)
-   * number of cells on each process. So, _meshWidth typicall is bigger or equal
-   * the user-defined meshwidth. This may result in higher computation times!
-   * However, the physics remain the same as the cutoff-radius is not affected
-   * by these changes.
+  /** returns the mesh width for the linked cells in the current simulation. Depending on the meshwidth
+   *  handed over during initialisation, this meshwidth might be different; we try to choose it as close
+   *  to the meshwidth defined by the user, but big enough so that we have the same (integer) number of
+   *  cells on each process. So, _meshWidth typicall is bigger or equal the user-defined meshwidth.
+   *  This may result in higher computation times! However, the physics remain the same as the cutoff-radius
+   *  is not affected by these changes.
    */
   const tarch::la::Vector<MD_DIM, double>& getMeshWidth() const { return _meshWidth; }
 
   /** returns the global number of cells in each spatial direction */
   const tarch::la::Vector<MD_DIM, unsigned int>& getGlobalNumberOfCells() const { return _globalNumberOfCells; }
 
-  /** returns the local number of cells in each spatial direction (i.e. only the
-   * cells of this process) */
+  /** returns the local number of cells in each spatial direction (i.e. only the cells of this process) */
   const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells() const { return _localNumberOfCells; }
 
   /** returns the number of processes used in each spatial direction */
@@ -105,41 +102,37 @@ public:
   /** returns the global index of the first (non-ghost) cell */
   const tarch::la::Vector<MD_DIM, unsigned int>& getGlobalIndexOfFirstCell() const { return _globalIndexOfFirstCell; }
 
-  /** returns true, if this process does not carry any work. This can be the
-   * case, if we have more ranks available in the NodePool than specified in the
-   * xml config.
+  /** returns true, if this process does not carry any work. This can be the case, if we have more ranks available
+   *  in the NodePool than specified in the xml config.
    */
   bool isIdle() const;
 
-  /** broadcasts all molecules contained in the (inner) cell "cell" with index
-   * cellIndex to all ghost cells that can be identified with this inner cell.
-   * Returns a vector containing the local cell coordinates of all neighbored
-   * ghost cells that are a local, non-parallel boundary. This is important for
-   * the case that we have 1 processor in one direction only. Then, we might
+  /** broadcasts all molecules contained in the (inner) cell "cell" with index cellIndex to all
+   * ghost cells that can be identified with this inner cell. Returns a vector containing the local
+   * cell coordinates of all neighbored ghost cells that are a local, non-parallel boundary.
+   * This is important for the case that we have 1 processor in one direction only. Then, we might
    * have a periodic boundary that needs to be handled locally!
    *
-   * This method is also used for handling process-leaving particles in the
-   * optimised case when they are sent together with molecules for ghost layers.
-   * The local buffer of the buffer service is filled only with process-leaving
-   * particles that need to be handled locally. Ghost particles that need to be
-   * handled locally are handled via the indices in the returned vector.
+   * This method is also used for handling process-leaving particles in the optimised case when
+   * they are sent together with molecules for ghost layers.
+   * The local buffer of the buffer service is filled only with process-leaving particles that need
+   * to be handled locally.
+   * Ghost particles that need to be handled locally are handled via the indices in the returned vector.
    *
-   * In the parallel case, this method makes use of the communication buffers:
-   * molecules are not messaged to neighbour one by one, but rather pushed into
-   * buffers, which store all molecules to be sent to a process.
+   * In the parallel case, this method makes use of the communication buffers: molecules are not
+   * messaged to neighbour one by one, but rather pushed into buffers, which store all molecules to be sent to a process.
    *
    * The MPI send calls are executed later (from within BoundaryTreatment).
    */
   std::vector<tarch::la::Vector<MD_DIM, unsigned int>> broadcastInnerCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
                                                                                    const simplemd::services::LinkedCellService& linkedCellService);
 
-  /** sends all molecules from cell cellIndex to the respective neighbouring
-   * process. The cell cellIndex needs to be a ghost cell. The function returns
-   * true, if the respective cell where the molecules need to be sorted in is
-   * part of another process; in this case the molecules are pushed to the send
-   * buffers and erased. Otherwise, the other (non-ghost) cell is part of the
-   * same process. In this case, no send-operation is triggered and false is
-   * returned.
+  /** sends all molecules from cell cellIndex to the respective neighbouring process. The cell
+   * cellIndex needs to be a ghost cell.
+   * The function returns true, if the respective cell where the molecules need to be sorted in
+   * is part of another process; in this case the molecules are pushed to the send buffers and erased.
+   * Otherwise, the other (non-ghost) cell is part of the same process. In this case, no send-operation is triggered and false
+   * is returned.
    *
    * The MPI send calls are executed later (from within BoundaryTreatment).
    */
@@ -162,8 +155,8 @@ public:
   /** See comment of communicationSteps_1_2() */
   void communicationSteps_3_4(simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService);
 
-  /** Compute (non-overlapping) intersection of a global region of interest
-     (ROI) with local domain. For example for purposes of profile plotter. */
+  /** Compute (non-overlapping) intersection of a global region of interest (ROI) with local domain.
+      For example for purposes of profile plotter. */
   bool globalToLocalRegionOfInterest(const tarch::la::Vector<MD_DIM, unsigned int>& globalStartCell, const tarch::la::Vector<MD_DIM, unsigned int>& globalRange,
                                      tarch::la::Vector<MD_DIM, unsigned int>& localStartCell, tarch::la::Vector<MD_DIM, unsigned int>& localRange) const;
 
@@ -191,9 +184,8 @@ private:
    */
   void addNeighbourToNeighbourRanksUnique(std::vector<int>& neighbourRanksUnique, unsigned int& numUniqueNeighbours, const int& addedNeighbour) const;
 
-  /** computes the actual mesh size that is used in the simulation. We make the
-   * width as similar to the prescribed mesh width "prescribedWidth" as possible
-   * so to have an integer number of grid cells.
+  /** computes the actual mesh size that is used in the simulation. We make the width as similar to the prescribed mesh width "prescribedWidth" as possible so
+   * to have an integer number of grid cells.
    */
   tarch::la::Vector<MD_DIM, double> computeMeshwidth(const tarch::la::Vector<MD_DIM, double>& prescribedWidth,
                                                      const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
@@ -212,21 +204,19 @@ private:
                                                                      const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
                                                                      const tarch::la::Vector<MD_DIM, double>& domainSize) const;
 
-  /** returns true if neighbourRank is present in the _neighbourRanks vector.
-   * Returns false otherwise. */
+  /** returns true if neighbourRank is present in the _neighbourRanks vector. Returns false otherwise. */
   bool isParallelNeighbour(const int& neighbourRank) const;
 
-  /** returns the local information needed for periodic boundary treatment. This
-   * function is called within the init() call and initialises the
-   * _periodicBoundary field.
+  /** returns the local information needed for periodic boundary treatment. This function
+   *  is called within the init() call and initialises the _periodicBoundary field.
    */
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>
   computeLocalBoundaryInformation(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
                                   const tarch::la::Vector<MD_DIM, unsigned int>& processCoordinates,
                                   const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses);
 
-  /** returns the number of transferred cells, if the neighbour is placed in
-   * distance x,y,z from the current cell.
+  /** returns the number of transferred cells, if the neighbour is placed in distance x,y,z
+   *  from the current cell.
    */
   unsigned int getNumberOfTransferredCells(const int& x
 #if (MD_DIM > 1)
@@ -239,10 +229,9 @@ private:
 #endif
   ) const;
 
-  /** corrects the position vector 'position' according to periodic boundary
-   * conditions. If the boundaryType is PERIODIC_BOUNDARY the index
-   * neighbourIndex is used to determine the location of the present boundary
-   * and to modify the position vector accordingly.
+  /** corrects the position vector 'position' according to periodic boundary conditions.
+   *  If the boundaryType is PERIODIC_BOUNDARY the index neighbourIndex is used to determine
+   *  the location of the present boundary and to modify the position vector accordingly.
    */
   void adaptPositionForPeriodicBoundaries(tarch::la::Vector<MD_DIM, double>& position, const simplemd::BoundaryType& boundaryType, const int& x
 #if (MD_DIM > 1)
@@ -255,36 +244,30 @@ private:
 #endif
   ) const;
 
-  /** get buffer index corresponding to neighbourRank from _neighbourRanksUnique
-   */
+  /** get buffer index corresponding to neighbourRank from _neighbourRanksUnique  */
   unsigned int getCurrentBufferIndexFromNeighbourRank(const int& neighbourRank) const;
 
-  /** Read off all molecules from buffer and resort them in the respective
-   * linked cells.
+  /** Read off all molecules from buffer and resort them in the respective linked cells.
    */
   void unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::services::MoleculeService& moleculeService,
                     simplemd::services::LinkedCellService& linkedCellService);
 
-  /** place position, velocity, forceOld and isFixed at the end of the
-   * respective local buffer.
+  /** place position, velocity, forceOld and isFixed at the end of the respective local buffer.
    */
   void pushMoleculeToLocalBuffer(const Molecule* mol, const tarch::la::Vector<MD_DIM, double>& pos);
 
 #if (MD_PARALLEL == MD_YES)
-  /** place position, velocity, forceOld and isFixed at the end of the
-   * respective sendBuffer.
+  /** place position, velocity, forceOld and isFixed at the end of the respective sendBuffer.
    */
   void pushMoleculeToSendBuffer(const unsigned int& bufferIndex, const Molecule* mol, const tarch::la::Vector<MD_DIM, double>& pos);
 
   /** Issues an Isend call on buffer.
-   * Does not wait for the request to be fulfilled, but uses up the respective
-   * request
+   * Does not wait for the request to be fulfilled, but uses up the respective request
    */
   void bufferIsend(ParallelAndLocalBufferService::SimpleBuffer* buffer, const int& neighbourRank, MPI_Request& request) const;
 
   /** Issues an Irecv call on buffer.
-   * Does not wait for the request to be fulfilled, but uses up the respective
-   * request
+   * Does not wait for the request to be fulfilled, but uses up the respective request
    */
   void bufferIrecv(ParallelAndLocalBufferService::SimpleBuffer* buffer, const int& neighbourRank, MPI_Request& request) const;
 #endif
@@ -318,8 +301,8 @@ private:
   /** boundary information on the local process */
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> _boundary;
 
-  /** coordinates of this process in the process matrix. This vector is the same
-   * as _rank, but written in vector form.
+  /** coordinates of this process in the process matrix. This vector is the same as
+   *  _rank, but written in vector form.
    */
   tarch::la::Vector<MD_DIM, unsigned int> _processCoordinates;
 

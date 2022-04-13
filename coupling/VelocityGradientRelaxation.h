@@ -15,7 +15,8 @@ template <class LinkedCell, unsigned int dim> class VelocityGradientRelaxation;
 template <class LinkedCell, unsigned int dim> class VelocityGradientRelaxationTopOnly;
 } // namespace coupling
 
-/** In this particular case, however, the velocity is relaxed within a one
+/** Carries out velocity relaxation (similar to the SetMomentumMapping procedure).
+ * In this particular case, however, the velocity is relaxed within a one
  * cell-wide strip around the molecular domain. For this purpose, the velocity
  * that shall be imposed in average in the cells that are within a three
  * cell-wide strip need to be known and stored in the

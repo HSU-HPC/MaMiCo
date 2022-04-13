@@ -75,14 +75,11 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuf
     (thisBuffer->second).bufferSize++;
     (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
     if ((thisBuffer->second).buffer == NULL) {
-      std::cout << "ERROR coupling::SendReceiveBuffer::writeToSendBuffer(): "
-                   "realloc yields NULL ptr!"
-                << std::endl;
+      std::cout << "ERROR coupling::SendReceiveBuffer::writeToSendBuffer(): realloc yields NULL ptr!" << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    // write global cell index and call to specialised function to read from
-    // macroscopic cell and write to send buffer
+    // write global cell index and call to specialised function to read from macroscopic cell and write to send buffer
     (thisBuffer->second).buffer[firstPos] = (double)globalIndex;
 
     dataExchange.readFromCell(&((thisBuffer->second).buffer[firstPos + 1]), macroscopicCell);
@@ -112,11 +109,9 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiv
       // determine global cell index for this macroscopic cell
       const unsigned int thisIndex = (unsigned int)(it->second).buffer[i * doublesPerCell];
 
-      // if this is the correct cell, write data into macroscopic cell and
-      // return
+      // if this is the correct cell, write data into macroscopic cell and return
       if (thisIndex == globalIndex) {
-        // read receive buffer and write to macroscopic cell (use specialised
-        // function)
+        // read receive buffer and write to macroscopic cell (use specialised function)
         dataExchange.writeToCell(&((it->second).buffer[i * doublesPerCell + 1]), macroscopicCell);
         return;
       }
@@ -130,8 +125,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiv
                                                                                          tarch::la::Vector<dim, unsigned int> globalVectorIndex) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
-  // determine the ranks from which we need to receive information of this
-  // macroscopic cell
+  // determine the ranks from which we need to receive information of this macroscopic cell
   const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(globalVectorIndex);
   const unsigned int ranksSize = (unsigned int)ranks.size();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -158,9 +152,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiv
     (thisBuffer->second).bufferSize++;
     (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
     if ((thisBuffer->second).buffer == NULL) {
-      std::cout << "ERROR coupling::SendReceiveBuffer::allocateReceiveBuffers(): "
-                   "realloc yields NULL ptr!"
-                << std::endl;
+      std::cout << "ERROR coupling::SendReceiveBuffer::allocateReceiveBuffers(): realloc yields NULL ptr!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // set all values to -1.0
@@ -192,9 +184,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending
         char* str = NULL;
         int len = -1;
         MPI_Error_string(err, str, &len);
-        std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerSending(): "
-                     "Sending from rank "
-                  << thisRank << " to " << it->first << " failed with error: " << str << std::endl;
+        std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerSending(): Sending from rank " << thisRank << " to " << it->first
+                  << " failed with error: " << str << std::endl;
         delete str;
         exit(EXIT_FAILURE);
       }
@@ -203,20 +194,16 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending
       // otherwise: copy information to _receiveBuffer
     } else {
 
-      // determine receive-buffer for this rank and check that the buffer is
-      // available and of correct size
+      // determine receive-buffer for this rank and check that the buffer is available and of correct size
       typename std::map<unsigned int, BufferWithID>::iterator itRecv = _receiveBuffer.find(thisRank);
       if ((itRecv == _receiveBuffer.end())) {
-        std::cout << "ERROR coupling::SendReceiveBuffer::triggerSending(): "
-                     "Could not send from rank "
-                  << thisRank << " to the same rank! No receive buffer available!";
+        std::cout << "ERROR coupling::SendReceiveBuffer::triggerSending(): Could not send from rank " << thisRank
+                  << " to the same rank! No receive buffer available!";
         std::cout << " Tag (in case of MPI; not used here): " << dataExchange.getTag() << std::endl;
         exit(EXIT_FAILURE);
       }
       if ((itRecv->second).bufferSize != (it->second).bufferSize) {
-        std::cout << "ERROR coupling::SendReceiveBuffer:triggerSending(): "
-                     "Send- and receive-buffer sizes do not match for "
-                     "information processed on same rank!"
+        std::cout << "ERROR coupling::SendReceiveBuffer:triggerSending(): Send- and receive-buffer sizes do not match for information processed on same rank!"
                   << std::endl;
         std::cout << "Recv-buffer size=" << (itRecv->second).bufferSize << ", send-buffer size=" << (it->second).bufferSize << std::endl;
         exit(EXIT_FAILURE);
@@ -246,9 +233,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceivi
         char* str = NULL;
         int len = -1;
         MPI_Error_string(err, str, &len);
-        std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerReceiving(): "
-                     "Receiving on rank "
-                  << thisRank << " from " << it->first << " failed with error: " << str << std::endl;
+        std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::triggerReceiving(): Receiving on rank " << thisRank << " from " << it->first
+                  << " failed with error: " << str << std::endl;
         delete str;
         exit(EXIT_FAILURE);
       }
@@ -262,9 +248,7 @@ template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests(const coupling::IndexConversion<dim>& indexConversion) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   if (_requestsAllocated) {
-    std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): "
-                 "allocateRequests() called although allocation already took place!"
-              << std::endl;
+    std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): allocateRequests() called although allocation already took place!" << std::endl;
     exit(EXIT_FAILURE);
   }
   if (_requests != NULL) {
@@ -289,9 +273,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReques
 
   _requests = new MPI_Request[_receiveSize + _sendSize];
   if (_requests == NULL) {
-    std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): "
-                 "_requests==NULL!"
-              << std::endl;
+    std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): _requests==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -307,9 +289,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperati
     return;
   }
   if (_requests == NULL) {
-    std::cout << "ERROR coupling::SendReceiveBuffer::waitAllOperations(): "
-                 "_requests==NULL!"
-              << std::endl;
+    std::cout << "ERROR coupling::SendReceiveBuffer::waitAllOperations(): _requests==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
   int err = MPI_Waitall(_sendSize + _receiveSize, _requests, MPI_STATUSES_IGNORE);
@@ -317,9 +297,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperati
     char* str = NULL;
     int len = -1;
     MPI_Error_string(err, str, &len);
-    std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::waitAllOperations(): "
-                 "Waiting failed with error: "
-              << str << std::endl;
+    std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::waitAllOperations(): Waiting failed with error: " << str << std::endl;
     delete str;
     exit(EXIT_FAILURE);
   }

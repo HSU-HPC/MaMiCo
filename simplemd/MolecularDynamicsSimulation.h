@@ -46,8 +46,8 @@ public:
   /** variant for multi-MD simulations */
   void initServices(const tarch::utils::MultiMDService<MD_DIM>& multiMDService, unsigned int localMDSimulation);
 
-  /** simulates one MD timestep. It's a virtual function as we (will definitely)
-   * need to extend this method when going to coupled LB-MD simulations.
+  /** simulates one MD timestep. It's a virtual function as we (will definitely) need to extend this method when
+   *  going to coupled LB-MD simulations.
    */
   void simulateOneTimestep(const unsigned int& t);
 
@@ -60,8 +60,8 @@ public:
   void evaluateStatistics(const unsigned int& t);
 
 private:
-  /** computes the number density for molecules given per direction and a
-   * certain domain size. This is only used during initialisation.
+  /** computes the number density for molecules given per direction and a certain domain size.
+   *  This is only used during initialisation.
    */
   double getNumberDensity(unsigned int numberMolecules, const tarch::la::Vector<MD_DIM, double>& domainSize) const;
 
@@ -96,8 +96,7 @@ protected:
   simplemd::services::LinkedCellService* _linkedCellService;
   // molecular properties (potential parameters, mass etc)
   simplemd::services::MolecularPropertiesService* _molecularPropertiesService;
-  // for external forces; has default constructor, hence we use it as object
-  // instead of ptr
+  // for external forces; has default constructor, hence we use it as object instead of ptr
   simplemd::services::ExternalForceService _externalForceService;
 };
 #endif // _MOLECULARDYNAMICS_MOLECULARDYNAMICSSIMULATION_H_

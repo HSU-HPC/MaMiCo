@@ -37,10 +37,7 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
       const double rij2 = tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {
-        std::cout << "ERROR "
-                     "simplemd::cellmappings::LennardJonesPotentialEnergyMapping::"
-                     "handleCell(): Particle positions are identical!"
-                  << std::endl;
+        std::cout << "ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(): Particle positions are identical!" << std::endl;
         exit(EXIT_FAILURE);
       }
 #endif
@@ -77,10 +74,7 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(
       const double rij2 = tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {
-        std::cout << "ERROR "
-                     "simplemd::cellmappings::LennardJonesPotentialEnergyMapping::"
-                     "handleCellPairs(): Particle positions are identical!"
-                  << std::endl;
+        std::cout << "ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPairs(): Particle positions are identical!" << std::endl;
         exit(EXIT_FAILURE);
       }
 #endif

@@ -27,8 +27,8 @@ public:
   enum PrintType { PRINT_ALL_CELLS = 0, PRINT_INNER_CELLS = 1, PRINT_GHOST_CELLS = 2 };
 
   /** initialise "numberCells" mamico cells. This number must be big enough to
-   * represent all local Mamico-macroscopic cells (incl. ghost cells) on every
-   * process.
+   * represent all local Mamico-macroscopic cells (incl.
+   *  ghost cells) on every process.
    */
   Sorting(int numberCells, LAMMPS_NS::LAMMPS *lmp)
       : _lmp(lmp), _numberCells((unsigned int)numberCells), _mamicoCells(new MamicoCell[numberCells]), _ghostAtoms(lmp) {
@@ -62,13 +62,13 @@ public:
             break;
           case PRINT_INNER_CELLS:
             decide = true;
-            for (int d = 0; d < dim; d++) {
+            for (unsigned int d = 0; d < dim; d++) {
               decide = decide && (loop[d] > 0) && (loop[d] < end[d] - 1);
             }
             break;
           case PRINT_GHOST_CELLS:
             decide = true;
-            for (int d = 0; d < dim; d++) {
+            for (unsigned int d = 0; d < dim; d++) {
               decide = decide && (loop[d] > 0) && (loop[d] < end[d] - 1);
             }
             decide = !decide;
@@ -127,9 +127,10 @@ public:
   }
 
   /** removes all atoms from the non-ghost cells and sorts the "nlocal" atoms
-   * from this process into the local cells. If "clearCellLists is set "false",
-   * the cell lists are not cleared before the update is carried out; by
-   * default, the cells are emptied.
+   * from this process into the local cells.
+   *  If "clearCellLists is set "false", the cell lists are not cleared before
+   * the update is carried out; by default, the
+   *  cells are emptied.
    */
   void updateNonGhostCells(const coupling::IndexConversion<dim> &indexConversion, bool clearCellLists = true) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -162,7 +163,7 @@ public:
     for (int n = 0; n < nLocalAtoms; n++) {
       // extract atom position
       tarch::la::Vector<dim, double> position(0.0);
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         position[d] = _lmp->atom->x[n][d];
       }
 
@@ -174,7 +175,7 @@ public:
         std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index " << vectorIndex << std::endl;
         // check if this is a global non-ghost cell and throw error otherwise
         bool isInnerCell = true;
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           isInnerCell = isInnerCell && (vectorIndex[d] > 0) && (vectorIndex[d] < indexConversion.getGlobalNumberMacroscopicCells()[d] + 1);
         }
         if (!isInnerCell) {
@@ -212,7 +213,7 @@ private:
         for (loop[0] = 0; loop[0] < end[0]; loop[0]++) {
           // determine ghost flag of cell
           bool isInnerCell = true;
-          for (int d = 0; d < dim; d++) {
+          for (unsigned int d = 0; d < dim; d++) {
             isInnerCell = isInnerCell && (loop[d] > 0) && (loop[d] < end[d] - 1);
           }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -244,7 +245,7 @@ private:
     for (int n = 0; n < nghost; n++) {
       // extract atom position
       tarch::la::Vector<dim, double> position(0.0);
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         position[d] = ghostX[n][d];
       }
 
@@ -260,7 +261,7 @@ private:
                   << indexConversion.convertLocalToGlobalVectorCellIndex(vectorIndex) << std::endl;
         // further check if this is a ghost cell and throw and error otherwise
         bool isGhostCell = false;
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           isGhostCell = isGhostCell || (vectorIndex[d] == 0) || (vectorIndex[d] == indexConversion.getLocalNumberMacroscopicCells()[d] + 1);
         }
         if (!isGhostCell) {

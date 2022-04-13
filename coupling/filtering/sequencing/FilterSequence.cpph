@@ -142,8 +142,8 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
       newfilter = new coupling::filtering::POD<dim>(inputCellVector, outputCellVector, _filteredValues, tws, kmax);
 #endif
 #else
-		std::cout << "ERROR: BUILD_WITH_EIGEN was not defined but filter node was set to POD." << std::endl;
-		exit(EXIT_FAILURE);
+      std::cout << "ERROR: BUILD_WITH_EIGEN was not defined but filter node was set to POD." << std::endl;
+      exit(EXIT_FAILURE);
 #endif
     }
 

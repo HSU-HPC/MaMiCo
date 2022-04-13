@@ -18,8 +18,8 @@
 #include <mpi.h>
 #endif
 
-/** tests the communication from a block of macroscopic cells (such as the block
- * of MaMiCo) to a selection of cells of a possible macroscopic solver.
+/** tests the communication from a block of macroscopic cells (such as the block of MaMiCo) to a selection of cells of a possible
+ *  macroscopic solver.
  *  @author Philipp Neumann
  */
 class FromMD2MacroTest : public Test {

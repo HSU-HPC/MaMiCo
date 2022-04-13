@@ -83,10 +83,7 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
   const double rij2 = tarch::la::dot(rij, rij);
 #if (MD_ERROR == MD_YES)
   if (tarch::la::equals(rij2, 0.0, 1e-4)) {
-    std::cout << "ERROR "
-                 "simplemd::cellmappings::LennardJonesForceMapping::"
-                 "getLennardJonesForce(): Particle positions are identical!"
-              << std::endl;
+    std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!" << std::endl;
     std::cout << "Position: " << position1 << ","
               << "Position2: " << position2 << std::endl;
   }
