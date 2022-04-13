@@ -131,80 +131,72 @@ $(function() {
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> potEnergyRef = pow(2.0, dim) * 0.5 * (4.0 * epsilon * (sigma6 / rij6) * ((sigma6 / rij6) - 1.0) - cutOffEnergy);</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keyword">const</span> <a class="code hl_class" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector&lt;dim, double&gt;</a> forceRef(0.0);</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="comment">// compute force/energy onto this molecule -&gt; only do this on rank 0, since</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="comment">// this is the rank containing the cell with the molecule at 3.0x3.0x3.0</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordflow">if</span> (indexConversion.<a class="code hl_function" href="classcoupling_1_1IndexConversion.html#aa2df66a3be59fc569c6dd7c079305cc9">getThisRank</a>() == 0) {</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>      mdSolverInterface-&gt;calculateForceAndEnergy(molecule);</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>      <a class="code hl_class" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector&lt;dim, double&gt;</a> force = molecule.<a class="code hl_function" href="classcoupling_1_1datastructures_1_1Molecule.html#a60a17873c34354836d7499eab2b2f760">getForce</a>();</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>      <span class="keywordtype">double</span> potEnergy = molecule.<a class="code hl_function" href="classcoupling_1_1datastructures_1_1Molecule.html#a0225adc5c32eb3072a850e3575cdcd46">getPotentialEnergy</a>();</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>      <span class="keywordflow">if</span> (fabs(potEnergy - potEnergyRef) &gt; tolerance) {</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculateForceEnergy: potential Energies &quot;</span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>                     <span class="stringliteral">&quot;do not match1! Potential energy ref.=&quot;</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>                  &lt;&lt; potEnergyRef &lt;&lt; <span class="stringliteral">&quot;, potential energy=&quot;</span> &lt;&lt; potEnergy &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        exit(EXIT_FAILURE);</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>      }</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>      <span class="keywordflow">if</span> (fabs(tarch::la::norm2(force - forceRef) &gt; tolerance)) {</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculcateForceEnergy: forces do not &quot;</span></div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>                     <span class="stringliteral">&quot;match1! Force ref.=&quot;</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                  &lt;&lt; forceRef &lt;&lt; <span class="stringliteral">&quot;, force=&quot;</span> &lt;&lt; force &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        exit(EXIT_FAILURE);</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>      }</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>      <span class="comment">// add molecule to simulation</span></div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Add molecule to MD simulation...&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>      mdSolverInterface-&gt;addMoleculeToMDSimulation(molecule);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    }</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="comment">// synchronise molecules over all processes</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    mdSolverInterface-&gt;synchronizeMoleculesAfterMassModification();</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="comment">// search for this molecule and try to extract potential energy from it;</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="comment">// this energy should again return the same value</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keywordflow">if</span> (indexConversion.<a class="code hl_function" href="classcoupling_1_1IndexConversion.html#aa2df66a3be59fc569c6dd7c079305cc9">getThisRank</a>() == 0) {</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Molecule synchronised; do next test...&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> nlocal = lammps-&gt;atom-&gt;nlocal;</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>      <span class="keywordtype">int</span> n = -1;</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nlocal; i++) {</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="keywordtype">bool</span> found = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> d = 0; d &lt; dim; d++) {</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>          found = found &amp;&amp; (thisPosition[d] == lammps-&gt;atom-&gt;x[i][d]);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        }</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <span class="keywordflow">if</span> (found) {</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>          n = i;</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>          <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        }</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>      }</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>      <span class="keywordflow">if</span> (n &lt; 0) {</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculateForceEnergy: Could not find &quot;</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                     <span class="stringliteral">&quot;molecule after adding it!&quot;</span></div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>                  &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        exit(EXIT_FAILURE);</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>      } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Molecule added at local position &quot;</span> &lt;&lt; n &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      }</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>      <span class="comment">// construct a lammps molecule</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>      LAMMPS_NS::MamicoLammpsMolecule&lt;dim&gt; lammpsMolecule(lammps-&gt;atom-&gt;x, lammps-&gt;atom-&gt;v, lammps-&gt;atom-&gt;f, n, cutOffRadius);</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>      <span class="keywordtype">double</span> potEnergy = lammpsMolecule.getPotentialEnergy();</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>      <span class="keywordflow">if</span> (fabs(potEnergy - potEnergyRef) &gt; tolerance) {</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculateForceEnergy: potential Energies &quot;</span></div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>                     <span class="stringliteral">&quot;do not match2! Potential energy ref.=&quot;</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>                  &lt;&lt; potEnergyRef &lt;&lt; <span class="stringliteral">&quot;, potential energy=&quot;</span> &lt;&lt; potEnergy &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        exit(EXIT_FAILURE);</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>      }</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    }</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>  }</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>};</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="preprocessor">#endif </span><span class="comment">// _TESTLAMMPSCALCULATEFORCEENERGY_H_</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="comment">// compute force/energy onto this molecule -&gt; only do this on rank 0, since this is the rank containing the cell with the molecule at 3.0x3.0x3.0</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordflow">if</span> (indexConversion.<a class="code hl_function" href="classcoupling_1_1IndexConversion.html#aa2df66a3be59fc569c6dd7c079305cc9">getThisRank</a>() == 0) {</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>      mdSolverInterface-&gt;calculateForceAndEnergy(molecule);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>      <a class="code hl_class" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector&lt;dim, double&gt;</a> force = molecule.<a class="code hl_function" href="classcoupling_1_1datastructures_1_1Molecule.html#a60a17873c34354836d7499eab2b2f760">getForce</a>();</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>      <span class="keywordtype">double</span> potEnergy = molecule.<a class="code hl_function" href="classcoupling_1_1datastructures_1_1Molecule.html#a0225adc5c32eb3072a850e3575cdcd46">getPotentialEnergy</a>();</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      <span class="keywordflow">if</span> (fabs(potEnergy - potEnergyRef) &gt; tolerance) {</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculateForceEnergy: potential Energies do not match1! Potential energy ref.=&quot;</span> &lt;&lt; potEnergyRef</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>                  &lt;&lt; <span class="stringliteral">&quot;, potential energy=&quot;</span> &lt;&lt; potEnergy &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        exit(EXIT_FAILURE);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>      }</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>      <span class="keywordflow">if</span> (fabs(tarch::la::norm2(force - forceRef) &gt; tolerance)) {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculcateForceEnergy: forces do not match1! Force ref.=&quot;</span> &lt;&lt; forceRef &lt;&lt; <span class="stringliteral">&quot;, force=&quot;</span> &lt;&lt; force &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        exit(EXIT_FAILURE);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>      }</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>      <span class="comment">// add molecule to simulation</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Add molecule to MD simulation...&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>      mdSolverInterface-&gt;addMoleculeToMDSimulation(molecule);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    }</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="comment">// synchronise molecules over all processes</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    mdSolverInterface-&gt;synchronizeMoleculesAfterMassModification();</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="comment">// search for this molecule and try to extract potential energy from it; this energy should again return the same value</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="keywordflow">if</span> (indexConversion.<a class="code hl_function" href="classcoupling_1_1IndexConversion.html#aa2df66a3be59fc569c6dd7c079305cc9">getThisRank</a>() == 0) {</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Molecule synchronised; do next test...&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> nlocal = lammps-&gt;atom-&gt;nlocal;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>      <span class="keywordtype">int</span> n = -1;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nlocal; i++) {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        <span class="keywordtype">bool</span> found = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> d = 0; d &lt; dim; d++) {</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>          found = found &amp;&amp; (thisPosition[d] == lammps-&gt;atom-&gt;x[i][d]);</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        }</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="keywordflow">if</span> (found) {</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>          n = i;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>          <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        }</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>      }</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>      <span class="keywordflow">if</span> (n &lt; 0) {</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculateForceEnergy: Could not find molecule after adding it!&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        exit(EXIT_FAILURE);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;Molecule added at local position &quot;</span> &lt;&lt; n &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>      }</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      <span class="comment">// construct a lammps molecule</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>      LAMMPS_NS::MamicoLammpsMolecule&lt;dim&gt; lammpsMolecule(lammps-&gt;atom-&gt;x, lammps-&gt;atom-&gt;v, lammps-&gt;atom-&gt;f, n, cutOffRadius);</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      <span class="keywordtype">double</span> potEnergy = lammpsMolecule.getPotentialEnergy();</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <span class="keywordflow">if</span> (fabs(potEnergy - potEnergyRef) &gt; tolerance) {</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculateForceEnergy: potential Energies do not match2! Potential energy ref.=&quot;</span> &lt;&lt; potEnergyRef</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>                  &lt;&lt; <span class="stringliteral">&quot;, potential energy=&quot;</span> &lt;&lt; potEnergy &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        exit(EXIT_FAILURE);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>      }</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    }</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>  }</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>};</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="preprocessor">#endif </span><span class="comment">// _TESTLAMMPSCALCULATEFORCEENERGY_H_</span></div>
 <div class="ttc" id="aclassTestLammpsCalculateForceEnergy_html"><div class="ttname"><a href="classTestLammpsCalculateForceEnergy.html">TestLammpsCalculateForceEnergy</a></div><div class="ttdef"><b>Definition:</b> TestLammpsCalculateForceEnergy.h:15</div></div>
 <div class="ttc" id="aclassTestLammpsCalculateForceEnergy_html_a3ce1cd03d0e3a54e92b86d6cff565f15"><div class="ttname"><a href="classTestLammpsCalculateForceEnergy.html#a3ce1cd03d0e3a54e92b86d6cff565f15">TestLammpsCalculateForceEnergy::run</a></div><div class="ttdeci">virtual void run()</div><div class="ttdef"><b>Definition:</b> TestLammpsCalculateForceEnergy.h:20</div></div>
 <div class="ttc" id="aclassTestLammps_html"><div class="ttname"><a href="classTestLammps.html">TestLammps</a></div><div class="ttdef"><b>Definition:</b> TestLammps.h:28</div></div>
-<div class="ttc" id="aclassTestLammps_html_a032e4b51f896ef2fd24df904b6ef56fe"><div class="ttname"><a href="classTestLammps.html#a032e4b51f896ef2fd24df904b6ef56fe">TestLammps::loadMacroscopicSolverConfiguration</a></div><div class="ttdeci">void loadMacroscopicSolverConfiguration()</div><div class="ttdef"><b>Definition:</b> TestLammps.h:323</div></div>
-<div class="ttc" id="aclassTestLammps_html_a3ed7deab01616dd6bc562b4d0f4e3156"><div class="ttname"><a href="classTestLammps.html#a3ed7deab01616dd6bc562b4d0f4e3156">TestLammps::loadMamicoTestConfiguration</a></div><div class="ttdeci">void loadMamicoTestConfiguration()</div><div class="ttdef"><b>Definition:</b> TestLammps.h:236</div></div>
-<div class="ttc" id="aclassTestLammps_html_ad45f8c2ea0d8437dad009ae2c6e218c0"><div class="ttname"><a href="classTestLammps.html#ad45f8c2ea0d8437dad009ae2c6e218c0">TestLammps::loadLammpsTestConfiguration</a></div><div class="ttdeci">void loadLammpsTestConfiguration(std::string inputmoleculeconfiguration, int numberAtoms)</div><div class="ttdef"><b>Definition:</b> TestLammps.h:128</div></div>
+<div class="ttc" id="aclassTestLammps_html_a032e4b51f896ef2fd24df904b6ef56fe"><div class="ttname"><a href="classTestLammps.html#a032e4b51f896ef2fd24df904b6ef56fe">TestLammps::loadMacroscopicSolverConfiguration</a></div><div class="ttdeci">void loadMacroscopicSolverConfiguration()</div><div class="ttdef"><b>Definition:</b> TestLammps.h:311</div></div>
+<div class="ttc" id="aclassTestLammps_html_a3ed7deab01616dd6bc562b4d0f4e3156"><div class="ttname"><a href="classTestLammps.html#a3ed7deab01616dd6bc562b4d0f4e3156">TestLammps::loadMamicoTestConfiguration</a></div><div class="ttdeci">void loadMamicoTestConfiguration()</div><div class="ttdef"><b>Definition:</b> TestLammps.h:227</div></div>
+<div class="ttc" id="aclassTestLammps_html_ad45f8c2ea0d8437dad009ae2c6e218c0"><div class="ttname"><a href="classTestLammps.html#ad45f8c2ea0d8437dad009ae2c6e218c0">TestLammps::loadLammpsTestConfiguration</a></div><div class="ttdeci">void loadLammpsTestConfiguration(std::string inputmoleculeconfiguration, int numberAtoms)</div><div class="ttdef"><b>Definition:</b> TestLammps.h:126</div></div>
 <div class="ttc" id="aclasscoupling_1_1IndexConversion_html"><div class="ttname"><a href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a></div><div class="ttdoc">handles the index conversion</div><div class="ttdef"><b>Definition:</b> IndexConversion.h:33</div></div>
 <div class="ttc" id="aclasscoupling_1_1IndexConversion_html_aa2df66a3be59fc569c6dd7c079305cc9"><div class="ttname"><a href="classcoupling_1_1IndexConversion.html#aa2df66a3be59fc569c6dd7c079305cc9">coupling::IndexConversion::getThisRank</a></div><div class="ttdeci">unsigned int getThisRank() const</div><div class="ttdoc">returns the rank which corresponds to the linearised index of the vector returned by getThisProcess()...</div></div>
 <div class="ttc" id="aclasscoupling_1_1datastructures_1_1Molecule_html"><div class="ttname"><a href="classcoupling_1_1datastructures_1_1Molecule.html">coupling::datastructures::Molecule</a></div><div class="ttdoc">molecule representation for coupling component. Dericed from the class coupling::interface::Molecule</div><div class="ttdef"><b>Definition:</b> Molecule.h:24</div></div>

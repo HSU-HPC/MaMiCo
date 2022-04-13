@@ -80,7 +80,7 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="FDCouetteSolver_8h_source.html">FDCouetteSolver.h</a>&gt;</code></p>
 
-<p>Inherits <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html">coupling::solvers::NumericalSolver</a>.</p>
+<p>Inherits <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html">coupling::solvers::NumericalSolver</a>, and <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html">coupling::solvers::NumericalSolver</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -102,6 +102,27 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3d393385a35bbb726b2cab7565be8954"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd23c29449ebfb23141dbb240d37354b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#afd23c29449ebfb23141dbb240d37354b">getDensity</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; pos) const override</td></tr>
 <tr class="memdesc:afd23c29449ebfb23141dbb240d37354b"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns density at a certain position  <a href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#afd23c29449ebfb23141dbb240d37354b">More...</a><br /></td></tr>
+<tr class="separator:afd23c29449ebfb23141dbb240d37354b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69307c42e01c17a68743912ad312b869"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#a69307c42e01c17a68743912ad312b869">setMDBoundaryValues</a> (std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; 3 &gt; * &gt; &amp;recvBuffer, const unsigned int *const recvIndices, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; 3 &gt; &amp;indexConversion) override</td></tr>
+<tr class="memdesc:a69307c42e01c17a68743912ad312b869"><td class="mdescLeft">&#160;</td><td class="mdescRight">applies the values received from the MD-solver within the conntinuum solver  <a href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#a69307c42e01c17a68743912ad312b869">More...</a><br /></td></tr>
+<tr class="separator:a69307c42e01c17a68743912ad312b869"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8629986bc9fb0676e9cd29bc460ab58f"><td class="memItemLeft" align="right" valign="top"><a id="a8629986bc9fb0676e9cd29bc460ab58f" name="a8629986bc9fb0676e9cd29bc460ab58f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>FiniteDifferenceSolver</b> (const double channelheight, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity, const double kinVisc, const double dx, const double dt, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, const unsigned int numThreads=1)</td></tr>
+<tr class="separator:a8629986bc9fb0676e9cd29bc460ab58f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab512829168cca71209b4d6e23755dd5a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#ab512829168cca71209b4d6e23755dd5a">advance</a> (double dt) override</td></tr>
+<tr class="memdesc:ab512829168cca71209b4d6e23755dd5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">advances the solver in time  <a href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#ab512829168cca71209b4d6e23755dd5a">More...</a><br /></td></tr>
+<tr class="separator:ab512829168cca71209b4d6e23755dd5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94fac6a45317b8a83dd220d0a4509dbb"><td class="memItemLeft" align="right" valign="top"><a id="a94fac6a45317b8a83dd220d0a4509dbb" name="a94fac6a45317b8a83dd220d0a4509dbb"></a>
+const double&#160;</td><td class="memItemRight" valign="bottom"><b>getError</b> () const override</td></tr>
+<tr class="separator:a94fac6a45317b8a83dd220d0a4509dbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1e169845a30716836e4e98977bb7959"><td class="memItemLeft" align="right" valign="top"><a id="ad1e169845a30716836e4e98977bb7959" name="ad1e169845a30716836e4e98977bb7959"></a>
+<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getVelocity</b> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; pos) const override</td></tr>
+<tr class="separator:ad1e169845a30716836e4e98977bb7959"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d393385a35bbb726b2cab7565be8954"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#a3d393385a35bbb726b2cab7565be8954">setWallVelocity</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity) override</td></tr>
+<tr class="memdesc:a3d393385a35bbb726b2cab7565be8954"><td class="mdescLeft">&#160;</td><td class="mdescRight">changes the velocity at the moving wall (z=0)  <a href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#a3d393385a35bbb726b2cab7565be8954">More...</a><br /></td></tr>
+<tr class="separator:a3d393385a35bbb726b2cab7565be8954"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd23c29449ebfb23141dbb240d37354b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#afd23c29449ebfb23141dbb240d37354b">getDensity</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; pos) const override</td></tr>
+<tr class="memdesc:afd23c29449ebfb23141dbb240d37354b"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the density for a given position  <a href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#afd23c29449ebfb23141dbb240d37354b">More...</a><br /></td></tr>
 <tr class="separator:afd23c29449ebfb23141dbb240d37354b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69307c42e01c17a68743912ad312b869"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#a69307c42e01c17a68743912ad312b869">setMDBoundaryValues</a> (std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; 3 &gt; * &gt; &amp;recvBuffer, const unsigned int *const recvIndices, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; 3 &gt; &amp;indexConversion) override</td></tr>
 <tr class="memdesc:a69307c42e01c17a68743912ad312b869"><td class="mdescLeft">&#160;</td><td class="mdescRight">applies the values received from the MD-solver within the conntinuum solver  <a href="classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html#a69307c42e01c17a68743912ad312b869">More...</a><br /></td></tr>
@@ -155,6 +176,12 @@ Private Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> ()</td></tr>
 <tr class="memdesc:ae2ddec7d81d49c660f013f2e87dc6ac1"><td class="mdescLeft">&#160;</td><td class="mdescRight">update the velocity in the cells which are flagged as FLUID <br /></td></tr>
 <tr class="separator:ae2ddec7d81d49c660f013f2e87dc6ac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a2b27e1654cd89f5d4c7a1efb08108c"><td class="memItemLeft" align="right" valign="top"><a id="a0a2b27e1654cd89f5d4c7a1efb08108c" name="a0a2b27e1654cd89f5d4c7a1efb08108c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setBeyondWall</b> ()</td></tr>
+<tr class="separator:a0a2b27e1654cd89f5d4c7a1efb08108c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea3bceca9d0cc716e70ef0d73bb18f7a"><td class="memItemLeft" align="right" valign="top"><a id="aea3bceca9d0cc716e70ef0d73bb18f7a" name="aea3bceca9d0cc716e70ef0d73bb18f7a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>stream</b> ()</td></tr>
+<tr class="separator:aea3bceca9d0cc716e70ef0d73bb18f7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -162,14 +189,14 @@ Private Attributes</h2></td></tr>
 const double&#160;</td><td class="memItemRight" valign="bottom"><b>_omega</b></td></tr>
 <tr class="memdesc:a6add4b99ddd61e0724ce2135dcef08ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">factor for the finite difference stencil = dt*kinVisc/(dx*dx) <br /></td></tr>
 <tr class="separator:a6add4b99ddd61e0724ce2135dcef08ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a946c3f8b6f9aa8655507714241842083"><td class="memItemLeft" align="right" valign="top"><a id="a946c3f8b6f9aa8655507714241842083" name="a946c3f8b6f9aa8655507714241842083"></a>
+<tr class="memitem:a65872220bfd1b5824bbfdce861db1056"><td class="memItemLeft" align="right" valign="top"><a id="a65872220bfd1b5824bbfdce861db1056" name="a65872220bfd1b5824bbfdce861db1056"></a>
 <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_wallVelocity</b></td></tr>
-<tr class="memdesc:a946c3f8b6f9aa8655507714241842083"><td class="mdescLeft">&#160;</td><td class="mdescRight">velocity of moving wall of Couette flow <br /></td></tr>
-<tr class="separator:a946c3f8b6f9aa8655507714241842083"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47d11c8e81b76a47076931416e55d7c1"><td class="memItemLeft" align="right" valign="top"><a id="a47d11c8e81b76a47076931416e55d7c1" name="a47d11c8e81b76a47076931416e55d7c1"></a>
+<tr class="memdesc:a65872220bfd1b5824bbfdce861db1056"><td class="mdescLeft">&#160;</td><td class="mdescRight">velocity of moving wall of Couette flow <br /></td></tr>
+<tr class="separator:a65872220bfd1b5824bbfdce861db1056"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f38bc0b7a1ed0d9dbc813a47504aecf"><td class="memItemLeft" align="right" valign="top"><a id="a4f38bc0b7a1ed0d9dbc813a47504aecf" name="a4f38bc0b7a1ed0d9dbc813a47504aecf"></a>
 double *&#160;</td><td class="memItemRight" valign="bottom"><b>_velold</b> {nullptr}</td></tr>
-<tr class="memdesc:a47d11c8e81b76a47076931416e55d7c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">the velocity field from the last time step <br /></td></tr>
-<tr class="separator:a47d11c8e81b76a47076931416e55d7c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:a4f38bc0b7a1ed0d9dbc813a47504aecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">the velocity field from the last time step <br /></td></tr>
+<tr class="separator:a4f38bc0b7a1ed0d9dbc813a47504aecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -433,7 +460,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="ab512829168cca71209b4d6e23755dd5a" name="ab512829168cca71209b4d6e23755dd5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab512829168cca71209b4d6e23755dd5a">&#9670;&nbsp;</a></span>advance()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab512829168cca71209b4d6e23755dd5a">&#9670;&nbsp;</a></span>advance() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -462,8 +489,44 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 
 </div>
 </div>
+<a id="ab512829168cca71209b4d6e23755dd5a" name="ab512829168cca71209b4d6e23755dd5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab512829168cca71209b4d6e23755dd5a">&#9670;&nbsp;</a></span>advance() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void coupling::solvers::FiniteDifferenceSolver::advance </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>dt</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>advances the solver in time </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dt</td><td>the solver will be advanced from the current time t to t+dt </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html#aa7a970b297fdc6494bf64da2b2d9c2e6">coupling::solvers::AbstractCouetteSolver&lt; 3 &gt;</a>.</p>
+
+</div>
+</div>
 <a id="afd23c29449ebfb23141dbb240d37354b" name="afd23c29449ebfb23141dbb240d37354b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afd23c29449ebfb23141dbb240d37354b">&#9670;&nbsp;</a></span>getDensity()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afd23c29449ebfb23141dbb240d37354b">&#9670;&nbsp;</a></span>getDensity() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -494,6 +557,43 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a density vector </dd></dl>
+
+<p>Implements <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ac92f6c01593bb8dbed359da565a4f21a">coupling::solvers::NumericalSolver</a>.</p>
+
+</div>
+</div>
+<a id="afd23c29449ebfb23141dbb240d37354b" name="afd23c29449ebfb23141dbb240d37354b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd23c29449ebfb23141dbb240d37354b">&#9670;&nbsp;</a></span>getDensity() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double coupling::solvers::FiniteDifferenceSolver::getDensity </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt;&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>returns the density for a given position </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>position for which the density will be returned </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the density </dd></dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ac92f6c01593bb8dbed359da565a4f21a">coupling::solvers::NumericalSolver</a>.</p>
 
@@ -563,7 +663,61 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 </div>
 </div>
 <a id="a69307c42e01c17a68743912ad312b869" name="a69307c42e01c17a68743912ad312b869"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69307c42e01c17a68743912ad312b869">&#9670;&nbsp;</a></span>setMDBoundaryValues()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a69307c42e01c17a68743912ad312b869">&#9670;&nbsp;</a></span>setMDBoundaryValues() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void coupling::solvers::FiniteDifferenceSolver::setMDBoundaryValues </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; 3 &gt; * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>recvBuffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int *const&#160;</td>
+          <td class="paramname"><em>recvIndices</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; 3 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>indexConversion</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>applies the values received from the MD-solver within the conntinuum solver </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">recvBuffer</td><td>holds the data from the md solver </td></tr>
+    <tr><td class="paramname">recvIndice</td><td>the indices to connect the data from the buffer with macroscopic cells </td></tr>
+    <tr><td class="paramname">indexConversion</td><td>instance of the indexConversion </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0792b72da558b7f8eafaaee4975f91ea">coupling::solvers::NumericalSolver</a>.</p>
+
+</div>
+</div>
+<a id="a69307c42e01c17a68743912ad312b869" name="a69307c42e01c17a68743912ad312b869"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69307c42e01c17a68743912ad312b869">&#9670;&nbsp;</a></span>setMDBoundaryValues() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -617,7 +771,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 </div>
 </div>
 <a id="a3d393385a35bbb726b2cab7565be8954" name="a3d393385a35bbb726b2cab7565be8954"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d393385a35bbb726b2cab7565be8954">&#9670;&nbsp;</a></span>setWallVelocity()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d393385a35bbb726b2cab7565be8954">&#9670;&nbsp;</a></span>setWallVelocity() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -652,8 +806,45 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a id="a3d393385a35bbb726b2cab7565be8954" name="a3d393385a35bbb726b2cab7565be8954"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d393385a35bbb726b2cab7565be8954">&#9670;&nbsp;</a></span>setWallVelocity() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void coupling::solvers::FiniteDifferenceSolver::setWallVelocity </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt;&#160;</td>
+          <td class="paramname"><em>wallVelocity</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>changes the velocity at the moving wall (z=0) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wallVelocity</td><td>new wall velocity to apply </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a1565b71bf69f96950b2b8bf2c41acb23">coupling::solvers::NumericalSolver</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>coupling/solvers/<a class="el" href="FDCouetteSolver_8h_source.html">FDCouetteSolver.h</a></li>
+<li>coupling/solvers/<a class="el" href="FiniteDifferenceSolver_8h_source.html">FiniteDifferenceSolver.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
