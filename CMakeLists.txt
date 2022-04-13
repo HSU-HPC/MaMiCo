@@ -504,3 +504,14 @@ add_custom_target(
   -i
   ${CLANGFORMAT_SOURCES_ABS}
 )
+
+#
+# compiletest target
+#
+set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
+get_filename_component(COMPILETEST_SCRIPT "tarch/tests/CompileTest.sh" ABSOLUTE)
+add_custom_target(
+  compiletest
+  COMMAND ${COMPILETEST_SCRIPT}
+  ${COMPILETEST_COMPILERS}
+)
