@@ -49,14 +49,15 @@ public:
     }
   }
 
-  /** runs various tests on get-methods of the MD interface. Explicitly tested
-   * are: getGlobalMDDomainSize() getGlobalMDDomainOffset() getMoleculeMass() ->
-   * here we only allow molecules/atoms to be of type "1" getKB() -> is
-   * always 1.0 (LJ case) getMoleculeSigma() -> is always 1.0 (LJ case)
+  /** runs various tests on get-methods of the MD interface. Explicitly tested are:
+   *  getGlobalMDDomainSize()
+   *  getGlobalMDDomainOffset()
+   *  getMoleculeMass() -> here we only allow molecules/atoms to be of type "1"
+   *  getKB() -> is always 1.0 (LJ case)
+   *  getMoleculeSigma() -> is always 1.0 (LJ case)
    *  getMoleculeEpsilon() -> is always 1.0 (LJ case)
    *  getDt()
-   *  Implicitly, we also test the method getLinkedCell() since this one is
-   * automatically invoked in the setup phase of the macroscopic cell service;
+   *  Implicitly, we also test the method getLinkedCell() since this one is automatically invoked in the setup phase of the macroscopic cell service;
    *  We can hence check the output from the couts in a first place.
    */
   virtual void run() {
@@ -118,21 +119,16 @@ public:
   }
 
 protected:
-  /** loads the LAMMPS test configuration. We provide a respective script in
-   * input->one()-statements. Besides, we parse input positions for molecules
-   *  from a file inputpositionsonly2D.xyz or inputpositions3D.xyz,
-   * respectively. This method supports dim=2 and dim=3. The arguments
-   * correspond to the file containing the molecule setup and the number of
-   * atoms contained.
+  /** loads the LAMMPS test configuration. We provide a respective script in input->one()-statements. Besides, we parse input positions for molecules
+   *  from a file inputpositionsonly2D.xyz or inputpositions3D.xyz, respectively. This method supports dim=2 and dim=3.
+   *  The arguments correspond to the file containing the molecule setup and the number of atoms contained.
    */
   void loadLammpsTestConfiguration(std::string inputmoleculeconfiguration, int numberAtoms) {
     int size = -1;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     if ((dim != 2) && (dim != 3)) {
-      std::cout << "ERROR TestLammps::loadLammpsTestConfiguration: only dim=2 "
-                   "or dim=3 supported!"
-                << std::endl;
+      std::cout << "ERROR TestLammps::loadLammpsTestConfiguration: only dim=2 or dim=3 supported!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // allocate lammps
@@ -142,9 +138,7 @@ protected:
     }
     _lammps = new LAMMPS_NS::LAMMPS(_argc, _argv, MPI_COMM_WORLD);
     if (_lammps == NULL) {
-      std::cout << "ERROR TestLammps::loadLammpsTestConfiguration: Could not "
-                   "allocate _lammps!"
-                << std::endl;
+      std::cout << "ERROR TestLammps::loadLammpsTestConfiguration: Could not allocate _lammps!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // read input -> this should also initialise the md solver interface
@@ -183,16 +177,14 @@ protected:
     _lammps->input->one("pair_style lj/cut 2.5");
     _lammps->input->one("pair_modify shift yes");
     _lammps->input->one("pair_coeff 1 1 1.0 1.0 2.5");
-    // use a very small time step to yield nearly no position changes after 1 or
-    // 2 time steps
+    // use a very small time step to yield nearly no position changes after 1 or 2 time steps
     _lammps->input->one("timestep 1.0e-14");
     _lammps->input->one("neighbor 0.5 bin");
     _lammps->input->one("neigh_modify delay 0 every 20 check no");
-    //_lammps->input->one("dump myDump all custom 100 atom*.dat id type x y z vx
-    // vy vz"); _lammps->input->one("restart 100 checkpoint1 checkpoint2");
+    //_lammps->input->one("dump myDump all custom 100 atom*.dat id type x y z vx vy vz");
+    //_lammps->input->one("restart 100 checkpoint1 checkpoint2");
     _lammps->input->one("fix 1 all nve");
-    // always use a minimal number of local mamico cells in fix mamico. This
-    // implies that we have to choose this depending on the number of procs
+    // always use a minimal number of local mamico cells in fix mamico. This implies that we have to choose this depending on the number of procs
     if (dim == 2) {
       switch (size) {
       case 1:
@@ -228,9 +220,8 @@ protected:
     }
   }
 
-  /** load mamico configuration and initialse macroscopic cell service; should
-   * be called after loadLammpsTestConfiguration() and
-   * loadMacroscopicSolverConfiguration(). We assume a valid configuration file
+  /** load mamico configuration and initialse macroscopic cell service; should be called after
+   *  loadLammpsTestConfiguration() and loadMacroscopicSolverConfiguration(). We assume a valid configuration file
    *  for this test setup in the file mamico_lammps_test_configuration.xml.
    */
   void loadMamicoTestConfiguration() {
@@ -290,9 +281,7 @@ protected:
         break;
       }
     } else {
-      std::cout << "ERROR TestLammps::loadMamicoTestConfiguration: only 2D and "
-                   "3D supported!"
-                << std::endl;
+      std::cout << "ERROR TestLammps::loadMamicoTestConfiguration: only 2D and 3D supported!" << std::endl;
       exit(EXIT_FAILURE);
     }
     const unsigned int numberMDTimestepsPerCouplingCycle = 100000;
@@ -318,8 +307,7 @@ protected:
     coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicCellService(_macroscopicCellService);
   }
 
-  /** this loads some dummy solver interface which basically does nothing at
-   * all. */
+  /** this loads some dummy solver interface which basically does nothing at all. */
   void loadMacroscopicSolverConfiguration() {
     // set up dummy macroscopic solver interface
     if (_macroSolverInterface != NULL) {
@@ -334,8 +322,7 @@ protected:
     coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicSolverInterface(_macroSolverInterface);
   }
 
-  /** prints the molecule information to the screen. If "printGhostMolecules" is
-   * true, also ghost atom information is printed. */
+  /** prints the molecule information to the screen. If "printGhostMolecules" is true, also ghost atom information is printed. */
   void printMolecules(bool printGhostMolecules = false) {
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);

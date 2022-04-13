@@ -21,10 +21,9 @@
 
 #include "coupling/tests/Test.h"
 
-/** general test class for Espresso. Here, I provide method to initialisation
- * routines which can be re-used by other inherited test classes. In this class,
- * I provide an example of how to start Espresso calculations by parsing Tcl
- * commands, which is later used in Dummy solver to Espresso test
+/** general test class for Espresso. Here, I provide method to initialisation routines which can be re-used by other inherited test classes.
+ *  In this class, I provide an example of how to start Espresso calculations by parsing Tcl commands, which is later used in
+ *  Dummy solver to Espresso test
  *  @author Rahul Arora
  */
 
@@ -67,12 +66,10 @@ protected:
     mpi_init(&_argc, &_argv);
     on_program_start();
 
-    // break_flag enables us to have a start-stop functionality in Espresso (for
-    // further details see espresso-mamico.pdf)
+    // break_flag enables us to have a start-stop functionality in Espresso (for further details see espresso-mamico.pdf)
     break_flag = 0;
 
-    // All commands will be executed on the master processor, while the other
-    // processors wait for instructions from master processor
+    // All commands will be executed on the master processor, while the other processors wait for instructions from master processor
     if (this_node == 0) {
       // Initialize the cell system
       int cellsystemflag = Tcl_Eval(interp, "cellsystem domain_decomposition -no_verlet_list;");

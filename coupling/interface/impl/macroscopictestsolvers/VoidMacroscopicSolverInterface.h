@@ -21,20 +21,18 @@ public:
   VoidMacroscopicSolverInterface() : TestMacroscopicSolverInterface<dim>() {}
   virtual ~VoidMacroscopicSolverInterface() {}
 
-  /** returns true if the cell at position globalCellIndex shall be received
-   * from the MD solver. This function does not send the cell, but only steers
-   * the process.
+  /** returns true if the cell at position globalCellIndex shall be received from the MD solver.
+   *  This function does not send the cell, but only steers the process.
    */
   virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return false; }
 
-  /** returns true if the cell at position globalCellIndex shall be sent to the
-   * MD solver. This function does not send the cell, but only steers the
-   * process.
+  /** returns true if the cell at position globalCellIndex shall be sent to the MD solver.
+   *  This function does not send the cell, but only steers the process.
    */
   virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return false; }
 
-  /** returns the ranks on which the macroscopic solver holds/requires data of
-   * the macroscopic cell at index globalCellIndex.
+  /** returns the ranks on which the macroscopic solver holds/requires data of the macroscopic cell
+   *  at index globalCellIndex.
    */
   virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     std::vector<unsigned int> result;

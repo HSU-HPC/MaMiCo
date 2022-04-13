@@ -26,9 +26,7 @@ void simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule(Mo
   for (unsigned int d = 0; d < MD_DIM; d++) {
 #if (MD_ERROR == MD_YES)
     if ((position[d] < _domainOffset[d] - _meshWidth[d]) || (position[d] > _domainOffset[d] + _domainSize[d] + _meshWidth[d])) {
-      std::cout << "ERROR "
-                   "simplemd::moleculemappings::UpdateLinkedCellListsMapping::"
-                   "handleMolecule: Position ";
+      std::cout << "ERROR simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule: Position ";
       std::cout << d << " is out of range!" << std::endl;
       std::cout << "Position: " << position << std::endl;
       std::cout << molecule.getConstVelocity() << std::endl;
@@ -50,8 +48,7 @@ void simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule(Mo
     index -= _globalIndexOfFirstCell[d];
 #if (MD_ERROR == MD_YES)
     if (index < 0) {
-      std::cout << "ERROR simplemd::moleculemappings::UpdateLinkedCellListsMapping: "
-                   "index < 0: index=";
+      std::cout << "ERROR simplemd::moleculemappings::UpdateLinkedCellListsMapping: index < 0: index=";
       std::cout << index << std::endl;
       std::cout << "Dimension : " << d << "," << _globalIndexOfFirstCell[d] << "," << _localIndexOfFirstCell[d] << std::endl;
       std::cout << (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])) << std::endl;
@@ -65,8 +62,7 @@ void simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule(Mo
     cellVectorIndex[d] = (unsigned int)index;
   }
 
-// if the molecule left the current cell, delete it from this cell and put it
-// into the other cell
+// if the molecule left the current cell, delete it from this cell and put it into the other cell
 #if (MD_DEBUG == MD_YES)
   std::cout << "Put molecule " << molecule.getID() << ", pos. " << molecule.getConstPosition() << ", vel: " << molecule.getConstVelocity()
             << " , force: " << molecule.getConstForceOld() << " into cell " << std::endl;

@@ -16,8 +16,8 @@
 #include "tarch/utils/MultiMDService.h"
 #include "tarch/utils/RandomNumberService.h"
 #if (BUILD_WITH_OPENFOAM)
-#include "coupling/solvers/FoamClass.h"
-#include "coupling/solvers/FoamSolverInterface.h"
+#include "coupling/solvers/IcoFoamBufferSetup.h"
+#include "coupling/solvers/IcoFoamInterface.h"
 #endif
 #include "coupling/configurations/CouetteConfiguration.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
@@ -580,32 +580,32 @@ private:
    *  @param cycle current time step of the coupled simulation */
   void twoWayCoupling(int cycle) {
     using coupling::configurations::CouetteConfig;
-    if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && _cfg.twoWayCoupling &&
-        cycle == _cfg.filterInitCycles) {
-      static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
-          ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                          _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
-                          _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
-    }
+    if (_cfg.twoWayCoupling) {
+      if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle == _cfg.filterInitCycles) {
+        static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
+            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
+                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+                            _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
+      }
 #if (BUILD_WITH_OPENFOAM)
-    else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && _cfg.twoWayCoupling && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
-      static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)
-          ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                          _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
-                          _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
-    }
+      else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
+        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
+            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
+                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+                            _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
+      }
 #endif
-    if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && _cfg.twoWayCoupling &&
-        cycle >= _cfg.filterInitCycles) {
-      static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
-          ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
-    }
+      if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
+        static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
+            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+      }
 #if (BUILD_WITH_OPENFOAM)
-    else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM && _cfg.twoWayCoupling && cycle >= _cfg.filterInitCycles && _couetteSolver != NULL) {
-      static_cast<coupling::solvers::IcoFoam*>(_couetteSolver)
-          ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
-    }
+      else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM && cycle >= _cfg.filterInitCycles && _couetteSolver != NULL) {
+        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
+            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+      }
 #endif
+    }
     // write data to csv-compatible file for evaluation
     write2CSV(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), cycle + 1);
   }
@@ -672,8 +672,7 @@ private:
     std::cout << "Finish CouetteTest::shutdown() " << std::endl;
   }
 
-  /** computes global number of macroscopic cells from configs. Required by
-   * couette solver interface before MacroscopicCellService is initialised! */
+  /** computes global number of macroscopic cells from configs. Required by couette solver interface before MacroscopicCellService is initialised! */
   tarch::la::Vector<3, unsigned int> getGlobalNumberMacroscopicCells(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
                                                                      const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig) const {
     tarch::la::Vector<3, double> domainSize(simpleMDConfig.getDomainConfiguration().getGlobalDomainSize());
@@ -752,9 +751,8 @@ private:
     _buf.globalCellIndices4SendBuffer = indices;
   }
 
-  /** allocates the recv-buffer. This buffer contains all global inner
-   * macroscopic cells, but only on rank 0. On all other ranks, no cells are
-   * stored and a NULL ptr is returned */
+  /** allocates the recv-buffer. This buffer contains all global inner macroscopic cells, but only on rank 0. On all other ranks, no cells are stored and a NULL
+   * ptr is returned */
   void allocateRecvBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) {
 
     // determine global number of cells
@@ -895,7 +893,6 @@ private:
       double mass = density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
       if (_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD)
         mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
-
       // compute momentum
       tarch::la::Vector<3, double> momentum(mass * couetteSolver.getVelocity(cellMidPoint));
       sendBuffer[i]->setMicroscopicMass(mass);
@@ -922,13 +919,11 @@ private:
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) {
-      if (_rank == 0) {
-        solver = new coupling::solvers::IcoFoam(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _cfg.foam.directory, _cfg.foam.folder,
-                                                _cfg.foam.boundariesWithMD);
-        if (solver == NULL) {
-          std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoam solver==NULL!" << std::endl;
-          exit(EXIT_FAILURE);
-        }
+      solver = new coupling::solvers::IcoFoamInterface(_rank, _cfg.plotEveryTimestep, _cfg.channelheight, _cfg.foam.directory, _cfg.foam.folder,
+                                                       _cfg.foam.boundariesWithMD, _cfg.wallVelocity);
+      if (solver == NULL) {
+        std::cout << "ERROR CouetteTest::getCouetteSolver(): IcoFoamInterface solver==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
 #endif
@@ -987,9 +982,7 @@ private:
         }
         offsetMDDomain[d] = floor(mdOffset[d] / mamicoMeshsize[d] + 0.5);
         if (fabs((offsetMDDomain[d] * mamicoMeshsize[d] - mdOffset[d]) / mamicoMeshsize[d]) > 1.0e-8) {
-          std::cout << "ERROR CouetteTest::getCouetteSolverInterface: MD "
-                       "offset and mesh size mismatch!"
-                    << std::endl;
+          std::cout << "ERROR CouetteTest::getCouetteSolverInterface: MD offset and mesh size mismatch!" << std::endl;
           exit(EXIT_FAILURE);
         }
       }
@@ -1016,9 +1009,7 @@ private:
         }
         offsetMDDomain[d] = floor(mdOffset[d] / mamicoMeshsize[d] + 0.5);
         if (fabs((offsetMDDomain[d] * mamicoMeshsize[d] - mdOffset[d]) / mamicoMeshsize[d]) > 1.0e-8) {
-          std::cout << "ERROR CouetteTest::getCouetteSolverInterface: MD "
-                       "offset and mesh size mismatch!"
-                    << std::endl;
+          std::cout << "ERROR CouetteTest::getCouetteSolverInterface: MD offset and mesh size mismatch!" << std::endl;
           exit(EXIT_FAILURE);
         }
       }

@@ -42,8 +42,7 @@ public:
     if (_currentTimestep < _startAtTimestep) {
       return;
     }
-    // if this is the first timestep in the sampling interval, remove old
-    // entries of the vector
+    // if this is the first timestep in the sampling interval, remove old entries of the vector
     if ((_currentTimestep - _startAtTimestep) % _plotEveryTimestep == 0) {
       _velocityAndDensity.clear();
       _sampleCounter = 0;
@@ -58,8 +57,7 @@ public:
       return;
     }
 
-    // if this is the first timestep in the sampling interval, create vector
-    // entry for this cell and store the cell index in vector form
+    // if this is the first timestep in the sampling interval, create vector entry for this cell and store the cell index in vector form
     if ((_currentTimestep - _startAtTimestep) % _plotEveryTimestep == 0) {
       _velocityAndDensity.push_back(tarch::la::Vector<2 * MD_DIM + 1, double>(0.0));
       const tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector = _linkedCellService.getLocalCellIndexVector(cellIndex);
@@ -103,9 +101,7 @@ public:
     // if this is our last frame under consideration, write to file
     if ((_currentTimestep - _startAtTimestep) % _plotEveryTimestep == _plotEveryTimestep - 1) {
       if (_sampleCounter == 0) {
-        std::cout << "ERROR simplemd::cellmappings::ProfilePlotterMapping: No "
-                     "samples taken!"
-                  << std::endl;
+        std::cout << "ERROR simplemd::cellmappings::ProfilePlotterMapping: No samples taken!" << std::endl;
       }
 
       const unsigned int size = (unsigned int)_velocityAndDensity.size();
@@ -118,9 +114,7 @@ public:
       std::ofstream file(ss.str().c_str());
 
       if (!file.is_open()) {
-        std::cout << "ERROR simplemd::cellmappings::ProfilePlotterMapping: "
-                     "Could not open file "
-                  << ss.str() << "!" << std::endl;
+        std::cout << "ERROR simplemd::cellmappings::ProfilePlotterMapping: Could not open file " << ss.str() << "!" << std::endl;
         exit(EXIT_FAILURE);
       }
 

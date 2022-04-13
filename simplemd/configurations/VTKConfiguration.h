@@ -55,8 +55,7 @@ private:
   /** name stem of the corresponding vtk file */
   std::string _filename;
 
-  /** number of timesteps per vtk output. If this value is zero, no output is
-   * written at all */
+  /** number of timesteps per vtk output. If this value is zero, no output is written at all */
   unsigned int _writeEveryTimestep;
 
   bool _isValid;

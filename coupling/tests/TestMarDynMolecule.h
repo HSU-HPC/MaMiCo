@@ -78,12 +78,10 @@ protected:
     for (curMolecule = cells->begin(); curMolecule != cells->end(); curMolecule = cells->next()) {
       counter++;
 
-      //			std::cout << "cellIndex is: " <<
-      // cells->getCellIndexOfMolecule(curMolecule) << std::endl;
-      // std::cout <<
-      //"pos       : "; 			for(int d=0; d<3; d++) std::cout
-      //<< curMolecule->r(d) <<
-      //", "; 			std::cout << std::endl;
+      //			std::cout << "cellIndex is: " << cells->getCellIndexOfMolecule(curMolecule) << std::endl;
+      //			std::cout << "pos       : ";
+      //			for(int d=0; d<3; d++) std::cout << curMolecule->r(d) << ", ";
+      //			std::cout << std::endl;
 
       // molecule values
       tarch::la::Vector<3, double> position(0.0);
@@ -301,9 +299,8 @@ protected:
 
     if (listMarDyn != listMarDynCouplingInterface) {
       errors = 1;
-      std::cout << "ERROR: the molecule values obtained from the MarDyn simulation "
-                   "and through the Coupling interface do not match! (Cell #"
-                << currentCellIndex << ")" << std::endl;
+      std::cout << "ERROR: the molecule values obtained from the MarDyn simulation and through the Coupling interface do not match! (Cell #" << currentCellIndex
+                << ")" << std::endl;
     }
   }
 };

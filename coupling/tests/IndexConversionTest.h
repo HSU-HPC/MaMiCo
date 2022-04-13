@@ -72,20 +72,15 @@ private:
                         const tarch::la::Vector<3, unsigned int> localVectorCellIndex(x, y, z);
                         const unsigned int localCellIndex = conversion.getLocalCellIndex(localVectorCellIndex);
                         if (!conversion.isValidLocalCellIndex(localCellIndex)) {
-                          std::cout << "ERROR IndexConversionTest: Local cell "
-                                       "index out of range!"
-                                    << std::endl;
+                          std::cout << "ERROR IndexConversionTest: Local cell index out of range!" << std::endl;
                           std::cout << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
                           return;
                         }
 
-                        // check that conversion from and to vector/scalar index
-                        // works
+                        // check that conversion from and to vector/scalar index works
                         tarch::la::Vector<3, unsigned int> vec = conversion.getLocalVectorCellIndex(localCellIndex);
                         if ((vec[0] != localVectorCellIndex[0]) || (vec[1] != localVectorCellIndex[1]) || (vec[2] != localVectorCellIndex[2])) {
-                          std::cout << "ERROR IndexConversionTest: Conversion "
-                                       "local indices failed!"
-                                    << std::endl;
+                          std::cout << "ERROR IndexConversionTest: Conversion local indices failed!" << std::endl;
                           std::cout << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
                           std::cout << "Converted local vector index: " << vec << std::endl;
                           return;
@@ -93,18 +88,14 @@ private:
 
                         vec = conversion.convertLocalToGlobalVectorCellIndex(vec);
                         if (!conversion.isValidGlobalVectorCellIndex(vec)) {
-                          std::cout << "ERROR IndexConversionTest: Global "
-                                       "vector cell index out of range!"
-                                    << std::endl;
+                          std::cout << "ERROR IndexConversionTest: Global vector cell index out of range!" << std::endl;
                           std::cout << "Local vector cell index: " << localVectorCellIndex << ", global vector cell index: " << vec << std::endl;
                           return;
                         }
 
                         vec = conversion.convertGlobalToLocalVectorCellIndex(vec);
                         if ((vec[0] != localVectorCellIndex[0]) || (vec[1] != localVectorCellIndex[1]) || (vec[2] != localVectorCellIndex[2])) {
-                          std::cout << "ERROR IndexConversionTest: Conversion "
-                                       "from global to local indices failed!"
-                                    << std::endl;
+                          std::cout << "ERROR IndexConversionTest: Conversion from global to local indices failed!" << std::endl;
                           std::cout << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
                           std::cout << "Converted local vector index: " << vec << std::endl;
                           return;
@@ -147,9 +138,7 @@ private:
                   const tarch::la::Vector<2, unsigned int> localVectorCellIndex(x, y);
                   const unsigned int localCellIndex = conversion.getLocalCellIndex(localVectorCellIndex);
                   if (!conversion.isValidLocalCellIndex(localCellIndex)) {
-                    std::cout << "ERROR IndexConversionTest: Local cell index "
-                                 "out of range!"
-                              << std::endl;
+                    std::cout << "ERROR IndexConversionTest: Local cell index out of range!" << std::endl;
                     std::cout << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
                     return;
                   }
@@ -157,9 +146,7 @@ private:
                   // check that conversion from and to vector/scalar index works
                   tarch::la::Vector<2, unsigned int> vec = conversion.getLocalVectorCellIndex(localCellIndex);
                   if ((vec[0] != localVectorCellIndex[0]) || (vec[1] != localVectorCellIndex[1])) {
-                    std::cout << "ERROR IndexConversionTest: Conversion local "
-                                 "indices failed!"
-                              << std::endl;
+                    std::cout << "ERROR IndexConversionTest: Conversion local indices failed!" << std::endl;
                     std::cout << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
                     std::cout << "Converted local vector index: " << vec << std::endl;
                     return;
@@ -167,18 +154,14 @@ private:
 
                   vec = conversion.convertLocalToGlobalVectorCellIndex(vec);
                   if (!conversion.isValidGlobalVectorCellIndex(vec)) {
-                    std::cout << "ERROR IndexConversionTest: Global vector "
-                                 "cell index out of range!"
-                              << std::endl;
+                    std::cout << "ERROR IndexConversionTest: Global vector cell index out of range!" << std::endl;
                     std::cout << "Local vector cell index: " << localVectorCellIndex << ", global vector cell index: " << vec << std::endl;
                     return;
                   }
 
                   vec = conversion.convertGlobalToLocalVectorCellIndex(vec);
                   if ((vec[0] != localVectorCellIndex[0]) || (vec[1] != localVectorCellIndex[1])) {
-                    std::cout << "ERROR IndexConversionTest: Conversion from "
-                                 "global to local indices failed!"
-                              << std::endl;
+                    std::cout << "ERROR IndexConversionTest: Conversion from global to local indices failed!" << std::endl;
                     std::cout << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
                     std::cout << "Converted local vector index: " << vec << std::endl;
                     return;

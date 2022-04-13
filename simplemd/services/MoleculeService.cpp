@@ -49,9 +49,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   }
   numberBlocks = _numberMolecules / _blockSize + (_numberMolecules % _blockSize != 0);
   if (_numberMolecules < 1) {
-    std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
-                 "_numberMolecules < 1!"
-              << std::endl;
+    std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): _numberMolecules < 1!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -60,15 +58,12 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     _molecules.push_back((Molecule*)NULL);
     _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[i] == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
-                   "_molecules == NULL!"
-                << std::endl;
+      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): _molecules == NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
 
-  // loop over domain and determine position vector (place molecules initially
-  // on a grid)
+  // loop over domain and determine position vector (place molecules initially on a grid)
 #if (MD_DIM > 2)
   for (unsigned int z = 0; z < moleculesPerDirection[2]; z++) {
     position[2] = (0.5 + z) * domainSize[2] / moleculesPerDirection[2] + domainOffset[2];
@@ -89,10 +84,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
         myNewMolecule = new (&_molecules[blockId][blockIndex]) Molecule(position, velocity);
 #if (MD_DEBUG == MD_YES)
         if (myNewMolecule == NULL) {
-          std::cout << "ERROR "
-                       "simplemd::services::MoleculeService::MoleculeService():"
-                       " myNewMolecule==NULL!"
-                    << std::endl;
+          std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): myNewMolecule==NULL!" << std::endl;
           exit(EXIT_FAILURE);
         }
 #endif
@@ -167,9 +159,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     _molecules.push_back((Molecule*)NULL);
     _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[i] == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
-                   "_molecules == NULL!"
-                << std::endl;
+      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): _molecules == NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -192,9 +182,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     myNewMolecule = new (&_molecules[blockId][blockIndex]) Molecule(position, velocity);
 #if (MD_DEBUG == MD_YES)
     if (myNewMolecule == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
-                   "myNewMolecule==NULL!"
-                << std::endl;
+      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): myNewMolecule==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif
@@ -287,9 +275,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     _molecules.push_back((Molecule*)NULL);
     _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[i] == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
-                   "_molecules == NULL!"
-                << std::endl;
+      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): _molecules == NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -307,9 +293,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     myNewMolecule = new (&_molecules[blockId][blockIndex]) Molecule(position, velocity);
 #if (MD_DEBUG == MD_YES)
     if (myNewMolecule == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): "
-                   "myNewMolecule==NULL!"
-                << std::endl;
+      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): myNewMolecule==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif
@@ -345,8 +329,7 @@ void simplemd::services::MoleculeService::getInitialVelocity(const tarch::la::Ve
     randomNumbers[d] = 2.0 * MD_PI * tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();
   }
 
-  // put initial velocity together. For 2D/ 3D, we use the polar/ spherical
-  // coordinates to generate the fluctuation around the mean velocity
+  // put initial velocity together. For 2D/ 3D, we use the polar/ spherical coordinates to generate the fluctuation around the mean velocity
 #if (MD_DIM == 1)
   initialVelocity = meanVelocity + stdDeviation * randomNumbers;
 #elif (MD_DIM == 2)
@@ -375,9 +358,8 @@ void simplemd::services::MoleculeService::shutdown() {
 simplemd::Molecule* simplemd::services::MoleculeService::addMolecule(const Molecule& molecule) {
   _numberMolecules++;
 
-  // if there is a free position within the available memory, just put molecule
-  // to the last entry and erase that entry afterwards. Important: set ID of the
-  // new molecule to its current position.
+  // if there is a free position within the available memory, just put molecule to the last entry
+  // and erase that entry afterwards. Important: set ID of the new molecule to its current position.
   if (!_freeMoleculePositions.empty()) {
     // determine block and index within block
     const unsigned int front = _freeMoleculePositions.front();
@@ -388,9 +370,8 @@ simplemd::Molecule* simplemd::services::MoleculeService::addMolecule(const Molec
     _freeMoleculePositions.pop_front();
     return &_molecules[blockId][blockIndex];
 
-    // otherwise: reallocate memory and adapt _numberMolecules and
-    // _freeMoleculePositions respectively. Besides, set ID of the added
-    // molecule.
+    // otherwise: reallocate memory and adapt _numberMolecules and _freeMoleculePositions respectively. Besides,
+    // set ID of the added molecule.
   } else {
     _molecules.push_back((Molecule*)NULL);
     _molecules[_molecules.size() - 1] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
@@ -448,9 +429,7 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
     _molecules.push_back((Molecule*)NULL);
     _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
     if (_molecules[i] == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::reorganiseMemory(): "
-                   "_molecules == NULL!"
-                << std::endl;
+      std::cout << "ERROR simplemd::services::MoleculeService::reorganiseMemory(): _molecules == NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }

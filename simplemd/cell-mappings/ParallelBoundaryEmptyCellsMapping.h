@@ -15,10 +15,9 @@ class ParallelBoundaryEmptyCellsMapping;
 }
 } // namespace simplemd
 
-/** shall only be applied to PARALLEL_BOUNDARY ghost cells. All particles of
- * each cell are sent to the respective neighbour with the inner cell
- * corresponding to these ghost boundary cells. Afterwards, the list of the
- * ghost cell is cleared and the molecules are deleted from the ghost cell.
+/** shall only be applied to PARALLEL_BOUNDARY ghost cells. All particles of each cell are sent to the
+ *  respective neighbour with the inner cell corresponding to these ghost boundary cells.
+ *  Afterwards, the list of the ghost cell is cleared and the molecules are deleted from the ghost cell.
  *  @author Philipp Neumann
  */
 class simplemd::cellmappings::ParallelBoundaryEmptyCellsMapping {

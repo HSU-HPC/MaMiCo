@@ -52,8 +52,8 @@ public:
     TestLammps<dim>::loadMacroscopicSolverConfiguration();
     TestLammps<dim>::loadMamicoTestConfiguration();
 
-    // extract information on current process -> required for exact evaluation
-    // of quantities in respective, subsequently called test methods
+    // extract information on current process -> required for exact evaluation of quantities in respective,
+    // subsequently called test methods
     coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>* macroscopicCellService =
         (coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>*)
             coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance()
@@ -70,8 +70,7 @@ public:
     coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim> moleculeExtractor(
         coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface());
 
-    // run one simulation time step; this is required so that molecules are
-    // sorted into the respective cells once as sort-of start-up phase
+    // run one simulation time step; this is required so that molecules are sorted into the respective cells once as sort-of start-up phase
     std::cout << "Run one time step..." << std::endl;
     TestLammps<dim>::_lammps->input->one("run 1");
     std::cout << "Check cell sorting via molecule extraction..." << std::endl;
@@ -81,9 +80,8 @@ public:
   }
 
 private:
-  /** returns the pairs (global macroscopic cell index, number molecules in this
-   * cell) in a vector. The number is hard-coded, oriented at the setup
-   * described above. */
+  /** returns the pairs (global macroscopic cell index, number molecules in this cell) in a vector. The number is hard-coded, oriented at the setup described
+   * above. */
   std::vector<tarch::la::Vector<2, unsigned int>> initNumberMoleculesPerMacroscopicCell(const coupling::IndexConversion<dim>& indexConversion) const {
     std::vector<tarch::la::Vector<2, unsigned int>> moleculesPerMacroscopicCell;
     tarch::la::Vector<2, unsigned int> buffer(0);
@@ -174,8 +172,7 @@ private:
     return moleculesPerMacroscopicCell;
   }
 
-  /** loops over all macroscopic cells on this process and checks for the number
-   * of molecules in each cell. Further, we plot the molecule positions of each
+  /** loops over all macroscopic cells on this process and checks for the number of molecules in each cell. Further, we plot the molecule positions of each
    * cell. */
   void testMolecules(coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells,
                      coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim>& moleculeExtractor,
@@ -212,8 +209,7 @@ private:
             // determine linearised indices
             const unsigned int localIndex = indexConversion.getLocalCellIndex(loop);
             const unsigned int globalIndex = indexConversion.convertLocalToGlobalCellIndex(localIndex);
-            // determine number of molecules in this cell, based on cell
-            // structure
+            // determine number of molecules in this cell, based on cell structure
             (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
             const unsigned int numberMoleculesFound = (unsigned int)moleculeExtractor.getExtractedMolecules().size();
             // determine the number of molecules as it was expected
@@ -234,9 +230,8 @@ private:
     }
   }
 
-  /** searches for the number of molecules for the macroscopic cell at global
-   * cell index "globalIndex" and returns this number from the vector. If no
-   * respective global cell is found, an error is thrown.
+  /** searches for the number of molecules for the macroscopic cell at global cell index "globalIndex" and returns this number from the vector. If no respective
+   *  global cell is found, an error is thrown.
    */
   unsigned int findNumberMolecules(const unsigned int& globalIndex,
                                    const std::vector<tarch::la::Vector<2, unsigned int>>& numberMoleculesPerMacroscopicCell) const {
@@ -247,9 +242,7 @@ private:
       }
     }
 
-    std::cout << "ERROR TestLammpsMoleculeIterator::findNumberMolecules(): "
-                 "Could not find molecule number for global cell index "
-              << globalIndex << std::endl;
+    std::cout << "ERROR TestLammpsMoleculeIterator::findNumberMolecules(): Could not find molecule number for global cell index " << globalIndex << std::endl;
     exit(EXIT_FAILURE);
     return 2000;
   }

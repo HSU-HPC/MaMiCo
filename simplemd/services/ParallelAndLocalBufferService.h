@@ -117,18 +117,15 @@ public:
 private:
   /* Methods */
 
-  /** method that calculates upper bound on number of molecules to be stored in
-   * the respective buffer. Determined from average number of molecules per
-   * linked cell, number of cells to be transferred via respective buffer and a
-   * special function A: upperBound[bufferIndex] = ceil(numCells[bufferIndex] *
-   * avMolPerCell * A(numCells[bufferIndex]))
+  /** method that calculates upper bound on number of molecules to be stored in the respective buffer.
+   * Determined from average number of molecules per linked cell, number of cells to be transferred
+   * via respective buffer and a special function A:
+   * upperBound[bufferIndex] = ceil(numCells[bufferIndex] * avMolPerCell * A(numCells[bufferIndex]))
    *
    * The purpose of this function A is to deal with the following:
-   * when we send only one linked cell to a process, the probability that the
-   * average number of molecules is exceeded is high, whereas, when we send
-   * thousands of cells, the probability that the average number of molecules is
-   * exceeded in all of them is much lower. We also need to keep buffer size
-   * low,  so we choose the function A to satisfy the following:
+   * when we send only one linked cell to a process, the probability that the average number of molecules is exceeded is
+   * high, whereas, when we send thousands of cells, the probability that the average number of molecules is exceeded in all
+   * of them is much lower. We also need to keep buffer size low,  so we choose the function A to satisfy the following:
    * 1. A: N -> R
    * 2. A(1) is "high", in our choice, A(1) = 5.5
    * 3. lim_{k to Inf} A(k) is "low", in our choice lim_{k to Inf} A(k) = 1.5

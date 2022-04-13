@@ -63,8 +63,7 @@ public:
     const double potEnergyRef = pow(2.0, dim) * 0.5 * (4.0 * epsilon * (sigma6 / rij6) * ((sigma6 / rij6) - 1.0) - cutOffEnergy);
     const tarch::la::Vector<dim, double> forceRef(0.0);
 
-    // compute force/energy onto this molecule -> only do this on rank 0, since
-    // this is the rank containing the cell with the molecule at 3.0x3.0x3.0
+    // compute force/energy onto this molecule -> only do this on rank 0, since this is the rank containing the cell with the molecule at 3.0x3.0x3.0
     if (indexConversion.getThisRank() == 0) {
       mdSolverInterface->calculateForceAndEnergy(molecule);
 
@@ -72,15 +71,12 @@ public:
       double potEnergy = molecule.getPotentialEnergy();
 
       if (fabs(potEnergy - potEnergyRef) > tolerance) {
-        std::cout << "ERROR TestLammpsCalculateForceEnergy: potential Energies "
-                     "do not match1! Potential energy ref.="
-                  << potEnergyRef << ", potential energy=" << potEnergy << std::endl;
+        std::cout << "ERROR TestLammpsCalculateForceEnergy: potential Energies do not match1! Potential energy ref.=" << potEnergyRef
+                  << ", potential energy=" << potEnergy << std::endl;
         exit(EXIT_FAILURE);
       }
       if (fabs(tarch::la::norm2(force - forceRef) > tolerance)) {
-        std::cout << "ERROR TestLammpsCalculcateForceEnergy: forces do not "
-                     "match1! Force ref.="
-                  << forceRef << ", force=" << force << std::endl;
+        std::cout << "ERROR TestLammpsCalculcateForceEnergy: forces do not match1! Force ref.=" << forceRef << ", force=" << force << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -92,8 +88,7 @@ public:
     // synchronise molecules over all processes
     mdSolverInterface->synchronizeMoleculesAfterMassModification();
 
-    // search for this molecule and try to extract potential energy from it;
-    // this energy should again return the same value
+    // search for this molecule and try to extract potential energy from it; this energy should again return the same value
     if (indexConversion.getThisRank() == 0) {
       std::cout << "Molecule synchronised; do next test..." << std::endl;
       const int nlocal = lammps->atom->nlocal;
@@ -109,9 +104,7 @@ public:
         }
       }
       if (n < 0) {
-        std::cout << "ERROR TestLammpsCalculateForceEnergy: Could not find "
-                     "molecule after adding it!"
-                  << std::endl;
+        std::cout << "ERROR TestLammpsCalculateForceEnergy: Could not find molecule after adding it!" << std::endl;
         exit(EXIT_FAILURE);
       } else {
         std::cout << "Molecule added at local position " << n << std::endl;
@@ -122,9 +115,8 @@ public:
       double potEnergy = lammpsMolecule.getPotentialEnergy();
 
       if (fabs(potEnergy - potEnergyRef) > tolerance) {
-        std::cout << "ERROR TestLammpsCalculateForceEnergy: potential Energies "
-                     "do not match2! Potential energy ref.="
-                  << potEnergyRef << ", potential energy=" << potEnergy << std::endl;
+        std::cout << "ERROR TestLammpsCalculateForceEnergy: potential Energies do not match2! Potential energy ref.=" << potEnergyRef
+                  << ", potential energy=" << potEnergy << std::endl;
         exit(EXIT_FAILURE);
       }
     }

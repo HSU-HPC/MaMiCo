@@ -20,9 +20,7 @@ int main(int argc, char* argv[]) {
   MPI_Init(&argc, &argv);
 #endif
   if (argc != 2) {
-    std::cout << "Wrong number of arguments! Please call program by "
-                 "./moleculardynamics inputfile.xml!"
-              << std::endl;
+    std::cout << "Wrong number of arguments! Please call program by ./moleculardynamics inputfile.xml!" << std::endl;
     return -1;
   }
 

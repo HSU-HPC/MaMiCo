@@ -19,11 +19,9 @@ public:
   virtual void run() {
     // initialise all interfaces and simulation parts
     if (dim == 2) {
-      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly2D.xyz",
-                                                   4); //"inputpositions2D_moleculeiterator.xyz",24);
+      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly2D.xyz", 4); //"inputpositions2D_moleculeiterator.xyz",24);
     } else {
-      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly3D.xyz",
-                                                   8); //"inputpositions3D_moleculeiterator.xyz",96);
+      TestLammps<dim>::loadLammpsTestConfiguration("inputpositionsonly3D.xyz", 8); //"inputpositions3D_moleculeiterator.xyz",96);
     }
     // extend cut-off radius
     // TestLammps<dim>::_lammps->input->one("pair_coeff 1 1 1.0 1.0 2.5");

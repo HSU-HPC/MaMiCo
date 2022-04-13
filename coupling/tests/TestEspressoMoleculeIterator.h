@@ -120,8 +120,7 @@ public:
   }
 
 private:
-  /** loops over all macroscopic cells on this process and checks for the number
-   * of molecules in each cell */
+  /** loops over all macroscopic cells on this process and checks for the number of molecules in each cell */
   void testMolecules() {
     unsigned int flag = 1;
     for (unsigned int i = 0; i < local_cells.n; i++) {

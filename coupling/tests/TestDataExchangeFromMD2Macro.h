@@ -14,11 +14,9 @@
 #include <mpi.h>
 #endif
 
-/** this class is used to handle test data exchange operations between dummy
- * MaMiCo and a dummy macroscopic solver. For N processes, this class sends data
- * from process n to n+1. The only data that are sent correspond to the points
- * on the main "diagonal" of a field, that is cell data for cells at coordinates
- * (n,n,n) (in global ordering).
+/** this class is used to handle test data exchange operations between dummy MaMiCo and a dummy macroscopic solver.
+ *  For N processes, this class sends data from process n to n+1. The only data that are sent
+ *  correspond to the points on the main "diagonal" of a field, that is cell data for cells at coordinates (n,n,n) (in global ordering).
  *  @author Philipp Neumann
  */
 template <unsigned int dim> class TestDataExchangeFromMD2Macro : public coupling::sendrecv::DataExchange<TestCell<dim>, dim> {
@@ -28,13 +26,11 @@ public:
       : coupling::sendrecv::DataExchange<TestCell<dim>, dim>(tag), _indexConversion(indexConversion) {}
   virtual ~TestDataExchangeFromMD2Macro() {}
 
-  /** returns the ranks to which a particular cell (at index globalCellIndex)
-   * should be sent. */
+  /** returns the ranks to which a particular cell (at index globalCellIndex) should be sent. */
   virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     bool isSource = true;
     std::vector<unsigned int> vec;
-    // empty target ranks if this is a global cell at the lower or upper end of
-    // the diagonal (inside ghost layer)
+    // empty target ranks if this is a global cell at the lower or upper end of the diagonal (inside ghost layer)
     if ((globalCellIndex == tarch::la::Vector<dim, unsigned int>(0)) ||
         (globalCellIndex == _indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1))) {
       return vec;
@@ -56,14 +52,13 @@ public:
     return vec;
   }
 
-  /** we obtain this value, if the entry is located on the "diagonal", i.e. the
-   * global coordinates correspond to (n,n,n).
+  /** we obtain this value, if the entry is located on the "diagonal", i.e. the global coordinates correspond to
+   *  (n,n,n).
    */
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     bool isSource = true;
     std::vector<unsigned int> vec;
-    // empty source ranks if this is a global cell at the lower or upper end of
-    // the diagonal (inside ghost layer)
+    // empty source ranks if this is a global cell at the lower or upper end of the diagonal (inside ghost layer)
     if ((globalCellIndex == tarch::la::Vector<dim, unsigned int>(0)) ||
         (globalCellIndex == _indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1))) {
       return vec;
@@ -82,8 +77,7 @@ public:
     return vec;
   }
 
-  /** local rule to read from macroscopic cell and write data to (e.g. send)
-   * buffer */
+  /** local rule to read from macroscopic cell and write data to (e.g. send) buffer */
   virtual void readFromCell(double* const buffer, const TestCell<dim>& cell) {
     tarch::la::Vector<dim, double> b1 = cell.getBuffer1();
     for (unsigned int d = 0; d < dim; d++) {
@@ -92,8 +86,7 @@ public:
     buffer[dim] = cell.getBuffer2();
   }
 
-  /** local rule to read from receive buffer and write data to macroscopic cell
-   */
+  /** local rule to read from receive buffer and write data to macroscopic cell */
   virtual void writeToCell(const double* const buffer, TestCell<dim>& cell) {
     tarch::la::Vector<dim, double> b1(0.0);
     for (unsigned int d = 0; d < dim; d++) {
@@ -106,16 +99,14 @@ public:
   /** returns the number of doubles that are sent per macroscopic cell. */
   virtual unsigned int getDoublesPerCell() const { return dim + 1; }
 
-  /** initialises the buffers required on the processes which by incrementing 1
-   * are obtained from process coordinates (n,n,n).
+  /** initialises the buffers required on the processes which by incrementing 1 are obtained from process coordinates (n,n,n).
    *
    */
   virtual void getBuffer4MacroscopicSolverCells(unsigned int& numberCells, std::vector<TestCell<dim>*>& cells, unsigned int*& globalCellIndices) {
     // for rank 0: expect data from last rank
     if (_indexConversion.getThisRank() == 0) {
-      // determine number of cells on last rank (this only works for cubic
-      // sub-domains) and start coordinate of first (non-ghost) global cell of
-      // last rank
+      // determine number of cells on last rank (this only works for cubic sub-domains) and start coordinate of first
+      // (non-ghost) global cell of last rank
       const tarch::la::Vector<dim, unsigned int> start =
           tarch::la::Vector<dim, unsigned int>(1) +
           (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) * _indexConversion.getAverageLocalNumberMacroscopicCells()[0];
@@ -131,9 +122,7 @@ public:
       }
       globalCellIndices = new unsigned int[numberCells];
       if (globalCellIndices == NULL) {
-        std::cout << "ERROR TestDataExchangeFromMD2Macro::getBuffer4ReceivedCells: "
-                     "NULL ptr returned!"
-                  << std::endl;
+        std::cout << "ERROR TestDataExchangeFromMD2Macro::getBuffer4ReceivedCells: NULL ptr returned!" << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -164,9 +153,7 @@ public:
           }
         }
         if (globalCellIndices == NULL) {
-          std::cout << "ERROR TestDataExchangeFromMD2Macro::getBuffer4ReceivedCells: "
-                       "NULL ptrs returned!"
-                    << std::endl;
+          std::cout << "ERROR TestDataExchangeFromMD2Macro::getBuffer4ReceivedCells: NULL ptrs returned!" << std::endl;
           exit(EXIT_FAILURE);
         }
         numberCells = numberLocalCells;
@@ -186,10 +173,9 @@ protected:
   const coupling::IndexConversion<dim>& _indexConversion;
 };
 
-/** same as TestDataExchangeFromMD2Macro, but with inverted target and source
- * ranks, i.e. the original target ranks are the current source ranks. Since we
- * hold certain macroscopic cells on several Mamico-blocks (due to the ghost
- * cells), we use a modified target ranks-vector (based on the indexConversion).
+/** same as TestDataExchangeFromMD2Macro, but with inverted target and source ranks, i.e. the original target ranks are
+ *  the current source ranks. Since we hold certain macroscopic cells on several Mamico-blocks (due to the ghost cells),
+ *  we use a modified target ranks-vector (based on the indexConversion).
  */
 template <unsigned int dim> class TestDataExchangeFromMacro2MD : public TestDataExchangeFromMD2Macro<dim> {
 public:

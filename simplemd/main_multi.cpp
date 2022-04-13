@@ -22,9 +22,7 @@ int main(int argc, char* argv[]) {
   MPI_Init(&argc, &argv);
 #endif
   if (argc != 3) {
-    std::cout << "Wrong number of arguments! Please call program by "
-                 "./moleculardynamics inputfile.xml numberMDSimulations!"
-              << std::endl;
+    std::cout << "Wrong number of arguments! Please call program by ./moleculardynamics inputfile.xml numberMDSimulations!" << std::endl;
     return -1;
   }
   // get total number of MD simulations from commandline

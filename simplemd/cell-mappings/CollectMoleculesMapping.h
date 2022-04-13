@@ -15,8 +15,8 @@ class CollectMoleculesMapping;
 }
 } // namespace simplemd
 
-/** collects molecules from a linked cell, adds them to a buffer and removes
- * them from the linked cell list. This is used in the boundary treatment.
+/** collects molecules from a linked cell, adds them to a buffer and removes them from the linked cell list.
+ *  This is used in the boundary treatment.
  *  @author Philipp Neumann
  */
 class simplemd::cellmappings::CollectMoleculesMapping {

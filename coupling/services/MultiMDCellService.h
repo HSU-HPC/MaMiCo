@@ -556,7 +556,7 @@ private:
 
   unsigned int _localNumberMDSimulations;
   /** number of MD simulations run on the current rank. This can differ for
-different blocks, i.e. different topologyOffset values. */
+  different blocks, i.e. different topologyOffset values. */
   unsigned int _totalNumberMDSimulations; /** total number of MD simulations */
   coupling::services::MacroscopicCellService<dim>** _macroscopicCellServices;
   /** pointers of MacroscopicCellService type, one for each MD simulation */
@@ -579,7 +579,7 @@ different blocks, i.e. different topologyOffset values. */
 
   unsigned int _blockOffset;
   std::vector<bool> _listActiveMDSimulations; /** One entry per (in-)active md
-simulation, totals to _totalNumberMDSimulations */
+  simulation, totals to _totalNumberMDSimulations */
   unsigned int _nextFreeBlock;
   /** Points to the next block, to which a simulation should be added. */
   std::vector<int> _warmupPhase;

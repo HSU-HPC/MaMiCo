@@ -63,12 +63,10 @@ private:
   /** timesteps per subsequent rdf evaluations */
   unsigned int _evaluateEveryTimestep;
 
-  /** number of timesteps per vtk output. If this value is zero, no output is
-   * written at all */
+  /** number of timesteps per vtk output. If this value is zero, no output is written at all */
   unsigned int _writeEveryTimestep;
 
-  /** number of points used to discretise the distance between two molecules
-   * (between r=0 and r=r_cutoff) */
+  /** number of points used to discretise the distance between two molecules (between r=0 and r=r_cutoff) */
   unsigned int _numberPoints;
 
   /** true, if the configuration was parsed */

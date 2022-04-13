@@ -26,10 +26,8 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   // updates); do it BEFORE quantities are manipulated as we can then also do
   // some pre-processing here.
   _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
-
   // ------------ coupling step: distribute mass ---------------------
   _macroscopicCellService->distributeMass(t);
-
   // for isothermal simulations: apply thermostat
   _macroscopicCellService->applyTemperatureToMolecules(t);
 
@@ -43,10 +41,8 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   // distribute momentum -> some methods require modification of force terms,
   // therefore we call it AFTER the force computation and before everything else
   _macroscopicCellService->distributeMomentum(t);
-
   // apply boundary forces
   _macroscopicCellService->applyBoundaryForce(t);
-
   // evaluate statistics
   evaluateStatistics(t);
 
@@ -62,13 +58,11 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
       (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
     _moleculeService->writeCheckPoint(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
   }
-
   // reorganise memory if needed
   if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
       (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
     _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
   }
-
   // plot also macroscopic cell information
   _macroscopicCellService->plotEveryMicroscopicTimestep(t);
 

@@ -20,8 +20,7 @@ void coupling::configurations::ParticleInsertionConfiguration::parseSubtag(tinyx
   // specify the type of insertion
   std::string thisType;
   tarch::configuration::ParseConfiguration::readStringMandatory(thisType, node, "type");
-  // in this case, no insertion should be carried out, no more parameters need
-  // to be parsed -> thus: return
+  // in this case, no insertion should be carried out, no more parameters need to be parsed -> thus: return
   if (thisType == "none") {
     _particleInsertionType = NO_INSERTION;
     return;
@@ -65,10 +64,8 @@ void coupling::configurations::ParticleInsertionConfiguration::parseSubtag(tinyx
   _tolerance = _meanPotentialEnergyFactor * 2.0;
   tarch::configuration::ParseConfiguration::readDoubleOptional(_tolerance, node, TOLERANCE);
   if (_tolerance <= 0.0) {
-    std::cout << "ERROR "
-                 "coupling::configurations::ParticleInsertionConfiguration::"
-                 "parseSubtag(): "
-              << TOLERANCE << " is smaller than or equal zero!" << std::endl;
+    std::cout << "ERROR coupling::configurations::ParticleInsertionConfiguration::parseSubtag(): " << TOLERANCE << " is smaller than or equal zero!"
+              << std::endl;
     exit(EXIT_FAILURE);
   }
 

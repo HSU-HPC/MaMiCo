@@ -11,28 +11,8 @@ class FiniteDifferenceSolver;
 }
 } // namespace coupling
 
-/** In our scenario, the lower wall is accelerated and the upper wall stands
- * still. The lower wall is located at zero height. The grid is just a simple
- * cubic, equidistant mesh.
- *  @brief implements a simple one-dimensional finite-diffference solver for the
- * Couette flow.
- *  @author Helene Wittenberg  */
 class coupling::solvers::FiniteDifferenceSolver : public coupling::solvers::NumericalSolver {
 public:
-  /** @brief a simple constructor
-   *  @param channelheight the width and height of the channel in y and z
-   * direction
-   *  @param kinVisc the kinematic viscosity of the fluid
-   *  @param wallVelocity velocity at the moving wall, refers to Couette
-   * scenario
-   *  @param dx the spacial step size, and equidistant grid is applied
-   *  @param dt the time step
-   *  @param plotEveryTimestep the time step interval for plotting data;
-   *                           4 means, every 4th time step is plotted
-   *  @param filestem the name of the plotted file
-   *  @param processes defines on how many processes the solver will run;
-   *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes
-   *  @param numThreads number of OpenMP threads */
   FiniteDifferenceSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
                          const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
                          const unsigned int numThreads = 1)
@@ -45,11 +25,14 @@ public:
       std::cout << "The FiniteDifferenceSolver was requested in a parallel manner. It will be run sequentially, since it doesn't support parallel runs. "
                 << std::endl;
     }
+
     // return if required
     if (skipRank()) {
       return;
     }
+
     _velold = new double[3 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
+
 #if defined(_OPENMP)
     omp_set_num_threads(numThreads);
 #endif
@@ -72,16 +55,13 @@ public:
     }
   }
 
-  /** @brief a simple destructor  */
   ~FiniteDifferenceSolver() {
     if (_velold) {
-      delete[] _velold;
-      _velold = nullptr;
+      delete[] _flag;
+      _flag = nullptr;
     }
   }
 
-  /** @brief advances one time step dt in time and triggers vtk plot if required
-   */
   void advance(double dt) override {
     if (skipRank()) {
       return;
@@ -93,16 +73,15 @@ public:
     }
     for (int i = 0; i < timesteps; i++) {
       setBeyondWall();
-      update();
+      stream();
       plot();
       _counter++;
     }
   }
 
-  /** @brief gets the velocity at a given position
-   *  @param pos a position within the continuum domain
-   *  @returns the velocity vector  */
-  tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const override {
+  const double getError() const override { return 0.0; }
+
+  tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const override { // same as with the function above
     const tarch::la::Vector<3, double> domainOffset(_coords[0] * _dx * _avgDomainSizeX, _coords[1] * _dx * _avgDomainSizeY, _coords[2] * _dx * _avgDomainSizeZ);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     if ((pos[0] < domainOffset[0]) || (pos[0] > domainOffset[0] + _domainSizeX * _dx) || (pos[1] < domainOffset[1]) ||
@@ -111,8 +90,7 @@ public:
       exit(EXIT_FAILURE);
     }
 #endif
-    // compute index for respective cell (_dx+... for ghost cells); use coords
-    // to store local cell coordinates
+    // compute index for respective cell (_dx+... for ghost cells); use coords to store local cell coordinates
     tarch::la::Vector<3, unsigned int> coords;
     for (unsigned int d = 0; d < 3; d++) {
       coords[d] = (unsigned int)((_dx + pos[d] - domainOffset[d]) / _dx);
@@ -126,13 +104,8 @@ public:
     return vel;
   }
 
-  /** @brief changes the velocity at the moving wall (z=0)
-   *  @param wallVelocity the velocity will be set at the moving wall */
   virtual void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) override { _wallVelocity = wallVelocity; }
 
-  /** @brief returns density at a certain position
-   *  @param pos position for which the density will be returned
-   *  @returns a density vector */
   double getDensity(tarch::la::Vector<3, double> pos) const override {
     tarch::la::Vector<3, unsigned int> coords;
     const tarch::la::Vector<3, double> domainOffset(_coords[0] * _dx * _avgDomainSizeX, _coords[1] * _dx * _avgDomainSizeY, _coords[2] * _dx * _avgDomainSizeZ);
@@ -143,6 +116,7 @@ public:
       exit(EXIT_FAILURE);
     }
 #endif
+    // compute index for respective cell (_dx+... for ghost cells); use coords to store local cell coordinates
     for (unsigned int d = 0; d < 3; d++) {
       coords[d] = (unsigned int)((_dx + pos[d] - domainOffset[d]) / _dx);
     }
@@ -150,12 +124,6 @@ public:
     return _density[index];
   }
 
-  /** @brief applies the values received from the MD-solver within the
-   * conntinuum solver
-   *  @param recvBuffer holds the data from the md solver
-   *  @param recvIndice the indices to connect the data from the buffer with
-   * macroscopic cells
-   *  @param indexConversion instance of the indexConversion */
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
                            const coupling::IndexConversion<3>& indexConversion) override {
     if (skipRank()) {
@@ -191,11 +159,6 @@ public:
   }
 
 private:
-  /** there is no grid point on the wall, since the wall is located directly
-   * between the cells on the boundary. Therefore so set the boundary condition,
-   * the velocity boundary condition is applied by setting the velocity in the
-   * outer cell
-   *  @brief updates the velocities at boundaries*/
   void setBeyondWall() {
 #pragma omp parallel for
     for (int i = 0; i < _yO; i++) {
@@ -203,8 +166,8 @@ private:
     }
   }
 
-  /** @brief update the velocity in the cells which are flagged as FLUID */
-  void update() {
+  // calcuation of velocity field for next timestap
+  void stream() {
     double* swap = _velold;
     _velold = _vel;
     _vel = swap;
@@ -216,11 +179,8 @@ private:
     }
   }
 
-  /** @brief factor for the finite difference stencil = dt*kinVisc/(dx*dx) */
-  const double _omega;
-  /** @brief  velocity of moving wall of Couette flow */
-  tarch::la::Vector<3, double> _wallVelocity;
-  /** @brief the velocity field from the last time step  */
+  const double _omega;                        // relaxation frequency
+  tarch::la::Vector<3, double> _wallVelocity; // velocity of moving wall of Couette flow
   double* _velold{nullptr};
 };
 #endif

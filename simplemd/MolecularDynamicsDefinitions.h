@@ -24,14 +24,11 @@
 namespace simplemd {
 // static const unsigned int NUMBER_MOLECULES_PER_BLOCK_ALLOCATION = 1;
 
-// PERIODIC_BOUNDARY: Ghost linked cells are filled by respective molecular
-// information from the cells on opposite end of box OPEN_BOUNDARY: Additional
-// force term is applied to molecules near this boundary to exert correct
-// hydrodynamic pressure
+// PERIODIC_BOUNDARY: Ghost linked cells are filled by respective molecular information from the cells on opposite end of box
+// OPEN_BOUNDARY: Additional force term is applied to molecules near this boundary to exert correct hydrodynamic pressure
 //                -> currently not supported!
-// PARALLEL_BOUNDARY: Similar to PERIODIC_BOUNDARY, but molecules need to be
-// fetched from neighboring process GEOMETRY_BOUNDARY: No molecules are assumed
-// to be in these cells (geometry needs to be included via the respective
+// PARALLEL_BOUNDARY: Similar to PERIODIC_BOUNDARY, but molecules need to be fetched from neighboring process
+// GEOMETRY_BOUNDARY: No molecules are assumed to be in these cells (geometry needs to be included via the respective
 //                    geometrical forms). -> currently not supported!
 enum BoundaryType { NO_BOUNDARY = 0, PERIODIC_BOUNDARY = 1, OPEN_BOUNDARY = 2, PARALLEL_BOUNDARY = 3, GEOMETRY_BOUNDARY = 4, REFLECTING_BOUNDARY = 5 };
 

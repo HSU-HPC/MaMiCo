@@ -30,13 +30,11 @@ public:
 
   /** sets the iterator to the next molecule */
   void next() {
-    // check if we need to update molecule information and reset flag in this
-    // case
+    // check if we need to update molecule information and reset flag in this case
     _it++;
   }
 
-  /** returns a reference to the molecule that this iterator currently points to
-   */
+  /** returns a reference to the molecule that this iterator currently points to */
   coupling::interface::Molecule<MD_DIM>& get() {
     _buffer.setMolecule(*_it);
     return _buffer;

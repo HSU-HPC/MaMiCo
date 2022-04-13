@@ -362,13 +362,14 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/Molecule.h"
   "coupling/interface/MDSolverInterface.h"
   "coupling/KineticEnergyController.h"
+  "coupling/solvers/FiniteDifferenceSolver.h"
   "coupling/solvers/FDCouetteSolver.h"
+  "coupling/solvers/IcoFoamInterface.h"
   "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
   "coupling/solvers/LBCouetteSolver.h"
+  "coupling/solvers/IcoFoamBufferSetup.h"
   "coupling/solvers/CoupledMolecularDynamicsSimulation.h"
-  "coupling/solvers/FoamClass.h"
   "coupling/solvers/CouetteSolver.h"
-  "coupling/solvers/FoamSolverInterface.h"
   "coupling/solvers/CouetteSolverInterface.h"
   "coupling/solvers/LBCouetteSolverInterface.h"
   "coupling/solvers/NumericalSolver.h"
@@ -499,7 +500,7 @@ foreach(clangformat_source ${CLANGFORMAT_SOURCES})
 endforeach()
 add_custom_target(
   clangformat
-  COMMAND /usr/bin/env clang-format
+  COMMAND /usr/bin/env clang-format --verbose
   -i
   ${CLANGFORMAT_SOURCES_ABS}
 )
