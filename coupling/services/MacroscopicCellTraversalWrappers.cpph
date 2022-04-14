@@ -11,305 +11,269 @@
  *  @author Philipp Neumann
  */
 
-
-
-
 /** wrapper to carry out functionality on a single macroscopic cell. This function can be called on several macroscopic cells
  *  using the callback patterns of MacroscopicCells.
  *  In the following, several wrappers are provided for the TransferStrategy as well as some further functional stuff which
  *  is required from the MacroscopicCellServiceImpl.
  */
 class Wrapper {
-  public:
-    Wrapper(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): _thisPtr(thisPtr){}
-    virtual ~Wrapper(){}
-    virtual void beginCellIteration()=0;
-    virtual void endCellIteration()=0;
-    virtual void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index)=0;
-  protected:
-    coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim>* _thisPtr;
-};
+public:
+  Wrapper(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : _thisPtr(thisPtr) {}
+  virtual ~Wrapper() {}
+  virtual void beginCellIteration() = 0;
+  virtual void endCellIteration() = 0;
+  virtual void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) = 0;
 
+protected:
+  coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* _thisPtr;
+};
 
 /** wrapper for method processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData of TransferStrategy */
-class Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData: public Wrapper {
-  public:
-    Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+class Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData : public Wrapper {
+public:
+  Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr)
+      : Wrapper(thisPtr) {}
 
-    void beginCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData();
-    }
-    void endCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData();
-    }
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(cell,index);
-    }
+  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData(); }
+  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData(); }
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(cell, index);
+  }
 };
-
-
 
 /** wrapper for method processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData of TransferStrategy */
-class Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData: public Wrapper {
-  public:
-    Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+class Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData : public Wrapper {
+public:
+  Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr)
+      : Wrapper(thisPtr) {}
 
-    void beginCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData();
-    }
-    void endCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData();
-    }
+  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData(); }
+  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData(); }
 
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(cell,index);
-    }
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(cell, index);
+  }
 };
-
-
 
 /** wrapper for method processInnerMacroscopicCellAfterReceivingMacroscopicSolverData of TransferStrategy */
-class Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData: public Wrapper {
-  public:
-    Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+class Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData : public Wrapper {
+public:
+  Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr)
+      : Wrapper(thisPtr) {}
 
-    void beginCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData();
-    }
-    void endCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData();
-    }
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(cell,index);
-    }
+  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData(); }
+  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData(); }
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(cell, index);
+  }
 };
-
-
 
 /** wrapper for method processOuterMacroscopicCellAfterReceivingMacroscopicSolverData of TransferStrategy */
-class Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData: public Wrapper {
-  public:
-    Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+class Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData : public Wrapper {
+public:
+  Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr)
+      : Wrapper(thisPtr) {}
 
-    void beginCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData();
-    }
-    void endCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData();
-    }
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(cell,index);
-    }
+  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData(); }
+  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData(); }
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(cell, index);
+  }
 };
-
-
 
 /** wrapper for method processInnerMacroscopicCellBeforeSendingMDSolverData of TransferStrategy */
-class Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData: public Wrapper {
-  public:
-    Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+class Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData : public Wrapper {
+public:
+  Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-    void beginCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
-    }
-    void endCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
-    }
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellBeforeSendingMDSolverData(cell,index);
-    }
+  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(); }
+  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(); }
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellBeforeSendingMDSolverData(cell, index);
+  }
 };
-
-
 
 /** wrapper for method processOuterMacroscopicCellBeforeSendingMDSolverData of TransferStrategy */
-class Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData: public Wrapper {
-  public:
-    Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+class Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData : public Wrapper {
+public:
+  Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-    void beginCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsBeforeSendingMDSolverData();
-    }
-    void endCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsBeforeSendingMDSolverData();
-    }
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellBeforeSendingMDSolverData(cell,index);
-    }
+  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsBeforeSendingMDSolverData(); }
+  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsBeforeSendingMDSolverData(); }
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellBeforeSendingMDSolverData(cell, index);
+  }
 };
-
 
 /** wrapper for method processInnerMacroscopicCellAfterMDTimestep of TransferStrategy */
-class Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep: public Wrapper {
-  public:
-    Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+class Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep : public Wrapper {
+public:
+  Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-    void beginCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsAfterMDTimestep();
-    }
-    void endCellIteration(){
-      Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsAfterMDTimestep();
-    }
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellAfterMDTimestep(cell,index);
-    }
+  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsAfterMDTimestep(); }
+  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsAfterMDTimestep(); }
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellAfterMDTimestep(cell, index);
+  }
 };
 
-
 /** computes and stores the current velocity in each non-ghost macroscopic cell. */
-class Wrapper4ComputeAndSetCurrentVelocity: public Wrapper {
+class Wrapper4ComputeAndSetCurrentVelocity : public Wrapper {
 public:
-  Wrapper4ComputeAndSetCurrentVelocity(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+  Wrapper4ComputeAndSetCurrentVelocity(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration(){}
-  void endCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    coupling::cellmappings::ComputeMomentumMapping<LinkedCell,dim> computeMomentumMapping(Wrapper::_thisPtr->_mdSolverInterface);
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(Wrapper::_thisPtr->_mdSolverInterface);
     cell.iterateConstCells(computeMomentumMapping);
-    const tarch::la::Vector<dim,double> velocity = computeMomentumMapping.getMeanVelocity();
+    const tarch::la::Vector<dim, double> velocity = computeMomentumMapping.getMeanVelocity();
     cell.setCurrentVelocity(velocity);
   }
 };
 
 /** computes and stores the current velocity in each non-ghost macroscopic cell. */
-class Wrapper4CheckMass: public Wrapper {
+class Wrapper4CheckMass : public Wrapper {
 public:
-  Wrapper4CheckMass(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+  Wrapper4CheckMass(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration(){}
-  void endCellIteration(){std::cout << _counter << std::endl;
-    _counter =0;}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(Wrapper::_thisPtr->_mdSolverInterface);
+  void beginCellIteration() {}
+  void endCellIteration() {
+    std::cout << _counter << std::endl;
+    _counter = 0;
+  }
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> computeMassMapping(Wrapper::_thisPtr->_mdSolverInterface);
     cell.iterateConstCells(computeMassMapping);
     _counter += computeMassMapping.getNumberOfParticles();
   }
+
 private:
   unsigned int _counter{};
 };
 
 /** computes and stores the current velocity in each non-ghost macroscopic cell. */
-class Wrapper4ApplyVacuumAndSetAccordingMasses: public Wrapper {
+class Wrapper4ApplyVacuumAndSetAccordingMasses : public Wrapper {
 public:
-  Wrapper4ApplyVacuumAndSetAccordingMasses(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+  Wrapper4ApplyVacuumAndSetAccordingMasses(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration(){}
-  void endCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     // calculate number of particles in cell
-    coupling::cellmappings::ComputeMassMapping<LinkedCell,dim> computeMassMapping(Wrapper::_thisPtr->_mdSolverInterface);
+    coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> computeMassMapping(Wrapper::_thisPtr->_mdSolverInterface);
     cell.iterateConstCells(computeMassMapping);
     unsigned int numberOfParticles = computeMassMapping.getNumberOfParticles();
     _particleCounter += numberOfParticles;
     // do while there are still particles in the cell
-    while(numberOfParticles > 0){
+    while (numberOfParticles > 0) {
       // delete one particle
-      coupling::cellmappings::DeleteParticleMapping<LinkedCell,dim> deleteParticleMapping(numberOfParticles-1,Wrapper::_thisPtr->_mdSolverInterface);
+      coupling::cellmappings::DeleteParticleMapping<LinkedCell, dim> deleteParticleMapping(numberOfParticles - 1, Wrapper::_thisPtr->_mdSolverInterface);
       cell.iterateCells(deleteParticleMapping);
       numberOfParticles--;
     }
   }
 
-  unsigned int getNumberOfDeletedParticels(){
-    return _particleCounter;
-  }
+  unsigned int getNumberOfDeletedParticels() { return _particleCounter; }
 
 private:
   unsigned int _particleCounter{};
 };
 
 /** calls the MomentumInsertion-mechanisms on each non-ghost macroscopic cell, including the energy controller */
-class Wrapper4InserteCertainParticlesOverZPlane: public Wrapper {
+class Wrapper4InserteCertainParticlesOverZPlane : public Wrapper {
 public:
-  Wrapper4InserteCertainParticlesOverZPlane(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr, unsigned int particlesToInserte):
-    Wrapper(thisPtr), _positionOfFirstLocalGhostCell{thisPtr->getPositionOfFirstLocalGhostCell()}, _macroscopicCellSize{thisPtr->_indexConversion->getMacroscopicCellSize()}
-    , _numberNonGhostCellsInX(Wrapper::_thisPtr->_indexConversion->getLocalNumberMacroscopicCells()[0]){
-    const unsigned int totalCells = _numberNonGhostCellsInX*Wrapper::_thisPtr->_indexConversion->getLocalNumberMacroscopicCells()[1];
-    _toInserte = new unsigned int [totalCells]{};
-    //todo take care of the case with only one macroscopic cell
-    for(unsigned int i=0; i<particlesToInserte; i++){
-      int tmp = static_cast<int>(tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber()*totalCells);
+  Wrapper4InserteCertainParticlesOverZPlane(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr, unsigned int particlesToInserte)
+      : Wrapper(thisPtr), _positionOfFirstLocalGhostCell{thisPtr->getPositionOfFirstLocalGhostCell()},
+        _macroscopicCellSize{thisPtr->_indexConversion->getMacroscopicCellSize()},
+        _numberNonGhostCellsInX(Wrapper::_thisPtr->_indexConversion->getLocalNumberMacroscopicCells()[0]) {
+    const unsigned int totalCells = _numberNonGhostCellsInX * Wrapper::_thisPtr->_indexConversion->getLocalNumberMacroscopicCells()[1];
+    _toInserte = new unsigned int[totalCells]{};
+    // todo take care of the case with only one macroscopic cell
+    for (unsigned int i = 0; i < particlesToInserte; i++) {
+      int tmp = static_cast<int>(tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber() * totalCells);
       _toInserte[tmp] += 1;
     }
   }
-  ~Wrapper4InserteCertainParticlesOverZPlane(){delete[] _toInserte;}
+  ~Wrapper4InserteCertainParticlesOverZPlane() { delete[] _toInserte; }
 
-  void beginCellIteration(){}
-  void endCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    tarch::la::Vector<dim,unsigned int> cellIndex = Wrapper::_thisPtr->_indexConversion->getLocalVectorCellIndex(index);
-    if(_toInserte[(cellIndex[0]-1)+_numberNonGhostCellsInX*(cellIndex[1]-1)]==0) return;
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    tarch::la::Vector<dim, unsigned int> cellIndex = Wrapper::_thisPtr->_indexConversion->getLocalVectorCellIndex(index);
+    if (_toInserte[(cellIndex[0] - 1) + _numberNonGhostCellsInX * (cellIndex[1] - 1)] == 0)
+      return;
     // setup potential energy landscape (i.e. computes the potential energy for relevant molecules).
     Wrapper::_thisPtr->_mdSolverInterface->setupPotentialEnergyLandscape(Wrapper::_thisPtr->_indexConversion->convertLocalToGlobalVectorCellIndex(cellIndex),
-      tarch::la::Vector<dim,unsigned int>(0),Wrapper::_thisPtr->_numberLinkedCellsPerMacroscopicCell);
+                                                                         tarch::la::Vector<dim, unsigned int>(0),
+                                                                         Wrapper::_thisPtr->_numberLinkedCellsPerMacroscopicCell);
     // compute cell position
-    tarch::la::Vector<dim,double> macroscopicCellPosition = _positionOfFirstLocalGhostCell;
+    tarch::la::Vector<dim, double> macroscopicCellPosition = _positionOfFirstLocalGhostCell;
     // std::cout << _positionOfFirstLocalGhostCell << std::endl;
-    for (unsigned int d = 0; d < dim; d++){
-      macroscopicCellPosition[d] += _macroscopicCellSize[d]*cellIndex[d];
+    for (unsigned int d = 0; d < dim; d++) {
+      macroscopicCellPosition[d] += _macroscopicCellSize[d] * cellIndex[d];
     }
     // buffers for temperature,momentum,mean velocity,pot. energy
-    tarch::la::Vector<dim,double> momentum(0.0);
-    tarch::la::Vector<dim,double> meanVelocity(0.0);
+    tarch::la::Vector<dim, double> momentum(0.0);
+    tarch::la::Vector<dim, double> meanVelocity(0.0);
     // compute mean potential energy over all macroscopic cells and set the value in the macroscopic cell
-    coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell,dim> computeMeanPotentialEnergyMapping(Wrapper::_thisPtr->_mdSolverInterface, *Wrapper::_thisPtr->_boundaryForceController);
-    while(_toInserte[(cellIndex[0]-1)+_numberNonGhostCellsInX*(cellIndex[1]-1)]>0){
+    coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell, dim> computeMeanPotentialEnergyMapping(Wrapper::_thisPtr->_mdSolverInterface,
+                                                                                                                 *Wrapper::_thisPtr->_boundaryForceController);
+    while (_toInserte[(cellIndex[0] - 1) + _numberNonGhostCellsInX * (cellIndex[1] - 1)] > 0) {
       // compute current momentum and energy
-      Wrapper::_thisPtr->_momentumController.computeMomentumAndMeanVelocity(cell,momentum,meanVelocity);
+      Wrapper::_thisPtr->_momentumController.computeMomentumAndMeanVelocity(cell, momentum, meanVelocity);
       const double temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
       // compute potential energy for this macroscopic cell and store it
       cell.iterateConstCells(computeMeanPotentialEnergyMapping);
       const double potentialEnergy = computeMeanPotentialEnergyMapping.getPotentialEnergy();
       cell.setPotentialEnergy(potentialEnergy);
-      Wrapper::_thisPtr->_particleInsertion->insertParticle(cell, macroscopicCellPosition,
-        _macroscopicCellSize, meanVelocity, temperature, *Wrapper::_thisPtr->_boundaryForceController);
-      _toInserte[(cellIndex[0]-1)+_numberNonGhostCellsInX*(cellIndex[1]-1)]--;
+      Wrapper::_thisPtr->_particleInsertion->insertParticle(cell, macroscopicCellPosition, _macroscopicCellSize, meanVelocity, temperature,
+                                                            *Wrapper::_thisPtr->_boundaryForceController);
+      _toInserte[(cellIndex[0] - 1) + _numberNonGhostCellsInX * (cellIndex[1] - 1)]--;
     }
   }
-  private:
-    const tarch::la::Vector<dim,double> _positionOfFirstLocalGhostCell;
-    const tarch::la::Vector<dim,double> _macroscopicCellSize;
-    const unsigned int _numberNonGhostCellsInX;
-    unsigned int* _toInserte;
-  };
 
-
-/** calls the MomentumInsertion-mechanisms on each non-ghost macroscopic cell, including the energy controller */
-class Wrapper4DistributeMomentum: public Wrapper {
-public:
-  Wrapper4DistributeMomentum(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr,unsigned int t): Wrapper(thisPtr){}
-
-  void beginCellIteration(){
-  }
-  void endCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    const double temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
-    Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell,index);
-    Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell,temperature);
-  }
+private:
+  const tarch::la::Vector<dim, double> _positionOfFirstLocalGhostCell;
+  const tarch::la::Vector<dim, double> _macroscopicCellSize;
+  const unsigned int _numberNonGhostCellsInX;
+  unsigned int* _toInserte;
 };
 
+/** calls the MomentumInsertion-mechanisms on each non-ghost macroscopic cell, including the energy controller */
+class Wrapper4DistributeMomentum : public Wrapper {
+public:
+  Wrapper4DistributeMomentum(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr, unsigned int t) : Wrapper(thisPtr) {}
 
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    const double temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
+    Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell, index);
+    Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell, temperature);
+  }
+};
 
 /** computes and stores the temperature value in all non-ghost cells. If the temperature parameter is set to -1.0,
  *  the current temperature of the molecules in this cell is stored.
  *  Otherwise, the temperature variable is used and applied to the molecules using the thermostat of the KineticEnergyController.
  */
-class Wrapper4ComputeAndStoreTemperature: public Wrapper {
+class Wrapper4ComputeAndStoreTemperature : public Wrapper {
 public:
-  Wrapper4ComputeAndStoreTemperature(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr,double temperature): Wrapper(thisPtr), _temperature(temperature){}
+  Wrapper4ComputeAndStoreTemperature(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr, double temperature)
+      : Wrapper(thisPtr), _temperature(temperature) {}
 
-  void beginCellIteration(){}
-  void endCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     // if this value is -1.0, we just set the temperature in the cell according to current temperature...
-    if (_temperature==-1.0){
+    if (_temperature == -1.0) {
       const double myTemperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
       cell.setTemperature(myTemperature);
-    // otherwise we use the temperature value of _setTemperature
+      // otherwise we use the temperature value of _setTemperature
     } else {
       cell.setTemperature(_temperature);
-      Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell,_temperature);
+      Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell, _temperature);
     }
   }
 
@@ -317,48 +281,46 @@ private:
   const double _temperature;
 };
 
-
 /** applies the thermostat in all non-ghost cells */
-class Wrapper4ApplyTemperature: public Wrapper {
+class Wrapper4ApplyTemperature : public Wrapper {
 public:
-  Wrapper4ApplyTemperature(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+  Wrapper4ApplyTemperature(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration(){}
-  void endCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      const double temperature = cell.getTemperature();
-      Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell,temperature);
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    const double temperature = cell.getTemperature();
+    Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell, temperature);
   }
 };
-
 
 /** applies the boundary force in all non-ghost cells which are close to an open boundary */
-class Wrapper4ApplyBoundaryForce: public Wrapper {
+class Wrapper4ApplyBoundaryForce : public Wrapper {
 public:
-  Wrapper4ApplyBoundaryForce(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr): Wrapper(thisPtr){}
+  Wrapper4ApplyBoundaryForce(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration(){}
-  void endCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-      Wrapper::_thisPtr->_boundaryForceController->applyBoundaryForce(cell,index);
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    Wrapper::_thisPtr->_boundaryForceController->applyBoundaryForce(cell, index);
   }
 };
 
-class Wrapper4SampleVelocityAndParticlesInZ: public Wrapper {
+class Wrapper4SampleVelocityAndParticlesInZ : public Wrapper {
 public:
-  Wrapper4SampleVelocityAndParticlesInZ(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr,
-   tarch::la::Vector<dim, double>* velocity, tarch::la::Vector<dim, double>* velocityPlus, tarch::la::Vector<dim, double>* velocityMinus,
-   unsigned int* numberParticles, unsigned int* numberParticlesPlus,  unsigned int* numberParticlesMinus): Wrapper(thisPtr),
-   _velocity(velocity), _velocityPlus(velocityPlus), _velocityMinus(velocityMinus), _numberParticles(numberParticles),
-   _numberParticlesPlus(numberParticlesPlus), _numberParticlesMinus(numberParticlesMinus){}
+  Wrapper4SampleVelocityAndParticlesInZ(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr, tarch::la::Vector<dim, double>* velocity,
+                                        tarch::la::Vector<dim, double>* velocityPlus, tarch::la::Vector<dim, double>* velocityMinus,
+                                        unsigned int* numberParticles, unsigned int* numberParticlesPlus, unsigned int* numberParticlesMinus)
+      : Wrapper(thisPtr), _velocity(velocity), _velocityPlus(velocityPlus), _velocityMinus(velocityMinus), _numberParticles(numberParticles),
+        _numberParticlesPlus(numberParticlesPlus), _numberParticlesMinus(numberParticlesMinus) {}
 
-  void beginCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    coupling::cellmappings::ComputeVelocityBinMapping<LinkedCell,dim> velocityBinMapping(Wrapper::_thisPtr->_mdSolverInterface,
-    _velocity, _velocityPlus, _velocityMinus, _numberParticles, _numberParticlesPlus, _numberParticlesMinus);
+  void beginCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    coupling::cellmappings::ComputeVelocityBinMapping<LinkedCell, dim> velocityBinMapping(
+        Wrapper::_thisPtr->_mdSolverInterface, _velocity, _velocityPlus, _velocityMinus, _numberParticles, _numberParticlesPlus, _numberParticlesMinus);
     cell.iterateConstCells(velocityBinMapping);
   }
-  void endCellIteration(){}
+  void endCellIteration() {}
 
 private:
   tarch::la::Vector<dim, double>* _velocity;
@@ -369,18 +331,19 @@ private:
   unsigned int* _numberParticlesMinus;
 };
 
-class Wrapper4SampleTemperatureInZ: public Wrapper {
+class Wrapper4SampleTemperatureInZ : public Wrapper {
 public:
-  Wrapper4SampleTemperatureInZ(coupling::services::MacroscopicCellServiceImpl<LinkedCell,dim> *thisPtr,
-   tarch::la::Vector<dim, double>* velocity, double* temperature): Wrapper(thisPtr),
-   _velocity(velocity), _temperature(temperature){}
+  Wrapper4SampleTemperatureInZ(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr, tarch::la::Vector<dim, double>* velocity,
+                               double* temperature)
+      : Wrapper(thisPtr), _velocity(velocity), _temperature(temperature) {}
 
-  void beginCellIteration(){}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell,dim> &cell, const unsigned int &index){
-    coupling::cellmappings::ComputeTemperatureBinMapping<LinkedCell,dim> temperatureBinMapping(Wrapper::_thisPtr->_mdSolverInterface, _velocity, _temperature);
+  void beginCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    coupling::cellmappings::ComputeTemperatureBinMapping<LinkedCell, dim> temperatureBinMapping(Wrapper::_thisPtr->_mdSolverInterface, _velocity, _temperature);
     cell.iterateConstCells(temperatureBinMapping);
   }
-  void endCellIteration(){}
+  void endCellIteration() {}
+
 private:
   tarch::la::Vector<dim, double>* _velocity;
   double* _temperature;
