@@ -7,7 +7,7 @@
 # BSD license, see the copyright notice in Mamico's main folder
 
 import sys
-sys.path.append('../../python-binding')
+sys.path.append('../../../build')
 sys.path.append('../../filtering/filters')
 import coloredlogs, logging
 import math
@@ -27,7 +27,7 @@ log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
 
 
-BENCH_BEFORE_RUN = False
+BENCH_BEFORE_RUN = True
 
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
@@ -147,6 +147,7 @@ class KVSTest():
             self.simpleMDConfig, self.rank, self.cfg.getint("microscopic-solver","number-md-simulations"),
             self.mamicoConfig, "kvs.xml", self.multiMDService)
 
+        mamico.tarch.utils.initIndexing(self.simpleMDConfig, self.mamicoConfig, self.macroscopicSolverInterface, self.rank)
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
