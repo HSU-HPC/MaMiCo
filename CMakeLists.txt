@@ -200,6 +200,7 @@ if(BUILD_WITH_PYBIND11)
 		${PYBIND_SOURCES11}
 	)
 	target_compile_options(mamico_pybind PRIVATE -fPIC)
+        set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
 	target_link_libraries(mamico_pybind PRIVATE mamico)
 endif()
 
