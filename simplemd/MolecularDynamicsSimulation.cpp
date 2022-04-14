@@ -3,23 +3,16 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 #include "simplemd/MolecularDynamicsSimulation.h"
+#include "simplemd/cell-mappings/VaryCheckpointMapping.h"
 
-simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(
-    const simplemd::configurations::MolecularDynamicsConfiguration
-        &configuration)
-    : _configuration(configuration), _timeIntegrator(NULL),
-      _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL),
-      _lennardJonesForce(NULL), _emptyLinkedListsMapping(NULL),
-      _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0),
-      _profilePlotter(NULL), _parallelTopologyService(NULL),
-      _moleculeService(NULL), _linkedCellService(NULL),
-      _molecularPropertiesService(NULL),
+simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
+    : _configuration(configuration), _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL), _lennardJonesForce(NULL),
+      _emptyLinkedListsMapping(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL), _parallelTopologyService(NULL),
+      _moleculeService(NULL), _linkedCellService(NULL), _molecularPropertiesService(NULL),
       // initialise external forces
       _externalForceService(configuration.getExternalForceConfigurations()) {}
 
-double simplemd::MolecularDynamicsSimulation::getNumberDensity(
-    unsigned int numberMolecules,
-    const tarch::la::Vector<MD_DIM, double> &domainSize) const {
+double simplemd::MolecularDynamicsSimulation::getNumberDensity(unsigned int numberMolecules, const tarch::la::Vector<MD_DIM, double>& domainSize) const {
   double density = 1.0;
   for (unsigned int d = 0; d < MD_DIM; d++) {
     density = density / domainSize[d];
@@ -32,33 +25,25 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
   // set vtk file stem and checkpoint filestem -> only one MD simulation runs
   _localMDSimulation = 0;
   _vtkFilestem = _configuration.getVTKConfiguration().getFilename();
-  _checkpointFilestem =
-      _configuration.getCheckpointConfiguration().getFilename();
+  _checkpointFilestem = _configuration.getCheckpointConfiguration().getFilename();
   // initialise local variable with global information first (they are adapted
   // later on)
-  tarch::la::Vector<MD_DIM, double> localDomainSize(
-      _configuration.getDomainConfiguration().getGlobalDomainSize());
-  tarch::la::Vector<MD_DIM, double> localDomainOffset(
-      _configuration.getDomainConfiguration().getGlobalDomainOffset());
-  tarch::la::Vector<MD_DIM, unsigned int> moleculesPerDirection(
-      _configuration.getDomainConfiguration().getMoleculesPerDirection());
+  tarch::la::Vector<MD_DIM, double> localDomainSize(_configuration.getDomainConfiguration().getGlobalDomainSize());
+  tarch::la::Vector<MD_DIM, double> localDomainOffset(_configuration.getDomainConfiguration().getGlobalDomainOffset());
+  tarch::la::Vector<MD_DIM, unsigned int> moleculesPerDirection(_configuration.getDomainConfiguration().getMoleculesPerDirection());
   tarch::la::Vector<MD_DIM, double> realMeshWidth(0.0);
   tarch::la::Vector<MD_DIM, unsigned int> processCoordinates(0);
   double linkedCellVolume = 1.0;
-  simplemd::moleculemappings::InitialPositionAndForceUpdate
-      initialPositionAndForceUpdate(
-          _configuration.getSimulationConfiguration().getDt(),
-          _configuration.getMoleculeConfiguration().getMass());
+  simplemd::moleculemappings::InitialPositionAndForceUpdate initialPositionAndForceUpdate(_configuration.getSimulationConfiguration().getDt(),
+                                                                                          _configuration.getMoleculeConfiguration().getMass());
   // initialise services -> initialise ParallelTopologyService first (also for
   // serial case!) and then, initialise other services, if this process
   // contributes to the simulation in some way Note: initBuffers must also be
   // called on non-idle processors, but only after MoleculeService has been
   // initialised.
   _parallelTopologyService = new simplemd::services::ParallelTopologyService(
-      _configuration.getDomainConfiguration().getGlobalDomainSize(),
-      _configuration.getDomainConfiguration().getGlobalDomainOffset(),
-      _configuration.getDomainConfiguration().getMeshWidth(),
-      _configuration.getMPIConfiguration().getNumberOfProcesses(),
+      _configuration.getDomainConfiguration().getGlobalDomainSize(), _configuration.getDomainConfiguration().getGlobalDomainOffset(),
+      _configuration.getDomainConfiguration().getMeshWidth(), _configuration.getMPIConfiguration().getNumberOfProcesses(),
       _configuration.getDomainConfiguration().getBoundary());
   if (_parallelTopologyService == NULL) {
     std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
@@ -78,52 +63,29 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // determine local domain size and local domain offset and local number of
     // molecules
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      localDomainSize[d] =
-          localDomainSize[d] /
-          (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
-      localDomainOffset[d] =
-          localDomainOffset[d] +
-          (processCoordinates[d] *
-           _parallelTopologyService->getLocalNumberOfCells()[d] *
-           realMeshWidth[d]);
-      int missingMolecules =
-          moleculesPerDirection[d] %
-          (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
-      moleculesPerDirection[d] =
-          moleculesPerDirection[d] /
-          (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
+      localDomainSize[d] = localDomainSize[d] / (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
+      localDomainOffset[d] = localDomainOffset[d] + (processCoordinates[d] * _parallelTopologyService->getLocalNumberOfCells()[d] * realMeshWidth[d]);
+      int missingMolecules = moleculesPerDirection[d] % (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
+      moleculesPerDirection[d] = moleculesPerDirection[d] / (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
       for (int i = 0; i < missingMolecules; i++) {
-        if (processCoordinates[d] ==
-            (unsigned int)(i *
-                           (1.0 * _configuration.getMPIConfiguration()
-                                      .getNumberOfProcesses()[d]) /
-                           missingMolecules))
+        if (processCoordinates[d] == (unsigned int)(i * (1.0 * _configuration.getMPIConfiguration().getNumberOfProcesses()[d]) / missingMolecules))
           moleculesPerDirection[d]++;
       }
     }
 #if (MD_DEBUG == MD_YES)
-    if (_parallelTopologyService->getProcessCoordinates() ==
-        tarch::la::Vector<MD_DIM, unsigned int>(0)) {
-      std::cout << "Local number of cells: "
-                << _parallelTopologyService->getLocalNumberOfCells()
-                << std::endl;
+    if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
+      std::cout << "Local number of cells: " << _parallelTopologyService->getLocalNumberOfCells() << std::endl;
     }
-    std::cout << "Rank: " << _parallelTopologyService->getRank()
-              << " Boundary: " << _localBoundary
-              << ", process coordinates: " << processCoordinates << std::endl;
-    std::cout << " Local Domain size: " << localDomainSize
-              << ", local domain offset: " << localDomainOffset << std::endl;
+    std::cout << "Rank: " << _parallelTopologyService->getRank() << " Boundary: " << _localBoundary << ", process coordinates: " << processCoordinates
+              << std::endl;
+    std::cout << " Local Domain size: " << localDomainSize << ", local domain offset: " << localDomainOffset << std::endl;
 #endif
 
-    tarch::utils::RandomNumberService::getInstance().init(
-        _configuration.getSimulationConfiguration().fixSeed());
-    _molecularPropertiesService =
-        new simplemd::services::MolecularPropertiesService(
-            _configuration.getMoleculeConfiguration().getMass(),
-            _configuration.getMoleculeConfiguration().getEpsilon(),
-            _configuration.getMoleculeConfiguration().getSigma(),
-            _configuration.getDomainConfiguration().getCutoffRadius(),
-            _configuration.getDomainConfiguration().getKB());
+    tarch::utils::RandomNumberService::getInstance().init(_configuration.getSimulationConfiguration().fixSeed());
+    _molecularPropertiesService = new simplemd::services::MolecularPropertiesService(
+        _configuration.getMoleculeConfiguration().getMass(), _configuration.getMoleculeConfiguration().getEpsilon(),
+        _configuration.getMoleculeConfiguration().getSigma(), _configuration.getDomainConfiguration().getCutoffRadius(),
+        _configuration.getDomainConfiguration().getKB());
     if (_molecularPropertiesService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "
                    "_molecularPropertiesService==NULL!"
@@ -134,25 +96,18 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // either initialise from checkpoint data or via a certain number of
     // molecules per direction
     if (_configuration.getDomainConfiguration().initFromCheckpoint()) {
-      _moleculeService = new simplemd::services::MoleculeService(
-          localDomainSize, localDomainOffset,
-          _configuration.getDomainConfiguration().getCheckpointFilestem(),
-          _configuration.getDomainConfiguration().getBlockSize(),
-          *_parallelTopologyService);
-    } else if (_configuration.getDomainConfiguration()
-                   .initFromSequentialCheckpoint()) {
-      _moleculeService = new simplemd::services::MoleculeService(
-          localDomainSize, localDomainOffset,
-          _configuration.getDomainConfiguration().getCheckpointFilestem(),
-          _configuration.getDomainConfiguration().getBlockSize());
+      _moleculeService =
+          new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
+                                                  _configuration.getDomainConfiguration().getBlockSize(), *_parallelTopologyService);
+    } else if (_configuration.getDomainConfiguration().initFromSequentialCheckpoint()) {
+      _moleculeService =
+          new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
+                                                  _configuration.getDomainConfiguration().getBlockSize());
     } else {
       _moleculeService = new simplemd::services::MoleculeService(
-          localDomainSize, localDomainOffset, moleculesPerDirection,
-          _configuration.getMoleculeConfiguration().getMeanVelocity(),
-          _configuration.getDomainConfiguration().getKB(),
-          _configuration.getMoleculeConfiguration().getTemperature(),
-          _configuration.getDomainConfiguration().getBlockSize(),
-          *_molecularPropertiesService);
+          localDomainSize, localDomainOffset, moleculesPerDirection, _configuration.getMoleculeConfiguration().getMeanVelocity(),
+          _configuration.getDomainConfiguration().getKB(), _configuration.getMoleculeConfiguration().getTemperature(),
+          _configuration.getDomainConfiguration().getBlockSize(), *_molecularPropertiesService);
     }
     if (_moleculeService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "
@@ -163,94 +118,72 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
 
     // initialise buffers. After this call, the ParallelTopologyService
     // initialisation is complete
-    _parallelTopologyService->initBuffers(
-        _moleculeService->getNumberMolecules());
-    _linkedCellService = new simplemd::services::LinkedCellService(
-        localDomainSize, localDomainOffset, *_parallelTopologyService,
-        *_moleculeService);
+    _parallelTopologyService->initBuffers(_moleculeService->getNumberMolecules());
+    _linkedCellService = new simplemd::services::LinkedCellService(localDomainSize, localDomainOffset, *_parallelTopologyService, *_moleculeService);
     if (_linkedCellService == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_linkedCellService==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_linkedCellService==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
     // init boundary treatment
-    _boundaryTreatment = new simplemd::BoundaryTreatment(
-        *_parallelTopologyService, *_moleculeService, *_linkedCellService);
+    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeService, *_linkedCellService);
     if (_boundaryTreatment == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_boundaryTreatment==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_boundaryTreatment==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
     // init all mappings here
-    _timeIntegrator =
-        new simplemd::moleculemappings::VelocityStoermerVerletMapping(
-            _configuration.getDomainConfiguration().getKB(),
-            _configuration.getSimulationConfiguration().getDt(),
-            _configuration.getMoleculeConfiguration().getMass(),
-            _configuration.getDomainConfiguration().getBoundary(),
-            _configuration.getDomainConfiguration().getGlobalDomainOffset(),
-            _configuration.getDomainConfiguration().getGlobalDomainSize());
+    _timeIntegrator = new simplemd::moleculemappings::VelocityStoermerVerletMapping(
+        _configuration.getDomainConfiguration().getKB(), _configuration.getSimulationConfiguration().getDt(),
+        _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getBoundary(),
+        _configuration.getDomainConfiguration().getGlobalDomainOffset(), _configuration.getDomainConfiguration().getGlobalDomainSize());
     if (_timeIntegrator == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_timeIntegrator==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_timeIntegrator==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
-    _updateLinkedCellListsMapping =
-        new simplemd::moleculemappings::UpdateLinkedCellListsMapping(
-            *_parallelTopologyService, *_linkedCellService);
+    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService);
     if (_updateLinkedCellListsMapping == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_updateLinkedCellListsMapping==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_updateLinkedCellListsMapping==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
-    _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(
-        *_parallelTopologyService, *_moleculeService, _vtkFilestem);
+    _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(*_parallelTopologyService, *_moleculeService, _vtkFilestem);
     if (_vtkMoleculeWriter == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_vtkMoleculeWriter==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_vtkMoleculeWriter==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
     // cell mappings
-    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(
-        _externalForceService, *_molecularPropertiesService);
+    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
     if (_lennardJonesForce == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_lennardJonesForce==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_lennardJonesForce==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
-    _emptyLinkedListsMapping =
-        new simplemd::cellmappings::EmptyLinkedListsMapping();
+    _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping();
     if (_emptyLinkedListsMapping == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_emptyLinkedListsMapping==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_emptyLinkedListsMapping==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
-    _rdfMapping = new simplemd::cellmappings::RDFMapping(
-        *_parallelTopologyService, *_linkedCellService,
-        _configuration.getDomainConfiguration().getCutoffRadius(),
-        _configuration.getRDFConfiguration().getNumberOfPoints());
+    _rdfMapping =
+        new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_linkedCellService, _configuration.getDomainConfiguration().getCutoffRadius(),
+                                               _configuration.getRDFConfiguration().getNumberOfPoints());
     if (_rdfMapping == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_rdfMapping==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_rdfMapping==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -261,25 +194,20 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     }
     linkedCellVolume = 1.0;
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      linkedCellVolume =
-          linkedCellVolume * _linkedCellService->getMeshWidth()[d];
+      linkedCellVolume = linkedCellVolume * _linkedCellService->getMeshWidth()[d];
     }
-    _profilePlotter = new simplemd::ProfilePlotter(
-        _configuration.getProfilePlotterConfigurations(),
-        *_parallelTopologyService, *_linkedCellService, linkedCellVolume,
-        _localMDSimulation);
+    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_linkedCellService,
+                                                   linkedCellVolume, _localMDSimulation);
     if (_profilePlotter == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
-             "_profilePlotter==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
+                   "_profilePlotter==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
     // -------------- do initial force computations and position update
     // ----------
-    _boundaryTreatment->fillBoundaryCells(_localBoundary,
-                                          *_parallelTopologyService);
+    _boundaryTreatment->fillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
     // After this step, each molecule has received all force contributions from
     // its neighbors.
@@ -296,45 +224,34 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
   } // end is process not idle
 }
 
-void simplemd::MolecularDynamicsSimulation::initServices(
-    const tarch::utils::MultiMDService<MD_DIM> &multiMDService,
-    unsigned int localMDSimulation) {
+void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::MultiMDService<MD_DIM>& multiMDService, unsigned int localMDSimulation) {
   // set vtk file stem and checkpoint filestem;
   _localMDSimulation = localMDSimulation;
   std::stringstream filestems;
-  filestems << _configuration.getVTKConfiguration().getFilename() << "_"
-            << localMDSimulation << "_";
+  filestems << _configuration.getVTKConfiguration().getFilename() << "_" << localMDSimulation << "_";
   _vtkFilestem = filestems.str();
   filestems.str("");
-  filestems << _configuration.getCheckpointConfiguration().getFilename() << "_"
-            << localMDSimulation << "_";
+  filestems << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_";
   _checkpointFilestem = filestems.str();
   filestems.str("");
   // initialise local variable with global information first (they are adapted
   // later on)
-  tarch::la::Vector<MD_DIM, double> localDomainSize(
-      _configuration.getDomainConfiguration().getGlobalDomainSize());
-  tarch::la::Vector<MD_DIM, double> localDomainOffset(
-      _configuration.getDomainConfiguration().getGlobalDomainOffset());
-  tarch::la::Vector<MD_DIM, unsigned int> moleculesPerDirection(
-      _configuration.getDomainConfiguration().getMoleculesPerDirection());
+  tarch::la::Vector<MD_DIM, double> localDomainSize(_configuration.getDomainConfiguration().getGlobalDomainSize());
+  tarch::la::Vector<MD_DIM, double> localDomainOffset(_configuration.getDomainConfiguration().getGlobalDomainOffset());
+  tarch::la::Vector<MD_DIM, unsigned int> moleculesPerDirection(_configuration.getDomainConfiguration().getMoleculesPerDirection());
   tarch::la::Vector<MD_DIM, double> realMeshWidth(0.0);
   tarch::la::Vector<MD_DIM, unsigned int> processCoordinates(0);
   double linkedCellVolume = 1.0;
-  simplemd::moleculemappings::InitialPositionAndForceUpdate
-      initialPositionAndForceUpdate(
-          _configuration.getSimulationConfiguration().getDt(),
-          _configuration.getMoleculeConfiguration().getMass());
+  simplemd::moleculemappings::InitialPositionAndForceUpdate initialPositionAndForceUpdate(_configuration.getSimulationConfiguration().getDt(),
+                                                                                          _configuration.getMoleculeConfiguration().getMass());
   // initialise services -> initialise ParallelTopologyService first (also for
   // serial case!) and then, initialise other services, if this process
   // contributes to the simulation in some way Note: initBuffers must also be
   // called on non-idle processors, but only after MoleculeService has been
   // initialised.
   _parallelTopologyService = new simplemd::services::ParallelTopologyService(
-      _configuration.getDomainConfiguration().getGlobalDomainSize(),
-      _configuration.getDomainConfiguration().getGlobalDomainOffset(),
-      _configuration.getDomainConfiguration().getMeshWidth(),
-      _configuration.getMPIConfiguration().getNumberOfProcesses(),
+      _configuration.getDomainConfiguration().getGlobalDomainSize(), _configuration.getDomainConfiguration().getGlobalDomainOffset(),
+      _configuration.getDomainConfiguration().getMeshWidth(), _configuration.getMPIConfiguration().getNumberOfProcesses(),
       _configuration.getDomainConfiguration().getBoundary()
 // DIFFERENCE TO initServices(): use communicator of MultiMDService
 #if (MD_PARALLEL == MD_YES)
@@ -360,52 +277,29 @@ void simplemd::MolecularDynamicsSimulation::initServices(
     // determine local domain size and local domain offset and local number of
     // molecules
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      localDomainSize[d] =
-          localDomainSize[d] /
-          (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
-      localDomainOffset[d] =
-          localDomainOffset[d] +
-          (processCoordinates[d] *
-           _parallelTopologyService->getLocalNumberOfCells()[d] *
-           realMeshWidth[d]);
-      int missingMolecules =
-          moleculesPerDirection[d] %
-          (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
-      moleculesPerDirection[d] =
-          moleculesPerDirection[d] /
-          (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
+      localDomainSize[d] = localDomainSize[d] / (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
+      localDomainOffset[d] = localDomainOffset[d] + (processCoordinates[d] * _parallelTopologyService->getLocalNumberOfCells()[d] * realMeshWidth[d]);
+      int missingMolecules = moleculesPerDirection[d] % (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
+      moleculesPerDirection[d] = moleculesPerDirection[d] / (_configuration.getMPIConfiguration().getNumberOfProcesses()[d]);
       for (int i = 0; i < missingMolecules; i++) {
-        if (processCoordinates[d] ==
-            (unsigned int)(i *
-                           (1.0 * _configuration.getMPIConfiguration()
-                                      .getNumberOfProcesses()[d]) /
-                           missingMolecules))
+        if (processCoordinates[d] == (unsigned int)(i * (1.0 * _configuration.getMPIConfiguration().getNumberOfProcesses()[d]) / missingMolecules))
           moleculesPerDirection[d]++;
       }
     }
 #if (MD_DEBUG == MD_YES)
-    if (_parallelTopologyService->getProcessCoordinates() ==
-        tarch::la::Vector<MD_DIM, unsigned int>(0)) {
-      std::cout << "Local number of cells: "
-                << _parallelTopologyService->getLocalNumberOfCells()
-                << std::endl;
+    if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
+      std::cout << "Local number of cells: " << _parallelTopologyService->getLocalNumberOfCells() << std::endl;
     }
-    std::cout << "Rank: " << _parallelTopologyService->getRank()
-              << " Boundary: " << _localBoundary
-              << ", process coordinates: " << processCoordinates << std::endl;
-    std::cout << " Local Domain size: " << localDomainSize
-              << ", local domain offset: " << localDomainOffset << std::endl;
+    std::cout << "Rank: " << _parallelTopologyService->getRank() << " Boundary: " << _localBoundary << ", process coordinates: " << processCoordinates
+              << std::endl;
+    std::cout << " Local Domain size: " << localDomainSize << ", local domain offset: " << localDomainOffset << std::endl;
 #endif
 
-    tarch::utils::RandomNumberService::getInstance().init(
-        _configuration.getSimulationConfiguration().fixSeed());
-    _molecularPropertiesService =
-        new simplemd::services::MolecularPropertiesService(
-            _configuration.getMoleculeConfiguration().getMass(),
-            _configuration.getMoleculeConfiguration().getEpsilon(),
-            _configuration.getMoleculeConfiguration().getSigma(),
-            _configuration.getDomainConfiguration().getCutoffRadius(),
-            _configuration.getDomainConfiguration().getKB());
+    tarch::utils::RandomNumberService::getInstance().init(_configuration.getSimulationConfiguration().fixSeed());
+    _molecularPropertiesService = new simplemd::services::MolecularPropertiesService(
+        _configuration.getMoleculeConfiguration().getMass(), _configuration.getMoleculeConfiguration().getEpsilon(),
+        _configuration.getMoleculeConfiguration().getSigma(), _configuration.getDomainConfiguration().getCutoffRadius(),
+        _configuration.getDomainConfiguration().getKB());
     if (_molecularPropertiesService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "
                    "_molecularPropertiesService==NULL!"
@@ -416,25 +310,18 @@ void simplemd::MolecularDynamicsSimulation::initServices(
     // either initialise from checkpoint data or via a certain number of
     // molecules per direction
     if (_configuration.getDomainConfiguration().initFromCheckpoint()) {
-      _moleculeService = new simplemd::services::MoleculeService(
-          localDomainSize, localDomainOffset,
-          _configuration.getDomainConfiguration().getCheckpointFilestem(),
-          _configuration.getDomainConfiguration().getBlockSize(),
-          *_parallelTopologyService);
-    } else if (_configuration.getDomainConfiguration()
-                   .initFromSequentialCheckpoint()) {
-      _moleculeService = new simplemd::services::MoleculeService(
-          localDomainSize, localDomainOffset,
-          _configuration.getDomainConfiguration().getCheckpointFilestem(),
-          _configuration.getDomainConfiguration().getBlockSize());
+      _moleculeService =
+          new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
+                                                  _configuration.getDomainConfiguration().getBlockSize(), *_parallelTopologyService);
+    } else if (_configuration.getDomainConfiguration().initFromSequentialCheckpoint()) {
+      _moleculeService =
+          new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
+                                                  _configuration.getDomainConfiguration().getBlockSize());
     } else {
       _moleculeService = new simplemd::services::MoleculeService(
-          localDomainSize, localDomainOffset, moleculesPerDirection,
-          _configuration.getMoleculeConfiguration().getMeanVelocity(),
-          _configuration.getDomainConfiguration().getKB(),
-          _configuration.getMoleculeConfiguration().getTemperature(),
-          _configuration.getDomainConfiguration().getBlockSize(),
-          *_molecularPropertiesService);
+          localDomainSize, localDomainOffset, moleculesPerDirection, _configuration.getMoleculeConfiguration().getMeanVelocity(),
+          _configuration.getDomainConfiguration().getKB(), _configuration.getMoleculeConfiguration().getTemperature(),
+          _configuration.getDomainConfiguration().getBlockSize(), *_molecularPropertiesService);
     }
     if (_moleculeService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "
@@ -445,94 +332,72 @@ void simplemd::MolecularDynamicsSimulation::initServices(
 
     // initialise buffers. After this call, the ParallelTopologyService
     // initialisation is complete
-    _parallelTopologyService->initBuffers(
-        _moleculeService->getNumberMolecules());
-    _linkedCellService = new simplemd::services::LinkedCellService(
-        localDomainSize, localDomainOffset, *_parallelTopologyService,
-        *_moleculeService);
+    _parallelTopologyService->initBuffers(_moleculeService->getNumberMolecules());
+    _linkedCellService = new simplemd::services::LinkedCellService(localDomainSize, localDomainOffset, *_parallelTopologyService, *_moleculeService);
     if (_linkedCellService == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_linkedCellService==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_linkedCellService==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
     // init boundary treatment
-    _boundaryTreatment = new simplemd::BoundaryTreatment(
-        *_parallelTopologyService, *_moleculeService, *_linkedCellService);
+    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeService, *_linkedCellService);
     if (_boundaryTreatment == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_boundaryTreatment==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_boundaryTreatment==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
     // init all mappings here
-    _timeIntegrator =
-        new simplemd::moleculemappings::VelocityStoermerVerletMapping(
-            _configuration.getDomainConfiguration().getKB(),
-            _configuration.getSimulationConfiguration().getDt(),
-            _configuration.getMoleculeConfiguration().getMass(),
-            _configuration.getDomainConfiguration().getBoundary(),
-            _configuration.getDomainConfiguration().getGlobalDomainOffset(),
-            _configuration.getDomainConfiguration().getGlobalDomainSize());
+    _timeIntegrator = new simplemd::moleculemappings::VelocityStoermerVerletMapping(
+        _configuration.getDomainConfiguration().getKB(), _configuration.getSimulationConfiguration().getDt(),
+        _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getBoundary(),
+        _configuration.getDomainConfiguration().getGlobalDomainOffset(), _configuration.getDomainConfiguration().getGlobalDomainSize());
     if (_timeIntegrator == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_timeIntegrator==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_timeIntegrator==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
-    _updateLinkedCellListsMapping =
-        new simplemd::moleculemappings::UpdateLinkedCellListsMapping(
-            *_parallelTopologyService, *_linkedCellService);
+    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService);
     if (_updateLinkedCellListsMapping == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_updateLinkedCellListsMapping==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_updateLinkedCellListsMapping==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
-    _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(
-        *_parallelTopologyService, *_moleculeService, _vtkFilestem);
+    _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(*_parallelTopologyService, *_moleculeService, _vtkFilestem);
     if (_vtkMoleculeWriter == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_vtkMoleculeWriter==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_vtkMoleculeWriter==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
     // cell mappings
-    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(
-        _externalForceService, *_molecularPropertiesService);
+    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
     if (_lennardJonesForce == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_lennardJonesForce==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_lennardJonesForce==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
-    _emptyLinkedListsMapping =
-        new simplemd::cellmappings::EmptyLinkedListsMapping();
+    _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping();
     if (_emptyLinkedListsMapping == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_emptyLinkedListsMapping==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_emptyLinkedListsMapping==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
-    _rdfMapping = new simplemd::cellmappings::RDFMapping(
-        *_parallelTopologyService, *_linkedCellService,
-        _configuration.getDomainConfiguration().getCutoffRadius(),
-        _configuration.getRDFConfiguration().getNumberOfPoints());
+    _rdfMapping =
+        new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_linkedCellService, _configuration.getDomainConfiguration().getCutoffRadius(),
+                                               _configuration.getRDFConfiguration().getNumberOfPoints());
     if (_rdfMapping == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-             "_rdfMapping==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_rdfMapping==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -543,25 +408,20 @@ void simplemd::MolecularDynamicsSimulation::initServices(
     }
     linkedCellVolume = 1.0;
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      linkedCellVolume =
-          linkedCellVolume * _linkedCellService->getMeshWidth()[d];
+      linkedCellVolume = linkedCellVolume * _linkedCellService->getMeshWidth()[d];
     }
-    _profilePlotter = new simplemd::ProfilePlotter(
-        _configuration.getProfilePlotterConfigurations(),
-        *_parallelTopologyService, *_linkedCellService, linkedCellVolume,
-        _localMDSimulation);
+    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_linkedCellService,
+                                                   linkedCellVolume, _localMDSimulation);
     if (_profilePlotter == NULL) {
-      std::cout
-          << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
-             "_profilePlotter==NULL!"
-          << std::endl;
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
+                   "_profilePlotter==NULL!"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
 
     // -------------- do initial force computations and position update
     // ----------
-    _boundaryTreatment->fillBoundaryCells(_localBoundary,
-                                          *_parallelTopologyService);
+    _boundaryTreatment->fillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
     // After this step, each molecule has received all force contributions from
     // its neighbors.
@@ -640,8 +500,7 @@ void simplemd::MolecularDynamicsSimulation::shutdownServices() {
   }
 }
 
-void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(
-    const unsigned int &t) {
+void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned int& t) {
   // nop for idle processes
   if (_parallelTopologyService->isIdle()) {
     return;
@@ -677,17 +536,13 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(
   //   on inner part of domain, wait for communication
   //     buffers to arrive, then compute forces near boundaries, all within
   //     putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations.
-  if (!_configuration.getSimulationConfiguration()
-           .useOverlappingCommunicationWithForceComputation()) {
-    _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(
-        _localBoundary, *_parallelTopologyService);
+  if (!_configuration.getSimulationConfiguration().useOverlappingCommunicationWithForceComputation()) {
+    _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
     _linkedCellService->iterateCellPairs(*_lennardJonesForce, false);
   } else {
-    _boundaryTreatment
-        ->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(
-            _localBoundary, *_parallelTopologyService, *_lennardJonesForce,
-            false);
+    _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
+                                                                                                         *_lennardJonesForce, false);
   }
 
   evaluateStatistics(t);
@@ -695,30 +550,29 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(
   _boundaryTreatment->emptyGhostBoundaryCells();
 
   // plot VTK output
-  if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) &&
-      (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
+  if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
     _vtkMoleculeWriter->setTimestep(t);
     _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false);
   }
 
   // write checkpoint
-  if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() !=
-       0) &&
-      (t % _configuration.getCheckpointConfiguration()
-               .getWriteEveryTimestep() ==
-       0)) {
-    _moleculeService->writeCheckPoint(*_parallelTopologyService,
-                                      _checkpointFilestem, t);
+  if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
+      (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
+    _moleculeService->writeCheckPoint(*_parallelTopologyService, _checkpointFilestem, t);
   }
 
   // reorganise memory if needed
-  if ((_configuration.getSimulationConfiguration()
-           .getReorganiseMemoryEveryTimestep() != 0) &&
-      (t % _configuration.getSimulationConfiguration()
-               .getReorganiseMemoryEveryTimestep() ==
-       0)) {
-    _moleculeService->reorganiseMemory(*_parallelTopologyService,
-                                       *_linkedCellService);
+  if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
+      (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
+    _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
+  }
+
+  if (t % 500 == 0) {
+    cellmappings::VaryCheckpointMapping varyCheckpointMapping(
+        _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getKB(),
+        _configuration.getMoleculeConfiguration().getTemperature(), _configuration.getMoleculeConfiguration().getSigma(),
+        _configuration.getDomainConfiguration().getMeshWidth());
+    _linkedCellService->iterateCells(varyCheckpointMapping, false);
   }
 
   // empty linked lists
@@ -731,8 +585,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(
   // sort molecules into linked cells
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
 
-  if (_parallelTopologyService->getProcessCoordinates() ==
-      tarch::la::Vector<MD_DIM, unsigned int>(0)) {
+  if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
     if (t % 50 == 0)
       std::cout << "Finish MD timestep " << t << "..." << std::endl;
   }
@@ -740,33 +593,23 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(
 
 void simplemd::MolecularDynamicsSimulation::runSimulation() {
   // time loop
-  for (unsigned int t = 0;
-       t < _configuration.getSimulationConfiguration().getNumberOfTimesteps();
-       t++) {
+  for (unsigned int t = 0; t < _configuration.getSimulationConfiguration().getNumberOfTimesteps(); t++) {
     // simulate one timestep
     simulateOneTimestep(t);
   }
-  if (_parallelTopologyService->getProcessCoordinates() ==
-      tarch::la::Vector<MD_DIM, unsigned int>(0)) {
+  if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
     std::cout << "Finish MD simulation." << std::endl;
   }
 }
 
-void simplemd::MolecularDynamicsSimulation::evaluateStatistics(
-    const unsigned int &t) {
-  const unsigned int timeInterval =
-      _configuration.getSimulationConfiguration()
-          .computeMacroscopicQuantitiesEveryTimestep();
+void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned int& t) {
+  const unsigned int timeInterval = _configuration.getSimulationConfiguration().computeMacroscopicQuantitiesEveryTimestep();
 
   if (_configuration.getRDFConfiguration().isDefined()) {
     if (t >= _configuration.getRDFConfiguration().getStartAtTimestep()) {
-      if ((t - _configuration.getRDFConfiguration().getStartAtTimestep()) %
-              _configuration.getRDFConfiguration().getEvaluateEveryTimestep() ==
-          0) {
+      if ((t - _configuration.getRDFConfiguration().getStartAtTimestep()) % _configuration.getRDFConfiguration().getEvaluateEveryTimestep() == 0) {
         _linkedCellService->iterateCellPairs(*_rdfMapping, false);
-        if ((t - _configuration.getRDFConfiguration().getStartAtTimestep()) %
-                _configuration.getRDFConfiguration().getWriteEveryTimestep() ==
-            0) {
+        if ((t - _configuration.getRDFConfiguration().getStartAtTimestep()) % _configuration.getRDFConfiguration().getWriteEveryTimestep() == 0) {
           _rdfMapping->evaluateRDF(_localMDSimulation);
         }
       }
@@ -775,14 +618,11 @@ void simplemd::MolecularDynamicsSimulation::evaluateStatistics(
 
   if ((timeInterval != 0) && (t % timeInterval == 0)) {
     // compute average velocity
-    simplemd::cellmappings::ComputeMeanVelocityMapping
-        computeMeanVelocityMapping(*_parallelTopologyService,
-                                   _localMDSimulation);
+    simplemd::cellmappings::ComputeMeanVelocityMapping computeMeanVelocityMapping(*_parallelTopologyService, _localMDSimulation);
     _linkedCellService->iterateCells(computeMeanVelocityMapping, false);
     // compute average temperature
-    simplemd::cellmappings::ComputeTemperatureMapping computeTemperatureMapping(
-        *_parallelTopologyService, *_molecularPropertiesService,
-        computeMeanVelocityMapping.getMeanVelocity(), _localMDSimulation);
+    simplemd::cellmappings::ComputeTemperatureMapping computeTemperatureMapping(*_parallelTopologyService, *_molecularPropertiesService,
+                                                                                computeMeanVelocityMapping.getMeanVelocity(), _localMDSimulation);
     _linkedCellService->iterateCells(computeTemperatureMapping, false);
   }
 

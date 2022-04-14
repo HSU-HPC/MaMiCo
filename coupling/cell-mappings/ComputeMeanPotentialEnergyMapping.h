@@ -12,8 +12,7 @@
 
 namespace coupling {
 namespace cellmappings {
-template <class LinkedCell, unsigned int dim>
-class ComputeMeanPotentialEnergyMapping;
+template <class LinkedCell, unsigned int dim> class ComputeMeanPotentialEnergyMapping;
 }
 } // namespace coupling
 
@@ -24,21 +23,15 @@ class ComputeMeanPotentialEnergyMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::ComputeMeanPotentialEnergyMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::ComputeMeanPotentialEnergyMapping {
 public:
   /** Constructor
    *	@param mdSolverInterface
    *	@param boundaryForceController
    */
-  ComputeMeanPotentialEnergyMapping(
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface,
-      const coupling::BoundaryForceController<LinkedCell, dim>
-          &boundaryForceController)
-      : _mdSolverInterface(mdSolverInterface), _meanPotentialEnergy(0.0),
-        _particleCounter(0), _boundaryForceController(boundaryForceController) {
-  }
+  ComputeMeanPotentialEnergyMapping(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                                    const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController)
+      : _mdSolverInterface(mdSolverInterface), _meanPotentialEnergy(0.0), _particleCounter(0), _boundaryForceController(boundaryForceController) {}
 
   /** Destructor */
   ~ComputeMeanPotentialEnergyMapping() {}
@@ -66,15 +59,13 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
-      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
+      const coupling::interface::Molecule<dim>& wrapper(it->getConst());
       _meanPotentialEnergy += wrapper.getPotentialEnergy();
-      _meanPotentialEnergy +=
-          _boundaryForceController.getPotentialEnergy(wrapper.getPosition());
+      _meanPotentialEnergy += _boundaryForceController.getPotentialEnergy(wrapper.getPosition());
       _particleCounter++;
 
       it->next();
@@ -88,11 +79,9 @@ public:
   double getPotentialEnergy() const { return _meanPotentialEnergy; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   double _meanPotentialEnergy;
   unsigned int _particleCounter;
-  const coupling::BoundaryForceController<LinkedCell, dim>
-      &_boundaryForceController;
+  const coupling::BoundaryForceController<LinkedCell, dim>& _boundaryForceController;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEMEANPOTENTIALENERGYMAPPING_H_

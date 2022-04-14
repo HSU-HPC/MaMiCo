@@ -21,15 +21,14 @@ class SetMeanVelocityMapping;
  */
 class simplemd::moleculemappings::SetMeanVelocityMapping {
 public:
-  SetMeanVelocityMapping(const tarch::la::Vector<MD_DIM, double> &oldVelocity,
-                         const tarch::la::Vector<MD_DIM, double> &newVelocity)
+  SetMeanVelocityMapping(const tarch::la::Vector<MD_DIM, double>& oldVelocity, const tarch::la::Vector<MD_DIM, double>& newVelocity)
       : _oldVelocity(oldVelocity), _newVelocity(newVelocity) {}
   ~SetMeanVelocityMapping() {}
 
   void beginMoleculeIteration() {}
   void endMoleculeIteration() {}
-  void handleMolecule(Molecule &molecule) {
-    tarch::la::Vector<MD_DIM, double> &velocity = molecule.getVelocity();
+  void handleMolecule(Molecule& molecule) {
+    tarch::la::Vector<MD_DIM, double>& velocity = molecule.getVelocity();
     velocity = velocity - _oldVelocity + _newVelocity;
   }
 

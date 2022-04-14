@@ -16,17 +16,15 @@ class SimulationConfiguration;
 }
 } // namespace simplemd
 
-/** simulation configuration for MD. Currently includes information on
- * timestepping only.
+/** simulation configuration for MD. Currently includes information on timestepping only.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::SimulationConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::SimulationConfiguration : public tarch::configuration::Configuration {
 public:
   SimulationConfiguration();
   virtual ~SimulationConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
 
   /**
    * Return name of xml tag that is associated to the configuration.
@@ -47,20 +45,12 @@ public:
   bool isValid() const;
 
   /** getters for all parsed and computed quantities */
-  const double &getDt() const { return _dt; }
-  const unsigned int &getNumberOfTimesteps() const {
-    return _numberOfTimesteps;
-  }
-  const unsigned int &getReorganiseMemoryEveryTimestep() const {
-    return _reorganiseMemoryEveryTimestep;
-  }
-  const unsigned int &computeMacroscopicQuantitiesEveryTimestep() const {
-    return _computeMacroscopicQuantitiesEveryTimestep;
-  }
-  const bool &fixSeed() const { return _fixSeed; }
-  const bool &useOverlappingCommunicationWithForceComputation() const {
-    return _overlapCommWithForceComputation;
-  }
+  const double& getDt() const { return _dt; }
+  const unsigned int& getNumberOfTimesteps() const { return _numberOfTimesteps; }
+  const unsigned int& getReorganiseMemoryEveryTimestep() const { return _reorganiseMemoryEveryTimestep; }
+  const unsigned int& computeMacroscopicQuantitiesEveryTimestep() const { return _computeMacroscopicQuantitiesEveryTimestep; }
+  const bool& fixSeed() const { return _fixSeed; }
+  const bool& useOverlappingCommunicationWithForceComputation() const { return _overlapCommWithForceComputation; }
 
 private:
   static const std::string DT;
@@ -73,20 +63,19 @@ private:
   double _dt;
   unsigned int _numberOfTimesteps;
 
-  /** number of timesteps between subsequent memory reorganisations. If it is
-   * zero, no reorganisation will be used.
+  /** number of timesteps between subsequent memory reorganisations. If it is zero,
+   *  no reorganisation will be used.
    */
   unsigned int _reorganiseMemoryEveryTimestep;
 
   /** number of timesteps between subsequent macroscopic quantity evaluations */
   unsigned int _computeMacroscopicQuantitiesEveryTimestep;
 
-  /** if true, the seed of the random number service is fixed in all simulation
-   * runs. */
+  /** if true, the seed of the random number service is fixed in all simulation runs. */
   bool _fixSeed;
 
-  /** if true, the force computation and the send/receive-operations for
-   * molecules at the process boundaries are overlapped.
+  /** if true, the force computation and the send/receive-operations for molecules at the process boundaries
+   *  are overlapped.
    */
   bool _overlapCommWithForceComputation;
 

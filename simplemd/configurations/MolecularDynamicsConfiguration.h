@@ -28,14 +28,13 @@ class MolecularDynamicsConfiguration;
  * one main tag.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::MolecularDynamicsConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::MolecularDynamicsConfiguration : public tarch::configuration::Configuration {
 
 public:
   MolecularDynamicsConfiguration() {}
   virtual ~MolecularDynamicsConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
   /**
    * Return name of xml tag that is associated to the configuration.
    */
@@ -54,50 +53,25 @@ public:
    */
   bool isValid() const;
 
-  const simplemd::configurations::DomainConfiguration &
-  getDomainConfiguration() const {
-    return _domainConfiguration;
-  }
+  const simplemd::configurations::DomainConfiguration& getDomainConfiguration() const { return _domainConfiguration; }
 
-  const simplemd::configurations::MoleculeConfiguration &
-  getMoleculeConfiguration() const {
-    return _moleculeConfiguration;
-  }
+  simplemd::configurations::DomainConfiguration& getDomainConfigurationNonConst() { return _domainConfiguration; }
 
-  const simplemd::configurations::MPIConfiguration &
-  getMPIConfiguration() const {
-    return _mpiConfiguration;
-  }
+  const simplemd::configurations::MoleculeConfiguration& getMoleculeConfiguration() const { return _moleculeConfiguration; }
 
-  const simplemd::configurations::VTKConfiguration &
-  getVTKConfiguration() const {
-    return _vtkConfiguration;
-  }
+  const simplemd::configurations::MPIConfiguration& getMPIConfiguration() const { return _mpiConfiguration; }
 
-  const simplemd::configurations::SimulationConfiguration &
-  getSimulationConfiguration() const {
-    return _simulationConfiguration;
-  }
+  const simplemd::configurations::VTKConfiguration& getVTKConfiguration() const { return _vtkConfiguration; }
 
-  const simplemd::configurations::RDFConfiguration &
-  getRDFConfiguration() const {
-    return _rdfConfiguration;
-  }
+  const simplemd::configurations::SimulationConfiguration& getSimulationConfiguration() const { return _simulationConfiguration; }
 
-  const simplemd::configurations::CheckpointConfiguration &
-  getCheckpointConfiguration() const {
-    return _checkpointConfiguration;
-  }
+  const simplemd::configurations::RDFConfiguration& getRDFConfiguration() const { return _rdfConfiguration; }
 
-  const std::vector<simplemd::configurations::ProfilePlotterConfiguration> &
-  getProfilePlotterConfigurations() const {
-    return _profilePlotterConfigurations;
-  }
+  const simplemd::configurations::CheckpointConfiguration& getCheckpointConfiguration() const { return _checkpointConfiguration; }
 
-  const std::vector<simplemd::configurations::ExternalForceConfiguration> &
-  getExternalForceConfigurations() const {
-    return _externalForceConfigurations;
-  }
+  const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& getProfilePlotterConfigurations() const { return _profilePlotterConfigurations; }
+
+  const std::vector<simplemd::configurations::ExternalForceConfiguration>& getExternalForceConfigurations() const { return _externalForceConfigurations; }
 
 private:
   simplemd::configurations::DomainConfiguration _domainConfiguration;
@@ -107,10 +81,8 @@ private:
   simplemd::configurations::SimulationConfiguration _simulationConfiguration;
   simplemd::configurations::RDFConfiguration _rdfConfiguration;
   simplemd::configurations::CheckpointConfiguration _checkpointConfiguration;
-  std::vector<simplemd::configurations::ProfilePlotterConfiguration>
-      _profilePlotterConfigurations;
-  std::vector<simplemd::configurations::ExternalForceConfiguration>
-      _externalForceConfigurations;
+  std::vector<simplemd::configurations::ProfilePlotterConfiguration> _profilePlotterConfigurations;
+  std::vector<simplemd::configurations::ExternalForceConfiguration> _externalForceConfigurations;
 };
 
 #endif // _MOLECULARDYNAMICS_CONFIGURATIONS_MOLECULARDYNAMICSCONFIGURATION_H_

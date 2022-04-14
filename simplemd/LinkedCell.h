@@ -20,32 +20,26 @@ class LinkedCell;
 class simplemd::LinkedCell {
 public:
   /** initialises linked cell list with numberMolecules empty entries */
-  LinkedCell(const unsigned int numberMolecules = 0)
-      : _molecules(numberMolecules) {}
+  LinkedCell(const unsigned int numberMolecules = 0) : _molecules(numberMolecules) {}
   ~LinkedCell() { _molecules.clear(); }
 
   /** iterators to begin and end position */
-  std::list<Molecule *>::iterator begin() { return _molecules.begin(); }
-  std::list<Molecule *>::const_iterator constBegin() const {
-    return _molecules.begin();
-  }
-  std::list<Molecule *>::iterator end() { return _molecules.end(); }
-  std::list<Molecule *>::const_iterator constEnd() const {
-    return _molecules.end();
-  }
+  std::list<Molecule*>::iterator begin() { return _molecules.begin(); }
+  std::list<Molecule*>::const_iterator constBegin() const { return _molecules.begin(); }
+  std::list<Molecule*>::iterator end() { return _molecules.end(); }
+  std::list<Molecule*>::const_iterator constEnd() const { return _molecules.end(); }
 
-  std::list<Molecule *> &getList() { return _molecules; }
-  const std::list<Molecule *> &getConstList() { return _molecules; }
+  std::list<Molecule*>& getList() { return _molecules; }
+  const std::list<Molecule*>& getConstList() { return _molecules; }
 
   /** adds a molecule pointer */
-  void addMolecule(Molecule *molecule) { _molecules.push_back(molecule); }
+  void addMolecule(Molecule* molecule) { _molecules.push_back(molecule); }
 
   /** deletes the molecule 'molecule' from the list, if it is contained */
-  void deleteMolecule(Molecule *molecule) {
+  void deleteMolecule(Molecule* molecule) {
 #if (MD_ERROR == MD_YES)
     if (molecule == NULL) {
-      std::cout << "ERROR simplemd::LinkedCell::deleteMolecule: molecule==NULL!"
-                << std::endl;
+      std::cout << "ERROR simplemd::LinkedCell::deleteMolecule: molecule==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif
@@ -53,12 +47,10 @@ public:
   }
 
   /** initialises the molecule pointer at it with the value of molecule */
-  void setMolecule(std::list<Molecule *>::iterator &it, Molecule *molecule) {
-    *it = molecule;
-  }
+  void setMolecule(std::list<Molecule*>::iterator& it, Molecule* molecule) { *it = molecule; }
 
 private:
-  std::list<Molecule *> _molecules;
+  std::list<Molecule*> _molecules;
 };
 
 #endif // _MOLECULARDYNAMICS_LINKEDCELL_H_

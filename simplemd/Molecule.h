@@ -19,14 +19,10 @@ class Molecule;
 class simplemd::Molecule {
 public:
   /** initialise position and velocity of molecule */
-  Molecule(const tarch::la::Vector<MD_DIM, double> &position,
-           const tarch::la::Vector<MD_DIM, double> &velocity)
-      : _position(position), _velocity(velocity), _force(0.0), _forceOld(0.0),
-        _potentialEnergy(0.0), _id(0), _isFixed(false) {}
+  Molecule(const tarch::la::Vector<MD_DIM, double>& position, const tarch::la::Vector<MD_DIM, double>& velocity)
+      : _position(position), _velocity(velocity), _force(0.0), _forceOld(0.0), _potentialEnergy(0.0), _id(0), _isFixed(false) {}
   /** empty constructor */
-  Molecule()
-      : _position(0.0), _velocity(0.0), _force(0.0), _forceOld(0.0),
-        _potentialEnergy(0.0), _id(0), _isFixed(false) {}
+  Molecule() : _position(0.0), _velocity(0.0), _force(0.0), _forceOld(0.0), _potentialEnergy(0.0), _id(0), _isFixed(false) {}
   ~Molecule() {}
 
   /** fix position of particle. */
@@ -36,53 +32,35 @@ public:
   }
 
   /** check if particle is fixed */
-  const bool &isFixed() const { return _isFixed; }
+  const bool& isFixed() const { return _isFixed; }
 
   /** get/set ID */
-  const unsigned int &getID() const { return _id; }
-  void setID(const unsigned int &id) { _id = id; }
+  const unsigned int& getID() const { return _id; }
+  void setID(const unsigned int& id) { _id = id; }
 
   /** get/ set position */
-  tarch::la::Vector<MD_DIM, double> &getPosition() { return _position; }
-  const tarch::la::Vector<MD_DIM, double> &getConstPosition() const {
-    return _position;
-  }
-  void setPosition(const tarch::la::Vector<MD_DIM, double> &position) {
-    _position = position;
-  }
+  tarch::la::Vector<MD_DIM, double>& getPosition() { return _position; }
+  const tarch::la::Vector<MD_DIM, double>& getConstPosition() const { return _position; }
+  void setPosition(const tarch::la::Vector<MD_DIM, double>& position) { _position = position; }
 
   /** get/ set velocity */
-  tarch::la::Vector<MD_DIM, double> &getVelocity() { return _velocity; }
-  const tarch::la::Vector<MD_DIM, double> &getConstVelocity() const {
-    return _velocity;
-  }
-  void setVelocity(const tarch::la::Vector<MD_DIM, double> &velocity) {
-    _velocity = velocity;
-  }
+  tarch::la::Vector<MD_DIM, double>& getVelocity() { return _velocity; }
+  const tarch::la::Vector<MD_DIM, double>& getConstVelocity() const { return _velocity; }
+  void setVelocity(const tarch::la::Vector<MD_DIM, double>& velocity) { _velocity = velocity; }
 
   /** get/ set force */
-  tarch::la::Vector<MD_DIM, double> &getForce() { return _force; }
-  const tarch::la::Vector<MD_DIM, double> &getConstForce() const {
-    return _force;
-  }
-  void setForce(const tarch::la::Vector<MD_DIM, double> &force) {
-    _force = force;
-  }
+  tarch::la::Vector<MD_DIM, double>& getForce() { return _force; }
+  const tarch::la::Vector<MD_DIM, double>& getConstForce() const { return _force; }
+  void setForce(const tarch::la::Vector<MD_DIM, double>& force) { _force = force; }
 
   /** get/ set force of last timestep */
-  tarch::la::Vector<MD_DIM, double> &getForceOld() { return _forceOld; }
-  const tarch::la::Vector<MD_DIM, double> &getConstForceOld() const {
-    return _forceOld;
-  }
-  void setForceOld(const tarch::la::Vector<MD_DIM, double> &force) {
-    _forceOld = force;
-  }
+  tarch::la::Vector<MD_DIM, double>& getForceOld() { return _forceOld; }
+  const tarch::la::Vector<MD_DIM, double>& getConstForceOld() const { return _forceOld; }
+  void setForceOld(const tarch::la::Vector<MD_DIM, double>& force) { _forceOld = force; }
 
-  double &getPotentialEnergy() { return _potentialEnergy; }
-  const double &getConstPotentialEnergy() const { return _potentialEnergy; }
-  void setPotentialEnergy(const double &potentialEnergy) {
-    _potentialEnergy = potentialEnergy;
-  }
+  double& getPotentialEnergy() { return _potentialEnergy; }
+  const double& getConstPotentialEnergy() const { return _potentialEnergy; }
+  void setPotentialEnergy(const double& potentialEnergy) { _potentialEnergy = potentialEnergy; }
 
 private:
   tarch::la::Vector<MD_DIM, double> _position;

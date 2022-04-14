@@ -5,42 +5,32 @@ namespace indexing {
 
 template <unsigned int dim, IndexTrait... traits>
 template <IndexTrait... converted_traits>
-CellIndex<dim, traits...>::operator CellIndex<dim, converted_traits...>()
-    const {
+CellIndex<dim, traits...>::operator CellIndex<dim, converted_traits...>() const {
 
   // conversion: identical IndexType -> "copy constructor"
-  if constexpr (std::is_same_v<CellIndex,
-                               CellIndex<dim, converted_traits...>>) {
+  if constexpr (std::is_same_v<CellIndex, CellIndex<dim, converted_traits...>>) {
     return CellIndex{_index};
   }
 
   // conversion: non-BaseIndex -> BaseIndex
-  if constexpr (std::is_same_v<CellIndex<dim, converted_traits...>,
-                               BaseIndex<dim>>) {
+  if constexpr (std::is_same_v<CellIndex<dim, converted_traits...>, BaseIndex<dim>>) {
     // convert to vector if neccessary, then add offset, then construct a
     // BaseIndex from that tarch::la::Vector
-    return BaseIndex<dim>{convertToVector<dim, traits...>(*this) +
-                          CellIndex<dim, traits...>::lowerBoundary.get()};
+    return BaseIndex<dim>{convertToVector<dim, traits...>(*this) + CellIndex<dim, traits...>::lowerBoundary.get()};
   }
 
   // conversion: BaseIndex -> non-BaseIndex
   if constexpr (std::is_same_v<CellIndex, BaseIndex<dim>>) {
     // convert to scalar if neccessary + construct CellIndex<dim,
     // converted_traits...>
-    if constexpr ((TraitOperations::is_same<IndexTrait::vector>(
-                       converted_traits) or
-                   ...)) {
-      return CellIndex<dim, converted_traits...>{
-          (*this - CellIndex<dim, converted_traits...>::lowerBoundary).get()};
+    if constexpr ((TraitOperations::is_same<IndexTrait::vector>(converted_traits) or ...)) {
+      return CellIndex<dim, converted_traits...>{(*this - CellIndex<dim, converted_traits...>::lowerBoundary).get()};
     } else /* result index is not a vector */ {
       // get scalar version of i_vec by first constructing a BaseIndex and then
       // converting it
-      const unsigned int i_sca{
-          // Get BaseIndex (i.e. traits=vector) and convert that to scalar
-          convertToScalar<dim, IndexTrait::vector, converted_traits...>(
-              CellIndex<dim, IndexTrait::vector, converted_traits...>(
-                  (*this - CellIndex<dim, converted_traits...>::lowerBoundary)
-                      .get()))};
+      const unsigned int i_sca{// Get BaseIndex (i.e. traits=vector) and convert that to scalar
+                               convertToScalar<dim, IndexTrait::vector, converted_traits...>(CellIndex<dim, IndexTrait::vector, converted_traits...>(
+                                   (*this - CellIndex<dim, converted_traits...>::lowerBoundary).get()))};
 
       return CellIndex<dim, converted_traits...>{i_sca};
     }
@@ -54,16 +44,14 @@ CellIndex<dim, traits...>::operator CellIndex<dim, converted_traits...>()
 }
 
 // Overloading operator<< for CellIndex
-template <unsigned int dim, IndexTrait... traits>
-std::ostream &operator<<(std::ostream &os, const CellIndex<dim, traits...> &i) {
+template <unsigned int dim, IndexTrait... traits> std::ostream& operator<<(std::ostream& os, const CellIndex<dim, traits...>& i) {
   os << i.get();
   return os;
 }
 
 // Overloading arithmetic operators for CellIndex
 template <unsigned int dim, IndexTrait... traits>
-CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...> &i1,
-                                    const CellIndex<dim, traits...> &i2) {
+CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...>& i1, const CellIndex<dim, traits...>& i2) {
   if constexpr (std::is_same_v<CellIndex<dim, traits...>, BaseIndex<dim>>)
     return BaseIndex<dim>{i1.get() + i2.get()};
   else
@@ -71,9 +59,7 @@ CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...> &i1,
 }
 
 template <unsigned int dim, IndexTrait... traits>
-coupling::indexing::CellIndex<dim, traits...>
-operator-(const CellIndex<dim, traits...> &i1,
-          const CellIndex<dim, traits...> &i2) {
+coupling::indexing::CellIndex<dim, traits...> operator-(const CellIndex<dim, traits...>& i1, const CellIndex<dim, traits...>& i2) {
   if constexpr (std::is_same_v<CellIndex<dim, traits...>, BaseIndex<dim>>)
     return BaseIndex<dim>{i1.get() - i2.get()};
   else
@@ -81,16 +67,12 @@ operator-(const CellIndex<dim, traits...> &i1,
 }
 
 template <unsigned int dim, IndexTrait... traits>
-CellIndex<dim, traits...>
-operator+(const CellIndex<dim, traits...> &i1,
-          const typename CellIndex<dim, traits...>::value_T &raw_i) {
+CellIndex<dim, traits...> operator+(const CellIndex<dim, traits...>& i1, const typename CellIndex<dim, traits...>::value_T& raw_i) {
   return CellIndex<dim, traits...>{i1.get() + raw_i};
 }
 
 template <unsigned int dim, IndexTrait... traits>
-coupling::indexing::CellIndex<dim, traits...>
-operator-(const CellIndex<dim, traits...> &i1,
-          const typename CellIndex<dim, traits...>::value_T &raw_i) {
+coupling::indexing::CellIndex<dim, traits...> operator-(const CellIndex<dim, traits...>& i1, const typename CellIndex<dim, traits...>::value_T& raw_i) {
   return CellIndex<dim, traits...>{i1.get() - raw_i};
 }
 

@@ -11,8 +11,7 @@ template <unsigned int dim>
 // TODO: This is very much hardcoded for kernel radius = 1
 void coupling::filtering::Gauss<dim>::operator()() {
 #ifdef DEBUG_GAUSS
-  std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter..."
-            << std::endl;
+  std::cout << "		GAUSS(Dim: " << _dim << "): Applying filter..." << std::endl;
 #endif
 
   using namespace coupling::indexing;
@@ -21,8 +20,7 @@ void coupling::filtering::Gauss<dim>::operator()() {
   ScalarIndex indexAbove;
   ScalarIndex indexBelow;
 
-  for (unsigned int raw_index = 0; raw_index < _inputCells.size();
-       raw_index++) {
+  for (unsigned int raw_index = 0; raw_index < _inputCells.size(); raw_index++) {
 
     // construct CellIndex using raw index
     index = {raw_index};
@@ -87,17 +85,15 @@ void coupling::filtering::Gauss<dim>::operator()() {
 
     // apply to scalars
     for (const auto scalarProperty : _scalarAccessFunctionPairs) {
-      (_outputCells[raw_index]->*scalarProperty.set)(
-          (_inputCells[indexBelow.get()]->*scalarProperty.get)() * weights[0] +
-          (_inputCells[raw_index]->*scalarProperty.get)() * weights[1] +
-          (_inputCells[indexAbove.get()]->*scalarProperty.get)() * weights[2]);
+      (_outputCells[raw_index]->*scalarProperty.set)((_inputCells[indexBelow.get()]->*scalarProperty.get)() * weights[0] +
+                                                     (_inputCells[raw_index]->*scalarProperty.get)() * weights[1] +
+                                                     (_inputCells[indexAbove.get()]->*scalarProperty.get)() * weights[2]);
     }
     // apply to vectors
     for (const auto vectorProperty : _vectorAccessFunctionPairs) {
-      (_outputCells[raw_index]->*vectorProperty.set)(
-          (_inputCells[indexBelow.get()]->*vectorProperty.get)() * weights[0] +
-          (_inputCells[raw_index]->*vectorProperty.get)() * weights[1] +
-          (_inputCells[indexAbove.get()]->*vectorProperty.get)() * weights[2]);
+      (_outputCells[raw_index]->*vectorProperty.set)((_inputCells[indexBelow.get()]->*vectorProperty.get)() * weights[0] +
+                                                     (_inputCells[raw_index]->*vectorProperty.get)() * weights[1] +
+                                                     (_inputCells[indexAbove.get()]->*vectorProperty.get)() * weights[2]);
     }
   } // index
 
@@ -107,9 +103,7 @@ void coupling::filtering::Gauss<dim>::operator()() {
 }
 
 // Private functions of Gauss.h:
-template <unsigned int dim>
-std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS>
-coupling::filtering::Gauss<dim>::generateKernel() {
+template <unsigned int dim> std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS> coupling::filtering::Gauss<dim>::generateKernel() {
   // std::cout << "gauss: kernel radius: " << GAUSS_KERNEL_RADIUS << std::endl;
 
   std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS> kernel;
@@ -125,37 +119,30 @@ coupling::filtering::Gauss<dim>::generateKernel() {
   }
 
   // normalize kernel. by definition, sum cannot be 0.
-  for (auto &k : kernel) {
+  for (auto& k : kernel) {
     k *= 1 / sum;
 
 #ifdef DEBUG_GAUSS
-    std::cout << "		GAUSS(Dim: " << _dim
-              << "): Add kernel entry: " << k << std::endl;
+    std::cout << "		GAUSS(Dim: " << _dim << "): Add kernel entry: " << k << std::endl;
 #endif
   }
 
   return kernel;
 }
 
-template <unsigned int dim>
-constexpr double
-coupling::filtering::Gauss<dim>::gaussianDensityFunction(int x) {
-  double ans =
-      (1 / (_sigma * sqrt(2 * M_PI))) * exp(-0.5 * (x / _sigma) * (x / _sigma));
+template <unsigned int dim> constexpr double coupling::filtering::Gauss<dim>::gaussianDensityFunction(int x) {
+  double ans = (1 / (_sigma * sqrt(2 * M_PI))) * exp(-0.5 * (x / _sigma) * (x / _sigma));
   return ans;
 }
 
 template <unsigned int dim>
-typename coupling::filtering::Gauss<dim>::VectorIndex
-coupling::filtering::Gauss<dim>::getIndexAbove(
-    const coupling::filtering::Gauss<dim>::VectorIndex index, unsigned int d) {
+typename coupling::filtering::Gauss<dim>::VectorIndex coupling::filtering::Gauss<dim>::getIndexAbove(const coupling::filtering::Gauss<dim>::VectorIndex index,
+                                                                                                     unsigned int d) {
   // check for border indices
-  const coupling::indexing::BaseIndex<dim> boundary =
-      coupling::filtering::Gauss<dim>::VectorIndex::upperBoundary;
+  const coupling::indexing::BaseIndex<dim> boundary = coupling::filtering::Gauss<dim>::VectorIndex::upperBoundary;
   for (unsigned int d = 0; d < dim; d++) {
     // convert index to BaseIndex and compare with boundary.
-    if ((coupling::indexing::BaseIndex<dim>{index}).get()[d] >=
-        boundary.get()[d])
+    if ((coupling::indexing::BaseIndex<dim>{index}).get()[d] >= boundary.get()[d])
       // if index is out of bounds, return it unmodified. this gets detected in
       // operator()'s boundary handling.
       return index;
@@ -170,16 +157,13 @@ coupling::filtering::Gauss<dim>::getIndexAbove(
 }
 
 template <unsigned int dim>
-typename coupling::filtering::Gauss<dim>::VectorIndex
-coupling::filtering::Gauss<dim>::getIndexBelow(
-    const coupling::filtering::Gauss<dim>::VectorIndex index, unsigned int d) {
+typename coupling::filtering::Gauss<dim>::VectorIndex coupling::filtering::Gauss<dim>::getIndexBelow(const coupling::filtering::Gauss<dim>::VectorIndex index,
+                                                                                                     unsigned int d) {
   // check for border indices
-  const coupling::indexing::BaseIndex<dim> boundary =
-      coupling::filtering::Gauss<dim>::VectorIndex::lowerBoundary;
+  const coupling::indexing::BaseIndex<dim> boundary = coupling::filtering::Gauss<dim>::VectorIndex::lowerBoundary;
   for (unsigned int d = 0; d < dim; d++) {
     // convert index to BaseIndex and compare with boundary.
-    if ((coupling::indexing::BaseIndex<dim>{index}).get()[d] <=
-        boundary.get()[d])
+    if ((coupling::indexing::BaseIndex<dim>{index}).get()[d] <= boundary.get()[d])
       // if index is out of bounds, return it unmodified. this gets detected in
       // operator()'s boundary handling.
       return index;

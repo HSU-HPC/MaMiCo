@@ -13,14 +13,12 @@ class EmptyLinkedListsMapping;
 }
 } // namespace simplemd
 
-/** deletes all molecules from the list within the cells. The molecules are only
- * removed from the lists in the cells, but are further available via the
- * MoleculeService. After the force evaluation over all molecules, the
- * DeleteMoleculesMapping is used to delete all molecules from the ghost cells.
- * The EmptyLinkedListsMapping is used to clear the lists in the inner part of
- * the simulation domain. Here, we still need to store the molecules but need to
- * sort these molecules again into the correct cells, as soon as the time
- * integration is carried out.
+/** deletes all molecules from the list within the cells. The molecules are only removed from the lists in the cells,
+ *  but are further available via the MoleculeService.
+ *  After the force evaluation over all molecules, the DeleteMoleculesMapping is used to delete all molecules from the
+ *  ghost cells. The EmptyLinkedListsMapping is used to clear the lists in the inner part of the simulation domain.
+ *  Here, we still need to store the molecules but need to sort these molecules again into the correct cells, as soon
+ *  as the time integration is carried out.
  *
  *  @author Philipp Neumann
  */
@@ -31,9 +29,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    cell.getList().clear();
-  }
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) { cell.getList().clear(); }
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_EMPTYLINKEDLISTSMAPPING_H_

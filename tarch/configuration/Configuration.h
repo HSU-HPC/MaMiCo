@@ -29,7 +29,7 @@ public:
   /** Parses a XML-element.
    * @param node a pointer to the xml-element from tinyxml2 class
    */
-  virtual void parseSubtag(tinyxml2::XMLElement *node) = 0;
+  virtual void parseSubtag(tinyxml2::XMLElement* node) = 0;
 
   /**
    * @return the name of the current xml-element

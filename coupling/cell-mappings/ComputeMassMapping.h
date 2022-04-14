@@ -20,16 +20,13 @@ template <class LinkedCell, unsigned int dim> class ComputeMassMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::ComputeMassMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::ComputeMassMapping {
 public:
   /** Constructor
    *	@param mdSolverInterface
    */
-  ComputeMassMapping(coupling::interface::MDSolverInterface<LinkedCell, dim>
-                         *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface), _mass(0.0), _particleCounter(0) {
-  }
+  ComputeMassMapping(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface), _mass(0.0), _particleCounter(0) {}
 
   /** Destructor */
   ~ComputeMassMapping() {}
@@ -45,17 +42,14 @@ public:
   /** computes the mass in a linked cell, by multiplying the number of particles
    * inside the cell with the particel mass(which is assuemd to be constant).
    */
-  void endCellIteration() {
-    _mass = _mdSolverInterface->getMoleculeMass() * _particleCounter;
-  }
+  void endCellIteration() { _mass = _mdSolverInterface->getMoleculeMass() * _particleCounter; }
 
   /** counts the molecules inside a linked cell.
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
       _particleCounter++;
@@ -74,8 +68,7 @@ public:
   unsigned int getNumberOfParticles() const { return _particleCounter; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   double _mass;
   unsigned int _particleCounter;
 };

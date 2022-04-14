@@ -20,14 +20,11 @@ template <class LinkedCell, unsigned int dim> class MomentumInsertion;
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::MomentumInsertion {
+template <class LinkedCell, unsigned int dim> class coupling::MomentumInsertion {
 public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface to the md solver*/
-  MomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim>
-                        *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface) {}
+  MomentumInsertion(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) : _mdSolverInterface(mdSolverInterface) {}
   /** @brief a simple destructor*/
   virtual ~MomentumInsertion() {}
 
@@ -43,15 +40,12 @@ public:
    * distributes is over all molecules.
    *  @param cell the macroscopic cell to insert the momentum
    *  @param fraction the fraction of momentum to use */
-  virtual void insertMomentum(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const unsigned int &currentMacroscopicCellIndex) const = 0;
+  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                              const unsigned int& currentMacroscopicCellIndex) const = 0;
 
 protected:
   /** interface to the md solver */
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_MOMENTUMINSERTION_H_

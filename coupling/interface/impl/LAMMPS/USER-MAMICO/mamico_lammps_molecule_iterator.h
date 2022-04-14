@@ -18,44 +18,27 @@ namespace LAMMPS_NS {
  * buffers provided by Lammps.
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class MamicoLammpsMoleculeIterator
-    : public coupling::interface::MoleculeIterator<MamicoCell, dim> {
+template <unsigned int dim> class MamicoLammpsMoleculeIterator : public coupling::interface::MoleculeIterator<MamicoCell, dim> {
 public:
-  MamicoLammpsMoleculeIterator(MoleculeInformation info, double cutoff,
-                               MamicoCell &cell)
-      : coupling::interface::MoleculeIterator<MamicoCell, dim>(cell),
-        _info(info), _cutoff(cutoff) {
+  MamicoLammpsMoleculeIterator(MoleculeInformation info, double cutoff, MamicoCell &cell)
+      : coupling::interface::MoleculeIterator<MamicoCell, dim>(cell), _info(info), _cutoff(cutoff) {
   } virtual ~MamicoLammpsMoleculeIterator() {
   }
 
-  virtual void begin() {
-    coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.begin();
-  }
+  virtual void begin() { coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.begin(); }
 
-  virtual void next() {
-    coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.next();
-  }
+  virtual void next() { coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.next(); }
 
-  virtual bool continueIteration() const {
-    return coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell
-        .continueIteration();
-  }
+  virtual bool continueIteration() const { return coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.continueIteration(); }
 
   virtual coupling::interface::Molecule<dim> &get() {
-    _molecule = MamicoLammpsMolecule<dim>(
-        _info._x, _info._v, _info._f,
-        coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.get(),
-        _cutoff);
+    _molecule = MamicoLammpsMolecule<dim>(_info._x, _info._v, _info._f, coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.get(), _cutoff);
     return _molecule;
   }
 
   virtual const coupling::interface::Molecule<dim> &
   getConst() {
-    _molecule = MamicoLammpsMolecule<dim>(
-        _info._x, _info._v, _info._f,
-        coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.get(),
-        _cutoff);
+    _molecule = MamicoLammpsMolecule<dim>(_info._x, _info._v, _info._f, coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.get(), _cutoff);
     return _molecule;
   }
 

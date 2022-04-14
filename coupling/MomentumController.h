@@ -23,16 +23,12 @@ template <class LinkedCell, unsigned int dim> class MomentumController;
  * linked cells in the molecular dynamics simulation
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3 */
-template <class LinkedCell, unsigned int dim>
-class coupling::MomentumController {
+template <class LinkedCell, unsigned int dim> class coupling::MomentumController {
 public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface to the md solver */
-  MomentumController(coupling::interface::MDSolverInterface<LinkedCell, dim>
-                         *const mdSolverInterface)
-      : _computeMassMapping(mdSolverInterface),
-        _computeMomentumMapping(mdSolverInterface),
-        _mdSolverInterface(mdSolverInterface) {}
+  MomentumController(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
+      : _computeMassMapping(mdSolverInterface), _computeMomentumMapping(mdSolverInterface), _mdSolverInterface(mdSolverInterface) {}
 
   /** a simple destructor */
   ~MomentumController() {}
@@ -44,11 +40,8 @@ public:
    * to
    *  @param meanVelocity vector to which the mean velocity of the cell will be
    * written to*/
-  void computeMomentumAndMeanVelocity(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      tarch::la::Vector<dim, double> &momentum,
-      tarch::la::Vector<dim, double> &meanVelocity) {
+  void computeMomentumAndMeanVelocity(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& momentum,
+                                      tarch::la::Vector<dim, double>& meanVelocity) {
     cell.iterateConstCells(_computeMomentumMapping);
     momentum = _computeMomentumMapping.getMomentum();
     meanVelocity = _computeMomentumMapping.getMeanVelocity();
@@ -58,10 +51,7 @@ public:
    * @param cell the macroscopic cell, for which the values shall be calculated
    *  @param momentum vector to which the momentum of the cell will be written
    * to */
-  void computeMomentum(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      tarch::la::Vector<dim, double> &momentum) {
+  void computeMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& momentum) {
     cell.iterateConstCells(_computeMomentumMapping);
     momentum = _computeMomentumMapping.getMomentum();
   }
@@ -70,10 +60,7 @@ public:
    *  @param cell the macroscopic cell, for which the values shall be calculated
    *  @param meanVelocity vector to which the mean velocity of the cell will be
    * written to*/
-  void computeMeanVelocity(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      tarch::la::Vector<dim, double> &meanVelocity) {
+  void computeMeanVelocity(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& meanVelocity) {
     cell.iterateConstCells(_computeMomentumMapping);
     meanVelocity = _computeMomentumMapping.getMeanVelocity();
   }
@@ -88,29 +75,21 @@ public:
    *  @brief sets the momentum of a macroscopic cell to the input value.
    *  @param cell the macroscopic cell in which the momentum shall be changed
    *  @param newMomentum the value to which the momentum will be set */
-  void setMomentum(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const tarch::la::Vector<dim, double> &newMomentum) {
+  void setMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& newMomentum) {
     tarch::la::Vector<dim, double> currentMomentum(0.0);
     computeMomentum(cell, currentMomentum);
     cell.iterateConstCells(_computeMassMapping);
     unsigned int numberParticles = _computeMassMapping.getNumberOfParticles();
-    coupling::cellmappings::SetMomentumMapping<LinkedCell, dim>
-        setMomentumMapping(currentMomentum, newMomentum, numberParticles,
-                           _mdSolverInterface);
+    coupling::cellmappings::SetMomentumMapping<LinkedCell, dim> setMomentumMapping(currentMomentum, newMomentum, numberParticles, _mdSolverInterface);
     cell.iterateCells(setMomentumMapping);
   }
 
 private:
   /** instance of the ComputeMassMapping */
-  coupling::cellmappings::ComputeMassMapping<LinkedCell, dim>
-      _computeMassMapping;
+  coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> _computeMassMapping;
   /** instance of the ComputeMomentumMapping*/
-  coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim>
-      _computeMomentumMapping;
+  coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> _computeMomentumMapping;
   /** interface to the md solver*/
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_MOMENTUMCONTROLLER_H_

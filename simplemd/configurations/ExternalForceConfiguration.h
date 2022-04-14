@@ -18,13 +18,12 @@ class ExternalForceConfiguration;
 /** parses a constant, external force term.
  *  @author Philipp Neumann
  */
-class simplemd::configurations::ExternalForceConfiguration
-    : public tarch::configuration::Configuration {
+class simplemd::configurations::ExternalForceConfiguration : public tarch::configuration::Configuration {
 public:
   ExternalForceConfiguration() : _externalForce(0.0), _isValid(false) {}
   virtual ~ExternalForceConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node);
+  void parseSubtag(tinyxml2::XMLElement* node);
 
   /**
    * Return name of xml tag that is associated to the configuration.
@@ -45,9 +44,7 @@ public:
   bool isValid() const { return _isValid; }
 
   /** getters for all parsed and computed quantities */
-  const tarch::la::Vector<MD_DIM, double> &getExternalForce() const {
-    return _externalForce;
-  }
+  const tarch::la::Vector<MD_DIM, double>& getExternalForce() const { return _externalForce; }
 
 private:
   static const std::string VALUE;

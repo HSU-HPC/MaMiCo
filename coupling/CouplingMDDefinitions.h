@@ -32,12 +32,6 @@
 #define TAG_FROM_MD2MACRO 100000
 #define TAG_FROM_MACRO2MD 500000
 
-#if defined(MDCoupled)
-#define COUPLING_MD_WITH_TEST_SOLVER COUPLING_MD_YES
-#else
-#define COUPLING_MD_WITH_TEST_SOLVER COUPLING_MD_NO
-#endif
-
 #include "tarch/la/Vector.h"
 
 namespace coupling {
@@ -57,9 +51,7 @@ enum MacroscopicSolverID {
  *  @tparam dim refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3
  *  @returns the given vector as 3d version */
-template <unsigned int dim>
-tarch::la::Vector<3, unsigned int>
-initRange(tarch::la::Vector<dim, unsigned int> vec) {
+template <unsigned int dim> tarch::la::Vector<3, unsigned int> initRange(tarch::la::Vector<dim, unsigned int> vec) {
   tarch::la::Vector<3, unsigned int> range(1);
   for (unsigned int d = 0; d < dim; d++) {
     range[d] = vec[d];
@@ -74,9 +66,7 @@ initRange(tarch::la::Vector<dim, unsigned int> vec) {
  * or 3
  *  @return the given 3d vector as a vector for the simulation dimension (dim)
  */
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-initDimVector(tarch::la::Vector<3, unsigned int> vec) {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> initDimVector(tarch::la::Vector<3, unsigned int> vec) {
   tarch::la::Vector<dim, unsigned int> smallVec;
   for (unsigned int d = 0; d < dim; d++) {
     smallVec[d] = vec[d];
@@ -90,9 +80,7 @@ initDimVector(tarch::la::Vector<3, unsigned int> vec) {
  *  @tparam dim refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3
  *  @returns the division factor for the simulation */
-template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-initDivisionFactor(tarch::la::Vector<dim, unsigned int> numberCells) {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> initDivisionFactor(tarch::la::Vector<dim, unsigned int> numberCells) {
   tarch::la::Vector<dim, unsigned int> divFactor(1);
   for (unsigned int d = 1; d < dim; d++) {
     divFactor[d] = divFactor[d - 1] * (numberCells[d - 1]);
@@ -111,9 +99,7 @@ initDivisionFactor(tarch::la::Vector<dim, unsigned int> numberCells) {
  * or 3
  *  @returns the dimensionized index for a given cell */
 template <unsigned int dim>
-tarch::la::Vector<dim, unsigned int>
-getVectorCellIndex(unsigned int cellIndex,
-                   const tarch::la::Vector<dim, unsigned int> &divisionFactor) {
+tarch::la::Vector<dim, unsigned int> getVectorCellIndex(unsigned int cellIndex, const tarch::la::Vector<dim, unsigned int>& divisionFactor) {
   tarch::la::Vector<dim, unsigned int> myVector(0);
   unsigned int help = cellIndex;
   for (int d = dim - 1; d > 0; d--) {

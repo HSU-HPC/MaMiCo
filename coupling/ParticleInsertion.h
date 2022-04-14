@@ -20,8 +20,7 @@ template <class LinkedCell, unsigned int dim> class ParticleInsertion;
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::ParticleInsertion {
+template <class LinkedCell, unsigned int dim> class coupling::ParticleInsertion {
 public:
   /** this state is returned by the insertDeleteMass() function. To tell the
    * program, which action happened through the application of the function*/
@@ -44,15 +43,10 @@ public:
    *  @returns the type of coupling::ParticleInsertion::Action that was applied
    */
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(
-      coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-          &cell,
-      const tarch::la::Vector<dim, double> &macroscopicCellPosition,
-      const tarch::la::Vector<dim, double> &macroscopicCellSize,
-      const tarch::la::Vector<dim, double> &meanVelocity,
-      const double &temperature,
-      const coupling::BoundaryForceController<LinkedCell, dim>
-          &boundaryForceController) = 0;
+  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+                   const tarch::la::Vector<dim, double>& macroscopicCellPosition, const tarch::la::Vector<dim, double>& macroscopicCellSize,
+                   const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
+                   const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController) = 0;
 
   /** returns true, if the particle insertion requires information on the
    * potential energy landscape. The USHER algorithm requires it. Other
@@ -68,8 +62,7 @@ public:
   /** @brief a simple constructor
    *  @param insertDeleteMassAtTimestep interval of time steps for the
    * insertion/removal of particles*/
-  ParticleInsertion(unsigned int insertDeleteMassEveryTimestep)
-      : _insertDeleteMassEveryTimestep(insertDeleteMassEveryTimestep) {
+  ParticleInsertion(unsigned int insertDeleteMassEveryTimestep) : _insertDeleteMassEveryTimestep(insertDeleteMassEveryTimestep) {
     if (_insertDeleteMassEveryTimestep == 0) {
       std::cout << "ERROR ParticleInsertion::ParticleInsertion(..): "
                    "_insertDeleteMassEveryTimestep=0!"
@@ -86,9 +79,7 @@ public:
    *  @param t time step to check for the insertion/removal of mass
    *  @returns a bool that indicates if mass insertion/deletion shall be applied
    * in this time step (true) or not (false) */
-  bool insertDeleteMassAtTimestep(unsigned int t) const {
-    return (t % _insertDeleteMassEveryTimestep == 0);
-  }
+  bool insertDeleteMassAtTimestep(unsigned int t) const { return (t % _insertDeleteMassEveryTimestep == 0); }
 
 private:
   /** interval of time steps for the insertion/removal of particles */

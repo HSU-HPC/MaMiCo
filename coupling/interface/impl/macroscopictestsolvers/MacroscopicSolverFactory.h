@@ -19,13 +19,12 @@ class coupling::interface::MacroscopicSolverFactory {
 public:
   enum SolverType { VOID_MACROSCOPIC_SOLVER = 0, UNIFORM_FLOW_SOLVER = 1 };
 
-  static coupling::interface::MacroscopicSolverFactory &getInstance() {
+  static coupling::interface::MacroscopicSolverFactory& getInstance() {
     static coupling::interface::MacroscopicSolverFactory singleton;
     return singleton;
   }
 
-  coupling::interface::TestMacroscopicSolver *
-  getTestMacroscopicSolver(SolverType type) {
+  coupling::interface::TestMacroscopicSolver* getTestMacroscopicSolver(SolverType type) {
     switch (type) {
     case VOID_MACROSCOPIC_SOLVER:
       return new coupling::interface::VoidMacroscopicSolver();
@@ -41,20 +40,15 @@ public:
   }
 
   template <unsigned int dim>
-  coupling::interface::TestMacroscopicSolverInterface<dim> *
-  getTestMacroscopicSolverInterface(
-      SolverType type,
-      tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
-      double massPerMacroscopicCell,
-      tarch::la::Vector<dim, double> momentumPerMacroscopicCell) {
+  coupling::interface::TestMacroscopicSolverInterface<dim>*
+  getTestMacroscopicSolverInterface(SolverType type, tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, double massPerMacroscopicCell,
+                                    tarch::la::Vector<dim, double> momentumPerMacroscopicCell) {
     switch (type) {
     case VOID_MACROSCOPIC_SOLVER:
       return new coupling::interface::VoidMacroscopicSolverInterface<dim>();
       break;
     case UNIFORM_FLOW_SOLVER:
-      return new coupling::interface::UniformFlowSolverInterface<dim>(
-          globalNumberMacroscopicCells, massPerMacroscopicCell,
-          momentumPerMacroscopicCell);
+      return new coupling::interface::UniformFlowSolverInterface<dim>(globalNumberMacroscopicCells, massPerMacroscopicCell, momentumPerMacroscopicCell);
     default:
       break;
     }

@@ -20,8 +20,7 @@
  */
 class TestMarDynMoleculeIterator : public TestMarDyn {
 public:
-  TestMarDynMoleculeIterator(int argc, char **argv, std::string name)
-      : TestMarDyn(argc, argv, name) {}
+  TestMarDynMoleculeIterator(int argc, char** argv, std::string name) : TestMarDyn(argc, argv, name) {}
   virtual ~TestMarDynMoleculeIterator() {}
 
   virtual void run() {
@@ -37,7 +36,7 @@ protected:
   void testIterator() {
     unsigned int errors = 0;
     // get particle container from simulation
-    LinkedCells *cells = (LinkedCells *)this->_marDyn->getMolecules();
+    LinkedCells* cells = (LinkedCells*)this->_marDyn->getMolecules();
 
     ParticleCell pc;
     for (int i = 0; i < 2744; i++) {
@@ -61,23 +60,19 @@ protected:
       }
 
       if (moleculeCount != 0)
-        std::cout << "Test: " << moleculeCount
-                  << " =?= " << moleculesInInterface << std::endl;
+        std::cout << "Test: " << moleculeCount << " =?= " << moleculesInInterface << std::endl;
 
       if (moleculeCount != moleculesInInterface) {
         errors++;
-        std::cout << "ERROR: number of molecules in current cell " << i
-                  << "should be " << moleculeCount
-                  << ". The interface instead has: " << moleculesInInterface
-                  << std::endl;
+        std::cout << "ERROR: number of molecules in current cell " << i << "should be " << moleculeCount
+                  << ". The interface instead has: " << moleculesInInterface << std::endl;
       }
     }
 
     if (errors == 0)
       std::cout << "MarDynMoleculeIterator test was successful!" << std::endl;
     else
-      std::cout << "MarDynMoleculeIterator test was not successful! (Errors: "
-                << errors << ")" << std::endl;
+      std::cout << "MarDynMoleculeIterator test was not successful! (Errors: " << errors << ")" << std::endl;
   }
 };
 

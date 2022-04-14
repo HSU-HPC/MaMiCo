@@ -22,29 +22,18 @@ template <unsigned int dim> class FilterFromFunction;
  * @author Felix Maurer
  */
 
-template <unsigned int dim>
-class coupling::filtering::FilterFromFunction
-    : public coupling::filtering::FilterInterface<dim> {
+template <unsigned int dim> class coupling::filtering::FilterFromFunction : public coupling::filtering::FilterInterface<dim> {
 public:
   FilterFromFunction(
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &inputCellVector,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &outputCellVector,
-      std::array<bool, 7> filteredValues,
-      const std::function<std::vector<double>(
-          std::vector<double>, std::vector<std::array<unsigned int, dim>>)>
-          *applyScalar,
-      const std::function<std::vector<std::array<double, dim>>(
-          std::vector<std::array<double, dim>>,
-          std::vector<std::array<unsigned int, dim>>)> *applyVector)
-      : coupling::filtering::FilterInterface<dim>(
-            inputCellVector, outputCellVector, filteredValues, "FFF"),
-        _applyScalar(applyScalar), _applyVector(applyVector) {
+      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, std::array<bool, 7> filteredValues,
+      const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
+      const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector)
+      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "FFF"), _applyScalar(applyScalar),
+        _applyVector(applyVector) {
 
     if (applyScalar == nullptr or applyVector == nullptr)
-      throw std::runtime_error(
-          "ERROR: FilterFromFunction received nullptr as function pointer!");
+      throw std::runtime_error("ERROR: FilterFromFunction received nullptr as function pointer!");
 
     // cast MaMiCo indexing to std::array
     tarch::la::Vector<dim, int> mamicoIndex;
@@ -53,9 +42,7 @@ public:
       // interpret position of cell in inputCellVector as linear local
       // md-to-macro index, then convert it to vector
       using coupling::indexing::IndexTrait;
-      mamicoIndex = coupling::indexing::convertToVector<
-          dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>(
-          {i});
+      mamicoIndex = coupling::indexing::convertToVector<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>({i});
 
       for (unsigned int d = 0; d < dim; d++)
         stlIndex[d] = mamicoIndex[d];
@@ -72,16 +59,13 @@ public:
     std::vector<double> input_s;
     std::vector<std::array<double, dim>> input_v;
 
-    input_s.reserve(
-        coupling::filtering::FilterInterface<dim>::_inputCells.size());
-    input_v.reserve(
-        coupling::filtering::FilterInterface<dim>::_inputCells.size());
+    input_s.reserve(coupling::filtering::FilterInterface<dim>::_inputCells.size());
+    input_v.reserve(coupling::filtering::FilterInterface<dim>::_inputCells.size());
 
     /*
      * SCALAR
      */
-    for (const auto scalarProperty : coupling::filtering::FilterInterface<
-             dim>::_scalarAccessFunctionPairs) {
+    for (const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs) {
 
       /*
        * PACK
@@ -108,19 +92,15 @@ public:
       /*
        * UNPACK
        */
-      for (unsigned int i = 0;
-           i < coupling::filtering::FilterInterface<dim>::_inputCells.size();
-           i++) {
-        (coupling::filtering::FilterInterface<dim>::_outputCells[i]
-             ->*scalarProperty.set)(output_s[i]);
+      for (unsigned int i = 0; i < coupling::filtering::FilterInterface<dim>::_inputCells.size(); i++) {
+        (coupling::filtering::FilterInterface<dim>::_outputCells[i]->*scalarProperty.set)(output_s[i]);
       }
     }
 
     /*
      * VECTOR
      */
-    for (const auto vectorProperty : coupling::filtering::FilterInterface<
-             dim>::_vectorAccessFunctionPairs) {
+    for (const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs) {
 
       // coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("FFF BEFORE
       // ");
@@ -129,8 +109,7 @@ public:
        * PACK
        */
       for (auto cell : coupling::filtering::FilterInterface<dim>::_inputCells) {
-        tarch::la::Vector<dim, double> mamico_vec =
-            (cell->*vectorProperty.get)();
+        tarch::la::Vector<dim, double> mamico_vec = (cell->*vectorProperty.get)();
         std::array<double, dim> array_vec;
         for (unsigned int d = 0; d < dim; d++)
           array_vec[d] = mamico_vec[d];
@@ -153,14 +132,11 @@ public:
       /*
        * UNPACK
        */
-      for (unsigned int i = 0;
-           i < coupling::filtering::FilterInterface<dim>::_inputCells.size();
-           i++) {
+      for (unsigned int i = 0; i < coupling::filtering::FilterInterface<dim>::_inputCells.size(); i++) {
         tarch::la::Vector<dim, double> mamico_vec{};
         for (unsigned int d = 0; d < dim; d++)
           mamico_vec[d] = output_v[i][d];
-        (coupling::filtering::FilterInterface<dim>::_outputCells[i]
-             ->*vectorProperty.set)(mamico_vec);
+        (coupling::filtering::FilterInterface<dim>::_outputCells[i]->*vectorProperty.set)(mamico_vec);
       }
 
       // coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("FFF AFTER
@@ -174,10 +150,6 @@ private:
   std::vector<std::array<unsigned int, dim>> _stlIndices;
 
   // this encodes what filter to use
-  const std::function<std::vector<double>(
-      std::vector<double>, std::vector<std::array<unsigned int, dim>>)>
-      *_applyScalar;
-  const std::function<std::vector<std::array<double, dim>>(
-      std::vector<std::array<double, dim>>,
-      std::vector<std::array<unsigned int, dim>>)> *_applyVector;
+  const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* _applyScalar;
+  const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* _applyVector;
 };

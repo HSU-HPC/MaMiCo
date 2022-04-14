@@ -21,8 +21,7 @@ template <class LinkedCell, unsigned int dim> class SetMomentumMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::SetMomentumMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::SetMomentumMapping {
 public:
   /** obtains the old momentum over the region of interest. Besides,
    *  obtains the new momentum that shall be set and the number of particles
@@ -32,13 +31,9 @@ public:
    *	@param numberParticles
    *	@param mdSolverInterface
    */
-  SetMomentumMapping(const tarch::la::Vector<dim, double> &oldMomentum,
-                     const tarch::la::Vector<dim, double> &newMomentum,
-                     const unsigned int &numberParticles,
-                     coupling::interface::MDSolverInterface<LinkedCell, dim>
-                         *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface),
-        _oldVelocity(getVelocity(numberParticles, oldMomentum)),
+  SetMomentumMapping(const tarch::la::Vector<dim, double>& oldMomentum, const tarch::la::Vector<dim, double>& newMomentum, const unsigned int& numberParticles,
+                     coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface), _oldVelocity(getVelocity(numberParticles, oldMomentum)),
         _newVelocity(getVelocity(numberParticles, newMomentum)) {}
 
   /** Destructor */
@@ -57,12 +52,11 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
-      coupling::interface::Molecule<dim> &wrapper(it->get());
+      coupling::interface::Molecule<dim>& wrapper(it->get());
       tarch::la::Vector<dim, double> velocity = wrapper.getVelocity();
       velocity = velocity - _oldVelocity + _newVelocity;
       wrapper.setVelocity(velocity);
@@ -78,19 +72,15 @@ private:
    *	@param momentum
    *	@return mean velocity og the cell
    */
-  tarch::la::Vector<dim, double>
-  getVelocity(const unsigned int &numberParticles,
-              const tarch::la::Vector<dim, double> &momentum) const {
+  tarch::la::Vector<dim, double> getVelocity(const unsigned int& numberParticles, const tarch::la::Vector<dim, double>& momentum) const {
     if (numberParticles != 0) {
-      return (1.0 / (numberParticles * _mdSolverInterface->getMoleculeMass())) *
-             momentum;
+      return (1.0 / (numberParticles * _mdSolverInterface->getMoleculeMass())) * momentum;
     } else {
       return tarch::la::Vector<dim, double>(0.0);
     }
   }
 
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   tarch::la::Vector<dim, double> _oldVelocity;
   tarch::la::Vector<dim, double> _newVelocity;
 };

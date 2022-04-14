@@ -7,90 +7,41 @@
 #include <sys/time.h>
 
 template <class LinkedCell, unsigned int dim>
-coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
-    MacroscopicCellServiceImpl(
-        unsigned int ID,
-        coupling::interface::MDSolverInterface<LinkedCell, dim>
-            *mdSolverInterface,
-        coupling::interface::MacroscopicSolverInterface<dim>
-            *macroscopicSolverInterface,
-        tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
-        const coupling::configurations::ParticleInsertionConfiguration
-            &particleInsertionConfiguration,
-        const coupling::configurations::MomentumInsertionConfiguration
-            &momentumInsertionConfiguration,
-        const coupling::configurations::BoundaryForceConfiguration<dim>
-            &boundaryForceConfiguration,
-        const coupling::configurations::TransferStrategyConfiguration<dim>
-            &transferStrategyConfiguration,
-        // const coupling::configurations::NoiseReductionConfiguration
-        // &noiseReductionConfiguration,
-        const coupling::configurations::ParallelTopologyConfiguration
-            &parallelTopologyConfiguration,
-        const coupling::configurations::ThermostatConfiguration
-            &thermostatConfiguration,
-        unsigned int numberMDTimestepsPerCouplingCycle,
-        const coupling::configurations::MacroscopicCellConfiguration<dim>
-            &macroscopicCellConfiguration,
-        const char *filterPipelineConfiguration,
-        const tarch::utils::MultiMDService<dim> &multiMDService,
-        unsigned int topologyOffset, int tws)
+coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::MacroscopicCellServiceImpl(
+    unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,
+    coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
+    const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,
+    const coupling::configurations::MomentumInsertionConfiguration& momentumInsertionConfiguration,
+    const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,
+    const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
+    const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
+    const coupling::configurations::ThermostatConfiguration& thermostatConfiguration, unsigned int numberMDTimestepsPerCouplingCycle,
+    const coupling::configurations::MacroscopicCellConfiguration<dim>& macroscopicCellConfiguration, const char* filterPipelineConfiguration,
+    const tarch::utils::MultiMDService<dim>& multiMDService, unsigned int topologyOffset, int tws)
     : coupling::services::MacroscopicCellService<dim>(ID),
       // index conversion should be the very first thing getting initialised!
-      _indexConversion(initIndexConversion(
-          macroscopicCellConfiguration.getMacroscopicCellSize(),
-          numberProcesses, rank, mdSolverInterface->getGlobalMDDomainSize(),
-          mdSolverInterface->getGlobalMDDomainOffset(),
-          parallelTopologyConfiguration.getParallelTopologyType(),
-          topologyOffset)),
+      _indexConversion(initIndexConversion(macroscopicCellConfiguration.getMacroscopicCellSize(), numberProcesses, rank,
+                                           mdSolverInterface->getGlobalMDDomainSize(), mdSolverInterface->getGlobalMDDomainOffset(),
+                                           parallelTopologyConfiguration.getParallelTopologyType(), topologyOffset)),
       _numberMDTimestepsPerCouplingCycle(numberMDTimestepsPerCouplingCycle),
       // initialise interface pointers before macroscopic cells are initialised
-      _mdSolverInterface(mdSolverInterface),
-      _macroscopicSolverInterface(macroscopicSolverInterface),
-      _deFromMacro2MD(_macroscopicSolverInterface, *_indexConversion, ID),
-      _deFromMD2Macro(_macroscopicSolverInterface, *_indexConversion, ID),
-      _macroscopicCells(
-          macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(),
-          *_indexConversion, mdSolverInterface),
-      _filterPipeline(nullptr),
-      _filterPipelineConfiguration(filterPipelineConfiguration),
-      _multiMDService(multiMDService),
-      _momentumInsertion(
-          momentumInsertionConfiguration
-              .interpreteConfiguration<LinkedCell, dim>(
-                  mdSolverInterface, *_indexConversion,
-                  _macroscopicCells.getMacroscopicCellsWithLinkedCells(),
-                  numberMDTimestepsPerCouplingCycle)),
-      _momentumInsertionType(
-          momentumInsertionConfiguration.getMomentumInsertionType()),
-      _particleInsertion(
-          particleInsertionConfiguration
-              .interpreteConfiguration<LinkedCell, dim>(mdSolverInterface)),
-      _numberLinkedCellsPerMacroscopicCell(
-          macroscopicCellConfiguration
-              .getNumberLinkedCellsPerMacroscopicCell()),
-      _particleInsertionType(
-          particleInsertionConfiguration.getParticleInsertionType()),
-      _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(
-          mdSolverInterface, *_indexConversion,
-          numberMDTimestepsPerCouplingCycle)),
-      //_noiseReduction(noiseReductionConfiguration.interpreteConfiguration<dim>(*_indexConversion,
-      // multiMDService, tws)),
-      _kineticEnergyController(mdSolverInterface),
-      _boundaryForceController(
-          boundaryForceConfiguration.interpreteConfiguration(
-              mdSolverInterface)),
-      _momentumController(mdSolverInterface),
-      _applyAccordingToConfiguration(
-          initCorrectApplicationOfThermostat(thermostatConfiguration)),
-      _microscopicFilename(
-          macroscopicCellConfiguration.getMicroscopicFilename()),
-      _writeEveryMicroscopicTimestep(
-          macroscopicCellConfiguration.getWriteEveryMicroscopicTimestep()),
-      _macroscopicFilename(
-          macroscopicCellConfiguration.getMacroscopicFilename()),
-      _writeEveryMacroscopicTimestep(
-          macroscopicCellConfiguration.getWriteEveryMacroscopicTimestep()) {
+      _mdSolverInterface(mdSolverInterface), _macroscopicSolverInterface(macroscopicSolverInterface),
+      _deFromMacro2MD(_macroscopicSolverInterface, _indexConversion, ID), _deFromMD2Macro(_macroscopicSolverInterface, _indexConversion, ID),
+      _macroscopicCells(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface), _filterPipeline(nullptr),
+      _filterPipelineConfiguration(filterPipelineConfiguration), _multiMDService(multiMDService),
+      _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(
+          mdSolverInterface, *_indexConversion, _macroscopicCells.getMacroscopicCellsWithLinkedCells(), numberMDTimestepsPerCouplingCycle)),
+      _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
+      _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface)),
+      _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
+      _particleInsertionType(particleInsertionConfiguration.getParticleInsertionType()),
+      _transferStrategy(transferStrategyConfiguration.interpreteConfiguration(mdSolverInterface, *_indexConversion, numberMDTimestepsPerCouplingCycle)),
+      _kineticEnergyController(mdSolverInterface), _boundaryForceController(boundaryForceConfiguration.interpreteConfiguration(mdSolverInterface)),
+      _momentumController(mdSolverInterface), _applyAccordingToConfiguration(initCorrectApplicationOfThermostat(thermostatConfiguration)),
+      _microscopicFilename(macroscopicCellConfiguration.getMicroscopicFilename()),
+      _writeEveryMicroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMicroscopicTimestep()),
+      _macroscopicFilename(macroscopicCellConfiguration.getMacroscopicFilename()),
+      _writeEveryMacroscopicTimestep(macroscopicCellConfiguration.getWriteEveryMacroscopicTimestep()) {
   // check for NULL pointers
   if (_particleInsertion == NULL) {
     std::cout << "ERROR "
@@ -113,11 +64,6 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
               << std::endl;
     exit(EXIT_FAILURE);
   }
-  /*if (_noiseReduction==NULL){
-    std::cout << "ERROR
-  coupling::services::MacroscopicCellServiceImpl::MacroscopicCellServiceImpl():
-  _noiseReduction==NULL!" << std::endl; exit(EXIT_FAILURE);
-  }*/
   if (_boundaryForceController == NULL) {
     std::cout << "ERROR "
                  "coupling::services::MacroscopicCellServiceImpl::"
@@ -133,17 +79,14 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
   }
 
   // init Usher parameters
-  initIndexVectors4Usher(
-      macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell());
+  initIndexVectors4Usher(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell());
 
   // init vector of inner (MD Domain/non-ghost) cells and their indices
   // TODO: REMOVE
   // initInnerMacroscopicCells(_macroscopicCells.getMacroscopicCells());
 }
 
-template <class LinkedCell, unsigned int dim>
-coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::~MacroscopicCellServiceImpl() {
+template <class LinkedCell, unsigned int dim> coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::~MacroscopicCellServiceImpl() {
   // free memory and delete objects
   if (_particleInsertion != NULL) {
     delete _particleInsertion;
@@ -157,8 +100,6 @@ coupling::services::MacroscopicCellServiceImpl<
     delete _transferStrategy;
     _transferStrategy = NULL;
   }
-  // if (_noiseReduction  != NULL){ delete    _noiseReduction;  _noiseReduction
-  // = NULL; }
   if (_boundaryForceController != NULL) {
     delete _boundaryForceController;
     _boundaryForceController = NULL;
@@ -173,56 +114,38 @@ coupling::services::MacroscopicCellServiceImpl<
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
-    sendFromMacro2MD(
-        const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-            &macroscopicCellsFromMacroscopicSolver,
-        const unsigned int *const globalCellIndicesFromMacroscopicSolver) {
-  Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData
-      wrapper1(this);
-  Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData
-      wrapper2(this);
-  Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData
-      wrapper3(this);
-  Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData
-      wrapper4(this);
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(
+    const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+    const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+  Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper1(this);
+  Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper2(this);
+  Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData wrapper3(this);
+  Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData wrapper4(this);
 
   // pre-process macroscopic cells of coupling tool
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(
-      wrapper1);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
 
   // carry out send-receive steps
-  _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD,
-                                 _macroscopicCells.getMacroscopicCells(),
-                                 macroscopicCellsFromMacroscopicSolver,
+  _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,
                                  globalCellIndicesFromMacroscopicSolver);
 
   // post-process inner macroscopic cells after receiving information from
   // macroscopic solver
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(
-      wrapper3);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
 }
 
 template <class LinkedCell, unsigned int dim>
-double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
-    sendFromMD2Macro(
-        const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-            &macroscopicCellsFromMacroscopicSolver,
-        const unsigned int *const globalCellIndicesFromMacroscopicSolver) {
+double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(
+    const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+    const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
   // transfer strategy
   Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
 
-  // TODO: deprecated, moved to filter pipeline.
-  //  noise reduction
-  // Wrapper4NoiseReductionProcessInnerMacroscopicCell wrapper3(this);
-  // Wrapper4NoiseReductionProcessOuterMacroscopicCell wrapper4(this);
-
   // pre-process data before sending to macroscopic solver
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(
-      wrapper1);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
 
   timeval start;
@@ -232,19 +155,8 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
     gettimeofday(&start, NULL);
   }
 
-  // TODO: deprecated, moved to filter pipeline.
-  //  run noise reduction
-  //_macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-  //_macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
-  // if(_noiseReduction->_doubleTraversal){
-  //   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-  //   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
-  // }
-
 #ifdef DEBUG_FILTER_PIPELINE
-  std::cout << "FP: Now applying per-instance filter pipeline for service ID: "
-            << coupling::services::MacroscopicCellService<dim>::getID()
-            << std::endl;
+  std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::MacroscopicCellService<dim>::getID() << std::endl;
 #endif
 
   if (_filterPipeline != nullptr) {
@@ -253,31 +165,23 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
 
   if (_indexConversion->getThisRank() == 0) {
     gettimeofday(&end, NULL);
-    runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 +
-                        (end.tv_usec - start.tv_usec));
+    runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
   }
 
   // carry out send-receive steps
-  _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro,
-                                 _macroscopicCells.getMacroscopicCells(),
-                                 macroscopicCellsFromMacroscopicSolver,
+  _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,
                                  globalCellIndicesFromMacroscopicSolver);
   return runtime;
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::processInnerMacroscopicCellAfterMDTimestep() {
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::processInnerMacroscopicCellAfterMDTimestep() {
   Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep wrapper(this);
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(
-      wrapper);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
 }
 
-template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::distributeMomentum(unsigned int t) {
-  if (_momentumInsertionType ==
-      coupling::configurations::MomentumInsertionConfiguration::NO_INSERTION) {
+template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::distributeMomentum(unsigned int t) {
+  if (_momentumInsertionType == coupling::configurations::MomentumInsertionConfiguration::NO_INSERTION) {
     return;
   }
 
@@ -285,59 +189,50 @@ void coupling::services::MacroscopicCellServiceImpl<
   Wrapper4DistributeMomentum distributeMomentum(this, t);
 
   // compute current velocity in all cells
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(
-      computeAndSetCurrentVelocity);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(computeAndSetCurrentVelocity);
   // distribute momentum and synchronize molecules between processes
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(
-      distributeMomentum);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(distributeMomentum);
   _mdSolverInterface->synchronizeMoleculesAfterMomentumModification();
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::computeAndStoreTemperature(double temperature) {
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::computeAndStoreTemperature(double temperature) {
   Wrapper4ComputeAndStoreTemperature wrapper(this, temperature);
   _applyAccordingToConfiguration(wrapper);
 }
 
+template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::perturbateVelocity() {
+  Wrapper4PerturbateVelocity wrapper(this);
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+}
+
 template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::applyTemperatureToMolecules(unsigned int t) {
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::applyTemperatureToMolecules(unsigned int t) {
   Wrapper4ApplyTemperature wrapper(this);
   _applyAccordingToConfiguration(wrapper);
 }
 
-template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::applyBoundaryForce(unsigned int t) {
+template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::applyBoundaryForce(unsigned int t) {
   Wrapper4ApplyBoundaryForce wrapper(this);
-  _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(
-      wrapper);
+  _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);
 }
 
 template <class LinkedCell, unsigned int dim>
-coupling::IndexConversion<dim> *coupling::services::
-    MacroscopicCellServiceImpl<LinkedCell, dim>::initIndexConversion(
-        tarch::la::Vector<dim, double> macroscopicCellSize,
-        tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
-        tarch::la::Vector<dim, double> globalMDDomainSize,
-        tarch::la::Vector<dim, double> globalMDDomainOffset,
-        coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-        unsigned int topologyOffset) const {
+coupling::IndexConversion<dim>* coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::initIndexConversion(
+    tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
+    tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim, double> globalMDDomainOffset,
+    coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset) const {
   tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
   for (unsigned int d = 0; d < dim; d++) {
-    globalNumberMacroscopicCells[d] = (unsigned int)floor(
-        globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
-    if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] -
-             globalMDDomainSize[d]) > 1e-13) {
+    globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
+    if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13) {
       std::cout << "coupling::services::MacroscopicCellServiceImpl::"
                    "initIndexConversion(): Deviation of domain size > 1e-13!"
                 << std::endl;
     }
   }
-  coupling::IndexConversion<dim> *ic = new coupling::IndexConversion<dim>(
-      globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,
-      globalMDDomainOffset, parallelTopologyType, topologyOffset);
+  coupling::IndexConversion<dim>* ic = new coupling::IndexConversion<dim>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,
+                                                                          globalMDDomainOffset, parallelTopologyType, topologyOffset);
   if (ic == NULL) {
     std::cout << "coupling::services::MacroscopicCellServiceImpl::"
                  "initIndexConversion(): ic==NULL!"
@@ -348,17 +243,14 @@ coupling::IndexConversion<dim> *coupling::services::
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
-    initIndexVectors4Usher(tarch::la::Vector<dim, unsigned int>
-                               numberLinkedCellsPerMacroscopicCell) {
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::initIndexVectors4Usher(
+    tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell) {
 
-  const tarch::la::Vector<dim, unsigned int> localNumberMacroscopicCells =
-      _indexConversion->getLocalNumberMacroscopicCells();
+  const tarch::la::Vector<dim, unsigned int> localNumberMacroscopicCells = _indexConversion->getLocalNumberMacroscopicCells();
   const tarch::la::Vector<dim, unsigned int> firstNonGhostMacroscopicCell(1);
 
   const tarch::la::Vector<3, unsigned int> start(0);
-  const tarch::la::Vector<3, unsigned int> end =
-      coupling::initRange<dim>(tarch::la::Vector<dim, unsigned int>(2));
+  const tarch::la::Vector<3, unsigned int> end = coupling::initRange<dim>(tarch::la::Vector<dim, unsigned int>(2));
   tarch::la::Vector<3, unsigned int> loop(0);
   unsigned int loopCounter = 0;
 
@@ -367,15 +259,10 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
       for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
         for (unsigned int d = 0; d < dim; d++) {
           _usherCellOffset[loopCounter][d] = loop[d];
-          _usherCellStart[loopCounter][d] =
-              firstNonGhostMacroscopicCell[d] +
-              loop[d] * (localNumberMacroscopicCells[d] / 2);
+          _usherCellStart[loopCounter][d] = firstNonGhostMacroscopicCell[d] + loop[d] * (localNumberMacroscopicCells[d] / 2);
           _usherCellEnd[loopCounter][d] =
-              firstNonGhostMacroscopicCell[d] +
-              (1 - loop[d]) * (localNumberMacroscopicCells[d] / 2) +
-              loop[d] * localNumberMacroscopicCells[d];
-          _usherRange[loopCounter][d] =
-              _usherCellEnd[loopCounter][d] - _usherCellStart[loopCounter][d];
+              firstNonGhostMacroscopicCell[d] + (1 - loop[d]) * (localNumberMacroscopicCells[d] / 2) + loop[d] * localNumberMacroscopicCells[d];
+          _usherRange[loopCounter][d] = _usherCellEnd[loopCounter][d] - _usherCellStart[loopCounter][d];
         }
         for (unsigned int d = dim; d < 3; d++) {
           _usherCellOffset[loopCounter][d] = 0;
@@ -391,28 +278,19 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::
 }
 
 template <class LinkedCell, unsigned int dim>
-tarch::la::Vector<dim, double> coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::getPositionOfFirstLocalGhostCell() const {
+tarch::la::Vector<dim, double> coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::getPositionOfFirstLocalGhostCell() const {
   // initialise with position of global first ghost cell
-  tarch::la::Vector<dim, double> position =
-      _indexConversion->getGlobalMDDomainOffset() -
-      _indexConversion->getMacroscopicCellSize();
+  tarch::la::Vector<dim, double> position = _indexConversion->getGlobalMDDomainOffset() - _indexConversion->getMacroscopicCellSize();
   for (unsigned int d = 0; d < dim; d++) {
-    position[d] =
-        position[d] +
-        _indexConversion->getThisProcess()[d] *
-            _indexConversion->getAverageLocalNumberMacroscopicCells()[d] *
-            _indexConversion->getMacroscopicCellSize()[d];
+    position[d] = position[d] + _indexConversion->getThisProcess()[d] * _indexConversion->getAverageLocalNumberMacroscopicCells()[d] *
+                                    _indexConversion->getMacroscopicCellSize()[d];
   }
   return position;
 }
 
-template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::distributeMass(unsigned int t) {
+template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::distributeMass(unsigned int t) {
   // nop if there is no particle insertion
-  if (_particleInsertionType ==
-      coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION) {
+  if (_particleInsertionType == coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION) {
     return;
   }
   // only insert mass every X time steps
@@ -422,24 +300,18 @@ void coupling::services::MacroscopicCellServiceImpl<
 
   // compute mean potential energy over all macroscopic cells and set the value
   // in the macroscopic cell
-  coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell, dim>
-      computeMeanPotentialEnergyMapping(_mdSolverInterface,
-                                        *_boundaryForceController);
+  coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell, dim> computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);
   // macroscopic cell access
-  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>
-      *const macroscopicCells =
-          _macroscopicCells.getMacroscopicCellsWithLinkedCells();
+  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells = _macroscopicCells.getMacroscopicCellsWithLinkedCells();
   // start coordinate of first (ghost) cell
-  const tarch::la::Vector<dim, double> startPosition =
-      getPositionOfFirstLocalGhostCell();
+  const tarch::la::Vector<dim, double> startPosition = getPositionOfFirstLocalGhostCell();
   // buffers for temperature,momentum,mean velocity,pot. energy
   double temperature(0.0);
   tarch::la::Vector<dim, double> momentum(0.0);
   tarch::la::Vector<dim, double> meanVelocity(0.0);
   double potentialEnergy = 0.0;
   // buffer for insertion/deletion action that has been carried out
-  typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-      particleInsertionAction;
+  typename coupling::ParticleInsertion<LinkedCell, dim>::Action particleInsertionAction;
   // true, if the costly operation of contructing the energy landscape is really
   // required
   bool constructEnergyLandscape;
@@ -462,8 +334,7 @@ void coupling::services::MacroscopicCellServiceImpl<
     constructEnergyLandscape = true;
     // reduce size of usherCellStart-vector to be consistent with
     // MDSolverInterface
-    const tarch::la::Vector<dim, unsigned int> usherCellStart =
-        coupling::initDimVector<dim>(_usherCellStart[j]);
+    const tarch::la::Vector<dim, unsigned int> usherCellStart = coupling::initDimVector<dim>(_usherCellStart[j]);
 
     // loop over the block again in a 2^dim-colour manner: For each particle
     // insertion within a macroscopic cell, the potential energy landscape needs
@@ -485,71 +356,51 @@ void coupling::services::MacroscopicCellServiceImpl<
       // consideration of this sub-domain. Besides, we skip this operation if
       // the particle insertion does not require it (e.g. in case of rarefied
       // gases, we possibly can come up with something better than USHER)
-      if (constructEnergyLandscape &&
-          _particleInsertion->requiresPotentialEnergyLandscape()) {
-        _mdSolverInterface->setupPotentialEnergyLandscape(
-            usherCellStart, _usherRange[j],
-            _numberLinkedCellsPerMacroscopicCell);
+      if (constructEnergyLandscape && _particleInsertion->requiresPotentialEnergyLandscape()) {
+        _mdSolverInterface->setupPotentialEnergyLandscape(usherCellStart, _usherRange[j], _numberLinkedCellsPerMacroscopicCell);
         // reset flag
         constructEnergyLandscape = false;
       }
 
       // loop over all respective macroscopic cells (incrementing by 2 for
       // 2^dim-colour-traversal)
-      for (cellIndex[2] = _usherCellStart[j][2] + _usherCellOffset[i][2];
-           cellIndex[2] < _usherCellEnd[j][2];
-           cellIndex[2] = cellIndex[2] + 2) {
-        for (cellIndex[1] = _usherCellStart[j][1] + _usherCellOffset[i][1];
-             cellIndex[1] < _usherCellEnd[j][1];
-             cellIndex[1] = cellIndex[1] + 2) {
-          for (cellIndex[0] = _usherCellStart[j][0] + _usherCellOffset[i][0];
-               cellIndex[0] < _usherCellEnd[j][0];
-               cellIndex[0] = cellIndex[0] + 2) {
+      for (cellIndex[2] = _usherCellStart[j][2] + _usherCellOffset[i][2]; cellIndex[2] < _usherCellEnd[j][2]; cellIndex[2] = cellIndex[2] + 2) {
+        for (cellIndex[1] = _usherCellStart[j][1] + _usherCellOffset[i][1]; cellIndex[1] < _usherCellEnd[j][1]; cellIndex[1] = cellIndex[1] + 2) {
+          for (cellIndex[0] = _usherCellStart[j][0] + _usherCellOffset[i][0]; cellIndex[0] < _usherCellEnd[j][0]; cellIndex[0] = cellIndex[0] + 2) {
             // determine macroscopic cell index
-            const unsigned int index = _indexConversion->getLocalCellIndex(
-                coupling::initDimVector<dim>(cellIndex));
+            const unsigned int index = _indexConversion->getLocalCellIndex(coupling::initDimVector<dim>(cellIndex));
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
             std::cout << "coupling::services::MacroscopicCellServiceImpl::"
                          "distributeMass(): Insert mass in cell "
                       << index << std::endl;
 #endif
             // compute cell position
-            tarch::la::Vector<dim, double> macroscopicCellPosition =
-                startPosition;
+            tarch::la::Vector<dim, double> macroscopicCellPosition = startPosition;
             for (unsigned int d = 0; d < dim; d++) {
-              macroscopicCellPosition[d] +=
-                  _indexConversion->getMacroscopicCellSize()[d] * cellIndex[d];
+              macroscopicCellPosition[d] += _indexConversion->getMacroscopicCellSize()[d] * cellIndex[d];
             }
 
             // compute current momentum and energy
-            _momentumController.computeMomentumAndMeanVelocity(
-                macroscopicCells[index], momentum, meanVelocity);
+            _momentumController.computeMomentumAndMeanVelocity(macroscopicCells[index], momentum, meanVelocity);
             temperature = macroscopicCells[index].getTemperature();
             // compute potential energy for this macroscopic cell and store it
-            macroscopicCells[index].iterateConstCells(
-                computeMeanPotentialEnergyMapping);
-            potentialEnergy =
-                computeMeanPotentialEnergyMapping.getPotentialEnergy();
+            macroscopicCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);
+            potentialEnergy = computeMeanPotentialEnergyMapping.getPotentialEnergy();
             macroscopicCells[index].setPotentialEnergy(potentialEnergy);
 
             // insert/ delete mass
-            particleInsertionAction = _particleInsertion->insertDeleteMass(
-                macroscopicCells[index], macroscopicCellPosition,
-                _indexConversion->getMacroscopicCellSize(), meanVelocity,
-                temperature, *_boundaryForceController);
+            particleInsertionAction =
+                _particleInsertion->insertDeleteMass(macroscopicCells[index], macroscopicCellPosition, _indexConversion->getMacroscopicCellSize(), meanVelocity,
+                                                     temperature, *_boundaryForceController);
             // if insertion/ deletion was successful...
-            if (particleInsertionAction !=
-                coupling::ParticleInsertion<LinkedCell, dim>::NoAction) {
+            if (particleInsertionAction != coupling::ParticleInsertion<LinkedCell, dim>::NoAction) {
               // ... determine new potential energy of the system (assumption:
               // symmetric potential energy)
-              macroscopicCells[index].iterateConstCells(
-                  computeMeanPotentialEnergyMapping);
+              macroscopicCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);
 
               // ... reset momentum and temperature
-              _momentumController.setMomentum(macroscopicCells[index],
-                                              momentum);
-              _kineticEnergyController.setTemperature(macroscopicCells[index],
-                                                      temperature);
+              _momentumController.setMomentum(macroscopicCells[index], momentum);
+              _kineticEnergyController.setTemperature(macroscopicCells[index], temperature);
               // ... set flag to construct energy landscape for next insertion
               // try
               constructEnergyLandscape = true;
@@ -566,8 +417,7 @@ void coupling::services::MacroscopicCellServiceImpl<
   } // 2^dim-colour whole domain (1<<dim)
 
 #ifdef USHER_DEBUG
-  coupling::UsherParticleInsertion<LinkedCell, dim> *p =
-      ((coupling::UsherParticleInsertion<LinkedCell, dim> *)_particleInsertion);
+  coupling::UsherParticleInsertion<LinkedCell, dim>* p = ((coupling::UsherParticleInsertion<LinkedCell, dim>*)_particleInsertion);
   std::cout << "_particlesInserted = " << p->_particlesInserted << std::endl;
   std::cout << "_energyInserted     = " << p->_energyInserted << std::endl;
   std::cout << "_ZhouEnergyInserted = " << p->_ZhouEnergyInserted << std::endl;
@@ -576,36 +426,26 @@ void coupling::services::MacroscopicCellServiceImpl<
   std::cout << "_energyRemoved      = " << p->_energyRemoved << std::endl;
   std::cout << "_ZhouEnergyRemoved  = " << p->_ZhouEnergyRemoved << std::endl;
   std::cout << "Energy inserted per Operation: "
-            << ((p->_energyInserted + p->_ZhouEnergyInserted) -
-                (p->_energyRemoved + p->_ZhouEnergyRemoved)) /
-                   (p->_particlesInserted + p->_particlesRemoved)
+            << ((p->_energyInserted + p->_ZhouEnergyInserted) - (p->_energyRemoved + p->_ZhouEnergyRemoved)) / (p->_particlesInserted + p->_particlesRemoved)
             << std::endl;
   std::cout << std::endl;
 #endif
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::plotEveryMicroscopicTimestep(unsigned int t) {
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::plotEveryMicroscopicTimestep(unsigned int t) {
   // trigger plotting
-  if ((_writeEveryMicroscopicTimestep != 0) &&
-      (t % _writeEveryMicroscopicTimestep == 0)) {
-    coupling::MacroscopicCellPlotter<LinkedCell, dim> plotter(
-        coupling::services::MacroscopicCellService<dim>::getID(),
-        _microscopicFilename, _indexConversion->getThisRank(), t,
-        *_indexConversion, _macroscopicCells, _mdSolverInterface);
+  if ((_writeEveryMicroscopicTimestep != 0) && (t % _writeEveryMicroscopicTimestep == 0)) {
+    coupling::MacroscopicCellPlotter<LinkedCell, dim> plotter(coupling::services::MacroscopicCellService<dim>::getID(), _microscopicFilename,
+                                                              _indexConversion->getThisRank(), t, *_indexConversion, _macroscopicCells, _mdSolverInterface);
   }
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<
-    LinkedCell, dim>::plotEveryMacroscopicTimestep(unsigned int t) {
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::plotEveryMacroscopicTimestep(unsigned int t) {
   // trigger plotting
-  if ((_writeEveryMacroscopicTimestep != 0) &&
-      (t % _writeEveryMacroscopicTimestep == 0)) {
-    coupling::MacroscopicCellPlotter<LinkedCell, dim> plotter(
-        coupling::services::MacroscopicCellService<dim>::getID(),
-        _macroscopicFilename, _indexConversion->getThisRank(), t,
-        *_indexConversion, _macroscopicCells, _mdSolverInterface);
+  if ((_writeEveryMacroscopicTimestep != 0) && (t % _writeEveryMacroscopicTimestep == 0)) {
+    coupling::MacroscopicCellPlotter<LinkedCell, dim> plotter(coupling::services::MacroscopicCellService<dim>::getID(), _macroscopicFilename,
+                                                              _indexConversion->getThisRank(), t, *_indexConversion, _macroscopicCells, _mdSolverInterface);
   }
 }

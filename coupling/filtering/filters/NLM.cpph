@@ -15,11 +15,9 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::operator()() {
 template <unsigned int dim> void coupling::filtering::NLM<dim>::save_data() {
   for (unsigned int i = 0; i < this->_inputCells.size(); ++i) {
     using namespace coupling::indexing;
-    CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>
-        idx(i);
-    coupling::filtering::Quantities<dim> &q = _flowfield(idx.get(), _t);
-    coupling::filtering::Quantities<dim> &qp =
-        _flowfield_prefiltered(idx.get(), _t);
+    CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost> idx(i);
+    coupling::filtering::Quantities<dim>& q = _flowfield(idx.get(), _t);
+    coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(idx.get(), _t);
     q[0] = this->_inputCellVectors[0][i]->getMacroscopicMass();
     qp[0] = this->_inputCellVectors[1][i]->getMacroscopicMass();
     for (unsigned int d = 0; d < dim; d++) {
@@ -29,27 +27,22 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::save_data() {
   }
 }
 
-template <unsigned int dim>
-void coupling::filtering::NLM<dim>::update_patchfield() {
+template <unsigned int dim> void coupling::filtering::NLM<dim>::update_patchfield() {
   for (auto idx : _innerCellIndices) {
-    auto idx_inner = (tarch::la::Vector<dim, unsigned int>)(idx.get()) -
-                     tarch::la::Vector<dim, unsigned int>{1};
+    auto idx_inner = (tarch::la::Vector<dim, unsigned int>)(idx.get()) - tarch::la::Vector<dim, unsigned int>{1};
     if (_cycleCounter > _t)
       _patchfield.destroy(idx_inner, _t);
-    _patchfield.construct(
-        idx_inner, _t, tarch::la::Vector<dim, unsigned int>(2 * _d + 1),
-        2 * _d + 1, _flowfield_prefiltered,
-        (tarch::la::Vector<dim, unsigned int>)(idx.get()), _t);
+    _patchfield.construct(idx_inner, _t, tarch::la::Vector<dim, unsigned int>(2 * _d + 1), 2 * _d + 1, _flowfield_prefiltered,
+                          (tarch::la::Vector<dim, unsigned int>)(idx.get()), _t);
   }
 }
 
 template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
   // counter for adaptive parameter modification
   int cnt_sigsq = 0, cnt_hsq = 0, cnt_total = 0;
-  for (auto const &idx : _innerCellIndices) {
-    auto idx_inner = (tarch::la::Vector<dim, unsigned int>)(idx.get()) -
-                     tarch::la::Vector<dim, unsigned int>{1};
-    auto &me = _patchfield(idx_inner, _t);
+  for (auto const& idx : _innerCellIndices) {
+    auto idx_inner = (tarch::la::Vector<dim, unsigned int>)(idx.get()) - tarch::la::Vector<dim, unsigned int>{1};
+    auto& me = _patchfield(idx_inner, _t);
     double C = 0;
 
     auto res_offset = compute_boundary_neighbors(idx_inner);
@@ -60,9 +53,8 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
     for (int offset_t = 0; offset_t > -tdist; offset_t--) {
       unsigned int t = posmod((int)_t + offset_t, _timeWindowSize);
       for (auto idx2 : _innerCellIndices) {
-        auto idx2_inner = (tarch::la::Vector<dim, unsigned int>)(idx2.get()) -
-                          tarch::la::Vector<dim, unsigned int>{1};
-        auto &other = _patchfield(idx2_inner, t);
+        auto idx2_inner = (tarch::la::Vector<dim, unsigned int>)(idx2.get()) - tarch::la::Vector<dim, unsigned int>{1};
+        auto& other = _patchfield(idx2_inner, t);
         double dist = me.distance(other);
 #ifdef NLM_DEBUG
         // std::cout << "dist = " << dist << std::endl;
@@ -72,17 +64,13 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
         if (dist - _sigsq < _hsq)
           cnt_hsq++;
         cnt_total++;
-        double weight = std::exp(-std::max(dist - _sigsq, 0.0) / _hsq) * 1 /
-                        (-offset_t + 1);
+        double weight = std::exp(-std::max(dist - _sigsq, 0.0) / _hsq) * 1 / (-offset_t + 1);
 #ifdef NLM_DEBUG
         // std::cout << "weight = " << weight << std::endl;
 #endif
         for (unsigned int i = 0; i < res_offset.size(); i++) {
-          tarch::la::Vector<dim, unsigned int> residx(
-              idx2.get()[0] + res_offset[i][0],
-              idx2.get()[1] + res_offset[i][1],
-              idx2.get()[2] + res_offset[i][2]);
-          coupling::filtering::Quantities<dim> &q = _flowfield(residx, t);
+          tarch::la::Vector<dim, unsigned int> residx(idx2.get()[0] + res_offset[i][0], idx2.get()[1] + res_offset[i][1], idx2.get()[2] + res_offset[i][2]);
+          coupling::filtering::Quantities<dim>& q = _flowfield(residx, t);
           res[i] += q * weight;
         }
         C += weight;
@@ -91,20 +79,14 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
 
     for (unsigned int i = 0; i < res_offset.size(); i++) {
       res[i] = res[i] * (1 / C);
-      tarch::la::Vector<dim, int> residx(idx.get()[0] + res_offset[i][0],
-                                         idx.get()[1] + res_offset[i][1],
-                                         idx.get()[2] + res_offset[i][2]);
+      tarch::la::Vector<dim, int> residx(idx.get()[0] + res_offset[i][0], idx.get()[1] + res_offset[i][1], idx.get()[2] + res_offset[i][2]);
       int cellidx = coupling::indexing::convertToScalar(CellIndex_T(residx));
 
-      coupling::filtering::JunctorInterface<dim, 2,
-                                            1>::_outputCellVectors[0][cellidx]
-          ->setMacroscopicMass(res[i][0]);
+      coupling::filtering::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMass(res[i][0]);
       tarch::la::Vector<dim, double> momentum;
       for (unsigned int d = 0; d < dim; d++)
         momentum[d] = res[i][d + 1];
-      coupling::filtering::JunctorInterface<dim, 2,
-                                            1>::_outputCellVectors[0][cellidx]
-          ->setMacroscopicMomentum(momentum);
+      coupling::filtering::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMomentum(momentum);
     }
   }
   // dynamic parameter adaption: Goal: cnt/cnt_total should be close to
@@ -128,9 +110,7 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
 }
 
 template <unsigned int dim>
-std::vector<tarch::la::Vector<dim, int>>
-coupling::filtering::NLM<dim>::compute_boundary_neighbors(
-    const tarch::la::Vector<dim, unsigned int> &idx_inner) {
+std::vector<tarch::la::Vector<dim, int>> coupling::filtering::NLM<dim>::compute_boundary_neighbors(const tarch::la::Vector<dim, unsigned int>& idx_inner) {
   auto domainSize = CellIndex_T::numberCellsInDomain;
   std::vector<tarch::la::Vector<dim, int>> res_offset;
   res_offset.reserve(1 << dim); // max this many neighbors are possible
@@ -139,33 +119,27 @@ coupling::filtering::NLM<dim>::compute_boundary_neighbors(
     tarch::la::Vector<dim, int> offset{0};
     if (idx_inner[d] == 0) {
       offset[d] = -1;
-      res_offset.push_back(
-          offset); // Comp res for neighbor cell on boundary surface
+      res_offset.push_back(offset); // Comp res for neighbor cell on boundary surface
     } else if (idx_inner[d] == domainSize[d] - 3) {
       offset[d] = 1;
-      res_offset.push_back(
-          offset); // Comp res for neighbor cell on boundary surface
+      res_offset.push_back(offset); // Comp res for neighbor cell on boundary surface
     }
     if (offset[d] != 0) {
       for (unsigned int d2 = d + 1; d2 < dim; d2++) {
         if (idx_inner[d2] == 0) {
           offset[d2] = -1;
-          res_offset.push_back(
-              offset); // Comp res for neighbor cell on boundary edge
+          res_offset.push_back(offset); // Comp res for neighbor cell on boundary edge
         } else if (idx_inner[d2] == domainSize[d2] - 3) {
           offset[d2] = 1;
-          res_offset.push_back(
-              offset); // Comp res for neighbor cell on boundary edge
+          res_offset.push_back(offset); // Comp res for neighbor cell on boundary edge
         }
         if (dim == 3 && d2 == 1 && offset[d2] != 0) {
           if (idx_inner[2] == 0) {
             offset[2] = -1;
-            res_offset.push_back(
-                offset); // Comp res for neighbor cell on boundary corner
+            res_offset.push_back(offset); // Comp res for neighbor cell on boundary corner
           } else if (idx_inner[2] == domainSize[2] - 3) {
             offset[2] = 1;
-            res_offset.push_back(
-                offset); // Comp res for neighbor cell on boundary corner
+            res_offset.push_back(offset); // Comp res for neighbor cell on boundary corner
           }
           offset[2] = 0;
         }
@@ -176,8 +150,7 @@ coupling::filtering::NLM<dim>::compute_boundary_neighbors(
   return res_offset; // (implicit std::move here)
 }
 
-template <unsigned int dim>
-void coupling::filtering::NLM<dim>::increment_time() {
+template <unsigned int dim> void coupling::filtering::NLM<dim>::increment_time() {
   _cycleCounter++;
   _t = _cycleCounter % _timeWindowSize;
 }

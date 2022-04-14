@@ -51,9 +51,7 @@ private:
   // step counter. Called from post_force() callback.
   template <unsigned int dim> void modifyMomentumAndTemperature();
 
-  template <unsigned int dim>
-  void sortAtomPositionsIntoCells(
-      const coupling::IndexConversion<dim> &indexConversion);
+  template <unsigned int dim> void sortAtomPositionsIntoCells(const coupling::IndexConversion<dim> &indexConversion);
 
   LAMMPS *_lmp;                  // ptr to lammps
   bool _use2D;                   // true, if this is a 2D simulation

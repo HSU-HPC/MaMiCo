@@ -15,40 +15,34 @@ class PeriodicBoundaryEmptyCellsMapping;
 }
 } // namespace simplemd
 
-/** this class is used to handle periodic boundaries. It takes all particles in
- * outer (ghost) cells, puts them into the respective inner cells (w.r.t.
- * periodicity) and deletes them from the ghost cell. In case of (MPI-)parallel
- * computations, the molecules are automatically adapted in the positions and
- * sent to the respective neighboring process (w.r.t. periodicity).
+/** this class is used to handle periodic boundaries. It takes all particles in outer (ghost) cells,
+ *  puts them into the respective inner cells (w.r.t. periodicity) and deletes them from the ghost cell.
+ *  In case of (MPI-)parallel computations, the molecules are automatically adapted in the positions and sent
+ *  to the respective neighboring process (w.r.t. periodicity).
  *  @author Philipp Neumann
  */
 class simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping {
 public:
-  PeriodicBoundaryEmptyCellsMapping(
-      simplemd::services::ParallelTopologyService &parallelTopologyService,
-      simplemd::services::MoleculeService &moleculeService,
-      simplemd::services::LinkedCellService &linkedCellService);
+  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
+                                    simplemd::services::LinkedCellService& linkedCellService);
   ~PeriodicBoundaryEmptyCellsMapping() {}
 
-  /** sets the global domain size (hopefully received from the
-   * ParallelTopologyService...) */
-  void setDomainSize(const tarch::la::Vector<MD_DIM, double> &domainSize);
+  /** sets the global domain size (hopefully received from the ParallelTopologyService...) */
+  void setDomainSize(const tarch::la::Vector<MD_DIM, double>& domainSize);
 
-  void setProcessCoordinates(
-      const tarch::la::Vector<MD_DIM, unsigned int> &processCoordinates);
+  void setProcessCoordinates(const tarch::la::Vector<MD_DIM, unsigned int>& processCoordinates);
 
-  void setNumberOfProcesses(
-      const tarch::la::Vector<MD_DIM, unsigned int> &numberProcesses);
+  void setNumberOfProcesses(const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses);
 
   void beginCellIteration() {}
   void endCellIteration() {}
 
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
 
 private:
-  simplemd::services::ParallelTopologyService &_parallelTopologyService;
-  simplemd::services::MoleculeService &_moleculeService;
-  simplemd::services::LinkedCellService &_linkedCellService;
+  simplemd::services::ParallelTopologyService& _parallelTopologyService;
+  simplemd::services::MoleculeService& _moleculeService;
+  simplemd::services::LinkedCellService& _linkedCellService;
   /** domain size and offset */
   tarch::la::Vector<MD_DIM, double> _domainSize;
   tarch::la::Vector<MD_DIM, unsigned int> _processCoordinates;

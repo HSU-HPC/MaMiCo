@@ -22,25 +22,29 @@ template <unsigned int dim> class MaMiCoConfiguration;
 }
 } // namespace coupling
 
-/** parses all sub-tags for MaMiCo configuration.
+/** parses all sub-tags for MaMiCo configuration. Derive from the class
+ * tarch::configuration::Configuration
+ *	@brief parses all sub-tags for MaMiCo configuration.
+ *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <unsigned int dim>
-class coupling::configurations::MaMiCoConfiguration
-    : public tarch::configuration::Configuration {
+template <unsigned int dim> class coupling::configurations::MaMiCoConfiguration : public tarch::configuration::Configuration {
 public:
+  /** Constructor, initializes the class  */
   MaMiCoConfiguration()
-      : _isValid(true), _isDefinedParticleInsertion(false),
-        _isDefinedMomentumInsertion(false), _isDefinedBoundaryForce(false),
-        _isDefinedTransferStrategy(false), _isDefinedParallelTopology(false),
-        _isDefinedThermostat(false) {}
+      : _isValid(true), _isDefinedParticleInsertion(false), _isDefinedMomentumInsertion(false), _isDefinedBoundaryForce(false),
+        _isDefinedTransferStrategy(false), _isDefinedParallelTopology(false), _isDefinedThermostat(false) {}
 
+  /** Destructor */
   virtual ~MaMiCoConfiguration() {}
 
-  void parseSubtag(tinyxml2::XMLElement *node);
+  /** parseSubtag
+   *  @param node
+   */
+  void parseSubtag(tinyxml2::XMLElement* node);
 
-  /**
-   * Return name of xml tag that is associated to the configuration.
+  /** Returns name of xml tag that is associated to the configuration.
+   *  @return name of xml tag that is associated to the configuration
    */
   std::string getTag() const { return "mamico"; }
 
@@ -54,16 +58,19 @@ public:
    * - parseSubtag() failed due to a wrong file.
    *
    * If a tag ain't optional and parseSubtag() was not called (first case)
+   *    @return _isValid
    */
   bool isValid() const { return _isValid; }
 
-  /** getters */
-  const coupling::configurations::MacroscopicCellConfiguration<dim> &
-  getMacroscopicCellConfiguration() const {
-    return _macroscopicCellConfiguration;
-  }
-  const coupling::configurations::ParticleInsertionConfiguration &
-  getParticleInsertionConfiguration() const {
+  /**
+   *  @return _macroscopicCellConfiguration
+   */
+  const coupling::configurations::MacroscopicCellConfiguration<dim>& getMacroscopicCellConfiguration() const { return _macroscopicCellConfiguration; }
+
+  /**
+   *  @return _particleInsertionConfiguration
+   */
+  const coupling::configurations::ParticleInsertionConfiguration& getParticleInsertionConfiguration() const {
     if (!_isDefinedParticleInsertion) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Particle insertion not defined!"
@@ -73,8 +80,10 @@ public:
     return _particleInsertionConfiguration;
   }
 
-  const coupling::configurations::MomentumInsertionConfiguration &
-  getMomentumInsertionConfiguration() const {
+  /**
+   * 	@return _momentumInsertionConfiguration
+   */
+  const coupling::configurations::MomentumInsertionConfiguration& getMomentumInsertionConfiguration() const {
     if (!_isDefinedMomentumInsertion) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Momentum insertion not defined!"
@@ -84,8 +93,10 @@ public:
     return _momentumInsertionConfiguration;
   }
 
-  const coupling::configurations::BoundaryForceConfiguration<dim> &
-  getBoundaryForceConfiguration() const {
+  /**
+   * 	@return _boundaryForceConfiguration
+   */
+  const coupling::configurations::BoundaryForceConfiguration<dim>& getBoundaryForceConfiguration() const {
     if (!_isDefinedBoundaryForce) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Boundary force not defined!"
@@ -95,8 +106,10 @@ public:
     return _boundaryForceConfiguration;
   }
 
-  const coupling::configurations::TransferStrategyConfiguration<dim> &
-  getTransferStrategyConfiguration() const {
+  /**
+   * 	@return _transferStrategyConfiguration
+   */
+  const coupling::configurations::TransferStrategyConfiguration<dim>& getTransferStrategyConfiguration() const {
     if (!_isDefinedTransferStrategy) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Transfer-Strategy not defined!"
@@ -106,8 +119,10 @@ public:
     return _transferStrategyConfiguration;
   }
 
-  const coupling::configurations::ParallelTopologyConfiguration &
-  getParallelTopologyConfiguration() const {
+  /**
+   *  @return _parallelTopologyConfiguration
+   */
+  const coupling::configurations::ParallelTopologyConfiguration& getParallelTopologyConfiguration() const {
     if (!_isDefinedParallelTopology) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Parallel-Topology not defined!"
@@ -117,8 +132,7 @@ public:
     return _parallelTopologyConfiguration;
   }
 
-  const coupling::configurations::ThermostatConfiguration &
-  getThermostatConfiguration() const {
+  const coupling::configurations::ThermostatConfiguration& getThermostatConfiguration() const {
     if (!_isDefinedThermostat) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Thermostat not defined!"
@@ -130,18 +144,12 @@ public:
 
 private:
   bool _isValid;
-  coupling::configurations::MacroscopicCellConfiguration<dim>
-      _macroscopicCellConfiguration;
-  coupling::configurations::ParticleInsertionConfiguration
-      _particleInsertionConfiguration;
-  coupling::configurations::MomentumInsertionConfiguration
-      _momentumInsertionConfiguration;
-  coupling::configurations::BoundaryForceConfiguration<dim>
-      _boundaryForceConfiguration;
-  coupling::configurations::TransferStrategyConfiguration<dim>
-      _transferStrategyConfiguration;
-  coupling::configurations::ParallelTopologyConfiguration
-      _parallelTopologyConfiguration;
+  coupling::configurations::MacroscopicCellConfiguration<dim> _macroscopicCellConfiguration;
+  coupling::configurations::ParticleInsertionConfiguration _particleInsertionConfiguration;
+  coupling::configurations::MomentumInsertionConfiguration _momentumInsertionConfiguration;
+  coupling::configurations::BoundaryForceConfiguration<dim> _boundaryForceConfiguration;
+  coupling::configurations::TransferStrategyConfiguration<dim> _transferStrategyConfiguration;
+  coupling::configurations::ParallelTopologyConfiguration _parallelTopologyConfiguration;
   coupling::configurations::ThermostatConfiguration _thermostatConfiguration;
   bool _isDefinedParticleInsertion;
   bool _isDefinedMomentumInsertion;

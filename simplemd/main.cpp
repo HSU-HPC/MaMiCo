@@ -14,24 +14,21 @@
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 // initialise parallel environment
 #if (MD_PARALLEL == MD_YES)
   MPI_Init(&argc, &argv);
 #endif
   if (argc != 2) {
-    std::cout << "Wrong number of arguments! Please call program by "
-                 "./moleculardynamics inputfile.xml!"
-              << std::endl;
+    std::cout << "Wrong number of arguments! Please call program by ./moleculardynamics inputfile.xml!" << std::endl;
     return -1;
   }
 
   // parse configuration
   simplemd::configurations::MolecularDynamicsConfiguration configuration;
   const std::string filename(argv[1]);
-  tarch::configuration::ParseConfiguration::parseConfiguration<
-      simplemd::configurations::MolecularDynamicsConfiguration>(
-      filename, "molecular-dynamics", configuration);
+  tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
+                                                                                                                         configuration);
   if (!configuration.isValid()) {
     std::cout << "Unvalid configuration!" << std::endl;
     return -1;
@@ -42,9 +39,7 @@ int main(int argc, char *argv[]) {
   simulation.initServices();
 
   // solve MD simulation
-  for (unsigned int t = 0;
-       t < configuration.getSimulationConfiguration().getNumberOfTimesteps();
-       t++) {
+  for (unsigned int t = 0; t < configuration.getSimulationConfiguration().getNumberOfTimesteps(); t++) {
     simulation.simulateOneTimestep(t);
   }
 

@@ -20,20 +20,17 @@ class CoupledMolecularDynamicsSimulation;
  *  @todo since simpleMD is not part of the docu, somthing is missing here?!?
  * How to deal with?
  */
-class coupling::solvers::CoupledMolecularDynamicsSimulation
-    : public simplemd::MolecularDynamicsSimulation {
+class coupling::solvers::CoupledMolecularDynamicsSimulation : public simplemd::MolecularDynamicsSimulation {
 public:
   /** @brief a simple constructor
    *  @param configuration configuration information for the md setup*/
-  CoupledMolecularDynamicsSimulation(
-      const simplemd::configurations::MolecularDynamicsConfiguration
-          &configuration);
+  CoupledMolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration);
 
   /** @brief a dummy destructor */
   virtual ~CoupledMolecularDynamicsSimulation() {}
 
   /** @brief simulates one coupled time step of the md solver */
-  void simulateOneCouplingTimestep(const unsigned int &t);
+  void simulateOneCouplingTimestep(const unsigned int& t);
 
   /** @brief enables the coupling, e.g. sets the boundary condition accordingly
    */
@@ -45,9 +42,7 @@ public:
 
   /** @brief set a macroscopic cell service for the coupled md simulation
    *  @param macroscopicCellService the macroscopicCellService to set */
-  void
-  setMacroscopicCellService(coupling::services::MacroscopicCellService<MD_DIM>
-                                *macroscopicCellService) {
+  void setMacroscopicCellService(coupling::services::MacroscopicCellService<MD_DIM>* macroscopicCellService) {
     _macroscopicCellService = macroscopicCellService;
   }
 
@@ -56,40 +51,29 @@ public:
    * deletion.
    *  @brief returns the boundary treatment of the simulation;
    *  @returns the boundary treatment of the simulation */
-  simplemd::BoundaryTreatment &getBoundaryTreatment() {
-    return *_boundaryTreatment;
-  }
+  simplemd::BoundaryTreatment& getBoundaryTreatment() { return *_boundaryTreatment; }
 
   /** this is needed by the MD solver interface in coupling.
    *  @brief returns the parallel topology service;
    *  @returns the parallel topology service*/
-  simplemd::services::ParallelTopologyService &getParallelTopologyService() {
-    return *_parallelTopologyService;
-  }
+  simplemd::services::ParallelTopologyService& getParallelTopologyService() { return *_parallelTopologyService; }
 
   /** this is needed by the MD solver interface in coupling.
    *  @brief returns the molecule service;
    *  @returns the molecule service */
-  simplemd::services::MoleculeService &getMoleculeService() {
-    return *_moleculeService;
-  }
+  simplemd::services::MoleculeService& getMoleculeService() { return *_moleculeService; }
 
   /** @brief getter for the LinkedCellService
    *  @returns the LinkedCellService */
-  simplemd::services::LinkedCellService &getLinkedCellService() {
-    return *_linkedCellService;
-  }
+  simplemd::services::LinkedCellService& getLinkedCellService() { return *_linkedCellService; }
 
   /** @brief getter for the molecular properties service
    *  @returns the molecular properties service */
-  const simplemd::services::MolecularPropertiesService &
-  getMolecularPropertiesService() {
-    return *_molecularPropertiesService;
-  }
+  const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() { return *_molecularPropertiesService; }
 
 private:
   /** @brief the macroscopic cell service for the coupled md simulation  */
-  coupling::services::MacroscopicCellService<MD_DIM> *_macroscopicCellService;
+  coupling::services::MacroscopicCellService<MD_DIM>* _macroscopicCellService;
   /** @brief bool holding the current state of the coupling: true - coupled
    * simulation and false - independent md simulation */
   bool _couplingSwitchedOn;

@@ -22,15 +22,12 @@ template <class LinkedCell, unsigned int dim> class ComputeKineticEnergyMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::ComputeKineticEnergyMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::ComputeKineticEnergyMapping {
 public:
   /** Constructor
    *	@param mdSolverInterface
    */
-  ComputeKineticEnergyMapping(
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface)
+  ComputeKineticEnergyMapping(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
       : _mdSolverInterface(mdSolverInterface), _kineticEnergy(0.0) {}
 
   /** Destructor */
@@ -43,24 +40,19 @@ public:
   /** computes the kinetic energy in a linked cell, by multiplying the specific
    * kinetic energy with the mass and 0.5.
    */
-  void endCellIteration() {
-    _kineticEnergy =
-        0.5 * _mdSolverInterface->getMoleculeMass() * _kineticEnergy;
-  }
+  void endCellIteration() { _kineticEnergy = 0.5 * _mdSolverInterface->getMoleculeMass() * _kineticEnergy; }
 
   /** sums up the specific kinetic energy of all molecules inside a linked cell.
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
 
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {
-      const coupling::interface::Molecule<dim> &wrapper(it->getConst());
-      _kineticEnergy +=
-          tarch::la::dot(wrapper.getVelocity(), wrapper.getVelocity());
+      const coupling::interface::Molecule<dim>& wrapper(it->getConst());
+      _kineticEnergy += tarch::la::dot(wrapper.getVelocity(), wrapper.getVelocity());
 
       it->next();
     }
@@ -73,8 +65,7 @@ public:
   double getKineticEnergy() const { return _kineticEnergy; }
 
 private:
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   double _kineticEnergy;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEKINETICENERGYMAPPING_H_

@@ -2,20 +2,15 @@
 
 template <unsigned int dim, std::size_t inputc>
 int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
-    tinyxml2::XMLElement
-        *sequenceNode) { // in our case "junctionNode" would be more precise
+    tinyxml2::XMLElement* sequenceNode) { // in our case "junctionNode" would be more precise
   if (!sequenceNode)
     return EXIT_FAILURE;
 
   // null if junction is empty
-  tinyxml2::XMLElement *currJunctorNode = sequenceNode->FirstChildElement();
+  tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
 
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>,
-             inputc>
-      inputCellVector = _inputCellVector_parted;
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim> *>,
-             inputc>
-      outputCellVector = _cellVector2_parted;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> inputCellVector = _inputCellVector_parted;
+  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> outputCellVector = _cellVector2_parted;
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initializing junctor objects." << std::endl;
 #endif
@@ -27,7 +22,7 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
 
     // All Junctors must implement one of the {X,Y}-Junctor interfaces, each of
     // which implement FilterInterface.
-    coupling::filtering::FilterInterface<dim> *newjunctor = nullptr;
+    coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 
     // TODO: reduce per-junctor customization: generalize!
     //###############################################################
@@ -38,28 +33,20 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
 
       // Optional parameters
       int inputp_unfiltered = 0; // default
-      tarch::configuration::ParseConfiguration::readIntOptional(
-          inputp_unfiltered, currJunctorNode, "input-unfiltered");
+      tarch::configuration::ParseConfiguration::readIntOptional(inputp_unfiltered, currJunctorNode, "input-unfiltered");
       int inputp_prefiltered = 1; // default
-      tarch::configuration::ParseConfiguration::readIntOptional(
-          inputp_prefiltered, currJunctorNode, "input-filtered");
+      tarch::configuration::ParseConfiguration::readIntOptional(inputp_prefiltered, currJunctorNode, "input-filtered");
       int outputp = 0; // default
-      tarch::configuration::ParseConfiguration::readIntOptional(
-          outputp, currJunctorNode, "output");
+      tarch::configuration::ParseConfiguration::readIntOptional(outputp, currJunctorNode, "output");
 
       // check for invalid partition indexes
       for (auto p : {inputp_unfiltered, inputp_prefiltered, outputp}) {
         if (p < 0) {
-          std::cout
-              << PRINT_PREFIX()
-              << "ERROR: Negative input or output lane index specified in XML:"
-              << p << std::endl;
+          std::cout << PRINT_PREFIX() << "ERROR: Negative input or output lane index specified in XML:" << p << std::endl;
           return EXIT_FAILURE;
         }
         if (p >= (int)inputc) {
-          std::cout << PRINT_PREFIX()
-                    << "ERROR: Input or output lane index specified in XML ("
-                    << p << ") is too large!" << std::endl;
+          std::cout << PRINT_PREFIX() << "ERROR: Input or output lane index specified in XML (" << p << ") is too large!" << std::endl;
           return EXIT_FAILURE;
         }
       }
@@ -73,25 +60,21 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
         exit(EXIT_FAILURE);
       }
       if (tws <= 2) {
-        std::cout << "ERROR: NLM: time-window-size must be greater than two."
-                  << std::endl;
+        std::cout << "ERROR: NLM: time-window-size must be greater than two." << std::endl;
         exit(EXIT_FAILURE);
       }
       double sigsq;
       if (currJunctorNode->QueryDoubleAttribute("sigsq", &sigsq)) {
-        std::cout << "ERROR: NLM filter misses attribute sigsq in config file."
-                  << std::endl;
+        std::cout << "ERROR: NLM filter misses attribute sigsq in config file." << std::endl;
         exit(EXIT_FAILURE);
       }
       if (sigsq < 0) {
-        std::cout << "ERROR: NLM: sigsq must be greater than zero."
-                  << std::endl;
+        std::cout << "ERROR: NLM: sigsq must be greater than zero." << std::endl;
         exit(EXIT_FAILURE);
       }
       double hsq;
       if (currJunctorNode->QueryDoubleAttribute("hsq", &hsq)) {
-        std::cout << "ERROR: NLM filter misses attribute hsq in config file."
-                  << std::endl;
+        std::cout << "ERROR: NLM filter misses attribute hsq in config file." << std::endl;
         exit(EXIT_FAILURE);
       }
       if (hsq < 0) {
@@ -101,37 +84,28 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
 
       // Optional parameters
       double sigsq_rel = -1;
-      tarch::configuration::ParseConfiguration::readDoubleOptional(
-          sigsq_rel, currJunctorNode, "sigsq_rel");
+      tarch::configuration::ParseConfiguration::readDoubleOptional(sigsq_rel, currJunctorNode, "sigsq_rel");
       if (sigsq_rel > 1) {
-        std::cout << "ERROR: NLM: sigsq_rel must be 0 <= sigsq_rel <= 1"
-                  << std::endl;
+        std::cout << "ERROR: NLM: sigsq_rel must be 0 <= sigsq_rel <= 1" << std::endl;
         exit(EXIT_FAILURE);
       }
       if (sigsq_rel >= 0) {
-        std::cout << "INFO: NLM: sigsq adaptivity enabled, target value = "
-                  << sigsq_rel * 100 << " % " << std::endl;
+        std::cout << "INFO: NLM: sigsq adaptivity enabled, target value = " << sigsq_rel * 100 << " % " << std::endl;
       }
 
       double hsq_rel = -1;
-      tarch::configuration::ParseConfiguration::readDoubleOptional(
-          hsq_rel, currJunctorNode, "hsq_rel");
+      tarch::configuration::ParseConfiguration::readDoubleOptional(hsq_rel, currJunctorNode, "hsq_rel");
       if (hsq_rel > 1) {
-        std::cout << "ERROR: NLM: hsq_rel must be 0 <= hsq_rel <= 1"
-                  << std::endl;
+        std::cout << "ERROR: NLM: hsq_rel must be 0 <= hsq_rel <= 1" << std::endl;
         exit(EXIT_FAILURE);
       }
       if (hsq_rel >= 0) {
-        std::cout << "INFO: NLM: hsq adaptivity enabled, target value = "
-                  << hsq_rel * 100 << " % " << std::endl;
+        std::cout << "INFO: NLM: hsq adaptivity enabled, target value = " << hsq_rel * 100 << " % " << std::endl;
       }
 
       // Instantiation
-      newjunctor = new coupling::filtering::NLM<dim>(
-          inputCellVector[inputp_unfiltered],
-          inputCellVector[inputp_prefiltered], outputCellVector[outputp],
-          coupling::filtering::FilterSequence<dim>::_filteredValues, tws, sigsq,
-          sigsq_rel, hsq, hsq_rel);
+      newjunctor = new coupling::filtering::NLM<dim>(inputCellVector[inputp_unfiltered], inputCellVector[inputp_prefiltered], outputCellVector[outputp],
+                                                     coupling::filtering::FilterSequence<dim>::_filteredValues, tws, sigsq, sigsq_rel, hsq, hsq_rel);
 
       // TODO: generalize this for arbitrary junctors?
       // Swapping for output partition
@@ -145,8 +119,7 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
 
     // Unknown junctor identifier
     else {
-      std::cout << "ERROR: Filter-Junction does not recognize junctor called "
-                << currJunctorNode->Value() << std::endl;
+      std::cout << "ERROR: Filter-Junction does not recognize junctor called " << currJunctorNode->Value() << std::endl;
       return EXIT_FAILURE;
     }
 

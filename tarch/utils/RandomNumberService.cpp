@@ -8,13 +8,14 @@
 #include <mpi.h>
 #endif
 
-tarch::utils::RandomNumberService &
-tarch::utils::RandomNumberService::getInstance() {
+tarch::utils::RandomNumberService& tarch::utils::RandomNumberService::getInstance() {
   static tarch::utils::RandomNumberService singleton;
   return singleton;
 }
 
 void tarch::utils::RandomNumberService::init(bool fixSeed) {
+  if (_isInitialized)
+    return;
   // for testing purpose: fix seed to a certain number
   if (fixSeed) {
     srand(10000);
@@ -27,22 +28,22 @@ void tarch::utils::RandomNumberService::init(bool fixSeed) {
   }
   _randomNumbers.assign(0.0);
   _isFirstRandomNumber = true;
+  _isInitialized = true;
 }
 
 void tarch::utils::RandomNumberService::shutdown() {}
 
 double tarch::utils::RandomNumberService::getUniformRandomNumber() const {
-  // We do not want this method to return 1.0, as this can lead to invalid
-  // behaviour in some situations. E.g., the Usher particle insertion relies on
-  // this method in order to generate valid positions within the local
-  // subdomain, which only the lower edge is part of, but not the upper edge.
+  // We do not want this method to return 1.0, as this can lead to invalid behaviour
+  // in some situations. E.g., the Usher particle insertion relies on this method
+  // in order to generate valid positions within the local subdomain, which only
+  // the lower edge is part of, but not the upper edge.
   return (0.5 * (double)rand()) / (0.5 * (double)RAND_MAX + 1.0);
 }
 
 double tarch::utils::RandomNumberService::getGaussianRandomNumber() {
 
-  // if the first random number is going to be called, create Gaussian random
-  // numbers
+  // if the first random number is going to be called, create Gaussian random numbers
   if (_isFirstRandomNumber) {
 
     // in this case: generate new numbers

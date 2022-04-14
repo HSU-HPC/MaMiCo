@@ -33,15 +33,13 @@ public:
    *	@brief converts process coordinates into a rank.
    *	@param processCoordinates Process coordinates
    */
-  virtual unsigned int
-  getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const = 0;
+  virtual unsigned int getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const = 0;
   /** This function takes rank as input and return the correpsponding process
    *coordinates.
    *	@brief converts rank into process coordinates.
    *	@param rank Rank
    */
-  virtual tarch::la::Vector<dim, unsigned int>
-  getProcessCoordinates(unsigned int rank) const = 0;
+  virtual tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const = 0;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_PARALLELTOPOLOGY_PARALLELTOPOLOGY_H_

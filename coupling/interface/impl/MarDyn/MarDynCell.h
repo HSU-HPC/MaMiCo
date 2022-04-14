@@ -14,10 +14,7 @@
  */
 class MarDynCell {
 public:
-  MarDynCell(ParticleCell *cell, double cutoffRadius)
-      : _myCell(cell), _cutoffRadius(cutoffRadius) {
-    _molecules = &(cell->getParticlePointers());
-  }
+  MarDynCell(ParticleCell *cell, double cutoffRadius) : _myCell(cell), _cutoffRadius(cutoffRadius) { _molecules = &(cell->getParticlePointers()); }
 
   MarDynCell() : _myCell(NULL), _molecules(NULL), _cutoffRadius(0.0) {}
 
@@ -30,9 +27,7 @@ public:
   void next() { _moleculeIter++; }
 
   // returns true if more molecules in the ParticleCell
-  bool continueIteration() const {
-    return (_moleculeIter != _molecules->end());
-  }
+  bool continueIteration() const { return (_moleculeIter != _molecules->end()); }
 
   // return the molecule the iterator is currently pointing to
   Molecule *get() { return *_moleculeIter; }

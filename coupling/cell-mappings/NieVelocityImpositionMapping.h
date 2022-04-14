@@ -15,8 +15,7 @@
 
 namespace coupling {
 namespace cellmappings {
-template <class LinkedCell, unsigned int dim>
-class NieVelocityImpositionMapping;
+template <class LinkedCell, unsigned int dim> class NieVelocityImpositionMapping;
 }
 } // namespace coupling
 
@@ -33,8 +32,7 @@ class NieVelocityImpositionMapping;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::cellmappings::NieVelocityImpositionMapping {
+template <class LinkedCell, unsigned int dim> class coupling::cellmappings::NieVelocityImpositionMapping {
 public:
   /** Constructor
    *	@param continuumVelocity    current velocity in this macroscopic cell
@@ -45,15 +43,9 @@ public:
    *	@param mdSolverInterface	MD solver interface, required for
    *molecule iterator and molecule mass
    */
-  NieVelocityImpositionMapping(
-      const tarch::la::Vector<dim, double> &continuumVelocity,
-      const tarch::la::Vector<dim, double> &avgMDVelocity,
-      const tarch::la::Vector<dim, double> &avgForce,
-      coupling::interface::MDSolverInterface<LinkedCell, dim>
-          *const mdSolverInterface)
-      : _mdSolverInterface(mdSolverInterface),
-        _continuumVelocity(continuumVelocity), _avgMDVelocity(avgMDVelocity),
-        _avgForce(avgForce) {}
+  NieVelocityImpositionMapping(const tarch::la::Vector<dim, double>& continuumVelocity, const tarch::la::Vector<dim, double>& avgMDVelocity,
+                               const tarch::la::Vector<dim, double>& avgForce, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface), _continuumVelocity(continuumVelocity), _avgMDVelocity(avgMDVelocity), _avgForce(avgForce) {}
 
   /** Destructor */
   virtual ~NieVelocityImpositionMapping() {}
@@ -70,18 +62,14 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell &cell, const unsigned int &cellIndex) {
-    coupling::interface::MoleculeIterator<LinkedCell, dim> *it =
-        _mdSolverInterface->getMoleculeIterator(cell);
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+    coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
 
     it->begin();
     while (it->continueIteration()) {
-      coupling::interface::Molecule<dim> &wrapper(it->get());
+      coupling::interface::Molecule<dim>& wrapper(it->get());
       tarch::la::Vector<dim, double> force(wrapper.getForce());
-      force = force - _avgForce -
-              (_mdSolverInterface->getMoleculeMass() /
-               _mdSolverInterface->getDt()) *
-                  (_avgMDVelocity - _continuumVelocity);
+      force = force - _avgForce - (_mdSolverInterface->getMoleculeMass() / _mdSolverInterface->getDt()) * (_avgMDVelocity - _continuumVelocity);
       wrapper.setForce(force);
       it->next();
     }
@@ -90,8 +78,7 @@ public:
 
 private:
   /** MD solver interface, required for molecule iterator and molecule mass */
-  coupling::interface::MDSolverInterface<LinkedCell, dim>
-      *const _mdSolverInterface;
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
   /** current velocity in this macroscopic cell (=velocity from continuum
    * solver) */
   const tarch::la::Vector<dim, double> _continuumVelocity;

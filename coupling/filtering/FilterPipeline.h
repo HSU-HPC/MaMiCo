@@ -40,11 +40,8 @@ enum class Scope { perInstance, postMultiInstance };
  */
 template <unsigned int dim> class coupling::filtering::FilterPipeline {
 public:
-  FilterPipeline(
-      std::vector<coupling::datastructures::MacroscopicCell<dim> *> inputCells,
-      const coupling::filtering::Scope scope,
-      const tarch::utils::MultiMDService<dim> &multiMDService,
-      const char *cfgpath);
+  FilterPipeline(std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCells, const coupling::filtering::Scope scope,
+                 const tarch::utils::MultiMDService<dim>& multiMDService, const char* cfgpath);
 
   ~FilterPipeline() {
     for (auto sequence : _sequences)
@@ -68,12 +65,8 @@ public:
    * Not that Junction is a subtype of Sequence, so this is how to get Junctions
    * as well.
    */
-  coupling::filtering::FilterSequence<dim> *
-  getSequence(const char *identifier) const;
-  std::vector<coupling::filtering::FilterSequence<dim> *>
-  getAllSequences() const {
-    return _sequences;
-  }
+  coupling::filtering::FilterSequence<dim>* getSequence(const char* identifier) const;
+  std::vector<coupling::filtering::FilterSequence<dim>*> getAllSequences() const { return _sequences; }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   /*
@@ -86,7 +79,7 @@ private:
   /*
    * Detects errors in XML config file.
    */
-  bool configIsValid(tinyxml2::XMLDocument &cfgfile);
+  bool configIsValid(tinyxml2::XMLDocument& cfgfile);
 
   /*
    * Interprets configuration of sequences and intializes them. Parameters
@@ -96,16 +89,16 @@ private:
    *
    * Also detects which sequence will be used as output to this FilterPipeline.
    */
-  void loadSequencesFromXML(tinyxml2::XMLElement *metaNode);
+  void loadSequencesFromXML(tinyxml2::XMLElement* metaNode);
 
   /*
    * Input cells within the local, md2macro, ghost layer excluding domain
    */
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _md2MacroCells;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _md2MacroCells;
   /*
    * Input cells that do not match the criteria to be in _md2MacroCells.
    */
-  std::vector<coupling::datastructures::MacroscopicCell<dim> *> _outerCells;
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _outerCells;
 
   tinyxml2::XMLDocument _config;
 
@@ -115,7 +108,7 @@ private:
    */
   const coupling::filtering::Scope _scope;
 
-  std::vector<coupling::filtering::FilterSequence<dim> *> _sequences;
+  std::vector<coupling::filtering::FilterSequence<dim>*> _sequences;
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _comm;

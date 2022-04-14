@@ -42,108 +42,76 @@ class simplemd::services::MoleculeService {
 public:
   ~MoleculeService();
 
-  /** initialises the molecules. Therefore, the molecules are put onto a regular
-   * Cartesian grid with moleculesPerDirection molecules in each spatial
-   * direction within the domain described by domainSize and domainOffset.
-   *  meanVelocity describes a mean flow velocity, temperature a temperature
-   * (controlling fluctuations). In addition, the numberMoleculesPerAllocation
-   * can be set: In case that molecules are added to the system, we need to
-   *  allocate more memory. If more memory is needed, a block of
-   * numberMoleculesPerAllocation is to be introduced.
+  /** initialises the molecules. Therefore, the molecules are put onto a regular Cartesian grid with moleculesPerDirection
+   *  molecules in each spatial direction within the domain described by domainSize and domainOffset.
+   *  meanVelocity describes a mean flow velocity, temperature a temperature (controlling fluctuations).
+   *  In addition, the numberMoleculesPerAllocation can be set: In case that molecules are added to the system, we need to
+   *  allocate more memory. If more memory is needed, a block of numberMoleculesPerAllocation is to be introduced.
    */
-  MoleculeService(
-      const tarch::la::Vector<MD_DIM, double> &domainSize,
-      const tarch::la::Vector<MD_DIM, double> &domainOffset,
-      const tarch::la::Vector<MD_DIM, unsigned int> &moleculesPerDirection,
-      const tarch::la::Vector<MD_DIM, double> &meanVelocity, const double &kB,
-      const double &temperature, const unsigned int &blockSize,
-      const simplemd::services::MolecularPropertiesService
-          &molecularPropertiesService);
+  MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
+                  const tarch::la::Vector<MD_DIM, unsigned int>& moleculesPerDirection, const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB,
+                  const double& temperature, const unsigned int& blockSize, const simplemd::services::MolecularPropertiesService& molecularPropertiesService);
 
-  /** initialises the MD simulation from a checkpoint-file. For a parallel
-   * simulation, this method parses checkpoint files for each rank,
-   * respectively. If multiple MD simulations are executed, make sure that the
-   * rank of the current MD simulation matches the respective rank of the
-   * checkpoint file.
+  /** initialises the MD simulation from a checkpoint-file. For a parallel simulation, this method parses
+   *  checkpoint files for each rank, respectively. If multiple MD simulations are executed, make sure that the rank of the current
+   *  MD simulation matches the respective rank of the checkpoint file.
    */
-  MoleculeService(const tarch::la::Vector<MD_DIM, double> &domainSize,
-                  const tarch::la::Vector<MD_DIM, double> &domainOffset,
-                  const std::string &checkPointFileStem,
-                  const unsigned int &blockSize,
-                  const simplemd::services::ParallelTopologyService
-                      &parallelTopologyService);
-  /** initialises a potentially parallel MD simulation from a sequential
-   * checkpoint file. */
-  MoleculeService(const tarch::la::Vector<MD_DIM, double> &domainSize,
-                  const tarch::la::Vector<MD_DIM, double> &domainOffset,
-                  const std::string &checkPointFileStem,
-                  const unsigned int &blockSize);
+  MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
+                  const std::string& checkPointFileStem, const unsigned int& blockSize,
+                  const simplemd::services::ParallelTopologyService& parallelTopologyService);
+  /** initialises a potentially parallel MD simulation from a sequential checkpoint file. */
+  MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
+                  const std::string& checkPointFileStem, const unsigned int& blockSize);
 
-  /** adds a molecule to the system. The molecule data are copied from the
-   * const. reference to a free position within the memory field or - in case no
-   * memory is available - new memory is allocated and the molecule is put in
-   * there. Besides, the list _freeMoleculePositions is adapted, accordingly
-   * (and _numberMolecules is incremented). The function returns a pointer to
-   * the new molecule. If something goes wrong, NULL is returned.
+  /** adds a molecule to the system. The molecule data are copied from the const. reference to a free position within the memory field
+   *  or - in case no memory is available - new memory is allocated and the molecule is put in there. Besides, the list _freeMoleculePositions
+   *  is adapted, accordingly (and _numberMolecules is incremented).
+   *  The function returns a pointer to the new molecule. If something goes wrong, NULL is returned.
    */
-  Molecule *addMolecule(const Molecule &molecule);
+  Molecule* addMolecule(const Molecule& molecule);
 
   /** returns the number of molecules */
-  const unsigned int &getNumberMolecules() const;
+  const unsigned int& getNumberMolecules() const;
 
-  /** deletes a molecule from the system by adding its position to the
-   * _freeMoleculePositions-list. */
-  void deleteMolecule(Molecule &molecule);
+  /** deletes a molecule from the system by adding its position to the _freeMoleculePositions-list. */
+  void deleteMolecule(Molecule& molecule);
 
   /** shuts down the service */
   void shutdown();
 
-  /** can be used to apply a molecule-mapping which is iterated over all
-   * molecules of this process (e.g. time integration)
+  /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
+   *  (e.g. time integration)
    */
-  template <class A> void iterateMolecules(A &a, const bool &useOpenMP);
+  template <class A> void iterateMolecules(A& a, const bool& useOpenMP);
 
-  /** creates initial velocity for molecule from meanVelocity and given
-   * temperature and stores the result in initialVelocity */
-  void
-  getInitialVelocity(const tarch::la::Vector<MD_DIM, double> &meanVelocity,
-                     const double &kB, const double &temperature,
-                     const simplemd::services::MolecularPropertiesService
-                         &molecularPropertiesService,
-                     tarch::la::Vector<MD_DIM, double> &initialVelocity) const;
+  /** creates initial velocity for molecule from meanVelocity and given temperature and stores the result in initialVelocity */
+  void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
+                          const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                          tarch::la::Vector<MD_DIM, double>& initialVelocity) const;
 
-  /** reorganises the storage of the molecules. If a simulation requires a big
-   * number of molecule deletions/ insertions, e.g., this might be useful to
-   * speed up the simulation. Besides, the molecules are stored in memory such
-   * that those molecules belonging to the same linked cell are located very
-   * closely in memory (actually, we sort the molecules according to their
-   * linked cell position, that is lexicographically w.r.t. to the linked cell
-   * index, and store them in this sequence).
+  /** reorganises the storage of the molecules. If a simulation requires a big number of
+   *  molecule deletions/ insertions, e.g., this might be useful to speed up the simulation.
+   *  Besides, the molecules are stored in memory such that those molecules belonging to the same linked cell are
+   *  located very closely in memory (actually, we sort the molecules according to their linked cell position, that is
+   *  lexicographically w.r.t. to the linked cell index, and store them in this sequence).
    */
-  void
-  reorganiseMemory(const simplemd::services::ParallelTopologyService
-                       &parallelTopologyService,
-                   simplemd::services::LinkedCellService &linkedCellService);
+  void reorganiseMemory(const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService);
 
   /** writes a checkpoint containing:
-   *  - the number of molecules and the dimension of the problem (1,2 or 3) in
-   * one line
-   *  - each molecule in one line consisting of position, velocity and
-   * force_old. In parallel cases, each process writes its own checkpoint data.
-   * The file will be named filestem_t_rank.dat in any case (rank=0 in the
-   * serial case). The mapping WriteCheckPointMapping is used.
+   *  - the number of molecules and the dimension of the problem (1,2 or 3) in one line
+   *  - each molecule in one line consisting of position, velocity and force_old.
+   *  In parallel cases, each process writes its own checkpoint data. The file will be named
+   *  filestem_t_rank.dat in any case (rank=0 in the serial case).
+   *  The mapping WriteCheckPointMapping is used.
    */
-  void writeCheckPoint(const simplemd::services::ParallelTopologyService
-                           &parallelTopologyService,
-                       const std::string &filestem, const unsigned int &t);
+  void writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService, const std::string& filestem, const unsigned int& t);
 
-  /** resets the velocity over the whole molecule system to the mean velocity
-   * specified at the beginning */
+  /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 
 private:
   /** pointer to all the molecules */
-  std::vector<simplemd::Molecule *> _molecules;
+  std::vector<simplemd::Molecule*> _molecules;
 
   /** stores the mean velocity for normalisation */
   tarch::la::Vector<MD_DIM, double> _meanVelocity;
@@ -158,16 +126,12 @@ private:
   unsigned int _blockSize;
 };
 
-template <class A>
-void simplemd::services::MoleculeService::iterateMolecules(
-    A &a, const bool &useOpenMP) {
+template <class A> void simplemd::services::MoleculeService::iterateMolecules(A& a, const bool& useOpenMP) {
 
   const unsigned int blockSize = _blockSize;
-  const unsigned int freeMoleculePositions =
-      (const unsigned int)_freeMoleculePositions.size();
+  const unsigned int freeMoleculePositions = (const unsigned int)_freeMoleculePositions.size();
   const unsigned int numberMolecules = _numberMolecules;
-  const unsigned int freeMoleculePositionsAndNumberMolecules =
-      (const unsigned int)(numberMolecules + freeMoleculePositions);
+  const unsigned int freeMoleculePositionsAndNumberMolecules = (const unsigned int)(numberMolecules + freeMoleculePositions);
   // start iteration();
   a.beginMoleculeIteration();
 
@@ -181,8 +145,7 @@ void simplemd::services::MoleculeService::iterateMolecules(
       std::list<unsigned int>::iterator myIt = _freeMoleculePositions.begin();
       unsigned int start = 0;
 
-      // loop over all intervals, starting at a certain point and ranging up to
-      // a deleted position
+      // loop over all intervals, starting at a certain point and ranging up to a deleted position
       for (unsigned int i = 0; i < freeMoleculePositions; i++) {
         const unsigned int end = (*myIt);
 #pragma omp parallel for
@@ -193,18 +156,16 @@ void simplemd::services::MoleculeService::iterateMolecules(
           a.handleMolecule(_molecules[j / blockSize][j % blockSize]);
         }
 
-        // go to next possible start position (one position after *myIt) and
-        // increment myIt
-        // -> remark: It may happen that *(myIt++) == (*myIt)+1. Then, the upper
-        // inner loop degenerates to an empty loop...
+        // go to next possible start position (one position after *myIt) and increment myIt
+        // -> remark: It may happen that *(myIt++) == (*myIt)+1. Then, the upper inner loop degenerates to
+        // an empty loop...
         start = end + 1;
         myIt++;
       }
 
 // do final loop (from last deleted molecule to last existing molecule)
 #pragma omp parallel for
-      for (unsigned int i = start; i < freeMoleculePositionsAndNumberMolecules;
-           i++) {
+      for (unsigned int i = start; i < freeMoleculePositionsAndNumberMolecules; i++) {
 #if (MD_DEBUG == MD_YES)
         std::cout << "Handle molecule " << i << std::endl;
 #endif
@@ -230,8 +191,7 @@ void simplemd::services::MoleculeService::iterateMolecules(
       std::list<unsigned int>::iterator myIt = _freeMoleculePositions.begin();
       unsigned int start = 0;
 
-      // loop over all intervals, starting at a certain point and ranging up to
-      // a deleted position
+      // loop over all intervals, starting at a certain point and ranging up to a deleted position
       for (unsigned int i = 0; i < freeMoleculePositions; i++) {
         const unsigned int end = *myIt;
         for (unsigned int j = start; j < end; j++) {
@@ -241,17 +201,15 @@ void simplemd::services::MoleculeService::iterateMolecules(
           a.handleMolecule(_molecules[j / blockSize][j % blockSize]);
         }
 
-        // go to next possible start position (one position after *myIt) and
-        // increment myIt
-        // -> remark: It may happen that *(myIt++) == (*myIt)+1. Then, the upper
-        // inner loop degenerates to an empty loop...
+        // go to next possible start position (one position after *myIt) and increment myIt
+        // -> remark: It may happen that *(myIt++) == (*myIt)+1. Then, the upper inner loop degenerates to
+        // an empty loop...
         start = (*myIt) + 1;
         myIt++;
       }
 
       // do final loop (from last deleted molecule to last existing molecule)
-      for (unsigned int i = start; i < freeMoleculePositionsAndNumberMolecules;
-           i++) {
+      for (unsigned int i = start; i < freeMoleculePositionsAndNumberMolecules; i++) {
 #if (MD_DEBUG == MD_YES)
         std::cout << "Handle molecule " << i << std::endl;
 #endif

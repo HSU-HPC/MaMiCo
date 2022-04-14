@@ -14,19 +14,16 @@
 #include <iostream>
 #include <tcl.h>
 
-/** Test class for EspressoMDMolecule class and functions, tries to check if the
- * datastaructures defined for Espresso in the coupling tool are correct or not.
- * To do that, I create two lists, one which gets data from Espresso data
- * structures and other from coupling tool data structures and compare the two
- * lists
+/** Test class for EspressoMDMolecule class and functions, tries to check if the datastaructures defined
+ *  for Espresso in the coupling tool are correct or not. To do that, I create two lists, one which gets data
+ *  from Espresso data structures and other from coupling tool data structures and compare the two lists
  *  @author Rahul Arora
  */
 
 class TestEspressoMDMolecule : public TestEspresso {
 private:
 public:
-  TestEspressoMDMolecule(std::string name, int argc, char **argv)
-      : TestEspresso(name, argc, argv) {}
+  TestEspressoMDMolecule(std::string name, int argc, char** argv) : TestEspresso(name, argc, argv) {}
   virtual ~TestEspressoMDMolecule() {}
 
   virtual void run() {
@@ -34,9 +31,9 @@ public:
 
     loadEspressoTestConfiguration();
 
-    Cell *cell;
+    Cell* cell;
     int j, c, np, cnt = 0;
-    Particle *part;
+    Particle* part;
     int flag = 1;
 
     for (c = 0; c < local_cells.n; c++) {
@@ -49,24 +46,21 @@ public:
     }
   }
 
-  /* compareParticleList() compares the list of particles in each cell, one
-   * directly read from Espresso Simulation and other from the list 	sent to
-   * the coupling tool (EspressoMDMolecule) */
+  /* compareParticleList() compares the list of particles in each cell, one directly read from Espresso Simulation and other from the list 	sent to the
+   * coupling tool (EspressoMDMolecule) */
 
-  void compareParticleLists(int c, int &flag) {
+  void compareParticleLists(int c, int& flag) {
     int j = 0;
     int counter = 0;
 
-    // Define a molecule iterator and iterate over all the molecules in that
-    // particular cell
-    ParticleList *list = local_cells.cell[c];
+    // Define a molecule iterator and iterate over all the molecules in that particular cell
+    ParticleList* list = local_cells.cell[c];
     coupling::interface::EspressoMDMoleculeIterator it(*list);
-    Particle *part;
+    Particle* part;
     part = list->part;
     int number = list->n;
 
-    // I define two lists, listEspresso and listEspressoCouplingInterface and
-    // add the respective data to them
+    // I define two lists, listEspresso and listEspressoCouplingInterface and add the respective data to them
     std::vector<tarch::la::Vector<3, double>> listEspresso;
     std::vector<tarch::la::Vector<3, double>> listEspressoCouplingInterface;
     tarch::la::Vector<3, double> velocity(0.0);
@@ -95,10 +89,7 @@ public:
       flag = 0;
     }
     if (listEspresso != listEspressoCouplingInterface) {
-      std::cout
-          << "ERROR: the particle positions and velocites obtianed by the "
-             "Coupling interfaces and Espresso simulation do not match "
-          << std::endl;
+      std::cout << "ERROR: the particle positions and velocites obtianed by the Coupling interfaces and Espresso simulation do not match " << std::endl;
       flag = 0;
     }
   }

@@ -23,23 +23,14 @@ template <unsigned int dim> class Strouhal;
  * accurate results.
  * @author Felix Maurer
  */
-template <unsigned int dim>
-class coupling::filtering::Strouhal
-    : public coupling::filtering::FilterInterfaceReadOnly<dim> {
+template <unsigned int dim> class coupling::filtering::Strouhal : public coupling::filtering::FilterInterfaceReadOnly<dim> {
 public:
-  Strouhal(const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-               &inputCellVector,
-           const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-               &outputCellVector,
-           const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices,
-           std::array<bool, 7> filteredValues, double u, double d)
-      : coupling::filtering::FilterInterfaceReadOnly<dim>(
-            inputCellVector, outputCellVector, cellIndices, filteredValues,
-            "STROUHALCPP"),
-        _U(u), _D(d) {
+  Strouhal(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+           const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector,
+           const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, std::array<bool, 7> filteredValues, double u, double d)
+      : coupling::filtering::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "STROUHALCPP"), _U(u), _D(d) {
     if (dim < 2) {
-      std::cout << "ERROR: Strouhal filter only works for dim >= 2."
-                << std::endl;
+      std::cout << "ERROR: Strouhal filter only works for dim >= 2." << std::endl;
       exit(EXIT_FAILURE);
     }
 #ifdef DEBUG_STROUHAL
@@ -48,8 +39,7 @@ public:
   }
 
   ~Strouhal() {
-    std::cout << "STROUHAL NUMBER IN MD DOMAIN: " << calculateStrouhalNumber()
-              << std::endl;
+    std::cout << "STROUHAL NUMBER IN MD DOMAIN: " << calculateStrouhalNumber() << std::endl;
 #ifdef DEBUG_WRITE_TO_FILE
     std::cout << "		STROUHAL: Instance deconstructed." << std::endl;
 #endif

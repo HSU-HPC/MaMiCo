@@ -28,20 +28,18 @@ class VTKMoleculeWriter;
  */
 class simplemd::moleculemappings::VTKMoleculeWriter {
 public:
-  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService
-                        &parallelTopologyService,
-                    const simplemd::services::MoleculeService &moleculeService,
-                    const std::string &filename);
+  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::services::MoleculeService& moleculeService,
+                    const std::string& filename);
   ~VTKMoleculeWriter();
-  void setTimestep(const unsigned int &timestep);
+  void setTimestep(const unsigned int& timestep);
 
   void beginMoleculeIteration();
   void endMoleculeIteration();
-  void handleMolecule(Molecule &molecule);
+  void handleMolecule(Molecule& molecule);
 
 private:
-  const simplemd::services::ParallelTopologyService &_parallelTopologyService;
-  const simplemd::services::MoleculeService &_moleculeService;
+  const simplemd::services::ParallelTopologyService& _parallelTopologyService;
+  const simplemd::services::MoleculeService& _moleculeService;
   /** filename */
   std::string _filename;
   /** current timestep */
@@ -61,6 +59,9 @@ private:
 
   /** stores the information whether a particle is fixed in space */
   std::stringstream _fix;
+
+  // stores the particleID
+  std::stringstream _id;
 };
 
 #endif // _MOLECULARDYNAMICS_MOLECULEMAPPINGS_VTKMOLECULEWRITER_H_

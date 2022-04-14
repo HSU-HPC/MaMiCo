@@ -28,18 +28,14 @@ public:
       _meanVelocity[d] = 0.0;
     }
   }
-  void endMoleculeIteration() {
-    _meanVelocity = (1.0 / ((double)_particleCounter)) * _meanVelocity;
-  }
-  void handleMolecule(Molecule &molecule) {
-    const tarch::la::Vector<MD_DIM, double> &velocity = molecule.getVelocity();
+  void endMoleculeIteration() { _meanVelocity = (1.0 / ((double)_particleCounter)) * _meanVelocity; }
+  void handleMolecule(Molecule& molecule) {
+    const tarch::la::Vector<MD_DIM, double>& velocity = molecule.getVelocity();
     _meanVelocity += velocity;
     _particleCounter++;
   }
 
-  tarch::la::Vector<MD_DIM, double> getMeanVelocity() const {
-    return _meanVelocity;
-  }
+  tarch::la::Vector<MD_DIM, double> getMeanVelocity() const { return _meanVelocity; }
 
 private:
   tarch::la::Vector<MD_DIM, double> _meanVelocity;

@@ -10,7 +10,7 @@
 
 #include <mpi.h>
 
-void runTest(Test *test) {
+void runTest(Test* test) {
   if (test == NULL) {
     std::cout << "ERROR executeTest: test==NULL!" << std::endl;
     exit(EXIT_FAILURE);
@@ -19,7 +19,7 @@ void runTest(Test *test) {
   delete test;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   int thisTest = atoi(argv[1]);
   switch (thisTest) {
   case 0:
@@ -29,16 +29,13 @@ int main(int argc, char *argv[]) {
     runTest(new TestEspressoMDMolecule("TestEspressoMDMolecule", argc, argv));
     break;
   case 3:
-    runTest(new TestEspressoAddDeleteMolecule("TestEspressoAddDeleteMolecule",
-                                              argc, argv));
+    runTest(new TestEspressoAddDeleteMolecule("TestEspressoAddDeleteMolecule", argc, argv));
     break;
   case 4:
-    runTest(new TestEspressoForceEnergyCalculation(
-        "TestEspressoForceEnergyCalculation", argc, argv));
+    runTest(new TestEspressoForceEnergyCalculation("TestEspressoForceEnergyCalculation", argc, argv));
     break;
   case 5:
-    runTest(new TestEspressoMoleculeIterator("TestEspressoMoleculeIterator",
-                                             argc, argv));
+    runTest(new TestEspressoMoleculeIterator("TestEspressoMoleculeIterator", argc, argv));
     break;
   default:
     std::cout << "Test number " << thisTest << " out of range..." << std::endl;

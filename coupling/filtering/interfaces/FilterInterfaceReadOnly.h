@@ -19,18 +19,12 @@ template <unsigned int dim> class FilterInterfaceReadOnly;
  * @author Felix Maurer
  */
 
-template <unsigned int dim>
-class coupling::filtering::FilterInterfaceReadOnly
-    : public coupling::filtering::FilterInterface<dim> {
+template <unsigned int dim> class coupling::filtering::FilterInterfaceReadOnly : public coupling::filtering::FilterInterface<dim> {
 public:
-  FilterInterfaceReadOnly(
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &inputCellVector,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &outputCellVector,
-      const std::array<bool, 7> filteredValues, const char *type)
-      : coupling::filtering::FilterInterface<dim>(
-            inputCellVector, outputCellVector, filteredValues, type) {}
+  FilterInterfaceReadOnly(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
+                          const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
+                          const char* type)
+      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, type) {}
 
 protected:
   /*
@@ -49,24 +43,16 @@ protected:
     if (coupling::filtering::FilterInterface<dim>::_outputCells.empty())
       return;
 
-    for (unsigned int ci = 0;
-         ci < coupling::filtering::FilterInterface<dim>::_outputCells.size();
-         ci++) {
-      for (const auto scalarProperty : coupling::filtering::FilterInterface<
-               dim>::_scalarAccessFunctionPairs) {
-        (coupling::filtering::FilterInterface<dim>::_outputCells[ci]
-             ->*scalarProperty.set)(
-            (coupling::filtering::FilterInterface<dim>::_inputCells[ci]
-                 ->*scalarProperty.get)()); // call setter from output cell
-                                            // using getter from input cell.
+    for (unsigned int ci = 0; ci < coupling::filtering::FilterInterface<dim>::_outputCells.size(); ci++) {
+      for (const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs) {
+        (coupling::filtering::FilterInterface<dim>::_outputCells[ci]->*scalarProperty.set)(
+            (coupling::filtering::FilterInterface<dim>::_inputCells[ci]->*scalarProperty.get)()); // call setter from output cell
+                                                                                                  // using getter from input cell.
       }
-      for (const auto vectorProperty : coupling::filtering::FilterInterface<
-               dim>::_vectorAccessFunctionPairs) {
-        (coupling::filtering::FilterInterface<dim>::_outputCells[ci]
-             ->*vectorProperty.set)(
-            (coupling::filtering::FilterInterface<dim>::_inputCells[ci]
-                 ->*vectorProperty.get)()); // call setter from output cell
-                                            // using getter from input cell.
+      for (const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs) {
+        (coupling::filtering::FilterInterface<dim>::_outputCells[ci]->*vectorProperty.set)(
+            (coupling::filtering::FilterInterface<dim>::_inputCells[ci]->*vectorProperty.get)()); // call setter from output cell
+                                                                                                  // using getter from input cell.
       }
     }
   }

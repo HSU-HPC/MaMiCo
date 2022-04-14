@@ -19,8 +19,7 @@ namespace LAMMPS_NS {
  */
 template <unsigned int dim> class GhostAtoms {
 public:
-  GhostAtoms(LAMMPS_NS::LAMMPS *lmp)
-      : _lmp(lmp), _ghostX(NULL), _nghost(0), _nghostBufferSize(0) {}
+  GhostAtoms(LAMMPS_NS::LAMMPS *lmp) : _lmp(lmp), _ghostX(NULL), _nghost(0), _nghostBufferSize(0) {}
   ~GhostAtoms() {
     if (_ghostX != NULL)
       _lmp->memory->destroy(_ghostX);
@@ -61,12 +60,12 @@ public:
 
     // extract positions of ghost atoms and write them to buffer
     for (int i = nlocal; i < nall; i++) {
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         _ghostX[i - nlocal][d] = _lmp->atom->x[i][d];
       }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       std::cout << "Rank " << rank << ": Ghost particle ";
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         std::cout << _ghostX[i - nlocal][d] << " ";
       }
       std::cout << std::endl;
@@ -75,12 +74,11 @@ public:
   }
 
 private:
-  LAMMPS_NS::LAMMPS *_lmp; // pointer to lammps instance
-  double **_ghostX; // stores the positions of the ghost atoms; allocated using
-                    // Lammps memory class
-  unsigned int _nghost; // number of ghost atoms in the buffer
-  unsigned int
-      _nghostBufferSize; // size of the buffer; this value is always >= _nghost
+  LAMMPS_NS::LAMMPS *_lmp;        // pointer to lammps instance
+  double **_ghostX;               // stores the positions of the ghost atoms; allocated using
+                                  // Lammps memory class
+  unsigned int _nghost;           // number of ghost atoms in the buffer
+  unsigned int _nghostBufferSize; // size of the buffer; this value is always >= _nghost
 };
 
 } // namespace LAMMPS_NS

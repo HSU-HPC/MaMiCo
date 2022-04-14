@@ -34,37 +34,25 @@ template <unsigned int dim> class WriteToFile;
  *
  * @author Felix Maurer
  */
-template <unsigned int dim>
-class coupling::filtering::WriteToFile
-    : public coupling::filtering::FilterInterfaceReadOnly<dim> {
+template <unsigned int dim> class coupling::filtering::WriteToFile : public coupling::filtering::FilterInterfaceReadOnly<dim> {
 public:
-  WriteToFile(
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &inputCells,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim> *>
-          &outputCells,
-      const std::array<bool, 7> filteredValues,
-      std::string location, // output file location
-      bool overwrite = false, int oneCellOnly = -1)
+  WriteToFile(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCells,
+              const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCells, const std::array<bool, 7> filteredValues,
+              std::string location, // output file location
+              bool overwrite = false, int oneCellOnly = -1)
       :
 
-        coupling::filtering::FilterInterfaceReadOnly<dim>(
-            inputCells, outputCells, filteredValues, "WTF"),
-        _location(location), _overwrite(overwrite), _oneCellOnly(oneCellOnly),
-        _iteration(1) {
+        coupling::filtering::FilterInterfaceReadOnly<dim>(inputCells, outputCells, filteredValues, "WTF"), _location(location), _overwrite(overwrite),
+        _oneCellOnly(oneCellOnly), _iteration(1) {
     if (!_overwrite) {
       _file.open(location);
       _file.close();
     }
 
 #ifdef DEBUG_WRITE_TO_FILE
-    std::cout
-        << "		WTF: Write to file instance created. Will save to: "
-        << _location << std::endl;
+    std::cout << "		WTF: Write to file instance created. Will save to: " << _location << std::endl;
     if (_overwrite)
-      std::cout
-          << "		It will only print output of the last iteration."
-          << std::endl;
+      std::cout << "		It will only print output of the last iteration." << std::endl;
     if (_oneCellOnly != -1)
       std::cout << "		It will only print data of cell with linear "
                    "sequence domain index "
@@ -74,8 +62,7 @@ public:
 
   ~WriteToFile() {
 #ifdef DEBUG_WRITE_TO_FILE
-    std::cout << "		WTF: Write to file instance deconstructed."
-              << std::endl;
+    std::cout << "		WTF: Write to file instance deconstructed." << std::endl;
 #endif
   }
 

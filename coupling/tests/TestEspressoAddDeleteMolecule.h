@@ -12,30 +12,26 @@
 #include "particle_data.hpp"
 #include "tarch/la/Vector.h"
 
-/** test class to check addition and deletion of molecule in espresso. It
- * derives from the scenario provided in TestEspresso.h, containing 8 particles
- * in 2*2*2 domain. We call the add particle and delete particle methods
- * provided in the interface classes and check the number of particles remaining
- * in our domain. Also this test class check the synchronization of ghosts cell
+/** test class to check addition and deletion of molecule in espresso. It derives from the scenario provided in TestEspresso.h,
+ *  containing 8 particles in 2*2*2 domain. We call the add particle and delete particle methods provided in the interface classes
+ *  and check the number of particles remaining in our domain. Also this test class check the synchronization of ghosts cell
  *  due to addition and deletion of particles
  *  @author Rahul Arora
  */
 
 class TestEspressoAddDeleteMolecule : public TestEspresso {
 public:
-  TestEspressoAddDeleteMolecule(std::string name, int argc, char **argv)
-      : TestEspresso(name, argc, argv) {}
+  TestEspressoAddDeleteMolecule(std::string name, int argc, char** argv) : TestEspresso(name, argc, argv) {}
   ~TestEspressoAddDeleteMolecule() {}
   virtual void run() {
 
     int type = 1;
 
-    // If type is one, we run a delete particle test, otherwise we run a add
-    // particle test and check the ghost cells for synchronization
+    // If type is one, we run a delete particle test, otherwise we run a add particle test and check the ghost cells for synchronization
 
     if (type == 1) {
       loadEspressoTestConfiguration();
-      Cell *cell;
+      Cell* cell;
       cell = local_cells.cell[0];
       deleteParticleTest(cell);
     }
@@ -51,26 +47,22 @@ public:
   }
 
 private:
-  /* This test function delete the first molecule in cell 0 at time t = 0 and
-   * then iterates over all the molecules, and counts the number of remaining
-   * molecules */
+  /* This test function delete the first molecule in cell 0 at time t = 0 and then iterates over all the molecules, and counts the number of remaining molecules
+   */
 
-  void deleteParticleTest(ParticleList *cell) {
-    ParticleList &temp_cell = *cell;
-    Particle *part;
+  void deleteParticleTest(ParticleList* cell) {
+    ParticleList& temp_cell = *cell;
+    Particle* part;
     part = cell->part;
 
     coupling::interface::EspressoMDSolverInterface delete_molecule_test;
     coupling::interface::EspressoMDMolecule coupling_part(part);
 
-    // Call the method deleteMoleculeFromMDSimulation provided in
-    // EspressoMDSolverInterface
-    delete_molecule_test.deleteMoleculeFromMDSimulation(coupling_part,
-                                                        temp_cell);
+    // Call the method deleteMoleculeFromMDSimulation provided in EspressoMDSolverInterface
+    delete_molecule_test.deleteMoleculeFromMDSimulation(coupling_part, temp_cell);
 
-    // Iterate over all the particles in the local domain (excluding ghost
-    // cells) in Espresso
-    Cell *celltemp;
+    // Iterate over all the particles in the local domain (excluding ghost cells) in Espresso
+    Cell* celltemp;
     int c, i, np, cnt = 0;
     for (c = 0; c < local_cells.n; c++) {
       celltemp = local_cells.cell[c];
@@ -86,9 +78,8 @@ private:
     }
   }
 
-  /* This test function adds a molecule to the simulation domain at time t=0 and
-   * at the location (0.05,0.05,0.05). Then it iterates over all the molecules
-   * in the domain and calculates the number of molecules */
+  /* This test function adds a molecule to the simulation domain at time t=0 and at the location (0.05,0.05,0.05). Then it iterates over all the molecules in
+   * the domain and calculates the number of molecules */
 
   void addParticleTest() {
     coupling::interface::EspressoMDSolverInterface _test;
@@ -108,13 +99,11 @@ private:
     new_part.setVelocity(vel);
     new_part.setForce(vel);
 
-    // Call the method addMoleculeToMDSimulation provided in
-    // EspressoMDSolverInterface
+    // Call the method addMoleculeToMDSimulation provided in EspressoMDSolverInterface
     _test.addMoleculeToMDSimulation(new_part);
 
-    // Iterate over all the particles in the local domain (excluding ghost
-    // cells) in Espresso
-    Cell *cell;
+    // Iterate over all the particles in the local domain (excluding ghost cells) in Espresso
+    Cell* cell;
     int c, i, np, cnt = 0;
     for (c = 0; c < local_cells.n; c++) {
       cell = local_cells.cell[c];
@@ -130,25 +119,22 @@ private:
     }
   }
 
-  /* This function, first call the addParticleTest() function and then updates
-   * the ghost layers and prints them to see if the added particle has been
-   * updated in the ghost layers */
+  /* This function, first call the addParticleTest() function and then updates the ghost layers and prints them to see if the added particle has been updated in
+   * the ghost layers */
 
   void synchronizeMoleculesAfterMassModificationTest() {
     coupling::interface::EspressoMDSolverInterface _test;
-    // Call the method synchronizeMoleculesAfterMassModification provided in
-    // EspressoMDSolverInterface, which call the Espresso synchronization
-    // function
+    // Call the method synchronizeMoleculesAfterMassModification provided in EspressoMDSolverInterface, which call the Espresso
+    // synchronization function
     _test.synchronizeMoleculesAfterMassModification();
 
-    Cell *cell;
+    Cell* cell;
     int c, i, np, cnt = 0;
-    Particle *part;
+    Particle* part;
 
     std::cout << ghost_cells.n << " " << local_cells.n << std::endl;
 
-    // Iterate over all the ghost cells in Espresso, and calculate the total no.
-    // of particles in them
+    // Iterate over all the ghost cells in Espresso, and calculate the total no. of particles in them
     for (c = 0; c < ghost_cells.n; c++) {
       cell = ghost_cells.cell[c];
       part = cell->part;
@@ -160,8 +146,7 @@ private:
     if (cnt > 56) {
       std::cout << "The test was successful with count " << cnt << std::endl;
     } else {
-      std::cout << "The test was not successful with count " << cnt
-                << std::endl;
+      std::cout << "The test was not successful with count " << cnt << std::endl;
     }
   }
 };

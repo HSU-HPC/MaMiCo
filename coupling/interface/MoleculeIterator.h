@@ -21,14 +21,13 @@ template <class LinkedCell, unsigned int dim> class MoleculeIterator;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::interface::MoleculeIterator {
+template <class LinkedCell, unsigned int dim> class coupling::interface::MoleculeIterator {
 protected:
-  LinkedCell &_cell;
+  LinkedCell& _cell;
 
 public:
   /** Constructor */
-  MoleculeIterator(LinkedCell &cell) : _cell(cell) {}
+  MoleculeIterator(LinkedCell& cell) : _cell(cell) {}
 
   /** Destructor */
   virtual ~MoleculeIterator() {}
@@ -45,11 +44,11 @@ public:
 
   /** @returns a reference to the molecule that this iterator currently points
    * to */
-  virtual coupling::interface::Molecule<dim> &get() = 0;
+  virtual coupling::interface::Molecule<dim>& get() = 0;
 
   /** @returns a const reference to the current molecule for pure reading
    * purposes */
-  virtual const coupling::interface::Molecule<dim> &getConst() = 0;
+  virtual const coupling::interface::Molecule<dim>& getConst() = 0;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_INTERFACE_MOLECULEITERATOR_H_
