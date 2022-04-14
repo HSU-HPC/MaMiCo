@@ -34,7 +34,7 @@ libs = []
 sourcesMolecularDynamics = []
 
 libs.append('rt')
-ccflags.append('-std=c++0x')
+ccflags.append('-std=c++17')
 
 ##### Determine dimension for which to build
 #
@@ -71,10 +71,20 @@ mpiIncludePath='/usr/lib/openmpi/include'
 mpiLibraryPath='/usr/lib/openmpi/lib'
 pthreadLibrary='pthread'
 
+if machine== 'hww-cluster':
+   mpiLibrary='mpi'
+   mpiIncludePath='/opt/hlrs/non-spack/mpi/openmpi/4.0.5-gcc-9.2.0/include'
+   mpiLibraryPath='/opt/hlrs/non-spack/mpi/openmpi/4.0.5-gcc-9.2.0/lib'
+
 if machine== 'mac-cluster':
    mpiLibrary=''
    mpiIncludePath=''
    mpiLibraryPath=''
+
+if machine== 'hsu-cluster':
+   mpiLibrary='mpi'
+   mpiIncludePath='/cluster/mpi/openmpi/3.0.0/include'
+   mpiLibraryPath='/cluster/mpi/openmpi/3.0.0/lib'
 
 ##### Determine MPI-Parallelization
 #
@@ -128,7 +138,7 @@ if compiler == 'gcc':
    ccflags.append('-Wno-non-virtual-dtor')
    if build == 'debug':
       ccflags.append('-g3')
-      ccflags.append('-O0')
+      ccflags.append('-O3')
    elif build == 'release':
       ccflags.append('-O3') 
 elif compiler == 'icc':
@@ -142,15 +152,39 @@ elif compiler == 'icc':
    ccflags.append('-ipo')
    linkerflags.append('-ipo')
    if build == 'debug':
-      ccflags.append('-O0')
+      ccflags.append('-O3')
    elif build == 'release':
       ccflags.append('-fast')
       ccflags.append('-w')
       ccflags.append('-Werror-all')
       ccflags.append('-align')
       ccflags.append('-ansi-alias')
+elif compiler == 'fcc':
+   if(parallel=='parallel_no' or parallel=='no'):
+      cxx = 'FCCpx -Nclang'
+   else:
+      cxx = 'mpiFCCpx -Nclang'
+
+   ccflags.append('-Wall')
+   ccflags.append('-Werror')
+   ccflags.append('-pedantic')
+   ccflags.append('-pedantic-errors')
+   ccflags.append('-Wstrict-aliasing')
+   ccflags.append('-fstrict-aliasing')
+   ccflags.append('-Wno-long-long')
+   ccflags.append('-Wno-unknown-pragmas')
+   ccflags.append('-Wconversion')
+   ccflags.append('-Wno-non-virtual-dtor')
+   ccflags.append('-Wno-sign-conversion')
+   ccflags.append('-Wno-unused-private-field')
+   ccflags.append('-mcpu=a64fx') ###################
+   if build == 'debug':
+      ccflags.append('-g3')
+      ccflags.append('-O3')
+   elif build == 'release':
+      ccflags.append('-Ofast')
 else:
-   print("ERROR: compiler must be = 'gcc' or 'icc'!")
+   print("ERROR: compiler must be = 'gcc' or 'icc' or 'fcc'!")
    sys.exit(1)
       
 ##### Determine build path
@@ -162,10 +196,7 @@ if parallel == 'yes' or parallel == 'parallel_yes':
    buildpath = buildpath + 'parallel_yes/'
 else:
    buildpath = buildpath + 'parallel_no/'
-if compiler == 'icc':
-   buildpath = buildpath + 'icc/'
-if compiler == 'gcc':
-   buildpath = buildpath + 'gcc/'
+buildpath = buildpath + compiler + '/'
 if gprof == 'yes' or gprof == 'gprof_yes':
    buildpath = buildpath + 'gprof/'
 else:

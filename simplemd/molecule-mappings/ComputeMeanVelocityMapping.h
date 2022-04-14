@@ -8,41 +8,38 @@
 #include "simplemd/Molecule.h"
 
 namespace simplemd {
-  namespace moleculemappings {
-    class ComputeMeanVelocityMapping;
-  }
+namespace moleculemappings {
+class ComputeMeanVelocityMapping;
 }
+} // namespace simplemd
 
 /** computes mean velocity.
  *
  *  @author Philipp Neumann
  */
 class simplemd::moleculemappings::ComputeMeanVelocityMapping {
-  public:
-    ComputeMeanVelocityMapping(){}
-    ~ComputeMeanVelocityMapping(){}
+public:
+  ComputeMeanVelocityMapping() {}
+  ~ComputeMeanVelocityMapping() {}
 
-    void beginMoleculeIteration(){
-      _particleCounter = 0;
-      for (unsigned int d = 0; d < MD_DIM; d++){
-        _meanVelocity[d] = 0.0;
-      }
+  void beginMoleculeIteration() {
+    _particleCounter = 0;
+    for (unsigned int d = 0; d < MD_DIM; d++) {
+      _meanVelocity[d] = 0.0;
     }
-    void endMoleculeIteration(){
-      _meanVelocity = (1.0/((double) _particleCounter))*_meanVelocity;
-    }
-    void handleMolecule(Molecule &molecule){
-      const tarch::la::Vector<MD_DIM,double>& velocity = molecule.getVelocity();
-      _meanVelocity += velocity;
-      _particleCounter++;
-    }
+  }
+  void endMoleculeIteration() { _meanVelocity = (1.0 / ((double)_particleCounter)) * _meanVelocity; }
+  void handleMolecule(Molecule& molecule) {
+    const tarch::la::Vector<MD_DIM, double>& velocity = molecule.getVelocity();
+    _meanVelocity += velocity;
+    _particleCounter++;
+  }
 
-    tarch::la::Vector<MD_DIM,double> getMeanVelocity() const {return _meanVelocity;}
-  private:
-    tarch::la::Vector<MD_DIM,double> _meanVelocity;
-    unsigned int _particleCounter;
+  tarch::la::Vector<MD_DIM, double> getMeanVelocity() const { return _meanVelocity; }
+
+private:
+  tarch::la::Vector<MD_DIM, double> _meanVelocity;
+  unsigned int _particleCounter;
 };
 
-
 #endif // _MOLECULARDYNAMICS_MOLECULEMAPPINGS_COMPUTEMEANVELOCITY_MAPPING_H_
-

@@ -106,7 +106,9 @@ typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherPar
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> computeMassMapping(_mdSolverInterface);
   thisCell.iterateConstCells(computeMassMapping);
-  // compute number density; if it's zero, we assume to have at least one particle in this cell (otherwise, we cannot choose an optimal step size for USHER)
+  // compute number density; if it's zero, we assume to have at least one
+  // particle in this cell (otherwise, we cannot choose an optimal step size for
+  // USHER)
   double numberDensity = (double)computeMassMapping.getNumberOfParticles();
   if (numberDensity == 0.0) {
     numberDensity = 1.0;

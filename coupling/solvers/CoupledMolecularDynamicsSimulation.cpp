@@ -20,9 +20,11 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
 
   _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
 
-  // call to synchronise data in cells; needs to be at this point of the coupling algorithm as the particles need to be placed inside
-  // the correct sampling volumes (hence: after communication with neighbours and molecule updates);
-  // do it BEFORE quantities are manipulated as we can then also do some pre-processing here.
+  // call to synchronise data in cells; needs to be at this point of the
+  // coupling algorithm as the particles need to be placed inside the correct
+  // sampling volumes (hence: after communication with neighbours and molecule
+  // updates); do it BEFORE quantities are manipulated as we can then also do
+  // some pre-processing here.
   _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
   // std::cout << "check 0" << std::endl;
   _macroscopicCellService->applyVacuum(t);

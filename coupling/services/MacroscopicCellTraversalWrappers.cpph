@@ -5,8 +5,9 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLTRAVERSALWRAPPERS_H_
 #define _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLTRAVERSALWRAPPERS_H_
 
-/** the following wrappers and smaller functional classes are included in the MacroscopicCellServiceImpl for internal use
- *  in this class only. They are used together with the applyTo...() methods of MacroscopicCells to bring
+/** the following wrappers and smaller functional classes are included in the
+ * MacroscopicCellServiceImpl for internal use in this class only. They are used
+ * together with the applyTo...() methods of MacroscopicCells to bring
  *  functionality which is defined cellwise onto the grid of macroscopic cells.
  *  @author Philipp Neumann
  */
@@ -281,6 +282,27 @@ private:
   const double _temperature;
 };
 
+class Wrapper4PerturbateVelocity : public Wrapper {
+public:
+  Wrapper4PerturbateVelocity(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
+
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(Wrapper::_thisPtr->_mdSolverInterface);
+    cell.iterateConstCells(computeMomentumMapping);
+
+    coupling::cellmappings::ComputeTemperatureMapping<LinkedCell, dim> computeTemperatureMapping(computeMomentumMapping.getMeanVelocity(),
+                                                                                                 Wrapper::_thisPtr->_mdSolverInterface);
+    cell.iterateConstCells(computeTemperatureMapping);
+
+    coupling::cellmappings::PerturbateVelocityMapping<LinkedCell, dim> perturbateVelocity(
+        Wrapper::_thisPtr->_mdSolverInterface, computeMomentumMapping.getMeanVelocity(), computeTemperatureMapping.getTemperature());
+
+    cell.iterateCells(perturbateVelocity);
+  }
+};
+
 /** applies the thermostat in all non-ghost cells */
 class Wrapper4ApplyTemperature : public Wrapper {
 public:
@@ -294,7 +316,8 @@ public:
   }
 };
 
-/** applies the boundary force in all non-ghost cells which are close to an open boundary */
+/** applies the boundary force in all non-ghost cells which are close to an open
+ * boundary */
 class Wrapper4ApplyBoundaryForce : public Wrapper {
 public:
   Wrapper4ApplyBoundaryForce(coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}

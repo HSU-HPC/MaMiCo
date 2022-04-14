@@ -6,19 +6,18 @@
 #define _MOLECULARDYNAMICS_COUPLING_INTERFACE_TESTMACROSCOPICSOLVER_H_
 
 namespace coupling {
-  namespace interface {
-    class TestMacroscopicSolver;
-  }
+namespace interface {
+class TestMacroscopicSolver;
 }
-
+} // namespace coupling
 
 /** interface for different test-macroscopic solvers.
  *  @author Philipp Neumann
  */
 class coupling::interface::TestMacroscopicSolver {
 public:
-  TestMacroscopicSolver(){}
-  virtual ~TestMacroscopicSolver(){}
+  TestMacroscopicSolver() {}
+  virtual ~TestMacroscopicSolver() {}
 
   virtual void solve() = 0;
 };

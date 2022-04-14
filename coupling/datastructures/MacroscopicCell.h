@@ -130,8 +130,10 @@ public:
  *  We can use the MacroscopicCell-structure to evaluate macroscopic quantities
  *  over a certain MD volume and then map macroscopic conserved quantities
  *  between macro- and microscopic simulations.
- *	@brief defines the cell type with cell-averaged quantities. Derived from the class coupling::datastructures::MacroscopicCell
- *	@tparam LinkedCell linked cells that build up the MacroscopicCellWithLinkedCells
+ *	@brief defines the cell type with cell-averaged quantities. Derived from
+ *the class coupling::datastructures::MacroscopicCell
+ *	@tparam LinkedCell linked cells that build up the
+ *MacroscopicCellWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */

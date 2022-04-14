@@ -86,7 +86,8 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
 #endif
   }
 
-  // write velocity value to new solution array and interpolate first solution (= value of old solution)
+  // write velocity value to new solution array and interpolate first solution
+  // (= value of old solution)
   _newSolution[index] = cell.getMicroscopicMomentum();
   cell.setMicroscopicMomentum((1.0 - _shiftTimestep) * _oldSolution[index] + _shiftTimestep * _newSolution[index]);
 
@@ -102,7 +103,8 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
 }
 
 // template<class LinkedCell,unsigned int dim>
-// void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
+// void
+// coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
 // beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
 // }
 

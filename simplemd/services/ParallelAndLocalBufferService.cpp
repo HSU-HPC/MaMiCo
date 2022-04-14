@@ -118,7 +118,8 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigne
                                                                    const double avMoleculesPerCell) {
   bool isOk = true;
   unsigned int doublesPerMolecule = MD_DIM * 3 + 1;
-  /* Reallocation of local buffer is permitted, so initialize it with a small value, say 20 molecules */
+  /* Reallocation of local buffer is permitted, so initialize it with a small
+   * value, say 20 molecules */
   unsigned int buffUpperBound = 20;
 
   isOk = _localBuffer.initialise(doublesPerMolecule, buffUpperBound);

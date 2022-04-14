@@ -14,7 +14,9 @@
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/ComputeTemperatureBinMapping.h"
 #include "coupling/cell-mappings/ComputeVelocityBinMapping.h"
+#include "coupling/cell-mappings/PerturbateVelocityMapping.h"
 #include "coupling/configurations/BoundaryForceConfiguration.h"
+#include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/configurations/MacroscopicCellConfiguration.h"
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
 #include "coupling/configurations/ParallelTopologyConfiguration.h"
@@ -65,10 +67,18 @@ public:
   virtual void applyBoundaryForce(unsigned int t) = 0;
   virtual void applyVacuum(unsigned int t) = 0;
   virtual void checkMass(unsigned int t){};
+  virtual void perturbateVelocity() = 0;
   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
   virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
   virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
-  virtual const coupling::FilterPipeline<dim>& getFilterPipeline() const {
+  virtual void updateIndexConversion(const unsigned int& topologyOffset) = 0;
+
+  virtual void initFiltering() {
+    throw std::runtime_error("MacroscopicCellService: Error: Called "
+                             "initFiltering for non-Impl object.");
+  } /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
+
+  virtual const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const {
     throw std::runtime_error("MacroscopicCellService: Error: Called getFilterPipeline() in instance without FilterPipeline.");
   } /*Note: This is not pure virtual, because some implementations of this interface don't have a FilterPipeline. */
   unsigned int getID() const { return _id; }
@@ -77,9 +87,9 @@ protected:
   const unsigned int _id; /** (unique) identifier of this macroscopic cell service */
 };
 
-/** This class put together all ingredients for coupling MD and some macroscopic solver.
- *  It thus triggers send/recv-operations between the coupling tool and MD as well as between the coupling tool
- *  and the macroscopic solver.
+/** This class put together all ingredients for coupling MD and some macroscopic
+ * solver. It thus triggers send/recv-operations between the coupling tool and
+ * MD as well as between the coupling tool and the macroscopic solver.
  *  @author Philipp Neumann
  */
 template <class LinkedCell, unsigned int dim> class coupling::services::MacroscopicCellServiceImpl : public coupling::services::MacroscopicCellService<dim> {
@@ -182,6 +192,10 @@ public:
   /** distributes momentum in MD. Should typically be called after force accumulation since momentum distribution may depend on current forces. */
   void distributeMomentum(unsigned int t);
 
+  /** applies a new velocity to each particle according to its cell's mean
+   * velocity. */
+  void perturbateVelocity();
+
   /** plots macroscopic cell and molecule information at some time step t. The correct triggering of plotting needs
    *  to be established from the main coupling loop which is outside the coupling tool (not included in this function).
    */
@@ -194,13 +208,32 @@ public:
    */
   const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
 
+  void updateIndexConversion(const unsigned int& topologyOffset) {
+    auto* newIndexConversion = initIndexConversion(_indexConversion->getMacroscopicCellSize(), _indexConversion->getNumberProcesses(),
+                                                   _indexConversion->getThisRank(), _indexConversion->getGlobalMDDomainSize(),
+                                                   _indexConversion->getGlobalMDDomainOffset(), _indexConversion->getParallelTopologyType(), topologyOffset);
+
+    delete _indexConversion;
+    _indexConversion = newIndexConversion;
+  }
+
+  /**
+   * Initialises the _filterPipeline member. Called from _multiMDCellService's
+   * constructFilterPipelines(). Make sure to delete _filterPipeline in
+   * ~MacroscopicCellServiceImpl()
+   */
+  void initFiltering() {
+    _filterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells.getMacroscopicCells(), coupling::filtering::Scope::perInstance,
+                                                                   _multiMDService, _filterPipelineConfiguration);
+  }
+
   void inserteMassFromVacuum(unsigned int t, unsigned int particlesToInserte);
 
   void applyVacuum(unsigned int t);
 
   void checkMass(unsigned int t);
 
-  const coupling::FilterPipeline<dim>& getFilterPipeline() const { return _filterPipeline; }
+  const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const { return _filterPipeline; }
 
   /**
    * Creates a new filter from scratch and appends it to a sequence that is part of this service's filter pipelining system.
@@ -249,7 +282,7 @@ private:
   }
 
   /** needed to determine cell range, ranks etc. */
-  const coupling::IndexConversion<dim>* _indexConversion;
+  coupling::IndexConversion<dim>* _indexConversion;
   /** number of MD time steps in each coupling cycle */
   const unsigned int _numberMDTimestepsPerCouplingCycle;
 
@@ -269,7 +302,11 @@ private:
   coupling::datastructures::MacroscopicCells<LinkedCell, dim> _macroscopicCells;
 
   /** filter pipeline, used to apply filters in sendFromMD2Macro */
-  coupling::FilterPipeline<dim> _filterPipeline;
+  coupling::filtering::FilterPipeline<dim>* _filterPipeline;
+
+  /**parameters needed in initFiltering() */
+  const char* _filterPipelineConfiguration;
+  const tarch::utils::MultiMDService<dim> _multiMDService;
 
   /** needed for insertion of momentum */
   coupling::MomentumInsertion<LinkedCell, dim>* _momentumInsertion;
@@ -295,10 +332,6 @@ private:
   const unsigned int _writeEveryMicroscopicTimestep;
   const std::string _macroscopicFilename;
   const unsigned int _writeEveryMacroscopicTimestep;
-
-  // Inner cells managed by std::vectors. Indexing starts at the bottom left inner cell.
-  // TODO: REMOVE std::vector<coupling::datastructures::MacroscopicCell<dim> *> _innerMacroscopicCells;
-  // TODO: REMOVE std::vector<tarch::la::Vector<dim, unsigned int>> _innerMacroscopicCellIndices;
 
   /** index vectors for block-usher scheme -----------------------------------------------------*/
   // start and end coordinate for block loop over macroscopic cells (with 3 entries always!)

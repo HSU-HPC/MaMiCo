@@ -15,8 +15,10 @@ template <class LinkedCell, unsigned int dim> class ParticleInsertion;
 
 /** @brief interface for particle insertion/removal on macroscopic cell basis.
  *  @author Philipp Neumann
- *  @tparam LinkedCell the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation
- *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2, or 3
+ *  @tparam LinkedCell the LinkedCell class is given by the implementation of
+ * linked cells in the molecular dynamics simulation
+ *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
+ * or 3
  */
 template <class LinkedCell, unsigned int dim> class coupling::ParticleInsertion {
 public:

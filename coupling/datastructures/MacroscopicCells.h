@@ -18,7 +18,8 @@ template <class LinkedCell, unsigned int dim> class MacroscopicCells;
 
 /**
  *	@brief provides access to the macroscopic cells.
- *	@tparam LinkedCell linked cells that build up the MacroscopicCellWithLinkedCells
+ *	@tparam LinkedCell linked cells that build up the
+ *MacroscopicCellWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */

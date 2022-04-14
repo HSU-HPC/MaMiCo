@@ -5,15 +5,13 @@
 #ifndef _MOLECULARDYNAMICS_CELLMAPPINGS_EMPTYLINKEDLISTSMAPPING_H_
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_EMPTYLINKEDLISTSMAPPING_H_
 
-
 #include "simplemd/LinkedCell.h"
 
 namespace simplemd {
-  namespace cellmappings {
-    class EmptyLinkedListsMapping;
-  }
+namespace cellmappings {
+class EmptyLinkedListsMapping;
 }
-
+} // namespace simplemd
 
 /** deletes all molecules from the list within the cells. The molecules are only removed from the lists in the cells,
  *  but are further available via the MoleculeService.
@@ -25,16 +23,13 @@ namespace simplemd {
  *  @author Philipp Neumann
  */
 class simplemd::cellmappings::EmptyLinkedListsMapping {
-  public:
-    EmptyLinkedListsMapping(){}
-    ~EmptyLinkedListsMapping(){}
+public:
+  EmptyLinkedListsMapping() {}
+  ~EmptyLinkedListsMapping() {}
 
-    void beginCellIteration(){}
-    void endCellIteration(){}
-    void handleCell(LinkedCell& cell,const unsigned int &cellIndex){
-      cell.getList().clear();
-    }
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) { cell.getList().clear(); }
 };
-
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_EMPTYLINKEDLISTSMAPPING_H_

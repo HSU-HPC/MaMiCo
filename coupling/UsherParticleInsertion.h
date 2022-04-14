@@ -22,10 +22,12 @@ namespace coupling {
 template <class LinkedCell, unsigned int dim> class UsherParticleInsertion;
 }
 
-/** particles will be inserted or removed based on the microscopic mass of a cell
- *  The algorithm is only applied to outer boundary cells of the md (non ghost cells)
- *  We currently also allow particle insertion in energyy holes, i.e. for energy(particle)==0.0.
- *  @brief handles particle insertion (via Usher algorithm) and random particle deletion.
+/** particles will be inserted or removed based on the microscopic mass of a
+ * cell The algorithm is only applied to outer boundary cells of the md (non
+ * ghost cells) We currently also allow particle insertion in energyy holes,
+ * i.e. for energy(particle)==0.0.
+ *  @brief handles particle insertion (via Usher algorithm) and random particle
+ * deletion.
  *  @author Philipp Neumann
  *  @tparam LinkedCell the LinkedCell class is given by the implementation of linked cells in the molecular dynamics simulation
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2, or 3 */
