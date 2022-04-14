@@ -185,6 +185,7 @@ endif()
 # Couette target
 #
 set(COUETTE_SOURCES
+		"coupling/indexing/IndexingService.cpp"
 		"coupling/configurations/ParticleInsertionConfiguration.cpp"
         "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
         "coupling/tests/main_couette.cpp"
@@ -198,11 +199,15 @@ target_link_libraries(couette PRIVATE mamico)
 #
 if(BUILD_WITH_PYBIND11)
 	set(PYBIND_SOURCES11
+			"coupling/indexing/IndexingService.cpp"
+			"coupling/configurations/ParticleInsertionConfiguration.cpp"
+	        "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
 			"coupling/python-binding/mamico.cpp"
 	)
 	pybind11_add_module(mamico_pybind
 		${PYBIND_SOURCES11}
 	)
+	set_target_properties(mamico_pybind PROPERTIES OUTPUT_NAME mamico)
 	target_compile_options(mamico_pybind PRIVATE -fPIC)
 	target_link_libraries(mamico_pybind PRIVATE mamico)
 endif()
