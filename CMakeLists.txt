@@ -209,7 +209,7 @@ if(BUILD_WITH_PYBIND11)
 	)
 	set_target_properties(mamico_pybind PROPERTIES OUTPUT_NAME mamico)
 	target_compile_options(mamico_pybind PRIVATE -fPIC)
-        set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
+	set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
 	target_link_libraries(mamico_pybind PRIVATE mamico)
 endif()
 
