@@ -24,8 +24,7 @@ option(BUILD_WITH_MPI "Enable the MPI library for parallel build, default is OFF
 message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 # Dimension for MD build, default is MDDim3
 set(MD_DIM MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")
-message(STATUS ">> SimpleMD dimension variable : " ${MD_DIM})
-mark_as_advanced(MD_DIM)
+message(STATUS ">> SimpleMD dimension : " ${MD_DIM})
 set_property(CACHE MD_DIM PROPERTY STRINGS MDDim3 MDDim2)
 # Enable the Eigen library used (so far) only for POD filtering, default is off
 option(BUILD_WITH_EIGEN "Enable the Eigen library used (so far) only for POD filtering, default is off." OFF)
@@ -44,6 +43,9 @@ message(STATUS ">> Build with OpenFOAM : " ${BUILD_WITH_OPENFOAM})
 # Enable coupling with the preCICE API, default is off
 option(BUILD_WITH_PRECICE "Enable coupling with the preCICE API, default is off." OFF)
 message(STATUS ">> Build with preCICE : " ${BUILD_WITH_PRECICE})
+# Compiler list to be used for compiletest
+set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
+message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_COMPILERS})
 
 #
 # Find dependencies
@@ -497,7 +499,6 @@ add_custom_target(
 #
 # compiletest target
 #
-set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
 get_filename_component(COMPILETEST_SCRIPT "tarch/tests/CompileTest.sh" ABSOLUTE)
 add_custom_target(
   compiletest
