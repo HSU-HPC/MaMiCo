@@ -51,7 +51,7 @@ message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_CO
 # Find dependencies
 #
 if(BUILD_WITH_EIGEN)
-	find_package(Eigen3 REQUIRED)
+	find_package(Eigen3 REQUIRED NO_MODULE)
 endif()
 
 if(BUILD_WITH_MPI)
@@ -157,11 +157,7 @@ add_library(mamico INTERFACE)
 target_link_libraries(mamico INTERFACE simplemd)
 if(BUILD_WITH_EIGEN)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
-	if(Eigen3_VERSION VERSION_LESS "3.3")
-		target_link_libraries(mamico INTERFACE Eigen3)
-	else()
-		target_link_libraries(mamico INTERFACE Eigen3::Eigen)
-	endif()
+	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
 endif()
 target_compile_definitions(mamico INTERFACE SIMPLE_MD MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-pragmas -Wfatal-errors -O3)
