@@ -222,7 +222,7 @@ private:
 
     // init indexing
 #if (BUILD_WITH_PRECICE)
-    if (_cfg.maSolverType == COUETTE_PRECICE) {
+    if (_cfg.maSolverType == coupling::configurations::CouetteConfig::COUETTE_PRECICE) {
       static_cast<coupling::solvers::PreciceAdapter<3>*>(_couetteSolver)
           ->setCouplingMesh(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
                             _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0]);
@@ -940,7 +940,7 @@ private:
     }
 #endif
 #if (BUILD_WITH_PRECICE)
-    else if (_cfg.maSolverType == COUETTE_PRECICE) {
+    else if (_cfg.maSolverType == CouetteConfig::COUETTE_PRECICE) {
       solver = new coupling::solvers::PreciceAdapter<3>(_cfg.channelheight, dx, dt, _cfg.plotEveryTimestep, "preCICECouette",
                                                         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
       if (solver == NULL) {
@@ -1017,7 +1017,7 @@ private:
     }
 #endif
 #if (BUILD_WITH_PRECICE)
-    else if (_cfg.maSolverType == COUETTE_PRECICE) {
+    else if (_cfg.maSolverType == CouetteConfig::COUETTE_PRECICE) {
       coupling::solvers::PreciceAdapter<3>* preciceInterface = static_cast<coupling::solvers::PreciceAdapter<3>*>(couetteSolver);
       preciceInterface->setInterface(outerRegion);
       interface = preciceInterface;
