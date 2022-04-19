@@ -18,6 +18,7 @@
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
+#include "coupling/indexing/IndexingService.h"
 
 // for debugging purposes only
 #include <iostream>
@@ -445,7 +446,11 @@ PYBIND11_MODULE(mamico, mamico) {
 
   utils.def("initMPI", &initMPI, "Calls MPI_Init and returns rank of this process");
   utils.def("finalizeMPI", &MPI_Finalize, "Calls MPI_Finalize");
-
+  utils.def("initIndexing", [](const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
+            const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig, coupling::interface::MacroscopicSolverInterface<3>* msi,
+            const unsigned int rank) {
+             return coupling::indexing::IndexingService<3>::getInstance().init(simpleMDConfig, mamicoConfig, msi, rank);
+           }, "Calls init of the IndexingService singleton object");
   ///////////////////////////////////////////////////////////////////////////////////
   // Bindings for all simplemd configuration classes and getter functions
   // //////////

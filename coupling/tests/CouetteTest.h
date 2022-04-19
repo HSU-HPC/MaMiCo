@@ -24,7 +24,7 @@
 #endif
 #include "coupling/configurations/CouetteConfiguration.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
-#include "coupling/indexing/IndexingService.cpp"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/services/MultiMDCellService.h"

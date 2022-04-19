@@ -14,7 +14,7 @@ endif()
 if(NOT CMAKE_BUILD_TYPE)
   message(WARNING "CMAKE_BUILD_TYPE was not specified. Debug build is assumed.")
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type." FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug DebugOptimized RelWithDebInfo Release)
 endif()
 message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
 # Automatically add the current source and build directories to the include path
@@ -51,7 +51,7 @@ message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_CO
 # Find dependencies
 #
 if(BUILD_WITH_EIGEN)
-	find_package(Eigen3 REQUIRED)
+	find_package(Eigen3 REQUIRED NO_MODULE)
 endif()
 
 if(BUILD_WITH_MPI)
@@ -77,7 +77,48 @@ if(BUILD_WITH_PRECICE)
 endif()
 
 #
-# simpleMD target
+# simplemd interface
+#
+add_library(simplemd_interface INTERFACE)
+target_compile_definitions(simplemd_interface INTERFACE ${MD_DIM})
+target_compile_options(simplemd_interface INTERFACE -fpic)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	target_compile_definitions(simplemd_interface INTERFACE MDError)
+endif()
+if(BUILD_WITH_MPI)
+    target_compile_definitions(simplemd_interface INTERFACE MDParallel TarchParallel)
+    target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
+endif()
+# Check the CXX compiler ID. IDs are defined here: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
+message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
+message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -O3)
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(simplemd_interface INTERFACE -g3)
+	endif()
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+	target_compile_options(simplemd_interface INTERFACE -fstrict-aliasing -qpack_semantic=gnu -ipo)
+	target_link_options(simplemd_interface INTERFACE -ipo)
+	if (CMAKE_BUILD_TYPE PRIVATE "Debug")
+		target_compile_options(simplemd_interface INTERFACE -O3)
+	else()
+		target_compile_options(simplemd_interface INTERFACE -fast -w -Werror-all -align -ansi-alias)
+	endif()
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Fujitsu")
+	target_compile_options(simplemd_interface INTERFACE -Nclang -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
+	target_link_options(simplemd_interface INTERFACE -ipo)
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(simplemd_interface INTERFACE -g3 -O3)
+	else()
+		target_compile_options(simplemd_interface INTERFACE -Ofast)
+	endif()
+else()
+	message(STATUS ">> Unsupported compiler.")
+endif()
+
+#
+# simplemd library target
 #
 set(SIMPLE_MD_SOURCES 
         "simplemd/BoundaryTreatment.cpp"
@@ -111,50 +152,31 @@ set(SIMPLE_MD_SOURCES
         "tarch/tinyxml2/tinyxml2.cpp"
         "tarch/utils/RandomNumberService.cpp"
 )
-add_library(simplemd ${SIMPLE_MD_SOURCES})
-set_target_properties(simplemd PROPERTIES CXX_STANDARD 17)
-target_compile_definitions(simplemd PRIVATE ${MD_DIM})
-target_compile_options(simplemd PRIVATE -fpic)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	target_compile_definitions(simplemd PRIVATE MDError)
-endif()
-if(BUILD_WITH_MPI)
-    target_compile_definitions(simplemd PRIVATE MDParallel TarchParallel)
-    target_link_libraries(simplemd PRIVATE MPI::MPI_CXX)
-endif()
-# Check the CXX compiler ID. IDs are defined here: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
-message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
-message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(simplemd PRIVATE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -O3)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(simplemd PRIVATE -g3)
-	endif()
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-	target_compile_options(simplemd PRIVATE -fstrict-aliasing -qpack_semantic=gnu -ipo)
-	target_link_options(simplemd PRIVATE -ipo)
-	if (CMAKE_BUILD_TYPE PRIVATE "Debug")
-		target_compile_options(simplemd PRIVATE -O3)
-	else()
-		target_compile_options(simplemd PRIVATE -fast -w -Werror-all -align -ansi-alias)
-	endif()
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Fujitsu")
-	target_compile_options(simplemd PRIVATE -Nclang -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
-	target_link_options(simplemd PRIVATE -ipo)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(simplemd PRIVATE -g3 -O3)
-	else()
-		target_compile_options(simplemd PRIVATE -Ofast)
-	endif()
-else()
-	message(STATUS ">> Unsupported compiler.")
-endif()
+add_library(libsimplemd ${SIMPLE_MD_SOURCES})
+target_link_libraries(libsimplemd PRIVATE simplemd_interface)
+set_target_properties(libsimplemd PROPERTIES CXX_STANDARD 17)
+set_target_properties(libsimplemd PROPERTIES OUTPUT_NAME simplemd)
 
 #
-# MaMiCo target
+# simplemd executable target
+#
+add_executable(simplemd ${SIMPLE_MD_SOURCES} "simplemd/main.cpp")
+target_link_libraries(simplemd PRIVATE simplemd_interface)
+set_target_properties(simplemd PROPERTIES CXX_STANDARD 17)
+set_target_properties(simplemd PROPERTIES OUTPUT_NAME simplemd)
+
+#
+# multi-simplemd target
+#
+add_executable(multi-simplemd ${SIMPLE_MD_SOURCES} "simplemd/main_multi.cpp")
+target_link_libraries(multi-simplemd PRIVATE simplemd_interface)
+set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
+
+#
+# MaMiCo interface
 #
 add_library(mamico INTERFACE)
-target_link_libraries(mamico INTERFACE simplemd)
+target_link_libraries(mamico INTERFACE libsimplemd)
 if(BUILD_WITH_EIGEN)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
 	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
@@ -181,6 +203,7 @@ endif()
 # Couette target
 #
 set(COUETTE_SOURCES
+		"coupling/indexing/IndexingService.cpp"
 		"coupling/configurations/ParticleInsertionConfiguration.cpp"
         "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
         "coupling/tests/main_couette.cpp"
@@ -194,12 +217,17 @@ target_link_libraries(couette PRIVATE mamico)
 #
 if(BUILD_WITH_PYBIND11)
 	set(PYBIND_SOURCES11
+			"coupling/indexing/IndexingService.cpp"
+			"coupling/configurations/ParticleInsertionConfiguration.cpp"
+	        "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
 			"coupling/python-binding/mamico.cpp"
 	)
 	pybind11_add_module(mamico_pybind
 		${PYBIND_SOURCES11}
 	)
+	set_target_properties(mamico_pybind PROPERTIES OUTPUT_NAME mamico)
 	target_compile_options(mamico_pybind PRIVATE -fPIC)
+	set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
 	target_link_libraries(mamico_pybind PRIVATE mamico)
 endif()
 
