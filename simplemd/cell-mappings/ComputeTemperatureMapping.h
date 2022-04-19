@@ -48,8 +48,9 @@ public:
       return;
 
 #if (MD_PARALLEL == MD_YES)
-    if (_parallelTopologyService.getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
+    if (_parallelTopologyService.getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0))
 #endif
+    {
       std::stringstream ss;
       ss << "Temperature_" << _localMDSimulation << "_" << _parallelTopologyService.getRank() << ".dat";
       std::ofstream file(ss.str().c_str(), std::ios::app);
@@ -59,9 +60,7 @@ public:
       }
       file << _temperature << std::endl;
       file.close();
-#if (MD_PARALLEL == MD_YES)
     }
-#endif
   }
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
