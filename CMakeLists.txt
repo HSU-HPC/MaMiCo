@@ -23,9 +23,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 option(BUILD_WITH_MPI "Enable the MPI library for parallel build, default is OFF." OFF)
 message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 # Dimension for MD build, default is MDDim3
-set(MD_DIM MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")
-message(STATUS ">> SimpleMD dimension : " ${MD_DIM})
-set_property(CACHE MD_DIM PROPERTY STRINGS MDDim3 MDDim2)
+set(MDDim MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")
+message(STATUS ">> SimpleMD dimension : " ${MDDim})
+set_property(CACHE MDDim PROPERTY STRINGS MDDim3 MDDim2)
 # Enable the Eigen library used (so far) only for POD filtering, default is off
 option(BUILD_WITH_EIGEN "Enable the Eigen library used (so far) only for POD filtering, default is off." OFF)
 message(STATUS ">> Build with Eigen : " ${BUILD_WITH_EIGEN})
@@ -80,7 +80,7 @@ endif()
 # simplemd interface
 #
 add_library(simplemd_interface INTERFACE)
-target_compile_definitions(simplemd_interface INTERFACE ${MD_DIM})
+target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_compile_definitions(simplemd_interface INTERFACE MDError)
