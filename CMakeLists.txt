@@ -46,6 +46,9 @@ message(STATUS ">> Build with preCICE : " ${BUILD_WITH_PRECICE})
 # Compiler list to be used for compiletest
 set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
 message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_COMPILERS})
+# Enable coupling with the preCICE API, default is off
+option(BUILD_WITH_TEST_INDEXING "Enable indexing tests, default is off." OFF)
+message(STATUS ">> Build with indexing tests : " ${BUILD_WITH_TEST_INDEXING})
 
 #
 # Find dependencies
@@ -204,6 +207,9 @@ endif()
 if(BUILD_WITH_PRECICE)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
 	target_link_libraries(mamico INTERFACE precice::precice)
+endif()
+if(BUILD_WITH_TEST_INDEXING)
+	target_compile_definitions(mamico INTERFACE TEST_INDEXING)
 endif()
 
 #
