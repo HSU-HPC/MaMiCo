@@ -37,7 +37,7 @@ coupling::IndexConversion<dim>::IndexConversion(tarch::la::Vector<dim, unsigned 
   }
 }
 
-template <unsigned int dim> coupling::IndexConversion<dim>::~IndexConversion() {
+template <unsigned int dim> coupling::IndexConversion<dim>::~IndexConversion<dim>() {
   if (_parallelTopology != NULL) {
     delete _parallelTopology;
     _parallelTopology = NULL;
