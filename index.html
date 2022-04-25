@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.3"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaMiCo: Main Page</title>
+<title>MaMiCo: MaMiCo</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -61,10 +61,35 @@ $(function() {
 </iframe>
 </div>
 
-<div class="header">
-  <div class="headertitle"><div class="title">MaMiCo Documentation</div></div>
+<div><div class="header">
+  <div class="headertitle"><div class="title">MaMiCo </div></div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p ><a class="anchor" id="md_README"></a>The macro-micro-coupling tool for multiscale coupled molecular-continuum flow simulation.</p>
+<h2><a class="anchor" id="autotoc_md0"></a>
+Documentation</h2>
+<p >* The source code documentation can be found <a href="https://hsu-hpc.github.io/MaMiCo/">here</a></p>
+<h2><a class="anchor" id="autotoc_md1"></a>
+Requirements and optional dependencies</h2>
+<p >To compile and execute MaMiCo on a linux system, you need at least: * a C++17 compiler installed * CMake version &gt;= 3.0</p>
+<p >Optional dependencies are: * <a href="https://www.open-mpi.org/">MPI</a>, highly recommended for parallel runs, e.g. on clusters. * <a href="http://eigen.tuxfamily.org/">Eigen 3</a>, a linear algebra library used for the POD noise filter. * <a href="https://pybind11.readthedocs.io/en/stable/">pybind11</a>, for the MaMiCo Python bindings. * <a href="https://openfoam.org/">OpenFOAM</a>, for coupling to CFD simulations with OpenFOAM. * <a href="https://precice.org/">preCICE</a>, for coupling with other solvers using the preCICE coupling library.</p>
+<h2><a class="anchor" id="autotoc_md2"></a>
+Build instructions and first steps</h2>
+<p >* First clone this repository and create a new build directory: </p><pre class="fragment">  git clone git@github.com:HSU-HPC/MaMiCo.git
+  cd MaMiCo
+  mkdir build
+  cd build
+</pre><p> * Then initialise CMake in your build directory, pointing it to the root directory of the repository. (Note that on some older systems, the command may be named <code>cmake3</code> instead of <code>cmake</code>.) </p><pre class="fragment">  cmake ..
+</pre><p> * This will configure the build system with default settings and generate makefiles in the build directory. Optionally, you might want to change the build configuration now: </p><pre class="fragment">  ccmake .
+</pre><p> * Here you can enable optional dependencies, e.g. activate BUILD_WITH_MPI (default OFF), or modifiy which compiler and flags you want to use. When you are done, press the configure [c] and generate [g] keys. Now you can start the compilation: </p><pre class="fragment">  make
+</pre><p> * The previous step has created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. An example simulation configuration can be found <a href="https://github.com/HSU-HPC/MaMiCo/blob/master/coupling/tests/build_couette/couette.xml.template">here</a>. * Copy this file to your build folder, rename it 'couette.xml' and modify the configuration to suit your needs. * Start the simulation by executing (sequential case) <code>./couette</code> or e.g. (MPI-parallel) <code>mpirun -n 8 ./couette</code>. * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats.</p>
+<h2><a class="anchor" id="autotoc_md3"></a>
+Acknowledgements</h2>
+<p >* TODO</p>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Papers to cite</h2>
+<p >* P. Jarmatz, P. Neumann: <a href="https://link.springer.com/chapter/10.1007/978-3-030-22747-0_34">MaMiCo: Parallel Noise Reduction for Multi-instance Molecular-Continuum Flow Simulation</a>, International Conference on Computational Science. Springer, Cham, 2019 * P. Neumann, X. Bian: <a href="https://doi.org/10.1016/j.cpc.2017.06.026">MaMiCo: Transient multi-instance molecular-continuum flow simulation on supercomputers</a>, Computer Physics Communications 220 (2017): 390-402 * P. Neumann, H. Flohr, R. Arora, P. Jarmatz: <a href="https://doi.org/10.1016/j.cpc.2015.10.029">MaMiCo: Software design for parallel molecular-continuum flow simulations</a> Computer Physics Communications 200 (2016): 324-335 </p>
+</div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
