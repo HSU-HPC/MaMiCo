@@ -15,9 +15,10 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::operator()() {
 template <unsigned int dim> void coupling::filtering::NLM<dim>::save_data() {
   for (unsigned int i = 0; i < this->_inputCells.size(); ++i) {
     using namespace coupling::indexing;
-    CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost> idx(i);
-    coupling::filtering::Quantities<dim>& q = _flowfield(idx.get(), _t);
-    coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(idx.get(), _t);
+    CellIndex_T idx{CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>{i}};
+    tarch::la::Vector<dim, unsigned int> idx_raw{idx.get()};
+    coupling::filtering::Quantities<dim>& q = _flowfield(idx_raw, _t);
+    coupling::filtering::Quantities<dim>& qp = _flowfield_prefiltered(idx_raw, _t);
     q[0] = this->_inputCellVectors[0][i]->getMacroscopicMass();
     qp[0] = this->_inputCellVectors[1][i]->getMacroscopicMass();
     for (unsigned int d = 0; d < dim; d++) {
