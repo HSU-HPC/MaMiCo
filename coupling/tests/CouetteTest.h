@@ -166,7 +166,7 @@ private:
                          _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     // even if _cfg.miSolverType == SYNTHETIC then
-    // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized
+    // multiMDService, _mdSimulations, _mdSolverInterface etc need to be initialized
 
     // anyway, so that we can finally obtain getIndexConversion from
     // MultiMDCellService, because SYNTHETIC should fill the same cells which
