@@ -61,7 +61,7 @@ tarch::utils::MultiMDService<dim>::MultiMDService(const tarch::la::Vector<dim, u
 
 namespace tarch {
 namespace utils {
-template <unsigned int dim> MultiMDService<dim>::~MultiMDService() {}
+template <unsigned int dim> MultiMDService<dim>::~MultiMDService<dim>() {}
 } // namespace utils
 } // namespace tarch
 
