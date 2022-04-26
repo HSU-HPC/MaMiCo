@@ -216,6 +216,10 @@ endif()
 if(BUILD_WITH_TEST_INDEXING)
 	target_compile_definitions(mamico INTERFACE TEST_INDEXING)
 endif()
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
+endif()
+
 
 #
 # Couette target
