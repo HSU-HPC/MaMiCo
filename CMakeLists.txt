@@ -232,6 +232,9 @@ set(COUETTE_SOURCES
 )
 add_executable(couette ${COUETTE_SOURCES})
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+	target_compile_options(couette PRIVATE -std=c++17)
+endif()
 target_link_libraries(couette PRIVATE mamico)
 
 #
