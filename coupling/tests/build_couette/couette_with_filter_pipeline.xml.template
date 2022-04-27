@@ -162,6 +162,7 @@
   <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
 
   <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
+  <adios2-configuration directory-name="adiosOutput" write-every-timestep="20"></adios2-configuration>
 
   <domain-configuration
     init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting"

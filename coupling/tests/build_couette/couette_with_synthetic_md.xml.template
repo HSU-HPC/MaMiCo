@@ -185,6 +185,7 @@
    ></simulation-configuration>
 
   <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
+  <adios2-configuration directory-name="adiosOutput" write-every-timestep="20"></adios2-configuration>
 
   <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
 
