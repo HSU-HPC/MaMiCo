@@ -36,7 +36,7 @@ Optional dependencies are:
 
         make
 
-* The previous step has created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. An example simulation configuration can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/coupling/tests/build_couette/couette.xml.template).
+* The previous step has created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. An example simulation configuration can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/examples/couette.xml.template).
 * Copy this file to your build folder, rename it 'couette.xml' and modify the configuration to suit your needs.
 * Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`. 
 * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats. 
