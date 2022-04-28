@@ -118,7 +118,7 @@ public:
 				vel[currentDim] = _velocities[dim*cellIndex+currentDim];
 			}
 		}
-		std::cout << "pos:" << pos << ", vel:" << vel << std::endl;
+		//std::cout << "pos:" << pos << ", vel:" << vel << std::endl;
 		return vel;
 	}
 	
@@ -137,7 +137,11 @@ public:
 				// velocity from the conitnuum solver
 				int dataID = _interface->getDataID("Velocity", meshID);
 				_interface->readBlockVectorData(dataID, _numberOfCells, _vertexIDs, _velocities);
-				
+				std::cout <<_numberOfCells << std::endl;
+				for (unsigned int vertexIndex = 0; vertexIndex < _numberOfCells; vertexIndex++)
+				{
+					std::cout << _velocities[dim*vertexIndex] << std::endl;
+				}
 				/*
 				std::cout << "[";
 				for (unsigned int interfaceCellIndex = 0; interfaceCellIndex < _numberOfCells; interfaceCellIndex++) {
