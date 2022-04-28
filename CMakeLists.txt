@@ -558,3 +558,15 @@ add_custom_target(
   COMMAND ${COMPILETEST_SCRIPT}
   ${COMPILETEST_COMPILERS}
 )
+
+#
+# Benchmarks target
+#
+set(BENCHMARKS_SOURCES
+		"coupling/indexing/IndexingService.cpp"
+		"coupling/configurations/ParticleInsertionConfiguration.cpp"
+	    "coupling/tests/cell_idx_iter_benchmark.cpp"
+)
+add_executable(benchmarks ${BENCHMARKS_SOURCES})
+set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
+target_link_libraries(benchmarks PRIVATE mamico)
