@@ -24,7 +24,7 @@ Optional dependencies are:
         mkdir build
         cd build
 
-* Then initialise CMake in your build directory (pointing it to the root directory of the repository):
+* Then initialise CMake in your build directory, pointing it to the root directory of the repository. (Note that on some older systems, the command may be named `cmake3` instead of `cmake`.)
 
         cmake ..
 

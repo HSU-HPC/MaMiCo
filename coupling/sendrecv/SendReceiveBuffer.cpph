@@ -11,7 +11,7 @@ template <class MacroscopicCell, unsigned int dim> coupling::sendrecv::SendRecei
 #endif
 }
 
-template <class MacroscopicCell, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::~SendReceiveBuffer() {
+template <class MacroscopicCell, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::~SendReceiveBuffer<MacroscopicCell, dim>() {
   deleteBuffers();
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   if (_requests != NULL) {

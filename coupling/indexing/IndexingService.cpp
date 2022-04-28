@@ -152,11 +152,7 @@ template <>
 tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
-
-// declare specialisation of IndexingService
-template class IndexingService<3>;
 } // namespace indexing
-
 } // namespace coupling
 #else
 static_assert(false, "IndexingService only available for dim=2 or dim=3.");
@@ -574,3 +570,6 @@ coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch:
   return _parallelTopology->getRank(processCoords);
 }
 #endif
+
+// declare specialisation of IndexingService
+template class coupling::indexing::IndexingService<3>;

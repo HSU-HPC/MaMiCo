@@ -167,7 +167,7 @@ private:
         getCouetteSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
                          _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
     // even if _cfg.miSolverType == SYNTHETIC then
-    // multiMDService, _simpleMD, _mdSolverInterface etc need to be initialized
+    // multiMDService, _mdSimulations, _mdSolverInterface etc need to be initialized
 
     // anyway, so that we can finally obtain getIndexConversion from
     // MultiMDCellService, because SYNTHETIC should fill the same cells which
@@ -176,8 +176,8 @@ private:
 
     if (_cfg.totalNumberMDSimulations > 0)
       _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _cfg.totalNumberMDSimulations);
-    else // dynamic case, start with 1 MD
-      _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), 1);
+    else // dynamic case, start with _cfg.lowerBoundNumberMDSimulations MD
+      _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _cfg.lowerBoundNumberMDSimulations);
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
     if (_instanceHandling == nullptr) {

@@ -59,7 +59,11 @@ tarch::utils::MultiMDService<dim>::MultiMDService(const tarch::la::Vector<dim, u
 #endif
 }
 
-template <unsigned int dim> tarch::utils::MultiMDService<dim>::~MultiMDService() {}
+namespace tarch {
+namespace utils {
+template <unsigned int dim> MultiMDService<dim>::~MultiMDService<dim>() {}
+} // namespace utils
+} // namespace tarch
 
 template <unsigned int dim> unsigned int tarch::utils::MultiMDService<dim>::getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const {
   return (_globalRank / _localSize) * _avgNumberMDSimulationsPerLocalComm + localMDSimulation;

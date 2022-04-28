@@ -59,9 +59,6 @@ public:
       exit(EXIT_FAILURE);
     }
 
-    const tarch::la::Vector<dim, double> mdDomainSize(mdSolverInterfaces[0]->getGlobalMDDomainSize());
-    const tarch::la::Vector<dim, double> mdDomainOffset(mdSolverInterfaces[0]->getGlobalMDDomainOffset());
-
     // determine globally unique IDs for each macroscopic cell service.
     // Assumptions:
     // - the global parallel topology is subdivided into equally sized blocks of

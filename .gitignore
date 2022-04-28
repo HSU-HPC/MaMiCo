@@ -35,3 +35,4 @@ coupling/tests/kvs-lbmpy/*.ini
 docs/
 coupling/tests/test
 *.checkpoint
+.vscode/launch.json
