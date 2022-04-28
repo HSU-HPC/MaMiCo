@@ -14,7 +14,9 @@
 #include "simplemd/configurations/RDFConfiguration.h"
 #include "simplemd/configurations/SimulationConfiguration.h"
 #include "simplemd/configurations/VTKConfiguration.h"
+#if BUILD_WITH_ADIOS2
 #include "simplemd/configurations/Adios2Configuration.h"
+#endif
 #include "tarch/configuration/Configuration.h"
 #include <iostream>
 #include <vector>
@@ -63,9 +65,9 @@ public:
   const simplemd::configurations::MPIConfiguration& getMPIConfiguration() const { return _mpiConfiguration; }
 
   const simplemd::configurations::VTKConfiguration& getVTKConfiguration() const { return _vtkConfiguration; }
-
+  #if BUILD_WITH_ADIOS2
   const simplemd::configurations::Adios2Configuration& getAdios2Configuration() const { return _Adios2Configuration; }
-
+  #endif 
   const simplemd::configurations::SimulationConfiguration& getSimulationConfiguration() const { return _simulationConfiguration; }
 
   const simplemd::configurations::RDFConfiguration& getRDFConfiguration() const { return _rdfConfiguration; }
@@ -81,7 +83,9 @@ private:
   simplemd::configurations::MoleculeConfiguration _moleculeConfiguration;
   simplemd::configurations::MPIConfiguration _mpiConfiguration;
   simplemd::configurations::VTKConfiguration _vtkConfiguration;
+  #if BUILD_WITH_ADIOS2
   simplemd::configurations::Adios2Configuration _Adios2Configuration;
+  #endif
   simplemd::configurations::SimulationConfiguration _simulationConfiguration;
   simplemd::configurations::RDFConfiguration _rdfConfiguration;
   simplemd::configurations::CheckpointConfiguration _checkpointConfiguration;

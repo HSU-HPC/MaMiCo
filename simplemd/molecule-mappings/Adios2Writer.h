@@ -53,7 +53,6 @@ class simplemd::moleculemappings::Adios2Writer {
     Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService,
       const simplemd::services::MoleculeService& moleculeService, const std::string& filename,
       tarch::la::Vector<MD_DIM,double> offset,
-      int numberProcesses,
       const simplemd::configurations::MolecularDynamicsConfiguration &configuration
       #if (MD_PARALLEL==MD_YES)
       ,MPI_Comm communicator = MPI_COMM_WORLD
@@ -114,8 +113,6 @@ class simplemd::moleculemappings::Adios2Writer {
     std::shared_ptr<adios2::ADIOS> _inst;
 	  std::shared_ptr<adios2::Engine> _engine;
 	  std::shared_ptr<adios2::IO> _io;
-
-    std::array<double, 3> _domainCenter;
 };
 
 #endif // _MOLECULARDYNAMICS_MOLECULEMAPPINGS_Adios2Writer_H_

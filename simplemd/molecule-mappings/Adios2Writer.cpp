@@ -24,15 +24,13 @@ const simplemd::services::ParallelTopologyService& parallelTopologyService,
 const simplemd::services::MoleculeService& moleculeService,
 const std::string& filename,
 tarch::la::Vector<MD_DIM,double> offset,
-int numberProcesses,
 const simplemd::configurations::MolecularDynamicsConfiguration &configuration
 #if (MD_PARALLEL==MD_YES)
 ,MPI_Comm communicator
 #endif
 ):
 _parallelTopologyService(parallelTopologyService),_moleculeService(moleculeService),
-_filename(filename), _timestep(0), _offset(offset), _numberProcesses(numberProcesses),
-_configuration(configuration)
+_filename(filename), _timestep(0), _offset(offset),_configuration(configuration)
 {
   //std::cout<<"constructor"<<std::endl;
   #if (MD_PARALLEL==MD_YES)
@@ -54,6 +52,8 @@ void simplemd::moleculemappings::Adios2Writer::initAdios2(
   _inst = std::make_shared<adios2::ADIOS>();
   #endif
 
+  _numberProcesses = _configuration.getMPIConfiguration().getNumberOfProcesses()[0]*_configuration.getMPIConfiguration().getNumberOfProcesses()[1]*_configuration.getMPIConfiguration().getNumberOfProcesses()[2];
+
   _io = std::make_shared<adios2::IO>(_inst->DeclareIO("Output"));
   _io->SetEngine("BP4");
   _engine = std::make_shared<adios2::Engine>(_io->Open("adios2output.bp", adios2::Mode::Write));
@@ -66,6 +66,7 @@ void simplemd::moleculemappings::Adios2Writer::initAdios2(
 
   std::string component_id = "component_0";
   std::vector<std::array<double, 3>> adios_centers;
+  std::array<double, 3> _domainCenter;
   std::vector<double> adios_sigmas;
   std::vector<double> adios_mass;
   std::vector<double> adios_epsilon;

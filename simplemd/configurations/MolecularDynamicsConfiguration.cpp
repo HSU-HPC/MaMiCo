@@ -18,9 +18,13 @@ void simplemd::configurations::MolecularDynamicsConfiguration::parseSubtag(tinyx
       _simulationConfiguration.parseSubtag(child);
     } else if (nodename == _vtkConfiguration.getTag()) {
       _vtkConfiguration.parseSubtag(child);
-    } else if (nodename == _Adios2Configuration.getTag()) {
-    _Adios2Configuration.parseSubtag(child);
-    } else if (nodename == _mpiConfiguration.getTag()) {
+    }
+
+    #if BUILD_WITH_ADIOS2
+    else if (nodename == _Adios2Configuration.getTag()) {_Adios2Configuration.parseSubtag(child);}
+    #endif
+
+    else if (nodename == _mpiConfiguration.getTag()) {
       _mpiConfiguration.parseSubtag(child);
     } else if (nodename == _rdfConfiguration.getTag()) {
       _rdfConfiguration.parseSubtag(child);
@@ -51,5 +55,8 @@ bool simplemd::configurations::MolecularDynamicsConfiguration::isValid() const {
   }
 
   return isValid && _domainConfiguration.isValid() && _moleculeConfiguration.isValid() && _vtkConfiguration.isValid() && _simulationConfiguration.isValid() &&
+  #if BUILD_WITH_ADIOS2
+  _Adios2Configuration.isValid() &&
+  #endif
          _mpiConfiguration.isValid() && _rdfConfiguration.isValid() && _checkpointConfiguration.isValid();
 }
