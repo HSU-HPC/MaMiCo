@@ -78,7 +78,7 @@ $(function() {
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;TestLammps.h&quot;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;coupling/datastructures/Molecule.h&quot;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;mamico_lammps_md_solver_interface.h&quot;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;coupling/interface/impl/LAMMPS/USER-MAMICO/mamico_lammps_md_solver_interface.h&quot;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classTestLammpsCalculateForceEnergy.html">   15</a></span><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dim&gt; <span class="keyword">class </span><a class="code hl_class" href="classTestLammpsCalculateForceEnergy.html">TestLammpsCalculateForceEnergy</a> : <span class="keyword">public</span> <a class="code hl_class" href="classTestLammps.html">TestLammps</a>&lt;dim&gt; {</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">public</span>:</div>
@@ -143,7 +143,7 @@ $(function() {
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>                  &lt;&lt; <span class="stringliteral">&quot;, potential energy=&quot;</span> &lt;&lt; potEnergy &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        exit(EXIT_FAILURE);</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>      }</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>      <span class="keywordflow">if</span> (fabs(tarch::la::norm2(force - forceRef) &gt; tolerance)) {</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>      <span class="keywordflow">if</span> (fabs(tarch::la::norm2(force - forceRef)) &gt; tolerance) {</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;ERROR TestLammpsCalculcateForceEnergy: forces do not match1! Force ref.=&quot;</span> &lt;&lt; forceRef &lt;&lt; <span class="stringliteral">&quot;, force=&quot;</span> &lt;&lt; force &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        exit(EXIT_FAILURE);</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>      }</div>
@@ -163,7 +163,7 @@ $(function() {
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>      <span class="keywordtype">int</span> n = -1;</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nlocal; i++) {</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        <span class="keywordtype">bool</span> found = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> d = 0; d &lt; dim; d++) {</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> d = 0; d &lt; dim; d++) {</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>          found = found &amp;&amp; (thisPosition[d] == lammps-&gt;atom-&gt;x[i][d]);</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        }</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="keywordflow">if</span> (found) {</div>
@@ -194,7 +194,7 @@ $(function() {
 <div class="ttc" id="aclassTestLammpsCalculateForceEnergy_html"><div class="ttname"><a href="classTestLammpsCalculateForceEnergy.html">TestLammpsCalculateForceEnergy</a></div><div class="ttdef"><b>Definition:</b> TestLammpsCalculateForceEnergy.h:15</div></div>
 <div class="ttc" id="aclassTestLammpsCalculateForceEnergy_html_a3ce1cd03d0e3a54e92b86d6cff565f15"><div class="ttname"><a href="classTestLammpsCalculateForceEnergy.html#a3ce1cd03d0e3a54e92b86d6cff565f15">TestLammpsCalculateForceEnergy::run</a></div><div class="ttdeci">virtual void run()</div><div class="ttdef"><b>Definition:</b> TestLammpsCalculateForceEnergy.h:20</div></div>
 <div class="ttc" id="aclassTestLammps_html"><div class="ttname"><a href="classTestLammps.html">TestLammps</a></div><div class="ttdef"><b>Definition:</b> TestLammps.h:28</div></div>
-<div class="ttc" id="aclassTestLammps_html_a032e4b51f896ef2fd24df904b6ef56fe"><div class="ttname"><a href="classTestLammps.html#a032e4b51f896ef2fd24df904b6ef56fe">TestLammps::loadMacroscopicSolverConfiguration</a></div><div class="ttdeci">void loadMacroscopicSolverConfiguration()</div><div class="ttdef"><b>Definition:</b> TestLammps.h:311</div></div>
+<div class="ttc" id="aclassTestLammps_html_a032e4b51f896ef2fd24df904b6ef56fe"><div class="ttname"><a href="classTestLammps.html#a032e4b51f896ef2fd24df904b6ef56fe">TestLammps::loadMacroscopicSolverConfiguration</a></div><div class="ttdeci">void loadMacroscopicSolverConfiguration()</div><div class="ttdef"><b>Definition:</b> TestLammps.h:325</div></div>
 <div class="ttc" id="aclassTestLammps_html_a3ed7deab01616dd6bc562b4d0f4e3156"><div class="ttname"><a href="classTestLammps.html#a3ed7deab01616dd6bc562b4d0f4e3156">TestLammps::loadMamicoTestConfiguration</a></div><div class="ttdeci">void loadMamicoTestConfiguration()</div><div class="ttdef"><b>Definition:</b> TestLammps.h:227</div></div>
 <div class="ttc" id="aclassTestLammps_html_ad45f8c2ea0d8437dad009ae2c6e218c0"><div class="ttname"><a href="classTestLammps.html#ad45f8c2ea0d8437dad009ae2c6e218c0">TestLammps::loadLammpsTestConfiguration</a></div><div class="ttdeci">void loadLammpsTestConfiguration(std::string inputmoleculeconfiguration, int numberAtoms)</div><div class="ttdef"><b>Definition:</b> TestLammps.h:126</div></div>
 <div class="ttc" id="aclasscoupling_1_1IndexConversion_html"><div class="ttname"><a href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a></div><div class="ttdoc">handles the index conversion</div><div class="ttdef"><b>Definition:</b> IndexConversion.h:33</div></div>
