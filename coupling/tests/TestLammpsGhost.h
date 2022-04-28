@@ -6,7 +6,7 @@
 #define _TESTLAMMPSGHOST_H_
 
 #include "TestLammps.h"
-#include "mamico_lammps_md_solver_interface.h"
+#include "coupling/interface/impl/LAMMPS/USER-MAMICO/mamico_lammps_md_solver_interface.h"
 
 /** prints the inner and ghost atoms.
  *  @author Philipp Neumann

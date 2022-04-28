@@ -3,32 +3,28 @@
 #if any compilation fails, exit
 set -e
 
-for compiler in $1; do
-
-	cmake . -D CMAKE_CXX_COMPILER=${compiler} -D BUILD_WITH_MPI=OFF || { #try/catch
-		>&2 echo "CompileTest: Makefile generation of sequential CouetteTest failed for compiler: ${compiler}"
+for build in Debug DebugOptimized RelWithDebInfo Release; do
+	for compiler in $1; do
+		# cmake must be called twice if the compiler changes (the other variables are deleted, so we need to set them again later)
+		cmake . -D CMAKE_CXX_COMPILER=${compiler} || { #try/catch
+		>&2 echo "CompileTest: Makefile generation of CouetteTest failed for compiler: ${compiler} with MPI ${mpi}"
 		exit 1 
-	}
+		}
 
-	make clean
+		for mpi in ON OFF; do
+			cmake . -D CMAKE_CXX_COMPILER=${compiler} -D BUILD_WITH_MPI=${mpi} -D CMAKE_BUILD_TYPE=${build} || { #try/catch
+			>&2 echo "CompileTest: Makefile generation of CouetteTest failed for compiler: ${compiler} with MPI ${mpi}"
+			exit 1 
+			}
 
-	make || { #try/catch
-		>&2 echo "CompileTest: Compilation of sequential CouetteTest failed for compiler: ${compiler}" 
-		exit 1 
-	}
+			make clean
 
-	cmake . -D CMAKE_CXX_COMPILER=${compiler} -D BUILD_WITH_MPI=ON || { #try/catch
-		>&2 echo "CompileTest: Makefile generation of parallel CouetteTest failed for compiler: ${compiler}" 
-		exit 1 
-	}
-
-	make clean
-
-	make || { #try/catch
-	 	>&2 echo "CompileTest: Compilation of parallel CouetteTest failed for compiler: ${compiler}"
-	 	exit 1 
-	}
-
+			make -j4 || { #try/catch
+				>&2 echo "CompileTest: Compilation of CouetteTest failed for compiler: ${compiler} with MPI ${mpi}" 
+				exit 1 
+			}
+		done
+	done
 done
 
 make clean

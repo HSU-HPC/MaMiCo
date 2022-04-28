@@ -158,7 +158,7 @@ public:
       : MacroscopicCellServiceImpl<LinkedCell, dim>(ID, mdSolverInterface, macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,
                                                     momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration,
                                                     parallelTopologyConfiguration, thermostatConfiguration, numberMDTimestepsPerCouplingCycle,
-                                                    macroscopicCellConfiguration, multiMDService, 0) {}
+                                                    macroscopicCellConfiguration, filterPipelineConfiguration, multiMDService, 0) {}
 
   /** destructor. Frees dynamically allocated memory for particle insertion,
    * momentum insertion and the transfer strategy.

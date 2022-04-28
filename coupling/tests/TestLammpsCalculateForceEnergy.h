@@ -7,7 +7,7 @@
 
 #include "TestLammps.h"
 #include "coupling/datastructures/Molecule.h"
-#include "mamico_lammps_md_solver_interface.h"
+#include "coupling/interface/impl/LAMMPS/USER-MAMICO/mamico_lammps_md_solver_interface.h"
 
 /** tests force and energy computation
  *  @author Philipp Neumann
@@ -75,7 +75,7 @@ public:
                   << ", potential energy=" << potEnergy << std::endl;
         exit(EXIT_FAILURE);
       }
-      if (fabs(tarch::la::norm2(force - forceRef) > tolerance)) {
+      if (fabs(tarch::la::norm2(force - forceRef)) > tolerance) {
         std::cout << "ERROR TestLammpsCalculcateForceEnergy: forces do not match1! Force ref.=" << forceRef << ", force=" << force << std::endl;
         exit(EXIT_FAILURE);
       }
@@ -95,7 +95,7 @@ public:
       int n = -1;
       for (int i = 0; i < nlocal; i++) {
         bool found = true;
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           found = found && (thisPosition[d] == lammps->atom->x[i][d]);
         }
         if (found) {

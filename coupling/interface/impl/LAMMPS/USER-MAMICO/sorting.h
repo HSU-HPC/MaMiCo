@@ -12,9 +12,9 @@
 #include "coupling/IndexConversion.h"
 #include "tarch/la/Vector.h"
 
-#include "atom.h"
-#include "lammps.h"
-#include "memory.h"
+#include "lammps/atom.h"
+#include "lammps/lammps.h"
+#include "lammps/memory.h"
 
 namespace LAMMPS_NS {
 
