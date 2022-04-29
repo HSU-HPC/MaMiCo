@@ -32,6 +32,8 @@ void simplemd::configurations::MPIConfiguration::parseSubtag(tinyxml2::XMLElemen
     numProc = numProc * _numberOfProcesses[d];
   }
   _isValid = _isValid && (numProc == 1);
+  if (!_isValid)
+    std::cout << "Invalid MPIConfiguration, MD_PARALLEL == MD_NO but _numberOfProcesses != 1" << std::endl;
 #endif
 }
 

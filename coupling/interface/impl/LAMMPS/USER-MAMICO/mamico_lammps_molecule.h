@@ -39,7 +39,7 @@ public:
     }
 #endif
     tarch::la::Vector<dim, double> vel(0.0);
-    for (int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; d++)
       vel[d] = _v[_n][d];
     return vel;
   }
@@ -50,18 +50,18 @@ public:
       exit(EXIT_FAILURE);
     }
 #endif
-    for (int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; d++)
       _v[_n][d] = vel[d];
   }
 
   virtual tarch::la::Vector<dim, double> getPosition() const {
     tarch::la::Vector<dim, double> pos(0.0);
-    for (int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; d++)
       pos[d] = _x[_n][d];
     return pos;
   }
   virtual void setPosition(const tarch::la::Vector<dim, double> &pos) {
-    for (int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; d++)
       _x[_n][d] = pos[d];
   }
 
@@ -73,7 +73,7 @@ public:
     }
 #endif
     tarch::la::Vector<dim, double> force(0.0);
-    for (int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; d++)
       force[d] = _f[_n][d];
     return force;
   }
@@ -84,7 +84,7 @@ public:
       exit(EXIT_FAILURE);
     }
 #endif
-    for (int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; d++)
       _f[_n][d] = force[d];
   }
 
@@ -116,7 +116,7 @@ public:
     tarch::la::Vector<3, unsigned int> start(0);
     tarch::la::Vector<3, unsigned int> end(1);
     tarch::la::Vector<3, unsigned int> loop(0);
-    for (int d = 0; d < dim; d++) {
+    for (unsigned int d = 0; d < dim; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       if (cellIndex[d] == 0) {
         std::cout << "ERROR MamicoLammpsMolecule::getPotentialEnergy(): Cannot "

@@ -6,9 +6,9 @@
 #define _MOLECULARDYNAMICS_COUPLING_TESTS_TESTLAMMPSMOLECULEITERATOR_H_
 
 #include "coupling/cell-mappings/MoleculeExtractor.h"
+#include "coupling/interface/impl/LAMMPS/USER-MAMICO/mamico_cell.h"
+#include "coupling/interface/impl/LAMMPS/USER-MAMICO/sorting.h"
 #include "coupling/tests/TestLammps.h"
-#include "mamico_cell.h"
-#include "sorting.h"
 #include <vector>
 
 /** this class is used to test the iterator over molecules in LAMMPS.

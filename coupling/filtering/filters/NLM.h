@@ -3,8 +3,6 @@
 
 #pragma once
 
-#define NLM_DEBUG
-
 #include "coupling/filtering/filters/Datastructures.h"
 #include "coupling/filtering/interfaces/JunctorInterface.h"
 #include <array>

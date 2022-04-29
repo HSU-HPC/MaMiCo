@@ -13,22 +13,22 @@
 #include "mamico_cell.h"
 #include "mamico_lammps_molecule_iterator.h"
 
-#include "atom_vec.h"
-#include "comm.h"
-#include "compute_pe_atom.h"
-#include "domain.h"
-#include "error.h"
-#include "fix.h"
-#include "force.h"
-#include "input.h"
-#include "lammps.h"
-#include "modify.h"
-#include "neighbor.h"
-#include "random_park.h"
+#include "lammps/atom_vec.h"
+#include "lammps/comm.h"
+#include "lammps/compute_pe_atom.h"
+#include "lammps/domain.h"
+#include "lammps/error.h"
+#include "lammps/fix.h"
+#include "lammps/force.h"
+#include "lammps/input.h"
+#include "lammps/lammps.h"
+#include "lammps/modify.h"
+#include "lammps/neighbor.h"
+#include "lammps/random_park.h"
 #include "sorting.h"
-#include "timer.h"
-#include "update.h"
-#include "verlet.h"
+#include "lammps/timer.h"
+#include "lammps/update.h"
+#include "lammps/verlet.h"
 // the following three lines were included since we had issues when compiling
 // with walberla -> compiler flag stcxx and INT64_MAX do not fit
 // -> use LAMMPS_SMALLSMALL or so as compiler flag to build library
@@ -96,7 +96,7 @@ public:
       _lmp->error->all(FLERR, "Only orthogonal box shape domain is supported!");
     }
     tarch::la::Vector<dim, double> domainsize(0.0);
-    for (int d = 0; d < dim; d++) {
+    for (unsigned int d = 0; d < dim; d++) {
       domainsize[d] = _lmp->domain->boxhi[d] - _lmp->domain->boxlo[d];
     }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -111,7 +111,7 @@ public:
       _lmp->error->all(FLERR, "Only orthogonal box shape domain is supported!");
     }
     tarch::la::Vector<dim, double> domainoffset(0.0);
-    for (int d = 0; d < dim; d++) {
+    for (unsigned int d = 0; d < dim; d++) {
       domainoffset[d] = _lmp->domain->boxlo[d];
     }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -159,7 +159,7 @@ public:
     tarch::la::Vector<dim, double> ran(0.0); // buffer for one gaussian and dim-1 uniform random numbers
                                              // (latter ones are used for random rotation of velocity vector)
     ran[0] = _random->gaussian();
-    for (int d = 1; d < dim; d++)
+    for (unsigned int d = 1; d < dim; d++)
       ran[d] = _random->uniform();
 
     // init 2D/3D vector with avg meanVelocity and respective fluctuation
@@ -227,9 +227,9 @@ public:
     const int nlocal_previous = _lmp->atom->nlocal;              // no. of atoms before insertion
     tarch::la::Vector<dim, double> pos = molecule.getPosition(); // position of molecule
     double posVec[3] = {0.0, 0.0, 0.0};
-    for (int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; d++)
       posVec[d] = pos[d];
-    for (int d = dim; d < 3; d++)
+    for (unsigned int d = dim; d < 3; d++)
       posVec[d] = 0.5 * (_lmp->domain->boxhi[d] + _lmp->domain->boxlo[d]);
     const tarch::la::Vector<dim, double> vel = molecule.getVelocity(); // velocity of molecule
     const tarch::la::Vector<dim, double> f = molecule.getForce();      // force of molecule
@@ -252,7 +252,7 @@ public:
     int indexAtom = -1;
     for (int i = nlocal - 1; i > -1; i--) {
       bool found = true;
-      for (int d = 0; d < dim; d++) {
+      for (unsigned int d = 0; d < dim; d++) {
         found = found && tarch::la::equals(_lmp->atom->x[i][d], pos[d], _tolerance);
       }
       if (found) {
@@ -348,7 +348,7 @@ public:
     tarch::la::Vector<3, unsigned int> start(0);
     tarch::la::Vector<3, unsigned int> end(1);
     tarch::la::Vector<3, unsigned int> loop(0);
-    for (int d = 0; d < dim; d++) {
+    for (unsigned int d = 0; d < dim; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       if (cellIndex[d] == 0) {
         std::cout << "ERROR "

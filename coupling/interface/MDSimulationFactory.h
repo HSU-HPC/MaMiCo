@@ -25,10 +25,10 @@
 #include "simplemd/LinkedCell.h"
 #define MY_LINKEDCELL simplemd::LinkedCell
 #elif defined(LAMMPS_MD) || defined(LAMMPS_DPD)
-#include "input.h"
-#include "lammps.h"
-#include "mamico_cell.h"
-#include "mamico_lammps_md_solver_interface.h"
+#include "impl/LAMMPS/USER-MAMICO/mamico_cell.h"
+#include "impl/LAMMPS/USER-MAMICO/mamico_lammps_md_solver_interface.h"
+#include "lammps/input.h"
+#include "lammps/lammps.h"
 #include <mpi.h>
 #define MY_LINKEDCELL LAMMPS_NS::MamicoCell
 #endif
