@@ -149,6 +149,8 @@ class KVSTest():
 
         mamico.tarch.utils.initIndexing(self.simpleMDConfig, self.mamicoConfig, self.macroscopicSolverInterface, self.rank)
 
+        self.multiMDCellService.constructFilterPipelines()
+
         for i in range(self.localMDInstances):
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
