@@ -597,14 +597,14 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   _boundaryTreatment->emptyGhostBoundaryCells();
 
   // plot VTK output
-  if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
+  if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() > 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
     _vtkMoleculeWriter->setTimestep(t);
     _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false);
   }
 
   #if BUILD_WITH_ADIOS2
   // plot Adios2 output
-  if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() != 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
+  if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() > 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
     _Adios2Writer->setTimestep(t);
     _moleculeService->iterateMolecules(*_Adios2Writer, false);
   }

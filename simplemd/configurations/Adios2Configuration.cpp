@@ -2,7 +2,6 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#if BUILD_WITH_ADIOS2
 #include "simplemd/configurations/Adios2Configuration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 
@@ -20,6 +19,15 @@ void simplemd::configurations::Adios2Configuration::parseSubtag(tinyxml2::XMLEle
     _isValid = false;
     exit(EXIT_FAILURE);
   }
+  #ifndef BUILD_WITH_ADIOS2
+  if(buffer != 0)
+  {
+    std::cout << " BUILD_WITH_ADIOS2 disabled but Adios2Writer enabled! " << std::endl;
+    _isValid = false;
+    exit(EXIT_FAILURE);
+  }
+  #endif
+
   _writeEveryTimestep = (unsigned int)(buffer);
 
   // parse file stem
@@ -34,5 +42,3 @@ void simplemd::configurations::Adios2Configuration::parseSubtag(tinyxml2::XMLEle
 std::string simplemd::configurations::Adios2Configuration::getTag() const { return "adios2-configuration"; }
 
 bool simplemd::configurations::Adios2Configuration::isValid() const { return _isValid; }
-
-#endif

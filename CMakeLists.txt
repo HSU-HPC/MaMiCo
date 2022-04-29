@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(mamico VERSION 2.0 LANGUAGES C CXX)
+project(mamico VERSION 2.0 LANGUAGES CXX)
 
 # CMake Policies
 # TODO: check policies
@@ -100,7 +100,8 @@ if(BUILD_WITH_MPI)
     target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
 endif()
 if(BUILD_WITH_ADIOS2)
-  if(BUILD_WITH_MPI)
+if(BUILD_WITH_MPI)
+    enable_language(C)
     target_link_libraries(simplemd_interface INTERFACE adios2::cxx11_mpi MPI::MPI_CXX)
   else()
     target_link_libraries(simplemd_interface INTERFACE adios2::cxx11)
@@ -175,10 +176,10 @@ set(SIMPLE_MD_SOURCES
 		"simplemd/services/ParallelTopologyService.cpp"
         "tarch/tinyxml2/tinyxml2.cpp"
         "tarch/utils/RandomNumberService.cpp"
+        "simplemd/configurations/Adios2Configuration.cpp"
 )
 if(BUILD_WITH_ADIOS2)
-  list(APPEND SIMPLE_MD_SOURCES "simplemd/molecule-mappings/Adios2Writer.cpp"
-  "simplemd/configurations/Adios2Configuration.cpp")
+  list(APPEND SIMPLE_MD_SOURCES "simplemd/molecule-mappings/Adios2Writer.cpp")
 endif()
 
 

@@ -53,6 +53,15 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
     _vtkMoleculeWriter->setTimestep(t);
     _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false);
   }
+
+  //plot ADIOS2 output
+  #if BUILD_WITH_ADIOS2
+  if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() != 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
+  _Adios2Writer->setTimestep(t);
+  _moleculeService->iterateMolecules(*_Adios2Writer, false);
+  }
+  #endif
+  
   // write checkpoint
   if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
       (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
