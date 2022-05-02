@@ -12,10 +12,148 @@
  * boundaries must be determined at runtime using IndexingService
  */
 
-#ifdef MDDim2
-// TODO
+// We must compile both, dim2 and dim3, so that both can be used (also in the same executable e.g. main_lammps.cpp)
+// Dim2    ///////////
+namespace coupling {
+namespace indexing {
 
-#elif MDDim3
+/*
+ * Declare specialisations of CellIndex.
+ * Define their static members.
+ */
+
+/*
+ * NON-MD-TO-MACRO aka MAMICO INDEXING, INCL GHOST LAYER
+ */
+
+// scalar, global, !md2macro, !noGL
+template <> BaseIndex<2> CellIndex<2>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2>::divisionFactor{};
+
+// BaseIndex
+template <> BaseIndex<2> BaseIndex<2>::lowerBoundary{};
+template <> BaseIndex<2> BaseIndex<2>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> BaseIndex<2>::numberCellsInDomain{};
+template <> unsigned int BaseIndex<2>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> BaseIndex<2>::divisionFactor{};
+
+// scalar, local, !md2macro, !noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::local>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::local>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::local>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::local>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::local>::divisionFactor{};
+
+// vector, local, !md2macro, !noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::local>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::local>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::local>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local>::divisionFactor{};
+
+/*
+ * MD TO MACRO, INCL GHOST LAYER
+ */
+
+// scalar, global, md2macro, !noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::md2macro>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::md2macro>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::md2macro>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::md2macro>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::md2macro>::divisionFactor{};
+
+// vector, global, md2macro, !noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::md2macro>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::md2macro>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::md2macro>::divisionFactor{};
+
+// scalar, local, md2macro, !noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::local, IndexTrait::md2macro>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::local, IndexTrait::md2macro>::divisionFactor{};
+
+// vector, local, md2macro, !noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::divisionFactor{};
+
+/*
+ * !MD TO MACRO aka MAMICO INDEXING, EXCL GHOST LAYER
+ */
+
+// scalar, global, !md2macro, noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::noGhost>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::noGhost>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::noGhost>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::noGhost>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::noGhost>::divisionFactor{};
+
+// vector, global, !md2macro, noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::noGhost>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::noGhost>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::noGhost>::divisionFactor{};
+
+// scalar, local, !md2macro, noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::local, IndexTrait::noGhost>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::local, IndexTrait::noGhost>::divisionFactor{};
+
+// vector, local, !md2macro, noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::divisionFactor{};
+
+/*
+ * MD TO MACRO, EXCL GHOST LAYER
+ */
+
+// scalar, global, md2macro, noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+
+// vector, global, md2macro, noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+
+// scalar, local, md2macro, noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+
+// vector, local, md2macro, noGL
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
+template <> BaseIndex<2> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary{};
+template <>
+tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
+template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+} // namespace indexing
+} // namespace coupling
+
+// Dim3   //////////////////////////
 namespace coupling {
 namespace indexing {
 
@@ -154,9 +292,6 @@ template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, Ind
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
 } // namespace indexing
 } // namespace coupling
-#else
-static_assert(false, "IndexingService only available for dim=2 or dim=3.");
-#endif
 
 // impl of IndexingService
 template <unsigned int dim>

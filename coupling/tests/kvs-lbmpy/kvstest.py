@@ -149,6 +149,8 @@ class KVSTest():
 
         mamico.tarch.utils.initIndexing(self.simpleMDConfig, self.mamicoConfig, self.macroscopicSolverInterface, self.rank)
 
+        self.multiMDCellService.constructFilterPipelines()
+
         for i in range(self.localMDInstances):
             self.simpleMD[i].setMacroscopicCellService(self.multiMDCellService.getMacroscopicCellService(i))
             self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
@@ -415,9 +417,17 @@ class LBSolver():
         self.cL_max = 0
 
     def setup_scenario(self):
+        try:  # for lbmpy version >= 0.4.0
+            from pystencils import Target
+            if self.cfg.get("macroscopic-solver", "optimization-target") == "cpu":
+                optTarget = Target.CPU
+            elif self.cfg.get("macroscopic-solver", "optimization-target") == "gpu":
+                optTarget = Target.GPU
+        except ImportError:   # for lbmpy version <= 0.3.4
+            optTarget = self.cfg.get("macroscopic-solver", "optimization-target")
         self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method='srt',stencil='D3Q19',
             relaxation_rate=self.omega, periodicity=(True, False, False),
-            optimization={'target':self.cfg.get("macroscopic-solver", "optimization-target") , 
+            optimization={'target':optTarget, 
             'gpu_indexing':'line', 
             'double_precision':self.cfg.get("macroscopic-solver", "double-precision")})
         def obstacle(x, y, z):

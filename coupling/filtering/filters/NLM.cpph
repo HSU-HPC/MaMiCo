@@ -3,7 +3,7 @@
 
 template <unsigned int dim> void coupling::filtering::NLM<dim>::operator()() {
 #ifdef NLM_DEBUG
-// std::cout << "    NLM: called operator()" << std::endl;
+  std::cout << "    NLM: called operator()" << std::endl;
 #endif
 
   save_data();
@@ -58,7 +58,7 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
         auto& other = _patchfield(idx2_inner, t);
         double dist = me.distance(other);
 #ifdef NLM_DEBUG
-        // std::cout << "dist = " << dist << std::endl;
+        std::cout << "dist = " << dist << std::endl;
 #endif
         if (dist < _sigsq)
           cnt_sigsq++;
@@ -67,10 +67,10 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
         cnt_total++;
         double weight = std::exp(-std::max(dist - _sigsq, 0.0) / _hsq) * 1 / (-offset_t + 1);
 #ifdef NLM_DEBUG
-        // std::cout << "weight = " << weight << std::endl;
+        std::cout << "weight = " << weight << std::endl;
 #endif
         for (unsigned int i = 0; i < res_offset.size(); i++) {
-          tarch::la::Vector<dim, unsigned int> residx(idx2.get()[0] + res_offset[i][0], idx2.get()[1] + res_offset[i][1], idx2.get()[2] + res_offset[i][2]);
+          tarch::la::Vector<dim, unsigned int> residx(idx2.get() + res_offset[i]);
           coupling::filtering::Quantities<dim>& q = _flowfield(residx, t);
           res[i] += q * weight;
         }
@@ -80,7 +80,7 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
 
     for (unsigned int i = 0; i < res_offset.size(); i++) {
       res[i] = res[i] * (1 / C);
-      tarch::la::Vector<dim, int> residx(idx.get()[0] + res_offset[i][0], idx.get()[1] + res_offset[i][1], idx.get()[2] + res_offset[i][2]);
+      tarch::la::Vector<dim, int> residx(idx.get() + res_offset[i]);
       int cellidx = coupling::indexing::convertToScalar(CellIndex_T(residx));
 
       coupling::filtering::JunctorInterface<dim, 2, 1>::_outputCellVectors[0][cellidx]->setMacroscopicMass(res[i][0]);

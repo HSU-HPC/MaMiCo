@@ -12,8 +12,8 @@ endif()
 #
 # Build type
 if(NOT CMAKE_BUILD_TYPE)
-  message(WARNING "CMAKE_BUILD_TYPE was not specified. Debug build is assumed.")
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type." FORCE)
+  message(WARNING "CMAKE_BUILD_TYPE was not specified. DebugOptimized build is assumed.")
+  set(CMAKE_BUILD_TYPE DebugOptimized CACHE STRING "Build type." FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug DebugOptimized RelWithDebInfo Release)
 endif()
 message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
@@ -24,8 +24,12 @@ option(BUILD_WITH_MPI "Enable the MPI library for parallel build, default is OFF
 message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 # Dimension for MD build, default is MDDim3
 set(MDDim MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")
-message(STATUS ">> SimpleMD dimension : " ${MDDim})
+message(STATUS ">> MD dimension : " ${MDDim})
 set_property(CACHE MDDim PROPERTY STRINGS MDDim3 MDDim2)
+# Set MD Simulation to use
+set(MD_SIM SIMPLE_MD CACHE STRING "Choose SIMPLE_MD or LAMMPS")
+set_property(CACHE MD_SIM PROPERTY STRINGS SIMPLE_MD LAMMPS_MD LAMMPS_DPD)
+message(STATUS ">> MD simulation used : " ${MD_SIM})
 # Enable the Eigen library used (so far) only for POD filtering, default is off
 option(BUILD_WITH_EIGEN "Enable the Eigen library used (so far) only for POD filtering, default is off." OFF)
 message(STATUS ">> Build with Eigen : " ${BUILD_WITH_EIGEN})
@@ -34,7 +38,7 @@ option(BUILD_WITH_PYBIND11 "Enable the MaMiCo python binding, default is off." O
 message(STATUS ">> Build with pybind11 : " ${BUILD_WITH_PYBIND11})
 if (BUILD_WITH_PYBIND11 AND NOT BUILD_WITH_MPI)
 	message(STATUS ">> Build with pybind11 was enabled but build with MPI was not. Enabling build with MPI.")
-	set(BUILD_WITH_MPI "ON")
+	set(BUILD_WITH_MPI ON CACHE BOOL "Enable the MPI library for parallel build, default is OFF." FORCE)
 	message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 endif()
 # Enable coupling the OpenFOAM API, default is off
@@ -43,6 +47,17 @@ message(STATUS ">> Build with OpenFOAM : " ${BUILD_WITH_OPENFOAM})
 # Enable coupling with the preCICE API, default is off
 option(BUILD_WITH_PRECICE "Enable coupling with the preCICE API, default is off." OFF)
 message(STATUS ">> Build with preCICE : " ${BUILD_WITH_PRECICE})
+# Enable coupling with the LAMMPS, default is off
+option(BUILD_WITH_LAMMPS "Enable coupling with LAMMPS MD, default is off." OFF)
+message(STATUS ">> Build with LAMMPS : " ${BUILD_WITH_LAMMPS})
+if(("${MD_SIM}" STREQUAL "LAMMPS_MD" OR "${MD_SIM}" STREQUAL "LAMMPS_DPD") AND NOT BUILD_WITH_LAMMPS)
+  message(STATUS ">> MD_SIM is LAMMPS but BUILD_WITH_LAMMPS was disabled. Enabling build with LAMMPS.")
+  set(BUILD_WITH_LAMMPS ON CACHE BOOL "Enable coupling with LAMMPS MD, default is off." FORCE)
+  message(STATUS ">> Build with LAMMPS : " ${BUILD_WITH_LAMMPS})
+endif()
+if("${MD_SIM}" STREQUAL "SIMPLE_MD" AND BUILD_WITH_LAMMPS)
+  message(WARNING ">> BUILD_WITH_LAMMPS is enabled but MD_SIM is SIMPLE_MD. Are you sure?")
+endif()
 # Compiler list to be used for compiletest
 set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
 message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_COMPILERS})
@@ -79,6 +94,11 @@ if(BUILD_WITH_PRECICE)
 	find_package(precice REQUIRED)
 endif()
 
+if(BUILD_WITH_LAMMPS)
+  find_package(PkgConfig REQUIRED)
+  pkg_search_module(LAMMPS REQUIRED liblammps)
+endif()
+
 #
 # simplemd interface
 #
@@ -86,8 +106,19 @@ add_library(simplemd_interface INTERFACE)
 target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	target_compile_definitions(simplemd_interface INTERFACE MDError)
+	target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
+  target_compile_options(simplemd_interface INTERFACE -Og -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
+  target_compile_definitions(simplemd_interface INTERFACE MDError)
+  target_compile_options(simplemd_interface INTERFACE -O3 -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  target_compile_options(simplemd_interface INTERFACE -O3 -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+  target_compile_options(simplemd_interface INTERFACE -Ofast)
+else()
+  message(FATAL_ERROR "Unsupported build type")
 endif()
+
 if(BUILD_WITH_MPI)
     target_compile_definitions(simplemd_interface INTERFACE MDParallel TarchParallel)
     target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
@@ -97,31 +128,13 @@ message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
 message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -O3)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(simplemd_interface INTERFACE -g3)
-	endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-	target_compile_options(simplemd_interface INTERFACE -fstrict-aliasing -qpack_semantic=gnu -ipo)
+	target_compile_options(simplemd_interface INTERFACE -fstrict-aliasing -qpack_semantic=gnu -ipo -align -ansi-alias) #-w
 	target_link_options(simplemd_interface INTERFACE -ipo)
-	if (CMAKE_BUILD_TYPE PRIVATE "Debug")
-		target_compile_options(simplemd_interface INTERFACE -O3)
-	else()
-		target_compile_options(simplemd_interface INTERFACE -fast -w -Werror-all -align -ansi-alias)
-	endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
 	target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(simplemd_interface INTERFACE -g3 -O3)
-	else()
-		target_compile_options(simplemd_interface INTERFACE -Ofast)
-	endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(simplemd_interface INTERFACE -Wall -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -Wno-gnu-array-member-paren-init)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(simplemd_interface INTERFACE -g -O3)
-	else()
-		target_compile_options(simplemd_interface INTERFACE -O3)
-	endif()
 else()
 	message(STATUS ">> Unsupported compiler.")
 endif()
@@ -185,12 +198,11 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
-target_link_libraries(mamico INTERFACE libsimplemd)
 if(BUILD_WITH_EIGEN)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
 	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
 endif()
-target_compile_definitions(mamico INTERFACE SIMPLE_MD MDDim3)
+target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors -O3)
 if(BUILD_WITH_MPI)
     target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
@@ -218,7 +230,27 @@ endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang" )
 	target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
 endif()
+# we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
+target_link_libraries(mamico INTERFACE libsimplemd)
+if("${MD_SIM}" STREQUAL "LAMMPS_MD")
+  target_link_libraries(mamico INTERFACE ${LAMMPS_LINK_LIBRARIES})
+  target_include_directories(mamico INTERFACE ${LAMMPS_INCLUDE_DIRS})
+  #target_compile_options(mamico INTERFACE ${LAMMPS_CFLAGS_OTHER})
+endif()
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
+  target_compile_options(mamico INTERFACE -Og -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
+  target_compile_definitions(mamico INTERFACE MDCoupledError)
+  target_compile_options(mamico INTERFACE -O3 -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  target_compile_options(mamico INTERFACE -O3 -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+  target_compile_options(mamico INTERFACE -Ofast)
+else()
+  message(FATAL_ERROR "Unsupported build type")
+endif()
 
 #
 # Couette target
@@ -235,6 +267,25 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
 	target_compile_options(couette PRIVATE -std=c++17)
 endif()
 target_link_libraries(couette PRIVATE mamico)
+
+#
+# test_lammps target
+#
+if("${MD_SIM}" STREQUAL "LAMMPS_MD")
+  set(TEST_LAMMPS_SOURCES
+    "tarch/tinyxml2/tinyxml2.cpp"
+    "coupling/configurations/ParticleInsertionConfiguration.cpp"
+    "tarch/utils/RandomNumberService.cpp"
+    "coupling/tests/main_lammps.cpp"
+    "coupling/indexing/IndexingService.cpp"
+  )
+  add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
+  set_target_properties(test_lammps PROPERTIES CXX_STANDARD 17)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+    target_compile_options(test_lammps PRIVATE -std=c++17)
+  endif()
+  target_link_libraries(test_lammps PRIVATE mamico)
+endif()
 
 #
 # pybind target

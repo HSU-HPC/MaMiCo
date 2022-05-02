@@ -46,10 +46,10 @@ public:
     for (unsigned int i = 0; i < multiMDService.getLocalNumberOfMDSimulations(); i++) {
       _mdSimulations.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(_mdConfig, _mamicoConfig
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                                                                                                            ,
-                                                                                                            _multiMDService.getLocalCommunicator()
+                                                                                                                 ,
+                                                                                                                 _multiMDService.getLocalCommunicator()
 #endif
-                                                                                                                ));
+                                                                                                                     ));
 
       if (_mdSimulations[i] == nullptr) {
         std::cout << "ERROR InstanceHandling : _mdSimulations [" << i << "] == NULL!" << std::endl;
