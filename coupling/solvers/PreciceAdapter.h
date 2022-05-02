@@ -87,6 +87,7 @@ public:
 				interfaceCellIndex++;
 			}
 		}
+	    
 	    /*
 		std::cout << "[";
 		for (unsigned int interfaceCellIndex = 0; interfaceCellIndex < _numberOfCells; interfaceCellIndex++) {
@@ -94,6 +95,7 @@ public:
 		}
 		std::cout << "]" << std::endl;
 		*/
+		
 		int meshID = _interface->getMeshID("mamico-mesh");
 		_vertexIDs = new int[_numberOfCells];
 		_interface->setMeshVertices(meshID, _numberOfCells, _coords, _vertexIDs); 
@@ -137,11 +139,6 @@ public:
 				// velocity from the conitnuum solver
 				int dataID = _interface->getDataID("Velocity", meshID);
 				_interface->readBlockVectorData(dataID, _numberOfCells, _vertexIDs, _velocities);
-				std::cout <<_numberOfCells << std::endl;
-				for (unsigned int vertexIndex = 0; vertexIndex < _numberOfCells; vertexIndex++)
-				{
-					std::cout << _velocities[dim*vertexIndex] << std::endl;
-				}
 				/*
 				std::cout << "[";
 				for (unsigned int interfaceCellIndex = 0; interfaceCellIndex < _numberOfCells; interfaceCellIndex++) {
