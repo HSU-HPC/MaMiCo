@@ -222,7 +222,7 @@ private:
 
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
-        
+
 #if (BUILD_WITH_PRECICE)
     if (_cfg.maSolverType == coupling::configurations::CouetteConfig::COUETTE_PRECICE) {
       static_cast<coupling::solvers::PreciceAdapter<3>*>(_couetteSolver)
