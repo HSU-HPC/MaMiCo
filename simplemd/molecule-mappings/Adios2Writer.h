@@ -2,7 +2,6 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#if BUILD_WITH_ADIOS2
 
 #ifndef _MOLECULARDYNAMICS_MOLECULEMAPPINGS_Adios2Writer_H_
 #define _MOLECULARDYNAMICS_MOLECULEMAPPINGS_Adios2Writer_H_
@@ -41,11 +40,10 @@ namespace simplemd {
   namespace moleculemappings {
     class Adios2Writer;
   }
-}
+} //namespace simplemd
 
 
-/** writes molecule data to a vtk file.
- *  In case of parallel computations, the rank of the respective process is added to the filename.
+/** writes molecule data to a adios2 output directory
  *  @author Philipp Neumann
  */
 class simplemd::moleculemappings::Adios2Writer {
@@ -72,14 +70,26 @@ class simplemd::moleculemappings::Adios2Writer {
     std::string _filename;
     /** current timestep */
     unsigned int _timestep;
-
+    /** domain offset*/
     tarch::la::Vector<MD_DIM,double> _offset;
-    int _numberProcesses;
+    /** molecular dynamics simulation*/
     const simplemd::configurations::MolecularDynamicsConfiguration &_configuration;
+
+    #if(MD_PARALLEL==MD_YES)
+      /** mpi-communicator*/
+      MPI_Comm _communicator;
+    #endif
+
+    /** number of MPI-threads */
+    int _numberProcesses;
+
+    /** center of global domain */
+    std::array<double, 3> _domainCenter;
 
     /** file stream */
     std::ofstream _file;
 
+    //** adios 2 variables storing positions, velocities, domain size and position and current timestep */
     adios2::Variable<float> rx_var;
     adios2::Variable<float> ry_var;
     adios2::Variable<float> rz_var;
@@ -105,16 +115,15 @@ class simplemd::moleculemappings::Adios2Writer {
     /** stores the information whether a particle is fixed in space */
     std::stringstream _fix;
 
-    #if (MD_PARALLEL==MD_YES)
-    void initAdios2(MPI_Comm communicator);
-    #else
+    /** Does all initializations needed for Adios2 output and writes time-consistent data */
     void initAdios2();
-    #endif
+
+    /** Adios2 instance */
     std::shared_ptr<adios2::ADIOS> _inst;
+    /** Adios2 engine */
 	  std::shared_ptr<adios2::Engine> _engine;
+    /** Adios2 IO */
 	  std::shared_ptr<adios2::IO> _io;
 };
 
 #endif // _MOLECULARDYNAMICS_MOLECULEMAPPINGS_Adios2Writer_H_
-
-#endif
