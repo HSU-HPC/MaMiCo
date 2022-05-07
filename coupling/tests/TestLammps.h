@@ -14,10 +14,10 @@
 #include "tarch/configuration/ParseConfiguration.h"
 #include <sstream>
 
-#include "atom.h"
-#include "input.h"
-#include "lammps.h"
-#include "mamico_cell.h"
+#include "coupling/interface/impl/LAMMPS/USER-MAMICO/mamico_cell.h"
+#include "lammps/atom.h"
+#include "lammps/input.h"
+#include "lammps/lammps.h"
 #include "mpi.h"
 
 /** general test class for lammps. Here, we provide tests for most get..(..)
@@ -99,7 +99,7 @@ public:
     // test domain size
     tmpVec = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getGlobalMDDomainSize();
     valid = (tmpVec[0] == 10.0);
-    for (int d = 1; d < dim; d++) {
+    for (unsigned int d = 1; d < dim; d++) {
       valid = valid && (tmpVec[d] == 10.0);
     }
     if (!valid) {
@@ -109,7 +109,7 @@ public:
     // test domain offset
     tmpVec = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getGlobalMDDomainOffset();
     valid = (tmpVec[0] == 1.0);
-    for (int d = 1; d < dim; d++) {
+    for (unsigned int d = 1; d < dim; d++) {
       valid = valid && (tmpVec[d] == 1.0);
     }
     if (!valid) {
@@ -239,17 +239,17 @@ protected:
     if (dim == 2) {
       switch (size) {
       case 1:
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           numberProcesses[d] = 1;
         }
         break;
       case 4:
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           numberProcesses[d] = 2;
         }
         break;
       case 16:
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           numberProcesses[d] = 4;
         }
         break;
@@ -261,17 +261,17 @@ protected:
     } else if (dim == 3) {
       switch (size) {
       case 1:
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           numberProcesses[d] = 1;
         }
         break;
       case 8:
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           numberProcesses[d] = 2;
         }
         break;
       case 64:
-        for (int d = 0; d < dim; d++) {
+        for (unsigned int d = 0; d < dim; d++) {
           numberProcesses[d] = 4;
         }
         break;
@@ -294,11 +294,25 @@ protected:
       delete _macroscopicCellService;
       _macroscopicCellService = NULL;
     }
+    tarch::utils::MultiMDService<dim> multiMDService{numberProcesses, 1};
+
     _macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>(
-        0, coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface(),
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicSolverInterface(), numberProcesses, rank,
-        config.getParticleInsertionConfiguration(), config.getMomentumInsertionConfiguration(), config.getTransferStrategyConfiguration(),
-        config.getParallelTopologyConfiguration(), numberMDTimestepsPerCouplingCycle, config.getMacroscopicCellConfiguration());
+        0, // arg #1
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface(),
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicSolverInterface(),
+        numberProcesses, // arg #4
+        rank,
+        config.getParticleInsertionConfiguration(), // arg #6
+        config.getMomentumInsertionConfiguration(),
+        config.getBoundaryForceConfiguration(), // arg #8
+        config.getTransferStrategyConfiguration(),
+        config.getParallelTopologyConfiguration(), // arg #10
+        config.getThermostatConfiguration(),
+        numberMDTimestepsPerCouplingCycle,        // arg #12
+        config.getMacroscopicCellConfiguration(), // arg #13
+        mamicoLammpsTestConfiguration.c_str(),    // arg #14
+        multiMDService                            // arg #15
+    );
     if (_macroscopicCellService == NULL) {
       std::cout << "ERROR TestLammps: _macroscopicCellService==NULL!" << std::endl;
       exit(EXIT_FAILURE);

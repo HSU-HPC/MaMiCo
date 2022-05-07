@@ -77,10 +77,10 @@ protected:
   simplemd::moleculemappings::VTKMoleculeWriter* _vtkMoleculeWriter;
   std::string _vtkFilestem;
 
-  #if BUILD_WITH_ADIOS2
+#if BUILD_WITH_ADIOS2
   simplemd::moleculemappings::Adios2Writer* _Adios2Writer;
   std::string _Adios2Filestem;
-  #endif
+#endif
 
   // cell mappings
   simplemd::cellmappings::LennardJonesForceMapping* _lennardJonesForce;

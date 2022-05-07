@@ -29,7 +29,8 @@ coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::Tra
   }
 }
 
-template <class LinkedCell, unsigned int dim> coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::~TransferStrategy4NieCoupling<LinkedCell, dim>() {
+template <class LinkedCell, unsigned int dim>
+coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::~TransferStrategy4NieCoupling<LinkedCell, dim>() {
   // delete arrays
   if (_oldSolution != NULL) {
     delete[] _oldSolution;

@@ -4,7 +4,7 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
-#include "coupling/indexing/IndexingService.cpp"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/tests/Test.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"

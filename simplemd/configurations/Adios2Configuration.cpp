@@ -19,14 +19,13 @@ void simplemd::configurations::Adios2Configuration::parseSubtag(tinyxml2::XMLEle
     _isValid = false;
     exit(EXIT_FAILURE);
   }
-  #ifndef BUILD_WITH_ADIOS2
-  if(buffer != 0)
-  {
+#ifndef BUILD_WITH_ADIOS2
+  if (buffer != 0) {
     std::cout << " BUILD_WITH_ADIOS2 disabled but Adios2Writer enabled! " << std::endl;
     _isValid = false;
     exit(EXIT_FAILURE);
   }
-  #endif
+#endif
 
   _writeEveryTimestep = (unsigned int)(buffer);
 

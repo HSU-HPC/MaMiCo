@@ -6,35 +6,33 @@
 #ifndef _MOLECULARDYNAMICS_MOLECULEMAPPINGS_Adios2Writer_H_
 #define _MOLECULARDYNAMICS_MOLECULEMAPPINGS_Adios2Writer_H_
 
-#include <string>
-#include "simplemd/Molecule.h"
-#include "simplemd/services/MoleculeService.h"
 #include "simplemd/MolecularDynamicsDefinitions.h"
-#include "simplemd/services/ParallelTopologyService.h"
+#include "simplemd/Molecule.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
-#include <sstream>
-#include <iostream>
-#include <fstream>
+#include "simplemd/services/MoleculeService.h"
+#include "simplemd/services/ParallelTopologyService.h"
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 
-#include <errno.h>
+#include <adios2.h>
 #include <chrono>
+#include <errno.h>
 #include <iomanip>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <set>
 #include <sstream>
 #include <string>
 #include <variant>
 #include <vector>
-#include <numeric>
-#include <adios2.h>
 
-
-#if (MD_PARALLEL==MD_YES)
+#if (MD_PARALLEL == MD_YES)
 #include <mpi.h>
 #endif
-
 
 namespace simplemd {
   namespace moleculemappings {

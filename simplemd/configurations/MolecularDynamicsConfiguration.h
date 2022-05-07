@@ -5,6 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_CONFIGURATIONS_MOLECULARDYNAMICSCONFIGURATION_H_
 #define _MOLECULARDYNAMICS_CONFIGURATIONS_MOLECULARDYNAMICSCONFIGURATION_H_
 
+#include "simplemd/configurations/Adios2Configuration.h"
 #include "simplemd/configurations/CheckpointConfiguration.h"
 #include "simplemd/configurations/DomainConfiguration.h"
 #include "simplemd/configurations/ExternalForceConfiguration.h"
@@ -14,7 +15,6 @@
 #include "simplemd/configurations/RDFConfiguration.h"
 #include "simplemd/configurations/SimulationConfiguration.h"
 #include "simplemd/configurations/VTKConfiguration.h"
-#include "simplemd/configurations/Adios2Configuration.h"
 #include "tarch/configuration/Configuration.h"
 #include <iostream>
 #include <vector>
