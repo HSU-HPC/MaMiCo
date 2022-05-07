@@ -87,19 +87,8 @@ void simplemd::moleculemappings::Adios2Writer::setTimestep(const unsigned int &t
   _timestep = timestep;
 }
 
-void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration(){
+void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration(){}
 
-void simplemd::moleculemappings::Adios2Writer::handleMolecule(Molecule& molecule) {
-
-  _positionsx.push_back((float)molecule.getConstPosition()[0]);
-  _velocitiesx.push_back((float)molecule.getConstVelocity()[0]);
-  _positionsy.push_back((float)molecule.getConstPosition()[1]);
-  _velocitiesy.push_back((float)molecule.getConstVelocity()[1]);
-  _positionsz.push_back((float)molecule.getConstPosition()[2]);
-  _velocitiesz.push_back((float)molecule.getConstVelocity()[2]);
-  _component_id.push_back((uint64_t)0);
-  counter++;
-}
 
 void simplemd::moleculemappings::Adios2Writer::handleMolecule(Molecule &molecule){
   
