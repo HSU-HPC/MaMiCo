@@ -42,10 +42,18 @@ namespace simplemd {
 
 
 /** writes molecule data to a adios2 output directory
- *  @author Philipp Neumann
+ *  @author Vincent Fürst
  */
 class simplemd::moleculemappings::Adios2Writer {
   public:
+    /** Constructor 
+   * @param parallelTopologyService parallel topology service
+   * @param moleculeService molecule service
+   * @param filename name for Adios2 output directory
+   * @param offset local domain offset
+   * @param configuration molecular dynamics configuration
+   * @param communicator MPI communicator in parallel case
+   */
     Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService,
       const simplemd::services::MoleculeService& moleculeService, const std::string& filename,
       tarch::la::Vector<MD_DIM,double> offset,
@@ -54,11 +62,24 @@ class simplemd::moleculemappings::Adios2Writer {
       ,MPI_Comm communicator = MPI_COMM_WORLD
       #endif
       );
+
+    /** Destructor */
     ~Adios2Writer();
+
+    /** updates local variable _timestep to global timestep
+     * @param timestep global timestep
+    */
     void setTimestep(const unsigned int &timestep);
 
+    /** begins new timestep in Adios2 IO before iterating over molecules */
     void beginMoleculeIteration();
+
+    /** writes assembled data to file after iterating over all molecules */
     void endMoleculeIteration();
+
+    /** writes position and velocity of the given molecule to the output vector 
+     * @param molecule regarded molecule
+    */
     void handleMolecule(Molecule &molecule);
 
   private:

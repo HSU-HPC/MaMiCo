@@ -87,23 +87,8 @@ void simplemd::moleculemappings::Adios2Writer::setTimestep(const unsigned int &t
   _timestep = timestep;
 }
 
-void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration(){}
-
-
-void simplemd::moleculemappings::Adios2Writer::handleMolecule(Molecule &molecule){
+void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration(){
   
-    _positionsx.push_back((float)molecule.getConstPosition()[0]);
-    _velocitiesx.push_back((float)molecule.getConstVelocity()[0]);
-    _positionsy.push_back((float)molecule.getConstPosition()[1]);
-    _velocitiesy.push_back((float)molecule.getConstVelocity()[1]);
-    _positionsz.push_back((float)molecule.getConstPosition()[2]);
-    _velocitiesz.push_back((float)molecule.getConstVelocity()[2]);
-    _component_id.push_back((uint64_t)0);
-    counter++;
-}
-
-void simplemd::moleculemappings::Adios2Writer::endMoleculeIteration(){
-
   _engine->BeginStep();
   _io->RemoveAllVariables(); //empty buffer
   
@@ -125,6 +110,23 @@ void simplemd::moleculemappings::Adios2Writer::endMoleculeIteration(){
   time_var = _io->DefineVariable<double>(simtime_name);
   global_box_var = _io->DefineVariable<float>("global_box", {6}, {0}, {6}, adios2::ConstantDims);
   component_id_var = _io->DefineVariable<uint64_t>("component_id", {global}, {offset}, {local}, adios2::ConstantDims);
+
+}
+
+
+void simplemd::moleculemappings::Adios2Writer::handleMolecule(Molecule &molecule){
+  
+    _positionsx.push_back((float)molecule.getConstPosition()[0]);
+    _velocitiesx.push_back((float)molecule.getConstVelocity()[0]);
+    _positionsy.push_back((float)molecule.getConstPosition()[1]);
+    _velocitiesy.push_back((float)molecule.getConstVelocity()[1]);
+    _positionsz.push_back((float)molecule.getConstPosition()[2]);
+    _velocitiesz.push_back((float)molecule.getConstVelocity()[2]);
+    _component_id.push_back((uint64_t)0);
+    counter++;
+}
+
+void simplemd::moleculemappings::Adios2Writer::endMoleculeIteration(){
 
   std::array<double, 6> tmp_global_box = {_offset[0], _offset[1], _offset[2], _domainCenter[0] * 2, _domainCenter[1] * 2, _domainCenter[2] * 2};
   std::array<float, 6> global_box;
