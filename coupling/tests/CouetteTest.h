@@ -223,14 +223,6 @@ private:
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
 
-#if (BUILD_WITH_PRECICE)
-    if (_cfg.maSolverType == coupling::configurations::CouetteConfig::COUETTE_PRECICE) {
-      static_cast<coupling::solvers::PreciceAdapter<3>*>(_couetteSolver)
-          ->setCouplingMesh(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-                            _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0]);
-    }
-#endif
-
     // init filtering for all md instances
     _multiMDCellService->constructFilterPipelines();
 
@@ -394,6 +386,15 @@ private:
     // allocate buffers for send/recv operations
     allocateSendBuffer(_multiMDCellService->getIndexConversion(), *couetteSolverInterface);
     allocateRecvBuffer(_multiMDCellService->getIndexConversion(), *couetteSolverInterface);
+
+    #if (BUILD_WITH_PRECICE)
+        if (_cfg.maSolverType == coupling::configurations::CouetteConfig::COUETTE_PRECICE) {
+          static_cast<coupling::solvers::PreciceAdapter<3>*>(_couetteSolver)
+              ->setCouplingMesh(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+                                _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
+                                _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
+        }
+    #endif
 
     if (_cfg.initAdvanceCycles > 0 && _couetteSolver != NULL)
       _couetteSolver->advance(_cfg.initAdvanceCycles * _simpleMDConfig.getSimulationConfiguration().getDt() *
@@ -612,6 +613,12 @@ private:
       else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM && cycle >= _cfg.filterInitCycles && _couetteSolver != NULL) {
         static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
             ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+      }
+#endif
+#if (BUILD_WITH_PRECICE)
+      else if (_cfg.maSolverType == CouetteConfig::COUETTE_PRECICE && cycle >= _cfg.filterInitCycles && _couetteSolver != NULL) {
+        static_cast<coupling::solvers::PreciceAdapter<3>*>(_couetteSolver)
+            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
       }
 #endif
     }

@@ -47,7 +47,8 @@ public:
 
   void setInterface(const unsigned int overlap) { _overlap = overlap; }
 
-  void setCouplingMesh(const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize) {
+  void setCouplingMesh(const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize,
+    const unsigned int* const recvIndices, size_t recvIndicesSize) {
     _mdDomainOffset = mdDomainOffset;
     _macroscopicCellSize = macroscopicCellSize;
     int rank = 0;
@@ -100,16 +101,40 @@ public:
     }
     _vertexm2MCellIDs = new int[_numberOfm2MCells];
     _interface->setMeshVertices(_interface->getMeshID("mamico-m2M-mesh"), _numberOfm2MCells, _coordsm2MCells, _vertexm2MCellIDs);
-    for (size_t i = 0; i < _numberOfm2MCells; i++) {
+    /*for (size_t i = 0; i < _numberOfm2MCells; i++) {
       std::cout << "vertex id:" << _vertexm2MCellIDs[i]
                 << ", coords:[" << _coordsm2MCells[dim* i]
                 << "," << _coordsm2MCells[dim* i+1]
-                << "," _coordsm2MCells[dim* i +2]
+                << "," << _coordsm2MCells[dim* i +2]
                 << "]" << std::endl;
-    }
+    }*/
     _velocitym2MCells = new double[_numberOfm2MCells * dim];
 
     _precice_dt = _interface->initialize();
+
+    for (size_t index = 0; index < recvIndicesSize; index++) {
+      const unsigned int recvIndex = recvIndices[index];
+      tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(coupling::indexing::convertToVector<dim>({recvIndex}));
+      if (sendMacroscopicQuantityToPreCICE(cellVectorIndex)) {
+        double* coords = new double[dim];
+        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+          coords[currentDim] =
+              _mdDomainOffset[currentDim] + cellVectorIndex[currentDim] * _dx - _dx + 0.5 * _macroscopicCellSize[currentDim];
+        }
+        unsigned int m2MCellID = 0;
+        while(m2MCellID < _numberOfm2MCells && (coords[0]!=_coordsm2MCells[m2MCellID*dim] || coords[1]!=_coordsm2MCells[m2MCellID*dim+1] || coords[2]!=_coordsm2MCells[m2MCellID*dim+2])) m2MCellID++;
+        if (m2MCellID >= _numberOfm2MCells) {
+          std::cout << "ERROR Could not find received macroscopic cell among precice cells " << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        _vertexRecvIDsTom2MCellIDs.insert({recvIndex,m2MCellID});
+      }
+    }
+    std::cout << "HEYYYYYYYYYYY" << std::endl;
+    for (const auto& [key, value] : _vertexRecvIDsTom2MCellIDs) {
+        std::cout << '[' << key << "] = " << value << "; ";
+    }
+    std::cout << std::endl;
   }
 
   void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) override { _wallVelocity = wallVelocity; }
@@ -199,72 +224,23 @@ public:
     return ranks;
   }
 
-/*
-  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
-                           const coupling::IndexConversion<3>& indexConversion) override {
-       unsigned int index = 0;
-       for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
-         tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get());
-         if (sendMacroscopicQuantityToPreCICE(cellVectorIndex)) {
-           for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-             _coordsm2MCells[dim * index + currentDim] =
-                 mdDomainOffset[currentDim] + cellVectorIndex[currentDim] * _dx - _dx + 0.5 * macroscopicCellSize[currentDim];
-           }
-           index++;
-         }
-       }
-       _vertexm2MCellIDs = new int[_numberOfm2MCells];
-       _interface->setMeshVertices(_interface->getMeshID("mamico-m2M-mesh"), _numberOfm2MCells, _coordsm2MCells, _vertexm2MCellIDs);
-       _velocitym2MCells = new double[_numberOfm2MCells * dim];
-    if (skipRank()) {
-      return;
-    }
-    // loop over all received cells
-    const unsigned int size = (unsigned int)recvBuffer.size();
-    for (unsigned int i = 0; i < size; i++) {
-      // determine cell index of this cell in LB domain
-      tarch::la::Vector<3, unsigned int> globalCellCoords = indexConversion.getGlobalVectorCellIndex(recvIndices[i]);
-      globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
-      globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
-      globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": "
-                << globalCellCoords << std::endl;
-#endif
-      const int index = get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      if (_flag[index] != MD_BOUNDARY) {
-        std::cout << "ERROR LBCouetteSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-#endif
-      // set velocity value and pdfs in MD boundary cell (before streaming); the
-      // boundary velocities are interpolated between the neighbouring and this
-      // cell. This interpolation is valid for FLUID-MD_BOUNDARY neighbouring
-      // relations only. determine local velocity received from MaMiCo and
-      // convert it to LB units; store the velocity in _vel
-      tarch::la::Vector<3, double> localVel((1.0 / recvBuffer[i]->getMacroscopicMass()) * (_dt / _dx) * recvBuffer[i]->getMacroscopicMomentum());
-      for (unsigned int d = 0; d < 3; d++) {
-        _vel[3 * index + d] = localVel[d];
-      }
-      // loop over all pdfs and set them according to interpolated moving-wall
-      // conditions
-      for (unsigned int q = 0; q < 19; q++) {
-        // index of neighbour cell; only if cell is located inside local domain
-        if (((int)globalCellCoords[0] + _C[q][0] > 0) && ((int)globalCellCoords[0] + _C[q][0] < _domainSizeX + 1) &&
-            ((int)globalCellCoords[1] + _C[q][1] > 0) && ((int)globalCellCoords[1] + _C[q][1] < _domainSizeY + 1) &&
-            ((int)globalCellCoords[2] + _C[q][2] > 0) && ((int)globalCellCoords[2] + _C[q][2] < _domainSizeZ + 1)) {
-          const int nbIndex = get((_C[q][0] + globalCellCoords[0]), (_C[q][1] + globalCellCoords[1]), (_C[q][2] + globalCellCoords[2]));
-          const tarch::la::Vector<3, double> interpolVel(0.5 * (_vel[3 * index] + _vel[3 * nbIndex]), 0.5 * (_vel[3 * index + 1] + _vel[3 * nbIndex + 1]),
-                                                         0.5 * (_vel[3 * index + 2] + _vel[3 * nbIndex + 2]));
-          _pdf1[19 * index + q] =
-              _pdf1[19 * nbIndex + 18 - q] -
-              6.0 * _W[q] * _density[nbIndex] * (_C[18 - q][0] * interpolVel[0] + _C[18 - q][1] * interpolVel[1] + _C[18 - q][2] * interpolVel[2]);
-        }
+
+  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices) {
+    std::cout << "setMDBoundaryValues" << std::endl;
+    const size_t size = recvBuffer.size();
+    for (size_t index = 0; index < size; index++) {
+      const unsigned int recvIndex = recvIndices[index];
+      if (_vertexRecvIDsTom2MCellIDs.count(recvIndex) > 0) {
+        const unsigned int m2MCellID = _vertexRecvIDsTom2MCellIDs[recvIndex];
+        tarch::la::Vector<3, double> vel((1.0 / recvBuffer[index]->getMacroscopicMass()) * recvBuffer[index]->getMacroscopicMomentum());
+        /*std::cout << "recvIndex: " << recvIndex << std::endl;
+        std::cout << "preciceIndex: " << i << std::endl;
+        std::cout << "vel: " << vel << std::endl;*/
+        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) _velocitym2MCells[dim * m2MCellID + currentDim] = vel[currentDim];
       }
     }
   }
-*/
+
 
 private:
   const double _channelHeight;
@@ -290,6 +266,8 @@ private:
   double* _coordsm2MCells;
   unsigned int _numberOfm2MCells;
   double* _velocitym2MCells;
+
+  std::map<unsigned int, unsigned int> _vertexRecvIDsTom2MCellIDs;
 };
 } // namespace solvers
 } // namespace coupling
