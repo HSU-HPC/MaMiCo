@@ -90,7 +90,7 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::opera
   for (coupling::filtering::FilterSequence<dim>* sequence : _sequences) {
     // finalize FS's filter vector
     if (sequence->isModifiable()) {
-#ifdef DEBUF_FILTER_PIPELINE
+#ifdef DEBUG_FILTER_PIPELINE
       sequence->printFilters();
 #endif
       sequence->makeUnmodifiable();
@@ -190,6 +190,7 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
                                                            std::endl*/
         ;
     }
+    return;
   }
 
   tinyxml2::XMLElement* currSequenceNode = node->FirstChildElement();
