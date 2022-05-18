@@ -81,22 +81,25 @@ public:
     _interface->setMeshVertices(_interface->getMeshID("mamico-M2m-mesh"), _numberOfM2mCells, _coordsM2mCells, _vertexM2mCellIDs);
     _velocityM2mCells = new double[_numberOfM2mCells * dim];
 
-		_numberOfm2MCells = 0;
-    for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
-      if (sendMacroscopicQuantityToPreCICE(static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get())))
-        _numberOfm2MCells++;
+    _numberOfm2MCells = 0;
+    for (size_t indexRecvIndices = 0; indexRecvIndices < recvIndicesSize; indexRecvIndices++) {
+      const unsigned int recvIndex = recvIndices[indexRecvIndices];
+      tarch::la::Vector<3, unsigned int> recvVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(coupling::indexing::convertToVector<dim>({recvIndex}));
+      if (receiveMacroscopicQuantityFromMDSolver(recvVectorIndex)) _numberOfm2MCells++;
     }
     std::cout << "MaMiCo >> mamico-m2M-mesh size: " << _numberOfm2MCells << std::endl;
+
     _coordsm2MCells = new double[dim * _numberOfm2MCells];
-    index = 0;
-    for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
-      tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get());
-      if (sendMacroscopicQuantityToPreCICE(cellVectorIndex)) {
+    int cellIndex = 0;
+    for (size_t indexRecvIndices = 0; indexRecvIndices < recvIndicesSize; indexRecvIndices++) {
+      const unsigned int recvIndex = recvIndices[indexRecvIndices];
+      tarch::la::Vector<3, unsigned int> recvVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(coupling::indexing::convertToVector<dim>({recvIndex}));
+      if (receiveMacroscopicQuantityFromMDSolver(recvVectorIndex)) {
         for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-          _coordsm2MCells[dim * index + currentDim] =
-              mdDomainOffset[currentDim] + cellVectorIndex[currentDim] * _dx - _dx + 0.5 * macroscopicCellSize[currentDim];
+          _coordsm2MCells[dim * cellIndex + currentDim] =
+              _mdDomainOffset[currentDim] + recvVectorIndex[currentDim] * _dx - _dx + 0.5 * _macroscopicCellSize[currentDim];
         }
-        index++;
+        cellIndex++;
       }
     }
     _vertexm2MCellIDs = new int[_numberOfm2MCells];
@@ -110,31 +113,26 @@ public:
     }*/
     _velocitym2MCells = new double[_numberOfm2MCells * dim];
 
-    _precice_dt = _interface->initialize();
-
-    for (size_t index = 0; index < recvIndicesSize; index++) {
-      const unsigned int recvIndex = recvIndices[index];
-      tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(coupling::indexing::convertToVector<dim>({recvIndex}));
-      if (sendMacroscopicQuantityToPreCICE(cellVectorIndex)) {
-        double* coords = new double[dim];
-        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-          coords[currentDim] =
-              _mdDomainOffset[currentDim] + cellVectorIndex[currentDim] * _dx - _dx + 0.5 * _macroscopicCellSize[currentDim];
+    cellIndex = 0;
+    tarch::la::Vector<3, int> directions[12] = {{1,0,-1}, {0,1,-1}, {-1,0,-1}, {0,-1,-1}, {1,0,0}, {0,1,0}, {-1,0,0}, {0,-1,0}, {1,0,1}, {0,1,1}, {-1,0,1}, {0,-1,1}};
+    int directionIndices[12];
+    for (size_t indexRecvIndices = 0; indexRecvIndices < recvIndicesSize; indexRecvIndices++) {
+      const unsigned int recvIndex = recvIndices[indexRecvIndices];
+      tarch::la::Vector<3, int> recvVectorIndex = coupling::indexing::convertToVector<dim>({recvIndex});
+      if (receiveMacroscopicQuantityFromMDSolver(static_cast<tarch::la::Vector<dim, unsigned int>>(recvVectorIndex))) {
+        for(size_t i=0; i < 12, i++) {
+          tarch::la::Vector<3, int> neighborVectorIndex = recvVectorIndex + directions[i];
+          if (receiveMacroscopicQuantityFromMDSolver(static_cast<tarch::la::Vector<dim, unsigned int>>(neighborVectorIndex))) {
+              int neighborIndex = coupling::indexing::convertToScalar<dim>(neighborVectorIndex);
+              int neighborIndexRecvIndices = 0;
+              while (neighborIndexRecvIndices < recvIndicesSize && recvIndices[neighborIndexRecvIndices] != neighborIndex) neighborIndexRecvIndices++;
+              directionIndices[i]=neighborIndexRecvIndices
+          }
         }
-        unsigned int m2MCellID = 0;
-        while(m2MCellID < _numberOfm2MCells && (coords[0]!=_coordsm2MCells[m2MCellID*dim] || coords[1]!=_coordsm2MCells[m2MCellID*dim+1] || coords[2]!=_coordsm2MCells[m2MCellID*dim+2])) m2MCellID++;
-        if (m2MCellID >= _numberOfm2MCells) {
-          std::cout << "ERROR Could not find received macroscopic cell among precice cells " << std::endl;
-          exit(EXIT_FAILURE);
-        }
-        _vertexRecvIDsTom2MCellIDs.insert({recvIndex,m2MCellID});
+        cellIndex++;
       }
     }
-    std::cout << "HEYYYYYYYYYYY" << std::endl;
-    for (const auto& [key, value] : _vertexRecvIDsTom2MCellIDs) {
-        std::cout << '[' << key << "] = " << value << "; ";
-    }
-    std::cout << std::endl;
+    _precice_dt = _interface->initialize();
   }
 
   void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) override { _wallVelocity = wallVelocity; }
@@ -179,20 +177,6 @@ public:
     }
   }
 
-  bool sendMacroscopicQuantityToPreCICE(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
-    tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
-    bool isInnerCell = true;
-    bool isOuterCell = false;
-    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-      isInnerCell &= (int)globalCellIndex[currentDim] > lowerBoundary[currentDim] + (int)_overlap + 1;
-      isInnerCell &= (int)globalCellIndex[currentDim] < upperBoundary[currentDim] - (int)_overlap - 1;
-      isOuterCell |= (int)globalCellIndex[currentDim] <= lowerBoundary[currentDim] + (int)_overlap - 1;
-      isOuterCell |= (int)globalCellIndex[currentDim] >= upperBoundary[currentDim] - (int)_overlap + 1;
-    }
-    return !isInnerCell && !isOuterCell;
-  }
-
   bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
 		tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
 		tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
@@ -227,16 +211,15 @@ public:
 
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices) {
     std::cout << "setMDBoundaryValues" << std::endl;
-    const size_t size = recvBuffer.size();
-    for (size_t index = 0; index < size; index++) {
-      const unsigned int recvIndex = recvIndices[index];
-      if (_vertexRecvIDsTom2MCellIDs.count(recvIndex) > 0) {
-        const unsigned int m2MCellID = _vertexRecvIDsTom2MCellIDs[recvIndex];
-        tarch::la::Vector<3, double> vel((1.0 / recvBuffer[index]->getMacroscopicMass()) * recvBuffer[index]->getMacroscopicMomentum());
-        /*std::cout << "recvIndex: " << recvIndex << std::endl;
-        std::cout << "preciceIndex: " << i << std::endl;
-        std::cout << "vel: " << vel << std::endl;*/
-        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) _velocitym2MCells[dim * m2MCellID + currentDim] = vel[currentDim];
+    const size_t recvIndicesSize = recvBuffer.size();
+    int cellIndex = 0;
+    for (size_t indexRecvIndices = 0; indexRecvIndices < recvIndicesSize; indexRecvIndices++) {
+      const unsigned int recvIndex = recvIndices[indexRecvIndices];
+      tarch::la::Vector<3, unsigned int> recvVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(coupling::indexing::convertToVector<dim>({recvIndex}));
+      if (sendMacroscopicQuantityToPreCICE(recvVectorIndex)) {
+        tarch::la::Vector<3, double> vel((1.0 / recvBuffer[indexRecvIndices]->getMacroscopicMass()) * recvBuffer[indexRecvIndices]->getMacroscopicMomentum());
+        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) _velocitym2MCells[dim * cellIndex + currentDim] = vel[currentDim];
+        cellIndex++;
       }
     }
   }
@@ -267,7 +250,6 @@ private:
   unsigned int _numberOfm2MCells;
   double* _velocitym2MCells;
 
-  std::map<unsigned int, unsigned int> _vertexRecvIDsTom2MCellIDs;
 };
 } // namespace solvers
 } // namespace coupling
