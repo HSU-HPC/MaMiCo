@@ -41,9 +41,6 @@ Optional dependencies are:
 * Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`. 
 * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats. 
 
-## Acknowledgements
-* TODO
- 
 ## Papers to cite
 * P. Jarmatz, P. Neumann: [MaMiCo: Parallel Noise Reduction for Multi-instance Molecular-Continuum Flow Simulation](https://link.springer.com/chapter/10.1007/978-3-030-22747-0_34), International Conference on Computational Science. Springer, Cham, 2019
 * P. Neumann, X. Bian: [MaMiCo: Transient multi-instance molecular-continuum flow simulation on supercomputers](https://doi.org/10.1016/j.cpc.2017.06.026), Computer Physics Communications 220 (2017): 390-402
