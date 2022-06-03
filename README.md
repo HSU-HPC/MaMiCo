@@ -6,7 +6,7 @@ The macro-micro-coupling tool for multiscale coupled molecular-continuum flow si
 
 ## Requirements and optional dependencies
 To compile and execute MaMiCo on a linux system, you need at least:
-* a C++17 compiler installed
+* a C++17 compiler installed (e.g. GCC 7 or newer)
 * CMake version >= 3.0
 
 Optional dependencies are:
@@ -23,6 +23,7 @@ Optional dependencies are:
         cd MaMiCo
         mkdir build
         cd build
+* If you don't have a github account or don't want to use it, you can alternatively use `git clone https://github.com/HSU-HPC/MaMiCo.git` (read-only). 
 
 * Then initialise CMake in your build directory, pointing it to the root directory of the repository. (Note that on some older systems, the command may be named `cmake3` instead of `cmake`.)
 
