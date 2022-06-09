@@ -40,7 +40,8 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
     // which implement FilterInterface.
     coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 
-    //###############################################################
+    //###############################################################################################################
+    //###############################################################################################################
     // This is where you have to define how to handle each junctor individually.
 
     // Write To File Junction
@@ -77,7 +78,42 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
           {currJunctorNode->Attribute("wtf1-location"), currJunctorNode->Attribute("wtf2-location")}, overwrite, oco);
     }
 
-    //###############################################################
+    //###############################################################################################################
+    //###############################################################################################################
+
+    // Asymmetrical Write To File Junctor
+    // TODO: documentation about parametrization in .xml
+    if (std::strcmp(currJunctorNode->Value(), "asymmetrical-write-to-file-junctor") == 0) {
+
+      // Check "overwrite" property for both underlying WriteToFile instances.
+      bool overwrite = false;
+      if (currJunctorNode->Attribute("overwrite"))
+        if (std::strcmp(currJunctorNode->Attribute("overwrite"), "true") == 0)
+          overwrite = true;
+
+      // Check "one-cell-only" property for both underlying WriteToFile instances.
+      std::array<int, 2> oco = {-1, -1};
+
+      tarch::configuration::ParseConfiguration::readIntOptional(oco[0], currJunctorNode, "wtf1-one-cell-only");
+      if (oco[0] < -1 || oco[0] >= (int)inputCellVector_primary.size()) {
+        std::cout << "ERROR: XML config file references undefined cell index " << oco[0] << " for primary write-to-file in asymmetrical-write-to-file-junctor." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      tarch::configuration::ParseConfiguration::readIntOptional(oco[1], currJunctorNode, "wtf2-one-cell-only");
+      if (oco[1] < -1 || oco[1] >= (int)inputCellVector_secondary.size()) {
+        std::cout << "ERROR: XML config file references undefined cell index " << oco[1] << " for secondary write-to-file in asymmetrical-write-to-file-junctor."
+                  << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      newjunctor = new coupling::filtering::AsymmetricalWriteToFileJunctor<dim>(
+          inputCellVector_primary, outputCellVector_primary, inputCellVector_secondary, this->_filteredValues,
+          currJunctorNode->Attribute("location"), overwrite, oco);
+    }
+
+    //###############################################################################################################
+    //###############################################################################################################
 
     // Unknown junctor identifier
     else {
