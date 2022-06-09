@@ -35,7 +35,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
     m2++;
     while (m2 != end) {
 #if (MD_DEBUG == MD_YES)
-      std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
+     //  std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif
 
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
@@ -65,7 +65,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
 
     for (std::list<Molecule*>::const_iterator m2 = beginCell2; m2 != endCell2; m2++) {
 #if (MD_DEBUG == MD_YES)
-      std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
+     // std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
 
