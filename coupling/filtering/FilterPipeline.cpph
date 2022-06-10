@@ -45,7 +45,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
         else{
           _outerCells.emplace_back(inputCells[i]);
         }
-        _inputCellVector_2.emplace_back(inputCells[i])
+        _inputCellVector_2.emplace_back(inputCells[i]);
       }
     }
     // case 2: the input vector contains only the MD-To-Macro domain
