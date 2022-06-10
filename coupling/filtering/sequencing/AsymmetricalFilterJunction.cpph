@@ -106,6 +106,9 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
                   << std::endl;
         exit(EXIT_FAILURE);
       }
+
+      std::std::cout << "Size of inputCellVector_primary:" << inputCellVector_primary.size() << '\n';
+      std::std::cout << "Size of inputCellVector_secondary:" << inputCellVector_secondary.size() << '\n';
       newjunctor = new coupling::filtering::AsymmetricalWriteToFileJunctor<dim>(
           inputCellVector_primary, outputCellVector_primary, inputCellVector_secondary, this->_filteredValues,
           {currJunctorNode->Attribute("wtf1-location"), currJunctorNode->Attribute("wtf2-location")}, overwrite, oco);
