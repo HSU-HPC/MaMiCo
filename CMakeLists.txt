@@ -142,7 +142,7 @@ endif()
 #
 # simplemd library target
 #
-set(SIMPLE_MD_SOURCES 
+set(SIMPLE_MD_SOURCES
         "simplemd/BoundaryTreatment.cpp"
         "simplemd/MolecularDynamicsSimulation.cpp"
         "simplemd/ProfilePlotter.cpp"
@@ -309,7 +309,7 @@ endif()
 #
 # Clangformat target
 #
-set(CLANGFORMAT_SOURCES 
+set(CLANGFORMAT_SOURCES
   "tarch/utils/Uncopyable.h"
   "tarch/utils/MultiMDService.cpph"
   "tarch/utils/RandomNumberService.h"
@@ -361,6 +361,7 @@ set(CLANGFORMAT_SOURCES
   "coupling/filtering/filters/WriteToFile.h"
   "coupling/filtering/filters/Datastructures.h"
   "coupling/filtering/filters/WriteToFileJunctor.h"
+  "coupling/filtering/filters/AsymmetricalWriteToFileJunctor.h"
   "coupling/filtering/filters/POD.h"
   "coupling/filtering/filters/Strouhal.cpph"
   "coupling/filtering/filters/WriteToFile.cpph"

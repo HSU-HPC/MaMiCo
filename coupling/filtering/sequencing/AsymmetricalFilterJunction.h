@@ -10,6 +10,7 @@
 
 // INCLUDE ALL RELEVANT JUNCTOR HEADERS HERE
 #include "coupling/filtering/filters/WriteToFileJunctor.h"
+#include "coupling/filtering/filters/AsymmetricalWriteToFileJunctor.h"
 
 /*
  * Filtering junction which does not use multiple identical input domains, but
