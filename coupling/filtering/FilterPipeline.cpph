@@ -275,8 +275,8 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     // Holds all input cells for this sequence
     /*
     * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    * (Lerdo) inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1; is a container for the inputCells of this sequence.
+    * (Lerdo) inputCellVector_1 is a container for the primary inputCells of this sequence.
+    * inputCellVector_2 is a container for the secondary inputCells of this sequence.
     */
     std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;
     std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_2;
@@ -302,8 +302,7 @@ std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1; 
       // sequence
       if (inputName == "md") {
         for (auto cell : _md2MacroCells)
-          inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;.push_back(cell);
+          inputCellVector_1;.push_back(cell);
         inputCount++;
       }
 
@@ -381,8 +380,7 @@ std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;.
     /*
      *	Concat output vectors of the new sequence's input(s) (singular for
      *non-Junction sequences) NOTE: If MD is (possibly among others) chosen as
-     *input, it will always occupy the first cells of inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;, i.e. be
+     *input, it will always occupy the first cells of inputCellVector_1, i.e. be
      *in cell partition one in the context of FilterJunctions.
      */
     // TODO: If a junction has multiple partitions, this only gets the first
@@ -397,25 +395,22 @@ std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;,
     */
     for (auto seq : inputSeqs)
       for (auto cell : seq->getOutputCellVector())
-        inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;.push_back(cell);
+        inputCellVector_1.push_back(cell);
         // Can this be done more efficiently? I dont think so. std::move is not
         // an option, std::insert does the same...
 
 #ifdef DEBUG_FILTER_PIPELINE
-  std::cout << "FP: Creating new sequence or junction: Size of inputCellVector: " << inputCellVector_1.size() << std::endl;
+  std::cout << "FP: Creating new sequence or junction: Size of inputCellVector_1: " << inputCellVector_1.size() << std::endl;
 #endif
 
     // CREATE SEQUENCE/JUNCTION
     /*
     * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     * (Lerdo) Now the safety check is performed for (inputCount == 1). In this case, a FilterSequence is created
-    * using the singular input in the inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;.
+    * using the singular input in the inputCellVector_1.
     */
     if (inputCount == 1) {
-      _sequences.push_back(new coupling::filtering::FilterSequence<dim>(currSequenceNode->Value(), inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;,
+      _sequences.push_back(new coupling::filtering::FilterSequence<dim>(currSequenceNode->Value(), inputCellVector_1,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                                         _comm,
 #endif
@@ -437,9 +432,8 @@ std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;,
     * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     * (Lerdo) Now the safety check is performed if (asymmetrical). First, inputCount is checked for validity.
     * Here, inputCount is invalid when (inputCount !=2) is not equal to 2 and an error is thrown. If inputCount
-    * is valid, an AsymmetricalFilterJunction is created using the inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1; contain "md"-values and the
-    * _outerCells containing "outer"-values.
+    * is valid, an AsymmetricalFilterJunction is created using the inputCellVector_1 containing "md"-values and
+    * inputCellVector_2 containing either _outerCells or inputCells depending on inputName.
     */
     else if (asymmetrical) {
       if (inputCount != 2){
@@ -449,8 +443,7 @@ std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1; 
       // TODO: currently, the only support asymmetrical junction is one that
       // uses outer cells as secondary input
 
-      _sequences.push_back(new coupling::filtering::AsymmetricalFilterJunction<dim>(currSequenceNode->Value(), inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;, inputCellVector_2,
+      _sequences.push_back(new coupling::filtering::AsymmetricalFilterJunction<dim>(currSequenceNode->Value(), inputCellVector_1, inputCellVector_2,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                                                     _comm,
 #endif
@@ -470,8 +463,7 @@ std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;,
     */
     else { //(symmetrical) Junction = Sequence with 2 or more inputs
       // TODO: move template inputc: currently has 2 hardcoded
-      _sequences.push_back(new coupling::filtering::FilterJunction<dim, 2>(currSequenceNode->Value(), inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;,
+      _sequences.push_back(new coupling::filtering::FilterJunction<dim, 2>(currSequenceNode->Value(), inputCellVector_1,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                                            _comm,
 #endif
