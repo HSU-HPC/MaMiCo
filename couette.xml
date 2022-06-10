@@ -218,18 +218,14 @@
 <!-- XML config file used by MaMiCo's FilterPipeline -->
 
 <filter-pipeline>
-
-	<per-instance output="md">
-		<test-md-domain-values input= "md outer" filtered-values="velocity">
-			<asymmetrical-write-to-file-junctor
-				wtf1-location="couette_test_md_domain.csv"
+  <per-instance output="md">
+    <test-md-domain-values input= "md outer" filtered-values="velocity">
+      <asymmetrical-write-to-file-junctor
+        wtf1-location="couette_test_md_domain.csv"
         wtf2-location="couette_test_combined_domain.csv"
-				overwrite="false"
-			/>
-		</test-couette-values>
-	</per-instance>
-
+      />
+    </test-couette-values>
+  </per-instance>
   <post-multi-instance output="md">
   </post-multi-instance>
-
 </filter-pipeline>
