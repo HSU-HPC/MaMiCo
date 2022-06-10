@@ -35,18 +35,14 @@ public:
       const std::array<bool, 7> filteredValues,
       // WriteToFile-specific parameters. [0] is for the dummy WriteToFile instance, while [1] is for the desired WriteToFile instance
       std::array<std::string, 2> location, std::array<bool, 2> overwrite = {false}, std::array<int, 2> oneCellOnly = {-1, -1})
-
       // Member initialization list to initialize parent class (AsymmetricalJunctorInterface)
       : coupling::filtering::AsymmetricalJunctorInterface<dim>(inputCellVector1, outputCellVector1, inputCellVector2, filteredValues, "AWTF-J") {
 
     // Dummy write to file instance for proper junctor output. Here, only one value is written to file, i.e. _oneCellOnly = 1.
-    coupling::filtering::AsymmetricalJunctorInterface<dim>::_filter1 =
-        new coupling::filtering::WriteToFile<dim>(inputCellVector1, outputCellVector1, filteredValues, location[0], overwrite[0], 1);
+    coupling::filtering::AsymmetricalJunctorInterface<dim>::_filter1 = new coupling::filtering::WriteToFile<dim>(inputCellVector1, outputCellVector1, filteredValues, location[0], overwrite[0], 1);
 
     // Actual write to file instance for entire MD domain to file. TODO DETERMINE MD DOMAIN
-    coupling::filtering::AsymmetricalJunctorInterface<dim>::_filter2 =
-        new coupling::filtering::WriteToFile<dim>(inputCellVector2, {}, filteredValues, location[1], overwrite[1], oneCellOnly[1]);
-
+    coupling::filtering::AsymmetricalJunctorInterface<dim>::_filter2 = new coupling::filtering::WriteToFile<dim>(inputCellVector2, {}, filteredValues, location[1], overwrite[1], oneCellOnly[1]);
   }
 
   ~AsymmetricalWriteToFileJunctor() {
