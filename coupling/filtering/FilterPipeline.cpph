@@ -301,8 +301,9 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
       // Special case: "md" is the default input and is not associated to any
       // sequence
       if (inputName == "md") {
-        for (auto cell : _md2MacroCells)
+        for (auto cell : _md2MacroCells){
           inputCellVector_1;.push_back(cell);
+        }
         inputCount++;
       }
 
