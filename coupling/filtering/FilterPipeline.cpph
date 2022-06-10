@@ -227,6 +227,12 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
                                    .append(currSequenceNode->Value()));
 
     // INPUT
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) This reads the input attribute (for the filter pipeline) from the xml file. It assigns the
+    * input to a stringstream.
+    */
+    //
     std::stringstream inputStringStream;
     if (currSequenceNode->Attribute("input"))
       inputStringStream = std::stringstream(currSequenceNode->Attribute("input"));
@@ -234,6 +240,11 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
       inputStringStream = std::stringstream("");
 
     // Split into input names, seperated by " ".
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) This iterates through the aforementioned stringstream (containing xml input attribute) and
+    * separates the individual inputs into a vector of strings.
+    */
     std::vector<std::string> inputNames;
     std::string namebuf;
     while (inputStringStream >> namebuf) {
@@ -241,6 +252,10 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     }
 
     // Default input if none is specified
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) If no inputs are explicitly mentioned, the default is set to "md".
+    */
     if (inputNames.empty()) {
       inputNames.push_back("md");
 #ifdef DEBUG_FILTER_PIPELINE
@@ -249,9 +264,17 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     }
 
     // For regular sequences, this holds just one element.
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) inputSeqs is a container (=vector) for FilterSequences.
+    */
     std::vector<FilterSequence<dim>*> inputSeqs;
 
     // Holds all input cells for this sequence
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) inputCellVector is a container for the inputCells of this sequence.
+    */
     std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector;
 
     // Iterate over all inputs specified in input string.
@@ -260,6 +283,15 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     bool asymmetrical = false; // true if we need to build an asymmetrical junction
     unsigned int inputCount = 0;
 
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) As the possible inputs are only "md" and "outer", the following for-loop
+    * iterates the container (=vector) of individual inputs (=inputNames) and checks
+    * for "md"/"outer". If the input is "md", the container for input cells is filled
+    * accordingly and the inputCount is incremented for a later safety check. If the input
+    * is "outer" the asymmetrical switch is turned on and the inputCount is incremented
+    * for a later safety check.
+    */
     for (auto inputName : inputNames) {
       // Special case: "md" is the default input and is not associated to any
       // sequence
@@ -291,6 +323,11 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     std::cout << "FP: Creating new sequence or junction: Number of inputs found: " << inputCount << std::endl;
 #endif
 
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) Next, the safety check is performed via the inputCount variable. If this
+    * value (== 0), the input is invalid and the default input "md" was not taken.
+    */
     if (inputCount == 0)
       throw std::runtime_error(std::string("ERROR: Filter-Pipeline: Invalid input ")
                                    .append(inputStringStream.str())
@@ -298,6 +335,13 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
                                    .append(currSequenceNode->Value()));
 
     //"filtered-values" is not mandatory, default is false
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) The following conditional if(fvStr) is true when filtered values are specified
+    * in the "filtered-values" attribute of the xml file. It then iterates through the
+    * filteredValues container (=vector) which essentially behaves like switches that indicate
+    * which type of values to filter.
+    */
     std::array<bool, 7> filteredValues = {false};
     const char* fvStr = currSequenceNode->Attribute("filtered-values");
     if (fvStr) {
@@ -330,6 +374,14 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
      */
     // TODO: If a junction has multiple partitions, this only gets the first
     // output partition.
+
+
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) Not sure what this does. The inputSeqs variable is a container for filter sequences.
+    * It is only filled when the inputNames container does not include "md"/"outer". In other
+    * word, it could potentially be empty. :-?
+    */
     for (auto seq : inputSeqs)
       for (auto cell : seq->getOutputCellVector())
         inputCellVector.push_back(cell);
@@ -341,6 +393,11 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
 #endif
 
     // CREATE SEQUENCE/JUNCTION
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) Now the safety check is performed for (inputCount == 1). In this case, a FilterSequence is created
+    * using the singular input in the inputCellVector.
+    */
     if (inputCount == 1) {
       _sequences.push_back(new coupling::filtering::FilterSequence<dim>(currSequenceNode->Value(), inputCellVector,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -359,10 +416,19 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
       else
         std::cout << "FP: " << _sequences.back()->getName() << " will use MD data as input." << std::endl;
 #endif
-    } else if (asymmetrical) {
-      if (inputCount != 2)
+    }
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) Now the safety check is performed if (asymmetrical). First, inputCount is checked for validity.
+    * Here, inputCount is invalid when (inputCount !=2) is not equal to 2 and an error is thrown. If inputCount
+    * is valid, an AsymmetricalFilterJunction is created using the inputCellVector contain "md"-values and the
+    * _outerCells containing "outer"-values.
+    */
+    else if (asymmetrical) {
+      if (inputCount != 2){
         throw std::runtime_error("ERROR: Currently, asymmetrical junctions are "
                                  "only allowed for exactly two inputs!");
+      }
       // TODO: currently, the only support asymmetrical junction is one that
       // uses outer cells as secondary input
       _sequences.push_back(new coupling::filtering::AsymmetricalFilterJunction<dim>(currSequenceNode->Value(), inputCellVector, _outerCells,
@@ -376,7 +442,14 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
 
       // TODO handling of parent sequences once this becomes relevant for
       // junctions
-    } else { //(symmetrical) Junction = Sequence with 2 or more inputs
+    }
+
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo) Next, the case of a symmetrical junction is considered. This is a subclass of FilterSequences
+    * containing one or more junctors (=filters) that take multiple inputs of the same size.
+    */
+    else { //(symmetrical) Junction = Sequence with 2 or more inputs
       // TODO: move template inputc: currently has 2 hardcoded
       _sequences.push_back(new coupling::filtering::FilterJunction<dim, 2>(currSequenceNode->Value(), inputCellVector,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -390,7 +463,10 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
       // TODO handling of parent sequences once this becomes relevant for
       // junctions
     }
-
+    /*
+    * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    * (Lerdo)
+    */
     // Add sequence to temp vector
     // Check if it's the output sequence.
     if (std::strcmp(_sequences.back()->getName(), node->Attribute("output")) == 0) {
