@@ -317,7 +317,6 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
         asymmetrical = true;
         inputCount++;
       }
-      std::cout << "/* current inputCount */" << inputCount <<'\n';
       // Default case: search for sequence
       else
         try {
@@ -328,6 +327,7 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
           std::cout << "Warning: Input identifier " << inputName << " for sequence " << currSequenceNode->Value() << " not recognized." << std::endl;
         }
     }
+    std::cout << "/* current inputCount */" << inputCount <<'\n';
 
 #ifdef DEBUG_FILTER_PIPELINE
     std::cout << "FP: Creating new sequence or junction: Number of inputs found: " << inputCount << std::endl;
