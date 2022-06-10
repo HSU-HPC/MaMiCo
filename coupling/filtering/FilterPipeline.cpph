@@ -314,6 +314,9 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
         inputCount++;
       }
       else if (inputName == "mdAndOuter") {
+        for (auto cell : _md2MacroCells){
+          _inputCellVector_1.push_back(cell);
+        }
         asymmetrical = true;
         inputCount++;
         inputCount++;
