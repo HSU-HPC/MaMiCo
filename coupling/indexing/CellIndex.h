@@ -15,9 +15,8 @@ namespace indexing {
  *
  * vector: implies representation as vector, false implies scalar index. \n
  * local: implies indexing restricted to local MD domain. \n
- * md2macro: implies indexing restricted to cells that are sent from MD to macro
- * solver. \n noGhost: implies ghost layer cells to not be included in indexing.
- * \n
+ * md2macro: implies indexing restricted to cells that are sent from MD to macrosolver. \n
+ * noGhost: implies ghost layer cells to not be included in indexing. \n
  *
  * @author Felix Maurer
  */

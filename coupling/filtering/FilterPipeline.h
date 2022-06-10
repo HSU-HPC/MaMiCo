@@ -99,6 +99,10 @@ private:
    * Input cells that do not match the criteria to be in _md2MacroCells.
    */
   std::vector<coupling::datastructures::MacroscopicCell<dim>*> _outerCells;
+  /*
+  * Container for entire md domain
+  */
+  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _mdAndOuterCells;
 
   tinyxml2::XMLDocument _config;
 
