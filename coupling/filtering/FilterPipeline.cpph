@@ -403,9 +403,7 @@ std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;.
         // an option, std::insert does the same...
 
 #ifdef DEBUG_FILTER_PIPELINE
-    std::cout << "FP: Creating new sequence or junction: Size of inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;: " << inputCellVector_1
-std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_1;.size() << std::endl;
+  std::cout << "FP: Creating new sequence or junction: Size of inputCellVector: " << inputCellVector_1.size() << std::endl;
 #endif
 
     // CREATE SEQUENCE/JUNCTION
