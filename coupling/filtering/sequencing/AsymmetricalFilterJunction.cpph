@@ -86,11 +86,12 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
     if (std::strcmp(currJunctorNode->Value(), "asymmetrical-write-to-file-junctor") == 0) {
 
       // Check "overwrite" property for both underlying WriteToFile instances.
-      bool overwrite = false;
-      if (currJunctorNode->Attribute("overwrite"))
-        if (std::strcmp(currJunctorNode->Attribute("overwrite"), "true") == 0)
-          overwrite = true;
-
+      /*
+      * bool overwrite = false;
+      * if (currJunctorNode->Attribute("overwrite"))
+      *   if (std::strcmp(currJunctorNode->Attribute("overwrite"), "true") == 0)
+      *     overwrite = true;
+      */
       // Check "one-cell-only" property for both underlying WriteToFile instances.
       std::array<int, 2> oco = {-1, -1};
 
