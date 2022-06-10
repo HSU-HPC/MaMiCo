@@ -46,7 +46,7 @@
       Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout. Only for sequential tests.
   -->
   <coupling
-    coupling-cycles="1000"
+    coupling-cycles="10"
     two-way-coupling="no"
     send-from-md-to-macro="yes"
     filter-init-cycles="0"
@@ -111,7 +111,7 @@
   <microscopic-solver
     type="md"
     temperature="1.1"
-    equilibration-steps="10000"
+    equilibration-steps="10"
     number-md-simulations="1"
     density="0.813037037"
   />
@@ -220,26 +220,16 @@
 <filter-pipeline>
 
 	<per-instance output="md">
-		<test-couette-values filtered-values="velocity">
-			<write-to-file
-				location="couette_test_velocities_micro.csv"
+		<test-md-domain-values input= "md outer" filtered-values="velocity">
+			<asymmetrical-write-to-file-junctor
+				wtf1-location="couette_test_md_domain.csv"
+        wtf2-location="couette_test_combined_domain.csv"
 				overwrite="false"
 			/>
 		</test-couette-values>
-	</per-instance>   
+	</per-instance>
 
-	<post-multi-instance output="md">
-	</post-multi-instance>
+  <post-multi-instance output="md">
+  </post-multi-instance>
 
-	<per-instance output="analytical">
-                <test-couette-values filtered-values="velocity">
-                        <write-to-file
-                                location="couette_test_velocities_macro.csv"
-                                overwrite="false"
-                        />
-                </test-couette-values>
-        </per-instance>
-
-        <post-multi-instance output="md">
-        </post-multi-instance>
 </filter-pipeline>
