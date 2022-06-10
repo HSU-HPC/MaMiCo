@@ -317,7 +317,7 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
         asymmetrical = true;
         inputCount++;
       }
-
+      std::cout << "/* current inputCount */" << inputCount <<'\n';
       // Default case: search for sequence
       else
         try {
