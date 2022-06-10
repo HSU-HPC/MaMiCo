@@ -1,6 +1,7 @@
 build/
 .sconsign.dblite
 *.csv
+*.txt
 *.vtk
 *.vti
 *.o
@@ -12,6 +13,7 @@ coupling/tests/build_nie/test
 coupling/tests/build_nie/out/
 coupling/tests/build_couette/test
 stuff/
+FoamSetup/
 .idea/.gitignore
 .idea/.name
 .idea/mamico-dev.iml

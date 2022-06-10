@@ -15,6 +15,7 @@
 #include "coupling/solvers/FoamClass.h"
 #include "coupling/solvers/FoamSolverInterface.h"
 #endif
+#include "coupling/configurations/EvaporationConfiguration.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/indexing/IndexingService.cpp"
 #include "coupling/interface/MDSimulationFactory.h"
@@ -77,82 +78,20 @@ private:
 
   /** @brief reads the configuration from the xml file and calls parseEvaporationTestConfiguration() */
   void parseConfigurations() {
-    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>("evaporation.xml", "molecular-dynamics",
+    std::string filename("evaporation.xml");
+    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
                                                                                                                            _MDSolverConfig);
     if (!_MDSolverConfig.isValid()) {
       std::cout << "ERROR EvaporationTest: Invalid MDSolver config!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>("evaporation.xml", "mamico", _mamicoConfig);
+    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>(filename, "mamico", _mamicoConfig);
     if (!_mamicoConfig.isValid()) {
       std::cout << "ERROR EvaporationTest: Invalid MaMiCo config!" << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    parseEvaporationTestConfiguration();
-  }
-
-  /** @brief reads the configuartion, checks that mandatory data is provided and stores the data in variables */
-  void parseEvaporationTestConfiguration() {
-    tinyxml2::XMLDocument conffile;
-    tinyxml2::XMLElement* node = NULL;
-    conffile.LoadFile("evaporation.xml");
-    node = conffile.FirstChildElement("evaporation-test");
-    if (node == NULL) {
-      std::cout << "Could not read input file evaporation.xml: missing element <evaporation-test>" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    tinyxml2::XMLElement* n_mamico = node->NextSiblingElement();
-    if (n_mamico == NULL) {
-      std::cout << "Could not read input file evaporation.xml: missing element <mamico>" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    tinyxml2::XMLElement* n_md = n_mamico->NextSiblingElement();
-    if (n_md == NULL) {
-      std::cout << "Could not read input file evaporation.xml: missing element <molecular-dynamics>" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    tinyxml2::XMLElement* n_fp = n_md->NextSiblingElement();
-    if (n_fp == NULL) {
-      std::cout << "Could not read input file evaporation.xml: missing element <filter-pipeline>" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    tinyxml2::XMLElement* n_unexpected = n_fp->NextSiblingElement();
-    if (n_unexpected != NULL) {
-      std::cout << "Could not read input file evaporation.xml: unknown element " << n_unexpected->Name() << std::endl;
-      exit(EXIT_FAILURE);
-    }
-
-    tinyxml2::XMLElement* subtag = node->FirstChildElement("coupling");
-    if (subtag == NULL) {
-      std::cout << "Could not read input file evaporation.xml: Missing subtag: coupling" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    tarch::configuration::ParseConfiguration::readIntMandatory(_EvapConfig.couplingCycles, subtag, "coupling-cycles");
-    tarch::configuration::ParseConfiguration::readIntMandatory(_EvapConfig.csvEveryTimestep, subtag, "write-csv-every-timestep");
-    subtag = node->FirstChildElement("microscopic-solver");
-    if (subtag == NULL) {
-      std::cout << "Could not read input file evaporation.xml: Missing subtag: microscopic-solver" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    std::string type;
-    tarch::configuration::ParseConfiguration::readStringMandatory(type, subtag, "type");
-    if (type == "md") {
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(_EvapConfig.temp, subtag, "temperature");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_EvapConfig.totalNumberMDSimulations, subtag, "number-md-simulations");
-      if (_EvapConfig.totalNumberMDSimulations < 1) {
-        std::cout << "Could not read input file evaporation.xml: number-md-simulations < 1" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    } else {
-      std::cout << "Could not read input file evaporation.xml: Unknown microscopic solver type!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    subtag = node->FirstChildElement("macroscopic-solver");
-    if (subtag == NULL) {
-      std::cout << "Could not read input file evaporation.xml: Missing subtag: macroscopic-solver" << std::endl;
-      exit(EXIT_FAILURE);
-    }
+    _EvapConfig = coupling::configurations::EvaporationConfig::parseConfiguration(filename);
   }
 
   /** @brief initialises the macro and micro solver according to the setup from the xml file and pre-proccses them */
@@ -602,24 +541,6 @@ private:
     return interface;
   }
 
-  /** @brief all the variables necessary to define the Evaporation scenario are stored in here */
-  struct EvaporationConfig {
-    /** @brief channel is always expected to have origin at (0.0,0.0,0.0) and to have the same width as height */
-    double channelheight;
-    /** @brief the total length of the channel */
-    double channellength;
-    /** @brief number of coupling cycles, that is continuum time steps; MD/DPD: 1000 */
-    int couplingCycles;
-    /** @brief the time step interval for writing the md data to csv files  */
-    int csvEveryTimestep;
-    /** @brief the general density of the fluid under consideration */
-    double density;
-    /** @brief the start temperature for the fluid under consideration */
-    double temp;
-    /** @brief the number of md simulation instances in a multi-instance coupling  */
-    int totalNumberMDSimulations;
-  };
-
   /** the buffers store macroscopic cells, so momentum and density will be transferred
    *  @brief holds the buffers for the data transfer */
   struct CouplingBuffer {
@@ -655,7 +576,7 @@ private:
   /** @brief the config data and information for MaMiCo*/
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
   /** @brief the EvaporationConfig for the current setup */
-  EvaporationConfig _EvapConfig;
+  coupling::configurations::EvaporationConfig _EvapConfig;
   /** @brief the counter for the time steps, which are done within the md */
   unsigned int _mdStepCounter;
   /** @brief the current macro/continuum solver */
