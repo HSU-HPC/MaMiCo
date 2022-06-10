@@ -285,7 +285,6 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     // Note: If there are non-matching names in input String, they are ignored.
 
     bool asymmetrical = false; // true if we need to build an asymmetrical junction
-    bool full_md_domain = false; // true if we need to build asymmetrical junction with (md and outer) as one input
     unsigned int inputCount = 0;
 
     /*
