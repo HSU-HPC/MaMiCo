@@ -5,6 +5,8 @@
 // TODO: replace exit()s with throws
 
 // constructors of coupling::filtering::FilterPipeline
+#include <typeinfo>
+
 template <unsigned int dim>
 coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCells,
                                                          coupling::filtering::Scope scope, const tarch::utils::MultiMDService<dim>& multiMDService,
@@ -69,7 +71,8 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
       for(unsigned int i = 0; i < inputCells.size(); ++i){
         ScalarIdx idx{CellIndex<dim>{i}};
         VectorIdx my3DIdx{idx};
-                std::cout << "Test: checking input index = " << my3DIdx.get() << '\n';
+        std::cout << "Test: checking input index = " << my3DIdx.get() << '\n';
+        std::cout << "Test: checking data type = " << typeid(my3DIdx.get()).name() << '\n';
       }
 
 
