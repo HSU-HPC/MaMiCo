@@ -18,12 +18,20 @@ template <unsigned int dim> void coupling::filtering::WriteToFile<dim>::operator
     _file.open(_location);
   }
 
+  bool _includeIndices = true;
+
   for (unsigned int ic_index = 0; ic_index < coupling::filtering::FilterInterface<dim>::_inputCells.size(); ic_index++) {
     // case: only one cell
     if (_oneCellOnly != -1)
       ic_index = (unsigned int)_oneCellOnly;
 
     _file << _iteration << " ; ";
+
+    if(_includeIndices){
+      coupling::indexing::CellIndex<dim> my1DIdx{coupling::indexing::CellIndex<dim>{ic_index}};
+      coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector> my3DIdx{my1DIdx};
+      _file << my3DIdx.get()<< " ; ";
+    }
 
     // printing all scalar values
     for (const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs)
