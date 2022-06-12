@@ -102,6 +102,8 @@ private:
   std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCellVector_1;
   std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCellVector_2;
 
+  using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector>;
+
   tinyxml2::XMLDocument _config;
 
   /*

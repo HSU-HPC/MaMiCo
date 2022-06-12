@@ -46,6 +46,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
           _outerCells.emplace_back(inputCells[i]);
         }
         _inputCellVector_2.emplace_back(inputCells[i]);
+
       }
     }
     // case 2: the input vector contains only the MD-To-Macro domain
@@ -85,6 +86,23 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
 
     loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     break;
+
+    for (unsigned int i = 0; i < inputCells.size(); ++i) {
+      using namespace coupling::indexing;
+      CellIndex_T idx{CellIndex<dim, IndexTrait::vector>{i}};
+      tarch::la::Vector<dim, unsigned int> idx_raw{idx.get()};
+      std::cout << "Test: checking input index - " << idx_raw << '\n';
+    }
+
+
+    /*
+    using tr = IndexTrait;
+    using ScalarIdx = CellIndex<dim>;
+    using VectorIdx = CellIndex<dim, tr::vector>;
+    for(auto i: ScalarIdx()){
+      tarch::la::Vector<dim, unsigned int> a = _inputCellVector_2[i.get()];
+      std::cout << "Test: checking input index = " << a << '\n';
+    }*/
   }
 }
 
