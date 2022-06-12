@@ -47,12 +47,32 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
         _inputCellVector_2.emplace_back(inputCells[i]);
 
       }
+
+      /*
+      This code (taken from /filters/NLM.cpph) compiles and works but does not yield the desired functionality.
+      It essentially gives each cell in inputCells its corresponding linear index, i.e. 0 - 17575
+
       for (unsigned int i = 0; i < inputCells.size(); ++i) {
         using namespace coupling::indexing;
         CellIndex_T idx{CellIndex<dim, IndexTrait::vector>{static_cast<int>(i)}};
         tarch::la::Vector<dim, unsigned int> idx_raw{idx.get()};
         std::cout << "Test: checking input index - " << idx_raw << '\n';
       }
+      */
+
+
+      using namespace coupling::indexing;
+      using tr = IndexTrait;
+      using ScalarIdx = CellIndex<dim>;
+      using VectorIdx = CellIndex<dim, tr::vector>;
+      // for(auto i: ScalarIdx()){
+      for(unsigned int i = 0; i < inputCells.size(); ++i){
+        ScalarIdx idx{CellIndex<dim>{static_cast<int>(i)}};
+        VectorIdx my3DIdx{idx};
+                std::cout << "Test: checking input index = " << my3DIdx.get() << '\n';
+      }
+
+
     }
     // case 2: the input vector contains only the MD-To-Macro domain
     else if (inputCells.size() == CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
@@ -95,15 +115,6 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
 
     }
 
-
-    /*
-    using tr = IndexTrait;
-    using ScalarIdx = CellIndex<dim>;
-    using VectorIdx = CellIndex<dim, tr::vector>;
-    for(auto i: ScalarIdx()){
-      tarch::la::Vector<dim, unsigned int> a = _inputCellVector_2[i.get()];
-      std::cout << "Test: checking input index = " << a << '\n';
-    }*/
 
 }
 
