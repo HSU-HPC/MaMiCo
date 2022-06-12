@@ -67,7 +67,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
       using VectorIdx = CellIndex<dim, tr::vector>;
       // for(auto i: ScalarIdx()){
       for(unsigned int i = 0; i < inputCells.size(); ++i){
-        ScalarIdx idx{CellIndex<dim>{static_cast<int>(i)}};
+        ScalarIdx idx{CellIndex<dim>{i}};
         VectorIdx my3DIdx{idx};
                 std::cout << "Test: checking input index = " << my3DIdx.get() << '\n';
       }
