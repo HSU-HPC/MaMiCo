@@ -39,14 +39,19 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
       using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
 
       for (unsigned int i = 0; i < inputCells.size(); i++) {
-        if (Md2MacroIndex::contains(CellIndex<dim, IndexTrait::local>{i})){
+        if (Md2MacroIndex::contains(CellIndex<dim, IndexTrait::local>{i}))
           _md2MacroCells.emplace_back(inputCells[i]);
-        }
-        else{
+        else
           _outerCells.emplace_back(inputCells[i]);
-        }
+
         _inputCellVector_2.emplace_back(inputCells[i]);
 
+      }
+      for (unsigned int i = 0; i < inputCells.size(); ++i) {
+        using namespace coupling::indexing;
+        CellIndex_T idx{CellIndex<dim, IndexTrait::vector>{static_cast<int>(i)}};
+        tarch::la::Vector<dim, unsigned int> idx_raw{idx.get()};
+        std::cout << "Test: checking input index - " << idx_raw << '\n';
       }
     }
     // case 2: the input vector contains only the MD-To-Macro domain
@@ -87,11 +92,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     break;
 
-    for (unsigned int i = 0; i < inputCells.size(); ++i) {
-      using namespace coupling::indexing;
-      CellIndex_T idx{CellIndex<dim, IndexTrait::vector>{static_cast<int>(i)}};
-      tarch::la::Vector<dim, unsigned int> idx_raw{idx.get()};
-      std::cout << "Test: checking input index - " << idx_raw << '\n';
+
     }
 
 
@@ -103,7 +104,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
       tarch::la::Vector<dim, unsigned int> a = _inputCellVector_2[i.get()];
       std::cout << "Test: checking input index = " << a << '\n';
     }*/
-  }
+
 }
 
 // member functions of coupling::filtering::FilterPipeline
