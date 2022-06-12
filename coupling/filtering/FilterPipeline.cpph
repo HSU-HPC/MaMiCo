@@ -87,9 +87,9 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     break;
 
-    for (long unsigned int i = 0; i < inputCells.size(); ++i) {
+    for (unsigned int i = 0; i < inputCells.size(); ++i) {
       using namespace coupling::indexing;
-      CellIndex_T idx{CellIndex<dim, IndexTrait::vector>{i}};
+      CellIndex_T idx{CellIndex<dim, IndexTrait::vector>{static_cast<int>(i)}};
       tarch::la::Vector<dim, unsigned int> idx_raw{idx.get()};
       std::cout << "Test: checking input index - " << idx_raw << '\n';
     }
