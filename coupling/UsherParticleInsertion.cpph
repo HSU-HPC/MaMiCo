@@ -227,7 +227,7 @@ typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherPar
 
       // if there is no force on the particle, we are in a low energy hole;
       // let's try to allow this
-      if (absForce == 0.0) {
+      if (absForce == 0.0 || energy - U_0 == 0.0) {
         molecule.setPosition(position);
         molecule.setForce(force);
         molecule.setPotentialEnergy(0.0);

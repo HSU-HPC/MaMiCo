@@ -30,24 +30,24 @@ public:
 
   void operator()() {
     tarch::la::Vector<dim, double> vec_buf;
-    for (auto outputCell : FilterInterface<dim>::_outputCells) {
+    for (unsigned int i = 0; i < this->_inputCells.size(); ++i) {
       // apply to scalars
       for (auto scalarProperty : FilterInterface<dim>::_scalarAccessFunctionPairs) {
-        (outputCell->*scalarProperty.set)(_constant);
+        (FilterInterface<dim>::_outputCells[i]->*scalarProperty.set)(_constant);
       }
 
       // apply to vectors
       for (auto vectorProperty : FilterInterface<dim>::_vectorAccessFunctionPairs) {
         // TODO: perhaps check if _filteredDims == true,..,true before this for
         // performance reasons?
-        vec_buf = (outputCell->*vectorProperty.get)();
+        vec_buf = (FilterInterface<dim>::_inputCells[i]->*vectorProperty.get)();
 
         for (unsigned int d = 0; d < dim; d++) {
           if (_filteredDims[d])
             vec_buf[d] = _constant;
         }
 
-        (outputCell->*vectorProperty.set)(vec_buf);
+        (FilterInterface<dim>::_outputCells[i]->*vectorProperty.set)(vec_buf);
       }
     }
   }

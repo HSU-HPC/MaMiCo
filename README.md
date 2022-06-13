@@ -6,7 +6,7 @@ The macro-micro-coupling tool for multiscale coupled molecular-continuum flow si
 
 ## Requirements and optional dependencies
 To compile and execute MaMiCo on a linux system, you need at least:
-* a C++17 compiler installed
+* a C++17 compiler installed (e.g. GCC 7 or newer)
 * CMake version >= 3.0
 
 Optional dependencies are:
@@ -23,6 +23,7 @@ Optional dependencies are:
         cd MaMiCo
         mkdir build
         cd build
+* If you don't have a github account or don't want to use it, you can alternatively use `git clone https://github.com/HSU-HPC/MaMiCo.git` (read-only). 
 
 * Then initialise CMake in your build directory, pointing it to the root directory of the repository. (Note that on some older systems, the command may be named `cmake3` instead of `cmake`.)
 
@@ -41,9 +42,6 @@ Optional dependencies are:
 * Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`. 
 * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats. 
 
-## Acknowledgements
-* TODO
- 
 ## Papers to cite
 * P. Jarmatz, P. Neumann: [MaMiCo: Parallel Noise Reduction for Multi-instance Molecular-Continuum Flow Simulation](https://link.springer.com/chapter/10.1007/978-3-030-22747-0_34), International Conference on Computational Science. Springer, Cham, 2019
 * P. Neumann, X. Bian: [MaMiCo: Transient multi-instance molecular-continuum flow simulation on supercomputers](https://doi.org/10.1016/j.cpc.2017.06.026), Computer Physics Communications 220 (2017): 390-402

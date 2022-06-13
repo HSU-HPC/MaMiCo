@@ -691,9 +691,9 @@ PYBIND11_MODULE(mamico, mamico) {
            py::return_value_policy::reference)
       .def("sendFromMacro2MD", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service,
                                   CouplingBuffer& buf) { service.sendFromMacro2MD(buf._sendBuffer, buf._globalCellIndices4SendBuffer); })
-      .def("sendFromMD2Macro", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service, CouplingBuffer& buf) {
-        service.sendFromMD2Macro(buf._recvBuffer, buf._globalCellIndices4RecvBuffer);
-      });
+      .def("sendFromMD2Macro", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service,
+                                  CouplingBuffer& buf) { service.sendFromMD2Macro(buf._recvBuffer, buf._globalCellIndices4RecvBuffer); })
+      .def("constructFilterPipelines", &coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>::constructFilterPipelines);
 
   py::class_<coupling::IndexConversion<3>>(coupling, "IndexConversion");
 
