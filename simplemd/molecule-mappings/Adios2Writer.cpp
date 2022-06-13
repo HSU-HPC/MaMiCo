@@ -26,28 +26,28 @@ simplemd::moleculemappings::Adios2Writer::Adios2Writer(const simplemd::services:
                                                        ,
                                                        MPI_Comm communicator
 #endif
-):
-_parallelTopologyService(parallelTopologyService),_moleculeService(moleculeService),
-_filename(filename), _timestep(0), _offset(offset),_configuration(configuration)
-#if (MD_PARALLEL==MD_YES)
-,_communicator(communicator)
+                                                       )
+    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _filename(filename), _timestep(0), _offset(offset),
+      _configuration(configuration)
+#if (MD_PARALLEL == MD_YES)
+      ,
+      _communicator(communicator)
 #endif
 {
   initAdios2();
 }
 
-
 void simplemd::moleculemappings::Adios2Writer::initAdios2() {
-  #if (MD_PARALLEL==MD_YES)
+#if (MD_PARALLEL == MD_YES)
   _inst = std::make_shared<adios2::ADIOS>(_communicator);
-  #else
+#else
   _inst = std::make_shared<adios2::ADIOS>();
 #endif
 
   _numberProcesses = _configuration.getMPIConfiguration().getNumberOfProcesses()[0] * _configuration.getMPIConfiguration().getNumberOfProcesses()[1] *
                      _configuration.getMPIConfiguration().getNumberOfProcesses()[2];
 
-  //Setup Adios2 IO
+  // Setup Adios2 IO
   _io = std::make_shared<adios2::IO>(_inst->DeclareIO("Output"));
   _io->SetEngine("BP4");
   _engine = std::make_shared<adios2::Engine>(_io->Open(_configuration.getAdios2Configuration().getFilename(), adios2::Mode::Write));
@@ -56,22 +56,22 @@ void simplemd::moleculemappings::Adios2Writer::initAdios2() {
   _io->DefineAttribute<int>("num_processes", _numberProcesses);
   _io->DefineAttribute<int>("num_components", 1);
 
-  //simpleMD only has 1 component
+  // simpleMD only has 1 component
   std::string component_id = "component_0";
   std::vector<std::array<double, 3>> adios_centers;
   std::vector<double> adios_sigmas;
   std::vector<double> adios_mass;
   std::vector<double> adios_epsilon;
-  
-  _domainCenter[0] = (_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](0)/2);
-  _domainCenter[1] = (_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](1)/2);
-  _domainCenter[2] = (_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](2)/2);
+
+  _domainCenter[0] = (_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](0) / 2);
+  _domainCenter[1] = (_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](1) / 2);
+  _domainCenter[2] = (_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](2) / 2);
   adios_centers.emplace_back(_domainCenter);
   adios_sigmas.emplace_back(_configuration.getMoleculeConfiguration().getSigma());
   adios_mass.emplace_back(_configuration.getMoleculeConfiguration().getMass());
   adios_epsilon.emplace_back(_configuration.getMoleculeConfiguration().getEpsilon());
 
-  _io->DefineAttribute<double>(component_id + "_centers", adios_centers[0].data(),adios_centers.size() * 3);
+  _io->DefineAttribute<double>(component_id + "_centers", adios_centers[0].data(), adios_centers.size() * 3);
   _io->DefineAttribute<double>(component_id + "_sigma", adios_sigmas.data(), adios_sigmas.size());
   _io->DefineAttribute<double>(component_id + "_mass", adios_mass.data(), adios_mass.size());
   _io->DefineAttribute<double>(component_id + "_epsilon", adios_epsilon.data(), adios_epsilon.size());
@@ -79,28 +79,24 @@ void simplemd::moleculemappings::Adios2Writer::initAdios2() {
   _io->DefineAttribute<std::string>(component_id + "_element_names", "SimpleMD_Particle");
 }
 
-simplemd::moleculemappings::Adios2Writer::~Adios2Writer(){
- _engine->Close();
-}
+simplemd::moleculemappings::Adios2Writer::~Adios2Writer() { _engine->Close(); }
 
-void simplemd::moleculemappings::Adios2Writer::setTimestep(const unsigned int &timestep){
-  _timestep = timestep;
-}
+void simplemd::moleculemappings::Adios2Writer::setTimestep(const unsigned int& timestep) { _timestep = timestep; }
 
-void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration(){
-  
+void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration() {
+
   _engine->BeginStep();
-  _io->RemoveAllVariables(); //empty buffer
-  
+  _io->RemoveAllVariables(); // empty buffer
+
   local = _moleculeService.getNumberMolecules();
-  global = local; //valid for sequential execution, overwritten in parallel case
-  
-  #if (MD_PARALLEL == MD_YES)
+  global = local; // valid for sequential execution, overwritten in parallel case
+
+#if (MD_PARALLEL == MD_YES)
   MPI_Exscan(&local, &offset, 1, MPI_UINT64_T, MPI_SUM, _communicator);
   MPI_Allreduce(&local, &global, 1, MPI_UINT64_T, MPI_SUM, _communicator);
-  #endif
+#endif
 
-  //define velocity- and position-variables in Adios2 IO
+  // define velocity- and position-variables in Adios2 IO
   rx_var = _io->DefineVariable<float>(rx_name, {global}, {offset}, {local}, adios2::ConstantDims);
   ry_var = _io->DefineVariable<float>(ry_name, {global}, {offset}, {local}, adios2::ConstantDims);
   rz_var = _io->DefineVariable<float>(rz_name, {global}, {offset}, {local}, adios2::ConstantDims);
@@ -110,29 +106,27 @@ void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration(){
   time_var = _io->DefineVariable<double>(simtime_name);
   global_box_var = _io->DefineVariable<float>("global_box", {6}, {0}, {6}, adios2::ConstantDims);
   component_id_var = _io->DefineVariable<uint64_t>("component_id", {global}, {offset}, {local}, adios2::ConstantDims);
-
 }
 
+void simplemd::moleculemappings::Adios2Writer::handleMolecule(Molecule& molecule) {
 
-void simplemd::moleculemappings::Adios2Writer::handleMolecule(Molecule &molecule){
-  
-    _positionsx.push_back((float)molecule.getConstPosition()[0]);
-    _velocitiesx.push_back((float)molecule.getConstVelocity()[0]);
-    _positionsy.push_back((float)molecule.getConstPosition()[1]);
-    _velocitiesy.push_back((float)molecule.getConstVelocity()[1]);
-    _positionsz.push_back((float)molecule.getConstPosition()[2]);
-    _velocitiesz.push_back((float)molecule.getConstVelocity()[2]);
-    _component_id.push_back((uint64_t)0);
-    counter++;
+  _positionsx.push_back((float)molecule.getConstPosition()[0]);
+  _velocitiesx.push_back((float)molecule.getConstVelocity()[0]);
+  _positionsy.push_back((float)molecule.getConstPosition()[1]);
+  _velocitiesy.push_back((float)molecule.getConstVelocity()[1]);
+  _positionsz.push_back((float)molecule.getConstPosition()[2]);
+  _velocitiesz.push_back((float)molecule.getConstVelocity()[2]);
+  _component_id.push_back((uint64_t)0);
+  counter++;
 }
 
-void simplemd::moleculemappings::Adios2Writer::endMoleculeIteration(){
+void simplemd::moleculemappings::Adios2Writer::endMoleculeIteration() {
 
   std::array<double, 6> tmp_global_box = {_offset[0], _offset[1], _offset[2], _domainCenter[0] * 2, _domainCenter[1] * 2, _domainCenter[2] * 2};
   std::array<float, 6> global_box;
   std::copy(tmp_global_box.begin(), tmp_global_box.end(), global_box.begin());
 
-  //write data
+  // write data
   _engine->Put<float>(rx_var, _positionsx.data());
   _engine->Put<float>(ry_var, _positionsy.data());
   _engine->Put<float>(rz_var, _positionsz.data());
