@@ -64,6 +64,9 @@ message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_CO
 # Enable coupling with the preCICE API, default is off
 option(BUILD_WITH_TEST_INDEXING "Enable indexing tests, default is off." OFF)
 message(STATUS ">> Build with indexing tests : " ${BUILD_WITH_TEST_INDEXING})
+#Enable Adios2 output for megamol
+option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
+message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
 
 #
 # Find dependencies
@@ -74,6 +77,11 @@ endif()
 
 if(BUILD_WITH_MPI)
 	find_package(MPI REQUIRED)
+endif()
+
+if(BUILD_WITH_ADIOS2)
+  enable_language(C)
+  find_package(ADIOS2 REQUIRED)
 endif()
 
 if(BUILD_WITH_PYBIND11)
@@ -123,6 +131,13 @@ if(BUILD_WITH_MPI)
     target_compile_definitions(simplemd_interface INTERFACE MDParallel TarchParallel)
     target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
 endif()
+if(BUILD_WITH_ADIOS2)
+if(BUILD_WITH_MPI)
+    target_link_libraries(simplemd_interface INTERFACE adios2::cxx11_mpi MPI::MPI_CXX)
+  else()
+    target_link_libraries(simplemd_interface INTERFACE adios2::cxx11)
+  endif()
+endif()
 # Check the CXX compiler ID. IDs are defined here: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
 message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
 message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
@@ -143,37 +158,43 @@ endif()
 # simplemd library target
 #
 set(SIMPLE_MD_SOURCES 
-        "simplemd/BoundaryTreatment.cpp"
-        "simplemd/MolecularDynamicsSimulation.cpp"
-        "simplemd/ProfilePlotter.cpp"
-        "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
-		"simplemd/cell-mappings/LennardJonesForceMapping.cpp"
-		"simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
-		"simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
-		"simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.cpp"
-		"simplemd/cell-mappings/RDFMapping.cpp"
-		"simplemd/configurations/DomainConfiguration.cpp"
-		"simplemd/configurations/ExternalForceConfiguration.cpp"
-		"simplemd/configurations/MolecularDynamicsConfiguration.cpp"
-		"simplemd/configurations/MoleculeConfiguration.cpp"
-		"simplemd/configurations/MPIConfiguration.cpp"
-		"simplemd/configurations/ProfilePlotterConfiguration.cpp"
-		"simplemd/configurations/RDFConfiguration.cpp"
-		"simplemd/configurations/SimulationConfiguration.cpp"
-		"simplemd/configurations/VTKConfiguration.cpp"
-		"simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
-		"simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
-		"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
-		"simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
-		"simplemd/services/ExternalForceService.cpp"
-		"simplemd/services/LinkedCellService.cpp"
-		"simplemd/services/MolecularPropertiesService.cpp"
-		"simplemd/services/MoleculeService.cpp"
-		"simplemd/services/ParallelAndLocalBufferService.cpp"
-		"simplemd/services/ParallelTopologyService.cpp"
-        "tarch/tinyxml2/tinyxml2.cpp"
-        "tarch/utils/RandomNumberService.cpp"
+  "simplemd/BoundaryTreatment.cpp"
+  "simplemd/MolecularDynamicsSimulation.cpp"
+  "simplemd/ProfilePlotter.cpp"
+  "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
+	"simplemd/cell-mappings/LennardJonesForceMapping.cpp"
+	"simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
+	"simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
+	"simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.cpp"
+	"simplemd/cell-mappings/RDFMapping.cpp"
+	"simplemd/configurations/DomainConfiguration.cpp"
+	"simplemd/configurations/ExternalForceConfiguration.cpp"
+	"simplemd/configurations/MolecularDynamicsConfiguration.cpp"
+	"simplemd/configurations/MoleculeConfiguration.cpp"
+	"simplemd/configurations/MPIConfiguration.cpp"
+	"simplemd/configurations/ProfilePlotterConfiguration.cpp"
+	"simplemd/configurations/RDFConfiguration.cpp"
+	"simplemd/configurations/SimulationConfiguration.cpp"
+	"simplemd/configurations/VTKConfiguration.cpp"
+	"simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
+	"simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
+	"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"    
+	"simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
+	"simplemd/services/ExternalForceService.cpp"
+	"simplemd/services/LinkedCellService.cpp"
+	"simplemd/services/MolecularPropertiesService.cpp"
+	"simplemd/services/MoleculeService.cpp"
+	"simplemd/services/ParallelAndLocalBufferService.cpp"
+	"simplemd/services/ParallelTopologyService.cpp"
+  "tarch/tinyxml2/tinyxml2.cpp"
+  "tarch/utils/RandomNumberService.cpp"
+  "simplemd/configurations/Adios2Configuration.cpp"
 )
+if(BUILD_WITH_ADIOS2)
+  list(APPEND SIMPLE_MD_SOURCES "simplemd/molecule-mappings/Adios2Writer.cpp")
+endif()
+
+
 add_library(libsimplemd ${SIMPLE_MD_SOURCES})
 target_link_libraries(libsimplemd PRIVATE simplemd_interface)
 set_target_properties(libsimplemd PROPERTIES CXX_STANDARD 17)
@@ -201,6 +222,9 @@ add_library(mamico INTERFACE)
 if(BUILD_WITH_EIGEN)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
 	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
+endif()
+if(BUILD_WITH_ADIOS2)
+  add_compile_definitions(BUILD_WITH_ADIOS2)
 endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors -O3)
@@ -561,6 +585,8 @@ set(CLANGFORMAT_SOURCES
   "simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
   "simplemd/molecule-mappings/WriteCheckPointMapping.h"
   "simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
+  "simplemd/molecule-mappings/Adios2Writer.cpp"
+  "simplemd/molecule-mappings/Adios2Writer.h"
   "simplemd/BoundaryTreatment.h"
   "simplemd/LinkedCell.h"
   "simplemd/main_multi.cpp"
@@ -583,6 +609,8 @@ set(CLANGFORMAT_SOURCES
   "simplemd/configurations/ExternalForceConfiguration.cpp"
   "simplemd/configurations/RDFConfiguration.h"
   "simplemd/configurations/VTKConfiguration.cpp"
+  "simplemd/configurations/Adios2Configuration.cpp"
+  "simplemd/configurations/Adios2Configuration.h"
   "simplemd/main.cpp"
   "simplemd/Molecule.h"
   "simplemd/ProfilePlotter.h"

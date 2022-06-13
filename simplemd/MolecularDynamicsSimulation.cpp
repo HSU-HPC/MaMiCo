@@ -6,11 +6,15 @@
 #include "simplemd/cell-mappings/VaryCheckpointMapping.h"
 
 simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
-    : _configuration(configuration), _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL), _lennardJonesForce(NULL),
-      _emptyLinkedListsMapping(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL), _parallelTopologyService(NULL),
-      _moleculeService(NULL), _linkedCellService(NULL), _molecularPropertiesService(NULL),
+    : _configuration(configuration), _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL),
+#if BUILD_WITH_ADIOS2
+      _Adios2Writer(NULL),
+#endif
+      _lennardJonesForce(NULL), _emptyLinkedListsMapping(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL),
+      _parallelTopologyService(NULL), _moleculeService(NULL), _linkedCellService(NULL), _molecularPropertiesService(NULL),
       // initialise external forces
-      _externalForceService(configuration.getExternalForceConfigurations()) {}
+      _externalForceService(configuration.getExternalForceConfigurations()) {
+}
 
 double simplemd::MolecularDynamicsSimulation::getNumberDensity(unsigned int numberMolecules, const tarch::la::Vector<MD_DIM, double>& domainSize) const {
   double density = 1.0;
@@ -25,6 +29,9 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
   // set vtk file stem and checkpoint filestem -> only one MD simulation runs
   _localMDSimulation = 0;
   _vtkFilestem = _configuration.getVTKConfiguration().getFilename();
+#if BUILD_WITH_ADIOS2
+  _Adios2Filestem = _configuration.getAdios2Configuration().getFilename();
+#endif
   _checkpointFilestem = _configuration.getCheckpointConfiguration().getFilename();
   // initialise local variable with global information first (they are adapted
   // later on)
@@ -162,6 +169,22 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
       exit(EXIT_FAILURE);
     }
 
+#if BUILD_WITH_ADIOS2
+    _Adios2Writer =
+        new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _Adios2Filestem, localDomainOffset, _configuration
+#if (MD_PARALLEL == MD_YES)
+                                                     ,
+                                                     MPI_COMM_WORLD
+#endif
+        );
+    if (_Adios2Writer == NULL) {
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_Adios2Writer==NULL!"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
+#endif
+
     // cell mappings
     _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
     if (_lennardJonesForce == NULL) {
@@ -225,7 +248,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
 }
 
 void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::MultiMDService<MD_DIM>& multiMDService, unsigned int localMDSimulation) {
-  // set vtk file stem and checkpoint filestem;
+  // set vtk file stem and checkpoint filestem and adios2 filestem;
   _localMDSimulation = localMDSimulation;
   std::stringstream filestems;
   filestems << _configuration.getVTKConfiguration().getFilename() << "_" << localMDSimulation << "_";
@@ -234,6 +257,11 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
   filestems << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_";
   _checkpointFilestem = filestems.str();
   filestems.str("");
+#if BUILD_WITH_ADIOS2
+  filestems << _configuration.getAdios2Configuration().getFilename() << "_" << localMDSimulation << "_";
+  _Adios2Filestem = filestems.str();
+  filestems.str("");
+#endif
   // initialise local variable with global information first (they are adapted
   // later on)
   tarch::la::Vector<MD_DIM, double> localDomainSize(_configuration.getDomainConfiguration().getGlobalDomainSize());
@@ -376,6 +404,22 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
       exit(EXIT_FAILURE);
     }
 
+#if BUILD_WITH_ADIOS2
+    _Adios2Writer =
+        new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _Adios2Filestem, localDomainOffset, _configuration
+#if (MD_PARALLEL == MD_YES)
+                                                     ,
+                                                     multiMDService.getLocalCommunicator()
+#endif
+        );
+    if (_Adios2Writer == NULL) {
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_Adios2Writer==NULL!"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
+#endif
+
     // cell mappings
     _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
     if (_lennardJonesForce == NULL) {
@@ -459,6 +503,12 @@ void simplemd::MolecularDynamicsSimulation::shutdownServices() {
     delete _vtkMoleculeWriter;
     _vtkMoleculeWriter = NULL;
   }
+#if BUILD_WITH_ADIOS2
+  if (_Adios2Writer != NULL) {
+    delete _Adios2Writer;
+    _Adios2Writer = NULL;
+  }
+#endif
   if (_lennardJonesForce != NULL) {
     delete _lennardJonesForce;
     _lennardJonesForce = NULL;
@@ -550,10 +600,18 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   _boundaryTreatment->emptyGhostBoundaryCells();
 
   // plot VTK output
-  if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
+  if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() > 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
     _vtkMoleculeWriter->setTimestep(t);
     _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false);
   }
+
+#if BUILD_WITH_ADIOS2
+  // plot Adios2 output
+  if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() > 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
+    _Adios2Writer->setTimestep(t);
+    _moleculeService->iterateMolecules(*_Adios2Writer, false);
+  }
+#endif
 
   // write checkpoint
   if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&

@@ -17,6 +17,9 @@
 #include "simplemd/molecule-mappings/InitialPositionAndForceUpdate.h"
 #include "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.h"
 #include "simplemd/molecule-mappings/VTKMoleculeWriter.h"
+#if BUILD_WITH_ADIOS2
+#include "simplemd/molecule-mappings/Adios2Writer.h"
+#endif
 #include "simplemd/molecule-mappings/VelocityStoermerVerletMapping.h"
 #include "simplemd/services/ExternalForceService.h"
 #include "simplemd/services/LinkedCellService.h"
@@ -73,6 +76,11 @@ protected:
   simplemd::moleculemappings::UpdateLinkedCellListsMapping* _updateLinkedCellListsMapping;
   simplemd::moleculemappings::VTKMoleculeWriter* _vtkMoleculeWriter;
   std::string _vtkFilestem;
+
+#if BUILD_WITH_ADIOS2
+  simplemd::moleculemappings::Adios2Writer* _Adios2Writer;
+  std::string _Adios2Filestem;
+#endif
 
   // cell mappings
   simplemd::cellmappings::LennardJonesForceMapping* _lennardJonesForce;

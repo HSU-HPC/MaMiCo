@@ -28,13 +28,31 @@ class VTKMoleculeWriter;
  */
 class simplemd::moleculemappings::VTKMoleculeWriter {
 public:
+  /** Constructor
+   * @param parallelTopologyService parallel topology service
+   * @param moleculeService molecule service
+   * @param filename filename for .vtk output file
+   */
   VTKMoleculeWriter(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::services::MoleculeService& moleculeService,
                     const std::string& filename);
+
+  /** Destructor */
   ~VTKMoleculeWriter();
+
+  /** updates local variable _timestep to global timestep
+   * @param timestep global timestep
+   */
   void setTimestep(const unsigned int& timestep);
 
+  /** Opens new .vtk file for current timestep, writes meta-data, empty buffers */
   void beginMoleculeIteration();
+
+  /** writes assembled data to file after iterating over all molecules */
   void endMoleculeIteration();
+
+  /** adds position and velocity of the given molecule to the temporary stringstreams
+   * @param molecule regarded molecule
+   */
   void handleMolecule(Molecule& molecule);
 
 private:

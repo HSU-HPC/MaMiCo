@@ -5,6 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_CONFIGURATIONS_MOLECULARDYNAMICSCONFIGURATION_H_
 #define _MOLECULARDYNAMICS_CONFIGURATIONS_MOLECULARDYNAMICSCONFIGURATION_H_
 
+#include "simplemd/configurations/Adios2Configuration.h"
 #include "simplemd/configurations/CheckpointConfiguration.h"
 #include "simplemd/configurations/DomainConfiguration.h"
 #include "simplemd/configurations/ExternalForceConfiguration.h"
@@ -63,6 +64,8 @@ public:
 
   const simplemd::configurations::VTKConfiguration& getVTKConfiguration() const { return _vtkConfiguration; }
 
+  const simplemd::configurations::Adios2Configuration& getAdios2Configuration() const { return _Adios2Configuration; }
+
   const simplemd::configurations::SimulationConfiguration& getSimulationConfiguration() const { return _simulationConfiguration; }
 
   const simplemd::configurations::RDFConfiguration& getRDFConfiguration() const { return _rdfConfiguration; }
@@ -78,6 +81,7 @@ private:
   simplemd::configurations::MoleculeConfiguration _moleculeConfiguration;
   simplemd::configurations::MPIConfiguration _mpiConfiguration;
   simplemd::configurations::VTKConfiguration _vtkConfiguration;
+  simplemd::configurations::Adios2Configuration _Adios2Configuration;
   simplemd::configurations::SimulationConfiguration _simulationConfiguration;
   simplemd::configurations::RDFConfiguration _rdfConfiguration;
   simplemd::configurations::CheckpointConfiguration _checkpointConfiguration;
