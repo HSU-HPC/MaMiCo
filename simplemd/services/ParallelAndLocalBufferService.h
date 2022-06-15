@@ -40,7 +40,7 @@ public:
     ~SimpleBuffer();
 
     /** allocate storage */
-    bool initialise(const unsigned int doublesPerMolecule, const unsigned int upperBoundOnNumberOfMolecules);
+    bool initialise(const unsigned int doublesPerMolecule, const unsigned int upperBoundOnNumberOfMolecules, const unsigned int bufferSizeFactor);
 
     void shutdown();
 
@@ -93,7 +93,7 @@ public:
   /** allocate all necessary buffers
    * return false if allocation of a buffer fails
    */
-  bool initialise(const unsigned int numUniqueNeighbours, const unsigned int numCellsPerBuffer[], const double avMoleculesPerCell);
+  bool initialise(const unsigned int numUniqueNeighbours, const unsigned int numCellsPerBuffer[], const double avMoleculesPerCell, const unsigned int bufferSizeFactor);
 
   void shutdown();
 

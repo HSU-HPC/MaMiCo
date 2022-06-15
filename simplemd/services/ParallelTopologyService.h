@@ -61,7 +61,7 @@ public:
    *
    *  Needs to be called after MoleculeService has been initialised.
    */
-  void initBuffers(const unsigned int& localNumberOfMolecules);
+  void initBuffers(const unsigned int& localNumberOfMolecules, const unsigned int& bufferSizeFactor);
 
   /** shuts down the buffer service and then the parallel service */
   void shutdown();

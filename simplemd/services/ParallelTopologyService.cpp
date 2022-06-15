@@ -87,7 +87,7 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int& localNumberOfMolecules) {
+void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int& localNumberOfMolecules, const unsigned int& bufferSizeFactor) {
 
   // idle processors should not enter this function, but still put a check:
   if (isIdle())
@@ -103,7 +103,7 @@ void simplemd::services::ParallelTopologyService::initBuffers(const unsigned int
 
   // initialize ParallelAndLocalBufferService
   bool isOk;
-  isOk = _bufferService.initialise(_numUniqueNeighbours, _numberOfCellsPerBuffer, averageNumberOfMoleculesPerLinkedCell);
+  isOk = _bufferService.initialise(_numUniqueNeighbours, _numberOfCellsPerBuffer, averageNumberOfMoleculesPerLinkedCell, bufferSizeFactor);
   if (!isOk) {
     std::cout << "Rank " << _rank << " could not initialise ParallelAndLocalBufferService. Terminating." << std::endl;
     exit(EXIT_FAILURE);

@@ -118,7 +118,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
 
     // initialise buffers. After this call, the ParallelTopologyService
     // initialisation is complete
-    _parallelTopologyService->initBuffers(_moleculeService->getNumberMolecules());
+    _parallelTopologyService->initBuffers(_moleculeService->getNumberMolecules(), _configuration.getSimulationConfiguration().getBufferSizeFactor());
     _linkedCellService = new simplemd::services::LinkedCellService(localDomainSize, localDomainOffset, *_parallelTopologyService, *_moleculeService);
     if (_linkedCellService == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
@@ -332,7 +332,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
 
     // initialise buffers. After this call, the ParallelTopologyService
     // initialisation is complete
-    _parallelTopologyService->initBuffers(_moleculeService->getNumberMolecules());
+    _parallelTopologyService->initBuffers(_moleculeService->getNumberMolecules(), _configuration.getSimulationConfiguration().getBufferSizeFactor());
     _linkedCellService = new simplemd::services::LinkedCellService(localDomainSize, localDomainOffset, *_parallelTopologyService, *_moleculeService);
     if (_linkedCellService == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "

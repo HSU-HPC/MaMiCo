@@ -16,9 +16,10 @@ simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::~SimpleBuffer()
 }
 
 bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise(const unsigned int doublesPerMolecule,
-                                                                                 const unsigned int upperBoundOnNumberOfMolecules) {
-  _capacity = 3 * upperBoundOnNumberOfMolecules * doublesPerMolecule;
+                                                                                 const unsigned int upperBoundOnNumberOfMolecules,
+                                                                                 const unsigned int bufferSizeFactor) {
 
+  _capacity = bufferSizeFactor * upperBoundOnNumberOfMolecules * doublesPerMolecule;
   _values = (double*)malloc(_capacity * sizeof(double));
   if (_values == NULL) {
     std::cout << "_values of SimpleBuffer, part of the ParallelAndLocalBufferService, could not be allocated. Terminating..." << std::endl;
@@ -115,14 +116,14 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::reallocate
 /* Public methods: */
 
 bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigned int numUniqueNeighbours, const unsigned int numCellsPerBuffer[],
-                                                                   const double avMoleculesPerCell) {
+                                                                   const double avMoleculesPerCell, const unsigned int bufferSizeFactor) {
   bool isOk = true;
   unsigned int doublesPerMolecule = MD_DIM * 3 + 1;
   /* Reallocation of local buffer is permitted, so initialize it with a small
    * value, say 20 molecules */
   unsigned int buffUpperBound = 20;
 
-  isOk = _localBuffer.initialise(doublesPerMolecule, buffUpperBound);
+  isOk = _localBuffer.initialise(doublesPerMolecule, buffUpperBound, bufferSizeFactor);
   if (!isOk) {
     std::cout << "Allocation of local buffer with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..." << std::endl;
     return false;
@@ -134,7 +135,7 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigne
   for (i_buffer = 0; i_buffer < _numberActiveParallelBuffers; i_buffer++) {
     buffUpperBound = computeBufferUpperBound(numCellsPerBuffer[i_buffer], avMoleculesPerCell);
 
-    isOk = _sendBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
+    isOk = _sendBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound, bufferSizeFactor);
     if (!isOk) {
       std::cout << "Allocation of send buffer " << i_buffer << " with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..."
                 << std::endl;
@@ -144,7 +145,7 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigne
     std::cout << "Send buffer " << i_buffer << " was successfully allocated with an upper bound of " << buffUpperBound << std::endl;
 #endif
 
-    isOk = _receiveBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
+    isOk = _receiveBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound, bufferSizeFactor);
     if (!isOk) {
       std::cout << "Allocation of receive buffer " << i_buffer << " with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..."
                 << std::endl;

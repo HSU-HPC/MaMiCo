@@ -15,7 +15,7 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
       _externalForceService(externalForceService) {
-  std::stringstream ss;
+  /* std::stringstream ss;
   ss << "CheckpointSimpleMD_Eva_liquid_ghostLayer.checkpoint";
   std::ifstream file(ss.str().c_str());
   tarch::la::Vector<MD_DIM, double> position(0.0);
@@ -24,7 +24,7 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
       file >> position[d];
     }
     _positions.push_back(position);
-  }
+  }*/
 }
 
 void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {}
@@ -58,12 +58,12 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
 
       m2++;
     }
-    if (cellIndex < 13448) {
+    /*if (cellIndex < 13448) {
       for (unsigned int i = 0; i < 66203; i++) {
         forceBuffer = getLennardJonesForce(position1, _positions[i]);
         force1 += forceBuffer;
       }
-    }
+    }*/
   }
 }
 

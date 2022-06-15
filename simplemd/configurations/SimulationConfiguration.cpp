@@ -8,6 +8,7 @@
 const std::string simplemd::configurations::SimulationConfiguration::DT("dt");
 const std::string simplemd::configurations::SimulationConfiguration::NUMBER_OF_TIMESTEPS("number-of-timesteps");
 const std::string simplemd::configurations::SimulationConfiguration::REORGANISE_MEMORY_EVERY_TIMESTEP("reorganise-memory-every-timestep");
+const std::string simplemd::configurations::SimulationConfiguration::BUFFER_SIZE_FACTOR("buffer-size-factor");
 const std::string simplemd::configurations::SimulationConfiguration::COMPUTE_QUANTITIES_EVERY_TIMESTEP("compute-macroscopic-quantities-every-timestep");
 const std::string simplemd::configurations::SimulationConfiguration::FIX_SEED("fix-seed");
 const std::string
@@ -45,10 +46,20 @@ void simplemd::configurations::SimulationConfiguration::parseSubtag(tinyxml2::XM
   }
   _reorganiseMemoryEveryTimestep = (unsigned int)(intBuf);
 
+  // get buffer-size-factor
+  intBuf = 1;
+  tarch::configuration::ParseConfiguration::readIntOptional(intBuf, node, BUFFER_SIZE_FACTOR);
+  if (intBuf <= 0) {
+    std::cout << BUFFER_SIZE_FACTOR << " is smaller than or equal zero: " << intBuf << std::endl;
+    _isValid = false;
+    exit(EXIT_FAILURE);
+  }
+  _bufferSizeFactor = (unsigned int)(intBuf);
+
   // get quantity evaluation info
   tarch::configuration::ParseConfiguration::readIntMandatory(intBuf, node, COMPUTE_QUANTITIES_EVERY_TIMESTEP);
   if (intBuf < 0) {
-    std::cout << REORGANISE_MEMORY_EVERY_TIMESTEP << " is smaller than zero: " << intBuf << std::endl;
+    std::cout << COMPUTE_QUANTITIES_EVERY_TIMESTEP << " is smaller than zero: " << intBuf << std::endl;
     _isValid = false;
     exit(EXIT_FAILURE);
   }
@@ -67,6 +78,7 @@ void simplemd::configurations::SimulationConfiguration::parseSubtag(tinyxml2::XM
   std::cout << "Timestep dt:   " << _dt << std::endl;
   std::cout << "No. timesteps: " << _numberOfTimesteps << std::endl;
   std::cout << "Reorganise memory every timestep: " << _reorganiseMemoryEveryTimestep << std::endl;
+  std::cout << "Buffer size factor: " << _bufferSizeFactor << std::endl;
 #endif
 }
 
