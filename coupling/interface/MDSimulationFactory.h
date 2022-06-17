@@ -60,7 +60,7 @@ public:
    *	@param firstTimestep
    */
   virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) = 0;
-
+  virtual void simulateTimestepsWithVacuum(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) = 0;
   // simulates a single time step
   // virtual void simulateTimestep(const unsigned int &thisTimestep ){const
   // unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
@@ -117,6 +117,12 @@ public:
   virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) {
     for (unsigned int t = firstTimestep; t < firstTimestep + numberTimesteps; t++) {
       _molecularDynamicsSimulation.simulateOneCouplingTimestep(t);
+    }
+  }
+  virtual void simulateTimestepsWithVacuum(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) {
+    for (unsigned int t = firstTimestep; t < firstTimestep + numberTimesteps; t++) {
+      _molecularDynamicsSimulation.simulateOneCouplingTimestep(t);
+      _molecularDynamicsSimulation.applyVacuum();
     }
   }
   virtual void sortMoleculesIntoCells() {

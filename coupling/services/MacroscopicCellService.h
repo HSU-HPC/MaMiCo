@@ -65,7 +65,7 @@ public:
   virtual void distributeMass(unsigned int t) = 0;
   virtual void distributeMomentum(unsigned int t) = 0;
   virtual void applyBoundaryForce(unsigned int t) = 0;
-  virtual void applyVacuum(unsigned int t) = 0;
+  virtual void applyVacuum() = 0;
   virtual void checkMass(unsigned int t){};
   virtual void perturbateVelocity() = 0;
   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
@@ -227,9 +227,9 @@ public:
                                                                    _multiMDService, _filterPipelineConfiguration);
   }
 
-  void inserteMassFromVacuum(unsigned int t, unsigned int particlesToInserte);
+  void inserteMassFromVacuum(unsigned int particlesToInserte);
 
-  void applyVacuum(unsigned int t);
+  void applyVacuum();
 
   void checkMass(unsigned int t);
 

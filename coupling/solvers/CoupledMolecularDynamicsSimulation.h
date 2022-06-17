@@ -46,6 +46,11 @@ public:
     _macroscopicCellService = macroscopicCellService;
   }
 
+  void applyVacuum(){
+    std::cout << "Vacuum is applied" << std::endl;
+    _macroscopicCellService->applyVacuum();
+  }
+
   /** this is needed by the coupling to synchronize molecules
    *  in boundary regions and on different processes after mass insertion/
    * deletion.

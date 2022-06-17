@@ -70,7 +70,6 @@ private:
 
   /** @brief initialises all MPI variables  */
   void initMPI() {
-    _rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
@@ -96,12 +95,7 @@ private:
 
   /** @brief initialises the macro and micro solver according to the setup from the xml file and pre-proccses them */
   void initSolvers() {
-    // for timing measurements
-    _tv.micro = 0;
-    _tv.macro = 0;
-
     // allocate solvers
-    _macroSolver = NULL;
     _macroSolver =
         getMacroSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
                          _MDSolverConfig.getSimulationConfiguration().getDt() * _MDSolverConfig.getSimulationConfiguration().getNumberOfTimesteps());
@@ -123,7 +117,6 @@ private:
         exit(EXIT_FAILURE);
       }
     }
-    _mdStepCounter = 0;
     if (_rank == 0) {
       gettimeofday(&_tv.start, NULL);
     }
@@ -158,8 +151,8 @@ private:
       _multiMDCellService->getMacroscopicCellService(i).computeAndStoreTemperature(_EvapConfig.temp);
     }
     // allocate buffers for CFDToMD/MDToCFD operations
-    // allocateCFDToMDBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*macroSolverInterface);
-    // allocateMDToCFDBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*macroSolverInterface);
+    allocateCFDToMDBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*macroSolverInterface);
+    allocateMDToCFDBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*macroSolverInterface);
     // finish time measurement for initialisation
     if (_rank == 0) {
       gettimeofday(&_tv.end, NULL);
@@ -200,7 +193,7 @@ private:
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicCellService(
           &(_multiMDCellService->getMacroscopicCellService(i)));
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
-      _MDSolver[i]->simulateTimesteps(_MDSolverConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter);
+      _MDSolver[i]->simulateTimestepsWithVacuum(_MDSolverConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter);
       // plot macroscopic time step info in multi md service
       _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);
     }
@@ -212,8 +205,6 @@ private:
     }
     // send back data from MD instances and merge it
     //_multiMDCellService->sendFromMD2Macro(_buf.MDToCFDBuffer,_buf.globalCellIndices4MDToCFDBuffer);
-    // write2CSV(_buf.MDToCFDBuffer,_buf.globalCellIndices4MDToCFDBuffer,_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),cycle+1);
-    std::cout << "Finished " << cycle << std::endl;
   }
 
   /** @brief finalize the time measurement, and cleans up at the end of the simulation */
@@ -226,6 +217,17 @@ private:
       std::cout << "Time percentages Micro, Macro, Other: " << std::endl;
       std::cout << _tv.micro / time_total * 100 << ", " << _tv.macro / time_total * 100 << ",  " << (1 - (_tv.micro + _tv.macro) / time_total) * 100
                 << std::endl;
+    }
+    // free buffers/arrays
+    deleteBuffer(_buf.CFDToMDBuffer);
+    if (_buf.globalCellIndices4CFDToMDBuffer != NULL) {
+      delete[] _buf.globalCellIndices4CFDToMDBuffer;
+      _buf.globalCellIndices4CFDToMDBuffer = NULL;
+    }
+    deleteBuffer(_buf.MDToCFDBuffer);
+    if (_buf.globalCellIndices4MDToCFDBuffer != NULL) {
+      delete[] _buf.globalCellIndices4MDToCFDBuffer;
+      _buf.globalCellIndices4MDToCFDBuffer = NULL;
     }
 
     // shutdown MD simulation
@@ -288,60 +290,25 @@ private:
    *  @param indexConversion instance of the indexConversion
    *  @param macroSolverInterface interface for the continuum solver */
   void allocateCFDToMDBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroSolverInterface) {
-    // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
-    const unsigned int num = cells[0] * cells[1] * cells[2];
-    // delete all potential entries of CFDToMDBuffer
+    const unsigned int num = 3; // just 3 cells shall be sent in oneD
+    // delete all potential entries of CFDToMDBuffer // todo: where should they come from, not really necessary
     deleteBuffer(_buf.CFDToMDBuffer);
-    // count number of cells to be sent from this process; therefore, loop over all global macroscopic cells...
-    unsigned int numCellsSent = 0;
-    for (unsigned int i = 0; i < num; i++) {
-      // ... and find out, if the current cell should be send to MD from this macro solver process
-      if (macroSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
-        std::vector<unsigned int> ranks = macroSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == (unsigned int)_rank);
-        }
-        if (containsThisRank) {
-          numCellsSent++;
-        }
-      }
-    }
+    // TODO: Adapt for parallel setup, check where this is necessary
     // allocate array for cell indices
-    unsigned int* indices = new unsigned int[numCellsSent];
+    unsigned int* indices = new unsigned int[num]{31, 40, 49}; // refers to third, fourth, fifth cell
     if (indices == NULL) {
       std::cout << "ERROR EvaporationTest::allocateCFDToMDBuffer(): indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // allocate CFDToMDBuffer and initialise all entries, incl. indices
     for (unsigned int i = 0; i < num; i++) {
-      if (macroSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
-        std::vector<unsigned int> ranks = macroSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == (unsigned int)_rank);
-        }
-        if (containsThisRank) {
-          _buf.CFDToMDBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          if (_buf.CFDToMDBuffer[_buf.CFDToMDBuffer.size() - 1] == NULL) {
-            std::cout << "ERROR EvaporationTest::allocateCFDToMDBuffer: CFDToMDBuffer[" << _buf.CFDToMDBuffer.size() - 1 << "]==NULL!" << std::endl;
-            exit(EXIT_FAILURE);
-          }
-          indices[_buf.CFDToMDBuffer.size() - 1] = i;
-        }
+      std::cout << "the global vector cell index is CFD2MD" << indexConversion.getGlobalVectorCellIndex(indices[i]) << std::endl;
+      _buf.CFDToMDBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+      if (_buf.CFDToMDBuffer[_buf.CFDToMDBuffer.size() - 1] == NULL) {
+        std::cout << "ERROR EvaporationTest::allocateCFDToMDBuffer: CFDToMDBuffer[" << _buf.CFDToMDBuffer.size() - 1 << "]==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    for (unsigned int i = 0; i < numCellsSent; i++) {
-      std::vector<unsigned int> ranks = macroSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(indices[i]));
-      std::cout << "Current rank= " << _rank << ", CFDToMD cell " << indexConversion.getGlobalVectorCellIndex(indices[i]) << ", ranks=";
-      for (unsigned int j = 0; j < ranks.size(); j++) {
-        std::cout << " " << ranks[j];
-      }
-      std::cout << std::endl;
-    }
-#endif
     _buf.globalCellIndices4CFDToMDBuffer = indices;
   }
 
@@ -349,97 +316,25 @@ private:
    * ptr is returned */
   void allocateMDToCFDBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroSolverInterface) {
     // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
-    const unsigned int num = cells[0] * cells[1] * cells[2];
+    const unsigned int num = 2;
     // delete all potential entries of MDToCFDBuffer
     deleteBuffer(_buf.MDToCFDBuffer);
-    // determine number of cells that should be received
-    unsigned int numCellsMDToCFD = 0;
-    for (unsigned int i = 0; i < num; i++) {
-      if (macroSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
-        std::vector<unsigned int> ranks = macroSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == (unsigned int)_rank);
-        }
-        if (containsThisRank) {
-          numCellsMDToCFD++;
-        }
-      }
-    }
     // allocate array for cell indices
-    unsigned int* indices = new unsigned int[numCellsMDToCFD];
+    unsigned int* indices = new unsigned int[num]{58,67};
     if (indices == NULL) {
       std::cout << "ERROR EvaporationTest::allocateMDToCFDBuffer(): indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
     // allocate MDToCFDBuffer and initialise all entries, incl. indices
     for (unsigned int i = 0; i < num; i++) {
-      if (macroSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
-        std::vector<unsigned int> ranks = macroSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == (unsigned int)_rank);
-        }
-        if (containsThisRank) {
-          _buf.MDToCFDBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          if (_buf.MDToCFDBuffer[_buf.MDToCFDBuffer.size() - 1] == NULL) {
-            std::cout << "ERROR EvaporationTest::allocateMDToCFDBuffer: MDToCFDBuffer[" << _buf.MDToCFDBuffer.size() - 1 << "]==NULL!" << std::endl;
-            exit(EXIT_FAILURE);
-          }
-          // set linearized index
-          indices[_buf.MDToCFDBuffer.size() - 1] = i;
-        }
+      std::cout << "the global vector cell index is MD2CFD" << indexConversion.getGlobalVectorCellIndex(indices[i]) << std::endl;
+      _buf.MDToCFDBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+      if (_buf.MDToCFDBuffer[_buf.MDToCFDBuffer.size() - 1] == NULL) {
+        std::cout << "ERROR EvaporationTest::allocateMDToCFDBuffer: MDToCFDBuffer[" << _buf.MDToCFDBuffer.size() - 1 << "]==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    for (unsigned int i = 0; i < numCellsMDToCFD; i++) {
-      std::vector<unsigned int> ranks = macroSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(indices[i]));
-      std::cout << "Current rank= " << _rank << ", MDToCFD cell " << indexConversion.getGlobalVectorCellIndex(indices[i]) << ", ranks=";
-      for (unsigned int j = 0; j < ranks.size(); j++) {
-        std::cout << " " << ranks[j];
-      }
-      std::cout << std::endl;
-    }
-#endif
     _buf.globalCellIndices4MDToCFDBuffer = indices;
-  }
-
-  /** @brief write macroscopic cells that have been received from MD to csv file
-   *  @param MDToCFDBuffer the buffer for the data, which comes from md
-   *  @param MDToCFDIndices the indices for the macr cells in the buffer
-   *  @param indexConversion an instance of the indexConversion
-   *  @param couplingCycle the current number of coupling cycle */
-  void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& MDToCFDBuffer, const unsigned int* const MDToCFDIndices,
-                 const coupling::IndexConversion<3>& indexConversion, int couplingCycle) const {
-    if (MDToCFDBuffer.size() == 0)
-      return;
-    if (_EvapConfig.csvEveryTimestep < 1 || couplingCycle % _EvapConfig.csvEveryTimestep > 0)
-      return;
-    // form file name and open file
-    std::stringstream ss;
-    ss << "EvaporationAvgMultiMDCells_" << _rank << "_" << couplingCycle << ".csv";
-    std::ofstream file(ss.str().c_str());
-    if (!file.is_open()) {
-      std::cout << "ERROR EvaporationTest::write2CSV(): Could not open file " << ss.str() << "!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-
-    // loop over received cells; read macroscopic mass+momentum buffers and write cell index, mass and velocity to one line in the csv-file
-    const unsigned int numCellsMDToCFD = MDToCFDBuffer.size();
-    for (unsigned int i = 0; i < numCellsMDToCFD; i++) {
-      tarch::la::Vector<3, double> vel(MDToCFDBuffer[i]->getMacroscopicMomentum());
-      if (MDToCFDBuffer[i]->getMacroscopicMass() != 0.0) {
-        vel = (1.0 / MDToCFDBuffer[i]->getMacroscopicMass()) * vel;
-      }
-      const tarch::la::Vector<3, unsigned int> counter(indexConversion.getGlobalVectorCellIndex(MDToCFDIndices[i]));
-      file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; "
-           << MDToCFDBuffer[i]->getMacroscopicMass();
-      file << std::endl;
-    }
-
-    // close file
-    file.close();
   }
 
   /** @brief deletes the data in the buffer for the macro to md transfer
@@ -564,13 +459,13 @@ private:
     /** @brief */
     timeval end;
     /** @brief */
-    double micro;
+    double micro{0};
     /** @brief */
-    double macro;
+    double macro{0};
   };
 
   /** @brief the rank of the current MPI process */
-  int _rank;
+  int _rank{0};
   /** @brief the config data and information for MDSolver */
   simplemd::configurations::MolecularDynamicsConfiguration _MDSolverConfig;
   /** @brief the config data and information for MaMiCo*/
@@ -578,9 +473,9 @@ private:
   /** @brief the EvaporationConfig for the current setup */
   coupling::configurations::EvaporationConfig _EvapConfig;
   /** @brief the counter for the time steps, which are done within the md */
-  unsigned int _mdStepCounter;
+  unsigned int _mdStepCounter{0};
   /** @brief the current macro/continuum solver */
-  coupling::solvers::AbstractCouetteSolver<3>* _macroSolver;
+  coupling::solvers::AbstractCouetteSolver<3>* _macroSolver{nullptr};
   /** @todo piet */
   tarch::utils::MultiMDService<3>* _multiMDService;
   /** @todo piet */

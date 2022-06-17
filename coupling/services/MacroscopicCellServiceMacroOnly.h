@@ -72,7 +72,7 @@ public:
   virtual void distributeMomentum(unsigned int t) {}
   virtual void perturbateVelocity() {}
   virtual void applyBoundaryForce(unsigned int t) {}
-  virtual void applyVacuum(unsigned int t) {}
+  virtual void applyVacuum() {}
   virtual void plotEveryMicroscopicTimestep(unsigned int t) {}
   virtual void plotEveryMacroscopicTimestep(unsigned int t) {}
   virtual const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }

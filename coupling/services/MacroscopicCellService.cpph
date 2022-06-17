@@ -202,12 +202,12 @@ template <class LinkedCell, unsigned int dim> void coupling::services::Macroscop
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::inserteMassFromVacuum(unsigned int t, unsigned int particlesToInserte) {
+void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::inserteMassFromVacuum(unsigned int particlesToInserte) {
   Wrapper4InserteCertainParticlesOverZPlane wrapper(this, particlesToInserte);
   _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtBottom(wrapper, 1);
 }
 
-template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::applyVacuum(unsigned int t) {
+template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::applyVacuum() {
   Wrapper4ApplyVacuumAndSetAccordingMasses wrapper(this);
   _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCellsAtTop(wrapper, 1);
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -229,12 +229,12 @@ template <class LinkedCell, unsigned int dim> void coupling::services::Macroscop
     // std::endl;
     if (particlesToInserte > 0) {
       // std::cout << "insertion" << std::endl;
-      inserteMassFromVacuum(t, particlesToInserte);
+      inserteMassFromVacuum(particlesToInserte);
     }
   }
 #else
   const unsigned int particlesToInserte = wrapper.getNumberOfDeletedParticels();
-  inserteMassFromVacuum(t, particlesToInserte);
+  inserteMassFromVacuum(particlesToInserte);
 #endif
 }
 

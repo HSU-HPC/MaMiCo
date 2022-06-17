@@ -27,7 +27,6 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   // some pre-processing here.
   _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
   // std::cout << "check 0" << std::endl;
-  _macroscopicCellService->applyVacuum(t);
   // ------------ coupling step: distribute mass ---------------------
   // _macroscopicCellService->distributeMass(t);
   // std::cout << "check 1" << std::endl;
@@ -71,7 +70,7 @@ void coupling::solvers::CoupledMolecularDynamicsSimulation::simulateOneCouplingT
   _macroscopicCellService->plotEveryMicroscopicTimestep(t);
   // std::cout << "check 9" << std::endl;
   _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
-  // std::cout << "check 10" << std::endl;
+  // std::cout << "check 10" << std::endl; // Crashes here after some time steps
   // time integration. After this step, the velocities and the positions of the molecules have been updated.
   _moleculeService->iterateMolecules(*_timeIntegrator, false);
   // sort molecules into linked cells
