@@ -52,10 +52,30 @@ then
 else
     FLAGS="-DSIMPLE_MD -DMDDim3 -std=c++1z -Wall -Wno-unknown-pragmas -DENABLE_POST_MULTI_INSTANCE_FILTERING -O3"
     # -Werror
-    includes="${includes} -I${LIB_EIGEN_PATH}" 
+    includes="${includes} -I${LIB_EIGEN_PATH}"
     compiler="g++"
 fi
 ###
+
+### specity flags, includes and libraries for a run with OpenFOAM
+if [ -v FOAM_PATH ]
+then
+  echo "MaMiCo is compiled including OpenFOAM library"
+  FLAGS="${FLAGS} -DBUILD_WITH_OPENFOAM -m64 -DOPENFOAM=2112 -DWM_DP -DWM_LABEL_SIZE=32 -Wall -Wextra -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -DNoRepository -ftemplate-depth-100"
+  includes="${includes} -I${FOAM_PATH}src/finiteVolume/lnInclude -IlnInclude -I. -I${FOAM_PATH}src/meshTools/lnInclude -I${FOAM_PATH}src/OpenFOAM/lnInclude -I${FOAM_PATH}src/OSspecific/POSIX/lnInclude -I${FOAM_PATH}src/dynamicFvMesh/lnInclude -I${FOAM_PATH}src/thermophysicalModels/basic/lnInclude -I${FOAM_PATH}src/transportModels/compressible/lnInclude -I${FOAM_PATH}src/TurbulenceModels/turbulenceModels/lnInclude -I${FOAM_PATH}src/TurbulenceModels/compressible/lnInclude -I${FOAM_PATH}applications/solvers/compressible/rhoCentralFoam/BCs/rho -I${FOAM_PATH}applications/solvers/compressible/rhoCentralFoam"
+  libraries="${libraries} -fPIC -fuse-ld=bfd -Xlinker --add-needed -Xlinker --no-as-needed -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib -L${FOAM_PATH}platforms/linux64GccDPInt32Opt/lib/dummy -lfiniteVolume -lfvOptions -lmeshTools -lcompressibleTransportModels -lfluidThermophysicalModels -lspecie -lrhoCentralFoam -lturbulenceModels -lcompressibleTurbulenceModels -ldynamicFvMesh -ltopoChangerFvMesh -lOpenFOAM -ldl -lm "
+else
+  FLAGS="${FLAGS} -pedantic"
+fi
+### Removed flags -Dlinux64 -DWM_ARCH_OPTION=64 -g -pg -Wold-style-cast
+### Removed Include Paths
+### Removed Libraries -lPstream -lOpenFOAM -lsurfMesh -lfileFormats
+### From rhoCentralFoam allwmake g++ -std=c++11 -m64 -pthread -DOPENFOAM=2112 -DWM_DP -DWM_LABEL_SIZE=32 -Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -Wno-unknown-pragmas  -O3  -DNoRepository -ftemplate-depth-100
+### -IBCs/lnInclude -I/home/helene/openfoam/src/finiteVolume/lnInclude -I/home/helene/openfoam/src/meshTools/lnInclude -I/home/helene/openfoam/src/transportModels/compressible/lnInclude -I/home/helene/openfoam/src/thermophysicalModels/basic/lnInclude -I/home/helene/openfoam/src/thermophysicalModels/specie/lnInclude -I/home/helene/openfoam/src/TurbulenceModels/turbulenceModels/lnInclude -I/home/helene/openfoam/src/TurbulenceModels/compressible/lnInclude -I/home/helene/openfoam/src/dynamicFvMesh/lnInclude -iquote. -IlnInclude -I/home/helene/openfoam/src/OpenFOAM/lnInclude -I/home/helene/openfoam/src/OSspecific/POSIX/lnInclude   -fPIC -c rhoCentralFoam.C -o /home/helene/openfoam/build/linux64GccDPInt32Opt/applications/solvers/compressible/rhoCentralFoam/rhoCentralFoam.o
+### g++ -std=c++11 -m64 -pthread -DOPENFOAM=2112 -DWM_DP -DWM_LABEL_SIZE=32 -Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -Wno-unknown-pragmas  -O3  -DNoRepository -ftemplate-depth-100 -IBCs/lnInclude -I/home/helene/openfoam/src/finiteVolume/lnInclude -I/home/helene/openfoam/src/meshTools/lnInclude -I/home/helene/openfoam/src/transportModels/compressible/lnInclude -I/home/helene/openfoam/src/thermophysicalModels/basic/lnInclude -I/home/helene/openfoam/src/thermophysicalModels/specie/lnInclude -I/home/helene/openfoam/src/TurbulenceModels/turbulenceModels/lnInclude -I/home/helene/openfoam/src/TurbulenceModels/compressible/lnInclude -I/home/helene/openfoam/src/dynamicFvMesh/lnInclude -iquote. -IlnInclude -I/home/helene/openfoam/src/OpenFOAM/lnInclude -I/home/helene/openfoam/src/OSspecific/POSIX/lnInclude   -fPIC -Xlinker --add-needed -Xlinker --no-as-needed  /home/helene/openfoam/build/linux64GccDPInt32Opt/applications/solvers/compressible/rhoCentralFoam/rhoCentralFoam.o -L/home/helene/openfoam/platforms/linux64GccDPInt32Opt/lib \
+    ### -lfiniteVolume -lfvOptions -lmeshTools -lcompressibleTransportModels -lfluidThermophysicalModels -lspecie -lrhoCentralFoam -lturbulenceModels -lcompressibleTurbulenceModels -ldynamicFvMesh -ltopoChangerFvMesh -lOpenFOAM -ldl  \
+    ### -lm -o /home/helene/openfoam/platforms/linux64GccDPInt32Opt/bin/rhoCentralFoam
+
 
 ### builds, objects, libraries for coupling -> we require several parts from simplemd
 cd ${MAMICO_PATH}

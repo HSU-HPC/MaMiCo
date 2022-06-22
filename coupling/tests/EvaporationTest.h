@@ -5,15 +5,13 @@
 #define _COUPLING_TESTS_EVAPORATIONTEST_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/solvers/CouetteSolver.h"
-#include "coupling/solvers/LBCouetteSolver.h"
 #include "coupling/tests/Test.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
 #if (BUILD_WITH_OPENFOAM)
-#include "coupling/solvers/FoamClass.h"
-#include "coupling/solvers/FoamSolverInterface.h"
+#include "coupling/solvers/RhoCentralInterface4Evaporation.h"
+// #include "coupling/solvers/FoamSolverInterface.h"
 #endif
 #include "coupling/configurations/EvaporationConfiguration.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
@@ -96,9 +94,11 @@ private:
   /** @brief initialises the macro and micro solver according to the setup from the xml file and pre-proccses them */
   void initSolvers() {
     // allocate solvers
-    _macroSolver =
-        getMacroSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
-                         _MDSolverConfig.getSimulationConfiguration().getDt() * _MDSolverConfig.getSimulationConfiguration().getNumberOfTimesteps());
+    int argc{1};
+    char* dummy_args[] = { "1", NULL };
+    char** argv = dummy_args;
+    _macroSolver = new coupling::solvers::RhoCentralInterface4Evaporation(argc, argv);
+    // _macroSolver = new coupling::solvers::RhoCentralInterface4Evaporation(_EvapConfig.foam.directory, _EvapConfig.foam.folder);
     if (_macroSolver != NULL)
       std::cout << "Macro solver not null on rank: " << _rank << std::endl; // TODO: remove debug
 
@@ -356,7 +356,7 @@ private:
    *  @param indexConversion an instance of the indexConversion
    *  @param CFDToMDBuffer the bufffer to CFDToMD data from macro to micro
    *  @param globalCellIndices4CFDToMDBuffer the global linearized indices of the macroscopic cells in the buffer  */
-  void fillCFDToMDBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& macroSolver,
+  void fillCFDToMDBuffer(const double density, const coupling::solvers::RhoCentralInterface4Evaporation& macroSolver,
                       const coupling::IndexConversion<3>& indexConversion, std::vector<coupling::datastructures::MacroscopicCell<3>*>& CFDToMDBuffer,
                       const unsigned int* const globalCellIndices4CFDToMDBuffer) const {
     const unsigned int size = CFDToMDBuffer.size();
@@ -373,28 +373,13 @@ private:
       }
 
       double mass = density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
-      mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&macroSolver)->getDensity(cellMidPoint);
+      mass *= macroSolver.getDensity(cellMidPoint);
 
       // compute momentum
       tarch::la::Vector<3, double> momentum(mass * macroSolver.getVelocity(cellMidPoint));
       CFDToMDBuffer[i]->setMicroscopicMass(mass);
       CFDToMDBuffer[i]->setMicroscopicMomentum(momentum);
     }
-  }
-
-  /** @returns the correct marco/continuum solver for the given setup
-   *  @param dx the grid size (equidistant mesh)
-   *  @param dt the time step  */
-  coupling::solvers::AbstractCouetteSolver<3>* getMacroSolver(const double dx, const double dt) {
-    coupling::solvers::AbstractCouetteSolver<3>* solver = NULL;
-    // LB solver: active on lbNumberProcesses
-    solver = new coupling::solvers::LBCouetteSolver(_EvapConfig.channelheight, tarch::la::Vector<3, double>(0), 0, dx, dt, -1, "LBEvaporation",
-                                                    tarch::la::Vector<3, unsigned int>(1));
-    if (solver == NULL) {
-      std::cout << "ERROR EvaporationTest::getEvaporationSolver(): LB solver==NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    return solver;
   }
 
   /** @returns the interface for the macro/continuum solver
@@ -404,14 +389,13 @@ private:
    *  @param globalNumberMacroscopicCells the total number macroscopic cells for the whole domain
    *  @param outerRegion
    *  @todo piet, what is the mamicoMeshsize & the outer layer  */
-  coupling::interface::MacroscopicSolverInterface<3>* getMacroSolverInterface(coupling::solvers::AbstractCouetteSolver<3>* macroSolver,
+  coupling::interface::MacroscopicSolverInterface<3>* getMacroSolverInterface(coupling::solvers::RhoCentralInterface4Evaporation* macroSolver,
                                                                                 tarch::la::Vector<3, double> mdOffset,
                                                                                 tarch::la::Vector<3, double> mamicoMeshsize,
                                                                                 tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
                                                                                 unsigned int outerRegion) {
     coupling::interface::MacroscopicSolverInterface<3>* interface = NULL;
-    coupling::solvers::LBCouetteSolver* lbSolver = static_cast<coupling::solvers::LBCouetteSolver*>(macroSolver);
-    if (lbSolver == NULL) {
+    if (macroSolver == NULL) {
       std::cout << "ERROR EvaporationTest::getMacroSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -474,8 +458,8 @@ private:
   coupling::configurations::EvaporationConfig _EvapConfig;
   /** @brief the counter for the time steps, which are done within the md */
   unsigned int _mdStepCounter{0};
-  /** @brief the current macro/continuum solver */
-  coupling::solvers::AbstractCouetteSolver<3>* _macroSolver{nullptr};
+  /** @brief the macro/continuum solver */
+  coupling::solvers::RhoCentralInterface4Evaporation* _macroSolver;
   /** @todo piet */
   tarch::utils::MultiMDService<3>* _multiMDService;
   /** @todo piet */
