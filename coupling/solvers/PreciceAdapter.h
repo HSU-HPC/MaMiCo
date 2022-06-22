@@ -111,9 +111,10 @@ public:
       const unsigned int mamicoRecvdIndex = mamicoRecvdIndices[iMamicoRecvdIndices];
       tarch::la::Vector<3, int> mamicoRecvdVIndex = coupling::indexing::convertToVector<dim>({mamicoRecvdIndex});
       if (receiveMacroscopicQuantityFromMDSolver(static_cast<tarch::la::Vector<dim, unsigned int>>(mamicoRecvdVIndex))) {
-        std::vector<int> triangleNodeIDs = getTriangleNodeIDs(vertexPreciceID, mamicoRecvdVIndex, mamicoRecvdIndices, mamicoRecvdIndicesSize);
-        for (size_t triangleIndex = 0; triangleIndex < triangleNodeIDs.size()/3; triangleIndex++) {
-          _interface->setMeshTriangleWithEdges(_interface->getMeshID("mamico-m2M-mesh"), triangleNodeIDs[triangleIndex*3], triangleNodeIDs[triangleIndex*3+1], triangleNodeIDs[triangleIndex*3+2]);
+        std::vector<int> tetrahedronsNodeIDs = getTetrahedronsNodeIDs(vertexPreciceID, mamicoRecvdVIndex, mamicoRecvdIndices, mamicoRecvdIndicesSize);
+        for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsNodeIDs.size()/4; tetrahedronIndex++) {
+          _interface->setMeshTetrahedron(_interface->getMeshID("mamico-m2M-mesh"),
+          tetrahedronsNodeIDs[tetrahedronIndex*4], tetrahedronsNodeIDs[tetrahedronIndex*4+1], tetrahedronsNodeIDs[tetrahedronIndex*4+2], tetrahedronsNodeIDs[tetrahedronIndex*4+3]);
         }
         vertexPreciceID++;
       }
@@ -121,10 +122,10 @@ public:
     _precice_dt = _interface->initialize();
   }
 
-  std::vector<int> getTriangleNodeIDs(const int nodePreciceID, const tarch::la::Vector<3, int> nodeMamicoVIndex, const unsigned int* const mamicoRecvdIndices, size_t mamicoRecvdIndicesSize) {
-    std::vector<int> triangleNodePreciceIDs;
+  std::vector<int> getTetrahedronsNodeIDs(const int nodePreciceID, const tarch::la::Vector<3, int> nodeMamicoVIndex, const unsigned int* const mamicoRecvdIndices, size_t mamicoRecvdIndicesSize) {
+    std::vector<int> tetrahedronsNodeIDs;
     const int numberOfNeighbors = 6;
-    tarch::la::Vector<3, int> directionNeighbors[numberOfNeighbors] = {{0,0,-1},{1,0,0}, {0,1,0}, {-1,0,0}, {0,-1,0},{1,0,1}};
+    tarch::la::Vector<3, int> directionNeighbors[numberOfNeighbors] = {{0,0,-1}, {0,0,1}, {1,0,0}, {0,1,0}, {-1,0,0}, {0,-1,0}};
     int neighborVertexIDSs[numberOfNeighbors];
     for (size_t iDirectionNeighbors= 0; iDirectionNeighbors < numberOfNeighbors; iDirectionNeighbors++) {
       tarch::la::Vector<3, int> neighborMamicoVIndex = nodeMamicoVIndex + directionNeighbors[iDirectionNeighbors];
@@ -142,14 +143,15 @@ public:
     }
     for (size_t zNeighborIndex = 0; zNeighborIndex < 2; zNeighborIndex++) {
       if (neighborVertexIDSs[zNeighborIndex] > 0) {
-        for (size_t xyNeighborIndex = 2; xyNeighborIndex < 6; xyNeighborIndex++) {
-          if (neighborVertexIDSs[xyNeighborIndex] > 0) {
-            triangleNodePreciceIDs.insert(triangleNodePreciceIDs.end(), {nodePreciceID, neighborVertexIDSs[zNeighborIndex], neighborVertexIDSs[xyNeighborIndex]});
+        for (size_t xyNeighborIndex = 0; xyNeighborIndex < 4; xyNeighborIndex++) {
+          if (neighborVertexIDSs[xyNeighborIndex+2] > 0 && neighborVertexIDSs[(xyNeighborIndex+1)%4 + 2] > 0) {
+            tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {nodePreciceID, neighborVertexIDSs[zNeighborIndex],
+                        neighborVertexIDSs[xyNeighborIndex+2], neighborVertexIDSs[(xyNeighborIndex+1)%4 + 2]});
           }
         }
       }
     }
-    return triangleNodePreciceIDs;
+    return tetrahedronsNodeIDs;
   }
 
   void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) override { _wallVelocity = wallVelocity; }
