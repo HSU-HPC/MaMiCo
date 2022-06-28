@@ -42,9 +42,12 @@ if (BUILD_WITH_PYBIND11 AND NOT BUILD_WITH_MPI)
 	set(BUILD_WITH_MPI "ON")
 	message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 endif()
-# Enable coupling the OpenFOAM API, default is off
-option(BUILD_WITH_OPENFOAM "Enable coupling the OpenFOAM API, default is off." OFF)
-message(STATUS ">> Build with OpenFOAM : " ${BUILD_WITH_OPENFOAM})
+# Enable coupling the OpenFOAM icoFOAM API, default is off
+option(BUILD_WITH_ICOFOAM "Enable coupling the OpenFOAM icoFOAM API, default is off." OFF)
+message(STATUS ">> Build with OpenFOAM icoFOAM : " ${BUILD_WITH_ICOFOAM})
+# Enable coupling the OpenFOAM rhoCentralFOAM API, default is off
+option(BUILD_WITH_RHOCENTRALFOAM "Enable coupling the OpenFOAM rhoCentralFOAM API, default is off." OFF)
+message(STATUS ">> Build with OpenFOAM rhoCentralFOAM : " ${BUILD_WITH_RHOCENTRALFOAM})
 # Enable coupling with the preCICE API, default is off
 option(BUILD_WITH_PRECICE "Enable coupling with the preCICE API, default is off." OFF)
 message(STATUS ">> Build with preCICE : " ${BUILD_WITH_PRECICE})
@@ -65,7 +68,7 @@ if(BUILD_WITH_PYBIND11)
 	find_package(pybind11 REQUIRED)
 endif()
 
-if(BUILD_WITH_OPENFOAM)
+if(BUILD_WITH_ICOFOAM OR BUILD_WITH_RHOCENTRALFOAM)
 	# Check valid OpenFOAM
 	if(DEFINED ENV{WM_PROJECT_DIR})
 		MESSAGE(STATUS ">> OpenFOAM found in : " $ENV{WM_PROJECT_DIR})
@@ -81,7 +84,7 @@ endif()
 #
 # simpleMD target
 #
-set(SIMPLE_MD_SOURCES 
+set(SIMPLE_MD_SOURCES
         "simplemd/BoundaryTreatment.cpp"
         "simplemd/MolecularDynamicsSimulation.cpp"
         "simplemd/ProfilePlotter.cpp"
@@ -168,9 +171,18 @@ if(BUILD_WITH_MPI)
     target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context -Wno-maybe-uninitialized)
     target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
 endif()
-if(BUILD_WITH_OPENFOAM)
+if(BUILD_WITH_ICOFOAM)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_OPENFOAM WM_LABEL_SIZE=32 WM_DP NoRepository)
 	target_include_directories(mamico INTERFACE $ENV{FOAM_SRC}/OpenFOAM/lnInclude $ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude $ENV{FOAM_SRC}/finiteVolume/lnInclude $ENV{FOAM_SRC}/meshTools/lnInclude)
+	target_link_directories(mamico INTERFACE $ENV{FOAM_LIBBIN} $ENV{FOAM_LIBBIN}/dummy $ENV{FOAM_LIBBIN}/sys-openmpi)
+	target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m)
+endif()
+if(BUILD_WITH_RHOCENTRALFOAM)
+	target_compile_definitions(mamico INTERFACE BUILD_WITH_OPENFOAM WM_LABEL_SIZE=32 WM_DP NoRepository)
+	target_include_directories(mamico INTERFACE $ENV{FOAM_SRC}/OpenFOAM/lnInclude $ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude
+  $ENV{FOAM_SRC}/finiteVolume/lnInclude $ENV{FOAM_SRC}/meshTools/lnInclude $ENV{FOAM_SRC}/dynamicFvMesh/lnInclude $ENV{FOAM_SRC}/thermophysicalModels/basic/lnInclude
+  $ENV{FOAM_SRC}/transportModels/compressible/lnInclude $ENV{FOAM_SRC}/TurbulenceModels/turbulenceModels/lnInclude
+$ENV{FOAM_SRC}/TurbulenceModels/compressible/lnInclude $ENV{FOAM_APP}/solvers/compressible/rhoCentralFoam/BCs/rho $ENV{FOAM_APP}/solvers/compressible/rhoCentralFoam)
 	target_link_directories(mamico INTERFACE $ENV{FOAM_LIBBIN} $ENV{FOAM_LIBBIN}/dummy $ENV{FOAM_LIBBIN}/sys-openmpi)
 	target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m)
 endif()
@@ -184,12 +196,24 @@ endif()
 #
 set(COUETTE_SOURCES
 		"coupling/configurations/ParticleInsertionConfiguration.cpp"
-        "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-        "coupling/tests/main_couette.cpp"
+    "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+    "coupling/tests/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
 target_link_libraries(couette PUBLIC mamico)
+
+#
+# Evaporation target
+#
+set(EVAPORATION_SOURCES
+		"coupling/configurations/ParticleInsertionConfiguration.cpp"
+    "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+    "coupling/tests/main_evaporation.cpp"
+)
+add_executable(evaporation ${EVAPORATION_SOURCES})
+set_target_properties(evaporation PROPERTIES CXX_STANDARD 17)
+target_link_libraries(evaporation PUBLIC mamico)
 
 #
 # pybind target
@@ -207,7 +231,7 @@ endif()
 #
 # Clangformat target
 #
-set(CLANGFORMAT_SOURCES 
+set(CLANGFORMAT_SOURCES
   "tarch/utils/Uncopyable.h"
   "tarch/utils/MultiMDService.cpph"
   "tarch/utils/RandomNumberService.h"

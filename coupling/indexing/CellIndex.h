@@ -284,7 +284,7 @@ public:
    */
   static tarch::la::Vector<dim, unsigned int> divisionFactor;
 
-  class IndexIterator : public std::iterator<std::input_iterator_tag, CellIndex> {
+  class IndexIterator {
   public:
     IndexIterator(CellIndex x) : _idx(x) {}
     IndexIterator(const IndexIterator& a) : _idx(a._idx) {}
