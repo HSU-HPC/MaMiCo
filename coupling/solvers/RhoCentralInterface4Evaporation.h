@@ -21,57 +21,61 @@ namespace coupling {
 namespace solvers {
 class RhoCentralInterface4Evaporation;
 }
-} // namespace coupling
+}
 
-/**
- * @author Helene Wittenberg
+/** interface to run rhoCentralFoam from the OpenFOAM library as macro solver for the Evaporation
+ *  scenario
+ *  @author Helene Wittenberg
  */
 class coupling::solvers::RhoCentralInterface4Evaporation {
 public:
-  RhoCentralInterface4Evaporation(int argc, char *argv[])
-    :
-      _args(argc, argv),
-      runTime(Foam::Time::controlDictName, _args),
-      meshPtr(Foam::dynamicFvMesh::New(_args, runTime)),
-      mesh(meshPtr()),
-      adjustTimeStep(runTime.controlDict().getOrDefault("adjustTimeStep", false)),
-      maxCo(runTime.controlDict().getOrDefault<Foam::scalar>("maxCo", 1)),
-      maxDeltaT(runTime.controlDict().getOrDefault<Foam::scalar>("maxDeltaT", Foam::GREAT)),
-      pThermo(Foam::psiThermo::New(mesh)),
-      thermo(pThermo()),
-      e(thermo.he()),
-      U(Foam::IOobject("U", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh),
-      rho(Foam::IOobject("rho", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::AUTO_WRITE), thermo.rho()),
-      rhoU(Foam::IOobject("rhoU", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::NO_WRITE ), rho*U),
-      rhoE(Foam::IOobject("rhoE", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::NO_WRITE ), rho*(e + 0.5*magSqr(U))),
-      pos(Foam::IOobject("pos", runTime.timeName(), mesh), mesh, Foam::dimensionedScalar("pos", Foam::dimless, 1.0)),
-      neg(Foam::IOobject("neg", runTime.timeName(), mesh), mesh, Foam::dimensionedScalar("neg", Foam::dimless, -1.0)),
-      phi("phi", Foam::fvc::flux(rhoU)),
-      turbulence(Foam::compressible::turbulenceModel::New(rho, U, phi, thermo)),
-      v_zero(Foam::dimVolume/Foam::dimTime, Foam::Zero),
-      p(thermo.p()),
-      T(thermo.T()),
-      psi(thermo.psi()),
-      mu(thermo.mu())
-      {
-        if (skipRank()) { return; }
-        initialiseOpenfoam();
-      }
+  /* Constructs an instance of the class and initialises all the necessary variables for OpenFOAM
+   * The initialisation is mostly copied from the following files, some things are sligtly adapted
+   * "createTime.H", "createDynamicFvMesh.H", "createFields.H", "createFieldRefs.H", "createTimeControls.H"
+   * and "readFluxScheme.H"
+   * @param directory path to the openFoam setup folder
+   * @param folder name of the openFoam setup folder
+   * @param rank rank of the current proccess
+   */
+  RhoCentralInterface4Evaporation(std::string directory, std::string folder, const int rank)
+  :
+  runTime(directory, folder),
+  meshPtr(Foam::dynamicFvMesh::New(Foam::IOobject(Foam::fvMesh::defaultRegion, runTime.timeName(), runTime, Foam::IOobject::MUST_READ))),
+  mesh(meshPtr()),
+  adjustTimeStep(runTime.controlDict().getOrDefault("adjustTimeStep", false)),
+  maxCo(runTime.controlDict().getOrDefault<Foam::scalar>("maxCo", 1)),
+  maxDeltaT(runTime.controlDict().getOrDefault<Foam::scalar>("maxDeltaT", Foam::GREAT)),
+  pThermo(Foam::psiThermo::New(mesh)),
+  thermo(pThermo()),
+  e(thermo.he()),
+  U(Foam::IOobject("U", runTime.timeName(), mesh, Foam::IOobject::MUST_READ, Foam::IOobject::AUTO_WRITE), mesh),
+  rho(Foam::IOobject("rho", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::AUTO_WRITE), thermo.rho()),
+  rhoU(Foam::IOobject("rhoU", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::NO_WRITE ), rho*U),
+  rhoE(Foam::IOobject("rhoE", runTime.timeName(), mesh, Foam::IOobject::NO_READ, Foam::IOobject::NO_WRITE ), rho*(e + 0.5*magSqr(U))),
+  pos(Foam::IOobject("pos", runTime.timeName(), mesh), mesh, Foam::dimensionedScalar("pos", Foam::dimless, 1.0)),
+  neg(Foam::IOobject("neg", runTime.timeName(), mesh), mesh, Foam::dimensionedScalar("neg", Foam::dimless, -1.0)),
+  phi("phi", Foam::fvc::flux(rhoU)),
+  turbulence(Foam::compressible::turbulenceModel::New(rho, U, phi, thermo)),
+  v_zero(Foam::dimVolume/Foam::dimTime, Foam::Zero),
+  p(thermo.p()),
+  T(thermo.T()),
+  psi(thermo.psi()),
+  mu(thermo.mu()),
+  _rank(rank)
+  {
+    if (skipRank()) { return; }
+    initialiseOpenfoam();
+  }
+
 
   int initialiseOpenfoam(){
     using namespace Foam;
     int argc{1};
-    char* dummy_args[] = { "1", NULL };
+    char* dummy_args[] = { "rhoCentralFoam", NULL };
     char** argv = dummy_args;
     #include "postProcess.H"
-    #include "addCheckCaseOptions.H" // No initialisation
-    #include "setRootCaseLists.H" // No initialisation
-    // #include "createTime.H" // runtime initialisation
-    // #include "createDynamicFvMesh.H"
-    // #include "createFields.H" // Initialisation of the fields
-    // #include "createFieldRefs.H"
-    // #include "createTimeControls.H" in class members
-    // #include "readFluxScheme.H"
+    #include "addCheckCaseOptions.H"
+    // #include "setRootCaseLists.H" // No initialisation
     turbulence->validate();
     if (max(mu.primitiveField()) > 0.0) // copied from #include "createFieldRefs.H"
     {
@@ -79,7 +83,7 @@ public:
     }
     if (mesh.schemesDict().readIfPresent("fluxScheme", fluxScheme)) // copied from #include "readFluxScheme.H"
     {
-      if (!(fluxScheme == "Tadmor") || !(fluxScheme == "Kurganov"))
+      if (!(fluxScheme == "Tadmor") && !(fluxScheme == "Kurganov"))
       {
         FatalErrorInFunction << "fluxScheme: " << fluxScheme << " is not a valid choice. "
           << "Options are: Tadmor, Kurganov" << abort(FatalError);
@@ -94,7 +98,8 @@ public:
     }
   }
 
-  void advance(double dt) {
+  /* @brief run one time step and advance all the fields */
+  void advance() {
     using namespace Foam;
     #include "readTimeControls.H"
 
@@ -242,45 +247,62 @@ public:
     runTime.printExecutionTime(Info);
   }
 
+  /* @brief returns the velocity at a position for the current time step
+   * @param pos vector of the position to get the velocity */
   tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const {
-    // const Foam::vector foamPosition(pos[0], pos[1], pos[2]);
-    // const int foamIndice = U.mesh().findCell(foamPosition);
-    // int foamIndice{0};
-    // if (foamIndice > 0) {
-    //   return tarch::la::Vector<3, double>(U[foamIndice][0], U[foamIndice][1], U[foamIndice][2]);
-    // } else {
-      return tarch::la::Vector<3, double>(0, 0, 0);
-    // }
+    using namespace Foam;
+    const Foam::vector foamPosition(pos[0], pos[1], pos[2]);
+    const int foamIndice = U.mesh().findCell(foamPosition);
+    if (foamIndice > 0) {
+      Info << "velocity " ;
+      Info << U[foamIndice] << endl;
+      return tarch::la::Vector<3, double>(U[foamIndice][0], U[foamIndice][1], U[foamIndice][2]);
+    } else {
+      std::cout << "ERROR EvaporationTest::RhoCentralInterface4Evaporation::getVelocity(): pos " <<
+      pos[0] << " " << pos[1] << " " << pos[2] <<" can't be found in the OpenFOAM mesh" << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
 
+  /* @brief returns the density at a position for the current time step
+   * @param pos vector of the position to get the density */
   double getDensity(tarch::la::Vector<3, double> pos) const {
-    // const Foam::vector foamPosition(pos[0], pos[1], pos[2]);
-    // const int foamIndice = U.mesh().findCell(foamPosition);
-    // int foamIndice{0};
-    // if (foamIndice > 0) {
-    //   return tarch::la::Vector<3, double>(U[foamIndice][0], U[foamIndice][1], U[foamIndice][2]);
-    // } else {
-      return 0.0;
-    // }
+    using namespace Foam;
+    const Foam::vector foamPosition(pos[0], pos[1], pos[2]);
+    Info << "vector ";
+    Info << foamPosition << endl;
+    const int foamIndice = rho.mesh().findCell(foamPosition);
+    // Foam::vector tmp = rho.mesh()[foamIndice];
+    Info << "findCell ";
+    Info << rho.mesh().C()[foamIndice] << endl;
+    if (foamIndice > 0) {
+      Info << "density " << rho[foamIndice] << endl;
+      return rho[foamIndice];
+
+    } else {
+      std::cout << "ERROR EvaporationTest::RhoCentralInterface4Evaporation::getDensity(): pos " <<
+      pos[0] << " " << pos[1] << " " << pos[2] <<" can't be found in the OpenFOAM mesh" << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
 
 private:
 
   void plottxt() const {
-    if (_plotEveryTimestep < 1 || _timestepCounter % _plotEveryTimestep > 0)
-      return;
-    std::stringstream ss;
-    ss << "velocity_" << _timestepCounter << ".txt";
-    std::ofstream file(ss.str().c_str());
-    if (!file.is_open()) {
-      std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    std::stringstream velocity;
-
-    // loop over domain (incl. boundary)
-    double y = _channelheight / 2;
-    double x = _channelheight / 2;
+    // if (_plotEveryTimestep < 1 || _timestepCounter % _plotEveryTimestep > 0)
+    //   return;
+    // std::stringstream ss;
+    // ss << "velocity_" << _timestepCounter << ".txt";
+    // std::ofstream file(ss.str().c_str());
+    // if (!file.is_open()) {
+    //   std::cout << "ERROR NumericalSolver::plottxt(): Could not open file " << ss.str() << "!" << std::endl;
+    //   exit(EXIT_FAILURE);
+    // }
+    // std::stringstream velocity;
+    //
+    // // loop over domain (incl. boundary)
+    // double y = _channelheight / 2;
+    // double x = _channelheight / 2;
     // for (double z = _dx / 2; z < _channelheight; z = z + _dx) {
     //   const int foamIndice = U.mesh().findCell(Foam::vector(x, y, z));
     //   // write information to streams
@@ -295,40 +317,72 @@ private:
   // The solver runs sequentially on rank 0. Therefore the function checks if the acutal rank is zero.
   bool skipRank() const { return !(_rank == 0); }
 
-  Foam::argList _args;
+  /** @brief */
   Foam::Time runTime;
+  /** @brief */
   Foam::autoPtr<Foam::dynamicFvMesh> meshPtr;
+  /** @brief */
   Foam::dynamicFvMesh& mesh;
+  /** @brief */
   bool adjustTimeStep;
+  /** @brief */
   Foam::scalar maxCo;
+  /** @brief */
   Foam::scalar maxDeltaT;
+  /** @brief */
   Foam::autoPtr<Foam::psiThermo> pThermo;
+  /** @brief */
   Foam::psiThermo& thermo;
+  /** @brief */
   Foam::volScalarField& e;
+  /** @brief */
   Foam::volVectorField U;
+  /** @brief */
   Foam::volScalarField rho;
+  /** @brief */
   Foam::volVectorField rhoU;
+  /** @brief */
   Foam::volScalarField rhoE;
+  /** @brief */
   Foam::surfaceScalarField pos;
+  /** @brief */
   Foam::surfaceScalarField neg;
+  /** @brief */
   Foam::surfaceScalarField phi;
+  /** @brief */
   Foam::autoPtr<Foam::compressible::turbulenceModel> turbulence;
+  /** @brief */
   Foam::tmp<Foam::volScalarField> trDeltaT;
+  /** @brief */
   Foam::dimensionedScalar v_zero;
+  /** @brief */
   Foam::volScalarField& p;
+  /** @brief */
   const Foam::volScalarField& T;
+  /** @brief */
   const Foam::volScalarField& psi;
+  /** @brief */
   const Foam::volScalarField& mu;
+  /** @brief */
   Foam::word fluxScheme{"Kurganov"};
+  /** @brief */
   bool inviscid{true};
+  /** @brief */
   Foam::scalar CoNum{0.0};
+  /** @brief */
   Foam::scalar meanCoNum{0.0};
-  const bool _rank{0};
+  /** @brief */
   const bool LTS{false};
+  /** @brief */
+  const int _rank{0};
+  /** @brief */
   int _plotEveryTimestep{0};
+  /** @brief */
   int _timestepCounter{0};
+  /** @brief */
   double _channelheight{200};
+  /** @brief */
   double _dx{2.5};
-
 };
+
 #endif // _COUPLING_SOLVERS_RHOCENTRALINTERFACE4EVAPORATION_H_
