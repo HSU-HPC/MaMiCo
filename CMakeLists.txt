@@ -85,36 +85,36 @@ endif()
 # simpleMD target
 #
 set(SIMPLE_MD_SOURCES
-        "simplemd/BoundaryTreatment.cpp"
-        "simplemd/MolecularDynamicsSimulation.cpp"
-        "simplemd/ProfilePlotter.cpp"
-        "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
-		"simplemd/cell-mappings/LennardJonesForceMapping.cpp"
-		"simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
-		"simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
-		"simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.cpp"
-		"simplemd/cell-mappings/RDFMapping.cpp"
-		"simplemd/configurations/DomainConfiguration.cpp"
-		"simplemd/configurations/ExternalForceConfiguration.cpp"
-		"simplemd/configurations/MolecularDynamicsConfiguration.cpp"
-		"simplemd/configurations/MoleculeConfiguration.cpp"
-		"simplemd/configurations/MPIConfiguration.cpp"
-		"simplemd/configurations/ProfilePlotterConfiguration.cpp"
-		"simplemd/configurations/RDFConfiguration.cpp"
-		"simplemd/configurations/SimulationConfiguration.cpp"
-		"simplemd/configurations/VTKConfiguration.cpp"
-		"simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
-		"simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
-		"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
-		"simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
-		"simplemd/services/ExternalForceService.cpp"
-		"simplemd/services/LinkedCellService.cpp"
-		"simplemd/services/MolecularPropertiesService.cpp"
-		"simplemd/services/MoleculeService.cpp"
-		"simplemd/services/ParallelAndLocalBufferService.cpp"
-		"simplemd/services/ParallelTopologyService.cpp"
-        "tarch/tinyxml2/tinyxml2.cpp"
-        "tarch/utils/RandomNumberService.cpp"
+  "simplemd/BoundaryTreatment.cpp"
+  "simplemd/MolecularDynamicsSimulation.cpp"
+  "simplemd/ProfilePlotter.cpp"
+  "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
+	"simplemd/cell-mappings/LennardJonesForceMapping.cpp"
+	"simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
+	"simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
+	"simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.cpp"
+	"simplemd/cell-mappings/RDFMapping.cpp"
+	"simplemd/configurations/DomainConfiguration.cpp"
+	"simplemd/configurations/ExternalForceConfiguration.cpp"
+	"simplemd/configurations/MolecularDynamicsConfiguration.cpp"
+	"simplemd/configurations/MoleculeConfiguration.cpp"
+	"simplemd/configurations/MPIConfiguration.cpp"
+	"simplemd/configurations/ProfilePlotterConfiguration.cpp"
+	"simplemd/configurations/RDFConfiguration.cpp"
+	"simplemd/configurations/SimulationConfiguration.cpp"
+	"simplemd/configurations/VTKConfiguration.cpp"
+	"simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
+	"simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
+	"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
+	"simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
+	"simplemd/services/ExternalForceService.cpp"
+	"simplemd/services/LinkedCellService.cpp"
+	"simplemd/services/MolecularPropertiesService.cpp"
+	"simplemd/services/MoleculeService.cpp"
+	"simplemd/services/ParallelAndLocalBufferService.cpp"
+	"simplemd/services/ParallelTopologyService.cpp"
+  "tarch/tinyxml2/tinyxml2.cpp"
+  "tarch/utils/RandomNumberService.cpp"
 )
 add_library(simplemd ${SIMPLE_MD_SOURCES})
 set_target_properties(simplemd PROPERTIES CXX_STANDARD 17)
@@ -184,7 +184,8 @@ if(BUILD_WITH_RHOCENTRALFOAM)
   $ENV{FOAM_SRC}/transportModels/compressible/lnInclude $ENV{FOAM_SRC}/TurbulenceModels/turbulenceModels/lnInclude
 $ENV{FOAM_SRC}/TurbulenceModels/compressible/lnInclude $ENV{FOAM_APP}/solvers/compressible/rhoCentralFoam/BCs/rho $ENV{FOAM_APP}/solvers/compressible/rhoCentralFoam)
 	target_link_directories(mamico INTERFACE $ENV{FOAM_LIBBIN} $ENV{FOAM_LIBBIN}/dummy $ENV{FOAM_LIBBIN}/sys-openmpi)
-	target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m)
+	target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m fvOptions
+  compressibleTransportModels compressibleTurbulenceModels turbulenceModels fluidThermophysicalModels topoChangerFvMesh dynamicFvMesh specie rhoCentralFoam)
 endif()
 if(BUILD_WITH_PRECICE)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
@@ -195,9 +196,9 @@ endif()
 # Couette target
 #
 set(COUETTE_SOURCES
-		"coupling/configurations/ParticleInsertionConfiguration.cpp"
-    "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-    "coupling/tests/main_couette.cpp"
+	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+  "coupling/tests/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
@@ -207,9 +208,9 @@ target_link_libraries(couette PUBLIC mamico)
 # Evaporation target
 #
 set(EVAPORATION_SOURCES
-		"coupling/configurations/ParticleInsertionConfiguration.cpp"
-    "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-    "coupling/tests/main_evaporation.cpp"
+	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+  "coupling/tests/main_evaporation.cpp"
 )
 add_executable(evaporation ${EVAPORATION_SOURCES})
 set_target_properties(evaporation PROPERTIES CXX_STANDARD 17)
