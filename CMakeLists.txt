@@ -168,7 +168,8 @@ target_compile_definitions(mamico INTERFACE SIMPLE_MD MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-pragmas -Wfatal-errors -O3)
 if(BUILD_WITH_MPI)
     target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
-    target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context -Wno-maybe-uninitialized)
+    #-Werror
+    target_compile_options(mamico INTERFACE -Wno-int-in-bool-context -Wno-maybe-uninitialized)
     target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
 endif()
 if(BUILD_WITH_ICOFOAM)
@@ -181,11 +182,11 @@ if(BUILD_WITH_RHOCENTRALFOAM)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_OPENFOAM WM_LABEL_SIZE=32 WM_DP NoRepository)
 	target_include_directories(mamico INTERFACE $ENV{FOAM_SRC}/OpenFOAM/lnInclude $ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude
   $ENV{FOAM_SRC}/finiteVolume/lnInclude $ENV{FOAM_SRC}/meshTools/lnInclude $ENV{FOAM_SRC}/dynamicFvMesh/lnInclude $ENV{FOAM_SRC}/thermophysicalModels/basic/lnInclude
-  $ENV{FOAM_SRC}/transportModels/compressible/lnInclude $ENV{FOAM_SRC}/TurbulenceModels/turbulenceModels/lnInclude
-$ENV{FOAM_SRC}/TurbulenceModels/compressible/lnInclude $ENV{FOAM_APP}/solvers/compressible/rhoCentralFoam/BCs/rho $ENV{FOAM_APP}/solvers/compressible/rhoCentralFoam)
+  $ENV{FOAM_SRC}/transportModels/compressible/lnInclude $ENV{FOAM_SRC}/TurbulenceModels/turbulenceModels/lnInclude $ENV{FOAM_SRC}/TurbulenceModels/compressible/lnInclude
+  $ENV{FOAM_APP}/solvers/compressible/rhoCentralFoam/BCs/rho $ENV{FOAM_APP}/solvers/compressible/rhoCentralFoam)
 	target_link_directories(mamico INTERFACE $ENV{FOAM_LIBBIN} $ENV{FOAM_LIBBIN}/dummy $ENV{FOAM_LIBBIN}/sys-openmpi)
 	target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m fvOptions
-  compressibleTransportModels compressibleTurbulenceModels turbulenceModels fluidThermophysicalModels topoChangerFvMesh dynamicFvMesh specie rhoCentralFoam)
+  compressibleTransportModels compressibleTurbulenceModels turbulenceModels fluidThermophysicalModels topoChangerFvMesh dynamicFvMesh specie)
 endif()
 if(BUILD_WITH_PRECICE)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
