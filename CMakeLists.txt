@@ -92,7 +92,7 @@ endif()
 if(BUILD_WITH_OPENFOAM)
 	# Check valid OpenFOAM
 	if(DEFINED ENV{WM_PROJECT_DIR})
-		MESSAGE(STATUS ">> OpenFOAM found in : " $ENV{WM_PROJECT_DIR})
+		message(STATUS ">> OpenFOAM found in : " $ENV{WM_PROJECT_DIR})
 	else()
 		message(FATAL_ERROR "The OpenFOAM bashrc is not sourced or OpenFOAM is not installed")
 	endif()
@@ -157,7 +157,7 @@ endif()
 #
 # simplemd library target
 #
-set(SIMPLE_MD_SOURCES 
+set(SIMPLE_MD_SOURCES
   "simplemd/BoundaryTreatment.cpp"
   "simplemd/MolecularDynamicsSimulation.cpp"
   "simplemd/ProfilePlotter.cpp"
@@ -178,7 +178,7 @@ set(SIMPLE_MD_SOURCES
 	"simplemd/configurations/VTKConfiguration.cpp"
 	"simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
 	"simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
-	"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"    
+	"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
 	"simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
 	"simplemd/services/ExternalForceService.cpp"
 	"simplemd/services/LinkedCellService.cpp"
@@ -229,14 +229,14 @@ endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors -O3)
 if(BUILD_WITH_MPI)
-    target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
-    target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-      target_compile_options(mamico INTERFACE -Wno-uninitialized)
-    else()
-      target_compile_options(mamico INTERFACE -Wno-maybe-uninitialized)
-    endif()
-    target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
+  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
+  target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+    target_compile_options(mamico INTERFACE -Wno-uninitialized)
+  else()
+    target_compile_options(mamico INTERFACE -Wno-maybe-uninitialized)
+  endif()
+  target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
 endif()
 if(BUILD_WITH_OPENFOAM)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_OPENFOAM WM_LABEL_SIZE=32 WM_DP NoRepository)
@@ -280,10 +280,10 @@ endif()
 # Couette target
 #
 set(COUETTE_SOURCES
-		"coupling/indexing/IndexingService.cpp"
-		"coupling/configurations/ParticleInsertionConfiguration.cpp"
-        "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-        "coupling/tests/main_couette.cpp"
+	"coupling/indexing/IndexingService.cpp"
+	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+  "coupling/tests/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
@@ -316,10 +316,10 @@ endif()
 #
 if(BUILD_WITH_PYBIND11)
 	set(PYBIND_SOURCES11
-			"coupling/indexing/IndexingService.cpp"
-			"coupling/configurations/ParticleInsertionConfiguration.cpp"
-	        "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-			"coupling/python-binding/mamico.cpp"
+		"coupling/indexing/IndexingService.cpp"
+		"coupling/configurations/ParticleInsertionConfiguration.cpp"
+    "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+		"coupling/python-binding/mamico.cpp"
 	)
 	pybind11_add_module(mamico_pybind
 		${PYBIND_SOURCES11}
@@ -333,7 +333,7 @@ endif()
 #
 # Clangformat target
 #
-set(CLANGFORMAT_SOURCES 
+set(CLANGFORMAT_SOURCES
   "tarch/utils/Uncopyable.h"
   "tarch/utils/MultiMDService.cpph"
   "tarch/utils/RandomNumberService.h"
@@ -641,9 +641,9 @@ add_custom_target(
 # Benchmarks target
 #
 set(BENCHMARKS_SOURCES
-		"coupling/indexing/IndexingService.cpp"
-		"coupling/configurations/ParticleInsertionConfiguration.cpp"
-	    "coupling/tests/cell_idx_iter_benchmark.cpp"
+	"coupling/indexing/IndexingService.cpp"
+	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/tests/cell_idx_iter_benchmark.cpp"
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
 set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
