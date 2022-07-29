@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 from configparser import ConfigParser
 import matplotlib.pyplot as mplt
+import adios2
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -49,7 +50,8 @@ class KVSTest():
         self.initSolvers()
         for cycle in range(self.cfg.getint("coupling", "couplingCycles")):
             self.runOneCouplingCycle(cycle)
-        pd.DataFrame(self.velLB).to_csv("lbm.csv", sep = ";", header = False)
+        if self.rank==0:
+            pd.DataFrame(self.velLB).to_csv("lbm.csv", sep = ";", header = False)
 
 
     def runOneCouplingCycle(self, cycle):
@@ -277,10 +279,14 @@ class KVSTest():
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
         self.png = self.cfg.getint("coupling", "png-every-timestep")
+        self.adios2 = self.cfg.getint("coupling", "adios2-every-timestep")
 
         # buffer for evaluation plot
         if self.rank==0:
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
+            if self.adios2 > 0:
+                self.adiosfile = adios2.open("kvstest.bp", "w")
+                self.adiosfile.write("shape", np.array(self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape))
     
         if self.rank==0:
             log.info("Finished initSolvers") # after ? ms
@@ -288,6 +294,8 @@ class KVSTest():
     def shutdown(self):
         if self.rank==0:
             log.info("Finished " + str(self.mdStepCounter) + " MD timesteps")
+            if self.adios2 > 0:
+                self.adiosfile.close()
 
         #Analyse data gathered by StrouhalPython filter
         #self.sf.calculateStrouhalNumber()
@@ -327,6 +335,12 @@ class KVSTest():
             if self.png > 0 and (cycle+1)%self.png == 0:
                 filename = "kvstest_" + str(cycle+1) + ".png"
                 self.macroscopicSolver.plot(filename)
+
+            if self.adios2 > 0 and (cycle+1)%self.adios2 == 0:
+               to_write = np.ascontiguousarray(self.macroscopicSolver.scen.velocity[:,:,:,:].data, dtype=np.float32)
+               log.info("writing to adios2 " + str(type(to_write)) + " with shape " + str(to_write.shape) + " and dtype " + str(to_write.dtype))
+               self.adiosfile.write("velocity", to_write, to_write.shape, np.zeros_like(to_write.shape), to_write.shape)
+               self.adiosfile.end_step()
 
         if self.cfg.getboolean("coupling", "send-from-macro-to-md"):
             self.multiMDCellService.sendFromMacro2MD(self.buf)
