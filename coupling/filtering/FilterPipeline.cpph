@@ -67,6 +67,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     if (inputCells.size() == CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
       std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
       _outerCells = {};
+      loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     }
     // case 2: the input vector is empty
     else if (inputCells.size() == 0) {
@@ -75,12 +76,17 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     }
     // case 3: the input vector contains a nonexpected amount of cells
     else {
-      throw std::runtime_error("Post-Multi-Instance-Filtering: Unexpected cell input size: "s + std::to_string(inputCells.size()) + "\n" + "Expected:"s +
-                               std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) +
-                               "(global MD-To-Macro domain size)");
+      // check if the post-multi-instance filter-pipeline actually contains XML sequences, otherwise ignore
+      if (_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")->FirstChildElement()) {
+        throw std::runtime_error("postMultiInstance FilterPipeline has received an unexpected number of cells: "s + std::to_string(inputCells.size()) + "\n" +
+                                 "Expected: "s +
+                                 std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) +
+                                 " (global MD-To-Macro domain size) \n This probably means that you are trying to use post-multi-instance filtering together "
+                                 "with a non-trivial parallelization of the macroscopic solver.\n This combination of features is currently not supported. You "
+                                 "can either:\n => use per-instance filtering instead, or\n => use a sequential macroscopic solver, or\n => choose to "
+                                 "parallelize the macroscopic solver so that it does not split the md2Macro-subdomain.");
+      }
     }
-
-    loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     break;
   }
 }
