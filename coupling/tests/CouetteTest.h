@@ -37,6 +37,14 @@
 #include <random>
 #include <sys/time.h>
 
+#if defined(LS1_MARDYN)
+#include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
+#include "coupling/interface/impl/ls1/LS1MamicoCouplingSwitch.h"
+#include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "utils/Logger.h"
+using Log::global_log;
+#endif
+
 // This is ignored if you dont use synthetic MD. For further instructions cf.
 // SYNTHETIC part of initSolvers().
 #define SYNTHETICMD_SEQUENCE "SYNTHETIC-MD"
@@ -84,6 +92,9 @@ private:
   /** triggers initMPI(), parseConfiguration(), and initSolvers()
    *  @brief initialises everthing necessary for the test */
   void init() {
+#if defined(LS1_MARDYN)
+    global_log = new Log::Logger(Log::Info);
+#endif
     initMPI();
     parseConfigurations();
     initSolvers();
@@ -149,6 +160,16 @@ private:
     }
 
     _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
+
+    #if defined(LS1_MARDYN)
+    assert((_mamicoConfig.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3, unsigned int>(1)));
+    auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
+    coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
+    coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
+    coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
+    coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
+    
+    #endif
   }
 
   /** @brief initialises the macro and micro solver according to the setup from
