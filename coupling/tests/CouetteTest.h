@@ -211,7 +211,7 @@ private:
       gettimeofday(&_tv.output, NULL);
     }
 
-    if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD) {
+    if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // equilibrate MD
       _instanceHandling->switchOffCoupling();
       _instanceHandling->equilibrate(_cfg.equSteps, _mdStepCounter);
@@ -248,7 +248,7 @@ private:
 
     _multiMDMediator = new coupling::MultiMDMediator<MY_LINKEDCELL, 3>(*_multiMDCellService, *_instanceHandling, *_multiMDService, couetteSolverInterface);
 
-    if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD) {
+    if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
@@ -535,7 +535,7 @@ private:
     if (_rank == 0) {
       gettimeofday(&_tv.start, NULL);
     }
-    if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD) {
+    if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // run MD instances
       _instanceHandling->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
       // plot macroscopic time step info in multi md service
