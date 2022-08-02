@@ -31,7 +31,7 @@ public:
         _particleContainer = global_simulation->getMoleculeContainer();
         _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
     }
-    LS1RegionWrapper() : _startRegion({0,0,0}), _endRegion({0,0,0}), _curParticleID(0), _IDinited(false) {}
+    LS1RegionWrapper() : _startRegion{0,0,0}, _endRegion{0,0,0}, _curParticleID(0), _IDinited(false) {}
 
     void setRegion(double startRegion[3], double endRegion[3])
     {
