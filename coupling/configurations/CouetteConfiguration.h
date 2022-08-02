@@ -37,7 +37,8 @@ public:
   /** Defines the type of md solver for the coupled simulation  */
   enum MicroSolverType {
     SIMPLEMD = 0, ///< the SimpleMD solver is used
-    SYNTHETIC = 1 ///< the synthetic solver is used
+    SYNTHETIC = 1, ///< the synthetic solver is used
+    LS1 = 2        ///< the LS1 solver is used
   };
 
   /** @brief creates CouetteConfig if all elements exist and can be read
@@ -149,6 +150,13 @@ public:
       _cfg.miSolverType = SYNTHETIC;
       tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.noiseSigma, subtag, "noise-sigma");
       _cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
+    } else if (type == "ls1") {
+      _cfg.miSolverType = LS1;
+      
+      _cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp, subtag, "temperature");
+      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps, subtag, "equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
     } else {
       std::cout << "Could not read input file " << filename
