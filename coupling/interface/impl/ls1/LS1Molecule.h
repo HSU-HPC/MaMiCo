@@ -110,7 +110,7 @@ public:
         double startRegion[] = {location1[0] - cutoff, location1[1] - cutoff, location1[2] - cutoff};
         double endRegion[] = {location1[0] + cutoff, location1[1] + cutoff, location1[2] + cutoff};
 
-        ls1::LS1RegionWrapper region(startRegion, endRegion);
+        ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
         double cutoff2 = cutoff * cutoff;
 
         //calculate lennard jones energy

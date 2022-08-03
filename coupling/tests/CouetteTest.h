@@ -94,6 +94,7 @@ private:
   void init() {
 #if defined(LS1_MARDYN)
     global_log = new Log::Logger(Log::Info);
+    global_log->set_mpi_output_root(0);
 #endif
     initMPI();
     parseConfigurations();

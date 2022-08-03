@@ -36,3 +36,4 @@ docs/
 coupling/tests/test
 *.checkpoint
 .vscode/launch.json
+runcouette/

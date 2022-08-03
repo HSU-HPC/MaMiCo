@@ -1,11 +1,11 @@
 #ifndef LS1_MD_SOLVER_INTERFACE_H_
 #define LS1_MD_SOLVER_INTERFACE_H_
 
-#include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "coupling/indexing/IndexingService.h"
 
 #include "tarch/utils/RandomNumberService.h"
 
@@ -64,12 +64,11 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       //size of the macroscopic cell
 			tarch::la::Vector<3,double> macroCellSize = indexConversion.getMacroscopicCellSize();
 
-       //conversion to global 
+      //conversion to global 
       using coupling::indexing::CellIndex;
       using coupling::indexing::IndexTrait;
       CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({macroscopicCellIndex[0], macroscopicCellIndex[1], macroscopicCellIndex[2]});
       CellIndex<3, IndexTrait::vector> globalIndex(localIndex);
-
 
 
       //We have unbroken MD domain, which we will divide into region iterators
@@ -77,12 +76,11 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       double regionOffset[3], regionEndpoint[3];
       for(int i = 0; i < 3; i++)
       {
-        //regionOffset[i] = (macroscopicCellIndex[i] - 1) * macroCellSize[i];
-        regionOffset[i] = (globalIndex.get()[i] - 1) * macroCellSize[i];
+        regionOffset[i] = bBoxMin[i] + ((macroscopicCellIndex[i] - 1) * macroCellSize[i]);
         regionEndpoint[i] = regionOffset[i] + macroCellSize[i];
       }
 
-      ls1::LS1RegionWrapper *cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint); //temporary till ls1 offset is natively supported
+      ls1::LS1RegionWrapper *cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint, global_simulation); //temporary till ls1 offset is natively supported
       //when offset is supported, the offset min will need to be added to both regions
       return *cell;
     }
@@ -153,7 +151,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
     { 
       auto up = global_simulation->getEnsemble()->domain()->rmax();
       auto down = global_simulation->getEnsemble()->domain()->rmin();
-      ls1::LS1RegionWrapper cell(down, up);
+      ls1::LS1RegionWrapper cell(down, up, global_simulation);
       cell.addMolecule(molecule);
     }
 
@@ -175,7 +173,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      */
     virtual tarch::la::Vector<3,unsigned int> getLinkedCellIndexForMoleculePosition(
       const tarch::la::Vector<3,double>& position
-    ) { return tarch::la::Vector<3, unsigned int> {1,1,1}; }
+    ) { return tarch::la::Vector<3, unsigned int> {0,0,0}; }
 
 
     /** assumes that a molecule is placed somewhere inside the linked cell at index
@@ -209,7 +207,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       double startRegion[] = {moleculePosition[0] - cutoff, moleculePosition[1] - cutoff, moleculePosition[2] - cutoff};
       double endRegion[] = {moleculePosition[0] + cutoff, moleculePosition[1] + cutoff, moleculePosition[2] + cutoff};
 
-      ls1::LS1RegionWrapper region(startRegion, endRegion);
+      ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
       double cutoff2 = cutoff * cutoff;
 
       //calculate lennard jones energy
