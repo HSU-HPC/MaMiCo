@@ -792,7 +792,7 @@ public:
   /** simulates numberTimesteps time steps and starts at time step no.
    * firstTimestep*/
   virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) {
-    for (int i = 0; i < numberTimesteps; i++) {
+    for (unsigned int i = 0; i < numberTimesteps; i++) {
       simulation->simulateOneTimestep();
     }
   }
