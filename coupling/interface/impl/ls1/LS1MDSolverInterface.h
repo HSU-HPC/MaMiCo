@@ -5,7 +5,7 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
-#include "coupling/indexing/IndexingService.h"
+//#include "coupling/indexing/IndexingService.h"
 
 #include "tarch/utils/RandomNumberService.h"
 
@@ -65,10 +65,10 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
 			tarch::la::Vector<3,double> macroCellSize = indexConversion.getMacroscopicCellSize();
 
       //conversion to global 
-      using coupling::indexing::CellIndex;
-      using coupling::indexing::IndexTrait;
-      CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({macroscopicCellIndex[0], macroscopicCellIndex[1], macroscopicCellIndex[2]});
-      CellIndex<3, IndexTrait::vector> globalIndex(localIndex);
+      //using coupling::indexing::CellIndex;
+      //using coupling::indexing::IndexTrait;
+      //CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({macroscopicCellIndex[0], macroscopicCellIndex[1], macroscopicCellIndex[2]});
+      //CellIndex<3, IndexTrait::vector> globalIndex(localIndex);
 
 
       //We have unbroken MD domain, which we will divide into region iterators
