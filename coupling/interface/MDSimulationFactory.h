@@ -38,6 +38,8 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #include "ls1/src/Simulation.h"
+#include "ls1/src/plugins/MamicoCoupling.h"
+#include <iostream>
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
 #endif
 
@@ -802,8 +804,22 @@ public:
   virtual void sortMoleculesIntoCells() {}
 
   virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
-    coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
-        macroscopicCellService);
+    //coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
+    //    macroscopicCellService);
+    auto mamicoPlugin = simulation->getPlugin("MamicoCoupling");
+    if(mamicoPlugin == nullptr)
+    {
+      std::cout << "ERROR: MaMiCo plugin not found!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    MamicoCoupling* temp = dynamic_cast<MamicoCoupling*>(mamicoPlugin);
+    if(temp != nullptr) {
+      temp->setMamicoMacroscopicCellService(macroscopicCellService);
+    }
+    else {
+      std::cout << "ERROR: Cast to Mamico plugin unsuccessful!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
   virtual void init() {
     // parse file
