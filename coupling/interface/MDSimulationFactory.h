@@ -34,7 +34,6 @@
 #define MY_LINKEDCELL LAMMPS_NS::MamicoCell
 #elif defined(LS1_MARDYN)
 #include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
-#include "coupling/interface/impl/ls1/LS1MamicoCouplingSwitch.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #include "ls1/src/Simulation.h"
@@ -779,17 +778,31 @@ private:
 #if defined(LS1_MARDYN)
 class LS1MDSimulation : public coupling::interface::MDSimulation {
 private:
-  Simulation* simulation;
+  Simulation* simulation; //cannot name this _simulation, a global preprocessor marco with the name _simulation expands to *global_simulation
+  MamicoCoupling* ls1MamicoPlugin; //the plugin is only initialized after the simulation object reads xml, so cannot use it before that point
+  bool internalCouplingState;
 
 public:
   LS1MDSimulation() : coupling::interface::MDSimulation() {
     simulation = new Simulation();
     global_simulation = simulation;
+    internalCouplingState = false;
+    ls1MamicoPlugin = nullptr;
   }
   virtual ~LS1MDSimulation() {}
   /** switches coupling on/off*/
-  void switchOffCoupling() { coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff(); }
-  void switchOnCoupling() { coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn(); }
+  void switchOffCoupling() { 
+    //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
+    internalCouplingState = true;
+    if(ls1MamicoPlugin != nullptr)
+      ls1MamicoPlugin->switchOnCoupling();
+  }
+  void switchOnCoupling() { 
+    //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
+    internalCouplingState = false;
+    if(ls1MamicoPlugin != nullptr)
+      ls1MamicoPlugin->switchOffCoupling();
+  }
 
   /** simulates numberTimesteps time steps and starts at time step no.
    * firstTimestep*/
@@ -806,26 +819,31 @@ public:
   virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
     //coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
     //    macroscopicCellService);
-    auto mamicoPlugin = simulation->getPlugin("MamicoCoupling");
-    if(mamicoPlugin == nullptr)
+    PluginBase* searchedPlugin = simulation->getPlugin("MamicoCoupling");
+    if(searchedPlugin == nullptr)
     {
       std::cout << "ERROR: MaMiCo plugin not found!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    MamicoCoupling* temp = dynamic_cast<MamicoCoupling*>(mamicoPlugin);
-    if(temp != nullptr) {
-      temp->setMamicoMacroscopicCellService(macroscopicCellService);
+    ls1MamicoPlugin = dynamic_cast<MamicoCoupling*>(searchedPlugin);
+    if(ls1MamicoPlugin != nullptr) {
+      ls1MamicoPlugin->setMamicoMacroscopicCellService(macroscopicCellService);
     }
     else {
       std::cout << "ERROR: Cast to Mamico plugin unsuccessful!" << std::endl;
       exit(EXIT_FAILURE);
     }
+    //since this is the first time the plugin is accessed, set whatever preexisting coupling variable we had here for the first time
+    if(internalCouplingState)
+      ls1MamicoPlugin->switchOnCoupling();
+    else
+      ls1MamicoPlugin->switchOffCoupling();
   }
   virtual void init() {
     // parse file
     const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
     simulation->readConfigFile(filename);
-    // all the things
+    // after this point the mamico plugin exists and is accessible
     simulation->prepare_start();
     simulation->preSimLoopSteps();
   }
