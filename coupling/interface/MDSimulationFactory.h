@@ -793,15 +793,15 @@ public:
   /** switches coupling on/off*/
   void switchOffCoupling() { 
     //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
-    internalCouplingState = true;
-    if(ls1MamicoPlugin != nullptr)
-      ls1MamicoPlugin->switchOnCoupling();
-  }
-  void switchOnCoupling() { 
-    //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
     internalCouplingState = false;
     if(ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOffCoupling();
+  }
+  void switchOnCoupling() { 
+    //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
+    internalCouplingState = true;
+    if(ls1MamicoPlugin != nullptr)
+      ls1MamicoPlugin->switchOnCoupling();
   }
 
   /** simulates numberTimesteps time steps and starts at time step no.
