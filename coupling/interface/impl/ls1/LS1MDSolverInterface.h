@@ -5,7 +5,7 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
-//#include "coupling/indexing/IndexingService.h"
+#include "coupling/indexing/IndexingService.h"
 
 #include "tarch/utils/RandomNumberService.h"
 
@@ -65,18 +65,18 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
 			tarch::la::Vector<3,double> macroCellSize = indexConversion.getMacroscopicCellSize();
 
       //conversion to global 
-      //using coupling::indexing::CellIndex;
-      //using coupling::indexing::IndexTrait;
-      //CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({macroscopicCellIndex[0], macroscopicCellIndex[1], macroscopicCellIndex[2]});
-      //CellIndex<3, IndexTrait::vector> globalIndex(localIndex);
-
+      using coupling::indexing::CellIndex;
+      using coupling::indexing::IndexTrait;
+      CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({(int)macroscopicCellIndex[0], (int)macroscopicCellIndex[1], (int)macroscopicCellIndex[2]});
+      CellIndex<3, IndexTrait::vector, IndexTrait::noGhost> globalIndex(localIndex);
 
       //We have unbroken MD domain, which we will divide into region iterators
       //So we split the MD into the same grid as the macro, and give the macroscopic cell the corresponding region
       double regionOffset[3], regionEndpoint[3];
       for(int i = 0; i < 3; i++)
       {
-        regionOffset[i] = bBoxMin[i] + ((macroscopicCellIndex[i] - 1) * macroCellSize[i]);
+        regionOffset[i] = globalIndex.get()[i] * macroCellSize[i];
+        //regionOffset[i] = bBoxMin[i] + ((macroscopicCellIndex[i] - 1) * macroCellSize[i]);
         regionEndpoint[i] = regionOffset[i] + macroCellSize[i];
       }
 
