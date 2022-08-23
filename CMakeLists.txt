@@ -293,6 +293,19 @@ endif()
 target_link_libraries(couette PRIVATE mamico)
 
 #
+# Evaporation target
+#
+set(EVAPORATION_SOURCES
+  "coupling/indexing/IndexingService.cpp"
+	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+  "coupling/tests/main_evaporation.cpp"
+)
+add_executable(evaporation ${EVAPORATION_SOURCES})
+set_target_properties(evaporation PROPERTIES CXX_STANDARD 17)
+target_link_libraries(evaporation PUBLIC mamico)
+
+#
 # test_lammps target
 #
 if("${MD_SIM}" STREQUAL "LAMMPS_MD")
