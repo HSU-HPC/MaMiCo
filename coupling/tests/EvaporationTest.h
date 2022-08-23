@@ -54,25 +54,22 @@ private:
     _macroSolver = new coupling::solvers::PreciceAdapter<dim>();
     if (_macroSolver != NULL) std::cout << "Macro solver not null on rank: " << _rank << std::endl;
     _multiMDService = new tarch::utils::MultiMDService<dim>(_mdConfig.getMPIConfiguration().getNumberOfProcesses(), _evaporationConfig.totalNumberMDSimulations);
-    _localMDInstances = _multiMDService->getLocalNumberOfMDSimulations();
-    for (unsigned int i = 0; i < _localMDInstances; i++) {
-      _mdSolvers.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(_mdConfig, _mamicoConfig, _multiMDService->getLocalCommunicator()));
-      if (_mdSolvers[i] == NULL) {
-        std::cout << "ERROR EvaporationTest: _mdSolvers[" << i << "]==NULL!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
+    _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_mdConfig, _mamicoConfig, *_multiMDService);
+    if (_instanceHandling == nullptr) {
+      std::cout << "ERROR EvaporationTest::init() : _instanceHandling == NULL!" << std::endl;
+      std::exit(EXIT_FAILURE);
     }
+    _mdStepCounter = 0;
     if (_rank == 0) {
       gettimeofday(&_tv.start, NULL);
     }
-    for (unsigned int i = 0; i < _localMDInstances; i++) {
-      _mdSolvers[i]->init(*_multiMDService, _multiMDService->getGlobalNumberOfLocalMDSimulation(i));
-      _mdSolversInterface.push_back(coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSolverInterface(_mdConfig, _mamicoConfig, _mdSolvers[i]));
-      if (_mdSolversInterface[i] == NULL) {
-        std::cout << "ERROR EvaporationTest: mdSolverInterface[" << i << "] == NULL!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
+    _instanceHandling->switchOffCoupling();
+    _instanceHandling->equilibrate(_evaporationConfig.equSteps, _mdStepCounter);
+    _instanceHandling->switchOnCoupling();
+    _mdStepCounter += _evaporationConfig.equSteps;
+
+    _instanceHandling->setMDSolverInterface();
+
     const tarch::la::Vector<dim, double> mdOffset{_mdConfig.getDomainConfiguration().getGlobalDomainOffset()};
     const tarch::la::Vector<dim, double> mamicoMeshsize{_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
     const tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells{getGlobalNumberMacroscopicCells()};
@@ -94,33 +91,15 @@ private:
       std::cout << "ERROR EvaporationTest: rank=" << _rank << ": macroSolverInterface==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(_mdSolversInterface, macroSolverInterface, _mdConfig, _mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
+
     coupling::indexing::IndexingService<dim>::getInstance().init(_mdConfig, _mamicoConfig, macroSolverInterface,  _rank);
 
-    /*
-    // TO DELETE
-    const tarch::la::Vector<dim, double> macroscopicCellSize(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
-    using namespace coupling;
-    using namespace indexing;
-    for (CellIndex<dim, IndexTrait::vector> cellIndex : coupling::indexing::CellIndex<dim, IndexTrait::vector>()) {
-      tarch::la::Vector<dim, int> cellVectorIndex = cellIndex.get();
-      unsigned int cellScalarIndex = convertToScalar<dim, IndexTrait::vector>(cellIndex);
-      if (cellScalarIndex < 70) {
-        std::cout << "cellScalarIndex:" << cellScalarIndex << std::endl;
-        std::cout << "cellVectorIndex:" << cellVectorIndex << std::endl;
-        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-          std::cout << "dim:" << currentDim << "," << cellVectorIndex[currentDim]*macroscopicCellSize[currentDim] + 0.5*macroscopicCellSize[currentDim] << std::endl;
-        }
-      }
-    }
-    // END TO DELETE
-    */
+    _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(_instanceHandling->getMDSolverInterface(), macroSolverInterface, _mdConfig, _mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
 
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, dim>::getInstance().setMacroscopicSolverInterface(macroSolverInterface);
-    for (unsigned int i = 0; i < _localMDInstances; i++) {
-      _mdSolvers[i]->setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
-      _multiMDCellService->getMacroscopicCellService(i).computeAndStoreTemperature(_evaporationConfig.temp);
-    }
+    _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
+    _multiMDCellService->computeAndStoreTemperature(_evaporationConfig.temp);
+
     allocateCFDToMDBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*macroSolverInterface);
     allocateMDToCFDBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(),*macroSolverInterface);
     _macroSolver->setCouplingMesh();
@@ -152,12 +131,8 @@ private:
     if (_rank == 0) {
       gettimeofday(&_tv.start, NULL);
     }
-    for (unsigned int i = 0; i < _localMDInstances; i++) {
-      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicCellService(&(_multiMDCellService->getMacroscopicCellService(i)));
-      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMDSolverInterface(_mdSolversInterface[i]);
-      _mdSolvers[i]->simulateTimesteps(_mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter);
-      _multiMDCellService->getMacroscopicCellService(i).plotEveryMacroscopicTimestep(cycle);
-    }
+    _instanceHandling->simulateTimesteps(_mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
+    _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
     _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
     if (_rank == 0) {
       gettimeofday(&_tv.end, NULL);
@@ -186,24 +161,9 @@ private:
       _buf.globalCellIndices4MDToCFDBuffer = NULL;
     }
 
-    // shutdown MD simulation
-    for (unsigned int i = 0; i < _localMDInstances; i++) {
-      // the shutdown operation may also delete the md solver interface; therefore, we update the MD solver interface in the vector _mdSolversInteface after the
-      // shutdown is completed
-      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMDSolverInterface(_mdSolversInterface[i]);
-      _mdSolvers[i]->shutdown();
-      delete _mdSolvers[i];
-      _mdSolvers[i] = NULL;
-      _mdSolversInterface[i] = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().getMDSolverInterface();
+    if (_instanceHandling != nullptr) {
+      delete _instanceHandling;
     }
-    _mdSolvers.clear();
-    for (unsigned int i = 0; i < _localMDInstances; i++) {
-      if (_mdSolversInterface[i] != NULL) {
-        delete _mdSolversInterface[i];
-        _mdSolversInterface[i] = NULL;
-      }
-    }
-    _mdSolversInterface.clear();
 
     coupling::interface::MacroscopicSolverInterface<3>* macroSolverInterface =
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().getMacroscopicSolverInterface();
@@ -318,19 +278,16 @@ private:
     double macro{0};
   };
 
-
   int _rank{0};
   simplemd::configurations::MolecularDynamicsConfiguration _mdConfig;
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
   coupling::configurations::EvaporationConfig _evaporationConfig;
   unsigned int _mdStepCounter{0};
   coupling::solvers::PreciceAdapter<3>* _macroSolver;
+  coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
   CouplingBuffer _buf;
-  unsigned int _localMDInstances;
-  std::vector<coupling::interface::MDSolverInterface<MY_LINKEDCELL, 3>*> _mdSolversInterface;
-  std::vector<coupling::interface::MDSimulation*> _mdSolvers;
   TimingValues _tv;
 };
 

@@ -210,7 +210,7 @@ private:
 
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
-    
+
     if (_cfg.twsLoop) {
       // initialise macroscopic cell service for multi-MD case and set single
       // cell services in each MD simulation
