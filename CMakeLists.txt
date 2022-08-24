@@ -137,6 +137,7 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN")
       message(FATAL_ERROR "xerces-c lib not found. Disable VTK support, if you do not need it.")
     endif()
   endif()
+  message(STATUS ">> ls1 found and initialized")
 endif()
 
 #

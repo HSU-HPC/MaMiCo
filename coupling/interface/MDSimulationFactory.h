@@ -40,6 +40,9 @@
 #include "ls1/src/plugins/MamicoCoupling.h"
 #include <iostream>
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#include <mpi.h>
+#endif
 #endif
 
 /** interface for different MD solvers.
@@ -786,18 +789,24 @@ public:
   LS1MDSimulation() : coupling::interface::MDSimulation() {
     simulation = new Simulation();
     global_simulation = simulation;
+    simulation->disableFinalCheckpoint();
     internalCouplingState = false;
     ls1MamicoPlugin = nullptr;
   }
-  virtual ~LS1MDSimulation() {}
+  virtual ~LS1MDSimulation() {
+    if(simulation != nullptr) {
+      delete simulation;
+      simulation = nullptr;
+    }
+  }
   /** switches coupling on/off*/
-  void switchOffCoupling() { 
+  virtual void switchOffCoupling() override { 
     //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
     internalCouplingState = false;
     if(ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOffCoupling();
   }
-  void switchOnCoupling() { 
+  virtual void switchOnCoupling() override { 
     //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
     internalCouplingState = true;
     if(ls1MamicoPlugin != nullptr)
@@ -806,7 +815,7 @@ public:
 
   /** simulates numberTimesteps time steps and starts at time step no.
    * firstTimestep*/
-  virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) {
+  virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) override {
     for (unsigned int i = 0; i < numberTimesteps; i++) {
       simulation->simulateOneTimestep();
     }
@@ -814,9 +823,9 @@ public:
   /** simulates a single time step*/
   // virtual void simulateTimestep(const unsigned int &thisTimestep ){const
   // unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
-  virtual void sortMoleculesIntoCells() {}
+  virtual void sortMoleculesIntoCells() override {}
 
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
+  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) override {
     //coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
     //    macroscopicCellService);
     PluginBase* searchedPlugin = simulation->getPlugin("MamicoCoupling");
@@ -839,7 +848,7 @@ public:
     else
       ls1MamicoPlugin->switchOffCoupling();
   }
-  virtual void init() {
+  virtual void init() override {
     // parse file
     const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
     simulation->readConfigFile(filename);
@@ -847,17 +856,13 @@ public:
     simulation->prepare_start();
     simulation->preSimLoopSteps();
   }
-  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) { init(); }
-  virtual void shutdown() {
+  virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) override { init(); }
+  virtual void shutdown() override {
     simulation->markSimAsDone();
     simulation->postSimLoopSteps();
     simulation->finalize();
-    if(simulation != nullptr) {
-      delete simulation;
-      simulation = nullptr;
-    }
   }
-  virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) {
+  virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) override {
     // configure through ls1 config file, using plugins
   }
 };
