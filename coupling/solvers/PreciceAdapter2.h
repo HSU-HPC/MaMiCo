@@ -67,8 +67,6 @@ public:
         vel[currentDim] = _velocityM2mCells[dim * cellIndex + currentDim];
       }
     }
-    std::cout << "pos:" << pos << std::endl;
-    std::cout << "vel:" << vel << std::endl;
     return vel;
   }
 
@@ -77,7 +75,6 @@ public:
   void advance(double dt) {
     if (_interface->isCouplingOngoing()) {
       if (_interface->isReadDataAvailable()) {
-        std::cout << "MaMiCo >> Reading macro velocities from preCICE !" << std::endl;
         // velocity from the conitnuum solver
         _interface->readBlockVectorData(_interface->getDataID("VelocityMacro", _interface->getMeshID("mamico-M2m-mesh")), _numberOfM2mCells, _vertexM2mCellIDs,
                                         _velocityM2mCells);

@@ -17,7 +17,8 @@ simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::~SimpleBuffer()
 
 bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise(const unsigned int doublesPerMolecule,
                                                                                  const unsigned int upperBoundOnNumberOfMolecules) {
-  _capacity = upperBoundOnNumberOfMolecules * doublesPerMolecule;
+   std::cout << "/* upperBoundOnNumberOfMolecules */" << upperBoundOnNumberOfMolecules << '\n';
+    _capacity = upperBoundOnNumberOfMolecules * doublesPerMolecule;
 
   _values = (double*)malloc(_capacity * sizeof(double));
   if (_values == NULL) {
@@ -41,7 +42,6 @@ bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::pushData(c
                                                                                const bool permitReallocation) {
   // check if buffer has enough storage for new data
   // we want to add position, velocity and forceOld, so we need 3 * MD_DIM more places
-
   // check is not in MD_ERROR, because the local buffer can be reallocated and if send/receive buffers are exhausted, we need to terminate in any case!
   if (_length + 3 * MD_DIM + 1 > _capacity) {
     if (permitReallocation == true) {
@@ -134,7 +134,7 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigne
   for (i_buffer = 0; i_buffer < _numberActiveParallelBuffers; i_buffer++) {
     buffUpperBound = computeBufferUpperBound(numCellsPerBuffer[i_buffer], avMoleculesPerCell);
 
-    isOk = _sendBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
+    isOk = _sendBuffers[i_buffer].initialise(doublesPerMolecule, 10*buffUpperBound);
     if (!isOk) {
       std::cout << "Allocation of send buffer " << i_buffer << " with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..."
                 << std::endl;
@@ -144,7 +144,7 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigne
     std::cout << "Send buffer " << i_buffer << " was successfully allocated with an upper bound of " << buffUpperBound << std::endl;
 #endif
 
-    isOk = _receiveBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
+    isOk = _receiveBuffers[i_buffer].initialise(doublesPerMolecule, 10*buffUpperBound);
     if (!isOk) {
       std::cout << "Allocation of receive buffer " << i_buffer << " with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..."
                 << std::endl;

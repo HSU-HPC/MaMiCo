@@ -243,7 +243,6 @@ private:
   }
 
   void fillCFDToMDBuffer() const {
-    std::cout << "fillCFDToMDBuffer" << std::endl;
     const coupling::IndexConversion<3>& indexConversion{_multiMDCellService->getIndexConversion()};
     const unsigned int size = _buf.CFDToMDBuffer.size();
     const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
@@ -254,7 +253,6 @@ private:
       for (unsigned int d = 0; d < 3; d++) {
         cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * macroscopicCellSize[d];
       }
-      std::cout << "cellMidPoint:" << cellMidPoint << std::endl;
       double mass = macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
       mass *= _macroSolver->getDensity(cellMidPoint);
       tarch::la::Vector<3, double> momentum(mass * _macroSolver->getVelocity(cellMidPoint));
