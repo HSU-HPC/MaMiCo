@@ -17,8 +17,7 @@ simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::~SimpleBuffer()
 
 bool simplemd::services::ParallelAndLocalBufferService::SimpleBuffer::initialise(const unsigned int doublesPerMolecule,
                                                                                  const unsigned int upperBoundOnNumberOfMolecules) {
-   std::cout << "/* upperBoundOnNumberOfMolecules */" << upperBoundOnNumberOfMolecules << '\n';
-    _capacity = upperBoundOnNumberOfMolecules * doublesPerMolecule;
+  _capacity = upperBoundOnNumberOfMolecules * doublesPerMolecule;
 
   _values = (double*)malloc(_capacity * sizeof(double));
   if (_values == NULL) {
@@ -133,8 +132,7 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigne
   unsigned int i_buffer;
   for (i_buffer = 0; i_buffer < _numberActiveParallelBuffers; i_buffer++) {
     buffUpperBound = computeBufferUpperBound(numCellsPerBuffer[i_buffer], avMoleculesPerCell);
-
-    isOk = _sendBuffers[i_buffer].initialise(doublesPerMolecule, 10*buffUpperBound);
+    isOk = _sendBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
     if (!isOk) {
       std::cout << "Allocation of send buffer " << i_buffer << " with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..."
                 << std::endl;
@@ -144,7 +142,7 @@ bool simplemd::services::ParallelAndLocalBufferService::initialise(const unsigne
     std::cout << "Send buffer " << i_buffer << " was successfully allocated with an upper bound of " << buffUpperBound << std::endl;
 #endif
 
-    isOk = _receiveBuffers[i_buffer].initialise(doublesPerMolecule, 10*buffUpperBound);
+    isOk = _receiveBuffers[i_buffer].initialise(doublesPerMolecule, buffUpperBound);
     if (!isOk) {
       std::cout << "Allocation of receive buffer " << i_buffer << " with " << buffUpperBound * doublesPerMolecule << " doubles failed. Terminating..."
                 << std::endl;
@@ -210,5 +208,5 @@ bool simplemd::services::ParallelAndLocalBufferService::pushMoleculeToSendBuffer
 
 unsigned int simplemd::services::ParallelAndLocalBufferService::computeBufferUpperBound(const unsigned int numCells, const double avMoleculesPerCell) const {
   // modeling a function of the type A(x) = c * x^-alpha + d
-  return (unsigned int)std::ceil((double)numCells * avMoleculesPerCell * (4.0 / std::sqrt((double)numCells) + 1.5));
+  return (unsigned int)std::ceil((double)numCells * avMoleculesPerCell * (4.0 / std::sqrt((double)numCells) + 2.0));
 }
