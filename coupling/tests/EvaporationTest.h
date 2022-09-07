@@ -28,6 +28,7 @@ public:
     for (int cycle = 0; cycle < _evaporationConfig.couplingCycles; cycle++) {
       advanceMacro(cycle);
       advanceMicro(cycle);
+      write2CSV(_buf.MDToCFDBuffer, _buf.globalCellIndices4MDToCFDBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), cycle + 1);
     }
     shutdown();
   }
@@ -140,6 +141,90 @@ private:
     }
   }
 
+  void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+                 const coupling::IndexConversion<3>& indexConversion, int couplingCycle) const {
+    if (recvBuffer.size() == 0)
+      return;
+    if (couplingCycle % _evaporationConfig.csvEveryTimestep > 0)
+      return;
+    std::stringstream ss;
+    ss << "results_" << _rank << "_" << couplingCycle << ".csv";
+    std::ofstream file(ss.str().c_str());
+    const unsigned int numCellsRecv = recvBuffer.size();
+    for (size_t i = 0; i < numCellsRecv; i++) {
+      tarch::la::Vector<3, double> vel(recvBuffer[i]->getMacroscopicMomentum());
+      if (recvBuffer[i]->getMacroscopicMass() != 0.0) {
+        vel = (1.0 / recvBuffer[i]->getMacroscopicMass()) * vel;
+      }
+      const tarch::la::Vector<3, unsigned int> counter(indexConversion.getGlobalVectorCellIndex(recvIndices[i]));
+      file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; "
+           << recvBuffer[i]->getMacroscopicMass() << ";";
+      file << std::endl;
+    }
+    file.close();
+  }
+
+  tarch::la::Vector<3, unsigned int> getGlobalNumberMacroscopicCells() const {
+    return tarch::la::Vector<3, unsigned int>{1,1,5};
+  }
+
+  void allocateCFDToMDBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroSolverInterface) {
+    const unsigned int num = 3; // just 3 cells shall be sent in oneD
+    deleteBuffer(_buf.CFDToMDBuffer);
+    // TODO: Adapt for parallel setup, check where this is necessary
+    // allocate array for cell indices
+    unsigned int* indices = new unsigned int[num]{31, 40, 49}; // refers to third, fourth, fifth cell
+    if (indices == NULL) {
+      std::cout << "ERROR EvaporationTest::allocateCFDToMDBuffer(): indices==NULL!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    for (unsigned int i = 0; i < num; i++) {
+      _buf.CFDToMDBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+      if (_buf.CFDToMDBuffer[_buf.CFDToMDBuffer.size() - 1] == NULL) {
+        std::cout << "ERROR EvaporationTest::allocateCFDToMDBuffer: CFDToMDBuffer[" << _buf.CFDToMDBuffer.size() - 1 << "]==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
+    _buf.globalCellIndices4CFDToMDBuffer = indices;
+  }
+
+  void fillCFDToMDBuffer() const {
+    const coupling::IndexConversion<3>& indexConversion{_multiMDCellService->getIndexConversion()};
+    const unsigned int size = _buf.CFDToMDBuffer.size();
+    const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+    const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+    for (unsigned int i = 0; i < size; i++) {
+      const tarch::la::Vector<3, unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4CFDToMDBuffer[i]));
+      tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * macroscopicCellSize);
+      for (unsigned int d = 0; d < 3; d++) {
+        cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * macroscopicCellSize[d];
+      }
+      double mass = macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
+      mass *= _macroSolver->getDensity(cellMidPoint);
+      tarch::la::Vector<3, double> momentum(mass * _macroSolver->getVelocity(cellMidPoint));
+      _buf.CFDToMDBuffer[i]->setMicroscopicMass(mass);
+      _buf.CFDToMDBuffer[i]->setMicroscopicMomentum(momentum);
+    }
+  }
+
+  void allocateMDToCFDBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroSolverInterface) {
+    const unsigned int num = 2;
+    deleteBuffer(_buf.MDToCFDBuffer);
+    unsigned int* indices = new unsigned int[num]{58,67};
+    if (indices == NULL) {
+      std::cout << "ERROR EvaporationTest::allocateMDToCFDBuffer(): indices==NULL!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    for (unsigned int i = 0; i < num; i++) {
+      _buf.MDToCFDBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+      if (_buf.MDToCFDBuffer[_buf.MDToCFDBuffer.size() - 1] == NULL) {
+        std::cout << "ERROR EvaporationTest::allocateMDToCFDBuffer: MDToCFDBuffer[" << _buf.MDToCFDBuffer.size() - 1 << "]==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
+    _buf.globalCellIndices4MDToCFDBuffer = indices;
+  }
+
   void shutdown() {
     if (_rank == 0) {
       gettimeofday(&_tv.end, NULL);
@@ -188,50 +273,6 @@ private:
     std::cout << "Finish EvaporationTest::shutdown() " << std::endl;
   }
 
-  tarch::la::Vector<3, unsigned int> getGlobalNumberMacroscopicCells() const {
-    return tarch::la::Vector<3, unsigned int>{1,1,5};
-  }
-
-  void allocateCFDToMDBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroSolverInterface) {
-    const unsigned int num = 3; // just 3 cells shall be sent in oneD
-    deleteBuffer(_buf.CFDToMDBuffer);
-    // TODO: Adapt for parallel setup, check where this is necessary
-    // allocate array for cell indices
-    unsigned int* indices = new unsigned int[num]{31, 40, 49}; // refers to third, fourth, fifth cell
-    if (indices == NULL) {
-      std::cout << "ERROR EvaporationTest::allocateCFDToMDBuffer(): indices==NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    for (unsigned int i = 0; i < num; i++) {
-      _buf.CFDToMDBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-      if (_buf.CFDToMDBuffer[_buf.CFDToMDBuffer.size() - 1] == NULL) {
-        std::cout << "ERROR EvaporationTest::allocateCFDToMDBuffer: CFDToMDBuffer[" << _buf.CFDToMDBuffer.size() - 1 << "]==NULL!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
-    _buf.globalCellIndices4CFDToMDBuffer = indices;
-  }
-
-
-  void allocateMDToCFDBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroSolverInterface) {
-    const unsigned int num = 2;
-    deleteBuffer(_buf.MDToCFDBuffer);
-    unsigned int* indices = new unsigned int[num]{58,67};
-    if (indices == NULL) {
-      std::cout << "ERROR EvaporationTest::allocateMDToCFDBuffer(): indices==NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    for (unsigned int i = 0; i < num; i++) {
-      _buf.MDToCFDBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-      if (_buf.MDToCFDBuffer[_buf.MDToCFDBuffer.size() - 1] == NULL) {
-        std::cout << "ERROR EvaporationTest::allocateMDToCFDBuffer: MDToCFDBuffer[" << _buf.MDToCFDBuffer.size() - 1 << "]==NULL!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
-    _buf.globalCellIndices4MDToCFDBuffer = indices;
-  }
-
-
   void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& buffer) const {
     for (unsigned int i = 0; i < buffer.size(); i++) {
       if (buffer[i] != NULL) {
@@ -240,25 +281,6 @@ private:
       }
     }
     buffer.clear();
-  }
-
-  void fillCFDToMDBuffer() const {
-    const coupling::IndexConversion<3>& indexConversion{_multiMDCellService->getIndexConversion()};
-    const unsigned int size = _buf.CFDToMDBuffer.size();
-    const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
-    const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
-    for (unsigned int i = 0; i < size; i++) {
-      const tarch::la::Vector<3, unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4CFDToMDBuffer[i]));
-      tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * macroscopicCellSize);
-      for (unsigned int d = 0; d < 3; d++) {
-        cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * macroscopicCellSize[d];
-      }
-      double mass = macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
-      mass *= _macroSolver->getDensity(cellMidPoint);
-      tarch::la::Vector<3, double> momentum(mass * _macroSolver->getVelocity(cellMidPoint));
-      _buf.CFDToMDBuffer[i]->setMicroscopicMass(mass);
-      _buf.CFDToMDBuffer[i]->setMicroscopicMomentum(momentum);
-    }
   }
 
   struct CouplingBuffer {
