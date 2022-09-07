@@ -16,7 +16,7 @@ Optional dependencies are:
 * [OpenFOAM](https://openfoam.org/), for coupling to CFD simulations with OpenFOAM.
 * [preCICE](https://precice.org/), for coupling with other solvers using the preCICE coupling library.
 
-## Build instructions and first steps
+## Build instructions
 * First clone this repository and create a new build directory:
 
         git clone git@github.com:HSU-HPC/MaMiCo.git
@@ -36,9 +36,12 @@ Optional dependencies are:
 * Here you can enable optional dependencies, e.g. activate BUILD_WITH_MPI (default OFF), or modifiy which compiler and flags you want to use. When you are done, press the configure [c] and generate [g] keys. Now you can start the compilation:
 
         make
-
-* The previous step has created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. An example simulation configuration can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/examples/couette.xml.template).
-* Copy this file to your build folder, rename it 'couette.xml' and modify the configuration to suit your needs.
+        
+## Input file construction and first runs
+* The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. 
+* An example simulation configuration file can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/examples/couette.xml.template), other template input files are in the [examples](https://github.com/HSU-HPC/MaMiCo/blob/master/examples) foder as well. 
+* Copy this file to your build folder, rename it 'couette.xml'. 
+* The available options and features are listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs. 
 * Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`. 
 * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats. 
 
