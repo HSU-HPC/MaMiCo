@@ -20,12 +20,10 @@ namespace solvers {
 
 using namespace indexing;
 
-template <unsigned int dim> class PreciceAdapter : public AbstractCouetteSolver<3>, public interface::MacroscopicSolverInterface<dim> {
+template <unsigned int dim> class PreciceAdapter {
 public:
-  PreciceAdapter(const double channelHeight, const double dx, const double dt, const unsigned int plotEveryTimestep, const std::string filestem,
-                 const unsigned int overlap)
-      : coupling::solvers::AbstractCouetteSolver<3>(), coupling::interface::MacroscopicSolverInterface<dim>(), _channelHeight(channelHeight), _dx(dx), _dt(dt),
-        _plotEveryTimestep(plotEveryTimestep), _filestem(filestem) {
+  PreciceAdapter(const double dx, const double dt, const unsigned int overlap)
+      : _dx(dx), _dt(dt), _overlap(overlap) {
   }
 
   virtual ~PreciceAdapter() {
@@ -44,8 +42,6 @@ public:
       delete[] _velocitym2MCells;
     }
   }
-
-  void setInterface(const unsigned int overlap) { _overlap = overlap; }
 
   void setCouplingMesh(const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize,
     const unsigned int* const mamicoRecvdIndices, size_t mamicoRecvdIndicesSize) {
@@ -154,8 +150,6 @@ public:
     return tetrahedronsNodeIDs;
   }
 
-  void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) override { _wallVelocity = wallVelocity; }
-
   tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const override {
     tarch::la::Vector<3, double> vel(0.0);
     unsigned int cellIndex = 0;
@@ -170,27 +164,18 @@ public:
     return vel;
   }
 
-  double getDensity(tarch::la::Vector<3, double> pos) const { return 1.0; }
-
   void advance(double dt) override {
     if (_interface->isCouplingOngoing()) {
       if (_interface->isReadDataAvailable()) {
-        std::cout << "MaMiCo >> Reading macro velocities from preCICE !" << std::endl;
-        // velocity from the conitnuum solver
         _interface->readBlockVectorData(_interface->getDataID("VelocityMacro", _interface->getMeshID("mamico-M2m-mesh")), _numberOfM2mCells, _vertexM2mCellIDs,
                                         _velocityM2mCells);
       }
-
-      // Solving the time step
-      // Normally does nothing, everything is done on the MD side
       if (_interface->isWriteDataRequired(dt)) {
         int meshID = _interface->getMeshID("mamico-m2M-mesh");
         std::cout << "MaMiCo >> Writing micro velocities to preCICE !" << std::endl;
-        // Velocit from the md solver
         int dataID = _interface->getDataID("VelocityMicro", meshID);
         _interface->writeBlockVectorData(dataID, _numberOfm2MCells, _vertexm2MCellIDs, _velocitym2MCells);
       }
-
       double computed_dt = std::min(_precice_dt, dt);
       _precice_dt = _interface->advance(computed_dt);
     }
@@ -245,13 +230,8 @@ public:
 
 
 private:
-  const double _channelHeight;
   const double _dx;
   const double _dt;
-  const unsigned int _plotEveryTimestep;
-  const std::string _filestem;
-  unsigned int _counter{0};
-  tarch::la::Vector<3, double> _wallVelocity;
   unsigned int _overlap;
   tarch::la::Vector<3, double> _mdDomainOffset;
   tarch::la::Vector<3, double> _macroscopicCellSize;
