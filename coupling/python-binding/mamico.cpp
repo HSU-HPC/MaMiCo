@@ -467,6 +467,7 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("getMoleculeConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getMoleculeConfiguration, py::return_value_policy::reference)
       .def("getMPIConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getMPIConfiguration, py::return_value_policy::reference)
       .def("getVTKConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getVTKConfiguration, py::return_value_policy::reference)
+      .def("getAdios2Configuration", &simplemd::configurations::MolecularDynamicsConfiguration::getAdios2Configuration, py::return_value_policy::reference)
       .def("getSimulationConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getSimulationConfiguration,
            py::return_value_policy::reference)
       .def("getRDFConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getRDFConfiguration, py::return_value_policy::reference)
@@ -503,6 +504,10 @@ PYBIND11_MODULE(mamico, mamico) {
   py::class_<simplemd::configurations::VTKConfiguration>(configuration, "VTKConfiguration")
       .def("getFilename", &simplemd::configurations::VTKConfiguration::getFilename)
       .def("getWriteEveryTimestep", &simplemd::configurations::VTKConfiguration::getWriteEveryTimestep);
+
+  py::class_<simplemd::configurations::Adios2Configuration>(configuration, "Adios2Configuration")
+      .def("getFilename", &simplemd::configurations::Adios2Configuration::getFilename)
+      .def("getWriteEveryTimestep", &simplemd::configurations::Adios2Configuration::getWriteEveryTimestep);
 
   py::class_<simplemd::configurations::SimulationConfiguration>(configuration, "SimulationConfiguration")
       .def("getDt", &simplemd::configurations::SimulationConfiguration::getDt)

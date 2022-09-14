@@ -6,6 +6,7 @@
 # Helmut Schmidt University, Hamburg. Chair for High Performance Computing
 # BSD license, see the copyright notice in Mamico's main folder
 
+from datetime import time
 import sys
 sys.path.append('../../../build')
 sys.path.append('../../filtering/filters')
@@ -286,7 +287,9 @@ class KVSTest():
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             if self.adios2 > 0:
                 self.adiosfile = adios2.open("kvstest.bp", "w")
-                self.adiosfile.write("shape", np.array(self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape))
+                timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
+                print("timefactor:", timefactor)
+                self.adiosfile.write_attribute('timefactor', str(timefactor))
     
         if self.rank==0:
             log.info("Finished initSolvers") # after ? ms
@@ -339,11 +342,18 @@ class KVSTest():
             if self.adios2 > 0 and (cycle+1)%self.adios2 == 0:
                to_write = np.ascontiguousarray(self.macroscopicSolver.scen.velocity[:,:,:,:].data, dtype=np.float32)
                log.info("writing to adios2 " + str(type(to_write)) + " with shape " + str(to_write.shape) + " and dtype " + str(to_write.dtype))
+               shape = np.array(self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape)*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
+               offset = [0.,0.,0.]
+               offset[0] = -((mdpos[0]/2.5 * self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape[0]*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize())-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[0]))
+               offset[1] = -((mdpos[1]/0.41 * self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape[1]*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize())-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[1]))
+               offset[2] = -((mdpos[2]/0.41 * self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape[2]*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize())-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[2]))
+               self.adiosfile.write("global_box", np.array([offset[0], offset[1], offset[2], offset[0] + shape[0], offset[1] + shape[1], offset[2] + shape[2]])
                self.adiosfile.write("velocity", to_write, to_write.shape, np.zeros_like(to_write.shape), to_write.shape)
                self.adiosfile.end_step()
 
         if self.cfg.getboolean("coupling", "send-from-macro-to-md"):
             self.multiMDCellService.sendFromMacro2MD(self.buf)
+
     
     def advanceMicro(self, cycle):
         numT = self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
