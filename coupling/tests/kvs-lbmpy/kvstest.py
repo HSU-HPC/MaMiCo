@@ -286,7 +286,7 @@ class KVSTest():
         if self.rank==0:
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             if self.adios2 > 0:
-                self.adiosfile = adios2.open("kvstest.bp", "w")
+                self.adiosfile = adios2.open("adios2_volume.bp", "w")
                 timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
                 print("timefactor:", timefactor)
                 self.adiosfile.write_attribute('timefactor', str(timefactor))
