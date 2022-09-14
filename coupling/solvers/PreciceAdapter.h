@@ -6,7 +6,6 @@
 #include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/indexing/CellIndex.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
-#include "coupling/solvers/CouetteSolver.h"
 #include "precice/SolverInterface.hpp"
 #include "tarch/la/Vector.h"
 #include <cmath>
@@ -20,7 +19,7 @@ namespace solvers {
 
 using namespace indexing;
 
-template <unsigned int dim> class PreciceAdapter {
+template <unsigned int dim> class PreciceAdapter : public coupling::interface::MacroscopicSolverInterface<dim> {
 public:
   PreciceAdapter(const double dx, const double dt, const unsigned int overlap)
       : _dx(dx), _dt(dt), _overlap(overlap) {
@@ -150,7 +149,7 @@ public:
     return tetrahedronsNodeIDs;
   }
 
-  tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const override {
+  tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const {
     tarch::la::Vector<3, double> vel(0.0);
     unsigned int cellIndex = 0;
     while (cellIndex < _numberOfM2mCells &&
@@ -164,7 +163,7 @@ public:
     return vel;
   }
 
-  void advance(double dt) override {
+  void advance(double dt) {
     if (_interface->isCouplingOngoing()) {
       if (_interface->isReadDataAvailable()) {
         _interface->readBlockVectorData(_interface->getDataID("VelocityMacro", _interface->getMeshID("mamico-M2m-mesh")), _numberOfM2mCells, _vertexM2mCellIDs,
@@ -192,7 +191,7 @@ public:
     return rcv;
   }
 
-  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
 		tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
     tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
     bool isInnerCell = true;
@@ -211,7 +210,6 @@ public:
     ranks.push_back(0);
     return ranks;
   }
-
 
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const mamicoRecvIndices) {
     std::cout << "setMDBoundaryValues" << std::endl;
