@@ -645,7 +645,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
 
   if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
     if (t % 50 == 0)
-      std::cout << "Finish MD timestep " << t << "..." << std::endl;
+      std::cout << "MaMiCo: Finish MD timestep " << t << "..." << std::endl;
   }
 }
 

@@ -10,8 +10,8 @@
 
 class Scenario {
 public:
-  Scenario(std::string scenarioname) : _scenarioname(scenarioname) { std::cout << "Run " << scenarioname << "..." << std::endl; }
-  virtual ~Scenario() { std::cout << "Shut down " << _scenarioname << std::endl; }
+  Scenario(std::string scenarioname) : _scenarioname(scenarioname) { std::cout << "MaMiCo: Run " << scenarioname << "..." << std::endl; }
+  virtual ~Scenario() { std::cout << "MaMiCo: Shut down " << _scenarioname << std::endl; }
 
   virtual void run() = 0;
 
