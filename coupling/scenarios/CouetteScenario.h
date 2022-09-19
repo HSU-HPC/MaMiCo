@@ -11,13 +11,13 @@
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/solvers/PreciceAdapter.h"
+#include "precice/SolverInterface.hpp"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
 #include <mpi.h>
 #include <random>
 #include <sys/time.h>
-#include "precice/SolverInterface.hpp"
 
 class CouetteScenario : public Scenario {
 public:
@@ -35,7 +35,7 @@ public:
     _scenarioConfig = coupling::configurations::ScenarioConfig::parseConfiguration(xmlConfigurationFilename);
 
     _multiMDService = new tarch::utils::MultiMDService<dim>(_mdConfig.getMPIConfiguration().getNumberOfProcesses(), _scenarioConfig.totalNumberMDSimulations);
-    _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_mdConfig, _mamicoConfig, *_multiMDService);
+    _instanceHandling = new coupling::InstanceHandling<simplemd::LinkedCell, 3>(_mdConfig, _mamicoConfig, *_multiMDService);
     _mdStepCounter = 0;
     _instanceHandling->switchOffCoupling();
     _instanceHandling->equilibrate(_scenarioConfig.equSteps, _mdStepCounter);
@@ -43,27 +43,27 @@ public:
     _mdStepCounter += _scenarioConfig.equSteps;
     _instanceHandling->setMDSolverInterface();
 
-    _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
-                                                              _mdConfig.getSimulationConfiguration().getDt() *
-                                                                  _mdConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-                                                              _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+     _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>();
     if (_preciceAdapter != NULL)
-      std::cout << "MaMiCo: CouetteScenario::init(): Macro solver not NULL on rank " << _rank << std::endl;
+      std::cout << "MaMiCo: CouetteScenario::run(): Macro solver not NULL on rank " << _rank << std::endl;
     coupling::indexing::IndexingService<dim>::getInstance().init(_mdConfig, _mamicoConfig, _preciceAdapter, _rank);
-    _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(_instanceHandling->getMDSolverInterface(), _preciceAdapter, _mdConfig,
-                                                                                         _mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
-    coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, dim>::getInstance().setMacroscopicSolverInterface(_preciceAdapter);
+    _multiMDCellService = new coupling::services::MultiMDCellService<simplemd::LinkedCell, dim>(_instanceHandling->getMDSolverInterface(), _preciceAdapter, _mdConfig, 
+				_mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
+    coupling::interface::MamicoInterfaceProvider<simplemd::LinkedCell, dim>::getInstance().setMacroscopicSolverInterface(_preciceAdapter);
     _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
     _multiMDCellService->computeAndStoreTemperature(_scenarioConfig.temp);
     allocateCFDToMDBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_preciceAdapter);
     allocateMDToCFDBuffer(_multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), *_preciceAdapter);
-    _preciceAdapter->setCouplingMesh(_mdConfig.getDomainConfiguration().getGlobalDomainOffset(),
-                                  _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], _buf.globalCellIndices4MDToCFDBuffer, _buf.MDToCFDBuffer.size());
-    std::cout << "MaMiCo: Finish CouetteScenario::init() " << std::endl;
+    double precice_dt = _preciceAdapter->initialize(
+        _mdConfig.getDomainConfiguration().getGlobalDomainOffset(), _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _buf.globalCellIndices4MDToCFDBuffer, _buf.MDToCFDBuffer.size());
+    std::cout << "MaMiCo: precice_dt=" << precice_dt << std::endl;
+    std::cout << "MaMiCo: CouetteScenario::run() finish initialization " << std::endl;
 
     int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
-      if (_preciceAdapter->readData()) {
+      if (_preciceAdapter->isReadDataAvailable()) {
+        _preciceAdapter->readData();
         const coupling::IndexConversion<3>& indexConversion{_multiMDCellService->getIndexConversion()};
         const unsigned int size = _buf.CFDToMDBuffer.size();
         const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
@@ -84,6 +84,13 @@ public:
       _instanceHandling->simulateTimesteps(_mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
+      double dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
+      if (_preciceAdapter->isWriteDataRequired(dt)) {
+        _preciceAdapter->setMDBoundaryValues(_buf.MDToCFDBuffer, _buf.globalCellIndices4MDToCFDBuffer);
+        _preciceAdapter->writeData();
+      }
+      precice_dt=_preciceAdapter->advance(dt);
+      std::cout << "MaMiCo: precice_dt=" << precice_dt << std::endl;
       cycle++;
     }
     
@@ -96,7 +103,7 @@ public:
       delete _instanceHandling;
     }
     coupling::interface::MacroscopicSolverInterface<3>* macroSolverInterface =
-        coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().getMacroscopicSolverInterface();
+        coupling::interface::MamicoInterfaceProvider<simplemd::LinkedCell, 3>::getInstance().getMacroscopicSolverInterface();
     if (_multiMDService != NULL) {
       delete _multiMDService;
       _multiMDService = NULL;
@@ -115,9 +122,9 @@ public:
     }
     std::cout << "MaMiCo: Finish CouetteScenario::shutdown() " << std::endl;
   }
+  
 
 private:
-
   void allocateCFDToMDBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroSolverInterface) {
     const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
     const unsigned int num = cells[0] * cells[1] * cells[2];
@@ -211,11 +218,10 @@ private:
   coupling::configurations::ScenarioConfig _scenarioConfig;
   unsigned int _mdStepCounter{0};
   coupling::solvers::PreciceAdapter<3>* _preciceAdapter;
-  coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
+  coupling::InstanceHandling<simplemd::LinkedCell, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
-  coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
+  coupling::services::MultiMDCellService<simplemd::LinkedCell, 3>* _multiMDCellService;
   CouplingBuffer _buf;
-  TimingValues _tv;
 };
 
 #endif // _COUPLING_TESTS_PRECICETEST_H_
