@@ -813,6 +813,7 @@ public:
   /** simulates numberTimesteps time steps and starts at time step no.
    * firstTimestep*/
   virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) override {
+    global_simulation = simulation;
     for (unsigned int i = 0; i < numberTimesteps; i++) {
       simulation->simulateOneTimestep();
     }
@@ -825,6 +826,7 @@ public:
   virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) override {
     //coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
     //    macroscopicCellService);
+    global_simulation = simulation;
     PluginBase* searchedPlugin = simulation->getPlugin("MamicoCoupling");
     if(searchedPlugin == nullptr)
     {
@@ -846,6 +848,7 @@ public:
       ls1MamicoPlugin->switchOffCoupling();
   }
   virtual void init() override {
+    global_simulation = simulation;
     // parse file
     const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
     simulation->readConfigFile(filename);
@@ -855,6 +858,7 @@ public:
   }
   virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) override { init(); }
   virtual void shutdown() override {
+    global_simulation = simulation;
     simulation->markSimAsDone();
     simulation->postSimLoopSteps();
     simulation->finalize();
