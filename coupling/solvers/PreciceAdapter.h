@@ -21,7 +21,8 @@ using namespace indexing;
 
 template <unsigned int dim> class PreciceAdapter : public coupling::interface::MacroscopicSolverInterface<dim> {
 public:
-  PreciceAdapter() {}
+  PreciceAdapter(const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize, const unsigned int overlap) : _overlap(overlap), _mdDomainOffset(mdDomainOffset), 
+  _macroscopicCellSize(macroscopicCellSize) {}
 
   virtual ~PreciceAdapter() {
     if (_solverInterface != NULL) {
@@ -40,11 +41,8 @@ public:
     }
   }
 
-  double initialize(const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize, const unsigned int overlap,
-    const unsigned int* const mamicoRecvdIndices, size_t mamicoRecvdIndicesSize) {
-    _mdDomainOffset = mdDomainOffset;
-    _macroscopicCellSize = macroscopicCellSize;
-    _overlap = overlap;
+  double initialize(const unsigned int* const M2mCellGlobalIndices, size_t numberOfM2mCells,
+    const unsigned int* const m2MCellGlobalIndices, size_t numberOfm2MCells) {
     int rank = 0;
     int size = 1;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -53,52 +51,48 @@ public:
 #endif
     _solverInterface = new precice::SolverInterface("mamico", "../precice-config.xml", rank, size);
 
-    _numberOfM2mCells = 0;
-    for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
-      if (sendMacroscopicQuantityToMDSolver(static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get())))
-        _numberOfM2mCells++;
-    }
-    std::cout << "MaMiCo: mamico-M2m-mesh size=" << _numberOfM2mCells << std::endl;
-    _coordsM2mCells = new double[dim * _numberOfM2mCells];
-    unsigned int vertexPreciceID = 0;
-    for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
-      tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get());
-      if (sendMacroscopicQuantityToMDSolver(cellVectorIndex)) {
-        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-          _coordsM2mCells[dim * vertexPreciceID + currentDim] =
-              mdDomainOffset[currentDim] + cellVectorIndex[currentDim] * macroscopicCellSize[0] - macroscopicCellSize[0] + 0.5 * macroscopicCellSize[currentDim];
-        }
-        vertexPreciceID++;
+    std::vector<double> coordsM2mCells;
+    for (size_t i = 0; i < numberOfM2mCells; i++) {
+      const unsigned int M2mCellGlobalIndex = M2mCellGlobalIndices[i];
+      tarch::la::Vector<dim, int> M2mCellGlobalVectorIndex = coupling::indexing::convertToVector<dim>({M2mCellGlobalIndex});
+      for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+        coordsM2mCells.push_back(_mdDomainOffset[currentDim] + M2mCellGlobalVectorIndex[currentDim] * _macroscopicCellSize[currentDim] 
+        - _macroscopicCellSize[currentDim] + 0.5 * _macroscopicCellSize[currentDim]);
       }
     }
+    _numberOfM2mCells = coordsM2mCells.size()/dim;
+    std::cout << "MaMiCo: mamico-M2m-mesh size=" << _numberOfM2mCells << std::endl;
+    _coordsM2mCells = coordsM2mCells.data();
     _vertexM2mCellIDs = new int[_numberOfM2mCells];
     _solverInterface->setMeshVertices(_solverInterface->getMeshID("mamico-M2m-mesh"), _numberOfM2mCells, _coordsM2mCells, _vertexM2mCellIDs);
     _velocityM2mCells = new double[_numberOfM2mCells * dim];
 
-    _coordsm2MCells = new double[dim * _numberOfm2MCells];
-    vertexPreciceID = 0;
-    for (size_t iMamicoRecvdIndices = 0; iMamicoRecvdIndices < mamicoRecvdIndicesSize; iMamicoRecvdIndices++) {
-      const unsigned int mamicoRecvdIndex = mamicoRecvdIndices[iMamicoRecvdIndices];
-      tarch::la::Vector<3, unsigned int> mamicoRecvdVIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(coupling::indexing::convertToVector<dim>({mamicoRecvdIndex}));
-      if (receiveMacroscopicQuantityFromMDSolver(mamicoRecvdVIndex)) {
-        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-          _coordsm2MCells[dim * vertexPreciceID + currentDim] =
-              _mdDomainOffset[currentDim] + mamicoRecvdVIndex[currentDim] * macroscopicCellSize[0] - macroscopicCellSize[0] + 0.5 * _macroscopicCellSize[currentDim];
-        }
-        vertexPreciceID++;
+    std::vector<double> coordsm2MCells;
+    for (size_t i = 0; i < numberOfm2MCells; i++) {
+      const unsigned int m2MCellGlobalIndex = m2MCellGlobalIndices[i];
+      tarch::la::Vector<dim, int> m2MCellGlobalVectorIndex = coupling::indexing::convertToVector<dim>({m2MCellGlobalIndex});
+      for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+        coordsm2MCells.push_back(_mdDomainOffset[currentDim] + m2MCellGlobalVectorIndex[currentDim] * _macroscopicCellSize[currentDim] 
+        - _macroscopicCellSize[currentDim] + 0.5 * _macroscopicCellSize[currentDim]);
       }
     }
+    _numberOfm2MCells = coordsm2MCells.size()/dim;
+    std::cout << "MaMiCo: mamico-m2M-mesh size=" << _numberOfm2MCells << std::endl;
+    _coordsm2MCells = coordsm2MCells.data();
+    _vertexm2MCellIDs = new int[_numberOfm2MCells];
+    _solverInterface->setMeshVertices(_solverInterface->getMeshID("mamico-m2M-mesh"), _numberOfm2MCells, _coordsm2MCells, _vertexm2MCellIDs);
+    _velocitym2MCells = new double[_numberOfm2MCells * dim];
     
     _vertexm2MCellIDs = new int[_numberOfm2MCells];
     _solverInterface->setMeshVertices(_solverInterface->getMeshID("mamico-m2M-mesh"), _numberOfm2MCells, _coordsm2MCells, _vertexm2MCellIDs);
     _velocitym2MCells = new double[_numberOfm2MCells * dim];
 
     /* vertexPreciceID = 0;
-    for (size_t iMamicoRecvdIndices = 0; iMamicoRecvdIndices < mamicoRecvdIndicesSize; iMamicoRecvdIndices++) {
-      const unsigned int mamicoRecvdIndex = mamicoRecvdIndices[iMamicoRecvdIndices];
+    for (size_t im2MCellGlobalIndices = 0; im2MCellGlobalIndices < numberOfm2MCells; im2MCellGlobalIndices++) {
+      const unsigned int mamicoRecvdIndex = m2MCellGlobalIndices[im2MCellGlobalIndices];
       tarch::la::Vector<3, int> mamicoRecvdVIndex = coupling::indexing::convertToVector<dim>({mamicoRecvdIndex});
       if (receiveMacroscopicQuantityFromMDSolver(static_cast<tarch::la::Vector<dim, unsigned int>>(mamicoRecvdVIndex))) {
-        std::vector<int> tetrahedronsNodeIDs = getTetrahedronsNodeIDs(vertexPreciceID, mamicoRecvdVIndex, mamicoRecvdIndices, mamicoRecvdIndicesSize);
+        std::vector<int> tetrahedronsNodeIDs = getTetrahedronsNodeIDs(vertexPreciceID, mamicoRecvdVIndex, m2MCellGlobalIndices, numberOfm2MCells);
         for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsNodeIDs.size()/4; tetrahedronIndex++) {
           _solverInterface->setMeshTetrahedron(_solverInterface->getMeshID("mamico-m2M-mesh"),
           tetrahedronsNodeIDs[tetrahedronIndex*4], tetrahedronsNodeIDs[tetrahedronIndex*4+1], tetrahedronsNodeIDs[tetrahedronIndex*4+2], tetrahedronsNodeIDs[tetrahedronIndex*4+3]);
@@ -106,11 +100,10 @@ public:
         vertexPreciceID++;
       }
     } */
-
     return _solverInterface->initialize();
   }
 
-/*   std::vector<int> getTetrahedronsNodeIDs(const int nodePreciceID, const tarch::la::Vector<3, int> nodeMamicoVIndex, const unsigned int* const mamicoRecvdIndices, size_t mamicoRecvdIndicesSize) {
+/*   std::vector<int> getTetrahedronsNodeIDs(const int nodePreciceID, const tarch::la::Vector<3, int> nodeMamicoVIndex, const unsigned int* const m2MCellGlobalIndices, size_t numberOfm2MCells) {
     std::vector<int> tetrahedronsNodeIDs;
     const int numberOfNeighbors = 6;
     tarch::la::Vector<3, int> directionNeighbors[numberOfNeighbors] = {{0,0,-1}, {0,0,1}, {1,0,0}, {0,1,0}, {-1,0,0}, {0,-1,0}};
@@ -123,7 +116,7 @@ public:
         using coupling::indexing::convertToScalar;
         int neighborMamicoIndex = convertToScalar<dim>(CellIndex<dim,IndexTrait::vector>(neighborMamicoVIndex));
         int neighborPreciceID = 0;
-        while (neighborPreciceID < (int)mamicoRecvdIndicesSize && (int)mamicoRecvdIndices[neighborPreciceID] != neighborMamicoIndex) neighborPreciceID++;
+        while (neighborPreciceID < (int)numberOfm2MCells && (int)m2MCellGlobalIndices[neighborPreciceID] != neighborMamicoIndex) neighborPreciceID++;
         neighborVertexIDSs[iDirectionNeighbors]=neighborPreciceID;
       } else {
         neighborVertexIDSs[iDirectionNeighbors]=-1;
@@ -171,6 +164,7 @@ public:
   void readData() {
       _solverInterface->readBlockVectorData(_solverInterface->getDataID("VelocityMacro", _solverInterface->getMeshID("mamico-M2m-mesh")), _numberOfM2mCells, _vertexM2mCellIDs,
                                       _velocityM2mCells);
+                std::cout << "Reading data" << std::endl;
   }
 
   bool isWriteDataRequired(const double dt) {
@@ -229,9 +223,9 @@ public:
 
 
 private:
-  unsigned int _overlap;
-  tarch::la::Vector<3, double> _mdDomainOffset;
-  tarch::la::Vector<3, double> _macroscopicCellSize;
+  const unsigned int _overlap;
+  const tarch::la::Vector<3, double> _mdDomainOffset;
+  const tarch::la::Vector<3, double> _macroscopicCellSize;
 
   precice::SolverInterface* _solverInterface = NULL;
 
