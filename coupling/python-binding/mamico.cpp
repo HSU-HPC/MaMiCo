@@ -467,7 +467,7 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("getMoleculeConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getMoleculeConfiguration, py::return_value_policy::reference)
       .def("getMPIConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getMPIConfiguration, py::return_value_policy::reference)
       .def("getVTKConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getVTKConfiguration, py::return_value_policy::reference)
-      .def("getAdios2Configuration", &simplemd::configurations::MolecularDynamicsConfiguration::getAdios2Configuration, py::return_value_policy::reference)
+      .def("getADIOS2Configuration", &simplemd::configurations::MolecularDynamicsConfiguration::getAdios2Configuration, py::return_value_policy::reference)
       .def("getSimulationConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getSimulationConfiguration,
            py::return_value_policy::reference)
       .def("getRDFConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getRDFConfiguration, py::return_value_policy::reference)

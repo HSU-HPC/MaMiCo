@@ -286,7 +286,7 @@ class KVSTest():
         if self.rank==0:
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             if self.adios2 > 0:
-                self.adiosfile = adios2.open("adios2_volume.bp", "w")
+                self.adiosfile = adios2.open("kvstest_volume.bp", "w")
                 timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
                 print("timefactor:", timefactor)
                 self.adiosfile.write_attribute('timefactor', str(timefactor))
@@ -342,12 +342,18 @@ class KVSTest():
             if self.adios2 > 0 and (cycle+1)%self.adios2 == 0:
                to_write = np.ascontiguousarray(self.macroscopicSolver.scen.velocity[:,:,:,:].data, dtype=np.float32)
                log.info("writing to adios2 " + str(type(to_write)) + " with shape " + str(to_write.shape) + " and dtype " + str(to_write.dtype))
-               shape = np.array(self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape)*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
+               shape = np.array(self.macroscopicSolver.scen.velocity[:,:,:,0].data.shape)*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
                offset = [0.,0.,0.]
-               offset[0] = -((mdpos[0]/2.5 * self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape[0]*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize())-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[0]))
-               offset[1] = -((mdpos[1]/0.41 * self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape[1]*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize())-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[1]))
-               offset[2] = -((mdpos[2]/0.41 * self.macroscopicSolver.scen.velocity[:,:,:,:].data.shape[2]*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize())-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[2]))
-               self.adiosfile.write("global_box", np.array([offset[0], offset[1], offset[2], offset[0] + shape[0], offset[1] + shape[1], offset[2] + shape[2]])
+               print(shape)
+               print(mdpos)
+               print(self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize())
+               offset[0] = -((mdpos[0]/to_write.shape[0]* shape[0])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[0]))
+               offset[1] = -((mdpos[1]/to_write.shape[1]* shape[1])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[1]))
+               offset[2] = -((mdpos[2]/to_write.shape[2]* shape[2])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[2]))
+               print(offset)
+               gb_to_write = np.array([offset[0], offset[1], offset[2], offset[0] + shape[0], offset[1] + shape[1], offset[2] + shape[2]])
+               print(gb_to_write)
+               self.adiosfile.write("global_box", gb_to_write, gb_to_write.shape, np.zeros_like(gb_to_write.shape), gb_to_write.shape)
                self.adiosfile.write("velocity", to_write, to_write.shape, np.zeros_like(to_write.shape), to_write.shape)
                self.adiosfile.end_step()
 
