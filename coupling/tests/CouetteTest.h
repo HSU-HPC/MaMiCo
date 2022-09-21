@@ -39,7 +39,6 @@
 
 #if defined(LS1_MARDYN)
 #include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
-#include "coupling/interface/impl/ls1/LS1MamicoCouplingSwitch.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #include "utils/Logger.h"
 using Log::global_log;
@@ -93,7 +92,7 @@ private:
    *  @brief initialises everthing necessary for the test */
   void init() {
 #if defined(LS1_MARDYN)
-    global_log = new Log::Logger(Log::Info);
+    global_log = new Log::Logger(Log::Error);
     global_log->set_mpi_output_root(0);
 #endif
     initMPI();

@@ -21,7 +21,7 @@ namespace coupling
             void operator=(LS1StaticCommData const&) = delete;
             
             //data sets and gets
-            void setConfigFilename(std::string name) {ls1ConfigFilename = name; std::cout << "setConfigFilename" << name << std::endl;}
+            void setConfigFilename(std::string name) {ls1ConfigFilename = name;}
             const std::string getConfigFilename() {return ls1ConfigFilename;}
 
             void setBoxOffsetAtDim(int dim, double offset) {boxoffset[dim] = offset;}
