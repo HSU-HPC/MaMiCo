@@ -93,7 +93,9 @@ private:
   void init() {
 #if defined(LS1_MARDYN)
     global_log = new Log::Logger(Log::Error);
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
+#endif
 #endif
     initMPI();
     parseConfigurations();
