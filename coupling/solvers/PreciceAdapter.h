@@ -21,7 +21,7 @@ using namespace indexing;
 
 template <unsigned int dim> class PreciceAdapter : public coupling::interface::MacroscopicSolverInterface<dim> {
 public:
-  PreciceAdapter(const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize, const unsigned int overlap) : _overlap(overlap), _mdDomainOffset(mdDomainOffset), 
+  PreciceAdapter(const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize, const unsigned int overlap, const int rank) : _rank(rank), _overlap(overlap), _mdDomainOffset(mdDomainOffset), 
   _macroscopicCellSize(macroscopicCellSize) {}
 
   virtual ~PreciceAdapter() {
@@ -36,6 +36,9 @@ public:
     if (_velocityM2mCells != NULL) {
       delete[] _velocityM2mCells;
     }
+    if (_coordsm2MCells != NULL) {
+      delete[] _coordsm2MCells;
+    }
     if (_velocitym2MCells != NULL) {
       delete[] _velocitym2MCells;
     }
@@ -43,16 +46,15 @@ public:
 
   double initialize(const unsigned int* const M2mCellGlobalIndices, size_t numberOfM2mCells,
     const unsigned int* const m2MCellGlobalIndices, size_t numberOfm2MCells) {
-    int rank = 0;
     int size = 1;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
-    _solverInterface = new precice::SolverInterface("mamico", "../precice-config.xml", rank, size);
+    _solverInterface = new precice::SolverInterface("mamico", "../precice-config.xml", _rank, size);
 
     std::vector<double> coordsM2mCells;
-    for (size_t i = 0; i < numberOfM2mCells; i++) {
+    _numberOfM2mCells = numberOfM2mCells;
+    for (size_t i = 0; i < _numberOfM2mCells; i++) {
       const unsigned int M2mCellGlobalIndex = M2mCellGlobalIndices[i];
       tarch::la::Vector<dim, int> M2mCellGlobalVectorIndex = coupling::indexing::convertToVector<dim>({M2mCellGlobalIndex});
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
@@ -60,15 +62,15 @@ public:
         - _macroscopicCellSize[currentDim] + 0.5 * _macroscopicCellSize[currentDim]);
       }
     }
-    _numberOfM2mCells = coordsM2mCells.size()/dim;
-    std::cout << "MaMiCo: mamico-M2m-mesh size=" << _numberOfM2mCells << std::endl;
-    _coordsM2mCells = coordsM2mCells.data();
+    _coordsM2mCells = new double[coordsM2mCells.size()];
+    std::copy(coordsM2mCells.begin(), coordsM2mCells.end(), _coordsM2mCells);
     _vertexM2mCellIDs = new int[_numberOfM2mCells];
     _solverInterface->setMeshVertices(_solverInterface->getMeshID("mamico-M2m-mesh"), _numberOfM2mCells, _coordsM2mCells, _vertexM2mCellIDs);
     _velocityM2mCells = new double[_numberOfM2mCells * dim];
 
     std::vector<double> coordsm2MCells;
-    for (size_t i = 0; i < numberOfm2MCells; i++) {
+    _numberOfm2MCells = numberOfm2MCells;
+    for (size_t i = 0; i < _numberOfm2MCells; i++) {
       const unsigned int m2MCellGlobalIndex = m2MCellGlobalIndices[i];
       tarch::la::Vector<dim, int> m2MCellGlobalVectorIndex = coupling::indexing::convertToVector<dim>({m2MCellGlobalIndex});
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
@@ -76,16 +78,13 @@ public:
         - _macroscopicCellSize[currentDim] + 0.5 * _macroscopicCellSize[currentDim]);
       }
     }
-    _numberOfm2MCells = coordsm2MCells.size()/dim;
-    std::cout << "MaMiCo: mamico-m2M-mesh size=" << _numberOfm2MCells << std::endl;
-    _coordsm2MCells = coordsm2MCells.data();
+    _coordsm2MCells = new double[coordsm2MCells.size()];
+    std::copy(coordsm2MCells.begin(), coordsm2MCells.end(), _coordsm2MCells);
     _vertexm2MCellIDs = new int[_numberOfm2MCells];
     _solverInterface->setMeshVertices(_solverInterface->getMeshID("mamico-m2M-mesh"), _numberOfm2MCells, _coordsm2MCells, _vertexm2MCellIDs);
     _velocitym2MCells = new double[_numberOfm2MCells * dim];
+    for (size_t i = 0; i < _numberOfm2MCells * dim; i++) _velocitym2MCells[i] = 0.0;
     
-    _vertexm2MCellIDs = new int[_numberOfm2MCells];
-    _solverInterface->setMeshVertices(_solverInterface->getMeshID("mamico-m2M-mesh"), _numberOfm2MCells, _coordsm2MCells, _vertexm2MCellIDs);
-    _velocitym2MCells = new double[_numberOfm2MCells * dim];
 
     /* vertexPreciceID = 0;
     for (size_t im2MCellGlobalIndices = 0; im2MCellGlobalIndices < numberOfm2MCells; im2MCellGlobalIndices++) {
@@ -176,17 +175,10 @@ public:
                                     _velocitym2MCells);      
   }
 
-  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const mamicoRecvIndices) {
-    const size_t mamicoRecvIndicesSize = recvBuffer.size();
-    int cellIndex = 0;
-    for (size_t indexRecvIndices = 0; indexRecvIndices < mamicoRecvIndicesSize; indexRecvIndices++) {
-      const unsigned int recvIndex = mamicoRecvIndices[indexRecvIndices];
-      tarch::la::Vector<3, unsigned int> recvVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(coupling::indexing::convertToVector<dim>({recvIndex}));
-      if (receiveMacroscopicQuantityFromMDSolver(recvVectorIndex)) {
-        tarch::la::Vector<3, double> vel((1.0 / recvBuffer[indexRecvIndices]->getMacroscopicMass()) * recvBuffer[indexRecvIndices]->getMacroscopicMomentum());
-        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) _velocitym2MCells[dim * cellIndex + currentDim] = vel[currentDim];
-        cellIndex++;
-      }
+  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& m2MBuffer, const unsigned int* const m2MCellGlobalIndices) {
+    for (size_t i = 0; i < _numberOfm2MCells; i++) {
+      tarch::la::Vector<3, double> vel((1.0 / m2MBuffer[i]->getMacroscopicMass()) * m2MBuffer[i]->getMacroscopicMomentum());
+      for (unsigned int currentDim = 0; currentDim < dim; currentDim++) _velocitym2MCells[dim * i + currentDim] = vel[currentDim];
     }
   }
 
@@ -217,12 +209,13 @@ public:
 
   std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
     std::vector<unsigned int> ranks;
-    ranks.push_back(0);
+    ranks.push_back(_rank);
     return ranks;
   }
 
 
 private:
+  int _rank;
   const unsigned int _overlap;
   const tarch::la::Vector<3, double> _mdDomainOffset;
   const tarch::la::Vector<3, double> _macroscopicCellSize;

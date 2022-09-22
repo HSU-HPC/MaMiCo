@@ -44,20 +44,18 @@ public:
     _instanceHandling->setMDSolverInterface();
 
      _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>(_mdConfig.getDomainConfiguration().getGlobalDomainOffset(), 
-     _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-    if (_preciceAdapter != NULL)
-      std::cout << "MaMiCo: CouetteScenario::run(): Macro solver not NULL on rank " << _rank << std::endl;
+     _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _rank);
     coupling::indexing::IndexingService<dim>::getInstance().init(_mdConfig, _mamicoConfig, _preciceAdapter, _rank);
     _multiMDCellService = new coupling::services::MultiMDCellService<simplemd::LinkedCell, dim>(_instanceHandling->getMDSolverInterface(), _preciceAdapter, _mdConfig, 
 				_mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
     coupling::interface::MamicoInterfaceProvider<simplemd::LinkedCell, dim>::getInstance().setMacroscopicSolverInterface(_preciceAdapter);
     _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
     _multiMDCellService->computeAndStoreTemperature(_scenarioConfig.temp);
-    allocateM2mBuffer();
-    allocatem2MBuffer();
+    allocateMacro2MicroBuffer();
+    allocateMicro2MacroBuffer();
     double precice_dt = _preciceAdapter->initialize(
-        _buf.M2mCellGlobalIndices, _buf.M2mBuffer.size(),
-        _buf.m2MCellGlobalIndices, _buf.m2MBuffer.size());
+        _buf._macro2MicroCellGlobalIndices, _buf._macro2MicroBuffer.size(),
+        _buf._micro2MacroCellGlobalIndices, _buf._micro2MacroBuffer.size());
     std::cout << "MaMiCo: CouetteScenario::run() finish initialization " << std::endl;
     std::cout << "MaMiCo: precice_dt=" << precice_dt << std::endl;
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
@@ -67,21 +65,21 @@ public:
       if (_preciceAdapter->isReadDataAvailable()) {
         _preciceAdapter->readData();
         const coupling::IndexConversion<3>& indexConversion{_multiMDCellService->getIndexConversion()};
-        const unsigned int size = _buf.M2mBuffer.size();
+        const unsigned int size = _buf._macro2MicroBuffer.size();
         const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
         const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
         for (unsigned int i = 0; i < size; i++) {
-          const tarch::la::Vector<3, unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.M2mCellGlobalIndices[i]));
+          const tarch::la::Vector<3, unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf._macro2MicroCellGlobalIndices[i]));
           tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * macroscopicCellSize);
           for (unsigned int d = 0; d < 3; d++) {
             cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * macroscopicCellSize[d];
           }
           double mass = macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
           tarch::la::Vector<3, double> momentum(mass * _preciceAdapter->getVelocity(cellMidPoint));
-          _buf.M2mBuffer[i]->setMicroscopicMass(mass);
-          _buf.M2mBuffer[i]->setMicroscopicMomentum(momentum);
+          _buf._macro2MicroBuffer[i]->setMicroscopicMass(mass);
+          _buf._macro2MicroBuffer[i]->setMicroscopicMomentum(momentum);
         } 
-        _multiMDCellService->sendFromMacro2MD(_buf.M2mBuffer, _buf.M2mCellGlobalIndices);
+        _multiMDCellService->sendFromMacro2MD(_buf._macro2MicroBuffer, _buf._macro2MicroCellGlobalIndices);
       }
       // should be like that
       //double dt = std::min(precice_dt, mamico_dt);
@@ -91,17 +89,18 @@ public:
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
       if (_preciceAdapter->isWriteDataRequired(mamico_dt)) {
-        _preciceAdapter->setMDBoundaryValues(_buf.m2MBuffer, _buf.m2MCellGlobalIndices);
+        _multiMDCellService->sendFromMD2Macro(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
+        _preciceAdapter->setMDBoundaryValues(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
         _preciceAdapter->writeData();
       }
       precice_dt=_preciceAdapter->advance(mamico_dt);
       cycle++;
     }
     
-    deleteBuffer(_buf.M2mBuffer);
-    if (_buf.M2mCellGlobalIndices != NULL) {
-      delete[] _buf.M2mCellGlobalIndices;
-      _buf.M2mCellGlobalIndices = NULL;
+    deleteBuffer(_buf._macro2MicroBuffer);
+    if (_buf._macro2MicroCellGlobalIndices != NULL) {
+      delete[] _buf._macro2MicroCellGlobalIndices;
+      _buf._macro2MicroCellGlobalIndices = NULL;
     }
     if (_instanceHandling != nullptr) {
       delete _instanceHandling;
@@ -129,10 +128,10 @@ public:
   
 
 private:
-  void allocateM2mBuffer() {
+  void allocateMacro2MicroBuffer() {
     using namespace coupling::indexing;
     const unsigned int dim = 3;
-    std::vector<unsigned int> M2mBufferCellGlobalIndices;
+    std::vector<unsigned int> macro2MicroBufferCellGlobalIndices;
     for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
       tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get());
       if (_preciceAdapter->sendMacroscopicQuantityToMDSolver(cellVectorIndex)) {
@@ -142,20 +141,20 @@ private:
           containsThisRank = containsThisRank || (ranks[k] == (unsigned int)_rank);
         }
         if (containsThisRank) {
-          _buf.M2mBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          M2mBufferCellGlobalIndices.push_back(convertToScalar<dim>(cellIndex));
+          _buf._macro2MicroBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+          macro2MicroBufferCellGlobalIndices.push_back(convertToScalar<dim>(cellIndex));
         }
       }
     }
-    _buf.M2mCellGlobalIndices = new unsigned int[_buf.M2mBuffer.size()];
-    std::copy(M2mBufferCellGlobalIndices.begin(), M2mBufferCellGlobalIndices.end(), _buf.M2mCellGlobalIndices);
-    std::cout << "MaMiCo: CouetteScenario::allocateM2mBuffer: numCells=" << _buf.M2mBuffer.size() << std::endl;
+    _buf._macro2MicroCellGlobalIndices = new unsigned int[_buf._macro2MicroBuffer.size()];
+    std::copy(macro2MicroBufferCellGlobalIndices.begin(), macro2MicroBufferCellGlobalIndices.end(), _buf._macro2MicroCellGlobalIndices);
+    std::cout << "MaMiCo: CouetteScenario::allocate_macro2MicroBuffer: numCells=" << _buf._macro2MicroBuffer.size() << std::endl;
   }
 
-  void allocatem2MBuffer() {
+  void allocateMicro2MacroBuffer() {
     using namespace coupling::indexing;
     const unsigned int dim = 3;
-    std::vector<unsigned int> m2MBufferCellGlobalIndices;
+    std::vector<unsigned int> micro2MacroBufferCellGlobalIndices;
     for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
       tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get());
       if (_preciceAdapter->receiveMacroscopicQuantityFromMDSolver(cellVectorIndex)) {
@@ -165,14 +164,14 @@ private:
           containsThisRank = containsThisRank || (ranks[k] == (unsigned int)_rank);
         }
         if (containsThisRank) {
-          _buf.m2MBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          m2MBufferCellGlobalIndices.push_back(convertToScalar<dim>(cellIndex));
+          _buf._micro2MacroBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+          micro2MacroBufferCellGlobalIndices.push_back(convertToScalar<dim>(cellIndex));
         }
       }
     }
-    _buf.m2MCellGlobalIndices = new unsigned int[_buf.m2MBuffer.size()];
-    std::copy(m2MBufferCellGlobalIndices.begin(), m2MBufferCellGlobalIndices.end(), _buf.m2MCellGlobalIndices);
-    std::cout << "MaMiCo: CouetteScenario::allocatem2MBuffer: numCells=" << _buf.m2MBuffer.size() << std::endl;
+    _buf._micro2MacroCellGlobalIndices = new unsigned int[_buf._micro2MacroBuffer.size()];
+    std::copy(micro2MacroBufferCellGlobalIndices.begin(), micro2MacroBufferCellGlobalIndices.end(), _buf._micro2MacroCellGlobalIndices);
+    std::cout << "MaMiCo: CouetteScenario::allocate_micro2MacroBuffer: numCells=" << _buf._micro2MacroBuffer.size() << std::endl;
   }
 
   void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& buffer) const {
@@ -186,10 +185,10 @@ private:
   }
 
   struct CouplingBuffer {
-    std::vector<coupling::datastructures::MacroscopicCell<3>*> M2mBuffer;
-    unsigned int* M2mCellGlobalIndices;
-    std::vector<coupling::datastructures::MacroscopicCell<3>*> m2MBuffer;
-    unsigned int* m2MCellGlobalIndices;
+    std::vector<coupling::datastructures::MacroscopicCell<3>*> _macro2MicroBuffer;
+    unsigned int* _macro2MicroCellGlobalIndices;
+    std::vector<coupling::datastructures::MacroscopicCell<3>*> _micro2MacroBuffer;
+    unsigned int* _micro2MacroCellGlobalIndices;
   };
 
   int _rank{0};
