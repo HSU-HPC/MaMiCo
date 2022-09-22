@@ -80,7 +80,7 @@ public:
           tarch::la::Vector<3, double> momentum(mass * _preciceAdapter->getVelocity(cellMidPoint));
           _buf.M2mBuffer[i]->setMicroscopicMass(mass);
           _buf.M2mBuffer[i]->setMicroscopicMomentum(momentum);
-        }
+        } 
         _multiMDCellService->sendFromMacro2MD(_buf.M2mBuffer, _buf.M2mCellGlobalIndices);
       }
       // should be like that
@@ -147,7 +147,8 @@ private:
         }
       }
     }
-    _buf.M2mCellGlobalIndices = M2mBufferCellGlobalIndices.data();
+    _buf.M2mCellGlobalIndices = new unsigned int[_buf.M2mBuffer.size()];
+    std::copy(M2mBufferCellGlobalIndices.begin(), M2mBufferCellGlobalIndices.end(), _buf.M2mCellGlobalIndices);
     std::cout << "MaMiCo: CouetteScenario::allocateM2mBuffer: numCells=" << _buf.M2mBuffer.size() << std::endl;
   }
 
@@ -169,7 +170,8 @@ private:
         }
       }
     }
-    _buf.m2MCellGlobalIndices = m2MBufferCellGlobalIndices.data();
+    _buf.m2MCellGlobalIndices = new unsigned int[_buf.m2MBuffer.size()];
+    std::copy(m2MBufferCellGlobalIndices.begin(), m2MBufferCellGlobalIndices.end(), _buf.m2MCellGlobalIndices);
     std::cout << "MaMiCo: CouetteScenario::allocatem2MBuffer: numCells=" << _buf.m2MBuffer.size() << std::endl;
   }
 
