@@ -61,8 +61,6 @@ public:
     _logger.info("rank {} precice_dt={}", _rank, precice_dt);
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
     _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
-    _logger.error("rank {} crashed.", _rank);
-    exit(EXIT_FAILURE);
     int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
@@ -95,6 +93,7 @@ public:
       _preciceAdapter->writeData();
       precice_dt=_preciceAdapter->advance(mamico_dt);
       cycle++;
+      write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle - 1);
     }
     
     deleteBuffer(_buf._macro2MicroBuffer);
@@ -171,7 +170,33 @@ private:
     }
     _buf._micro2MacroCellGlobalIndices = new unsigned int[_buf._micro2MacroBuffer.size()];
     std::copy(micro2MacroBufferCellGlobalIndices.begin(), micro2MacroBufferCellGlobalIndices.end(), _buf._micro2MacroCellGlobalIndices);
-    _logger.debug("rank {} numCells {}", _rank, _buf._macro2MicroBuffer.size());
+    _logger.debug("rank {} numCells {}", _rank, _buf._micro2MacroBuffer.size());
+  }
+
+  void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& micro2MacroBuffer, const unsigned int* const micro2MacroCellGlobalIndices,
+                 int couplingCycle) const {
+    if (micro2MacroBuffer.size() == 0)
+      return;
+    if (_scenarioConfig.csvEveryTimestep < 1 || couplingCycle % _scenarioConfig.csvEveryTimestep > 0)
+      return;
+    std::stringstream ss;
+    ss << "results_" << _rank << "_" << couplingCycle << ".csv";
+    std::ofstream file(ss.str().c_str());
+    if (!file.is_open()) {
+      exit(EXIT_FAILURE);
+    }
+    const unsigned int numCells = micro2MacroBuffer.size();
+    for (unsigned int i = 0; i < numCells; i++) {
+      tarch::la::Vector<3, double> vel(micro2MacroBuffer[i]->getMacroscopicMomentum());
+      if (micro2MacroBuffer[i]->getMacroscopicMass() != 0.0) {
+        vel = (1.0 / micro2MacroBuffer[i]->getMacroscopicMass()) * vel;
+      }
+      const tarch::la::Vector<3, unsigned int> counter(coupling::indexing::convertToVector<3>({micro2MacroCellGlobalIndices[i]}));
+      file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; "
+           << micro2MacroBuffer[i]->getMacroscopicMass() << ";";
+      file << std::endl;
+    }
+    file.close();
   }
 
   void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& buffer) const {
@@ -225,7 +250,7 @@ private:
     }
 
     std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-      return {(unsigned int) _rank};
+      return {0};
     }
 
     std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
