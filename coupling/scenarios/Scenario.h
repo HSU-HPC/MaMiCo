@@ -7,16 +7,23 @@
 
 #include <iostream>
 #include <string>
+#include "tarch/logging/Logger.h"
 
 class Scenario {
 public:
-  Scenario(std::string scenarioname) : _scenarioname(scenarioname) { std::cout << "MaMiCo: Run " << scenarioname << "..." << std::endl; }
-  virtual ~Scenario() { std::cout << "MaMiCo: Shut down " << _scenarioname << std::endl; }
+  Scenario(std::string scenarioname) : _scenarioname(scenarioname), _logger(tarch::logging::Logger(scenarioname)) {
+    _logger.info("Running {}", _scenarioname);
+  }
+  
+  virtual ~Scenario() {
+    _logger.info("Shutting down {}", _scenarioname);
+  }
 
   virtual void run() = 0;
 
 private:
   const std::string _scenarioname;
+  tarch::logging::Logger _logger;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_SCENARIOS_SCENARIO_H_

@@ -192,6 +192,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Fu
 endif()
 # we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
 target_link_libraries(mamico INTERFACE libsimplemd)
+target_include_directories(mamico INTERFACE "tarch/logging/")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
