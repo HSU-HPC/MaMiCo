@@ -25,7 +25,6 @@ public:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
       MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
-    if (skipRank()) return; 
     int size = 1;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -56,7 +55,6 @@ public:
 
   double initialize(const unsigned int* const M2mCellGlobalIndices, size_t numberOfM2mCells,
     const unsigned int* const m2MCellGlobalIndices, size_t numberOfm2MCells) {
-    if (skipRank()) return std::numeric_limits<double>::max();  
 
     std::vector<double> coordsM2mCells;
     _numberOfM2mCells = numberOfM2mCells;
@@ -142,34 +140,20 @@ public:
   } */
 
   bool isCouplingOngoing() {
-    if (skipRank()) return true;
     return _solverInterface->isCouplingOngoing();
   }
 
   double advance(const double dt) {
-    if (skipRank()) return std::numeric_limits<double>::max();
     return _solverInterface->advance(dt);
   }
 
-  bool isReadDataAvailable() {
-    if (skipRank()) return false;
-    return (_solverInterface->isCouplingOngoing() && _solverInterface->isReadDataAvailable());
-  }
-
   void readData() {
-      if (skipRank()) return;
       _logger.info("rank {} reading data from precice", _rank);
       _solverInterface->readBlockVectorData(_solverInterface->getDataID("VelocityMacro", _solverInterface->getMeshID("mamico-M2m-mesh")), _numberOfM2mCells, _vertexM2mCellIDs,
                                       _velocityM2mCells);
   }
 
-  bool isWriteDataRequired(const double dt) {
-    if (skipRank()) return false;
-    return (_solverInterface->isCouplingOngoing() && _solverInterface->isWriteDataRequired(dt));
-  }
-
   void writeData() {
-    if (skipRank()) return;
     _logger.info("rank {} writing data to precice", _rank);
     _solverInterface->writeBlockVectorData(_solverInterface->getDataID("VelocityMicro", _solverInterface->getMeshID("mamico-m2M-mesh")), _numberOfm2MCells, _vertexm2MCellIDs, 
                                     _velocitym2MCells);      
@@ -177,11 +161,6 @@ public:
 
   tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const {
     tarch::la::Vector<3, double> vel(0.0);
-    if (skipRank())
-    {
-      std::cout << "PreciceAdapter::getVelocity : skipRank() but still called, something is wrong." << std::endl;
-      return vel;
-    }
     unsigned int cellIndex = 0;
     while (cellIndex < _numberOfM2mCells &&
            !(_coordsM2mCells[dim * cellIndex] == pos[0] && _coordsM2mCells[dim * cellIndex + 1] == pos[1] && _coordsM2mCells[dim * cellIndex + 2] == pos[2]))
@@ -195,11 +174,6 @@ public:
   }
 
   void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& m2MBuffer, const unsigned int* const m2MCellGlobalIndices) {
-    if (skipRank())
-    {
-      std::cout << "PreciceAdapter::setMDBoundaryValues : skipRank() but still called, something is wrong." << std::endl;
-      return;
-    }
     for (size_t i = 0; i < _numberOfm2MCells; i++) {
       tarch::la::Vector<3, double> vel((1.0 / m2MBuffer[i]->getMacroscopicMass()) * m2MBuffer[i]->getMacroscopicMomentum());
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) _velocitym2MCells[dim * i + currentDim] = vel[currentDim];
@@ -208,11 +182,6 @@ public:
 
 
 private:
-  bool skipRank() const {
-    // return (_rank!=0);
-    return false;
-  }
-
   tarch::logging::Logger _logger;
   int _rank;
   const tarch::la::Vector<3, double> _mdDomainOffset;

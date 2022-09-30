@@ -65,26 +65,24 @@ public:
     exit(EXIT_FAILURE);
     int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
-      if (_preciceAdapter->isReadDataAvailable()) {
-        _preciceAdapter->readData();
-        _logger.info("rank {} data read from precice", _rank);
-        const coupling::IndexConversion<3>& indexConversion{_multiMDCellService->getIndexConversion()};
-        const unsigned int size = _buf._macro2MicroBuffer.size();
-        const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
-        const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
-        for (unsigned int i = 0; i < size; i++) {
-          const tarch::la::Vector<3, unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf._macro2MicroCellGlobalIndices[i]));
-          tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * macroscopicCellSize);
-          for (unsigned int d = 0; d < 3; d++) {
-            cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * macroscopicCellSize[d];
-          }
-          double mass = macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
-          tarch::la::Vector<3, double> momentum(mass * _preciceAdapter->getVelocity(cellMidPoint));
-          _buf._macro2MicroBuffer[i]->setMicroscopicMass(mass);
-          _buf._macro2MicroBuffer[i]->setMicroscopicMomentum(momentum);
-        } 
-        _multiMDCellService->sendFromMacro2MD(_buf._macro2MicroBuffer, _buf._macro2MicroCellGlobalIndices);
-      }
+      _preciceAdapter->readData();
+      _logger.info("rank {} data read from precice", _rank);
+      const coupling::IndexConversion<3>& indexConversion{_multiMDCellService->getIndexConversion()};
+      const unsigned int size = _buf._macro2MicroBuffer.size();
+      const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
+      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+      for (unsigned int i = 0; i < size; i++) {
+        const tarch::la::Vector<3, unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf._macro2MicroCellGlobalIndices[i]));
+        tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * macroscopicCellSize);
+        for (unsigned int d = 0; d < 3; d++) {
+          cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * macroscopicCellSize[d];
+        }
+        double mass = macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
+        tarch::la::Vector<3, double> momentum(mass * _preciceAdapter->getVelocity(cellMidPoint));
+        _buf._macro2MicroBuffer[i]->setMicroscopicMass(mass);
+        _buf._macro2MicroBuffer[i]->setMicroscopicMomentum(momentum);
+      } 
+      _multiMDCellService->sendFromMacro2MD(_buf._macro2MicroBuffer, _buf._macro2MicroCellGlobalIndices);
       // should be like that
       //double dt = std::min(precice_dt, mamico_dt);
       _logger.info("rank {} precice_dt={}", _rank, precice_dt);
@@ -92,11 +90,9 @@ public:
       _instanceHandling->simulateTimesteps(_mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
-      if (_preciceAdapter->isWriteDataRequired(mamico_dt)) {
-        _multiMDCellService->sendFromMD2Macro(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
-        _preciceAdapter->setMDBoundaryValues(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
-        _preciceAdapter->writeData();
-      }
+      _multiMDCellService->sendFromMD2Macro(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
+      _preciceAdapter->setMDBoundaryValues(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
+      _preciceAdapter->writeData();
       precice_dt=_preciceAdapter->advance(mamico_dt);
       cycle++;
     }
