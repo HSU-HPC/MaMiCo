@@ -58,9 +58,9 @@ public:
         _buf._macro2MicroCellGlobalIndices, _buf._macro2MicroBuffer.size(),
         _buf._micro2MacroCellGlobalIndices, _buf._micro2MacroBuffer.size());
     _logger.info("rank {} finished initialization", _rank);
-    // _logger.info("rank {} precice_dt={}", _rank, precice_dt);
+    _logger.info("rank {} precice_dt={}", _rank, precice_dt);
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
-    // _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
+    _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
     int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
