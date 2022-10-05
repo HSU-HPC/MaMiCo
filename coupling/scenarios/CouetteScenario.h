@@ -221,8 +221,8 @@ private:
     MyMacroscopicSolverInterface(const unsigned int overlap, const int rank) : _overlap(overlap), _rank(rank) {}
 
     bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-      tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
-      tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
+      tarch::la::Vector<3, int> lowerBoundary = CellIndex<3, IndexTrait::noGhost>::lowerBoundary.get();
+      tarch::la::Vector<3, int> upperBoundary = CellIndex<3, IndexTrait::noGhost>::upperBoundary.get();
       bool rcv = true;
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
         rcv &= (int)globalCellIndex[currentDim] >= lowerBoundary[currentDim] + (int)_overlap;
@@ -234,15 +234,12 @@ private:
     bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
       tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
       tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
-      bool isInnerCell = true;
       bool isGhostCell = false;
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-        isInnerCell &= (int)globalCellIndex[currentDim] > lowerBoundary[currentDim] + (int)_overlap;
-        isInnerCell &= (int)globalCellIndex[currentDim] < upperBoundary[currentDim] - (int)_overlap;
-        isGhostCell |= globalCellIndex[currentDim] == 0;
+        isGhostCell |= (int)globalCellIndex[currentDim] == lowerBoundary[currentDim];
         isGhostCell |= (int)globalCellIndex[currentDim] == upperBoundary[currentDim];
       }
-      return (!isGhostCell) && (!isInnerCell);
+      return (!isGhostCell) && (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
     }
 
     std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
