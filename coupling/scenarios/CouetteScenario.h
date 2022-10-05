@@ -58,13 +58,13 @@ public:
         _buf._macro2MicroCellGlobalIndices, _buf._macro2MicroBuffer.size(),
         _buf._micro2MacroCellGlobalIndices, _buf._micro2MacroBuffer.size());
     _logger.info("rank {} finished initialization", _rank);
-    _logger.info("rank {} precice_dt={}", _rank, precice_dt);
+    // _logger.info("rank {} precice_dt={}", _rank, precice_dt);
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
-    _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
+    // _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
     int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
-      _logger.info("rank {} data read from precice", _rank);
+      // _logger.info("rank {} data read from precice", _rank);
       const coupling::IndexConversion<3>& indexConversion{_multiMDCellService->getIndexConversion()};
       const unsigned int size = _buf._macro2MicroBuffer.size();
       const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
@@ -83,8 +83,8 @@ public:
       _multiMDCellService->sendFromMacro2MD(_buf._macro2MicroBuffer, _buf._macro2MicroCellGlobalIndices);
       // should be like that
       //double dt = std::min(precice_dt, mamico_dt);
-      _logger.info("rank {} precice_dt={}", _rank, precice_dt);
-      _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
+      // _logger.info("rank {} precice_dt={}", _rank, precice_dt);
+      // _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
       _instanceHandling->simulateTimesteps(_mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
