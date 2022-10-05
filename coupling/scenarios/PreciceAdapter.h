@@ -148,13 +148,13 @@ public:
   }
 
   void readData() {
-      _logger.info("rank {} reading data from precice", _rank);
+      // _logger.info("rank {} reading data from precice", _rank);
       _solverInterface->readBlockVectorData(_solverInterface->getDataID("VelocityMacro", _solverInterface->getMeshID("mamico-M2m-mesh")), _numberOfM2mCells, _vertexM2mCellIDs,
                                       _velocityM2mCells);
   }
 
   void writeData() {
-    _logger.info("rank {} writing data to precice", _rank);
+    // _logger.info("rank {} writing data to precice", _rank);
     _solverInterface->writeBlockVectorData(_solverInterface->getDataID("VelocityMicro", _solverInterface->getMeshID("mamico-m2M-mesh")), _numberOfm2MCells, _vertexm2MCellIDs, 
                                     _velocitym2MCells);      
   }
