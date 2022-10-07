@@ -55,8 +55,12 @@ public:
     allocateMacro2MicroBuffer();
     allocateMicro2MacroBuffer();
     double precice_dt = _preciceAdapter->initialize(
-        _buf._macro2MicroCellGlobalIndices, _buf._macro2MicroBuffer.size(),
-        _buf._micro2MacroCellGlobalIndices, _buf._micro2MacroBuffer.size());
+        _buf._macro2MicroCellGlobalIndices, _buf._macro2MicroBuffer.size()
+#ifdef TWO_WAY 
+        , _buf._micro2MacroCellGlobalIndices, _buf._micro2MacroBuffer.size());
+#else
+        );
+#endif
     _logger.info("rank {} finished initialization", _rank);
     _logger.info("rank {} precice_dt={}", _rank, precice_dt);
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
@@ -89,8 +93,10 @@ public:
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
       _multiMDCellService->sendFromMD2Macro(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
+#ifdef TWO_WAY 
       _preciceAdapter->setMDBoundaryValues(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
       _preciceAdapter->writeData();
+#endif
       precice_dt=_preciceAdapter->advance(mamico_dt);
       cycle++;
       write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle - 1);
