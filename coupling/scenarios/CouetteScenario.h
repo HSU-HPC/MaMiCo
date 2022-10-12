@@ -45,7 +45,7 @@ public:
 
     _preciceAdapter = new PreciceAdapter<dim>(_mdConfig.getDomainConfiguration().getGlobalDomainOffset(), 
     _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
-    _macroscopicSolverInterface = new MyMacroscopicSolverInterface<dim>(_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),  _rank);
+    _macroscopicSolverInterface = new MyMacroscopicSolverInterface<dim>((int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),  _rank);
     coupling::indexing::IndexingService<dim>::getInstance().init(_mdConfig, _mamicoConfig, _macroscopicSolverInterface, _rank);
     _multiMDCellService = new coupling::services::MultiMDCellService<simplemd::LinkedCell, dim>(_instanceHandling->getMDSolverInterface(), _macroscopicSolverInterface, _mdConfig, 
 				_mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
@@ -153,7 +153,7 @@ private:
     }
     _buf._macro2MicroCellGlobalIndices = new unsigned int[_buf._macro2MicroBuffer.size()];
     std::copy(macro2MicroBufferCellGlobalIndices.begin(), macro2MicroBufferCellGlobalIndices.end(), _buf._macro2MicroCellGlobalIndices);
-    _logger.debug("rank {} numCells {}", _rank, _buf._macro2MicroBuffer.size());
+    _logger.debug("rank {} macro2Micro buffer numCells {}", _rank, _buf._macro2MicroBuffer.size());
   }
 
   void allocateMicro2MacroBuffer() {
@@ -176,7 +176,7 @@ private:
     }
     _buf._micro2MacroCellGlobalIndices = new unsigned int[_buf._micro2MacroBuffer.size()];
     std::copy(micro2MacroBufferCellGlobalIndices.begin(), micro2MacroBufferCellGlobalIndices.end(), _buf._micro2MacroCellGlobalIndices);
-    _logger.debug("rank {} numCells {}", _rank, _buf._micro2MacroBuffer.size());
+    _logger.debug("rank {} micro2Macro buffer numCells {}", _rank, _buf._micro2MacroBuffer.size());
   }
 
   void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& micro2MacroBuffer, const unsigned int* const micro2MacroCellGlobalIndices,
@@ -191,18 +191,23 @@ private:
     if (!file.is_open()) {
       exit(EXIT_FAILURE);
     }
-    const unsigned int numCells = micro2MacroBuffer.size();
-    for (unsigned int i = 0; i < numCells; i++) {
-      tarch::la::Vector<3, double> vel(micro2MacroBuffer[i]->getMacroscopicMomentum());
-      if (micro2MacroBuffer[i]->getMacroscopicMass() != 0.0) {
-        vel = (1.0 / micro2MacroBuffer[i]->getMacroscopicMass()) * vel;
+    tarch::la::Vector<3, int> cellIndex;
+    unsigned int count = 0;
+    for (unsigned int i = 0; i < micro2MacroBuffer.size(); i++) {
+      cellIndex = coupling::indexing::convertToVector<3>({micro2MacroCellGlobalIndices[i]});
+      if (CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::contains(BaseIndex<3>{cellIndex})) {
+        tarch::la::Vector<3, double> vel(micro2MacroBuffer[i]->getMacroscopicMomentum());
+        if (micro2MacroBuffer[i]->getMacroscopicMass() != 0.0) {
+          vel = (1.0 / micro2MacroBuffer[i]->getMacroscopicMass()) * vel;
+        }
+        file << cellIndex[0] << " ; " << cellIndex[1] << " ; " << cellIndex[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; "
+            << micro2MacroBuffer[i]->getMacroscopicMass() << ";";
+        file << std::endl;
+        count++;
       }
-      const tarch::la::Vector<3, unsigned int> counter(coupling::indexing::convertToVector<3>({micro2MacroCellGlobalIndices[i]}));
-      file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; "
-           << micro2MacroBuffer[i]->getMacroscopicMass() << ";";
-      file << std::endl;
     }
     file.close();
+    _logger.debug("Number of cells written = {}", count);
   }
 
   void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& buffer) const {
@@ -224,28 +229,27 @@ private:
 
   template <unsigned int dim> class MyMacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
   public:
-    MyMacroscopicSolverInterface(const unsigned int overlap, const int rank) : _overlap(overlap), _rank(rank) {}
+    MyMacroscopicSolverInterface(const int overlap, const int rank) : _overlap(overlap), _rank(rank) {}
 
     bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-      tarch::la::Vector<3, int> lowerBoundary = CellIndex<3, IndexTrait::noGhost>::lowerBoundary.get();
-      tarch::la::Vector<3, int> upperBoundary = CellIndex<3, IndexTrait::noGhost>::upperBoundary.get();
       bool rcv = true;
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-        rcv &= (int)globalCellIndex[currentDim] >= lowerBoundary[currentDim] + (int)_overlap;
-        rcv &= (int)globalCellIndex[currentDim] <= upperBoundary[currentDim] - (int)_overlap;
+        rcv &= (int)globalCellIndex[currentDim] >= CellIndex<3, IndexTrait::noGhost>::lowerBoundary.get()[currentDim] +  (_overlap - 1);
+        rcv &= (int)globalCellIndex[currentDim] <= CellIndex<3, IndexTrait::noGhost>::upperBoundary.get()[currentDim] - (_overlap - 1);
       }
       return rcv;
     }
 
     bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-      tarch::la::Vector<3, int> lowerBoundary = CellIndex<3>::lowerBoundary.get();
-      tarch::la::Vector<3, int> upperBoundary = CellIndex<3>::upperBoundary.get();
       bool isGhostCell = false;
+      bool isInner = true;
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-        isGhostCell |= (int)globalCellIndex[currentDim] == lowerBoundary[currentDim];
-        isGhostCell |= (int)globalCellIndex[currentDim] == upperBoundary[currentDim];
+        isGhostCell |= (int)globalCellIndex[currentDim] == CellIndex<3>::lowerBoundary.get()[currentDim];
+        isGhostCell |= (int)globalCellIndex[currentDim] == CellIndex<3>::upperBoundary.get()[currentDim];
+        isInner &= (int)globalCellIndex[currentDim] >= CellIndex<3, IndexTrait::noGhost>::lowerBoundary.get()[currentDim] + _overlap;
+        isInner &= (int)globalCellIndex[currentDim] <= CellIndex<3, IndexTrait::noGhost>::upperBoundary.get()[currentDim] - _overlap;
       }
-      return (!isGhostCell) && (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
+      return (!isGhostCell) && (!isInner);
     }
 
     std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
@@ -261,7 +265,7 @@ private:
     }
 
   private:
-    const unsigned int _overlap;
+    const int _overlap;
     const int _rank;
   };
 

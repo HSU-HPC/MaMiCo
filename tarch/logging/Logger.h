@@ -21,17 +21,17 @@ public:
   }
 
   template <typename... Args> 
-  void info(spdlog::format_string_t<Args...> fmt, Args &&... args) {
+  void info(spdlog::format_string_t<Args...> fmt, Args &&... args) const {
      _spdlogger->info(fmt, std::forward<Args>(args)...);
   }
 
   template <typename... Args> 
-  void debug(spdlog::format_string_t<Args...> fmt, Args &&... args) {
+  void debug(spdlog::format_string_t<Args...> fmt, Args &&... args) const {
     _spdlogger->debug(fmt, std::forward<Args>(args)...);
   }
 
   template <typename... Args> 
-  void error(spdlog::format_string_t<Args...> fmt, Args &&... args) {
+  void error(spdlog::format_string_t<Args...> fmt, Args &&... args) const {
     _spdlogger->error(fmt, std::forward<Args>(args)...);
   }
 

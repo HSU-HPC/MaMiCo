@@ -36,6 +36,9 @@ message(STATUS ">> Build with Eigen : " ${BUILD_WITH_EIGEN})
 #Enable Adios2 output for megamol
 option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
+#Enable Adios2 output for megamol
+option(TWO_WAY "Two way coupling." OFF)
+message(STATUS ">> Build with two way coupling: " ${TWO_WAY})
 
 #
 # Find dependencies
@@ -206,6 +209,10 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   target_compile_options(mamico INTERFACE -Ofast)
 else()
   message(FATAL_ERROR "Unsupported build type")
+endif()
+
+if(TWO_WAY)
+  target_compile_definitions(mamico INTERFACE TWO_WAY)
 endif()
 
 #
