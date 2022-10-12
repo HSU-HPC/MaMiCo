@@ -93,10 +93,52 @@ public:
     _solverInterface->setMeshVertices(_solverInterface->getMeshID("mamico-m2M-mesh"), _numberOfm2MCells, _coordsm2MCells, _vertexm2MCellIDs);
     _velocitym2MCells = new double[_numberOfm2MCells * dim];
     for (size_t i = 0; i < _numberOfm2MCells * dim; i++) _velocitym2MCells[i] = 0.0;
+
+    for (size_t i = 0; i < _numberOfm2MCells; i++) {
+      const unsigned int m2MCellGlobalIndex = m2MCellGlobalIndices[i];
+      tarch::la::Vector<dim, int> m2MCellGlobalVectorIndex = coupling::indexing::convertToVector<dim>({m2MCellGlobalIndex});
+      std::vector<int> tetrahedronsNodeIDs = getTetrahedronsNodeIDs(i, m2MCellGlobalVectorIndex, m2MCellGlobalIndices, numberOfm2MCells);
+      for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsNodeIDs.size()/4; tetrahedronIndex++) {
+        _solverInterface->setMeshTetrahedron(_solverInterface->getMeshID("mamico-m2M-mesh"),
+        tetrahedronsNodeIDs[tetrahedronIndex*4], tetrahedronsNodeIDs[tetrahedronIndex*4+1], tetrahedronsNodeIDs[tetrahedronIndex*4+2], tetrahedronsNodeIDs[tetrahedronIndex*4+3]);
+      }
+    }
 #endif
     _logger.info("rank {} initializing precice", _rank);
     return _solverInterface->initialize();
   }
+
+  std::vector<int> getTetrahedronsNodeIDs(const int nodePreciceID, const tarch::la::Vector<3, int> nodeMamicoVIndex, const unsigned int* const m2MCellGlobalIndices, size_t numberOfm2MCells) {
+    std::vector<int> tetrahedronsNodeIDs;
+    const int numberOfNeighbors = 6;
+    tarch::la::Vector<3, int> directionNeighbors[numberOfNeighbors] = {{0,0,-1}, {0,0,1}, {1,0,0}, {0,1,0}, {-1,0,0}, {0,-1,0}};
+    int neighborVertexIDSs[numberOfNeighbors];
+    for (size_t iDirectionNeighbors= 0; iDirectionNeighbors < numberOfNeighbors; iDirectionNeighbors++) {
+      tarch::la::Vector<3, int> neighborMamicoVIndex = nodeMamicoVIndex + directionNeighbors[iDirectionNeighbors];
+      using coupling::indexing::IndexTrait;
+      using coupling::indexing::BaseIndex;
+      using coupling::indexing::convertToScalar;
+      int neighborMamicoIndex = convertToScalar<dim>(BaseIndex<dim>(neighborMamicoVIndex));
+      int neighborPreciceID = 0;
+      while (neighborPreciceID < (int)numberOfm2MCells && (int)m2MCellGlobalIndices[neighborPreciceID] != neighborMamicoIndex) neighborPreciceID++;
+      if (neighborPreciceID < (int)numberOfm2MCells) {
+        neighborVertexIDSs[iDirectionNeighbors]=neighborPreciceID;
+      } else {
+        neighborVertexIDSs[iDirectionNeighbors]=-1;
+      }      
+    }
+    for (size_t zNeighborIndex = 0; zNeighborIndex < 2; zNeighborIndex++) {
+      if (neighborVertexIDSs[zNeighborIndex] > 0) {
+        for (size_t xyNeighborIndex = 0; xyNeighborIndex < 4; xyNeighborIndex++) {
+          if (neighborVertexIDSs[xyNeighborIndex+2] > 0 && neighborVertexIDSs[(xyNeighborIndex+1)%4 + 2] > 0) {
+            tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {nodePreciceID, neighborVertexIDSs[zNeighborIndex],
+                        neighborVertexIDSs[xyNeighborIndex+2], neighborVertexIDSs[(xyNeighborIndex+1)%4 + 2]});
+          }
+        }
+      }
+    }
+    return tetrahedronsNodeIDs;
+  } 
 
   bool isCouplingOngoing() {
     return _solverInterface->isCouplingOngoing();
