@@ -101,7 +101,7 @@ public:
       for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsNodeIDs.size()/4; tetrahedronIndex++) {
         _solverInterface->setMeshTetrahedron(_solverInterface->getMeshID("mamico-m2M-mesh"),
         tetrahedronsNodeIDs[tetrahedronIndex*4], tetrahedronsNodeIDs[tetrahedronIndex*4+1], tetrahedronsNodeIDs[tetrahedronIndex*4+2], tetrahedronsNodeIDs[tetrahedronIndex*4+3]);
-      }
+     }
     }
 #endif
     _logger.info("rank {} initializing precice", _rank);
@@ -110,8 +110,8 @@ public:
 
   std::vector<int> getTetrahedronsNodeIDs(const int nodePreciceID, const tarch::la::Vector<3, int> nodeMamicoVIndex, const unsigned int* const m2MCellGlobalIndices, size_t numberOfm2MCells) {
     std::vector<int> tetrahedronsNodeIDs;
-    const int numberOfNeighbors = 6;
-    tarch::la::Vector<3, int> directionNeighbors[numberOfNeighbors] = {{0,0,-1}, {0,0,1}, {1,0,0}, {0,1,0}, {-1,0,0}, {0,-1,0}};
+    const int numberOfNeighbors = 7;
+    tarch::la::Vector<3, int> directionNeighbors[numberOfNeighbors] = {{1,0,0}, {1,1,0}, {0,1,0}, {1,0,1}, {1,1,1}, {0,1,1}, {0,0,1}};
     int neighborVertexIDSs[numberOfNeighbors];
     for (size_t iDirectionNeighbors= 0; iDirectionNeighbors < numberOfNeighbors; iDirectionNeighbors++) {
       tarch::la::Vector<3, int> neighborMamicoVIndex = nodeMamicoVIndex + directionNeighbors[iDirectionNeighbors];
@@ -127,16 +127,18 @@ public:
         neighborVertexIDSs[iDirectionNeighbors]=-1;
       }      
     }
-    for (size_t zNeighborIndex = 0; zNeighborIndex < 2; zNeighborIndex++) {
-      if (neighborVertexIDSs[zNeighborIndex] > 0) {
-        for (size_t xyNeighborIndex = 0; xyNeighborIndex < 4; xyNeighborIndex++) {
-          if (neighborVertexIDSs[xyNeighborIndex+2] > 0 && neighborVertexIDSs[(xyNeighborIndex+1)%4 + 2] > 0) {
-            tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {nodePreciceID, neighborVertexIDSs[zNeighborIndex],
-                        neighborVertexIDSs[xyNeighborIndex+2], neighborVertexIDSs[(xyNeighborIndex+1)%4 + 2]});
-          }
-        }
-      }
-    }
+    if (neighborVertexIDSs[0] > -1 && neighborVertexIDSs[5]>-1 && neighborVertexIDSs[6] > -1)
+      tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {nodePreciceID, neighborVertexIDSs[0], neighborVertexIDSs[5], neighborVertexIDSs[6]});
+    if (neighborVertexIDSs[0] > -1 && neighborVertexIDSs[2]>-1 && neighborVertexIDSs[5] > -1)
+      tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {nodePreciceID, neighborVertexIDSs[0], neighborVertexIDSs[2], neighborVertexIDSs[5]});
+    if (neighborVertexIDSs[0] > -1 && neighborVertexIDSs[5]>-1 && neighborVertexIDSs[6] > -1 && neighborVertexIDSs[3] > -1)
+      tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {neighborVertexIDSs[0], neighborVertexIDSs[5], neighborVertexIDSs[6], neighborVertexIDSs[3]});
+    if (neighborVertexIDSs[0] > -1 && neighborVertexIDSs[1]>-1 && neighborVertexIDSs[2] > -1 && neighborVertexIDSs[5] > -1)
+      tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {neighborVertexIDSs[0], neighborVertexIDSs[1], neighborVertexIDSs[2], neighborVertexIDSs[5]});
+    if (neighborVertexIDSs[0] > -1 && neighborVertexIDSs[1]>-1 && neighborVertexIDSs[4] > -1 && neighborVertexIDSs[5] > -1)
+      tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {neighborVertexIDSs[0], neighborVertexIDSs[1], neighborVertexIDSs[4], neighborVertexIDSs[5]});
+    if (neighborVertexIDSs[0] > -1 && neighborVertexIDSs[3]>-1 && neighborVertexIDSs[4] > -1 && neighborVertexIDSs[5] > -1)
+      tetrahedronsNodeIDs.insert(tetrahedronsNodeIDs.end(), {neighborVertexIDSs[0], neighborVertexIDSs[3], neighborVertexIDSs[4], neighborVertexIDSs[5]});
     return tetrahedronsNodeIDs;
   } 
 
