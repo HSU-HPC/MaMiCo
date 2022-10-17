@@ -13,7 +13,7 @@ Optional dependencies are:
 * [MPI](https://www.open-mpi.org/), highly recommended for parallel runs, e.g. on clusters.
 * [Eigen 3](http://eigen.tuxfamily.org/), a linear algebra library used for the POD noise filter.
 * [pybind11](https://pybind11.readthedocs.io/en/stable/), for the MaMiCo Python bindings.
-* [OpenFOAM](https://openfoam.org/), for coupling to CFD simulations with OpenFOAM.
+* [OpenFOAM](https://develop.openfoam.com/Development/openfoam/blob/develop/doc/Build.md), for coupling to CFD simulations with OpenFOAM.
 * [preCICE](https://precice.org/), for coupling with other solvers using the preCICE coupling library.
 
 ## Build instructions
