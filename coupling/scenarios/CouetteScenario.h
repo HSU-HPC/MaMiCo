@@ -43,9 +43,12 @@ public:
     _mdStepCounter += _scenarioConfig.equSteps;
     _instanceHandling->setMDSolverInterface();
 
-    _preciceAdapter = new PreciceAdapter<dim>(_mdConfig.getDomainConfiguration().getGlobalDomainOffset(), 
-    _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
-    _macroscopicSolverInterface = new MyMacroscopicSolverInterface<dim>((int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),  _rank);
+    _preciceAdapter = new PreciceAdapter<dim>(_mdConfig.getDomainConfiguration().getGlobalDomainOffset(), _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
+    tarch::la::Vector<3, int> globalNumberMacroscopicCells;
+    for (unsigned int d = 0; d < 3; d++) {
+      globalNumberMacroscopicCells[d] = floor(_mdConfig.getDomainConfiguration().getGlobalDomainSize()[d] / _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[d] + 0.5);
+    }
+    _macroscopicSolverInterface = new MyMacroscopicSolverInterface<dim>(globalNumberMacroscopicCells, (int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),  _rank);
     coupling::indexing::IndexingService<dim>::getInstance().init(_mdConfig, _mamicoConfig, _macroscopicSolverInterface, _rank);
     _multiMDCellService = new coupling::services::MultiMDCellService<simplemd::LinkedCell, dim>(_instanceHandling->getMDSolverInterface(), _macroscopicSolverInterface, _mdConfig, 
 				_mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
@@ -99,7 +102,7 @@ public:
 #endif
       precice_dt=_preciceAdapter->advance(mamico_dt);
       cycle++;
-      write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle);
+      write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle, globalNumberMacroscopicCells, (int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
     }
     
     deleteBuffer(_buf._macro2MicroBuffer);
@@ -110,15 +113,13 @@ public:
     if (_instanceHandling != nullptr) {
       delete _instanceHandling;
     }
-    coupling::interface::MacroscopicSolverInterface<3>* macroSolverInterface =
-        coupling::interface::MamicoInterfaceProvider<simplemd::LinkedCell, 3>::getInstance().getMacroscopicSolverInterface();
     if (_multiMDService != NULL) {
       delete _multiMDService;
       _multiMDService = NULL;
     }
-    if (macroSolverInterface != NULL) {
-      delete macroSolverInterface;
-      macroSolverInterface = NULL;
+    if (_macroscopicSolverInterface != NULL) {
+      delete _macroscopicSolverInterface;
+      _macroscopicSolverInterface = NULL;
     }
     if (_preciceAdapter != NULL) {
       delete _preciceAdapter;
@@ -180,7 +181,7 @@ private:
   }
 
   void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& micro2MacroBuffer, const unsigned int* const micro2MacroCellGlobalIndices,
-                 int couplingCycle) const {
+                 int couplingCycle, const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const int overlap) const {
     if (micro2MacroBuffer.size() == 0)
       return;
     if (_scenarioConfig.csvEveryTimestep < 1 || couplingCycle % _scenarioConfig.csvEveryTimestep > 0)
@@ -195,7 +196,12 @@ private:
     unsigned int count = 0;
     for (unsigned int i = 0; i < micro2MacroBuffer.size(); i++) {
       cellIndex = coupling::indexing::convertToVector<3>({micro2MacroCellGlobalIndices[i]});
-      if (CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::contains(BaseIndex<3>{cellIndex})) {
+      bool isOuter = false;
+      for (unsigned int currentDim = 0; currentDim < 3; currentDim++) {
+        isOuter |= (int)cellIndex[currentDim] == overlap;
+        isOuter |= (int)cellIndex[currentDim] == globalNumberMacroscopicCells[currentDim] + 1 - overlap;
+      }
+      if (!isOuter) {
         tarch::la::Vector<3, double> vel(micro2MacroBuffer[i]->getMacroscopicMomentum());
         if (micro2MacroBuffer[i]->getMacroscopicMass() != 0.0) {
           vel = (1.0 / micro2MacroBuffer[i]->getMacroscopicMass()) * vel;
@@ -229,13 +235,13 @@ private:
 
   template <unsigned int dim> class MyMacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
   public:
-    MyMacroscopicSolverInterface(const int overlap, const int rank) : _overlap(overlap), _rank(rank) {}
+    MyMacroscopicSolverInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const int overlap, const int rank) : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _rank(rank) {}
 
     bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
       bool rcv = true;
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-        rcv &= (int)globalCellIndex[currentDim] >= CellIndex<3, IndexTrait::noGhost>::lowerBoundary.get()[currentDim] +  (_overlap - 1);
-        rcv &= (int)globalCellIndex[currentDim] <= CellIndex<3, IndexTrait::noGhost>::upperBoundary.get()[currentDim] - (_overlap - 1);
+        rcv &= (int)globalCellIndex[currentDim] >= 1 + (_overlap - 1) ;
+        rcv &= (int)globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - (_overlap - 1);
       }
       return rcv;
     }
@@ -244,10 +250,10 @@ private:
       bool isGhostCell = false;
       bool isInner = true;
       for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-        isGhostCell |= (int)globalCellIndex[currentDim] == CellIndex<3>::lowerBoundary.get()[currentDim];
-        isGhostCell |= (int)globalCellIndex[currentDim] == CellIndex<3>::upperBoundary.get()[currentDim];
-        isInner &= (int)globalCellIndex[currentDim] >= CellIndex<3, IndexTrait::noGhost>::lowerBoundary.get()[currentDim] + _overlap;
-        isInner &= (int)globalCellIndex[currentDim] <= CellIndex<3, IndexTrait::noGhost>::upperBoundary.get()[currentDim] - _overlap;
+        isGhostCell |= (int)globalCellIndex[currentDim] > _globalNumberMacroscopicCells[currentDim];
+        isGhostCell |= (int)globalCellIndex[currentDim] < 1;
+        isInner &= (int)globalCellIndex[currentDim] >= 1 + _overlap;
+        isInner &= (int)globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - _overlap;
       }
       return (!isGhostCell) && (!isInner);
     }
@@ -265,6 +271,7 @@ private:
     }
 
   private:
+    const tarch::la::Vector<3, int> _globalNumberMacroscopicCells;
     const int _overlap;
     const int _rank;
   };
