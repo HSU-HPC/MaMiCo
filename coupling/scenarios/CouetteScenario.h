@@ -99,7 +99,7 @@ public:
 #endif
       precice_dt=_preciceAdapter->advance(mamico_dt);
       cycle++;
-      write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle - 1);
+      write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle);
     }
     
     deleteBuffer(_buf._macro2MicroBuffer);
