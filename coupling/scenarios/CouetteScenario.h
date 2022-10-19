@@ -102,13 +102,19 @@ public:
 #endif
       precice_dt=_preciceAdapter->advance(mamico_dt);
       cycle++;
-      write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle, globalNumberMacroscopicCells, (int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+      if (_buf._micro2MacroBuffer.size() != 0 && _scenarioConfig.csvEveryTimestep >= 1 && cycle % _scenarioConfig.csvEveryTimestep == 0)
+        write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle, globalNumberMacroscopicCells, (int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
     }
     
     deleteBuffer(_buf._macro2MicroBuffer);
     if (_buf._macro2MicroCellGlobalIndices != NULL) {
       delete[] _buf._macro2MicroCellGlobalIndices;
       _buf._macro2MicroCellGlobalIndices = NULL;
+    }
+    deleteBuffer(_buf._micro2MacroBuffer);
+    if (_buf._micro2MacroCellGlobalIndices != NULL) {
+      delete[] _buf._micro2MacroCellGlobalIndices;
+      _buf._micro2MacroCellGlobalIndices = NULL;
     }
     if (_instanceHandling != nullptr) {
       delete _instanceHandling;
@@ -182,10 +188,6 @@ private:
 
   void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& micro2MacroBuffer, const unsigned int* const micro2MacroCellGlobalIndices,
                  int couplingCycle, const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const int overlap) const {
-    if (micro2MacroBuffer.size() == 0)
-      return;
-    if (_scenarioConfig.csvEveryTimestep < 1 || couplingCycle % _scenarioConfig.csvEveryTimestep > 0)
-      return;
     std::stringstream ss;
     ss << "results_" << _rank << "_" << couplingCycle << ".csv";
     std::ofstream file(ss.str().c_str());
