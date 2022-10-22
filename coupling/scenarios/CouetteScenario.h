@@ -74,7 +74,7 @@ public:
     int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
-      double density = 0.001;
+      const double density = 0.81;
       double mass = density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
       for (unsigned int i = 0; i < _buf._macro2MicroBuffer.size(); i++) {
         const tarch::la::Vector<3, int> cellGlobalIndex(coupling::indexing::convertToVector<dim>({_buf._macro2MicroCellGlobalIndices[i]}));
