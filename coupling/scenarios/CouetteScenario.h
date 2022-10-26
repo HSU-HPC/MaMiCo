@@ -68,9 +68,7 @@ public:
         );
 #endif
     _logger.info("rank {} finished initialization", _rank);
-    _logger.info("rank {} precice_dt={}", _rank, precice_dt);
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
-    _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
     int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
@@ -87,10 +85,7 @@ public:
         _buf._macro2MicroBuffer[i]->setMicroscopicMomentum(momentum);
       } 
       _multiMDCellService->sendFromMacro2MD(_buf._macro2MicroBuffer, _buf._macro2MicroCellGlobalIndices);
-      // should be like that
-      //double dt = std::min(precice_dt, mamico_dt);
-      // _logger.info("rank {} precice_dt={}", _rank, precice_dt);
-      // _logger.info("rank {} precice_dt={}", _rank, mamico_dt);
+      if (precice_dt < mamico_dt) _logger.warn("rank {} maximum timestep from preCICE ({}) is lower than MaMiCo timestep ({})", _rank, precice_dt, mamico_dt);
       _instanceHandling->simulateTimesteps(_mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();

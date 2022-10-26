@@ -20,7 +20,6 @@ public:
     conffile.LoadFile(filename.c_str());
     node = conffile.FirstChildElement("scenario");
     tinyxml2::XMLElement* subtag = node->FirstChildElement("coupling");
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.couplingCycles, subtag, "coupling-cycles");
     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.csvEveryTimestep, subtag, "write-csv-every-timestep");
     subtag = node->FirstChildElement("microscopic-solver");
     tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp, subtag, "temperature");

@@ -26,6 +26,11 @@ public:
   }
 
   template <typename... Args> 
+  void warn(spdlog::format_string_t<Args...> fmt, Args &&... args) const {
+     _spdlogger->warn(fmt, std::forward<Args>(args)...);
+  }
+
+  template <typename... Args> 
   void debug(spdlog::format_string_t<Args...> fmt, Args &&... args) const {
     _spdlogger->debug(fmt, std::forward<Args>(args)...);
   }
