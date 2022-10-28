@@ -70,18 +70,19 @@ public:
     _logger.info("rank {} finished initialization", _rank);
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
+    const tarch::la::Vector<dim, unsigned int> moleculesParDirection{_mdConfig.getDomainConfiguration().getMoleculesPerDirection()};
+    const double densityMacroscopicCell = moleculesParDirection[0] * moleculesParDirection[1] * moleculesParDirection[2];
+    const double massMacroscopicCell = densityMacroscopicCell * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
-      const double density = 0.81;
-      double mass = density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
       for (unsigned int i = 0; i < _buf._macro2MicroBuffer.size(); i++) {
         const tarch::la::Vector<3, int> cellGlobalIndex(coupling::indexing::convertToVector<dim>({_buf._macro2MicroCellGlobalIndices[i]}));
         tarch::la::Vector<3, double> cellMidPoint(mdGlobalDomainOffset - 0.5 * macroscopicCellSize);
         for (unsigned int d = 0; d < 3; d++) {
           cellMidPoint[d] = cellMidPoint[d] + cellGlobalIndex[d] * macroscopicCellSize[d];
         }
-        tarch::la::Vector<3, double> momentum(mass * _preciceAdapter->getVelocity(cellMidPoint));
-        _buf._macro2MicroBuffer[i]->setMicroscopicMass(mass);
+        tarch::la::Vector<3, double> momentum(massMacroscopicCell * _preciceAdapter->getVelocity(cellMidPoint));
+        _buf._macro2MicroBuffer[i]->setMicroscopicMass(massMacroscopicCell);
         _buf._macro2MicroBuffer[i]->setMicroscopicMomentum(momentum);
       } 
       _multiMDCellService->sendFromMacro2MD(_buf._macro2MicroBuffer, _buf._macro2MicroCellGlobalIndices);
