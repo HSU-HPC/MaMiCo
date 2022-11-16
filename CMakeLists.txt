@@ -1,11 +1,18 @@
 cmake_minimum_required(VERSION 3.0)
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
+# Make our cmake modules visible to CMake
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+
 # CMake Policies
 # TODO: check policies
 if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
 endif()
+
+# CTest
+option(BUILD_TESTING "Build testing" OFF)
+include(CTest)
 
 #
 # Setup Options
@@ -64,7 +71,7 @@ message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_CO
 # Enable coupling with the preCICE API, default is off
 option(BUILD_WITH_TEST_INDEXING "Enable indexing tests, default is off." OFF)
 message(STATUS ">> Build with indexing tests : " ${BUILD_WITH_TEST_INDEXING})
-#Enable Adios2 output for megamol
+# Enable Adios2 output for megamol
 option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
 
@@ -105,6 +112,10 @@ endif()
 if(BUILD_WITH_LAMMPS)
   find_package(PkgConfig REQUIRED)
   pkg_search_module(LAMMPS REQUIRED liblammps)
+endif()
+
+if(BUILD_TESTING)
+  find_package(CppUnit REQUIRED)
 endif()
 
 #
@@ -648,3 +659,19 @@ set(BENCHMARKS_SOURCES
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
 set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
 target_link_libraries(benchmarks PRIVATE mamico)
+
+#
+# Testing
+#
+if (BUILD_TESTING)    
+  file(GLOB_RECURSE TEST_SOURCES "test/*Test.cpp")
+  add_executable(testmamico "test/main.cpp" ${TEST_SOURCES})
+  target_link_libraries(testmamico PRIVATE mamico)
+  target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
+  target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
+  target_link_libraries(testmamico PRIVATE cppunit)
+  foreach(TEST ${TEST_SOURCES})
+    get_filename_component(TEST_NAME ${TEST} NAME_WE)
+    add_test(${TEST_NAME} testmamico ${TEST_NAME})
+  endforeach()
+endif()
