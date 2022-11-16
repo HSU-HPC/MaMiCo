@@ -14,7 +14,6 @@ struct coupling::configurations::ScenarioConfig {
 public:
   static ScenarioConfig parseConfiguration(const std::string& filename) {
     ScenarioConfig _cfg;
-
     tinyxml2::XMLDocument conffile;
     tinyxml2::XMLElement* node = NULL;
     conffile.LoadFile(filename.c_str());
@@ -28,7 +27,6 @@ public:
     return _cfg;
   }
 
-  int couplingCycles;
   int csvEveryTimestep;
   int equSteps;
   double temp;
