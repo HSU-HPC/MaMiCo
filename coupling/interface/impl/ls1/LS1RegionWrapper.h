@@ -113,9 +113,9 @@ public:
             _IDIncrementor = 1;
             #ifdef ENABLE_MPI
                 int curRank;
-                MPI_Comm_rank(MPI_COMM_WORLD,&curRank);
+                MPI_Comm_rank(coupling::interface::LS1StaticCommData::getInstance().getLocalCommunicator(),&curRank);
                 _curParticleID += curRank + 1;
-                MPI_Comm_size(MPI_COMM_WORLD,&_IDIncrementor);  // interleave the particles
+                MPI_Comm_size(coupling::interface::LS1StaticCommData::getInstance().getLocalCommunicator(),&_IDIncrementor);  // interleave the particles
             #endif
 
             _IDinited = true;

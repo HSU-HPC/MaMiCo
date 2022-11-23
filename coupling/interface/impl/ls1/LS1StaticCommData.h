@@ -4,6 +4,9 @@
 //possibly bad practice? will phase out
 #include <string>
 #include <iostream>
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#include <mpi.h>
+#endif
 
 namespace coupling
 {
@@ -27,10 +30,18 @@ namespace coupling
             void setBoxOffsetAtDim(int dim, double offset) {boxoffset[dim] = offset;}
             const double getBoxOffsetAtDim(int dim) {return boxoffset[dim];}
 
+            #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            void setLocalCommunicator(MPI_Comm comm) {localComm = comm;}
+            MPI_Comm getLocalCommunicator() {return localComm;}
+            #endif
+
         private:
             LS1StaticCommData() {}
             std::string ls1ConfigFilename;
             double boxoffset[3]; //temporary till ls1 offset is natively supported
+            #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            MPI_Comm localComm;
+            #endif
         };
     }
 }
