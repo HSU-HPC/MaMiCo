@@ -1,68 +1,32 @@
 cmake_minimum_required(VERSION 3.0)
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
-# CMake Policies
-# TODO: check policies
 if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
 endif()
 
-#
-# Setup Options
-#
-# Build type
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 if(NOT CMAKE_BUILD_TYPE)
   message(WARNING "CMAKE_BUILD_TYPE was not specified. DebugOptimized build is assumed.")
   set(CMAKE_BUILD_TYPE DebugOptimized CACHE STRING "Build type." FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug DebugOptimized RelWithDebInfo Release)
 endif()
 message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
-# Automatically add the current source and build directories to the include path
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Enable the MPI library for parallel build, default is OFF
-option(BUILD_WITH_MPI "Enable the MPI library for parallel build, default is OFF." OFF)
-message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
-# Dimension for MD build, default is MDDim3
-set(MDDim MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")
-message(STATUS ">> MD dimension : " ${MDDim})
-set_property(CACHE MDDim PROPERTY STRINGS MDDim3 MDDim2)
-# Set MD Simulation to use
-set(MD_SIM SIMPLE_MD CACHE STRING "Choose SIMPLE_MD")
-set_property(CACHE MD_SIM PROPERTY STRINGS SIMPLE_MD)
-message(STATUS ">> MD simulation used : " ${MD_SIM})
-# Enable the Eigen library used (so far) only for POD filtering, default is off
-option(BUILD_WITH_EIGEN "Enable the Eigen library used (so far) only for POD filtering, default is off." OFF)
-message(STATUS ">> Build with Eigen : " ${BUILD_WITH_EIGEN})
-#Enable Adios2 output for megamol
-option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
-message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
-#Enable Adios2 output for megamol
 option(TWO_WAY "Two way coupling." OFF)
 message(STATUS ">> Build with two way coupling: " ${TWO_WAY})
 
 #
 # Find dependencies
 #
-if(BUILD_WITH_EIGEN)
-	find_package(Eigen3 REQUIRED NO_MODULE)
-endif()
-
-if(BUILD_WITH_MPI)
-	find_package(MPI REQUIRED)
-endif()
-
-if(BUILD_WITH_ADIOS2)
-  enable_language(C)
-  find_package(ADIOS2 REQUIRED)
-endif()
-
+find_package(MPI REQUIRED)
 find_package(precice REQUIRED)
 
 #
 # simplemd interface
 #
 add_library(simplemd_interface INTERFACE)
-target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
+target_compile_definitions(simplemd_interface INTERFACE MDDim3)
 target_compile_options(simplemd_interface INTERFACE -fpic)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
@@ -78,17 +42,8 @@ else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
 
-if(BUILD_WITH_MPI)
-    target_compile_definitions(simplemd_interface INTERFACE MDParallel TarchParallel)
-    target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
-endif()
-if(BUILD_WITH_ADIOS2)
-if(BUILD_WITH_MPI)
-    target_link_libraries(simplemd_interface INTERFACE adios2::cxx11_mpi MPI::MPI_CXX)
-  else()
-    target_link_libraries(simplemd_interface INTERFACE adios2::cxx11)
-  endif()
-endif()
+target_compile_definitions(simplemd_interface INTERFACE MDParallel TarchParallel)
+target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
 # Check the CXX compiler ID. IDs are defined here: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
 message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
 message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
@@ -176,27 +131,23 @@ endif()
 if(BUILD_WITH_ADIOS2)
   add_compile_definitions(BUILD_WITH_ADIOS2)
 endif()
-target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
+target_compile_definitions(mamico INTERFACE SIMPLE_MD MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
-if(BUILD_WITH_MPI)
-  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
-  target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-    target_compile_options(mamico INTERFACE -Wno-uninitialized)
-  else()
-    target_compile_options(mamico INTERFACE -Wno-maybe-uninitialized)
-  endif()
-  target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
+target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
+target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+  target_compile_options(mamico INTERFACE -Wno-uninitialized)
+else()
+  target_compile_options(mamico INTERFACE -Wno-maybe-uninitialized)
 endif()
+target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
 target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
 target_link_libraries(mamico INTERFACE precice::precice)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang" )
 	target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
 endif()
-# we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
 target_link_libraries(mamico INTERFACE libsimplemd)
 target_include_directories(mamico INTERFACE "tarch/logging/")
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
   target_compile_options(mamico INTERFACE -Og -g3)
@@ -210,7 +161,6 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
-
 if(TWO_WAY)
   target_compile_definitions(mamico INTERFACE TWO_WAY)
 endif()
