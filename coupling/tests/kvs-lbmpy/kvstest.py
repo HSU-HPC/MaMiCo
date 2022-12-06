@@ -142,12 +142,11 @@ class KVSTest():
             self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
         mamico.coupling.setMacroscopicSolverInterface(self.macroscopicSolverInterface)
 
+        mamico.tarch.utils.initIndexing(self.simpleMDConfig, self.mamicoConfig, self.macroscopicSolverInterface, self.rank)
 
         self.multiMDCellService = MultiMDCellService(self.mdSolverInterface, self.macroscopicSolverInterface, 
             self.simpleMDConfig, self.rank, self.cfg.getint("microscopic-solver","number-md-simulations"),
             self.mamicoConfig, "kvs.xml", self.multiMDService)
-
-        mamico.tarch.utils.initIndexing(self.simpleMDConfig, self.mamicoConfig, self.macroscopicSolverInterface, self.rank)
 
         self.multiMDCellService.constructFilterPipelines()
 
