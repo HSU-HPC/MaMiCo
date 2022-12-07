@@ -1,13 +1,13 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "tarch/la/Vector.h"
+#include "tarch/utils/MultiMDService.h"
 
 using namespace tarch;
 using namespace la;
 
-class VectorOperationsTest : public CppUnit::TestFixture
+class MultiMDServiceTest : public CppUnit::TestFixture
 {
-  CPPUNIT_TEST_SUITE(VectorOperationsTest);
+  CPPUNIT_TEST_SUITE(MultiMDServiceTest);
   CPPUNIT_TEST(testEquality);
   CPPUNIT_TEST(testAddition);
   CPPUNIT_TEST(testSubstraction);
@@ -43,4 +43,4 @@ private:
   Vector<3, double> *v_1_2_3, *v_4_5_6;
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(VectorOperationsTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(MultiMDServiceTest);

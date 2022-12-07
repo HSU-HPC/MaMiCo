@@ -25,7 +25,7 @@ int main( int argc, char **argv)
     runner.addTest( CppUnit::TestFactoryRegistry::getRegistry().makeTest() );   
     try
     {
-        std::cout << "Running "  <<  testPath;
+        std::cout << "Running ...\n"  <<  testPath;
         runner.run( controller, testPath );
 
         std::cerr << std::endl;

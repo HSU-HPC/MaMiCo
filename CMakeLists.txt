@@ -12,7 +12,10 @@ endif()
 
 # CTest
 option(BUILD_TESTING "Build testing" OFF)
-include(CTest)
+message(STATUS ">> Build with testing: " ${BUILD_TESTING})
+if (BUILD_TESTING)
+  include(CTest)
+endif()
 
 #
 # Setup Options

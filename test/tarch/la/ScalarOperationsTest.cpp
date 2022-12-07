@@ -1,5 +1,4 @@
 #include <cppunit/TestCase.h>
-#include <cppunit/TestSuite.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "tarch/la/ScalarOperations.h"
 
