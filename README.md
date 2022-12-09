@@ -13,7 +13,7 @@ Optional dependencies are:
 * [MPI](https://www.open-mpi.org/), highly recommended for parallel runs, e.g. on clusters.
 * [Eigen 3](http://eigen.tuxfamily.org/), a linear algebra library used for the POD noise filter.
 * [pybind11](https://pybind11.readthedocs.io/en/stable/), for the MaMiCo Python bindings.
-* [OpenFOAM](https://openfoam.org/), for coupling to CFD simulations with OpenFOAM.
+* [OpenFOAM](https://develop.openfoam.com/Development/openfoam/blob/develop/doc/Build.md), for coupling to CFD simulations with OpenFOAM.
 * [preCICE](https://precice.org/), for coupling with other solvers using the preCICE coupling library.
 * [ls1-MarDyn](https://www.ls1-mardyn.de/home.html), for coupling to MD simulations with ls1.
 
@@ -50,10 +50,11 @@ Optional dependencies are:
 
 ## Input file construction and first runs
 * The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. 
-* An example simulation configuration file can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/examples/couette.xml.template), other template input files are in the [examples](https://github.com/HSU-HPC/MaMiCo/blob/master/examples) foder as well. 
+* An example simulation configuration file can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/examples/couette.xml.template), other template input files are in the [examples](https://github.com/HSU-HPC/MaMiCo/blob/master/examples) folder as well. 
 * Copy this file to your build folder, rename it 'couette.xml'. 
 * The available options and features are listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs. 
-* Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`. 
+* Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`.
+* If you get the error message 'ERROR MoleculeService::MoleculeService: Could not open file CheckpointSimpleMD_10000_reflecting_0.checkpoint!', copy the file of the same name from the 'examples' folder into your build folder.
 * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats. 
 
 ## Papers to cite
