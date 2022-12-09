@@ -38,7 +38,6 @@
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #include "ls1/src/Simulation.h"
 #include "ls1/src/plugins/MamicoCoupling.h"
-#include <iostream>
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
 #endif
 
