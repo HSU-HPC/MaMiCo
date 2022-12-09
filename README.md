@@ -15,6 +15,7 @@ Optional dependencies are:
 * [pybind11](https://pybind11.readthedocs.io/en/stable/), for the MaMiCo Python bindings.
 * [OpenFOAM](https://develop.openfoam.com/Development/openfoam/blob/develop/doc/Build.md), for coupling to CFD simulations with OpenFOAM.
 * [preCICE](https://precice.org/), for coupling with other solvers using the preCICE coupling library.
+* [ls1-MarDyn](https://www.ls1-mardyn.de/home.html), for coupling to MD simulations with ls1.
 
 ## Build instructions
 * First clone this repository and create a new build directory:
@@ -36,7 +37,17 @@ Optional dependencies are:
 * Here you can enable optional dependencies, e.g. activate BUILD_WITH_MPI (default OFF), or modifiy which compiler and flags you want to use. When you are done, press the configure [c] and generate [g] keys. Now you can start the compilation:
 
         make
-        
+
+### Additional instructions to build with ls1
+* After cloning the repository, initialize the ls1 submodule with
+
+        git submodule init
+        git submodule update
+
+* Follow the instructions on the [ls1 repository](https://github.com/ls1mardyn/ls1-mardyn) to build with cmake, however remember to enable the MAMICO_COUPLING flag, and provide the MaMiCo base directory in the MAMICO_SRC_DIR variable.
+
+* Make MaMiCo as normal, choosing LS1_MARDYN as your MD library.
+
 ## Input file construction and first runs
 * The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. 
 * An example simulation configuration file can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/examples/couette.xml.template), other template input files are in the [examples](https://github.com/HSU-HPC/MaMiCo/blob/master/examples) folder as well. 
