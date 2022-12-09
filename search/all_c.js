@@ -12,5 +12,6 @@ var searchData=
   ['loadmacroscopicsolverconfiguration_9',['loadMacroscopicSolverConfiguration',['../classTestLammps.html#a032e4b51f896ef2fd24df904b6ef56fe',1,'TestLammps::loadMacroscopicSolverConfiguration()'],['../classTestMarDyn.html#a6e30649b59082819ec29df757914f9ed',1,'TestMarDyn::loadMacroscopicSolverConfiguration()']]],
   ['loadmamicotestconfiguration_10',['loadMamicoTestConfiguration',['../classTestLammps.html#a3ed7deab01616dd6bc562b4d0f4e3156',1,'TestLammps::loadMamicoTestConfiguration()'],['../classTestMarDyn.html#a3577c10195285a8c893e9516955694c2',1,'TestMarDyn::loadMamicoTestConfiguration()']]],
   ['lowerboundary_11',['lowerBoundary',['../classcoupling_1_1indexing_1_1CellIndex.html#a0beda362945cf512b97a59229a82fe74',1,'coupling::indexing::CellIndex']]],
-  ['lowerboundnumbermdsimulations_12',['lowerBoundNumberMDSimulations',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a4e0f37d22510a6afd3d503a310560da3',1,'coupling::configurations::CouetteConfig']]]
+  ['lowerboundnumbermdsimulations_12',['lowerBoundNumberMDSimulations',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a4e0f37d22510a6afd3d503a310560da3',1,'coupling::configurations::CouetteConfig']]],
+  ['ls1_13',['LS1',['../structcoupling_1_1configurations_1_1CouetteConfig.html#aef04cb07afb10e80bbc425c30de71ee9af3b922dd5bb9c9effc1f8dc100c4f3db',1,'coupling::configurations::CouetteConfig']]]
 ];
