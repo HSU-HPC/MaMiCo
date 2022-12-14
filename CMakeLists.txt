@@ -356,7 +356,7 @@ set(COUETTE_SOURCES
 	"coupling/indexing/IndexingService.cpp"
 	"coupling/configurations/ParticleInsertionConfiguration.cpp"
   "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-  "coupling/tests/main_couette.cpp"
+  "coupling/scenario/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
@@ -373,7 +373,7 @@ if("${MD_SIM}" STREQUAL "LAMMPS_MD")
     "tarch/tinyxml2/tinyxml2.cpp"
     "coupling/configurations/ParticleInsertionConfiguration.cpp"
     "tarch/utils/RandomNumberService.cpp"
-    "coupling/tests/main_lammps.cpp"
+    "coupling/test/integration/main_lammps.cpp"
     "coupling/indexing/IndexingService.cpp"
   )
   add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
@@ -572,39 +572,34 @@ set(CLANGFORMAT_SOURCES
   "coupling/solvers/CouetteSolverInterface.h"
   "coupling/solvers/LBCouetteSolverInterface.h"
   "coupling/solvers/NumericalSolver.h"
-  "coupling/tests/TestEspressoMDMolecule.h"
-  "coupling/tests/Test.h"
-  "coupling/tests/MacroscopicCellsTest.h"
-  "coupling/tests/TestEspressoAddDeleteMolecule.h"
-  "coupling/tests/main_lbcouettesolver.cpp"
-  "coupling/tests/TestLammpsCalculateForceEnergy.h"
-  "coupling/tests/main_couette.cpp"
-  "coupling/tests/CouetteTest.h"
-  "coupling/tests/FromMD2MacroTest.h"
-  "coupling/tests/CompileTest.h"
-  "coupling/tests/FromMacro2MDTest.h"
-  "coupling/tests/TestEspressoMDSolverInterface.h"
-  "coupling/tests/main_lammps.cpp"
-  "coupling/tests/TestLammpsMoleculeIterator.h"
-  "coupling/tests/TestMarDynMolecule.h"
-  "coupling/tests/TestLammpsAddDeleteAtom.h"
-  "coupling/tests/IndexConversionTest.h"
-  "coupling/tests/main_mardyn.cpp"
-  "coupling/tests/TestCell.h"
-  "coupling/tests/TestEspressoForceEnergyCalculation.h"
-  "coupling/tests/TestLammps.h"
-  "coupling/tests/TestLammpsInitialVelocity.h"
-  "coupling/tests/main.cpp"
-  "coupling/tests/TestLBCouetteSolver.h"
-  "coupling/tests/cell_idx_iter_benchmark.cpp"
-  "coupling/tests/TestDataExchangeFromMD2Macro.h"
-  "coupling/tests/main_espresso.cpp"
-  "coupling/tests/TestEspresso.h"
-  "coupling/tests/TestMarDyn.h"
-  "coupling/tests/TestLammpsGhost.h"
-  "coupling/tests/TestMarDynAddDeleteMolecule.h"
-  "coupling/tests/TestEspressoMoleculeIterator.h"
-  "coupling/tests/TestMarDynMoleculeIterator.h"
+  "test/integration/TestEspressoMDMolecule.h"
+  "test/integration/Test.h"
+  "test/integration/MacroscopicCellsTest.h"
+  "test/integration/TestEspressoAddDeleteMolecule.h"
+  "test/integration/main_lbcouettesolver.cpp"
+  "test/integration/TestLammpsCalculateForceEnergy.h"
+  "test/integration/CompileTest.h"
+  "test/integration/TestEspressoMDSolverInterface.h"
+  "test/integration/main_lammps.cpp"
+  "test/integration/TestLammpsMoleculeIterator.h"
+  "test/integration/TestMarDynMolecule.h"
+  "test/integration/TestLammpsAddDeleteAtom.h"
+  "test/integration/main_mardyn.cpp"
+  "test/integration/TestEspressoForceEnergyCalculation.h"
+  "test/integration/TestLammps.h"
+  "test/integration/TestLammpsInitialVelocity.h"
+  "test/integration/TestLBCouetteSolver.h"
+  "test/integration/cell_idx_iter_benchmark.cpp"
+  "test/integration/main_espresso.cpp"
+  "test/integration/TestEspresso.h"
+  "test/integration/TestMarDyn.h"
+  "test/integration/TestLammpsGhost.h"
+  "test/integration/TestMarDynAddDeleteMolecule.h"
+  "test/integration/TestEspressoMoleculeIterator.h"
+  "test/integration/TestMarDynMoleculeIterator.h"
+  "coupling/scenario/CouetteScenario.h"
+  "coupling/scenario/main_couette.cpp"
+  "coupling/scenario/Scenario.h"
   "coupling/MPIIndexConversion.h"
   "coupling/InstanceHandling.h"
   "coupling/MomentumInsertion.h"
@@ -703,7 +698,7 @@ add_custom_target(
 #
 # compiletest target
 #
-get_filename_component(COMPILETEST_SCRIPT "tarch/tests/CompileTest.sh" ABSOLUTE)
+get_filename_component(COMPILETEST_SCRIPT "cmake/CompileTest.sh" ABSOLUTE)
 add_custom_target(
   compiletest
   COMMAND ${COMPILETEST_SCRIPT}
@@ -716,7 +711,7 @@ add_custom_target(
 set(BENCHMARKS_SOURCES
 	"coupling/indexing/IndexingService.cpp"
 	"coupling/configurations/ParticleInsertionConfiguration.cpp"
-  "coupling/tests/cell_idx_iter_benchmark.cpp"
+  "test/integration/cell_idx_iter_benchmark.cpp"
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
 set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
@@ -727,13 +722,17 @@ target_link_libraries(benchmarks PRIVATE mamico)
 #
 if (BUILD_TESTING)    
   file(GLOB_RECURSE TEST_SOURCES "test/*Test.cpp")
-  add_executable(testmamico "test/main.cpp" ${TEST_SOURCES})
+  add_executable(testmamico "test/unit/main.cpp" ${TEST_SOURCES})
   target_link_libraries(testmamico PRIVATE mamico)
   target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
   target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
   target_link_libraries(testmamico PRIVATE cppunit)
   foreach(TEST ${TEST_SOURCES})
     get_filename_component(TEST_NAME ${TEST} NAME_WE)
-    add_test(${TEST_NAME} testmamico ${TEST_NAME})
+    if (BUILD_WITH_MPI)
+      add_test(NAME ${TEST_NAME} COMMAND mpirun -np 4 ./testmamico ${TEST_NAME})
+    else()
+      add_test(NAME ${TEST_NAME} COMMAND ./testmamico ${TEST_NAME})
+    endif()
   endforeach()
 endif()
