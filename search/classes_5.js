@@ -14,10 +14,8 @@ var searchData=
   ['frommacro2md_3c_20coupling_3a_3adatastructures_3a_3amacroscopiccell_3c_20dim_20_3e_2c_20dim_20_3e_11',['FromMacro2MD&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1FromMacro2MD.html',1,'coupling::sendrecv']]],
   ['frommacro2mdsendonly_12',['FromMacro2MDSendOnly',['../classcoupling_1_1sendrecv_1_1FromMacro2MDSendOnly.html',1,'coupling::sendrecv']]],
   ['frommacro2mdsendonly_3c_20coupling_3a_3adatastructures_3a_3amacroscopiccell_3c_20dim_20_3e_2c_20dim_20_3e_13',['FromMacro2MDSendOnly&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1FromMacro2MDSendOnly.html',1,'coupling::sendrecv']]],
-  ['frommacro2mdtest_14',['FromMacro2MDTest',['../classFromMacro2MDTest.html',1,'']]],
-  ['frommd2macro_15',['FromMD2Macro',['../classcoupling_1_1sendrecv_1_1FromMD2Macro.html',1,'coupling::sendrecv']]],
-  ['frommd2macro_3c_20coupling_3a_3adatastructures_3a_3amacroscopiccell_3c_20dim_20_3e_2c_20dim_20_3e_16',['FromMD2Macro&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1FromMD2Macro.html',1,'coupling::sendrecv']]],
-  ['frommd2macrorecvonly_17',['FromMD2MacroRecvOnly',['../classcoupling_1_1sendrecv_1_1FromMD2MacroRecvOnly.html',1,'coupling::sendrecv']]],
-  ['frommd2macrorecvonly_3c_20coupling_3a_3adatastructures_3a_3amacroscopiccell_3c_20dim_20_3e_2c_20dim_20_3e_18',['FromMD2MacroRecvOnly&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1FromMD2MacroRecvOnly.html',1,'coupling::sendrecv']]],
-  ['frommd2macrotest_19',['FromMD2MacroTest',['../classFromMD2MacroTest.html',1,'']]]
+  ['frommd2macro_14',['FromMD2Macro',['../classcoupling_1_1sendrecv_1_1FromMD2Macro.html',1,'coupling::sendrecv']]],
+  ['frommd2macro_3c_20coupling_3a_3adatastructures_3a_3amacroscopiccell_3c_20dim_20_3e_2c_20dim_20_3e_15',['FromMD2Macro&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1FromMD2Macro.html',1,'coupling::sendrecv']]],
+  ['frommd2macrorecvonly_16',['FromMD2MacroRecvOnly',['../classcoupling_1_1sendrecv_1_1FromMD2MacroRecvOnly.html',1,'coupling::sendrecv']]],
+  ['frommd2macrorecvonly_3c_20coupling_3a_3adatastructures_3a_3amacroscopiccell_3c_20dim_20_3e_2c_20dim_20_3e_17',['FromMD2MacroRecvOnly&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1FromMD2MacroRecvOnly.html',1,'coupling::sendrecv']]]
 ];

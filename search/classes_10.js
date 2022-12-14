@@ -21,11 +21,10 @@ var searchData=
   ['testmardynadddeletemolecule_18',['TestMarDynAddDeleteMolecule',['../classTestMarDynAddDeleteMolecule.html',1,'']]],
   ['testmardynmolecule_19',['TestMarDynMolecule',['../classTestMarDynMolecule.html',1,'']]],
   ['testmardynmoleculeiterator_20',['TestMarDynMoleculeIterator',['../classTestMarDynMoleculeIterator.html',1,'']]],
-  ['testmdsolverinterface_21',['TestMDSolverInterface',['../classMacroscopicCellsTest_1_1TestMDSolverInterface.html',1,'MacroscopicCellsTest']]],
-  ['thermostatconfiguration_22',['ThermostatConfiguration',['../classcoupling_1_1configurations_1_1ThermostatConfiguration.html',1,'coupling::configurations']]],
-  ['timingvalues_23',['TimingValues',['../structCouetteTest_1_1TimingValues.html',1,'CouetteTest']]],
-  ['transferstrategy_24',['TransferStrategy',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html',1,'coupling::transferstrategies']]],
-  ['transferstrategy4niecoupling_25',['TransferStrategy4NieCoupling',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html',1,'coupling::transferstrategies']]],
-  ['transferstrategy4schwarzcoupling_26',['TransferStrategy4SchwarzCoupling',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4SchwarzCoupling.html',1,'coupling::transferstrategies']]],
-  ['transferstrategyconfiguration_27',['TransferStrategyConfiguration',['../classcoupling_1_1configurations_1_1TransferStrategyConfiguration.html',1,'coupling::configurations']]]
+  ['thermostatconfiguration_21',['ThermostatConfiguration',['../classcoupling_1_1configurations_1_1ThermostatConfiguration.html',1,'coupling::configurations']]],
+  ['timingvalues_22',['TimingValues',['../structCouetteScenario_1_1TimingValues.html',1,'CouetteScenario']]],
+  ['transferstrategy_23',['TransferStrategy',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html',1,'coupling::transferstrategies']]],
+  ['transferstrategy4niecoupling_24',['TransferStrategy4NieCoupling',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html',1,'coupling::transferstrategies']]],
+  ['transferstrategy4schwarzcoupling_25',['TransferStrategy4SchwarzCoupling',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4SchwarzCoupling.html',1,'coupling::transferstrategies']]],
+  ['transferstrategyconfiguration_26',['TransferStrategyConfiguration',['../classcoupling_1_1configurations_1_1TransferStrategyConfiguration.html',1,'coupling::configurations']]]
 ];

@@ -14,6 +14,6 @@ var searchData=
   ['transferstrategyconfiguration_11',['TransferStrategyConfiguration',['../classcoupling_1_1configurations_1_1TransferStrategyConfiguration.html#ade8ab7551a02e11f86623ea836dab703',1,'coupling::configurations::TransferStrategyConfiguration']]],
   ['triggerreceiving_12',['triggerReceiving',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a5685ebdb7b1c89cca733641164a4fb8c',1,'coupling::sendrecv::SendReceiveBuffer']]],
   ['triggersending_13',['triggerSending',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ac98cde3865a7c34a6a0a3447e23689cc',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['twowaycoupling_14',['twoWayCoupling',['../classCouetteTest.html#ae558b5edb4ddd5b51a0105b6d7c8b168',1,'CouetteTest']]],
-  ['twsloop_15',['twsLoop',['../classCouetteTest.html#a03ed7ba5923445c75bee6f2c5e1bee86',1,'CouetteTest']]]
+  ['twowaycoupling_14',['twoWayCoupling',['../classCouetteScenario.html#ab44da55e6dcc2ef872efc49b05334830',1,'CouetteScenario']]],
+  ['twsloop_15',['twsLoop',['../classCouetteScenario.html#a434ab00124be51cb5b781c017a3b5e4e',1,'CouetteScenario']]]
 ];
