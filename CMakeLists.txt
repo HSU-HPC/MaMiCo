@@ -158,7 +158,7 @@ endif()
 # simplemd interface
 #
 add_library(simplemd_interface INTERFACE)
-target_compile_definitions(simplemd_interface INTERFACE MDDim3)
+target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
@@ -241,6 +241,7 @@ if(BUILD_WITH_ADIOS2)
   list(APPEND SIMPLE_MD_SOURCES "simplemd/molecule-mappings/Adios2Writer.cpp")
 endif()
 
+
 add_library(libsimplemd ${SIMPLE_MD_SOURCES})
 target_link_libraries(libsimplemd PRIVATE simplemd_interface)
 set_target_properties(libsimplemd PROPERTIES CXX_STANDARD 17)
@@ -272,21 +273,35 @@ endif()
 if(BUILD_WITH_ADIOS2)
   add_compile_definitions(BUILD_WITH_ADIOS2)
 endif()
-target_compile_definitions(mamico INTERFACE SIMPLE_MD MDDim3)
+target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
-target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
-target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-  target_compile_options(mamico INTERFACE -Wno-uninitialized)
-else()
-  target_compile_options(mamico INTERFACE -Wno-maybe-uninitialized)
+if(BUILD_WITH_MPI)
+  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
+  target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+    target_compile_options(mamico INTERFACE -Wno-uninitialized)
+  else()
+    target_compile_options(mamico INTERFACE -Wno-maybe-uninitialized)
+  endif()
+  target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
 endif()
-target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
-target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
-target_link_libraries(mamico INTERFACE precice::precice)
+if(BUILD_WITH_OPENFOAM)
+	target_compile_definitions(mamico INTERFACE BUILD_WITH_OPENFOAM WM_LABEL_SIZE=32 WM_DP NoRepository)
+	target_include_directories(mamico INTERFACE $ENV{FOAM_SRC}/OpenFOAM/lnInclude $ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude $ENV{FOAM_SRC}/finiteVolume/lnInclude $ENV{FOAM_SRC}/meshTools/lnInclude)
+	target_link_directories(mamico INTERFACE $ENV{FOAM_LIBBIN} $ENV{FOAM_LIBBIN}/dummy $ENV{FOAM_LIBBIN}/sys-openmpi)
+	target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m)
+endif()
+if(BUILD_WITH_PRECICE)
+	target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
+	target_link_libraries(mamico INTERFACE precice::precice)
+endif()
+if(BUILD_WITH_TEST_INDEXING)
+	target_compile_definitions(mamico INTERFACE TEST_INDEXING)
+endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang" )
 	target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
 endif()
+# we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
 target_link_libraries(mamico INTERFACE libsimplemd)
 if("${MD_SIM}" STREQUAL "LAMMPS_MD")
   target_link_libraries(mamico INTERFACE ${LAMMPS_LINK_LIBRARIES})
@@ -370,11 +385,185 @@ if("${MD_SIM}" STREQUAL "LAMMPS_MD")
 endif()
 
 #
-# Main target
+# pybind target
 #
-set(MAMICO_MAIN_SOURCES
+if(BUILD_WITH_PYBIND11)
+	set(PYBIND_SOURCES11
+		"coupling/indexing/IndexingService.cpp"
+		"coupling/configurations/ParticleInsertionConfiguration.cpp"
+    "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+		"coupling/python-binding/mamico.cpp"
+	)
+	pybind11_add_module(mamico_pybind
+		${PYBIND_SOURCES11}
+	)
+	set_target_properties(mamico_pybind PROPERTIES OUTPUT_NAME mamico)
+	target_compile_options(mamico_pybind PRIVATE -fPIC)
+	set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
+	target_link_libraries(mamico_pybind PRIVATE mamico)
+endif()
+
+#
+# Clangformat target
+#
+set(CLANGFORMAT_SOURCES
+  "tarch/utils/Uncopyable.h"
+  "tarch/utils/MultiMDService.cpph"
+  "tarch/utils/RandomNumberService.h"
+  "tarch/utils/RandomNumberService.cpp"
+  "tarch/utils/MultiMDService.h"
+  "tarch/configuration/ParseConfiguration.h"
+  "tarch/configuration/Configuration.h"
+  "tarch/tests/main_readconfig.cpp"
+  "tarch/la/VectorOperations.cpph"
+  "tarch/la/Vector.h"
+  "tarch/la/ScalarOperations.h"
+  "tarch/la/Matrix.h"
+  "tarch/TarchDefinitions.h"
+  "coupling/services/MultiMDCellService.h"
+  "coupling/services/MacroscopicCellServiceMacroOnly.h"
+  "coupling/services/MacroscopicCellService.cpph"
+  "coupling/services/MacroscopicCellTraversalWrappers.cpph"
+  "coupling/services/MacroscopicCellService.h"
+  "coupling/ErrorEstimation.h"
+  "coupling/ParticleInsertion.h"
+  "coupling/IndexConversionMD2Macro.cpph"
+  "coupling/SetGivenVelocity4MomentumInsertion.h"
+  "coupling/MomentumController.h"
+  "coupling/filtering/FilterPipeline.cpph"
+  "coupling/filtering/FilterPipeline.h"
+  "coupling/filtering/SequentialFilter.h"
+  "coupling/filtering/sequencing/AsymmetricalFilterJunction.cpph"
+  "coupling/filtering/sequencing/FilterJunction.h"
+  "coupling/filtering/sequencing/FilterSequence.cpph"
+  "coupling/filtering/sequencing/FilterJunction.cpph"
+  "coupling/filtering/sequencing/FilterSequence.h"
+  "coupling/filtering/sequencing/AsymmetricalFilterJunction.h"
+  "coupling/filtering/SequentialFilter.cpph"
+  "coupling/filtering/interfaces/FilterInterfaceReadOnly.h"
+  "coupling/filtering/interfaces/FilterInterface.h"
+  "coupling/filtering/interfaces/AsymmetricalJunctorInterface.h"
+  "coupling/filtering/interfaces/JunctorInterface.h"
+  "coupling/filtering/filters/NLM.cpph"
+  "coupling/filtering/filters/POD.cpph"
+  "coupling/filtering/filters/Strouhal.h"
+  "coupling/filtering/filters/NLM.h"
+  "coupling/filtering/filters/Copy.h"
+  "coupling/filtering/filters/Gauss.h"
+  "coupling/filtering/filters/Constant.h"
+  "coupling/filtering/filters/ReadFromFile.cpph"
+  "coupling/filtering/filters/Gauss.cpph"
+  "coupling/filtering/filters/FilterFromFunction.h"
+  "coupling/filtering/filters/ReadFromFile.h"
+  "coupling/filtering/filters/WriteToFile.h"
+  "coupling/filtering/filters/Datastructures.h"
+  "coupling/filtering/filters/WriteToFileJunctor.h"
+  "coupling/filtering/filters/POD.h"
+  "coupling/filtering/filters/Strouhal.cpph"
+  "coupling/filtering/filters/WriteToFile.cpph"
+  "coupling/UsherParticleInsertion.h"
+  "coupling/NieVelocityImposition.h"
+  "coupling/MultiMDMediator.cpph"
+  "coupling/python-binding/mamico.cpp"
+  "coupling/python-binding/conversion.h"
+  "coupling/NoParticleInsertion.h"
+  "coupling/MacroscopicCellPlotter.h"
+  "coupling/NoMomentumInsertion.h"
+  "coupling/cell-mappings/ComputeKineticEnergyMapping.h"
+  "coupling/cell-mappings/MoleculeExtractor.h"
+  "coupling/cell-mappings/ComputeMomentumMapping.h"
+  "coupling/cell-mappings/VTKMoleculePlotter.h"
+  "coupling/cell-mappings/SetKineticEnergyMapping.h"
+  "coupling/cell-mappings/ComputeAvgForceAndVelocity.h"
+  "coupling/cell-mappings/SetMomentumMapping.h"
+  "coupling/cell-mappings/ComputeTemperatureMapping.h"
+  "coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h"
+  "coupling/cell-mappings/DeleteParticleMapping.h"
+  "coupling/cell-mappings/ComputeMassMapping.h"
+  "coupling/cell-mappings/VelocityGradientRelaxationMapping.h"
+  "coupling/cell-mappings/PerturbateVelocityMapping.h"
+  "coupling/cell-mappings/SetTemperatureMapping.h"
+  "coupling/cell-mappings/NieVelocityImpositionMapping.h"
+  "coupling/cell-mappings/ZhouBoundaryForce.h"
+  "coupling/ZhouBoundaryForceController.h"
+  "coupling/IndexConversionMD2Macro.h"
+  "coupling/indexing/CellIndex.cpph"
   "coupling/indexing/IndexingService.cpp"
-	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/indexing/Operations.h"
+  "coupling/indexing/Testing.cpph"
+  "coupling/indexing/Testing.h"
+  "coupling/indexing/IndexingService.h"
+  "coupling/indexing/CellIndex.h"
+  "coupling/sendrecv/FromMacro2MDSendOnly.h"
+  "coupling/sendrecv/FromMD2MacroRecvOnly.h"
+  "coupling/sendrecv/FromMacro2MD.h"
+  "coupling/sendrecv/FromMD2MacroRecvOnly.cpph"
+  "coupling/sendrecv/SendReceiveBuffer.h"
+  "coupling/sendrecv/FromMacro2MDSendOnly.cpph"
+  "coupling/sendrecv/DataExchangeFromMD2Macro.h"
+  "coupling/sendrecv/FromMD2Macro.cpph"
+  "coupling/sendrecv/DataExchange.h"
+  "coupling/sendrecv/DataExchangeFromMacro2MD.h"
+  "coupling/sendrecv/SendReceiveBuffer.cpph"
+  "coupling/sendrecv/FromMacro2MD.cpph"
+  "coupling/sendrecv/FromMD2Macro.h"
+  "coupling/IndexConversion.cpph"
+  "coupling/UsherParticleInsertion.cpph"
+  "coupling/NoBoundaryForce.h"
+  "coupling/CouplingMDDefinitions.h"
+  "coupling/AdditiveMomentumInsertion.h"
+  "coupling/IndexConversion.h"
+  "coupling/transferstrategies/AveragingTransferStrategy.h"
+  "coupling/transferstrategies/TransferStrategy4NieCoupling.h"
+  "coupling/transferstrategies/TransferStrategy4SchwarzCoupling.h"
+  "coupling/transferstrategies/TransferStrategy4SchwarzCoupling.cpph"
+  "coupling/transferstrategies/TransferStrategy.h"
+  "coupling/transferstrategies/DifferenceTransferStrategy.h"
+  "coupling/transferstrategies/TransferStrategy4NieCoupling.cpph"
+  "coupling/transferstrategies/DirectTransferStrategy.h"
+  "coupling/paralleltopology/ParallelTopology.h"
+  "coupling/paralleltopology/ZYXTopology.h"
+  "coupling/paralleltopology/XYZTopology.h"
+  "coupling/paralleltopology/ParallelTopologyFactory.h"
+  "coupling/datastructures/MacroscopicCells.h"
+  "coupling/datastructures/MacroscopicCell.h"
+  "coupling/datastructures/MacroscopicCells.cpph"
+  "coupling/datastructures/Molecule.h"
+  "coupling/MultiMDMediator.h"
+  "coupling/configurations/ParticleInsertionConfiguration.h"
+  "coupling/configurations/TransferStrategyConfiguration.h"
+  "coupling/configurations/BoundaryForceConfiguration.h"
+  "coupling/configurations/CouetteConfiguration.h"
+  "coupling/configurations/MaMiCoConfiguration.cpph"
+  "coupling/configurations/MomentumInsertionConfiguration.h"
+  "coupling/configurations/ParallelTopologyConfiguration.h"
+  "coupling/configurations/MacroscopicCellConfiguration.h"
+  "coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/configurations/MacroscopicCellConfiguration.cpph"
+  "coupling/configurations/MaMiCoConfiguration.h"
+  "coupling/configurations/ThermostatConfiguration.h"
+  "coupling/VelocityGradientRelaxation.h"
+  "coupling/BoundaryForceController.h"
+  "coupling/interface/MDSimulationFactory.h"
+  "coupling/interface/MoleculeIterator.h"
+  "coupling/interface/MacroscopicSolverInterface.h"
+  "coupling/interface/impl/SimpleMD/SimpleMDMoleculeIterator.h"
+  "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
+  "coupling/interface/impl/SimpleMD/SimpleMDMolecule.h"
+  "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolverInterface.h"
+  "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolver.h"
+  "coupling/interface/impl/macroscopictestsolvers/MacroscopicSolverFactory.h"
+  "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolverInterface.h"
+  "coupling/interface/impl/macroscopictestsolvers/Helper.h"
+  "coupling/interface/impl/macroscopictestsolvers/UniformFlowSolverInterface.h"
+  "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolver.h"
+  "coupling/interface/MamicoInterfaceProvider.h"
+  "coupling/interface/Molecule.h"
+  "coupling/interface/MDSolverInterface.h"
+  "coupling/KineticEnergyController.h"
+  "coupling/solvers/FiniteDifferenceSolver.h"
+  "coupling/solvers/FDCouetteSolver.h"
+  "coupling/solvers/IcoFoamInterface.h"
   "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
   "coupling/solvers/LBCouetteSolver.h"
   "coupling/solvers/IcoFoamBufferSetup.h"
