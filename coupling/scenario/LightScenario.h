@@ -1,5 +1,4 @@
-#ifndef _COUPLING_TESTS_PRECICETEST_H_
-#define _COUPLING_TESTS_PRECICETEST_H_
+#pragma once
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
