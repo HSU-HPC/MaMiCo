@@ -334,7 +334,6 @@ elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
     target_link_libraries(mamico INTERFACE ${VTK_LIB})
   endif()
 endif()
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
   target_compile_options(mamico INTERFACE -Og -g3)
@@ -348,6 +347,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
+target_include_directories(mamico INTERFACE "tarch/logging/")
 
 #
 # Couette target
@@ -364,6 +364,22 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
 	target_compile_options(couette PRIVATE -std=c++17)
 endif()
 target_link_libraries(couette PRIVATE mamico)
+
+#
+# Light target
+#
+set(LIGHT_SOURCES
+	"coupling/indexing/IndexingService.cpp"
+	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
+  "coupling/scenario/main_light.cpp"
+)
+add_executable(light ${LIGHT_SOURCES})
+set_target_properties(light PROPERTIES CXX_STANDARD 17)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+	target_compile_options(light PRIVATE -std=c++17)
+endif()
+target_link_libraries(light PRIVATE mamico)
 
 #
 # test_lammps target

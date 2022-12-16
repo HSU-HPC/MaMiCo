@@ -5,11 +5,7 @@
 #define _MAIN_CPP_
 
 #include "coupling/CouplingMDDefinitions.h"
-<<<<<<<< HEAD:coupling/scenarios/main.cpp
-#include "coupling/scenarios/CouetteScenario.h"
-========
 #include "coupling/scenario/CouetteScenario.h"
->>>>>>>> master:coupling/scenario/main_couette.cpp
 #include <cstdlib>
 #include <iostream>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
