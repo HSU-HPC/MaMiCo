@@ -280,5 +280,3 @@ private:
   coupling::services::MultiMDCellService<simplemd::LinkedCell, 3>* _multiMDCellService;
   CouplingBuffer _buf;
 };
-
-#endif // _COUPLING_TESTS_PRECICETEST_H_

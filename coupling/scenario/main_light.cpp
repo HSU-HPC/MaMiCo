@@ -1,9 +1,3 @@
-// This file is part of the Mamico project. For conditions of distribution
-// and use, please see the copyright notice in Mamico's main folder, or at
-// www5.in.tum.de/mamico
-#ifndef _MAIN_CPP_
-#define _MAIN_CPP_
-
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/scenario/LightScenario.h"
 #include <cstdlib>
@@ -37,5 +31,3 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-
-#endif // _MAIN_CPP_
