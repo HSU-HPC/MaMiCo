@@ -7,7 +7,9 @@
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "precice/SolverInterface.hpp"
 #include "tarch/la/Vector.h"
-#include "tarch/logging/Logger.h"
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#include <mpi.h>
+#endif
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -29,7 +31,6 @@ public:
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
     _solverInterface = new precice::SolverInterface("mamico", "../precice-config.xml", _rank, size);
-    _logger.info("rank {} adapter created", _rank);
   }
 
   virtual ~PreciceAdapter() {
@@ -140,7 +141,6 @@ public:
   }
 
   double initialize() {
-    _logger.info("rank {} initializing precice", _rank);
     return _solverInterface->initialize();
   }
 
@@ -194,7 +194,6 @@ private:
   const static std::string m2M_MESH_NAME;
   const static std::string m2M_VELOCITY_NAME;
 
-  tarch::logging::Logger _logger;
   int _rank;
   const tarch::la::Vector<3, double> _mdDomainOffset;
   const tarch::la::Vector<3, double> _macroscopicCellSize;
