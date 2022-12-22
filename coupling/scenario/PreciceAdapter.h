@@ -45,11 +45,17 @@ public:
     if (_velocityM2mCells != NULL) {
       delete[] _velocityM2mCells;
     }
+    if (_vertexM2mCellIDs != NULL) {
+      delete[] _vertexM2mCellIDs;
+    }
     if (_coordsm2MCells != NULL) {
       delete[] _coordsm2MCells;
     }
     if (_velocitym2MCells != NULL) {
       delete[] _velocitym2MCells;
+    }
+    if (_vertexm2MCellIDs != NULL) {
+      delete[] _vertexm2MCellIDs;
     }
   }
 
@@ -73,6 +79,7 @@ public:
       _velocityM2mCells = new double[_numberOfM2mCells * dim];
     }
     if (_solverInterface->hasMesh(m2M_MESH_NAME)) {
+      std::cout << "LOL" << std::endl;
       std::vector<double> coordsm2MCells;
       _numberOfm2MCells = numberOfm2MCells;
       for (size_t i = 0; i < _numberOfm2MCells; i++) {
@@ -200,15 +207,15 @@ private:
 
   precice::SolverInterface* _solverInterface = NULL;
 
-  int* _vertexM2mCellIDs;
-  double* _coordsM2mCells;
+  int* _vertexM2mCellIDs = NULL;
+  double* _coordsM2mCells = NULL;
   unsigned int _numberOfM2mCells;
-  double* _velocityM2mCells;
+  double* _velocityM2mCells = NULL;
 
-  int* _vertexm2MCellIDs;
-  double* _coordsm2MCells;
+  int* _vertexm2MCellIDs = NULL;
+  double* _coordsm2MCells = NULL;
   unsigned int _numberOfm2MCells;
-  double* _velocitym2MCells;
+  double* _velocitym2MCells = NULL;
 };
 
 template<> const std::string PreciceAdapter<3>::M2m_MESH_NAME = "mamico-M2m-mesh";

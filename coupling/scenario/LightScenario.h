@@ -31,7 +31,38 @@ using Log::global_log;
 class LightScenario : public Scenario {
 public:
   LightScenario() : Scenario("LightScenario") {}
-  virtual ~LightScenario() {}
+  ~LightScenario() {
+    std::cout << "Shut down from LightScenario" << std::endl;
+    deleteBuffer(_buf._macro2MicroBuffer);
+    if (_buf._macro2MicroCellGlobalIndices != NULL) {
+      delete[] _buf._macro2MicroCellGlobalIndices;
+      _buf._macro2MicroCellGlobalIndices = NULL;
+    }
+    deleteBuffer(_buf._micro2MacroBuffer);
+    if (_buf._micro2MacroCellGlobalIndices != NULL) {
+      delete[] _buf._micro2MacroCellGlobalIndices;
+      _buf._micro2MacroCellGlobalIndices = NULL;
+    }
+    if (_instanceHandling != nullptr) {
+      delete _instanceHandling;
+    }
+    if (_multiMDService != NULL) {
+      delete _multiMDService;
+      _multiMDService = NULL;
+    }
+    if (_macroscopicSolverInterface != NULL) {
+      delete _macroscopicSolverInterface;
+      _macroscopicSolverInterface = NULL;
+    }
+    if (_preciceAdapter != NULL) {
+      delete _preciceAdapter;
+      _preciceAdapter = NULL;
+    }
+    if (_multiMDCellService != NULL) {
+      delete _multiMDCellService;
+      _multiMDCellService = NULL;
+    }
+  }
 
   virtual void run() {
 #if defined(LS1_MARDYN)
@@ -119,36 +150,6 @@ public:
       if (_buf._micro2MacroBuffer.size() != 0 && _scenarioConfig.csvEveryTimestep >= 1 && cycle % _scenarioConfig.csvEveryTimestep == 0)
         write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle, globalNumberMacroscopicCells,
                   (int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-    }
-
-    deleteBuffer(_buf._macro2MicroBuffer);
-    if (_buf._macro2MicroCellGlobalIndices != NULL) {
-      delete[] _buf._macro2MicroCellGlobalIndices;
-      _buf._macro2MicroCellGlobalIndices = NULL;
-    }
-    deleteBuffer(_buf._micro2MacroBuffer);
-    if (_buf._micro2MacroCellGlobalIndices != NULL) {
-      delete[] _buf._micro2MacroCellGlobalIndices;
-      _buf._micro2MacroCellGlobalIndices = NULL;
-    }
-    if (_instanceHandling != nullptr) {
-      delete _instanceHandling;
-    }
-    if (_multiMDService != NULL) {
-      delete _multiMDService;
-      _multiMDService = NULL;
-    }
-    if (_macroscopicSolverInterface != NULL) {
-      delete _macroscopicSolverInterface;
-      _macroscopicSolverInterface = NULL;
-    }
-    if (_preciceAdapter != NULL) {
-      delete _preciceAdapter;
-      _preciceAdapter = NULL;
-    }
-    if (_multiMDCellService != NULL) {
-      delete _multiMDCellService;
-      _multiMDCellService = NULL;
     }
   }
 
