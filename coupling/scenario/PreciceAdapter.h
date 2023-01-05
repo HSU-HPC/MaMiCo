@@ -205,17 +205,17 @@ private:
   const tarch::la::Vector<3, double> _mdDomainOffset;
   const tarch::la::Vector<3, double> _macroscopicCellSize;
 
-  precice::SolverInterface* _solverInterface = NULL;
+  precice::SolverInterface* _solverInterface = nullptr;
 
-  int* _vertexM2mCellIDs = NULL;
-  double* _coordsM2mCells = NULL;
-  unsigned int _numberOfM2mCells;
-  double* _velocityM2mCells = NULL;
+  int* _vertexM2mCellIDs = nullptr;
+  double* _coordsM2mCells = nullptr;
+  unsigned int _numberOfM2mCells = 0;
+  double* _velocityM2mCells = nullptr;
 
-  int* _vertexm2MCellIDs = NULL;
-  double* _coordsm2MCells = NULL;
-  unsigned int _numberOfm2MCells;
-  double* _velocitym2MCells = NULL;
+  int* _vertexm2MCellIDs = nullptr;
+  double* _coordsm2MCells = nullptr;
+  unsigned int _numberOfm2MCells = 0;
+  double* _velocitym2MCells = nullptr;
 };
 
 template<> const std::string PreciceAdapter<3>::M2m_MESH_NAME = "mamico-M2m-mesh";
