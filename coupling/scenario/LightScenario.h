@@ -32,7 +32,6 @@ class LightScenario : public Scenario {
 public:
   LightScenario() : Scenario("LightScenario") {}
   ~LightScenario() {
-    std::cout << "Shut down from LightScenario" << std::endl;
     deleteBuffer(_buf._macro2MicroBuffer);
     if (_buf._macro2MicroCellGlobalIndices != NULL) {
       delete[] _buf._macro2MicroCellGlobalIndices;
