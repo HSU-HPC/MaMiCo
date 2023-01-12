@@ -173,7 +173,6 @@ private:
     }
     _buf._macro2MicroCellGlobalIndices = new unsigned int[_buf._macro2MicroBuffer.size()];
     std::copy(macro2MicroBufferCellGlobalIndices.begin(), macro2MicroBufferCellGlobalIndices.end(), _buf._macro2MicroCellGlobalIndices);
-    std::cout << "rank " << _rank << " macro2Micro buffer numCells " << _buf._macro2MicroBuffer.size() << std::endl;
   }
 
   void allocateMicro2MacroBuffer() {
@@ -196,7 +195,6 @@ private:
     }
     _buf._micro2MacroCellGlobalIndices = new unsigned int[_buf._micro2MacroBuffer.size()];
     std::copy(micro2MacroBufferCellGlobalIndices.begin(), micro2MacroBufferCellGlobalIndices.end(), _buf._micro2MacroCellGlobalIndices);
-    std::cout << "rank " << _rank << " micro2Macro buffer numCells " << _buf._micro2MacroBuffer.size() << std::endl;
   }
 
   void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& micro2MacroBuffer, const unsigned int* const micro2MacroCellGlobalIndices,
