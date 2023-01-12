@@ -79,7 +79,6 @@ public:
       _velocityM2mCells = new double[_numberOfM2mCells * dim];
     }
     if (_solverInterface->hasMesh(m2M_MESH_NAME)) {
-      std::cout << "LOL" << std::endl;
       std::vector<double> coordsm2MCells;
       _numberOfm2MCells = numberOfm2MCells;
       for (size_t i = 0; i < _numberOfm2MCells; i++) {
