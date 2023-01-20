@@ -65,7 +65,7 @@ public:
 
   virtual void run() {
 #if defined(LS1_MARDYN)
-    global_log = new Log::Logger(Log::Error); // Info
+    global_log = new Log::Logger(Log::Debug); // Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif
