@@ -338,12 +338,17 @@ elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
     target_link_libraries(mamico INTERFACE ${VTK_LIB})
   endif()
   if(LS1_CACHE_ENABLE_ADIOS2)
-    target_compile_definitions(mamico INTERFACE "ENABLE_ADIOS2")
-    if(BUILD_WITH_MPI)
-      target_link_libraries(simplemd_interface INTERFACE adios2::cxx11_mpi MPI::MPI_CXX)
-    else()
-      target_link_libraries(simplemd_interface INTERFACE adios2::cxx11)
+    if (NOT DEFINED ADIOS2_HAVE_MPI)
+        set(ADIOS2_HAVE_MPI OFF)
     endif()
+    if ((ADIOS2_HAVE_MPI OR BUILD_WITH_MPI) AND (NOT (ADIOS2_HAVE_MPI AND BUILD_WITH_MPI))) # handish implementation of xor (cmake's EQUAL does not work)
+        message(FATAL_ERROR "
+        ADIOS2_HAVE_MPI set to \"${ADIOS2_HAVE_MPI}\" and mamico BUILD_WITH_MPI is set to \"${BUILD_WITH_MPI}\".
+        For a parallel build, MPI has to be enabled in the packaged ADIOS2 as well as mamico (ADIOS2_ENABLE_MPI=ON, BUILD_WITH_MPI=ON).
+        For a sequential build, deactivate MPI for both.")
+    endif()
+    target_compile_definitions(mamico INTERFACE ENABLE_ADIOS2)
+    target_link_libraries(mamico INTERFACE adios2::adios2)
   endif()
 endif()
 
