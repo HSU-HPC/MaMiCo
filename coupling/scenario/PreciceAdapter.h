@@ -188,6 +188,15 @@ public:
     if (_solverInterface->hasMesh(m2M_MESH_NAME)) {
       for (size_t i = 0; i < _numberOfm2MCells; i++) {
         tarch::la::Vector<3, double> vel((1.0 / m2MBuffer[i]->getMacroscopicMass()) * m2MBuffer[i]->getMacroscopicMomentum());
+        // CellIndex<dim> cellIdx{m2MCellGlobalIndices[i]};
+        // CellIndex<dim, IndexTrait::vector> cellIdxVector = cellIdx;
+        // if (isnan(vel[0])) {
+        //   // std::cout << "cellIdx:" << cellIdx << ", cellIdxVector:" << cellIdxVector << ", mass:" << m2MBuffer[i]->getMacroscopicMass();
+        //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+        //     std::cout <<_mdDomainOffset[currentDim] + cellIdxVector.get()[currentDim] * _macroscopicCellSize[currentDim] - _macroscopicCellSize[currentDim] + 0.5 * _macroscopicCellSize[currentDim] << " ";
+        //   }
+        //   std::cout << std::endl;
+        // }
         for (unsigned int currentDim = 0; currentDim < dim; currentDim++)
           _velocitym2MCells[dim * i + currentDim] = vel[currentDim];
       }

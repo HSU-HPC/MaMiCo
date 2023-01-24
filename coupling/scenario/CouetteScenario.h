@@ -1,8 +1,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _COUPLING_TESTS_COUETTETEST_H_
-#define _COUPLING_TESTS_COUETTETEST_H_
+#ifndef _COUPLING_SCENARIO_COUETTESCENARIO_H_
+#define _COUPLING_SCENARIO_COUETTESCENARIO_H_
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/ErrorEstimation.h"
@@ -1113,4 +1113,4 @@ private:
   coupling::MultiMDMediator<MY_LINKEDCELL, 3>* _multiMDMediator;
 };
 
-#endif // _COUPLING_TESTS_COUETTETEST_H_
+#endif // _COUPLING_SCENARIO_COUETTESCENARIO_H_
