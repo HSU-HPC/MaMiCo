@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+
+<!-- Configuration for CouetteTest.h, a configurable Couette flow test for noise-filtered multi-instance Nie coupling -->
+<couette-test>
+  <!-- Simulation domain / scenario parameters:
+    - double channelheight:
+      z distance between upper and lower wall (parallel plates)
+      Since the domain is cubic, this determines also the domain size in x and y directions.
+    - Vector<3,double> wall-velocity:
+      Speed of moving wall (for all timesteps after wall-init-cycles coupling cycles)
+    - optional int wall-init-cycles:
+      Number of coupling cycles with wall-init-velocity applied instead of wall-velocity
+      This can be used to investigate or initialize the simulation before the couette startup.
+      There is no interpolation between wall-init-velocity and wall-velocity.
+    - optional Vector<3,double> wall-init-velocity:
+      Speed of moving wall, for the first wall-init-cycles simulation cycles
+      Should be "0.0 ; 0.0 ; 0.0" unless e.g multi-stage startup is desired.
+    - optional double wall-oscillations:
+      To create oscillating couette scenario, define the total number of periods during all coupling cycles here.
+      For every CYCLE after wall-init-cycles, wall speed will equal:
+        wall-velocity * cos(2PI * wall-oscillations * CYCLE / coupling-cycles)
+  -->
+  <domain
+    channelheight="100"
+    wall-init-velocity="0.0 ; 0.0 ; 0.0"
+    wall-init-cycles="0"
+    wall-velocity="1.5 ; 0.0 ; 0.0"
+    wall-oscillations="0"
+  />
+
+  <!-- Coupled simulation general setup parameters:
+    - int coupling-cycles:
+      Total number of coupling cycles to run. Each cycle may consist of e.g. 100 MD timesteps.
+    - bool two-way-coupling:
+      Enables / disables the use of MD data as boundary condition in LBCouetteSolver.
+    - bool send-from-md-to-macro:
+      Enables / disables the data transfer from MD instances, merging, and communication to macroscopic-solver ranks.
+    - bool send-from-macro-to-md:
+      Enables / disables data extraction from couette solver and communication to MD ranks.
+    - int filter-init-cycles:
+      Number of cycles with two-way-coupling and compute-snr disabled at simulation startup, used for initialisation of noise filter. TODO rename?
+    - int write-csv-every-timestep:
+      Writes data collected by sendFromMD2Macro, i.e. noise filter output, to CSV file; for evaluation.
+      timestep means coupling cycle here.
+    - bool compute-snr:
+      Enables / disables computation of signal-to-noise ratio between filter output and macroscopic solver, writes to stdout. Only for sequential tests.
+  -->
+  <coupling
+    coupling-cycles="1000"
+    two-way-coupling="no"
+    send-from-md-to-macro="yes"
+    filter-init-cycles="0"
+    write-csv-every-timestep="0"
+    send-from-macro-to-md="yes"
+    compute-snr="no"
+  />
+
+  <!-- Configuration parameters for macroscopic solver:
+    - string type:
+      Supports "lb" (Lattice Boltzmann solver), "fd" (simple, sequential finite difference solver), "foam" (sequential, finite difference solver icoFoam from OpenFOAM) or "analytical".
+      Note that analytic solver only supports flow in x-direction, is only active on rank 0,
+      and that it does not model viscous shear forces in the oscillating wall case (i.e. changes of wall-velocity are propagated through the whole domain instantaneously).
+      The LB solver does not impose these limitations and can be parallelized.
+    - lb: Vector<3,unsigned int> number-of-processes:
+      Number of LB ranks per direction (x; y; z)
+    - lb: int plot-every-timestep:
+      VTK plotting per time step, only for LB solver
+    - double viscosity:
+      Dynamic viscosity of fluid
+    - int init-advance-cycles:
+      Advances the macroscopic-solver before starting the coupling. Can be used for analytic solver and oscillating wall,
+      to skip couette startup.
+    - foam: string foam-setup-directory:
+      path to the OpenFOAM setup directory
+    - foam: string foam-setup-folder:
+      name of the OpenFOAM folder
+    - foam: Vector<12,unsigned int> boundaries-with-MD:
+      vector of '0' and '1', '1' for a boundary OpenFOAM when it shall be coupled with MaMiCo, uses the order according to the blockMesh order, '0' when the boundary shall not be coupled
+  -->
+  <macroscopic-solver
+    type="lb"
+    viscosity="2.14"
+    number-of-processes="1 ; 1 ; 1"
+    plot-every-timestep="0"
+    init-advance-cycles="0"
+    foam-setup-directory="/home/helene/Dokumente/mamico-dev/coupling/tests/build_couette"
+    foam-setup-folder="FoamSetup"
+    boundaries-with-MD="0; 0; 0; 0; 0; 0; 1; 1; 1; 1; 1; 1"
+  />
+
+  <!-- Configuration parameters for microscopic solver:
+    - string type:
+      Supports "md" (SimpleMD) or "synthetic" (data from macroscopic plus gaussian noise).
+      Synthetic runs sequentially only and does not support parallel communication, so send-from-x-to-x must be "no".
+      Hence, in the Synthetic + LB case, macroscopic-solver_number-of-processes must be "1 ; 1 ; 1"
+      Synthetic MD does not support multi-instance sampling.
+    - md: double temperature:
+      Temperature of MD system, is initially applied to the molecules using the thermostat.
+    - md: int equilibration-steps
+      Number of MD timesteps to run before start of coupled simulation.
+      Can be 0 if MD checkpoint is used.
+    - md: int number-md-simulations:
+      Total number of MD instances.
+      Set to 1 to disable multi-instance sampling.
+    - synthetic: double noise-sigma
+      Standard deviation of gaussian noise used to emulate MD flow field data, e.g. "0.1667".
+    - double density:
+      Density of fluid
+      Should be equal to molecules-per-direction[0] / domain-size[0] * molecules-per-direction[1] / domain-size[1] * molecules-per-direction[2] / domain-size[2], unless MD checkpoint is used.
+  -->
+  <microscopic-solver
+    type="md"
+    temperature="1.1"
+    equilibration-steps="10000"
+    number-md-simulations="1"
+    density="0.813037037"
+  />
+
+  <!-- Optional feature: tws-loop
+    Used to override time-window-size (tws) parameter in <mamico <noise-reduction>>
+    Reruns the complete simulation for a range of time-window-size values.
+    - int min:
+      Starting value of tws.
+    - int max:
+      Loop while tws <= max.
+    - optional int step:
+      Increments tws by step, default 1.
+    Example <tws-loop min="3" max="100" step="5" />
+  -->
+</couette-test>
+
+<!-- MaMiCo configuration for NieTest, as described in the respective paper -->
+<mamico>
+  <!-- "write-every-macroscopic-timestep" means CFD time step /-->
+  <macroscopic-cell-configuration
+    cell-size="2.5 ; 2.5 ; 2.5"
+    linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+    write-every-microscopic-timestep="0"
+    microscopic-filename="MacroscopicCell_micro"
+    write-every-macroscopic-timestep="0"
+    macroscopic-filename="MacroscopicCell_macro"
+  />
+  <!-- particle-insertion type="usher" enables removal of particles  /-->
+  <!-- TODO choose insert-every-timestep automatically /-->
+  <!-- TODO check tolerance criterium /-->
+  <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
+  <!--<particle-insertion type="none" />/-->
+  <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
+  <!-- TODO inconsistent mass flux evaluation? /-->
+  <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
+  <!-- time-window-size means number of coupling cycles/-->
+  <!-- TODO try to use local density for boundary force /-->
+  <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
+  <parallel-topology type="xyz" />
+  <!-- the thermostat option defines, where to apply the above defined temperature within the md region, options:
+    -all: the thermostat will be applied in every cell of the md region
+    -outerLayers: the thermostat will be applied in the value defined in "number-layers" (integer value) number of layers, starting with the most outer layer
+    -onlyOutestLayer: the thermostat will be applied only in the outest cell layer of the md region
+    -nowhere: the thermostat will be applied nowehere within the md region /-->
+  <thermostat type='outerLayers' number-layers='1' />
+</mamico>
+
+<molecular-dynamics>
+
+  <!-- initial temperature should be 1.27 to reach 1.1 after equilibration /-->
+  <molecule-configuration
+    mass="1.0"
+    temperature="1.27"
+    sigma="1.0"
+    epsilon="1.0"
+    mean-velocity="0.0 ; 0.0 ; 0.0"
+  ></molecule-configuration>
+
+  <!-- number of linked cells must be divisible by number-of-processes /-->
+  <!-- number of mpi ranks must be total number-of-processes /-->
+  <mpi-configuration number-of-processes="1 ; 1 ; 1" ></mpi-configuration>
+
+  <!-- TODO check fix-seed for mamico / USHER /-->
+  <simulation-configuration
+    dt="0.005"
+    number-of-timesteps="50"
+    reorganise-memory-every-timestep="20"
+    compute-macroscopic-quantities-every-timestep="0"
+    fix-seed="no"
+   ></simulation-configuration>
+
+  <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
+
+  <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
+
+  <!-- max density using molecules-per-direction ca. 0.9  /-->
+  <!-- cutoff-radius should be 2.2 to be consistent with Nie et. al paper /-->
+  <!-- init-from-sequential-checkpoint="CheckpointSimpleMD_10000_reflecting" /-->
+  <domain-configuration
+    molecules-per-direction="56; 56; 56"
+    domain-size="60.0 ; 60.0 ; 60.0"
+    domain-offset="20.0 ; 20.0 ; 40.0"
+    cutoff-radius="2.2"
+    linked-cell-size="2.5 ; 2.5 ; 2.5"
+    k_B="1.0"
+    block-size="100"
+
+    bottom-south-west="reflecting" bottom-south="reflecting" bottom-south-east="reflecting"
+    bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
+    bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
+
+    south-west="reflecting"        south="reflecting"        south-east="reflecting"
+    west="reflecting"                                          east="reflecting"
+    north-west="reflecting"        north="reflecting"        north-east="reflecting"
+
+    top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
+    top-west="reflecting"          top="reflecting"          top-east="reflecting"
+    top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
+  > </domain-configuration>
+
+</molecular-dynamics>
+
+<!-- XML config file used by MaMiCo's FilterPipeline -->
+<filter-pipeline>
+
+    <per-instance output="md">
+      <test-md-domain-values input= "mdAndOuter" filtered-values="velocity">
+        <asymmetrical-write-to-file-junctor
+          wtf1-location="couette_md_domain_top_0_oscil_1_5_u_wall.csv"
+          wtf2-location="couette_combined_domain_top_0_oscil_1_5_u_wall.csv"
+        />
+      </test-md-domain-values>
+    </per-instance>
+
+    <post-multi-instance output="md">
+    </post-multi-instance>
+</filter-pipeline>
