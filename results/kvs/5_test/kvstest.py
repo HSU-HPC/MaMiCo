@@ -387,7 +387,7 @@ class LBSolver():
         self.cpm = cpm = cfg.getint("macroscopic-solver", "cells-per-meter")
         self.domain_size = (int(2.5*cpm), int(0.41*cpm), int(0.41*cpm))
         self.vis = 1e-3
-        self.scaling = Scaling(physical_length=0.1, physical_velocity=1, kinematic_viscosity=self.vis,
+        self.scaling = Scaling(physical_length=0.1, physical_velocity=2.25, kinematic_viscosity=self.vis,
              cells_per_length=0.1*cpm)
         self.omega = cfg.getfloat("macroscopic-solver", "omega")
         if self.omega > 1.92:
@@ -424,7 +424,7 @@ class LBSolver():
                 optTarget = Target.GPU
         except ImportError:   # for lbmpy version <= 0.3.4
             optTarget = self.cfg.get("macroscopic-solver", "optimization-target")
-        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method='srt',stencil='D3Q19',
+        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method='trt',stencil='D3Q19',
             relaxation_rate=self.omega, periodicity=(True, False, False),
             optimization={'target':optTarget, 
             'gpu_indexing':'line', 
