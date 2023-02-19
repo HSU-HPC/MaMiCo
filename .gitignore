@@ -1,10 +1,10 @@
 build/
 .sconsign.dblite
-*.csv
-*.vtk
-*.vti
-*.o
-*.out
+**/*.csv
+**/*.vtk
+**/*.vti
+**/*.o
+**/*.out
 out/
 !coupling/tests/build/
 coupling/tests/build_nie/test
