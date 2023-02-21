@@ -6,9 +6,9 @@
 # Helmut Schmidt University, Hamburg. Chair for High Performance Computing
 # BSD license, see the copyright notice in Mamico's main folder
 
-from datetime import time
 import sys
 sys.path.append('../../../../build')
+# sys.path.append('../../coupling/filtering/filters')
 import coloredlogs
 import logging
 import math
@@ -24,13 +24,12 @@ from configparser import ConfigParser
 import matplotlib.pyplot as mplt
 import adios2
 
-
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
 
 
 BENCH_BEFORE_RUN = False
-RANK = mamico.tarch.utils.initMPI()
+# RANK = mamico.tarch.utils.initMPI()
 
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
@@ -423,7 +422,7 @@ class KVSTest():
         return [math.floor(domainSize[d]/dx[d]+0.5) for d in range(3)]
 
 
-if RANK == 0:    # This fixes last_config.json-Error
+if self.rank == 0:    # This fixes last_config.json-Error
     from lbmpy.session import *
     from lbmpy.parameterization import Scaling
 
