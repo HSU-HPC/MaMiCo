@@ -7,7 +7,7 @@
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=1    # number of cores per process
 #SBATCH --time=06:00:00
-#SBATCH --output=/beegfs/project/MaMiCo/mamico-ml/MaMiCo/results/kvs/1_init_timesteps_22000/1_NW/kvs_init_22000_NW_%j.log # log file which will contain all output
+#SBATCH --output=/beegfs/project/MaMiCo/mamico-ml/MaMiCo/results/kvs/1_init_timesteps_22000/1_NW/kvs_init_22000_NW_%j.log  # log file which will contain all output
 
 # commands to be executed
 source /beegfs/project/MaMiCo/setup-env.sh

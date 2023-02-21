@@ -10,11 +10,11 @@
     write-every-macroscopic-timestep="0"
     macroscopic-filename="MacroscopicCell_macro"
   />
-  <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
-  <!--<particle-insertion type="none" />/-->
+  <!--<particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />-->
+  <particle-insertion type="none" />
   <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
   <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="yes" mass-flux-south="yes" mass-flux-bottom="yes" mass-flux-top="yes" />
-  <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
+  <boundary-force type="zhou-boundary-force" west="no" east="no" north="no" south="no" bottom="no" top="no" density="0.81" temperature="1.1" />
   <parallel-topology type="xyz" />
     <!-- the thermostat option defines, where to apply the above defined temperature within the md region, options:
     -all: the thermostat will be applied in every cell of the md region
@@ -58,17 +58,17 @@
     k_B="1.0"
     block-size="100"
 
-    bottom-south-west="reflecting" bottom-south="reflecting" bottom-south-east="reflecting"
-    bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
-    bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
+    bottom-south-west="periodic"   bottom-south="periodic" bottom-south-east="periodic"
+    bottom-west="periodic"       bottom="periodic"       bottom-east="periodic"
+    bottom-north-west="periodic" bottom-north="periodic" bottom-north-east="periodic"
 
-    south-west="reflecting"        south="reflecting"        south-east="reflecting"
-    west="reflecting"                                          east="reflecting"
-    north-west="reflecting"        north="reflecting"        north-east="reflecting"
+    south-west="periodic"        south="periodic"        south-east="periodic"
+    west="periodic"                                          east="periodic"
+    north-west="periodic"        north="periodic"        north-east="periodic"
 
-    top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
-    top-west="reflecting"          top="reflecting"          top-east="reflecting"
-    top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
+    top-south-west="periodic"    top-south="periodic"    top-south-east="periodic"
+    top-west="periodic"          top="periodic"          top-east="periodic"
+    top-north-west="periodic"    top-north="periodic"    top-north-east="periodic"
   > </domain-configuration>
 </molecular-dynamics>
 

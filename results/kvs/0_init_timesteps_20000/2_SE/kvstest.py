@@ -6,8 +6,10 @@
 # Helmut Schmidt University, Hamburg. Chair for High Performance Computing
 # BSD license, see the copyright notice in Mamico's main folder
 
-import logging
-import coloredlogs
+import sys
+sys.path.append('../../../../build')
+# sys.path.append('../../coupling/filtering/filters')
+import adios2
 import matplotlib.pyplot as mplt
 from configparser import ConfigParser
 import pandas as pd
@@ -19,9 +21,8 @@ from mamico.coupling.services import MultiMDCellService
 import mamico.tarch.configuration
 import json
 import math
-import sys
-sys.path.append('../../../../build')
-# sys.path.append('../../coupling/filtering/filters')
+import logging
+import coloredlogs
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -41,7 +42,7 @@ RANK = mamico.tarch.utils.initMPI()
 class KVSTest():
     def __init__(self, cfg):
         self.cfg = cfg
-        self.rank = mamico.tarch.utils.initMPI()
+        self.rank = RANK
         if self.rank == 0:
             log.info("Created KVSTest ...")
 
