@@ -6,22 +6,22 @@
 # Helmut Schmidt University, Hamburg. Chair for High Performance Computing
 # BSD license, see the copyright notice in Mamico's main folder
 
-import logging
-import coloredlogs
-import matplotlib.pyplot as mplt
-from configparser import ConfigParser
-import pandas as pd
-import numpy as np
-import mamico.tarch.utils
-import mamico.coupling
-from mamico.coupling.solvers import CouetteSolverInterface
-from mamico.coupling.services import MultiMDCellService
-import mamico.tarch.configuration
-import json
-import math
+from datetime import time
 import sys
-sys.path.append('../../../../build')
-# sys.path.append('../../coupling/filtering/filters')
+import coloredlogs, logging
+import math
+import json
+import mamico.tarch.configuration
+from mamico.coupling.services import MultiMDCellService
+from mamico.coupling.solvers import CouetteSolverInterface
+import mamico.coupling
+import mamico.tarch.utils
+import numpy as np
+import pandas as pd
+from configparser import ConfigParser
+import matplotlib.pyplot as mplt
+import adios2
+
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
