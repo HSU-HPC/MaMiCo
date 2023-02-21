@@ -9,27 +9,27 @@
 import sys
 sys.path.append('../../../../build')
 # sys.path.append('../../coupling/filtering/filters')
-import coloredlogs
-import logging
-import math
-import json
-import mamico.tarch.configuration
-from mamico.coupling.services import MultiMDCellService
-from mamico.coupling.solvers import CouetteSolverInterface
-import mamico.coupling
-import mamico.tarch.utils
-import numpy as np
-import pandas as pd
-from configparser import ConfigParser
-import matplotlib.pyplot as mplt
 import adios2
+import matplotlib.pyplot as mplt
+from configparser import ConfigParser
+import pandas as pd
+import numpy as np
+import mamico.tarch.utils
+import mamico.coupling
+from mamico.coupling.solvers import CouetteSolverInterface
+from mamico.coupling.services import MultiMDCellService
+import mamico.tarch.configuration
+import json
+import math
+import logging
+import coloredlogs
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
 
 
 BENCH_BEFORE_RUN = False
-# RANK = mamico.tarch.utils.initMPI()
+RANK = mamico.tarch.utils.initMPI()
 
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
@@ -42,7 +42,7 @@ BENCH_BEFORE_RUN = False
 class KVSTest():
     def __init__(self, cfg):
         self.cfg = cfg
-        self.rank = mamico.tarch.utils.initMPI()
+        self.rank = RANK
         if self.rank == 0:
             log.info("Created KVSTest ...")
 
@@ -422,7 +422,7 @@ class KVSTest():
         return [math.floor(domainSize[d]/dx[d]+0.5) for d in range(3)]
 
 
-if self.rank == 0:    # This fixes last_config.json-Error
+if RANK == 0:    # This fixes last_config.json-Error
     from lbmpy.session import *
     from lbmpy.parameterization import Scaling
 
