@@ -8,7 +8,9 @@
 
 from datetime import time
 import sys
-import coloredlogs, logging
+sys.path.append('../../../../build')
+import coloredlogs
+import logging
 import math
 import json
 import mamico.tarch.configuration
