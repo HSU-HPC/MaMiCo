@@ -6,10 +6,10 @@
 # Helmut Schmidt University, Hamburg. Chair for High Performance Computing
 # BSD license, see the copyright notice in Mamico's main folder
 
-from lbmpy.session import *
-import logging
-import coloredlogs
-from lbmpy.parameterization import Scaling
+import sys
+sys.path.append('../../../../build')
+# sys.path.append('../../coupling/filtering/filters')
+import adios2
 import matplotlib.pyplot as mplt
 from configparser import ConfigParser
 import pandas as pd
@@ -21,15 +21,15 @@ from mamico.coupling.services import MultiMDCellService
 import mamico.tarch.configuration
 import json
 import math
-import sys
-sys.path.append('../../../../build')
-# sys.path.append('../../coupling/filtering/filters')
+import logging
+import coloredlogs
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
 
 
-BENCH_BEFORE_RUN = True
+BENCH_BEFORE_RUN = False
+RANK = mamico.tarch.utils.initMPI()
 
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
@@ -42,7 +42,7 @@ BENCH_BEFORE_RUN = True
 class KVSTest():
     def __init__(self, cfg):
         self.cfg = cfg
-        self.rank = mamico.tarch.utils.initMPI()
+        self.rank = RANK
         if self.rank == 0:
             log.info("Created KVSTest ...")
 
@@ -284,19 +284,26 @@ class KVSTest():
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
         self.png = self.cfg.getint("coupling", "png-every-timestep")
+        self.adios2 = self.cfg.getint("coupling", "adios2-every-timestep")
 
         # buffer for evaluation plot
         if self.rank == 0:
             self.velLB = np.zeros(
                 (self.cfg.getint("coupling", "couplingCycles"), 2))
-
+            if self.adios2 > 0:
+                self.adiosfile = adios2.open("kvstest_volume.bp", "w")
+                timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration(
+                ).getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
+                print("timefactor:", timefactor)
+                self.adiosfile.write_attribute('timefactor', str(timefactor))
         if self.rank == 0:
             log.info("Finished initSolvers")  # after ? ms
 
     def shutdown(self):
         if self.rank == 0:
             log.info("Finished " + str(self.mdStepCounter) + " MD timesteps")
-
+            if self.adios2 > 0:
+                self.adiosfile.close()
         #Analyse data gathered by StrouhalPython filter
         #self.sf.calculateStrouhalNumber()
 
@@ -335,6 +342,33 @@ class KVSTest():
             if self.png > 0 and (cycle+1) % self.png == 0:
                 filename = "kvstest_" + str(cycle+1) + ".png"
                 self.macroscopicSolver.plot(filename)
+
+            if self.adios2 > 0 and (cycle+1) % self.adios2 == 0:
+               to_write = np.ascontiguousarray(
+                   self.macroscopicSolver.scen.velocity[:, :, :, :].data, dtype=np.float32)
+               log.info("writing to adios2 " + str(type(to_write)) + " with shape "
+                        + str(to_write.shape) + " and dtype " + str(to_write.dtype))
+               shape = np.array(self.macroscopicSolver.scen.velocity[:, :, :, 0].data.shape) * \
+                   self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
+               offset = [0., 0., 0.]
+               print(shape)
+               print(mdpos)
+               print(self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize())
+               offset[0] = -((mdpos[0]/to_write.shape[0] * shape[0])-(
+                   0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[0]))
+               offset[1] = -((mdpos[1]/to_write.shape[1] * shape[1])-(
+                   0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[1]))
+               offset[2] = -((mdpos[2]/to_write.shape[2] * shape[2])-(
+                   0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[2]))
+               print(offset)
+               gb_to_write = np.array(
+                   [offset[0], offset[1], offset[2], offset[0] + shape[0], offset[1] + shape[1], offset[2] + shape[2]])
+               print(gb_to_write)
+               self.adiosfile.write("global_box", gb_to_write, gb_to_write.shape, np.zeros_like(
+                   gb_to_write.shape), gb_to_write.shape)
+               self.adiosfile.write("velocity", to_write, to_write.shape, np.zeros_like(
+                   to_write.shape), to_write.shape)
+               self.adiosfile.end_step()
 
         if self.cfg.getboolean("coupling", "send-from-macro-to-md"):
             self.multiMDCellService.sendFromMacro2MD(self.buf)
@@ -386,6 +420,11 @@ class KVSTest():
         domainSize = self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()
         dx = self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
         return [math.floor(domainSize[d]/dx[d]+0.5) for d in range(3)]
+
+
+if RANK == 0:    # This fixes last_config.json-Error
+    from lbmpy.session import *
+    from lbmpy.parameterization import Scaling
 
 
 lb_log = logging.getLogger('LBSolver')
@@ -464,7 +503,7 @@ class LBSolver():
         self.scen.boundary_handling.set_boundary(outflow, make_slice[-1, :, :])
 
     def advance(self, timesteps):
-        vtk_every_ts = 500000
+        vtk_every_ts = 100000
        	ts_goal = self.timesteps_finished + timesteps
         while self.timesteps_finished < ts_goal:
             if ts_goal - self.timesteps_finished < vtk_every_ts:
