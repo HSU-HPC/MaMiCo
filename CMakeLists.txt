@@ -367,36 +367,20 @@ endif()
 target_include_directories(mamico INTERFACE "tarch/logging/")
 
 #
-# Couette target
+# Main target
 #
-set(COUETTE_SOURCES
+set(MAIN_SOURCES
 	"coupling/indexing/IndexingService.cpp"
 	"coupling/configurations/ParticleInsertionConfiguration.cpp"
   "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-  "coupling/scenario/main_couette.cpp"
+  "coupling/scenario/main.cpp"
 )
-add_executable(couette ${COUETTE_SOURCES})
-set_target_properties(couette PROPERTIES CXX_STANDARD 17)
+add_executable(main ${MAIN_SOURCES})
+set_target_properties(main PROPERTIES CXX_STANDARD 17)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-	target_compile_options(couette PRIVATE -std=c++17)
+	target_compile_options(main PRIVATE -std=c++17)
 endif()
-target_link_libraries(couette PRIVATE mamico)
-
-#
-# Light target
-#
-set(LIGHT_SOURCES
-	"coupling/indexing/IndexingService.cpp"
-	"coupling/configurations/ParticleInsertionConfiguration.cpp"
-  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-  "coupling/scenario/main_light.cpp"
-)
-add_executable(light ${LIGHT_SOURCES})
-set_target_properties(light PROPERTIES CXX_STANDARD 17)
-if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-	target_compile_options(light PRIVATE -std=c++17)
-endif()
-target_link_libraries(light PRIVATE mamico)
+target_link_libraries(main PRIVATE mamico)
 
 #
 # test_lammps target

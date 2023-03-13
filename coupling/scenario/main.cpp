@@ -1,5 +1,15 @@
+// This file is part of the Mamico project. For conditions of distribution
+// and use, please see the copyright notice in Mamico's main folder, or at
+// www5.in.tum.de/mamico
+#ifndef _MAIN_CPP_
+#define _MAIN_CPP_
+
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/scenario/LightScenario.h"
+#if (BUILD_WITH_PRECICE)
+#include "coupling/scenario/PreciceScenario.h"
+#else
+#include "coupling/scenario/CouetteScenario.h"
+#endif
 #include <cstdlib>
 #include <iostream>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -23,7 +33,13 @@ int main(int argc, char* argv[]) {
 #endif
 
   // run scenarios
-  runScenario(new LightScenario());
+  Scenario* scenario;
+#if (BUILD_WITH_PRECICE)
+  scenario = new PreciceScenario();
+#else
+  scenario = new CouetteScenario();
+#endif
+  runScenario(scenario);
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();
@@ -31,3 +47,5 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
+
+#endif // _MAIN_CPP_

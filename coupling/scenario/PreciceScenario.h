@@ -2,17 +2,17 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
-#include "coupling/configurations/ScenarioConfiguration.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
-#include "coupling/scenario/PreciceAdapter.h"
+#include "coupling/solvers/PreciceAdapter.h"
 #include "coupling/scenario/Scenario.h"
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
-#include "precice/SolverInterface.hpp"
+#include "coupling/solvers/PreciceAdapter.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+#include "tarch/configuration/Configuration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -28,10 +28,10 @@
 using Log::global_log;
 #endif
 
-class LightScenario : public Scenario {
+class PreciceScenario : public Scenario {
 public:
-  LightScenario() : Scenario("LightScenario") {}
-  ~LightScenario() {
+  PreciceScenario() : Scenario("PreciceScenario") {}
+  ~PreciceScenario() {
     deleteBuffer(_buf._macro2MicroBuffer);
     if (_buf._macro2MicroCellGlobalIndices != NULL) {
       delete[] _buf._macro2MicroCellGlobalIndices;
@@ -63,7 +63,7 @@ public:
     }
   }
 
-  virtual void run() {
+  void run() {
 #if defined(LS1_MARDYN)
     global_log = new Log::Logger(Log::Error); // Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -79,7 +79,7 @@ public:
                                                                                                                            "molecular-dynamics", _mdConfig);
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<dim>>(xmlConfigurationFilename, "mamico",
                                                                                                                      _mamicoConfig);
-    _scenarioConfig = coupling::configurations::ScenarioConfig::parseConfiguration(xmlConfigurationFilename);
+    tarch::configuration::ParseConfiguration::parseConfiguration<ScenarioConfig>(xmlConfigurationFilename, "scenario", _scenarioConfig);
 #if defined(LS1_MARDYN)
     assert((_mamicoConfig.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3, unsigned int>(1)));
     auto offset = _mdConfig.getDomainConfiguration().getGlobalDomainOffset();
@@ -103,8 +103,8 @@ public:
     for (unsigned int d = 0; d < 3; d++) {
       globalNumberMacroscopicCells[d] = floor(_mdConfig.getDomainConfiguration().getGlobalDomainSize()[d] / macroscopicCellSize[d] + 0.5);
     }
-    _macroscopicSolverInterface =
-        new MyMacroscopicSolverInterface<dim>(globalNumberMacroscopicCells, (int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _rank);
+    _macroscopicSolverInterface = new coupling::solvers::PreciceInterface<dim>(globalNumberMacroscopicCells,
+                                                                               (int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _rank);
     coupling::indexing::IndexingService<dim>::getInstance().init(_mdConfig, _mamicoConfig, _macroscopicSolverInterface, _rank);
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
         _instanceHandling->getMDSolverInterface(), _macroscopicSolverInterface, _mdConfig, _mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
@@ -113,9 +113,9 @@ public:
     _multiMDCellService->computeAndStoreTemperature(_scenarioConfig.temp);
     allocateMacro2MicroBuffer();
     allocateMicro2MacroBuffer();
-    _preciceAdapter = new PreciceAdapter<dim>(mdGlobalDomainOffset, macroscopicCellSize);
+    _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>("mamico-M2m-mesh", "mamico-m2M-mesh", "Velocity", "Velocity");
     _preciceAdapter->setMeshes(_buf._macro2MicroCellGlobalIndices, _buf._macro2MicroBuffer.size(), _buf._micro2MacroCellGlobalIndices,
-                               _buf._micro2MacroBuffer.size());
+                               _buf._micro2MacroBuffer.size(), mdGlobalDomainOffset, macroscopicCellSize);
     double precice_dt = _preciceAdapter->initialize();
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
@@ -238,6 +238,28 @@ private:
     buffer.clear();
   }
 
+  struct ScenarioConfig : public tarch::configuration::Configuration {
+    ~ScenarioConfig() {}
+
+    void parseSubtag(tinyxml2::XMLElement* node) override {
+      tinyxml2::XMLElement* subtag = node->FirstChildElement("coupling");
+      tarch::configuration::ParseConfiguration::readIntMandatory(csvEveryTimestep, subtag, "write-csv-every-timestep");
+      subtag = node->FirstChildElement("microscopic-solver");
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(temp, subtag, "temperature");
+      tarch::configuration::ParseConfiguration::readIntMandatory(equSteps, subtag, "equilibration-steps");
+      tarch::configuration::ParseConfiguration::readIntMandatory(totalNumberMDSimulations, subtag, "number-md-simulations");
+    };
+
+    std::string getTag() const override { return "scenario"; };
+
+    bool isValid() const override { return true; };
+
+    int csvEveryTimestep;
+    int equSteps;
+    double temp;
+    int totalNumberMDSimulations;
+  };
+
   struct CouplingBuffer {
     std::vector<coupling::datastructures::MacroscopicCell<3>*> _macro2MicroBuffer;
     unsigned int* _macro2MicroCellGlobalIndices;
@@ -245,50 +267,12 @@ private:
     unsigned int* _micro2MacroCellGlobalIndices;
   };
 
-  template <unsigned int dim> class MyMacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
-  public:
-    MyMacroscopicSolverInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const int overlap, const int rank)
-        : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _rank(rank) {}
-
-    bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-      bool rcv = true;
-      for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-        rcv &= (int)globalCellIndex[currentDim] >= 1 + (_overlap - 1);
-        rcv &= (int)globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - (_overlap - 1);
-      }
-      return rcv;
-    }
-
-    bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-      bool isGhostCell = false;
-      bool isInner = true;
-      for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-        isGhostCell |= (int)globalCellIndex[currentDim] > _globalNumberMacroscopicCells[currentDim];
-        isGhostCell |= (int)globalCellIndex[currentDim] < 1;
-        isInner &= (int)globalCellIndex[currentDim] >= 1 + _overlap;
-        isInner &= (int)globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - _overlap;
-      }
-      return (!isGhostCell) && (!isInner);
-    }
-
-    std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
-
-    std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
-
-    std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
-
-  private:
-    const tarch::la::Vector<3, int> _globalNumberMacroscopicCells;
-    const int _overlap;
-    const int _rank;
-  };
-
   int _rank{0};
   simplemd::configurations::MolecularDynamicsConfiguration _mdConfig;
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
-  coupling::configurations::ScenarioConfig _scenarioConfig;
+  ScenarioConfig _scenarioConfig;
   unsigned int _mdStepCounter{0};
-  PreciceAdapter<3>* _preciceAdapter;
+  coupling::solvers::PreciceAdapter<3>* _preciceAdapter;
   coupling::interface::MacroscopicSolverInterface<3>* _macroscopicSolverInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
