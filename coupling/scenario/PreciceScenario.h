@@ -91,17 +91,19 @@ public:
     _multiMDService = new tarch::utils::MultiMDService<dim>(_mdConfig.getMPIConfiguration().getNumberOfProcesses(), _scenarioConfig.totalNumberMDSimulations);
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_mdConfig, _mamicoConfig, *_multiMDService);
     _mdStepCounter = 0;
-    _instanceHandling->switchOffCoupling();
-    _instanceHandling->equilibrate(_scenarioConfig.equSteps, _mdStepCounter);
-    _instanceHandling->switchOnCoupling();
-    _mdStepCounter += _scenarioConfig.equSteps;
+    if (_scenarioConfig.equSteps > 0) {
+      _instanceHandling->switchOffCoupling();
+      _instanceHandling->equilibrate(_scenarioConfig.equSteps, _mdStepCounter);
+      _instanceHandling->switchOnCoupling();
+      _mdStepCounter += _scenarioConfig.equSteps;
+    }
     _instanceHandling->setMDSolverInterface();
-
     const tarch::la::Vector<3, double> mdGlobalDomainOffset{_mdConfig.getDomainConfiguration().getGlobalDomainOffset()};
     const tarch::la::Vector<3, double> macroscopicCellSize{_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
+    const tarch::la::Vector<dim, double> mdGlobalDomainSize{_mdConfig.getDomainConfiguration().getGlobalDomainSize()};
     tarch::la::Vector<3, int> globalNumberMacroscopicCells;
     for (unsigned int d = 0; d < 3; d++) {
-      globalNumberMacroscopicCells[d] = floor(_mdConfig.getDomainConfiguration().getGlobalDomainSize()[d] / macroscopicCellSize[d] + 0.5);
+      globalNumberMacroscopicCells[d] = floor(mdGlobalDomainSize[d] / macroscopicCellSize[d] + 0.5);
     }
     _macroscopicSolverInterface = new coupling::solvers::PreciceInterface<dim>(globalNumberMacroscopicCells,
                                                                                (int)_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _rank);
@@ -120,7 +122,7 @@ public:
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
     const tarch::la::Vector<dim, unsigned int> moleculesParDirection{_mdConfig.getDomainConfiguration().getMoleculesPerDirection()};
-    const double densityMacroscopicCell = moleculesParDirection[0] * moleculesParDirection[1] * moleculesParDirection[2];
+    const double densityMacroscopicCell = moleculesParDirection[0] * moleculesParDirection[1] * moleculesParDirection[2] / mdGlobalDomainSize[0] * mdGlobalDomainSize[1] * mdGlobalDomainSize[2];
     const double massMacroscopicCell = densityMacroscopicCell * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
@@ -135,16 +137,31 @@ public:
         _buf._macro2MicroBuffer[i]->setMicroscopicMomentum(momentum);
       }
       _multiMDCellService->sendFromMacro2MD(_buf._macro2MicroBuffer, _buf._macro2MicroCellGlobalIndices);
-      if (precice_dt < mamico_dt)
-        std::cout << "rank " << _rank << " maximum timestep from preCICE (" << precice_dt << ") is lower than MaMiCo timestep (" << mamico_dt << ")"
-                  << std::endl;
-      _instanceHandling->simulateTimesteps(_mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
-      _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
-      _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
-      _multiMDCellService->sendFromMD2Macro(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
+      if (!_scenarioConfig.couetteAnalytical) {
+        _instanceHandling->simulateTimesteps(_mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
+        _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
+        _mdStepCounter += _mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
+        _multiMDCellService->sendFromMD2Macro(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
+      } else {
+        coupling::solvers::CouetteSolver<3>* couetteSolver = new coupling::solvers::CouetteSolver<3>( _scenarioConfig.channelHeight, _scenarioConfig.wallVelocity, _scenarioConfig.kinematicViscosity);
+        couetteSolver->advance(mamico_dt * (cycle+1));
+        for (unsigned int i = 0; i < _buf._micro2MacroBuffer.size(); i++) {
+          const tarch::la::Vector<3, int> cellGlobalIndex(coupling::indexing::convertToVector<dim>({_buf._micro2MacroCellGlobalIndices[i]}));
+          tarch::la::Vector<3, double> cellMidPoint(mdGlobalDomainOffset - 0.5 * macroscopicCellSize);
+          for (unsigned int d = 0; d < 3; d++) {
+            cellMidPoint[d] = cellMidPoint[d] + cellGlobalIndex[d] * macroscopicCellSize[d];
+          }
+          const tarch::la::Vector<3, double> momentum{massMacroscopicCell * (couetteSolver->getVelocity(cellMidPoint))};
+          _buf._micro2MacroBuffer[i]->setMacroscopicMass(massMacroscopicCell);
+          _buf._micro2MacroBuffer[i]->setMacroscopicMomentum(momentum);
+        }
+      }
       _preciceAdapter->setMDBoundaryValues(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices);
       _preciceAdapter->writeData();
       precice_dt = _preciceAdapter->advance(mamico_dt);
+      if (precice_dt < mamico_dt)
+        std::cout << "warning: rank " << _rank << " maximum timestep from preCICE (" << precice_dt << ") is lower than MaMiCo timestep (" << mamico_dt << ")"
+                  << std::endl;
       cycle++;
       if (_buf._micro2MacroBuffer.size() != 0 && _scenarioConfig.csvEveryTimestep >= 1 && cycle % _scenarioConfig.csvEveryTimestep == 0)
         write2CSV(_buf._micro2MacroBuffer, _buf._micro2MacroCellGlobalIndices, cycle, globalNumberMacroscopicCells,
@@ -248,6 +265,10 @@ private:
       tarch::configuration::ParseConfiguration::readDoubleMandatory(temp, subtag, "temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(equSteps, subtag, "equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntMandatory(totalNumberMDSimulations, subtag, "number-md-simulations");
+      tarch::configuration::ParseConfiguration::readBoolOptional(couetteAnalytical, subtag, "couette-analytical");
+      tarch::configuration::ParseConfiguration::readDoubleOptional(channelHeight, subtag, "channel-height");
+      tarch::configuration::ParseConfiguration::readDoubleOptional(wallVelocity, subtag, "wall-velocity");
+      tarch::configuration::ParseConfiguration::readDoubleOptional(kinematicViscosity, subtag, "kinematic-viscosity");
     };
 
     std::string getTag() const override { return "scenario"; };
@@ -258,6 +279,10 @@ private:
     int equSteps;
     double temp;
     int totalNumberMDSimulations;
+    bool couetteAnalytical = false;
+    double channelHeight;
+    double wallVelocity;
+    double kinematicViscosity;
   };
 
   struct CouplingBuffer {
