@@ -115,14 +115,14 @@ public:
     _multiMDCellService->computeAndStoreTemperature(_scenarioConfig.temp);
     allocateMacro2MicroBuffer();
     allocateMicro2MacroBuffer();
-    _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>("mamico-M2m-mesh", "mamico-m2M-mesh", "Velocity", "Velocity");
+    _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>("mamico-M2m-mesh", "mamico-m2M-mesh", "VelocityMacro", "VelocityMicro");
     _preciceAdapter->setMeshes(_buf._macro2MicroCellGlobalIndices, _buf._macro2MicroBuffer.size(), _buf._micro2MacroCellGlobalIndices,
                                _buf._micro2MacroBuffer.size(), mdGlobalDomainOffset, macroscopicCellSize);
     double precice_dt = _preciceAdapter->initialize();
     double mamico_dt = _mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * _mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
     const tarch::la::Vector<dim, unsigned int> moleculesParDirection{_mdConfig.getDomainConfiguration().getMoleculesPerDirection()};
-    const double densityMacroscopicCell = moleculesParDirection[0] * moleculesParDirection[1] * moleculesParDirection[2] / mdGlobalDomainSize[0] * mdGlobalDomainSize[1] * mdGlobalDomainSize[2];
+    const double densityMacroscopicCell = moleculesParDirection[0] * moleculesParDirection[1] * moleculesParDirection[2] / (mdGlobalDomainSize[0] * mdGlobalDomainSize[1] * mdGlobalDomainSize[2]);
     const double massMacroscopicCell = densityMacroscopicCell * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
