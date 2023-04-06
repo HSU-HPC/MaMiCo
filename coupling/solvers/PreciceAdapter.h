@@ -145,8 +145,7 @@ public:
     if (_solverInterface->hasMesh(_M2mMeshName)) {
       unsigned int cellIndex = 0;
       while (cellIndex < _numberOfM2mCells &&
-             !(_coordsM2mCells[dim * cellIndex] == pos[0] && _coordsM2mCells[dim * cellIndex + 1] == pos[1] &&
-               _coordsM2mCells[dim * cellIndex + 2] == pos[2]))
+             !(_coordsM2mCells[dim * cellIndex] == pos[0] && _coordsM2mCells[dim * cellIndex + 1] == pos[1] && _coordsM2mCells[dim * cellIndex + 2] == pos[2]))
         cellIndex++;
       if (cellIndex < _numberOfM2mCells) {
         for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
