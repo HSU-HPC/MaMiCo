@@ -17,7 +17,7 @@ simplemd::configurations::MoleculeConfiguration::MoleculeConfiguration()
 
 void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   // read mean velocity
-  tarch::configuration::ParseConfiguration::readVector<MD_DIM, double>(_meanVelocity, node, MEAN_VELOCITY);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<MD_DIM, double>(_meanVelocity, node, MEAN_VELOCITY);
 
   // read temperature
   tarch::configuration::ParseConfiguration::readDoubleMandatory(_temperature, node, TEMPERATURE);

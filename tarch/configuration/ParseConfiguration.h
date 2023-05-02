@@ -192,15 +192,9 @@ public:
    *	@tparam T Data type
    *	@tparam Size size of the entry
    *	@param result
-   *	@param node
-   *	@param tag
+   *	@param myText
    */
-  template <unsigned int size, class T> static void readVector(tarch::la::Vector<size, T>& result, tinyxml2::XMLElement* node, std::string tag) {
-    const char* myText = node->Attribute(tag.c_str());
-    if (myText == NULL) {
-      std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
-      exit(EXIT_FAILURE);
-    }
+  template <unsigned int size, class T> static void readVector(tarch::la::Vector<size, T>& result, const char* myText) {
     std::string input(myText);
     for (unsigned int i = 0; i < size; i++) {
       // search for first non-whitespace entry in this vector entry
@@ -221,12 +215,42 @@ public:
       if (i < size - 1) {
         input = input.substr(last + 1, input.size() - last - 1);
       }
-      // for debugging
-      // std::cout << input << std::endl;
+    }
+  }
+
+  /** reads with ";"-separated entry "tag" with "size" entries and returns the
+   *corresponding vector on success
+   *	@tparam T Data type
+   *	@tparam Size size of the entry
+   *	@param result
+   *	@param node
+   *	@param tag
+   */
+  template <unsigned int size, class T> static void readVectorMandatory(tarch::la::Vector<size, T>& result, tinyxml2::XMLElement* node, std::string tag) {
+    const char* myText = node->Attribute(tag.c_str());
+    if (myText == NULL) {
+      std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    readVector<size, T>(result, myText);
+  }
+
+  /** reads with ";"-separated entry "tag" with "size" entries and returns the
+   *corresponding vector on success
+   *if "tag" is existent
+   *	@tparam T Data type
+   *	@tparam Size size of the entry
+   *	@param result
+   *	@param node
+   *	@param tag
+   */
+  template <unsigned int size, class T> static void readVectorOptional(tarch::la::Vector<size, T>& result, tinyxml2::XMLElement* node, std::string tag) {
+    const char* myText = node->Attribute(tag.c_str());
+    if (myText != NULL) {
+      readVector<size, T>(result, myText);
     }
   }
 };
-
 } // namespace configuration
 } // namespace tarch
 #endif

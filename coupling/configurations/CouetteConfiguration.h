@@ -92,11 +92,11 @@ public:
       exit(EXIT_FAILURE);
     }
     tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.channelheight, subtag, "channelheight");
-    tarch::configuration::ParseConfiguration::readVector<3, double>(_cfg.wallVelocity, subtag, "wall-velocity");
+    tarch::configuration::ParseConfiguration::readVectorMandatory<3, double>(_cfg.wallVelocity, subtag, "wall-velocity");
     _cfg.wallInitCycles = 0;
     tarch::configuration::ParseConfiguration::readIntOptional(_cfg.wallInitCycles, subtag, "wall-init-cycles");
     if (_cfg.wallInitCycles > 0)
-      tarch::configuration::ParseConfiguration::readVector<3, double>(_cfg.wallInitVelocity, subtag, "wall-init-velocity");
+      tarch::configuration::ParseConfiguration::readVectorMandatory<3, double>(_cfg.wallInitVelocity, subtag, "wall-init-velocity");
     _cfg.wallOscillations = 0;
     tarch::configuration::ParseConfiguration::readDoubleOptional(_cfg.wallOscillations, subtag, "wall-oscillations");
 
@@ -179,11 +179,11 @@ public:
     tarch::configuration::ParseConfiguration::readStringMandatory(type, subtag, "type");
     if (type == "lb") {
       _cfg.maSolverType = COUETTE_LB;
-      tarch::configuration::ParseConfiguration::readVector<3, unsigned int>(_cfg.lbNumberProcesses, subtag, "number-of-processes");
+      tarch::configuration::ParseConfiguration::readVectorMandatory<3, unsigned int>(_cfg.lbNumberProcesses, subtag, "number-of-processes");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, "plot-every-timestep");
     } else if (type == "fd") {
       _cfg.maSolverType = COUETTE_FD;
-      tarch::configuration::ParseConfiguration::readVector<3, unsigned int>(_cfg.lbNumberProcesses, subtag, "number-of-processes");
+      tarch::configuration::ParseConfiguration::readVectorMandatory<3, unsigned int>(_cfg.lbNumberProcesses, subtag, "number-of-processes");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, "plot-every-timestep");
     }
 #if (BUILD_WITH_OPENFOAM)
@@ -192,7 +192,7 @@ public:
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, "plot-every-timestep");
       tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.directory, subtag, "foam-setup-directory");
       tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.folder, subtag, "foam-setup-folder");
-      tarch::configuration::ParseConfiguration::readVector<12, unsigned int>(_cfg.foam.boundariesWithMD, subtag, "boundaries-with-MD");
+      tarch::configuration::ParseConfiguration::readVectorMandatory<12, unsigned int>(_cfg.foam.boundariesWithMD, subtag, "boundaries-with-MD");
       if (!_cfg.twoWayCoupling && _cfg.foam.boundariesWithMD != tarch::la::Vector<12, unsigned int>{0}) {
         std::cout << "ERROR: Two-way coupling is disabled, but boundaries with "
                      "MD for openfoam were defined"
