@@ -176,6 +176,9 @@ public:
     return NULL;
   }
 
+protected:
+  MomentumInsertionConfiguration(MomentumInsertionType insertionType) : _insertionType(insertionType), _isValid(true) {}
+
 private:
   MomentumInsertionType _insertionType;
   double _velocityRelaxationFactor; // required by velocity relaxation schemes

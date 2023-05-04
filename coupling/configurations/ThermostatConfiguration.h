@@ -75,6 +75,9 @@ public:
 
   unsigned int getCells2Use() const { return _cells; }
 
+protected:
+  ThermostatConfiguration(ThermostatRegion type) : _type{type}, _isValid(true) {}
+
 private:
   ThermostatRegion _type;
   int _cells{0};

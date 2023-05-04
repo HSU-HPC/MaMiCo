@@ -137,6 +137,10 @@ public:
     return NULL;
   }
 
+protected:
+  BoundaryForceConfiguration(BoundaryForceType insertionType, double density, double temperature, tarch::la::Vector<2 * dim, bool> boundary) : 
+  _insertionType(insertionType), _density(density), _temperature(temperature), _isValid(true) {}
+  
 private:
   BoundaryForceType _insertionType;
   double _density;
