@@ -136,13 +136,16 @@ $(function() {
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> getCells2Use()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _cells; }</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  ThermostatRegion _type;</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  <span class="keywordtype">int</span> _cells{0};</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  <span class="keywordtype">bool</span> _isValid;</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>};</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="preprocessor">#endif </span><span class="comment">// _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_THERMOSTATCONFIGURATION_H_</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  ThermostatConfiguration(ThermostatRegion type) : _type{type}, _isValid(true) {}</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  ThermostatRegion _type;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  <span class="keywordtype">int</span> _cells{0};</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  <span class="keywordtype">bool</span> _isValid;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>};</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="preprocessor">#endif </span><span class="comment">// _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_THERMOSTATCONFIGURATION_H_</span></div>
 <div class="ttc" id="aclasscoupling_1_1configurations_1_1ThermostatConfiguration_html"><div class="ttname"><a href="classcoupling_1_1configurations_1_1ThermostatConfiguration.html">coupling::configurations::ThermostatConfiguration</a></div><div class="ttdef"><b>Definition:</b> ThermostatConfiguration.h:23</div></div>
 <div class="ttc" id="aclasscoupling_1_1configurations_1_1ThermostatConfiguration_html_a5e32061d995a78a981935d0c2cc0b6e9"><div class="ttname"><a href="classcoupling_1_1configurations_1_1ThermostatConfiguration.html#a5e32061d995a78a981935d0c2cc0b6e9">coupling::configurations::ThermostatConfiguration::getTag</a></div><div class="ttdeci">std::string getTag() const</div><div class="ttdef"><b>Definition:</b> ThermostatConfiguration.h:59</div></div>
 <div class="ttc" id="aclasscoupling_1_1configurations_1_1ThermostatConfiguration_html_a9e99880bcf0b81ee434467f9f6c24cee"><div class="ttname"><a href="classcoupling_1_1configurations_1_1ThermostatConfiguration.html#a9e99880bcf0b81ee434467f9f6c24cee">coupling::configurations::ThermostatConfiguration::isValid</a></div><div class="ttdeci">bool isValid() const</div><div class="ttdef"><b>Definition:</b> ThermostatConfiguration.h:72</div></div>

@@ -103,9 +103,15 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a2a6143634d666721b0e1baf29b8d0a30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fd43e500c7d2717f825563ec60d704d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtarch_1_1configuration_1_1ParseConfiguration.html#a3fd43e500c7d2717f825563ec60d704d">readStringOptional</a> (std::string &amp;storage, <a class="el" href="classtinyxml2_1_1XMLElement.html">tinyxml2::XMLElement</a> *node, std::string tag)</td></tr>
 <tr class="separator:a3fd43e500c7d2717f825563ec60d704d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7648810d1608b41112425f3fdf785f3c"><td class="memTemplParams" colspan="2">template&lt;unsigned int size, class T &gt; </td></tr>
-<tr class="memitem:a7648810d1608b41112425f3fdf785f3c"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtarch_1_1configuration_1_1ParseConfiguration.html#a7648810d1608b41112425f3fdf785f3c">readVector</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; size, T &gt; &amp;result, <a class="el" href="classtinyxml2_1_1XMLElement.html">tinyxml2::XMLElement</a> *node, std::string tag)</td></tr>
-<tr class="separator:a7648810d1608b41112425f3fdf785f3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a941232ea2114ca31e31454aeafc6a919"><td class="memTemplParams" colspan="2">template&lt;unsigned int size, class T &gt; </td></tr>
+<tr class="memitem:a941232ea2114ca31e31454aeafc6a919"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtarch_1_1configuration_1_1ParseConfiguration.html#a941232ea2114ca31e31454aeafc6a919">readVector</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; size, T &gt; &amp;result, const char *myText)</td></tr>
+<tr class="separator:a941232ea2114ca31e31454aeafc6a919"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d80c5f557e57cb85daf798a7e932eae"><td class="memTemplParams" colspan="2">template&lt;unsigned int size, class T &gt; </td></tr>
+<tr class="memitem:a2d80c5f557e57cb85daf798a7e932eae"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtarch_1_1configuration_1_1ParseConfiguration.html#a2d80c5f557e57cb85daf798a7e932eae">readVectorMandatory</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; size, T &gt; &amp;result, <a class="el" href="classtinyxml2_1_1XMLElement.html">tinyxml2::XMLElement</a> *node, std::string tag)</td></tr>
+<tr class="separator:a2d80c5f557e57cb85daf798a7e932eae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79ba57b4f0995105c090e34b186a24b1"><td class="memTemplParams" colspan="2">template&lt;unsigned int size, class T &gt; </td></tr>
+<tr class="memitem:a79ba57b4f0995105c090e34b186a24b1"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtarch_1_1configuration_1_1ParseConfiguration.html#a79ba57b4f0995105c090e34b186a24b1">readVectorOptional</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; size, T &gt; &amp;result, <a class="el" href="classtinyxml2_1_1XMLElement.html">tinyxml2::XMLElement</a> *node, std::string tag)</td></tr>
+<tr class="separator:a79ba57b4f0995105c090e34b186a24b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>interface for configuration using tinyxml2 </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
@@ -560,8 +566,8 @@ template&lt;class <a class="el" href="classtarch_1_1configuration_1_1Configurati
 
 </div>
 </div>
-<a id="a7648810d1608b41112425f3fdf785f3c" name="a7648810d1608b41112425f3fdf785f3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7648810d1608b41112425f3fdf785f3c">&#9670;&#160;</a></span>readVector()</h2>
+<a id="a941232ea2114ca31e31454aeafc6a919" name="a941232ea2114ca31e31454aeafc6a919"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a941232ea2114ca31e31454aeafc6a919">&#9670;&#160;</a></span>readVector()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -573,6 +579,58 @@ template&lt;unsigned int size, class T &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">static void tarch::configuration::ParseConfiguration::readVector </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; size, T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>myText</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>reads with ";"-separated entry "tag" with "size" entries and returns the corresponding vector on success </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Data type </td></tr>
+    <tr><td class="paramname">Size</td><td>size of the entry </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">result</td><td></td></tr>
+    <tr><td class="paramname">myText</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a2d80c5f557e57cb85daf798a7e932eae" name="a2d80c5f557e57cb85daf798a7e932eae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d80c5f557e57cb85daf798a7e932eae">&#9670;&#160;</a></span>readVectorMandatory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int size, class T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void tarch::configuration::ParseConfiguration::readVectorMandatory </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; size, T &gt; &amp;&#160;</td>
           <td class="paramname"><em>result</em>, </td>
@@ -602,6 +660,65 @@ template&lt;unsigned int size, class T &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>reads with ";"-separated entry "tag" with "size" entries and returns the corresponding vector on success </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Data type </td></tr>
+    <tr><td class="paramname">Size</td><td>size of the entry </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">result</td><td></td></tr>
+    <tr><td class="paramname">node</td><td></td></tr>
+    <tr><td class="paramname">tag</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a79ba57b4f0995105c090e34b186a24b1" name="a79ba57b4f0995105c090e34b186a24b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79ba57b4f0995105c090e34b186a24b1">&#9670;&#160;</a></span>readVectorOptional()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int size, class T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void tarch::configuration::ParseConfiguration::readVectorOptional </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; size, T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classtinyxml2_1_1XMLElement.html">tinyxml2::XMLElement</a> *&#160;</td>
+          <td class="paramname"><em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>tag</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>reads with ";"-separated entry "tag" with "size" entries and returns the corresponding vector on success if "tag" is existent </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">T</td><td>Data type </td></tr>
     <tr><td class="paramname">Size</td><td>size of the entry </td></tr>
