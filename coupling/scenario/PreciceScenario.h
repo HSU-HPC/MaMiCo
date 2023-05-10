@@ -260,6 +260,7 @@ private:
     if (!file.is_open()) {
       exit(EXIT_FAILURE);
     }
+    file << "i;j;k;x;y;z;v_x;v_y;v_z;T;m" << std::endl;
     tarch::la::Vector<3, int> cellIndex;
     for (unsigned int i = 0; i < m2MBuffer.size(); i++) {
       cellIndex = coupling::indexing::convertToVector<3>({m2MCellIndices[i]});
@@ -274,8 +275,10 @@ private:
         if (m2MBuffer[i]->getMacroscopicMass() != 0.0) {
           vel = (1.0 / m2MBuffer[i]->getMacroscopicMass()) * vel;
         }
-        file << cellIndex[0] << " ; " << cellIndex[1] << " ; " << cellIndex[2] << " ; " << cellMidPoint[0] << " ; " << cellMidPoint[1] << " ; "
-             << cellMidPoint[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; " << m2MBuffer[i]->getMacroscopicMass() << ";";
+        file << cellIndex[0] << ";" << cellIndex[1] << ";" << cellIndex[2] << ";" 
+             << cellMidPoint[0] << ";" << cellMidPoint[1] << ";" << cellMidPoint[2] << ";" 
+             << vel[0] << ";" << vel[1] << ";" << vel[2] << ";" 
+             << m2MBuffer[i]->getTemperature() << ";" << m2MBuffer[i]->getMacroscopicMass();
         file << std::endl;
       }
     }
