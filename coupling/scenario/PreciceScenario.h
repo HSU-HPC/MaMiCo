@@ -63,16 +63,16 @@ public:
   }
 
   void run() {
+    const unsigned int dim = 3;
+    int rank;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
 #if defined(LS1_MARDYN)
     global_log = new Log::Logger(Log::Error); // Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif
-#endif
-    const unsigned int dim = 3;
-    int rank;
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
     std::string xmlConfigurationFilename("config.xml");
     simplemd::configurations::MolecularDynamicsConfiguration mdConfig;
@@ -127,6 +127,7 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
+    timeval tv1, tv2;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
       for (unsigned int i = 0; i < _buf._M2mBuffer.size(); i++) {
@@ -138,10 +139,17 @@ public:
       }
       _multiMDCellService->sendFromMacro2MD(_buf._M2mBuffer, _buf._M2mCellIndices);
       if (!scenarioConfig.couetteAnalytical) {
+        gettimeofday(&tv1, NULL);
         _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
-        _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
+        gettimeofday(&tv2, NULL);
+        double time_total = (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec);
+        std::cout << "Rank: " << rank << ", cycle: " << cycle <<", finished MD simulate time steps in " << time_total / 1000000 << " s" << std::endl;
         mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
         _multiMDCellService->sendFromMD2Macro(_buf._m2MBuffer, _buf._m2MCellIndices);
+        gettimeofday(&tv1, NULL);
+        time_total = (tv1.tv_sec - tv2.tv_sec) * 1000000 + (tv1.tv_usec - tv2.tv_usec);
+        std::cout << "Rank: " << rank << ", cycle: " << cycle << ", finished send from MD to macro in " << time_total / 100000 << " s" << std::endl;
+        _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       } else {
         coupling::solvers::CouetteSolver<3>* couetteSolver =
             new coupling::solvers::CouetteSolver<3>(scenarioConfig.channelHeight, scenarioConfig.wallVelocity, scenarioConfig.dynamicViscosity);
