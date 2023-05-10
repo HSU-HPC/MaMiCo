@@ -148,7 +148,7 @@ public:
         couetteSolver->advance(mamico_dt * (cycle + 1));
         for (unsigned int i = 0; i < _buf._m2MBuffer.size(); i++) {
           tarch::la::Vector<3, double> cellMidPoint =
-              getCellMidPoint(coupling::indexing::convertToVector<dim>({_buf._M2mCellIndices[i]}), domainOffset, cellSize);
+              getCellMidPoint(coupling::indexing::convertToVector<dim>({_buf._m2MCellIndices[i]}), domainOffset, cellSize);
           const tarch::la::Vector<3, double> momentum{massCell * (couetteSolver->getVelocity(cellMidPoint))};
           _buf._m2MBuffer[i]->setMacroscopicMass(massCell);
           _buf._m2MBuffer[i]->setMacroscopicMomentum(momentum);
