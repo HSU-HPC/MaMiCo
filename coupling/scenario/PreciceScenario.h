@@ -128,6 +128,7 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
     timeval tv1, tv2;
+    std::list<double> solving, comm;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
       for (unsigned int i = 0; i < _buf._M2mBuffer.size(); i++) {
@@ -142,13 +143,11 @@ public:
         gettimeofday(&tv1, NULL);
         _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
         gettimeofday(&tv2, NULL);
-        double time_total = (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec);
-        std::cout << "Rank: " << rank << ", cycle: " << cycle <<", finished MD simulate time steps in " << time_total / 1000000 << " s" << std::endl;
+        solving.push_back((tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec));
         mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
         _multiMDCellService->sendFromMD2Macro(_buf._m2MBuffer, _buf._m2MCellIndices);
         gettimeofday(&tv1, NULL);
-        time_total = (tv1.tv_sec - tv2.tv_sec) * 1000000 + (tv1.tv_usec - tv2.tv_usec);
-        std::cout << "Rank: " << rank << ", cycle: " << cycle << ", finished send from MD to macro in " << time_total / 100000 << " s" << std::endl;
+        comm.push_back((tv1.tv_sec - tv2.tv_sec) * 1000000 + (tv1.tv_usec - tv2.tv_usec));
         _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       } else {
         coupling::solvers::CouetteSolver<3>* couetteSolver =
@@ -172,6 +171,21 @@ public:
       if (_buf._m2MBuffer.size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
         write2CSV(_buf._m2MBuffer, _buf._m2MCellIndices, cycle, numberCells, domainOffset, cellSize, overLap, rank);
     }
+    std::stringstream ss;
+    ss << "tv_" << rank << ".csv";
+    std::ofstream file(ss.str().c_str());
+    if (!file.is_open()) {
+      exit(EXIT_FAILURE);
+    }
+    file << "cycle;md_solving;md2macro_comm" << std::endl;
+    std::list<double>::iterator it1 = solving.begin();
+    std::list<double>::iterator it2 = comm.begin();
+    cycle = 0;
+    for (; it1 != solving.end() && it2!= comm.end(); it1++, it2++) {
+      file << cycle << ";" << *it1 << ";" << *it2 << std::endl;
+      cycle++;
+    }
+    file.close();
   }
 
 private:
