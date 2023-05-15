@@ -94,12 +94,10 @@ public:
     _multiMDService = new tarch::utils::MultiMDService<dim>(mdConfig.getMPIConfiguration().getNumberOfProcesses(), scenarioConfig.totalNumberMDSimulations);
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(mdConfig, mamicoConfig, *_multiMDService);
     unsigned int mdStepCounter = 0;
-    if (scenarioConfig.equSteps > 0) {
-      _instanceHandling->switchOffCoupling();
-      _instanceHandling->equilibrate(scenarioConfig.equSteps, mdStepCounter);
-      _instanceHandling->switchOnCoupling();
-      mdStepCounter += scenarioConfig.equSteps;
-    }
+    _instanceHandling->switchOffCoupling();
+    _instanceHandling->equilibrate(scenarioConfig.equSteps, mdStepCounter);
+    _instanceHandling->switchOnCoupling();
+    mdStepCounter += scenarioConfig.equSteps;
     _instanceHandling->setMDSolverInterface();
     const tarch::la::Vector<3, double> domainOffset{mdConfig.getDomainConfiguration().getGlobalDomainOffset()};
     const tarch::la::Vector<3, double> cellSize{mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
