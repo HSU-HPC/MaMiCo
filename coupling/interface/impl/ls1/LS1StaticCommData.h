@@ -33,6 +33,10 @@ namespace coupling
             #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
             void setLocalCommunicator(MPI_Comm comm) {localComm = comm;}
             MPI_Comm getLocalCommunicator() {return localComm;}
+
+            void setDomainGridDecompAtDim(int dim, int breakdown) {domainGridDecomp[dim] = breakdown;}
+            const int getDomainGridDecompAtDim(int dim) {return domainGridDecomp[dim];}
+            const int* getDomainGridDecomp() {return domainGridDecomp;}
             #endif
 
         private:
@@ -41,6 +45,7 @@ namespace coupling
             double boxoffset[3]; //temporary till ls1 offset is natively supported
             #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
             MPI_Comm localComm;
+            int domainGridDecomp[3];
             #endif
         };
     }

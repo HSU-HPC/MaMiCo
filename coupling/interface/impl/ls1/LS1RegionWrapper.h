@@ -8,6 +8,7 @@
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/molecules/Molecule.h"
 #include "ls1/src/Simulation.h"
+#include "ls1/src/parallel/DomainDecompMPIBase.h"
 //#include "ls1/ensemble/EnsembleBase.h"
 
 
