@@ -176,23 +176,25 @@ public:
       if (_buf._m2MBuffer.size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
         write2CSV(_buf._m2MBuffer, _buf._m2MCellIndices, cycle, numberCells, domainOffset, cellSize, overLap, rank);
     }
-    std::stringstream ss;
-    ss << "tv_" << rank << ".csv";
-    std::ofstream file(ss.str().c_str());
-    if (!file.is_open()) {
-      exit(EXIT_FAILURE);
+    if (rank == 0) {
+      std::stringstream ss;
+      ss << "tv_" << rank << ".csv";
+      std::ofstream file(ss.str().c_str());
+      if (!file.is_open()) {
+        exit(EXIT_FAILURE);
+      }
+      file << "cycle;md_solving;md2macro_comm;precice_read;precice_write" << std::endl;
+      std::list<double>::iterator it1 = solving.begin();
+      std::list<double>::iterator it2 = comm.begin();
+      std::list<double>::iterator it3 = precice_read.begin();
+      std::list<double>::iterator it4 = precice_write.begin();
+      cycle = 0;
+      for (; it1 != solving.end() && it2!= comm.end() && it3!= precice_read.end() && it4!= precice_write.end(); it1++, it2++, it3++, it4++) {
+        file << cycle << ";" << *it1 << ";" << *it2 << ";" << *it3 << ";" << *it4 << std::endl;
+        cycle++;
+      }
+      file.close();
     }
-    file << "cycle;md_solving;md2macro_comm;precice_read;precice_write" << std::endl;
-    std::list<double>::iterator it1 = solving.begin();
-    std::list<double>::iterator it2 = comm.begin();
-    std::list<double>::iterator it3 = precice_read.begin();
-    std::list<double>::iterator it4 = precice_write.begin();
-    cycle = 0;
-    for (; it1 != solving.end() && it2!= comm.end() && it3!= precice_read.end() && it4!= precice_write.end(); it1++, it2++, it3++, it4++) {
-      file << cycle << ";" << *it1 << ";" << *it2 << ";" << *it3 << ";" << *it4 << std::endl;
-      cycle++;
-    }
-    file.close();
   }
 
 private:
