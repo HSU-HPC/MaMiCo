@@ -11,9 +11,10 @@ const std::string simplemd::configurations::MoleculeConfiguration::TEMPERATURE("
 const std::string simplemd::configurations::MoleculeConfiguration::MASS("mass");
 const std::string simplemd::configurations::MoleculeConfiguration::EPSILON("epsilon");
 const std::string simplemd::configurations::MoleculeConfiguration::SIGMA("sigma");
+const std::string simplemd::configurations::MoleculeConfiguration::V("v");
 
 simplemd::configurations::MoleculeConfiguration::MoleculeConfiguration()
-    : _meanVelocity(0.0), _temperature(0.0), _mass(0.0), _epsilon(0.0), _sigma(0.0), _isValid(true) {}
+    : _meanVelocity(0.0), _temperature(0.0), _mass(0.0), _epsilon(0.0), _sigma(0.0), _v(0.0), _isValid(true) {}
 
 void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   // read mean velocity
@@ -35,6 +36,7 @@ void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLE
     exit(EXIT_FAILURE);
   }
 
+#if (MD_BODY == 2)
   // read epsilon
   tarch::configuration::ParseConfiguration::readDoubleMandatory(_epsilon, node, EPSILON);
   if (_epsilon <= 0.0) {
@@ -51,10 +53,24 @@ void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLE
     exit(EXIT_FAILURE);
   }
 
+#else
+  // read v
+  tarch::configuration::ParseConfiguration::readDoubleMandatory(_v, node, V);
+  if (_v <= 0.0) {
+    std::cout << V << " is smaller than or equal zero!" << std::endl;
+    _isValid = false;
+    exit(EXIT_FAILURE);
+  }
+#endif
+
 #if (MD_DEBUG == MD_YES)
   std::cout << "Temperature: " << _temperature << std::endl;
+#if (MD_BODY == 2)
   std::cout << "Sigma:       " << _sigma << std::endl;
   std::cout << "Epsilon:     " << _epsilon << std::endl;
+#else
+  std::cout << "V:           " << _v << std::endl;
+#endif
   std::cout << "Mass:        " << _mass << std::endl;
   std::cout << "Mean vel.:   " << _meanVelocity << std::endl;
 #endif

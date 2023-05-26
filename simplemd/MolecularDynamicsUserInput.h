@@ -18,6 +18,15 @@
 #error "MDDim2 or MDDim3"
 #endif
 
+// n-body potential of simulation
+#if defined(MDBody2)
+#define MD_BODY 2
+#elif defined(MDBody3)
+#define MD_BODY 3
+#else
+#error "MDBody2 or MDBody3"
+#endif
+
 // MPI-Parallelisation (MD_YES/ MD_NO)
 #ifdef MDParallel
 #define MD_PARALLEL MD_YES

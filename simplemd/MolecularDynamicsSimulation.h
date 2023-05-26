@@ -12,6 +12,7 @@
 #include "simplemd/cell-mappings/ComputeTemperatureMapping.h"
 #include "simplemd/cell-mappings/EmptyLinkedListsMapping.h"
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
+#include "simplemd/cell-mappings/AxilrodTellerForceMapping.h"
 #include "simplemd/cell-mappings/RDFMapping.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "simplemd/molecule-mappings/InitialPositionAndForceUpdate.h"
@@ -83,7 +84,11 @@ protected:
 #endif
 
   // cell mappings
+#if (MD_BODY == 2)
   simplemd::cellmappings::LennardJonesForceMapping* _lennardJonesForce;
+#else
+  simplemd::cellmappings::AxilrodTellerForceMapping* _axilrodTellerForce;
+#endif
   simplemd::cellmappings::EmptyLinkedListsMapping* _emptyLinkedListsMapping;
   simplemd::cellmappings::RDFMapping* _rdfMapping;
 

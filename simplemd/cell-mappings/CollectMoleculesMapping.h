@@ -44,6 +44,8 @@ public:
     cell.getList().clear();
   }
   void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {}
+  void handleCellTriplet(const LinkedCell& cell1, const LinkedCell& cell2, const LinkedCell& cell3,
+                         const unsigned int& cellIndex1, const unsigned int& cellIndex2, const unsigned int& cellIndex3) {}
 
   void reset() { _molecules.clear(); }
   std::list<simplemd::Molecule> getCollectedMolecules() const { return _molecules; }

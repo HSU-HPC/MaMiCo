@@ -36,6 +36,10 @@ message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 set(MDDim MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")
 message(STATUS ">> MD dimension : " ${MDDim})
 set_property(CACHE MDDim PROPERTY STRINGS MDDim3 MDDim2)
+# Use n-body potentials for calculations, default is MDBody2
+set(MDBody MDBody2 CACHE STRING "Set to MDBody2 or MDBody3, default is MDBody2.")
+message(STATUS ">> MD n-body potential : " ${MDBody})
+set_property(CACHE MDBody PROPERTY STRINGS MDBody2 MDBody3)
 # Set MD Simulation to use
 set(MD_SIM SIMPLE_MD CACHE STRING "Choose SIMPLE_MD, LAMMPS, or LS1_MARDYN")
 set_property(CACHE MD_SIM PROPERTY STRINGS SIMPLE_MD LAMMPS_MD LAMMPS_DPD LS1_MARDYN)
@@ -163,6 +167,7 @@ endif()
 #
 add_library(simplemd_interface INTERFACE)
 target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
+target_compile_definitions(simplemd_interface INTERFACE ${MDBody})
 target_compile_options(simplemd_interface INTERFACE -fpic)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
@@ -212,6 +217,8 @@ set(SIMPLE_MD_SOURCES
   "simplemd/BoundaryTreatment.cpp"
   "simplemd/MolecularDynamicsSimulation.cpp"
   "simplemd/ProfilePlotter.cpp"
+  "simplemd/cell-mappings/AxilrodTellerForceMapping.cpp"
+  "simplemd/cell-mappings/AxilrodTellerPotentialEnergyMapping.cpp"
   "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
 	"simplemd/cell-mappings/LennardJonesForceMapping.cpp"
 	"simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
@@ -277,7 +284,7 @@ endif()
 if(BUILD_WITH_ADIOS2)
   target_compile_definitions(mamico INTERFACE BUILD_WITH_ADIOS2)
 endif()
-target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
+target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3 MDBody2)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
 if(BUILD_WITH_MPI)
   target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)

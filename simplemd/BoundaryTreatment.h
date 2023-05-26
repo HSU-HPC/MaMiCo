@@ -7,6 +7,7 @@
 
 #include "simplemd/cell-mappings/CollectMoleculesMapping.h"
 #include "simplemd/cell-mappings/DeleteMoleculesMapping.h"
+#include "simplemd/cell-mappings/AxilrodTellerForceMapping.h"
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 #include "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.h"
 #include "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.h"
@@ -76,7 +77,12 @@ public:
    */
   void putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(
       const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
-      simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce,
+      simplemd::services::ParallelTopologyService& parallelTopologyService, 
+#if (MD_BODY == 2)
+      simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce,
+#else
+      simplemd::cellmappings::AxilrodTellerForceMapping& axilrodTellerForce,
+#endif
       const bool& useOpenMP);
 
   /** returns a list with all molecules from the open boundary cells */

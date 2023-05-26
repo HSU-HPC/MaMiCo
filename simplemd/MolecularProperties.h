@@ -16,12 +16,17 @@ class simplemd::MolecularProperties {
 
 public:
   MolecularProperties(const double& mass, const double& epsilon, const double& sigma, const double& cutoffRadius, const double& kB)
-      : _mass(mass), _epsilon(epsilon), _sigma(sigma), _cutoffRadius(cutoffRadius), _kB(kB) {}
+      : _mass(mass), _epsilon(epsilon), _sigma(sigma), _v(0.0), _cutoffRadius(cutoffRadius), _kB(kB) {}
+  MolecularProperties(const double& mass, const double& v, const double& cutoffRadius, const double& kB)
+      : _mass(mass), _epsilon(0.0), _sigma(0.0), _v(v), _cutoffRadius(cutoffRadius), _kB(kB) {}
+  MolecularProperties(const double& mass, const double& epsilon, const double& sigma, const double& v, const double& cutoffRadius, const double& kB)
+      : _mass(mass), _epsilon(epsilon), _sigma(sigma), _v(v), _cutoffRadius(cutoffRadius), _kB(kB) {}
   ~MolecularProperties() {}
 
   const double& getMass() const { return _mass; }
   const double& getEpsilon() const { return _epsilon; }
   const double& getSigma() const { return _sigma; }
+  const double& getV() const { return _v; }
   const double& getCutOffRadius() const { return _cutoffRadius; }
   const double& getKB() const { return _kB; }
 
@@ -34,6 +39,9 @@ private:
 
   /** sigma parameter of the LJ-description */
   double _sigma;
+
+  /** v parameter of the AT-description */
+  double _v;
 
   /** cutoff radius */
   double _cutoffRadius;

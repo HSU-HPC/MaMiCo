@@ -26,7 +26,9 @@ public:
 
   void endCellIteration() {}
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
-  void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2);
+  void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2);  
+  void handleCellTriplet(LinkedCell& cell1, LinkedCell& cell2, LinkedCell& cell3,
+                         const unsigned int& cellIndex1, const unsigned int& cellIndex2, const unsigned int& cellIndex3) {}
 
 private:
   /** epsilon */

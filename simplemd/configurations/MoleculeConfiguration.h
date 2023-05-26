@@ -50,6 +50,7 @@ public:
   const double& getMass() const { return _mass; }
   const double& getEpsilon() const { return _epsilon; }
   const double& getSigma() const { return _sigma; }
+  const double& getV() const { return _v; }
 
 private:
   static const std::string MEAN_VELOCITY;
@@ -57,12 +58,14 @@ private:
   static const std::string MASS;
   static const std::string EPSILON;
   static const std::string SIGMA;
+  static const std::string V;
 
   tarch::la::Vector<MD_DIM, double> _meanVelocity;
   double _temperature;
   double _mass;
   double _epsilon;
   double _sigma;
+  double _v;
 
   bool _isValid;
 };

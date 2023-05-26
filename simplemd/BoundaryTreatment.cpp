@@ -146,7 +146,12 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundar
 
 void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(
     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary, simplemd::services::ParallelTopologyService& parallelTopologyService,
-    simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce, const bool& useOpenMP) {
+#if (MD_BODY == 2)
+    simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce,
+#else
+    simplemd::cellmappings::AxilrodTellerForceMapping& axilrodTellerForce,
+#endif
+    const bool& useOpenMP) {
   // prevent execution in case domain is too small
   const tarch::la::Vector<MD_DIM, unsigned int> localNumberOfCells(_linkedCellService.getLocalNumberOfCells());
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -192,7 +197,11 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
   parallelTopologyService.unpackLocalBuffer(_moleculeService, _linkedCellService);
 
   // compute forces in inner cells, where boundary and process-leaving particles are not needed.
+#if (MD_BODY == 2)
   applyMappingToCommunicationIndependentCells(useOpenMP, lennardJonesForce);
+#else
+  applyMappingToCommunicationIndependentCells(useOpenMP, axilrodTellerForce);
+#endif
 
 // wait for buffers
 #if (MD_PARALLEL == MD_YES)
@@ -205,5 +214,9 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
 #endif
 
   // compute rest of forces
+#if (MD_BODY == 2)
   applyMappingToCommunicationDependentCells(useOpenMP, lennardJonesForce);
+#else
+  applyMappingToCommunicationDependentCells(useOpenMP, axilrodTellerForce);
+#endif
 }

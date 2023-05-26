@@ -73,6 +73,9 @@ public:
   }
 
   void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {}
+  
+  void handleCellTriplet(const LinkedCell& cell1, const LinkedCell& cell2, const LinkedCell& cell3,
+                         const unsigned int& cellIndex1, const unsigned int& cellIndex2, const unsigned int& cellIndex3) {}
 
   const double& getTemperature() const { return _temperature; }
 
