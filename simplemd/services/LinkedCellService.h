@@ -194,12 +194,12 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
   if (useOpenMP) {
     const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
                                                        2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
-    const int length = cellRange(0)
+    const int length = cellRange[0]
 #if (MD_DIM > 1)
-                       * cellRange(1)
+                       * cellRange[1]
 #endif
 #if (MD_DIM > 2)
-                       * cellRange(2)
+                       * cellRange[2]
 #endif
         ;
 // loop over domain, but with a single loop
@@ -214,23 +214,23 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
 
 #if (MD_DIM > 2)
       // determine plane within traversed block
-      helpIndex2 = helpIndex1 / (cellRange(0) * cellRange(1));
+      helpIndex2 = helpIndex1 / (cellRange[0] * cellRange[1]);
       // save rest of index in helpIndex1
-      helpIndex1 = helpIndex1 - helpIndex2 * (cellRange(0) * cellRange(1));
+      helpIndex1 = helpIndex1 - helpIndex2 * (cellRange[0] * cellRange[1]);
       // compute contribution to index
-      index += (lowerLeftFrontCell(2) + helpIndex2) * size(0) * size(1);
+      index += (lowerLeftFrontCell[2] + helpIndex2) * size[0] * size[1];
 #endif
 #if (MD_DIM > 1)
       // determine plane within traversed block
-      helpIndex2 = helpIndex1 / cellRange(0);
+      helpIndex2 = helpIndex1 / cellRange[0];
       // save rest of index in helpIndex1
-      helpIndex1 = helpIndex1 - helpIndex2 * cellRange(0);
+      helpIndex1 = helpIndex1 - helpIndex2 * cellRange[0];
       // compute contribution to index
-      index += (lowerLeftFrontCell(1) + helpIndex2) * size(0);
+      index += (lowerLeftFrontCell[1] + helpIndex2) * size[0];
       // compute contribution for last dimension
-      index += (lowerLeftFrontCell(0) + helpIndex1);
+      index += (lowerLeftFrontCell[0] + helpIndex1);
 #else
-      index = lowerLeftFrontCell(0) + i;
+      index = lowerLeftFrontCell[0] + i;
 #endif
 #if (MD_DEBUG == MD_YES)
       std::cout << "Handle cell " << index << std::endl;
@@ -695,7 +695,7 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
   // start iteration();
   a.beginCellIteration();
 
-#if (MD_OPENMP == MD_YES) // TODO
+#if (MD_OPENMP == MD_YES)
   if (useOpenMP) {
     const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
                                                        2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
@@ -742,6 +742,7 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
 #endif
             unsigned int coordsCell1Buffer;
             unsigned int coordsCell2Buffer;
+            unsigned int coordsCell3Buffer;
 
 #if (MD_DIM > 2)
             // determine plane within traversed block
@@ -764,19 +765,48 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
         index = lowerLeftFrontCell[0] + 2 * j + x;
 #endif
 #if (MD_DEBUG == MD_YES)
-            std::cout << "Handle cell " << index << std::endl;
+            std::cout << "iterateCellTriplets: Single index " << index << std::endl;
 #endif
 
             a.handleCell(_cells[index], index);
-            // handle pairs (lower,left,back-oriented cells)
+            // handle pairs and triplets (lower,left,back-oriented cells)
             for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)
-              std::cout << "iterateCellPairs: Pair index " << index + indexOffset[i] << "," << index + neighbourOffset[i] << std::endl;
+              std::cout << "iterateCellTriplets: Pair index " << index + indexOffset[i] << "," << index + neighbourOffset[i] << std::endl;
 #endif
+
               coordsCell1Buffer = index + indexOffset[i];
               coordsCell2Buffer = index + neighbourOffset[i];
               a.handleCellPair(_cells[coordsCell1Buffer], _cells[coordsCell2Buffer], coordsCell1Buffer, coordsCell2Buffer);
+
+#if (MD_DIM == 2)
+#if (MD_DEBUG == MD_YES)
+              std::cout << "iterateCellTriplets: Triplet index " << index + indexOffset[i] << ","
+                        << index + neighbourOffset[i] << "," << index + tripletOffset[i] << std::endl;
+#endif 
+
+              coordsCell3Buffer = index + tripletOffset[i];
+              a.handleCellTriplet(_cells[coordsCell1Buffer], _cells[coordsCell2Buffer], _cells[coordsCell3Buffer],
+                                  coordsCell1Buffer, coordsCell2Buffer, coordsCell3Buffer);
             }
+#elif (MD_DIM == 3)
+            }
+
+            for (unsigned int i = 0; i < 44; i++) {
+#if (MD_DEBUG == MD_YES)
+              std::cout << "iterateCellTriplets: Triplet index " << index + tripletIndexOffset[i] << ","
+                        << index + tripletNeighbourOffset1[i] << "," << index + tripletNeighbourOffset2[i] << std::endl;
+#endif
+
+              coordsCell1Buffer = index + tripletIndexOffset[i];
+              coordsCell2Buffer = index + tripletNeighbourOffset1[i];
+              coordsCell3Buffer = index + tripletNeighbourOffset2[i];
+              a.handleCellTriplet(_cells[coordsCell1Buffer], _cells[coordsCell2Buffer], _cells[coordsCell3Buffer],
+                                  coordsCell1Buffer, coordsCell2Buffer, coordsCell3Buffer);
+            }
+#else
+            }
+#endif
           } // j
         }   // x
 #if (MD_DIM > 1)
@@ -810,7 +840,7 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
 #endif
 
           a.handleCell(_cells[index], index);
-          // handle pairs (lower,left,back-oriented cells)
+          // handle pairs and triplets (lower,left,back-oriented cells)
           for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)
             std::cout << "iterateCellTriplets: Pair index " << index + indexOffset[i] << "," << index + neighbourOffset[i] << std::endl;

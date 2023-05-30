@@ -16,7 +16,7 @@ class AxilrodTellerPotentialEnergyMapping;
 }
 } // namespace simplemd
 
-/** computes the Lennard Jones energy for all atomp pairs.
+/** computes the Axilrod-Teller energy for all atomp triplets.
  *  @author Maximilian Mayr
  */
 class simplemd::cellmappings::AxilrodTellerPotentialEnergyMapping {
