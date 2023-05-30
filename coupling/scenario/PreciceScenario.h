@@ -125,13 +125,8 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
-    timeval tv1, tv2;
-    std::list<double> solving, comm, precice_read, precice_write;
     while (_preciceAdapter->isCouplingOngoing()) {
-      gettimeofday(&tv1, NULL);
       _preciceAdapter->readData();
-      gettimeofday(&tv2, NULL);
-      precice_read.push_back((tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec));
       for (unsigned int i = 0; i < _buf._M2mBuffer.size(); i++) {
         tarch::la::Vector<3, double> cellMidPoint =
             getCellMidPoint(coupling::indexing::convertToVector<dim>({_buf._M2mCellIndices[i]}), domainOffset, cellSize);
@@ -141,15 +136,9 @@ public:
       }
       _multiMDCellService->sendFromMacro2MD(_buf._M2mBuffer, _buf._M2mCellIndices);
       if (!scenarioConfig.couetteAnalytical) {
-        gettimeofday(&tv1, NULL);
         _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
-        gettimeofday(&tv2, NULL);
-        solving.push_back((tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec));
         mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
-        gettimeofday(&tv1, NULL);
         _multiMDCellService->sendFromMD2Macro(_buf._m2MBuffer, _buf._m2MCellIndices);
-        gettimeofday(&tv2, NULL);
-        comm.push_back((tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec));
         _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       } else {
         coupling::solvers::CouetteSolver<3>* couetteSolver =
@@ -164,10 +153,7 @@ public:
         }
       }
       _preciceAdapter->setMDBoundaryValues(_buf._m2MBuffer, _buf._m2MCellIndices);
-      gettimeofday(&tv1, NULL);
       _preciceAdapter->writeData();
-      gettimeofday(&tv2, NULL);
-      precice_write.push_back((tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec));
       precice_dt = _preciceAdapter->advance(mamico_dt);
       if (precice_dt < mamico_dt)
         std::cout << "warning: rank " << rank << " maximum timestep from preCICE (" << precice_dt << ") is lower than MaMiCo timestep (" << mamico_dt << ")"
@@ -175,25 +161,6 @@ public:
       cycle++;
       if (_buf._m2MBuffer.size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
         write2CSV(_buf._m2MBuffer, _buf._m2MCellIndices, cycle, numberCells, domainOffset, cellSize, overLap, rank);
-    }
-    if (rank == 0) {
-      std::stringstream ss;
-      ss << "tv_" << rank << ".csv";
-      std::ofstream file(ss.str().c_str());
-      if (!file.is_open()) {
-        exit(EXIT_FAILURE);
-      }
-      file << "cycle;md_solving;md2macro_comm;precice_read;precice_write" << std::endl;
-      std::list<double>::iterator it1 = solving.begin();
-      std::list<double>::iterator it2 = comm.begin();
-      std::list<double>::iterator it3 = precice_read.begin();
-      std::list<double>::iterator it4 = precice_write.begin();
-      cycle = 0;
-      for (; it1 != solving.end() && it2!= comm.end() && it3!= precice_read.end() && it4!= precice_write.end(); it1++, it2++, it3++, it4++) {
-        file << cycle << ";" << *it1 << ";" << *it2 << ";" << *it3 << ";" << *it4 << std::endl;
-        cycle++;
-      }
-      file.close();
     }
   }
 
