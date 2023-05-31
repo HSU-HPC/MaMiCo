@@ -167,9 +167,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending
                                                                                  coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange) {
   const unsigned int thisRank = indexConversion.getThisRank();
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    double start = MPI_Wtime();
-#endif
 
 // loop over all ranks
 // counter loops over [0; _sendSize-1]
@@ -216,18 +213,11 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending
       memcpy((itRecv->second).buffer, (it->second).buffer, sizeof(double) * doublesPerCell * (it->second).bufferSize);
     }
   }
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    double end = MPI_Wtime();
-    std::cout << "rank: " << indexConversion.getThisRank() << ", SendReceiveBuffer::triggerSending : " << end - start << " s" << std::endl;
-#endif
 }
 
 template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceiving(const coupling::IndexConversion<dim>& indexConversion,
                                                                                    coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange) {
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    double start = MPI_Wtime();
-#endif
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   const unsigned int thisRank = indexConversion.getThisRank();
 
@@ -251,10 +241,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceivi
       counter++;
     }
   }
-#endif
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    double end = MPI_Wtime();
-    std::cout << "rank: " << indexConversion.getThisRank() << ", SendReceiveBuffer::triggerReceiving : " << end - start << " s" << std::endl;
 #endif
 }
 
@@ -298,9 +284,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReques
 template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations(const coupling::IndexConversion<dim>& indexConversion) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    double start = MPI_Wtime();
-#endif
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   // if no requests have been allocated, return immediately
   if (!_requestsAllocated && (_requests == NULL)) {
     return;
@@ -321,9 +304,5 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperati
   delete[] _requests;
   _requests = NULL;
   _requestsAllocated = false;
-#endif
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    double end = MPI_Wtime();
-    std::cout << "rank: " << indexConversion.getThisRank() << ", SendReceiveBuffer::waitAllOperations : " << end - start << " s" << std::endl;
 #endif
 }
