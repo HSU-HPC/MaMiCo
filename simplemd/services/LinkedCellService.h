@@ -192,8 +192,7 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
 
 #if (MD_OPENMP == MD_YES)
   if (useOpenMP) {
-    const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
-                                                       2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
+    const tarch::la::Vector<MD_DIM, unsigned int> size(getLocalNumberOfCells() + (unsigned int)2 * getLocalIndexOfFirstCell());
     const int length = cellRange[0]
 #if (MD_DIM > 1)
                        * cellRange[1]
@@ -341,8 +340,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 
 #if (MD_OPENMP == MD_YES)
   if (useOpenMP) {
-    const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
-                                                       2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
+    const tarch::la::Vector<MD_DIM, unsigned int> size(getLocalNumberOfCells() + (unsigned int)2 * getLocalIndexOfFirstCell());
 
 // iterate over the domain in a red-black manner
 #if (MD_DIM > 2)
@@ -697,8 +695,7 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
 
 #if (MD_OPENMP == MD_YES)
   if (useOpenMP) {
-    const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
-                                                       2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
+    const tarch::la::Vector<MD_DIM, unsigned int> size(getLocalNumberOfCells() + (unsigned int)2 * getLocalIndexOfFirstCell());
 
 // iterate over the domain in a red-black manner
 #if (MD_DIM > 2)
@@ -818,7 +815,7 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
     // now: no open mp
   } else {
 #endif
-
+    
     tarch::la::Vector<MD_DIM, unsigned int> coords(0);
     unsigned int coordsCell1Buffer(0);
     unsigned int coordsCell2Buffer(0);

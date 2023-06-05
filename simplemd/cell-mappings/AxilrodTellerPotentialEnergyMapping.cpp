@@ -162,17 +162,17 @@ simplemd::cellmappings::AxilrodTellerPotentialEnergyMapping::getAxilrodTellerPot
 #if (MD_ERROR == MD_YES)
   if (tarch::la::equals(rij2, 0.0, 1e-4)) {
     std::cout << "ERROR simplemd::cellmappings::AxilrodTellerForceMapping::getAxilrodTellerForce(): Particle positions are identical!" << std::endl;
-    std::cout << "Position1: " << position1 << ","
+    std::cout << "Position1: " << position1 << ", "
               << "Position2: " << position2 << std::endl;
   }
   if (tarch::la::equals(rik2, 0.0, 1e-4)) {
     std::cout << "ERROR simplemd::cellmappings::AxilrodTellerForceMapping::getAxilrodTellerForce(): Particle positions are identical!" << std::endl;
-    std::cout << "Position1: " << position1 << ","
+    std::cout << "Position1: " << position1 << ", "
               << "Position3: " << position3 << std::endl;
   }
   if (tarch::la::equals(rjk2, 0.0, 1e-4)) {
     std::cout << "ERROR simplemd::cellmappings::AxilrodTellerForceMapping::getAxilrodTellerForce(): Particle positions are identical!" << std::endl;
-    std::cout << "Position2: " << position2 << ","
+    std::cout << "Position2: " << position2 << ", "
               << "Position3: " << position3 << std::endl;
   }
 #endif
