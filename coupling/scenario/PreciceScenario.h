@@ -169,7 +169,15 @@ public:
           _buf._m2MBuffer[i]->setMacroscopicMomentum(momentum);
         }
       }
-      _preciceAdapter->setMDBoundaryValues(_buf._m2MBuffer, _buf._m2MCellIndices);
+      for (unsigned int i = 0; i < _buf._m2MBuffer.size(); i++) {
+        tarch::la::Vector<3, double> cellMidPoint =
+            getCellMidPoint(coupling::indexing::convertToVector<dim>({_buf._m2MCellIndices[i]}), domainOffset, cellSize);
+        tarch::la::Vector<3, double> vel{0.0};
+        if (_buf._m2MBuffer[i]->getMacroscopicMass() != 0.0) {
+          vel = (1.0 / _buf._m2MBuffer[i]->getMacroscopicMass()) * _buf._m2MBuffer[i]->getMacroscopicMomentum();
+        }
+        _preciceAdapter->setVelocity(cellMidPoint, vel);
+      }
       _preciceAdapter->writeData();
       std::cout << "6" << std::endl;
       precice_dt = _preciceAdapter->advance(mamico_dt);

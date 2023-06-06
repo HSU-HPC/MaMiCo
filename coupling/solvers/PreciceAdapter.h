@@ -144,7 +144,7 @@ public:
 
   // Couette solver methods, to be moved.
 
-  tarch::la::Vector<3, double> getVelocity(tarch::la::Vector<3, double> pos) const {
+  tarch::la::Vector<3, double> getVelocity(const tarch::la::Vector<3, double> &pos) const {
     tarch::la::Vector<3, double> vel(0.0);
     if (_solverInterface->hasMesh(_M2mMeshName)) {
       unsigned int vertexIndex = 0;
@@ -160,17 +160,31 @@ public:
     return vel;
   }
 
-  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& m2MBuffer, const unsigned int* const m2MCellIndices) {
+  void setVelocity(const tarch::la::Vector<3, double> &pos, const tarch::la::Vector<3, double> &velocity) const {
     if (_solverInterface->hasMesh(_m2MMeshName)) {
-      for (size_t i = 0; i < _m2MVertexNumbers; i++) {
-        if (m2MBuffer[i]->getMacroscopicMass() != 0.0) {
-          tarch::la::Vector<3, double> vel((1.0 / m2MBuffer[i]->getMacroscopicMass()) * m2MBuffer[i]->getMacroscopicMomentum());
-          for (unsigned int currentDim = 0; currentDim < dim; currentDim++)
-            _m2MVertexVelocities[dim * i + currentDim] = vel[currentDim];
+      unsigned int vertexIndex = 0;
+      while (vertexIndex < _m2MVertexNumbers &&
+             !(_m2MVertexCoords[dim * vertexIndex] == pos[0] && _m2MVertexCoords[dim * vertexIndex + 1] == pos[1] && _m2MVertexCoords[dim * vertexIndex + 2] == pos[2]))
+        vertexIndex++;
+      if (vertexIndex < _m2MVertexNumbers) {
+        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+          _m2MVertexVelocities[dim * vertexIndex + currentDim] = velocity[currentDim];
         }
       }
     }
   }
+
+  // void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& m2MBuffer, const unsigned int* const m2MCellIndices) {
+  //   if (_solverInterface->hasMesh(_m2MMeshName)) {
+  //     for (size_t i = 0; i < _m2MVertexNumbers; i++) {
+  //       if (m2MBuffer[i]->getMacroscopicMass() != 0.0) {
+  //         tarch::la::Vector<3, double> vel((1.0 / m2MBuffer[i]->getMacroscopicMass()) * m2MBuffer[i]->getMacroscopicMomentum());
+  //         for (unsigned int currentDim = 0; currentDim < dim; currentDim++)
+  //           _m2MVertexVelocities[dim * i + currentDim] = vel[currentDim];
+  //       }
+  //     }
+  //   }
+  // }
 
 private:
   std::vector<int> getTetrahedronsVertexIndices(int i, int* m2MVertexIndices, std::vector<unsigned int>& m2MCellIndices) {
