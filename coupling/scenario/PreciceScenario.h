@@ -107,17 +107,29 @@ public:
       numberCells[d] = floor(domainSize[d] / cellSize[d] + 0.5);
     }
     const unsigned int overLap = mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap();
-    _macroscopicSolverInterface = new coupling::solvers::PreciceInterface<dim>(numberCells, overLap, rank);
+
+    coupling::IndexConversion<3>* indexConversion = initIndexConversion(mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+                                             _multiMDService->getNumberProcessesPerMDSimulation(), _multiMDService->getGlobalRank(),
+                                             mdConfig.getDomainConfiguration().getGlobalDomainSize(),
+                                             mdConfig.getDomainConfiguration().getGlobalDomainOffset(),
+                                             mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), computeTopologyOffset());
+    _macroscopicSolverInterface = new coupling::solvers::PreciceInterface<dim>(numberCells, overLap, rank, indexConversion);
+
     coupling::indexing::IndexingService<dim>::getInstance().init(mdConfig, mamicoConfig, _macroscopicSolverInterface, rank);
+
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
         _instanceHandling->getMDSolverInterface(), _macroscopicSolverInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
+    
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, dim>::getInstance().setMacroscopicSolverInterface(_macroscopicSolverInterface);
+    
     _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
+    
     _multiMDCellService->computeAndStoreTemperature(scenarioConfig.temp);
     allocateM2mBuffer(rank);
     allocatem2MBuffer(rank);
+    
     _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>("mamico-M2m-mesh", "mamico-m2M-mesh", "VelocityMacro", "VelocityMicro");
-    _preciceAdapter->setMeshes(_buf._M2mCellIndices, _buf._M2mBuffer.size(), _buf._m2MCellIndices, _buf._m2MBuffer.size(), domainOffset, cellSize);
+    _preciceAdapter->setMeshes(_macroscopicSolverInterface, domainOffset, cellSize);
     double precice_dt = _preciceAdapter->initialize();
     double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
@@ -125,8 +137,10 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
+    std::cout << "1" << std::endl;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData();
+      std::cout << "2" << std::endl;
       for (unsigned int i = 0; i < _buf._M2mBuffer.size(); i++) {
         tarch::la::Vector<3, double> cellMidPoint =
             getCellMidPoint(coupling::indexing::convertToVector<dim>({_buf._M2mCellIndices[i]}), domainOffset, cellSize);
@@ -134,12 +148,15 @@ public:
         _buf._M2mBuffer[i]->setMicroscopicMass(massCell);
         _buf._M2mBuffer[i]->setMicroscopicMomentum(momentum);
       }
+      std::cout << "3" << std::endl;
       _multiMDCellService->sendFromMacro2MD(_buf._M2mBuffer, _buf._M2mCellIndices);
       if (!scenarioConfig.couetteAnalytical) {
+        std::cout << "4" << std::endl;
         _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
         mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
         _multiMDCellService->sendFromMD2Macro(_buf._m2MBuffer, _buf._m2MCellIndices);
         _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
+        std::cout << "5" << std::endl;
       } else {
         coupling::solvers::CouetteSolver<3>* couetteSolver =
             new coupling::solvers::CouetteSolver<3>(scenarioConfig.channelHeight, scenarioConfig.wallVelocity, scenarioConfig.dynamicViscosity);
@@ -154,7 +171,9 @@ public:
       }
       _preciceAdapter->setMDBoundaryValues(_buf._m2MBuffer, _buf._m2MCellIndices);
       _preciceAdapter->writeData();
+      std::cout << "6" << std::endl;
       precice_dt = _preciceAdapter->advance(mamico_dt);
+      std::cout << "7" << std::endl;
       if (precice_dt < mamico_dt)
         std::cout << "warning: rank " << rank << " maximum timestep from preCICE (" << precice_dt << ") is lower than MaMiCo timestep (" << mamico_dt << ")"
                   << std::endl;
@@ -165,6 +184,47 @@ public:
   }
 
 private:
+  unsigned int computeTopologyOffset() const {
+    // determine topology offset of this rank
+    const unsigned int intNumberProcesses = computeScalarNumberProcesses();
+    const unsigned int topologyOffset = (_multiMDService->getGlobalRank() / intNumberProcesses) * intNumberProcesses;
+    return topologyOffset;
+  }
+
+  unsigned int computeScalarNumberProcesses() const {
+    unsigned int np = _multiMDService->getNumberProcessesPerMDSimulation()[0];
+    for (unsigned int d = 1; d < 3; d++) {
+      np = np * _multiMDService->getNumberProcessesPerMDSimulation()[d];
+    }
+    return np;
+  }
+
+  coupling::IndexConversion<3>* initIndexConversion(tarch::la::Vector<3, double> macroscopicCellSize, tarch::la::Vector<3, unsigned int> numberProcesses,
+                                                      unsigned int rank, tarch::la::Vector<3, double> globalMDDomainSize,
+                                                      tarch::la::Vector<3, double> globalMDDomainOffset,
+                                                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                                                      unsigned int topologyOffset) const {
+
+    tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
+    for (unsigned int d = 0; d < 3; d++) {
+      globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
+      if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13) {
+        std::cout << "coupling::services::MultiMDCellService::initIndexConversi"
+                     "on(): Deviation of domain size > 1e-13!"
+                  << std::endl;
+      }
+    }
+    coupling::IndexConversion<3>* ic = new coupling::IndexConversion<3>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,
+                                                                            globalMDDomainOffset, parallelTopologyType, topologyOffset);
+    if (ic == NULL) {
+      std::cout << "coupling::services::MultiMDCellService::initIndexConversion"
+                   "(): ic==NULL!"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    return ic;
+  }
+
   tarch::la::Vector<3, double> getCellMidPoint(const tarch::la::Vector<3, int> cellIndex, const tarch::la::Vector<3, double> domainOffset,
                                                const tarch::la::Vector<3, double> cellSize) const {
     tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * cellSize);
@@ -192,6 +252,7 @@ private:
         }
       }
     }
+    std::cout << "@@@@ _buf._M2mBuffer.size():" << _buf._M2mBuffer.size() << std::endl;
     _buf._M2mCellIndices = new unsigned int[_buf._M2mBuffer.size()];
     std::copy(M2mBufferCellIndices.begin(), M2mBufferCellIndices.end(), _buf._M2mCellIndices);
   }
@@ -214,6 +275,7 @@ private:
         }
       }
     }
+    std::cout << "@@@@ _buf._m2MBuffer.size():" << _buf._m2MBuffer.size() << std::endl;
     _buf._m2MCellIndices = new unsigned int[_buf._m2MBuffer.size()];
     std::copy(m2MBufferCellIndices.begin(), m2MBufferCellIndices.end(), _buf._m2MCellIndices);
   }
@@ -300,7 +362,7 @@ private:
   };
 
   coupling::solvers::PreciceAdapter<3>* _preciceAdapter;
-  coupling::interface::MacroscopicSolverInterface<3>* _macroscopicSolverInterface;
+  coupling::solvers::PreciceInterface<3>* _macroscopicSolverInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
