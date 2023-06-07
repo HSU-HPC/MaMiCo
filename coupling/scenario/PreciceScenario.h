@@ -108,12 +108,7 @@ public:
     }
     const unsigned int overLap = mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap();
 
-    coupling::IndexConversion<3>* indexConversion = initIndexConversion(mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
-                                             _multiMDService->getNumberProcessesPerMDSimulation(), _multiMDService->getGlobalRank(),
-                                             mdConfig.getDomainConfiguration().getGlobalDomainSize(),
-                                             mdConfig.getDomainConfiguration().getGlobalDomainOffset(),
-                                             mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), computeTopologyOffset());
-    _macroscopicSolverInterface = new coupling::solvers::PreciceInterface<dim>(numberCells, overLap, rank, indexConversion);
+    _macroscopicSolverInterface = new coupling::solvers::PreciceInterface<dim>(numberCells, overLap, rank);
 
     coupling::indexing::IndexingService<dim>::getInstance().init(mdConfig, mamicoConfig, _macroscopicSolverInterface, rank);
 
@@ -125,10 +120,8 @@ public:
     _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
     
     _multiMDCellService->computeAndStoreTemperature(scenarioConfig.temp);
-    allocateM2mBuffer(rank);
-    allocatem2MBuffer(rank);
     
-    _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>("mamico-M2m-mesh", "mamico-m2M-mesh", "VelocityMacro", "VelocityMicro");
+    _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>();
     _preciceAdapter->setMeshes(_macroscopicSolverInterface, domainOffset, cellSize);
     double precice_dt = _preciceAdapter->initialize();
     double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
@@ -137,102 +130,38 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
-    std::cout << "1" << std::endl;
     while (_preciceAdapter->isCouplingOngoing()) {
-      _preciceAdapter->readData();
-      std::cout << "2" << std::endl;
-      for (unsigned int i = 0; i < _buf._M2mBuffer.size(); i++) {
-        tarch::la::Vector<3, double> cellMidPoint =
-            getCellMidPoint(coupling::indexing::convertToVector<dim>({_buf._M2mCellIndices[i]}), domainOffset, cellSize);
-        tarch::la::Vector<3, double> momentum(massCell * _preciceAdapter->getVelocity(cellMidPoint));
-        _buf._M2mBuffer[i]->setMicroscopicMass(massCell);
-        _buf._M2mBuffer[i]->setMicroscopicMomentum(momentum);
-      }
-      std::cout << "3" << std::endl;
-      _multiMDCellService->sendFromMacro2MD(_buf._M2mBuffer, _buf._M2mCellIndices);
+      _preciceAdapter->readVelocities(massCell);
+      _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
       if (!scenarioConfig.couetteAnalytical) {
-        std::cout << "4" << std::endl;
         _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
         mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
-        _multiMDCellService->sendFromMD2Macro(_buf._m2MBuffer, _buf._m2MCellIndices);
+        _multiMDCellService->sendFromMD2Macro(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices());
         _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
-        std::cout << "5" << std::endl;
       } else {
         coupling::solvers::CouetteSolver<3>* couetteSolver =
-            new coupling::solvers::CouetteSolver<3>(scenarioConfig.channelHeight, scenarioConfig.wallVelocity, scenarioConfig.dynamicViscosity);
+            new coupling::solvers::CouetteSolver<3>(scenarioConfig.channelHeight, scenarioConfig.wallVelocity, scenarioConfig.kinematicViscosity);
         couetteSolver->advance(mamico_dt * (cycle + 1));
-        for (unsigned int i = 0; i < _buf._m2MBuffer.size(); i++) {
+        for (unsigned int i = 0; i < _preciceAdapter->getm2MCells().size(); i++) {
           tarch::la::Vector<3, double> cellMidPoint =
-              getCellMidPoint(coupling::indexing::convertToVector<dim>({_buf._m2MCellIndices[i]}), domainOffset, cellSize);
+              getCellMidPoint(coupling::indexing::convertToVector<dim>({_preciceAdapter->getm2MCellIndices()[i]}), domainOffset, cellSize);
           const tarch::la::Vector<3, double> momentum{massCell * (couetteSolver->getVelocity(cellMidPoint))};
-          _buf._m2MBuffer[i]->setMacroscopicMass(massCell);
-          _buf._m2MBuffer[i]->setMacroscopicMomentum(momentum);
+          _preciceAdapter->getm2MCells()[i]->setMacroscopicMass(massCell);
+          _preciceAdapter->getm2MCells()[i]->setMacroscopicMomentum(momentum);
         }
       }
-      for (unsigned int i = 0; i < _buf._m2MBuffer.size(); i++) {
-        tarch::la::Vector<3, double> cellMidPoint =
-            getCellMidPoint(coupling::indexing::convertToVector<dim>({_buf._m2MCellIndices[i]}), domainOffset, cellSize);
-        tarch::la::Vector<3, double> vel{0.0};
-        if (_buf._m2MBuffer[i]->getMacroscopicMass() != 0.0) {
-          vel = (1.0 / _buf._m2MBuffer[i]->getMacroscopicMass()) * _buf._m2MBuffer[i]->getMacroscopicMomentum();
-        }
-        _preciceAdapter->setVelocity(cellMidPoint, vel);
-      }
-      _preciceAdapter->writeData();
-      std::cout << "6" << std::endl;
+      _preciceAdapter->writeVelocities();
       precice_dt = _preciceAdapter->advance(mamico_dt);
-      std::cout << "7" << std::endl;
       if (precice_dt < mamico_dt)
         std::cout << "warning: rank " << rank << " maximum timestep from preCICE (" << precice_dt << ") is lower than MaMiCo timestep (" << mamico_dt << ")"
                   << std::endl;
       cycle++;
-      if (_buf._m2MBuffer.size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
-        write2CSV(_buf._m2MBuffer, _buf._m2MCellIndices, cycle, numberCells, domainOffset, cellSize, overLap, rank);
+      if (_preciceAdapter->getm2MCells().size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
+        write2CSV(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices(), cycle, numberCells, domainOffset, cellSize, overLap, rank);
     }
   }
 
 private:
-  unsigned int computeTopologyOffset() const {
-    // determine topology offset of this rank
-    const unsigned int intNumberProcesses = computeScalarNumberProcesses();
-    const unsigned int topologyOffset = (_multiMDService->getGlobalRank() / intNumberProcesses) * intNumberProcesses;
-    return topologyOffset;
-  }
-
-  unsigned int computeScalarNumberProcesses() const {
-    unsigned int np = _multiMDService->getNumberProcessesPerMDSimulation()[0];
-    for (unsigned int d = 1; d < 3; d++) {
-      np = np * _multiMDService->getNumberProcessesPerMDSimulation()[d];
-    }
-    return np;
-  }
-
-  coupling::IndexConversion<3>* initIndexConversion(tarch::la::Vector<3, double> macroscopicCellSize, tarch::la::Vector<3, unsigned int> numberProcesses,
-                                                      unsigned int rank, tarch::la::Vector<3, double> globalMDDomainSize,
-                                                      tarch::la::Vector<3, double> globalMDDomainOffset,
-                                                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-                                                      unsigned int topologyOffset) const {
-
-    tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
-    for (unsigned int d = 0; d < 3; d++) {
-      globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
-      if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13) {
-        std::cout << "coupling::services::MultiMDCellService::initIndexConversi"
-                     "on(): Deviation of domain size > 1e-13!"
-                  << std::endl;
-      }
-    }
-    coupling::IndexConversion<3>* ic = new coupling::IndexConversion<3>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,
-                                                                            globalMDDomainOffset, parallelTopologyType, topologyOffset);
-    if (ic == NULL) {
-      std::cout << "coupling::services::MultiMDCellService::initIndexConversion"
-                   "(): ic==NULL!"
-                << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    return ic;
-  }
-
   tarch::la::Vector<3, double> getCellMidPoint(const tarch::la::Vector<3, int> cellIndex, const tarch::la::Vector<3, double> domainOffset,
                                                const tarch::la::Vector<3, double> cellSize) const {
     tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * cellSize);
@@ -240,52 +169,6 @@ private:
       cellMidPoint[d] = cellMidPoint[d] + cellIndex[d] * cellSize[d];
     }
     return cellMidPoint;
-  }
-
-  void allocateM2mBuffer(const unsigned int rank) {
-    using namespace coupling::indexing;
-    const unsigned int dim = 3;
-    std::vector<unsigned int> M2mBufferCellIndices;
-    for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
-      tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get());
-      if (_macroscopicSolverInterface->sendMacroscopicQuantityToMDSolver(cellVectorIndex)) {
-        std::vector<unsigned int> ranks = _macroscopicSolverInterface->getSourceRanks(cellVectorIndex);
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
-        }
-        if (containsThisRank) {
-          _buf._M2mBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          M2mBufferCellIndices.push_back(convertToScalar<dim>(cellIndex));
-        }
-      }
-    }
-    std::cout << "@@@@ _buf._M2mBuffer.size():" << _buf._M2mBuffer.size() << std::endl;
-    _buf._M2mCellIndices = new unsigned int[_buf._M2mBuffer.size()];
-    std::copy(M2mBufferCellIndices.begin(), M2mBufferCellIndices.end(), _buf._M2mCellIndices);
-  }
-
-  void allocatem2MBuffer(const unsigned int rank) {
-    using namespace coupling::indexing;
-    const unsigned int dim = 3;
-    std::vector<unsigned int> m2MBufferCellIndices;
-    for (CellIndex<dim, IndexTrait::vector> cellIndex : CellIndex<dim, IndexTrait::vector>()) {
-      tarch::la::Vector<3, unsigned int> cellVectorIndex = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex.get());
-      if (_macroscopicSolverInterface->receiveMacroscopicQuantityFromMDSolver(cellVectorIndex)) {
-        std::vector<unsigned int> ranks = _macroscopicSolverInterface->getTargetRanks(cellVectorIndex);
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == (unsigned int)rank);
-        }
-        if (containsThisRank) {
-          _buf._m2MBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          m2MBufferCellIndices.push_back(convertToScalar<dim>(cellIndex));
-        }
-      }
-    }
-    std::cout << "@@@@ _buf._m2MBuffer.size():" << _buf._m2MBuffer.size() << std::endl;
-    _buf._m2MCellIndices = new unsigned int[_buf._m2MBuffer.size()];
-    std::copy(m2MBufferCellIndices.begin(), m2MBufferCellIndices.end(), _buf._m2MCellIndices);
   }
 
   void write2CSV(const std::vector<coupling::datastructures::MacroscopicCell<3>*>& m2MBuffer, const unsigned int* const m2MCellIndices, const int couplingCycle,
@@ -345,7 +228,7 @@ private:
       tarch::configuration::ParseConfiguration::readBoolOptional(couetteAnalytical, subtag, "couette-analytical");
       tarch::configuration::ParseConfiguration::readDoubleOptional(channelHeight, subtag, "channel-height");
       tarch::configuration::ParseConfiguration::readDoubleOptional(wallVelocity, subtag, "wall-velocity");
-      tarch::configuration::ParseConfiguration::readDoubleOptional(dynamicViscosity, subtag, "dynamic-viscosity");
+      tarch::configuration::ParseConfiguration::readDoubleOptional(kinematicViscosity, subtag, "kinematic-viscosity");
     };
 
     std::string getTag() const override { return "scenario"; };
@@ -359,7 +242,7 @@ private:
     bool couetteAnalytical = false;
     double channelHeight;
     double wallVelocity;
-    double dynamicViscosity;
+    double kinematicViscosity;
   };
 
   struct CouplingBuffer {
