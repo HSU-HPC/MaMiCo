@@ -3,6 +3,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/IndexConversion.h"
 #include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/indexing/CellIndex.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "precice/SolverInterface.hpp"
@@ -193,7 +194,7 @@ public:
       }
     }
   }
-  
+
 private:
   std::vector<int> getTetrahedronsVertexIndices(int i, int* m2MVertexIndices, std::vector<unsigned int>& m2MCellIndices) {
     int m2MVertexIndex = m2MVertexIndices[i];
@@ -282,9 +283,13 @@ public:
 
   std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
 
-  std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
+  std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {_rank}; }
 
-  std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
+  std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+    coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<dim,int>>(globalCellIndex)};
+    std::vector<unsigned int> ranks = coupling::indexing::IndexingService<dim>::getInstance().getRanksForGlobalIndex(cellIndex_v);
+    return ranks; 
+  }
 
 private:
   const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
