@@ -24,13 +24,21 @@ public:
 #if (AD_RES == MD_YES)
         _twoBodyForce(0.0), _threeBodyForce(0.0),
 #endif      
-        _force(0.0), _forceOld(0.0), _potentialEnergy(0.0), _id(0), _isFixed(false) {}
+        _force(0.0), _forceOld(0.0),
+#if (AD_RES == MD_YES)
+        _twoBodyPotentialEnergy(0.0), _threeBodyPotentialEnergy(0.0),
+#endif
+        _potentialEnergy(0.0), _id(0), _isFixed(false) {}
   /** empty constructor */
   Molecule() : _position(0.0), _velocity(0.0),
 #if (AD_RES == MD_YES)
                _twoBodyForce(0.0), _threeBodyForce(0.0),
 #endif
-               _force(0.0), _forceOld(0.0), _potentialEnergy(0.0), _id(0), _isFixed(false) {}
+               _force(0.0), _forceOld(0.0),
+#if (AD_RES == MD_YES)
+               _twoBodyPotentialEnergy(0.0), _threeBodyPotentialEnergy(0.0),
+#endif
+               _potentialEnergy(0.0), _id(0), _isFixed(false) {}
   ~Molecule() {}
 
   /** fix position of particle. */
