@@ -7,10 +7,13 @@
 
 #include "simplemd/LinkedCell.h"
 #include "simplemd/Molecule.h"
+#include "simplemd/cell-mappings/AxilrodTellerForceMapping.h"
+#include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 #include "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include "tarch/la/Vector.h"
 #include <iostream>
+#include <cmath>
 
 namespace simplemd {
 namespace services {
@@ -29,6 +32,9 @@ public:
    *  numberOfCells - local number of cells
    */
   LinkedCellService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
+  #if (AD_RES == MD_YES)
+                    const unsigned int& adResDimension, const double& interfaceStart, const double& interfaceLength,
+  #endif
                     const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService);
 
   /** shuts down the service, frees memory and resets all variables */
@@ -87,6 +93,11 @@ public:
   template <class A>
   void iterateCellTriplets(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
                         const bool& useOpenMP) const;
+
+#if (AD_RES == MD_YES)
+  /** returns true if the argument is of the defined class */
+  template <typename Base, typename T> bool instanceof(const T*) const;
+#endif
 
   /** returns the index of the first (non-ghost) cell */
   const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const;
@@ -163,6 +174,14 @@ private:
  * reasons */
 #if (MD_DIM > 2)
   const unsigned int _totalNumberOfCells_X_By_totalNumberOfCells_Y;
+#endif
+#if (AD_RES == MD_YES)
+  /** dimension in which adaptive resolution is applied */
+  const unsigned int _adResDimension;
+  /** index (in dimension _adResDimension) of first cell to calculate three body forces */
+  const unsigned int _threeBodyStart;
+  /** index (in dimension _adResDimension) of last cell to calculate two body forces */
+  const unsigned int _twoBodyEnd;
 #endif
 };
 
@@ -335,6 +354,11 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
   }
 #endif
 
+// check if adaptive resolution efficiency improvements can be applied
+#if (AD_RES == MD_YES)
+  const bool applyAdRes = instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&a);
+#endif
+
   // start iteration();
   a.beginCellIteration();
 
@@ -405,6 +429,11 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 #else
         index = lowerLeftFrontCell[0] + 2 * j + x;
 #endif
+#if (AD_RES == MD_YES)
+            if (applyAdRes && getLocalCellIndexVector(index)[_adResDimension - 1] > _twoBodyEnd) {
+              continue;
+            }
+#endif
 #if (MD_DEBUG == MD_YES)
             std::cout << "Handle cell " << index << std::endl;
 #endif
@@ -439,12 +468,27 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 // loop over domain
 #if (MD_DIM > 2)
     for (coords[2] = lowerLeftFrontCell[2]; coords[2] < lowerLeftFrontCell[2] + cellRange[2]; coords[2]++) {
+#if (AD_RES == MD_YES)
+    if (applyAdRes && _adResDimension == 3 && coords[2] > _twoBodyEnd) {
+      break;
+    }
+#endif
 #endif
 #if (MD_DIM > 1)
       for (coords[1] = lowerLeftFrontCell[1]; coords[1] < lowerLeftFrontCell[1] + cellRange[1]; coords[1]++) {
+#if (AD_RES == MD_YES)
+        if (applyAdRes && _adResDimension == 2 && coords[1] > _twoBodyEnd) {
+          break;
+        }
+#endif
 #endif
         for (coords[0] = lowerLeftFrontCell[0]; coords[0] < lowerLeftFrontCell[0] + cellRange[0]; coords[0]++) {
           // handle cell itself
+#if (AD_RES == MD_YES)
+          if (applyAdRes && _adResDimension == 1 && coords[0] > _twoBodyEnd) {
+            break;
+          }
+#endif
           index = getLocalIndexFromLocalVector(coords);
 #if (MD_DEBUG == MD_YES)
           std::cout << "iterateCellPairs: Single index " << index << std::endl;
@@ -690,6 +734,11 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
   }
 #endif
 
+// check if adaptive resolution efficiency improvements can be applied
+#if (AD_RES == MD_YES)
+  const bool applyAdRes = instanceof<simplemd::cellmappings::AxilrodTellerForceMapping>(&a);
+#endif
+
   // start iteration();
   a.beginCellIteration();
 
@@ -761,6 +810,11 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
 #else
         index = lowerLeftFrontCell[0] + 2 * j + x;
 #endif
+#if (AD_RES == MD_YES)
+            if (applyAdRes && getLocalCellIndexVector(index)[_adResDimension - 1] < _threeBodyStart) {
+              continue;
+            }
+#endif
 #if (MD_DEBUG == MD_YES)
             std::cout << "iterateCellTriplets: Single index " << index << std::endl;
 #endif
@@ -825,11 +879,26 @@ void simplemd::services::LinkedCellService::iterateCellTriplets(A& a, const tarc
 // loop over domain
 #if (MD_DIM > 2)
     for (coords[2] = lowerLeftFrontCell[2]; coords[2] < lowerLeftFrontCell[2] + cellRange[2]; coords[2]++) {
+#if (AD_RES == MD_YES)
+      if (applyAdRes && _adResDimension == 3 && coords[2] < _threeBodyStart) {
+        continue;
+      }
+#endif
 #endif
 #if (MD_DIM > 1)
       for (coords[1] = lowerLeftFrontCell[1]; coords[1] < lowerLeftFrontCell[1] + cellRange[1]; coords[1]++) {
+#if (AD_RES == MD_YES)
+        if (applyAdRes && _adResDimension == 2 && coords[1] < _threeBodyStart) {
+          continue;
+        }
+#endif
 #endif
         for (coords[0] = lowerLeftFrontCell[0]; coords[0] < lowerLeftFrontCell[0] + cellRange[0]; coords[0]++) {
+#if (AD_RES == MD_YES)
+          if (applyAdRes && _adResDimension == 1 && coords[0] < _threeBodyStart) {
+            continue;
+          }
+#endif
           // handle cell itself
           index = getLocalIndexFromLocalVector(coords);
 #if (MD_DEBUG == MD_YES)
@@ -896,5 +965,11 @@ template <class A> void simplemd::services::LinkedCellService::iterateCellTriple
   const tarch::la::Vector<MD_DIM, unsigned int> tripletIterationLength(getLocalNumberOfCells() + getLocalIndexOfFirstCell());
   iterateCellTriplets(a, tripletIterationStart, tripletIterationLength, useOpenMP);
 }
+
+#if (AD_RES == MD_YES)
+template <typename Base, typename T> bool simplemd::services::LinkedCellService::instanceof(const T*) const {
+  return std::is_base_of<Base, T>::value;
+}
+#endif
 
 #endif // _MOLECULARDYNAMICS_SERVICES_LINKEDCELLSERVICE_H_

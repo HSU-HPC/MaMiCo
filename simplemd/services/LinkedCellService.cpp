@@ -7,6 +7,11 @@
 
 simplemd::services::LinkedCellService::LinkedCellService(const tarch::la::Vector<MD_DIM, double>& domainSize,
                                                          const tarch::la::Vector<MD_DIM, double>& domainOffset,
+#if (AD_RES == MD_YES)
+                                                         const unsigned int& adResDimension,
+                                                         const double& interfaceStart,
+                                                         const double& interfaceLength,
+#endif
                                                          const simplemd::services::ParallelTopologyService& parallelTopologyService,
                                                          simplemd::services::MoleculeService& moleculeService)
     : _cells(NULL), _domainSize(domainSize), _domainOffset(domainOffset), _meshWidth(getMeshwidth(domainSize, parallelTopologyService.getLocalNumberOfCells())),
@@ -15,6 +20,12 @@ simplemd::services::LinkedCellService::LinkedCellService(const tarch::la::Vector
 #if (MD_DIM > 2)
       ,
       _totalNumberOfCells_X_By_totalNumberOfCells_Y(_totalNumberOfCells[0] * _totalNumberOfCells[1])
+#endif
+#if (AD_RES == MD_YES)
+      ,
+      _adResDimension(adResDimension), 
+      _threeBodyStart(((unsigned int) ((interfaceStart - _domainOffset[_adResDimension - 1]) / _meshWidth[_adResDimension - 1])) - 1 + _indexOffset[_adResDimension - 1]), 
+      _twoBodyEnd(((unsigned int) ceil((interfaceStart + interfaceLength - _domainOffset[_adResDimension - 1]) / _meshWidth[_adResDimension - 1])) + _indexOffset[_adResDimension - 1])
 #endif
 {
   // initialise memory for cell structure according to number of cells and index

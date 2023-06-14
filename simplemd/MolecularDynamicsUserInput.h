@@ -27,6 +27,13 @@
 #error "MDBody2 or MDBody3"
 #endif
 
+// AdRes (MD_YES/MD_NO)
+#if defined(AdRes)
+#define AD_RES MD_YES
+#else
+#define AD_RES MD_NO
+#endif
+
 // MPI-Parallelisation (MD_YES/ MD_NO)
 #ifdef MDParallel
 #define MD_PARALLEL MD_YES

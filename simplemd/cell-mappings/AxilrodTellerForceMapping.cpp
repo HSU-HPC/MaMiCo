@@ -22,7 +22,11 @@ void simplemd::cellmappings::AxilrodTellerForceMapping::handleCell(const LinkedC
   const std::list<Molecule*>::const_iterator begin = cell.constBegin();
   for (std::list<Molecule*>::const_iterator m1 = begin; m1 != end; m1++) {
     std::list<Molecule*>::const_iterator m2 = m1;
+#if (AD_RES == MD_NO)
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
+#else
+    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getThreeBodyForce();
+#endif
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
     // add external force
@@ -31,7 +35,11 @@ void simplemd::cellmappings::AxilrodTellerForceMapping::handleCell(const LinkedC
     // iterate over all other molecules not touched so far
     m2++;
     while (m2 != end) {
+#if (AD_RES == MD_NO)
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
+#else
+      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getThreeBodyForce();
+#endif
       const tarch::la::Vector<MD_DIM, double>& position2 = (*m2)->getConstPosition();  
 
       std::list<Molecule*>::const_iterator m3 = m2;
@@ -41,7 +49,11 @@ void simplemd::cellmappings::AxilrodTellerForceMapping::handleCell(const LinkedC
         std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << " <-> " << (*m3)->getID() << std::endl;
 #endif
 
+#if (AD_RES == MD_NO)
         tarch::la::Vector<MD_DIM, double>& force3 = (*m3)->getForce();
+#else
+        tarch::la::Vector<MD_DIM, double>& force3 = (*m3)->getThreeBodyForce();
+#endif
         forceBuffer = getAxilrodTellerForce(position1, position2, (*m3)->getConstPosition());
         force1 -= forceBuffer[0];
         force2 -= forceBuffer[1];
@@ -69,20 +81,32 @@ void simplemd::cellmappings::AxilrodTellerForceMapping::handleCellPair(const Lin
   // iterate over triplets of molecules with two molecules from cell1
   for (std::list<Molecule*>::const_iterator m1 = beginCell1; m1 != endCell1; m1++) {
     std::list<Molecule*>::const_iterator m2 = m1;
+#if (AD_RES == MD_NO)
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
+#else
+    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getThreeBodyForce();
+#endif
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
     // iterate over all molecules not touched so far from cell1
     m2++;
     while (m2 != endCell1) {
+#if (AD_RES == MD_NO)
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
+#else
+      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getThreeBodyForce();
+#endif
       const tarch::la::Vector<MD_DIM, double>& position2 = (*m2)->getConstPosition();
 
       for (std::list<Molecule*>::const_iterator m3 = beginCell2; m3 != endCell2; m3++) {
 #if (MD_DEBUG == MD_YES)
         std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << " <-> " << (*m3)->getID() << std::endl;
 #endif
+#if (AD_RES == MD_NO)
         tarch::la::Vector<MD_DIM, double>& force3 = (*m3)->getForce();
+#else
+        tarch::la::Vector<MD_DIM, double>& force3 = (*m3)->getThreeBodyForce();
+#endif
 
         forceBuffer = getAxilrodTellerForce(position1, position2, (*m3)->getConstPosition());
         force1 -= forceBuffer[0];
@@ -95,12 +119,20 @@ void simplemd::cellmappings::AxilrodTellerForceMapping::handleCellPair(const Lin
 
   // iterate over triplets of molecules with two molecules from cell2
   for (std::list<Molecule*>::const_iterator m1 = beginCell1; m1 != endCell1; m1++) {
+#if (AD_RES == MD_NO)
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
+#else
+    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getThreeBodyForce();
+#endif
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
     for (std::list<Molecule*>::const_iterator m2 = beginCell2; m2 != endCell2; m2++) {
       std::list<Molecule*>::const_iterator m3 = m2;
+#if (AD_RES == MD_NO)
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
+#else
+      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getThreeBodyForce();
+#endif
       const tarch::la::Vector<MD_DIM, double>& position2 = (*m2)->getConstPosition();
 
       // iterate over all molecoles not touched so far from cell2
@@ -109,7 +141,11 @@ void simplemd::cellmappings::AxilrodTellerForceMapping::handleCellPair(const Lin
 #if (MD_DEBUG == MD_YES)
         std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << " <-> " << (*m3)->getID() << std::endl;
 #endif
+#if (AD_RES == MD_NO)
         tarch::la::Vector<MD_DIM, double>& force3 = (*m3)->getForce();
+#else
+        tarch::la::Vector<MD_DIM, double>& force3 = (*m3)->getThreeBodyForce();
+#endif
 
         forceBuffer = getAxilrodTellerForce(position1, position2, (*m3)->getConstPosition());
         force1 -= forceBuffer[0];
@@ -135,18 +171,30 @@ void simplemd::cellmappings::AxilrodTellerForceMapping::handleCellTriplet(const 
   const std::list<Molecule*>::const_iterator beginCell2 = cell2.constBegin();
   const std::list<Molecule*>::const_iterator beginCell3 = cell3.constBegin();
   for (std::list<Molecule*>::const_iterator m1 = beginCell1; m1 != endCell1; m1++) {
+#if (AD_RES == MD_NO)
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
+#else
+    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getThreeBodyForce();
+#endif
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
     for (std::list<Molecule*>::const_iterator m2 = beginCell2; m2 != endCell2; m2++) {
+#if (AD_RES == MD_NO)
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
+#else
+      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getThreeBodyForce();
+#endif
       const tarch::la::Vector<MD_DIM, double>& position2 = (*m2)->getConstPosition();  
 
       for (std::list<Molecule*>::const_iterator m3 = beginCell3; m3 != endCell3; m3++) {
 #if (MD_DEBUG == MD_YES)
         std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << " <-> " << (*m3)->getID() << std::endl;
 #endif
+#if (AD_RES == MD_NO)
         tarch::la::Vector<MD_DIM, double>& force3 = (*m3)->getForce();
+#else
+        tarch::la::Vector<MD_DIM, double>& force3 = (*m3)->getThreeBodyForce();
+#endif
 
         forceBuffer = getAxilrodTellerForce(position1, position2, (*m3)->getConstPosition());
         force1 -= forceBuffer[0];

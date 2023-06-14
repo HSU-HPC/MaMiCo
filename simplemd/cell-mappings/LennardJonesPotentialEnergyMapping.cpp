@@ -24,7 +24,11 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
   const std::list<Molecule*>::const_iterator itBegin = cell.begin();
   for (std::list<Molecule*>::const_iterator m1 = itBegin; m1 != itEnd; m1++) {
     std::list<Molecule*>::const_iterator m2 = m1;
+//#if (AD_RES == MD_NO)
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
+/*#else
+    double& potentialEnergy1 = (*m1)->getTwoBodyPotentialEnergy();
+#endif*/ // adaptive resolution not compatible with coupling
 
     // iterate over all other molecules not touched so far
     m2++;
@@ -33,7 +37,11 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
       std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif
 
+//#if (AD_RES == MD_NO)
       double& potentialEnergy2 = (*m2)->getPotentialEnergy();
+/*#else
+      double& potentialEnergy2 = (*m2)->getTwoBodyPotentialEnergy();
+#endif*/ // adaptive resolution not compatible with coupling
       const double rij2 = tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {
@@ -63,14 +71,22 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(
   const std::list<Molecule*>::const_iterator m1Begin = cell1.begin();
   const std::list<Molecule*>::const_iterator m2Begin = cell2.begin();
   for (std::list<Molecule*>::const_iterator m1 = m1Begin; m1 != m1End; m1++) {
+//#if (AD_RES == MD_NO)
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
+/*#else
+    double& potentialEnergy1 = (*m1)->getTwoBodyPotentialEnergy();
+#endif*/ // adaptive resolution not compatible with coupling
 
     for (std::list<Molecule*>::const_iterator m2 = m2Begin; m2 != m2End; m2++) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif
 
+//#if (AD_RES == MD_NO)
       double& potentialEnergy2 = (*m2)->getPotentialEnergy();
+/*#else
+      double& potentialEnergy2 = (*m2)->getTwoBodyPotentialEnergy();
+#endif*/ // adaptive resolution not compatible with coupling
       const double rij2 = tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {

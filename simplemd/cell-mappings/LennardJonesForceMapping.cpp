@@ -25,7 +25,11 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
   const std::list<Molecule*>::const_iterator begin = cell.constBegin();
   for (std::list<Molecule*>::const_iterator m1 = begin; m1 != end; m1++) {
     std::list<Molecule*>::const_iterator m2 = m1;
+#if (AD_RES == MD_NO)
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
+#else
+    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getTwoBodyForce();
+#endif
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
     // add external force
@@ -38,7 +42,11 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
       std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif
 
+#if (AD_RES == MD_NO)
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
+#else
+      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getTwoBodyForce();
+#endif
       forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
       force1 += forceBuffer;
       force2 -= forceBuffer;
@@ -60,14 +68,22 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
   const std::list<Molecule*>::const_iterator beginCell1 = cell1.constBegin();
   const std::list<Molecule*>::const_iterator beginCell2 = cell2.constBegin();
   for (std::list<Molecule*>::const_iterator m1 = beginCell1; m1 != endCell1; m1++) {
+#if (AD_RES == MD_NO)
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
+#else
+    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getTwoBodyForce();
+#endif
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
     for (std::list<Molecule*>::const_iterator m2 = beginCell2; m2 != endCell2; m2++) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif
+#if (AD_RES == MD_NO)
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
+#else
+      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getTwoBodyForce();
+#endif
 
       forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
       force1 += forceBuffer;

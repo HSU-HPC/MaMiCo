@@ -54,6 +54,11 @@ public:
   const tarch::la::Vector<MD_DIM, double>& getMeshWidth() const { return _meshWidth; }
   const double& getKB() const { return _kB; }
   const unsigned int& getBlockSize() const { return _blockSize; }
+#if (AD_RES == MD_YES)
+  const unsigned int& getAdResDimension() const { return _adResDimension; }
+  const double& getInterfaceStart() const { return _interfaceStart; }
+  const double& getInterfaceLength() const { return _interfaceLength; }
+#endif
   const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& getBoundary() const { return _boundary; }
   const std::string& getCheckpointFilestem() const { return _checkpointFilestem; }
   const bool& initFromCheckpoint() const { return _initFromCheckpoint; }
@@ -73,6 +78,11 @@ private:
   static const std::string LINKED_CELL_SIZE;
   static const std::string K_B;
   static const std::string BLOCK_SIZE;
+#if (AD_RES == MD_YES)
+  static const std::string AD_RES_DIMENSION;
+  static const std::string INTERFACE_START;
+  static const std::string INTERFACE_LENGTH;
+#endif
   static const std::string BOUNDARY[MD_LINKED_CELL_NEIGHBOURS];
   static const std::string PERIODIC_BOUNDARY;
   static const std::string GEOMETRY_BOUNDARY;
@@ -106,6 +116,17 @@ private:
 
   /** blocksize to be used for molecule storage */
   unsigned int _blockSize;
+
+#if (AD_RES == MD_YES)
+  /** dimension in which adaptive resolution should be applied */
+  unsigned int _adResDimension;
+
+  /** start of the adaptive reolution interface layer */
+  double _interfaceStart;
+
+  /** length of the adaptive resolution interface layer */
+  double _interfaceLength;
+#endif
 
   /** boundary types for all outer boundaries */
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> _boundary;

@@ -24,20 +24,32 @@ void simplemd::cellmappings::AxilrodTellerPotentialEnergyMapping::handleCell(Lin
   const std::list<Molecule*>::const_iterator itBegin = cell.begin();
   for (std::list<Molecule*>::const_iterator m1 = itBegin; m1 != itEnd; m1++) {
     std::list<Molecule*>::const_iterator m2 = m1;
+#if (AD_RES == MD_NO)
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
+#else
+    double& potentialEnergy1 = (*m1)->getThreeBodyPotentialEnergy();
+#endif
 
     // iterate over all other molecules not touched so far
     m2++;
     while (m2 != itEnd) {
       std::list<Molecule*>::const_iterator m3 = m2;
+#if (AD_RES == MD_NO)
       double& potentialEnergy2 = (*m2)->getPotentialEnergy();
+#else
+      double& potentialEnergy2 = (*m2)->getThreeBodyPotentialEnergy();
+#endif
 
       while (m3 != itEnd) {
 #if (MD_DEBUG == MD_YES)
         std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << " <-> " << (*m3)->getID() << std::endl;
 #endif
 
+#if (AD_RES == MD_NO)
         double& potentialEnergy3 = (*m3)->getPotentialEnergy();
+#else
+        double& potentialEnergy3 = (*m3)->getThreeBodyPotentialEnergy();
+#endif
         potentialEnergyBuffer = getAxilrodTellerPotentialEnergy((*m1)->getConstPosition(), (*m2)->getConstPosition(), (*m3)->getConstPosition());
 
         potentialEnergy1 += potentialEnergyBuffer[0];
@@ -65,18 +77,30 @@ void simplemd::cellmappings::AxilrodTellerPotentialEnergyMapping::handleCellPair
   // iterate over triplets of molecules with two molecules from cell1
   for (std::list<Molecule*>::const_iterator m1 = m1Begin; m1 != m1End; m1++) {
     std::list<Molecule*>::const_iterator m2 = m1;
+#if (AD_RES == MD_NO)
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
+#else
+    double& potentialEnergy1 = (*m1)->getThreeBodyPotentialEnergy();
+#endif
 
     // iterate over all molecules not touched so far from cell1
     m2++;
     while (m2 != m1End) {
+#if (AD_RES == MD_NO)
       double& potentialEnergy2 = (*m2)->getPotentialEnergy();
+#else
+      double& potentialEnergy2 = (*m2)->getThreeBodyPotentialEnergy();
+#endif
 
       for (std::list<Molecule*>::const_iterator m3 = m2Begin; m3 != m2End; m3++) {
 #if (MD_DEBUG == MD_YES)
         std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << " <-> " << (*m3)->getID() << std::endl;
 #endif
+#if (AD_RES == MD_NO)
         double& potentialEnergy3 = (*m3)->getPotentialEnergy();
+#else
+        double& potentialEnergy3 = (*m3)->getThreeBodyPotentialEnergy();
+#endif
 
         potentialEnergyBuffer = getAxilrodTellerPotentialEnergy((*m1)->getConstPosition(), (*m2)->getConstPosition(), (*m3)->getConstPosition());
 
@@ -90,11 +114,19 @@ void simplemd::cellmappings::AxilrodTellerPotentialEnergyMapping::handleCellPair
 
   // iterate over triplets of molecules with two molecules from cell2
   for (std::list<Molecule*>::const_iterator m1 = m1Begin; m1 != m1End; m1++) {
+#if (AD_RES == MD_NO)
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
+#else
+    double& potentialEnergy1 = (*m1)->getThreeBodyPotentialEnergy();
+#endif
 
     for (std::list<Molecule*>::const_iterator m2 = m2Begin; m2 != m2End; m2++) {
       std::list<Molecule*>::const_iterator m3 = m2;
+#if (AD_RES == MD_NO)
       double& potentialEnergy2 = (*m2)->getPotentialEnergy();
+#else
+      double& potentialEnergy2 = (*m2)->getThreeBodyPotentialEnergy();
+#endif
 
       // iterate over all molecoles not touched so far from cell2
       m3++;
@@ -102,7 +134,11 @@ void simplemd::cellmappings::AxilrodTellerPotentialEnergyMapping::handleCellPair
 #if (MD_DEBUG == MD_YES)
         std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << " <-> " << (*m3)->getID() << std::endl;
 #endif
+#if (AD_RES == MD_NO)
         double& potentialEnergy3 = (*m3)->getPotentialEnergy();
+#else
+        double& potentialEnergy3 = (*m3)->getThreeBodyPotentialEnergy();
+#endif
 
         potentialEnergyBuffer = getAxilrodTellerPotentialEnergy((*m1)->getConstPosition(), (*m2)->getConstPosition(), (*m3)->getConstPosition());
 
@@ -129,16 +165,28 @@ void simplemd::cellmappings::AxilrodTellerPotentialEnergyMapping::handleCellTrip
   const std::list<Molecule*>::const_iterator m2Begin = cell2.constBegin();
   const std::list<Molecule*>::const_iterator m3Begin = cell3.constBegin();
   for (std::list<Molecule*>::const_iterator m1 = m1Begin; m1 != m1End; m1++) {
+#if (AD_RES == MD_NO)
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
+#else
+    double& potentialEnergy1 = (*m1)->getThreeBodyPotentialEnergy();
+#endif
 
     for (std::list<Molecule*>::const_iterator m2 = m2Begin; m2 != m2End; m2++) {
-      double& potentialEnergy2 = (*m2)->getPotentialEnergy(); 
+#if (AD_RES == MD_NO)
+      double& potentialEnergy2 = (*m2)->getPotentialEnergy();
+#else
+      double& potentialEnergy2 = (*m2)->getThreeBodyPotentialEnergy();
+#endif
 
       for (std::list<Molecule*>::const_iterator m3 = m3Begin; m3 != m3End; m3++) {
 #if (MD_DEBUG == MD_YES)
         std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << " <-> " << (*m3)->getID() << std::endl;
 #endif
+#if (AD_RES == MD_NO)
         double& potentialEnergy3 = (*m3)->getPotentialEnergy();
+#else
+        double& potentialEnergy3 = (*m3)->getThreeBodyPotentialEnergy();
+#endif
 
         potentialEnergyBuffer = getAxilrodTellerPotentialEnergy((*m1)->getConstPosition(), (*m2)->getConstPosition(), (*m3)->getConstPosition());
 

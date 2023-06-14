@@ -14,6 +14,11 @@ const std::string simplemd::configurations::DomainConfiguration::CUTOFF_RADIUS("
 const std::string simplemd::configurations::DomainConfiguration::LINKED_CELL_SIZE("linked-cell-size");
 const std::string simplemd::configurations::DomainConfiguration::K_B("k_B");
 const std::string simplemd::configurations::DomainConfiguration::BLOCK_SIZE("block-size");
+#if (AD_RES == MD_YES)
+const std::string simplemd::configurations::DomainConfiguration::AD_RES_DIMENSION("dimension");
+const std::string simplemd::configurations::DomainConfiguration::INTERFACE_START("interface-start");
+const std::string simplemd::configurations::DomainConfiguration::INTERFACE_LENGTH("interface-length");
+#endif
 const std::string simplemd::configurations::DomainConfiguration::BOUNDARY[MD_LINKED_CELL_NEIGHBOURS]
 #if (MD_DIM == 1)
     = {"west", "east"}
@@ -60,6 +65,9 @@ const std::string simplemd::configurations::DomainConfiguration::LINKED_CELLS_PE
 
 simplemd::configurations::DomainConfiguration::DomainConfiguration()
     : _moleculesPerDirection(0), _domainSize(0.0), _domainOffset(0.0), _cutoffRadius(0.0), _meshWidth(0.0), _kB(0.0), _blockSize(0),
+#if (AD_RES == MD_YES)
+      _adResDimension(0), _interfaceStart(0.0), _interfaceLength(0.0),
+#endif
       _boundary(simplemd::PERIODIC_BOUNDARY), _checkpointFilestem(""), _initFromCheckpoint(false), _initFromSequentialCheckpoint(false), _isValid(true) {}
 
 void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
@@ -151,6 +159,33 @@ void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLEle
   }
   _blockSize = (unsigned int)intBuf;
 
+#if (AD_RES == MD_YES)
+  // read dimension
+  tarch::configuration::ParseConfiguration::readIntMandatory(intBuf, node, AD_RES_DIMENSION);
+  if (intBuf <= 0 || intBuf > MD_DIM) {
+    std::cout << AD_RES_DIMENSION << " is none of the defined dimensions!" << std::endl;
+    _isValid = false;
+    exit(EXIT_FAILURE);
+  }
+  _adResDimension = (unsigned int)intBuf;
+
+  // read interface start
+  tarch::configuration::ParseConfiguration::readDoubleMandatory(_interfaceStart, node, INTERFACE_START);
+  if (_interfaceStart < _domainOffset[_adResDimension - 1] || _interfaceStart > _domainOffset[_adResDimension - 1] + _domainSize[_adResDimension - 1]) {
+    std::cout << INTERFACE_START << " is outside of the domain!" << std::endl;
+    _isValid = false;
+    exit(EXIT_FAILURE);
+  }
+
+  // read interface length
+  tarch::configuration::ParseConfiguration::readDoubleMandatory(_interfaceLength, node, INTERFACE_LENGTH);
+  if (_interfaceLength < 0.0 || _interfaceStart + _interfaceLength > _domainOffset[_adResDimension - 1] + _domainSize[_adResDimension - 1]) {
+    std::cout << INTERFACE_LENGTH << " is smaller than zero or larger than the remaining domain!" << std::endl;
+    _isValid = false;
+    exit(EXIT_FAILURE);
+  }
+#endif
+
   // read all boundary information
   for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS; i++) {
     strBuf = "";
@@ -190,6 +225,11 @@ void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLEle
   std::cout << "Cutoff radius:                  " << _cutoffRadius << std::endl;
   std::cout << "Linked-cell size:               " << _meshWidth << std::endl;
   std::cout << "K_B:                            " << _kB << std::endl;
+#if (AD_RES == MD_YES)
+  std::cout << "Adaptive resolution dimension:  " << _adResDimension;
+  std::cout << "Interface start:                " << _interfaceStart;
+  std::cout << "Interface length:               " << _interfaceLength;
+#endif
   std::cout << "Boundary:                       " << _boundary << std::endl;
   std::cout << "Blocksize:                      " << _blockSize << std::endl;
 #endif

@@ -22,6 +22,7 @@
 #include "simplemd/molecule-mappings/Adios2Writer.h"
 #endif
 #include "simplemd/molecule-mappings/VelocityStoermerVerletMapping.h"
+#include "simplemd/molecule-mappings/ComputeTotalForceMapping.h"
 #include "simplemd/services/ExternalForceService.h"
 #include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MolecularPropertiesService.h"
@@ -73,6 +74,9 @@ protected:
   const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
 
   // molecule mappings
+#if (AD_RES == MD_YES)
+  simplemd::moleculemappings::ComputeTotalForceMapping* _computeTotalForceMapping;
+#endif
   simplemd::moleculemappings::VelocityStoermerVerletMapping* _timeIntegrator;
   simplemd::moleculemappings::UpdateLinkedCellListsMapping* _updateLinkedCellListsMapping;
   simplemd::moleculemappings::VTKMoleculeWriter* _vtkMoleculeWriter;
@@ -84,9 +88,10 @@ protected:
 #endif
 
   // cell mappings
-#if (MD_BODY == 2)
+#if (MD_BODY == 2 || AD_RES == MD_YES)
   simplemd::cellmappings::LennardJonesForceMapping* _lennardJonesForce;
-#else
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
   simplemd::cellmappings::AxilrodTellerForceMapping* _axilrodTellerForce;
 #endif
   simplemd::cellmappings::EmptyLinkedListsMapping* _emptyLinkedListsMapping;
