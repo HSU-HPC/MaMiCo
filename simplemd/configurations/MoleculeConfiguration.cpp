@@ -36,7 +36,7 @@ void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLE
     exit(EXIT_FAILURE);
   }
 
-#if (MD_BODY == 2)
+#if (MD_BODY == 2 || AD_RES == MD_YES)
   // read epsilon
   tarch::configuration::ParseConfiguration::readDoubleMandatory(_epsilon, node, EPSILON);
   if (_epsilon <= 0.0) {
@@ -52,8 +52,8 @@ void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLE
     _isValid = false;
     exit(EXIT_FAILURE);
   }
-
-#else
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
   // read v
   tarch::configuration::ParseConfiguration::readDoubleMandatory(_v, node, V);
   if (_v <= 0.0) {
@@ -65,10 +65,11 @@ void simplemd::configurations::MoleculeConfiguration::parseSubtag(tinyxml2::XMLE
 
 #if (MD_DEBUG == MD_YES)
   std::cout << "Temperature: " << _temperature << std::endl;
-#if (MD_BODY == 2)
+#if (MD_BODY == 2 || AD_RES == MD_YES)
   std::cout << "Sigma:       " << _sigma << std::endl;
   std::cout << "Epsilon:     " << _epsilon << std::endl;
-#else
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
   std::cout << "V:           " << _v << std::endl;
 #endif
   std::cout << "Mass:        " << _mass << std::endl;

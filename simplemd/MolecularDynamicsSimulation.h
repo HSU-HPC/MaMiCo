@@ -10,6 +10,7 @@
 #include "simplemd/ProfilePlotter.h"
 #include "simplemd/cell-mappings/ComputeMeanVelocityMapping.h"
 #include "simplemd/cell-mappings/ComputeTemperatureMapping.h"
+#include "simplemd/cell-mappings/ComputeTotalForceMapping.h"
 #include "simplemd/cell-mappings/EmptyLinkedListsMapping.h"
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 #include "simplemd/cell-mappings/AxilrodTellerForceMapping.h"
@@ -22,7 +23,6 @@
 #include "simplemd/molecule-mappings/Adios2Writer.h"
 #endif
 #include "simplemd/molecule-mappings/VelocityStoermerVerletMapping.h"
-#include "simplemd/molecule-mappings/ComputeTotalForceMapping.h"
 #include "simplemd/services/ExternalForceService.h"
 #include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MolecularPropertiesService.h"
@@ -74,9 +74,6 @@ protected:
   const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
 
   // molecule mappings
-#if (AD_RES == MD_YES)
-  simplemd::moleculemappings::ComputeTotalForceMapping* _computeTotalForceMapping;
-#endif
   simplemd::moleculemappings::VelocityStoermerVerletMapping* _timeIntegrator;
   simplemd::moleculemappings::UpdateLinkedCellListsMapping* _updateLinkedCellListsMapping;
   simplemd::moleculemappings::VTKMoleculeWriter* _vtkMoleculeWriter;
@@ -93,6 +90,9 @@ protected:
 #endif
 #if (MD_BODY == 3 || AD_RES == MD_YES)
   simplemd::cellmappings::AxilrodTellerForceMapping* _axilrodTellerForce;
+#endif
+#if (AD_RES == MD_YES)
+  simplemd::cellmappings::ComputeTotalForceMapping* _computeTotalForceMapping;
 #endif
   simplemd::cellmappings::EmptyLinkedListsMapping* _emptyLinkedListsMapping;
   simplemd::cellmappings::RDFMapping* _rdfMapping;

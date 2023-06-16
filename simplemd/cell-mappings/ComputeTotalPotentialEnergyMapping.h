@@ -2,14 +2,15 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _MOLECULARDYNAMICS_MOLECULEMAPPINGS_COMPUTETOTALPOTENTIALENERGYMAPPING_H_
-#define _MOLECULARDYNAMICS_MOLECULEMAPPINGS_COMPUTETOTALPOTENTIALENERGYMAPPING_H_
+#ifndef _MOLECULARDYNAMICS_CELLMAPPINGS_COMPUTETOTALPOTENTIALENERGYMAPPING_H_
+#define _MOLECULARDYNAMICS_CELLMAPPINGS_COMPUTETOTALPOTENTIALENERGYMAPPING_H_
 
 #include "simplemd/Molecule.h"
+#include "simplemd/LinkedCell.h"
 #include <cmath>
 
 namespace simplemd {
-namespace moleculemappings {
+namespace cellmappings {
 class ComputeTotalPotentialEnergyMapping;
 }
 } // namespace simplemd
@@ -18,22 +19,18 @@ class ComputeTotalPotentialEnergyMapping;
  *
  *  @author Maximilian Mayr
  */
-class simplemd::moleculemappings::ComputeTotalForceMapping {
+class simplemd::cellmappings::ComputeTotalPotentialEnergyMapping {
 public:
   ComputeTotalPotentialEnergyMapping(const double& domainSize, const double& interfaceStart, const double& interfaceLength, const unsigned int& dimension)
       : _domainSize(domainSize), _interfaceStart(interfaceStart), _interfaceLength(interfaceLength), _dimension(dimension) {}
   ~ComputeTotalPotentialEnergyMapping() {}
 
-  void beginMoleculeIteration() {}
-  void endMoleculeIteration() {}
-  void handleMolecule(Molecule& molecule) {
-    double position = molecule.getPosition()[dimension - 1];
-    double weight = calculateWeight(position);
-    double totalPotentialEnergy = weight * molecule.getConstThreeBodyPotentialEnergy() + (1.0 - weight) * molecule.getConstTwoBodyPotentialEnergy();
-    molecule.setPotentialEnergy(totalPotentialEnergy);
-    molecule.setTwoBodyPotentialEnergy(0.0);
-    molecule.setThreeBodyPotentialEnergy(0.0);
-  }
+  void beginCellIteration() {}
+  void endCellIteration() {}
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
+  void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {} 
+  void handleCellTriplet(LinkedCell& cell1, LinkedCell& cell2, LinkedCell& cell3,
+                         const unsigned int& cellIndex1, const unsigned int& cellIndex2, const unsigned int& cellIndex3) {}
 
 private:
   const double _domainSize;

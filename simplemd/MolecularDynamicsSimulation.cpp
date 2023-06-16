@@ -6,11 +6,7 @@
 #include "simplemd/cell-mappings/VaryCheckpointMapping.h"
 
 simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
-    : _configuration(configuration),
-#if (AD_RES == MD_YES)
-      _computeTotalForceMapping(NULL),
-#endif
-      _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL),
+    : _configuration(configuration), _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL),
 #if BUILD_WITH_ADIOS2
       _Adios2Writer(NULL),
 #endif
@@ -19,6 +15,9 @@ simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplem
 #endif
 #if (MD_BODY == 3 || AD_RES == MD_YES)
       _axilrodTellerForce(NULL),
+#endif
+#if (AD_RES == MD_YES)
+      _computeTotalForceMapping(NULL),
 #endif
       _emptyLinkedListsMapping(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL),
       _parallelTopologyService(NULL), _moleculeService(NULL), _linkedCellService(NULL), _molecularPropertiesService(NULL),
@@ -211,17 +210,6 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     }
 #endif
 
-#if (AD_RES == MD_YES)
-    _computeTotalForceMapping = new simplemd::moleculemappings::ComputeTotalForceMapping(_configuration.getDomainConfiguration().getInterfaceStart(),
-                            _configuration.getDomainConfiguration().getInterfaceLength(), _configuration.getDomainConfiguration().getAdResDimension());
-    if (_computeTotalForceMapping == NULL) {
-      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-                   "_computeTotalForceMapping==NULL!"
-                << std::endl;
-      exit(EXIT_FAILURE);      
-    }
-#endif
-
     // cell mappings
 #if (MD_BODY == 2 || AD_RES == MD_YES)
     _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
@@ -239,6 +227,16 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
                    "_axilrodTellerForce==NULL!"
                 << std::endl;
       exit(EXIT_FAILURE);
+    }
+#endif
+#if (AD_RES == MD_YES)
+    _computeTotalForceMapping = new simplemd::cellmappings::ComputeTotalForceMapping(_configuration.getDomainConfiguration().getInterfaceStart(),
+                            _configuration.getDomainConfiguration().getInterfaceLength(), _configuration.getDomainConfiguration().getAdResDimension());
+    if (_computeTotalForceMapping == NULL) {
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_computeTotalForceMapping==NULL!"
+                << std::endl;
+      exit(EXIT_FAILURE);      
     }
 #endif
     _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping();
@@ -288,11 +286,11 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
 #if (MD_BODY == 3 || AD_RES == MD_YES)
     _linkedCellService->iterateCellTriplets(*_axilrodTellerForce, false);
 #endif
+#if (AD_RES == MD_YES)
+    _linkedCellService->iterateCells(*_computeTotalForceMapping, false);
+#endif
     _boundaryTreatment->emptyGhostBoundaryCells();
     _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
-#if (AD_RES == MD_YES)
-    _moleculeService->iterateMolecules(*_computeTotalForceMapping, false);
-#endif
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate, false);
 
     // sort molecules into linked cells
@@ -380,10 +378,21 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
 #endif
 
     tarch::utils::RandomNumberService::getInstance().init(_configuration.getSimulationConfiguration().fixSeed());
+#if (MD_BODY == 2 && AD_RES == MD_NO)
     _molecularPropertiesService = new simplemd::services::MolecularPropertiesService(
         _configuration.getMoleculeConfiguration().getMass(), _configuration.getMoleculeConfiguration().getEpsilon(),
         _configuration.getMoleculeConfiguration().getSigma(), _configuration.getDomainConfiguration().getCutoffRadius(),
         _configuration.getDomainConfiguration().getKB());
+#elif (MD_BODY == 3 && AD_RES == MD_NO)
+    _molecularPropertiesService = new simplemd::services::MolecularPropertiesService(
+        _configuration.getMoleculeConfiguration().getMass(), _configuration.getMoleculeConfiguration().getV(),
+         _configuration.getDomainConfiguration().getCutoffRadius(), _configuration.getDomainConfiguration().getKB());
+#else
+    _molecularPropertiesService = new simplemd::services::MolecularPropertiesService(
+        _configuration.getMoleculeConfiguration().getMass(), _configuration.getMoleculeConfiguration().getEpsilon(),
+        _configuration.getMoleculeConfiguration().getSigma(), _configuration.getMoleculeConfiguration().getV(),
+        _configuration.getDomainConfiguration().getCutoffRadius(), _configuration.getDomainConfiguration().getKB());
+#endif
     if (_molecularPropertiesService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "
                    "_molecularPropertiesService==NULL!"
@@ -481,17 +490,6 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     }
 #endif
 
-#if (AD_RES == MD_YES)
-    _computeTotalForceMapping = new simplemd::moleculemappings::ComputeTotalForceMapping(_configuration.getDomainConfiguration().getInterfaceStart(),
-                            _configuration.getDomainConfiguration().getInterfaceLength(), _configuration.getDomainConfiguration().getAdResDimension());
-    if (_computeTotalForceMapping == NULL) {
-      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-                   "_computeTotalForceMapping==NULL!"
-                << std::endl;
-      exit(EXIT_FAILURE);      
-    }
-#endif
-
     // cell mappings
 #if (MD_BODY == 2 || AD_RES == MD_YES)
     _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
@@ -509,6 +507,16 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
                    "_axilrodTellerForce==NULL!"
                 << std::endl;
       exit(EXIT_FAILURE);
+    }
+#endif
+#if (AD_RES == MD_YES)
+    _computeTotalForceMapping = new simplemd::cellmappings::ComputeTotalForceMapping(_configuration.getDomainConfiguration().getInterfaceStart(),
+                            _configuration.getDomainConfiguration().getInterfaceLength(), _configuration.getDomainConfiguration().getAdResDimension());
+    if (_computeTotalForceMapping == NULL) {
+      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
+                   "_computeTotalForceMapping==NULL!"
+                << std::endl;
+      exit(EXIT_FAILURE);      
     }
 #endif
     _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping();
@@ -558,11 +566,11 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
 #if (MD_BODY == 3 || AD_RES == MD_YES)
     _linkedCellService->iterateCellTriplets(*_axilrodTellerForce, false);
 #endif
+#if (AD_RES == MD_YES)
+    _linkedCellService->iterateCells(*_computeTotalForceMapping, false);
+#endif
     _boundaryTreatment->emptyGhostBoundaryCells();
     _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
-#if (AD_RES == MD_YES)
-    _moleculeService->iterateMolecules(*_computeTotalForceMapping, false);
-#endif
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate, false);
     // sort molecules into linked cells
     _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
@@ -600,12 +608,6 @@ void simplemd::MolecularDynamicsSimulation::shutdownServices() {
     _Adios2Writer = NULL;
   }
 #endif
-#if (AD_RES == MD_YES)
-  if (_computeTotalForceMapping != NULL) {
-    delete _computeTotalForceMapping;
-    _computeTotalForceMapping = NULL;
-  }
-#endif
 #if (MD_BODY == 2 || AD_RES == MD_YES)
   if (_lennardJonesForce != NULL) {
     delete _lennardJonesForce;
@@ -616,6 +618,12 @@ void simplemd::MolecularDynamicsSimulation::shutdownServices() {
   if (_axilrodTellerForce != NULL) {
     delete _axilrodTellerForce;
     _axilrodTellerForce = NULL;
+  }
+#endif
+#if (AD_RES == MD_YES)
+  if (_computeTotalForceMapping != NULL) {
+    delete _computeTotalForceMapping;
+    _computeTotalForceMapping = NULL;
   }
 #endif
   if (_emptyLinkedListsMapping != NULL) {
@@ -700,6 +708,10 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
 #if (MD_BODY == 3 || AD_RES == MD_YES)
     _linkedCellService->iterateCellTriplets(*_axilrodTellerForce, false);
 #endif
+#if (AD_RES == MD_YES)
+    // calculate total forces in adaptive resplution case
+    _linkedCellService->iterateCells(*_computeTotalForceMapping, false);
+#endif
   } else {
 #if (MD_BODY == 2) // TODO
     _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
@@ -751,11 +763,6 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   // empty linked lists
   _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
 
-#if (AD_RES == MD_YES)
-  // calculate total forces in adaptive resplution case
-  _moleculeService->iterateMolecules(*_computeTotalForceMapping, false);
-#endif
-
   // time integration. After this step, the velocities and the positions of the
   // molecules have been updated.
   _moleculeService->iterateMolecules(*_timeIntegrator, false);
@@ -764,7 +771,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
 
   if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
-    if (t % 50 == 0)
+    if (t % 1 == 0)
       std::cout << "Finish MD timestep " << t << "..." << std::endl;
   }
 }

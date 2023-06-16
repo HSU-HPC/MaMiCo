@@ -25,7 +25,7 @@ simplemd::services::LinkedCellService::LinkedCellService(const tarch::la::Vector
       ,
       _adResDimension(adResDimension), 
       _threeBodyStart(((unsigned int) ((interfaceStart - _domainOffset[_adResDimension - 1]) / _meshWidth[_adResDimension - 1])) - 1 + _indexOffset[_adResDimension - 1]), 
-      _twoBodyEnd(((unsigned int) ceil((interfaceStart + interfaceLength - _domainOffset[_adResDimension - 1]) / _meshWidth[_adResDimension - 1])) + _indexOffset[_adResDimension - 1])
+      _twoBodyEnd(((unsigned int) ceil((interfaceStart + interfaceLength - _domainOffset[_adResDimension - 1]) / _meshWidth[_adResDimension - 1])) - 1 + _indexOffset[_adResDimension - 1])
 #endif
 {
   // initialise memory for cell structure according to number of cells and index

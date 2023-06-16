@@ -257,6 +257,10 @@ set(SIMPLE_MD_SOURCES
 if(BUILD_WITH_ADIOS2)
   list(APPEND SIMPLE_MD_SOURCES "simplemd/molecule-mappings/Adios2Writer.cpp")
 endif()
+if(ADRES)
+  list(APPEND SIMPLE_MD_SOURCES "simplemd/cell-mappings/ComputeTotalForceMapping.cpp")
+  list(APPEND SIMPLE_MD_SOURCES "simplemd/cell-mappings/ComputeTotalPotentialEnergyMapping.cpp")
+endif()
 
 
 add_library(libsimplemd ${SIMPLE_MD_SOURCES})
