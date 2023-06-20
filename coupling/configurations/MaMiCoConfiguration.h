@@ -132,6 +132,9 @@ public:
     return _parallelTopologyConfiguration;
   }
 
+  /**
+   * @return _thermostatConfiguration
+  */
   const coupling::configurations::ThermostatConfiguration& getThermostatConfiguration() const {
     if (!_isDefinedThermostat) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "

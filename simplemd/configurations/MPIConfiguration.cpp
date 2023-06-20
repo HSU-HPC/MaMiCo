@@ -12,7 +12,7 @@ simplemd::configurations::MPIConfiguration::MPIConfiguration() : _numberOfProces
 void simplemd::configurations::MPIConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
   // parse number of processes
   tarch::la::Vector<MD_DIM, int> buffer(-1);
-  tarch::configuration::ParseConfiguration::readVector<MD_DIM, int>(buffer, node, NUMBER_OF_PROCESSES);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<MD_DIM, int>(buffer, node, NUMBER_OF_PROCESSES);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (buffer[d] <= 0) {
       std::cout << NUMBER_OF_PROCESSES << ": Entry " << d << " is smaller than or equal zero: " << buffer << std::endl;

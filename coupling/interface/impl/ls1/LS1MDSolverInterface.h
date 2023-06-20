@@ -256,7 +256,10 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      *  For the builtin MD simulation, the implementation of this method clears all molecules from the ghost
      *  layers and re-fills the ghost layers again.
      */
-    virtual void synchronizeMoleculesAfterMassModification() {}
+    virtual void synchronizeMoleculesAfterMassModification() 
+    {
+      global_simulation->updateParticleContainerAndDecomposition(1.0, false);
+    }
 
     /** is called each time when MaMiCo tried to insert momentum in the MD simulation. For the builtin MD simulation,
      *  this method is empty as the simulation does not need to synchronize changing momentum over the processes

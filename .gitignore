@@ -23,3 +23,5 @@ coupling/scenario/kvs-lbmpy/*.ini
 *.dot
 docs/
 *.checkpoint
+/runcouette
+/runkvs

@@ -8,6 +8,7 @@
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/molecules/Molecule.h"
 #include "ls1/src/Simulation.h"
+#include "ls1/src/parallel/DomainDecompMPIBase.h"
 //#include "ls1/ensemble/EnsembleBase.h"
 
 
@@ -111,11 +112,11 @@ public:
         {
             _curParticleID = _locSimulation->getTotalNumberOfMolecules() + 1;
             _IDIncrementor = 1;
+            
             #ifdef ENABLE_MPI
-                int curRank;
-                MPI_Comm_rank(coupling::interface::LS1StaticCommData::getInstance().getLocalCommunicator(),&curRank);
+                int curRank = global_simulation->domainDecomposition().getRank();
                 _curParticleID += curRank + 1;
-                MPI_Comm_size(coupling::interface::LS1StaticCommData::getInstance().getLocalCommunicator(),&_IDIncrementor);  // interleave the particles
+                _IDIncrementor = global_simulation->domainDecomposition().getNumProcs();
             #endif
 
             _IDinited = true;

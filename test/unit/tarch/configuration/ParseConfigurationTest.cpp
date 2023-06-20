@@ -33,10 +33,10 @@ public:
     CPPUNIT_ASSERT(mydouble == 0.034);
     tarch::configuration::ParseConfiguration::readIntMandatory(myint, node, "myint");
     CPPUNIT_ASSERT(myint == 4);
-    tarch::configuration::ParseConfiguration::readVector<2, double>(myDblVec, node, "myvecdbl");
+    tarch::configuration::ParseConfiguration::readVectorMandatory<2, double>(myDblVec, node, "myvecdbl");
     tarch::la::Vector<2, double> expectedMyDblVec{12.2, 4.3};
     CPPUNIT_ASSERT(myDblVec == expectedMyDblVec);
-    tarch::configuration::ParseConfiguration::readVector<3, int>(myIntVec, node, "myvecint");
+    tarch::configuration::ParseConfiguration::readVectorMandatory<3, int>(myIntVec, node, "myvecint");
     tarch::la::Vector<3, int> expectedMyIntVec{1,3,1};
     CPPUNIT_ASSERT(myIntVec == expectedMyIntVec);
     tarch::configuration::ParseConfiguration::readBoolMandatory(mybool, node, "mybool");

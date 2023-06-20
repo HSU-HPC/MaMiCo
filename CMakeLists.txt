@@ -739,7 +739,12 @@ target_link_libraries(benchmarks PRIVATE mamico)
 #
 if (BUILD_TESTING)    
   file(GLOB_RECURSE TEST_SOURCES "test/*Test.cpp")
-  add_executable(testmamico "test/unit/main.cpp" ${TEST_SOURCES})
+  add_executable(testmamico 
+    "coupling/indexing/IndexingService.cpp"
+    "coupling/configurations/ParticleInsertionConfiguration.cpp" 
+    "test/unit/main.cpp"
+    ${TEST_SOURCES}
+  )
   set_target_properties(testmamico PROPERTIES CXX_STANDARD 17)
   target_link_libraries(testmamico PRIVATE mamico)
   target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})

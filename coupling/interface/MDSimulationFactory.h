@@ -777,6 +777,7 @@ private:
 #if defined(LS1_MARDYN)
 class LS1MDSimulation : public coupling::interface::MDSimulation {
 private:
+  const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
   Simulation* simulation; //cannot name this _simulation, a global preprocessor marco with the name _simulation expands to *global_simulation
   MamicoCoupling* ls1MamicoPlugin; //the plugin is only initialized after the simulation object reads xml, so cannot use it before that point
   bool internalCouplingState;
@@ -785,15 +786,21 @@ private:
 #endif
 
 public:
-  LS1MDSimulation(
+  LS1MDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                     MPI_Comm localComm
+                    , MPI_Comm localComm
 #endif
-  ) : coupling::interface::MDSimulation() {
+  ) : coupling::interface::MDSimulation(), _configuration(configuration) {
+
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     comm = localComm;
     LS1StaticCommData::getInstance().setLocalCommunicator(comm); //needs to be done before creating the simulation object
+    const tarch::la::Vector<3, unsigned int> numberProcs = _configuration.getMPIConfiguration().getNumberOfProcesses();
+    LS1StaticCommData::getInstance().setDomainGridDecompAtDim(0, numberProcs[0]);
+    LS1StaticCommData::getInstance().setDomainGridDecompAtDim(1, numberProcs[1]);
+    LS1StaticCommData::getInstance().setDomainGridDecompAtDim(2, numberProcs[2]);
 #endif
+
     simulation = new Simulation();
     global_simulation = simulation;
     simulation->disableFinalCheckpoint();
@@ -926,8 +933,9 @@ public:
 #endif
     );
 #elif defined(LS1_MARDYN)
-    return new coupling::interface::LS1MDSimulation(
+    return new coupling::interface::LS1MDSimulation(configuration
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                                                    ,
                                                     localComm
 #endif
     );
