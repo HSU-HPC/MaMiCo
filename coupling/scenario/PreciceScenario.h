@@ -69,7 +69,7 @@ public:
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
 #if defined(LS1_MARDYN)
-    global_log = new Log::Logger(Log::Error); // Info
+    global_log = new Log::Logger(Log::Info); // Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif

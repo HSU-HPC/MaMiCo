@@ -113,7 +113,6 @@ public:
     }
     _M2mVertexVelocities = new double[_M2mVertexNumbers * dim];
 
-    std::cout << "@@@@ _M2mCells.size():" << _M2mCells.size() << std::endl;
     _M2mCellIndices = new unsigned int[_M2mCells.size()];
     std::copy(M2mCellIndices.begin(), M2mCellIndices.end(), _M2mCellIndices);
   
@@ -143,7 +142,6 @@ public:
     }
     _m2MVertexVelocities = new double[_m2MVertexNumbers * dim];
 
-    std::cout << "@@@@ _m2MCells.size():" << _m2MCells.size() << std::endl;
     _m2MCellIndices = new unsigned int[_m2MCells.size()];
     std::copy(m2MCellIndices.begin(), m2MCellIndices.end(), _m2MCellIndices);
 
