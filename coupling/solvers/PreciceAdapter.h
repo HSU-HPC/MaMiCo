@@ -147,12 +147,14 @@ public:
     _m2MCellIndices = new unsigned int[_m2MCells.size()];
     std::copy(m2MCellIndices.begin(), m2MCellIndices.end(), _m2MCellIndices);
 
-    for (size_t i = 0; i < _m2MVertexNumbers; i++) {
-      std::vector<int> tetrahedronsVertexIndices = getTetrahedronsVertexIndices(i, _m2MVertexIndices, m2MCellIndices);
-      for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsVertexIndices.size() / 4; tetrahedronIndex++) {
-        _solverInterface->setMeshTetrahedron(_solverInterface->getMeshID(_m2MMeshName), tetrahedronsVertexIndices[tetrahedronIndex * 4],
-                                            tetrahedronsVertexIndices[tetrahedronIndex * 4 + 1], tetrahedronsVertexIndices[tetrahedronIndex * 4 + 2],
-                                            tetrahedronsVertexIndices[tetrahedronIndex * 4 + 3]);
+    if (_solverInterface->hasMesh(_m2MMeshName)) {
+      for (size_t i = 0; i < _m2MVertexNumbers; i++) {
+        std::vector<int> tetrahedronsVertexIndices = getTetrahedronsVertexIndices(i, _m2MVertexIndices, m2MCellIndices);
+        for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsVertexIndices.size() / 4; tetrahedronIndex++) {
+          _solverInterface->setMeshTetrahedron(_solverInterface->getMeshID(_m2MMeshName), tetrahedronsVertexIndices[tetrahedronIndex * 4],
+                                              tetrahedronsVertexIndices[tetrahedronIndex * 4 + 1], tetrahedronsVertexIndices[tetrahedronIndex * 4 + 2],
+                                              tetrahedronsVertexIndices[tetrahedronIndex * 4 + 3]);
+        }
       }
     }
   }
