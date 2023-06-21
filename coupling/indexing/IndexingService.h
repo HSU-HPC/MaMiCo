@@ -15,9 +15,9 @@ namespace indexing {
 
 template <unsigned int dim> class IndexingService;
 
-template <unsigned int dim>
-std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex,
-                                                 const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells);
+// template <unsigned int dim>
+// std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex,
+//                                                  const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells);
 
 } // namespace indexing
 } // namespace coupling
@@ -71,15 +71,21 @@ public:
 
   unsigned int getRank() const { return _rank; }
 
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
+   /** If the cell is contained in the MD volume, the rank is uniquely chosen by
+   * using the process which contains the macroscopic cell as non-ghost (i.e.
+   * real inner) cell. If the cell is a global ghost cell, we choose the rank
+   * according to the block-decomposition of the grid applied to the complete
+   * grid incl. the ghost layer.
+   *  @brief returns the unique rank for a macroscopic cell.
+   *  @param globalCellIndex the global vector coordinates of a macroscopic cell
+   *  @returns the rank for the given macroscopic cell */
+  // TODO inline in getRanksForGlobalIndex()
+  unsigned int getUniqueRankForGlobalIndex(tarch::la::Vector<dim, unsigned int> globalCellIndex) const;
+#endif
+
 private:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
-  /**
-   * Helper function used by getRanksForGlobalIndex().
-   */
-  // TODO inline in getRanksForGlobalIndex()
-  unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
-                                               const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const;
-
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;
 #endif

@@ -636,7 +636,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
         }
 
         // determine the unique rank for this cell
-        const unsigned int rank = getUniqueRankForMacroscopicCell(thisGlobalCellIndex, globalNumberMacroscopicCells);
+        const unsigned int rank = getUniqueRankForGlobalIndex(thisGlobalCellIndex);
 
         // add this rank to the vector with all ranks if we did not add this one
         // before
@@ -660,25 +660,21 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 #endif
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // unused in sequential scenario
-/*
- * This was in large parts stolen from IndexConversion.
- * Note that this uses the globalNumberMacroscopicCells definition excl. the
- * ghost layer.
- */
 template <unsigned int dim>
 unsigned int
-coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
-                                                                          const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const {
+coupling::indexing::IndexingService<dim>::getUniqueRankForGlobalIndex(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+  //This was in large parts stolen from IndexConversion. Note that this uses the globalNumberMacroscopicCells definition excl. the ghost layer.
+  const auto globalNumberMacroscopicCells = BaseIndex<dim>::numberCellsInDomain - tarch::la::Vector<dim, unsigned int>{2};
   // vector containing avg number of macro cells, not counting global GL.
   tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells{0};
   for (unsigned int d = 0; d < dim; d++) {
     if (globalCellIndex[d] >= globalNumberMacroscopicCells[d] + 2) { // greater or equal to the total global number incl GL (+2)
       using namespace std::string_literals;
-      throw std::runtime_error("IndexingService: getUniqueRankForMacroscopicCell(): Global cell index greater than global size in dim "s + std::to_string(d));
+      throw std::runtime_error("IndexingService: getUniqueRankForGlobalIndex(): Global cell index greater than global size in dim "s + std::to_string(d));
     }
     if (globalNumberMacroscopicCells[d] % _numberProcesses[d] != 0) {
       std::stringstream ss;
-      ss << "IndexingService: getUniqueRankForMacroscopicCell(): ERROR: Number "
+      ss << "IndexingService: getUniqueRankForGlobalIndex(): ERROR: Number "
             "of macroscopic cells must be divisible by number of processes! ";
       ss << "globalNumberMacroscopicCells = " << globalNumberMacroscopicCells;
       ss << ", numberProcesses = " << _numberProcesses;

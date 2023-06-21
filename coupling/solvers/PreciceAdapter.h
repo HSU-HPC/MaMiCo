@@ -283,11 +283,16 @@ public:
 
   std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
 
-  std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {_rank}; }
-
-  std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+  std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { 
     coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<dim,int>>(globalCellIndex)};
     std::vector<unsigned int> ranks = coupling::indexing::IndexingService<dim>::getInstance().getRanksForGlobalIndex(cellIndex_v);
+    return ranks;
+  }
+
+  std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+    const unsigned int rank = coupling::indexing::IndexingService<dim>::getInstance().getUniqueRankForGlobalIndex(globalCellIndex);
+    std::vector<unsigned int> ranks;
+    ranks.push_back(rank);
     return ranks; 
   }
 
