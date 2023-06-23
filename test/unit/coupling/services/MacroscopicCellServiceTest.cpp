@@ -48,7 +48,7 @@ public:
     tarch::utils::MultiMDService<dim> multiMDService{tarch::la::Vector<dim, unsigned int>{1},1};
     const unsigned int topologyOffset = 1;
 
-    coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>* _macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>(
+    new coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>(
           1, 
           mdSolverInterface, 
           macroscopicSolverInterface, 
@@ -64,7 +64,7 @@ public:
           macroscopicCellConfiguration,
           filterPipelineConfigurationFile, 
           multiMDService, 
-          topologyOffset);
+          topologyOffset); 
   }
 
 private:
