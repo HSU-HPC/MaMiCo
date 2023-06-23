@@ -2,8 +2,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _MOLECULARDYNAMICS_COUPLING_SCENARIO_SCENARIO_H_
-#define _MOLECULARDYNAMICS_COUPLING_SCENARIO_SCENARIO_H_
+#ifndef _MAMICO_COUPLING_SCENARIO_SCENARIO_H_
+#define _MAMICO_COUPLING_SCENARIO_SCENARIO_H_
 
 #include <iostream>
 #include <string>
@@ -19,4 +19,4 @@ private:
   const std::string _scenarioname;
 };
 
-#endif // _MOLECULARDYNAMICS_COUPLING_SCENARIO_SCENARIO_H_
+#endif // _MAMICO_COUPLING_SCENARIO_SCENARIO_H_
