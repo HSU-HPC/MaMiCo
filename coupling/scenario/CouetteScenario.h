@@ -4,7 +4,6 @@
 #ifndef _COUPLING_SCENARIO_COUETTESCENARIO_H_
 #define _COUPLING_SCENARIO_COUETTESCENARIO_H_
 
-#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/ErrorEstimation.h"
 #include "coupling/InstanceHandling.h"
 #include "coupling/MultiMDMediator.h"
@@ -76,7 +75,7 @@ public:
 
   /** triggers void init(), runOneCouplingCycle() and shutdown()
    *  @brief runs the simulation */
-  virtual void run() {
+  void run() override {
     init();
     if (_cfg.twsLoop) {
       twsLoop();
@@ -87,10 +86,10 @@ public:
     shutdown();
   }
 
-private:
+protected:
   /** triggers initMPI(), parseConfiguration(), and initSolvers()
    *  @brief initialises everthing necessary for the test */
-  void init() {
+  void init() override {
 #if defined(LS1_MARDYN)
     global_log = new Log::Logger(Log::Error); //Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -177,6 +176,8 @@ private:
   /** @brief initialises the macro and micro solver according to the setup from
    * the xml file and pre-proccses them */
   void initSolvers() {
+    _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>>();
+
     // for timing measurements
     _tv.micro = 0;
     _tv.macro = 0;
