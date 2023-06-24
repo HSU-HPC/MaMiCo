@@ -51,7 +51,11 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
   _parallelTopologyService = new simplemd::services::ParallelTopologyService(
       _configuration.getDomainConfiguration().getGlobalDomainSize(), _configuration.getDomainConfiguration().getGlobalDomainOffset(),
       _configuration.getDomainConfiguration().getMeshWidth(), _configuration.getMPIConfiguration().getNumberOfProcesses(),
-      _configuration.getDomainConfiguration().getBoundary());
+      _configuration.getDomainConfiguration().getBoundary()
+      #if (MD_PARALLEL == MD_YES)
+      , MPI_COMM_WORLD
+      #endif
+      );
   if (_parallelTopologyService == NULL) {
     std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                  "_parallelTopologyService==NULL!"
