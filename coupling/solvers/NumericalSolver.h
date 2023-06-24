@@ -15,6 +15,7 @@
 #include <mpi.h>
 #endif
 #include "coupling/IndexConversion.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/solvers/CouetteSolver.h"
 
@@ -230,7 +231,7 @@ private:
     tarch::la::Vector<3, unsigned int> coords(0);
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
     // determine rank coordinates
     coords[2] = ((unsigned int)rank) / (_processes[0] * _processes[1]);
     coords[1] = (((unsigned int)rank) - coords[2] * _processes[0] * _processes[1]) / _processes[0];
@@ -244,8 +245,8 @@ private:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     int rank;
     int size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
+    MPI_Comm_size(coupling::indexing::IndexingService<3>::getInstance().getComm(), &size);
     // check if enough ranks are available
     if (_processes[0] * _processes[1] * _processes[2] > (unsigned int)size) {
       std::cout << "ERROR NumericalSolver::determineParallelNeighbours(): Not "
@@ -328,7 +329,7 @@ private:
     tarch::la::Vector<3, unsigned int> coords(0);
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
     // if this rank is outside the range given by processes: return 0
     // -> cannot use method skipRank() here, since _processes may not be
     // initialized yet!
@@ -437,7 +438,7 @@ protected:
     // // offset of domain for MPI-parallel simulations
     int rank = 0; // rank in MPI-parallel simulations
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
 #endif
     std::stringstream ss;
     ss << _filestem << "_" << rank << "_" << _counter << ".vtk";
@@ -503,7 +504,7 @@ protected:
   bool skipRank() const {
     int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
 #endif
     return ((unsigned int)rank > _processes[0] * _processes[1] * _processes[2] - 1);
   }

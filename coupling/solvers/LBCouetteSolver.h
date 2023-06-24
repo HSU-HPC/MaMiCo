@@ -508,8 +508,8 @@ private:
       }
     }
     // send and receive data
-    MPI_Irecv(recvBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagFrom], 1000, MPI_COMM_WORLD, &requests[0]);
-    MPI_Isend(sendBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagTo], 1000, MPI_COMM_WORLD, &requests[1]);
+    MPI_Irecv(recvBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagFrom], 1000, coupling::indexing::IndexingService<3>::getInstance().getComm(), &requests[0]);
+    MPI_Isend(sendBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagTo], 1000, coupling::indexing::IndexingService<3>::getInstance().getComm(), &requests[1]);
     MPI_Waitall(2, requests, status);
     // write data back to pdf field
     if (_parallelNeighbours[nbFlagFrom] != MPI_PROC_NULL) {
