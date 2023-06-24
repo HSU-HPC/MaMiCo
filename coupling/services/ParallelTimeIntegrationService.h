@@ -27,10 +27,10 @@ public:
     _pint_domain(1),
     _cfg( mamicoConfig.getTimeIntegrationConfiguration() ) {
         #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+        int world_size, world_rank;
+        MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+        MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
         if(_cfg.isPinTEnabled()){
-            int world_size, world_rank;
-            MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-            MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
             if(world_size % _cfg.getPintDomains() != 0){
                 if(world_rank == 0){
                     std::cout << "ERROR coupling::services::ParallelTimeIntegrationService: " <<
@@ -48,6 +48,11 @@ public:
             _local_pint_comm = MPI_COMM_WORLD;
         }
         MPI_Comm_rank(_local_pint_comm, &_rank);
+
+        #ifdef PINT_DEBUG
+        std::cout << "PINT_DEBUG: world_rank " << world_rank << " is rank " << _rank << " in pint domain " << _pint_domain << std::endl;
+        #endif
+
         #endif
     }
 

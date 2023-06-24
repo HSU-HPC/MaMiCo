@@ -68,12 +68,19 @@ endif()
 if("${MD_SIM}" STREQUAL "SIMPLE_MD" AND BUILD_WITH_LAMMPS)
   message(WARNING ">> BUILD_WITH_LAMMPS is enabled but MD_SIM is SIMPLE_MD. Are you sure?")
 endif()
+
 # Compiler list to be used for compiletest
 set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
 message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_COMPILERS})
-# Enable coupling with the preCICE API, default is off
+
+# Enable coupling with indexing tests, default is off
 option(BUILD_WITH_TEST_INDEXING "Enable indexing tests, default is off." OFF)
 message(STATUS ">> Build with indexing tests : " ${BUILD_WITH_TEST_INDEXING})
+
+# Enable coupling with pint debug, default is off
+option(BUILD_WITH_PINT_DEBUG "Enable parallel-in-time integration debugging, default is off." OFF)
+message(STATUS ">> Build with PINT_DEBUG : " ${BUILD_WITH_PINT_DEBUG})
+
 # Enable Adios2 output for megamol
 option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
@@ -301,6 +308,9 @@ if(BUILD_WITH_PRECICE)
 endif()
 if(BUILD_WITH_TEST_INDEXING)
 	target_compile_definitions(mamico INTERFACE TEST_INDEXING)
+endif()
+if(BUILD_WITH_PINT_DEBUG)
+  target_compile_definitions(mamico INTERFACE PINT_DEBUG)
 endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang" )
 	target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
