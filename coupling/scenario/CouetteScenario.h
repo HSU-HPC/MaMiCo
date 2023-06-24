@@ -189,7 +189,8 @@ protected:
     _couetteSolver = NULL;
     _couetteSolver =
         getCouetteSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
-                         _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
+                         _simpleMDConfig.getSimulationConfiguration().getDt() * 
+                         _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _mdSimulations, _mdSolverInterface etc need to be initialized
@@ -236,7 +237,8 @@ protected:
     _mdSolverInterface = _instanceHandling->getMDSolverInterface();
 
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
-        _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], 
+        _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
         _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
@@ -966,10 +968,8 @@ protected:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      std::cout << "Iamhere COUETTE_LB" << std::endl;
       solver =
           new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette", _cfg.lbNumberProcesses, 1);
-      std::cout << "Iamhere 100" << std::endl;
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -985,8 +985,6 @@ protected:
       std::cout << "ERROR CouetteScenario::getCouetteSolver(): Unknown solver type!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    std::cout << "Iamhere 5" << std::endl;
-
     return solver;
   }
 
@@ -998,7 +996,7 @@ protected:
    * the whole domain
    *  @param outerRegion
    *  @todo piet, what is the mamicoMeshsize & the outer layer  */
-  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(coupling::solvers::AbstractCouetteSolver<3>* couetteSolver,
+  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(const double dx,
                                                                                 tarch::la::Vector<3, double> mdOffset,
                                                                                 tarch::la::Vector<3, double> mamicoMeshsize,
                                                                                 tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
@@ -1008,11 +1006,6 @@ protected:
     if (_cfg.maSolverType == CouetteConfig::COUETTE_ANALYTICAL) {
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells, outerRegion);
     } else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      coupling::solvers::LBCouetteSolver* lbSolver = static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver);
-      if (lbSolver == NULL) {
-        std::cout << "ERROR CouetteScenario::getCouetteSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
       // compute number of cells of MD offset; detect any mismatches!
       tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
       for (unsigned int d = 0; d < 3; d++) {
@@ -1026,7 +1019,12 @@ protected:
           exit(EXIT_FAILURE);
         }
       }
-      interface = new coupling::solvers::LBCouetteSolverInterface(lbSolver->getAvgNumberLBCells(), lbSolver->getNumberProcesses(), offsetMDDomain,
+      tarch::la::Vector<3, unsigned int> cells_per_process{
+        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
+        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
+        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)
+      };
+      interface = new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain,
                                                                   globalNumberMacroscopicCells, outerRegion);
     }
 #if (BUILD_WITH_OPENFOAM)
@@ -1035,11 +1033,6 @@ protected:
     }
 #endif
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
-      coupling::solvers::FiniteDifferenceSolver* fdSolver = static_cast<coupling::solvers::FiniteDifferenceSolver*>(couetteSolver);
-      if (fdSolver == NULL) {
-        std::cout << "ERROR CouetteScenario::getCouetteSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
       // compute number of cells of MD offset; detect any mismatches!
       tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
       for (unsigned int d = 0; d < 3; d++) {
@@ -1053,7 +1046,12 @@ protected:
           exit(EXIT_FAILURE);
         }
       }
-      interface = new coupling::solvers::LBCouetteSolverInterface(fdSolver->getAvgNumberLBCells(), fdSolver->getNumberProcesses(), offsetMDDomain,
+      tarch::la::Vector<3, unsigned int> cells_per_process{
+        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
+        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
+        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)
+      };
+      interface = new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain,
                                                                   globalNumberMacroscopicCells, outerRegion);
     }
 

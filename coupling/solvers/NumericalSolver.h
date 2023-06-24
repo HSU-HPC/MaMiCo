@@ -224,6 +224,14 @@ public:
    *  @param wallVelocity new wall velocity to apply */
   virtual void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) = 0;
 
+  /** determines the "avg" domain size which is the domain size on each MPI
+   * process, except for potentially the last one (the last one may include
+   * additional cells) */
+  static int getAvgDomainSize(double channelheight, double dx, tarch::la::Vector<3, unsigned int> processes, int d) {
+    int globalDomainSize = floor((channelheight + 0.5) / dx);
+    return globalDomainSize / processes[d];
+  }
+
 private:
   /** @brief determines the process coordinates
    *  @returns the coordinates of the current process */
@@ -349,14 +357,6 @@ private:
     } else {
       return globalDomainSize / processes[d] + globalDomainSize % processes[d];
     }
-  }
-
-  /** determines the "avg" domain size which is the domain size on each MPI
-   * process, except for potentially the last one (the last one may include
-   * additional cells) */
-  int getAvgDomainSize(double channelheight, double dx, tarch::la::Vector<3, unsigned int> processes, int d) const {
-    int globalDomainSize = floor((channelheight + 0.5) / dx);
-    return globalDomainSize / processes[d];
   }
 
 protected:
