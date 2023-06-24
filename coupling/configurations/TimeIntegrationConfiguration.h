@@ -41,6 +41,13 @@ public:
     _pint_domains = buf;
 
     if(isPinTEnabled()){
+      #if (COUPLING_MD_PARALLEL != COUPLING_MD_YES)
+        std::cout << "ERROR coupling::TimeIntegrationConfiguration: PinT is enabled but COUPLING_MD_PARALLEL disabled" << std::endl;
+        std::cout << "Disable PinT in XML config, or enable BUILD_WITH_MPI in cmake." << std::endl;
+        _isValid = false;
+        exit(EXIT_FAILURE);
+      #endif
+
       std::string value;
       tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "number-iterations");
       if (value == "auto"){
