@@ -10,6 +10,10 @@
 // Include CellIndex template class definition
 #include "CellIndex.h"
 
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#include <mpi.h>
+#endif
+
 namespace coupling {
 namespace indexing {
 
@@ -54,7 +58,11 @@ public:
 
   void init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
             const coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig, coupling::interface::MacroscopicSolverInterface<dim>* msi,
-            const unsigned int rank);
+            const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            ,MPI_Comm comm = MPI_COMM_WORLD
+#endif
+            );
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   /**
@@ -67,9 +75,27 @@ public:
    * @returns vector of all cells which contain the index
    */
   std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const;
+
+  MPI_Comm getComm() const { 
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(!_isInitialized){
+      throw std::runtime_error(std::string("IndexingService: Called index system getComm() before initalization! "));
+    }
+    #endif
+
+    return _comm; 
+  }
 #endif
 
-  unsigned int getRank() const { return _rank; }
+  unsigned int getRank() const { 
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(!_isInitialized){
+      throw std::runtime_error(std::string("IndexingService: Called index system getRank() before initalization! "));
+    }
+    #endif
+
+    return _rank; 
+  }
 
 private:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
@@ -82,10 +108,14 @@ private:
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;
+  MPI_Comm _comm;
 #endif
 
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
   coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
   coupling::interface::MacroscopicSolverInterface<dim>* _msi;
   unsigned int _rank;
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  bool _isInitialized = false;
+#endif
 };

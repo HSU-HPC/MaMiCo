@@ -297,12 +297,20 @@ template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, 
 template <unsigned int dim>
 void coupling::indexing::IndexingService<dim>::init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
                                                     const coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig,
-                                                    coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank) {
+                                                    coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    , MPI_Comm comm
+#endif
+                                                    ) {
   // init members
   _simpleMDConfig = simpleMDConfig;
   _mamicoConfig = mamicoConfig;
   _msi = msi;
   _rank = rank;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    _comm = comm;
+#endif
+
 
   // read relevant data from configs
   const auto globalMDDomainSize{_simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
@@ -592,6 +600,10 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
   }
 
   of.close();
+#endif
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  _isInitialized = true;
 #endif
 }
 
