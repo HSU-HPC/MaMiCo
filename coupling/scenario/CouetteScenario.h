@@ -124,6 +124,8 @@ public:
       }
     }
   }
+
+  coupling::solvers::AbstractCouetteSolver<3>* getSolver() override {return _couetteSolver;}
 protected:
 
   /** @brief initialises all MPI variables  */

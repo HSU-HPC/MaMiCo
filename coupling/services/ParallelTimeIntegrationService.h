@@ -74,6 +74,13 @@ public:
             std::cout << "PINT_DEBUG: _pint_domain " << _pint_domain << " has minCycle " << minCycle << " and maxCycle " << maxCycle << std::endl;
             #endif
 
+            auto solver = dynamic_cast<coupling::interface::PintableMacroSolver*>( _scenario->getSolver() );
+            if(solver == nullptr){
+                std::cout << "ERROR coupling::services::ParallelTimeIntegrationService: " <<
+                    "macroscopic solver is not pintable (= not compatible with parallel in time coupling)" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+
             for (int cycle = minCycle; cycle < maxCycle; cycle++)
                 _scenario->runOneCouplingCycle(cycle);
         }

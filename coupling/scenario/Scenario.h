@@ -19,6 +19,8 @@ public:
   virtual void init() = 0;
   virtual void runOneCouplingCycle(int cycle) = 0;
 
+  virtual coupling::solvers::AbstractCouetteSolver<3>* getSolver() = 0;
+
 protected:
   std::unique_ptr<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>> _timeIntegrationService;
 
