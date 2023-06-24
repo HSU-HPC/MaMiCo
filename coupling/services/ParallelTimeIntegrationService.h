@@ -10,9 +10,8 @@ template <class LinkedCell, unsigned int dim> class ParallelTimeIntegrationServi
 } // namespace services
 } // namespace coupling
 
-//#include "coupling/configurations/MaMiCoConfiguration.h"
-//#include "coupling/indexing/IndexingService.h"
-#include "coupling/services/MultiMDCellService.h"
+#include "coupling/configurations/MaMiCoConfiguration.h"
+#include "coupling/interface/PintableMacroSolver.h"
 
 /** 
  * Service to manage timeloop of a coupled simulation scenario. Supports sequential or parallel-in-time integration using a Parareal variant,
