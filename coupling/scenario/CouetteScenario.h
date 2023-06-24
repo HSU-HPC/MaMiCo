@@ -180,17 +180,25 @@ protected:
     _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>>(_mamicoConfig);
     _rank = _timeIntegrationService->getRank(); // returns the rank inside local time domain
 
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], 
+        _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), 
+        getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
+    );
+
+    // init indexing
+    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank
+      #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+      ,_timeIntegrationService->getPintComm()
+      #endif
+    );
+
     // for timing measurements
     _tv.micro = 0;
     _tv.macro = 0;
     _tv.filter = 0;
-
-    // allocate solvers
-    _couetteSolver = NULL;
-    _couetteSolver =
-        getCouetteSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
-                         _simpleMDConfig.getSimulationConfiguration().getDt() * 
-                         _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _mdSimulations, _mdSolverInterface etc need to be initialized
@@ -236,19 +244,6 @@ protected:
     _instanceHandling->setMDSolverInterface();
     _mdSolverInterface = _instanceHandling->getMDSolverInterface();
 
-    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], 
-        _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
-        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-
-    // init indexing
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank
-      #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      ,_timeIntegrationService->getPintComm()
-      #endif
-    );
-    
     if (_cfg.twsLoop) {
       // initialise macroscopic cell service for multi-MD case and set single
       // cell services in each MD simulation
@@ -265,6 +260,13 @@ protected:
     _multiMDCellService->constructFilterPipelines();
 
     _multiMDMediator = new coupling::MultiMDMediator<MY_LINKEDCELL, 3>(*_multiMDCellService, *_instanceHandling, *_multiMDService, couetteSolverInterface);
+
+    // allocate solvers
+    _couetteSolver = NULL;
+    _couetteSolver =
+        getCouetteSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
+                         _simpleMDConfig.getSimulationConfiguration().getDt() * 
+                         _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // set couette solver interface in MamicoInterfaceProvider
