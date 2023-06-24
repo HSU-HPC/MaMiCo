@@ -58,8 +58,25 @@ public:
     }
 
     void run(int num_cycles) {
-        for (int cycle = 0; cycle < num_cycles; cycle++)
-            _scenario->runOneCouplingCycle(cycle);
+        if(!_cfg.isPinTEnabled()){
+            for (int cycle = 0; cycle < num_cycles; cycle++)
+                _scenario->runOneCouplingCycle(cycle);
+        } 
+        else {
+            int pintDomainSize = (int)( num_cycles / _cfg.getPintDomains() );
+            int minCycle{ _pint_domain * pintDomainSize };
+            int maxCycle{ minCycle + pintDomainSize };
+            // In case num_cycles is not divisible by _cfg.getPintDomains(), the last domain gets the remainder
+            if(_pint_domain == _cfg.getPintDomains()-1) 
+                maxCycle = num_cycles;
+
+            #ifdef PINT_DEBUG
+            std::cout << "PINT_DEBUG: _pint_domain " << _pint_domain << " has minCycle " << minCycle << " and maxCycle " << maxCycle << std::endl;
+            #endif
+
+            for (int cycle = minCycle; cycle < maxCycle; cycle++)
+                _scenario->runOneCouplingCycle(cycle);
+        }
     }
 
     int getPintDomain() { return _pint_domain; }
