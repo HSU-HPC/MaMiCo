@@ -23,8 +23,46 @@ template <class LinkedCell, unsigned int dim> class ParallelTimeIntegrationServi
  */
 template <class LinkedCell, unsigned int dim> class coupling::services::ParallelTimeIntegrationService {
 public:
-    ParallelTimeIntegrationService() {}
+    ParallelTimeIntegrationService(coupling::configurations::MaMiCoConfiguration<dim> mamicoConfig):
+    _pint_domain(1),
+    _cfg( mamicoConfig.getTimeIntegrationConfiguration() ) {
+        #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+        if(_cfg.isPinTEnabled()){
+            int world_size, world_rank;
+            MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+            MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+            if(world_size % _cfg.getPintDomains() != 0){
+                if(world_rank == 0){
+                    std::cout << "ERROR coupling::services::ParallelTimeIntegrationService: " <<
+                        "MPI ranks not divisible by number of PinT subdomains!" << std::endl;
+                    std::cout << "When PinT is used, the number of required MPI ranks increases by a factor of number-subdomains." << std::endl;
+                    std::cout << "Check your configuration." << std::endl;
+                }
+                exit(EXIT_FAILURE);
+            }
+            int ranks_per_domain = world_size / _cfg.getPintDomains();
+            _pint_domain = world_rank / ranks_per_domain;
+            // This initializes _local_pint_comm by splitting MPI_COMM_WORLD into getPintDomains() disjoint communicators
+            MPI_Comm_split(MPI_COMM_WORLD, _pint_domain, world_rank, &_local_pint_comm);
+        } else {
+            _local_pint_comm = MPI_COMM_WORLD;
+        }
+        MPI_Comm_rank(_local_pint_comm, &_rank);
+        #endif
+    }
+
+    int getPintDomain() { return _pint_domain; }
+    int getRank() { return _rank; }
+
+    #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm getPintComm() { return _local_pint_comm; }
+    #endif
 
 private:
-
+    int _pint_domain;  // the index of the time domain to which this process belongs to
+    int _rank;         // rank of current process in _local_pint_comm
+    #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm _local_pint_comm; // the communicator of the local time domain of this rank
+    #endif
+    coupling::configurations::TimeIntegrationConfiguration _cfg;
 };

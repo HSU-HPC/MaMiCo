@@ -96,7 +96,7 @@ protected:
     global_log->set_mpi_output_root(0);
 #endif
 #endif
-    initMPI();
+    getRootRank();
     parseConfigurations();
     initSolvers();
   }
@@ -114,7 +114,7 @@ protected:
     twoWayCoupling(cycle);
     if (_cfg.totalNumberMDSimulations < 0) // dynamic MD
       _multiMDCellService->finishCycle(cycle, *_instanceHandling);
-    if (_rank == 0) {
+    if (_isRootRank) {
       // Output status info only every 10 seconds
       gettimeofday(&_tv.end, NULL);
       int runtime_ms = (int)(((_tv.end.tv_sec - _tv.output.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.output.tv_usec)) / 1000);
@@ -126,11 +126,12 @@ protected:
   }
 
   /** @brief initialises all MPI variables  */
-  void initMPI() {
-    _rank = 0;
+  void getRootRank() {
+    int rank;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
+    _isRootRank = (rank == 0);
   }
 
   /** @brief Executes the entire test several times for a range of time-window-size parameters */
@@ -176,7 +177,8 @@ protected:
   /** @brief initialises the macro and micro solver according to the setup from
    * the xml file and pre-proccses them */
   void initSolvers() {
-    _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>>();
+    _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>>(_mamicoConfig);
+    _rank = _timeIntegrationService->getRank(); // returns the rank inside local time domain
 
     // for timing measurements
     _tv.micro = 0;
@@ -197,10 +199,17 @@ protected:
     // SIMPLEMD would use depending e.g. on domain size and offset from
     // simpleMDConfig
 
+    unsigned int totNumMD;
     if (_cfg.totalNumberMDSimulations > 0)
-      _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _cfg.totalNumberMDSimulations);
+      totNumMD = _cfg.totalNumberMDSimulations;
     else // dynamic case, start with _cfg.lowerBoundNumberMDSimulations MD
-      _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _cfg.lowerBoundNumberMDSimulations);
+      totNumMD = _cfg.lowerBoundNumberMDSimulations;
+
+    _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), totNumMD
+      #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+      ,_timeIntegrationService->getPintComm()
+      #endif
+    );
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
     if (_instanceHandling == nullptr) {
@@ -209,7 +218,7 @@ protected:
     }
 
     _mdStepCounter = 0;
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.start, NULL);
       gettimeofday(&_tv.output, NULL);
     }
@@ -232,7 +241,11 @@ protected:
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     // init indexing
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
+    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank
+      #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+      ,_timeIntegrationService->getPintComm()
+      #endif
+    );
     
     if (_cfg.twsLoop) {
       // initialise macroscopic cell service for multi-MD case and set single
@@ -313,7 +326,7 @@ protected:
                                                                                 // signature
                            std::vector<std::array<unsigned int, 3>> cellIndices // not used either
                     ) {
-                      if (_rank == 0) {
+                      if (_isRootRank) {
                         gettimeofday(&_tv.start, NULL);
                       }
 
@@ -331,7 +344,7 @@ protected:
                       }
                       // std::cout << "Generated masses!" << std::endl;
 
-                      if (_rank == 0) {
+                      if (_isRootRank) {
                         gettimeofday(&_tv.end, NULL);
                         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
                       }
@@ -343,7 +356,7 @@ protected:
                     [this](std::vector<std::array<double, 3>> inputVectors,     // same as above
                            std::vector<std::array<unsigned int, 3>> cellIndices // same as above
                     ) {
-                      if (_rank == 0) {
+                      if (_isRootRank) {
                         gettimeofday(&_tv.start, NULL);
                       }
 
@@ -385,7 +398,7 @@ protected:
                       }
                       // std::cout << "Generated momenta!" << std::endl;
 
-                      if (_rank == 0) {
+                      if (_isRootRank) {
                         gettimeofday(&_tv.end, NULL);
                         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
                       }
@@ -415,7 +428,7 @@ protected:
                               _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     // finish time measurement for initialisation
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.end, NULL);
       double runtime = (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
       std::cout << "Initialization: " << (int)(runtime / 1000) << "ms" << std::endl;
@@ -430,7 +443,7 @@ protected:
       _sum_noise = 0;
     }
 
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.start_total, NULL);
     }
     std::cout << "Finish CouetteScenario::initSolvers() " << std::endl;
@@ -441,7 +454,7 @@ protected:
    *  @param cycle the number of the current coupling time step */
   void advanceMacro(int cycle) {
     if (_couetteSolver != NULL) {
-      if (_rank == 0) {
+      if (_isRootRank) {
         gettimeofday(&_tv.start, NULL);
       }
 
@@ -456,7 +469,7 @@ protected:
         _couetteSolver->setWallVelocity(vel);
       }
       _couetteSolver->advance(_simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
-      if (_rank == 0) {
+      if (_isRootRank) {
         gettimeofday(&_tv.end, NULL);
         _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
         // std::cout << "Finish _couetteSolver->advance " << std::endl;
@@ -513,7 +526,7 @@ protected:
     }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Bcast(&addMDInstances, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&addMDInstances, 1, MPI_INT, 0, _timeIntegrationService->getPintComm() );
 #endif
     if (addMDInstances < 0) {
       if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() + addMDInstances < _cfg.lowerBoundNumberMDSimulations) {
@@ -535,7 +548,7 @@ protected:
    * data for the coupling
    *  @param cycle the number of the current coupling time step  */
   void advanceMicro(int cycle) {
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.start, NULL);
     }
     if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
@@ -546,7 +559,7 @@ protected:
 
       _mdStepCounter += _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
 
-      if (_rank == 0) {
+      if (_isRootRank) {
         gettimeofday(&_tv.end, NULL);
         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
       }
@@ -642,7 +655,7 @@ protected:
     }
 
     // finish time measurement for coupled simulation
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.end, NULL);
       double time_total = (_tv.end.tv_sec - _tv.start_total.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start_total.tv_usec);
       std::cout << "Finished all coupling cycles after " << time_total / 1000000 << " s" << std::endl;
@@ -852,7 +865,7 @@ protected:
       return;
     // form file name and open file
     std::stringstream ss;
-    ss << "CouetteAvgMultiMDCells_" << _rank << "_" << couplingCycle << ".csv";
+    ss << "CouetteAvgMultiMDCells_" << _timeIntegrationService->getPintDomain() << "_" << _rank << "_" << couplingCycle << ".csv";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CouetteScenario::write2CSV(): Could not open file " << ss.str() << "!" << std::endl;
@@ -953,8 +966,10 @@ protected:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
+      std::cout << "Iamhere COUETTE_LB" << std::endl;
       solver =
           new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette", _cfg.lbNumberProcesses, 1);
+      std::cout << "Iamhere 100" << std::endl;
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -970,6 +985,7 @@ protected:
       std::cout << "ERROR CouetteScenario::getCouetteSolver(): Unknown solver type!" << std::endl;
       exit(EXIT_FAILURE);
     }
+    std::cout << "Iamhere 5" << std::endl;
 
     return solver;
   }
@@ -1080,8 +1096,10 @@ protected:
     double filter;
   };
 
-  /** @brief the rank of the current MPI process */
+  /** @brief the rank of the current MPI process in the local time domain*/
   int _rank;
+  /** @brief if this is the world global root process */
+  bool _isRootRank;
   /** @todo Piet */
   int _tws;
   /** @brief the config data and information for SimpleMD */
