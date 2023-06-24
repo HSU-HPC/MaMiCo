@@ -16,10 +16,10 @@ public:
   virtual ~Scenario() { std::cout << "Shut down " << _scenarioname << std::endl; }
 
   virtual void run() = 0;
+  virtual void init() = 0;
+  virtual void runOneCouplingCycle(int cycle) = 0;
 
 protected:
-  virtual void init() = 0;
-
   std::unique_ptr<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>> _timeIntegrationService;
 
 private:

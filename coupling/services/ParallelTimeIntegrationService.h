@@ -12,6 +12,7 @@ template <class LinkedCell, unsigned int dim> class ParallelTimeIntegrationServi
 
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/interface/PintableMacroSolver.h"
+#include "coupling/scenario/Scenario.h"
 
 /** 
  * Service to manage timeloop of a coupled simulation scenario. Supports sequential or parallel-in-time integration using a Parareal variant,
@@ -22,9 +23,10 @@ template <class LinkedCell, unsigned int dim> class ParallelTimeIntegrationServi
  */
 template <class LinkedCell, unsigned int dim> class coupling::services::ParallelTimeIntegrationService {
 public:
-    ParallelTimeIntegrationService(coupling::configurations::MaMiCoConfiguration<dim> mamicoConfig):
-    _pint_domain(1),
-    _cfg( mamicoConfig.getTimeIntegrationConfiguration() ) {
+    ParallelTimeIntegrationService(coupling::configurations::MaMiCoConfiguration<dim> mamicoConfig, Scenario* scenario):
+    _pint_domain(0), _rank(0), 
+    _cfg( mamicoConfig.getTimeIntegrationConfiguration() ),
+    _scenario(scenario) {
         #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         int world_size, world_rank;
         MPI_Comm_size(MPI_COMM_WORLD, &world_size);
@@ -55,6 +57,11 @@ public:
         #endif
     }
 
+    void run(int num_cycles) {
+        for (int cycle = 0; cycle < num_cycles; cycle++)
+            _scenario->runOneCouplingCycle(cycle);
+    }
+
     int getPintDomain() { return _pint_domain; }
     int getRank() { return _rank; }
 
@@ -69,4 +76,5 @@ private:
     MPI_Comm _local_pint_comm; // the communicator of the local time domain of this rank
     #endif
     coupling::configurations::TimeIntegrationConfiguration _cfg;
+    Scenario* _scenario;
 };

@@ -9,6 +9,7 @@
 #include "coupling/MultiMDMediator.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/LBCouetteSolver.h"
+#include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/scenario/Scenario.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
@@ -81,12 +82,11 @@ public:
       twsLoop();
       return;
     }
-    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++)
-      runOneCouplingCycle(cycle);
+    _timeIntegrationService->run(_cfg.couplingCycles);
     shutdown();
   }
 
-protected:
+
   /** triggers initMPI(), parseConfiguration(), and initSolvers()
    *  @brief initialises everthing necessary for the test */
   void init() override {
@@ -106,7 +106,7 @@ protected:
    * the macro to the micro solver (twoWayCoupling())
    *  @brief combines the functioniality necessary for a cycle of the coupled
    * simulation  */
-  void runOneCouplingCycle(int cycle) {
+  void runOneCouplingCycle(int cycle) override {
     advanceMacro(cycle);
     varyMD(cycle);
     advanceMicro(cycle);
@@ -124,6 +124,7 @@ protected:
       }
     }
   }
+protected:
 
   /** @brief initialises all MPI variables  */
   void getRootRank() {
@@ -177,7 +178,7 @@ protected:
   /** @brief initialises the macro and micro solver according to the setup from
    * the xml file and pre-proccses them */
   void initSolvers() {
-    _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>>(_mamicoConfig);
+    _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>>(_mamicoConfig, this);
     _rank = _timeIntegrationService->getRank(); // returns the rank inside local time domain
 
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
