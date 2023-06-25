@@ -333,7 +333,7 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   if(_isInitialized){
-    throw std::runtime_error(std::string("IndexingService: Initialized twice! "));
+    std::cout << "IndexingService: WARNING: Initializing twice! " << std::endl;
   }
 #endif
 
@@ -412,7 +412,10 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
 
   _numberProcesses = numberProcesses;
 
-  const unsigned int scalarNumberProcesses = _numberProcesses[0] * _numberProcesses[1] * _numberProcesses[2];
+  unsigned int scalarNumberProcesses = _numberProcesses[0];
+  for (unsigned int d = 1; d < dim; d++)
+    scalarNumberProcesses *= _numberProcesses[d];
+
   const unsigned int parallelTopologyOffset = (_rank / scalarNumberProcesses) * scalarNumberProcesses; // copied from IndexConversion
   _parallelTopology =
       coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, _numberProcesses, parallelTopologyOffset);
