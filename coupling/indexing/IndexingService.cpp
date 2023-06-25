@@ -315,36 +315,6 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
     );
 }
 
-// Config unpacking variant of init
-template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
-                                                    const coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig,
-                                                    coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    , MPI_Comm comm
-#endif
-  ) {  
-  // read relevant data from configs
-  const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
-  const auto macroscopicCellSize{mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
-
-  // calculate total number of macroscopic cells on all ranks in Base Domain
-  tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
-  for (unsigned int d = 0; d < dim; d++) {
-    globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
-
-    if (fabs((globalNumberMacroscopicCells[d]) * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13)
-      std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
-  }
-
-    init(globalNumberMacroscopicCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), 
-        mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), msi, rank
-        #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-        , comm
-        #endif
-    );
-}
-
 // delegated init, this does the main work
 template <unsigned int dim>
 void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int>  globalNumberMacroscopicCells,
@@ -759,4 +729,5 @@ coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch:
 #endif
 
 // declare specialisation of IndexingService
+template class coupling::indexing::IndexingService<2>;
 template class coupling::indexing::IndexingService<3>;

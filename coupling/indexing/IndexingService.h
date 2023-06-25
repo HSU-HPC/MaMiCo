@@ -65,13 +65,36 @@ public:
 #endif
   );
 
-  void init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
-            const coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig, coupling::interface::MacroscopicSolverInterface<dim>* msi,
+// Config unpacking variant of init
+template<unsigned int mddim>
+  typename std::enable_if<mddim == MD_DIM>::type
+   init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
+            const coupling::configurations::MaMiCoConfiguration<mddim>& mamicoConfig, coupling::interface::MacroscopicSolverInterface<mddim>* msi,
             const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
             ,MPI_Comm comm = MPI_COMM_WORLD
 #endif
-            );
+    ){  
+  // read relevant data from configs
+  const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
+  const auto macroscopicCellSize{mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
+
+  // calculate total number of macroscopic cells on all ranks in Base Domain
+  tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
+  for (unsigned int d = 0; d < dim; d++) {
+    globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
+
+    if (fabs((globalNumberMacroscopicCells[d]) * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13)
+      std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
+  }
+
+    init(globalNumberMacroscopicCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), 
+        mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), msi, rank
+        #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+        , comm
+        #endif
+    );
+}
 
   void init(tarch::la::Vector<dim, unsigned int>  globalNumberMacroscopicCells,
             tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType type,
