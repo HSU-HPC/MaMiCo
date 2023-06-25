@@ -56,11 +56,29 @@ public:
     return singleton;
   }
 
+  void init(tarch::la::Vector<dim, unsigned int>  globalNumberMacroscopicCells,
+            tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType type,
+            unsigned int outerRegion,
+            const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            ,MPI_Comm comm = MPI_COMM_WORLD
+#endif
+  );
+
   void init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
             const coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig, coupling::interface::MacroscopicSolverInterface<dim>* msi,
             const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
             ,MPI_Comm comm = MPI_COMM_WORLD
+#endif
+            );
+
+  void init(tarch::la::Vector<dim, unsigned int>  globalNumberMacroscopicCells,
+            tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType type,
+            coupling::interface::MacroscopicSolverInterface<dim>* msi,
+            const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            ,MPI_Comm comm
 #endif
             );
 
@@ -110,10 +128,6 @@ private:
   const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;
   MPI_Comm _comm;
 #endif
-
-  simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
-  coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
-  coupling::interface::MacroscopicSolverInterface<dim>* _msi;
   unsigned int _rank;
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   bool _isInitialized = false;

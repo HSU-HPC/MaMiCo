@@ -1,5 +1,6 @@
 // Include header
 #include "IndexingService.h"
+#include "coupling/solvers/CouetteSolverInterface.h"  // to create default msi
 
 #include <algorithm>
 #include <iterator>
@@ -293,7 +294,28 @@ template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, 
 } // namespace indexing
 } // namespace coupling
 
-// impl of IndexingService
+// raw date based variant of init
+template <unsigned int dim>
+void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int>  globalNumberMacroscopicCells,
+            tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType type,
+            unsigned int outerRegion,
+            const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            ,MPI_Comm comm
+#endif
+){
+    coupling::interface::MacroscopicSolverInterface<dim>* msi = 
+        new coupling::solvers::CouetteSolverInterface<dim>(globalNumberMacroscopicCells, outerRegion);
+
+    init(globalNumberMacroscopicCells, numberProcesses, 
+        type, msi, rank
+        #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+        , comm
+        #endif
+    );
+}
+
+// Config unpacking variant of init
 template <unsigned int dim>
 void coupling::indexing::IndexingService<dim>::init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
                                                     const coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig,
@@ -301,20 +323,10 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     , MPI_Comm comm
 #endif
-                                                    ) {
-  // init members
-  _simpleMDConfig = simpleMDConfig;
-  _mamicoConfig = mamicoConfig;
-  _msi = msi;
-  _rank = rank;
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    _comm = comm;
-#endif
-
-
+  ) {  
   // read relevant data from configs
-  const auto globalMDDomainSize{_simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
-  const auto macroscopicCellSize{_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
+  const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
+  const auto macroscopicCellSize{mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
 
   // calculate total number of macroscopic cells on all ranks in Base Domain
   tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
@@ -324,6 +336,36 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
     if (fabs((globalNumberMacroscopicCells[d]) * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13)
       std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
   }
+
+    init(globalNumberMacroscopicCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), 
+        mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), msi, rank
+        #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+        , comm
+        #endif
+    );
+}
+
+// delegated init, this does the main work
+template <unsigned int dim>
+void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int>  globalNumberMacroscopicCells,
+            tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+            coupling::interface::MacroscopicSolverInterface<dim>* msi,
+            const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            ,MPI_Comm comm
+#endif
+  ) {
+
+   _rank = rank;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    _comm = comm;
+#endif
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if(_isInitialized){
+    throw std::runtime_error(std::string("IndexingService: Initialized twice! "));
+  }
+#endif
 
   // TODO: make this globalNumberMacroscopicCells and remove all usages of the
   // old meaning (seen above)
@@ -351,7 +393,7 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
   // init boundaries of all global, m2m, GL excluding indexing types
   {
     CellIndex<dim> lowerBoundary{BaseIndex<dim>::lowerBoundary};
-    while (not _msi->receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int>{CellIndex<dim, IndexTrait::vector>{lowerBoundary}.get()})) {
+    while (not msi->receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int>{CellIndex<dim, IndexTrait::vector>{lowerBoundary}.get()})) {
       // sanity check: empty m2m domain
       if (lowerBoundary == BaseIndex<dim>::upperBoundary) {
         std::cout << "IndexingService: WARNING: Empty MD-To-Macro domain!" << std::endl;
@@ -362,7 +404,7 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
       ++lowerBoundary;
     }
     CellIndex<dim> upperBoundary{BaseIndex<dim>::upperBoundary};
-    while (not _msi->receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int>{CellIndex<dim, IndexTrait::vector>{upperBoundary}.get()})) {
+    while (not msi->receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int>{CellIndex<dim, IndexTrait::vector>{upperBoundary}.get()})) {
       // sanity check: empty m2m domain
       if (upperBoundary < lowerBoundary) {
         std::cout << "IndexingService: WARNING: Empty MD-To-Macro domain!" << std::endl;
@@ -398,10 +440,8 @@ void coupling::indexing::IndexingService<dim>::init(const simplemd::configuratio
 // handle all local indexing types
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
 
-  _numberProcesses = _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses();
+  _numberProcesses = numberProcesses;
 
-  // determine topology offset of this rank
-  const auto parallelTopologyType{_mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType()};
   const unsigned int scalarNumberProcesses = _numberProcesses[0] * _numberProcesses[1] * _numberProcesses[2];
   const unsigned int parallelTopologyOffset = (_rank / scalarNumberProcesses) * scalarNumberProcesses; // copied from IndexConversion
   _parallelTopology =
