@@ -632,9 +632,9 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
   const auto globalNumberMacroscopicCells = BaseIndex<dim>::numberCellsInDomain - tarch::la::Vector<dim, unsigned int>{2};
 
   // start and end coordinates of neighboured cells.
-  tarch::la::Vector<dim, unsigned int> start(0);
-  tarch::la::Vector<dim, unsigned int> end(0);
-  tarch::la::Vector<dim, unsigned int> loopIndex(0);
+  tarch::la::Vector<3, unsigned int> start(0);
+  tarch::la::Vector<3, unsigned int> end(0);
+  tarch::la::Vector<3, unsigned int> loopIndex(0);
 
   // determine up to 3^dim neighboured cells in the surrounding of
   // globalCellIndex; reduce this number if globalCellIndex lies on the global
