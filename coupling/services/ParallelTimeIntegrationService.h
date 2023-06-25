@@ -23,6 +23,9 @@ template <class LinkedCell, unsigned int dim> class ParallelTimeIntegrationServi
  */
 template <class LinkedCell, unsigned int dim> class coupling::services::ParallelTimeIntegrationService {
 public:
+    using State = coupling::interface::PintableMacroSolverState;
+    using Solver = coupling::interface::PintableMacroSolver;
+
     ParallelTimeIntegrationService(coupling::configurations::MaMiCoConfiguration<dim> mamicoConfig, Scenario* scenario):
     _pint_domain(0), _rank(0), 
     _cfg( mamicoConfig.getTimeIntegrationConfiguration() ),
@@ -63,26 +66,70 @@ public:
                 _scenario->runOneCouplingCycle(cycle);
         } 
         else {
+            // Domain setup //////////////////////////////////////////////////////////////////////////
             int pintDomainSize = (int)( num_cycles / _cfg.getPintDomains() );
             int minCycle{ _pint_domain * pintDomainSize };
             int maxCycle{ minCycle + pintDomainSize };
             // In case num_cycles is not divisible by _cfg.getPintDomains(), the last domain gets the remainder
             if(_pint_domain == _cfg.getPintDomains()-1) 
                 maxCycle = num_cycles;
-
             #ifdef PINT_DEBUG
             std::cout << "PINT_DEBUG: _pint_domain " << _pint_domain << " has minCycle " << minCycle << " and maxCycle " << maxCycle << std::endl;
             #endif
 
-            auto solver = dynamic_cast<coupling::interface::PintableMacroSolver*>( _scenario->getSolver() );
+            // Solver setup  ////////////////////////////////////////////////////////////////////////////////
+            auto solver = dynamic_cast<Solver*>( _scenario->getSolver() );
             if(solver == nullptr){
                 std::cout << "ERROR coupling::services::ParallelTimeIntegrationService: " <<
                     "macroscopic solver is not pintable (= not compatible with parallel in time coupling)" << std::endl;
                 exit(EXIT_FAILURE);
             }
+            _G = solver->getSupervisor(pintDomainSize, 2.0);
+            auto F = [](State s&){
+                solver->setState(s);
+                // TODO enable momentumTransfer on inner cells for MD equilibration steps here
+                // TODO run MD equilibration here
+                for (int cycle = minCycle; cycle < maxCycle; cycle++)
+                    _scenario->runOneCouplingCycle(cycle);
+                // TODO double check that filter pipeline output ends up in solver.getState() here
+                return solver.getState();
+            };
+            std::unique_ptr<State> u_0 = solver->getState();
 
-            for (int cycle = minCycle; cycle < maxCycle; cycle++)
-                _scenario->runOneCouplingCycle(cycle);
+            // Initialisation  /////////////////////////////////////////////////////////////////////
+            if(_pint_domain == 0) 
+                _u_last_past = u_0->clone();
+            else
+                receive(_u_last_past);
+            _u_last_future = _G->operator()(*_u_last_past);
+            if(_pint_domain != _cfg.getPintDomains()-1)
+                send(_u_last_future);
+
+            // Parareal iterations   //////////////////////////////////////////////////////////////////
+            for(int it = 0; it < _cfg.getPintIterations(); it++){
+                // correction
+                std::unique_ptr<State> delta = F(_u_last_past) - _G->operator()(*_u_last_past);
+
+                // prediction
+                if(_pint_domain == 0)
+                    _u_next_past = u_0->clone();
+                else
+                    receive(_u_next_past);
+                std::unique_ptr<State> prediction = _G->operator()(*_u_next_past);
+
+                // refinement
+                _u_next_future = prediction + delta;
+                if(_pint_domain != _cfg.getPintDomains()-1)
+                    send(_u_next_future);
+                
+                // swap for next iteration
+                _u_last_past = _u_next_past->clone();
+                _last_future = _u_next_future->clone();
+            }
+
+            #ifdef PINT_DEBUG
+            std::cout << "PINT_DEBUG: Finished all PinT iterations. " << std::endl;
+            #endif
         }
     }
 
@@ -101,4 +148,13 @@ private:
     #endif
     coupling::configurations::TimeIntegrationConfiguration _cfg;
     Scenario* _scenario;
+    std::unique_ptr<Solver> _G;  // The supervisor, i.e. the coarse predictor
+
+    // These objects represent coupled simulation states. There are used by the supervised parallel in time algorithm for operations
+    // "last" and "next" describe two consecutive parareal iterations
+    // "past" and "future" describe two points in simulation time, one pint time domain apart
+    std::unique_ptr<State> _u_last_past;
+    std::unique_ptr<State> _u_last_future;
+    std::unique_ptr<State> _u_next_past;
+    std::unique_ptr<State> _u_next_future;
 };
