@@ -1,7 +1,6 @@
 // Copyright (C) 2015 Technische Universitaet Muenchen
 // This file is part of the Mamico project. For conditions of distribution
-// and use, please see the copyright notice in Mamico's main folder, or at
-// www5.in.tum.de/mamico
+// and use, please see the copyright notice in Mamico's main folder
 #ifndef _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
 #define _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
 
@@ -20,15 +19,15 @@ class LBCouetteSolverState;
 
 class coupling::solvers::LBCouetteSolverState : public coupling::interface::PintableMacroSolverState {
 public:
-  LBCouetteSolverState(long size): _pdf(new double[size]{0}), _size(size) {}
+  LBCouetteSolverState(long size): _pdf(size, 0) {}
 
   LBCouetteSolverState(long size, double* pdf): LBCouetteSolverState(size) {
-    std::copy(pdf, pdf+size, _pdf.get());
+    std::copy(pdf, pdf+size, _pdf.data());
   }
 
   ~LBCouetteSolverState() {}
 
-  long getSizeBytes() override {return sizeof(double) * _size; }
+  long getSizeBytes() override {return sizeof(double) * _pdf.size(); }
 
   std::unique_ptr<PintableMacroSolverState> operator+(const PintableMacroSolverState& rhs) override {
     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
@@ -38,45 +37,44 @@ public:
       std::cout << "ERROR LBCouetteSolverState operator+ type mismatch" << std::endl;
       exit(EXIT_FAILURE);
     }
-    if(other->_size != _size){
-      std::cout << "ERROR LBCouetteSolverState size mismatch" << std::endl;
+    if(other->_pdf.size() != _pdf.size()){
+      std::cout << "ERROR LBCouetteSolverState operator+ size mismatch" << std::endl;
       exit(EXIT_FAILURE);
     }
     #endif
 
-    std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(_size, _pdf.get());
-    for(long i=0; i<_size; ++i)
+    std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(*this);
+    for(long i=0; i<_pdf.size(); ++i)
       res->_pdf[i] += other->_pdf[i];
 
     return res;
   }
 
   std::unique_ptr<PintableMacroSolverState> operator-(const PintableMacroSolverState& rhs) override {
-    const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
+     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
 
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if(other == nullptr){
-      std::cout << "ERROR LBCouetteSolverState operator+ type mismatch" << std::endl;
+      std::cout << "ERROR LBCouetteSolverState operator- type mismatch" << std::endl;
       exit(EXIT_FAILURE);
     }
-    if(other->_size != _size){
-      std::cout << "ERROR LBCouetteSolverState size mismatch" << std::endl;
+    if(other->_pdf.size() != _pdf.size()){
+      std::cout << "ERROR LBCouetteSolverState operator- size mismatch" << std::endl;
       exit(EXIT_FAILURE);
     }
     #endif
 
-    std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(_size, _pdf.get());
-    for(long i=0; i<_size; ++i)
+    std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(*this);
+    for(long i=0; i<_pdf.size(); ++i)
       res->_pdf[i] -= other->_pdf[i];
 
     return res;
   }
 
-  const double* getData() {return _pdf.get();}  // for testing
+  double* getData() override {return _pdf.data();}
 
 private:
-  std::unique_ptr<double[]> _pdf;
-  long _size;
+  std::vector<double> _pdf;
 };
 
 /** In our scenario, the lower wall is accelerated and the upper wall stands

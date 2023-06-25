@@ -34,6 +34,7 @@ public:
 	virtual std::unique_ptr<State> operator()(const State&) = 0;
 	virtual Mode getMode() = 0;
 };
+coupling::interface::PintableMacroSolver::~PintableMacroSolver() {}
 
 /**
  * Interface for state instances
@@ -45,4 +46,6 @@ public:
 	virtual long getSizeBytes() = 0;   // for MPI communication
 	virtual std::unique_ptr<State> operator+(const State&) = 0;
 	virtual std::unique_ptr<State> operator-(const State&) = 0;
+	virtual double* getData() = 0;
 };
+coupling::interface::PintableMacroSolverState::~PintableMacroSolverState() {}
