@@ -55,6 +55,10 @@ public:
       std::cout << "Number processes: " << numberProcesses << std::endl;
     }
 
+    // init new indexing system
+    coupling::indexing::IndexingService<dim>::getInstance().init(globalNumberMacroscopicCells, numberProcesses, 
+      coupling::paralleltopology::XYZ, 3, (unsigned int)rank);
+
     // define functional objects
     coupling::IndexConversion<dim> indexConversion(globalNumberMacroscopicCells, numberProcesses, rank, mdDomainSize, mdDomainOffset,
                                                    coupling::paralleltopology::XYZ);
