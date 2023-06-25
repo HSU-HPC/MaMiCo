@@ -9,18 +9,81 @@
 #include <omp.h>
 #endif
 #include "coupling/solvers/NumericalSolver.h"
+#include "coupling/interface/PintableMacroSolver.h"
 
 namespace coupling {
 namespace solvers {
 class LBCouetteSolver;
+class LBCouetteSolverState;
 }
 } // namespace coupling
+
+class coupling::solvers::LBCouetteSolverState : public coupling::interface::PintableMacroSolverState {
+public:
+  LBCouetteSolverState(long size): _pdf(new double[size]{0}), _size(size) {}
+
+  LBCouetteSolverState(long size, double* pdf): LBCouetteSolverState(size) {
+    std::copy(pdf, pdf+size, _pdf.get());
+  }
+
+  ~LBCouetteSolverState() {}
+
+  long getSizeBytes() override {return sizeof(double) * _size; }
+
+  std::unique_ptr<PintableMacroSolverState> operator+(const PintableMacroSolverState& rhs) override {
+    const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
+
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(other == nullptr){
+      std::cout << "ERROR LBCouetteSolverState operator+ type mismatch" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    if(other->_size != _size){
+      std::cout << "ERROR LBCouetteSolverState size mismatch" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    #endif
+
+    std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(_size, _pdf.get());
+    for(long i=0; i<_size; ++i)
+      res->_pdf[i] += other->_pdf[i];
+
+    return res;
+  }
+
+  std::unique_ptr<PintableMacroSolverState> operator-(const PintableMacroSolverState& rhs) override {
+    const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
+
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(other == nullptr){
+      std::cout << "ERROR LBCouetteSolverState operator+ type mismatch" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    if(other->_size != _size){
+      std::cout << "ERROR LBCouetteSolverState size mismatch" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    #endif
+
+    std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(_size, _pdf.get());
+    for(long i=0; i<_size; ++i)
+      res->_pdf[i] -= other->_pdf[i];
+
+    return res;
+  }
+
+  const double* getData() {return _pdf.get();}  // for testing
+
+private:
+  std::unique_ptr<double[]> _pdf;
+  long _size;
+};
 
 /** In our scenario, the lower wall is accelerated and the upper wall stands
  * still. The lower wall is located at zero height.
  *  @brief implements a three-dimensional Lattice-Boltzmann Couette flow solver.
  *  @author Philipp Neumann  */
-class coupling::solvers::LBCouetteSolver : public coupling::solvers::NumericalSolver {
+class coupling::solvers::LBCouetteSolver : public coupling::solvers::NumericalSolver{//, public coupling::interface::PintableMacroSolver {
 public:
   /** @brief a simple constructor
    *  @param channelheight the width and height of the channel in y and z
