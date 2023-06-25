@@ -26,13 +26,15 @@ class PintableMacroSolverState;
  *  @author Piet Jarmatz
  */
 class coupling::interface::PintableMacroSolver {
+public:
 	using State = PintableMacroSolverState;
 	enum class Mode { supervising, coupling };
-public:
+
 	virtual ~PintableMacroSolver() = 0;
-	virtual std::unique_ptr<State> getInitialState() = 0;
+	virtual std::unique_ptr<State> getState() const = 0;
 	virtual std::unique_ptr<State> operator()(const State&) = 0;
-	virtual Mode getMode() = 0;
+	virtual Mode getMode() const = 0;
+	virtual std::unique_ptr<PintableMacroSolver> getSupervisor(int num_cycles, double visc_multiplier=1) const = 0;
 };
 coupling::interface::PintableMacroSolver::~PintableMacroSolver() {}
 
@@ -40,12 +42,14 @@ coupling::interface::PintableMacroSolver::~PintableMacroSolver() {}
  * Interface for state instances
  */
 class coupling::interface::PintableMacroSolverState {
-	using State = PintableMacroSolverState;
 public:
+	using State = PintableMacroSolverState;
+	virtual std::unique_ptr<State> clone() const = 0;
 	virtual ~PintableMacroSolverState() = 0;
 	virtual long getSizeBytes() = 0;   // for MPI communication
 	virtual std::unique_ptr<State> operator+(const State&) = 0;
 	virtual std::unique_ptr<State> operator-(const State&) = 0;
 	virtual double* getData() = 0;
+	virtual const double* getData() const = 0;
 };
 coupling::interface::PintableMacroSolverState::~PintableMacroSolverState() {}

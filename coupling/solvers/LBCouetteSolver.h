@@ -25,11 +25,13 @@ public:
     std::copy(pdf, pdf+size, _pdf.data());
   }
 
+  std::unique_ptr<State> clone() const override { return std::make_unique<LBCouetteSolverState>(*this); }
+
   ~LBCouetteSolverState() {}
 
   long getSizeBytes() override {return sizeof(double) * _pdf.size(); }
 
-  std::unique_ptr<PintableMacroSolverState> operator+(const PintableMacroSolverState& rhs) override {
+  std::unique_ptr<State> operator+(const State& rhs) override {
     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
 
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -72,6 +74,7 @@ public:
   }
 
   double* getData() override {return _pdf.data();}
+  const double* getData() const override {return _pdf.data();}
 
 private:
   std::vector<double> _pdf;
@@ -81,7 +84,7 @@ private:
  * still. The lower wall is located at zero height.
  *  @brief implements a three-dimensional Lattice-Boltzmann Couette flow solver.
  *  @author Philipp Neumann  */
-class coupling::solvers::LBCouetteSolver : public coupling::solvers::NumericalSolver{//, public coupling::interface::PintableMacroSolver {
+class coupling::solvers::LBCouetteSolver : public coupling::solvers::NumericalSolver, public coupling::interface::PintableMacroSolver {
 public:
   /** @brief a simple constructor
    *  @param channelheight the width and height of the channel in y and z
@@ -101,13 +104,15 @@ public:
                   const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
                   const unsigned int numThreads = 1)
       : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes),
+        _mode(Mode::coupling), _dt_pint(dt),
         _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity) {
     // return if required
     if (skipRank()) {
       return;
     }
-    _pdf1 = new double[19 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
-    _pdf2 = new double[19 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
+    _pdfsize = 19 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2);
+    _pdf1 = new double[_pdfsize];
+    _pdf2 = new double[_pdfsize];
 #if defined(_OPENMP)
     omp_set_num_threads(numThreads);
 #endif
@@ -225,6 +230,13 @@ public:
     if (skipRank()) {
       return;
     }
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(_mode == Mode::supervising){
+      std::cout << "ERROR LBCouetteSolver setMDBoundaryValues() called in supervising mode" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    #endif
+
     // loop over all received cells
     const unsigned int size = (unsigned int)recvBuffer.size();
     for (unsigned int i = 0; i < size; i++) {
@@ -327,7 +339,70 @@ public:
    *  @param wallVelocity the velocity will be set at the moving wall */
   virtual void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) override { _wallVelocity = (_dt / _dx) * wallVelocity; }
 
+  /// ------------------------------------------------------------------------------------------------------
+  /// Pint methods    ------   Pint methods    ------   Pint methods    ------   Pint methods    ------   Pint methods
+  /// ------------------------------------------------------------------------------------------------------
+
+  std::unique_ptr<State> getState() const override{
+    return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
+  }
+
+  std::unique_ptr<State> operator()(const State& input) override{
+    const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(&input);
+
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(state == nullptr){
+      std::cout << "ERROR LBCouetteSolver operator() wrong state type" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    if(_mode != Mode::supervising){
+      std::cout << "ERROR LBCouetteSolver operator() called but not in supervising mode" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    #endif
+
+    setState(state);
+    advance(_dt_pint);
+    return getState();
+  }
+
+  Mode getMode() const override { return _mode; }
+
+  /**
+   * This will create a new instance of this LBCouetteSolver
+   * In the supervisor, setMDBoundary() has not been called, independently of state of couette solver in coupling mode
+   * The supervisor can run with a modified viscosity
+   * The supervisor's operator() advances many coupling cycles at once, interval is stored in _dt_pint
+   */
+  std::unique_ptr<PintableMacroSolver> getSupervisor(int num_cycles, double visc_multiplier) const override {
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(_mode == Mode::supervising){
+      std::cout << "ERROR LBCouetteSolver getSupervisor(): already in supervising mode" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    #endif
+
+    auto res = std::make_unique<LBCouetteSolver>( _channelheight, _wallVelocity * _dx / _dt, 
+      _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep, _filestem+std::string("_supervising"), _processes );
+
+    res->_mode = Mode::supervising;
+    res->_dt_pint = _dt * num_cycles;
+
+    return res;
+  }
+
 private:
+  Mode _mode;
+  double _dt_pint;
+
+  void setState(const LBCouetteSolverState* state){
+    std::copy(state->getData(), state->getData() + _pdfsize, _pdf1);
+  }
+
+  /// ------------------------------------------------------------------------------------------------------
+  /// End of Pint methods    ------      End of Pint methods    ------      End of Pint methods    ------      End of Pint methods
+  /// ------------------------------------------------------------------------------------------------------
+
   /** calls stream() and collide() and swaps the fields
    *  @brief collide-stream algorithm for the Lattice-Boltzmann method  */
   void collidestream() {
@@ -625,6 +700,7 @@ private:
   const double _omega;
   /** @brief velocity of moving wall of Couette flow */
   tarch::la::Vector<3, double> _wallVelocity;
+  long _pdfsize;
   /** @brief partical distribution function field */
   double* _pdf1{NULL};
   /** @brief partial distribution function field (stores the old time step)*/
