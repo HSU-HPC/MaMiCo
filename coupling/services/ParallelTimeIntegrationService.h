@@ -120,7 +120,7 @@ private:
             exit(EXIT_FAILURE);
         }
         _G = solver->getSupervisor(domain.size, 2.0);
-        _F = [this, &solver, domain](const std::unique_ptr<State>& s){
+        _F = [this, solver, domain](const std::unique_ptr<State>& s){
             solver->setState(s);
             // TODO enable momentumTransfer on inner cells for MD equilibration steps here
             // TODO run MD equilibration here
