@@ -133,6 +133,7 @@ private:
 
     void receive(std::unique_ptr<State>& state){
         int source_rank = _world_rank - _ranks_per_domain;
+        if(!state) state = _u_0->clone();
         #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         MPI_Recv(state->getData(), state->getSizeBytes(), MPI_BYTE, source_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         #endif
