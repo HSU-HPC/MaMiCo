@@ -32,7 +32,8 @@ public:
 
 	virtual ~PintableMacroSolver() = 0;
 	virtual std::unique_ptr<State> getState() const = 0;
-	virtual std::unique_ptr<State> operator()(const State&) = 0;
+	virtual void setState(const std::unique_ptr<State>&) = 0;
+	virtual std::unique_ptr<State> operator()(const std::unique_ptr<State>&) = 0;
 	virtual Mode getMode() const = 0;
 	virtual std::unique_ptr<PintableMacroSolver> getSupervisor(int num_cycles, double visc_multiplier=1) const = 0;
 };
@@ -46,7 +47,7 @@ public:
 	using State = PintableMacroSolverState;
 	virtual std::unique_ptr<State> clone() const = 0;
 	virtual ~PintableMacroSolverState() = 0;
-	virtual long getSizeBytes() = 0;   // for MPI communication
+	virtual int getSizeBytes() = 0;   // for MPI communication
 	virtual std::unique_ptr<State> operator+(const State&) = 0;
 	virtual std::unique_ptr<State> operator-(const State&) = 0;
 	virtual double* getData() = 0;

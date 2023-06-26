@@ -19,9 +19,9 @@ class LBCouetteSolverState;
 
 class coupling::solvers::LBCouetteSolverState : public coupling::interface::PintableMacroSolverState {
 public:
-  LBCouetteSolverState(long size): _pdf(size, 0) {}
+  LBCouetteSolverState(int size): _pdf(size, 0) {}
 
-  LBCouetteSolverState(long size, double* pdf): LBCouetteSolverState(size) {
+  LBCouetteSolverState(int size, double* pdf): LBCouetteSolverState(size) {
     std::copy(pdf, pdf+size, _pdf.data());
   }
 
@@ -29,7 +29,7 @@ public:
 
   ~LBCouetteSolverState() {}
 
-  long getSizeBytes() override {return sizeof(double) * _pdf.size(); }
+  int getSizeBytes() override {return sizeof(double) * _pdf.size(); }
 
   std::unique_ptr<State> operator+(const State& rhs) override {
     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
@@ -46,7 +46,7 @@ public:
     #endif
 
     std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(*this);
-    for(long i=0; i<_pdf.size(); ++i)
+    for(int i=0; i<_pdf.size(); ++i)
       res->_pdf[i] += other->_pdf[i];
 
     return res;
@@ -67,7 +67,7 @@ public:
     #endif
 
     std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(*this);
-    for(long i=0; i<_pdf.size(); ++i)
+    for(int i=0; i<_pdf.size(); ++i)
       res->_pdf[i] -= other->_pdf[i];
 
     return res;
@@ -343,25 +343,33 @@ public:
   /// Pint methods    ------   Pint methods    ------   Pint methods    ------   Pint methods    ------   Pint methods
   /// ------------------------------------------------------------------------------------------------------
 
-  std::unique_ptr<State> getState() const override{
+  std::unique_ptr<State> getState() const override {
     return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
   }
 
-  std::unique_ptr<State> operator()(const State& input) override{
-    const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(&input);
+  void setState(const std::unique_ptr<State>& input) override {
+    const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(input.get());
 
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if(state == nullptr){
-      std::cout << "ERROR LBCouetteSolver operator() wrong state type" << std::endl;
+      std::cout << "ERROR LBCouetteSolver setState() wrong state type" << std::endl;
       exit(EXIT_FAILURE);
     }
+    #endif
+
+    std::copy(state->getData(), state->getData() + _pdfsize, _pdf1);
+  }
+
+  std::unique_ptr<State> operator()(const std::unique_ptr<State>& input) override {
+    setState(input);
+
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if(_mode != Mode::supervising){
       std::cout << "ERROR LBCouetteSolver operator() called but not in supervising mode" << std::endl;
       exit(EXIT_FAILURE);
     }
     #endif
-
-    setState(state);
+    
     advance(_dt_pint);
     return getState();
   }
@@ -394,10 +402,6 @@ public:
 private:
   Mode _mode;
   double _dt_pint;
-
-  void setState(const LBCouetteSolverState* state){
-    std::copy(state->getData(), state->getData() + _pdfsize, _pdf1);
-  }
 
   /// ------------------------------------------------------------------------------------------------------
   /// End of Pint methods    ------      End of Pint methods    ------      End of Pint methods    ------      End of Pint methods
@@ -700,7 +704,7 @@ private:
   const double _omega;
   /** @brief velocity of moving wall of Couette flow */
   tarch::la::Vector<3, double> _wallVelocity;
-  long _pdfsize;
+  int _pdfsize{0};
   /** @brief partical distribution function field */
   double* _pdf1{NULL};
   /** @brief partial distribution function field (stores the old time step)*/
