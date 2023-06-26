@@ -52,7 +52,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuf
   const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(globalVectorIndex);
   const unsigned int ranksSize = (unsigned int)ranks.size();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Rank " << IndexingService<dim>::getInstance().getRank(); << ": write cell " << globalVectorIndex << " to send buffer;";
+  std::cout << "Rank " << IndexingService<dim>::getInstance().getRank() << ": write cell " << globalVectorIndex << " to send buffer;";
   std::cout << " associated target ranks: ";
   for (unsigned int i = 0; i < ranksSize; i++) {
     std::cout << ranks[i] << " ";
