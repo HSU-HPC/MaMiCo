@@ -36,8 +36,14 @@ public:
 	virtual std::unique_ptr<State> operator()(const std::unique_ptr<State>&) = 0;
 	virtual Mode getMode() const = 0;
 	virtual std::unique_ptr<PintableMacroSolver> getSupervisor(int num_cycles, double visc_multiplier=1) const = 0;
+	virtual void print(std::ostream& os) const = 0;
 };
 coupling::interface::PintableMacroSolver::~PintableMacroSolver() {}
+
+std::ostream& operator<<(std::ostream& os, const coupling::interface::PintableMacroSolver& s) {
+	s.print(os);
+	return os;
+}
 
 /**
  * Interface for state instances
@@ -47,10 +53,16 @@ public:
 	using State = PintableMacroSolverState;
 	virtual std::unique_ptr<State> clone() const = 0;
 	virtual ~PintableMacroSolverState() = 0;
-	virtual int getSizeBytes() = 0;   // for MPI communication
+	virtual int getSizeBytes() const = 0;   // for MPI communication
 	virtual std::unique_ptr<State> operator+(const State&) = 0;
 	virtual std::unique_ptr<State> operator-(const State&) = 0;
 	virtual double* getData() = 0;
 	virtual const double* getData() const = 0;
+	virtual void print(std::ostream& os) const = 0;
 };
 coupling::interface::PintableMacroSolverState::~PintableMacroSolverState() {}
+
+std::ostream& operator<<(std::ostream& os, const coupling::interface::PintableMacroSolverState& s) {
+	s.print(os);
+	return os;
+}

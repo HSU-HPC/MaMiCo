@@ -29,7 +29,7 @@ public:
 
   ~LBCouetteSolverState() {}
 
-  int getSizeBytes() override {return sizeof(double) * _pdf.size(); }
+  int getSizeBytes() const override {return sizeof(double) * _pdf.size(); }
 
   std::unique_ptr<State> operator+(const State& rhs) override {
     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
@@ -75,6 +75,10 @@ public:
 
   double* getData() override {return _pdf.data();}
   const double* getData() const override {return _pdf.data();}
+
+  void print(std::ostream& os) const override {
+    os << "<LBCouetteSolverState instance with size " << getSizeBytes() << ">";
+  }
 
 private:
   std::vector<double> _pdf;
@@ -397,6 +401,13 @@ public:
     res->_dt_pint = _dt * num_cycles;
 
     return res;
+  }
+
+  void print(std::ostream& os) const override {
+    if (_mode == Mode::supervising)
+      os << "<LBCouetteSolver instance in supervising mode >";
+    if (_mode == Mode::coupling)
+      os << "<LBCouetteSolver instance in coupling mode >";
   }
 
 private:
