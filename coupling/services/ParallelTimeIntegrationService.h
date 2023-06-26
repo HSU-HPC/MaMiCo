@@ -15,6 +15,15 @@ template <class LinkedCell, unsigned int dim> class ParallelTimeIntegrationServi
 #include "coupling/scenario/Scenario.h"
 #include <functional>
 
+// Convenience operators, to be able to write parareal iterations in a readable notation
+using st_ptr = std::unique_ptr<coupling::interface::PintableMacroSolverState>;
+st_ptr operator+(const st_ptr& lhs, const st_ptr& rhs){
+    return *lhs + *rhs;
+}
+st_ptr operator-(const st_ptr& lhs, const st_ptr& rhs){
+    return *lhs - *rhs;
+}
+
 /** 
  * Service to manage timeloop of a coupled simulation scenario. Supports sequential or parallel-in-time integration using a Parareal variant,
  * as described in "Blumers, A. L., Li, Z., & Karniadakis, G. E. (2019). Supervised parallel-in-time algorithm for long-time Lagrangian 
@@ -165,14 +174,14 @@ private:
         for(int it = 0; it < iterations; it++){
             // Correction step
             auto& G = *_G;
-            auto delta = *_F(_u_last_past) - *G(_u_last_past);
+            auto delta = _F(_u_last_past) - G(_u_last_past);
 
             // Prediction step
             get_past_state(_u_next_past);
             auto prediction = G(_u_next_past);
 
             // Refinement step
-            _u_next_future = *prediction + *delta;
+            _u_next_future = prediction + delta;
             if( !isLast() )
                 send(_u_next_future);
             
