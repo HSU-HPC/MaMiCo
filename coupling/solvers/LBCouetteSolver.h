@@ -53,7 +53,7 @@ public:
   }
 
   std::unique_ptr<PintableMacroSolverState> operator-(const PintableMacroSolverState& rhs) override {
-     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
+    const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
 
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if(other == nullptr){
@@ -71,6 +71,12 @@ public:
       res->_pdf[i] -= other->_pdf[i];
 
     return res;
+  }
+
+  bool operator==(const State& rhs) override {
+    const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
+    if(other == nullptr) return false;
+    return _pdf == other->_pdf;
   }
 
   double* getData() override {return _pdf.data();}

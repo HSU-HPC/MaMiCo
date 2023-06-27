@@ -56,6 +56,7 @@ public:
 	virtual int getSizeBytes() const = 0;   // for MPI communication
 	virtual std::unique_ptr<State> operator+(const State&) = 0;
 	virtual std::unique_ptr<State> operator-(const State&) = 0;
+	virtual bool operator==(const State&) = 0;
 	virtual double* getData() = 0;
 	virtual const double* getData() const = 0;
 	virtual void print(std::ostream& os) const = 0;
