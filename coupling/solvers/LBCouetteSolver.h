@@ -31,47 +31,8 @@ public:
 
   int getSizeBytes() const override {return sizeof(double) * _pdf.size(); }
 
-  std::unique_ptr<State> operator+(const State& rhs) override {
-    const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
-
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(other == nullptr){
-      std::cout << "ERROR LBCouetteSolverState operator+ type mismatch" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    if(other->_pdf.size() != _pdf.size()){
-      std::cout << "ERROR LBCouetteSolverState operator+ size mismatch" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    #endif
-
-    std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(*this);
-    for(int i=0; i<_pdf.size(); ++i)
-      res->_pdf[i] += other->_pdf[i];
-
-    return res;
-  }
-
-  std::unique_ptr<PintableMacroSolverState> operator-(const PintableMacroSolverState& rhs) override {
-    const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
-
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(other == nullptr){
-      std::cout << "ERROR LBCouetteSolverState operator- type mismatch" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    if(other->_pdf.size() != _pdf.size()){
-      std::cout << "ERROR LBCouetteSolverState operator- size mismatch" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    #endif
-
-    std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(*this);
-    for(int i=0; i<_pdf.size(); ++i)
-      res->_pdf[i] -= other->_pdf[i];
-
-    return res;
-  }
+  std::unique_ptr<State> operator+(const State& rhs) override;
+  std::unique_ptr<State> operator-(const State& rhs) override;
 
   bool operator==(const State& rhs) override {
     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);

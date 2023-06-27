@@ -17,10 +17,10 @@ template <unsigned int dim> class ParallelTimeIntegrationService;
 
 // Convenience operators, to be able to write parareal iterations in a readable notation
 using st_ptr = std::unique_ptr<coupling::interface::PintableMacroSolverState>;
-st_ptr operator+(const st_ptr& lhs, const st_ptr& rhs){
+inline st_ptr operator+(const st_ptr& lhs, const st_ptr& rhs){
     return *lhs + *rhs;
 }
-st_ptr operator-(const st_ptr& lhs, const st_ptr& rhs){
+inline st_ptr operator-(const st_ptr& lhs, const st_ptr& rhs){
     return *lhs - *rhs;
 }
 

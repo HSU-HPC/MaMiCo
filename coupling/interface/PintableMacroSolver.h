@@ -11,6 +11,8 @@ class PintableMacroSolverState;
 }
 } 
 
+#include <memory>
+
 /** 
  *  Interface for a macroscopic solver who supports parallel-in-time coupled simulations. This requires:
  *   - The macro solver can be switched between *supervising mode* and *coupling mode*
@@ -30,20 +32,18 @@ public:
 	using State = PintableMacroSolverState;
 	enum class Mode { supervising, coupling };
 
-	virtual ~PintableMacroSolver() = 0;
+	virtual ~PintableMacroSolver() {}
 	virtual std::unique_ptr<State> getState() const = 0;
 	virtual void setState(const std::unique_ptr<State>&, int cycle = 0) = 0;
 	virtual std::unique_ptr<State> operator()(const std::unique_ptr<State>&, int cycle = 0) = 0;
 	virtual Mode getMode() const = 0;
 	virtual std::unique_ptr<PintableMacroSolver> getSupervisor(int num_cycles, double visc_multiplier=1) const = 0;
 	virtual void print(std::ostream& os) const = 0;
+	friend std::ostream& operator<<(std::ostream& os, const coupling::interface::PintableMacroSolver& s) {
+		s.print(os);
+		return os;
+	}
 };
-coupling::interface::PintableMacroSolver::~PintableMacroSolver() {}
-
-std::ostream& operator<<(std::ostream& os, const coupling::interface::PintableMacroSolver& s) {
-	s.print(os);
-	return os;
-}
 
 /**
  * Interface for state instances
@@ -52,7 +52,7 @@ class coupling::interface::PintableMacroSolverState {
 public:
 	using State = PintableMacroSolverState;
 	virtual std::unique_ptr<State> clone() const = 0;
-	virtual ~PintableMacroSolverState() = 0;
+	virtual ~PintableMacroSolverState() {}
 	virtual int getSizeBytes() const = 0;   // for MPI communication
 	virtual std::unique_ptr<State> operator+(const State&) = 0;
 	virtual std::unique_ptr<State> operator-(const State&) = 0;
@@ -60,10 +60,8 @@ public:
 	virtual double* getData() = 0;
 	virtual const double* getData() const = 0;
 	virtual void print(std::ostream& os) const = 0;
+	friend std::ostream& operator<<(std::ostream& os, const coupling::interface::PintableMacroSolverState& s) {
+		s.print(os);
+		return os;
+	}
 };
-coupling::interface::PintableMacroSolverState::~PintableMacroSolverState() {}
-
-std::ostream& operator<<(std::ostream& os, const coupling::interface::PintableMacroSolverState& s) {
-	s.print(os);
-	return os;
-}
