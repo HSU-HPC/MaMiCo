@@ -16,6 +16,7 @@ class LBCouetteSolverStateTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(TestCopyAssignments);
   CPPUNIT_TEST(testOpPlus);
   CPPUNIT_TEST(testOpMinus);
+  CPPUNIT_TEST(testEquality);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -91,6 +92,19 @@ public:
     CPPUNIT_ASSERT(res.getData()[0] == 1);
     CPPUNIT_ASSERT(res.getData()[1] == 1);
     CPPUNIT_ASSERT(res.getData()[2] == 1);
+  }
+
+  void testEquality() {
+    double data_two[3]{2,2,2};
+    LBCouetteSolverState my_two = LBCouetteSolverState{3, data_two};
+    CPPUNIT_ASSERT(my_two == _two);
+    LBCouetteSolverState res1 = *dynamic_cast<LBCouetteSolverState*>((_one + _two).get());
+    LBCouetteSolverState res2 = *dynamic_cast<LBCouetteSolverState*>((_two + _one).get());
+    CPPUNIT_ASSERT(res1 == res2);
+    CPPUNIT_ASSERT(!(my_two == res1));
+    CPPUNIT_ASSERT(!(_two == res1));
+    CPPUNIT_ASSERT(!(my_two == res2));
+    CPPUNIT_ASSERT(!(_two == res2));
   }
 
 private:
