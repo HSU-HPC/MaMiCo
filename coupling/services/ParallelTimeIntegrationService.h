@@ -180,9 +180,11 @@ private:
     }
 
     void run_parareal(int iterations){
-        for(_iteration = 0; _iteration < iterations; _iteration++){
+        while(_iteration < iterations){
             // Correction step
             auto delta = _F(_u_last_past) - _G(_u_last_past);
+
+            _iteration++;
 
             // Prediction step
             get_past_state(_u_next_past);
@@ -225,5 +227,5 @@ private:
     std::unique_ptr<State> _u_next_past;
     std::unique_ptr<State> _u_next_future;
 
-    int _iteration{-1};  // there is an init phase before iteration zero, lets call it "-1"
+    int _iteration{0};
 };
