@@ -18,6 +18,7 @@
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/datastructures/MacroscopicCell.h"
 #include "coupling/solvers/CouetteSolver.h"
+#include "coupling/services/ParallelTimeIntegrationService.h"
 
 namespace coupling {
 namespace solvers {
@@ -44,9 +45,9 @@ public:
    *  @param processes defines on how many processes the solver will run;
    *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes  */
   NumericalSolver(const double channelheight, const double dx, const double dt, const double kinVisc, const int plotEveryTimestep, const std::string filestem,
-                  const tarch::la::Vector<3, unsigned int> processes)
+                  const tarch::la::Vector<3, unsigned int> processes, const Scenario* scen = nullptr)
       : coupling::solvers::AbstractCouetteSolver<3>(), _channelheight(channelheight), _dx(dx), _dt(dt), _kinVisc(kinVisc), _processes(processes),
-        _plotEveryTimestep(plotEveryTimestep), _filestem(filestem) {
+        _plotEveryTimestep(plotEveryTimestep), _filestem(filestem), _scen(scen) {
     _vel = new double[3 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
     _density = new double[(_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
     _flag = new Flag[(_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
@@ -425,8 +426,26 @@ protected:
     return x + (lengthx + 2) * y;
   }
 
-  /** @brief create vtk plot if required */
   void plot() const {
+    int rank = 0; // rank in MPI-parallel simulations
+    #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
+    #endif
+    std::stringstream ss;
+    ss << _filestem << "_r" << rank << "_c" << _counter;
+    if(_scen != nullptr){
+      auto ts = _scen->getTimeIntegrationService();
+      if( ts != nullptr ){
+        if (ts->isPinTEnabled())
+          ss << "_i" << ts->getInteration();
+      }
+    }
+    ss << ".vtk";
+    plot(ss.str());
+  }
+
+  /** @brief create vtk plot if required */
+  void plot(std::string filename) const {
     // only plot output if this is the correct timestep
     if (_plotEveryTimestep < 1) {
       return;
@@ -434,17 +453,9 @@ protected:
     if (_counter % _plotEveryTimestep != 0) {
       return;
     }
-    // const tarch::la::Vector<3,unsigned int> coords(getProcessCoordinates());
-    // // offset of domain for MPI-parallel simulations
-    int rank = 0; // rank in MPI-parallel simulations
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
-#endif
-    std::stringstream ss;
-    ss << _filestem << "_" << rank << "_" << _counter << ".vtk";
-    std::ofstream file(ss.str().c_str());
+    std::ofstream file(filename.c_str());
     if (!file.is_open()) {
-      std::cout << "ERROR NumericalSolver::plot(): Could not open file " << ss.str() << "!" << std::endl;
+      std::cout << "ERROR NumericalSolver::plot(): Could not open file " << filename << "!" << std::endl;
       exit(EXIT_FAILURE);
     }
     std::stringstream flag, density, velocity;
@@ -592,6 +603,7 @@ protected:
   tarch::la::Vector<3, int> _offset{(-1)};
   /** @brief the total number of macroscopic cells of the coupled simulation */
   tarch::la::Vector<3, int> _globalNumberMacroscopicCells{(-1)};
+  const Scenario* _scen;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_SOLVERS_NUMERICALSOLVER_H_

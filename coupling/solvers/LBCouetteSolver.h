@@ -106,8 +106,8 @@ public:
    *  @param numThreads number of OpenMP threads */
   LBCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
                   const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
-                  const unsigned int numThreads = 1)
-      : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes),
+                  const unsigned int numThreads = 1, const Scenario* scen = nullptr)
+      : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes, scen),
         _mode(Mode::coupling), _dt_pint(dt),
         _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity) {
     // return if required
@@ -351,7 +351,7 @@ public:
     return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
   }
 
-  void setState(const std::unique_ptr<State>& input) override {
+  void setState(const std::unique_ptr<State>& input, int cycle) override {
     const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(input.get());
 
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -362,10 +362,11 @@ public:
     #endif
 
     std::copy(state->getData(), state->getData() + _pdfsize, _pdf1);
+    _counter = cycle;
   }
 
-  std::unique_ptr<State> operator()(const std::unique_ptr<State>& input) override {
-    setState(input);
+  std::unique_ptr<State> operator()(const std::unique_ptr<State>& input, int cycle) override {
+    setState(input, cycle);
 
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if(_mode != Mode::supervising){
@@ -394,8 +395,13 @@ public:
     }
     #endif
 
+    int numThreads = 1;
+    #if defined(_OPENMP)
+    numThreads = omp_get_num_threads();
+    #endif
+
     auto res = std::make_unique<LBCouetteSolver>( _channelheight, _wallVelocity * _dx / _dt, 
-      _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep, _filestem+std::string("_supervising"), _processes );
+      _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep, _filestem+std::string("_supervising"), _processes, numThreads, _scen );
 
     res->_mode = Mode::supervising;
     res->_dt_pint = _dt * num_cycles;

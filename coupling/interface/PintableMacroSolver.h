@@ -32,8 +32,8 @@ public:
 
 	virtual ~PintableMacroSolver() = 0;
 	virtual std::unique_ptr<State> getState() const = 0;
-	virtual void setState(const std::unique_ptr<State>&) = 0;
-	virtual std::unique_ptr<State> operator()(const std::unique_ptr<State>&) = 0;
+	virtual void setState(const std::unique_ptr<State>&, int cycle = 0) = 0;
+	virtual std::unique_ptr<State> operator()(const std::unique_ptr<State>&, int cycle = 0) = 0;
 	virtual Mode getMode() const = 0;
 	virtual std::unique_ptr<PintableMacroSolver> getSupervisor(int num_cycles, double visc_multiplier=1) const = 0;
 	virtual void print(std::ostream& os) const = 0;

@@ -8,8 +8,8 @@
 #include "coupling/InstanceHandling.h"
 #include "coupling/MultiMDMediator.h"
 #include "coupling/solvers/CouetteSolver.h"
-#include "coupling/solvers/LBCouetteSolver.h"
 #include "coupling/services/ParallelTimeIntegrationService.h"
+#include "coupling/solvers/LBCouetteSolver.h"
 #include "coupling/scenario/Scenario.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
@@ -180,7 +180,7 @@ protected:
   /** @brief initialises the macro and micro solver according to the setup from
    * the xml file and pre-proccses them */
   void initSolvers() {
-    _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>>(_mamicoConfig, this);
+    _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<3>>(_mamicoConfig, this);
     _rank = _timeIntegrationService->getRank(); // returns the rank inside local time domain
 
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
@@ -974,7 +974,8 @@ protected:
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
       solver =
-          new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette", _cfg.lbNumberProcesses, 1);
+          new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette", 
+            _cfg.lbNumberProcesses, 1, this);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);

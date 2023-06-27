@@ -6,7 +6,7 @@
 
 namespace coupling {
 namespace services {
-template <class LinkedCell, unsigned int dim> class ParallelTimeIntegrationService;
+template <unsigned int dim> class ParallelTimeIntegrationService;
 } // namespace services
 } // namespace coupling
 
@@ -31,7 +31,7 @@ st_ptr operator-(const st_ptr& lhs, const st_ptr& rhs){
  * 
  *  @author Piet Jarmatz
  */
-template <class LinkedCell, unsigned int dim> class coupling::services::ParallelTimeIntegrationService {
+template <unsigned int dim> class coupling::services::ParallelTimeIntegrationService {
 public:
     using State = coupling::interface::PintableMacroSolverState;
     using Solver = coupling::interface::PintableMacroSolver;
@@ -81,11 +81,13 @@ public:
         }
     }
 
-    int getPintDomain() { return _pint_domain; }
-    int getRank() { return _rank; }
+    int getPintDomain() const { return _pint_domain; }
+    int getRank() const { return _rank; }
+    bool isPinTEnabled() const { return _cfg.isPinTEnabled(); }
+    int getInteration() const { return _iteration; }
 
     #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm getPintComm() { return _local_pint_comm; }
+    MPI_Comm getPintComm() const { return _local_pint_comm; }
     #endif
 
 private:
@@ -94,8 +96,8 @@ private:
             _scenario->runOneCouplingCycle(cycle);
     }
 
-    bool isFirst() { return _pint_domain == 0; }
-    bool isLast()  { return _pint_domain == _cfg.getPintDomains()-1; }
+    bool isFirst() const { return _pint_domain == 0; }
+    bool isLast() const { return _pint_domain == _cfg.getPintDomains()-1; }
 
     struct PintDomain {
         /** @brief number of time steps (coupling cycles) in this temporal domain */
@@ -106,7 +108,7 @@ private:
         int maxCycle;
     };
 
-    PintDomain setup_domain(int num_cycles) {
+    PintDomain setup_domain(int num_cycles) const {
         PintDomain res;
         res.size = (int)( num_cycles / _cfg.getPintDomains() );
         res.minCycle = _pint_domain * res.size;
@@ -132,19 +134,23 @@ private:
         if(_cfg.getViscMultiplier() != 1.0)
             std::cout << "PINT_DEBUG: Starting supervisor with viscosity modified by " << _cfg.getViscMultiplier() << std::endl;
         #endif
-        _G = solver->getSupervisor(domain.size, _cfg.getViscMultiplier() );
+        _supervisor = solver->getSupervisor(domain.size, _cfg.getViscMultiplier() );
         _F = [this, solver, domain](const std::unique_ptr<State>& s){
-            solver->setState(s);
+            solver->setState(s, domain.minCycle);
             // TODO enable momentumTransfer on inner cells for MD equilibration steps here
             // TODO run MD equilibration here
             run_cycles(domain.minCycle, domain.maxCycle);
             // TODO double check that filter pipeline output ends up in solver.getState() here
             return solver->getState();
         };
+        _G = [this, domain](const std::unique_ptr<State>& s){
+            auto& G = *_supervisor;
+            return G(s, domain.minCycle);
+        };
         _u_0 = solver->getState();
     }
 
-    void receive(std::unique_ptr<State>& state){
+    void receive(std::unique_ptr<State>& state) const{
         int source_rank = _world_rank - _ranks_per_domain;
         if(!state) state = _u_0->clone();
         #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -152,14 +158,14 @@ private:
         #endif
     }
 
-    void send(std::unique_ptr<State>& state) {
+    void send(std::unique_ptr<State>& state) const {
         int destination_rank = _world_rank + _ranks_per_domain;
         #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         MPI_Send(state->getData(), state->getSizeBytes(), MPI_BYTE, destination_rank, 0, MPI_COMM_WORLD);
         #endif
     }
 
-    void get_past_state(std::unique_ptr<State>& state){
+    void get_past_state(std::unique_ptr<State>& state) const {
         if( isFirst() ) 
             state = _u_0->clone();
         else
@@ -168,21 +174,19 @@ private:
 
     void init_parareal(){
         get_past_state(_u_last_past);
-        auto& G = *_G;
-        _u_last_future = G(_u_last_past);
+        _u_last_future = _G(_u_last_past);
         if( !isLast() )
             send(_u_last_future);
     }
 
     void run_parareal(int iterations){
-        for(int it = 0; it < iterations; it++){
+        for(_iteration = 0; _iteration < iterations; _iteration++){
             // Correction step
-            auto& G = *_G;
-            auto delta = _F(_u_last_past) - G(_u_last_past);
+            auto delta = _F(_u_last_past) - _G(_u_last_past);
 
             // Prediction step
             get_past_state(_u_next_past);
-            auto prediction = G(_u_next_past);
+            auto prediction = _G(_u_next_past);
 
             // Refinement step
             _u_next_future = prediction + delta;
@@ -208,8 +212,9 @@ private:
     #endif
     coupling::configurations::TimeIntegrationConfiguration _cfg;
     Scenario* _scenario;
-    std::unique_ptr<Solver> _G;  // The supervisor, i.e. the coarse predictor
+    std::unique_ptr<Solver> _supervisor;  // The supervisor, i.e. the coarse predictor
     std::function<std::unique_ptr<State>(const std::unique_ptr<State>&)> _F;
+    std::function<std::unique_ptr<State>(const std::unique_ptr<State>&)> _G;
 
     // These objects represent coupled simulation states. There are used by the supervised parallel in time algorithm for operations
     // "last" and "next" describe two consecutive parareal iterations
@@ -219,4 +224,6 @@ private:
     std::unique_ptr<State> _u_last_future;
     std::unique_ptr<State> _u_next_past;
     std::unique_ptr<State> _u_next_future;
+
+    int _iteration{-1};  // there is an init phase before iteration zero, lets call it "-1"
 };

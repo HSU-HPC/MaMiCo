@@ -8,7 +8,6 @@
 #include <iostream>
 #include <string>
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/services/ParallelTimeIntegrationService.h"
 
 class Scenario {
 public:
@@ -20,9 +19,10 @@ public:
   virtual void runOneCouplingCycle(int cycle) = 0;
 
   virtual coupling::solvers::AbstractCouetteSolver<3>* getSolver() = 0;
+  const coupling::services::ParallelTimeIntegrationService<3>* getTimeIntegrationService() const {return _timeIntegrationService.get(); }
 
 protected:
-  std::unique_ptr<coupling::services::ParallelTimeIntegrationService<MY_LINKEDCELL, 3>> _timeIntegrationService;
+  std::unique_ptr<coupling::services::ParallelTimeIntegrationService<3>> _timeIntegrationService;
 
 private:
   const std::string _scenarioname;
