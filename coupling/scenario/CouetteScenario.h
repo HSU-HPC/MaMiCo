@@ -1026,9 +1026,11 @@ protected:
         }
       }
       tarch::la::Vector<3, unsigned int> cells_per_process{
-        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
-        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
-        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)
+	tarch::la::Vector<3,int>{
+          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
+          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
+          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)
+	}
       };
       interface = new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain,
                                                                   globalNumberMacroscopicCells, outerRegion);
@@ -1053,9 +1055,11 @@ protected:
         }
       }
       tarch::la::Vector<3, unsigned int> cells_per_process{
-        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
-        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
-        coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)
+	tarch::la::Vector<3,int>{
+          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
+          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
+          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)
+        }
       };
       interface = new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain,
                                                                   globalNumberMacroscopicCells, outerRegion);

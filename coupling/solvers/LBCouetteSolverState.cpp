@@ -21,7 +21,7 @@ std::unique_ptr<State> coupling::solvers::LBCouetteSolverState::operator+(const 
     #endif
 
     std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(*this);
-    for(int i=0; i<_pdf.size(); ++i)
+    for(std::vector<double>::size_type i=0; i<_pdf.size(); ++i)
       res->_pdf[i] += other->_pdf[i];
 
     return res;
@@ -42,7 +42,7 @@ std::unique_ptr<State> coupling::solvers::LBCouetteSolverState::operator-(const 
 	#endif
 
 	std::unique_ptr<LBCouetteSolverState> res = std::make_unique<LBCouetteSolverState>(*this);
-	for(int i=0; i<_pdf.size(); ++i)
+	for(std::vector<double>::size_type i=0; i<_pdf.size(); ++i)
 	  res->_pdf[i] -= other->_pdf[i];
 
 	return res;
