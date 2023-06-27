@@ -29,11 +29,11 @@ def get_attrs(file):
 	cycle = int(parts[idx][1:])
 	idx += 1
 	if(len(parts) <= idx):
-		iteration = 0
+		iteration = -1
 	else:
 		if parts[idx][0] != 'i':
 			raise IOException("Filename error, found strange file " + filename)
-	iteration = int(parts[idx][1:])
+		iteration = int(parts[idx][1:])
 	return (supervising, rank, cycle, iteration)
 
 modes = set()
@@ -73,27 +73,32 @@ data = data.sort_values(by=["supervising", "cycle", "iteration"])
 #print(data)
 
 import matplotlib.pyplot as plt
-import random
 
-def plot(df, label):
-	lw=random.randint(1, 5)
-	ls=random.choice(['-','--','-.',':'])
-	plt.plot(df.cycle, df.avg_vel, linestyle=ls, linewidth=lw, label=label)
+def plot(df, label, ls, lw):
+	plt.plot(df.cycle, df.avg_vel, label=label, linestyle=ls, linewidth=lw)
 
 for mode in modes:
 	if mode:
 		label = 'G'
+		ls = 'dotted'
 	else:
 		label = 'F'
+		ls = 'dashed'
 	for it in iterations:
-		full_label = label + '_' + str(it)
+		if it >= 0:
+			full_label = label + '_' + str(it)
+			lw = 1
+		else:
+			full_label = label + '_sequential'
+			lw = 2
+			ls = "solid"
 		subdataframe = data[(data['supervising'] == mode) & (data['iteration'] == it)]
 		size = len(subdataframe.index)
 		if(size > 0):
 			print("Data series " + full_label + " with size " + str(size) + " is: ")
 			print(subdataframe)
 			print()
-			plot(subdataframe, full_label)
+			plot(subdataframe, full_label, ls, lw)
 
 plt.legend()
 plt.xlabel("Coupling cycle")
