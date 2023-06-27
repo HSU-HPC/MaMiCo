@@ -383,12 +383,17 @@ else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
 
+# List of sources for all Mamico targets
+set(MAMICO_SOURCES
+  "coupling/indexing/IndexingService.cpp"
+  "coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/solvers/LBCouetteSolverState.cpp"
+)
 #
 # Couette target
 #
 set(COUETTE_SOURCES
-	"coupling/indexing/IndexingService.cpp"
-	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+	${MAMICO_SOURCES}
   "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
   "coupling/scenario/main_couette.cpp"
 )
@@ -404,11 +409,10 @@ target_link_libraries(couette PRIVATE mamico)
 #
 if("${MD_SIM}" STREQUAL "LAMMPS_MD")
   set(TEST_LAMMPS_SOURCES
+    ${MAMICO_SOURCES}
     "tarch/tinyxml2/tinyxml2.cpp"
-    "coupling/configurations/ParticleInsertionConfiguration.cpp"
     "tarch/utils/RandomNumberService.cpp"
     "coupling/test/integration/main_lammps.cpp"
-    "coupling/indexing/IndexingService.cpp"
   )
   add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
   set_target_properties(test_lammps PROPERTIES CXX_STANDARD 17)
@@ -423,8 +427,7 @@ endif()
 #
 if(BUILD_WITH_PYBIND11)
 	set(PYBIND_SOURCES11
-		"coupling/indexing/IndexingService.cpp"
-		"coupling/configurations/ParticleInsertionConfiguration.cpp"
+		${MAMICO_SOURCES}
     "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
 		"coupling/python-binding/mamico.cpp"
 	)
@@ -743,8 +746,7 @@ add_custom_target(
 # Benchmarks target
 #
 set(BENCHMARKS_SOURCES
-	"coupling/indexing/IndexingService.cpp"
-	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+	${MAMICO_SOURCES}
   "test/integration/cell_idx_iter_benchmark.cpp"
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
@@ -757,8 +759,7 @@ target_link_libraries(benchmarks PRIVATE mamico)
 if (BUILD_TESTING)    
   file(GLOB_RECURSE TEST_SOURCES "test/*Test.cpp")
   add_executable(testmamico 
-    "coupling/indexing/IndexingService.cpp"
-    "coupling/configurations/ParticleInsertionConfiguration.cpp" 
+    ${MAMICO_SOURCES} 
     "test/unit/main.cpp"
     ${TEST_SOURCES}
   )
