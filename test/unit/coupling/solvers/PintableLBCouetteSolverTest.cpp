@@ -20,6 +20,7 @@ class PintableLBCouetteSolverTest : public CppUnit::TestFixture {
     CPPUNIT_TEST( testMode );
     CPPUNIT_TEST( testReturnToZero );
     CPPUNIT_TEST( testRunIntoSameState );
+    CPPUNIT_TEST( testSupervisorRunIntoSameState );
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -36,8 +37,12 @@ public:
 
     F = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5,0,0}, 
         2.14, 2.5, 0.25, 0, "LBCouette", tarch::la::Vector<3, unsigned int>{1,1,1});
-    auto supervisor = F->getSupervisor(5,2);
+    int num_cycles = 5;
+    double visc_multiplier = 2;
+    auto supervisor = F->getSupervisor(num_cycles,visc_multiplier);
     G = std::unique_ptr<LBCouetteSolver>{dynamic_cast<LBCouetteSolver*>(supervisor.release())};
+    supervisor = F->getSupervisor(num_cycles,visc_multiplier);
+    G2 = std::unique_ptr<LBCouetteSolver>{dynamic_cast<LBCouetteSolver*>(supervisor.release())};
   }
 
   void testSetUp() {
@@ -116,9 +121,21 @@ public:
     return {a,b,c};
   }
 
+  void testSupervisorRunIntoSameState() {
+    std::unique_ptr<State> u0 = G->getState();
+    std::unique_ptr<State> u1_A = G->operator()(u0, 0);
+    std::unique_ptr<State> u1_B = u1_A->clone();
+
+    std::unique_ptr<State> u2_A = G->operator()(u1_A, 5);
+    std::unique_ptr<State> u2_B = G2->operator()(u1_B, 5);
+
+    CPPUNIT_ASSERT_EQUAL( *u2_A, *u2_B );
+    sameDensityAndVelocity(G, G2);
+  }
+
 private:
     int _size, _rank;
-    std::unique_ptr<LBCouetteSolver> F, G;
+    std::unique_ptr<LBCouetteSolver> F, G, G2;
 
 };
 
