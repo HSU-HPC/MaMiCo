@@ -33,7 +33,7 @@ public:
 	enum class Mode { supervising, coupling };
 
 	virtual ~PintableMacroSolver() {}
-	virtual std::unique_ptr<State> getState() const = 0;
+	virtual std::unique_ptr<State> getState() = 0;
 	virtual void setState(const std::unique_ptr<State>&, int cycle = 0) = 0;
 	virtual std::unique_ptr<State> operator()(const std::unique_ptr<State>&, int cycle = 0) = 0;
 	virtual Mode getMode() const = 0;

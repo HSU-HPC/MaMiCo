@@ -119,6 +119,7 @@ public:
         _pdf2[get(i) * 19 + q] = _W[q];
       }
     }
+    computeDensityAndVelocityEverywhere();
   }
 
   /** @brief a simple destructor */
@@ -265,6 +266,11 @@ public:
     if ((pos[0] < domainOffset[0]) || (pos[0] > domainOffset[0] + _domainSizeX * _dx) || (pos[1] < domainOffset[1]) ||
         (pos[1] > domainOffset[1] + _domainSizeY * _dx) || (pos[2] < domainOffset[2]) || (pos[2] > domainOffset[2] + _domainSizeZ * _dx)) {
       std::cout << "ERROR LBCouetteSolver::getVelocity(): Position " << pos << " out of range!" << std::endl;
+      std::cout << "domainOffset = " << domainOffset << std::endl;
+      std::cout << "_domainSizeX = " << _domainSizeX << std::endl;
+      std::cout << "_domainSizeY = " << _domainSizeY << std::endl;
+      std::cout << "_domainSizeZ = " << _domainSizeZ << std::endl;
+      std::cout << "_dx = " << _dx << std::endl;
       exit(EXIT_FAILURE);
     }
     // compute index for respective cell (_dx+... for ghost cells); use coords
@@ -314,7 +320,8 @@ public:
   /// Pint methods    ------   Pint methods    ------   Pint methods    ------   Pint methods    ------   Pint methods
   /// ------------------------------------------------------------------------------------------------------
 
-  std::unique_ptr<State> getState() const override {
+  std::unique_ptr<State> getState() override {
+    computeDensityAndVelocityEverywhere();
     return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
   }
 
@@ -329,6 +336,8 @@ public:
     #endif
 
     std::copy(state->getData(), state->getData() + _pdfsize, _pdf1);
+    computeDensityAndVelocityEverywhere();
+
     _counter = cycle;
   }
 
@@ -386,6 +395,19 @@ public:
 private:
   Mode _mode;
   double _dt_pint;
+
+  void computeDensityAndVelocityEverywhere() {
+    for (int z = 1; z < _domainSizeZ + 1; z++) {
+      for (int y = 1; y < _domainSizeY + 1; y++) {
+        for (int x = 1; x < _domainSizeX + 1; x++) {
+          const int index = get(x, y, z);
+          const int pI = 19 * index;
+          double* vel = &_vel[3 * index];
+          computeDensityAndVelocity(vel, _density[index], &_pdf1[pI]);
+        }
+      }
+    }
+  }
 
   /// ------------------------------------------------------------------------------------------------------
   /// End of Pint methods    ------      End of Pint methods    ------      End of Pint methods    ------      End of Pint methods
