@@ -128,7 +128,11 @@ private:
                 "macroscopic solver is not pintable (= not compatible with parallel in time coupling)" << std::endl;
             exit(EXIT_FAILURE);
         }
-        _G = solver->getSupervisor(domain.size, 2.0);
+        #ifdef PINT_DEBUG
+        if(_cfg.getViscMultiplier() != 1.0)
+            std::cout << "PINT_DEBUG: Starting supervisor with viscosity modified by " << _cfg.getViscMultiplier() << std::endl;
+        #endif
+        _G = solver->getSupervisor(domain.size, _cfg.getViscMultiplier() );
         _F = [this, solver, domain](const std::unique_ptr<State>& s){
             solver->setState(s);
             // TODO enable momentumTransfer on inner cells for MD equilibration steps here

@@ -23,7 +23,8 @@ class TimeIntegrationConfiguration;
 class coupling::configurations::TimeIntegrationConfiguration : public tarch::configuration::Configuration {
 public:
   /** Constructor, initializes the class  */
-  TimeIntegrationConfiguration() : _pint_domains(1), _pint_iterations(1), _auto_iteration(false), _isValid(true) {}
+  TimeIntegrationConfiguration() : _pint_domains(1), _pint_iterations(1),
+  _auto_iteration(false), _visc_multiplier(1), _isValid(true) {}
 
   /** Destructor */
   virtual ~TimeIntegrationConfiguration() {}
@@ -68,7 +69,9 @@ public:
           exit(EXIT_FAILURE);
         }
         _pint_iterations = buf;
-      }  
+      }
+
+      tarch::configuration::ParseConfiguration::readDoubleOptional(_visc_multiplier, node, "visc-multiplier");
     }
   }
 
@@ -86,11 +89,13 @@ public:
   bool isPinTEnabled() const { return _pint_domains > 1; }
   int getPintIterations() const { return _pint_iterations; }
   bool isAutoIteration() const { return _auto_iteration; }
+  double getViscMultiplier() const { return _visc_multiplier; }
 
 private:
   int _pint_domains;
   int _pint_iterations;
   bool _auto_iteration;
+  double _visc_multiplier;
 
   bool _isValid;
 };
