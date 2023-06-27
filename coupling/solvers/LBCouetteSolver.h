@@ -4,18 +4,19 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
 #define _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
 
-#if defined(_OPENMP)
-#include <omp.h>
-#endif
-#include "coupling/solvers/NumericalSolver.h"
-#include "coupling/interface/PintableMacroSolver.h"
-
 namespace coupling {
 namespace solvers {
 class LBCouetteSolver;
 class LBCouetteSolverState;
 }
 } // namespace coupling
+
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
+#include "coupling/solvers/NumericalSolver.h"
+#include "coupling/interface/PintableMacroSolver.h"
+#include <cmath>
 
 class coupling::solvers::LBCouetteSolverState : public coupling::interface::PintableMacroSolverState {
 public:
@@ -34,7 +35,7 @@ public:
   std::unique_ptr<State> operator+(const State& rhs) override;
   std::unique_ptr<State> operator-(const State& rhs) override;
 
-  bool operator==(const State& rhs) override {
+  bool operator==(const State& rhs) const override {
     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
     if(other == nullptr) return false;
     return _pdf == other->_pdf;
@@ -184,6 +185,8 @@ public:
       exit(EXIT_FAILURE);
     }
     for (int i = 0; i < timesteps; i++) {
+      if ( _plotEveryTimestep >= 1 && _counter % _plotEveryTimestep == 0)
+        computeDensityAndVelocityEverywhere();
       plot();
       collidestream();
       communicate(); // exchange between neighbouring MPI subdomains
@@ -392,6 +395,22 @@ public:
       os << "<LBCouetteSolver instance in coupling mode >";
   }
 
+  double get_avg_vel(const std::unique_ptr<State>& state) const override {
+    double vel[3];
+    double density;
+    double res[3]{0,0,0};
+    for(int i=0;i<_pdfsize;i+=19){
+      LBCouetteSolver::computeDensityAndVelocity(vel, density, state->getData()+i);
+      res[0] += vel[0];
+      res[1] += vel[1];
+      res[2] += vel[2];
+    }
+    res[0] /= (_pdfsize/19);
+    res[1] /= (_pdfsize/19);
+    res[2] /= (_pdfsize/19);
+    return std::sqrt(res[0]*res[0] + res[1]*res[1]+res[2]*res[2]);
+  }
+
 private:
   Mode _mode;
   double _dt_pint;
@@ -586,7 +605,7 @@ private:
    *  @param vel velocity
    *  @param density density
    *  @param pdf partial distribution function */
-  void computeDensityAndVelocity(double* const vel, double& density, const double* const pdf) {
+  static void computeDensityAndVelocity(double* const vel, double& density, const double* const pdf) {
     vel[0] = -(pdf[1] + pdf[5] + pdf[8] + pdf[11] + pdf[15]);
     density = pdf[3] + pdf[7] + pdf[10] + pdf[13] + pdf[17];
     vel[1] = (pdf[4] + pdf[11] + pdf[12] + pdf[13] + pdf[18]) - (pdf[0] + pdf[5] + pdf[6] + pdf[7] + pdf[14]);
