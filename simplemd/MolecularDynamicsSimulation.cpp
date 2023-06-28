@@ -715,10 +715,10 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   } else {
 #if (MD_BODY == 2) // TODO
     _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
-                                                                                                         *_lennardJonesForce, false); 
+                                                                                                         *_lennardJonesForce, MD_OPENMP); 
 #else   
     _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
-                                                                                                         *_axilrodTellerForce, false);
+                                                                                                         *_axilrodTellerForce, MD_OPENMP);
 #endif 
   }
 
