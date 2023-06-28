@@ -14,6 +14,9 @@
 #include "tarch/la/Vector.h"
 #include <iostream>
 #include <cmath>
+#if (MD_OPENMP == MD_YES)
+#include <omp.h>
+#endif
 
 namespace simplemd {
 namespace services {

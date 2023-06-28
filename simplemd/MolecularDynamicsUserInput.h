@@ -57,7 +57,11 @@
 #endif
 
 // OpenMP-Parallelisation (MD_YES/MD_NO)
+#ifdef OpenMP
+#define MD_OPENMP MD_YES
+#else
 #define MD_OPENMP MD_NO
+#endif
 
 // TEST_TCHIPEV (MD_YES/MD_NO). If no - two communication stages, if yes - one
 // communication stage.
