@@ -755,13 +755,13 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
     _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
   }
 
-  /*if (t % 500 == 0) {
+  if (t % 500 == 0) {
     cellmappings::VaryCheckpointMapping varyCheckpointMapping(
         _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getKB(),
         _configuration.getMoleculeConfiguration().getTemperature(), _configuration.getMoleculeConfiguration().getSigma(),
         _configuration.getDomainConfiguration().getMeshWidth());
     _linkedCellService->iterateCells(varyCheckpointMapping, MD_OPENMP);
-  }*/
+  }
 
   // empty linked lists
   _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
@@ -774,7 +774,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
 
   if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
-    if (t % 1 == 0)
+    if (t % 50 == 0)
       std::cout << "Finish MD timestep " << t << "..." << std::endl;
   }
 }
