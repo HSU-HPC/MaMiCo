@@ -290,11 +290,11 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     _linkedCellService->iterateCells(*_computeTotalForceMapping, MD_OPENMP);
 #endif
     _boundaryTreatment->emptyGhostBoundaryCells();
-    _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);  // TODO
+    _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate, MD_OPENMP);
 
     // sort molecules into linked cells
-    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false); // TODO
+    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
 
     // -------------- do initial force computations and position update (end)
     // ----------
@@ -570,10 +570,10 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     _linkedCellService->iterateCells(*_computeTotalForceMapping, MD_OPENMP);
 #endif
     _boundaryTreatment->emptyGhostBoundaryCells();
-    _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false); // TODO
+    _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate, MD_OPENMP);
     // sort molecules into linked cells
-    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false); // TODO
+    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
     // -------------- do initial force computations and position update (end)
     // ----------
   } // end is process not idle
@@ -708,19 +708,22 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
 #if (MD_BODY == 3 || AD_RES == MD_YES)
     _linkedCellService->iterateCellTriplets(*_axilrodTellerForce, MD_OPENMP);
 #endif
-#if (AD_RES == MD_YES)
-    // calculate total forces in adaptive resplution case
-    _linkedCellService->iterateCells(*_computeTotalForceMapping, MD_OPENMP);
-#endif
   } else {
-#if (MD_BODY == 2) // TODO
+#if (MD_BODY == 2 && AD_RES == MD_NO)
     _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
                                                                                                          *_lennardJonesForce, MD_OPENMP); 
-#else   
+#elif (MD_BODY == 3 && AD_RES == MD_NO)  
     _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
                                                                                                          *_axilrodTellerForce, MD_OPENMP);
+#else
+    _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
+                                                                                                         *_lennardJonesForce, *_axilrodTellerForce, MD_OPENMP);
 #endif 
   }
+#if (AD_RES == MD_YES)
+  // calculate total forces in adaptive resplution case
+  _linkedCellService->iterateCells(*_computeTotalForceMapping, MD_OPENMP);
+#endif
 
   evaluateStatistics(t);
 
@@ -729,14 +732,14 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   // plot VTK output
   if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() > 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
     _vtkMoleculeWriter->setTimestep(t);
-    _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false); // TODO
+    _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false);
   }
 
 #if BUILD_WITH_ADIOS2
   // plot Adios2 output
   if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() > 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
     _Adios2Writer->setTimestep(t);
-    _moleculeService->iterateMolecules(*_Adios2Writer, false); // TODO
+    _moleculeService->iterateMolecules(*_Adios2Writer, false);
   }
 #endif
 
@@ -752,26 +755,26 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
     _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
   }
 
-  if (t % 500 == 0) {
+  /*if (t % 500 == 0) {
     cellmappings::VaryCheckpointMapping varyCheckpointMapping(
         _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getKB(),
         _configuration.getMoleculeConfiguration().getTemperature(), _configuration.getMoleculeConfiguration().getSigma(),
         _configuration.getDomainConfiguration().getMeshWidth());
     _linkedCellService->iterateCells(varyCheckpointMapping, MD_OPENMP);
-  }
+  }*/
 
   // empty linked lists
-  _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false); // TODO
+  _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
 
   // time integration. After this step, the velocities and the positions of the
   // molecules have been updated.
   _moleculeService->iterateMolecules(*_timeIntegrator, MD_OPENMP);
 
   // sort molecules into linked cells
-  _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false); // TODO
+  _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
 
   if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
-    if (t % 50 == 0)
+    if (t % 1 == 0)
       std::cout << "Finish MD timestep " << t << "..." << std::endl;
   }
 }
@@ -793,7 +796,7 @@ void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned in
   if (_configuration.getRDFConfiguration().isDefined()) {
     if (t >= _configuration.getRDFConfiguration().getStartAtTimestep()) {
       if ((t - _configuration.getRDFConfiguration().getStartAtTimestep()) % _configuration.getRDFConfiguration().getEvaluateEveryTimestep() == 0) {
-        _linkedCellService->iterateCellPairs(*_rdfMapping, false); // TODO
+        _linkedCellService->iterateCellPairs(*_rdfMapping, false);
         if ((t - _configuration.getRDFConfiguration().getStartAtTimestep()) % _configuration.getRDFConfiguration().getWriteEveryTimestep() == 0) {
           _rdfMapping->evaluateRDF(_localMDSimulation);
         }
@@ -804,11 +807,11 @@ void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned in
   if ((timeInterval != 0) && (t % timeInterval == 0)) {
     // compute average velocity
     simplemd::cellmappings::ComputeMeanVelocityMapping computeMeanVelocityMapping(*_parallelTopologyService, _localMDSimulation);
-    _linkedCellService->iterateCells(computeMeanVelocityMapping, false); // TODO
+    _linkedCellService->iterateCells(computeMeanVelocityMapping, false);
     // compute average temperature
     simplemd::cellmappings::ComputeTemperatureMapping computeTemperatureMapping(*_parallelTopologyService, *_molecularPropertiesService,
                                                                                 computeMeanVelocityMapping.getMeanVelocity(), _localMDSimulation);
-    _linkedCellService->iterateCells(computeTemperatureMapping, false); // TODO
+    _linkedCellService->iterateCells(computeTemperatureMapping, false);
   }
 
   // trigger profile plotting

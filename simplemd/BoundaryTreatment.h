@@ -78,9 +78,10 @@ public:
   void putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(
       const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
       simplemd::services::ParallelTopologyService& parallelTopologyService, 
-#if (MD_BODY == 2)
+#if (MD_BODY == 2 || AD_RES == MD_YES)
       simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce,
-#else
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
       simplemd::cellmappings::AxilrodTellerForceMapping& axilrodTellerForce,
 #endif
       const bool& useOpenMP);
@@ -108,6 +109,11 @@ private:
   /** applies the mapping myMapping to all cells which are directly influenced by communication
    */
   template <class Mapping> void applyMappingToCommunicationDependentCells(const bool useOpenMP, Mapping& myMapping) const;
+
+#if (AD_RES == MD_YES)
+  /** returns true if the argument is of the defined class */
+  template <typename Base, typename T> bool instanceof(const T*) const;
+#endif
 
   simplemd::services::MoleculeService& _moleculeService;
   simplemd::services::LinkedCellService& _linkedCellService;
@@ -552,165 +558,353 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
 
 template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommunicationIndependentCells(const bool useOpenMP, Mapping& myMapping) const {
   // starting point and range of cells, on which we can (for example) compute forces before the messages carrying boundary and process-leaving particles
-  //  have arrived. Due to handling of iterateCellParis, we need to leave 1 inner cell on the "left" and 2 on the "right".
+  //  have arrived. In case of handling of iterateCellPairs/Triplets, we need to leave 1 inner cell on the "left" and 2 on the "right".
   //  Or, counting from ghost cells, we leave 2 cells on the "left" and 3 on the "right".
-  tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(_linkedCellService.getLocalIndexOfFirstCell());
-  tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(_linkedCellService.getLocalNumberOfCells());
+  tarch::la::Vector<MD_DIM, unsigned int> iterationStart(_linkedCellService.getLocalIndexOfFirstCell());
+  tarch::la::Vector<MD_DIM, unsigned int> iterationLength(_linkedCellService.getLocalNumberOfCells());
   for (unsigned int d = 0; d < MD_DIM; d++) {
-    pairIterationStart[d] += 1;
-    pairIterationLength[d] -= 3;
+    iterationStart[d] += 1;
+    iterationLength[d] -= 3;
   }
 
 // apply force mapping
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication independent cells on pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication independent cells on iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 }
 
 template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommunicationDependentCells(const bool useOpenMP, Mapping& myMapping) const {
   // apply mapping to all cell-pairs, not processed by the above function
 
-  tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(_linkedCellService.getLocalIndexOfFirstCell());
-  tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(_linkedCellService.getLocalNumberOfCells());
+  tarch::la::Vector<MD_DIM, unsigned int> iterationStart(_linkedCellService.getLocalIndexOfFirstCell());
+  tarch::la::Vector<MD_DIM, unsigned int> iterationLength(_linkedCellService.getLocalNumberOfCells());
 
 #if (MD_DIM == 1)
   // left side
-  pairIterationStart[0] = 0;
-  pairIterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + 1;
+  iterationStart[0] = 0;
+  iterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + 1;
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // right side
   // changing only necessary values:
-  pairIterationStart[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0] - 2;
+  iterationStart[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0] - 2;
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 #endif
 #if (MD_DIM == 2)
   // whole lower edge
-  pairIterationStart[0] = 0;
-  pairIterationStart[1] = 0;
-  pairIterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0];
-  pairIterationLength[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + 1;
+  iterationStart[0] = 0;
+  iterationStart[1] = 0;
+  iterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0];
+  iterationLength[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + 1;
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // whole upper edge
   // changing only necessary values:
-  pairIterationStart[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + _linkedCellService.getLocalNumberOfCells()[1] - 2;
+  iterationStart[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + _linkedCellService.getLocalNumberOfCells()[1] - 2;
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // remaining of left edge
-  pairIterationStart[0] = 0;
-  pairIterationStart[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + 1;
-  pairIterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + 1;
-  pairIterationLength[1] = _linkedCellService.getLocalNumberOfCells()[1] - 3;
+  iterationStart[0] = 0;
+  iterationStart[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + 1;
+  iterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + 1;
+  iterationLength[1] = _linkedCellService.getLocalNumberOfCells()[1] - 3;
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // remaining of right edge
   // changing only necessary values:
-  pairIterationStart[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0] - 2;
+  iterationStart[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0] - 2;
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
 #endif
 #if (MD_DIM == 3)
   // whole lower face
-  pairIterationStart[0] = 0;
-  pairIterationStart[1] = 0;
-  pairIterationStart[2] = 0;
+  iterationStart[0] = 0;
+  iterationStart[1] = 0;
+  iterationStart[2] = 0;
 
-  pairIterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0];
-  pairIterationLength[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + _linkedCellService.getLocalNumberOfCells()[1];
-  pairIterationLength[2] = _linkedCellService.getLocalIndexOfFirstCell()[2] + 1;
+  iterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0];
+  iterationLength[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + _linkedCellService.getLocalNumberOfCells()[1];
+  iterationLength[2] = _linkedCellService.getLocalIndexOfFirstCell()[2] + 1;
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // whole top face
   // changing only necessary values
-  pairIterationStart[2] = _linkedCellService.getLocalIndexOfFirstCell()[2] + _linkedCellService.getLocalNumberOfCells()[2] - 2;
+  iterationStart[2] = _linkedCellService.getLocalIndexOfFirstCell()[2] + _linkedCellService.getLocalNumberOfCells()[2] - 2;
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // remaining of left face
-  pairIterationStart[0] = 0;
-  pairIterationStart[1] = 0;
-  pairIterationStart[2] = _linkedCellService.getLocalIndexOfFirstCell()[2] + 1;
+  iterationStart[0] = 0;
+  iterationStart[1] = 0;
+  iterationStart[2] = _linkedCellService.getLocalIndexOfFirstCell()[2] + 1;
 
-  pairIterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + 1;
-  pairIterationLength[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + _linkedCellService.getLocalNumberOfCells()[1];
-  pairIterationLength[2] = _linkedCellService.getLocalNumberOfCells()[2] - 3;
+  iterationLength[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + 1;
+  iterationLength[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + _linkedCellService.getLocalNumberOfCells()[1];
+  iterationLength[2] = _linkedCellService.getLocalNumberOfCells()[2] - 3;
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // remaining of right face
-  pairIterationStart[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0] - 2;
+  iterationStart[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + _linkedCellService.getLocalNumberOfCells()[0] - 2;
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // remaining of front face
-  pairIterationStart[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + 1;
-  pairIterationStart[1] = 0;
-  pairIterationStart[2] = _linkedCellService.getLocalIndexOfFirstCell()[2] + 1;
+  iterationStart[0] = _linkedCellService.getLocalIndexOfFirstCell()[0] + 1;
+  iterationStart[1] = 0;
+  iterationStart[2] = _linkedCellService.getLocalIndexOfFirstCell()[2] + 1;
 
-  pairIterationLength[0] = _linkedCellService.getLocalNumberOfCells()[0] - 3;
-  pairIterationLength[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + 1;
-  pairIterationLength[2] = _linkedCellService.getLocalNumberOfCells()[2] - 3;
+  iterationLength[0] = _linkedCellService.getLocalNumberOfCells()[0] - 3;
+  iterationLength[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + 1;
+  iterationLength[2] = _linkedCellService.getLocalNumberOfCells()[2] - 3;
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 
   // remaining of back face
-  pairIterationStart[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + _linkedCellService.getLocalNumberOfCells()[1] - 2;
+  iterationStart[1] = _linkedCellService.getLocalIndexOfFirstCell()[1] + _linkedCellService.getLocalNumberOfCells()[1] - 2;
 
 #if (MD_DEBUG == MD_YES)
-  std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
-            << "\n with pairIterationLength: " << pairIterationLength << std::endl;
+  std::cout << "applying mapping on communication dependent cells with iterationStart: " << iterationStart
+            << "\n with iterationLength: " << iterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength, useOpenMP);
+#if (AD_RES == MD_YES)
+  if (instanceof<simplemd::cellmappings::LennardJonesForceMapping>(&myMapping)) {
+#endif
+#if (MD_BODY == 2 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellPairs(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  } else {
+#endif
+#if (MD_BODY == 3 || AD_RES == MD_YES)
+    _linkedCellService.iterateCellTriplets(myMapping, iterationStart, iterationLength, useOpenMP);
+#endif
+#if (AD_RES == MD_YES)
+  }
+#endif
 #endif
 }
+
+#if (AD_RES == MD_YES)
+template <typename Base, typename T> bool simplemd::BoundaryTreatment::instanceof(const T*) const {
+  return std::is_base_of<Base, T>::value;
+}
+#endif
 
 #endif // _MOLECULARDYNAMICS_BOUNDARYTREATMENT_H_
