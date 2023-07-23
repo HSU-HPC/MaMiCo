@@ -21,8 +21,8 @@ class ComputeTotalPotentialEnergyMapping;
  */
 class simplemd::cellmappings::ComputeTotalPotentialEnergyMapping {
 public:
-  ComputeTotalPotentialEnergyMapping(const double& domainSize, const double& interfaceStart, const double& interfaceLength, const unsigned int& dimension)
-      : _domainSize(domainSize), _interfaceStart(interfaceStart), _interfaceLength(interfaceLength), _dimension(dimension) {}
+  ComputeTotalPotentialEnergyMapping(const double& interfaceStart, const double& interfaceLength, const unsigned int& dimension)
+      : _interfaceStart(interfaceStart), _interfaceLength(interfaceLength), _dimension(dimension) {}
   ~ComputeTotalPotentialEnergyMapping() {}
 
   void beginCellIteration() {}
@@ -33,7 +33,6 @@ public:
                          const unsigned int& cellIndex1, const unsigned int& cellIndex2, const unsigned int& cellIndex3) {}
 
 private:
-  const double _domainSize;
   const double _interfaceStart;
   const double _interfaceLength;
   const unsigned int _dimension;
