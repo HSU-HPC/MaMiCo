@@ -191,7 +191,12 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       double potentialEnergy = 0.0;
 
       //molecule position
-      const tarch::la::Vector<3,double> moleculePosition = molecule.getPosition();
+      tarch::la::Vector<3,double> moleculePosition = molecule.getPosition();
+      for(int i = 0; i < 3; i++)
+      {
+          moleculePosition[i] = moleculePosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); //temporary till ls1 offset is natively supported
+      }
+
       tarch::la::Vector<3,double> tempMoleculePosition;
 
       //calculate force

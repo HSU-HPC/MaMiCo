@@ -31,7 +31,7 @@ public:
         }
         _locSimulation = simulation;
         _particleContainer = _locSimulation->getMoleculeContainer();
-        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
+        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
     }
     LS1RegionWrapper() : _startRegion{0,0,0}, _endRegion{0,0,0}, _curParticleID(0), _IDinited(false) {}
 
@@ -42,12 +42,12 @@ public:
             _startRegion[i] = startRegion[i];
             _endRegion[i] = endRegion[i];
         }
-        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
+        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
     }
 
     void iteratorReset()
     {
-        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
+        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
     }
 
     void iteratorNext() { ++_iterator; }
@@ -125,6 +125,8 @@ public:
         temp.setid(_curParticleID);
         _curParticleID += _IDIncrementor;
 
+        temp.setComponent(_locSimulation->getEnsemble()->getComponent(0));
+
         addMolecule(temp);
         //_particleContainer->addParticle(temp);
     }
@@ -134,31 +136,35 @@ public:
         //check if coords in region
         auto molPosition = molecule.getPosition();
         for(int i = 0; i < 3; i++) {molPosition[i] = molPosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i);} //temporary till ls1 offset is natively supported
+        std::cout << "deleting molecule at " << molPosition << std::endl;
         if(!isInRegion(molPosition))
             return;
         //check if molecule at location specified
+        std::cout << "molecule in region" << std::endl;
         double cutoff = _locSimulation->getcutoffRadius();
 
         double startBox[] = {molPosition[0]-cutoff/10, molPosition[1]-cutoff/10, molPosition[2]-cutoff/10};
         double endBox[] = {molPosition[0]+cutoff/10, molPosition[1]+cutoff/10, molPosition[2]+cutoff/10};
 
-        RegionParticleIterator temp = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ONLY_INNER_AND_BOUNDARY);
+        RegionParticleIterator _curIterator = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ALL_CELLS);
         bool found = false;
-        while(temp.isValid())
+        std::cout << "entering iterator "<< std::endl;
+        while(_curIterator.isValid())
         {
-            ::Molecule* temp = &(*_iterator);
+            ::Molecule* temp = &(*_curIterator);
+            std::cout << "molecule found at " << *temp <<std::endl;
             if(temp->r(0) == molPosition[0] && temp->r(1) == molPosition[1] && temp->r(2) == molPosition[2])
             {
                 found = true;
                 break;
             }
-            temp++;
+            ++_curIterator;
         }
         //delete molecule
         if(!found)
             return;
 
-        deleteMolecule(temp);
+        deleteMolecule(_curIterator);
         //_particleContainer->deleteMolecule(temp, false);
     }
 
