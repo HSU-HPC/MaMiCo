@@ -225,30 +225,16 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
           if(r2 < cutoff2)
           {
               const double r6 = r2 * r2 * r2;
-              const auto contrib =  (24.0 * epsilon / r2 * (sigma6/r6) * (1.0 - 2.0 * (sigma6/r6))) * r;
-              force += contrib;
+              const double sigByR = sigma6 / r6;
+              const auto forceContrib =  (24.0 * epsilon / r2 * sigByR * (1.0 - 2.0 * sigByR)) * r;
+              const double uContrib =  2.0* epsilon * sigByR * (sigByR - 1.0);
+              potentialEnergy += uContrib;
+              force += forceContrib;
           }
 
           region.iteratorNext();
       }
       //calculate energy (copied from coupling::interface, assuming that the molecule used here is a coupling::datastructures)
-      region.iteratorReset();
-      while(region.iteratorValid())
-      {
-          ::Molecule* temp = region.getParticleAtIterator();
-          tempMoleculePosition = { temp->r(0), temp->r(1), temp->r(2) };
-          const auto r = tempMoleculePosition - moleculePosition;
-          const double r2 = tarch::la::dot(r, r);
-          if(r2 < cutoff2)
-          {
-              const double r6 = r2 * r2 * r2;
-              const double contrib =  2.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0);
-              potentialEnergy += contrib;
-          }
-
-          region.iteratorNext();
-      }
-
       molecule.setForce(force);
       molecule.setPotentialEnergy(potentialEnergy);
     }
