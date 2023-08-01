@@ -135,12 +135,10 @@ public:
     {
         //check if coords in region
         auto molPosition = molecule.getPosition();
-        for(int i = 0; i < 3; i++) {molPosition[i] = molPosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i);} //temporary till ls1 offset is natively supported
-        std::cout << "deleting molecule at " << molPosition << std::endl;
+        for(int i = 0; i < 3; i++) {molPosition[i] = molPosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i);} //temporary till ls1 offset is natively supported;
         if(!isInRegion(molPosition))
             return;
         //check if molecule at location specified
-        std::cout << "molecule in region" << std::endl;
         double cutoff = _locSimulation->getcutoffRadius();
 
         double startBox[] = {molPosition[0]-cutoff/10, molPosition[1]-cutoff/10, molPosition[2]-cutoff/10};
@@ -148,11 +146,9 @@ public:
 
         RegionParticleIterator _curIterator = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ALL_CELLS);
         bool found = false;
-        std::cout << "entering iterator "<< std::endl;
         while(_curIterator.isValid())
         {
             ::Molecule* temp = &(*_curIterator);
-            std::cout << "molecule found at " << *temp <<std::endl;
             if(temp->r(0) == molPosition[0] && temp->r(1) == molPosition[1] && temp->r(2) == molPosition[2])
             {
                 found = true;
