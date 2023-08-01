@@ -3,6 +3,7 @@
 #ifndef LS1_REGION_WRAPPER_H_
 #define LS1_REGION_WRAPPER_H_
 
+#include <tuple>
 
 #include "ls1/src/particleContainer/RegionParticleIterator.h"
 #include "ls1/src/particleContainer/ParticleContainer.h"
@@ -163,6 +164,58 @@ public:
         deleteMolecule(_curIterator);
         //_particleContainer->deleteMolecule(temp, false);
     }
+
+    std::tuple<tarch::la::Vector<3,double>, double> calculateForceAndPositionAtPoint(const tarch::la::Vector<3,double> position)
+    {
+        tarch::la::Vector<3,double> force (0.0);
+        double potentialEnergy = 0.0;
+
+        //molecule position
+        tarch::la::Vector<3,double> moleculePosition = position;
+        for(int i = 0; i < 3; i++)
+        {
+            moleculePosition[i] = moleculePosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); //temporary till ls1 offset is natively supported
+        }
+
+        tarch::la::Vector<3,double> tempMoleculePosition;
+
+        //calculate force
+        //find all molecules within cutoff
+        double cutoff = global_simulation->getcutoffRadius();
+        Ensemble* ensemble = global_simulation->getEnsemble();
+        const double sigma = ensemble->getComponent(0)->getSigma(0);
+        const double epsilon = ensemble->getComponent(0)->ljcenter(0).eps();
+
+        const double sigma2 = sigma * sigma;
+        const double sigma6 = sigma2 * sigma2 * sigma2;
+
+        double startRegion[] = {moleculePosition[0] - cutoff, moleculePosition[1] - cutoff, moleculePosition[2] - cutoff};
+        double endRegion[] = {moleculePosition[0] + cutoff, moleculePosition[1] + cutoff, moleculePosition[2] + cutoff};
+
+        ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
+        double cutoff2 = cutoff * cutoff;
+
+        //calculate lennard jones energy
+        while(region.iteratorValid())
+        {
+            ::Molecule* temp = region.getParticleAtIterator();
+            tempMoleculePosition = { temp->r(0), temp->r(1), temp->r(2) };
+            const auto r = tempMoleculePosition - moleculePosition;
+            const double r2 = tarch::la::dot(r, r);
+            if(r2 < cutoff2)
+            {
+                const double r6 = r2 * r2 * r2;
+                const auto forceContrib =  (24.0 * epsilon / r2 * (sigma6 / r6)) * (1.0 - 2.0 * (sigma6 / r6)) * r;
+                const double uContrib =  2.0* epsilon * (sigma6 / r6) * ((sigma6 / r6) - 1.0);
+                potentialEnergy += uContrib;
+                force += forceContrib;
+            }
+
+            region.iteratorNext();
+        }
+        return std::make_tuple(force, potentialEnergy);
+    }
+
 
 private:
     double _startRegion[3], _endRegion[3];
