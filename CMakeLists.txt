@@ -364,7 +364,6 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
-target_include_directories(mamico INTERFACE "tarch/logging/")
 
 #
 # Main target
