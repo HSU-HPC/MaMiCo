@@ -165,7 +165,7 @@ public:
         //_particleContainer->deleteMolecule(temp, false);
     }
 
-    std::tuple<tarch::la::Vector<3,double>, double> calculateForceAndPositionAtPoint(const tarch::la::Vector<3,double> position)
+    std::tuple<tarch::la::Vector<3,double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3,double> position, double adjustCutoff)
     {
         tarch::la::Vector<3,double> force (0.0);
         double potentialEnergy = 0.0;

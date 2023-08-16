@@ -26,7 +26,8 @@ namespace coupling
 class coupling::interface::LS1MDSolverInterface : public coupling::interface::MDSolverInterface<ls1::LS1RegionWrapper, 3>
 {
   public:
-    LS1MDSolverInterface(): _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {}
+    LS1MDSolverInterface(): 
+    _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {}
     /** returns a particular linked cell inside a macroscopic cell.
      *  The macroscopic cells are currently located on the same process as the respective linked cells.
      *  However, several linked cells may be part of a macroscopic cell.
@@ -187,7 +188,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       tarch::la::Vector<3,double> force (0.0);
       double potentialEnergy = 0.0;
       //calculate energy (copied from coupling::interface, assuming that the molecule used here is a coupling::datastructures)
-      std::tie(force, potentialEnergy) = _fullDomainWrapper.calculateForceAndPositionAtPoint(molecule.getPosition());
+      std::tie(force, potentialEnergy) = _fullDomainWrapper.calculateForceAndPotentialAtPoint(molecule.getPosition(), true);
       molecule.setForce(force);
       molecule.setPotentialEnergy(potentialEnergy);
     }
