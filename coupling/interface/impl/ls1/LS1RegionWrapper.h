@@ -21,7 +21,16 @@ namespace ls1 {
 class LS1RegionWrapper
 {
 public:
-    LS1RegionWrapper(double startRegion[3], double endRegion[3], Simulation* simulation)
+    LS1RegionWrapper(double startRegion[3], double endRegion[3], Simulation* simulation) :
+        _locSimulation(simulation),
+        _particleContainer(simulation->getMoleculeContainer()),
+        _iterator(simulation->getMoleculeContainer()->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS)),
+        _cutoff(simulation->getcutoffRadius()),
+        _cutoff2(_cutoff*_cutoff),
+        _sigma(simulation->getEnsemble()->getComponent(0)->getSigma(0)),
+        _sigma6(_sigma*_sigma*_sigma*_sigma*_sigma*_sigma),
+        _epsilon(simulation->getEnsemble()->getComponent(0)->ljcenter(0).eps()),
+        _cutoffEnergy(2.0 * _epsilon * _sigma6 / (_cutoff2 * _cutoff2 * _cutoff2) * (_sigma6 / (_cutoff2* _cutoff2 * _cutoff2) - 1.0))
     {
         _curParticleID = 0;
         _IDinited = false;
@@ -30,11 +39,7 @@ public:
             _startRegion[i] = startRegion[i];
             _endRegion[i] = endRegion[i]; //boundingboxmin
         }
-        _locSimulation = simulation;
-        _particleContainer = _locSimulation->getMoleculeContainer();
-        _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
     }
-    LS1RegionWrapper() : _startRegion{0,0,0}, _endRegion{0,0,0}, _curParticleID(0), _IDinited(false) {}
 
     void setRegion(double startRegion[3], double endRegion[3])
     {
@@ -140,10 +145,9 @@ public:
         if(!isInRegion(molPosition))
             return;
         //check if molecule at location specified
-        double cutoff = _locSimulation->getcutoffRadius();
-
-        double startBox[] = {molPosition[0]-cutoff/10, molPosition[1]-cutoff/10, molPosition[2]-cutoff/10};
-        double endBox[] = {molPosition[0]+cutoff/10, molPosition[1]+cutoff/10, molPosition[2]+cutoff/10};
+        double margin = _cutoff/10;
+        double startBox[] = {molPosition[0]-margin, molPosition[1]-margin, molPosition[2]-margin};
+        double endBox[] = {molPosition[0]+margin, molPosition[1]+margin, molPosition[2]+margin};
 
         RegionParticleIterator _curIterator = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ALL_CELLS);
         bool found = false;
@@ -181,19 +185,11 @@ public:
 
         //calculate force
         //find all molecules within cutoff
-        double cutoff = global_simulation->getcutoffRadius();
-        Ensemble* ensemble = global_simulation->getEnsemble();
-        const double sigma = ensemble->getComponent(0)->getSigma(0);
-        const double epsilon = ensemble->getComponent(0)->ljcenter(0).eps();
 
-        const double sigma2 = sigma * sigma;
-        const double sigma6 = sigma2 * sigma2 * sigma2;
-
-        double startRegion[] = {moleculePosition[0] - cutoff, moleculePosition[1] - cutoff, moleculePosition[2] - cutoff};
-        double endRegion[] = {moleculePosition[0] + cutoff, moleculePosition[1] + cutoff, moleculePosition[2] + cutoff};
+        double startRegion[] = {moleculePosition[0] - _cutoff, moleculePosition[1] - _cutoff, moleculePosition[2] - _cutoff};
+        double endRegion[] = {moleculePosition[0] + _cutoff, moleculePosition[1] + _cutoff, moleculePosition[2] + _cutoff};
 
         ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
-        double cutoff2 = cutoff * cutoff;
 
         //calculate lennard jones energy
         while(region.iteratorValid())
@@ -202,11 +198,11 @@ public:
             tempMoleculePosition = { temp->r(0), temp->r(1), temp->r(2) };
             const auto r = tempMoleculePosition - moleculePosition;
             const double r2 = tarch::la::dot(r, r);
-            if(r2 < cutoff2)
+            if(r2 < _cutoff2)
             {
                 const double r6 = r2 * r2 * r2;
-                const auto forceContrib =  (24.0 * epsilon / r2 * (sigma6 / r6)) * (1.0 - 2.0 * (sigma6 / r6)) * r;
-                const double uContrib =  2.0* epsilon * (sigma6 / r6) * ((sigma6 / r6) - 1.0);
+                const auto forceContrib =  (24.0 * _epsilon / r2 * (_sigma6 / r6)) * (1.0 - 2.0 * (_sigma6 / r6)) * r;
+                const double uContrib =  2.0* _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff?_cutoffEnergy:0);
                 potentialEnergy += uContrib;
                 force += forceContrib;
             }
@@ -222,6 +218,10 @@ private:
     unsigned long int _curParticleID;
     int _IDIncrementor;
     bool _IDinited;
+    const double _cutoff, _cutoff2;
+    const double _sigma, _sigma6;
+    const double _epsilon;
+    const double _cutoffEnergy;
     Simulation* _locSimulation;
     RegionParticleIterator _iterator;
     ParticleContainer* _particleContainer;
