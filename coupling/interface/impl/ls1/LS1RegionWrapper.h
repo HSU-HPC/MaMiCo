@@ -24,7 +24,6 @@ public:
     LS1RegionWrapper(double startRegion[3], double endRegion[3], Simulation* simulation) :
         _locSimulation(simulation),
         _particleContainer(simulation->getMoleculeContainer()),
-        _iterator(simulation->getMoleculeContainer()->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS)),
         _cutoff(simulation->getcutoffRadius()),
         _cutoff2(_cutoff*_cutoff),
         _sigma(simulation->getEnsemble()->getComponent(0)->getSigma(0)),
@@ -39,6 +38,7 @@ public:
             _startRegion[i] = startRegion[i];
             _endRegion[i] = endRegion[i]; //boundingboxmin
         }
+        _iterator = simulation->getMoleculeContainer()->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
     }
 
     void setRegion(double startRegion[3], double endRegion[3])
