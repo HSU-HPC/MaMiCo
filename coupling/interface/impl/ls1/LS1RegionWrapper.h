@@ -120,9 +120,9 @@ public:
             _IDIncrementor = 1;
             
             #ifdef ENABLE_MPI
-                int curRank = global_simulation->domainDecomposition().getRank();
+                int curRank = simulation->domainDecomposition().getRank();
                 _curParticleID += curRank + 1;
-                _IDIncrementor = global_simulation->domainDecomposition().getNumProcs();
+                _IDIncrementor = simulation->domainDecomposition().getNumProcs();
             #endif
 
             _IDinited = true;
@@ -189,7 +189,7 @@ public:
         double startRegion[] = {moleculePosition[0] - _cutoff, moleculePosition[1] - _cutoff, moleculePosition[2] - _cutoff};
         double endRegion[] = {moleculePosition[0] + _cutoff, moleculePosition[1] + _cutoff, moleculePosition[2] + _cutoff};
 
-        ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
+        ls1::LS1RegionWrapper region(startRegion, endRegion, simulation);
 
         //calculate lennard jones energy
         while(region.iteratorValid())
