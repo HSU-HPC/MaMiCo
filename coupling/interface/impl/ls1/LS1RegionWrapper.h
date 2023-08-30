@@ -29,7 +29,7 @@ public:
         _sigma(simulation->getEnsemble()->getComponent(0)->getSigma(0)),
         _sigma6(_sigma*_sigma*_sigma*_sigma*_sigma*_sigma),
         _epsilon(simulation->getEnsemble()->getComponent(0)->ljcenter(0).eps()),
-        _cutoffEnergy(2.0 * _epsilon * _sigma6 / (_cutoff2 * _cutoff2 * _cutoff2) * (_sigma6 / (_cutoff2* _cutoff2 * _cutoff2) - 1.0))
+        _cutoffEnergy(4.0 * _epsilon * _sigma6 / (_cutoff2 * _cutoff2 * _cutoff2) * (_sigma6 / (_cutoff2* _cutoff2 * _cutoff2) - 1.0))
     {
         _curParticleID = 0;
         _IDinited = false;
@@ -202,7 +202,7 @@ public:
             {
                 const double r6 = r2 * r2 * r2;
                 const auto forceContrib =  (24.0 * _epsilon / r2 * (_sigma6 / r6)) * (1.0 - 2.0 * (_sigma6 / r6)) * r;
-                const double uContrib =  2.0* _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff?_cutoffEnergy:0);
+                const double uContrib =  4.0* _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff?_cutoffEnergy:0);
                 potentialEnergy += uContrib;
                 force += forceContrib;
             }
