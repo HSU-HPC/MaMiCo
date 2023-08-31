@@ -203,6 +203,9 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      */
     virtual void synchronizeMoleculesAfterMassModification() 
     {
+      #ifndef MARDYN_AUTOPAS
+	    global_simulation->getMoleculeContainer()->deleteOuterParticles();
+      #endif
       global_simulation->updateParticleContainerAndDecomposition(1.0, false);
     }
 
