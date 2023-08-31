@@ -25,8 +25,8 @@ namespace coupling
 class coupling::interface::LS1Molecule: public coupling::interface::Molecule<3>
 {
 public:
-    LS1Molecule(::Molecule *myMolecule): _myMolecule(myMolecule), _u(0.0){}
-    LS1Molecule(): _myMolecule(), _u(0.0){}
+    LS1Molecule(::Molecule *myMolecule): _myMolecule(myMolecule){}
+    LS1Molecule(): _myMolecule(){}
     virtual ~LS1Molecule(){}
 
     void setMolecule(::Molecule *newMolecule) { _myMolecule=newMolecule;}
@@ -138,6 +138,5 @@ public:
 
 private:
     ::Molecule* _myMolecule;
-    double _u;
 };
 #endif
