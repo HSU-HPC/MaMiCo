@@ -91,7 +91,7 @@ public:
     /** returns/ sets the potential energy of the molecule */
     virtual double getPotentialEnergy() const
     {
-        double _u = 0.0;
+        double u = 0.0;
 
         tarch::la::Vector<3,double> location1, location2;
         //if(_myMolecule == NULL) return 0.0;
@@ -122,14 +122,14 @@ public:
             {
                 const double r6 = r2 * r2 * r2;
                 const double contrib =  4.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0);
-                _u += contrib;
+                u += contrib;
             }
 
             region.iteratorNext();
         }
 
         //sum and return
-        return _u;
+        return u;
     }
     virtual void setPotentialEnergy(const double& potentialEnergy) 
     {
