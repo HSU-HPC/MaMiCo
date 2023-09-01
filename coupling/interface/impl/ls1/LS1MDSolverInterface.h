@@ -27,7 +27,10 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
 {
   public:
     LS1MDSolverInterface(): 
-    _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {}
+    _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) 
+    {
+      _fullDomainWrapper.setupIDcounterForParticleAddition();
+    }
     /** returns a particular linked cell inside a macroscopic cell.
      *  The macroscopic cells are currently located on the same process as the respective linked cells.
      *  However, several linked cells may be part of a macroscopic cell.

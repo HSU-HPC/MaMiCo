@@ -112,6 +112,8 @@ public:
         ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
         double cutoff2 = cutoff * cutoff;
 
+        double cutoffEnergy = 4.0 * epsilon * sigma6 / (cutoff2 * cutoff2 * cutoff2) * (sigma6 / (cutoff2* cutoff2 * cutoff2) - 1.0);
+
         //calculate lennard jones energy
         while(region.iteratorValid())
         {
@@ -121,7 +123,7 @@ public:
             if(r2 < cutoff2 && r2 != 0)
             {
                 const double r6 = r2 * r2 * r2;
-                const double contrib =  4.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0);
+                const double contrib =  4.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0) - cutoffEnergy;
                 u += contrib;
             }
 

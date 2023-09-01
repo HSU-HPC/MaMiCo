@@ -84,8 +84,29 @@ public:
         return isInRegion;
     }
 
+    void setupIDcounterForParticleAddition()
+    {
+        if(!_IDinited)
+        {
+            _curParticleID = _locSimulation->getTotalNumberOfMolecules() + 1;
+            _IDIncrementor = 1;
+            
+            #ifdef ENABLE_MPI
+                int curRank = _locSimulation->domainDecomposition().getRank();
+                _curParticleID += curRank + 1;
+                _IDIncrementor = _locSimulation->domainDecomposition().getNumProcs();
+            #endif
+            
+            _IDinited = true;
+        }
+    }
+
     void addMolecule(::Molecule &molecule)
     {
+        if(!_IDinited)
+        {
+            throw std::runtime_error("addMolecule used with a wrapper that did not have particle ID initalized");
+        }
         _particleContainer->addParticle(molecule);
     }
 
@@ -96,6 +117,11 @@ public:
 
     void addMolecule(const coupling::interface::Molecule<3> &molecule)
     {
+        if(!_IDinited)
+        {
+            throw std::runtime_error("addMolecule used with a wrapper that did not have particle ID initalized");
+        }
+
         ::Molecule temp;
 
         auto position = molecule.getPosition();
@@ -113,20 +139,6 @@ public:
         temp.setF(0, force[0]);  //more important for usher particles
         temp.setF(1, force[1]);
         temp.setF(2, force[2]);
-        
-        if(!_IDinited)
-        {
-            _curParticleID = _locSimulation->getTotalNumberOfMolecules() + 1;
-            _IDIncrementor = 1;
-            
-            #ifdef ENABLE_MPI
-                int curRank = _locSimulation->domainDecomposition().getRank();
-                _curParticleID += curRank + 1;
-                _IDIncrementor = _locSimulation->domainDecomposition().getNumProcs();
-            #endif
-
-            _IDinited = true;
-        }
 
         temp.setid(_curParticleID);
         _curParticleID += _IDIncrementor;
