@@ -18,12 +18,11 @@
 #include <limits>
 #include <sstream>
 
-namespace coupling {
-namespace solvers {
-template <unsigned int dim> class PreciceAdapter;
-template <unsigned int dim> class PreciceInterface;
-} // namespace solvers
-} // namespace coupling
+namespace precice_scenario{
+  template <unsigned int dim> class PreciceAdapter;
+  template <unsigned int dim> class PreciceInterface;
+  template <unsigned int dim> class PreciceInterfaceForEvaporation;
+}
 
 /**
  * Adapter for the preCICE library
@@ -31,7 +30,7 @@ template <unsigned int dim> class PreciceInterface;
  * 'Cells' are used in the MaMiCo context (elements consituting the MaMiCo cartesian grid)
  * CellIndexing system should be initialized prior to using this class
  */
-template <unsigned int dim> class coupling::solvers::PreciceAdapter {
+template <unsigned int dim> class precice_scenario::PreciceAdapter {
 public:
   PreciceAdapter(): _M2mMeshName("mamico-M2m-mesh"), _m2MMeshName("mamico-m2M-mesh"), _M2mVelocityName("VelocityMacro"), _m2MVelocityName("VelocityMicro"), _rank(0) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -68,6 +67,14 @@ public:
     if (_m2MVertexIndices != NULL) {
       delete[] _m2MVertexIndices;
     }
+    if (_M2mCellIndices != NULL) {
+      delete[] _M2mCellIndices;
+    }
+    if (_m2MCellIndices != NULL) {
+      delete[] _m2MCellIndices;
+    }
+    deleteBuffer(_M2mCells);
+    deleteBuffer(_m2MCells);
   }
 
   std::vector<coupling::datastructures::MacroscopicCell<3>*> getM2mCells() {
@@ -86,7 +93,7 @@ public:
     return _m2MCellIndices;
   }
 
-  void setMeshes(coupling::solvers::PreciceInterface<dim>* _macroscopicSolverInterface, const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize) {
+  void setMeshes(precice_scenario::PreciceInterface<dim>* _macroscopicSolverInterface, const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize) {
     std::vector<double> M2mVertexCoords;
     std::vector<unsigned int> M2mCellIndices;
     using namespace coupling::indexing;
@@ -117,6 +124,7 @@ public:
     std::copy(M2mCellIndices.begin(), M2mCellIndices.end(), _M2mCellIndices);
   
     std::vector<double> m2MVertexCoords;
+    double offset[dim] = {0, -180+1.25, 0}; 
     std::vector<unsigned int> m2MCellIndices;
     using namespace coupling::indexing;
     for (auto cellIndex_v : CellIndex<dim, IndexTrait::vector>()) {
@@ -126,7 +134,7 @@ public:
         if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
           for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
             m2MVertexCoords.push_back(mdDomainOffset[currentDim] + cellIndex_v.get()[currentDim] * macroscopicCellSize[currentDim] -
-                                    macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim]);
+                                    macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim] + offset[currentDim]);
           }
           _m2MCells.push_back(new coupling::datastructures::MacroscopicCell<3>());
           m2MCellIndices.push_back(convertToScalar<dim>(cellIndex_v));
@@ -163,7 +171,7 @@ public:
 
   double advance(const double dt) { return _solverInterface->advance(dt); }
 
-  void readVelocities(double massCell) {
+  void readData(double massCell) {
     if (_solverInterface->hasMesh(_M2mMeshName)) {
       _solverInterface->readBlockVectorData(_solverInterface->getDataID(_M2mVelocityName, _solverInterface->getMeshID(_M2mMeshName)), _M2mVertexNumbers,
                                             _M2mVertexIndices, _M2mVertexVelocities);
@@ -179,10 +187,8 @@ public:
     }
   }
 
-  void writeVelocities() {
+  void writeData() {
     if (_solverInterface->hasMesh(_m2MMeshName)) {
-      _solverInterface->writeBlockVectorData(_solverInterface->getDataID(_m2MVelocityName, _solverInterface->getMeshID(_m2MMeshName)), _m2MVertexNumbers,
-                                             _m2MVertexIndices, _m2MVertexVelocities);
       for (size_t i = 0; i < _m2MCells.size(); i++) {
         tarch::la::Vector<3, double> velocity{0.0};
         if (_m2MCells[i]->getMacroscopicMass() != 0.0) {
@@ -192,6 +198,20 @@ public:
           _m2MVertexVelocities[dim * i + currentDim] = velocity[currentDim];
         }
       }
+      _solverInterface->writeBlockVectorData(_solverInterface->getDataID(_m2MVelocityName, _solverInterface->getMeshID(_m2MMeshName)), _m2MVertexNumbers,
+                                             _m2MVertexIndices, _m2MVertexVelocities);
+    }
+  }
+
+  void writeData(double value) {
+    if (_solverInterface->hasMesh(_m2MMeshName)) {
+      for (size_t i = 0; i < _m2MCells.size(); i++) {
+        _m2MVertexVelocities[dim * i] = 0.0;
+        _m2MVertexVelocities[dim * i + 1] = value;
+        _m2MVertexVelocities[dim * i + 2] = 0.0;
+      }
+      _solverInterface->writeBlockVectorData(_solverInterface->getDataID(_m2MVelocityName, _solverInterface->getMeshID(_m2MMeshName)), _m2MVertexNumbers,
+                                             _m2MVertexIndices, _m2MVertexVelocities);
     }
   }
 
@@ -230,6 +250,16 @@ private:
     return tetrahedronsVertexIndices;
   }
 
+  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<dim>*>& buffer) const {
+    for (unsigned int i = 0; i < buffer.size(); i++) {
+      if (buffer[i] != NULL) {
+        delete buffer[i];
+        buffer[i] = NULL;
+      }
+    }
+    buffer.clear();
+  }
+
   const std::string _M2mMeshName;
   const std::string _m2MMeshName;
   const std::string _M2mVelocityName;
@@ -255,12 +285,12 @@ private:
   unsigned int* _m2MCellIndices;
 };
 
-template <unsigned int dim> class coupling::solvers::PreciceInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
+template <unsigned int dim> class precice_scenario::PreciceInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
 public:
-  PreciceInterface(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap, const unsigned int rank)
-      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _rank(rank) {}
+  PreciceInterface(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap)
+      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap) {}
 
-  bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
     bool rcv = true;
     for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
       rcv &= globalCellIndex[currentDim] >= 1 + (_overlap - 1);
@@ -269,7 +299,7 @@ public:
     return rcv;
   }
 
-  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
     bool isGhostCell = false;
     bool isInner = true;
     for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
@@ -296,8 +326,65 @@ public:
   //   return ranks; 
   // }
 
-private:
+protected:
   const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
   const unsigned int _overlap;
-  const unsigned int _rank;
+};
+
+template <unsigned int dim> class precice_scenario::PreciceInterfaceForEvaporation : public precice_scenario::PreciceInterface<dim> {
+public:
+  PreciceInterfaceForEvaporation(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap) : precice_scenario::PreciceInterface<dim>(globalNumberMacroscopicCells, overlap) {}
+
+  bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+    bool isGhostCell = false;
+    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+      isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
+      isGhostCell |= globalCellIndex[currentDim] < 1;
+    }
+    return !isGhostCell && globalCellIndex[1] == this->_globalNumberMacroscopicCells[1];
+  }
+
+  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    bool isGhostCell = false;
+    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+      isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
+      isGhostCell |= globalCellIndex[currentDim] < 1;
+    }
+    return !isGhostCell && (globalCellIndex[1] == 1 || globalCellIndex[1] == 2 || globalCellIndex[1] == 3);
+  }
+
+  std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { 
+    std::vector<unsigned int> ranks;
+    int size = 1;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+#endif
+    for (int i = 0; i < size; i++)
+    {
+      ranks.push_back(i);
+    }
+    
+    return ranks;
+  }
+
+  // bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+  //   bool rcv = true;
+  //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+  //     rcv &= globalCellIndex[currentDim] >= 1 + (this->_overlap - 1);
+  //     rcv &= globalCellIndex[currentDim] < this->_globalNumberMacroscopicCells[currentDim] + 1 - (this->_overlap - 1);
+  //   }
+  //   return rcv;
+  // }
+
+  // bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+  //   bool isGhostCell = false;
+  //   bool isInner = true;
+  //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+  //     isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
+  //     isGhostCell |= globalCellIndex[currentDim] < 1;
+  //     isInner &= globalCellIndex[currentDim] >= 1 + this->_overlap;
+  //     isInner &= globalCellIndex[currentDim] < this->_globalNumberMacroscopicCells[currentDim] + 1 - this->_overlap;
+  //   }
+  //   return (!isGhostCell) && (!isInner);
+  // }
 };

@@ -9,7 +9,7 @@
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
-#include "coupling/solvers/PreciceAdapter.h"
+#include "coupling/scenario/precice/PreciceAdapter.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/Configuration.h"
 #include "tarch/configuration/ParseConfiguration.h"
@@ -27,20 +27,15 @@
 using Log::global_log;
 #endif
 
-class PreciceScenario : public Scenario {
+namespace precice_scenario{
+  class CouetteScenario;
+}
+
+
+class precice_scenario::CouetteScenario : public Scenario {
 public:
-  PreciceScenario() : Scenario("PreciceScenario") {}
-  ~PreciceScenario() {
-    deleteBuffer(_buf._M2mBuffer);
-    if (_buf._M2mCellIndices != NULL) {
-      delete[] _buf._M2mCellIndices;
-      _buf._M2mCellIndices = NULL;
-    }
-    deleteBuffer(_buf._m2MBuffer);
-    if (_buf._m2MCellIndices != NULL) {
-      delete[] _buf._m2MCellIndices;
-      _buf._m2MCellIndices = NULL;
-    }
+  CouetteScenario() : Scenario("couette") {}
+  ~CouetteScenario() {
     if (_instanceHandling != nullptr) {
       delete _instanceHandling;
     }
@@ -108,7 +103,7 @@ public:
     }
     const unsigned int overLap = mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap();
 
-    _macroscopicSolverInterface = new coupling::solvers::PreciceInterface<dim>(numberCells, overLap, rank);
+    _macroscopicSolverInterface = new precice_scenario::PreciceInterface<dim>(numberCells, overLap);
 
     coupling::indexing::IndexingService<dim>::getInstance().init(mdConfig, mamicoConfig, _macroscopicSolverInterface, rank);
 
@@ -121,7 +116,7 @@ public:
     
     _multiMDCellService->computeAndStoreTemperature(scenarioConfig.temp);
     
-    _preciceAdapter = new coupling::solvers::PreciceAdapter<dim>();
+    _preciceAdapter = new precice_scenario::PreciceAdapter<dim>();
     _preciceAdapter->setMeshes(_macroscopicSolverInterface, domainOffset, cellSize);
     double precice_dt = _preciceAdapter->initialize();
     double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
@@ -131,7 +126,7 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
     while (_preciceAdapter->isCouplingOngoing()) {
-      _preciceAdapter->readVelocities(massCell);
+      _preciceAdapter->readData(massCell);
       _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
       if (!scenarioConfig.couetteAnalytical) {
         _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
@@ -150,7 +145,7 @@ public:
           _preciceAdapter->getm2MCells()[i]->setMacroscopicMomentum(momentum);
         }
       }
-      _preciceAdapter->writeVelocities();
+      _preciceAdapter->writeData();
       precice_dt = _preciceAdapter->advance(mamico_dt);
       if (precice_dt < mamico_dt)
         std::cout << "warning: rank " << rank << " maximum timestep from preCICE (" << precice_dt << ") is lower than MaMiCo timestep (" << mamico_dt << ")"
@@ -245,17 +240,9 @@ private:
     double kinematicViscosity;
   };
 
-  struct CouplingBuffer {
-    std::vector<coupling::datastructures::MacroscopicCell<3>*> _M2mBuffer;
-    unsigned int* _M2mCellIndices;
-    std::vector<coupling::datastructures::MacroscopicCell<3>*> _m2MBuffer;
-    unsigned int* _m2MCellIndices;
-  };
-
-  coupling::solvers::PreciceAdapter<3>* _preciceAdapter;
-  coupling::solvers::PreciceInterface<3>* _macroscopicSolverInterface;
+  precice_scenario::PreciceAdapter<3>* _preciceAdapter;
+  precice_scenario::PreciceInterface<3>* _macroscopicSolverInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
-  CouplingBuffer _buf;
 };

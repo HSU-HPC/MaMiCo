@@ -6,10 +6,10 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #if (BUILD_WITH_PRECICE)
-#include "coupling/scenario/PreciceScenario.h"
-#else
-#include "coupling/scenario/CouetteScenario.h"
+#include "coupling/scenario/precice/CouetteScenario.h"
+#include "coupling/scenario/precice/EvaporationScenario.h"
 #endif
+#include "coupling/scenario/CouetteScenario.h"
 #include <cstdlib>
 #include <iostream>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -35,7 +35,16 @@ int main(int argc, char* argv[]) {
   // run scenarios
   Scenario* scenario;
 #if (BUILD_WITH_PRECICE)
-  scenario = new PreciceScenario();
+  if (argc > 1) {  
+    std::string scenarioName(argv[1]);
+    if (scenarioName == "couette") {
+      scenario = new precice_scenario::CouetteScenario();
+    } else if (scenarioName == "evaporation") {
+      scenario = new precice_scenario::EvaporationScenario();
+    } else { // default to couette scenario
+      scenario = new CouetteScenario();    
+    }
+  }
 #else
   scenario = new CouetteScenario();
 #endif
