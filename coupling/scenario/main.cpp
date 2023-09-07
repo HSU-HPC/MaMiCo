@@ -44,6 +44,8 @@ int main(int argc, char* argv[]) {
     } else { // default to couette scenario
       scenario = new CouetteScenario();    
     }
+  } else {
+    scenario = new CouetteScenario();
   }
 #else
   scenario = new CouetteScenario();

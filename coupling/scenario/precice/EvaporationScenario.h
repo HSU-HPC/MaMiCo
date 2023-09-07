@@ -106,7 +106,7 @@ public:
     }
     const unsigned int overLap = mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap();
 
-    _macroscopicSolverInterface = new precice_scenario::PreciceInterfaceForEvaporation<dim>(numberCells, overLap);
+    _macroscopicSolverInterface = new MacroscopicSolverInterface<dim>(numberCells, overLap);
 
     coupling::indexing::IndexingService<dim>::getInstance().init(mdConfig, mamicoConfig, _macroscopicSolverInterface, rank);
 
@@ -128,18 +128,21 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
+    int updateFrequency = 10000;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData(massCell);
       // _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
       double feedrate = 0.0;
-      int count = 0;
-      for (unsigned int i = 0; i < _preciceAdapter->getM2mCells().size(); i++) {
-        if (_preciceAdapter->getM2mCells()[i]->getMicroscopicMass() != 0.0) {
-          feedrate += _preciceAdapter->getM2mCells()[i]->getMicroscopicMomentum()[1] / _preciceAdapter->getM2mCells()[i]->getMicroscopicMass();
-          count++;
+      if (mdStepCounter % updateFrequency > 0) {
+        int count = 0;
+        for (unsigned int i = 0; i < _preciceAdapter->getM2mCells().size(); i++) {
+          if (_preciceAdapter->getM2mCells()[i]->getMicroscopicMass() != 0.0) {
+            feedrate += _preciceAdapter->getM2mCells()[i]->getMicroscopicMomentum()[1] / _preciceAdapter->getM2mCells()[i]->getMicroscopicMass();
+            count++;
+          }
         }
+        if (count != 0) feedrate /= count;
       }
-      if (count != 0) feedrate /= count;
       MettDeamon* mettDeamon = nullptr;
       std::list<PluginBase*>& plugins = *(global_simulation->getPluginList() );
       for (auto&& pit:plugins) {
@@ -148,21 +151,23 @@ public:
           mettDeamon = dynamic_cast<MettDeamon*>(pit);
       }
       mettDeamon->setActualFeedrate(feedrate);
-      // std::cout << "rank: " << rank << ", feed rate given to plugin :" << feedrate << std::endl;
+      std::cout << "rank: " << rank << ", feed rate given to plugin :" << feedrate << std::endl;
       _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
       mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
       _multiMDCellService->sendFromMD2Macro(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices());
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
-      MettDeamonFeedrateDirector* mettDeamonFeedrateDirector = nullptr;
-      for (auto&& pit:plugins) {
-        std::string name = pit->getPluginName();
-        if(name == "MettDeamonFeedrateDirector")
-          mettDeamonFeedrateDirector = dynamic_cast<MettDeamonFeedrateDirector*>(pit);
+      if (mdStepCounter % updateFrequency > 0) {
+        MettDeamonFeedrateDirector* mettDeamonFeedrateDirector = nullptr;
+        for (auto&& pit:plugins) {
+          std::string name = pit->getPluginName();
+          if(name == "MettDeamonFeedrateDirector")
+            mettDeamonFeedrateDirector = dynamic_cast<MettDeamonFeedrateDirector*>(pit);
+        }
+        feedrate = mettDeamonFeedrateDirector->getFeedrate();
       }
-      feedrate = mettDeamonFeedrateDirector->getFeedrate();
-      // std::cout << "rank: " << rank << ", feed rate from plugin MDFD:" << feedrate << std::endl;
+      std::cout << "rank: " << rank << ", feed rate from plugin MDFD:" << feedrate << std::endl;
       _preciceAdapter->writeData(feedrate);
-      // _preciceAdapter->writeData();
+        // _preciceAdapter->writeData();
       precice_dt = _preciceAdapter->advance(mamico_dt);
       if (precice_dt < mamico_dt)
         std::cout << "warning: rank " << rank << " maximum timestep from preCICE (" << precice_dt << ") is lower than MaMiCo timestep (" << mamico_dt << ")"
@@ -257,8 +262,73 @@ private:
     double kinematicViscosity;
   };
 
+template <unsigned int dim> class MacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
+public:
+  MacroscopicSolverInterface(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap)
+      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap) {}
+
+  bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+    bool isGhostCell = false;
+    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+      isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
+      isGhostCell |= globalCellIndex[currentDim] < 1;
+    }
+    return !isGhostCell && globalCellIndex[1] == this->_globalNumberMacroscopicCells[1];
+  }
+
+  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    bool isGhostCell = false;
+    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+      isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
+      isGhostCell |= globalCellIndex[currentDim] < 1;
+    }
+    return !isGhostCell && (globalCellIndex[1] == 1 || globalCellIndex[1] == 2 || globalCellIndex[1] == 3);
+  }
+
+  std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
+
+  std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { 
+    std::vector<unsigned int> ranks;
+    int size = 1;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+#endif
+    for (int i = 0; i < size; i++)
+    {
+      ranks.push_back(i);
+    }
+    
+    return ranks;
+  }
+
+  // bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+  //   bool rcv = true;
+  //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+  //     rcv &= globalCellIndex[currentDim] >= 1 + (this->_overlap - 1);
+  //     rcv &= globalCellIndex[currentDim] < this->_globalNumberMacroscopicCells[currentDim] + 1 - (this->_overlap - 1);
+  //   }
+  //   return rcv;
+  // }
+
+  // bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+  //   bool isGhostCell = false;
+  //   bool isInner = true;
+  //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+  //     isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
+  //     isGhostCell |= globalCellIndex[currentDim] < 1;
+  //     isInner &= globalCellIndex[currentDim] >= 1 + this->_overlap;
+  //     isInner &= globalCellIndex[currentDim] < this->_globalNumberMacroscopicCells[currentDim] + 1 - this->_overlap;
+  //   }
+  //   return (!isGhostCell) && (!isInner);
+  // }
+
+private:
+  const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
+  const unsigned int _overlap;
+};
+
   precice_scenario::PreciceAdapter<3>* _preciceAdapter;
-  precice_scenario::PreciceInterface<3>* _macroscopicSolverInterface;
+  MacroscopicSolverInterface<3>* _macroscopicSolverInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;

@@ -103,7 +103,7 @@ public:
     }
     const unsigned int overLap = mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap();
 
-    _macroscopicSolverInterface = new precice_scenario::PreciceInterface<dim>(numberCells, overLap);
+    _macroscopicSolverInterface = new MacroscopicSolverInterface<dim>(numberCells, overLap);
 
     coupling::indexing::IndexingService<dim>::getInstance().init(mdConfig, mamicoConfig, _macroscopicSolverInterface, rank);
 
@@ -240,8 +240,54 @@ private:
     double kinematicViscosity;
   };
 
+template <unsigned int dim> class MacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
+public:
+  MacroscopicSolverInterface(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap)
+      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap) {}
+
+  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+    bool rcv = true;
+    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+      rcv &= globalCellIndex[currentDim] >= 1 + (_overlap - 1);
+      rcv &= globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - (_overlap - 1);
+    }
+    return rcv;
+  }
+
+  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    bool isGhostCell = false;
+    bool isInner = true;
+    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+      isGhostCell |= globalCellIndex[currentDim] > _globalNumberMacroscopicCells[currentDim];
+      isGhostCell |= globalCellIndex[currentDim] < 1;
+      isInner &= globalCellIndex[currentDim] >= 1 + _overlap;
+      isInner &= globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - _overlap;
+    }
+    return (!isGhostCell) && (!isInner);
+  }
+
+  std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
+
+  // std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { 
+  //   coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<dim,int>>(globalCellIndex)};
+  //   std::vector<unsigned int> ranks = coupling::indexing::IndexingService<dim>::getInstance().getRanksForGlobalIndex(cellIndex_v);
+  //   return ranks;
+  // }
+
+  // std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+  //   const unsigned int rank = coupling::indexing::IndexingService<dim>::getInstance().getUniqueRankForGlobalIndex(globalCellIndex);
+  //   std::vector<unsigned int> ranks;
+  //   ranks.push_back(rank);
+  //   return ranks; 
+  // }
+
+private:
+  const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
+  const unsigned int _overlap;
+};
+
   precice_scenario::PreciceAdapter<3>* _preciceAdapter;
-  precice_scenario::PreciceInterface<3>* _macroscopicSolverInterface;
+  MacroscopicSolverInterface<3>* _macroscopicSolverInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;

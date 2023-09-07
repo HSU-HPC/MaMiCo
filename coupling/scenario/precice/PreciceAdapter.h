@@ -20,8 +20,6 @@
 
 namespace precice_scenario{
   template <unsigned int dim> class PreciceAdapter;
-  template <unsigned int dim> class PreciceInterface;
-  template <unsigned int dim> class PreciceInterfaceForEvaporation;
 }
 
 /**
@@ -93,7 +91,7 @@ public:
     return _m2MCellIndices;
   }
 
-  void setMeshes(precice_scenario::PreciceInterface<dim>* _macroscopicSolverInterface, const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize) {
+  void setMeshes(coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface, const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize) {
     std::vector<double> M2mVertexCoords;
     std::vector<unsigned int> M2mCellIndices;
     using namespace coupling::indexing;
@@ -124,7 +122,7 @@ public:
     std::copy(M2mCellIndices.begin(), M2mCellIndices.end(), _M2mCellIndices);
   
     std::vector<double> m2MVertexCoords;
-    double offset[dim] = {0, -180+1.25, 0}; 
+    double offset[dim] = {0, /*MD size*/-120/*CFD size*/-20/*half a mamico cell*/+1.25, 0}; 
     std::vector<unsigned int> m2MCellIndices;
     using namespace coupling::indexing;
     for (auto cellIndex_v : CellIndex<dim, IndexTrait::vector>()) {
@@ -283,108 +281,4 @@ private:
   unsigned int* _M2mCellIndices;
   std::vector<coupling::datastructures::MacroscopicCell<dim>*> _m2MCells;
   unsigned int* _m2MCellIndices;
-};
-
-template <unsigned int dim> class precice_scenario::PreciceInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
-public:
-  PreciceInterface(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap)
-      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap) {}
-
-  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-    bool rcv = true;
-    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-      rcv &= globalCellIndex[currentDim] >= 1 + (_overlap - 1);
-      rcv &= globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - (_overlap - 1);
-    }
-    return rcv;
-  }
-
-  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-    bool isGhostCell = false;
-    bool isInner = true;
-    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-      isGhostCell |= globalCellIndex[currentDim] > _globalNumberMacroscopicCells[currentDim];
-      isGhostCell |= globalCellIndex[currentDim] < 1;
-      isInner &= globalCellIndex[currentDim] >= 1 + _overlap;
-      isInner &= globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - _overlap;
-    }
-    return (!isGhostCell) && (!isInner);
-  }
-
-  std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
-
-  // std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { 
-  //   coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<dim,int>>(globalCellIndex)};
-  //   std::vector<unsigned int> ranks = coupling::indexing::IndexingService<dim>::getInstance().getRanksForGlobalIndex(cellIndex_v);
-  //   return ranks;
-  // }
-
-  // std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-  //   const unsigned int rank = coupling::indexing::IndexingService<dim>::getInstance().getUniqueRankForGlobalIndex(globalCellIndex);
-  //   std::vector<unsigned int> ranks;
-  //   ranks.push_back(rank);
-  //   return ranks; 
-  // }
-
-protected:
-  const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
-  const unsigned int _overlap;
-};
-
-template <unsigned int dim> class precice_scenario::PreciceInterfaceForEvaporation : public precice_scenario::PreciceInterface<dim> {
-public:
-  PreciceInterfaceForEvaporation(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap) : precice_scenario::PreciceInterface<dim>(globalNumberMacroscopicCells, overlap) {}
-
-  bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-    bool isGhostCell = false;
-    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-      isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
-      isGhostCell |= globalCellIndex[currentDim] < 1;
-    }
-    return !isGhostCell && globalCellIndex[1] == this->_globalNumberMacroscopicCells[1];
-  }
-
-  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-    bool isGhostCell = false;
-    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-      isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
-      isGhostCell |= globalCellIndex[currentDim] < 1;
-    }
-    return !isGhostCell && (globalCellIndex[1] == 1 || globalCellIndex[1] == 2 || globalCellIndex[1] == 3);
-  }
-
-  std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { 
-    std::vector<unsigned int> ranks;
-    int size = 1;
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-#endif
-    for (int i = 0; i < size; i++)
-    {
-      ranks.push_back(i);
-    }
-    
-    return ranks;
-  }
-
-  // bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-  //   bool rcv = true;
-  //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-  //     rcv &= globalCellIndex[currentDim] >= 1 + (this->_overlap - 1);
-  //     rcv &= globalCellIndex[currentDim] < this->_globalNumberMacroscopicCells[currentDim] + 1 - (this->_overlap - 1);
-  //   }
-  //   return rcv;
-  // }
-
-  // bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-  //   bool isGhostCell = false;
-  //   bool isInner = true;
-  //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-  //     isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
-  //     isGhostCell |= globalCellIndex[currentDim] < 1;
-  //     isInner &= globalCellIndex[currentDim] >= 1 + this->_overlap;
-  //     isInner &= globalCellIndex[currentDim] < this->_globalNumberMacroscopicCells[currentDim] + 1 - this->_overlap;
-  //   }
-  //   return (!isGhostCell) && (!isInner);
-  // }
 };
