@@ -133,7 +133,7 @@ public:
       _preciceAdapter->readData(massCell);
       // _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
       double feedrate = 0.0;
-      if (mdStepCounter % updateFrequency > 0) {
+      if (mdStepCounter % updateFrequency == 0) {
         int count = 0;
         for (unsigned int i = 0; i < _preciceAdapter->getM2mCells().size(); i++) {
           if (_preciceAdapter->getM2mCells()[i]->getMicroscopicMass() != 0.0) {
@@ -142,6 +142,7 @@ public:
           }
         }
         if (count != 0) feedrate /= count;
+        std::cout << "rank: " << rank << "is updating feed rate of MettDeamon :" << feedrate << std::endl;
       }
       MettDeamon* mettDeamon = nullptr;
       std::list<PluginBase*>& plugins = *(global_simulation->getPluginList() );
@@ -151,12 +152,11 @@ public:
           mettDeamon = dynamic_cast<MettDeamon*>(pit);
       }
       mettDeamon->setActualFeedrate(feedrate);
-      std::cout << "rank: " << rank << ", feed rate given to plugin :" << feedrate << std::endl;
       _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
       mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
       _multiMDCellService->sendFromMD2Macro(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices());
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
-      if (mdStepCounter % updateFrequency > 0) {
+      if (mdStepCounter % updateFrequency == 0) {
         MettDeamonFeedrateDirector* mettDeamonFeedrateDirector = nullptr;
         for (auto&& pit:plugins) {
           std::string name = pit->getPluginName();
@@ -164,8 +164,8 @@ public:
             mettDeamonFeedrateDirector = dynamic_cast<MettDeamonFeedrateDirector*>(pit);
         }
         feedrate = mettDeamonFeedrateDirector->getFeedrate();
+        std::cout << "rank: " << rank << "is updating CFD feedrate given by MDFD :" << feedrate << std::endl;
       }
-      std::cout << "rank: " << rank << ", feed rate from plugin MDFD:" << feedrate << std::endl;
       _preciceAdapter->writeData(feedrate);
         // _preciceAdapter->writeData();
       precice_dt = _preciceAdapter->advance(mamico_dt);
