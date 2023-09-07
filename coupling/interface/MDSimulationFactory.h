@@ -38,6 +38,7 @@
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #include "ls1/src/Simulation.h"
 #include "ls1/src/plugins/MamicoCoupling.h"
+#include "ls1/src/Domain.h"
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
 #endif
 
@@ -869,6 +870,7 @@ public:
     // parse file
     const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
     simulation->readConfigFile(filename);
+    simulation->getDomain()->thermostatOff();
     // after this point the mamico plugin exists and is accessible
     simulation->prepare_start();
     simulation->preSimLoopSteps();

@@ -95,7 +95,6 @@ public:
 
         tarch::la::Vector<3,double> location1, location2;
         //if(_myMolecule == NULL) return 0.0;
-        
         location1 = { _myMolecule->r(0), _myMolecule->r(1), _myMolecule->r(2)};
         
         //find all molecules within cutoff
@@ -113,16 +112,18 @@ public:
         ls1::LS1RegionWrapper region(startRegion, endRegion, global_simulation);
         double cutoff2 = cutoff * cutoff;
 
+        double cutoffEnergy = 4.0 * epsilon * sigma6 / (cutoff2 * cutoff2 * cutoff2) * (sigma6 / (cutoff2* cutoff2 * cutoff2) - 1.0);
+
         //calculate lennard jones energy
         while(region.iteratorValid())
         {
             ::Molecule* temp = region.getParticleAtIterator();
             location2 = { temp->r(0), temp->r(1), temp->r(2) };
             const double r2 = tarch::la::dot(location2 - location1, location2 - location1);
-            if(r2 < cutoff2)
+            if(r2 < cutoff2 && r2 != 0)
             {
                 const double r6 = r2 * r2 * r2;
-                const double contrib =  2.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0);
+                const double contrib =  4.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0) - cutoffEnergy;
                 u += contrib;
             }
 
@@ -132,7 +133,10 @@ public:
         //sum and return
         return u;
     }
-    virtual void setPotentialEnergy(const double& potentialEnergy) {};
+    virtual void setPotentialEnergy(const double& potentialEnergy) 
+    {
+        throw std::runtime_error("LS1Molecule:setPotentialEnergy should never be called!");
+    }
 
 private:
     ::Molecule* _myMolecule;
