@@ -871,6 +871,7 @@ public:
     const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
     simulation->readConfigFile(filename);
     simulation->getDomain()->thermostatOff();
+    simulation->getDomain()->setExplosionHeuristics(false);
     // after this point the mamico plugin exists and is accessible
     simulation->prepare_start();
     simulation->preSimLoopSteps();
