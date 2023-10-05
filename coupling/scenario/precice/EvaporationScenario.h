@@ -24,9 +24,6 @@
 #include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #include "utils/Logger.h"
-#include "plugins/NEMD/MettDeamon.h"
-#include "plugins/NEMD/MettDeamonFeedrateDirector.h"
-#include "plugins/PluginBase.h"
 using Log::global_log;
 #endif
 
@@ -128,46 +125,14 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
-    int updateFrequency = 10000;
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData(massCell);
-      // _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
-      double feedrate = 0.0;
-      if (mdStepCounter % updateFrequency == 0) {
-        int count = 0;
-        for (unsigned int i = 0; i < _preciceAdapter->getM2mCells().size(); i++) {
-          if (_preciceAdapter->getM2mCells()[i]->getMicroscopicMass() != 0.0) {
-            feedrate += _preciceAdapter->getM2mCells()[i]->getMicroscopicMomentum()[1] / _preciceAdapter->getM2mCells()[i]->getMicroscopicMass();
-            count++;
-          }
-        }
-        if (count != 0) feedrate /= count;
-        std::cout << "rank: " << rank << "is updating feed rate of MettDeamon :" << feedrate << std::endl;
-      }
-      MettDeamon* mettDeamon = nullptr;
-      std::list<PluginBase*>& plugins = *(global_simulation->getPluginList() );
-      for (auto&& pit:plugins) {
-        std::string name = pit->getPluginName();
-        if(name == "MettDeamon")
-          mettDeamon = dynamic_cast<MettDeamon*>(pit);
-      }
-      mettDeamon->setActualFeedrate(feedrate);
+      _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
       _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
       mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
       _multiMDCellService->sendFromMD2Macro(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices());
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
-      if (mdStepCounter % updateFrequency == 0) {
-        MettDeamonFeedrateDirector* mettDeamonFeedrateDirector = nullptr;
-        for (auto&& pit:plugins) {
-          std::string name = pit->getPluginName();
-          if(name == "MettDeamonFeedrateDirector")
-            mettDeamonFeedrateDirector = dynamic_cast<MettDeamonFeedrateDirector*>(pit);
-        }
-        feedrate = mettDeamonFeedrateDirector->getFeedrate();
-        std::cout << "rank: " << rank << "is updating CFD feedrate given by MDFD :" << feedrate << std::endl;
-      }
-      _preciceAdapter->writeData(feedrate);
-        // _preciceAdapter->writeData();
+      _preciceAdapter->writeData();
       _preciceAdapter->advance(mamico_dt);
       cycle++;
       if (_preciceAdapter->getm2MCells().size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
