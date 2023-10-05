@@ -6,7 +6,7 @@
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/indexing/CellIndex.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
-#include "precice/SolverInterface.hpp"
+#include "precice/precice.hpp"
 #include "tarch/la/Vector.h"
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
@@ -38,32 +38,14 @@ public:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
-    _solverInterface = new precice::SolverInterface("mamico", "../precice-config.xml", _rank, size);
+    _participant = new precice::Participant("mamico", "../precice-config.xml", _rank, size);
   }
 
   virtual ~PreciceAdapter() {
-    if (_solverInterface != NULL) {
-      _solverInterface->finalize();
-      delete _solverInterface;
-      _solverInterface = NULL;
-    }
-    if (_M2mVertexCoords != NULL) {
-      delete[] _M2mVertexCoords;
-    }
-    if (_M2mVertexVelocities != NULL) {
-      delete[] _M2mVertexVelocities;
-    }
-    if (_M2mVertexIndices != NULL) {
-      delete[] _M2mVertexIndices;
-    }
-    if (_m2MVertexCoords != NULL) {
-      delete[] _m2MVertexCoords;
-    }
-    if (_m2MVertexVelocities != NULL) {
-      delete[] _m2MVertexVelocities;
-    }
-    if (_m2MVertexIndices != NULL) {
-      delete[] _m2MVertexIndices;
+    if (_participant != NULL) {
+      _participant->finalize();
+      delete _participant;
+      _participant = NULL;
     }
     if (_M2mCellIndices != NULL) {
       delete[] _M2mCellIndices;
@@ -92,7 +74,6 @@ public:
   }
 
   void setMeshes(coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface, const tarch::la::Vector<3, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize) {
-    std::vector<double> M2mVertexCoords;
     std::vector<unsigned int> M2mCellIndices;
     using namespace coupling::indexing;
     for (auto cellIndex_v : CellIndex<dim, IndexTrait::vector>()) {
@@ -101,7 +82,7 @@ public:
         std::vector<unsigned int> ranks = _macroscopicSolverInterface->getSourceRanks(cellIndex_V);
         if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
           for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-            M2mVertexCoords.push_back(mdDomainOffset[currentDim] + cellIndex_v.get()[currentDim] * macroscopicCellSize[currentDim] -
+            _M2mVertexCoords.push_back(mdDomainOffset[currentDim] + cellIndex_v.get()[currentDim] * macroscopicCellSize[currentDim] -
                                     macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim]);
           }
           _M2mCells.push_back(new coupling::datastructures::MacroscopicCell<3>());
@@ -109,14 +90,9 @@ public:
         }
       }
     }
-    _M2mVertexNumbers = M2mVertexCoords.size() / dim;
-    _M2mVertexCoords = new double[M2mVertexCoords.size()];
-    std::copy(M2mVertexCoords.begin(), M2mVertexCoords.end(), _M2mVertexCoords);
-    _M2mVertexIndices = new int[_M2mVertexNumbers];
-    if (_solverInterface->hasMesh(_M2mMeshName)) {
-      _solverInterface->setMeshVertices(_solverInterface->getMeshID(_M2mMeshName), _M2mVertexNumbers, _M2mVertexCoords, _M2mVertexIndices);
-    }
-    _M2mVertexVelocities = new double[_M2mVertexNumbers * dim];
+    // if (_participant->hasMesh(_M2mMeshName)) {
+      _participant->setMeshVertices(_M2mMeshName, _M2mVertexCoords, _M2mVertexIndices);
+    // }
 
     _M2mCellIndices = new unsigned int[_M2mCells.size()];
     std::copy(M2mCellIndices.begin(), M2mCellIndices.end(), _M2mCellIndices);
@@ -131,7 +107,7 @@ public:
         std::vector<unsigned int> ranks = _macroscopicSolverInterface->getTargetRanks(cellIndex_V);
         if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
           for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-            m2MVertexCoords.push_back(mdDomainOffset[currentDim] + cellIndex_v.get()[currentDim] * macroscopicCellSize[currentDim] -
+            _m2MVertexCoords.push_back(mdDomainOffset[currentDim] + cellIndex_v.get()[currentDim] * macroscopicCellSize[currentDim] -
                                     macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim] + offset[currentDim]);
           }
           _m2MCells.push_back(new coupling::datastructures::MacroscopicCell<3>());
@@ -139,40 +115,34 @@ public:
         }
       }
     }
-    _m2MVertexNumbers = m2MVertexCoords.size() / dim;
-    _m2MVertexCoords = new double[m2MVertexCoords.size()];
-    std::copy(m2MVertexCoords.begin(), m2MVertexCoords.end(), _m2MVertexCoords);
-    _m2MVertexIndices = new int[_m2MVertexNumbers];
-    if (_solverInterface->hasMesh(_m2MMeshName)) {
-      _solverInterface->setMeshVertices(_solverInterface->getMeshID(_m2MMeshName), _m2MVertexNumbers, _m2MVertexCoords, _m2MVertexIndices);
-    }
-    _m2MVertexVelocities = new double[_m2MVertexNumbers * dim];
+    // if (_participant->hasMesh(_m2MMeshName)) {
+      _participant->setMeshVertices(_m2MMeshName, _m2MVertexCoords, _m2MVertexIndices);
+    // }
 
     _m2MCellIndices = new unsigned int[_m2MCells.size()];
     std::copy(m2MCellIndices.begin(), m2MCellIndices.end(), _m2MCellIndices);
 
-    if (_solverInterface->hasMesh(_m2MMeshName)) {
-      for (size_t i = 0; i < _m2MVertexNumbers; i++) {
+    // if (_participant->hasMesh(_m2MMeshName)) {
+      for (size_t i = 0; i < _m2MVertexCoords.size()/dim; i++) {
         std::vector<int> tetrahedronsVertexIndices = getTetrahedronsVertexIndices(i, _m2MVertexIndices, m2MCellIndices);
         for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsVertexIndices.size() / 4; tetrahedronIndex++) {
-          _solverInterface->setMeshTetrahedron(_solverInterface->getMeshID(_m2MMeshName), tetrahedronsVertexIndices[tetrahedronIndex * 4],
+          _participant->setMeshTetrahedron(_m2MMeshName, tetrahedronsVertexIndices[tetrahedronIndex * 4],
                                               tetrahedronsVertexIndices[tetrahedronIndex * 4 + 1], tetrahedronsVertexIndices[tetrahedronIndex * 4 + 2],
                                               tetrahedronsVertexIndices[tetrahedronIndex * 4 + 3]);
         }
       }
-    }
+    // }
   }
 
-  double initialize() { return _solverInterface->initialize(); }
+  void initialize() { _participant->initialize(); }
 
-  bool isCouplingOngoing() { return _solverInterface->isCouplingOngoing(); }
+  bool isCouplingOngoing() { return _participant->isCouplingOngoing(); }
 
-  double advance(const double dt) { return _solverInterface->advance(dt); }
+  void advance(const double dt) { _participant->advance(dt); }
 
   void readData(double massCell) {
-    if (_solverInterface->hasMesh(_M2mMeshName)) {
-      _solverInterface->readBlockVectorData(_solverInterface->getDataID(_M2mVelocityName, _solverInterface->getMeshID(_M2mMeshName)), _M2mVertexNumbers,
-                                            _M2mVertexIndices, _M2mVertexVelocities);
+    // if (_participant->hasMesh(_M2mMeshName)) {
+      _participant->readData(_M2mMeshName, _M2mVelocityName, _M2mVertexIndices, 0, _M2mVertexVelocities);
       for (size_t i = 0; i < _M2mCells.size(); i++) {
         tarch::la::Vector<3, double> velocity{0.0};
         for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
@@ -182,11 +152,11 @@ public:
         _M2mCells[i]->setMicroscopicMass(massCell);
         _M2mCells[i]->setMicroscopicMomentum(momentum);
       }
-    }
+    // }
   }
 
   void writeData() {
-    if (_solverInterface->hasMesh(_m2MMeshName)) {
+    // if (_participant->hasMesh(_m2MMeshName)) {
       for (size_t i = 0; i < _m2MCells.size(); i++) {
         tarch::la::Vector<3, double> velocity{0.0};
         if (_m2MCells[i]->getMacroscopicMass() != 0.0) {
@@ -196,25 +166,23 @@ public:
           _m2MVertexVelocities[dim * i + currentDim] = velocity[currentDim];
         }
       }
-      _solverInterface->writeBlockVectorData(_solverInterface->getDataID(_m2MVelocityName, _solverInterface->getMeshID(_m2MMeshName)), _m2MVertexNumbers,
-                                             _m2MVertexIndices, _m2MVertexVelocities);
-    }
+      _participant->writeData(_m2MMeshName, _m2MVelocityName, _m2MVertexIndices, _m2MVertexVelocities);
+    // }
   }
 
   void writeData(double value) {
-    if (_solverInterface->hasMesh(_m2MMeshName)) {
+    // if (_participant->hasMesh(_m2MMeshName)) {
       for (size_t i = 0; i < _m2MCells.size(); i++) {
         _m2MVertexVelocities[dim * i] = 0.0;
         _m2MVertexVelocities[dim * i + 1] = value;
         _m2MVertexVelocities[dim * i + 2] = 0.0;
       }
-      _solverInterface->writeBlockVectorData(_solverInterface->getDataID(_m2MVelocityName, _solverInterface->getMeshID(_m2MMeshName)), _m2MVertexNumbers,
-                                             _m2MVertexIndices, _m2MVertexVelocities);
-    }
+      _participant->writeData(_m2MMeshName, _m2MVelocityName, _m2MVertexIndices, _m2MVertexVelocities);
+    // }
   }
 
 private:
-  std::vector<int> getTetrahedronsVertexIndices(int i, int* m2MVertexIndices, std::vector<unsigned int>& m2MCellIndices) {
+  std::vector<int> getTetrahedronsVertexIndices(int i, std::vector<int> m2MVertexIndices, std::vector<unsigned int>& m2MCellIndices) {
     int m2MVertexIndex = m2MVertexIndices[i];
     using CellIndex_v = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector>;
     using CellIndex_s = coupling::indexing::CellIndex<dim>;
@@ -265,17 +233,15 @@ private:
 
   int _rank;
 
-  precice::SolverInterface* _solverInterface = nullptr;
+  precice::Participant* _participant = nullptr;
 
-  int* _M2mVertexIndices = nullptr;
-  double* _M2mVertexCoords = nullptr;
-  unsigned int _M2mVertexNumbers = 0;
-  double* _M2mVertexVelocities = nullptr;
+  std::vector<int> _M2mVertexIndices;
+  std::vector<double> _M2mVertexCoords;
+  std::vector<double> _M2mVertexVelocities;
 
-  int* _m2MVertexIndices = nullptr;
-  double* _m2MVertexCoords = nullptr;
-  unsigned int _m2MVertexNumbers = 0;
-  double* _m2MVertexVelocities = nullptr;
+  std::vector<int> _m2MVertexIndices;
+  std::vector<double> _m2MVertexCoords;
+  std::vector<double> _m2MVertexVelocities;
 
   std::vector<coupling::datastructures::MacroscopicCell<dim>*> _M2mCells;
   unsigned int* _M2mCellIndices;

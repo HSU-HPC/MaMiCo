@@ -118,7 +118,7 @@ public:
     
     _preciceAdapter = new precice_scenario::PreciceAdapter<dim>();
     _preciceAdapter->setMeshes(_macroscopicSolverInterface, domainOffset, cellSize);
-    double precice_dt = _preciceAdapter->initialize();
+    _preciceAdapter->initialize();
     double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
     const double densityCell = mdConfig.getDomainConfiguration().getMoleculesPerDirection()[0] *
@@ -146,10 +146,7 @@ public:
         }
       }
       _preciceAdapter->writeData();
-      precice_dt = _preciceAdapter->advance(mamico_dt);
-      if (precice_dt < mamico_dt)
-        std::cout << "warning: rank " << rank << " maximum timestep from preCICE (" << precice_dt << ") is lower than MaMiCo timestep (" << mamico_dt << ")"
-                  << std::endl;
+      _preciceAdapter->advance(mamico_dt);
       cycle++;
       if (_preciceAdapter->getm2MCells().size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
         write2CSV(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices(), cycle, numberCells, domainOffset, cellSize, overLap, rank);
