@@ -90,15 +90,14 @@ public:
         }
       }
     }
-    // if (_participant->hasMesh(_M2mMeshName)) {
-      _participant->setMeshVertices(_M2mMeshName, _M2mVertexCoords, _M2mVertexIndices);
-    // }
+    _M2mVertexIndices = std::vector<int>(_M2mVertexCoords.size()/dim);
+    _participant->setMeshVertices(_M2mMeshName, _M2mVertexCoords, _M2mVertexIndices);
+    _M2mVertexVelocities = std::vector<double>(_M2mVertexCoords.size());
 
     _M2mCellIndices = new unsigned int[_M2mCells.size()];
     std::copy(M2mCellIndices.begin(), M2mCellIndices.end(), _M2mCellIndices);
   
-    std::vector<double> m2MVertexCoords;
-    double offset[dim] = {0, /*MD size*/-120/*CFD size*/-20/*half a mamico cell*/+1.25, 0}; 
+    double offset[dim] = {0, /*MD size*/-330/*CFD size*/-20/*half a mamico cell*/+1.25, 0}; 
     std::vector<unsigned int> m2MCellIndices;
     using namespace coupling::indexing;
     for (auto cellIndex_v : CellIndex<dim, IndexTrait::vector>()) {
@@ -115,23 +114,21 @@ public:
         }
       }
     }
-    // if (_participant->hasMesh(_m2MMeshName)) {
-      _participant->setMeshVertices(_m2MMeshName, _m2MVertexCoords, _m2MVertexIndices);
-    // }
+    _m2MVertexIndices = std::vector<int>(_m2MVertexCoords.size()/dim);
+    _participant->setMeshVertices(_m2MMeshName, _m2MVertexCoords, _m2MVertexIndices);
+    _m2MVertexVelocities = std::vector<double>(_m2MVertexCoords.size());
 
     _m2MCellIndices = new unsigned int[_m2MCells.size()];
     std::copy(m2MCellIndices.begin(), m2MCellIndices.end(), _m2MCellIndices);
 
-    // if (_participant->hasMesh(_m2MMeshName)) {
-      for (size_t i = 0; i < _m2MVertexCoords.size()/dim; i++) {
+    for (size_t i = 0; i < _m2MVertexCoords.size()/dim; i++) {
         std::vector<int> tetrahedronsVertexIndices = getTetrahedronsVertexIndices(i, _m2MVertexIndices, m2MCellIndices);
         for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsVertexIndices.size() / 4; tetrahedronIndex++) {
           _participant->setMeshTetrahedron(_m2MMeshName, tetrahedronsVertexIndices[tetrahedronIndex * 4],
                                               tetrahedronsVertexIndices[tetrahedronIndex * 4 + 1], tetrahedronsVertexIndices[tetrahedronIndex * 4 + 2],
                                               tetrahedronsVertexIndices[tetrahedronIndex * 4 + 3]);
         }
-      }
-    // }
+    }
   }
 
   void initialize() { _participant->initialize(); }
