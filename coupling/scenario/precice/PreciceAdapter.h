@@ -167,6 +167,17 @@ public:
     // }
   }
 
+  void writeData(double value) {
+    // if (_participant->hasMesh(_m2MMeshName)) {
+      for (size_t i = 0; i < _m2MCells.size(); i++) {
+        _m2MVertexVelocities[dim * i] = 0.0;
+        _m2MVertexVelocities[dim * i + 1] = value;
+        _m2MVertexVelocities[dim * i + 2] = 0.0;
+      }
+      _participant->writeData(_m2MMeshName, _m2MVelocityName, _m2MVertexIndices, _m2MVertexVelocities);
+    // }
+  }
+
 private:
   std::vector<int> getTetrahedronsVertexIndices(int i, std::vector<int> m2MVertexIndices, std::vector<unsigned int>& m2MCellIndices) {
     int m2MVertexIndex = m2MVertexIndices[i];
