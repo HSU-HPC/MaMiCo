@@ -44,7 +44,7 @@ var searchData=
   ['_7emamicointerfaceprovider_41',['~MamicoInterfaceProvider',['../classcoupling_1_1interface_1_1MamicoInterfaceProvider.html#a6d063df00d8d0696e31bf3c114bdbdf2',1,'coupling::interface::MamicoInterfaceProvider']]],
   ['_7emdsimulation_42',['~MDSimulation',['../classcoupling_1_1interface_1_1MDSimulation.html#a7b7e0568ca40371150e19c0f752b207b',1,'coupling::interface::MDSimulation']]],
   ['_7emdsolverinterface_43',['~MDSolverInterface',['../classcoupling_1_1interface_1_1MDSolverInterface.html#a22e268632ce04a50e00ca2838ecfe17d',1,'coupling::interface::MDSolverInterface']]],
-  ['_7emolecule_44',['~Molecule',['../classcoupling_1_1datastructures_1_1Molecule.html#a0683a44c38965bf38eddd2f3227d43ec',1,'coupling::datastructures::Molecule::~Molecule()'],['../classcoupling_1_1interface_1_1Molecule.html#a3feed5b171014c4e816da2db19d0d950',1,'coupling::interface::Molecule::~Molecule()']]],
+  ['_7emolecule_44',['~molecule',['../classcoupling_1_1datastructures_1_1Molecule.html#a0683a44c38965bf38eddd2f3227d43ec',1,'coupling::datastructures::Molecule::~Molecule()'],['../classcoupling_1_1interface_1_1Molecule.html#a3feed5b171014c4e816da2db19d0d950',1,'coupling::interface::Molecule::~Molecule()']]],
   ['_7emoleculeextractor_45',['~MoleculeExtractor',['../classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#aad3eab4f42a07b5c611645b2909295aa',1,'coupling::cellmappings::MoleculeExtractor']]],
   ['_7emoleculeiterator_46',['~MoleculeIterator',['../classcoupling_1_1interface_1_1MoleculeIterator.html#a5b07e3a5bc0732fbd8bc663a2defcd2b',1,'coupling::interface::MoleculeIterator']]],
   ['_7emomentumcontroller_47',['~MomentumController',['../classcoupling_1_1MomentumController.html#ace1afc2211e36ec74a3d4ecfbbe60270',1,'coupling::MomentumController']]],

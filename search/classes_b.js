@@ -24,7 +24,7 @@ var searchData=
   ['mempoolt_3c_20sizeof_28tinyxml2_3a_3axmlcomment_29_3e_21',['MemPoolT&lt; sizeof(tinyxml2::XMLComment)&gt;',['../classtinyxml2_1_1MemPoolT.html',1,'tinyxml2']]],
   ['mempoolt_3c_20sizeof_28tinyxml2_3a_3axmlelement_29_3e_22',['MemPoolT&lt; sizeof(tinyxml2::XMLElement)&gt;',['../classtinyxml2_1_1MemPoolT.html',1,'tinyxml2']]],
   ['mempoolt_3c_20sizeof_28tinyxml2_3a_3axmltext_29_3e_23',['MemPoolT&lt; sizeof(tinyxml2::XMLText)&gt;',['../classtinyxml2_1_1MemPoolT.html',1,'tinyxml2']]],
-  ['molecule_24',['Molecule',['../classcoupling_1_1datastructures_1_1Molecule.html',1,'coupling::datastructures::Molecule&lt; dim &gt;'],['../classcoupling_1_1interface_1_1Molecule.html',1,'coupling::interface::Molecule&lt; dim &gt;']]],
+  ['molecule_24',['molecule',['../classcoupling_1_1datastructures_1_1Molecule.html',1,'coupling::datastructures::Molecule&lt; dim &gt;'],['../classcoupling_1_1interface_1_1Molecule.html',1,'coupling::interface::Molecule&lt; dim &gt;']]],
   ['moleculeextractor_25',['MoleculeExtractor',['../classcoupling_1_1cellmappings_1_1MoleculeExtractor.html',1,'coupling::cellmappings']]],
   ['moleculeiterator_26',['MoleculeIterator',['../classcoupling_1_1interface_1_1MoleculeIterator.html',1,'coupling::interface']]],
   ['momentumcontroller_27',['MomentumController',['../classcoupling_1_1MomentumController.html',1,'coupling']]],
