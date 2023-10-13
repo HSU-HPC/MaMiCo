@@ -52,5 +52,5 @@ int main( int argc, char **argv)
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Finalize();
 #endif
-    return result.wasSuccessful() ? 0 : 1;
+    return result.wasSuccessful();
 }
