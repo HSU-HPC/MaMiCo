@@ -372,7 +372,6 @@ endif()
 set(COUETTE_SOURCES
 	"coupling/indexing/IndexingService.cpp"
 	"coupling/configurations/ParticleInsertionConfiguration.cpp"
-  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
   "coupling/scenario/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
@@ -408,7 +407,6 @@ if(BUILD_WITH_PYBIND11)
 	set(PYBIND_SOURCES11
 		"coupling/indexing/IndexingService.cpp"
 		"coupling/configurations/ParticleInsertionConfiguration.cpp"
-    "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
 		"coupling/python-binding/mamico.cpp"
 	)
 	pybind11_add_module(mamico_pybind
@@ -581,10 +579,8 @@ set(CLANGFORMAT_SOURCES
   "coupling/solvers/FiniteDifferenceSolver.h"
   "coupling/solvers/FDCouetteSolver.h"
   "coupling/solvers/IcoFoamInterface.h"
-  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
   "coupling/solvers/LBCouetteSolver.h"
   "coupling/solvers/IcoFoamBufferSetup.h"
-  "coupling/solvers/CoupledMolecularDynamicsSimulation.h"
   "coupling/solvers/CouetteSolver.h"
   "coupling/solvers/CouetteSolverInterface.h"
   "coupling/solvers/LBCouetteSolverInterface.h"
