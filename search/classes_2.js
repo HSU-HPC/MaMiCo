@@ -15,6 +15,5 @@ var searchData=
   ['couettescenario_12',['CouetteScenario',['../classCouetteScenario.html',1,'']]],
   ['couettesolver_13',['CouetteSolver',['../classcoupling_1_1solvers_1_1CouetteSolver.html',1,'coupling::solvers']]],
   ['couettesolverinterface_14',['CouetteSolverInterface',['../classcoupling_1_1solvers_1_1CouetteSolverInterface.html',1,'coupling::solvers']]],
-  ['coupledmoleculardynamicssimulation_15',['CoupledMolecularDynamicsSimulation',['../classcoupling_1_1solvers_1_1CoupledMolecularDynamicsSimulation.html',1,'coupling::solvers']]],
-  ['couplingbuffer_16',['CouplingBuffer',['../structCouetteScenario_1_1CouplingBuffer.html',1,'CouetteScenario']]]
+  ['couplingbuffer_15',['CouplingBuffer',['../structCouetteScenario_1_1CouplingBuffer.html',1,'CouetteScenario']]]
 ];
