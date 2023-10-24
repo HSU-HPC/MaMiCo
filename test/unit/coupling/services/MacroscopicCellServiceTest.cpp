@@ -64,7 +64,10 @@ public:
           macroscopicCellConfiguration,
           filterPipelineConfigurationFile, 
           multiMDService, 
-          topologyOffset); 
+          topologyOffset);
+    
+    // TODO: complete test
+    std::cout << "ID:" << _macroscopicCellService->getID() << std::endl;
   }
 
 private:
