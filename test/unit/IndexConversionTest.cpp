@@ -19,8 +19,8 @@ class IndexConversionTest : public CppUnit::TestFixture {
 
 public:
   void test3D() {
-    tarch::la::Vector<3, unsigned int> testGlobalNumberCells3D(10, 4, 4);
-    tarch::la::Vector<3, unsigned int> testNumberProcesses3D(5, 2, 2);
+    tarch::la::Vector<3, unsigned int> testGlobalNumberCells3D(6, 4, 4);
+    tarch::la::Vector<3, unsigned int> testNumberProcesses3D(3, 2, 2);
     tarch::la::Vector<3, double> size3D(1.0);
     tarch::la::Vector<3, double> offset3D(0.0);
     std::cout << "Run 3D test..." << std::endl;
@@ -28,8 +28,8 @@ public:
   }
 
   void test2D() {
-    tarch::la::Vector<2, unsigned int> testGlobalNumberCells2D(10, 10);
-    tarch::la::Vector<2, unsigned int> testNumberProcesses2D(5, 5);
+    tarch::la::Vector<2, unsigned int> testGlobalNumberCells2D(10, 6);
+    tarch::la::Vector<2, unsigned int> testNumberProcesses2D(5, 3);
     tarch::la::Vector<2, double> size2D(1.0);
     tarch::la::Vector<2, double> offset2D(0.0);
     std::cout << "Run 2D test..." << std::endl;
