@@ -66,8 +66,6 @@ public:
           multiMDService, 
           topologyOffset);
     
-    // TODO: complete test
-    std::cout << "ID:" << _macroscopicCellService->getID() << std::endl;
   }
 
 private:
