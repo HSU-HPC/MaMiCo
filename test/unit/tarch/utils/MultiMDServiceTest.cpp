@@ -11,9 +11,11 @@ using namespace utils;
 class MultiMDServiceTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(MultiMDServiceTest);
+#if (TARCH_PARALLEL == TARCH_YES)
   CPPUNIT_TEST(testAvgNumberOfMDSimulations);
   CPPUNIT_TEST(testNumberLocalComms);
   CPPUNIT_TEST(testLocalNumberOfMDSimulations);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -88,7 +90,9 @@ public:
 
     unsigned int expectedLocalNumberOfMDSimulations = 2;
     int rank;
+  #if (TARCH_PARALLEL == TARCH_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  #endif
     if (rank == 3) {
       expectedLocalNumberOfMDSimulations = _multiMDService_111_10->getTotalNumberOfMDSimulations() - expectedLocalNumberOfMDSimulations * (_multiMDService_111_10->getNumberLocalComms()-1);
     }
