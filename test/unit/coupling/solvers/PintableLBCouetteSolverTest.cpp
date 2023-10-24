@@ -56,7 +56,9 @@ public:
     CPPUNIT_ASSERT( F->getAvgNumberLBCells() == F2->getAvgNumberLBCells());
   }
 
-  void tearDown() {}
+  void tearDown() {
+    coupling::indexing::IndexingService<3>::getInstance().finalize();
+  }
 
   void testMode(){
     CPPUNIT_ASSERT( F->getMode() == Solver::Mode::coupling);
@@ -136,7 +138,6 @@ public:
 private:
     int _size, _rank;
     std::unique_ptr<LBCouetteSolver> F, G, G2;
-
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(PintableLBCouetteSolverTest);

@@ -105,6 +105,12 @@ template<unsigned int mddim>
 #endif
             );
 
+  void finalize(){
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    _isInitialized = false;
+    #endif
+  }
+
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   /**
    * Determines all ranks that contain a certain global BaseIndex.
