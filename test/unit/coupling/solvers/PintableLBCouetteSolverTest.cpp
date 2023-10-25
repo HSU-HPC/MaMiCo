@@ -82,6 +82,8 @@ public:
     std::stringstream msg; msg << "velocities are " << v0 << " and " << v1 << std::endl;
     CPPUNIT_ASSERT_MESSAGE(msg.str(), !( *u0 == *u1 ));
 
+    CPPUNIT_FAIL("HAHA");
+
     F->setState(u0, 0);
     CPPUNIT_ASSERT( *u0 == *(F->getState()) );
     F->advance(1.0);
