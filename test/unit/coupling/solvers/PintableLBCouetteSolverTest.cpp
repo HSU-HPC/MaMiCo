@@ -21,6 +21,8 @@ class PintableLBCouetteSolverTest : public CppUnit::TestFixture {
     CPPUNIT_TEST( testReturnToZero );
     CPPUNIT_TEST( testRunIntoSameState );
     CPPUNIT_TEST( testSupervisorRunIntoSameState );
+    CPPUNIT_TEST( testAdvanceSupervisorChangesState );
+    CPPUNIT_TEST( testSupervisorsUnique );
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -58,17 +60,27 @@ public:
 
   void tearDown() {
     coupling::indexing::IndexingService<3>::getInstance().finalize();
+    F = nullptr;
+    G = nullptr;
+    G2 = nullptr;
   }
 
   void testMode(){
     CPPUNIT_ASSERT( F->getMode() == Solver::Mode::coupling);
     CPPUNIT_ASSERT( G->getMode() == Solver::Mode::supervising);
+    CPPUNIT_ASSERT( G2->getMode() == Solver::Mode::supervising);
   }
 
   void testReturnToZero() {
     std::unique_ptr<State> u0 = F->getState();
     F->advance(1.0);
     std::unique_ptr<State> u1 = F->getState();
+
+    double v0 = F->get_avg_vel(u0);
+    double v1 = F->get_avg_vel(u1);
+    CPPUNIT_ASSERT(v0 != v1);
+    std::stringstream msg; msg << "velocities are " << v0 << " and " << v1 << std::endl;
+    CPPUNIT_ASSERT_MESSAGE(msg.str(), !( *u0 == *u1 ));
 
     F->setState(u0, 0);
     CPPUNIT_ASSERT( *u0 == *(F->getState()) );
@@ -133,6 +145,30 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( *u2_A, *u2_B );
     sameDensityAndVelocity(G, G2);
+  }
+
+  void testAdvanceSupervisorChangesState(){
+    std::unique_ptr<State> u0 = G->getState();
+    G->advance(0.5);
+    std::unique_ptr<State> u1 = G->getState();
+    std::unique_ptr<State> u2 = G->operator()(u1, 0);
+
+    CPPUNIT_ASSERT(!( *u0 == *u1 ));
+    CPPUNIT_ASSERT(!( *u1 == *u2 ));
+    CPPUNIT_ASSERT(!( *u0 == *u2 ));
+  }
+
+  void testSupervisorsUnique() {
+    G->advance(0.5);
+    CPPUNIT_ASSERT(!( *(G->getState()) == *(G2->getState()) ));
+
+    std::unique_ptr<State> u0 = G->getState();
+    G2->setState(u0, 0);
+    CPPUNIT_ASSERT( *(G->getState()) == *(G2->getState()) );
+
+    std::unique_ptr<State> u1 = G2->operator()(u0, 0);
+    CPPUNIT_ASSERT( *u1 == *(G2->getState()) );
+    CPPUNIT_ASSERT(!(*u1 == *( G->getState())) );
   }
 
 private:
