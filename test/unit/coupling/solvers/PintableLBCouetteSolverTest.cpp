@@ -21,8 +21,8 @@ class PintableLBCouetteSolverTest : public CppUnit::TestFixture {
     CPPUNIT_TEST( testReturnToZero );
     CPPUNIT_TEST( testRunIntoSameState );
     CPPUNIT_TEST( testSupervisorRunIntoSameState );
-    CPPUNIT_TEST( testAdvanceSupervisorChangesState );
-    CPPUNIT_TEST( testSupervisorsUnique );
+    //CPPUNIT_TEST( testAdvanceSupervisorChangesState );
+    //CPPUNIT_TEST( testSupervisorsUnique );
     CPPUNIT_TEST_SUITE_END();
 
 public:

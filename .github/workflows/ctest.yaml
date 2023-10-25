@@ -33,4 +33,4 @@ jobs:
 
     - name: Test
       # shell: bash
-      run: cd build; ctest
+      run: cd build; ctest --output-on-failure
