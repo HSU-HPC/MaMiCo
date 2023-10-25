@@ -29,8 +29,8 @@ jobs:
         cmake -DBUILD_TESTING=ON ..
 
     - name: Build
-      run: make -j4 testmamico
+      run: cd build; make -j4 testmamico
 
     - name: Test
       # shell: bash
-      run: ctest
+      run: cd build; ctest
