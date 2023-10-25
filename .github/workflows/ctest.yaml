@@ -23,7 +23,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake ..
+        cmake -DBUILD_TESTING=ON ..
 
     - name: Build
       run: make -j4 testmamico
