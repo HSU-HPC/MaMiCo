@@ -3,7 +3,7 @@
 #if any compilation fails, exit
 set -e
 
-for build in Debug DebugOptimized RelWithDebInfo Release; do
+for build in $2; do
 	for compiler in $1; do
 		# cmake must be called twice if the compiler changes (the other variables are deleted, so we need to set them again later)
 		cmake . -D CMAKE_CXX_COMPILER=${compiler} || { #try/catch

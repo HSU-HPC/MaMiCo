@@ -73,6 +73,10 @@ endif()
 set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
 message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_COMPILERS})
 
+# Build mode list to be used for compiletest
+set(COMPILETEST_MODES "Debug DebugOptimized RelWithDebInfo Release" CACHE STRING "Build mode list to be used for compiletest")
+message(STATUS ">> Build mode list to be used for compiletest : " ${COMPILETEST_MODES})
+
 # Enable coupling with indexing tests, default is off
 option(BUILD_WITH_TEST_INDEXING "Enable indexing tests, default is off." OFF)
 message(STATUS ">> Build with indexing tests : " ${BUILD_WITH_TEST_INDEXING})
@@ -736,6 +740,7 @@ add_custom_target(
   compiletest
   COMMAND ${COMPILETEST_SCRIPT}
   ${COMPILETEST_COMPILERS}
+  ${COMPILETEST_MODES}
 )
 
 #
