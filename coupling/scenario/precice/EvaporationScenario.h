@@ -252,7 +252,7 @@ public:
       isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
       isGhostCell |= globalCellIndex[currentDim] < 1;
     }
-    return !isGhostCell && globalCellIndex[1] == this->_globalNumberMacroscopicCells[1];
+    return !isGhostCell && (globalCellIndex[1] == this->_globalNumberMacroscopicCells[1] || globalCellIndex[1] == 3 || globalCellIndex[1] == 4);
   }
 
   bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {

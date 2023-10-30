@@ -30,7 +30,7 @@ namespace precice_scenario{
  */
 template <unsigned int dim> class precice_scenario::PreciceAdapter {
 public:
-  PreciceAdapter(): _M2mMeshName("mamico-M2m-mesh"), _m2MMeshName("mamico-m2M-mesh"), _M2mVelocityName("VelocityMacro"), _m2MVelocityName("VelocityMicro"), _rank(0) {
+  PreciceAdapter(): _M2mMeshName("mamico-M2m-mesh"), _m2MLMeshName("mamico-m2ML-mesh"), _m2MVMeshName("mamico-m2MV-mesh"), _M2mVelocityName("VelocityMacro"), _m2MVelocityName("VelocityMicro"), _rank(0) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
@@ -105,30 +105,51 @@ public:
       if (_macroscopicSolverInterface->receiveMacroscopicQuantityFromMDSolver(cellIndex_V)) {
         std::vector<unsigned int> ranks = _macroscopicSolverInterface->getTargetRanks(cellIndex_V);
         if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
-          for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-            _m2MVertexCoords.push_back(mdDomainOffset[currentDim] + cellIndex_v.get()[currentDim] * macroscopicCellSize[currentDim] -
-                                    macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim] + offset[currentDim]);
+          if (cellIndex_V[1] == 3 || cellIndex_V[1] == 4) {
+            for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+              _m2MLVertexCoords.push_back(mdDomainOffset[currentDim] + cellIndex_v.get()[currentDim] * macroscopicCellSize[currentDim] -
+                                      macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim]);
+            }
+            _m2MCells.push_back(new coupling::datastructures::MacroscopicCell<3>());
+            m2MCellIndices.push_back(convertToScalar<dim>(cellIndex_v));  
           }
-          _m2MCells.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          m2MCellIndices.push_back(convertToScalar<dim>(cellIndex_v));
         }
       }
     }
-    _m2MVertexIndices = std::vector<int>(_m2MVertexCoords.size()/dim);
-    _participant->setMeshVertices(_m2MMeshName, _m2MVertexCoords, _m2MVertexIndices);
-    _m2MVertexVelocities = std::vector<double>(_m2MVertexCoords.size());
+    for (auto cellIndex_v : CellIndex<dim, IndexTrait::vector>()) {
+      tarch::la::Vector<3, unsigned int> cellIndex_V = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex_v.get());
+      if (_macroscopicSolverInterface->receiveMacroscopicQuantityFromMDSolver(cellIndex_V)) {
+        std::vector<unsigned int> ranks = _macroscopicSolverInterface->getTargetRanks(cellIndex_V);
+        if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
+          if (cellIndex_V[1] != 3 && cellIndex_V[1] != 4) {
+            for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+              _m2MVVertexCoords.push_back(mdDomainOffset[currentDim] + cellIndex_v.get()[currentDim] * macroscopicCellSize[currentDim] -
+                                      macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim] + offset[currentDim]);
+            }
+            _m2MCells.push_back(new coupling::datastructures::MacroscopicCell<3>());
+            m2MCellIndices.push_back(convertToScalar<dim>(cellIndex_v));
+          }
+        }
+      }
+    }
+    _m2MLVertexIndices = std::vector<int>(_m2MLVertexCoords.size()/dim);
+    _m2MVVertexIndices = std::vector<int>(_m2MVVertexCoords.size()/dim);
+    _participant->setMeshVertices(_m2MLMeshName, _m2MLVertexCoords, _m2MLVertexIndices);
+    _participant->setMeshVertices(_m2MVMeshName, _m2MVVertexCoords, _m2MVVertexIndices);
+    _m2MLVertexVelocities = std::vector<double>(_m2MLVertexCoords.size());
+    _m2MVVertexVelocities = std::vector<double>(_m2MLVertexCoords.size());
 
     _m2MCellIndices = new unsigned int[_m2MCells.size()];
     std::copy(m2MCellIndices.begin(), m2MCellIndices.end(), _m2MCellIndices);
 
-    for (size_t i = 0; i < _m2MVertexCoords.size()/dim; i++) {
-        std::vector<int> tetrahedronsVertexIndices = getTetrahedronsVertexIndices(i, _m2MVertexIndices, m2MCellIndices);
-        for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsVertexIndices.size() / 4; tetrahedronIndex++) {
-          _participant->setMeshTetrahedron(_m2MMeshName, tetrahedronsVertexIndices[tetrahedronIndex * 4],
-                                              tetrahedronsVertexIndices[tetrahedronIndex * 4 + 1], tetrahedronsVertexIndices[tetrahedronIndex * 4 + 2],
-                                              tetrahedronsVertexIndices[tetrahedronIndex * 4 + 3]);
-        }
-    }
+    // for (size_t i = 0; i < _m2MLVertexCoords.size()/dim; i++) {
+    //     std::vector<int> tetrahedronsVertexIndices = getTetrahedronsVertexIndices(i, _m2MLVertexIndices, m2MCellIndices);
+    //     for (size_t tetrahedronIndex = 0; tetrahedronIndex < tetrahedronsVertexIndices.size() / 4; tetrahedronIndex++) {
+    //       _participant->setMeshTetrahedron(_m2MLMeshName, tetrahedronsVertexIndices[tetrahedronIndex * 4],
+    //                                           tetrahedronsVertexIndices[tetrahedronIndex * 4 + 1], tetrahedronsVertexIndices[tetrahedronIndex * 4 + 2],
+    //                                           tetrahedronsVertexIndices[tetrahedronIndex * 4 + 3]);
+    //     }
+    // }
   }
 
   void initialize() { _participant->initialize(); }
@@ -153,28 +174,38 @@ public:
   }
 
   void writeData() {
-    // if (_participant->hasMesh(_m2MMeshName)) {
+    // if (_participant->hasMesh(_m2MLMeshName)) {
       for (size_t i = 0; i < _m2MCells.size(); i++) {
         tarch::la::Vector<3, double> velocity{0.0};
         if (_m2MCells[i]->getMacroscopicMass() != 0.0) {
           velocity = (1.0 / _m2MCells[i]->getMacroscopicMass()) * _m2MCells[i]->getMacroscopicMomentum();
         }
         for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-          _m2MVertexVelocities[dim * i + currentDim] = velocity[currentDim];
+          _m2MLVertexVelocities[dim * i + currentDim] = velocity[currentDim];
         }
       }
-      _participant->writeData(_m2MMeshName, _m2MVelocityName, _m2MVertexIndices, _m2MVertexVelocities);
+      _participant->writeData(_m2MLMeshName, _m2MVelocityName, _m2MLVertexIndices, _m2MLVertexVelocities);
     // }
   }
 
   void writeData(double value) {
-    // if (_participant->hasMesh(_m2MMeshName)) {
-      for (size_t i = 0; i < _m2MCells.size(); i++) {
-        _m2MVertexVelocities[dim * i] = 0.0;
-        _m2MVertexVelocities[dim * i + 1] = value;
-        _m2MVertexVelocities[dim * i + 2] = 0.0;
+    // if (_participant->hasMesh(_m2MLMeshName)) {
+      for (size_t i = 0; i < _m2MVVertexIndices.size(); i++) {
+        _m2MLVertexVelocities[dim * i] = 0.0;
+        _m2MLVertexVelocities[dim * i + 1] = value;
+        _m2MLVertexVelocities[dim * i + 2] = 0.0;
       }
-      _participant->writeData(_m2MMeshName, _m2MVelocityName, _m2MVertexIndices, _m2MVertexVelocities);
+      _participant->writeData(_m2MVMeshName, _m2MVelocityName, _m2MVVertexIndices, _m2MVVertexVelocities);
+      for (size_t i = 0; i < _m2MLVertexIndices.size(); i++) {
+        tarch::la::Vector<3, double> velocity{0.0};
+        if (_m2MCells[i]->getMacroscopicMass() != 0.0) {
+          velocity = (1.0 / _m2MCells[i]->getMacroscopicMass()) * _m2MCells[i]->getMacroscopicMomentum();
+        }
+        for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+          _m2MLVertexVelocities[dim * i + currentDim] = velocity[currentDim];
+        }
+      }
+      _participant->writeData(_m2MLMeshName, _m2MVelocityName, _m2MLVertexIndices, _m2MLVertexVelocities);
     // }
   }
 
@@ -224,7 +255,8 @@ private:
   }
 
   const std::string _M2mMeshName;
-  const std::string _m2MMeshName;
+  const std::string _m2MLMeshName;
+  const std::string _m2MVMeshName;
   const std::string _M2mVelocityName;
   const std::string _m2MVelocityName;
 
@@ -236,9 +268,13 @@ private:
   std::vector<double> _M2mVertexCoords;
   std::vector<double> _M2mVertexVelocities;
 
-  std::vector<int> _m2MVertexIndices;
-  std::vector<double> _m2MVertexCoords;
-  std::vector<double> _m2MVertexVelocities;
+  std::vector<int> _m2MLVertexIndices;
+  std::vector<double> _m2MLVertexCoords;
+  std::vector<double> _m2MLVertexVelocities;
+
+  std::vector<int> _m2MVVertexIndices;
+  std::vector<double> _m2MVVertexCoords;
+  std::vector<double> _m2MVVertexVelocities;
 
   std::vector<coupling::datastructures::MacroscopicCell<dim>*> _M2mCells;
   unsigned int* _M2mCellIndices;
