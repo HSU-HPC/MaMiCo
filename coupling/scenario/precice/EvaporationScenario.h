@@ -144,9 +144,8 @@ public:
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       double feedrate;
       if (mdStepCounter % updateFrequency == 0) {
-        
         feedrate = mettDeamonFeedrateDirector->getFeedrate();
-        std::cout << "rank: " << rank << "is updating CFD feedrate given by MDFD :" << feedrate << std::endl;
+        if (rank==0) std::cout << "updating CFD feedrate given by MDFD :" << feedrate << std::endl;
       }
       _preciceAdapter->writeData(feedrate);
         // _preciceAdapter->writeData();

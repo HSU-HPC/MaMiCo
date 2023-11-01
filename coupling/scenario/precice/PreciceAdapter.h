@@ -116,6 +116,9 @@ public:
         }
       }
     }
+    _m2MLVertexIndices = std::vector<int>(_m2MLVertexCoords.size()/dim);
+    _participant->setMeshVertices(_m2MLMeshName, _m2MLVertexCoords, _m2MLVertexIndices);
+    _m2MLVertexVelocities = std::vector<double>(_m2MLVertexCoords.size());
     for (auto cellIndex_v : CellIndex<dim, IndexTrait::vector>()) {
       tarch::la::Vector<3, unsigned int> cellIndex_V = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex_v.get());
       if (_macroscopicSolverInterface->receiveMacroscopicQuantityFromMDSolver(cellIndex_V)) {
@@ -132,12 +135,9 @@ public:
         }
       }
     }
-    _m2MLVertexIndices = std::vector<int>(_m2MLVertexCoords.size()/dim);
     _m2MVVertexIndices = std::vector<int>(_m2MVVertexCoords.size()/dim);
-    _participant->setMeshVertices(_m2MLMeshName, _m2MLVertexCoords, _m2MLVertexIndices);
     _participant->setMeshVertices(_m2MVMeshName, _m2MVVertexCoords, _m2MVVertexIndices);
-    _m2MLVertexVelocities = std::vector<double>(_m2MLVertexCoords.size());
-    _m2MVVertexVelocities = std::vector<double>(_m2MLVertexCoords.size());
+    _m2MVVertexVelocities = std::vector<double>(_m2MVVertexCoords.size());
 
     _m2MCellIndices = new unsigned int[_m2MCells.size()];
     std::copy(m2MCellIndices.begin(), m2MCellIndices.end(), _m2MCellIndices);
@@ -191,9 +191,9 @@ public:
   void writeData(double value) {
     // if (_participant->hasMesh(_m2MLMeshName)) {
       for (size_t i = 0; i < _m2MVVertexIndices.size(); i++) {
-        _m2MLVertexVelocities[dim * i] = 0.0;
-        _m2MLVertexVelocities[dim * i + 1] = value;
-        _m2MLVertexVelocities[dim * i + 2] = 0.0;
+        _m2MVVertexVelocities[dim * i] = 0.0;
+        _m2MVVertexVelocities[dim * i + 1] = value;
+        _m2MVVertexVelocities[dim * i + 2] = 0.0;
       }
       _participant->writeData(_m2MVMeshName, _m2MVelocityName, _m2MVVertexIndices, _m2MVVertexVelocities);
       for (size_t i = 0; i < _m2MLVertexIndices.size(); i++) {
