@@ -14,6 +14,7 @@
 #include "tarch/configuration/Configuration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
+#include "coupling/scenario/precice/PreciceInterface.h"
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -240,10 +241,12 @@ private:
     double kinematicViscosity;
   };
 
-template <unsigned int dim> class MacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
+template <unsigned int dim> class MacroscopicSolverInterface : public coupling::scenario::precice_scenario::PreciceInterface<dim> {
 public:
   MacroscopicSolverInterface(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap)
-      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap) {}
+      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap),
+      _offset(tarch::la::Vector<dim,double>{0, /*MD size*/-330/*CFD size*/-20/*half a mamico cell*/+1.25, 0}),
+      _M2mMeshName("mamico-M2m-mesh"), _m2MLMeshName("mamico-m2ML-mesh"), _m2MVMeshName("mamico-m2MV-mesh") {}
 
   bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
     bool isGhostCell = false;
@@ -254,7 +257,7 @@ public:
     return !isGhostCell && (globalCellIndex[1] == this->_globalNumberMacroscopicCells[1] || globalCellIndex[1] == 3 || globalCellIndex[1] == 4);
   }
 
-  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
     bool isGhostCell = false;
     for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
       isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
@@ -277,6 +280,26 @@ public:
     }
     
     return ranks;
+  }
+
+  std::string getMeshName(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+    if (sendMacroscopicQuantityToMDSolver(globalCellIndex)) {
+      return _M2mMeshName;
+    } else if (receiveMacroscopicQuantityFromMDSolver(globalCellIndex) && globalCellIndex[1] == this->_globalNumberMacroscopicCells[1]) {
+      return _m2MVMeshName;
+    } else if (receiveMacroscopicQuantityFromMDSolver(globalCellIndex) && globalCellIndex[1] == 3 || globalCellIndex[1] == 4) {
+      return _m2MLMeshName;
+    } else {
+      std::cout << "ERROR: cell " << globalCellIndex << " does not belong to a coupling mesh" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  tarch::la::Vector<3, double> getMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) {
+    if (receiveMacroscopicQuantityFromMDSolver(globalCellIndex) && globalCellIndex[1] == this->_globalNumberMacroscopicCells[1]) {
+      return _offset;
+    }
+    return tarch::la::Vector<dim,double>(0.0);
   }
 
   // bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
@@ -303,6 +326,10 @@ public:
 private:
   const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
   const unsigned int _overlap;
+  const tarch::la::Vector<3, double> _offset;
+  const std::string _M2mMeshName;
+  const std::string _m2MLMeshName;
+  const std::string _m2MVMeshName;
 };
 
   precice_scenario::PreciceAdapter<3>* _preciceAdapter;

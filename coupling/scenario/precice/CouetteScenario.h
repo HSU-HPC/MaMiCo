@@ -27,12 +27,16 @@
 using Log::global_log;
 #endif
 
-namespace precice_scenario{
+namespace coupling{
+namespace scenario {
+namespace precice {
   class CouetteScenario;
+}
+}
 }
 
 
-class precice_scenario::CouetteScenario : public Scenario {
+class coupling::scenario::precice::CouetteScenario : public Scenario {
 public:
   CouetteScenario() : Scenario("couette") {}
   ~CouetteScenario() {
@@ -43,9 +47,9 @@ public:
       delete _multiMDService;
       _multiMDService = NULL;
     }
-    if (_macroscopicSolverInterface != NULL) {
-      delete _macroscopicSolverInterface;
-      _macroscopicSolverInterface = NULL;
+    if (_preciceInterface != NULL) {
+      delete _preciceInterface;
+      _preciceInterface = NULL;
     }
     if (_preciceAdapter != NULL) {
       delete _preciceAdapter;
@@ -102,31 +106,24 @@ public:
       numberCells[d] = floor(domainSize[d] / cellSize[d] + 0.5);
     }
     const unsigned int overLap = mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap();
-
-    _macroscopicSolverInterface = new MacroscopicSolverInterface<dim>(numberCells, overLap);
-
-    coupling::indexing::IndexingService<dim>::getInstance().init(mdConfig, mamicoConfig, _macroscopicSolverInterface, rank);
-
-    _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
-        _instanceHandling->getMDSolverInterface(), _macroscopicSolverInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
-    
-    coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, dim>::getInstance().setMacroscopicSolverInterface(_macroscopicSolverInterface);
-    
-    _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
-    
-    _multiMDCellService->computeAndStoreTemperature(scenarioConfig.temp);
-    
-    _preciceAdapter = new precice_scenario::PreciceAdapter<dim>();
-    _preciceAdapter->setMeshes(_macroscopicSolverInterface, domainOffset, cellSize);
-    _preciceAdapter->initialize();
-    double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
-    int cycle = 0;
     const double densityCell = mdConfig.getDomainConfiguration().getMoleculesPerDirection()[0] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
+    _preciceInterface = new PreciceInterface(numberCells, overLap, massCell);
+    coupling::indexing::IndexingService<dim>::getInstance().init(mdConfig, mamicoConfig, _preciceInterface, rank);
+    _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
+        _instanceHandling->getMDSolverInterface(), _preciceInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
+    coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, dim>::getInstance().setMacroscopicSolverInterface(_preciceInterface);
+    _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
+    _multiMDCellService->computeAndStoreTemperature(scenarioConfig.temp);
+    _preciceAdapter = new coupling::preciceadapter::PreciceAdapter<dim>();
+    _preciceAdapter->setMeshes(_preciceInterface, domainOffset, cellSize);
+    _preciceAdapter->initialize();
+    double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
+    int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
-      _preciceAdapter->readData(massCell);
+      _preciceAdapter->readData(_preciceInterface);
       _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
       if (!scenarioConfig.couetteAnalytical) {
         _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
@@ -145,7 +142,7 @@ public:
           _preciceAdapter->getm2MCells()[i]->setMacroscopicMomentum(momentum);
         }
       }
-      _preciceAdapter->writeData();
+      _preciceAdapter->writeData(_preciceInterface);
       _preciceAdapter->advance(mamico_dt);
       cycle++;
       if (_preciceAdapter->getm2MCells().size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
@@ -197,16 +194,6 @@ private:
     file.close();
   }
 
-  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& buffer) const {
-    for (unsigned int i = 0; i < buffer.size(); i++) {
-      if (buffer[i] != NULL) {
-        delete buffer[i];
-        buffer[i] = NULL;
-      }
-    }
-    buffer.clear();
-  }
-
   struct ScenarioConfig : public tarch::configuration::Configuration {
     ~ScenarioConfig() {}
 
@@ -237,14 +224,26 @@ private:
     double kinematicViscosity;
   };
 
-template <unsigned int dim> class MacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
-public:
-  MacroscopicSolverInterface(const tarch::la::Vector<dim, int> globalNumberMacroscopicCells, const unsigned int overlap)
-      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap) {}
+class PreciceInterface : public coupling::preciceadapter::PreciceInterface<3> {
+private:
+  const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
+  const unsigned int _overlap;
+  const double _massCell;
+  const std::string _M2mMeshName;
+  const std::string _m2MMeshName;
+  const coupling::preciceadapter::Data _M2mVelocity;
+  const coupling::preciceadapter::Data _m2MVelocity;
 
-  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
+public:
+  PreciceInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell)
+      : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _massCell{massCell}, 
+      _M2mMeshName("mamico-M2m-mesh"), _m2MMeshName("mamico-m2M-mesh"),
+      _M2mVelocity{"VelocityMacro", coupling::preciceadapter::DataType::vector}, 
+      _m2MVelocity{"VelocityMicro", coupling::preciceadapter::DataType::vector} {}
+
+  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
     bool rcv = true;
-    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+    for (unsigned int currentDim = 0; currentDim < 3; currentDim++) {
       rcv &= globalCellIndex[currentDim] >= 1 + (_overlap - 1);
       rcv &= globalCellIndex[currentDim] < _globalNumberMacroscopicCells[currentDim] + 1 - (_overlap - 1);
     }
@@ -254,7 +253,7 @@ public:
   virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
     bool isGhostCell = false;
     bool isInner = true;
-    for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
+    for (unsigned int currentDim = 0; currentDim < 3; currentDim++) {
       isGhostCell |= globalCellIndex[currentDim] > _globalNumberMacroscopicCells[currentDim];
       isGhostCell |= globalCellIndex[currentDim] < 1;
       isInner &= globalCellIndex[currentDim] >= 1 + _overlap;
@@ -263,28 +262,102 @@ public:
     return (!isGhostCell) && (!isInner);
   }
 
-  std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {0}; }
+  std::vector<unsigned int> getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override { return {0}; }
 
-  // std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { 
-  //   coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<dim,int>>(globalCellIndex)};
-  //   std::vector<unsigned int> ranks = coupling::indexing::IndexingService<dim>::getInstance().getRanksForGlobalIndex(cellIndex_v);
+  // std::vector<unsigned int> getSourceRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override { 
+  //   coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<3,int>>(globalCellIndex)};
+  //   std::vector<unsigned int> ranks = coupling::indexing::IndexingService<3>::getInstance().getRanksForGlobalIndex(cellIndex_v);
   //   return ranks;
   // }
 
-  // std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override {
-  //   const unsigned int rank = coupling::indexing::IndexingService<dim>::getInstance().getUniqueRankForGlobalIndex(globalCellIndex);
+  // std::vector<unsigned int> getTargetRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+  //   const unsigned int rank = coupling::indexing::IndexingService<3>::getInstance().getUniqueRankForGlobalIndex(globalCellIndex);
   //   std::vector<unsigned int> ranks;
   //   ranks.push_back(rank);
   //   return ranks; 
   // }
 
-private:
-  const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
-  const unsigned int _overlap;
+  std::string getMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) {
+    std::string meshName;
+    if (receiveMacroscopicQuantityFromMDSolver(globalCellIndex)) {
+      meshName=_m2MMeshName;
+    } else if (sendMacroscopicQuantityToMDSolver(globalCellIndex)) {
+      meshName=_M2mMeshName;
+    } else {
+      std::cout << "PreciceInterface::getMeshName: cell with index " << globalCellIndex << " does not belong to a coupling mesh" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    return meshName;
+  }
+
+  tarch::la::Vector<3, double> getMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    return tarch::la::Vector<3, double>(0.0);
+  }
+
+  std::vector<coupling::preciceadapter::Data> getData(std::string meshName) {
+    std::vector<coupling::preciceadapter::Data> vector;
+    if (meshName == _M2mMeshName) {
+      vector.push_back(_M2mVelocity);
+    } else if (meshName == _m2MMeshName) {
+      vector.push_back(_m2MVelocity);
+    } else {
+      std::cout << "PreciceInterface::getData: no mesh named " << meshName << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    return vector;
+  }
+
+  coupling::preciceadapter::Data getData(std::string meshName, std::string dataName) {
+    coupling::preciceadapter::Data data;
+    if (meshName == _M2mMeshName && dataName == _M2mVelocity.name) {
+      data=_M2mVelocity;
+    } else if (meshName == _m2MMeshName && dataName == _m2MVelocity.name) {
+      data=_m2MVelocity;
+    } else {
+      std::cout << "PreciceInterface::getData: no mesh named " << meshName << " or no data named " << dataName << " or this data does not belong to this mesh" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    return data;
+  }
+
+  void readVectorData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<3>* const cell, const double vx, const double vy, const double vz) override {
+    if (meshName != _M2mMeshName || dataName != _M2mVelocity.name) {
+      std::cout << "PreciceInterface::readVectorData: incorrect mesh name " << meshName << " or data name " << dataName << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    tarch::la::Vector<3, double> momentum{vx, vy, vz};
+    momentum=momentum*_massCell;
+    cell->setMicroscopicMass(_massCell);
+    cell->setMicroscopicMomentum(momentum);
+  }
+
+  void readScalarData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<3>* const cell, const double v) override {
+    std::cout << "PreciceInterface::readScalarData: should not be used" << std::endl;
+    exit(EXIT_FAILURE); 
+  }
+
+  void writeVectorData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<3>* const cell, double& vx, double& vy, double& vz) {
+    if (meshName != _m2MMeshName || dataName != _m2MVelocity.name) {
+      std::cout << "PreciceInterface::readData: incorrect mesh name " << meshName << " or data name " << dataName << std::endl;
+      exit(EXIT_FAILURE)   ;
+    }
+    tarch::la::Vector<3, double> velocity;
+    if (cell->getMacroscopicMass() != 0.0) {
+      velocity = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();
+    }
+    vx=velocity[0];
+    vy=velocity[1];
+    vz=velocity[2];
+  }
+
+  void writeScalarData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<3>* const cell, double& v) {
+    std::cout << "PreciceInterface::readScalarData: should not be used" << std::endl;
+    exit(EXIT_FAILURE); 
+  }
 };
 
-  precice_scenario::PreciceAdapter<3>* _preciceAdapter;
-  MacroscopicSolverInterface<3>* _macroscopicSolverInterface;
+  coupling::preciceadapter::PreciceAdapter<3>* _preciceAdapter;
+  coupling::preciceadapter::PreciceInterface<3>* _preciceInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
