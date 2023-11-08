@@ -18,15 +18,29 @@ template <unsigned int dim> class coupling::preciceadapter::PreciceInterface : p
 public:
   /**
    * get the mesh name associated to this cell
+   * this mesh is used to couple the macroscopic solver to the MD solver
    * @return mesh name
    */
-  virtual std::string getMeshName(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual std::string getMacroscopicToMDSolverMeshName(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+
+  /**
+   * get the mesh name associated to this cell
+   * this mesh is used to couple the MD solver to the macroscopic solver
+   * @return mesh name
+   */
+  virtual std::string getMDToMacroscopicSolverMeshName(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
   /**
    * get the mesh off set associated to this cell
    * @return mesh offset
    */
-  virtual tarch::la::Vector<dim, double> getMeshOffset(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual tarch::la::Vector<dim, double> getMacroscopicToMDSolverMeshOffset(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+
+  /**
+   * get the mesh off set associated to this cell
+   * @return mesh offset
+   */
+  virtual tarch::la::Vector<dim, double> getMDToMacroscopicSolverMeshOffset(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
   /**
    * get a vector of data associated to this mesh

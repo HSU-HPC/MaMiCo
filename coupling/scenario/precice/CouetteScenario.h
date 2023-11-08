@@ -277,24 +277,23 @@ public:
   //   return ranks; 
   // }
 
-  std::string getMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) {
-    std::string meshName;
-    if (receiveMacroscopicQuantityFromMDSolver(globalCellIndex)) {
-      meshName=_m2MMeshName;
-    } else if (sendMacroscopicQuantityToMDSolver(globalCellIndex)) {
-      meshName=_M2mMeshName;
-    } else {
-      std::cout << "PreciceInterface::getMeshName: cell with index " << globalCellIndex << " does not belong to a coupling mesh" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    return meshName;
+  std::string getMacroscopicToMDSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    return _M2mMeshName;
   }
 
-  tarch::la::Vector<3, double> getMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+  std::string getMDToMacroscopicSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    return _m2MMeshName;
+  }
+
+  tarch::la::Vector<3, double> getMacroscopicToMDSolverMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
     return tarch::la::Vector<3, double>(0.0);
   }
 
-  std::vector<coupling::preciceadapter::Data> getData(std::string meshName) {
+  tarch::la::Vector<3, double> getMDToMacroscopicSolverMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    return tarch::la::Vector<3, double>(0.0);
+  }
+
+  std::vector<coupling::preciceadapter::Data> getData(std::string meshName) override {
     std::vector<coupling::preciceadapter::Data> vector;
     if (meshName == _M2mMeshName) {
       vector.push_back(_M2mVelocity);
@@ -307,7 +306,7 @@ public:
     return vector;
   }
 
-  coupling::preciceadapter::Data getData(std::string meshName, std::string dataName) {
+  coupling::preciceadapter::Data getData(std::string meshName, std::string dataName) override {
     coupling::preciceadapter::Data data;
     if (meshName == _M2mMeshName && dataName == _M2mVelocity.name) {
       data=_M2mVelocity;

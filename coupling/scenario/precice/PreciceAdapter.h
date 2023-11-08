@@ -85,13 +85,13 @@ public:
       if (preciceInterface->sendMacroscopicQuantityToMDSolver(cellIndex_V)) {
         std::vector<unsigned int> ranks = preciceInterface->getSourceRanks(cellIndex_V);
         if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
-          addCell(cellIndex_V, _M2mVertexCoordinates, _M2mCells, M2mCellIndices, _M2mVertexToCell, _M2mCellToVertex, mdDomainOffset, macroscopicCellSize, preciceInterface);
+          addCell(preciceInterface->getMacroscopicToMDSolverMeshName(cellIndex_V), cellIndex_V, _M2mVertexCoordinates, _M2mCells, M2mCellIndices, _M2mVertexToCell, _M2mCellToVertex, mdDomainOffset, macroscopicCellSize, preciceInterface->getMacroscopicToMDSolverMeshOffset(cellIndex_V));
         }
       }
       if (preciceInterface->receiveMacroscopicQuantityFromMDSolver(cellIndex_V)) {
         std::vector<unsigned int> ranks = preciceInterface->getTargetRanks(cellIndex_V);
         if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
-          addCell(cellIndex_V, _m2MVertexCoordinates, _m2MCells, m2MCellIndices, _m2MVertexToCell, _M2mCellToVertex, mdDomainOffset, macroscopicCellSize, preciceInterface);
+          addCell(preciceInterface->getMDToMacroscopicSolverMeshName(cellIndex_V), cellIndex_V, _m2MVertexCoordinates, _m2MCells, m2MCellIndices, _m2MVertexToCell, _m2MCellToVertex, mdDomainOffset, macroscopicCellSize, preciceInterface->getMDToMacroscopicSolverMeshOffset(cellIndex_V));
         }
       }
     }
@@ -194,13 +194,11 @@ public:
   // }
 
 private:
-  void addCell(tarch::la::Vector<dim, unsigned int> cellIndex, std::map<std::string, std::vector<double>> vertexCoordinates,
-    std::vector<coupling::datastructures::MacroscopicCell<dim>*> cells, std::vector<unsigned int> cellIndices,
-    std::map<std::string, std::map<int, unsigned int>> vertexToCell, std::map<std::string, std::map<unsigned int, int>> cellToVertex,
-    const tarch::la::Vector<dim, double> mdDomainOffset, const tarch::la::Vector<3, double> macroscopicCellSize, 
-    coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
-    std::string meshName = preciceInterface->getMeshName(cellIndex);
-    tarch::la::Vector<dim, double> offset = preciceInterface->getMeshOffset(cellIndex);
+  void addCell(const std::string& meshName, tarch::la::Vector<dim, unsigned int>& cellIndex, std::map<std::string, std::vector<double>>& vertexCoordinates,
+    std::vector<coupling::datastructures::MacroscopicCell<dim>*>& cells, std::vector<unsigned int>& cellIndices,
+    std::map<std::string, std::map<int, unsigned int>>& vertexToCell, std::map<std::string, std::map<unsigned int, int>>& cellToVertex,
+    const tarch::la::Vector<dim, double>& mdDomainOffset, const tarch::la::Vector<3, double>& macroscopicCellSize, 
+    const tarch::la::Vector<dim, double> offset) {
     for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
       vertexCoordinates[meshName].push_back(mdDomainOffset[currentDim] + cellIndex[currentDim] * macroscopicCellSize[currentDim] -
                               macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim] + offset[currentDim]);
@@ -208,12 +206,12 @@ private:
     cells.push_back(new coupling::datastructures::MacroscopicCell<dim>());
     coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<dim,int>>(cellIndex)};
     cellIndices.push_back(coupling::indexing::convertToScalar<dim>(cellIndex_v));
-    vertexToCell[meshName][vertexCoordinates[meshName].size()-1] = cells.size()-1;
-    cellToVertex[meshName][cells.size()-1] = vertexCoordinates[meshName].size()-1;
+    vertexToCell[meshName][vertexCoordinates[meshName].size()/dim - 1] = cells.size()-1;
+    cellToVertex[meshName][cells.size()-1] = vertexCoordinates[meshName].size()/dim-1;
   }
 
-  void initializeVectors(std::map<std::string, std::vector<double>> vertexCoordinates, 
-    std::map<std::string, std::vector<int>> vertexIndices, std::map<std::string, std::map<std::string, std::vector<double>>> vertexData,
+  void initializeVectors(std::map<std::string, std::vector<double>>& vertexCoordinates, 
+    std::map<std::string, std::vector<int>>& vertexIndices, std::map<std::string, std::map<std::string, std::vector<double>>>& vertexData,
     coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
     std::map<std::string, std::vector<double>>::iterator itVertexCoordinates;
     for (itVertexCoordinates = vertexCoordinates.begin(); itVertexCoordinates != vertexCoordinates.end(); ++itVertexCoordinates) {
@@ -222,29 +220,28 @@ private:
       _participant->setMeshVertices(itVertexCoordinates->first, itVertexCoordinates->second, vertexIndices[itVertexCoordinates->first]);
       for (const Data& data : preciceInterface->getData(itVertexCoordinates->first)) {
         size_t dataSize = numberOfCoordinates;
-        if (data.type == DataType::scalar)
-          dataSize/=dim;
+        if (data.type == DataType::scalar) dataSize/=dim;
         vertexData[itVertexCoordinates->first][data.name] = std::vector<double>(dataSize);
       }
     }
   }
 
-  void setMeshTetrahedra(std::map<std::string, std::vector<int>> vertexIndices, std::vector<unsigned int> cellIndices, 
-    std::map<std::string, std::map<int, unsigned int>> vertexToCell, std::map<std::string, std::map<unsigned int, int>> cellToVertex) {
-    std::map<std::string, std::vector<int>>::iterator itVertexIndices;
+  void setMeshTetrahedra(const std::map<std::string, std::vector<int>>& vertexIndices, const std::vector<unsigned int>& cellIndices, 
+    const std::map<std::string, std::map<int, unsigned int>>& vertexToCell, const std::map<std::string, std::map<unsigned int, int>>& cellToVertex) {
+    std::map<std::string, std::vector<int>>::const_iterator itVertexIndices;
     for (itVertexIndices = vertexIndices.begin(); itVertexIndices != vertexIndices.end(); ++itVertexIndices) {
       for (size_t i = 0; i < itVertexIndices->second.size(); ++i) {
         using CellIndex_v = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector>;
         using CellIndex_s = coupling::indexing::CellIndex<dim>;
-        CellIndex_v cellIndex_v = CellIndex_s{cellIndices[vertexToCell[itVertexIndices->first][i]]};
+        CellIndex_v cellIndex_v = CellIndex_s{cellIndices[vertexToCell.at(itVertexIndices->first).at(i)]};
         const int numberOfNeighbors = 7;
         tarch::la::Vector<3, int> directions[numberOfNeighbors] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 0}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1}, {0, 0, 1}};
         int neighborVertexIndices[numberOfNeighbors];
         for (size_t j = 0; j < numberOfNeighbors; j++) {
           CellIndex_s neighborCellIndex_s = CellIndex_v{cellIndex_v.get() + directions[j]};
-          std::vector<unsigned int>::iterator itCells = std::find(cellIndices.begin(), cellIndices.end(), neighborCellIndex_s.get());
+          std::vector<unsigned int>::const_iterator itCells = std::find(cellIndices.begin(), cellIndices.end(), neighborCellIndex_s.get());
           if (itCells != cellIndices.end()) {
-            neighborVertexIndices[j] = cellToVertex[itVertexIndices->first][itCells - cellIndices.begin()];
+            neighborVertexIndices[j] = itVertexIndices->second[cellToVertex.at(itVertexIndices->first).at(itCells - cellIndices.begin())];
           } else {
             neighborVertexIndices[j] = -1;
           }
