@@ -989,7 +989,10 @@ public:
 #elif defined(LAMMPS_DPD)
     mdSolverInterface = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
 #elif defined(LS1_MARDYN)
-    mdSolverInterface = new coupling::interface::LS1MDSolverInterface();
+    mdSolverInterface = new coupling::interface::LS1MDSolverInterface(
+      mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+      mamicoConfiguration.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell()
+    );
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(mdSolverInterface);
 #endif
 

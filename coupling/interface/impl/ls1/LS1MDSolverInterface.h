@@ -26,10 +26,12 @@ namespace coupling
 class coupling::interface::LS1MDSolverInterface : public coupling::interface::MDSolverInterface<ls1::LS1RegionWrapper, 3>
 {
   public:
-    LS1MDSolverInterface(): 
+    LS1MDSolverInterface(tarch::la::Vector<3,double> macroscopicCellSize, tarch::la::Vector<3,unsigned int> linkedCellsPerMacroscopicCell): 
     _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) 
     {
       _fullDomainWrapper.setupIDcounterForParticleAddition();
+      for (int i = 0; i < 3; i++)
+        _linkedCellSize[i] = macroscopicCellSize[i] / linkedCellsPerMacroscopicCell[i];
     }
     /** returns a particular linked cell inside a macroscopic cell.
      *  The macroscopic cells are currently located on the same process as the respective linked cells.
@@ -47,12 +49,6 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       const coupling::IndexConversion<3> &indexConversion
     )
     {
-      //only one cell per macroscopic cell
-      if(linkedCellInMacroscopicCell[0] != 0 || linkedCellInMacroscopicCell[1] != 0 || linkedCellInMacroscopicCell[2] != 0)
-      {
-        std::cout << "ERROR in LS1MDSolverInterface::getLinkedCell(): only one linked cell per macroscopic cell allowed!" << std::endl;
-				exit(EXIT_FAILURE);
-      }
       //ghost layer not allowed to have linked cells
       if(macroscopicCellIndex[0] == 0 || macroscopicCellIndex[1] == 0 || macroscopicCellIndex[2] == 0)
       {
@@ -60,13 +56,8 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
 				exit(EXIT_FAILURE);
       }
 
-      //get bounds of current process
-      double bBoxMin[3];
-			double bBoxMax[3];
-      global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
-
       //size of the macroscopic cell
-			tarch::la::Vector<3,double> macroCellSize = indexConversion.getMacroscopicCellSize();
+      tarch::la::Vector<3,double> macroCellSize(indexConversion.getMacroscopicCellSize());
 
       //conversion to global 
       using coupling::indexing::CellIndex;
@@ -77,11 +68,12 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       //We have unbroken MD domain, which we will divide into region iterators
       //So we split the MD into the same grid as the macro, and give the macroscopic cell the corresponding region
       double regionOffset[3], regionEndpoint[3];
+      double currentLinkedCellSize;
       for(int i = 0; i < 3; i++)
       {
-        regionOffset[i] = globalIndex.get()[i] * macroCellSize[i];
-        //regionOffset[i] = bBoxMin[i] + ((macroscopicCellIndex[i] - 1) * macroCellSize[i]);
-        regionEndpoint[i] = regionOffset[i] + macroCellSize[i];
+        currentLinkedCellSize = macroCellSize[i] / linkedCellsPerMacroscopicCell[i];
+        regionOffset[i] = (globalIndex.get()[i] * macroCellSize[i]) + (linkedCellInMacroscopicCell[i] * currentLinkedCellSize) ;
+        regionEndpoint[i] = regionOffset[i] + currentLinkedCellSize;
       }
 
       ls1::LS1RegionWrapper *cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint, global_simulation); //temporary till ls1 offset is natively supported
@@ -174,7 +166,25 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
      */
     virtual tarch::la::Vector<3,unsigned int> getLinkedCellIndexForMoleculePosition(
       const tarch::la::Vector<3,double>& position
-    ) { return tarch::la::Vector<3, unsigned int> {0,0,0}; }
+    )
+    { 
+      tarch::la::Vector<3,unsigned int> requiredCellIndex;
+      auto shiftedPosition = position - getGlobalMDDomainOffset();
+
+      //get bounds of current process
+      double bBoxMin[3];
+      double bBoxMax[3];
+      global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
+
+      //calculate the index
+      for (int i = 0; i < 3; i++)
+      {
+        shiftedPosition[i] = shiftedPosition[i] - bBoxMin[i];
+        requiredCellIndex[i] = static_cast<unsigned int>(std::floor(shiftedPosition[i]/_linkedCellSize[i]));
+      }
+
+      return requiredCellIndex;
+    }
 
 
     /** assumes that a molecule is placed somewhere inside the linked cell at index
@@ -230,5 +240,6 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
     }
   private:
     ls1::LS1RegionWrapper _fullDomainWrapper;
+    tarch::la::Vector <3,double> _linkedCellSize;
 };
 #endif
