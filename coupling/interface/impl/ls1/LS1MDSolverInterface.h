@@ -53,7 +53,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       if(macroscopicCellIndex[0] == 0 || macroscopicCellIndex[1] == 0 || macroscopicCellIndex[2] == 0)
       {
         std::cout << "ERROR in LS1MDSolverInterface::getLinkedCell(): ghost macroscopic cells may not have linked cells!" << std::endl;
-				exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
       }
 
       //size of the macroscopic cell
