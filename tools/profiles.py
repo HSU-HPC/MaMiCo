@@ -5,15 +5,16 @@ import pandas as pd
 import matplotlib as mpl
 import os
 from matplotlib import pyplot as plt
+import seaborn as sns
 
 # simulation parameters
 dt = 0.25
-ccs = [100, 500, 1000]
+ccs = [100, 200]
 
+volume = 6*6*6*2.5*2.5*2.5
 H = 50
 u_w = 0.5
 index=[4,5,6,7,8,9]
-path = os.path.join(os.sep,'home', 'loux', 'run', 'misc', 'md30')
 title = 'Velocity profiles'
 filename = 'profiles.eps'
        
@@ -38,13 +39,13 @@ def load_mamico_data(csv_file):
 	# load data in pandas DataFrame
 	df = pd.read_csv(csv_file, sep=";")
 	# get Avg x velocity per z layer
-	res = pd.DataFrame(columns=['z', 'avg_velocities', 'std_velocities', 'avg_mass'],index=index)
+	res = pd.DataFrame(columns=['z', 'avg_velocities', 'std_velocities', 'mass'],index=index)
 	for i,_ in res.iterrows():
 		sub_df = df.loc[df.loc[:,'k'] == i]
 		res.at[i, 'z'] = sub_df.loc[:,'z'].iat[0]
 		res.at[i, 'avg_velocities'] = sub_df.loc[:,'v_x'].mean()
 		res.at[i, 'std_velocities'] = sub_df.loc[:,'v_x'].std()
-		res.at[i, 'avg_mass'] = sub_df.loc[:,'m'].mean()
+		res.at[i, 'avg_mass'] = sub_df.loc[:,'m'].sum()
 	return res
 
 def load_external_data(csv_file):
@@ -65,12 +66,17 @@ def plot_one_coupling_cycle(cc, color, ax, path):
 	csv_file = os.path.join(path, 'mamico', 'results_0_'+str(cc)+'.csv')
 	res = load_mamico_data(csv_file)
 	ax.errorbar(res.loc[:,'z'], res.loc[:,'avg_velocities'], yerr = res.loc[:,'std_velocities'], marker='.', linestyle='none', linewidth=0.5,
-    markersize=4, color=color, capsize=1, elinewidth=0.5)
+    markersize=4, color=color, capsize=0.5, elinewidth=0.5)
+	""" Mass
+	"""
+	#print('z:'+str(res.loc[:,'z']))
+	print('rho:'+str(res.loc[:,'avg_mass'].sum()/volume))
 	""" Plot external velocities
 	"""
 	csv_file = os.path.join(path, 'openfoam', 'postProcessing', 'sampleDict', str(int(cc*dt)),'l_U.csv')
 	res = load_external_data(csv_file)
 	ax.plot(res.loc[:,'z'], res.loc[:,'U_0'], color=color, linestyle='none', marker='x', markersize=4);
+
 
 def main(argv):
 	opts, args = getopt.getopt(argv,'hp::',['path='])
@@ -81,13 +87,13 @@ def main(argv):
 			sys.exit()
 		elif opt in ('-p', '--path'):
 			path = arg
-	print(path)
 	fig = plt.figure(figsize=(7,5))
 	ax = fig.add_subplot(111)
-	cmap = mpl.colormaps['Accent'].resampled(ccs[-1])
+	cmap = mpl.colormaps['Spectral']
+	norm = mpl.colors.Normalize(vmin=ccs[0], vmax=ccs[-1])
 
 	for cc in ccs:
-		plot_one_coupling_cycle(cc, cmap(cc), ax, path)
+		plot_one_coupling_cycle(cc, cmap(norm(cc)), ax, path)
 
 	ax.set_xlim(0,H)
 	ax.set_xlabel('z', fontsize=14)

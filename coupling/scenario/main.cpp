@@ -7,7 +7,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #if (BUILD_WITH_PRECICE)
 #include "coupling/scenario/precice/CouetteScenario.h"
-//#include "coupling/scenario/precice/EvaporationScenario.h"
+#include "coupling/scenario/precice/EvaporationScenario.h"
 #endif
 #include "coupling/scenario/CouetteScenario.h"
 #include <cstdlib>
@@ -39,8 +39,8 @@ int main(int argc, char* argv[]) {
     std::string scenarioName(argv[1]);
     if (scenarioName == "couette") {
       scenario = new coupling::scenario::precice::CouetteScenario();
-    // } else if (scenarioName == "evaporation") {
-    //   scenario = new precice_scenario::EvaporationScenario();
+    } else if (scenarioName == "evaporation") {
+      scenario = new coupling::scenario::precice::EvaporationScenario();
     } else { // default to couette scenario
       scenario = new CouetteScenario();    
     }

@@ -143,7 +143,7 @@ public:
         temp.setid(_curParticleID);
         _curParticleID += _IDIncrementor;
 
-        temp.setComponent(_locSimulation->getEnsemble()->getComponent(0));
+        temp.setComponent(_locSimulation->getEnsemble()->getComponent(1));
 
         addMolecule(temp);
         //_particleContainer->addParticle(temp);

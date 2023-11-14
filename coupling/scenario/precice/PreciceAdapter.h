@@ -59,19 +59,19 @@ public:
     deleteBuffer(_m2MCells);
   }
 
-  std::vector<coupling::datastructures::MacroscopicCell<3>*> getM2mCells() {
+  std::vector<coupling::datastructures::MacroscopicCell<3>*> getM2mCells() const {
     return _M2mCells;
   }
 
-  std::vector<coupling::datastructures::MacroscopicCell<3>*> getm2MCells() {
+  std::vector<coupling::datastructures::MacroscopicCell<3>*> getm2MCells() const {
     return _m2MCells;
   }
 
-  unsigned int* getM2mCellIndices() {
+  unsigned int* getM2mCellIndices() const {
     return _M2mCellIndices;
   }
 
-  unsigned int* getm2MCellIndices() {
+  unsigned int* getm2MCellIndices() const {
     return _m2MCellIndices;
   }
 
@@ -107,7 +107,11 @@ public:
 
   void initialize() { _participant->initialize(); }
 
-  bool isCouplingOngoing() { return _participant->isCouplingOngoing(); }
+  bool isCouplingOngoing() const { return _participant->isCouplingOngoing(); }
+
+  bool isTimeWindowComplete() const { return _participant->isTimeWindowComplete(); }
+
+  double getMaxTimeStepSize() const { return _participant->getMaxTimeStepSize(); }
 
   void advance(const double dt) { _participant->advance(dt); }
 
@@ -156,42 +160,6 @@ public:
       }
     }
   }
-
-  // void writeData() {
-  //   // if (_participant->hasMesh(_m2MLMeshName)) {
-  //     // for (size_t i = 0; i < _m2MCells.size(); i++) {
-  //     //   tarch::la::Vector<3, double> velocity{0.0};
-  //     //   if (_m2MCells[i]->getMacroscopicMass() != 0.0) {
-  //     //     velocity = (1.0 / _m2MCells[i]->getMacroscopicMass()) * _m2MCells[i]->getMacroscopicMomentum();
-  //     //   }
-  //     //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-  //     //     _m2MLVertexVelocities[dim * i + currentDim] = velocity[currentDim];
-  //     //   }
-  //     // }
-  //     // _participant->writeData(_m2MLMeshName, _m2MVelocityName, _m2MLVertexIndices, _m2MLVertexVelocities);
-  //   // }
-  // }
-
-  // void writeData(double value) {
-  //   // if (_participant->hasMesh(_m2MLMeshName)) {
-  //     // for (size_t i = 0; i < _m2MVVertexIndices.size(); i++) {
-  //     //   _m2MVVertexVelocities[dim * i] = 0.0;
-  //     //   _m2MVVertexVelocities[dim * i + 1] = value;
-  //     //   _m2MVVertexVelocities[dim * i + 2] = 0.0;
-  //     // }
-  //     // _participant->writeData(_m2MVMeshName, _m2MVelocityName, _m2MVVertexIndices, _m2MVVertexVelocities);
-  //     // for (size_t i = 0; i < _m2MLVertexIndices.size(); i++) {
-  //     //   tarch::la::Vector<3, double> velocity{0.0};
-  //     //   if (_m2MCells[i]->getMacroscopicMass() != 0.0) {
-  //     //     velocity = (1.0 / _m2MCells[i]->getMacroscopicMass()) * _m2MCells[i]->getMacroscopicMomentum();
-  //     //   }
-  //     //   for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-  //     //     _m2MLVertexVelocities[dim * i + currentDim] = velocity[currentDim];
-  //     //   }
-  //     // }
-  //     // _participant->writeData(_m2MLMeshName, _m2MVelocityName, _m2MLVertexIndices, _m2MLVertexVelocities);
-  //   // }
-  // }
 
 private:
   void addCell(const std::string& meshName, tarch::la::Vector<dim, unsigned int>& cellIndex, std::map<std::string, std::vector<double>>& vertexCoordinates,
