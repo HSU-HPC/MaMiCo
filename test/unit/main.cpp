@@ -9,6 +9,13 @@
 #include <mpi.h>
 #endif
 
+class Listener : public CppUnit::TextTestProgressListener {
+ public:
+     void startTest(CppUnit::Test *test) override {
+        CppUnit::stdCOut() << test->getName() << " ...\n";
+     }
+};
+
 int main( int argc, char **argv)
 {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -24,7 +31,7 @@ int main( int argc, char **argv)
     controller.addListener( &result );        
 
     // Add a listener that print dots as test run.
-    CppUnit::TextTestProgressListener progress;
+    Listener progress;
     controller.addListener( &progress );      
 
     // Add the top suite to the test runner
@@ -32,7 +39,7 @@ int main( int argc, char **argv)
     runner.addTest( CppUnit::TestFactoryRegistry::getRegistry().makeTest() );   
     try
     {
-        std::cout << "Running ...\n"  <<  testPath;
+        std::cout << "Running  ..." << std::endl;
         runner.run( controller, testPath );
 
         std::cerr << std::endl;
