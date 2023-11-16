@@ -9,9 +9,9 @@ import seaborn as sns
 
 # simulation parameters
 dt = 0.25
-ccs = [100, 200]
+ccs = [100, 200, 500]
 
-volume = 6*6*6*2.5*2.5*2.5
+volume_inner_md_domain = 6*6*6*2.5*2.5*2.5
 H = 50
 u_w = 0.5
 index=[4,5,6,7,8,9]
@@ -70,7 +70,7 @@ def plot_one_coupling_cycle(cc, color, ax, path):
 	""" Mass
 	"""
 	#print('z:'+str(res.loc[:,'z']))
-	print('rho:'+str(res.loc[:,'avg_mass'].sum()/volume))
+	print('rho:'+str(res.loc[:,'avg_mass'].sum()/volume_inner_md_domain))
 	""" Plot external velocities
 	"""
 	csv_file = os.path.join(path, 'openfoam', 'postProcessing', 'sampleDict', str(int(cc*dt)),'l_U.csv')
