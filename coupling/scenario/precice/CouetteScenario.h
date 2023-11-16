@@ -392,7 +392,7 @@ private:
     }
 
     std::string getMDToMacroscopicSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-      return _m2MMeshName;
+      return "";
     }
 
     tarch::la::Vector<3, double> getMacroscopicToMDSolverMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
