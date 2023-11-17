@@ -32,7 +32,6 @@ public:
   }
 
   template <unsigned int dim> void test() {
-    /*
     coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>* mdSolverInterface = new TestMDSolverInterface<dim>();
     coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface = new TestMacroscopicSolverInterface<dim>();
     const tarch::la::Vector<dim, unsigned int> numberOfProcesses{1};
@@ -46,8 +45,7 @@ public:
     const unsigned int numberOfTimeSteps = 1;
     TestMacroscopicCellConfiguration<dim> macroscopicCellConfiguration;
     const char * filterPipelineConfigurationFile = nullptr;
-    // TODO this gets stuck in an infinite busy loop on my machine (with 4 MPI ranks)
-    // tarch::utils::MultiMDService<dim> multiMDService{tarch::la::Vector<dim, unsigned int>{1},1};
+    tarch::utils::MultiMDService<dim> multiMDService{tarch::la::Vector<dim, unsigned int>{1},1};
     const unsigned int topologyOffset = 1;
     new coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>(
           1, 
@@ -66,7 +64,6 @@ public:
           filterPipelineConfigurationFile, 
           multiMDService, 
           topologyOffset);
-    */
   }
 
 private:

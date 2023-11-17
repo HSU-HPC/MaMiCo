@@ -405,9 +405,11 @@ public:
       res[1] += vel[1];
       res[2] += vel[2];
     }
-    res[0] /= (_pdfsize/19);
-    res[1] /= (_pdfsize/19);
-    res[2] /= (_pdfsize/19);
+    if(_pdfsize>0){
+      res[0] /= (_pdfsize/19);
+      res[1] /= (_pdfsize/19);
+      res[2] /= (_pdfsize/19);
+    }
     return std::sqrt(res[0]*res[0] + res[1]*res[1]+res[2]*res[2]);
   }
 
@@ -416,6 +418,7 @@ private:
   double _dt_pint;
 
   void computeDensityAndVelocityEverywhere() {
+    if (skipRank()) return;
     for (int z = 1; z < _domainSizeZ + 1; z++) {
       for (int y = 1; y < _domainSizeY + 1; y++) {
         for (int x = 1; x < _domainSizeX + 1; x++) {

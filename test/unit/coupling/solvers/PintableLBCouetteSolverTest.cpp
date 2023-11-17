@@ -17,12 +17,15 @@ using State = coupling::interface::PintableMacroSolverState;
 class PintableLBCouetteSolverTest : public CppUnit::TestFixture {
 
     CPPUNIT_TEST_SUITE(PintableLBCouetteSolverTest);
+    CPPUNIT_TEST( testSetUp );
     CPPUNIT_TEST( testMode );
+    CPPUNIT_TEST( testGetAvgVelOnEmptyState );
+    CPPUNIT_TEST( testInitialisedOK );
     CPPUNIT_TEST( testReturnToZero );
     CPPUNIT_TEST( testRunIntoSameState );
     CPPUNIT_TEST( testSupervisorRunIntoSameState );
-    //CPPUNIT_TEST( testAdvanceSupervisorChangesState );
-    //CPPUNIT_TEST( testSupervisorsUnique );
+    CPPUNIT_TEST( testAdvanceSupervisorChangesState );
+    CPPUNIT_TEST( testSupervisorsUnique );
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -47,22 +50,30 @@ public:
     G2 = std::unique_ptr<LBCouetteSolver>{dynamic_cast<LBCouetteSolver*>(supervisor.release())};
   }
 
-  void testSetUp() {
-    std::unique_ptr<LBCouetteSolver> F2 = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5,0,0}, 
-        2.14, 2.5, 0.25, 0, "LBCouette", tarch::la::Vector<3, unsigned int>{1,1,1});
-
-    CPPUNIT_ASSERT( F->getNumberProcesses() == G->getNumberProcesses());
-    CPPUNIT_ASSERT( F->getNumberProcesses() == F2->getNumberProcesses());
-
-    CPPUNIT_ASSERT( F->getAvgNumberLBCells() == G->getAvgNumberLBCells());
-    CPPUNIT_ASSERT( F->getAvgNumberLBCells() == F2->getAvgNumberLBCells());
-  }
-
   void tearDown() {
     coupling::indexing::IndexingService<3>::getInstance().finalize();
     F = nullptr;
     G = nullptr;
     G2 = nullptr;
+  }
+
+  void testSetUp() {
+    std::unique_ptr<LBCouetteSolver> F2 = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5,0,0}, 
+        2.14, 2.5, 0.25, 0, "LBCouette", tarch::la::Vector<3, unsigned int>{1,1,1});
+
+    CPPUNIT_ASSERT_EQUAL( F->getNumberProcesses() , G->getNumberProcesses());
+    CPPUNIT_ASSERT_EQUAL( F->getNumberProcesses() , F2->getNumberProcesses());
+
+    CPPUNIT_ASSERT_EQUAL( F->getAvgNumberLBCells() , G->getAvgNumberLBCells());
+    CPPUNIT_ASSERT_EQUAL( F->getAvgNumberLBCells() , F2->getAvgNumberLBCells());
+  }
+
+  void testNoStateOnUnusedRank(){
+    if(_rank > 0){
+      CPPUNIT_ASSERT_EQUAL ( F->getState()->getSizeBytes() , 0 );
+      CPPUNIT_ASSERT_EQUAL ( G->getState()->getSizeBytes() , 0 );
+      CPPUNIT_ASSERT_EQUAL ( G2->getState()->getSizeBytes(), 0 );
+    }
   }
 
   void testMode(){
@@ -71,18 +82,41 @@ public:
     CPPUNIT_ASSERT( G2->getMode() == Solver::Mode::supervising);
   }
 
+  void testGetAvgVelOnEmptyState() {
+    if(_rank > 0){
+      CPPUNIT_ASSERT_EQUAL ( F->get_avg_vel( F->getState()) , 0.0 );
+      CPPUNIT_ASSERT_EQUAL(  G->get_avg_vel( G->getState()) , 0.0 );
+      CPPUNIT_ASSERT_EQUAL( G2->get_avg_vel(G2->getState()) , 0.0 );
+    }
+  }
+
+  void testInitialisedOK() {
+    std::unique_ptr<State> u0 = F->getState();
+    double v0 = F->get_avg_vel(u0);
+    CPPUNIT_ASSERT_MESSAGE ( std::to_string(v0), v0 == 0 );
+
+    u0 = G->getState();
+    v0 = G->get_avg_vel(u0);
+    CPPUNIT_ASSERT_MESSAGE ( std::to_string(v0), v0 == 0 );
+
+    u0 = G2->getState();
+    v0 = G2->get_avg_vel(u0);
+    CPPUNIT_ASSERT_MESSAGE ( std::to_string(v0), v0 == 0 );
+  }
+
   void testReturnToZero() {
     std::unique_ptr<State> u0 = F->getState();
     F->advance(1.0);
     std::unique_ptr<State> u1 = F->getState();
 
-    /*double v0 = F->get_avg_vel(u0);
+    double v0 = F->get_avg_vel(u0);
     double v1 = F->get_avg_vel(u1);
-    CPPUNIT_ASSERT(v0 != v1);
-    std::stringstream msg; msg << "velocities are " << v0 << " and " << v1 << std::endl;
-    CPPUNIT_ASSERT_MESSAGE(msg.str(), !( *u0 == *u1 ));
-
-    CPPUNIT_FAIL("HAHA");*/
+    
+    std::stringstream msg; msg << "Rank " << _rank << " velocities are " << v0 << " and " << v1 << std::endl;
+    if(_rank == 0){
+      CPPUNIT_ASSERT_MESSAGE(msg.str(), v0 != v1);
+      CPPUNIT_ASSERT_MESSAGE(msg.str(), !( *u0 == *u1 ));
+    }
 
     F->setState(u0, 0);
     CPPUNIT_ASSERT( *u0 == *(F->getState()) );
@@ -150,27 +184,31 @@ public:
   }
 
   void testAdvanceSupervisorChangesState(){
-    std::unique_ptr<State> u0 = G->getState();
-    G->advance(0.5);
-    std::unique_ptr<State> u1 = G->getState();
-    std::unique_ptr<State> u2 = G->operator()(u1, 0);
+    if(_rank == 0){
+      std::unique_ptr<State> u0 = G->getState();
+      G->advance(0.5);
+      std::unique_ptr<State> u1 = G->getState();
+      std::unique_ptr<State> u2 = G->operator()(u1, 0);
 
-    CPPUNIT_ASSERT(!( *u0 == *u1 ));
-    CPPUNIT_ASSERT(!( *u1 == *u2 ));
-    CPPUNIT_ASSERT(!( *u0 == *u2 ));
+      CPPUNIT_ASSERT(!( *u0 == *u1 ));
+      CPPUNIT_ASSERT(!( *u1 == *u2 ));
+      CPPUNIT_ASSERT(!( *u0 == *u2 ));
+    }
   }
 
   void testSupervisorsUnique() {
-    G->advance(0.5);
-    CPPUNIT_ASSERT(!( *(G->getState()) == *(G2->getState()) ));
+    if(_rank == 0){
+      G->advance(0.5);
+      CPPUNIT_ASSERT(!( *(G->getState()) == *(G2->getState()) ));
 
-    std::unique_ptr<State> u0 = G->getState();
-    G2->setState(u0, 0);
-    CPPUNIT_ASSERT( *(G->getState()) == *(G2->getState()) );
+      std::unique_ptr<State> u0 = G->getState();
+      G2->setState(u0, 0);
+      CPPUNIT_ASSERT( *(G->getState()) == *(G2->getState()) );
 
-    std::unique_ptr<State> u1 = G2->operator()(u0, 0);
-    CPPUNIT_ASSERT( *u1 == *(G2->getState()) );
-    CPPUNIT_ASSERT(!(*u1 == *( G->getState())) );
+      std::unique_ptr<State> u1 = G2->operator()(u0, 0);
+      CPPUNIT_ASSERT( *u1 == *(G2->getState()) );
+      CPPUNIT_ASSERT(!(*u1 == *( G->getState())) );
+    }
   }
 
 private:
