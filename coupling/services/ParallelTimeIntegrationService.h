@@ -151,16 +151,16 @@ private:
     }
 
     void receive(std::unique_ptr<State>& state) const{
-        int source_rank = _world_rank - _ranks_per_domain;
         if(!state) state = _u_0->clone();
         #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+        int source_rank = _world_rank - _ranks_per_domain;
         MPI_Recv(state->getData(), state->getSizeBytes(), MPI_BYTE, source_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         #endif
     }
 
     void send(std::unique_ptr<State>& state) const {
-        int destination_rank = _world_rank + _ranks_per_domain;
         #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+        int destination_rank = _world_rank + _ranks_per_domain;
         MPI_Send(state->getData(), state->getSizeBytes(), MPI_BYTE, destination_rank, 0, MPI_COMM_WORLD);
         #endif
     }
