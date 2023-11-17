@@ -130,7 +130,7 @@ protected:
 
   /** @brief initialises all MPI variables  */
   void getRootRank() {
-    int rank;
+    int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
