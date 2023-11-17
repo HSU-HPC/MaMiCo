@@ -110,7 +110,7 @@ public:
     const unsigned int overLap = mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap();
     const double densityCell = 0.81;
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
-    _preciceInterface = new PreciceInterface(numberCells, overLap, massCell);
+    _preciceInterface = new PreciceInterface(numberCells, overLap, massCell, scenarioConfig.twoWayCoupling);
     coupling::indexing::IndexingService<dim>::getInstance().init(mdConfig, mamicoConfig, _preciceInterface, rank);
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
         _instanceHandling->getMDSolverInterface(), _preciceInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
@@ -174,6 +174,7 @@ private:
     const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
     const unsigned int _overlap;
     const double _massCell;
+    const bool _twoWayCoupling;
     const std::string _M2mMeshName;
     const std::string _m2MLMeshName;
     const std::string _m2MVMeshName;
@@ -191,8 +192,8 @@ private:
     }
 
   public:
-    PreciceInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell)
-        : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _massCell{massCell}, 
+    PreciceInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell, const bool twoWayCoupling)
+        : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _massCell{massCell}, _twoWayCoupling(twoWayCoupling),
         _M2mMeshName("mamico-M2m-mesh"), _m2MLMeshName("mamico-m2ML-mesh"), _m2MVMeshName("mamico-m2MV-mesh"),
         _M2mVelocity{"VelocityMacro", coupling::preciceadapter::DataType::vector}, 
         _m2MLVelocity{"VelocityMicro", coupling::preciceadapter::DataType::vector}, _m2MVVelocity{"VelocityMicro", coupling::preciceadapter::DataType::vector} {}
@@ -215,6 +216,10 @@ private:
         isGhostCell |= globalCellIndex[currentDim] < 1;
       }
       return !isGhostCell && (globalCellIndex[1] == 1 || globalCellIndex[1] == 2 || globalCellIndex[1] == 3);
+    }
+
+    bool twoWayCoupling() override {
+      return _twoWayCoupling;
     }
 
     std::vector<unsigned int> getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override { return {0}; }
@@ -342,7 +347,9 @@ private:
     ~ScenarioConfig() {}
 
     void parseSubtag(tinyxml2::XMLElement* node) override {
-      tinyxml2::XMLElement* subtag = node->FirstChildElement("microscopic-solver");
+      tinyxml2::XMLElement* subtag = node->FirstChildElement("coupling");
+      tarch::configuration::ParseConfiguration::readBoolMandatory(twoWayCoupling, subtag, "two-way-coupling");
+      subtag = node->FirstChildElement("microscopic-solver");
       tarch::configuration::ParseConfiguration::readDoubleMandatory(temp, subtag, "temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(equSteps, subtag, "equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntMandatory(totalNumberMDSimulations, subtag, "number-md-simulations");
@@ -352,7 +359,7 @@ private:
 
     bool isValid() const override { return true; };
 
-    int csvEveryTimestep;
+    bool twoWayCoupling;
     int equSteps;
     double temp;
     int totalNumberMDSimulations;

@@ -43,6 +43,11 @@ public:
   virtual tarch::la::Vector<dim, double> getMDToMacroscopicSolverMeshOffset(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
   /**
+   * return true if two way coupling, i.e. macro to md and md to macro, is activated
+   */
+  virtual bool twoWayCoupling() = 0;
+
+  /**
    * get a vector of data associated to this mesh
    * @return std::vector<Data>
    */

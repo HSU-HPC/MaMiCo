@@ -95,14 +95,16 @@ public:
         }
       }
     }
-    initializeVectors(_M2mVertexCoordinates, _M2mVertexIndices, _M2mVertexData, preciceInterface);
-    initializeVectors(_m2MVertexCoordinates, _m2MVertexIndices, _m2MVertexData, preciceInterface);
     _M2mCellIndices = new unsigned int[_M2mCells.size()];
     std::copy(M2mCellIndices.begin(), M2mCellIndices.end(), _M2mCellIndices);
     _m2MCellIndices = new unsigned int[_m2MCells.size()];
     std::copy(m2MCellIndices.begin(), m2MCellIndices.end(), _m2MCellIndices);
+    initializeVectors(_M2mVertexCoordinates, _M2mVertexIndices, _M2mVertexData, preciceInterface);
     setMeshTetrahedra(_M2mVertexIndices, M2mCellIndices, _M2mVertexToCell, _M2mCellToVertex);
-    setMeshTetrahedra(_m2MVertexIndices, m2MCellIndices, _m2MVertexToCell, _m2MCellToVertex);
+    if (preciceInterface->twoWayCoupling()) {
+      initializeVectors(_m2MVertexCoordinates, _m2MVertexIndices, _m2MVertexData, preciceInterface);
+      setMeshTetrahedra(_m2MVertexIndices, m2MCellIndices, _m2MVertexToCell, _m2MCellToVertex);
+    }
   }
 
   void initialize() { _participant->initialize(); }
@@ -162,6 +164,10 @@ public:
   }
 
 private:
+  /**
+   * add a vertex and a cell in vertexCoordinates map and cells map for this mesh name 
+   * and compute the vertex/cell mapping
+   */ 
   void addCell(const std::string& meshName, tarch::la::Vector<dim, unsigned int>& cellIndex, std::map<std::string, std::vector<double>>& vertexCoordinates,
     std::vector<coupling::datastructures::MacroscopicCell<dim>*>& cells, std::vector<unsigned int>& cellIndices,
     std::map<std::string, std::map<int, unsigned int>>& vertexToCell, std::map<std::string, std::map<unsigned int, int>>& cellToVertex,
@@ -178,6 +184,10 @@ private:
     cellToVertex[meshName][cells.size()-1] = vertexCoordinates[meshName].size()/dim-1;
   }
 
+  /**
+   * initialize the vertex indices and vertex data maps based on the vertex coordinates map
+   * set the participant precice mesh vertices 
+   */
   void initializeVectors(std::map<std::string, std::vector<double>>& vertexCoordinates, 
     std::map<std::string, std::vector<int>>& vertexIndices, std::map<std::string, std::map<std::string, std::vector<double>>>& vertexData,
     coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
@@ -194,6 +204,9 @@ private:
     }
   }
 
+  /**
+   * set the participant mesh tetrahedra
+   */
   void setMeshTetrahedra(const std::map<std::string, std::vector<int>>& vertexIndices, const std::vector<unsigned int>& cellIndices, 
     const std::map<std::string, std::map<int, unsigned int>>& vertexToCell, const std::map<std::string, std::map<unsigned int, int>>& cellToVertex) {
     std::map<std::string, std::vector<int>>::const_iterator itVertexIndices;
