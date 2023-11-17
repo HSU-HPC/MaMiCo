@@ -19,8 +19,10 @@
  */
 class FromMD2MacroTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(FromMD2MacroTest);
-  CPPUNIT_TEST(test<2>);
-  CPPUNIT_TEST(test<3>);
+  // TODO While this code is named "test", it just prints debug output, but does not execute any tests
+  // Thus there is no reason to execute it at all
+  //CPPUNIT_TEST(test<2>);
+  //CPPUNIT_TEST(test<3>);
   CPPUNIT_TEST_SUITE_END();
 
 public:
