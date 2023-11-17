@@ -7,7 +7,6 @@
 #include "coupling/ErrorEstimation.h"
 #include "coupling/InstanceHandling.h"
 #include "coupling/MultiMDMediator.h"
-#include "coupling/scenario/Scenario.h"
 #include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/LBCouetteSolver.h"

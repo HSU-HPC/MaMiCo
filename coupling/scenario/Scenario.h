@@ -5,7 +5,10 @@
 #ifndef _MAMICO_COUPLING_SCENARIO_SCENARIO_H_
 #define _MAMICO_COUPLING_SCENARIO_SCENARIO_H_
 
+class Scenario;
+
 #include "coupling/CouplingMDDefinitions.h"
+#include "coupling/solvers/CouetteSolver.h"
 #include <iostream>
 #include <string>
 
