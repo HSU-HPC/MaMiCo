@@ -46,8 +46,8 @@ protected:
    * 	@param cell
    * 	@param globalVectorIndex
    */
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                         const MacroscopicCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void writeToSendBuffer(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, const MacroscopicCell& cell,
+                         tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
   /** reads the information from the receive-buffer and fills it into a
    * macroscopic cell.
@@ -55,16 +55,15 @@ protected:
    * 	@param macroscopicCell
    * 	@param globalVectorIndex
    */
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                             MacroscopicCell& macroscopicCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, MacroscopicCell& macroscopicCell,
+                             tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
   /** according to rule by dataExchange, the receive buffers are allocated. This
    * function adds a contribution for the cell at globalVectorIndex.
    * 	@param dataExchange
    * 	@param globalVectorIndex
    */
-  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                              tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
   /** triggers the MPI-sending on the respective buffers. No sending for
    * information transfer from/ to this rank.

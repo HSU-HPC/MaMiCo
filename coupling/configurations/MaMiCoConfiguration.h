@@ -8,9 +8,9 @@
 #include "coupling/configurations/MacroscopicCellConfiguration.h"
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
 #include "coupling/configurations/ParallelTopologyConfiguration.h"
-#include "coupling/configurations/TimeIntegrationConfiguration.h"
 #include "coupling/configurations/ParticleInsertionConfiguration.h"
 #include "coupling/configurations/ThermostatConfiguration.h"
+#include "coupling/configurations/TimeIntegrationConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
 #include "tarch/configuration/Configuration.h"
 #include "tarch/la/Vector.h"
@@ -142,7 +142,7 @@ public:
 
   /**
    * @return _thermostatConfiguration
-  */
+   */
   const coupling::configurations::ThermostatConfiguration& getThermostatConfiguration() const {
     if (!_isDefinedThermostat) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "

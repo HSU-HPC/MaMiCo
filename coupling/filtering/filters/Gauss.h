@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-//#define DEBUG_GAUSS
+// #define DEBUG_GAUSS
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling {

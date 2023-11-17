@@ -7,7 +7,8 @@ template <unsigned int dim>
 tarch::utils::MultiMDService<dim>::MultiMDService(const tarch::la::Vector<dim, unsigned int>& numberProcessesPerMDSimulation,
                                                   const unsigned int& totalNumberMDSimulations
 #if (TARCH_PARALLEL == TARCH_YES)
-                                                  , MPI_Comm globalComm
+                                                  ,
+                                                  MPI_Comm globalComm
 #endif
                                                   )
     : // initialise all values, either immediately consistent for single and

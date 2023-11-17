@@ -7,10 +7,10 @@
 #include "coupling/ErrorEstimation.h"
 #include "coupling/InstanceHandling.h"
 #include "coupling/MultiMDMediator.h"
-#include "coupling/solvers/CouetteSolver.h"
-#include "coupling/services/ParallelTimeIntegrationService.h"
-#include "coupling/solvers/LBCouetteSolver.h"
 #include "coupling/scenario/Scenario.h"
+#include "coupling/services/ParallelTimeIntegrationService.h"
+#include "coupling/solvers/CouetteSolver.h"
+#include "coupling/solvers/LBCouetteSolver.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
@@ -86,12 +86,11 @@ public:
     shutdown();
   }
 
-
   /** triggers initMPI(), parseConfiguration(), and initSolvers()
    *  @brief initialises everthing necessary for the test */
   void init() override {
 #if defined(LS1_MARDYN)
-    global_log = new Log::Logger(Log::Error); //Info
+    global_log = new Log::Logger(Log::Error); // Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif
@@ -125,9 +124,9 @@ public:
     }
   }
 
-  coupling::solvers::AbstractCouetteSolver<3>* getSolver() override {return _couetteSolver;}
-protected:
+  coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { return _couetteSolver; }
 
+protected:
   /** @brief initialises all MPI variables  */
   void getRootRank() {
     int rank = 0;
@@ -166,15 +165,15 @@ protected:
 
     _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
 
-    #if defined(LS1_MARDYN)
+#if defined(LS1_MARDYN)
     assert((_mamicoConfig.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3, unsigned int>(1)));
     auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
     coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
-    
-    #endif
+
+#endif
   }
 
   /** @brief initialises the macro and micro solver according to the setup from
@@ -184,18 +183,16 @@ protected:
     _rank = _timeIntegrationService->getRank(); // returns the rank inside local time domain
 
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], 
-        _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), 
-        getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
-        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap()
-    );
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank
-      #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      ,_timeIntegrationService->getPintComm()
-      #endif
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                                                               ,
+                                                               _timeIntegrationService->getPintComm()
+#endif
     );
 
     // for timing measurements
@@ -218,9 +215,10 @@ protected:
       totNumMD = _cfg.lowerBoundNumberMDSimulations;
 
     _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), totNumMD
-      #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      ,_timeIntegrationService->getPintComm()
-      #endif
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                                                          ,
+                                                          _timeIntegrationService->getPintComm()
+#endif
     );
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
@@ -268,8 +266,7 @@ protected:
     _couetteSolver = NULL;
     _couetteSolver =
         getCouetteSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
-                         _simpleMDConfig.getSimulationConfiguration().getDt() * 
-                         _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
+                         _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // set couette solver interface in MamicoInterfaceProvider
@@ -533,7 +530,7 @@ protected:
     }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Bcast(&addMDInstances, 1, MPI_INT, 0, _timeIntegrationService->getPintComm() );
+    MPI_Bcast(&addMDInstances, 1, MPI_INT, 0, _timeIntegrationService->getPintComm());
 #endif
     if (addMDInstances < 0) {
       if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() + addMDInstances < _cfg.lowerBoundNumberMDSimulations) {
@@ -973,9 +970,8 @@ protected:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      solver =
-          new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette", 
-            _cfg.lbNumberProcesses, 1, this);
+      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette",
+                                                      _cfg.lbNumberProcesses, 1, this);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -1002,8 +998,7 @@ protected:
    * the whole domain
    *  @param outerRegion
    *  @todo piet, what is the mamicoMeshsize & the outer layer  */
-  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(const double dx,
-                                                                                tarch::la::Vector<3, double> mdOffset,
+  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(const double dx, tarch::la::Vector<3, double> mdOffset,
                                                                                 tarch::la::Vector<3, double> mamicoMeshsize,
                                                                                 tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
                                                                                 unsigned int outerRegion) {
@@ -1026,14 +1021,11 @@ protected:
         }
       }
       tarch::la::Vector<3, unsigned int> cells_per_process{
-	tarch::la::Vector<3,int>{
-          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
-          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
-          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)
-	}
-      };
-      interface = new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain,
-                                                                  globalNumberMacroscopicCells, outerRegion);
+          tarch::la::Vector<3, int>{coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
+                                    coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
+                                    coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)}};
+      interface =
+          new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain, globalNumberMacroscopicCells, outerRegion);
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) {
@@ -1055,14 +1047,11 @@ protected:
         }
       }
       tarch::la::Vector<3, unsigned int> cells_per_process{
-	tarch::la::Vector<3,int>{
-          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
-          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
-          coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)
-        }
-      };
-      interface = new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain,
-                                                                  globalNumberMacroscopicCells, outerRegion);
+          tarch::la::Vector<3, int>{coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
+                                    coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
+                                    coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)}};
+      interface =
+          new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain, globalNumberMacroscopicCells, outerRegion);
     }
 
     if (interface == NULL) {

@@ -44,8 +44,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuf
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
   using namespace coupling::indexing;
-  const unsigned int globalIndex = CellIndex<dim>{CellIndex<dim, IndexTrait::vector>{
-    tarch::la::Vector<dim,int>(globalVectorIndex) } }.get();
+  const unsigned int globalIndex = CellIndex<dim>{CellIndex<dim, IndexTrait::vector>{tarch::la::Vector<dim, int>(globalVectorIndex)}}.get();
 
   // determine the ranks which need to receive information of this macroscopic
   // cell
@@ -92,11 +91,11 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiv
                                                                                         tarch::la::Vector<dim, unsigned int> globalVectorIndex) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   using namespace coupling::indexing;
-  const unsigned int globalIndex = CellIndex<dim>{CellIndex<dim, IndexTrait::vector>{
-    tarch::la::Vector<dim,int>(globalVectorIndex) } }.get();
+  const unsigned int globalIndex = CellIndex<dim>{CellIndex<dim, IndexTrait::vector>{tarch::la::Vector<dim, int>(globalVectorIndex)}}.get();
 
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Rank " << coupling::indexing::IndexingService<dim>::getInstance().getRank() << ": read cell " << globalVectorIndex << " (" << globalIndex << ") "
+  std::cout << "Rank " << coupling::indexing::IndexingService<dim>::getInstance().getRank() << ": read cell " << globalVectorIndex << " (" << globalIndex
+            << ") "
             << " from receive buffer" << std::endl;
 #endif
 
@@ -129,7 +128,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiv
   const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(globalVectorIndex);
   const unsigned int ranksSize = (unsigned int)ranks.size();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Rank " << coupling::indexing::IndexingService<dim>::getInstance().getRank() << ": allocate receive buffers for cell " << globalVectorIndex << ";";
+  std::cout << "Rank " << coupling::indexing::IndexingService<dim>::getInstance().getRank() << ": allocate receive buffers for cell " << globalVectorIndex
+            << ";";
   std::cout << " associated source ranks: ";
   for (unsigned int i = 0; i < ranksSize; i++) {
     std::cout << ranks[i] << " ";
@@ -177,9 +177,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending
     // if this is not the same rank, do sending
     if ((it->first) != thisRank) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      int err = MPI_Isend((it->second).buffer, doublesPerCell * (it->second).bufferSize, MPI_DOUBLE, (it->first), dataExchange.getTag(), 
-                          coupling::indexing::IndexingService<dim>::getInstance().getComm(),
-                          &_requests[counter]);
+      int err = MPI_Isend((it->second).buffer, doublesPerCell * (it->second).bufferSize, MPI_DOUBLE, (it->first), dataExchange.getTag(),
+                          coupling::indexing::IndexingService<dim>::getInstance().getComm(), &_requests[counter]);
       if (err != MPI_SUCCESS) {
         char* str = NULL;
         int len = -1;
@@ -243,8 +242,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceivi
 #endif
 }
 
-template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests() {
+template <class MacroscopicCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   if (_requestsAllocated) {
     std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): allocateRequests() called although allocation already took place!" << std::endl;
@@ -280,8 +278,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReques
 #endif
 }
 
-template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations() {
+template <class MacroscopicCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   // if no requests have been allocated, return immediately
   if (!_requestsAllocated && (_requests == NULL)) {

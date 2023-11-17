@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-//#define DEBUG_POD
+// #define DEBUG_POD
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling {

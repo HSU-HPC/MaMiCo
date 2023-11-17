@@ -1,10 +1,10 @@
+#include "coupling/solvers/LBCouetteSolver.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "coupling/solvers/LBCouetteSolver.h"
 
 using namespace coupling::solvers;
 
-/** 
+/**
  *  @author Piet Jarmatz
  */
 class LBCouetteSolverStateTest : public CppUnit::TestFixture {
@@ -21,8 +21,8 @@ class LBCouetteSolverStateTest : public CppUnit::TestFixture {
 
 public:
   void setUp() {
-    double data_one[3]{1,1,1};
-    double data_two[3]{2,2,2};
+    double data_one[3]{1, 1, 1};
+    double data_two[3]{2, 2, 2};
     _one = LBCouetteSolverState{3, data_one};
     _two = LBCouetteSolverState{3, data_two};
   }
@@ -40,7 +40,7 @@ public:
   }
 
   void testInit() {
-    double pdf[5]{1,2,3,4,5.5};
+    double pdf[5]{1, 2, 3, 4, 5.5};
     LBCouetteSolverState state(5, pdf);
     const double* data = state.getData();
     CPPUNIT_ASSERT(data[0] == 1);
@@ -51,13 +51,13 @@ public:
   }
 
   void testSize() {
-    double pdf[5]{1,2,3,4,5.5};
+    double pdf[5]{1, 2, 3, 4, 5.5};
     LBCouetteSolverState state(5, pdf);
-    CPPUNIT_ASSERT(state.getSizeBytes() == 40);  // 5 values times 8 bytes per double
+    CPPUNIT_ASSERT(state.getSizeBytes() == 40); // 5 values times 8 bytes per double
   }
 
   void TestCopyAssignments() {
-    double pdf[3]{100,100,100};
+    double pdf[3]{100, 100, 100};
     LBCouetteSolverState a(3, pdf);
     LBCouetteSolverState b = a;
     CPPUNIT_ASSERT(b.getData()[0] == 100);
@@ -95,7 +95,7 @@ public:
   }
 
   void testEquality() {
-    double data_two[3]{2,2,2};
+    double data_two[3]{2, 2, 2};
     LBCouetteSolverState my_two = LBCouetteSolverState{3, data_two};
     CPPUNIT_ASSERT(my_two == _two);
     LBCouetteSolverState res1 = *dynamic_cast<LBCouetteSolverState*>((_one + _two).get());
@@ -109,7 +109,6 @@ public:
 
 private:
   LBCouetteSolverState _one{1}, _two{1};
-
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(LBCouetteSolverStateTest);

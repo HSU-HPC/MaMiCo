@@ -8,45 +8,42 @@ namespace coupling {
 namespace solvers {
 class LBCouetteSolver;
 class LBCouetteSolverState;
-}
+} // namespace solvers
 } // namespace coupling
 
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
-#include "coupling/solvers/NumericalSolver.h"
 #include "coupling/interface/PintableMacroSolver.h"
+#include "coupling/solvers/NumericalSolver.h"
 #include <cmath>
 
 class coupling::solvers::LBCouetteSolverState : public coupling::interface::PintableMacroSolverState {
 public:
-  LBCouetteSolverState(int size): _pdf(size, 0) {}
+  LBCouetteSolverState(int size) : _pdf(size, 0) {}
 
-  LBCouetteSolverState(int size, double* pdf): LBCouetteSolverState(size) {
-    std::copy(pdf, pdf+size, _pdf.data());
-  }
+  LBCouetteSolverState(int size, double* pdf) : LBCouetteSolverState(size) { std::copy(pdf, pdf + size, _pdf.data()); }
 
   std::unique_ptr<State> clone() const override { return std::make_unique<LBCouetteSolverState>(*this); }
 
   ~LBCouetteSolverState() {}
 
-  int getSizeBytes() const override {return sizeof(double) * _pdf.size(); }
+  int getSizeBytes() const override { return sizeof(double) * _pdf.size(); }
 
   std::unique_ptr<State> operator+(const State& rhs) override;
   std::unique_ptr<State> operator-(const State& rhs) override;
 
   bool operator==(const State& rhs) const override {
     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
-    if(other == nullptr) return false;
+    if (other == nullptr)
+      return false;
     return _pdf == other->_pdf;
   }
 
-  double* getData() override {return _pdf.data();}
-  const double* getData() const override {return _pdf.data();}
+  double* getData() override { return _pdf.data(); }
+  const double* getData() const override { return _pdf.data(); }
 
-  void print(std::ostream& os) const override {
-    os << "<LBCouetteSolverState instance with size " << getSizeBytes() << ">";
-  }
+  void print(std::ostream& os) const override { os << "<LBCouetteSolverState instance with size " << getSizeBytes() << ">"; }
 
 private:
   std::vector<double> _pdf;
@@ -75,8 +72,7 @@ public:
   LBCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
                   const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
                   const unsigned int numThreads = 1, const Scenario* scen = nullptr)
-      : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes, scen),
-        _mode(Mode::coupling), _dt_pint(dt),
+      : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes, scen), _mode(Mode::coupling), _dt_pint(dt),
         _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity) {
     // return if required
     if (skipRank()) {
@@ -185,7 +181,7 @@ public:
       exit(EXIT_FAILURE);
     }
     for (int i = 0; i < timesteps; i++) {
-      if ( _plotEveryTimestep >= 1 && _counter % _plotEveryTimestep == 0)
+      if (_plotEveryTimestep >= 1 && _counter % _plotEveryTimestep == 0)
         computeDensityAndVelocityEverywhere();
       plot();
       collidestream();
@@ -205,12 +201,12 @@ public:
     if (skipRank()) {
       return;
     }
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_mode == Mode::supervising){
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_mode == Mode::supervising) {
       std::cout << "ERROR LBCouetteSolver setMDBoundaryValues() called in supervising mode" << std::endl;
       exit(EXIT_FAILURE);
     }
-    #endif
+#endif
 
     // loop over all received cells
     const unsigned int size = (unsigned int)recvBuffer.size();
@@ -331,12 +327,12 @@ public:
   void setState(const std::unique_ptr<State>& input, int cycle) override {
     const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(input.get());
 
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(state == nullptr){
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (state == nullptr) {
       std::cout << "ERROR LBCouetteSolver setState() wrong state type" << std::endl;
       exit(EXIT_FAILURE);
     }
-    #endif
+#endif
 
     std::copy(state->getData(), state->getData() + _pdfsize, _pdf1);
     computeDensityAndVelocityEverywhere();
@@ -347,13 +343,13 @@ public:
   std::unique_ptr<State> operator()(const std::unique_ptr<State>& input, int cycle) override {
     setState(input, cycle);
 
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_mode != Mode::supervising){
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_mode != Mode::supervising) {
       std::cout << "ERROR LBCouetteSolver operator() called but not in supervising mode" << std::endl;
       exit(EXIT_FAILURE);
     }
-    #endif
-    
+#endif
+
     advance(_dt_pint);
     return getState();
   }
@@ -367,20 +363,20 @@ public:
    * The supervisor's operator() advances many coupling cycles at once, interval is stored in _dt_pint
    */
   std::unique_ptr<PintableMacroSolver> getSupervisor(int num_cycles, double visc_multiplier) const override {
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_mode == Mode::supervising){
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_mode == Mode::supervising) {
       std::cout << "ERROR LBCouetteSolver getSupervisor(): already in supervising mode" << std::endl;
       exit(EXIT_FAILURE);
     }
-    #endif
+#endif
 
     int numThreads = 1;
-    #if defined(_OPENMP)
+#if defined(_OPENMP)
     numThreads = omp_get_num_threads();
-    #endif
+#endif
 
-    auto res = std::make_unique<LBCouetteSolver>( _channelheight, _wallVelocity * _dx / _dt, 
-      _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep, _filestem+std::string("_supervising"), _processes, numThreads, _scen );
+    auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep,
+                                                 _filestem + std::string("_supervising"), _processes, numThreads, _scen);
 
     res->_mode = Mode::supervising;
     res->_dt_pint = _dt * num_cycles;
@@ -398,19 +394,19 @@ public:
   double get_avg_vel(const std::unique_ptr<State>& state) const override {
     double vel[3];
     double density;
-    double res[3]{0,0,0};
-    for(int i=0;i<_pdfsize;i+=19){
-      LBCouetteSolver::computeDensityAndVelocity(vel, density, state->getData()+i);
+    double res[3]{0, 0, 0};
+    for (int i = 0; i < _pdfsize; i += 19) {
+      LBCouetteSolver::computeDensityAndVelocity(vel, density, state->getData() + i);
       res[0] += vel[0];
       res[1] += vel[1];
       res[2] += vel[2];
     }
-    if(_pdfsize>0){
-      res[0] /= (_pdfsize/19);
-      res[1] /= (_pdfsize/19);
-      res[2] /= (_pdfsize/19);
+    if (_pdfsize > 0) {
+      res[0] /= (_pdfsize / 19);
+      res[1] /= (_pdfsize / 19);
+      res[2] /= (_pdfsize / 19);
     }
-    return std::sqrt(res[0]*res[0] + res[1]*res[1]+res[2]*res[2]);
+    return std::sqrt(res[0] * res[0] + res[1] * res[1] + res[2] * res[2]);
   }
 
 private:
@@ -418,7 +414,8 @@ private:
   double _dt_pint;
 
   void computeDensityAndVelocityEverywhere() {
-    if (skipRank()) return;
+    if (skipRank())
+      return;
     for (int z = 1; z < _domainSizeZ + 1; z++) {
       for (int y = 1; y < _domainSizeY + 1; y++) {
         for (int x = 1; x < _domainSizeX + 1; x++) {
@@ -676,8 +673,10 @@ private:
       }
     }
     // send and receive data
-    MPI_Irecv(recvBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagFrom], 1000, coupling::indexing::IndexingService<3>::getInstance().getComm(), &requests[0]);
-    MPI_Isend(sendBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagTo], 1000, coupling::indexing::IndexingService<3>::getInstance().getComm(), &requests[1]);
+    MPI_Irecv(recvBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagFrom], 1000,
+              coupling::indexing::IndexingService<3>::getInstance().getComm(), &requests[0]);
+    MPI_Isend(sendBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagTo], 1000,
+              coupling::indexing::IndexingService<3>::getInstance().getComm(), &requests[1]);
     MPI_Waitall(2, requests, status);
     // write data back to pdf field
     if (_parallelNeighbours[nbFlagFrom] != MPI_PROC_NULL) {

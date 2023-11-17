@@ -15,10 +15,10 @@
 #include <mpi.h>
 #endif
 #include "coupling/IndexConversion.h"
-#include "coupling/indexing/IndexingService.h"
 #include "coupling/datastructures/MacroscopicCell.h"
-#include "coupling/solvers/CouetteSolver.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/services/ParallelTimeIntegrationService.h"
+#include "coupling/solvers/CouetteSolver.h"
 
 namespace coupling {
 namespace solvers {
@@ -428,14 +428,14 @@ protected:
 
   void plot() const {
     int rank = 0; // rank in MPI-parallel simulations
-    #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
-    #endif
+#endif
     std::stringstream ss;
     ss << _filestem << "_r" << rank << "_c" << _counter;
-    if(_scen != nullptr){
+    if (_scen != nullptr) {
       auto ts = _scen->getTimeIntegrationService();
-      if( ts != nullptr ){
+      if (ts != nullptr) {
         if (ts->isPinTEnabled())
           ss << "_i" << ts->getInteration();
       }

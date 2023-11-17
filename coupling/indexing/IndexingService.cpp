@@ -1,6 +1,6 @@
 // Include header
 #include "IndexingService.h"
-#include "coupling/solvers/CouetteSolverInterface.h"  // to create default msi
+#include "coupling/solvers/CouetteSolverInterface.h" // to create default msi
 
 #include <algorithm>
 #include <iterator>
@@ -296,43 +296,43 @@ template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, 
 
 // raw date based variant of init
 template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int>  globalNumberMacroscopicCells,
-            tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType type,
-            unsigned int outerRegion,
-            const unsigned int rank
+void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
+                                                    tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType type,
+                                                    unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-            ,MPI_Comm comm
+                                                    ,
+                                                    MPI_Comm comm
 #endif
-){
-    coupling::interface::MacroscopicSolverInterface<dim>* msi = 
-        new coupling::solvers::CouetteSolverInterface<dim>(globalNumberMacroscopicCells, outerRegion);
+) {
+  coupling::interface::MacroscopicSolverInterface<dim>* msi = new coupling::solvers::CouetteSolverInterface<dim>(globalNumberMacroscopicCells, outerRegion);
 
-    init(globalNumberMacroscopicCells, numberProcesses, 
-        type, msi, rank
-        #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-        , comm
-        #endif
-    );
+  init(globalNumberMacroscopicCells, numberProcesses, type, msi, rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+       ,
+       comm
+#endif
+  );
 }
 
 // delegated init, this does the main work
 template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int>  globalNumberMacroscopicCells,
-            tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-            coupling::interface::MacroscopicSolverInterface<dim>* msi,
-            const unsigned int rank
+void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
+                                                    tarch::la::Vector<dim, unsigned int> numberProcesses,
+                                                    coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                                                    coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-            ,MPI_Comm comm
+                                                    ,
+                                                    MPI_Comm comm
 #endif
-  ) {
+) {
 
-   _rank = rank;
+  _rank = rank;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    _comm = comm;
+  _comm = comm;
 #endif
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-  if(_isInitialized){
+  if (_isInitialized) {
     std::cout << "IndexingService: WARNING: Initializing twice! " << std::endl;
   }
 #endif

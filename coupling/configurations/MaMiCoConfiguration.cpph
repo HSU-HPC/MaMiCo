@@ -35,6 +35,6 @@ template <unsigned int dim> void coupling::configurations::MaMiCoConfiguration<d
   }
 
   _isValid = _momentumInsertionConfiguration.isValid() && _particleInsertionConfiguration.isValid() && _macroscopicCellConfiguration.isValid() &&
-             _transferStrategyConfiguration.isValid() && _boundaryForceConfiguration.isValid() && _parallelTopologyConfiguration.isValid() && 
+             _transferStrategyConfiguration.isValid() && _boundaryForceConfiguration.isValid() && _parallelTopologyConfiguration.isValid() &&
              _timeIntegrationConfiguration.isValid();
 }

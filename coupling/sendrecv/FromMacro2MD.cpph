@@ -57,8 +57,7 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromReceiveBuff
         globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
 
         // call readFromReceiveBuffer for this cell
-        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(dataExchange, *macroscopicCells[localIndex],
-                                                                                           globalVectorIndex);
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(dataExchange, *macroscopicCells[localIndex], globalVectorIndex);
       }
     }
   }
