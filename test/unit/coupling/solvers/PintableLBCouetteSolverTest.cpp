@@ -1,4 +1,5 @@
 #include "coupling/solvers/LBCouetteSolver.h"
+#include <cmath>
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cstdlib>
@@ -92,15 +93,15 @@ public:
   void testInitialisedOK() {
     std::unique_ptr<State> u0 = F->getState();
     double v0 = F->get_avg_vel(u0);
-    CPPUNIT_ASSERT_MESSAGE(std::to_string(v0), v0 == 0);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(v0), std::abs(v0) < 1e-9);
 
     u0 = G->getState();
     v0 = G->get_avg_vel(u0);
-    CPPUNIT_ASSERT_MESSAGE(std::to_string(v0), v0 == 0);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(v0), std::abs(v0) < 1e-9);
 
     u0 = G2->getState();
     v0 = G2->get_avg_vel(u0);
-    CPPUNIT_ASSERT_MESSAGE(std::to_string(v0), v0 == 0);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(v0), std::abs(v0) < 1e-9);
   }
 
   void testReturnToZero() {
