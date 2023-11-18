@@ -89,7 +89,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(_multiMDService_111_4->getLocalNumberOfMDSimulations(), _multiMDService_111_4->getAvgNumberOfMDSimulations());
 
     unsigned int expectedLocalNumberOfMDSimulations = 2;
-    int rank;
+    int rank = 0;
   #if (TARCH_PARALLEL == TARCH_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   #endif
