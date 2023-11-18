@@ -633,6 +633,7 @@ set(CLANGFORMAT_SOURCES
   "test/integration/TestMarDynMoleculeIterator.h"
   "test/unit/coupling/solvers/LBCouetteSolverStateTest.cpp"
   "test/unit/coupling/solvers/PintableLBCouetteSolverTest.cpp"
+  "test/unit/getTestNames.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
@@ -758,6 +759,21 @@ target_link_libraries(benchmarks PRIVATE mamico)
 #
 if (BUILD_TESTING)    
   file(GLOB_RECURSE TEST_SOURCES "test/*Test.cpp")
+
+  if(GET_TEST_NAMES)
+    add_executable(getTestNames
+      ${MAMICO_SOURCES}
+      "test/unit/getTestNames.cpp"
+      ${TEST_SOURCES}
+    )
+    set_target_properties(getTestNames PROPERTIES CXX_STANDARD 17)
+    target_link_libraries(getTestNames PRIVATE mamico)
+    target_include_directories(getTestNames PRIVATE ${CPPUNIT_INCLUDE_DIRS})
+    target_link_directories(getTestNames PRIVATE ${CPPUNIT_LIBRARY})
+    target_link_libraries(getTestNames PRIVATE cppunit)
+    return()
+  endif()
+
   add_executable(testmamico 
     ${MAMICO_SOURCES} 
     "test/unit/main.cpp"
@@ -768,8 +784,13 @@ if (BUILD_TESTING)
   target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
   target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
   target_link_libraries(testmamico PRIVATE cppunit)
-  foreach(TEST ${TEST_SOURCES})
-    get_filename_component(TEST_NAME ${TEST} NAME_WE)
+
+  execute_process(COMMAND cmake -DGET_TEST_NAMES=ON .)
+  execute_process(COMMAND make getTestNames)
+  execute_process(COMMAND ./getTestNames OUTPUT_VARIABLE TEST_NAMES)
+  separate_arguments(TEST_NAMES UNIX_COMMAND ${TEST_NAMES})
+
+  foreach(TEST_NAME ${TEST_NAMES})
     if (BUILD_WITH_MPI)
       add_test(NAME ${TEST_NAME} COMMAND mpirun --oversubscribe -np 4 ./testmamico ${TEST_NAME})
     else()
