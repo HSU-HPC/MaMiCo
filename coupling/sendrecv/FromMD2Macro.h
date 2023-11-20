@@ -6,6 +6,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_MD2MACRO_H_
 
 #include "coupling/CouplingMDDefinitions.h"
+#include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
 #include "coupling/sendrecv/SendReceiveBuffer.h"
 #include <vector>
 
@@ -50,6 +51,17 @@ public:
                         const std::vector<MacroscopicCell*>& macroscopicCellsFromMacroscopicSolver,
                         const unsigned int* const globalCellIndicesFromMacroscopicSolver);
 
+  /** reduces information from the local macroscopic cells of MaMiCo (only inner
+   * non-ghost cells of this process) and sends it to the macroscopic solver.
+   * 	@param dataExchange
+   * 	@param macroscopicCellsFromMamico
+   *  @param reducedMacroscopicCellsFromMacroscopicSolver
+   * 	@param macroscopicCellsFromMacroscopicSolver
+   */
+  void reduceFromMD2Macro(std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>*>& dataExchange,
+                          const std::vector<MacroscopicCell*>& macroscopicCellsFromMamico, const unsigned int* const globalCellIndicesFromMacroscopicSolver,
+                          const std::vector<MacroscopicCell*>& reducedMacroscopicCellsFromMacroscopicSolver);
+
   /** triggers the send/recv operations for data transfer. After returning,
    * these data transfers do not necessarily need to be finished, according to
    * ISend/IRecv in MPI.
@@ -87,6 +99,15 @@ private:
   void writeToSendBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                          const std::vector<MacroscopicCell*>& macroscopicCells);
 
+  /** loops over the whole local Cartesian grid (only non-ghost cells!) and
+   * writes respective cells to reduce buffer.
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param macroscopicCells
+   */
+  void writeToReduceBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
+                           const std::vector<MacroscopicCell*>& macroscopicCells);
+
   /** allocates the receive buffers for the macroscopic solver. Since we do not
    * know anything about the macroscopic solver, we only have a list of global
    * vector cell indices available for possible cells to be received on this
@@ -100,6 +121,19 @@ private:
   void allocateReceiveBuffers(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                               const unsigned int* const globalCellIndices, unsigned int numberCells);
 
+  /** allocates the reduce receive buffers for the macroscopic solver. Since we do not
+   * know anything about the macroscopic solver, we only have a list of global
+   * vector cell indices available for possible cells to be received on this
+   * rank.
+   * TODO: add more detail
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param globalCellIndices
+   * 	@param numberCells
+   */
+  void allocateReduceBufferForReceiving(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
+                                        const unsigned int* globalCellIndices, unsigned int numberCells);
+
   /** reads information from the receive buffer and stores the result in the
    * list of macroscopic cells. Since this is a receive for the macroscopic
    * cells on the side of the macroscopic solver, we just have a list of global
@@ -112,6 +146,18 @@ private:
    */
   void readFromReceiveBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                              const std::vector<MacroscopicCell*>& macroscopicCells, const unsigned int* const globalCellIndices);
+
+  /** reads information from the reduce buffer and stores the result in the
+   * list of macroscopic cells. Since this is a receive for the macroscopic
+   * cells on the side of the macroscopic solver, we just have a list of global
+   * cell indices and corresponding macrocsopic cell buffers.
+   * TODO: add more detail
+   * 	@param dataExchange
+   * 	@param macroscopicCells
+   * 	@param globalCellIndices
+   */
+  void readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const std::vector<MacroscopicCell*>& macroscopicCells,
+                            const unsigned int* globalCellIndices);
 };
 
 #include "FromMD2Macro.cpph"

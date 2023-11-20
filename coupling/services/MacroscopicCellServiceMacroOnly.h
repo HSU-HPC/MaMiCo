@@ -72,6 +72,7 @@ public:
     _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return 0;
   }
+  virtual void sendFromMD2MacroPreProcess() {}
   virtual void processInnerMacroscopicCellAfterMDTimestep() {}
   virtual void computeAndStoreTemperature(double temperature) {}
   virtual void applyTemperatureToMolecules(unsigned int t) {}

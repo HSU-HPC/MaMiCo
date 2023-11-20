@@ -8,9 +8,9 @@
 #include "coupling/ErrorEstimation.h"
 #include "coupling/InstanceHandling.h"
 #include "coupling/MultiMDMediator.h"
+#include "coupling/scenario/Scenario.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/LBCouetteSolver.h"
-#include "coupling/scenario/Scenario.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
@@ -92,7 +92,7 @@ private:
    *  @brief initialises everthing necessary for the test */
   void init() {
 #if defined(LS1_MARDYN)
-    global_log = new Log::Logger(Log::Error); //Info
+    global_log = new Log::Logger(Log::Error); // Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif
@@ -163,15 +163,15 @@ private:
 
     _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
 
-    #if defined(LS1_MARDYN)
+#if defined(LS1_MARDYN)
     assert((_mamicoConfig.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3, unsigned int>(1)));
     auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
     coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
-    
-    #endif
+
+#endif
   }
 
   /** @brief initialises the macro and micro solver according to the setup from
@@ -232,7 +232,7 @@ private:
 
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
-    
+
     if (_cfg.twsLoop) {
       // initialise macroscopic cell service for multi-MD case and set single
       // cell services in each MD simulation
@@ -552,7 +552,9 @@ private:
 
       // send back data from MD instances and merge it
       if (_cfg.md2Macro) {
-        _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+        // _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+        // Use reduce instead
+        _tv.filter += _multiMDCellService->reduceFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
         // std::cout << "Finish _multiMDCellService->sendFromMD2Macro " <<
         // std::endl;
       }
@@ -563,7 +565,9 @@ private:
         //_buf does not get used here: Instead, the synthetic MD in the
         // SYNTHETICMD_SEQUENCE generates values. To prevent segfaults, it has
         // to be nonempty, though.
-        _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+        // _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+        // Use reduce instead
+        _tv.filter += _multiMDCellService->reduceFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
       }
     }
   }
