@@ -12,9 +12,10 @@
 #include "ls1/src/parallel/DomainDecompMPIBase.h"
 #include "ls1/src/ensemble/EnsembleBase.h"
 
-
 #include "coupling/interface/Molecule.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+
+#include "tarch/la/Vector.h"
 
 namespace ls1 {
 
