@@ -1,5 +1,6 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
@@ -23,7 +24,7 @@ public:
 		_testSimulation = new Simulation();
 		global_simulation = _testSimulation;
 		_testSimulation->disableFinalCheckpoint();
-		_testSimulation->readConfigFile("../test/unit/coupling/interface/impl/ls1/ls1config.xml");
+		_testSimulation->readConfigFile("../test/unit/coupling/interface/impl/ls1/ls1gridconfig.xml");
 		//_testSimulation->getDomain()->thermostatOff();
 		//_testSimulation->getDomain()->setExplosionHeuristics(false);
 		// after this point the mamico plugin exists and is accessible
@@ -40,7 +41,8 @@ public:
 	}
 	void testPotentialEnergyAtPoint()
 	{
-		//CPPUNIT_ASSERT( 1 == 0 );
+		std::cout << "Particle density: " << _testSimulation->getTotalNumberOfMolecules() << 
+			" Resultant density: " << static_cast<double>(_testSimulation->getTotalNumberOfMolecules())/(10*10*10) << std::endl;
 		for(int i = 4; i < 8; i++)
 		{
 			for(int j = 4; j < 8; j++)

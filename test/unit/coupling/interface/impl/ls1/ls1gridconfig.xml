@@ -51,7 +51,7 @@
 								</site>
 							</basis>
 							<latticeOccupancy>1</latticeOccupancy>
-							<density>1.5</density>
+							<density>0.81</density>
 						</filler>
 						<object type="Cuboid">
 							<lower> <x>0</x> <y>0</y> <z>0</z> </lower>
