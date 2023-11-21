@@ -29,7 +29,7 @@ public:
    * 	@param numberOfSamples
    * 	@param cellVolume
    */
-  ErrorEstimation(double velocity, double temperature, double numberOfParticle, double particleMass, double soundSpeed, int numberOfSamples, double cellVolume)
+  ErrorEstimation(double velocity, double temperature, double numberOfParticle, double particleMass, double soundSpeed, double numberOfSamples, double cellVolume)
       : _velocity(velocity), _temperature(temperature), _numberOfParticle(numberOfParticle), _particleMass(particleMass), _soundSpeed(soundSpeed),
         _numberOfSamples(numberOfSamples), _cellVolume(cellVolume), _desiredAbsErrorVelocity(0.08), _desiredRelErrorVelocity(0.1),
         _desiredAbsErrorDensity(0.05), _desiredRelErrorDensity(0.05), _desiredAbsErrorTemperature(0.05), _desiredRelErrorTemperature(0.05),
@@ -110,7 +110,7 @@ public:
 
     } else if (BaseQuantity == Density) {
 
-      return requiredSamplesD(_desiredAbsErrorDensity, _temperature, _soundSpeed, _velocity, _particleMass, _numberOfParticle);
+      return requiredSamplesD(_desiredRelErrorDensity, _temperature, _soundSpeed, _velocity, _particleMass, _numberOfParticle);
 
     } else if (BaseQuantity == Temperature) {
 
@@ -134,7 +134,7 @@ public:
    *	 @param particleMass
    *	 @return error veocty error
    */
-  double getErrorVelocity(int numberOfSamples, double velocity, double temperature, double numberOfParticle, double particleMass) {
+  double getErrorVelocity(double numberOfSamples, double velocity, double temperature, double numberOfParticle, double particleMass) {
     double error = 1 / (velocitySNR(velocity, temperature, numberOfParticle, particleMass) * std::sqrt(numberOfSamples));
     return error;
   }
@@ -147,7 +147,7 @@ public:
    *	 @param particleMass
    *	 @return error density error
    */
-  double getErrorDensity(int numberOfSamples, double soundSpeed, double temperature, double numberOfParticle, double particleMass) {
+  double getErrorDensity(double numberOfSamples, double soundSpeed, double temperature, double numberOfParticle, double particleMass) {
     double refSP = referenceSoundSpeed(temperature, particleMass);
     double Ac = acousticNumber(soundSpeed, refSP);
     double error = 1 / std::sqrt(numberOfParticle * numberOfSamples) / Ac;
@@ -162,7 +162,7 @@ public:
    *	 @param numberOfParticle
    *	 @return error temperature error
    */
-  double getErrorTemperature(int numberOfSamples, double numberOfParticle, double temperature) {
+  double getErrorTemperature(double numberOfSamples, double numberOfParticle, double temperature) {
 
     //	    double deltaT = k*temperature*temperature/_C_v/numberOfParticle;
 
@@ -180,13 +180,13 @@ public:
    *	 @param pressure
    *	 @return error pressure error
    */
-  double getErrorPressure(int numberOfSamples, double numberOfParticle, double temperature, double soundSpeed, double particleMass, double cellVolume,
+  double getErrorPressure(double numberOfSamples, double numberOfParticle, double temperature, double soundSpeed, double particleMass, double cellVolume,
                           double pressure) {
 
     double Ac = acousticNumber(soundSpeed, referenceSoundSpeed(temperature, particleMass));
     double referenceP = referencePressure(temperature, numberOfParticle, cellVolume);
 
-    double error = referenceP / pressure * Ac * std::sqrt(_gamma / (numberOfParticle * numberOfSamples)) * temperature;
+    double error = referenceP / pressure * Ac * std::sqrt(_gamma / (numberOfParticle * numberOfSamples));
     return error;
   }
 
@@ -224,7 +224,7 @@ public:
   double requiredSamplesD(double desiredError, double temperature, double soundSpeed, double velocity, double particleMass, double numberOfParticle) {
     double refSP = referenceSoundSpeed(temperature, particleMass);
     double Ac = acousticNumber(soundSpeed, refSP);
-    double desiredNumber = (numberOfParticle * desiredError) * (numberOfParticle * desiredError) * Ac;
+    double desiredNumber =  1 / numberOfParticle / (desiredError * desiredError) / (Ac*Ac);
 
     return desiredNumber;
   }
@@ -349,7 +349,7 @@ private:
   double _numberOfParticle;
   double _particleMass;
   double _soundSpeed;
-  int _numberOfSamples;
+  double _numberOfSamples;
   double _cellVolume;
 
   double _desiredAbsErrorVelocity; //=0.08;
