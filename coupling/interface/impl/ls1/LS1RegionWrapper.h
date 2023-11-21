@@ -211,12 +211,12 @@ public:
             tempMoleculePosition = { temp->r(0), temp->r(1), temp->r(2) };
             const auto r = tempMoleculePosition - moleculePosition;
             const double r2 = tarch::la::dot(r, r);
-            if(r2 < _cutoff2)
+            if(r2 <= _cutoff2)
             {
                 const double r6 = r2 * r2 * r2;
                 const auto forceContrib =  (24.0 * _epsilon / r2 * (_sigma6 / r6)) * (1.0 - 2.0 * (_sigma6 / r6)) * r;
-                const double uContrib =  4.0* _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff?_cutoffEnergy:0);
-                potentialEnergy += uContrib;
+                const double uContrib =  4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff?_cutoffEnergy:0);
+                potentialEnergy += 0.5 * uContrib;
                 force += forceContrib;
             }
 

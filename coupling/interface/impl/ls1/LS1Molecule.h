@@ -120,11 +120,11 @@ public:
             ::Molecule* temp = region.getParticleAtIterator();
             location2 = { temp->r(0), temp->r(1), temp->r(2) };
             const double r2 = tarch::la::dot(location2 - location1, location2 - location1);
-            if(r2 < cutoff2 && r2 != 0)
+            if(r2 <= cutoff2 && r2 != 0)
             {
                 const double r6 = r2 * r2 * r2;
-                const double contrib =  4.0* epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0) - cutoffEnergy;
-                u += contrib;
+                const double contrib =  4.0 * epsilon * (sigma6/r6) * ((sigma6/r6) - 1.0) - cutoffEnergy;
+                u += 0.5 * contrib;
             }
 
             region.iteratorNext();
