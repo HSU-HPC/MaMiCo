@@ -13,7 +13,7 @@ var searchData=
   ['equsteps_10',['equSteps',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a21913bc621f0067726c4773417822f76',1,'coupling::configurations::CouetteConfig']]],
   ['error_11',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
   ['errorbasequantity_12',['errorBaseQuantity',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967a',1,'coupling::error::ErrorEstimation']]],
-  ['errorestimation_13',['errorestimation',['../classcoupling_1_1error_1_1ErrorEstimation.html',1,'coupling::error::ErrorEstimation'],['../classcoupling_1_1error_1_1ErrorEstimation.html#aa6dc6094b824b3574f3910c31d2da20b',1,'coupling::error::ErrorEstimation::ErrorEstimation()']]],
+  ['errorestimation_13',['errorestimation',['../classcoupling_1_1error_1_1ErrorEstimation.html',1,'coupling::error::ErrorEstimation'],['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation::ErrorEstimation()']]],
   ['errorid_14',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],
   ['errortype_15',['errorType',['../classcoupling_1_1error_1_1ErrorEstimation.html#a3ed1fc36c80690f4d115cecba42316ff',1,'coupling::error::ErrorEstimation']]]
 ];

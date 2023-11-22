@@ -11,6 +11,6 @@ var searchData=
   ['equals_8',['equals',['../namespacetarch_1_1la.html#a8bbd66d3a6348329fb8449f7307e187a',1,'tarch::la']]],
   ['equilibrate_9',['equilibrate',['../classcoupling_1_1InstanceHandling.html#a7ddf0b99e9b6fe4184079172d1915c85',1,'coupling::InstanceHandling']]],
   ['error_10',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
-  ['errorestimation_11',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html#aa6dc6094b824b3574f3910c31d2da20b',1,'coupling::error::ErrorEstimation']]],
+  ['errorestimation_11',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation']]],
   ['errorid_12',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]]
 ];
