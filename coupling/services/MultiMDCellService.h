@@ -45,7 +45,6 @@ public:
     _topologyOffset = computeTopologyOffset();
     _localNumberMDSimulations = multiMDService.getLocalNumberOfMDSimulations();
     _totalNumberMDSimulations = multiMDService.getTotalNumberOfMDSimulations();
-    _macroscopicSolverInterface = coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().getMacroscopicSolverInterface();
 
     _blockOffset = _localNumberMDSimulations * _topologyOffset / _intNumberProcesses;
 
@@ -263,11 +262,12 @@ public:
 
     std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>*> allDEs(_totalNumberMDSimulations);
     std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
+    coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface =
+        coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().getMacroscopicSolverInterface();
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
       allDEs[i] = new coupling::sendrecv::DataExchangeFromMD2Macro<dim>(_macroscopicSolverInterface, &_macroscopicCellServices[i]->getIndexConversion(),
                                                                         _macroscopicCellServices[i]->getID());
     }
-
     _fromMD2Macro.reduceFromMD2Macro(allDEs, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver, _sumMacroscopicCells);
 
     if (_multiMDService.getRank() == 0) {
@@ -352,7 +352,9 @@ public:
       //_macroscopicCellServices[l]->getIndexConversion().getThisRank() << ":
       // Send from MD to Macro for Simulation no. " << l << std::endl;
       if (_macroscopicCellServices[l] != nullptr && _warmupPhase[l] == 0) {
-        res += _macroscopicCellServices[l]->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+        // res += _macroscopicCellServices[l]->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+        // Use reduce instead
+        res += _macroscopicCellServices[l]->reduceFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
         for (unsigned int i = 0; i < size; i++) {
           _macroscopicCells[i]->addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
           _macroscopicCells[i]->addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
@@ -708,7 +710,6 @@ private:
 
   simplemd::configurations::MolecularDynamicsConfiguration& _mdConfiguration;
   coupling::configurations::MaMiCoConfiguration<dim>& _mamicoConfiguration;
-  coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
   const std::string _filterPipelineConfiguration;
 
   coupling::IndexConversion<dim>* _indexConversion;
