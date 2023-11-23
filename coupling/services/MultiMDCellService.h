@@ -35,7 +35,8 @@ public:
                      coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfiguration, const char* filterPipelineConfiguration,
                      tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0)
       : _multiMDService(multiMDService), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses()), _mdConfiguration(mdConfiguration),
-        _mamicoConfiguration(mamicoConfiguration), _filterPipelineConfiguration(filterPipelineConfiguration),
+        _mamicoConfiguration(mamicoConfiguration), _macroscopicSolverInterface(macroscopicSolverInterface),
+        _filterPipelineConfiguration(filterPipelineConfiguration),
         _indexConversion(initIndexConversion(_mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
                                              _multiMDService.getNumberProcessesPerMDSimulation(), _multiMDService.getGlobalRank(),
                                              _mdConfiguration.getDomainConfiguration().getGlobalDomainSize(),
@@ -202,17 +203,32 @@ public:
   }
 
   /** broadcasts data from macroscopic solver to all MD simulations */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
-                        const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
-    // just send information to all MD instances. This is currently
-    // sequentialized inside MacroscopicCellService/SendRecvBuffer
-    for (unsigned int i = 0; i < _totalNumberMDSimulations; i++) {
-      // std::cout << "Rank " <<
-      //_macroscopicCellServices[i]->getIndexConversion().getThisRank() << ":
-      // Send from macro to MD for Simulation no. " << i << std::endl;
-      if (_macroscopicCellServices[i] != nullptr) {
-        _macroscopicCellServices[i]->sendFromMacro2MD(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+  void bcastFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+                         const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+
+    std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*> allDEs(_totalNumberMDSimulations);
+    std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
+    for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+      allDEs[i] = new coupling::sendrecv::DataExchangeFromMacro2MD<dim>(_macroscopicSolverInterface, &_macroscopicCellServices[i]->getIndexConversion(),
+                                                                        _macroscopicCellServices[i]->getID());
+      if (auto* v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[i])) {
+        allMacroscopicCellsFromMamico[i] = v->getMacroscopicCells().getMacroscopicCells();
       }
+    }
+
+    for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+      _macroscopicCellServices[i]->sendFromMacro2MDPreProcess();
+    }
+
+    coupling::sendrecv::FromMacro2MD<coupling::datastructures::MacroscopicCell<dim>, dim> fromMacro2MD;
+    fromMacro2MD.bcastFromMacro2MD(allDEs, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver, allMacroscopicCellsFromMamico);
+
+    for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+      _macroscopicCellServices[i]->sendFromMacro2MDPostProcess();
+    }
+    for (coupling::sendrecv::DataExchangeFromMacro2MD<dim>*& de : allDEs) {
+      delete de;
+      de = nullptr;
     }
   }
 
@@ -708,6 +724,7 @@ private:
 
   simplemd::configurations::MolecularDynamicsConfiguration& _mdConfiguration;
   coupling::configurations::MaMiCoConfiguration<dim>& _mamicoConfiguration;
+  coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
   const std::string _filterPipelineConfiguration;
 
   coupling::IndexConversion<dim>* _indexConversion;

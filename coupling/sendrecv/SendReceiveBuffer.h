@@ -53,6 +53,16 @@ protected:
   void writeToSendBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                          const MacroscopicCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
+  /** @brief fills all information that needs to be broadcast from a macroscopic cell
+   * into the broadcast-buffer.
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param cell
+   * 	@param globalVectorIndex
+   */
+  void writeToBcastBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                          const MacroscopicCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
   /** @brief fills all information that needs to be reduced to a macroscopic cell
    * into the reduce-buffer.
    * 	@param indexConversion
@@ -72,6 +82,10 @@ protected:
    */
   void readFromReceiveBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                              MacroscopicCell& macroscopicCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
+  void readFromCollectiveBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                MacroscopicCell& macroscopicCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
   /** reads the information from the reduce-buffer and fills it into a
    * macroscopic cell.
    * 	@param indexConversion
@@ -91,6 +105,15 @@ protected:
   void allocateReceiveBuffers(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                               tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
+  /** Allocates buffer for receiving in the context of the broadcast operation
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param globalVectorIndex
+   */
+  void allocateBcastBufferForReceiving(const coupling::IndexConversion<dim>& indexConversion,
+                                       coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                       tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
   /** Allocates buffer for receiving in the context of the reduce operation
    * 	@param indexConversion
    * 	@param dataExchange
@@ -106,6 +129,11 @@ protected:
    * 	@param dataExchange
    */
   void triggerSending(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange);
+
+  /** triggers the MPI-broadcast on the respective buffers.
+   * 	@param rank
+   */
+  void triggerBcasts(unsigned int rank);
 
   /** triggers the MPI-receiving on the respective buffers. No receiving of
    * information from/to this rank.
@@ -131,6 +159,11 @@ protected:
    * 	@param indexConversion
    */
   void allocateRequests(const coupling::IndexConversion<dim>& indexConversion);
+
+  /** allocates broadcast request
+   * 	@param thisRank
+   */
+  void allocateBcastRequests(unsigned int thisRank);
 
   /** allocates reduce request
    * 	@param thisRank
@@ -166,6 +199,7 @@ private:
   std::map<unsigned int, BufferWithID> _sendBuffer;
 
   /** members for collective communication */
+  std::map<unsigned int, BufferCollective> _bcastBuffer;
   std::map<unsigned int, BufferCollective> _reduceBuffer;
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
