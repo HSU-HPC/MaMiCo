@@ -352,9 +352,7 @@ public:
       //_macroscopicCellServices[l]->getIndexConversion().getThisRank() << ":
       // Send from MD to Macro for Simulation no. " << l << std::endl;
       if (_macroscopicCellServices[l] != nullptr && _warmupPhase[l] == 0) {
-        // res += _macroscopicCellServices[l]->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
-        // Use reduce instead
-        res += _macroscopicCellServices[l]->reduceFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+        res += _macroscopicCellServices[l]->sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
         for (unsigned int i = 0; i < size; i++) {
           _macroscopicCells[i]->addMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass());
           _macroscopicCells[i]->addMacroscopicMomentum(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());

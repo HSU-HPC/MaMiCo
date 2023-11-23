@@ -8,6 +8,16 @@ template <class MacroscopicCell, unsigned int dim> coupling::sendrecv::SendRecei
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   _requestsAllocated = false;
   _requests = NULL;
+
+  int err = MPI_Op_create(&elementWiseSum, true, &elementWiseSumOperation);
+  if (err != MPI_SUCCESS) {
+    char* str = new char[MPI_MAX_ERROR_STRING];
+    int len;
+    MPI_Error_string(err, str, &len);
+    std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::SendReceiveBuffer(): MPI_Op_create failed with error: " << str << std::endl;
+    delete[] str;
+    exit(EXIT_FAILURE);
+  }
 #endif
 }
 

@@ -178,6 +178,15 @@ private:
   std::vector<MPI_Comm> _subComms;
   std::vector<MPI_Group> _subGroups;
   int _bcastSize;
+
+  static void elementWiseSum(void* in, void* inout, int* len, MPI_Datatype* datatype) {
+    auto* output = (double*)inout;
+    auto* input = (double*)in;
+    for (int i = 0; i < *len; ++i) {
+      output[i] += input[i];
+    }
+  }
+
   MPI_Op elementWiseSumOperation;
 #endif
 };
