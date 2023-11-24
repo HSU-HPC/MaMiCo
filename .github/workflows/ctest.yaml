@@ -3,7 +3,25 @@
 name: CTest
 
 # Controls when the action will run. Triggers the workflow on push or pull request events
-on: [push, pull_request]
+on: 
+  push:
+    paths-ignore:
+      - 'examples/**'
+      - 'ls1/**'
+      - 'README.md'
+    branches-ignore:
+      # If you want the CI to not run, call your branch work-in-progress by naming it `something-WIP`
+      - '*-WIP'
+  pull_request:
+    paths-ignore:
+      - 'examples/**'
+      - 'ls1/**'
+      - 'README.md'
+
+# Abort running jobs if a new one is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -11,7 +29,32 @@ jobs:
   test:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    # How to update container: See ../../test/docker/Readme.md
     container: ghcr.io/hsu-hpc/testmamico
+    ##################################################################
+    # @author Piet
+    # REASONS WHY THIS TIMEOUT WAS SET:
+    #   (a) To catch an accidental push of a non-terminating or very long running test that consumes all our minutes
+    #   (b) To prevent us from slowly collecting too many unit tests with medium run times
+    #   (c) Long CI run time slows down development, results should be available quickly
+    #   (d) We should be able to push many times per month, without using up our compute budget
+    #   (e) Compute budget currently is 2000 minutes per month
+    # RUN TIMES WHEN THIS TIMEOUT WAS DEFINED:
+    #   (Initialize containers) = 22s
+    #   (Compiletest)           = 2m 44s
+    #   (CMake)                 = 25s
+    #   (Build)                 = 10s
+    #   (Test) [26 unit tests]  = 9s
+    #   [Total]                 = 4m
+    # HOW TO PROCEED IF YOU READ THESE LINES BECAUSE THE TIMEOUT WAS HIT:
+    #   (a) Check that container init time is < 30s (otherwise check host+connection)
+    #   (b) Check that Compiletest time is < 3m (otherwise modify compiletest)
+    #   (c) Check that combined CMake and Build time is < 60s (Otherwise check CMake build system)
+    #   (d) Check that runtime of each unit test is < 5000 ms (Otherwise modify or disable this test)
+    #   (e) Check that average unit test runtime is < 750 ms  (Otherwise optimize long-running unit tests)
+    # HOW NOT TO PROCEED IF YOU READ THESE LINES BECAUSE THE TIMEOUT WAS HIT:
+    #   (z) increase timeout (unless total number of unit tests is > 500, then change to 20)
+    ##################################################################
     timeout-minutes: 10
 
     # Steps represent a sequence of tasks that will be executed as part of the job
