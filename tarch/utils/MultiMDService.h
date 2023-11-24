@@ -29,7 +29,12 @@ template <unsigned int dim> class MultiMDService;
  */
 template <unsigned int dim> class tarch::utils::MultiMDService {
 public:
-  MultiMDService(const tarch::la::Vector<dim, unsigned int>& numberProcesses, const unsigned int& totalNumberMDSimulations);
+  MultiMDService(const tarch::la::Vector<dim, unsigned int>& numberProcesses, const unsigned int& totalNumberMDSimulations
+#if (TARCH_PARALLEL == TARCH_YES)
+                 ,
+                 MPI_Comm globalComm = MPI_COMM_WORLD
+#endif
+  );
   ~MultiMDService();
 
   unsigned int getGlobalNumberOfLocalMDSimulation(unsigned int localMDSimulation) const;
@@ -49,7 +54,7 @@ public:
   unsigned int getLocalSize() const { return _localSize; }
 
 #if (TARCH_PARALLEL == TARCH_YES)
-  MPI_Comm getGlobalCommunicator() const { return MPI_COMM_WORLD; }
+  MPI_Comm getGlobalCommunicator() const { return _globalComm; }
 #endif
   unsigned int getGlobalRank() const { return _globalRank; }
   unsigned int getGlobalSize() const { return _globalSize; }
@@ -84,7 +89,8 @@ public:
 
 private:
 #if (TARCH_PARALLEL == TARCH_YES)
-  MPI_Comm _localComm; // communicator of "local" MD simulation
+  MPI_Comm _localComm;  // communicator of "local" MD simulation
+  MPI_Comm _globalComm; // normally MPI_COMM_WORLD, unless there are ranks outside all MD simulations (e.g. due to PinT)
 #endif
   // number of processes used for a single MD simulation. Currently, the total
   // number of MPI processes needs to
@@ -112,7 +118,7 @@ private:
   unsigned int _thisNumberMDSimulations;
 
   int _globalSize; // global number of available MPI processes
-  int _globalRank; // rank in global communicator MPI_COMM_WORLD
+  int _globalRank; // rank in global communicator getGlobalCommunicator()
 
   int _localSize; // size of communicator _localComm
   int _localRank; // local rank in communicator _localComm

@@ -25,7 +25,7 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
     coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 
     // TODO: reduce per-junctor customization: generalize!
-    //###############################################################
+    // ###############################################################
     // This is where you have to define how to handle each junctor individually.
 
     // NLM
@@ -115,7 +115,7 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
       }
       inputCellVector[outputp].swap(outputCellVector[outputp]);
     }
-    //###############################################################
+    // ###############################################################
 
     // Unknown junctor identifier
     else {

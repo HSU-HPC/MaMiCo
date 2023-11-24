@@ -40,8 +40,8 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
     // which implement FilterInterface.
     coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 
-    //###############################################################
-    // This is where you have to define how to handle each junctor individually.
+    // ###############################################################
+    //  This is where you have to define how to handle each junctor individually.
 
     // Write To File Junction
     // TODO: documentation about parametrization in .xml
@@ -77,7 +77,7 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
           {currJunctorNode->Attribute("wtf1-location"), currJunctorNode->Attribute("wtf2-location")}, overwrite, oco);
     }
 
-    //###############################################################
+    // ###############################################################
 
     // Unknown junctor identifier
     else {

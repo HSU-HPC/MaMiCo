@@ -176,13 +176,13 @@ public:
       _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false);
     }
 
-  // plot ADIOS2 output
-  #if BUILD_WITH_ADIOS2
+// plot ADIOS2 output
+#if BUILD_WITH_ADIOS2
     if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() != 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
       _Adios2Writer->setTimestep(t);
       _moleculeService->iterateMolecules(*_Adios2Writer, false);
     }
-  #endif
+#endif
 
     // write checkpoint
     if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
@@ -221,7 +221,7 @@ public:
     // typically not required in coupling, but makes the simulation state more
     // consistent compared to using LAMMPS
     coupling::interface::MamicoInterfaceProvider<simplemd::LinkedCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
-      macroscopicCellService);
+        macroscopicCellService);
   }
 
   virtual void init() { initServices(); }
@@ -240,7 +240,7 @@ public:
   // called from factory
   simplemd::BoundaryTreatment& getBoundaryTreatment() { return *_boundaryTreatment; }
   simplemd::services::ParallelTopologyService& getParallelTopologyService() { return *_parallelTopologyService; }
-  simplemd::services::MoleculeService& getMoleculeService() { return *_moleculeService;  }
+  simplemd::services::MoleculeService& getMoleculeService() { return *_moleculeService; }
   simplemd::services::LinkedCellService& getLinkedCellService() { return *_linkedCellService; }
   const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() { return *_molecularPropertiesService; }
 
@@ -869,8 +869,8 @@ private:
 class LS1MDSimulation : public coupling::interface::MDSimulation {
 private:
   const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
-  Simulation* simulation; //cannot name this _simulation, a global preprocessor marco with the name _simulation expands to *global_simulation
-  MamicoCoupling* ls1MamicoPlugin; //the plugin is only initialized after the simulation object reads xml, so cannot use it before that point
+  Simulation* simulation;          // cannot name this _simulation, a global preprocessor marco with the name _simulation expands to *global_simulation
+  MamicoCoupling* ls1MamicoPlugin; // the plugin is only initialized after the simulation object reads xml, so cannot use it before that point
   bool internalCouplingState;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm comm;
@@ -879,13 +879,15 @@ private:
 public:
   LS1MDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                    , MPI_Comm localComm
+                  ,
+                  MPI_Comm localComm
 #endif
-  ) : coupling::interface::MDSimulation(), _configuration(configuration) {
+                  )
+      : coupling::interface::MDSimulation(), _configuration(configuration) {
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     comm = localComm;
-    LS1StaticCommData::getInstance().setLocalCommunicator(comm); //needs to be done before creating the simulation object
+    LS1StaticCommData::getInstance().setLocalCommunicator(comm); // needs to be done before creating the simulation object
     const tarch::la::Vector<3, unsigned int> numberProcs = _configuration.getMPIConfiguration().getNumberOfProcesses();
     LS1StaticCommData::getInstance().setDomainGridDecompAtDim(0, numberProcs[0]);
     LS1StaticCommData::getInstance().setDomainGridDecompAtDim(1, numberProcs[1]);
@@ -899,22 +901,22 @@ public:
     ls1MamicoPlugin = nullptr;
   }
   virtual ~LS1MDSimulation() {
-    if(simulation != nullptr) {
+    if (simulation != nullptr) {
       delete simulation;
       simulation = nullptr;
     }
   }
   /** switches coupling on/off*/
-  virtual void switchOffCoupling() override { 
-    //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
+  virtual void switchOffCoupling() override {
+    // coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
     internalCouplingState = false;
-    if(ls1MamicoPlugin != nullptr)
+    if (ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOffCoupling();
   }
-  virtual void switchOnCoupling() override { 
-    //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
+  virtual void switchOnCoupling() override {
+    // coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
     internalCouplingState = true;
-    if(ls1MamicoPlugin != nullptr)
+    if (ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOnCoupling();
   }
 
@@ -932,25 +934,23 @@ public:
   virtual void sortMoleculesIntoCells() override {}
 
   virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) override {
-    //coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
-    //    macroscopicCellService);
+    // coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
+    //     macroscopicCellService);
     global_simulation = simulation;
     PluginBase* searchedPlugin = simulation->getPlugin("MamicoCoupling");
-    if(searchedPlugin == nullptr)
-    {
+    if (searchedPlugin == nullptr) {
       std::cout << "ERROR: MaMiCo plugin not found!" << std::endl;
       exit(EXIT_FAILURE);
     }
     ls1MamicoPlugin = dynamic_cast<MamicoCoupling*>(searchedPlugin);
-    if(ls1MamicoPlugin != nullptr) {
+    if (ls1MamicoPlugin != nullptr) {
       ls1MamicoPlugin->setMamicoMacroscopicCellService(macroscopicCellService);
-    }
-    else {
+    } else {
       std::cout << "ERROR: Cast to Mamico plugin unsuccessful!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    //since this is the first time the plugin is accessed, set whatever preexisting coupling variable we had here for the first time
-    if(internalCouplingState)
+    // since this is the first time the plugin is accessed, set whatever preexisting coupling variable we had here for the first time
+    if (internalCouplingState)
       ls1MamicoPlugin->switchOnCoupling();
     else
       ls1MamicoPlugin->switchOffCoupling();
