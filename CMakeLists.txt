@@ -599,6 +599,7 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/MamicoInterfaceProvider.h"
   "coupling/interface/Molecule.h"
   "coupling/interface/MDSolverInterface.h"
+  "coupling/interface/PintableMacroSolver.h"
   "coupling/KineticEnergyController.h"
   "coupling/solvers/FiniteDifferenceSolver.h"
   "coupling/solvers/FDCouetteSolver.h"
