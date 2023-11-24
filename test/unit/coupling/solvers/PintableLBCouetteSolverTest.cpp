@@ -40,12 +40,14 @@ public:
 
     coupling::indexing::IndexingService<3>::getInstance().init({14}, {1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
 
+    // Temporal fine solver
     F = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, "LBCouette",
                                           tarch::la::Vector<3, unsigned int>{1, 1, 1});
     int num_cycles = 5;
     double visc_multiplier = 2;
     auto supervisor = F->getSupervisor(num_cycles, visc_multiplier);
-    G = std::unique_ptr<LBCouetteSolver>{dynamic_cast<LBCouetteSolver*>(supervisor.release())};
+    // Temporal coarse solver
+    G1 = std::unique_ptr<LBCouetteSolver>{dynamic_cast<LBCouetteSolver*>(supervisor.release())};
     supervisor = F->getSupervisor(num_cycles, visc_multiplier);
     G2 = std::unique_ptr<LBCouetteSolver>{dynamic_cast<LBCouetteSolver*>(supervisor.release())};
   }
@@ -53,7 +55,7 @@ public:
   void tearDown() {
     coupling::indexing::IndexingService<3>::getInstance().finalize();
     F = nullptr;
-    G = nullptr;
+    G1 = nullptr;
     G2 = nullptr;
   }
 
@@ -61,31 +63,31 @@ public:
     std::unique_ptr<LBCouetteSolver> F2 = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, "LBCouette",
                                                                             tarch::la::Vector<3, unsigned int>{1, 1, 1});
 
-    CPPUNIT_ASSERT_EQUAL(F->getNumberProcesses(), G->getNumberProcesses());
+    CPPUNIT_ASSERT_EQUAL(F->getNumberProcesses(), G1->getNumberProcesses());
     CPPUNIT_ASSERT_EQUAL(F->getNumberProcesses(), F2->getNumberProcesses());
 
-    CPPUNIT_ASSERT_EQUAL(F->getAvgNumberLBCells(), G->getAvgNumberLBCells());
+    CPPUNIT_ASSERT_EQUAL(F->getAvgNumberLBCells(), G1->getAvgNumberLBCells());
     CPPUNIT_ASSERT_EQUAL(F->getAvgNumberLBCells(), F2->getAvgNumberLBCells());
   }
 
   void testNoStateOnUnusedRank() {
     if (_rank > 0) {
       CPPUNIT_ASSERT_EQUAL(F->getState()->getSizeBytes(), 0);
-      CPPUNIT_ASSERT_EQUAL(G->getState()->getSizeBytes(), 0);
+      CPPUNIT_ASSERT_EQUAL(G1->getState()->getSizeBytes(), 0);
       CPPUNIT_ASSERT_EQUAL(G2->getState()->getSizeBytes(), 0);
     }
   }
 
   void testMode() {
     CPPUNIT_ASSERT(F->getMode() == Solver::Mode::coupling);
-    CPPUNIT_ASSERT(G->getMode() == Solver::Mode::supervising);
+    CPPUNIT_ASSERT(G1->getMode() == Solver::Mode::supervising);
     CPPUNIT_ASSERT(G2->getMode() == Solver::Mode::supervising);
   }
 
   void testGetAvgVelOnEmptyState() {
     if (_rank > 0) {
       CPPUNIT_ASSERT_EQUAL(F->get_avg_vel(F->getState()), 0.0);
-      CPPUNIT_ASSERT_EQUAL(G->get_avg_vel(G->getState()), 0.0);
+      CPPUNIT_ASSERT_EQUAL(G1->get_avg_vel(G1->getState()), 0.0);
       CPPUNIT_ASSERT_EQUAL(G2->get_avg_vel(G2->getState()), 0.0);
     }
   }
@@ -95,8 +97,8 @@ public:
     double v0 = F->get_avg_vel(u0);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(v0), std::abs(v0) < 1e-9);
 
-    u0 = G->getState();
-    v0 = G->get_avg_vel(u0);
+    u0 = G1->getState();
+    v0 = G1->get_avg_vel(u0);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(v0), std::abs(v0) < 1e-9);
 
     u0 = G2->getState();
@@ -174,23 +176,23 @@ public:
   }
 
   void testSupervisorRunIntoSameState() {
-    std::unique_ptr<State> u0 = G->getState();
-    std::unique_ptr<State> u1_A = G->operator()(u0, 0);
+    std::unique_ptr<State> u0 = G1->getState();
+    std::unique_ptr<State> u1_A = G1->operator()(u0, 0);
     std::unique_ptr<State> u1_B = u1_A->clone();
 
-    std::unique_ptr<State> u2_A = G->operator()(u1_A, 5);
+    std::unique_ptr<State> u2_A = G1->operator()(u1_A, 5);
     std::unique_ptr<State> u2_B = G2->operator()(u1_B, 5);
 
     CPPUNIT_ASSERT_EQUAL(*u2_A, *u2_B);
-    sameDensityAndVelocity(G, G2);
+    sameDensityAndVelocity(G1, G2);
   }
 
   void testAdvanceSupervisorChangesState() {
     if (_rank == 0) {
-      std::unique_ptr<State> u0 = G->getState();
-      G->advance(0.5);
-      std::unique_ptr<State> u1 = G->getState();
-      std::unique_ptr<State> u2 = G->operator()(u1, 0);
+      std::unique_ptr<State> u0 = G1->getState();
+      G1->advance(0.5);
+      std::unique_ptr<State> u1 = G1->getState();
+      std::unique_ptr<State> u2 = G1->operator()(u1, 0);
 
       CPPUNIT_ASSERT(!(*u0 == *u1));
       CPPUNIT_ASSERT(!(*u1 == *u2));
@@ -200,22 +202,23 @@ public:
 
   void testSupervisorsUnique() {
     if (_rank == 0) {
-      G->advance(0.5);
-      CPPUNIT_ASSERT(!(*(G->getState()) == *(G2->getState())));
+      G1->advance(0.5);
+      CPPUNIT_ASSERT(!(*(G1->getState()) == *(G2->getState())));
 
-      std::unique_ptr<State> u0 = G->getState();
+      std::unique_ptr<State> u0 = G1->getState();
       G2->setState(u0, 0);
-      CPPUNIT_ASSERT(*(G->getState()) == *(G2->getState()));
+      CPPUNIT_ASSERT(*(G1->getState()) == *(G2->getState()));
 
       std::unique_ptr<State> u1 = G2->operator()(u0, 0);
       CPPUNIT_ASSERT(*u1 == *(G2->getState()));
-      CPPUNIT_ASSERT(!(*u1 == *(G->getState())));
+      CPPUNIT_ASSERT(!(*u1 == *(G1->getState())));
     }
   }
 
 private:
   int _size, _rank;
-  std::unique_ptr<LBCouetteSolver> F, G, G2;
+  // From PinT literature: F = fine solver, G = coarse solver (supervisor)
+  std::unique_ptr<LBCouetteSolver> F, G1, G2;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(PintableLBCouetteSolverTest);
