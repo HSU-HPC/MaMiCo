@@ -281,6 +281,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateBcastB
     return;
   }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+  const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(globalVectorIndex);
+  const unsigned int ranksSize = (unsigned int)ranks.size();
   std::cout << "Rank " << indexConversion.getThisRank() << ": allocate receive buffers for cell " << globalVectorIndex << ";";
   std::cout << " associated source ranks: ";
   for (unsigned int i = 0; i < ranksSize; i++) {
@@ -777,6 +779,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReduce
     return;
   }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+  const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(globalVectorIndex);
+  const unsigned int ranksSize = (unsigned int)ranks.size();
   std::cout << "Rank " << indexConversion.getThisRank() << ": allocate receive buffers for cell " << globalVectorIndex << ";";
   std::cout << " associated source ranks: ";
   for (unsigned int i = 0; i < ranksSize; i++) {

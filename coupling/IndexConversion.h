@@ -44,7 +44,13 @@ public:
    * e.g. for two md simulations on eight ranks it would be 4; */
   IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
                   tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim, double> globalMDDomainOffset,
-                  coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset);
+                  coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset)
+      : IndexConversion<dim>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset, parallelTopologyType,
+                             topologyOffset, rank) {}
+  /** constructor for MacroOnly Cell services */
+  IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
+                  tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim, double> globalMDDomainOffset,
+                  coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset, unsigned int rankOnGrid);
   /** @brief constructor for single-MD simulations
    *  @param globalNumberMacroscopicCells total number of macroscopic cells of
    * the md simulation
@@ -58,7 +64,7 @@ public:
   IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
                   tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim, double> globalMDDomainOffset,
                   coupling::paralleltopology::ParallelTopologyType parallelTopologyType)
-      : IndexConversion<dim>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset, parallelTopologyType, 0) {}
+      : IndexConversion<dim>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset, parallelTopologyType, 0, 0) {}
   /** @brief Destructor */
   ~IndexConversion();
 
@@ -202,6 +208,7 @@ public:
    *  @param rank the linearised/continuous rank of a process
    *  @returns the process coordinates */
   tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const;
+  tarch::la::Vector<dim, unsigned int> getThisProcessCoordinates(unsigned int rank) const;
   /** Forwards the call to the ParallelTopology implementation.
    *  @brief returns the linearised index (i.e. rank) of the given process
    * coordinates.
@@ -318,8 +325,13 @@ private:
   const tarch::la::Vector<dim, unsigned int> _numberProcesses;
   /** rank of current process */
   const unsigned int _rank;
+  const unsigned int _rankOnGrid;
+
+protected:
   /** the coordinates of the current process. */
   const tarch::la::Vector<dim, unsigned int> _thisProcess;
+
+private:
   /** global number of (inner) macroscopic cells. In total this number is
    * extended by 2 in order to account for an
    *  additional ghost layer surrounding the global domain.  */
