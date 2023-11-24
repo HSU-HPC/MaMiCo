@@ -29,7 +29,8 @@ public:
    * 	@param numberOfSamples
    * 	@param cellVolume
    */
-  ErrorEstimation(double velocity, double temperature, double numberOfParticle, double particleMass, double soundSpeed, double numberOfSamples, double cellVolume)
+  ErrorEstimation(double velocity, double temperature, double numberOfParticle, double particleMass, double soundSpeed, double numberOfSamples,
+                  double cellVolume)
       : _velocity(velocity), _temperature(temperature), _numberOfParticle(numberOfParticle), _particleMass(particleMass), _soundSpeed(soundSpeed),
         _numberOfSamples(numberOfSamples), _cellVolume(cellVolume), _desiredAbsErrorVelocity(0.08), _desiredRelErrorVelocity(0.1),
         _desiredAbsErrorDensity(0.05), _desiredRelErrorDensity(0.05), _desiredAbsErrorTemperature(0.05), _desiredRelErrorTemperature(0.05),
@@ -224,7 +225,7 @@ public:
   double requiredSamplesD(double desiredError, double temperature, double soundSpeed, double velocity, double particleMass, double numberOfParticle) {
     double refSP = referenceSoundSpeed(temperature, particleMass);
     double Ac = acousticNumber(soundSpeed, refSP);
-    double desiredNumber =  1 / numberOfParticle / (desiredError * desiredError) / (Ac*Ac);
+    double desiredNumber = 1 / numberOfParticle / (desiredError * desiredError) / (Ac * Ac);
 
     return desiredNumber;
   }
