@@ -436,7 +436,7 @@ protected:
     if (_scen != nullptr) {
       auto ts = _scen->getTimeIntegrationService();
       if (ts != nullptr) {
-        if (ts->isPinTEnabled())
+        if (ts->isPintEnabled())
           ss << "_i" << ts->getInteration();
       }
     }

@@ -41,7 +41,7 @@ public:
     }
     _pint_domains = buf;
 
-    if(isPinTEnabled()){
+    if(isPintEnabled()){
       #if (COUPLING_MD_PARALLEL != COUPLING_MD_YES)
         std::cout << "ERROR coupling::TimeIntegrationConfiguration: PinT is enabled but COUPLING_MD_PARALLEL disabled" << std::endl;
         std::cout << "Disable PinT in XML config, or enable BUILD_WITH_MPI in cmake." << std::endl;
@@ -86,7 +86,7 @@ public:
   bool isValid() const { return _isValid; }
 
   int getPintDomains() const { return _pint_domains; }
-  bool isPinTEnabled() const { return _pint_domains > 1; }
+  bool isPintEnabled() const { return _pint_domains > 1; }
   int getPintIterations() const { return _pint_iterations; }
   bool isAutoIteration() const { return _auto_iteration; }
   double getViscMultiplier() const { return _visc_multiplier; }

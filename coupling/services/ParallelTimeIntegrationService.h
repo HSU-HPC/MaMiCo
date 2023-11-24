@@ -44,7 +44,7 @@ public:
         int world_size;
         MPI_Comm_size(MPI_COMM_WORLD, &world_size);
         MPI_Comm_rank(MPI_COMM_WORLD, &_world_rank);
-        if(_cfg.isPinTEnabled()){
+        if(_cfg.isPintEnabled()){
             if(world_size % _cfg.getPintDomains() != 0){
                 if(_world_rank == 0){
                     std::cout << "ERROR coupling::services::ParallelTimeIntegrationService: " <<
@@ -71,7 +71,7 @@ public:
     }
 
     void run(int num_cycles) {
-        if(!_cfg.isPinTEnabled())
+        if(!_cfg.isPintEnabled())
             run_cycles(0, num_cycles);
         else {
             PintDomain domain = setup_domain(num_cycles);            
@@ -83,7 +83,7 @@ public:
 
     int getPintDomain() const { return _pint_domain; }
     int getRank() const { return _rank; }
-    bool isPinTEnabled() const { return _cfg.isPinTEnabled(); }
+    bool isPintEnabled() const { return _cfg.isPintEnabled(); }
     int getInteration() const { return _iteration; }
 
     #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
