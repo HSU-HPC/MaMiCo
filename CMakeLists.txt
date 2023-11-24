@@ -792,6 +792,8 @@ if (BUILD_TESTING)
 
   foreach(TEST_NAME ${TEST_NAMES})
     if (BUILD_WITH_MPI)
+    # We have to use the --oversubscribe OpenMPI option here as openmpi is installed in the test container (see test/docker/Dockerfile) 
+    # and the  the github runner VM has less than 4 VCPUS.
       add_test(NAME ${TEST_NAME} COMMAND mpirun --oversubscribe -np 4 ./testmamico ${TEST_NAME})
     else()
       add_test(NAME ${TEST_NAME} COMMAND ./testmamico ${TEST_NAME})
