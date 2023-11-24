@@ -580,6 +580,7 @@ set(CLANGFORMAT_SOURCES
   "coupling/configurations/MacroscopicCellConfiguration.cpph"
   "coupling/configurations/MaMiCoConfiguration.h"
   "coupling/configurations/ThermostatConfiguration.h"
+  "coupling/configurations/TimeIntegrationConfiguration.h"
   "coupling/VelocityGradientRelaxation.h"
   "coupling/BoundaryForceController.h"
   "coupling/interface/MDSimulationFactory.h"

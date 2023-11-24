@@ -14,8 +14,8 @@ class TimeIntegrationConfiguration;
 }
 } // namespace coupling
 
-/** 
- *  Reads time integration configuration. Use number-subdomains="1" to disable PinT. 
+/**
+ *  Reads time integration configuration. Use number-subdomains="1" to disable PinT.
  *  Derived from tarch::configuration::Configuration
  *	@brief reads time integration configuration
  *  @author Piet Jarmatz
@@ -23,8 +23,7 @@ class TimeIntegrationConfiguration;
 class coupling::configurations::TimeIntegrationConfiguration : public tarch::configuration::Configuration {
 public:
   /** Constructor, initializes the class  */
-  TimeIntegrationConfiguration() : _pint_domains(1), _pint_iterations(1),
-  _auto_iteration(false), _visc_multiplier(1), _isValid(true) {}
+  TimeIntegrationConfiguration() : _pint_domains(1), _pint_iterations(1), _auto_iteration(false), _visc_multiplier(1), _isValid(true) {}
 
   /** Destructor */
   virtual ~TimeIntegrationConfiguration() {}
@@ -41,21 +40,20 @@ public:
     }
     _pint_domains = buf;
 
-    if(isPintEnabled()){
-      #if (COUPLING_MD_PARALLEL != COUPLING_MD_YES)
-        std::cout << "ERROR coupling::TimeIntegrationConfiguration: PinT is enabled but COUPLING_MD_PARALLEL disabled" << std::endl;
-        std::cout << "Disable PinT in XML config, or enable BUILD_WITH_MPI in cmake." << std::endl;
-        _isValid = false;
-        exit(EXIT_FAILURE);
-      #endif
+    if (isPintEnabled()) {
+#if (COUPLING_MD_PARALLEL != COUPLING_MD_YES)
+      std::cout << "ERROR coupling::TimeIntegrationConfiguration: PinT is enabled but COUPLING_MD_PARALLEL disabled" << std::endl;
+      std::cout << "Disable PinT in XML config, or enable BUILD_WITH_MPI in cmake." << std::endl;
+      _isValid = false;
+      exit(EXIT_FAILURE);
+#endif
 
       std::string value;
       tarch::configuration::ParseConfiguration::readStringMandatory(value, node, "number-iterations");
-      if (value == "auto"){
+      if (value == "auto") {
         _auto_iteration = true;
         _pint_iterations = 0;
-      }
-      else{
+      } else {
         _auto_iteration = false;
         tarch::configuration::ParseConfiguration::readIntMandatory(buf, node, "number-iterations");
         if (buf <= 0) {
@@ -80,7 +78,7 @@ public:
    */
   std::string getTag() const { return "time-integration"; }
 
-  /** checks if the configuration is valid. 
+  /** checks if the configuration is valid.
    * 	@return _isValid
    */
   bool isValid() const { return _isValid; }
