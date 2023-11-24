@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-//#define DEBUG_WRITE_TO_FILE
+// #define DEBUG_WRITE_TO_FILE
 
 namespace coupling {
 namespace filtering {

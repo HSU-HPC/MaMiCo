@@ -10,8 +10,8 @@
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolverInterface.h"
 #include "coupling/services/MacroscopicCellService.h"
-#include "test/integration/Test.h"
 #include "tarch/configuration/ParseConfiguration.h"
+#include "test/integration/Test.h"
 #include <sstream>
 
 #include "coupling/interface/impl/LAMMPS/USER-MAMICO/mamico_cell.h"

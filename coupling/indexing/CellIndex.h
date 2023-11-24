@@ -170,7 +170,8 @@ public:
         ++_index[1];
         if (_index[1] == (int)numberCellsInDomain[1]) {
           _index[1] = 0;
-          ++_index[2];
+          if constexpr (dim == 3)
+            ++_index[2];
         }
       }
     } else
@@ -191,7 +192,8 @@ public:
         --_index[1];
         if (_index[1] < 0) {
           _index[1] = numberCellsInDomain[1] - 1;
-          --_index[2];
+          if constexpr (dim == 3)
+            --_index[2];
         }
       }
     } else
