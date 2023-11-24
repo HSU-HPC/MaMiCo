@@ -85,9 +85,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a254b7226c05d979ccd64094718cf6ab8" id="r_a254b7226c05d979ccd64094718cf6ab8"><td class="memItemLeft" align="right" valign="top"><a id="a254b7226c05d979ccd64094718cf6ab8" name="a254b7226c05d979ccd64094718cf6ab8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MultiMDService</b> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;numberProcesses, const unsigned int &amp;totalNumberMDSimulations)</td></tr>
-<tr class="separator:a254b7226c05d979ccd64094718cf6ab8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab3fbce56af744ac360eecf676c7cf15" id="r_aab3fbce56af744ac360eecf676c7cf15"><td class="memItemLeft" align="right" valign="top"><a id="aab3fbce56af744ac360eecf676c7cf15" name="aab3fbce56af744ac360eecf676c7cf15"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>MultiMDService</b> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;numberProcesses, const unsigned int &amp;totalNumberMDSimulations, MPI_Comm globalComm=MPI_COMM_WORLD)</td></tr>
+<tr class="separator:aab3fbce56af744ac360eecf676c7cf15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a763926d1d2d2bb6e4f6289e0e80a1d2e" id="r_a763926d1d2d2bb6e4f6289e0e80a1d2e"><td class="memItemLeft" align="right" valign="top"><a id="a763926d1d2d2bb6e4f6289e0e80a1d2e" name="a763926d1d2d2bb6e4f6289e0e80a1d2e"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>getGlobalNumberOfLocalMDSimulation</b> (unsigned int localMDSimulation) const</td></tr>
 <tr class="separator:a763926d1d2d2bb6e4f6289e0e80a1d2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,6 +148,9 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:ad13e9fe52e7705ed0f11b988ef8bd6a4" id="r_ad13e9fe52e7705ed0f11b988ef8bd6a4"><td class="memItemLeft" align="right" valign="top"><a id="ad13e9fe52e7705ed0f11b988ef8bd6a4" name="ad13e9fe52e7705ed0f11b988ef8bd6a4"></a>
 MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><b>_localComm</b></td></tr>
 <tr class="separator:ad13e9fe52e7705ed0f11b988ef8bd6a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32bcd3edb6bcebb18e080141ed6d2b54" id="r_a32bcd3edb6bcebb18e080141ed6d2b54"><td class="memItemLeft" align="right" valign="top"><a id="a32bcd3edb6bcebb18e080141ed6d2b54" name="a32bcd3edb6bcebb18e080141ed6d2b54"></a>
+MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><b>_globalComm</b></td></tr>
+<tr class="separator:a32bcd3edb6bcebb18e080141ed6d2b54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f5e37a789a0f009df6cbba981a067ff" id="r_a8f5e37a789a0f009df6cbba981a067ff"><td class="memItemLeft" align="right" valign="top"><a id="a8f5e37a789a0f009df6cbba981a067ff" name="a8f5e37a789a0f009df6cbba981a067ff"></a>
 const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_numberProcessesPerMDSimulation</b></td></tr>
 <tr class="separator:a8f5e37a789a0f009df6cbba981a067ff"><td class="memSeparator" colspan="2">&#160;</td></tr>

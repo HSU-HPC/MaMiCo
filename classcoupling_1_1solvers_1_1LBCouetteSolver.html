@@ -76,6 +76,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-static-methods">Static Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classcoupling_1_1solvers_1_1LBCouetteSolver-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">coupling::solvers::LBCouetteSolver Class Reference</div></div>
@@ -87,13 +88,13 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="LBCouetteSolver_8h_source.html">LBCouetteSolver.h</a>&gt;</code></p>
 
-<p>Inherits <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html">coupling::solvers::NumericalSolver</a>.</p>
+<p>Inherits <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html">coupling::solvers::NumericalSolver</a>, and <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html">coupling::interface::PintableMacroSolver</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af7a43b719b7e7959b56900a64752f326" id="r_af7a43b719b7e7959b56900a64752f326"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#af7a43b719b7e7959b56900a64752f326">LBCouetteSolver</a> (const double channelheight, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity, const double kinVisc, const double dx, const double dt, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, const unsigned int numThreads=1)</td></tr>
-<tr class="memdesc:af7a43b719b7e7959b56900a64752f326"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
-<tr class="separator:af7a43b719b7e7959b56900a64752f326"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af10faf0866b869f325e6acee3b131e5d" id="r_af10faf0866b869f325e6acee3b131e5d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#af10faf0866b869f325e6acee3b131e5d">LBCouetteSolver</a> (const double channelheight, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity, const double kinVisc, const double dx, const double dt, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, const unsigned int numThreads=1, const <a class="el" href="classScenario.html">Scenario</a> *scen=nullptr)</td></tr>
+<tr class="memdesc:af10faf0866b869f325e6acee3b131e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
+<tr class="separator:af10faf0866b869f325e6acee3b131e5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4865583dba58b9b3542ee7e836866be" id="r_aa4865583dba58b9b3542ee7e836866be"><td class="memItemLeft" align="right" valign="top"><a id="aa4865583dba58b9b3542ee7e836866be" name="aa4865583dba58b9b3542ee7e836866be"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~LBCouetteSolver</b> ()</td></tr>
 <tr class="memdesc:aa4865583dba58b9b3542ee7e836866be"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
@@ -113,10 +114,24 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~LBCouetteSolver</
 <tr class="memitem:abf20a66b2ac990f532e5ee149141602d" id="r_abf20a66b2ac990f532e5ee149141602d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#abf20a66b2ac990f532e5ee149141602d">setWallVelocity</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity) override</td></tr>
 <tr class="memdesc:abf20a66b2ac990f532e5ee149141602d"><td class="mdescLeft">&#160;</td><td class="mdescRight">changes the velocity at the moving wall (z=0)  <br /></td></tr>
 <tr class="separator:abf20a66b2ac990f532e5ee149141602d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fa6c759b0e0ec42e37aacdeb4a182a3" id="r_a2fa6c759b0e0ec42e37aacdeb4a182a3"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a2fa6c759b0e0ec42e37aacdeb4a182a3">getState</a> () override</td></tr>
+<tr class="separator:a2fa6c759b0e0ec42e37aacdeb4a182a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad91ec50e73d3a9be93b60165df5c59fb" id="r_ad91ec50e73d3a9be93b60165df5c59fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#ad91ec50e73d3a9be93b60165df5c59fb">setState</a> (const std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt; &amp;input, int cycle) override</td></tr>
+<tr class="separator:ad91ec50e73d3a9be93b60165df5c59fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f760867426e5c26fbf8f6a63a31dc5c" id="r_a0f760867426e5c26fbf8f6a63a31dc5c"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a0f760867426e5c26fbf8f6a63a31dc5c">operator()</a> (const std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt; &amp;input, int cycle) override</td></tr>
+<tr class="separator:a0f760867426e5c26fbf8f6a63a31dc5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f6ab9b54fff3b640f5f5108727cfd12" id="r_a6f6ab9b54fff3b640f5f5108727cfd12"><td class="memItemLeft" align="right" valign="top">Mode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a6f6ab9b54fff3b640f5f5108727cfd12">getMode</a> () const override</td></tr>
+<tr class="separator:a6f6ab9b54fff3b640f5f5108727cfd12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22430f699a2df7b5498dad19a6752b22" id="r_a22430f699a2df7b5498dad19a6752b22"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; PintableMacroSolver &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a22430f699a2df7b5498dad19a6752b22">getSupervisor</a> (int num_cycles, double visc_multiplier) const override</td></tr>
+<tr class="separator:a22430f699a2df7b5498dad19a6752b22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad966928d1e6cd8f96fdf2ded5e4c8435" id="r_ad966928d1e6cd8f96fdf2ded5e4c8435"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#ad966928d1e6cd8f96fdf2ded5e4c8435">print</a> (std::ostream &amp;os) const override</td></tr>
+<tr class="separator:ad966928d1e6cd8f96fdf2ded5e4c8435"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30819e7abaae3374971d0955ad27ce30" id="r_a30819e7abaae3374971d0955ad27ce30"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a30819e7abaae3374971d0955ad27ce30">get_avg_vel</a> (const std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt; &amp;state) const override</td></tr>
+<tr class="separator:a30819e7abaae3374971d0955ad27ce30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcoupling_1_1solvers_1_1NumericalSolver')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html">coupling::solvers::NumericalSolver</a></td></tr>
-<tr class="memitem:a72ac62f4677473f0cbeb16d265c15605 inherit pub_methods_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a72ac62f4677473f0cbeb16d265c15605"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a72ac62f4677473f0cbeb16d265c15605">NumericalSolver</a> (const double channelheight, const double dx, const double dt, const double kinVisc, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes)</td></tr>
-<tr class="memdesc:a72ac62f4677473f0cbeb16d265c15605 inherit pub_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
-<tr class="separator:a72ac62f4677473f0cbeb16d265c15605 inherit pub_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5575988fb4542fd5afd67f51d1d1af19 inherit pub_methods_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a5575988fb4542fd5afd67f51d1d1af19"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a5575988fb4542fd5afd67f51d1d1af19">NumericalSolver</a> (const double channelheight, const double dx, const double dt, const double kinVisc, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, const <a class="el" href="classScenario.html">Scenario</a> *scen=nullptr)</td></tr>
+<tr class="memdesc:a5575988fb4542fd5afd67f51d1d1af19 inherit pub_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
+<tr class="separator:a5575988fb4542fd5afd67f51d1d1af19 inherit pub_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb15462633d99548d2074baf27af123b inherit pub_methods_classcoupling_1_1solvers_1_1NumericalSolver" id="r_aeb15462633d99548d2074baf27af123b"><td class="memItemLeft" align="right" valign="top">
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~NumericalSolver</b> ()</td></tr>
 <tr class="memdesc:aeb15462633d99548d2074baf27af123b inherit pub_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
@@ -143,6 +158,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~NumericalSolver</
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
+<tr class="memitem:af7a8b2bf1178adc65e4c8bbf165c339b" id="r_af7a8b2bf1178adc65e4c8bbf165c339b"><td class="memItemLeft" align="right" valign="top"><a id="af7a8b2bf1178adc65e4c8bbf165c339b" name="af7a8b2bf1178adc65e4c8bbf165c339b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>computeDensityAndVelocityEverywhere</b> ()</td></tr>
+<tr class="separator:af7a8b2bf1178adc65e4c8bbf165c339b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc742469952320d1b444cd3b2c1d33f0" id="r_acc742469952320d1b444cd3b2c1d33f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#acc742469952320d1b444cd3b2c1d33f0">collidestream</a> ()</td></tr>
 <tr class="memdesc:acc742469952320d1b444cd3b2c1d33f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">collide-stream algorithm for the Lattice-Boltzmann method  <br /></td></tr>
 <tr class="separator:acc742469952320d1b444cd3b2c1d33f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,9 +173,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>stream</b> (int index
 <tr class="memitem:a677344e27f8faf2644d9bef3c50a993b" id="r_a677344e27f8faf2644d9bef3c50a993b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a677344e27f8faf2644d9bef3c50a993b">boundary</a> (double *const pdf, int index, int x, int y, int z, int q, const <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a9be98c40ee9eca5a8522dc7b30396b8b">Flag</a> &amp;flag, int nbIndex)</td></tr>
 <tr class="memdesc:a677344e27f8faf2644d9bef3c50a993b"><td class="mdescLeft">&#160;</td><td class="mdescRight">takes care of the correct boundary treatment for the LB method  <br /></td></tr>
 <tr class="separator:a677344e27f8faf2644d9bef3c50a993b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f241142beb944a7efc6b132dcd5e3e3" id="r_a3f241142beb944a7efc6b132dcd5e3e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a3f241142beb944a7efc6b132dcd5e3e3">computeDensityAndVelocity</a> (double *const vel, double &amp;density, const double *const pdf)</td></tr>
-<tr class="memdesc:a3f241142beb944a7efc6b132dcd5e3e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">refers to the LB method; computes density and velocity on pdf  <br /></td></tr>
-<tr class="separator:a3f241142beb944a7efc6b132dcd5e3e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2718ed321012e407269c093278f3cccf" id="r_a2718ed321012e407269c093278f3cccf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a2718ed321012e407269c093278f3cccf">communicatePart</a> (double *pdf, double *sendBuffer, double *recvBuffer, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a84f11769e98cd2a7ca834deb019491c7">NbFlag</a> nbFlagTo, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a84f11769e98cd2a7ca834deb019491c7">NbFlag</a> nbFlagFrom, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt; startSend, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt; endSend, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt; startRecv, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt; endRecv)</td></tr>
 <tr class="separator:a2718ed321012e407269c093278f3cccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78f724c607ea44f48e25911d22cd1d57" id="r_a78f724c607ea44f48e25911d22cd1d57"><td class="memItemLeft" align="right" valign="top"><a id="a78f724c607ea44f48e25911d22cd1d57" name="a78f724c607ea44f48e25911d22cd1d57"></a>
@@ -165,8 +180,20 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>communicate</b> ()</t
 <tr class="memdesc:a78f724c607ea44f48e25911d22cd1d57"><td class="mdescLeft">&#160;</td><td class="mdescRight">comunicates the boundary field data between the different processes <br /></td></tr>
 <tr class="separator:a78f724c607ea44f48e25911d22cd1d57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
+Static Private Member Functions</h2></td></tr>
+<tr class="memitem:a0d59b0f02800c54c433d905f97f4e138" id="r_a0d59b0f02800c54c433d905f97f4e138"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a0d59b0f02800c54c433d905f97f4e138">computeDensityAndVelocity</a> (double *const vel, double &amp;density, const double *const pdf)</td></tr>
+<tr class="memdesc:a0d59b0f02800c54c433d905f97f4e138"><td class="mdescLeft">&#160;</td><td class="mdescRight">refers to the LB method; computes density and velocity on pdf  <br /></td></tr>
+<tr class="separator:a0d59b0f02800c54c433d905f97f4e138"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
+<tr class="memitem:a351bf7ff032cc450869403ce826a5615" id="r_a351bf7ff032cc450869403ce826a5615"><td class="memItemLeft" align="right" valign="top"><a id="a351bf7ff032cc450869403ce826a5615" name="a351bf7ff032cc450869403ce826a5615"></a>
+Mode&#160;</td><td class="memItemRight" valign="bottom"><b>_mode</b></td></tr>
+<tr class="separator:a351bf7ff032cc450869403ce826a5615"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c862b8866828f93f8c449b3c288cc4e" id="r_a5c862b8866828f93f8c449b3c288cc4e"><td class="memItemLeft" align="right" valign="top"><a id="a5c862b8866828f93f8c449b3c288cc4e" name="a5c862b8866828f93f8c449b3c288cc4e"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>_dt_pint</b></td></tr>
+<tr class="separator:a5c862b8866828f93f8c449b3c288cc4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a340da76a6973dc635e7310d4d057044b" id="r_a340da76a6973dc635e7310d4d057044b"><td class="memItemLeft" align="right" valign="top"><a id="a340da76a6973dc635e7310d4d057044b" name="a340da76a6973dc635e7310d4d057044b"></a>
 const double&#160;</td><td class="memItemRight" valign="bottom"><b>_omega</b></td></tr>
 <tr class="memdesc:a340da76a6973dc635e7310d4d057044b"><td class="mdescLeft">&#160;</td><td class="mdescRight">relaxation frequency <br /></td></tr>
@@ -175,6 +202,9 @@ const double&#160;</td><td class="memItemRight" valign="bottom"><b>_omega</b></t
 <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_wallVelocity</b></td></tr>
 <tr class="memdesc:ac32a4f870606ca7757d3af088631cdbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">velocity of moving wall of Couette flow <br /></td></tr>
 <tr class="separator:ac32a4f870606ca7757d3af088631cdbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a587575b3745ff7faac040320bebfe767" id="r_a587575b3745ff7faac040320bebfe767"><td class="memItemLeft" align="right" valign="top"><a id="a587575b3745ff7faac040320bebfe767" name="a587575b3745ff7faac040320bebfe767"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>_pdfsize</b> {0}</td></tr>
+<tr class="separator:a587575b3745ff7faac040320bebfe767"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a361f5f242209f9fb624bbdcd83674f74" id="r_a361f5f242209f9fb624bbdcd83674f74"><td class="memItemLeft" align="right" valign="top"><a id="a361f5f242209f9fb624bbdcd83674f74" name="a361f5f242209f9fb624bbdcd83674f74"></a>
 double *&#160;</td><td class="memItemRight" valign="bottom"><b>_pdf1</b> {NULL}</td></tr>
 <tr class="memdesc:a361f5f242209f9fb624bbdcd83674f74"><td class="mdescLeft">&#160;</td><td class="mdescRight">partical distribution function field <br /></td></tr>
@@ -192,6 +222,17 @@ double *&#160;</td><td class="memItemRight" valign="bottom"><b>_pdf2</b> {NULL}<
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_types_classcoupling_1_1interface_1_1PintableMacroSolver"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classcoupling_1_1interface_1_1PintableMacroSolver')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html">coupling::interface::PintableMacroSolver</a></td></tr>
+<tr class="memitem:a5b0aa8c4a7637cafc5ff7da4f38f8885 inherit pub_types_classcoupling_1_1interface_1_1PintableMacroSolver" id="r_a5b0aa8c4a7637cafc5ff7da4f38f8885"><td class="memItemLeft" align="right" valign="top"><a id="a5b0aa8c4a7637cafc5ff7da4f38f8885" name="a5b0aa8c4a7637cafc5ff7da4f38f8885"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>Mode</b> { <b>supervising</b>
+, <b>coupling</b>
+ }</td></tr>
+<tr class="separator:a5b0aa8c4a7637cafc5ff7da4f38f8885 inherit pub_types_classcoupling_1_1interface_1_1PintableMacroSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dba6fc5748e09ec3ffcd61377ccb82c inherit pub_types_classcoupling_1_1interface_1_1PintableMacroSolver" id="r_a0dba6fc5748e09ec3ffcd61377ccb82c"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classcoupling_1_1interface_1_1Molecule.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><b>State</b> = <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">PintableMacroSolverState</a></td></tr>
+<tr class="separator:a0dba6fc5748e09ec3ffcd61377ccb82c inherit pub_types_classcoupling_1_1interface_1_1PintableMacroSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classcoupling_1_1solvers_1_1NumericalSolver')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html">coupling::solvers::NumericalSolver</a></td></tr>
+<tr class="memitem:a8d2edfab5e6d2bbbca5fd5a95e6c20b6 inherit pub_static_methods_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a8d2edfab5e6d2bbbca5fd5a95e6c20b6"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">getAvgDomainSize</a> (double channelheight, double dx, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, int d)</td></tr>
+<tr class="separator:a8d2edfab5e6d2bbbca5fd5a95e6c20b6 inherit pub_static_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_types_classcoupling_1_1solvers_1_1NumericalSolver"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcoupling_1_1solvers_1_1NumericalSolver')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html">coupling::solvers::NumericalSolver</a></td></tr>
 <tr class="memitem:a9be98c40ee9eca5a8522dc7b30396b8b inherit pro_types_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a9be98c40ee9eca5a8522dc7b30396b8b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a9be98c40ee9eca5a8522dc7b30396b8b">Flag</a> { <br />
 &#160;&#160;<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a9be98c40ee9eca5a8522dc7b30396b8baa41916cc6431ad73304c0ad59a3bbba3">FLUID</a> = 0
@@ -229,8 +270,11 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a2b159a13b338cff42b15686432e43052 inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ce9c5dc87a4f0967236c972d9ef7093 inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a0ce9c5dc87a4f0967236c972d9ef7093"><td class="memItemLeft" align="right" valign="top">
 void&#160;</td><td class="memItemRight" valign="bottom"><b>plot</b> () const</td></tr>
-<tr class="memdesc:a0ce9c5dc87a4f0967236c972d9ef7093 inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">create vtk plot if required <br /></td></tr>
 <tr class="separator:a0ce9c5dc87a4f0967236c972d9ef7093 inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a0fb0cf8523a5adaf54cd6611f7708b inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a2a0fb0cf8523a5adaf54cd6611f7708b"><td class="memItemLeft" align="right" valign="top">
+void&#160;</td><td class="memItemRight" valign="bottom"><b>plot</b> (std::string filename) const</td></tr>
+<tr class="memdesc:a2a0fb0cf8523a5adaf54cd6611f7708b inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">create vtk plot if required <br /></td></tr>
+<tr class="separator:a2a0fb0cf8523a5adaf54cd6611f7708b inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc01afcdec5fa82f71205e46d71f078c inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver" id="r_acc01afcdec5fa82f71205e46d71f078c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#acc01afcdec5fa82f71205e46d71f078c">skipRank</a> () const</td></tr>
 <tr class="memdesc:acc01afcdec5fa82f71205e46d71f078c inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true, if this rank is not of relevance for the LB simulation  <br /></td></tr>
 <tr class="separator:acc01afcdec5fa82f71205e46d71f078c inherit pro_methods_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -276,15 +320,15 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_domainSizeZ</b>
 <tr class="memdesc:af1d56e91232bc3a6eb3c4842afab6122 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">domain size in z-direction <br /></td></tr>
 <tr class="separator:af1d56e91232bc3a6eb3c4842afab6122 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb4431ce63475488392fe592679291d3 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver" id="r_acb4431ce63475488392fe592679291d3"><td class="memItemLeft" align="right" valign="top">
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeX</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ad1431c90223e9134990eafc6cf11750a">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 0)}</td></tr>
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeX</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 0)}</td></tr>
 <tr class="memdesc:acb4431ce63475488392fe592679291d3 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">avg. domain size in MPI-parallel simulation in x-direction <br /></td></tr>
 <tr class="separator:acb4431ce63475488392fe592679291d3 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b8dcc87380441293f8e34334d560bc7 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a5b8dcc87380441293f8e34334d560bc7"><td class="memItemLeft" align="right" valign="top">
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeY</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ad1431c90223e9134990eafc6cf11750a">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 1)}</td></tr>
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeY</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 1)}</td></tr>
 <tr class="memdesc:a5b8dcc87380441293f8e34334d560bc7 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">avg. domain size in MPI-parallel simulation in y-direction <br /></td></tr>
 <tr class="separator:a5b8dcc87380441293f8e34334d560bc7 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26bc996e094b0378974a7230bedadd7b inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a26bc996e094b0378974a7230bedadd7b"><td class="memItemLeft" align="right" valign="top">
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeZ</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ad1431c90223e9134990eafc6cf11750a">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 2)}</td></tr>
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeZ</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 2)}</td></tr>
 <tr class="memdesc:a26bc996e094b0378974a7230bedadd7b inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">avg. domain size in MPI-parallel simulation in z-direction <br /></td></tr>
 <tr class="separator:a26bc996e094b0378974a7230bedadd7b inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fd2b3b3b116d9e6b1a5c069be12b72e inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver" id="r_a5fd2b3b3b116d9e6b1a5c069be12b72e"><td class="memItemLeft" align="right" valign="top">
@@ -351,13 +395,16 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_globalNumberMacroscopicCells</b> {(-1)}</td></tr>
 <tr class="memdesc:a793e187f6538e5bd0fa7cefa980a6478 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">the total number of macroscopic cells of the coupled simulation <br /></td></tr>
 <tr class="separator:a793e187f6538e5bd0fa7cefa980a6478 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebcdcf3ead3d533c0adc9e6a4b97e9a8 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver" id="r_aebcdcf3ead3d533c0adc9e6a4b97e9a8"><td class="memItemLeft" align="right" valign="top">
+const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_scen</b></td></tr>
+<tr class="separator:aebcdcf3ead3d533c0adc9e6a4b97e9a8 inherit pro_attribs_classcoupling_1_1solvers_1_1NumericalSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>implements a three-dimensional Lattice-Boltzmann Couette flow solver. </p>
 <p>In our scenario, the lower wall is accelerated and the upper wall stands still. The lower wall is located at zero height. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="af7a43b719b7e7959b56900a64752f326" name="af7a43b719b7e7959b56900a64752f326"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7a43b719b7e7959b56900a64752f326">&#9670;&#160;</a></span>LBCouetteSolver()</h2>
+<a id="af10faf0866b869f325e6acee3b131e5d" name="af10faf0866b869f325e6acee3b131e5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af10faf0866b869f325e6acee3b131e5d">&#9670;&#160;</a></span>LBCouetteSolver()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -417,7 +464,13 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>numThreads</em> = <code>1</code>&#160;</td>
+          <td class="paramname"><em>numThreads</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td>
+          <td class="paramname"><em>scen</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -641,7 +694,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 </div><div class="memdoc">
 
 <p>collide-stream algorithm for the Lattice-Boltzmann method </p>
-<p>calls <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#aea83db4b7c2c88c745e963cd7bc5f187" title="the stream part of the LB algorithm (from pdf1 to pdf2)">stream()</a> and <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a66f79429bad0e4270592bc383c3022df">collide()</a> and swaps the fields </p>
+<p>------------------------------------------------------------------------------------------------------ End of Pint methods &mdash;&mdash; End of Pint methods &mdash;&mdash; End of Pint methods &mdash;&mdash; End of Pint methods &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; calls <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#aea83db4b7c2c88c745e963cd7bc5f187" title="the stream part of the LB algorithm (from pdf1 to pdf2)">stream()</a> and <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html#a66f79429bad0e4270592bc383c3022df">collide()</a> and swaps the fields </p>
 
 </div>
 </div>
@@ -737,8 +790,8 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 
 </div>
 </div>
-<a id="a3f241142beb944a7efc6b132dcd5e3e3" name="a3f241142beb944a7efc6b132dcd5e3e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3f241142beb944a7efc6b132dcd5e3e3">&#9670;&#160;</a></span>computeDensityAndVelocity()</h2>
+<a id="a0d59b0f02800c54c433d905f97f4e138" name="a0d59b0f02800c54c433d905f97f4e138"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d59b0f02800c54c433d905f97f4e138">&#9670;&#160;</a></span>computeDensityAndVelocity()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -747,7 +800,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void coupling::solvers::LBCouetteSolver::computeDensityAndVelocity </td>
+          <td class="memname">static void coupling::solvers::LBCouetteSolver::computeDensityAndVelocity </td>
           <td>(</td>
           <td class="paramtype">double *const&#160;</td>
           <td class="paramname"><em>vel</em>, </td>
@@ -772,7 +825,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -786,6 +839,35 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a30819e7abaae3374971d0955ad27ce30" name="a30819e7abaae3374971d0955ad27ce30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30819e7abaae3374971d0955ad27ce30">&#9670;&#160;</a></span>get_avg_vel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double coupling::solvers::LBCouetteSolver::get_avg_vel </td>
+          <td>(</td>
+          <td class="paramtype">const std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Useful to test if a solver behaves as expected, similar to a "det(state)": should return a single numeric value that characterises the state object, by computing the mean flow velocity </p>
+
+<p>Reimplemented from <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html#ad9986bfc51132405774884182755ce29">coupling::interface::PintableMacroSolver</a>.</p>
 
 </div>
 </div>
@@ -826,6 +908,101 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 
 </div>
 </div>
+<a id="a6f6ab9b54fff3b640f5f5108727cfd12" name="a6f6ab9b54fff3b640f5f5108727cfd12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f6ab9b54fff3b640f5f5108727cfd12">&#9670;&#160;</a></span>getMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Mode coupling::solvers::LBCouetteSolver::getMode </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>returns either Mode.supervising or Mode.coupling </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html#a404dcfed5a1fffa9f094261c1da3049c">coupling::interface::PintableMacroSolver</a>.</p>
+
+</div>
+</div>
+<a id="a2fa6c759b0e0ec42e37aacdeb4a182a3" name="a2fa6c759b0e0ec42e37aacdeb4a182a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fa6c759b0e0ec42e37aacdeb4a182a3">&#9670;&#160;</a></span>getState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt; coupling::solvers::LBCouetteSolver::getState </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>------------------------------------------------------------------------------------------------------ Pint methods &mdash;&mdash; Pint methods &mdash;&mdash; Pint methods &mdash;&mdash; Pint methods &mdash;&mdash; Pint methods &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html#a7a6c8e327ecc6fe2f92aa49e07274c8d">coupling::interface::PintableMacroSolver</a>.</p>
+
+</div>
+</div>
+<a id="a22430f699a2df7b5498dad19a6752b22" name="a22430f699a2df7b5498dad19a6752b22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22430f699a2df7b5498dad19a6752b22">&#9670;&#160;</a></span>getSupervisor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; PintableMacroSolver &gt; coupling::solvers::LBCouetteSolver::getSupervisor </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_cycles</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>visc_multiplier</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This will create a new instance of this <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html" title="implements a three-dimensional Lattice-Boltzmann Couette flow solver.">LBCouetteSolver</a> In the supervisor, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a6dfc158888496ca18de62e25d695c817" title="flags the domain boundary cells.">setMDBoundary()</a> has not been called, independently of state of couette solver in coupling mode The supervisor can run with a modified viscosity The supervisor's operator() advances many coupling cycles at once, interval is stored in _dt_pint </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html#a40c24821ab08862c6a4c3672fe8ca95c">coupling::interface::PintableMacroSolver</a>.</p>
+
+</div>
+</div>
 <a id="a89e9095d3f2d0c40b24fb529d50b266f" name="a89e9095d3f2d0c40b24fb529d50b266f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a89e9095d3f2d0c40b24fb529d50b266f">&#9670;&#160;</a></span>getVelocity()</h2>
 
@@ -858,6 +1035,74 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the velocity vector for the position </dd></dl>
+
+</div>
+</div>
+<a id="a0f760867426e5c26fbf8f6a63a31dc5c" name="a0f760867426e5c26fbf8f6a63a31dc5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f760867426e5c26fbf8f6a63a31dc5c">&#9670;&#160;</a></span>operator()()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt; coupling::solvers::LBCouetteSolver::operator() </td>
+          <td>(</td>
+          <td class="paramtype">const std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt; &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>cycle</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This advances the macroSolver by one time step, starting from the given state </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html#a9a3d09fe07052045868cd2f4f126277a">coupling::interface::PintableMacroSolver</a>.</p>
+
+</div>
+</div>
+<a id="ad966928d1e6cd8f96fdf2ded5e4c8435" name="ad966928d1e6cd8f96fdf2ded5e4c8435"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad966928d1e6cd8f96fdf2ded5e4c8435">&#9670;&#160;</a></span>print()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void coupling::solvers::LBCouetteSolver::print </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>this is expected to print information about the mode and type of this solver object to os </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html#aef0676bcdb9dcd89decc3459642f23a0">coupling::interface::PintableMacroSolver</a>.</p>
 
 </div>
 </div>
@@ -912,6 +1157,45 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 </dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0792b72da558b7f8eafaaee4975f91ea">coupling::solvers::NumericalSolver</a>.</p>
+
+</div>
+</div>
+<a id="ad91ec50e73d3a9be93b60165df5c59fb" name="ad91ec50e73d3a9be93b60165df5c59fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad91ec50e73d3a9be93b60165df5c59fb">&#9670;&#160;</a></span>setState()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void coupling::solvers::LBCouetteSolver::setState </td>
+          <td>(</td>
+          <td class="paramtype">const std::unique_ptr&lt; <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">State</a> &gt; &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>cycle</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This method fully reset / initialize the CFD solver to the given state </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolver.html#ac6e6cab7681663e6bc26b8848c7ea557">coupling::interface::PintableMacroSolver</a>.</p>
 
 </div>
 </div>

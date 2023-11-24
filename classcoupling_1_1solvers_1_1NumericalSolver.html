@@ -75,6 +75,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
@@ -95,9 +96,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a72ac62f4677473f0cbeb16d265c15605" id="r_a72ac62f4677473f0cbeb16d265c15605"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a72ac62f4677473f0cbeb16d265c15605">NumericalSolver</a> (const double channelheight, const double dx, const double dt, const double kinVisc, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes)</td></tr>
-<tr class="memdesc:a72ac62f4677473f0cbeb16d265c15605"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
-<tr class="separator:a72ac62f4677473f0cbeb16d265c15605"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5575988fb4542fd5afd67f51d1d1af19" id="r_a5575988fb4542fd5afd67f51d1d1af19"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a5575988fb4542fd5afd67f51d1d1af19">NumericalSolver</a> (const double channelheight, const double dx, const double dt, const double kinVisc, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, const <a class="el" href="classScenario.html">Scenario</a> *scen=nullptr)</td></tr>
+<tr class="memdesc:a5575988fb4542fd5afd67f51d1d1af19"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
+<tr class="separator:a5575988fb4542fd5afd67f51d1d1af19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb15462633d99548d2074baf27af123b" id="r_aeb15462633d99548d2074baf27af123b"><td class="memItemLeft" align="right" valign="top"><a id="aeb15462633d99548d2074baf27af123b" name="aeb15462633d99548d2074baf27af123b"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~NumericalSolver</b> ()</td></tr>
 <tr class="memdesc:aeb15462633d99548d2074baf27af123b"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
@@ -133,6 +134,11 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~NumericalSolver</
 <tr class="memitem:a4781452d95fa4e2caa2a178b1680fea8 inherit pub_methods_classcoupling_1_1solvers_1_1AbstractCouetteSolver" id="r_a4781452d95fa4e2caa2a178b1680fea8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html#a4781452d95fa4e2caa2a178b1680fea8">setWallVelocity</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, double &gt; wallVelocity)=0</td></tr>
 <tr class="memdesc:a4781452d95fa4e2caa2a178b1680fea8 inherit pub_methods_classcoupling_1_1solvers_1_1AbstractCouetteSolver"><td class="mdescLeft">&#160;</td><td class="mdescRight">changes the velocity at the moving for, refers to Couette scenario  <br /></td></tr>
 <tr class="separator:a4781452d95fa4e2caa2a178b1680fea8 inherit pub_methods_classcoupling_1_1solvers_1_1AbstractCouetteSolver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a8d2edfab5e6d2bbbca5fd5a95e6c20b6" id="r_a8d2edfab5e6d2bbbca5fd5a95e6c20b6"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">getAvgDomainSize</a> (double channelheight, double dx, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, int d)</td></tr>
+<tr class="separator:a8d2edfab5e6d2bbbca5fd5a95e6c20b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-types" name="pro-types"></a>
 Protected Types</h2></td></tr>
@@ -174,8 +180,11 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a2b159a13b338cff42b15686432e43052"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ce9c5dc87a4f0967236c972d9ef7093" id="r_a0ce9c5dc87a4f0967236c972d9ef7093"><td class="memItemLeft" align="right" valign="top"><a id="a0ce9c5dc87a4f0967236c972d9ef7093" name="a0ce9c5dc87a4f0967236c972d9ef7093"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>plot</b> () const</td></tr>
-<tr class="memdesc:a0ce9c5dc87a4f0967236c972d9ef7093"><td class="mdescLeft">&#160;</td><td class="mdescRight">create vtk plot if required <br /></td></tr>
 <tr class="separator:a0ce9c5dc87a4f0967236c972d9ef7093"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a0fb0cf8523a5adaf54cd6611f7708b" id="r_a2a0fb0cf8523a5adaf54cd6611f7708b"><td class="memItemLeft" align="right" valign="top"><a id="a2a0fb0cf8523a5adaf54cd6611f7708b" name="a2a0fb0cf8523a5adaf54cd6611f7708b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>plot</b> (std::string filename) const</td></tr>
+<tr class="memdesc:a2a0fb0cf8523a5adaf54cd6611f7708b"><td class="mdescLeft">&#160;</td><td class="mdescRight">create vtk plot if required <br /></td></tr>
+<tr class="separator:a2a0fb0cf8523a5adaf54cd6611f7708b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc01afcdec5fa82f71205e46d71f078c" id="r_acc01afcdec5fa82f71205e46d71f078c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#acc01afcdec5fa82f71205e46d71f078c">skipRank</a> () const</td></tr>
 <tr class="memdesc:acc01afcdec5fa82f71205e46d71f078c"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true, if this rank is not of relevance for the LB simulation  <br /></td></tr>
 <tr class="separator:acc01afcdec5fa82f71205e46d71f078c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -223,15 +232,15 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_domainSizeZ</b>
 <tr class="memdesc:af1d56e91232bc3a6eb3c4842afab6122"><td class="mdescLeft">&#160;</td><td class="mdescRight">domain size in z-direction <br /></td></tr>
 <tr class="separator:af1d56e91232bc3a6eb3c4842afab6122"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb4431ce63475488392fe592679291d3" id="r_acb4431ce63475488392fe592679291d3"><td class="memItemLeft" align="right" valign="top"><a id="acb4431ce63475488392fe592679291d3" name="acb4431ce63475488392fe592679291d3"></a>
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeX</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ad1431c90223e9134990eafc6cf11750a">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 0)}</td></tr>
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeX</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 0)}</td></tr>
 <tr class="memdesc:acb4431ce63475488392fe592679291d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">avg. domain size in MPI-parallel simulation in x-direction <br /></td></tr>
 <tr class="separator:acb4431ce63475488392fe592679291d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b8dcc87380441293f8e34334d560bc7" id="r_a5b8dcc87380441293f8e34334d560bc7"><td class="memItemLeft" align="right" valign="top"><a id="a5b8dcc87380441293f8e34334d560bc7" name="a5b8dcc87380441293f8e34334d560bc7"></a>
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeY</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ad1431c90223e9134990eafc6cf11750a">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 1)}</td></tr>
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeY</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 1)}</td></tr>
 <tr class="memdesc:a5b8dcc87380441293f8e34334d560bc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">avg. domain size in MPI-parallel simulation in y-direction <br /></td></tr>
 <tr class="separator:a5b8dcc87380441293f8e34334d560bc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26bc996e094b0378974a7230bedadd7b" id="r_a26bc996e094b0378974a7230bedadd7b"><td class="memItemLeft" align="right" valign="top"><a id="a26bc996e094b0378974a7230bedadd7b" name="a26bc996e094b0378974a7230bedadd7b"></a>
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeZ</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ad1431c90223e9134990eafc6cf11750a">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 2)}</td></tr>
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>_avgDomainSizeZ</b> {<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">getAvgDomainSize</a>(<a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a0b6e2318791f684837985d568d07490b">_channelheight</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aefcd74e7e68082b99022f41d05eaa27c">_dx</a>, <a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#a7ab8bf6137144a02f3bf0ecc1c73b69c">_processes</a>, 2)}</td></tr>
 <tr class="memdesc:a26bc996e094b0378974a7230bedadd7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">avg. domain size in MPI-parallel simulation in z-direction <br /></td></tr>
 <tr class="separator:a26bc996e094b0378974a7230bedadd7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fd2b3b3b116d9e6b1a5c069be12b72e" id="r_a5fd2b3b3b116d9e6b1a5c069be12b72e"><td class="memItemLeft" align="right" valign="top"><a id="a5fd2b3b3b116d9e6b1a5c069be12b72e" name="a5fd2b3b3b116d9e6b1a5c069be12b72e"></a>
@@ -298,6 +307,9 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>_yO</b> {(<a cla
 <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_globalNumberMacroscopicCells</b> {(-1)}</td></tr>
 <tr class="memdesc:a793e187f6538e5bd0fa7cefa980a6478"><td class="mdescLeft">&#160;</td><td class="mdescRight">the total number of macroscopic cells of the coupled simulation <br /></td></tr>
 <tr class="separator:a793e187f6538e5bd0fa7cefa980a6478"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebcdcf3ead3d533c0adc9e6a4b97e9a8" id="r_aebcdcf3ead3d533c0adc9e6a4b97e9a8"><td class="memItemLeft" align="right" valign="top"><a id="aebcdcf3ead3d533c0adc9e6a4b97e9a8" name="aebcdcf3ead3d533c0adc9e6a4b97e9a8"></a>
+const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_scen</b></td></tr>
+<tr class="separator:aebcdcf3ead3d533c0adc9e6a4b97e9a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -315,8 +327,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setParallelBoundaryFl
 <tr class="memitem:aafc9ecb6a1c5b9bb26649672704a8421" id="r_aafc9ecb6a1c5b9bb26649672704a8421"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#aafc9ecb6a1c5b9bb26649672704a8421">getDomainSize</a> (double channelheight, double dx, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, int d) const</td></tr>
 <tr class="memdesc:aafc9ecb6a1c5b9bb26649672704a8421"><td class="mdescLeft">&#160;</td><td class="mdescRight">determines the local domain size on this rank where channelheight is the domain length in direction d.  <br /></td></tr>
 <tr class="separator:aafc9ecb6a1c5b9bb26649672704a8421"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1431c90223e9134990eafc6cf11750a" id="r_ad1431c90223e9134990eafc6cf11750a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1solvers_1_1NumericalSolver.html#ad1431c90223e9134990eafc6cf11750a">getAvgDomainSize</a> (double channelheight, double dx, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, int d) const</td></tr>
-<tr class="separator:ad1431c90223e9134990eafc6cf11750a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>is a virtual base class for the interface for a numerical fluid solver for the Couette scenario </p>
@@ -399,8 +409,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setParallelBoundaryFl
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a72ac62f4677473f0cbeb16d265c15605" name="a72ac62f4677473f0cbeb16d265c15605"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a72ac62f4677473f0cbeb16d265c15605">&#9670;&#160;</a></span>NumericalSolver()</h2>
+<a id="a5575988fb4542fd5afd67f51d1d1af19" name="a5575988fb4542fd5afd67f51d1d1af19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5575988fb4542fd5afd67f51d1d1af19">&#9670;&#160;</a></span>NumericalSolver()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -448,7 +458,13 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setParallelBoundaryFl
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;&#160;</td>
-          <td class="paramname"><em>processes</em>&#160;</td>
+          <td class="paramname"><em>processes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td>
+          <td class="paramname"><em>scen</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -554,8 +570,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setParallelBoundaryFl
 
 </div>
 </div>
-<a id="ad1431c90223e9134990eafc6cf11750a" name="ad1431c90223e9134990eafc6cf11750a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1431c90223e9134990eafc6cf11750a">&#9670;&#160;</a></span>getAvgDomainSize()</h2>
+<a id="a8d2edfab5e6d2bbbca5fd5a95e6c20b6" name="a8d2edfab5e6d2bbbca5fd5a95e6c20b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d2edfab5e6d2bbbca5fd5a95e6c20b6">&#9670;&#160;</a></span>getAvgDomainSize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -564,7 +580,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setParallelBoundaryFl
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int coupling::solvers::NumericalSolver::getAvgDomainSize </td>
+          <td class="memname">static int coupling::solvers::NumericalSolver::getAvgDomainSize </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>channelheight</em>, </td>
@@ -590,12 +606,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setParallelBoundaryFl
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td> const</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

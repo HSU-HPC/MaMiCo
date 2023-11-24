@@ -71,6 +71,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classScenario-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">Scenario Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
@@ -86,6 +87,22 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1c68c57198c4e0d491bcb808290cd4e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad154adb33f1b2aad6f114254dd9f016c" id="r_ad154adb33f1b2aad6f114254dd9f016c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScenario.html#ad154adb33f1b2aad6f114254dd9f016c">run</a> ()=0</td></tr>
 <tr class="separator:ad154adb33f1b2aad6f114254dd9f016c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d0eb09412ca9f67029407397746d280" id="r_a9d0eb09412ca9f67029407397746d280"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScenario.html#a9d0eb09412ca9f67029407397746d280">init</a> ()=0</td></tr>
+<tr class="separator:a9d0eb09412ca9f67029407397746d280"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bb88e59cf248dff6461f706416a7c1a" id="r_a2bb88e59cf248dff6461f706416a7c1a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScenario.html#a2bb88e59cf248dff6461f706416a7c1a">runOneCouplingCycle</a> (int cycle)=0</td></tr>
+<tr class="separator:a2bb88e59cf248dff6461f706416a7c1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7725185463f5a8bfd27cea1816b358fa" id="r_a7725185463f5a8bfd27cea1816b358fa"><td class="memItemLeft" align="right" valign="top"><a id="a7725185463f5a8bfd27cea1816b358fa" name="a7725185463f5a8bfd27cea1816b358fa"></a>
+virtual <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver</a>&lt; 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>getSolver</b> ()=0</td></tr>
+<tr class="separator:a7725185463f5a8bfd27cea1816b358fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4064ca23fec4408112ca87155de3b3ff" id="r_a4064ca23fec4408112ca87155de3b3ff"><td class="memItemLeft" align="right" valign="top"><a id="a4064ca23fec4408112ca87155de3b3ff" name="a4064ca23fec4408112ca87155de3b3ff"></a>
+const <a class="el" href="classcoupling_1_1services_1_1ParallelTimeIntegrationService.html">coupling::services::ParallelTimeIntegrationService</a>&lt; 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>getTimeIntegrationService</b> () const</td></tr>
+<tr class="separator:a4064ca23fec4408112ca87155de3b3ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:af71eb63183673f5e74df857054f26096" id="r_af71eb63183673f5e74df857054f26096"><td class="memItemLeft" align="right" valign="top"><a id="af71eb63183673f5e74df857054f26096" name="af71eb63183673f5e74df857054f26096"></a>
+std::unique_ptr&lt; <a class="el" href="classcoupling_1_1services_1_1ParallelTimeIntegrationService.html">coupling::services::ParallelTimeIntegrationService</a>&lt; 3 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_timeIntegrationService</b></td></tr>
+<tr class="separator:af71eb63183673f5e74df857054f26096"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -94,6 +111,33 @@ const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>_scenari
 <tr class="separator:a242510bc2300ec74b4a086475b02d8f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a9d0eb09412ca9f67029407397746d280" name="a9d0eb09412ca9f67029407397746d280"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d0eb09412ca9f67029407397746d280">&#9670;&#160;</a></span>init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void Scenario::init </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classCouetteScenario.html#a796800f74f7e0e69ad33d736ba3939f5">CouetteScenario</a>.</p>
+
+</div>
+</div>
 <a id="ad154adb33f1b2aad6f114254dd9f016c" name="ad154adb33f1b2aad6f114254dd9f016c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad154adb33f1b2aad6f114254dd9f016c">&#9670;&#160;</a></span>run()</h2>
 
@@ -117,7 +161,35 @@ const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>_scenari
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classCouetteScenario.html#ac2fcd62d86f838ad22442b1083049ac9">CouetteScenario</a>.</p>
+<p>Implemented in <a class="el" href="classCouetteScenario.html#ac017544d3da7dcab46d92fca45723da2">CouetteScenario</a>.</p>
+
+</div>
+</div>
+<a id="a2bb88e59cf248dff6461f706416a7c1a" name="a2bb88e59cf248dff6461f706416a7c1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bb88e59cf248dff6461f706416a7c1a">&#9670;&#160;</a></span>runOneCouplingCycle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void Scenario::runOneCouplingCycle </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>cycle</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classCouetteScenario.html#ac8ef1d8c08241d9b6cf10545ad1173c3">CouetteScenario</a>.</p>
 
 </div>
 </div>

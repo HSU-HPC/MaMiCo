@@ -13,7 +13,7 @@ var searchData=
   ['compute_5fboundary_5fneighbors_10',['compute_boundary_neighbors',['../classcoupling_1_1filtering_1_1NLM.html#affc75dfef78539d202cf27d8b20ec6b0',1,'coupling::filtering::NLM']]],
   ['computeandstoretemperature_11',['computeAndStoreTemperature',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a03413c9008bebffec669db3155af7904',1,'coupling::services::MacroscopicCellServiceImpl']]],
   ['computeavgforceandvelocity_12',['ComputeAvgForceAndVelocity',['../classcoupling_1_1cellmappings_1_1ComputeAvgForceAndVelocity.html#ac481a44a615a9ff4e5d1d64703bfd316',1,'coupling::cellmappings::ComputeAvgForceAndVelocity']]],
-  ['computedensityandvelocity_13',['computeDensityAndVelocity',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a3f241142beb944a7efc6b132dcd5e3e3',1,'coupling::solvers::LBCouetteSolver']]],
+  ['computedensityandvelocity_13',['computeDensityAndVelocity',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a0d59b0f02800c54c433d905f97f4e138',1,'coupling::solvers::LBCouetteSolver']]],
   ['computekineticenergy_14',['computeKineticEnergy',['../classcoupling_1_1KineticEnergyController.html#a00929e8bfbdb9b329850884585b195bd',1,'coupling::KineticEnergyController']]],
   ['computekineticenergymapping_15',['ComputeKineticEnergyMapping',['../classcoupling_1_1cellmappings_1_1ComputeKineticEnergyMapping.html#a8492b0bb8bcbb2ad1506bee611ed9cb8',1,'coupling::cellmappings::ComputeKineticEnergyMapping']]],
   ['computemassflux_16',['computeMassFlux',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a063a4f0697c4e51f2500c0875a32943c',1,'coupling::transferstrategies::TransferStrategy4NieCoupling']]],

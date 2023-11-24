@@ -87,11 +87,24 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a12d969272ec6989fe8aeea6d2f8a32ea" id="r_a12d969272ec6989fe8aeea6d2f8a32ea"><td class="memItemLeft" align="right" valign="top"><a id="a12d969272ec6989fe8aeea6d2f8a32ea" name="a12d969272ec6989fe8aeea6d2f8a32ea"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (const simplemd::configurations::MolecularDynamicsConfiguration &amp;simpleMDConfig, const <a class="el" href="classcoupling_1_1configurations_1_1MaMiCoConfiguration.html">coupling::configurations::MaMiCoConfiguration</a>&lt; dim &gt; &amp;mamicoConfig, <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *msi, const unsigned int rank)</td></tr>
-<tr class="separator:a12d969272ec6989fe8aeea6d2f8a32ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f1dda30b0388d394b23dde811f5fd41" id="r_a1f1dda30b0388d394b23dde811f5fd41"><td class="memItemLeft" align="right" valign="top"><a id="a1f1dda30b0388d394b23dde811f5fd41" name="a1f1dda30b0388d394b23dde811f5fd41"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalNumberMacroscopicCells, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; numberProcesses, <a class="el" href="namespacecoupling_1_1paralleltopology.html#ad59b0afbf0aa9de388db04cbd6c1c5d0">coupling::paralleltopology::ParallelTopologyType</a> type, unsigned int outerRegion, const unsigned int rank, MPI_Comm comm=MPI_COMM_WORLD)</td></tr>
+<tr class="separator:a1f1dda30b0388d394b23dde811f5fd41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a657a5f5e254264babe504a01b1c1f8ee" id="r_a657a5f5e254264babe504a01b1c1f8ee"><td class="memTemplParams" colspan="2"><a id="a657a5f5e254264babe504a01b1c1f8ee" name="a657a5f5e254264babe504a01b1c1f8ee"></a>
+template&lt;unsigned int mddim&gt; </td></tr>
+<tr class="memitem:a657a5f5e254264babe504a01b1c1f8ee"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt; mddim==MD_DIM &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><b>init</b> (const simplemd::configurations::MolecularDynamicsConfiguration &amp;simpleMDConfig, const <a class="el" href="classcoupling_1_1configurations_1_1MaMiCoConfiguration.html">coupling::configurations::MaMiCoConfiguration</a>&lt; mddim &gt; &amp;mamicoConfig, <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; mddim &gt; *msi, const unsigned int rank, MPI_Comm comm=MPI_COMM_WORLD)</td></tr>
+<tr class="separator:a657a5f5e254264babe504a01b1c1f8ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a151ab5c5a90bee2f4ebcfbe31e684aac" id="r_a151ab5c5a90bee2f4ebcfbe31e684aac"><td class="memItemLeft" align="right" valign="top"><a id="a151ab5c5a90bee2f4ebcfbe31e684aac" name="a151ab5c5a90bee2f4ebcfbe31e684aac"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalNumberMacroscopicCells, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; numberProcesses, <a class="el" href="namespacecoupling_1_1paralleltopology.html#ad59b0afbf0aa9de388db04cbd6c1c5d0">coupling::paralleltopology::ParallelTopologyType</a> type, <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *msi, const unsigned int rank, MPI_Comm comm)</td></tr>
+<tr class="separator:a151ab5c5a90bee2f4ebcfbe31e684aac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0314010c11eacd6e526b9d3a93bb4363" id="r_a0314010c11eacd6e526b9d3a93bb4363"><td class="memItemLeft" align="right" valign="top"><a id="a0314010c11eacd6e526b9d3a93bb4363" name="a0314010c11eacd6e526b9d3a93bb4363"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>finalize</b> ()</td></tr>
+<tr class="separator:a0314010c11eacd6e526b9d3a93bb4363"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fe87a7d20b3c996273fe7c07333623b" id="r_a3fe87a7d20b3c996273fe7c07333623b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1indexing_1_1IndexingService.html#a3fe87a7d20b3c996273fe7c07333623b">getRanksForGlobalIndex</a> (const <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">BaseIndex</a>&lt; dim &gt; &amp;globalCellIndex) const</td></tr>
 <tr class="separator:a3fe87a7d20b3c996273fe7c07333623b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5092ad984d8df9c84d458641b772512" id="r_ab5092ad984d8df9c84d458641b772512"><td class="memItemLeft" align="right" valign="top"><a id="ab5092ad984d8df9c84d458641b772512" name="ab5092ad984d8df9c84d458641b772512"></a>
+MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><b>getComm</b> () const</td></tr>
+<tr class="separator:ab5092ad984d8df9c84d458641b772512"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8240555f041e34275cc494ad25f43e42" id="r_a8240555f041e34275cc494ad25f43e42"><td class="memItemLeft" align="right" valign="top"><a id="a8240555f041e34275cc494ad25f43e42" name="a8240555f041e34275cc494ad25f43e42"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>getRank</b> () const</td></tr>
 <tr class="separator:a8240555f041e34275cc494ad25f43e42"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,18 +128,15 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:ac8b336c76c63b9f598837270a28c9d07" id="r_ac8b336c76c63b9f598837270a28c9d07"><td class="memItemLeft" align="right" valign="top"><a id="ac8b336c76c63b9f598837270a28c9d07" name="ac8b336c76c63b9f598837270a28c9d07"></a>
 const <a class="el" href="classcoupling_1_1paralleltopology_1_1ParallelTopology.html">coupling::paralleltopology::ParallelTopology</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_parallelTopology</b></td></tr>
 <tr class="separator:ac8b336c76c63b9f598837270a28c9d07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94194a93a2809e4a213a223763fc7b13" id="r_a94194a93a2809e4a213a223763fc7b13"><td class="memItemLeft" align="right" valign="top"><a id="a94194a93a2809e4a213a223763fc7b13" name="a94194a93a2809e4a213a223763fc7b13"></a>
-simplemd::configurations::MolecularDynamicsConfiguration&#160;</td><td class="memItemRight" valign="bottom"><b>_simpleMDConfig</b></td></tr>
-<tr class="separator:a94194a93a2809e4a213a223763fc7b13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab40ff86763fe51437abe1a03c0f25073" id="r_ab40ff86763fe51437abe1a03c0f25073"><td class="memItemLeft" align="right" valign="top"><a id="ab40ff86763fe51437abe1a03c0f25073" name="ab40ff86763fe51437abe1a03c0f25073"></a>
-<a class="el" href="classcoupling_1_1configurations_1_1MaMiCoConfiguration.html">coupling::configurations::MaMiCoConfiguration</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_mamicoConfig</b></td></tr>
-<tr class="separator:ab40ff86763fe51437abe1a03c0f25073"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0edff85482f30a95c994efb6d3e79c5a" id="r_a0edff85482f30a95c994efb6d3e79c5a"><td class="memItemLeft" align="right" valign="top"><a id="a0edff85482f30a95c994efb6d3e79c5a" name="a0edff85482f30a95c994efb6d3e79c5a"></a>
-<a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_msi</b></td></tr>
-<tr class="separator:a0edff85482f30a95c994efb6d3e79c5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0438609dd60d07285ac33ca878145cf" id="r_af0438609dd60d07285ac33ca878145cf"><td class="memItemLeft" align="right" valign="top"><a id="af0438609dd60d07285ac33ca878145cf" name="af0438609dd60d07285ac33ca878145cf"></a>
+MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><b>_comm</b></td></tr>
+<tr class="separator:af0438609dd60d07285ac33ca878145cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac179679a521a939ee62d4875c0e44761" id="r_ac179679a521a939ee62d4875c0e44761"><td class="memItemLeft" align="right" valign="top"><a id="ac179679a521a939ee62d4875c0e44761" name="ac179679a521a939ee62d4875c0e44761"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_rank</b></td></tr>
 <tr class="separator:ac179679a521a939ee62d4875c0e44761"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e895f1be37de08cb5c248c094e12812" id="r_a1e895f1be37de08cb5c248c094e12812"><td class="memItemLeft" align="right" valign="top"><a id="a1e895f1be37de08cb5c248c094e12812" name="a1e895f1be37de08cb5c248c094e12812"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>_isInitialized</b> = false</td></tr>
+<tr class="separator:a1e895f1be37de08cb5c248c094e12812"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
