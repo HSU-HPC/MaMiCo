@@ -909,12 +909,16 @@ public:
   virtual void switchOffCoupling() override { 
     //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
     internalCouplingState = false;
+    simulation->getDomain()->thermostatOn();
+    simulation->getDomain()->setExplosionHeuristics(true);
     if(ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOffCoupling();
   }
   virtual void switchOnCoupling() override { 
     //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
     internalCouplingState = true;
+    simulation->getDomain()->thermostatOff();
+    simulation->getDomain()->setExplosionHeuristics(false);
     if(ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOnCoupling();
   }
