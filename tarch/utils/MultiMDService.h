@@ -54,7 +54,8 @@ public:
   unsigned int getGlobalRank() const { return _globalRank; }
   unsigned int getGlobalSize() const { return _globalSize; }
 
-  void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
+  // FIXME: This is never used
+  // void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
   unsigned int getTotalNumberOfMDSimulations() { return _totalNumberMDSimulations; }
 
   void addMDSimulationBlock() {

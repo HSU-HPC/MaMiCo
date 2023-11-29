@@ -55,12 +55,15 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::reduceFromMD2Macro(
                                                                                 const unsigned int* const globalCellIndicesFromMacroscopicSolver,
                                                                                 const std::vector<MacroscopicCell*>& sumMacroscopicCellsFromMamico) {
 
+  // TODO will DE #0 (MD instance #0) always be non-NULL?
   const unsigned int rank = dataExchange[0]->getIndexConversion()->getThisRank();
 
   // empty send and receive buffers
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::deleteBuffers();
 
   for (unsigned int i = 0; i < dataExchange.size(); ++i) {
+    if (nullptr == dataExchange[i])
+      continue;
     const auto numberCellsFromMacroscopicSolver = (unsigned int)macroscopicCellsFromMacroscopicSolver.size();
 
     const coupling::IndexConversion<dim>* indexConversion = dataExchange[i]->getIndexConversion();
@@ -77,6 +80,8 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::reduceFromMD2Macro(
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllBcasts(*dataExchange[0]->getIndexConversion());
 
   for (unsigned int i = 0; i < dataExchange.size(); ++i) {
+    if (nullptr == dataExchange[i])
+      continue;
     readFromReduceBuffer(*dataExchange[i], macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
   }
 }

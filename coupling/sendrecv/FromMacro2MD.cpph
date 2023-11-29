@@ -147,9 +147,12 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::bcastFromMacro2MD(
   // empty send and receive buffers
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::deleteBuffers();
 
+  // TODO will DE #0 (MD instance #0) always be non-NULL?
   const unsigned int rank = dataExchangeFromMacroscopicCellServices[0]->getIndexConversion()->getThisRank();
 
   for (auto& de : dataExchangeFromMacroscopicCellServices) {
+    if (nullptr == de)
+      continue;
     auto indexConversion = de->getIndexConversion();
     // TODO compute target ranks here and pass them in
     writeToSendBufferCollective(*indexConversion, *de, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
@@ -161,12 +164,14 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::bcastFromMacro2MD(
   // SendReceiveBuffer<MacroscopicCell,dim >::triggerReceivingCollective(indexConversion, dataExchange);
   SendReceiveBuffer<MacroscopicCell, dim>::triggerBcasts(rank);
 
+  // TODO will DE #0 (MD instance #0) always be non-NULL?
   coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllBcasts(*dataExchangeFromMacroscopicCellServices[0]->getIndexConversion());
 
   for (unsigned int i = 0; i < dataExchangeFromMacroscopicCellServices.size(); ++i) {
-    if (macroscopicCellsFromMamico[i].empty()) {
+    if (macroscopicCellsFromMamico[i].empty())
       continue;
-    }
+    if (nullptr == dataExchangeFromMacroscopicCellServices[i])
+      continue;
     readFromCollectiveBuffer(*dataExchangeFromMacroscopicCellServices[i]->getIndexConversion(), *dataExchangeFromMacroscopicCellServices[i],
                              macroscopicCellsFromMamico[i]);
   }

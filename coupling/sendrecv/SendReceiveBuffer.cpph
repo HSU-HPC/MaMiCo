@@ -396,8 +396,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerBcasts(
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   int counter = 0;
-#endif
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   // if(thisRank == 23) std::cout << thisRank << " sendrecvBuffer size " << _sendRecvBuffer.size() << std::endl;
   for (std::pair<const unsigned int, BufferCollective>& buffer : _bcastBuffer) {
     /*if(thisRank == 23) {

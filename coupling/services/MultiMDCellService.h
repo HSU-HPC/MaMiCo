@@ -209,6 +209,8 @@ public:
     std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*> allDEs(_totalNumberMDSimulations);
     std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+      if (nullptr == _macroscopicCellServices[i])
+        continue;
       allDEs[i] = new coupling::sendrecv::DataExchangeFromMacro2MD<dim>(_macroscopicSolverInterface, &_macroscopicCellServices[i]->getIndexConversion(),
                                                                         _macroscopicCellServices[i]->getID());
       if (auto* v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[i])) {
@@ -217,6 +219,8 @@ public:
     }
 
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+      if (nullptr == _macroscopicCellServices[i])
+        continue;
       _macroscopicCellServices[i]->sendFromMacro2MDPreProcess();
     }
 
@@ -224,6 +228,8 @@ public:
     fromMacro2MD.bcastFromMacro2MD(allDEs, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver, allMacroscopicCellsFromMamico);
 
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+      if (nullptr == _macroscopicCellServices[i])
+        continue;
       _macroscopicCellServices[i]->sendFromMacro2MDPostProcess();
     }
     for (coupling::sendrecv::DataExchangeFromMacro2MD<dim>*& de : allDEs) {
@@ -253,13 +259,13 @@ public:
    * macroscopicCellsFromMacroscopicSolver. */
   double reduceFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                             const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
-    auto* debugTMP = &dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[0])->getMacroscopicCells();
     unsigned int size = macroscopicCellsFromMacroscopicSolver.size(); // we assume globalCellIndicesFromMacroscopicSolver to be of identical size
 
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+      if (nullptr == _macroscopicCellServices[i])
+        continue;
       _macroscopicCellServices[i]->sendFromMD2MacroPreProcess();
     }
-    debugTMP = &dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[0])->getMacroscopicCells();
 
     preprocessingForMD2Macro(globalCellIndicesFromMacroscopicSolver, size);
 
@@ -280,9 +286,19 @@ public:
     std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
     coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface =
         coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().getMacroscopicSolverInterface();
+    unsigned int totalNumberEquilibratedMDSimulations = 0;
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
+      if (nullptr == _macroscopicCellServices[i] || 0 != _warmupPhase[i])
+        continue; // Only reduce using equilibrated MD simulation instances
+
       allDEs[i] = new coupling::sendrecv::DataExchangeFromMD2Macro<dim>(_macroscopicSolverInterface, &_macroscopicCellServices[i]->getIndexConversion(),
                                                                         _macroscopicCellServices[i]->getID());
+      totalNumberEquilibratedMDSimulations += 1;
+    }
+    // FIXME Reseting macroscopicCellsFromMacroscopicSolver does not seem to help :(
+    for (unsigned int i = 0; i < size; i++) {
+      macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMass(0);
+      macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
     }
     _fromMD2Macro.reduceFromMD2Macro(allDEs, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver, _sumMacroscopicCells);
 
@@ -298,18 +314,23 @@ public:
 
     // average data
     for (unsigned int i = 0; i < size; i++) {
-      _macroscopicCells[i]->setMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass() / _totalNumberMDSimulations);
-      _macroscopicCells[i]->setMacroscopicMomentum(1.0 / _totalNumberMDSimulations * macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
+      _macroscopicCells[i]->setMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass() / (double)totalNumberEquilibratedMDSimulations);
+      _macroscopicCells[i]->setMacroscopicMomentum(1.0 / (double)totalNumberEquilibratedMDSimulations *
+                                                   macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
     }
+
+    // apply post multi instance FilterPipeline on cell data
+
+#ifdef DEBUG_FILTER_PIPELINE
+    std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
+#endif
+
+    (*_postMultiInstanceFilterPipeline)();
 
     // store data in macroscopicCellsFromMacroscopicSolver
     for (unsigned int i = 0; i < size; i++) {
       macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMass(_macroscopicCells[i]->getMacroscopicMass());
       macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(_macroscopicCells[i]->getMacroscopicMomentum());
-    }
-
-    debugTMP = &dynamic_cast<coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[0])->getMacroscopicCells();
-    if (debugTMP != nullptr) {
     }
     return runtime;
   }
