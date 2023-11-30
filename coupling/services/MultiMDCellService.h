@@ -263,6 +263,8 @@ public:
   void sumUpMacroscopicCellsFromMamico() {
     for (unsigned int n = 0; n < _totalNumberMDSimulations; ++n) {
       if (auto* v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[n])) {
+        if (0 != _warmupPhase[n])
+          continue;
         for (unsigned int i = 0; i < v->getMacroscopicCells().getMacroscopicCells().size(); ++i) {
           if (_sumMacroscopicCells.size() <= i) {
             _sumMacroscopicCells.emplace_back(new coupling::datastructures::MacroscopicCell<dim>());
@@ -467,12 +469,12 @@ public:
       }
     }
 
-/*
- * If this is the first coupling step, we must init the post multi instance filter pipeline operating on averaged cell data.
- * The ENABLE_POST_MULTI_INSTANCE_FILTERING flag is used for debugging purposes and shall be removed later.
- * If you wish to not use post multi-instance filtering in deployment, you can simply leave the corresponding XML-Subtag empty.
- */
 #ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
+    /*
+     * If this is the first coupling step, we must init the post multi instance filter pipeline operating on averaged cell data.
+     * The ENABLE_POST_MULTI_INSTANCE_FILTERING flag is used for debugging purposes and shall be removed later.
+     * If you wish to not use post multi-instance filtering in deployment, you can simply leave the corresponding XML-Subtag empty.
+     */
     if (_postMultiInstanceFilterPipeline == nullptr) {
       // Init filter pipeline
       _postMultiInstanceFilterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells, coupling::filtering::Scope::postMultiInstance,
