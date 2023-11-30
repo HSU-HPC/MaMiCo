@@ -124,8 +124,8 @@ private:
   /** allocates the reduce receive buffers for the macroscopic solver. Since we do not
    * know anything about the macroscopic solver, we only have a list of global
    * vector cell indices available for possible cells to be received on this
-   * rank.
-   * TODO: add more detail
+   * rank. For each global cell which is in the list,
+   * allocateReduceBufferForReceiving(...) of SendReceiveBuffer is called.
    * 	@param indexConversion
    * 	@param dataExchange
    * 	@param globalCellIndices
@@ -150,8 +150,8 @@ private:
   /** reads information from the reduce buffer and stores the result in the
    * list of macroscopic cells. Since this is a receive for the macroscopic
    * cells on the side of the macroscopic solver, we just have a list of global
-   * cell indices and corresponding macrocsopic cell buffers.
-   * TODO: add more detail
+   * cell indices and corresponding macrocsopic cell buffers. For each cell in
+   * this list, readFromReduceBuffer(...) of SendReceiveBuffer is called.
    * 	@param dataExchange
    * 	@param macroscopicCells
    * 	@param globalCellIndices

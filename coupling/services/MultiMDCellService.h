@@ -287,7 +287,7 @@ public:
     unsigned int size = macroscopicCellsFromMacroscopicSolver.size(); // we assume globalCellIndicesFromMacroscopicSolver to be of identical size
 
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
-      if (nullptr == _macroscopicCellServices[i])
+      if (nullptr == _macroscopicCellServices[i] || 0 != _warmupPhase[i])
         continue;
       _macroscopicCellServices[i]->sendFromMD2MacroPreProcess();
     }
@@ -320,11 +320,6 @@ public:
                                                                         _macroscopicCellServices[i]->getID());
       totalNumberEquilibratedMDSimulations += 1;
     }
-    // FIXME Reseting macroscopicCellsFromMacroscopicSolver does not seem to help :(
-    for (unsigned int i = 0; i < size; i++) {
-      macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMass(0);
-      macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
-    }
     _fromMD2Macro.reduceFromMD2Macro(allDEs, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver, _sumMacroscopicCells);
 
     if (_multiMDService.getRank() == 0) {
@@ -332,9 +327,10 @@ public:
       runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
     }
 
-    // receive data from each MD simulation and accumulate information in cells
-    for (unsigned int l = 0; l < _totalNumberMDSimulations; l++) {
-      //_macroscopicCellServices[l]->sendFromMD2MacroPostProcess();
+    for (unsigned int i = 0; i < _totalNumberMDSimulations; i++) {
+      if (nullptr == _macroscopicCellServices[i] || 0 != _warmupPhase[i])
+        continue; // Only equilibrated MD simulation instances
+      _macroscopicCellServices[i]->sendFromMD2MacroPostProcess();
     }
 
     // average data

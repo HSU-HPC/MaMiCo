@@ -746,12 +746,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllBcasts(
   }
   delete[] _requests;
   _requests = nullptr;
-  /*for(MPI_Comm & subcomm : _subComms) {
-    if (subcomm != MPI_COMM_NULL) { MPI_Comm_free(&subcomm); subcomm = MPI_COMM_NULL; }
-  }
-  for(MPI_Group & subgroup : _subGroups) {
-    if (subgroup != MPI_GROUP_NULL) { MPI_Group_free(&subgroup); subgroup = MPI_GROUP_NULL; }
-  }*/
   _requestsAllocated = false;
 #endif
 }
@@ -769,10 +763,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReduce
     // Nothing to do for this rank and subdomain!
     return;
   }
-  /*if(indexConversion.getThisRank() == 15) {
-    std::cout << globalVectorIndex << " <---> " << indexConversion.getGlobalCellIndex(globalVectorIndex) << " => "
-              << sourceRanks << " ==> " << targetRanks << std::endl;
-  }*/
   if (sourceRanks.empty()) {
     return;
   }

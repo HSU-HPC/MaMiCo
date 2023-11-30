@@ -93,6 +93,16 @@
     - md: int number-md-simulations:
       Total number of MD instances.
       Set to 1 to disable multi-instance sampling.
+      Set to "dynamic" to change the ensemble size at runtime as required.
+    - md: int min-number-md:
+      Minimum number of MD instances.
+      Required when number-md-simulations="dynamic".
+    - md: double error-start:
+      Error threshold at the start of the simulation.
+      Required when number-md-simulations="dynamic".
+    - md: double error-end:
+      Error threshold at the end of the simulation.
+      Required when number-md-simulations="dynamic".
     - synthetic: double noise-sigma
       Standard deviation of gaussian noise used to emulate MD flow field data, e.g. "0.1667".
     - double density:
