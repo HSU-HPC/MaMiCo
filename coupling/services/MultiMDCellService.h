@@ -220,6 +220,11 @@ public:
   /** broadcasts data from macroscopic solver to all MD simulations */
   void bcastFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                          const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
+    // Fall back to sequential operation when MPI is not available (avoids redundant implementation)
+    sendFromMacro2MD(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+    return;
+#endif
 
     std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*> allDEs(_totalNumberMDSimulations);
     std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
@@ -274,6 +279,11 @@ public:
    * macroscopicCellsFromMacroscopicSolver. */
   double reduceFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                             const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
+    // Fall back to sequential operation when MPI is not available (avoids redundant implementation)
+    return sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+#endif
+
     unsigned int size = macroscopicCellsFromMacroscopicSolver.size(); // we assume globalCellIndicesFromMacroscopicSolver to be of identical size
 
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
