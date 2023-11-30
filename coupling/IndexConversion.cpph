@@ -7,23 +7,22 @@ template <unsigned int dim>
 coupling::IndexConversion<dim>::IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
                                                 tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
                                                 tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim, double> globalMDDomainOffset,
-                                                coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset,
-                                                unsigned int rankOnGrid)
+                                                coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset)
     : // DO NOT CHANGE ORDERING OF THESE PARAMETERS
       // parallel-topology and type need to be initialised first (independent of
       // other class-members in init.)
       _parallelTopologyType(parallelTopologyType),
       _parallelTopology(coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, numberProcesses, topologyOffset)),
       // independent from other members in init.
-      _numberProcesses(numberProcesses), _rank(rank), _rankOnGrid(rankOnGrid),
+      _numberProcesses(numberProcesses), _rank(rank),
       // depends on parallel-topology
-      _thisProcess(getThisProcessCoordinates(rankOnGrid)),
+      _thisProcess(getThisProcessCoordinates(rank)),
       // independent from other members in init.
       _globalNumberMacroscopicCells(globalNumberMacroscopicCells),
       // independent from other members in init.
       _averageLocalNumberMacroscopicCells(initAverageLocalNumberMacroscopicCells(globalNumberMacroscopicCells, numberProcesses)),
       // requires parallel-topology to be init.
-      _localNumberMacroscopicCells(initLocalNumberMacroscopicCells(globalNumberMacroscopicCells, numberProcesses, rankOnGrid)),
+      _localNumberMacroscopicCells(initLocalNumberMacroscopicCells(globalNumberMacroscopicCells, numberProcesses, rank)),
       // no dependen.
       _divisionFactor4GlobalNumberMacroscopicCells(coupling::initDivisionFactor<dim>(_globalNumberMacroscopicCells + tarch::la::Vector<dim, unsigned int>(2))),
       // no dependen.
@@ -112,12 +111,11 @@ template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::Index
 }
 
 template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getThisProcessCoordinates(unsigned int rank) const {
-  tarch::la::Vector<dim, unsigned int> temp = _parallelTopology->getProcessCoordinates(rank);
+  tarch::la::Vector<dim, unsigned int> processCoordinates = getProcessCoordinates(rank);
   for (unsigned int d = 0; d < dim; ++d) {
-    temp[d] = temp[d] % _numberProcesses[d];
+    processCoordinates[d] = processCoordinates[d] % _numberProcesses[d];
   }
-
-  return temp;
+  return processCoordinates;
 }
 
 template <unsigned int dim> unsigned int coupling::IndexConversion<dim>::getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
