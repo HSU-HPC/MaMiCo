@@ -466,6 +466,8 @@ private:
       fillSendBuffer(_cfg.density, *_couetteSolver, _multiMDCellService->getIndexConversion(), _buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
     }
     if (_cfg.macro2Md) {
+      // _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
+      // Use broadcast instead
       _multiMDCellService->bcastFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
       // std::cout << "Finish _multiMDCellService->sendFromMacro2MD " <<
       // std::endl;

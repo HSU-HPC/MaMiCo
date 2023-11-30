@@ -202,6 +202,21 @@ public:
     }
   }
 
+  /** send data from macroscopic solver to all MD simulations */
+  void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+                        const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+    // just send information to all MD instances. This is currently
+    // sequentialized inside MacroscopicCellService/SendRecvBuffer
+    for (unsigned int i = 0; i < _totalNumberMDSimulations; i++) {
+      // std::cout << "Rank " <<
+      //_macroscopicCellServices[i]->getIndexConversion().getThisRank() << ":
+      // Send from macro to MD for Simulation no. " << i << std::endl;
+      if (_macroscopicCellServices[i] != nullptr) {
+        _macroscopicCellServices[i]->sendFromMacro2MD(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+      }
+    }
+  }
+
   /** broadcasts data from macroscopic solver to all MD simulations */
   void bcastFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                          const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
