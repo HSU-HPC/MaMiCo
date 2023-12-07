@@ -5,8 +5,8 @@
 
 #pragma once
 
-//#define DEBUG_ICM2M
-//#define DEBUG_ICM2M_VERBOSE
+// #define DEBUG_ICM2M
+// #define DEBUG_ICM2M_VERBOSE
 
 #include "IndexConversion.h"
 #include "interface/MacroscopicSolverInterface.h"
@@ -38,7 +38,7 @@ public:
                           coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                           ,
-                          const MPI_Comm comm = MPI_COMM_WORLD, const int lowestRankInComm = 0
+                          const MPI_Comm comm, const int lowestRankInComm = 0
 #endif
                           /** @todo @felix adapt the params comm and
                              lowestRankInComm for case multimd */

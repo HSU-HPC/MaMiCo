@@ -19,8 +19,10 @@
  */
 class FromMD2MacroTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(FromMD2MacroTest);
-  CPPUNIT_TEST(test<2>);
-  CPPUNIT_TEST(test<3>);
+  // TODO While this code is named "test", it just prints debug output, but does not execute any tests
+  // Thus there is no reason to execute it at all
+  //CPPUNIT_TEST(test<2>);
+  //CPPUNIT_TEST(test<3>);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -56,6 +58,10 @@ public:
       std::cout << "Global number macroscopic cells: " << globalNumberMacroscopicCells << std::endl;
       std::cout << "Number processes: " << numberProcesses << std::endl;
     }
+
+    // init new indexing system
+    coupling::indexing::IndexingService<dim>::getInstance().init(globalNumberMacroscopicCells, numberProcesses, 
+      coupling::paralleltopology::XYZ, 3, (unsigned int)rank);
 
     // define functional objects
     coupling::IndexConversion<dim> indexConversion(globalNumberMacroscopicCells, numberProcesses, rank, mdDomainSize, mdDomainOffset,

@@ -57,8 +57,8 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::writeToReduceBuffer
         const unsigned int localIndex = indexConversion.getLocalCellIndex(globalVectorIndex);
         globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
 
-        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToReduceBuffer(indexConversion, dataExchange, *macroscopicCells[localIndex],
-                                                                                         globalVectorIndex);
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(indexConversion, dataExchange, *macroscopicCells[localIndex],
+                                                                                       globalVectorIndex);
       }
     }
   }
@@ -72,7 +72,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::allocateReduceBuffe
   for (unsigned int i = 0; i < numberCells; i++) {
     const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
 
-    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReduceBufferForReceiving(indexConversion, dataExchange, globalVectorIndex);
+    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiveBuffers(dataExchange, globalVectorIndex);
   }
 }
 
@@ -82,9 +82,9 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::readFromReduceBuffe
                                                                                   const unsigned int* const globalCellIndices) {
   const auto numberCells = (unsigned int)macroscopicCells.size();
   for (unsigned int i = 0; i < numberCells; i++) {
-    const tarch::la::Vector<dim, unsigned int> globalVectorIndex = dataExchange.getIndexConversion()->getGlobalVectorCellIndex(globalCellIndices[i]);
-    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReduceBuffer(*dataExchange.getIndexConversion(), dataExchange, *macroscopicCells[i],
-                                                                                      globalVectorIndex);
+    const tarch::la::Vector<dim, unsigned int> globalVectorIndex =
+        coupling::indexing::IndexingService<dim>::getInstance().getGlobalVectorCellIndex(globalCellIndices[i]);
+    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(dataExchange, *macroscopicCells[i], globalVectorIndex);
   }
 }
 
@@ -119,11 +119,11 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::sendFromMD2MacroNon
   writeToSendBuffer(indexConversion, dataExchange, macroscopicCellsFromMamico);
 
   // allocate all requests -> needs to be called AFTER all buffers are filled
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests(indexConversion);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests();
 
   // trigger MPI recv/send
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceiving(indexConversion, dataExchange);
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(indexConversion, dataExchange);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceiving(dataExchange);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(dataExchange);
 }
 
 template <class MacroscopicCell, unsigned int dim>
@@ -133,7 +133,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::allocateReceiveBuff
   for (unsigned int i = 0; i < numberCells; i++) {
     const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
 
-    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiveBuffers(indexConversion, dataExchange, globalVectorIndex);
+    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiveBuffers(dataExchange, globalVectorIndex);
   }
 }
 
@@ -153,8 +153,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::writeToSendBuffer(c
         const unsigned int localIndex = indexConversion.getLocalCellIndex(globalVectorIndex);
         globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
 
-        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(indexConversion, dataExchange, *macroscopicCells[localIndex],
-                                                                                       globalVectorIndex);
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(dataExchange, *macroscopicCells[localIndex], globalVectorIndex);
       }
     }
   }
@@ -166,7 +165,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::wait4SendFromMD2Mac
                                                                                    const std::vector<MacroscopicCell*>& macroscopicCellsFromMacroscopicSolver,
                                                                                    const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
   // wait for all send- and receive operations to complete
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations(indexConversion);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations();
 
   // fill information from receive buffers into the macroscopic cells
   readFromReceiveBuffer(indexConversion, dataExchange, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
@@ -180,7 +179,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::readFromReceiveBuff
   const unsigned int numberCells = (unsigned int)macroscopicCells.size();
   for (unsigned int i = 0; i < numberCells; i++) {
     const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
-    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(indexConversion, dataExchange, *macroscopicCells[i], globalVectorIndex);
+    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(dataExchange, *macroscopicCells[i], globalVectorIndex);
   }
 }
 

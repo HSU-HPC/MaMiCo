@@ -4,7 +4,7 @@
 
 #pragma once
 
-//#define DEBUG_FILTER_PIPELINE
+// #define DEBUG_FILTER_PIPELINE
 #define POST_MULTI_INSTANCE_FILTERING_YES true
 #define POST_MULTI_INSTANCE_FILTERING_NO false
 

@@ -11,7 +11,7 @@ void coupling::sendrecv::FromMacro2MDSendOnly<MacroscopicCell, dim>::writeToSend
   const unsigned int numberCells = (unsigned int)macroscopicCells.size();
   for (unsigned int i = 0; i < numberCells; i++) {
     const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
-    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(indexConversion, dataExchange, *macroscopicCells[i], globalVectorIndex);
+    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(dataExchange, *macroscopicCells[i], globalVectorIndex);
   }
 }
 
@@ -36,16 +36,16 @@ void coupling::sendrecv::FromMacro2MDSendOnly<MacroscopicCell, dim>::sendFromMac
   // fill the send buffers and trigger the MPI-send
   writeToSendBuffer(indexConversion, dataExchange, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
 
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests(indexConversion);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests();
 
   // coupling::sendrecv::SendReceiveBuffer<MacroscopicCell,dim>::triggerReceiving(indexConversion,dataExchange); // not required since no data are received
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(indexConversion, dataExchange);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(dataExchange);
 }
 
 template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MDSendOnly<MacroscopicCell, dim>::wait4SendFromMacro2MD(const coupling::IndexConversion<dim>& indexConversion) {
   // wait for all send- and receive operations to complete
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations(indexConversion);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations();
   // fill information from receive buffers into the macroscopic cells -> not required
   // readFromReceiveBuffer(indexConversion,dataExchange,macroscopicCellsFromMamico);
 }

@@ -10,6 +10,10 @@
 // Include CellIndex template class definition
 #include "CellIndex.h"
 
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#include <mpi.h>
+#endif
+
 namespace coupling {
 namespace indexing {
 
@@ -26,7 +30,7 @@ std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCel
 #include "Operations.h"
 
 // enable/disable tests
-//#define TEST_INDEXING
+// #define TEST_INDEXING
 
 #ifdef TEST_INDEXING
 // Inlcude index tests
@@ -52,9 +56,59 @@ public:
     return singleton;
   }
 
-  void init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
-            const coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfig, coupling::interface::MacroscopicSolverInterface<dim>* msi,
-            const unsigned int rank);
+  void init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
+            coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion, const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            ,
+            MPI_Comm comm = MPI_COMM_WORLD
+#endif
+  );
+
+  // Config unpacking variant of init
+  template <unsigned int mddim>
+  typename std::enable_if<mddim == MD_DIM>::type init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
+                                                      const coupling::configurations::MaMiCoConfiguration<mddim>& mamicoConfig,
+                                                      coupling::interface::MacroscopicSolverInterface<mddim>* msi, const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                                                      ,
+                                                      MPI_Comm comm = MPI_COMM_WORLD
+#endif
+  ) {
+    // read relevant data from configs
+    const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
+    const auto macroscopicCellSize{mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
+
+    // calculate total number of macroscopic cells on all ranks in Base Domain
+    tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
+    for (unsigned int d = 0; d < dim; d++) {
+      globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
+
+      if (fabs((globalNumberMacroscopicCells[d]) * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13)
+        std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
+    }
+
+    init(globalNumberMacroscopicCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+         mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), msi, rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+         ,
+         comm
+#endif
+    );
+  }
+
+  void init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
+            coupling::paralleltopology::ParallelTopologyType type, coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+            ,
+            MPI_Comm comm
+#endif
+  );
+
+  void finalize() {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    _isInitialized = false;
+#endif
+  }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   /**
@@ -67,9 +121,27 @@ public:
    * @returns vector of all cells which contain the index
    */
   std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const;
+
+  MPI_Comm getComm() const {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!_isInitialized) {
+      throw std::runtime_error(std::string("IndexingService: Called index system getComm() before initalization! "));
+    }
 #endif
 
-  unsigned int getRank() const { return _rank; }
+    return _comm;
+  }
+#endif
+
+  unsigned int getRank() const {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!_isInitialized) {
+      throw std::runtime_error(std::string("IndexingService: Called index system getRank() before initalization! "));
+    }
+#endif
+
+    return _rank;
+  }
 
 private:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
@@ -82,10 +154,10 @@ private:
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;
+  MPI_Comm _comm;
 #endif
-
-  simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
-  coupling::configurations::MaMiCoConfiguration<dim> _mamicoConfig;
-  coupling::interface::MacroscopicSolverInterface<dim>* _msi;
   unsigned int _rank;
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  bool _isInitialized = false;
+#endif
 };
