@@ -25,5 +25,3 @@ coupling/scenario/kvs-lbmpy/*.ini
 docs/
 *.checkpoint
 /runcouette
-/runkvs
-**/.gdb_history
