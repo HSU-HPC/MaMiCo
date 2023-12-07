@@ -36,7 +36,7 @@ public:
   };
   /** Defines the type of md solver for the coupled simulation  */
   enum MicroSolverType {
-    SIMPLEMD = 0, ///< the SimpleMD solver is used
+    SIMPLEMD = 0,  ///< the SimpleMD solver is used
     SYNTHETIC = 1, ///< the synthetic solver is used
     LS1 = 2        ///< the LS1 solver is used
   };
@@ -153,7 +153,7 @@ public:
       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
     } else if (type == "ls1") {
       _cfg.miSolverType = LS1;
-      
+
       _cfg.totalNumberMDSimulations = 1;
       tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp, subtag, "temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps, subtag, "equilibration-steps");

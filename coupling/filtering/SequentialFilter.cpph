@@ -81,7 +81,9 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
   if (_processingRank == _myRank) {
     // count cells that we update. This should be equal to
     // _inputCells_Global.size().
+#ifdef DEBUG_SEQ_FILTER
     unsigned int cellsUpdated = 0;
+#endif
 
     // Iterate over all (contributing) ranks...
     for (int rank = 0; rank < _commSize; rank++) {
@@ -101,7 +103,9 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
                                IndexTrait::noGhost>(index).get(); // then convert back to unsigned int
 
           *(_inputCells_Global[indexbuf]) = *(_inputCells_Local[index.get()]);
+#ifdef DEBUG_SEQ_FILTER
           cellsUpdated++;
+#endif
         }
 
 #ifdef DEBUG_SEQ_FILTER
@@ -134,7 +138,9 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
           // save rank for this cell to be able to send it back later
           _cellRanks[indexbuf] = rank;
 
+#ifdef DEBUG_SEQ_FILTER
           cellsUpdated++;
+#endif
 
 #ifdef DEBUG_SEQ_FILTER_VERBOSE
           std::cout << "			SEQFILTER (" << _myRank << "): Received cell from rank " << rank << std::endl;

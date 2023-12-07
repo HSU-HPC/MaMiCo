@@ -5,6 +5,7 @@ build/
 *.vti
 *.o
 *.out
+.gdb_history
 .idea/.gitignore
 .idea/.name
 .idea/mamico-dev.iml

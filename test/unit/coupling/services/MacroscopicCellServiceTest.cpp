@@ -47,8 +47,7 @@ public:
     const char * filterPipelineConfigurationFile = nullptr;
     tarch::utils::MultiMDService<dim> multiMDService{tarch::la::Vector<dim, unsigned int>{1},1};
     const unsigned int topologyOffset = 1;
-
-    coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>* _macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>(
+    new coupling::services::MacroscopicCellServiceImpl<simplemd::LinkedCell, dim>(
           1, 
           mdSolverInterface, 
           macroscopicSolverInterface, 
@@ -65,12 +64,10 @@ public:
           filterPipelineConfigurationFile, 
           multiMDService, 
           topologyOffset);
-    
-    // TODO: complete test
-    std::cout << "ID:" << _macroscopicCellService->getID() << std::endl;
   }
 
 private:
+  
   template <unsigned int dim> class TestMDSolverInterface : public coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim> {
   public:
     TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>() {} 
@@ -83,29 +80,29 @@ private:
       return _linkedcell;
     }
 
-    virtual tarch::la::Vector<dim, double> getGlobalMDDomainSize() const { return tarch::la::Vector<dim, double>(1.0); }
+    virtual tarch::la::Vector<dim, double> getGlobalMDDomainSize() const override { return tarch::la::Vector<dim, double>(1.0); }
 
-    virtual tarch::la::Vector<dim, double> getGlobalMDDomainOffset() const { return tarch::la::Vector<dim, double>(0.0); }
+    virtual tarch::la::Vector<dim, double> getGlobalMDDomainOffset() const override { return tarch::la::Vector<dim, double>(0.0); }
 
-    virtual double getMoleculeMass() const { return 1.0; }
-    virtual double getKB() const { return 1.0; }
-    virtual double getMoleculeSigma() const { return 1.0; }
-    virtual double getMoleculeEpsilon() const { return 1.0; }
-    virtual void getInitialVelocity(const tarch::la::Vector<dim, double>& meanVelocity, const double& kB, const double& temperature,
-                                    tarch::la::Vector<dim, double>& initialVelocity) const {}
-    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, simplemd::LinkedCell& cell) {}
-    virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) {}
+    virtual double getMoleculeMass() const override { return 1.0; }
+    virtual double getKB() const override { return 1.0; }
+    virtual double getMoleculeSigma() const override { return 1.0; }
+    virtual double getMoleculeEpsilon() const override { return 1.0; }
+    virtual void getInitialVelocity (const tarch::la::Vector<dim, double>& meanVelocity, const double& kB, const double& temperature,
+                                    tarch::la::Vector<dim, double>& initialVelocity) const override {}
+    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, simplemd::LinkedCell& cell) override {}
+    virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) override {}
     virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstMacroscopicCell,
                                                const tarch::la::Vector<dim, unsigned int>& rangeMacroscopicCells,
-                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell) {}
-    virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double>& position) {
+                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell) override {}
+    virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double>& position) override {
       return tarch::la::Vector<dim, unsigned int>(0);
     }
-    virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim>& molecule) {}
-    virtual void synchronizeMoleculesAfterMassModification() {}
-    virtual void synchronizeMoleculesAfterMomentumModification() {}
-    virtual double getDt() { return 1.0; }
-    virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, dim>* getMoleculeIterator(simplemd::LinkedCell& cell) {
+    virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim>& molecule) override {}
+    virtual void synchronizeMoleculesAfterMassModification() override {}
+    virtual void synchronizeMoleculesAfterMomentumModification() override {}
+    virtual double getDt() override { return 1.0; }
+    virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, dim>* getMoleculeIterator(simplemd::LinkedCell& cell) override {
       return NULL;
     }
 

@@ -8,9 +8,9 @@
 #include "coupling/interface/impl/Espresso/EspressoMDMolecule.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMoleculeIterator.h"
 #include "coupling/interface/impl/Espresso/EspressoMDSolverInterface.h"
-#include "test/integration/TestEspresso.h"
 #include "particle_data.hpp"
 #include "tarch/la/Vector.h"
+#include "test/integration/TestEspresso.h"
 #include <iostream>
 #include <tcl.h>
 
