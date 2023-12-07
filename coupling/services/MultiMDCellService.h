@@ -262,9 +262,9 @@ public:
    */
   void sumUpMacroscopicCellsFromMamico() {
     for (unsigned int n = 0; n < _totalNumberMDSimulations; ++n) {
+      if (0 != _warmupPhase[n])
+        continue;
       if (auto* v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[n])) {
-        if (0 != _warmupPhase[n])
-          continue;
         for (unsigned int i = 0; i < v->getMacroscopicCells().getMacroscopicCells().size(); ++i) {
           if (_sumMacroscopicCells.size() <= i) {
             _sumMacroscopicCells.emplace_back(new coupling::datastructures::MacroscopicCell<dim>());
