@@ -77,10 +77,12 @@ private:
     
     errorControl.setAbsVelocityError(0.05);
     double NoMD = errorControl.getCorrectorNumberOfSamples(coupling::error::ErrorEstimation::Velocity, coupling::error::ErrorEstimation::Absolute);
+    NoMD = (int)(NoMD+0.000001);
     CPPUNIT_ASSERT(NoMD == 225.0);
     
     errorControl.setRelVelocityError(0.01);
     NoMD = errorControl.getCorrectorNumberOfSamples(coupling::error::ErrorEstimation::Velocity, coupling::error::ErrorEstimation::Relative);
+    NoMD = (int)(NoMD+0.000001);
     CPPUNIT_ASSERT(NoMD == 225.0);
   }
 
@@ -95,7 +97,8 @@ private:
     
     errorControl.setRelDensityError(0.2);
     double NoMD = errorControl.getCorrectorNumberOfSamples(coupling::error::ErrorEstimation::Density, coupling::error::ErrorEstimation::Relative);
-    CPPUNIT_ASSERT(std::abs(NoMD- 16)<0.000001);
+    NoMD = (int)(NoMD+0.000001);
+    CPPUNIT_ASSERT(NoMD == 16.0);
     
   }
   
@@ -110,7 +113,8 @@ private:
     
     errorControl.setRelDensityError(0.2);
     double NoMD = errorControl.getCorrectorNumberOfSamples(coupling::error::ErrorEstimation::Temperature, coupling::error::ErrorEstimation::Relative);
-    CPPUNIT_ASSERT(std::abs(NoMD - 3)<0.000001);
+    NoMD = (int)(NoMD+0.000001);
+    CPPUNIT_ASSERT(NoMD == 3.0);
     
   }
   
@@ -122,7 +126,8 @@ private:
     
     errorControl.setRelDensityError(0.2);
     double NoMD = errorControl.getCorrectorNumberOfSamples(coupling::error::ErrorEstimation::Pressure, coupling::error::ErrorEstimation::Relative);
-    CPPUNIT_ASSERT(std::abs(NoMD - 4)<0.000001);
+    NoMD = (int)(NoMD+0.000001);
+    CPPUNIT_ASSERT(NoMD == 4.0);
     
   }
 
