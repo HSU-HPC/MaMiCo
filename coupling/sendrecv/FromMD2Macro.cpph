@@ -57,8 +57,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::writeToReduceBuffer
         const unsigned int localIndex = indexConversion.getLocalCellIndex(globalVectorIndex);
         globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
 
-        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(indexConversion, dataExchange, *macroscopicCells[localIndex],
-                                                                                       globalVectorIndex);
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(dataExchange, *macroscopicCells[localIndex], globalVectorIndex);
       }
     }
   }
@@ -82,8 +81,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::readFromReduceBuffe
                                                                                   const unsigned int* const globalCellIndices) {
   const auto numberCells = (unsigned int)macroscopicCells.size();
   for (unsigned int i = 0; i < numberCells; i++) {
-    const tarch::la::Vector<dim, unsigned int> globalVectorIndex =
-        coupling::indexing::IndexingService<dim>::getInstance().getGlobalVectorCellIndex(globalCellIndices[i]);
+    const tarch::la::Vector<dim, unsigned int> globalVectorIndex = dataExchange.getIndexConversion()->getGlobalVectorCellIndex(globalCellIndices[i]);
     coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(dataExchange, *macroscopicCells[i], globalVectorIndex);
   }
 }

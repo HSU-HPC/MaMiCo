@@ -43,7 +43,8 @@ def compare_csv(a, b, header=None, sep=";"):
         1 if d else 0 for d in diff_rows_mask)
     if diff_rows_count > 0:
         print(f'{diff_rows_count}/{len(df_a)} rows have significant differences')
-        # print(df_a - df_b)
+        df_relative_diff = (df_a - df_b).abs() / df_a.abs()
+        # print(df_relative_diff)
     else:
         print('Equal')
 

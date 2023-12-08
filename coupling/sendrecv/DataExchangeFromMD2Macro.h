@@ -40,7 +40,7 @@ public:
    * 	@param indexConversion index conversion
    * 	@param tagoffset 0 per default
    */
-  DataExchangeFromMD2Macro(coupling::interface::MacroscopicSolverInterface<dim>* interface, coupling::IndexConversion<dim>* indexConversion,
+  DataExchangeFromMD2Macro(coupling::interface::MacroscopicSolverInterface<dim>* interface, const coupling::IndexConversion<dim>* indexConversion,
                            unsigned int tagoffset = 0)
       : coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim>(TAG_FROM_MD2MACRO + tagoffset), _interface(interface),
         _indexConversion(indexConversion) {
@@ -117,10 +117,10 @@ public:
 
   void setIndexConversion(coupling::IndexConversion<dim>* indexConversion) { _indexConversion = indexConversion; }
 
-  coupling::IndexConversion<dim>* getIndexConversion() const { return _indexConversion; }
+  const coupling::IndexConversion<dim>* getIndexConversion() const { return _indexConversion; }
 
 private:
   coupling::interface::MacroscopicSolverInterface<dim>* _interface;
-  coupling::IndexConversion<dim>* _indexConversion;
+  const coupling::IndexConversion<dim>* _indexConversion;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGEFROMMD2MACRO_H_
