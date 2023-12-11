@@ -14,6 +14,7 @@ class LS1MoleculeTest : public CppUnit::TestFixture
 	CPPUNIT_TEST_SUITE(LS1MoleculeTest);
 	CPPUNIT_TEST(testPosition);
 	CPPUNIT_TEST(testVelocity);
+	CPPUNIT_TEST(testForce);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -101,6 +102,26 @@ public:
 					mamicoMolecule.setVelocity(velocity);
 					tarch::la::Vector<3,double> storedVelocity = mamicoMolecule.getVelocity();
 					CPPUNIT_ASSERT_MESSAGE( "velocity assersion",storedVelocity == velocity );
+				}
+			}
+			
+		}
+	}
+	void testForce()
+	{
+		::Molecule ls1Molecule;
+		coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);
+		for(int i = -4000; i < 4001; i+=100)
+		{
+			for(int j = -4000; j < 4001; j+=100)
+			{
+				for(int k = -4000; k < 4001; k+=100)
+				{
+					tarch::la::Vector<3,double> force{i+0.5,j+0.5,k+0.5};
+
+					mamicoMolecule.setForce(force);
+					tarch::la::Vector<3,double> storedForce = mamicoMolecule.getForce();
+					CPPUNIT_ASSERT_MESSAGE( "force assersion",storedForce == force );
 				}
 			}
 			

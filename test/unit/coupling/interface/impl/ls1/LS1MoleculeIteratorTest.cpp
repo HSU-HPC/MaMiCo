@@ -19,7 +19,8 @@ class LS1MoleculeIteratorTest : public CppUnit::TestFixture
 {
 	CPPUNIT_TEST_SUITE(LS1MoleculeIteratorTest);
 	CPPUNIT_TEST(testIteration);
-	CPPUNIT_TEST(testGet);
+	CPPUNIT_TEST(testReset);
+	//CPPUNIT_TEST(testGet);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -90,9 +91,53 @@ public:
 		ss2<< "global particle count after reset: " << particleCount << " particles in simulation: " << _testSimulation->getTotalNumberOfMolecules();
 		CPPUNIT_ASSERT_MESSAGE( ss2.str(), particleCount == _testSimulation->getTotalNumberOfMolecules() );
 	}
+	void testReset()
+	{
+		ls1::LS1RegionWrapper fullRegion(_testSimulation->getEnsemble()->domain()->rmin(), _testSimulation->getEnsemble()->domain()->rmax(), _testSimulation);
+		coupling::interface::LS1MoleculeIterator moleculeIterator(fullRegion);
+		moleculeIterator.begin();
+		if(!moleculeIterator.continueIteration())
+			return; //no particles in subdomain
+		
+		//grab first particle
+		const coupling::interface::Molecule<3>& firstMolecule(moleculeIterator.getConst());
+
+		//iterate through and reset
+		while(moleculeIterator.continueIteration())
+		{
+			moleculeIterator.next();
+		}
+
+		//reset and check first particle
+		moleculeIterator.begin();
+		CPPUNIT_ASSERT( firstMolecule.getPosition() == moleculeIterator.getConst().getPosition() 
+						&& firstMolecule.getForce() == moleculeIterator.getConst().getForce()
+						&& firstMolecule.getVelocity() == moleculeIterator.getConst().getVelocity());
+
+	}
 	void testGet()
 	{
+		/**
+		ls1::LS1RegionWrapper fullRegion(_testSimulation->getEnsemble()->domain()->rmin(), _testSimulation->getEnsemble()->domain()->rmax(), _testSimulation);
+		coupling::interface::LS1MoleculeIterator moleculeIterator(fullRegion);
+		long unsigned int particleIDList = 0;
+		moleculeIterator.begin();
+		while(moleculeIterator.continueIteration())
+		{
+			
+			moleculeIterator.next();
+		}
 
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+		long unsigned int globalCount;
+		MPI_Barrier(MPI_COMM_WORLD);
+		MPI_Allreduce(&particleCount, &globalCount, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
+		particleCount = globalCount;
+#endif
+		std::stringstream ss;
+		ss << "global particle count: " << particleCount << " particles in simulation: " << _testSimulation->getTotalNumberOfMolecules();
+		CPPUNIT_ASSERT_MESSAGE( ss.str(), particleCount == _testSimulation->getTotalNumberOfMolecules() );
+		*/
 	}
 
 private:
