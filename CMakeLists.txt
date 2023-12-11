@@ -10,11 +10,17 @@ if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
 endif()
 
-# CTest
+# Testing and coverage
 option(BUILD_TESTING "Build testing" OFF)
 message(STATUS ">> Build with testing: " ${BUILD_TESTING})
 if (BUILD_TESTING)
   include(CTest)
+endif()
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
+message(STATUS ">> Enable code coverage: " ${ENABLE_COVERAGE})
+if (ENABLE_COVERAGE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+  message(STATUS ">> Enable code coverage was enabled but CMAKE_BUILD_TYPE is not Debug, disabling code coverage ...")
+  set(ENABLE_COVERAGE OFF)
 endif()
 
 #
@@ -353,7 +359,7 @@ elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE _GLIBCXX_DEBUG)
+  target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
   target_compile_options(mamico INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(mamico INTERFACE MDCoupledError)
@@ -729,6 +735,28 @@ set(BENCHMARKS_SOURCES
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
 set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
 target_link_libraries(benchmarks PRIVATE mamico)
+
+#
+# Coverage
+#
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND ENABLE_COVERAGE)
+  target_compile_options(mamico INTERFACE -O0 --coverage)
+  target_link_libraries(mamico INTERFACE gcov)
+
+  # find required tools
+  find_program(LCOV lcov REQUIRED)
+  find_program(GENHTML genhtml REQUIRED)
+
+  # add coverage target
+  add_custom_target(
+    coverage
+    # gather data
+    COMMAND
+      ${LCOV} --ignore-errors unused  --directory . --capture --exclude */test/* --exclude '/usr/*' --exclude '*/simplemd/*' --output-file coverage.info
+    # generate report
+    COMMAND ${GENHTML} --demangle-cpp -o coverage coverage.info
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+endif()
 
 #
 # Testing
