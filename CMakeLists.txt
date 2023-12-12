@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.0...3.28)
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
 # Make our cmake modules visible to CMake
@@ -15,12 +15,15 @@ option(BUILD_TESTING "Build testing" OFF)
 message(STATUS ">> Build with testing: " ${BUILD_TESTING})
 if (BUILD_TESTING)
   include(CTest)
+  option(ENABLE_COVERAGE "Enable code coverage, requires CMAKE_BUILD_TYPE=Debug." OFF)
+  message(STATUS ">> Enable code coverage: " ${ENABLE_COVERAGE})
 endif()
-option(ENABLE_COVERAGE "Enable code coverage" OFF)
-message(STATUS ">> Enable code coverage: " ${ENABLE_COVERAGE})
-if (ENABLE_COVERAGE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-  message(STATUS ">> Enable code coverage was enabled but CMAKE_BUILD_TYPE is not Debug, disabling code coverage ...")
-  set(ENABLE_COVERAGE OFF)
+if (ENABLE_COVERAGE)
+  if (NOT BUILD_TESTING OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(WARNING ">> Disabling code coverage.\n CMAKE_BUILD_TYPE=Debug and BUILD_TESTING=ON required.")
+    set(ENABLE_COVERAGE OFF CACHE BOOL "Enable code coverage, requires CMAKE_BUILD_TYPE=Debug." FORCE)
+    message(STATUS ">> Enable code coverage: " ${ENABLE_COVERAGE})
+  endif()
 endif()
 
 #
@@ -739,7 +742,7 @@ target_link_libraries(benchmarks PRIVATE mamico)
 #
 # Coverage
 #
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND ENABLE_COVERAGE)
+if(ENABLE_COVERAGE)
   target_compile_options(mamico INTERFACE -O0 --coverage)
   target_link_libraries(mamico INTERFACE gcov)
 
