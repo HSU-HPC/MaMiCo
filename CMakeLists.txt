@@ -818,7 +818,7 @@ if (BUILD_TESTING)
   target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
   target_link_libraries(testmamico PRIVATE cppunit)
 
-  execute_process(COMMAND cmake -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON -DBUILD_WITH_MPI=${BUILD_WITH_MPI} .)
+  execute_process(COMMAND cmake -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON -DENABLE_COVERAGE=OFF -DBUILD_WITH_MPI=${BUILD_WITH_MPI} .)
   execute_process(COMMAND make getTestNames)
   execute_process(COMMAND ./getTestNames OUTPUT_VARIABLE TEST_NAMES)
   separate_arguments(TEST_NAMES UNIX_COMMAND ${TEST_NAMES})
