@@ -108,7 +108,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(_multiMDService_111_4->getLocalNumberOfMDSimulations(), _multiMDService_111_4->getAvgNumberOfMDSimulations());
 
     unsigned int expectedLocalNumberOfMDSimulations = 2;
-    int rank;
+    int rank = 0;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     if (rank == 3) {
       expectedLocalNumberOfMDSimulations = _multiMDService_111_10->getTotalNumberOfMDSimulations() - expectedLocalNumberOfMDSimulations * (_multiMDService_111_10->getNumberLocalComms()-1);

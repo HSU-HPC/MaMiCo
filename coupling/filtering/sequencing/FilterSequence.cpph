@@ -22,9 +22,9 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
   while (currFilterNode) {
     coupling::filtering::FilterInterface<dim>* newfilter = nullptr;
 
-    //###############################################################
-    // This is where you have to define how to handle each filter individually.
-    // Write To File
+    // ###############################################################
+    //  This is where you have to define how to handle each filter individually.
+    //  Write To File
     if (std::strcmp(currFilterNode->Value(), "write-to-file") == 0) {
       bool overwrite = false;
       if (currFilterNode->Attribute("overwrite"))
@@ -167,7 +167,7 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
     }
     */
 
-    //###############################################################
+    // ###############################################################
 
     // Unknown filter identifier
     else {

@@ -8,10 +8,10 @@
 #include "coupling/interface/impl/Espresso/EspressoMDMolecule.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMoleculeIterator.h"
 #include "coupling/interface/impl/Espresso/EspressoMDSolverInterface.h"
-#include "test/integration/TestEspresso.h"
 #include "integrate_tcl.hpp"
 #include "particle_data.hpp"
 #include "tarch/la/Vector.h"
+#include "test/integration/TestEspresso.h"
 
 /** test class for force and potential energy calculation methods provided inside the EspressoMDSolverInterface.
  *  In this class, I derive from TestEspresso and have a very simple 2*2*2 grid, with 8 particles, all located at the center of each cell

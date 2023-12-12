@@ -6,9 +6,9 @@
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
-#include "test/integration/Test.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
+#include "test/integration/Test.h"
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>

@@ -33,7 +33,7 @@ endif()
 if(NOT CMAKE_BUILD_TYPE)
   message(WARNING "CMAKE_BUILD_TYPE was not specified. DebugOptimized build is assumed.")
   set(CMAKE_BUILD_TYPE DebugOptimized CACHE STRING "Build type." FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug DebugOptimized RelWithDebInfo Release)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS DebugMD Debug DebugOptimized RelWithDebInfo Release)
 endif()
 message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
 # Automatically add the current source and build directories to the include path
@@ -77,12 +77,23 @@ endif()
 if("${MD_SIM}" STREQUAL "SIMPLE_MD" AND BUILD_WITH_LAMMPS)
   message(WARNING ">> BUILD_WITH_LAMMPS is enabled but MD_SIM is SIMPLE_MD. Are you sure?")
 endif()
+
 # Compiler list to be used for compiletest
 set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
 message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_COMPILERS})
-# Enable coupling with the preCICE API, default is off
+
+# Build mode list to be used for compiletest
+set(COMPILETEST_MODES "Debug DebugOptimized RelWithDebInfo Release" CACHE STRING "Build mode list to be used for compiletest")
+message(STATUS ">> Build mode list to be used for compiletest : " ${COMPILETEST_MODES})
+
+# Enable coupling with indexing tests, default is off
 option(BUILD_WITH_TEST_INDEXING "Enable indexing tests, default is off." OFF)
 message(STATUS ">> Build with indexing tests : " ${BUILD_WITH_TEST_INDEXING})
+
+# Enable coupling with pint debug, default is off
+option(BUILD_WITH_PINT_DEBUG "Enable parallel-in-time integration debugging, default is off." OFF)
+message(STATUS ">> Build with PINT_DEBUG : " ${BUILD_WITH_PINT_DEBUG})
+
 # Enable Adios2 output for megamol
 option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
@@ -173,8 +184,12 @@ endif()
 add_library(simplemd_interface INTERFACE)
 target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError _GLIBCXX_DEBUG)
+
+if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
+  target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
+  target_compile_options(simplemd_interface INTERFACE -Og -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	target_compile_definitions(simplemd_interface INTERFACE MDError)
   target_compile_options(simplemd_interface INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(simplemd_interface INTERFACE MDError)
@@ -311,6 +326,9 @@ endif()
 if(BUILD_WITH_TEST_INDEXING)
 	target_compile_definitions(mamico INTERFACE TEST_INDEXING)
 endif()
+if(BUILD_WITH_PINT_DEBUG)
+  target_compile_definitions(mamico INTERFACE PINT_DEBUG)
+endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang" )
 	target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
 endif()
@@ -361,8 +379,11 @@ elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
   endif()
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
   target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
+  target_compile_options(mamico INTERFACE -Og -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE PINT_DEBUG)
   target_compile_options(mamico INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(mamico INTERFACE MDCoupledError)
@@ -375,12 +396,17 @@ else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
 
+# List of sources for all Mamico targets
+set(MAMICO_SOURCES
+  "coupling/indexing/IndexingService.cpp"
+  "coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/solvers/LBCouetteSolverState.cpp"
+)
 #
 # Couette target
 #
 set(COUETTE_SOURCES
-	"coupling/indexing/IndexingService.cpp"
-	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+	${MAMICO_SOURCES}
   "coupling/scenario/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
@@ -395,11 +421,10 @@ target_link_libraries(couette PRIVATE mamico)
 #
 if("${MD_SIM}" STREQUAL "LAMMPS_MD")
   set(TEST_LAMMPS_SOURCES
+    ${MAMICO_SOURCES}
     "tarch/tinyxml2/tinyxml2.cpp"
-    "coupling/configurations/ParticleInsertionConfiguration.cpp"
     "tarch/utils/RandomNumberService.cpp"
     "coupling/test/integration/main_lammps.cpp"
-    "coupling/indexing/IndexingService.cpp"
   )
   add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
   set_target_properties(test_lammps PROPERTIES CXX_STANDARD 17)
@@ -414,8 +439,7 @@ endif()
 #
 if(BUILD_WITH_PYBIND11)
 	set(PYBIND_SOURCES11
-		"coupling/indexing/IndexingService.cpp"
-		"coupling/configurations/ParticleInsertionConfiguration.cpp"
+		${MAMICO_SOURCES}
 		"coupling/python-binding/mamico.cpp"
 	)
 	pybind11_add_module(mamico_pybind
@@ -438,7 +462,6 @@ set(CLANGFORMAT_SOURCES
   "tarch/utils/MultiMDService.h"
   "tarch/configuration/ParseConfiguration.h"
   "tarch/configuration/Configuration.h"
-  "tarch/tests/main_readconfig.cpp"
   "tarch/la/VectorOperations.cpph"
   "tarch/la/Vector.h"
   "tarch/la/ScalarOperations.h"
@@ -566,6 +589,7 @@ set(CLANGFORMAT_SOURCES
   "coupling/configurations/MacroscopicCellConfiguration.cpph"
   "coupling/configurations/MaMiCoConfiguration.h"
   "coupling/configurations/ThermostatConfiguration.h"
+  "coupling/configurations/TimeIntegrationConfiguration.h"
   "coupling/VelocityGradientRelaxation.h"
   "coupling/BoundaryForceController.h"
   "coupling/interface/MDSimulationFactory.h"
@@ -584,6 +608,7 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/MamicoInterfaceProvider.h"
   "coupling/interface/Molecule.h"
   "coupling/interface/MDSolverInterface.h"
+  "coupling/interface/PintableMacroSolver.h"
   "coupling/KineticEnergyController.h"
   "coupling/solvers/FiniteDifferenceSolver.h"
   "coupling/solvers/FDCouetteSolver.h"
@@ -596,11 +621,9 @@ set(CLANGFORMAT_SOURCES
   "coupling/solvers/NumericalSolver.h"
   "test/integration/TestEspressoMDMolecule.h"
   "test/integration/Test.h"
-  "test/integration/MacroscopicCellsTest.h"
   "test/integration/TestEspressoAddDeleteMolecule.h"
   "test/integration/main_lbcouettesolver.cpp"
   "test/integration/TestLammpsCalculateForceEnergy.h"
-  "test/integration/CompileTest.h"
   "test/integration/TestEspressoMDSolverInterface.h"
   "test/integration/main_lammps.cpp"
   "test/integration/TestLammpsMoleculeIterator.h"
@@ -619,6 +642,9 @@ set(CLANGFORMAT_SOURCES
   "test/integration/TestMarDynAddDeleteMolecule.h"
   "test/integration/TestEspressoMoleculeIterator.h"
   "test/integration/TestMarDynMoleculeIterator.h"
+  "test/unit/coupling/solvers/LBCouetteSolverStateTest.cpp"
+  "test/unit/coupling/solvers/PintableLBCouetteSolverTest.cpp"
+  "test/unit/getTestNames.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
@@ -725,14 +751,14 @@ add_custom_target(
   compiletest
   COMMAND ${COMPILETEST_SCRIPT}
   ${COMPILETEST_COMPILERS}
+  ${COMPILETEST_MODES}
 )
 
 #
 # Benchmarks target
 #
 set(BENCHMARKS_SOURCES
-	"coupling/indexing/IndexingService.cpp"
-	"coupling/configurations/ParticleInsertionConfiguration.cpp"
+	${MAMICO_SOURCES}
   "test/integration/cell_idx_iter_benchmark.cpp"
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
@@ -766,9 +792,23 @@ endif()
 #
 if (BUILD_TESTING)    
   file(GLOB_RECURSE TEST_SOURCES "test/*Test.cpp")
+
+  if(GET_TEST_NAMES)
+    add_executable(getTestNames
+      ${MAMICO_SOURCES}
+      "test/unit/getTestNames.cpp"
+      ${TEST_SOURCES}
+    )
+    set_target_properties(getTestNames PROPERTIES CXX_STANDARD 17)
+    target_link_libraries(getTestNames PRIVATE mamico)
+    target_include_directories(getTestNames PRIVATE ${CPPUNIT_INCLUDE_DIRS})
+    target_link_directories(getTestNames PRIVATE ${CPPUNIT_LIBRARY})
+    target_link_libraries(getTestNames PRIVATE cppunit)
+    return()
+  endif()
+
   add_executable(testmamico 
-    "coupling/indexing/IndexingService.cpp"
-    "coupling/configurations/ParticleInsertionConfiguration.cpp" 
+    ${MAMICO_SOURCES} 
     "test/unit/main.cpp"
     ${TEST_SOURCES}
   )
@@ -777,10 +817,17 @@ if (BUILD_TESTING)
   target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
   target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
   target_link_libraries(testmamico PRIVATE cppunit)
-  foreach(TEST ${TEST_SOURCES})
-    get_filename_component(TEST_NAME ${TEST} NAME_WE)
+
+  execute_process(COMMAND cmake -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON -DBUILD_WITH_MPI=${BUILD_WITH_MPI} .)
+  execute_process(COMMAND make getTestNames)
+  execute_process(COMMAND ./getTestNames OUTPUT_VARIABLE TEST_NAMES)
+  separate_arguments(TEST_NAMES UNIX_COMMAND ${TEST_NAMES})
+
+  foreach(TEST_NAME ${TEST_NAMES})
     if (BUILD_WITH_MPI)
-      add_test(NAME ${TEST_NAME} COMMAND mpirun -np 4 ./testmamico ${TEST_NAME})
+    # We have to use the --oversubscribe OpenMPI option here as openmpi is installed in the test container (see test/docker/Dockerfile) 
+    # and the  the github runner VM has less than 4 VCPUS.
+      add_test(NAME ${TEST_NAME} COMMAND mpirun --oversubscribe -np 4 ./testmamico ${TEST_NAME})
     else()
       add_test(NAME ${TEST_NAME} COMMAND ./testmamico ${TEST_NAME})
     endif()

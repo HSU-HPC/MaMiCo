@@ -140,9 +140,9 @@ public:
   StrategyType getStrategyType() const { return _type; }
 
 protected:
-  TransferStrategyConfiguration(StrategyType type, tarch::la::Vector<2 * dim, bool> massFluxBoundary, double shiftTimestep) : 
-  _type(type), _massFluxBoundary(massFluxBoundary), _shiftTimestep(shiftTimestep), _isValid(true) {}
-  
+  TransferStrategyConfiguration(StrategyType type, tarch::la::Vector<2 * dim, bool> massFluxBoundary, double shiftTimestep)
+      : _type(type), _massFluxBoundary(massFluxBoundary), _shiftTimestep(shiftTimestep), _isValid(true) {}
+
 private:
   StrategyType _type;
   tarch::la::Vector<2 * dim, bool> _massFluxBoundary; // true in each component, if one of the 2*dim
