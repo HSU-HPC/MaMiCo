@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.0...3.28)
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
 # Make our cmake modules visible to CMake
@@ -10,11 +10,23 @@ if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
 endif()
 
-# CTest
+# Testing and coverage
 option(BUILD_TESTING "Build testing" OFF)
 message(STATUS ">> Build with testing: " ${BUILD_TESTING})
 if (BUILD_TESTING)
   include(CTest)
+  option(ENABLE_COVERAGE "Enable code coverage, requires GCC and CMAKE_BUILD_TYPE=Debug." OFF)
+  message(STATUS ">> Enable code coverage: " ${ENABLE_COVERAGE})
+endif()
+if (ENABLE_COVERAGE)
+  if (NOT BUILD_TESTING OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(WARNING ">> Disabling code coverage.\n CMAKE_BUILD_TYPE=Debug and BUILD_TESTING=ON required.")
+    set(ENABLE_COVERAGE OFF CACHE BOOL "Enable code coverage, requires GCC and CMAKE_BUILD_TYPE=Debug." FORCE)
+    message(STATUS ">> Enable code coverage: " ${ENABLE_COVERAGE})
+  endif()
+  if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message(FATAL_ERROR ">> ENABLE_COVERAGE only works with GCC. Change your compiler or set ENABLE_COVERAGE=OFF")
+  endif()
 endif()
 
 #
@@ -757,6 +769,28 @@ set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
 target_link_libraries(benchmarks PRIVATE mamico)
 
 #
+# Coverage
+#
+if(ENABLE_COVERAGE)
+  target_compile_options(mamico INTERFACE -O0 --coverage)
+  target_link_libraries(mamico INTERFACE gcov)
+
+  # find required tools
+  find_program(LCOV lcov REQUIRED)
+  find_program(GENHTML genhtml REQUIRED)
+
+  # add coverage target
+  add_custom_target(
+    coverage
+    # gather data
+    COMMAND
+      ${LCOV} --ignore-errors unused  --directory . --capture --exclude */test/* --exclude '/usr/*' --exclude '*/simplemd/*' --output-file coverage.info
+    # generate report
+    COMMAND ${GENHTML} --demangle-cpp -o coverage coverage.info
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+endif()
+
+#
 # Testing
 #
 if (BUILD_TESTING)    
@@ -787,7 +821,9 @@ if (BUILD_TESTING)
   target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
   target_link_libraries(testmamico PRIVATE cppunit)
 
-  execute_process(COMMAND cmake -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON -DBUILD_WITH_MPI=${BUILD_WITH_MPI} .)
+  message(STATUS ">> Running cmake with GET_TEST_NAMES ON ...")
+  execute_process(COMMAND cmake -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON -DENABLE_COVERAGE=OFF -DBUILD_WITH_MPI=${BUILD_WITH_MPI} .)
+  message(STATUS ">> Building getTestNames executable ...")
   execute_process(COMMAND make getTestNames)
   execute_process(COMMAND ./getTestNames OUTPUT_VARIABLE TEST_NAMES)
   separate_arguments(TEST_NAMES UNIX_COMMAND ${TEST_NAMES})

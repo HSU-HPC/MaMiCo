@@ -5,22 +5,17 @@ name: CTest
 # Controls when the action will run. Triggers the workflow on push or pull request events
 on: 
   push:
-    paths-ignore:
-      - 'examples/**'
-      - 'ls1/**'
-      - 'README.md'
     branches-ignore:
       # If you want the CI to not run, call your branch work-in-progress by naming it `something-WIP`
       - '*-WIP'
   pull_request:
-    paths-ignore:
-      - 'examples/**'
-      - 'ls1/**'
-      - 'README.md'
+    branches:
+      - master
 
 # Abort running jobs if a new one is triggered
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # github.ref = refs/heads/<branch_name> for push or refs/pull/<pr_number>/merge for pull request
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
