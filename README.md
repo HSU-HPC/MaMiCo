@@ -17,7 +17,6 @@ Optional dependencies are:
 * [preCICE](https://precice.org/), for coupling with other solvers using the preCICE coupling library.
 * [ls1-MarDyn](https://www.ls1-mardyn.de/home.html), for coupling to MD simulations with ls1.
 * [LCOV](https://github.com/linux-test-project/lcov), for test code coverage analysis.
-* [genhtml](https://linux.die.net/man/1/genhtml), to generate HTML view from LCOV coverage data files.
 
 ## Build instructions
 * First clone this repository and create a new build directory:
