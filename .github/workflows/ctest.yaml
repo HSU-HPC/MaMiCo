@@ -5,18 +5,12 @@ name: CTest
 # Controls when the action will run. Triggers the workflow on push or pull request events
 on: 
   push:
-    paths-ignore:
-      - 'examples/**'
-      - 'ls1/**'
-      - 'README.md'
     branches-ignore:
       # If you want the CI to not run, call your branch work-in-progress by naming it `something-WIP`
       - '*-WIP'
   pull_request:
-    paths-ignore:
-      - 'examples/**'
-      - 'ls1/**'
-      - 'README.md'
+    branches:
+      - master
 
 # Abort running jobs if a new one is triggered
 concurrency:
