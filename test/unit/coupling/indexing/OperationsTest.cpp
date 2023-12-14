@@ -1,15 +1,7 @@
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
-#ifndef MDCoupledError
-// Needed to test if runtime_error is thrown for invalid indices
-#define MDCoupledError
-#endif
-
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/indexing/IndexingService.h"
-
-#include "coupling/indexing/Operations.h"
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 using namespace coupling::indexing;
 
