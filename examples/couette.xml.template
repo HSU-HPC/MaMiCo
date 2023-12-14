@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- Configuration for CouetteTest.h, a configurable Couette flow test for noise-filtered multi-instance Nie coupling -->
+<!-- Configuration for CouetteScenario.h, a configurable Couette flow test for noise-filtered multi-instance Nie coupling -->
 <couette-test>
   <!-- Simulation domain / scenario parameters:
     - double channelheight:
