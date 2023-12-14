@@ -146,6 +146,8 @@ public:
       _preciceAdapter->writeData(_preciceInterface);
       _preciceAdapter->advance(numberOfMDTimesteps * mdConfig.getSimulationConfiguration().getDt());
       cycle++;
+      if (_preciceAdapter->getm2MCells().size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
+        write2CSV(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices(), _preciceInterface, cycle, domainOffset, cellSize, rank);
     }
   }
 
@@ -157,16 +159,6 @@ private:
       cellMidPoint[d] = cellMidPoint[d] + cellIndex[d] * cellSize[d];
     }
     return cellMidPoint;
-  }
-
-  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& buffer) const {
-    for (unsigned int i = 0; i < buffer.size(); i++) {
-      if (buffer[i] != NULL) {
-        delete buffer[i];
-        buffer[i] = NULL;
-      }
-    }
-    buffer.clear();
   }
 
   class PreciceInterface : public coupling::preciceadapter::PreciceInterface<3> {
@@ -183,6 +175,13 @@ private:
     const coupling::preciceadapter::Data _m2MVVelocity;
     double _feedrate;
 
+  public:
+    PreciceInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell, const bool twoWayCoupling)
+        : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _massCell{massCell}, _twoWayCoupling(twoWayCoupling),
+        _M2mMeshName("mamico-M2m-mesh"), _m2MLMeshName("mamico-m2ML-mesh"), _m2MVMeshName("mamico-m2MV-mesh"),
+        _M2mVelocity{"VelocityMacro", coupling::preciceadapter::DataType::vector}, 
+        _m2MLVelocity{"VelocityMicro", coupling::preciceadapter::DataType::vector}, _m2MVVelocity{"VelocityMicro", coupling::preciceadapter::DataType::vector} {}
+
     bool isLiquid(tarch::la::Vector<3, unsigned int> globalCellIndex) {
       return (globalCellIndex[1] == 3 || globalCellIndex[1] == 4);
     }
@@ -190,13 +189,6 @@ private:
     bool isVapor(tarch::la::Vector<3, unsigned int> globalCellIndex) {
       return (globalCellIndex[1] == this->_globalNumberMacroscopicCells[1]);
     }
-
-  public:
-    PreciceInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell, const bool twoWayCoupling)
-        : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _massCell{massCell}, _twoWayCoupling(twoWayCoupling),
-        _M2mMeshName("mamico-M2m-mesh"), _m2MLMeshName("mamico-m2ML-mesh"), _m2MVMeshName("mamico-m2MV-mesh"),
-        _M2mVelocity{"VelocityMacro", coupling::preciceadapter::DataType::vector}, 
-        _m2MLVelocity{"VelocityMicro", coupling::preciceadapter::DataType::vector}, _m2MVVelocity{"VelocityMicro", coupling::preciceadapter::DataType::vector} {}
 
     void updateFeedrate(double feedrate) { _feedrate = feedrate; }
 
@@ -348,6 +340,7 @@ private:
 
     void parseSubtag(tinyxml2::XMLElement* node) override {
       tinyxml2::XMLElement* subtag = node->FirstChildElement("coupling");
+      tarch::configuration::ParseConfiguration::readIntMandatory(csvEveryTimestep, subtag, "write-csv-every-timestep"); 
       tarch::configuration::ParseConfiguration::readBoolMandatory(twoWayCoupling, subtag, "two-way-coupling");
       subtag = node->FirstChildElement("microscopic-solver");
       tarch::configuration::ParseConfiguration::readDoubleMandatory(temp, subtag, "temperature");
@@ -359,6 +352,7 @@ private:
 
     bool isValid() const override { return true; };
 
+    int csvEveryTimestep;
     bool twoWayCoupling;
     int equSteps;
     double temp;
@@ -368,6 +362,37 @@ private:
     double wallVelocity;
     double kinematicViscosity;
   };
+
+  void write2CSV(const std::vector<coupling::datastructures::MacroscopicCell<3>*>& m2MBuffer, const unsigned int* const m2MCellIndices, 
+                 PreciceInterface* preciceInterface,
+                 const int couplingCycle, const tarch::la::Vector<3, double> domainOffset, const tarch::la::Vector<3, double> cellSize,
+                 const unsigned int rank) const {
+    std::stringstream ss;
+    ss << "results_" << rank << "_" << couplingCycle << ".csv";
+    std::ofstream file(ss.str().c_str());
+    if (!file.is_open()) {
+      exit(EXIT_FAILURE);
+    }
+    file << "i;j;k;x;y;z;v_x_macro;v_y_macro;v_z_macro;m_macro;m_micro;T" << std::endl;
+    tarch::la::Vector<3, unsigned int> cellIndex;
+    for (unsigned int i = 0; i < m2MBuffer.size(); i++) {
+      cellIndex = static_cast<tarch::la::Vector<3, unsigned int>>(coupling::indexing::convertToVector<3>({m2MCellIndices[i]}));
+      if (preciceInterface->receiveMacroscopicQuantityFromMDSolver(cellIndex) && preciceInterface->isLiquid(cellIndex)) {
+        tarch::la::Vector<3, double> cellMidPoint = getCellMidPoint(static_cast<tarch::la::Vector<3, int>>(cellIndex), domainOffset, cellSize);
+        tarch::la::Vector<3, double> vel(m2MBuffer[i]->getMacroscopicMomentum());
+        if (m2MBuffer[i]->getMacroscopicMass() != 0.0) {
+          vel = (1.0 / m2MBuffer[i]->getMacroscopicMass()) * vel;
+        }
+        file << cellIndex[0] << ";" << cellIndex[1] << ";" << cellIndex[2] << ";" 
+             << cellMidPoint[0] << ";" << cellMidPoint[1] << ";" << cellMidPoint[2] << ";" 
+             << vel[0] << ";" << vel[1] << ";" << vel[2] << ";" 
+             << m2MBuffer[i]->getMacroscopicMass() << ";" << m2MBuffer[i]->getMicroscopicMass() << ";"
+             << m2MBuffer[i]->getTemperature();
+        file << std::endl;
+      }
+    }
+    file.close();
+  }
 
   coupling::preciceadapter::PreciceAdapter<3>* _preciceAdapter;
   PreciceInterface* _preciceInterface;
