@@ -38,17 +38,19 @@ def compare_csv(a, b, header=None, sep=";"):
     if len(df_a) != len(df_b):
         print(f"Number of lines of {a} and {b} do not match")
     diff_rows_mask = (
-        (df_a - df_b).abs() > SIGNIFICANT_DIFFERENCE_THRESHOLD).any(axis=1)
+        (df_a - df_b).abs() >= SIGNIFICANT_DIFFERENCE_THRESHOLD).any(axis=1)
     diff_rows_count = sum(
         1 if d else 0 for d in diff_rows_mask)
     if diff_rows_count > 0:
         print(f'{diff_rows_count}/{len(df_a)} rows have significant differences')
-        df_relative_diff = 100 * (df_a - df_b).abs() / df_a.abs()
+        df_diff = df_a - df_b
         # Filter out rows that match
-        df_relative_diff = df_relative_diff.loc[(
-            df_relative_diff != 0).any(axis=1)]
-        print('Differences as percentages below:')
-        print(df_relative_diff)
+        df_diff = df_diff.loc[(
+            df_diff >= SIGNIFICANT_DIFFERENCE_THRESHOLD).any(axis=1)]
+        print('Differences below')
+        # print('... as percentage')
+        # df_diff = 100 * df_diff / df_a.abs()
+        print(df_diff)
     else:
         print('Equal')
 
