@@ -20,15 +20,17 @@ template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(c
   } else {
     // copied from deprecated coupling::IndexConversion::getCellIndex())
 
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     for (unsigned d = 0; d < dim; d++)
-      if (index.get()[d] < 0) {
+      if (index.get()[d] < 0 || index.get()[d] > ((int)CellIndex<dim, traits...>::numberCellsInDomain[d]) - 1) {
         std::stringstream ss;
-        ss << "ERROR: Indexing: Cannot convert negative vector index to scalar." << std::endl;
+        ss << "ERROR: Indexing: Cannot convert this vector index to scalar." << std::endl;
         ss << "Faulty Index = " << index.get() << std::endl;
         ss << "My rank = " << IndexingService<dim>::getInstance().getRank() << std::endl;
         ss << "Index Traits = " << TraitOperations::print_traitlist<traits...>().data() << std::endl;
         throw std::runtime_error(ss.str());
       }
+#endif
 
     unsigned int i{static_cast<unsigned int>(index.get()[dim - 1])};
     for (int d = dim - 2; d > -1; d--) {

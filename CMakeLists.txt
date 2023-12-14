@@ -648,6 +648,7 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/solvers/LBCouetteSolverStateTest.cpp"
   "test/unit/coupling/solvers/PintableLBCouetteSolverTest.cpp"
   "test/unit/getTestNames.cpp"
+  "test/unit/coupling/indexing/OperationsTest.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
