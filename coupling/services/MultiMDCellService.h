@@ -35,8 +35,8 @@ public:
                      coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfiguration, const char* filterPipelineConfiguration,
                      tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0)
       : _multiMDService(multiMDService), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses()), _mdConfiguration(mdConfiguration),
-        _mamicoConfiguration(mamicoConfiguration), _macroscopicSolverInterface(macroscopicSolverInterface),
-        _filterPipelineConfiguration(filterPipelineConfiguration),
+        _mamicoConfiguration(mamicoConfiguration), _filterPipelineConfiguration(filterPipelineConfiguration),
+        _macroscopicSolverInterface(macroscopicSolverInterface),
         _indexConversion(initIndexConversion(_mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
                                              _multiMDService.getNumberProcessesPerMDSimulation(), _multiMDService.getGlobalRank(),
                                              _mdConfiguration.getDomainConfiguration().getGlobalDomainSize(),
@@ -221,7 +221,7 @@ public:
   void bcastFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                          const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
-    // Fall back to sequential operation when MPI is not available (avoids redundant implementation)
+    // Fall back on sequential operation when MPI is not available (avoids redundant implementation)
     sendFromMacro2MD(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return;
 #endif
@@ -282,7 +282,7 @@ public:
   double reduceFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                             const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
-    // Fall back to sequential operation when MPI is not available (avoids redundant implementation)
+    // Fall back on sequential operation when MPI is not available (avoids redundant implementation)
     return sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
 #endif
 
@@ -329,17 +329,17 @@ public:
       runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
     }
 
-    for (unsigned int i = 0; i < _totalNumberMDSimulations; i++) {
-      if (nullptr == _macroscopicCellServices[i] || 0 != _warmupPhase[i])
-        continue; // Only equilibrated MD simulation instances
-      _macroscopicCellServices[i]->sendFromMD2MacroPostProcess();
-    }
-
     // average data
     for (unsigned int i = 0; i < size; i++) {
       _macroscopicCells[i]->setMacroscopicMass(macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMass() / (double)totalNumberEquilibratedMDSimulations);
       _macroscopicCells[i]->setMacroscopicMomentum(1.0 / (double)totalNumberEquilibratedMDSimulations *
                                                    macroscopicCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
+    }
+
+    for (unsigned int i = 0; i < _totalNumberMDSimulations; i++) {
+      if (nullptr == _macroscopicCellServices[i] || 0 != _warmupPhase[i])
+        continue; // Only equilibrated MD simulation instances
+      _macroscopicCellServices[i]->sendFromMD2MacroPostProcess();
     }
 
     // apply post multi instance FilterPipeline on cell data
@@ -762,14 +762,14 @@ private:
   // const coupling::IndexConversion<dim> _indexConversion; /* Used for index
   // conversions during filtering TODO after merge with dynamic-md*/
   std::vector<coupling::datastructures::MacroscopicCell<dim>*> _macroscopicCells; /** used to store in MD data in sendFromMDtoMacro */
+  std::vector<unsigned int> _cellIndices;                                         /** used to store in indexing of the above */
   std::vector<coupling::datastructures::MacroscopicCell<dim>*>
-      _sumMacroscopicCells;               /** used to reduce all local macroscopic cells before sending from md 2 macro */
-  std::vector<unsigned int> _cellIndices; /** used to store in indexing of the above */
+      _sumMacroscopicCells; /** used to reduce all local macroscopic cells before sending from md 2 macro */
 
   simplemd::configurations::MolecularDynamicsConfiguration& _mdConfiguration;
   coupling::configurations::MaMiCoConfiguration<dim>& _mamicoConfiguration;
-  coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
   const std::string _filterPipelineConfiguration;
+  coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
 
   coupling::IndexConversion<dim>* _indexConversion;
 
