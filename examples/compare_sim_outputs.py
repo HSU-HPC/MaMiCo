@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 import pandas as pd
 
-SIGNIFICANT_DIFFERENCE_THRESHOLD = 0.001
+SIGNIFICANT_DIFFERENCE_THRESHOLD = 0  # 1e-6
 
 if len(sys.argv) != 3 or any(s in sys.argv for s in ["-h", "--help"]):
     the_script = Path(sys.argv[0]).name
@@ -43,8 +43,12 @@ def compare_csv(a, b, header=None, sep=";"):
         1 if d else 0 for d in diff_rows_mask)
     if diff_rows_count > 0:
         print(f'{diff_rows_count}/{len(df_a)} rows have significant differences')
-        df_relative_diff = (df_a - df_b).abs() / df_a.abs()
-        # print(df_relative_diff)
+        df_relative_diff = 100 * (df_a - df_b).abs() / df_a.abs()
+        # Filter out rows that match
+        df_relative_diff = df_relative_diff.loc[(
+            df_relative_diff != 0).any(axis=1)]
+        print('Differences as percentages below:')
+        print(df_relative_diff)
     else:
         print('Equal')
 

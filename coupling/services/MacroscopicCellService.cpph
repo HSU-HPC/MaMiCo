@@ -162,18 +162,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::Macroscop
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
 }
 
-template <class LinkedCell, unsigned int dim>
-double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(
-    const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
-    const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
-  // transfer strategy
-  Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
-  Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
-
-  // pre-process data before sending to macroscopic solver
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
-
+template <class LinkedCell, unsigned int dim> double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::applyFilterPipeline() {
   timeval start;
   timeval end;
   double runtime = 0;
@@ -193,6 +182,22 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFrom
     gettimeofday(&end, NULL);
     runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
   }
+  return runtime;
+}
+
+template <class LinkedCell, unsigned int dim>
+double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(
+    const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+    const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+  // transfer strategy
+  Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
+  Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
+
+  // pre-process data before sending to macroscopic solver
+  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
+  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
+
+  double runtime = applyFilterPipeline();
 
   // carry out send-receive steps
   _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,

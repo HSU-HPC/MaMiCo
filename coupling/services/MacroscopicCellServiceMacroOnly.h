@@ -72,6 +72,7 @@ public:
     _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return 0;
   }
+  virtual double applyFilterPipeline() { return 0; }
   virtual void sendFromMacro2MDPreProcess() {}
   virtual void sendFromMacro2MDPostProcess() {}
   virtual void sendFromMD2MacroPreProcess() {}
