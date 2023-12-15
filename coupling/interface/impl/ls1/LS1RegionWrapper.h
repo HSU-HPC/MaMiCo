@@ -80,9 +80,7 @@ public:
 
     bool isInRegion(const double startBox[3], const double endBox[3])
     {
-        bool isInRegion = true;
-        for (int i = 0; i < 3; i++) { isInRegion &= ((startBox[i] >= _startRegion[i]) & (endBox[i] < _endRegion[i])); }
-        return isInRegion;
+        return isInRegion(startBox) && isInRegion(endBox);
     }
 
     void setupIDcounterForParticleAddition()

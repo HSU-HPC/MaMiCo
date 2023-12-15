@@ -1,6 +1,10 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+#include <cstdlib>
+#include <ctime>
+#include <vector>
+
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
@@ -112,10 +116,76 @@ public:
 	}
 	void testPointIsInRegion()
 	{
-		double start[3] = {0,0,0}, end[3] = {5,5,5};
+		//set up random seed
+		srand(time(NULL));
+
+		//set up startpoint with point values less than 250
+		double start[3] = {static_cast<double>(rand()%250),static_cast<double>(rand()%250),static_cast<double>(rand()%250)};
+
+		//set up endpoint with point values between 750-1000
+		double end[3] = {static_cast<double>(rand()%250+750),static_cast<double>(rand()%250+750),static_cast<double>(rand()%250+750)};
+
+		//math section
+		//lower corner face centres
+		std::vector<tarch::la::Vector<3,double>> lowerCornerFaceCentres;
+		lowerCornerFaceCentres.push_back({(start[0]+end[0])/2, (start[1]+end[1])/2, start[2]});
+		lowerCornerFaceCentres.push_back({(start[0]+end[0])/2, start[1], (start[2]+end[2])/2});
+		lowerCornerFaceCentres.push_back({start[0], (start[1]+end[1])/2, (start[2]+end[2])/2});
+
+		//upper corner face centres
+		std::vector<tarch::la::Vector<3,double>> upperCornerFaceCentres;
+		upperCornerFaceCentres.push_back({(start[0]+end[0])/2, (start[1]+end[1])/2, end[2]});
+		upperCornerFaceCentres.push_back({(start[0]+end[0])/2, end[1], (start[2]+end[2])/2});
+		upperCornerFaceCentres.push_back({end[0], (start[1]+end[1])/2, (start[2]+end[2])/2});
+
+		//region centre
+		tarch::la::Vector<3,double> regionCenter = {(start[0]+end[0])/2, (start[1]+end[1])/2,(start[2]+end[2])/2};
+
+		//generate list of 20 random points less than 1000
+		const int numberOfPoints = 30;
+		std::vector<tarch::la::Vector<3,double>> pointsToCheck;
+		for(int i=0; i < numberOfPoints - 6; i++)
+		{
+			tarch::la::Vector<3,double> temp = {static_cast<double>(rand()%1000), static_cast<double>(rand()%1000), static_cast<double>(rand()%1000)};
+			if(temp == regionCenter || temp == lowerCornerFaceCentres[0] || temp == lowerCornerFaceCentres[1] || temp == lowerCornerFaceCentres[2]
+						|| temp == upperCornerFaceCentres[0] || temp == upperCornerFaceCentres[1] || temp == upperCornerFaceCentres[2])
+						{
+							i--;
+							continue;
+						}
+			pointsToCheck.push_back(temp);
+		}
+		pointsToCheck.push_back({(start[0]+end[0])/2 + 0.002, (start[1]+end[1])/2  + 0.002, start[2]});
+		pointsToCheck.push_back({(start[0]+end[0])/2 + 0.002, start[1], (start[2]+end[2])/2 + 0.002});
+		pointsToCheck.push_back({start[0], (start[1]+end[1])/2 + 0.002, (start[2]+end[2])/2 + 0.002});
+		pointsToCheck.push_back({(start[0]+end[0])/2 + 0.002, (start[1]+end[1])/2 + 0.002, end[2]});
+		pointsToCheck.push_back({(start[0]+end[0])/2 + 0.002, end[1], (start[2]+end[2])/2 + 0.002});
+		pointsToCheck.push_back({end[0], (start[1]+end[1])/2 + 0.002, (start[2]+end[2])/2 + 0.002});
+
+		//populate a bool vector with true if point is inside region
+		//if point is in region, angle to all normals on faces will be acute angles, hence cosine will be positive
+		std::array<bool,numberOfPoints> isPointInRegion;
+		for(int i = 0; i < numberOfPoints; i++)
+		{
+			isPointInRegion[i] = true;
+			for(int j = 0; j < 3; j++)
+			{
+				// cos theta = (a.b)/(|a||b|)
+				isPointInRegion[i] &= (tarch::la::dot(regionCenter - lowerCornerFaceCentres[j], pointsToCheck[i] - lowerCornerFaceCentres[j])
+										/ (tarch::la::norm2(regionCenter - lowerCornerFaceCentres[j]) * tarch::la::norm2(pointsToCheck[i] - lowerCornerFaceCentres[j])))
+										>= 0;
+				isPointInRegion[i] &= (tarch::la::dot(regionCenter - upperCornerFaceCentres[j], pointsToCheck[i] - upperCornerFaceCentres[j])
+										/ (tarch::la::norm2(regionCenter - upperCornerFaceCentres[j]) * tarch::la::norm2(pointsToCheck[i] - upperCornerFaceCentres[j])))
+										> 0; //0 means right angle, means point lies on face
+			}
+		}
+
+		//check all the points
 		ls1::LS1RegionWrapper wrapper(start, end, _testSimulation);
-		CPPUNIT_ASSERT(wrapper.isInRegion({1,1,1}));
-		CPPUNIT_ASSERT(!wrapper.isInRegion({5,6,5}));
+		for(int i = 0; i < numberOfPoints; i++)
+		{
+			CPPUNIT_ASSERT( wrapper.isInRegion(pointsToCheck[i]) == isPointInRegion[i] );
+		}
 	}
 	void testSetRegion()
 	{
