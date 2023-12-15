@@ -12,6 +12,7 @@ class OperationsTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testConvertToScalarIsScalar);
   CPPUNIT_TEST(testConvertToScalarInDomain);
   CPPUNIT_TEST(testConvertTwice);
+  CPPUNIT_TEST(testConvertToVectorIsVector);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -75,6 +76,12 @@ public:
 
     for (const auto& idx : LocalMD2M_IdxT_s{})
       CPPUNIT_ASSERT_EQUAL(convertToScalar(LocalMD2M_IdxT{convertToVector(idx)}), idx.get());
+  }
+
+  void testConvertToVectorIsVector() {
+    using Idx_T = CellIndex<3, Trait::vector, Trait::local, Trait::md2macro>;
+    for (const auto& idx : Idx_T{})
+      CPPUNIT_ASSERT_EQUAL(idx.get(), convertToVector(idx));
   }
 
 private:
