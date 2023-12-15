@@ -13,6 +13,8 @@
  * boundaries must be determined at runtime using IndexingService
  */
 
+// #DEFINE INDEXING_ENABLE_DIM2
+#ifdef INDEXING_ENABLE_DIM2
 // We must compile both, dim2 and dim3, so that both can be used (also in the same executable e.g. main_lammps.cpp)
 // Dim2    ///////////
 namespace coupling {
@@ -153,6 +155,7 @@ template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::local, Ind
 template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
 } // namespace indexing
 } // namespace coupling
+#endif
 
 // Dim3   //////////////////////////
 namespace coupling {
@@ -732,5 +735,7 @@ coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch:
 #endif
 
 // declare specialisation of IndexingService
+#ifdef INDEXING_ENABLE_DIM2
 template class coupling::indexing::IndexingService<2>;
+#endif
 template class coupling::indexing::IndexingService<3>;
