@@ -174,16 +174,27 @@ public:
   }
 
   void testOperatorStream() {
+    testOperatorsStream<T00, T01>();
+    testOperatorsStream<T02, T03>();
+    testOperatorsStream<T04, T05>();
+    testOperatorsStream<T06, T07>();
+    testOperatorsStream<T08, T09>();
+    testOperatorsStream<T10, T11>();
+    testOperatorsStream<T12, T13>();
+    testOperatorsStream<T14, T15>();
+  }
+
+  template <class T_scalar, class T_vector> void testOperatorsStream(){
     std::stringstream ss, ss2, ss3;
 
     // scalar is expected to print the value
-    T00 a{3};
+    T_scalar a{3};
     ss << a;
     CPPUNIT_ASSERT_EQUAL(ss.str(), std::string("3"));
 
     // vector is expected to print like tarch::la::Vector
     tarch::la::Vector<3, int> vec{1, 2, 3};
-    T01 b{vec};
+    T_vector b{vec};
     ss2 << b;
     ss3 << vec;
     CPPUNIT_ASSERT_EQUAL(ss2.str(), ss3.str());
