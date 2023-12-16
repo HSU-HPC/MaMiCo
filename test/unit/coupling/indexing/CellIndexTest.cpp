@@ -13,6 +13,7 @@ class CellIndexTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testAllConversions);
   CPPUNIT_TEST(testAllOperators);
   CPPUNIT_TEST(testAllLoops);
+  CPPUNIT_TEST(testOperatorStream);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -170,6 +171,22 @@ public:
 
     tearDown();
     setUp();
+  }
+
+  void testOperatorStream() {
+    std::stringstream ss, ss2, ss3;
+
+    // scalar is expected to print the value
+    T00 a{3};
+    ss << a;
+    CPPUNIT_ASSERT_EQUAL(ss.str(), std::string("3"));
+
+    // vector is expected to print like tarch::la::Vector
+    tarch::la::Vector<3, int> vec{1, 2, 3};
+    T01 b{vec};
+    ss2 << b;
+    ss3 << vec;
+    CPPUNIT_ASSERT_EQUAL(ss2.str(), ss3.str());
   }
 
 private:
