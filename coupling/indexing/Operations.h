@@ -12,7 +12,7 @@ namespace indexing {
  * @param index index that shall be converted
  * @return int representation of index
  *
- * @author Felix Maurer
+ * @author Felix Maurer and Piet Jarmatz
  */
 template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(const CellIndex<dim, traits...>& index) {
   if constexpr (std::is_same_v<unsigned int, typename CellIndex<dim, traits...>::value_T>) {
@@ -27,7 +27,7 @@ template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(c
         ss << "ERROR: Indexing: Cannot convert this vector index to scalar." << std::endl;
         ss << "Faulty Index = " << index.get() << std::endl;
         ss << "My rank = " << IndexingService<dim>::getInstance().getRank() << std::endl;
-        ss << "Index Traits = " << TraitOperations::print_traitlist<traits...>().data() << std::endl;
+        ss << "Index type = " << index.TNAME << std::endl;
         throw std::runtime_error(ss.str());
       }
 #endif

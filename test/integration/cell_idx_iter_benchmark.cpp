@@ -37,7 +37,7 @@ private:
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
 
-    std::string fname = "mdconf.xml.tmp."+std::to_string(_rank);
+    std::string fname = "mdconf.xml.tmp." + std::to_string(_rank);
     std::ofstream file(fname.c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CellIdxIterBench: Could not open file " << fname << "!" << std::endl;
@@ -91,7 +91,7 @@ private:
       exit(EXIT_FAILURE);
     }
 
-    fname = fname = "mamicoconf.xml.tmp."+std::to_string(_rank);
+    fname = fname = "mamicoconf.xml.tmp." + std::to_string(_rank);
     file.open(fname.c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CellIdxIterBench: Could not open file " << fname << "!" << std::endl;

@@ -29,14 +29,6 @@ std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCel
 // Include non-member functions operating on indexes
 #include "Operations.h"
 
-// enable/disable tests
-// #define TEST_INDEXING
-
-#ifdef TEST_INDEXING
-// Inlcude index tests
-#include "Testing.h"
-#endif
-
 /**
  * Singleton service class initialising lower and upper boundaries of all
  * possible CellIndex specialisations.
