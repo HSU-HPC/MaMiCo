@@ -35,6 +35,8 @@ std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCel
 // Include non-member functions operating on indexes
 #include "Operations.h"
 
+class IndexingServiceTest;
+
 /**
  * Singleton service class initialising lower and upper boundaries of all
  * possible CellIndex specialisations.
@@ -162,4 +164,5 @@ private:
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   bool _isInitialized = false;
 #endif
+  friend IndexingServiceTest;
 };

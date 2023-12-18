@@ -1,3 +1,4 @@
+// For testing private methods of IndexingService
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include <cppunit/TestFixture.h>
@@ -11,6 +12,7 @@ class IndexingServiceTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(IndexingServiceTest);
   CPPUNIT_TEST(testAllBoundaries);
   CPPUNIT_TEST(testIndexingServiceMustBeInitialized);
+  CPPUNIT_TEST(testEdgeCases);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -335,6 +337,27 @@ public:
     tearDown();
     for (auto& op : operations)
       CPPUNIT_ASSERT_THROW(op(), std::runtime_error);
+  }
+
+  void testEdgeCases() {
+    auto& service = IndexingService<3>::getInstance();
+
+    // re-initialization
+    CPPUNIT_ASSERT_NO_THROW(service.init({12}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+
+    // empty MD2M domain
+    CPPUNIT_ASSERT_NO_THROW(service.init({6}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+
+    // non divisible domain
+    CPPUNIT_ASSERT_THROW(service.init({6, 6, 7}, {1, 1, 2}, coupling::paralleltopology::XYZ, 3, 0u), std::runtime_error);
+
+    service.init({12}, {2, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u);
+
+    // out of domain
+    CPPUNIT_ASSERT_THROW(service.getUniqueRankForMacroscopicCell({1, 14, 1}, {12}), std::runtime_error);
+
+    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForMacroscopicCell({1, 1, 1}, {12}), 0u);
+    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForMacroscopicCell({7, 1, 1}, {12}), 1u);
   }
 
 private:
