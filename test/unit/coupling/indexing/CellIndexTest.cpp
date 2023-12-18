@@ -184,7 +184,7 @@ public:
     testOperatorsStream<T14, T15>();
   }
 
-  template <class T_scalar, class T_vector> void testOperatorsStream(){
+  template <class T_scalar, class T_vector> void testOperatorsStream() {
     std::stringstream ss, ss2, ss3;
 
     // scalar is expected to print the value

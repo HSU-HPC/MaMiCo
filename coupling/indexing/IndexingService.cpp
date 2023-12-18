@@ -381,6 +381,11 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
   CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::noGhost>::upperBoundary;
   CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::setDomainParameters();
 
+// CellIndex<dim> and CellIndex<dim, IndexTrait::vector> have been set up, so from here on it is ok to do some basic conversions
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  _isInitialized = true;
+#endif
+
   // init boundaries of all global, m2m, GL excluding indexing types
   {
     CellIndex<dim> lowerBoundary{BaseIndex<dim>::lowerBoundary};
@@ -581,10 +586,6 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
       CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary;
   CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 #endif
-
-#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-  _isInitialized = true;
-#endif
 }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // unused in sequential scenario
@@ -593,6 +594,13 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
  */
 template <unsigned int dim>
 std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const {
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if (!_isInitialized) {
+    throw std::runtime_error(std::string("coupling::indexing::convertToVector: IndexingService not initialized! "));
+  }
+#endif
+
   std::vector<unsigned int> ranks;
   // using the old meaning of 'globalNumberMacroscopicCells' from
   // IndexConversion

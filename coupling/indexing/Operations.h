@@ -21,6 +21,9 @@ template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(c
     // copied from deprecated coupling::IndexConversion::getCellIndex())
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!IndexingService<dim>::getInstance().isInitialized()) {
+      throw std::runtime_error(std::string("coupling::indexing::convertToScalar: IndexingService not initialized! "));
+    }
     for (unsigned d = 0; d < dim; d++)
       if (index.get()[d] < 0 || index.get()[d] > ((int)CellIndex<dim, traits...>::numberCellsInDomain[d]) - 1) {
         std::stringstream ss;
@@ -58,6 +61,12 @@ template <unsigned int dim, IndexTrait... traits> tarch::la::Vector<dim, int> co
     return index.get();
   } else {
     // copied from coupling::getVectorCellIndex()
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!IndexingService<dim>::getInstance().isInitialized()) {
+      throw std::runtime_error(std::string("coupling::indexing::convertToVector: IndexingService not initialized! "));
+    }
+#endif
 
     tarch::la::Vector<dim, int> i{0};
     unsigned int i_sca{index.get()};

@@ -2,6 +2,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include <functional>
 
 using namespace coupling::indexing;
 
@@ -9,6 +10,7 @@ class IndexingServiceTest : public CppUnit::TestFixture {
 
   CPPUNIT_TEST_SUITE(IndexingServiceTest);
   CPPUNIT_TEST(testAllBoundaries);
+  CPPUNIT_TEST(testIndexingServiceMustBeInitialized);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -309,6 +311,30 @@ public:
         CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 54u);
       }
     }
+  }
+
+  void testIndexingServiceMustBeInitialized() {
+    // some operations that need the indexing system to be initialized
+    std::vector<std::function<void(void)>> operations;
+    tarch::la::Vector<3, int> one{1, 1, 1};
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    operations.push_back([one]() { IndexingService<3>::getInstance().getRanksForGlobalIndex(one); });
+    operations.push_back([]() { IndexingService<3>::getInstance().getComm(); });
+#endif
+    operations.push_back([]() { IndexingService<3>::getInstance().getRank(); });
+    operations.push_back([one]() { convertToScalar(T5{one}); });
+    operations.push_back([]() { convertToVector(T4{1}); });
+    operations.push_back([one]() { T0{T5{one}}; });
+    operations.push_back([]() { T5{T0{0}}; });
+
+    // it was initialized by setup() before, so now they should be ok
+    for (auto& op : operations)
+      CPPUNIT_ASSERT_NO_THROW(op());
+
+    // calls IndexingService::finalize(), now all should fail
+    tearDown();
+    for (auto& op : operations)
+      CPPUNIT_ASSERT_THROW(op(), std::runtime_error);
   }
 
 private:
