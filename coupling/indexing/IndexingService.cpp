@@ -461,12 +461,6 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
                                                                           occurs...*/
         break;
 
-      // sanity check: empty local domain
-      if (lowerBoundary == CellIndex<dim /*global*/>::upperBoundary) {
-        using namespace std::string_literals;
-        throw std::runtime_error("IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s);
-      }
-
       //...increment by one if above is too high to be in local domain
       ++lowerBoundary;
     }
@@ -475,12 +469,6 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
       if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index
                                                                           occurs...*/
         break;
-
-      // sanity check: empty local domain
-      if (upperBoundary < lowerBoundary) {
-        using namespace std::string_literals;
-        throw std::runtime_error("IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s);
-      }
 
       //...decrement by one if above is too high to be in local domain
       --upperBoundary;
