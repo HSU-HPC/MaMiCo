@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaMiCo: coupling::filtering::NLM&lt; dim &gt; Class Template Reference</title>
+<title>MaMiCo: coupling::filtering::NLM&lt; dim, scope &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -79,7 +79,7 @@ $(function() {
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classcoupling_1_1filtering_1_1NLM-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">coupling::filtering::NLM&lt; dim &gt; Class Template Reference</div></div>
+  <div class="headertitle"><div class="title">coupling::filtering::NLM&lt; dim, scope &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -89,9 +89,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a55d97d6ce1818700f0a8c3796d002314" id="r_a55d97d6ce1818700f0a8c3796d002314"><td class="memItemLeft" align="right" valign="top"><a id="a55d97d6ce1818700f0a8c3796d002314" name="a55d97d6ce1818700f0a8c3796d002314"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>CellIndex_T</b> = <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">coupling::indexing::CellIndex</a>&lt; dim, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost &gt;</td></tr>
-<tr class="separator:a55d97d6ce1818700f0a8c3796d002314"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d2c10533dfa31f4c850ea14e9fa3128" id="r_a2d2c10533dfa31f4c850ea14e9fa3128"><td class="memItemLeft" align="right" valign="top"><a id="a2d2c10533dfa31f4c850ea14e9fa3128" name="a2d2c10533dfa31f4c850ea14e9fa3128"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>CellIndex_T</b> = <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">coupling::indexing::CellIndex</a>&lt; dim, coupling::indexing::IndexTrait::vector, scope..., coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost &gt;</td></tr>
+<tr class="separator:a2d2c10533dfa31f4c850ea14e9fa3128"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_types_classcoupling_1_1filtering_1_1FilterInterface"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classcoupling_1_1filtering_1_1FilterInterface')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classcoupling_1_1filtering_1_1FilterInterface.html">coupling::filtering::FilterInterface&lt; dim &gt;</a></td></tr>
 <tr class="memitem:ab2f124997ae4bbba4cbdfe6ca833144d inherit pub_types_classcoupling_1_1filtering_1_1FilterInterface" id="r_ab2f124997ae4bbba4cbdfe6ca833144d"><td class="memItemLeft" align="right" valign="top">
 using&#160;</td><td class="memItemRight" valign="bottom"><b>CellIndex_T</b> = <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">coupling::indexing::CellIndex</a>&lt; dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost &gt;</td></tr>
@@ -99,11 +99,11 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CellIndex_T</b> = <a
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aea84a540ae18d1bfd8f328fd6d12f769" id="r_aea84a540ae18d1bfd8f328fd6d12f769"><td class="memItemLeft" align="right" valign="top"><a id="aea84a540ae18d1bfd8f328fd6d12f769" name="aea84a540ae18d1bfd8f328fd6d12f769"></a>
+<tr class="memitem:a7ca8312ced9c0420fd377cb4c9d2d5e7" id="r_a7ca8312ced9c0420fd377cb4c9d2d5e7"><td class="memItemLeft" align="right" valign="top"><a id="a7ca8312ced9c0420fd377cb4c9d2d5e7" name="a7ca8312ced9c0420fd377cb4c9d2d5e7"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>NLM</b> (const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; inputCellVector_unfiltered, const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; inputCellVector_prefiltered, const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; outputCellVector, const std::array&lt; bool, 7 &gt; filteredValues, int tws, double sigsq, double sigsq_rel, double hsq, double hsq_rel, int M=2, int d=1)</td></tr>
-<tr class="separator:aea84a540ae18d1bfd8f328fd6d12f769"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a873b2d487678f6ccff37d76e1e44d81e" id="r_a873b2d487678f6ccff37d76e1e44d81e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#a873b2d487678f6ccff37d76e1e44d81e">operator()</a> ()</td></tr>
-<tr class="separator:a873b2d487678f6ccff37d76e1e44d81e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a7ca8312ced9c0420fd377cb4c9d2d5e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61425c9cfe062a0520c67f9d0b9e6e56" id="r_a61425c9cfe062a0520c67f9d0b9e6e56"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#a61425c9cfe062a0520c67f9d0b9e6e56">operator()</a> ()</td></tr>
+<tr class="separator:a61425c9cfe062a0520c67f9d0b9e6e56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcoupling_1_1filtering_1_1JunctorInterface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcoupling_1_1filtering_1_1JunctorInterface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1filtering_1_1JunctorInterface.html">coupling::filtering::JunctorInterface&lt; dim, 2, 1 &gt;</a></td></tr>
 <tr class="memitem:a48448d159ccd29092730cc94f3bdda57 inherit pub_methods_classcoupling_1_1filtering_1_1JunctorInterface" id="r_a48448d159ccd29092730cc94f3bdda57"><td class="memItemLeft" align="right" valign="top">
 &#160;</td><td class="memItemRight" valign="bottom"><b>JunctorInterface</b> (const std::array&lt; std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt;, inputc &gt; inputCellVectors, const std::array&lt; std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt;, outputc &gt; outputCellVectors, const std::array&lt; bool, 7 &gt; filteredValues, const char *type)</td></tr>
@@ -145,61 +145,61 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getSize</b> () const</
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:ac7fee506e387a454a71e52ee82842547" id="r_ac7fee506e387a454a71e52ee82842547"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#ac7fee506e387a454a71e52ee82842547">save_data</a> ()</td></tr>
-<tr class="separator:ac7fee506e387a454a71e52ee82842547"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90864842026fd216f9ea5e446076dbdd" id="r_a90864842026fd216f9ea5e446076dbdd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#a90864842026fd216f9ea5e446076dbdd">update_patchfield</a> ()</td></tr>
-<tr class="separator:a90864842026fd216f9ea5e446076dbdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1153cda00e57d658d06f1287e6e6b0be" id="r_a1153cda00e57d658d06f1287e6e6b0be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#a1153cda00e57d658d06f1287e6e6b0be">denoise</a> ()</td></tr>
-<tr class="separator:a1153cda00e57d658d06f1287e6e6b0be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affc75dfef78539d202cf27d8b20ec6b0" id="r_affc75dfef78539d202cf27d8b20ec6b0"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#affc75dfef78539d202cf27d8b20ec6b0">compute_boundary_neighbors</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;)</td></tr>
-<tr class="separator:affc75dfef78539d202cf27d8b20ec6b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52881b4a2c3025225ce560a40c935dba" id="r_a52881b4a2c3025225ce560a40c935dba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#a52881b4a2c3025225ce560a40c935dba">increment_time</a> ()</td></tr>
-<tr class="separator:a52881b4a2c3025225ce560a40c935dba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a327b09678ac158ac11a9320f3720f2" id="r_a5a327b09678ac158ac11a9320f3720f2"><td class="memItemLeft" align="right" valign="top"><a id="a5a327b09678ac158ac11a9320f3720f2" name="a5a327b09678ac158ac11a9320f3720f2"></a>
+<tr class="memitem:a9a5db6ce361f1ef8ee07d15daf762c15" id="r_a9a5db6ce361f1ef8ee07d15daf762c15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#a9a5db6ce361f1ef8ee07d15daf762c15">save_data</a> ()</td></tr>
+<tr class="separator:a9a5db6ce361f1ef8ee07d15daf762c15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38dc4c9b227d6e7630036837677df77c" id="r_a38dc4c9b227d6e7630036837677df77c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#a38dc4c9b227d6e7630036837677df77c">update_patchfield</a> ()</td></tr>
+<tr class="separator:a38dc4c9b227d6e7630036837677df77c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c3f43755cf0b95000f58a4af2aa2978" id="r_a7c3f43755cf0b95000f58a4af2aa2978"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#a7c3f43755cf0b95000f58a4af2aa2978">denoise</a> ()</td></tr>
+<tr class="separator:a7c3f43755cf0b95000f58a4af2aa2978"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aceac5f7e43c5837bf49ea4c73b2a43ae" id="r_aceac5f7e43c5837bf49ea4c73b2a43ae"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#aceac5f7e43c5837bf49ea4c73b2a43ae">compute_boundary_neighbors</a> (const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;)</td></tr>
+<tr class="separator:aceac5f7e43c5837bf49ea4c73b2a43ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec705074fc6d15b4d0142f4fbfc5ce85" id="r_aec705074fc6d15b4d0142f4fbfc5ce85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1filtering_1_1NLM.html#aec705074fc6d15b4d0142f4fbfc5ce85">increment_time</a> ()</td></tr>
+<tr class="separator:aec705074fc6d15b4d0142f4fbfc5ce85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73c2075c47b0cbfa7149062a12a51a7f" id="r_a73c2075c47b0cbfa7149062a12a51a7f"><td class="memItemLeft" align="right" valign="top"><a id="a73c2075c47b0cbfa7149062a12a51a7f" name="a73c2075c47b0cbfa7149062a12a51a7f"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>posmod</b> (int i, int n) const</td></tr>
-<tr class="separator:a5a327b09678ac158ac11a9320f3720f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a73c2075c47b0cbfa7149062a12a51a7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:afa9a9df5700d3726582b26cafb5417cc" id="r_afa9a9df5700d3726582b26cafb5417cc"><td class="memItemLeft" align="right" valign="top"><a id="afa9a9df5700d3726582b26cafb5417cc" name="afa9a9df5700d3726582b26cafb5417cc"></a>
+<tr class="memitem:a7a5b30475a1491b28c1d926891baf183" id="r_a7a5b30475a1491b28c1d926891baf183"><td class="memItemLeft" align="right" valign="top"><a id="a7a5b30475a1491b28c1d926891baf183" name="a7a5b30475a1491b28c1d926891baf183"></a>
 const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_timeWindowSize</b></td></tr>
-<tr class="separator:afa9a9df5700d3726582b26cafb5417cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa68057730684dad856b7b01cbabbd5e0" id="r_aa68057730684dad856b7b01cbabbd5e0"><td class="memItemLeft" align="right" valign="top"><a id="aa68057730684dad856b7b01cbabbd5e0" name="aa68057730684dad856b7b01cbabbd5e0"></a>
+<tr class="separator:a7a5b30475a1491b28c1d926891baf183"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b50a883a78fec05fb5bcfc4387e5e70" id="r_a2b50a883a78fec05fb5bcfc4387e5e70"><td class="memItemLeft" align="right" valign="top"><a id="a2b50a883a78fec05fb5bcfc4387e5e70" name="a2b50a883a78fec05fb5bcfc4387e5e70"></a>
 const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_M</b></td></tr>
-<tr class="separator:aa68057730684dad856b7b01cbabbd5e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae3f95106c353a4bb0c2aac4de5bf00e" id="r_aae3f95106c353a4bb0c2aac4de5bf00e"><td class="memItemLeft" align="right" valign="top"><a id="aae3f95106c353a4bb0c2aac4de5bf00e" name="aae3f95106c353a4bb0c2aac4de5bf00e"></a>
+<tr class="separator:a2b50a883a78fec05fb5bcfc4387e5e70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2813e77281b1f3d61d79906ae75c1204" id="r_a2813e77281b1f3d61d79906ae75c1204"><td class="memItemLeft" align="right" valign="top"><a id="a2813e77281b1f3d61d79906ae75c1204" name="a2813e77281b1f3d61d79906ae75c1204"></a>
 const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_d</b></td></tr>
-<tr class="separator:aae3f95106c353a4bb0c2aac4de5bf00e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b179905c9f7f591412c35a0edd5f846" id="r_a7b179905c9f7f591412c35a0edd5f846"><td class="memItemLeft" align="right" valign="top"><a id="a7b179905c9f7f591412c35a0edd5f846" name="a7b179905c9f7f591412c35a0edd5f846"></a>
+<tr class="separator:a2813e77281b1f3d61d79906ae75c1204"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0f7243e8b66324859c6f48e54f75cf3" id="r_ab0f7243e8b66324859c6f48e54f75cf3"><td class="memItemLeft" align="right" valign="top"><a id="ab0f7243e8b66324859c6f48e54f75cf3" name="ab0f7243e8b66324859c6f48e54f75cf3"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>_sigsq</b></td></tr>
-<tr class="separator:a7b179905c9f7f591412c35a0edd5f846"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a616e0387602f03260ccc9fe113ca5807" id="r_a616e0387602f03260ccc9fe113ca5807"><td class="memItemLeft" align="right" valign="top"><a id="a616e0387602f03260ccc9fe113ca5807" name="a616e0387602f03260ccc9fe113ca5807"></a>
+<tr class="separator:ab0f7243e8b66324859c6f48e54f75cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16df176f6d2ede4c88ee0cf80c459772" id="r_a16df176f6d2ede4c88ee0cf80c459772"><td class="memItemLeft" align="right" valign="top"><a id="a16df176f6d2ede4c88ee0cf80c459772" name="a16df176f6d2ede4c88ee0cf80c459772"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>_sigsq_rel</b></td></tr>
-<tr class="separator:a616e0387602f03260ccc9fe113ca5807"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b23cd507085d072865cb7d696949ee6" id="r_a5b23cd507085d072865cb7d696949ee6"><td class="memItemLeft" align="right" valign="top"><a id="a5b23cd507085d072865cb7d696949ee6" name="a5b23cd507085d072865cb7d696949ee6"></a>
+<tr class="separator:a16df176f6d2ede4c88ee0cf80c459772"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaff485f2e2614d1b5aa2f56a1c9b2cad" id="r_aaff485f2e2614d1b5aa2f56a1c9b2cad"><td class="memItemLeft" align="right" valign="top"><a id="aaff485f2e2614d1b5aa2f56a1c9b2cad" name="aaff485f2e2614d1b5aa2f56a1c9b2cad"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>_hsq</b></td></tr>
-<tr class="separator:a5b23cd507085d072865cb7d696949ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2468a9d237fc79c99139f3a89ed13c2f" id="r_a2468a9d237fc79c99139f3a89ed13c2f"><td class="memItemLeft" align="right" valign="top"><a id="a2468a9d237fc79c99139f3a89ed13c2f" name="a2468a9d237fc79c99139f3a89ed13c2f"></a>
+<tr class="separator:aaff485f2e2614d1b5aa2f56a1c9b2cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b00819610689af938c61a2fe4b9f62b" id="r_a9b00819610689af938c61a2fe4b9f62b"><td class="memItemLeft" align="right" valign="top"><a id="a9b00819610689af938c61a2fe4b9f62b" name="a9b00819610689af938c61a2fe4b9f62b"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>_hsq_rel</b></td></tr>
-<tr class="separator:a2468a9d237fc79c99139f3a89ed13c2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae54617575a16aa6728b18d89f3388104" id="r_ae54617575a16aa6728b18d89f3388104"><td class="memItemLeft" align="right" valign="top"><a id="ae54617575a16aa6728b18d89f3388104" name="ae54617575a16aa6728b18d89f3388104"></a>
+<tr class="separator:a9b00819610689af938c61a2fe4b9f62b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7229ad5d21e71e5b1455051fd6b33382" id="r_a7229ad5d21e71e5b1455051fd6b33382"><td class="memItemLeft" align="right" valign="top"><a id="a7229ad5d21e71e5b1455051fd6b33382" name="a7229ad5d21e71e5b1455051fd6b33382"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_cycleCounter</b></td></tr>
-<tr class="separator:ae54617575a16aa6728b18d89f3388104"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39b498bb4911d9cd48fe08b5bb17aef2" id="r_a39b498bb4911d9cd48fe08b5bb17aef2"><td class="memItemLeft" align="right" valign="top"><a id="a39b498bb4911d9cd48fe08b5bb17aef2" name="a39b498bb4911d9cd48fe08b5bb17aef2"></a>
+<tr class="separator:a7229ad5d21e71e5b1455051fd6b33382"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eecd289a2525854cc7057553a9c3cf0" id="r_a5eecd289a2525854cc7057553a9c3cf0"><td class="memItemLeft" align="right" valign="top"><a id="a5eecd289a2525854cc7057553a9c3cf0" name="a5eecd289a2525854cc7057553a9c3cf0"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_t</b></td></tr>
-<tr class="separator:a39b498bb4911d9cd48fe08b5bb17aef2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7e350b981fa31920e0b4b6a029ff9d8" id="r_ad7e350b981fa31920e0b4b6a029ff9d8"><td class="memItemLeft" align="right" valign="top"><a id="ad7e350b981fa31920e0b4b6a029ff9d8" name="ad7e350b981fa31920e0b4b6a029ff9d8"></a>
+<tr class="separator:a5eecd289a2525854cc7057553a9c3cf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5856881de703d57ae8eba568d70312aa" id="r_a5856881de703d57ae8eba568d70312aa"><td class="memItemLeft" align="right" valign="top"><a id="a5856881de703d57ae8eba568d70312aa" name="a5856881de703d57ae8eba568d70312aa"></a>
 <a class="el" href="classcoupling_1_1filtering_1_1Field.html">coupling::filtering::Flowfield</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_flowfield</b></td></tr>
-<tr class="separator:ad7e350b981fa31920e0b4b6a029ff9d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6924513d7d2db23405263ddb9c46936" id="r_aa6924513d7d2db23405263ddb9c46936"><td class="memItemLeft" align="right" valign="top"><a id="aa6924513d7d2db23405263ddb9c46936" name="aa6924513d7d2db23405263ddb9c46936"></a>
+<tr class="separator:a5856881de703d57ae8eba568d70312aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af126d1479c580a994621f308dafbd43f" id="r_af126d1479c580a994621f308dafbd43f"><td class="memItemLeft" align="right" valign="top"><a id="af126d1479c580a994621f308dafbd43f" name="af126d1479c580a994621f308dafbd43f"></a>
 <a class="el" href="classcoupling_1_1filtering_1_1Field.html">coupling::filtering::Flowfield</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_flowfield_prefiltered</b></td></tr>
-<tr class="separator:aa6924513d7d2db23405263ddb9c46936"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3df49beea6b87952be114d2fecddd29d" id="r_a3df49beea6b87952be114d2fecddd29d"><td class="memItemLeft" align="right" valign="top"><a id="a3df49beea6b87952be114d2fecddd29d" name="a3df49beea6b87952be114d2fecddd29d"></a>
+<tr class="separator:af126d1479c580a994621f308dafbd43f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cc35bf9aaed2fc34ac456a5322985c1" id="r_a1cc35bf9aaed2fc34ac456a5322985c1"><td class="memItemLeft" align="right" valign="top"><a id="a1cc35bf9aaed2fc34ac456a5322985c1" name="a1cc35bf9aaed2fc34ac456a5322985c1"></a>
 <a class="el" href="classcoupling_1_1filtering_1_1Field.html">coupling::filtering::Patchfield</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_patchfield</b></td></tr>
-<tr class="separator:a3df49beea6b87952be114d2fecddd29d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7cec58e46fd54f7739d1df9f4135f3aa" id="r_a7cec58e46fd54f7739d1df9f4135f3aa"><td class="memItemLeft" align="right" valign="top"><a id="a7cec58e46fd54f7739d1df9f4135f3aa" name="a7cec58e46fd54f7739d1df9f4135f3aa"></a>
+<tr class="separator:a1cc35bf9aaed2fc34ac456a5322985c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab59d1faae1bf00209d4baf0afd30a8af" id="r_ab59d1faae1bf00209d4baf0afd30a8af"><td class="memItemLeft" align="right" valign="top"><a id="ab59d1faae1bf00209d4baf0afd30a8af" name="ab59d1faae1bf00209d4baf0afd30a8af"></a>
 std::vector&lt; <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">CellIndex_T</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_innerCellIndices</b></td></tr>
-<tr class="separator:a7cec58e46fd54f7739d1df9f4135f3aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ab59d1faae1bf00209d4baf0afd30a8af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -226,23 +226,23 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>_type</b></td
 <tr class="separator:ab5d96e4cc6a461a72428574ec7d7ecf0 inherit pro_attribs_classcoupling_1_1filtering_1_1FilterInterface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
-class coupling::filtering::NLM&lt; dim &gt;</div><p>Noise reduction algorithm using non-local means (<a class="el" href="classcoupling_1_1filtering_1_1NLM.html">NLM</a>) method See 'Fast Non Local Means Denoising for 3D MR Images' by Coupé et al. 2006 and 'Non-Local Means Denoising' by Buades et al. 2011.</p>
+<div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim, coupling::indexing::IndexTrait... scope&gt;<br />
+class coupling::filtering::NLM&lt; dim, scope &gt;</div><p>Noise reduction algorithm using non-local means (<a class="el" href="classcoupling_1_1filtering_1_1NLM.html">NLM</a>) method See 'Fast Non Local Means Denoising for 3D MR Images' by Coupé et al. 2006 and 'Non-Local Means Denoising' by Buades et al. 2011.</p>
 <dl class="section author"><dt>Author</dt><dd>Piet Jarmatz </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="affc75dfef78539d202cf27d8b20ec6b0" name="affc75dfef78539d202cf27d8b20ec6b0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#affc75dfef78539d202cf27d8b20ec6b0">&#9670;&#160;</a></span>compute_boundary_neighbors()</h2>
+<a id="aceac5f7e43c5837bf49ea4c73b2a43ae" name="aceac5f7e43c5837bf49ea4c73b2a43ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aceac5f7e43c5837bf49ea4c73b2a43ae">&#9670;&#160;</a></span>compute_boundary_neighbors()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;unsigned int dim&gt; </div>
+template&lt;unsigned int dim, coupling::indexing::IndexTrait... scope&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, int &gt; &gt; <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim &gt;::compute_boundary_neighbors </td>
+          <td class="memname">std::vector&lt; <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, int &gt; &gt; <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim, scope &gt;::compute_boundary_neighbors </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -265,19 +265,19 @@ template&lt;unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a1153cda00e57d658d06f1287e6e6b0be" name="a1153cda00e57d658d06f1287e6e6b0be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1153cda00e57d658d06f1287e6e6b0be">&#9670;&#160;</a></span>denoise()</h2>
+<a id="a7c3f43755cf0b95000f58a4af2aa2978" name="a7c3f43755cf0b95000f58a4af2aa2978"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c3f43755cf0b95000f58a4af2aa2978">&#9670;&#160;</a></span>denoise()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;unsigned int dim&gt; </div>
+template&lt;unsigned int dim, coupling::indexing::IndexTrait... scope&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim &gt;::denoise </td>
+          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim, scope &gt;::denoise </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -293,19 +293,19 @@ template&lt;unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a52881b4a2c3025225ce560a40c935dba" name="a52881b4a2c3025225ce560a40c935dba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52881b4a2c3025225ce560a40c935dba">&#9670;&#160;</a></span>increment_time()</h2>
+<a id="aec705074fc6d15b4d0142f4fbfc5ce85" name="aec705074fc6d15b4d0142f4fbfc5ce85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec705074fc6d15b4d0142f4fbfc5ce85">&#9670;&#160;</a></span>increment_time()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;unsigned int dim&gt; </div>
+template&lt;unsigned int dim, coupling::indexing::IndexTrait... scope&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim &gt;::increment_time </td>
+          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim, scope &gt;::increment_time </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -321,19 +321,19 @@ template&lt;unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a873b2d487678f6ccff37d76e1e44d81e" name="a873b2d487678f6ccff37d76e1e44d81e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a873b2d487678f6ccff37d76e1e44d81e">&#9670;&#160;</a></span>operator()()</h2>
+<a id="a61425c9cfe062a0520c67f9d0b9e6e56" name="a61425c9cfe062a0520c67f9d0b9e6e56"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61425c9cfe062a0520c67f9d0b9e6e56">&#9670;&#160;</a></span>operator()()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;unsigned int dim&gt; </div>
+template&lt;unsigned int dim, coupling::indexing::IndexTrait... scope&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim &gt;::operator() </td>
+          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim, scope &gt;::operator() </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -350,19 +350,19 @@ template&lt;unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="ac7fee506e387a454a71e52ee82842547" name="ac7fee506e387a454a71e52ee82842547"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7fee506e387a454a71e52ee82842547">&#9670;&#160;</a></span>save_data()</h2>
+<a id="a9a5db6ce361f1ef8ee07d15daf762c15" name="a9a5db6ce361f1ef8ee07d15daf762c15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a5db6ce361f1ef8ee07d15daf762c15">&#9670;&#160;</a></span>save_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;unsigned int dim&gt; </div>
+template&lt;unsigned int dim, coupling::indexing::IndexTrait... scope&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim &gt;::save_data </td>
+          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim, scope &gt;::save_data </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -378,19 +378,19 @@ template&lt;unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="a90864842026fd216f9ea5e446076dbdd" name="a90864842026fd216f9ea5e446076dbdd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90864842026fd216f9ea5e446076dbdd">&#9670;&#160;</a></span>update_patchfield()</h2>
+<a id="a38dc4c9b227d6e7630036837677df77c" name="a38dc4c9b227d6e7630036837677df77c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38dc4c9b227d6e7630036837677df77c">&#9670;&#160;</a></span>update_patchfield()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;unsigned int dim&gt; </div>
+template&lt;unsigned int dim, coupling::indexing::IndexTrait... scope&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim &gt;::update_patchfield </td>
+          <td class="memname">void <a class="el" href="classcoupling_1_1filtering_1_1NLM.html">coupling::filtering::NLM</a>&lt; dim, scope &gt;::update_patchfield </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>

@@ -12,7 +12,7 @@ var searchData=
   ['deletenode_9',['DeleteNode',['../classtinyxml2_1_1XMLDocument.html#ac1d6e2c7fcc1a660624ac4f68e96380d',1,'tinyxml2::XMLDocument']]],
   ['deleteparticle_10',['deleteParticle',['../classcoupling_1_1UsherParticleInsertion.html#a62fff91ffad10ad00fc715c815589027',1,'coupling::UsherParticleInsertion']]],
   ['deleteparticlemapping_11',['DeleteParticleMapping',['../classcoupling_1_1cellmappings_1_1DeleteParticleMapping.html#ae5308c3c587ca3860d5b503b218f3cb9',1,'coupling::cellmappings::DeleteParticleMapping']]],
-  ['denoise_12',['denoise',['../classcoupling_1_1filtering_1_1NLM.html#a1153cda00e57d658d06f1287e6e6b0be',1,'coupling::filtering::NLM']]],
+  ['denoise_12',['denoise',['../classcoupling_1_1filtering_1_1NLM.html#a7c3f43755cf0b95000f58a4af2aa2978',1,'coupling::filtering::NLM']]],
   ['determineparallelneighbours_13',['determineParallelNeighbours',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a5c55dd2fbfb5b46f0363b62352d0edaa',1,'coupling::solvers::NumericalSolver']]],
   ['differencetransferstrategy_14',['DifferenceTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DifferenceTransferStrategy.html#a54b0876cf325469210f6fad7f661269f',1,'coupling::transferstrategies::DifferenceTransferStrategy']]],
   ['directtransferstrategy_15',['DirectTransferStrategy',['../classcoupling_1_1transferstrategies_1_1DirectTransferStrategy.html#acb7a365647a5e2045199c498fecd45ae',1,'coupling::transferstrategies::DirectTransferStrategy']]],

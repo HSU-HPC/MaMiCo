@@ -138,7 +138,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>      index = _numberProcesses[d] * index + processCoordinates[d];</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    }</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Process coordinates=&quot;</span> &lt;&lt; processCoordinates &lt;&lt; <span class="stringliteral">&quot; correspond to rank=&quot;</span> &lt;&lt; index + _topologyOffset &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="comment">// std::cout &lt;&lt; &quot;Process coordinates=&quot; &lt;&lt; processCoordinates &lt;&lt; &quot; correspond to rank=&quot; &lt;&lt; index + _topologyOffset &lt;&lt; std::endl;</span></div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="keywordflow">return</span> index + _topologyOffset;</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  }</div>

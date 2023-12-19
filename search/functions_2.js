@@ -10,7 +10,7 @@ var searchData=
   ['collidestream_7',['collidestream',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#acc742469952320d1b444cd3b2c1d33f0',1,'coupling::solvers::LBCouetteSolver']]],
   ['communicate_8',['communicate',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a78f724c607ea44f48e25911d22cd1d57',1,'coupling::solvers::LBCouetteSolver']]],
   ['communicatepart_9',['communicatePart',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a2718ed321012e407269c093278f3cccf',1,'coupling::solvers::LBCouetteSolver']]],
-  ['compute_5fboundary_5fneighbors_10',['compute_boundary_neighbors',['../classcoupling_1_1filtering_1_1NLM.html#affc75dfef78539d202cf27d8b20ec6b0',1,'coupling::filtering::NLM']]],
+  ['compute_5fboundary_5fneighbors_10',['compute_boundary_neighbors',['../classcoupling_1_1filtering_1_1NLM.html#aceac5f7e43c5837bf49ea4c73b2a43ae',1,'coupling::filtering::NLM']]],
   ['computeandstoretemperature_11',['computeAndStoreTemperature',['../classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html#a03413c9008bebffec669db3155af7904',1,'coupling::services::MacroscopicCellServiceImpl']]],
   ['computeavgforceandvelocity_12',['ComputeAvgForceAndVelocity',['../classcoupling_1_1cellmappings_1_1ComputeAvgForceAndVelocity.html#ac481a44a615a9ff4e5d1d64703bfd316',1,'coupling::cellmappings::ComputeAvgForceAndVelocity']]],
   ['computedensityandvelocity_13',['computeDensityAndVelocity',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a0d59b0f02800c54c433d905f97f4e138',1,'coupling::solvers::LBCouetteSolver']]],

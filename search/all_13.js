@@ -1,7 +1,7 @@
 var searchData=
 [
   ['sample_0',['sample',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4SchwarzCoupling.html#ad41e41d14ba4d1de9e2b2f97c7ce308a',1,'coupling::transferstrategies::TransferStrategy4SchwarzCoupling']]],
-  ['save_5fdata_1',['save_data',['../classcoupling_1_1filtering_1_1NLM.html#ac7fee506e387a454a71e52ee82842547',1,'coupling::filtering::NLM']]],
+  ['save_5fdata_1',['save_data',['../classcoupling_1_1filtering_1_1NLM.html#a9a5db6ce361f1ef8ee07d15daf762c15',1,'coupling::filtering::NLM']]],
   ['savefile_2',['savefile',['../classtinyxml2_1_1XMLDocument.html#a8b95779479a0035acc67b3a61dfe1b74',1,'tinyxml2::XMLDocument::SaveFile(FILE *fp, bool compact=false)'],['../classtinyxml2_1_1XMLDocument.html#a73ac416b4a2aa0952e841220eb3da18f',1,'tinyxml2::XMLDocument::SaveFile(const char *filename, bool compact=false)']]],
   ['scalaraccessfunctionpair_3',['ScalarAccessFunctionPair',['../structcoupling_1_1filtering_1_1FilterInterface_1_1ScalarAccessFunctionPair.html',1,'coupling::filtering::FilterInterface']]],
   ['scenario_4',['Scenario',['../classScenario.html',1,'']]],
