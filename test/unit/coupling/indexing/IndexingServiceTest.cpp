@@ -326,8 +326,9 @@ public:
     operations.push_back([]() { IndexingService<3>::getInstance().getRank(); });
     operations.push_back([one]() { convertToScalar(T5{one}); });
     operations.push_back([]() { convertToVector(T4{1}); });
-    operations.push_back([one]() { T0{T5{one}}; });
-    operations.push_back([]() { T5{T0{0}}; });
+    // static_cast<void>() is used to explicity discard value (prevents unused-value warning)
+    operations.push_back([one]() { static_cast<void>(T0{T5{one}}); });
+    operations.push_back([]() { static_cast<void>(T5{T0{0}}); });
 
     // it was initialized by setup() before, so now they should be ok
     for (auto& op : operations)
