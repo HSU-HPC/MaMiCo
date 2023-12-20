@@ -3,7 +3,7 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
-#pragma region sequential operation
+#pragma region sequential operations
 
 template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::sendFromMacro2MD(const coupling::IndexConversion<dim>& indexConversion,
@@ -108,9 +108,9 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromReceiveBuff
   }
 }
 
-#pragma endregion // sequential operation
+#pragma endregion // sequential operations
 
-#pragma region collective operation
+#pragma region collective operations
 template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::bcastFromMacro2MD(
     std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromMacroscopicCellServices,
@@ -210,4 +210,4 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromCollectiveB
   }
 }
 
-#pragma endregion // collective operation
+#pragma endregion // collective operations
