@@ -11,9 +11,12 @@ __author__ = "Ruben"
 
 import sys
 from pathlib import Path
+import numpy as np
 import pandas as pd
+import vtk
+from vtk.util import numpy_support as vtk_np
 
-SIGNIFICANT_DIFFERENCE_THRESHOLD = 1e-32
+SIGNIFICANT_DIFFERENCE_THRESHOLD = 1e-9
 
 if len(sys.argv) != 3 or any(s in sys.argv for s in ["-h", "--help"]):
     the_script = Path(sys.argv[0]).name
@@ -26,13 +29,14 @@ assert (output_dir_a.exists())
 output_dir_b = Path(sys.argv[2])
 assert (output_dir_b.exists())
 
+max_diff = 0
+max_diff_debug_info = ''
 
-def compare_csv(a, b, header=None, sep=";"):
-    def read_csv(f):
-        df = pd.read_csv(f, header=header, sep=sep)
-        return df.dropna(axis=1)
-    df_a = read_csv(a)
-    df_b = read_csv(b)
+
+def compare_df(a, b, df_loader=None):
+    global max_diff, max_diff_debug_info
+    df_a = a if df_loader is None else df_loader(a)
+    df_b = a if df_loader is None else df_loader(b)
     if any(df_a.columns != df_b.columns):
         print(f"Columns of {a} and {b} do not match")
     if len(df_a) != len(df_b):
@@ -44,15 +48,74 @@ def compare_csv(a, b, header=None, sep=";"):
     if diff_rows_count > 0:
         print(f'{diff_rows_count}/{len(df_a)} rows have significant differences')
         df_diff = df_a - df_b
-        # Filter out rows that match
-        df_diff = df_diff.loc[(
-            df_diff >= SIGNIFICANT_DIFFERENCE_THRESHOLD).any(axis=1)]
-        # print('Differences below')
-        # print('... as percentage')
-        # df_diff = 100 * df_diff / df_a
-        # print(df_diff)
+        if len(df_diff) > 0 and np.max(df_diff.values) > max_diff:
+            max_diff = np.max(df_diff.values)
+            max_diff_idx = np.argmax(df_diff.values)
+            max_diff_row = int(max_diff_idx / len(df_diff.columns))
+            max_diff_col = max_diff_idx % len(df_diff.columns)
+            # Just making sure that the indexing logic is correct
+            assert (max_diff - (df_a.values[max_diff_row, max_diff_col] -
+                    df_b.values[max_diff_row, max_diff_col] < 1e-10))
+            max_diff_col_name = df_a.columns[max_diff_col]
+            max_diff_debug_info = f'Maximum difference {max_diff} ({round(100* max_diff / df_a.values[max_diff_row,max_diff_col])}%)'
+            max_diff_debug_info += f' was in ..._{a.name.split("_")[-1]} at row {max_diff_row+1} and column {max_diff_col+1} ({max_diff_col_name})'
+            # max_diff_debug_info += f', {df_a.values[max_diff_row,max_diff_col]} != {df_b.values[max_diff_row,max_diff_col]}'
+
+        print('Differences below')
+        # Filter out rows that match and sort (show values with largest absolute values)
+        print(df_diff.loc[diff_rows_mask].sort_values(list(df_diff.columns)))
+
     else:
         print('Equal')
+
+
+def compare_csv(a, b, header=None, sep=";"):
+
+    def read_csv(f):
+        df = pd.read_csv(f, header=header, sep=sep)
+        return df.dropna(axis=1)
+
+    compare_df(a, b, read_csv)
+
+
+def compare_vtk(a, b, fields=['velocity']):
+    def get_vtk_dataset_type(filename):
+        dataset_type = None
+        for line in Path(filename).read_text().splitlines():
+            if line.startswith('DATASET'):
+                dataset_type = line[7:].strip().upper()
+        return dataset_type
+
+    if get_vtk_dataset_type(a) != get_vtk_dataset_type(b):
+        print(
+            f'VTK dataset types do not match ({str(a)}, {str(b)})', file=sys.stderr)
+        exit(1)
+    if get_vtk_dataset_type(a) != 'STRUCTURED_GRID':
+        print('Currently, only VTK dataset type STRUCTURED_GRID is supported.', file=sys.stderr)
+        exit(1)
+
+    def read_vtk(filename):
+        reader = vtk.vtkStructuredGridReader()
+        reader.SetFileName(filename)
+        reader.ReadAllScalarsOn()
+        reader.ReadAllVectorsOn()
+        reader.Update()
+        vtk_data = reader.GetOutput().GetCellData()
+        df_data = {}
+        for i in range(vtk_data.GetNumberOfArrays()):
+            column = vtk_data.GetArrayName(i)
+            array = vtk_np.vtk_to_numpy(vtk_data.GetArray(i))
+            if len(array.shape) == 1:
+                df_data[column] = array
+            elif len(array.shape) == 2:
+                for i in range(array.shape[1]):
+                    df_data[f'{column}_{i}'] = array[:, i]
+            else:
+                raise NotImplementedError(
+                    'VTK array with more than 2 dimensions')
+        return pd.DataFrame(df_data)
+
+    compare_df(a, b, read_vtk)
 
 
 def join_dicts(a, b):
@@ -61,10 +124,14 @@ def join_dicts(a, b):
     joined = {}
     for k in list(a.keys()):
         if k in b:
+            if a[k].name.split('_')[0] != b[k].name.split('_')[0]:
+                print(
+                    f'Prefix out output files does not match! ({str(a[k])}, {str(b[k])})', file=sys.stderr)
+                exit(1)
             joined[k] = (a[k], b[k])
             a.pop(k)
             b.pop(k)
-    return joined, a, b
+    return joined, list(a.values()) + list(b.values())
 
 
 def get_output_files(output_dir, file_extension):
@@ -73,19 +140,20 @@ def get_output_files(output_dir, file_extension):
 
 file_type_to_comparator = {
     ".csv": compare_csv,
-    ".vtk": None
+    ".vtk": compare_vtk,
 }
 
 for e in file_type_to_comparator:
+    max_diff = 0
+    max_diff_debug_info = f'All pairs of {e} files were equal'
     if file_type_to_comparator[e] is None:
-        print(f"No comparator set up for {e} files", file=sys.stderr)
+        print(f"No comparator set up for {e} files\n", file=sys.stderr)
         continue
     output_files_a = get_output_files(output_dir_a, e)
     output_files_b = get_output_files(output_dir_b, e)
 
-    output_file_pairs, unpaired_a, unpaired_b = join_dicts(
+    output_file_pairs, unpaired = join_dicts(
         output_files_a, output_files_b)
-    unpaired = list(unpaired_a.values()) + list(unpaired_b.values())
     if len(unpaired) > 0:
         print("Could not pair files:", file=sys.stderr)
         for f in unpaired:
@@ -96,5 +164,7 @@ for e in file_type_to_comparator:
 
     for k in keys:
         print('..._', k, sep='')
-        compare_csv(*output_file_pairs[k])
+        file_type_to_comparator[e](*output_file_pairs[k])
         print()
+
+    print(max_diff_debug_info, end='\n\n')
