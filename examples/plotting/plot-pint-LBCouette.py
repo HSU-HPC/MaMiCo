@@ -4,6 +4,8 @@
 Used to create Couette flow profile plots (average X-vel over simulation time) for a time-parallel simulation.
 Plots several PinT iterations in a single plot, can be used to show convergence.
 
+Usage: MaMiCo/build> ../examples/plotting/plot-pint-LBCouette.py
+
 Assumptions:
 - this file is in examples/plotting
 - there is VTK output from a PinT Couette flow scenario in build
@@ -12,6 +14,9 @@ Assumptions:
 	LBCouette_r<RANK>_c<CYCLE>_i<ITERATION>.vtk for F
 - No assumptions about total number of ranks, cycles or iterations
 - No assumptions about Couette config (wall velocity, viscosity, etc.)
+
+Output will be written to current working directory. Output file name contains total number of solver modes, total number
+of MPI ranks, total number of coupling cycles, total number of PinT iterations in data plotted. 
 """
 __author__ = "Piet"
 
@@ -120,7 +125,9 @@ def plot_all(metadata, data):
 	plt.legend()
 	plt.xlabel("Coupling cycle")
 	plt.ylabel("Average velocity")
-	plt.savefig('pint.png')
+	filename = ('pint' + '_M' + str(len(metadata['modes'])) + '_R' + str(len(metadata['ranks'])) + 
+		'_C' + str(len(metadata['cycles'])) + '_I' + str(len(metadata['iterations'])) + '.png')
+	plt.savefig(filename)
 	plt.show()
 
 def main():

@@ -1,7 +1,7 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder
 
-template <unsigned int dim> void coupling::filtering::NLM<dim>::operator()() {
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> void coupling::filtering::NLM<dim, scope...>::operator()() {
 #ifdef NLM_DEBUG
   std::cout << "    NLM: called operator()" << std::endl;
 #endif
@@ -12,7 +12,7 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::operator()() {
   increment_time();
 }
 
-template <unsigned int dim> void coupling::filtering::NLM<dim>::save_data() {
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> void coupling::filtering::NLM<dim, scope...>::save_data() {
   for (unsigned int i = 0; i < this->_inputCells.size(); ++i) {
     using namespace coupling::indexing;
     CellIndex_T idx{CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>{i}};
@@ -28,7 +28,7 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::save_data() {
   }
 }
 
-template <unsigned int dim> void coupling::filtering::NLM<dim>::update_patchfield() {
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> void coupling::filtering::NLM<dim, scope...>::update_patchfield() {
   for (auto idx : _innerCellIndices) {
     auto idx_inner = (tarch::la::Vector<dim, unsigned int>)(idx.get()) - tarch::la::Vector<dim, unsigned int>{1};
     if (_cycleCounter > _t)
@@ -38,7 +38,7 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::update_patchfiel
   }
 }
 
-template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> void coupling::filtering::NLM<dim, scope...>::denoise() {
   // counter for adaptive parameter modification
   int cnt_sigsq = 0, cnt_hsq = 0, cnt_total = 0;
   for (auto const& idx : _innerCellIndices) {
@@ -110,8 +110,9 @@ template <unsigned int dim> void coupling::filtering::NLM<dim>::denoise() {
   }
 }
 
-template <unsigned int dim>
-std::vector<tarch::la::Vector<dim, int>> coupling::filtering::NLM<dim>::compute_boundary_neighbors(const tarch::la::Vector<dim, unsigned int>& idx_inner) {
+template <unsigned int dim, coupling::indexing::IndexTrait... scope>
+std::vector<tarch::la::Vector<dim, int>>
+coupling::filtering::NLM<dim, scope...>::compute_boundary_neighbors(const tarch::la::Vector<dim, unsigned int>& idx_inner) {
   auto domainSize = CellIndex_T::numberCellsInDomain;
   std::vector<tarch::la::Vector<dim, int>> res_offset;
   res_offset.reserve(1 << dim); // max this many neighbors are possible
@@ -151,7 +152,7 @@ std::vector<tarch::la::Vector<dim, int>> coupling::filtering::NLM<dim>::compute_
   return res_offset; // (implicit std::move here)
 }
 
-template <unsigned int dim> void coupling::filtering::NLM<dim>::increment_time() {
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> void coupling::filtering::NLM<dim, scope...>::increment_time() {
   _cycleCounter++;
   _t = _cycleCounter % _timeWindowSize;
 }

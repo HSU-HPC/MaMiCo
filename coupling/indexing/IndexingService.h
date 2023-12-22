@@ -7,9 +7,6 @@
 #include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/paralleltopology/ParallelTopologyFactory.h"
 
-// Include CellIndex template class definition
-#include "CellIndex.h"
-
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -18,6 +15,15 @@ namespace coupling {
 namespace indexing {
 
 template <unsigned int dim> class IndexingService;
+
+}
+} // namespace coupling
+
+// Include CellIndex template class definition
+#include "CellIndex.h"
+
+namespace coupling {
+namespace indexing {
 
 template <unsigned int dim>
 std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex,
@@ -29,13 +35,7 @@ std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCel
 // Include non-member functions operating on indexes
 #include "Operations.h"
 
-// enable/disable tests
-// #define TEST_INDEXING
-
-#ifdef TEST_INDEXING
-// Inlcude index tests
-#include "Testing.h"
-#endif
+class IndexingServiceTest;
 
 /**
  * Singleton service class initialising lower and upper boundaries of all
@@ -143,6 +143,10 @@ public:
     return _rank;
   }
 
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  bool isInitialized() const { return _isInitialized; }
+#endif
+
 private:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   /**
@@ -160,4 +164,5 @@ private:
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   bool _isInitialized = false;
 #endif
+  friend IndexingServiceTest;
 };

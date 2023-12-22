@@ -12,6 +12,13 @@ CellIndex<dim, traits...>::operator CellIndex<dim, converted_traits...>() const 
     return CellIndex{_index};
   }
 
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if (!IndexingService<dim>::getInstance().isInitialized()) {
+    throw std::runtime_error(std::string("coupling::indexing::CellIndex::operator CellIndex(): IndexingService not initialized! (I.e. you attempted to convert "
+                                         "indices before defining their domains)"));
+  }
+#endif
+
   // conversion: non-BaseIndex -> BaseIndex
   if constexpr (std::is_same_v<CellIndex<dim, converted_traits...>, BaseIndex<dim>>) {
     // convert to vector if neccessary, then add offset, then construct a
