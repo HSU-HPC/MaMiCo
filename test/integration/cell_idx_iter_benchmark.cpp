@@ -91,7 +91,7 @@ private:
       exit(EXIT_FAILURE);
     }
 
-    fname = fname = "mamicoconf.xml.tmp." + std::to_string(_rank);
+    fname = "mamicoconf.xml.tmp." + std::to_string(_rank);
     file.open(fname.c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CellIdxIterBench: Could not open file " << fname << "!" << std::endl;
