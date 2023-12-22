@@ -29,6 +29,8 @@ jobs:
         doxyfile-path: "./Doxyfile" # default is ./Doxyfile
         # Working directory
         working-directory: "." # default is .
+        # Dependency for creating UML class/collaboration diagrams
+        additional-packages: graphviz
     
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
