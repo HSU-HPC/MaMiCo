@@ -36,23 +36,6 @@ public:
   using T14 = CellIndex<3, Trait::local, Trait::md2macro, Trait::noGhost>;
   using T15 = CellIndex<3, Trait::vector, Trait::local, Trait::md2macro, Trait::noGhost>;
 
-  void setUp() {
-    _rank = 0;
-    _size = 1;
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_size(MPI_COMM_WORLD, &_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
-#endif
-
-    tarch::la::Vector<3, unsigned int> numberProcesses{(unsigned int)_size, 1, 1};
-    if (_size == 4)
-      numberProcesses = {2, 2, 1};
-
-    IndexingService<3>::getInstance().init({12}, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
-  }
-
-  void tearDown() { IndexingService<3>::getInstance().finalize(); }
-
   void testAllConversions() {
     _conversionsTested = 0;
     testAll<Testmode::conversion>();
@@ -72,22 +55,27 @@ public:
   }
 
   template <Testmode mode> void testAll() {
-    runtests<mode, T00>();
-    runtests<mode, T01>();
-    runtests<mode, T02>();
-    runtests<mode, T03>();
-    runtests<mode, T04>();
-    runtests<mode, T05>();
-    runtests<mode, T06>();
-    runtests<mode, T07>();
-    runtests<mode, T08>();
-    runtests<mode, T09>();
-    runtests<mode, T10>();
-    runtests<mode, T11>();
-    runtests<mode, T12>();
-    runtests<mode, T13>();
-    runtests<mode, T14>();
-    runtests<mode, T15>();
+    // Simulate size = 4 MPI ranks, even if executed sequentially
+    for (_rank = 0; _rank < 4; _rank++) {
+      IndexingService<3>::getInstance().init({12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, _rank);
+      runtests<mode, T00>();
+      runtests<mode, T01>();
+      runtests<mode, T02>();
+      runtests<mode, T03>();
+      runtests<mode, T04>();
+      runtests<mode, T05>();
+      runtests<mode, T06>();
+      runtests<mode, T07>();
+      runtests<mode, T08>();
+      runtests<mode, T09>();
+      runtests<mode, T10>();
+      runtests<mode, T11>();
+      runtests<mode, T12>();
+      runtests<mode, T13>();
+      runtests<mode, T14>();
+      runtests<mode, T15>();
+      IndexingService<3>::getInstance().finalize();
+    }
   }
 
   template <Testmode mode, class T_in> void runtests() {
@@ -147,8 +135,9 @@ public:
   }
 
   template <class T> void testLoop() {
-    tearDown();
-    IndexingService<3>::getInstance().init({12}, {(unsigned int)_size, 1, 1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+    // We want a different domain decomposition here (to test empty domains), so we have to set up that
+    IndexingService<3>::getInstance().finalize();
+    IndexingService<3>::getInstance().init({12}, {4, 1, 1}, coupling::paralleltopology::XYZ, 3, _rank);
 
     unsigned int count = 0;
     T foo;
@@ -169,8 +158,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(count, T::linearNumberCellsInDomain);
     _conversionsTested++;
 
-    tearDown();
-    setUp();
+    // Cleanup (in case other tests follow later after calling this function) / reset to previous state
+    IndexingService<3>::getInstance().finalize();
+    IndexingService<3>::getInstance().init({12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, _rank);
   }
 
   void testOperatorStream() {
@@ -201,7 +191,7 @@ public:
   }
 
 private:
-  int _size, _rank;
+  unsigned int _rank;
   int _conversionsTested;
 };
 
