@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -93,9 +93,9 @@
 <a name="31"><span class="lineNum">      31 </span>            :    *  @param globalNumberMacroscopicCells the total number of macroscopic cells</a>
 <a name="32"><span class="lineNum">      32 </span>            :    *  @param outerRegion defines, how many cell layers will be sent to the macro</a>
 <a name="33"><span class="lineNum">      33 </span>            :    * solver */</a>
-<a name="34"><span class="lineNum">      34 </span><span class="lineCov">        228 :   CouetteSolverInterface(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells, unsigned int outerRegion = 1)</span></a>
-<a name="35"><span class="lineNum">      35 </span><span class="lineCov">        228 :       : coupling::interface::MacroscopicSolverInterface&lt;dim&gt;(), _outerRegion(outerRegion), _globalNumberMacroscopicCells(globalNumberMacroscopicCells) {</span></a>
-<a name="36"><span class="lineNum">      36 </span><span class="lineCov">        228 :   }</span></a>
+<a name="34"><span class="lineNum">      34 </span><span class="lineCov">        644 :   CouetteSolverInterface(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells, unsigned int outerRegion = 1)</span></a>
+<a name="35"><span class="lineNum">      35 </span><span class="lineCov">        644 :       : coupling::interface::MacroscopicSolverInterface&lt;dim&gt;(), _outerRegion(outerRegion), _globalNumberMacroscopicCells(globalNumberMacroscopicCells) {</span></a>
+<a name="36"><span class="lineNum">      36 </span><span class="lineCov">        644 :   }</span></a>
 <a name="37"><span class="lineNum">      37 </span>            : </a>
 <a name="38"><span class="lineNum">      38 </span>            :   /** @brief a dummy destructor */</a>
 <a name="39"><span class="lineNum">      39 </span><span class="lineNoCov">          0 :   virtual ~CouetteSolverInterface() {</span></a>
@@ -109,12 +109,12 @@
 <a name="47"><span class="lineNum">      47 </span>            :    *  @param globalCellIndex global dimensioned cell index to check for</a>
 <a name="48"><span class="lineNum">      48 </span>            :    *  @returns a bool, which indicates if a cell will be received (true) or not</a>
 <a name="49"><span class="lineNum">      49 </span>            :    * (false) */</a>
-<a name="50"><span class="lineNum">      50 </span><span class="lineCov">     376168 :   virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector&lt;dim, unsigned int&gt; globalCellIndex) {</span></a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineCov">     376168 :     bool recv = true;</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">    1504672 :     for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="53"><span class="lineNum">      53 </span><span class="lineCov">    1128504 :       recv = recv &amp;&amp; (globalCellIndex[d] &gt; _outerRegion) &amp;&amp; (globalCellIndex[d] &lt; _globalNumberMacroscopicCells[d] + 1 - _outerRegion);</span></a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineCov">    1079208 :   virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector&lt;dim, unsigned int&gt; globalCellIndex) {</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">    1079208 :     bool recv = true;</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">    4316832 :     for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="53"><span class="lineNum">      53 </span><span class="lineCov">    3237624 :       recv = recv &amp;&amp; (globalCellIndex[d] &gt; _outerRegion) &amp;&amp; (globalCellIndex[d] &lt; _globalNumberMacroscopicCells[d] + 1 - _outerRegion);</span></a>
 <a name="54"><span class="lineNum">      54 </span>            :     }</a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineCov">     376168 :     return recv;</span></a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineCov">    1079208 :     return recv;</span></a>
 <a name="56"><span class="lineNum">      56 </span>            :   }</a>
 <a name="57"><span class="lineNum">      57 </span>            : </a>
 <a name="58"><span class="lineNum">      58 </span>            :   /** send all macroscopic cell data within a boundary strip to MD. Only send</a>

@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">5</td>
@@ -113,9 +113,9 @@
 <a name="51"><span class="lineNum">      51 </span>            :  */</a>
 <a name="52"><span class="lineNum">      52 </span>            : template &lt;unsigned int dim&gt; class coupling::indexing::IndexingService {</a>
 <a name="53"><span class="lineNum">      53 </span>            : public:</a>
-<a name="54"><span class="lineNum">      54 </span><span class="lineCov">    4600459 :   static IndexingService&amp; getInstance() {</span></a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineCov">    4600459 :     static IndexingService singleton{};</span></a>
-<a name="56"><span class="lineNum">      56 </span><span class="lineCov">    4600459 :     return singleton;</span></a>
+<a name="54"><span class="lineNum">      54 </span><span class="lineCov">   16970075 :   static IndexingService&amp; getInstance() {</span></a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineCov">   16970075 :     static IndexingService singleton{};</span></a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineCov">   16970075 :     return singleton;</span></a>
 <a name="57"><span class="lineNum">      57 </span>            :   }</a>
 <a name="58"><span class="lineNum">      58 </span>            : </a>
 <a name="59"><span class="lineNum">      59 </span>            :   void init(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells, tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,</a>
@@ -166,11 +166,11 @@
 <a name="104"><span class="lineNum">     104 </span>            : #endif</a>
 <a name="105"><span class="lineNum">     105 </span>            :   );</a>
 <a name="106"><span class="lineNum">     106 </span>            : </a>
-<a name="107"><span class="lineNum">     107 </span><span class="lineCov">        216 :   void finalize() {</span></a>
+<a name="107"><span class="lineNum">     107 </span><span class="lineCov">        632 :   void finalize() {</span></a>
 <a name="108"><span class="lineNum">     108 </span>            : #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
-<a name="109"><span class="lineNum">     109 </span><span class="lineCov">        216 :     _isInitialized = false;</span></a>
+<a name="109"><span class="lineNum">     109 </span><span class="lineCov">        632 :     _isInitialized = false;</span></a>
 <a name="110"><span class="lineNum">     110 </span>            : #endif</a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineCov">        216 :   }</span></a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineCov">        632 :   }</span></a>
 <a name="112"><span class="lineNum">     112 </span>            : </a>
 <a name="113"><span class="lineNum">     113 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario</a>
 <a name="114"><span class="lineNum">     114 </span>            :   /**</a>
@@ -206,7 +206,7 @@
 <a name="144"><span class="lineNum">     144 </span>            :   }</a>
 <a name="145"><span class="lineNum">     145 </span>            : </a>
 <a name="146"><span class="lineNum">     146 </span>            : #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
-<a name="147"><span class="lineNum">     147 </span><span class="lineCov">    4598296 :   bool isInitialized() const { return _isInitialized; }</span></a>
+<a name="147"><span class="lineNum">     147 </span><span class="lineCov">   16967080 :   bool isInitialized() const { return _isInitialized; }</span></a>
 <a name="148"><span class="lineNum">     148 </span>            : #endif</a>
 <a name="149"><span class="lineNum">     149 </span>            : </a>
 <a name="150"><span class="lineNum">     150 </span>            : private:</a>

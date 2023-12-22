@@ -31,13 +31,13 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">328</td>
-            <td class="headerCovTableEntry">408</td>
-            <td class="headerCovTableEntryMed">80.4 %</td>
+            <td class="headerCovTableEntry">320</td>
+            <td class="headerCovTableEntry">395</td>
+            <td class="headerCovTableEntryMed">81.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">29</td>
@@ -147,13 +147,13 @@
 <a name="85"><span class="lineNum">      85 </span>            :     omp_set_num_threads(numThreads);</a>
 <a name="86"><span class="lineNum">      86 </span>            : #endif</a>
 <a name="87"><span class="lineNum">      87 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="88"><span class="lineNum">      88 </span><span class="lineCov">         29 :     std::cout &lt;&lt; &quot;Domain size=&quot; &lt;&lt; _domainSizeX &lt;&lt; &quot;,&quot; &lt;&lt; _domainSizeY &lt;&lt; &quot;,&quot; &lt;&lt; _domainSizeZ &lt;&lt; std::endl;</span></a>
-<a name="89"><span class="lineNum">      89 </span><span class="lineCov">         29 :     std::cout &lt;&lt; &quot;tau=&quot; &lt;&lt; 1.0 / _omega &lt;&lt; std::endl;</span></a>
-<a name="90"><span class="lineNum">      90 </span><span class="lineCov">         29 :     std::cout &lt;&lt; &quot;wallVelocity=&quot; &lt;&lt; _wallVelocity &lt;&lt; std::endl;</span></a>
-<a name="91"><span class="lineNum">      91 </span><span class="lineCov">        667 :     for (int z = 0; z &lt; _domainSizeZ + 2; z++) {</span></a>
-<a name="92"><span class="lineNum">      92 </span><span class="lineCov">      14674 :       for (int y = 0; y &lt; _domainSizeY + 2; y++) {</span></a>
-<a name="93"><span class="lineNum">      93 </span><span class="lineCov">     322828 :         for (int x = 0; x &lt; _domainSizeX + 2; x++) {</span></a>
-<a name="94"><span class="lineNum">      94 </span><span class="lineCov">     308792 :           std::cout &lt;&lt; x &lt;&lt; &quot;,&quot; &lt;&lt; y &lt;&lt; &quot;,&quot; &lt;&lt; z &lt;&lt; &quot;FLAG=&quot; &lt;&lt; _flag[get(x, y, z)] &lt;&lt; std::endl;</span></a>
+<a name="88"><span class="lineNum">      88 </span>            :     std::cout &lt;&lt; &quot;Domain size=&quot; &lt;&lt; _domainSizeX &lt;&lt; &quot;,&quot; &lt;&lt; _domainSizeY &lt;&lt; &quot;,&quot; &lt;&lt; _domainSizeZ &lt;&lt; std::endl;</a>
+<a name="89"><span class="lineNum">      89 </span>            :     std::cout &lt;&lt; &quot;tau=&quot; &lt;&lt; 1.0 / _omega &lt;&lt; std::endl;</a>
+<a name="90"><span class="lineNum">      90 </span>            :     std::cout &lt;&lt; &quot;wallVelocity=&quot; &lt;&lt; _wallVelocity &lt;&lt; std::endl;</a>
+<a name="91"><span class="lineNum">      91 </span>            :     for (int z = 0; z &lt; _domainSizeZ + 2; z++) {</a>
+<a name="92"><span class="lineNum">      92 </span>            :       for (int y = 0; y &lt; _domainSizeY + 2; y++) {</a>
+<a name="93"><span class="lineNum">      93 </span>            :         for (int x = 0; x &lt; _domainSizeX + 2; x++) {</a>
+<a name="94"><span class="lineNum">      94 </span>            :           std::cout &lt;&lt; x &lt;&lt; &quot;,&quot; &lt;&lt; y &lt;&lt; &quot;,&quot; &lt;&lt; z &lt;&lt; &quot;FLAG=&quot; &lt;&lt; _flag[get(x, y, z)] &lt;&lt; std::endl;</a>
 <a name="95"><span class="lineNum">      95 </span>            :         }</a>
 <a name="96"><span class="lineNum">      96 </span>            :       }</a>
 <a name="97"><span class="lineNum">      97 </span>            :     }</a>
@@ -279,14 +279,14 @@
 <a name="217"><span class="lineNum">     217 </span><span class="lineNoCov">          0 :       globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;</span></a>
 <a name="218"><span class="lineNum">     218 </span><span class="lineNoCov">          0 :       globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;</span></a>
 <a name="219"><span class="lineNum">     219 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="220"><span class="lineNum">     220 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Process coords: &quot; &lt;&lt; _coords &lt;&lt; &quot;:  GlobalCellCoords for index &quot; &lt;&lt; indexConversion.getGlobalVectorCellIndex(recvIndices[i]) &lt;&lt; &quot;: &quot;</span></a>
-<a name="221"><span class="lineNum">     221 </span><span class="lineNoCov">          0 :                 &lt;&lt; globalCellCoords &lt;&lt; std::endl;</span></a>
+<a name="220"><span class="lineNum">     220 </span>            :       std::cout &lt;&lt; &quot;Process coords: &quot; &lt;&lt; _coords &lt;&lt; &quot;:  GlobalCellCoords for index &quot; &lt;&lt; indexConversion.getGlobalVectorCellIndex(recvIndices[i]) &lt;&lt; &quot;: &quot;</a>
+<a name="221"><span class="lineNum">     221 </span>            :                 &lt;&lt; globalCellCoords &lt;&lt; std::endl;</a>
 <a name="222"><span class="lineNum">     222 </span>            : #endif</a>
 <a name="223"><span class="lineNum">     223 </span><span class="lineNoCov">          0 :       const int index = get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);</span></a>
 <a name="224"><span class="lineNum">     224 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineNoCov">          0 :       if (_flag[index] != MD_BOUNDARY) {</span></a>
-<a name="226"><span class="lineNum">     226 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;ERROR LBCouetteSolver::setMDBoundaryValues(): Cell &quot; &lt;&lt; index &lt;&lt; &quot; is no MD boundary cell!&quot; &lt;&lt; std::endl;</span></a>
-<a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
+<a name="225"><span class="lineNum">     225 </span>            :       if (_flag[index] != MD_BOUNDARY) {</a>
+<a name="226"><span class="lineNum">     226 </span>            :         std::cout &lt;&lt; &quot;ERROR LBCouetteSolver::setMDBoundaryValues(): Cell &quot; &lt;&lt; index &lt;&lt; &quot; is no MD boundary cell!&quot; &lt;&lt; std::endl;</a>
+<a name="227"><span class="lineNum">     227 </span>            :         exit(EXIT_FAILURE);</a>
 <a name="228"><span class="lineNum">     228 </span>            :       }</a>
 <a name="229"><span class="lineNum">     229 </span>            : #endif</a>
 <a name="230"><span class="lineNum">     230 </span>            :       // set velocity value and pdfs in MD boundary cell (before streaming); the</a>
@@ -346,7 +346,7 @@
 <a name="284"><span class="lineNum">     284 </span><span class="lineCov">        900 :       vel[d] = _dx / _dt * _vel[3 * index + d];</span></a>
 <a name="285"><span class="lineNum">     285 </span>            :     }</a>
 <a name="286"><span class="lineNum">     286 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="287"><span class="lineNum">     287 </span><span class="lineCov">        300 :     std::cout &lt;&lt; &quot;Position &quot; &lt;&lt; pos &lt;&lt; &quot; corresponds to cell: &quot; &lt;&lt; coords &lt;&lt; &quot;; vel=&quot; &lt;&lt; vel &lt;&lt; std::endl;</span></a>
+<a name="287"><span class="lineNum">     287 </span>            :     std::cout &lt;&lt; &quot;Position &quot; &lt;&lt; pos &lt;&lt; &quot; corresponds to cell: &quot; &lt;&lt; coords &lt;&lt; &quot;; vel=&quot; &lt;&lt; vel &lt;&lt; std::endl;</a>
 <a name="288"><span class="lineNum">     288 </span>            : #endif</a>
 <a name="289"><span class="lineNum">     289 </span><span class="lineCov">        600 :     return vel;</span></a>
 <a name="290"><span class="lineNum">     290 </span>            :   }</a>

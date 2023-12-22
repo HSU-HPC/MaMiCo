@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">180</td>
+            <td class="headerCovTableEntry">169</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -159,7 +159,7 @@
 <a name="97"><span class="lineNum">      97 </span>            :     // finalize FS's filter vector</a>
 <a name="98"><span class="lineNum">      98 </span><span class="lineNoCov">          0 :     if (sequence-&gt;isModifiable()) {</span></a>
 <a name="99"><span class="lineNum">      99 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="100"><span class="lineNum">     100 </span><span class="lineNoCov">          0 :       sequence-&gt;printFilters();</span></a>
+<a name="100"><span class="lineNum">     100 </span>            :       sequence-&gt;printFilters();</a>
 <a name="101"><span class="lineNum">     101 </span>            : #endif</a>
 <a name="102"><span class="lineNum">     102 </span><span class="lineNoCov">          0 :       sequence-&gt;makeUnmodifiable();</span></a>
 <a name="103"><span class="lineNum">     103 </span>            :     }</a>
@@ -171,7 +171,7 @@
 <a name="109"><span class="lineNum">     109 </span><span class="lineNoCov">          0 :     (*sequence)();</span></a>
 <a name="110"><span class="lineNum">     110 </span>            : </a>
 <a name="111"><span class="lineNum">     111 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;FP: Done applying sequence &quot; &lt;&lt; sequence-&gt;getName() &lt;&lt; std::endl;</span></a>
+<a name="112"><span class="lineNum">     112 </span>            :     std::cout &lt;&lt; &quot;FP: Done applying sequence &quot; &lt;&lt; sequence-&gt;getName() &lt;&lt; std::endl;</a>
 <a name="113"><span class="lineNum">     113 </span>            : #endif</a>
 <a name="114"><span class="lineNum">     114 </span>            : </a>
 <a name="115"><span class="lineNum">     115 </span>            :     // If !isOutputToMacro() for all sequences, &quot;md&quot; must be our output. This is</a>
@@ -239,7 +239,7 @@
 <a name="177"><span class="lineNum">     177 </span>            :   // sequence-subnodes can be found in their respective initializer methods.</a>
 <a name="178"><span class="lineNum">     178 </span>            : </a>
 <a name="179"><span class="lineNum">     179 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="180"><span class="lineNum">     180 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot;FP: Config is valid!&quot; &lt;&lt; std::endl;</span></a>
+<a name="180"><span class="lineNum">     180 </span>            :   std::cout &lt;&lt; &quot;FP: Config is valid!&quot; &lt;&lt; std::endl;</a>
 <a name="181"><span class="lineNum">     181 </span>            : #endif</a>
 <a name="182"><span class="lineNum">     182 </span>            : </a>
 <a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :   return true;</span></a>
@@ -312,7 +312,7 @@
 <a name="250"><span class="lineNum">     250 </span><span class="lineNoCov">          0 :     if (inputNames.empty()) {</span></a>
 <a name="251"><span class="lineNum">     251 </span><span class="lineNoCov">          0 :       inputNames.push_back(&quot;md&quot;);</span></a>
 <a name="252"><span class="lineNum">     252 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="253"><span class="lineNum">     253 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;FP: Choosing default (md) input for sequence &quot; &lt;&lt; currSequenceNode-&gt;Value() &lt;&lt; std::endl;</span></a>
+<a name="253"><span class="lineNum">     253 </span>            :       std::cout &lt;&lt; &quot;FP: Choosing default (md) input for sequence &quot; &lt;&lt; currSequenceNode-&gt;Value() &lt;&lt; std::endl;</a>
 <a name="254"><span class="lineNum">     254 </span>            : #endif</a>
 <a name="255"><span class="lineNum">     255 </span>            :     }</a>
 <a name="256"><span class="lineNum">     256 </span>            : </a>
@@ -356,7 +356,7 @@
 <a name="294"><span class="lineNum">     294 </span>            :     }</a>
 <a name="295"><span class="lineNum">     295 </span>            : </a>
 <a name="296"><span class="lineNum">     296 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="297"><span class="lineNum">     297 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;FP: Creating new sequence or junction: Number of inputs found: &quot; &lt;&lt; inputCount &lt;&lt; std::endl;</span></a>
+<a name="297"><span class="lineNum">     297 </span>            :     std::cout &lt;&lt; &quot;FP: Creating new sequence or junction: Number of inputs found: &quot; &lt;&lt; inputCount &lt;&lt; std::endl;</a>
 <a name="298"><span class="lineNum">     298 </span>            : #endif</a>
 <a name="299"><span class="lineNum">     299 </span>            : </a>
 <a name="300"><span class="lineNum">     300 </span><span class="lineNoCov">          0 :     if (inputCount == 0)</span></a>
@@ -405,7 +405,7 @@
 <a name="343"><span class="lineNum">     343 </span>            :         // an option, std::insert does the same...</a>
 <a name="344"><span class="lineNum">     344 </span>            : </a>
 <a name="345"><span class="lineNum">     345 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="346"><span class="lineNum">     346 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;FP: Creating new sequence or junction: Size of inputCellVector: &quot; &lt;&lt; inputCellVector.size() &lt;&lt; std::endl;</span></a>
+<a name="346"><span class="lineNum">     346 </span>            :     std::cout &lt;&lt; &quot;FP: Creating new sequence or junction: Size of inputCellVector: &quot; &lt;&lt; inputCellVector.size() &lt;&lt; std::endl;</a>
 <a name="347"><span class="lineNum">     347 </span>            : #endif</a>
 <a name="348"><span class="lineNum">     348 </span>            : </a>
 <a name="349"><span class="lineNum">     349 </span>            :     // CREATE SEQUENCE/JUNCTION</a>
@@ -422,10 +422,10 @@
 <a name="360"><span class="lineNum">     360 </span><span class="lineNoCov">          0 :         inputSeqs[0]-&gt;addChildSequence(_sequences.back());</span></a>
 <a name="361"><span class="lineNum">     361 </span>            : </a>
 <a name="362"><span class="lineNum">     362 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="363"><span class="lineNum">     363 </span><span class="lineNoCov">          0 :       if (inputSeqs.size() == 1)</span></a>
-<a name="364"><span class="lineNum">     364 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;FP: &quot; &lt;&lt; _sequences.back()-&gt;getName() &lt;&lt; &quot; will use &quot; &lt;&lt; inputSeqs[0]-&gt;getName() &lt;&lt; &quot; as input.&quot; &lt;&lt; std::endl;</span></a>
+<a name="363"><span class="lineNum">     363 </span>            :       if (inputSeqs.size() == 1)</a>
+<a name="364"><span class="lineNum">     364 </span>            :         std::cout &lt;&lt; &quot;FP: &quot; &lt;&lt; _sequences.back()-&gt;getName() &lt;&lt; &quot; will use &quot; &lt;&lt; inputSeqs[0]-&gt;getName() &lt;&lt; &quot; as input.&quot; &lt;&lt; std::endl;</a>
 <a name="365"><span class="lineNum">     365 </span>            :       else</a>
-<a name="366"><span class="lineNum">     366 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;FP: &quot; &lt;&lt; _sequences.back()-&gt;getName() &lt;&lt; &quot; will use MD data as input.&quot; &lt;&lt; std::endl;</span></a>
+<a name="366"><span class="lineNum">     366 </span>            :         std::cout &lt;&lt; &quot;FP: &quot; &lt;&lt; _sequences.back()-&gt;getName() &lt;&lt; &quot; will use MD data as input.&quot; &lt;&lt; std::endl;</a>
 <a name="367"><span class="lineNum">     367 </span>            : #endif</a>
 <a name="368"><span class="lineNum">     368 </span><span class="lineNoCov">          0 :     } else if (asymmetrical) {</span></a>
 <a name="369"><span class="lineNum">     369 </span><span class="lineNoCov">          0 :       if (inputCount != 2)</span></a>
@@ -439,7 +439,7 @@
 <a name="377"><span class="lineNum">     377 </span>            : #endif</a>
 <a name="378"><span class="lineNum">     378 </span>            :                                                                                     filteredValues));</a>
 <a name="379"><span class="lineNum">     379 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="380"><span class="lineNum">     380 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;FP: &quot; &lt;&lt; _sequences.back()-&gt;getName() &lt;&lt; &quot; will use &quot; &lt;&lt; currSequenceNode-&gt;Attribute(&quot;input&quot;) &lt;&lt; &quot; as input.&quot; &lt;&lt; std::endl;</span></a>
+<a name="380"><span class="lineNum">     380 </span>            :       std::cout &lt;&lt; &quot;FP: &quot; &lt;&lt; _sequences.back()-&gt;getName() &lt;&lt; &quot; will use &quot; &lt;&lt; currSequenceNode-&gt;Attribute(&quot;input&quot;) &lt;&lt; &quot; as input.&quot; &lt;&lt; std::endl;</a>
 <a name="381"><span class="lineNum">     381 </span>            : #endif</a>
 <a name="382"><span class="lineNum">     382 </span>            : </a>
 <a name="383"><span class="lineNum">     383 </span>            :       // TODO handling of parent sequences once this becomes relevant for</a>
@@ -452,7 +452,7 @@
 <a name="390"><span class="lineNum">     390 </span>            : #endif</a>
 <a name="391"><span class="lineNum">     391 </span>            :                                                                            filteredValues));</a>
 <a name="392"><span class="lineNum">     392 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="393"><span class="lineNum">     393 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;FP: &quot; &lt;&lt; _sequences.back()-&gt;getName() &lt;&lt; &quot; will use &quot; &lt;&lt; currSequenceNode-&gt;Attribute(&quot;input&quot;) &lt;&lt; &quot; as input.&quot; &lt;&lt; std::endl;</span></a>
+<a name="393"><span class="lineNum">     393 </span>            :       std::cout &lt;&lt; &quot;FP: &quot; &lt;&lt; _sequences.back()-&gt;getName() &lt;&lt; &quot; will use &quot; &lt;&lt; currSequenceNode-&gt;Attribute(&quot;input&quot;) &lt;&lt; &quot; as input.&quot; &lt;&lt; std::endl;</a>
 <a name="394"><span class="lineNum">     394 </span>            : #endif</a>
 <a name="395"><span class="lineNum">     395 </span>            : </a>
 <a name="396"><span class="lineNum">     396 </span>            :       // TODO handling of parent sequences once this becomes relevant for</a>

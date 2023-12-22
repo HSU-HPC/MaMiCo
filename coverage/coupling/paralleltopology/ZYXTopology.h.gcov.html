@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntry">21</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -102,16 +102,16 @@
 <a name="40"><span class="lineNum">      40 </span>            : </a>
 <a name="41"><span class="lineNum">      41 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, unsigned int&gt; getProcessCoordinates(unsigned int rank) const {</span></a>
 <a name="42"><span class="lineNum">      42 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="43"><span class="lineNum">      43 </span><span class="lineNoCov">          0 :     unsigned int intNumberProcesses = _numberProcesses[0];</span></a>
-<a name="44"><span class="lineNum">      44 </span><span class="lineNoCov">          0 :     for (unsigned int d = 1; d &lt; dim; d++) {</span></a>
-<a name="45"><span class="lineNum">      45 </span><span class="lineNoCov">          0 :       intNumberProcesses = intNumberProcesses * _numberProcesses[d];</span></a>
+<a name="43"><span class="lineNum">      43 </span>            :     unsigned int intNumberProcesses = _numberProcesses[0];</a>
+<a name="44"><span class="lineNum">      44 </span>            :     for (unsigned int d = 1; d &lt; dim; d++) {</a>
+<a name="45"><span class="lineNum">      45 </span>            :       intNumberProcesses = intNumberProcesses * _numberProcesses[d];</a>
 <a name="46"><span class="lineNum">      46 </span>            :     }</a>
-<a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :     if ((rank &lt; _topologyOffset) || (rank &gt; _topologyOffset + intNumberProcesses - 1)) {</span></a>
-<a name="48"><span class="lineNum">      48 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Warning &quot;</span></a>
+<a name="47"><span class="lineNum">      47 </span>            :     if ((rank &lt; _topologyOffset) || (rank &gt; _topologyOffset + intNumberProcesses - 1)) {</a>
+<a name="48"><span class="lineNum">      48 </span>            :       std::cout &lt;&lt; &quot;Warning &quot;</a>
 <a name="49"><span class="lineNum">      49 </span>            :                    &quot;coupling::paralleltopology::ZYXTopology::&quot;</a>
 <a name="50"><span class="lineNum">      50 </span>            :                    &quot;getProcessCoordinates(): rank out of range!&quot;</a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Offset=&quot; &lt;&lt; _topologyOffset &lt;&lt; &quot;, rank=&quot; &lt;&lt; rank &lt;&lt; std::endl;</span></a>
+<a name="51"><span class="lineNum">      51 </span>            :                 &lt;&lt; std::endl;</a>
+<a name="52"><span class="lineNum">      52 </span>            :       std::cout &lt;&lt; &quot;Offset=&quot; &lt;&lt; _topologyOffset &lt;&lt; &quot;, rank=&quot; &lt;&lt; rank &lt;&lt; std::endl;</a>
 <a name="53"><span class="lineNum">      53 </span>            :     }</a>
 <a name="54"><span class="lineNum">      54 </span>            : #endif</a>
 <a name="55"><span class="lineNum">      55 </span><span class="lineNoCov">          0 :     tarch::la::Vector&lt;dim, unsigned int&gt; processCoordinates(0);</span></a>

@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">257</td>
@@ -176,9 +176,9 @@
 <a name="114"><span class="lineNum">     114 </span>            :   /**</a>
 <a name="115"><span class="lineNum">     115 </span>            :    * Constructors</a>
 <a name="116"><span class="lineNum">     116 </span>            :    */</a>
-<a name="117"><span class="lineNum">     117 </span><span class="lineCov">       6028 :   CellIndex() = default;</span></a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineCov">     489210 :   CellIndex(const CellIndex&amp; ci) = default;</span></a>
-<a name="119"><span class="lineNum">     119 </span><span class="lineCov">    3679072 :   CellIndex(const value_T&amp; i) : _index(i) {}</span></a>
+<a name="117"><span class="lineNum">     117 </span><span class="lineCov">       6412 :   CellIndex() = default;</span></a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineCov">    1955884 :   CellIndex(const CellIndex&amp; ci) = default;</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">   13560220 :   CellIndex(const value_T&amp; i) : _index(i) {}</span></a>
 <a name="120"><span class="lineNum">     120 </span>            : </a>
 <a name="121"><span class="lineNum">     121 </span>            :   /**</a>
 <a name="122"><span class="lineNum">     122 </span>            :    * Conversion function: Convert to CellIndex of same dim but different</a>
@@ -197,51 +197,51 @@
 <a name="135"><span class="lineNum">     135 </span>            :    *</a>
 <a name="136"><span class="lineNum">     136 </span>            :    * @return unsigned integer/vector representation of this index.</a>
 <a name="137"><span class="lineNum">     137 </span>            :    */</a>
-<a name="138"><span class="lineNum">     138 </span><span class="lineCov">   20230440 :   value_T get() const { return _index; } // TODO: why (value_T) cast?</span></a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineCov">   75428800 :   value_T get() const { return _index; } // TODO: why (value_T) cast?</span></a>
 <a name="139"><span class="lineNum">     139 </span>            : </a>
 <a name="140"><span class="lineNum">     140 </span>            :   /**</a>
 <a name="141"><span class="lineNum">     141 </span>            :    * Increments the index by one.</a>
 <a name="142"><span class="lineNum">     142 </span>            :    * Note that this does NOT increment indices in vector representation in all</a>
 <a name="143"><span class="lineNum">     143 </span>            :    * directions.</a>
 <a name="144"><span class="lineNum">     144 </span>            :    */</a>
-<a name="145"><span class="lineNum">     145 </span><span class="lineCov">     491628 :   CellIndex&amp; operator++() {</span></a>
+<a name="145"><span class="lineNum">     145 </span><span class="lineCov">    1670480 :   CellIndex&amp; operator++() {</span></a>
 <a name="146"><span class="lineNum">     146 </span>            :     if constexpr (std::is_same_v&lt;value_T, tarch::la::Vector&lt;dim, int&gt;&gt;) {</a>
-<a name="147"><span class="lineNum">     147 </span><span class="lineCov">     153466 :       ++_index[0];</span></a>
-<a name="148"><span class="lineNum">     148 </span><span class="lineCov">     153466 :       if (_index[0] == (int)numberCellsInDomain[0]) {</span></a>
-<a name="149"><span class="lineNum">     149 </span><span class="lineCov">      15786 :         _index[0] = 0;</span></a>
-<a name="150"><span class="lineNum">     150 </span><span class="lineCov">      15786 :         ++_index[1];</span></a>
-<a name="151"><span class="lineNum">     151 </span><span class="lineCov">      15786 :         if (_index[1] == (int)numberCellsInDomain[1]) {</span></a>
-<a name="152"><span class="lineNum">     152 </span><span class="lineCov">       1774 :           _index[1] = 0;</span></a>
+<a name="147"><span class="lineNum">     147 </span><span class="lineCov">     572812 :       ++_index[0];</span></a>
+<a name="148"><span class="lineNum">     148 </span><span class="lineCov">     572812 :       if (_index[0] == (int)numberCellsInDomain[0]) {</span></a>
+<a name="149"><span class="lineNum">     149 </span><span class="lineCov">      59724 :         _index[0] = 0;</span></a>
+<a name="150"><span class="lineNum">     150 </span><span class="lineCov">      59724 :         ++_index[1];</span></a>
+<a name="151"><span class="lineNum">     151 </span><span class="lineCov">      59724 :         if (_index[1] == (int)numberCellsInDomain[1]) {</span></a>
+<a name="152"><span class="lineNum">     152 </span><span class="lineCov">       6724 :           _index[1] = 0;</span></a>
 <a name="153"><span class="lineNum">     153 </span>            :           if constexpr (dim == 3)</a>
-<a name="154"><span class="lineNum">     154 </span><span class="lineCov">       1774 :             ++_index[2];</span></a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineCov">       6724 :             ++_index[2];</span></a>
 <a name="155"><span class="lineNum">     155 </span>            :         }</a>
 <a name="156"><span class="lineNum">     156 </span>            :       }</a>
 <a name="157"><span class="lineNum">     157 </span>            :     } else</a>
-<a name="158"><span class="lineNum">     158 </span><span class="lineCov">     338162 :       ++_index;</span></a>
+<a name="158"><span class="lineNum">     158 </span><span class="lineCov">    1097668 :       ++_index;</span></a>
 <a name="159"><span class="lineNum">     159 </span>            : </a>
-<a name="160"><span class="lineNum">     160 </span><span class="lineCov">     491628 :     return *this;</span></a>
+<a name="160"><span class="lineNum">     160 </span><span class="lineCov">    1670480 :     return *this;</span></a>
 <a name="161"><span class="lineNum">     161 </span>            :   }</a>
 <a name="162"><span class="lineNum">     162 </span>            :   /**</a>
 <a name="163"><span class="lineNum">     163 </span>            :    * Decrements the index by one.</a>
 <a name="164"><span class="lineNum">     164 </span>            :    * Note that this does NOT decrement indices in vector representation in all</a>
 <a name="165"><span class="lineNum">     165 </span>            :    * directions.</a>
 <a name="166"><span class="lineNum">     166 </span>            :    */</a>
-<a name="167"><span class="lineNum">     167 </span><span class="lineCov">     299488 :   CellIndex&amp; operator--() {</span></a>
+<a name="167"><span class="lineNum">     167 </span><span class="lineCov">     986880 :   CellIndex&amp; operator--() {</span></a>
 <a name="168"><span class="lineNum">     168 </span>            :     if constexpr (std::is_same_v&lt;value_T, tarch::la::Vector&lt;dim, int&gt;&gt;) {</a>
-<a name="169"><span class="lineNum">     169 </span><span class="lineCov">      59576 :       --_index[0];</span></a>
-<a name="170"><span class="lineNum">     170 </span><span class="lineCov">      59576 :       if (_index[0] &lt; 0) {</span></a>
-<a name="171"><span class="lineNum">     171 </span><span class="lineCov">       5760 :         _index[0] = numberCellsInDomain[0] - 1;</span></a>
-<a name="172"><span class="lineNum">     172 </span><span class="lineCov">       5760 :         --_index[1];</span></a>
-<a name="173"><span class="lineNum">     173 </span><span class="lineCov">       5760 :         if (_index[1] &lt; 0) {</span></a>
-<a name="174"><span class="lineNum">     174 </span><span class="lineCov">        608 :           _index[1] = numberCellsInDomain[1] - 1;</span></a>
+<a name="169"><span class="lineNum">     169 </span><span class="lineCov">     233192 :       --_index[0];</span></a>
+<a name="170"><span class="lineNum">     170 </span><span class="lineCov">     233192 :       if (_index[0] &lt; 0) {</span></a>
+<a name="171"><span class="lineNum">     171 </span><span class="lineCov">      22704 :         _index[0] = numberCellsInDomain[0] - 1;</span></a>
+<a name="172"><span class="lineNum">     172 </span><span class="lineCov">      22704 :         --_index[1];</span></a>
+<a name="173"><span class="lineNum">     173 </span><span class="lineCov">      22704 :         if (_index[1] &lt; 0) {</span></a>
+<a name="174"><span class="lineNum">     174 </span><span class="lineCov">       2432 :           _index[1] = numberCellsInDomain[1] - 1;</span></a>
 <a name="175"><span class="lineNum">     175 </span>            :           if constexpr (dim == 3)</a>
-<a name="176"><span class="lineNum">     176 </span><span class="lineCov">        608 :             --_index[2];</span></a>
+<a name="176"><span class="lineNum">     176 </span><span class="lineCov">       2432 :             --_index[2];</span></a>
 <a name="177"><span class="lineNum">     177 </span>            :         }</a>
 <a name="178"><span class="lineNum">     178 </span>            :       }</a>
 <a name="179"><span class="lineNum">     179 </span>            :     } else</a>
-<a name="180"><span class="lineNum">     180 </span><span class="lineCov">     239912 :       --_index;</span></a>
+<a name="180"><span class="lineNum">     180 </span><span class="lineCov">     753688 :       --_index;</span></a>
 <a name="181"><span class="lineNum">     181 </span>            : </a>
-<a name="182"><span class="lineNum">     182 </span><span class="lineCov">     299488 :     return *this;</span></a>
+<a name="182"><span class="lineNum">     182 </span><span class="lineCov">     986880 :     return *this;</span></a>
 <a name="183"><span class="lineNum">     183 </span>            :   }</a>
 <a name="184"><span class="lineNum">     184 </span>            : </a>
 <a name="185"><span class="lineNum">     185 </span>            :   /*</a>
@@ -251,9 +251,9 @@
 <a name="189"><span class="lineNum">     189 </span>            :    *</a>
 <a name="190"><span class="lineNum">     190 </span>            :    * @param CellIndex index to compare this index to</a>
 <a name="191"><span class="lineNum">     191 </span>            :    */</a>
-<a name="192"><span class="lineNum">     192 </span><span class="lineCov">     852680 :   bool operator==(const CellIndex&amp; i) const { return _index == i.get(); }</span></a>
-<a name="193"><span class="lineNum">     193 </span><span class="lineCov">     187832 :   bool operator!=(const CellIndex&amp; i) const { return not(i == *this); }</span></a>
-<a name="194"><span class="lineNum">     194 </span><span class="lineCov">     185696 :   bool operator&lt;(const CellIndex&amp; i) const { return convertToScalar&lt;dim, traits...&gt;(*this) &lt; convertToScalar&lt;dim, traits...&gt;(i); };</span></a>
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">    3119704 :   bool operator==(const CellIndex&amp; i) const { return _index == i.get(); }</span></a>
+<a name="193"><span class="lineNum">     193 </span><span class="lineCov">     679304 :   bool operator!=(const CellIndex&amp; i) const { return not(i == *this); }</span></a>
+<a name="194"><span class="lineNum">     194 </span><span class="lineCov">     536800 :   bool operator&lt;(const CellIndex&amp; i) const { return convertToScalar&lt;dim, traits...&gt;(*this) &lt; convertToScalar&lt;dim, traits...&gt;(i); };</span></a>
 <a name="195"><span class="lineNum">     195 </span>            :   bool operator&lt;=(const CellIndex&amp; i) const { return convertToScalar&lt;dim, traits...&gt;(*this) &lt;= convertToScalar&lt;dim, traits...&gt;(i); };</a>
 <a name="196"><span class="lineNum">     196 </span>            :   bool operator&gt;(const CellIndex&amp; i) const { return convertToScalar&lt;dim, traits...&gt;(*this) &gt; convertToScalar&lt;dim, traits...&gt;(i); };</a>
 <a name="197"><span class="lineNum">     197 </span>            :   bool operator&gt;=(const CellIndex&amp; i) const { return convertToScalar&lt;dim, traits...&gt;(*this) &gt;= convertToScalar&lt;dim, traits...&gt;(i); };</a>
@@ -262,21 +262,21 @@
 <a name="200"><span class="lineNum">     200 </span>            :    * Initialises all static members dependant only on upperBoundary and</a>
 <a name="201"><span class="lineNum">     201 </span>            :    * lowerBoundary</a>
 <a name="202"><span class="lineNum">     202 </span>            :    */</a>
-<a name="203"><span class="lineNum">     203 </span><span class="lineCov">       3616 :   static void setDomainParameters() {</span></a>
-<a name="204"><span class="lineNum">     204 </span><span class="lineCov">       3616 :     auto cellnum = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1};</span></a>
-<a name="205"><span class="lineNum">     205 </span><span class="lineCov">      14464 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
-<a name="206"><span class="lineNum">     206 </span><span class="lineCov">      10848 :       cellnum[d] = std::max(0, cellnum[d]);</span></a>
-<a name="207"><span class="lineNum">     207 </span><span class="lineCov">       3616 :     numberCellsInDomain = tarch::la::Vector&lt;dim, unsigned int&gt;{cellnum};</span></a>
+<a name="203"><span class="lineNum">     203 </span><span class="lineCov">      10272 :   static void setDomainParameters() {</span></a>
+<a name="204"><span class="lineNum">     204 </span><span class="lineCov">      10272 :     auto cellnum = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1};</span></a>
+<a name="205"><span class="lineNum">     205 </span><span class="lineCov">      41088 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
+<a name="206"><span class="lineNum">     206 </span><span class="lineCov">      30816 :       cellnum[d] = std::max(0, cellnum[d]);</span></a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineCov">      10272 :     numberCellsInDomain = tarch::la::Vector&lt;dim, unsigned int&gt;{cellnum};</span></a>
 <a name="208"><span class="lineNum">     208 </span>            : </a>
-<a name="209"><span class="lineNum">     209 </span><span class="lineCov">       3616 :     linearNumberCellsInDomain = 1;</span></a>
-<a name="210"><span class="lineNum">     210 </span><span class="lineCov">      14464 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineCov">      10848 :       linearNumberCellsInDomain *= numberCellsInDomain[d];</span></a>
+<a name="209"><span class="lineNum">     209 </span><span class="lineCov">      10272 :     linearNumberCellsInDomain = 1;</span></a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineCov">      41088 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
+<a name="211"><span class="lineNum">     211 </span><span class="lineCov">      30816 :       linearNumberCellsInDomain *= numberCellsInDomain[d];</span></a>
 <a name="212"><span class="lineNum">     212 </span>            : </a>
-<a name="213"><span class="lineNum">     213 </span><span class="lineCov">       3616 :     tarch::la::Vector&lt;dim, unsigned int&gt; divFactor{1};</span></a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineCov">      10848 :     for (unsigned int d = 1; d &lt; dim; d++)</span></a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineCov">       7232 :       divFactor[d] = divFactor[d - 1] * (numberCellsInDomain[d - 1]);</span></a>
-<a name="216"><span class="lineNum">     216 </span><span class="lineCov">       3616 :     divisionFactor = divFactor;</span></a>
-<a name="217"><span class="lineNum">     217 </span><span class="lineCov">       3616 :   }</span></a>
+<a name="213"><span class="lineNum">     213 </span><span class="lineCov">      10272 :     tarch::la::Vector&lt;dim, unsigned int&gt; divFactor{1};</span></a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineCov">      30816 :     for (unsigned int d = 1; d &lt; dim; d++)</span></a>
+<a name="215"><span class="lineNum">     215 </span><span class="lineCov">      20544 :       divFactor[d] = divFactor[d - 1] * (numberCellsInDomain[d - 1]);</span></a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineCov">      10272 :     divisionFactor = divFactor;</span></a>
+<a name="217"><span class="lineNum">     217 </span><span class="lineCov">      10272 :   }</span></a>
 <a name="218"><span class="lineNum">     218 </span>            : </a>
 <a name="219"><span class="lineNum">     219 </span>            :   /**</a>
 <a name="220"><span class="lineNum">     220 </span>            :    * Checks if a given index is within the domain between this the lower and</a>
@@ -286,15 +286,15 @@
 <a name="224"><span class="lineNum">     224 </span>            :    * @return true iff i is within the domain of this CellIndex template</a>
 <a name="225"><span class="lineNum">     225 </span>            :    * specialisation.</a>
 <a name="226"><span class="lineNum">     226 </span>            :    */</a>
-<a name="227"><span class="lineNum">     227 </span><span class="lineCov">     976608 :   static bool contains(const coupling::indexing::BaseIndex&lt;dim&gt;&amp; index) {</span></a>
-<a name="228"><span class="lineNum">     228 </span><span class="lineCov">    2638240 :     for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="229"><span class="lineNum">     229 </span><span class="lineCov">    2163424 :       if (index.get()[d] &lt; CellIndex::lowerBoundary.get()[d])</span></a>
-<a name="230"><span class="lineNum">     230 </span><span class="lineCov">     250864 :         return false;</span></a>
-<a name="231"><span class="lineNum">     231 </span><span class="lineCov">    1912560 :       if (index.get()[d] &gt; CellIndex::upperBoundary.get()[d])</span></a>
-<a name="232"><span class="lineNum">     232 </span><span class="lineCov">     250928 :         return false;</span></a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineCov">    3906432 :   static bool contains(const coupling::indexing::BaseIndex&lt;dim&gt;&amp; index) {</span></a>
+<a name="228"><span class="lineNum">     228 </span><span class="lineCov">   10552960 :     for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="229"><span class="lineNum">     229 </span><span class="lineCov">    8653696 :       if (index.get()[d] &lt; CellIndex::lowerBoundary.get()[d])</span></a>
+<a name="230"><span class="lineNum">     230 </span><span class="lineCov">    1003456 :         return false;</span></a>
+<a name="231"><span class="lineNum">     231 </span><span class="lineCov">    7650240 :       if (index.get()[d] &gt; CellIndex::upperBoundary.get()[d])</span></a>
+<a name="232"><span class="lineNum">     232 </span><span class="lineCov">    1003712 :         return false;</span></a>
 <a name="233"><span class="lineNum">     233 </span>            :     }</a>
 <a name="234"><span class="lineNum">     234 </span>            : </a>
-<a name="235"><span class="lineNum">     235 </span><span class="lineCov">     474816 :     return true;</span></a>
+<a name="235"><span class="lineNum">     235 </span><span class="lineCov">    1899264 :     return true;</span></a>
 <a name="236"><span class="lineNum">     236 </span>            :   }</a>
 <a name="237"><span class="lineNum">     237 </span>            : </a>
 <a name="238"><span class="lineNum">     238 </span>            :   /**</a>
@@ -330,16 +330,16 @@
 <a name="268"><span class="lineNum">     268 </span>            : </a>
 <a name="269"><span class="lineNum">     269 </span>            :   class IndexIterator {</a>
 <a name="270"><span class="lineNum">     270 </span>            :   public:</a>
-<a name="271"><span class="lineNum">     271 </span><span class="lineCov">        432 :     IndexIterator(CellIndex x) : _idx(x) {}</span></a>
-<a name="272"><span class="lineNum">     272 </span><span class="lineCov">        212 :     IndexIterator(const IndexIterator&amp; a) : _idx(a._idx) {}</span></a>
+<a name="271"><span class="lineNum">     271 </span><span class="lineCov">       1584 :     IndexIterator(CellIndex x) : _idx(x) {}</span></a>
+<a name="272"><span class="lineNum">     272 </span><span class="lineCov">        776 :     IndexIterator(const IndexIterator&amp; a) : _idx(a._idx) {}</span></a>
 <a name="273"><span class="lineNum">     273 </span>            : </a>
-<a name="274"><span class="lineNum">     274 </span><span class="lineCov">     187616 :     CellIndex&amp; operator*() { return _idx; }</span></a>
+<a name="274"><span class="lineNum">     274 </span><span class="lineCov">     678512 :     CellIndex&amp; operator*() { return _idx; }</span></a>
 <a name="275"><span class="lineNum">     275 </span>            :     CellIndex* operator-&gt;() { return &amp;_idx; }</a>
 <a name="276"><span class="lineNum">     276 </span>            : </a>
 <a name="277"><span class="lineNum">     277 </span>            :     // Prefix increment</a>
-<a name="278"><span class="lineNum">     278 </span><span class="lineCov">     187828 :     IndexIterator&amp; operator++() {</span></a>
-<a name="279"><span class="lineNum">     279 </span><span class="lineCov">     187828 :       ++_idx;</span></a>
-<a name="280"><span class="lineNum">     280 </span><span class="lineCov">     187828 :       return *this;</span></a>
+<a name="278"><span class="lineNum">     278 </span><span class="lineCov">     679288 :     IndexIterator&amp; operator++() {</span></a>
+<a name="279"><span class="lineNum">     279 </span><span class="lineCov">     679288 :       ++_idx;</span></a>
+<a name="280"><span class="lineNum">     280 </span><span class="lineCov">     679288 :       return *this;</span></a>
 <a name="281"><span class="lineNum">     281 </span>            :     }</a>
 <a name="282"><span class="lineNum">     282 </span>            : </a>
 <a name="283"><span class="lineNum">     283 </span>            :     // Postfix increment</a>
@@ -350,29 +350,29 @@
 <a name="288"><span class="lineNum">     288 </span>            :     }</a>
 <a name="289"><span class="lineNum">     289 </span>            : </a>
 <a name="290"><span class="lineNum">     290 </span>            :     friend bool operator==(const IndexIterator&amp; a, const IndexIterator&amp; b) { return a._idx == b._idx; };</a>
-<a name="291"><span class="lineNum">     291 </span><span class="lineCov">     187832 :     friend bool operator!=(const IndexIterator&amp; a, const IndexIterator&amp; b) { return a._idx != b._idx; };</span></a>
+<a name="291"><span class="lineNum">     291 </span><span class="lineCov">     679304 :     friend bool operator!=(const IndexIterator&amp; a, const IndexIterator&amp; b) { return a._idx != b._idx; };</span></a>
 <a name="292"><span class="lineNum">     292 </span>            : </a>
 <a name="293"><span class="lineNum">     293 </span>            :   private:</a>
 <a name="294"><span class="lineNum">     294 </span>            :     CellIndex _idx;</a>
 <a name="295"><span class="lineNum">     295 </span>            :   };</a>
-<a name="296"><span class="lineNum">     296 </span><span class="lineCov">        220 :   static IndexIterator begin() {</span></a>
+<a name="296"><span class="lineNum">     296 </span><span class="lineCov">        808 :   static IndexIterator begin() {</span></a>
 <a name="297"><span class="lineNum">     297 </span>            :     // if constexpr is neccessary here (otherwise benchmark performance breaks, due to runtime if)</a>
 <a name="298"><span class="lineNum">     298 </span>            :     if constexpr (std::is_same_v&lt;unsigned int, value_T&gt;) {</a>
 <a name="299"><span class="lineNum">     299 </span>            :       // If this CellIndex is scalar and if the domain is empty, then lowerBoundary can not be converted to CellIndex</a>
 <a name="300"><span class="lineNum">     300 </span>            :       // Thus we have to return something else as an iterator for the empty domain</a>
-<a name="301"><span class="lineNum">     301 </span><span class="lineCov">        110 :       if (linearNumberCellsInDomain == 0)</span></a>
-<a name="302"><span class="lineNum">     302 </span><span class="lineCov">          4 :         return IndexIterator(CellIndex{});</span></a>
+<a name="301"><span class="lineNum">     301 </span><span class="lineCov">        404 :       if (linearNumberCellsInDomain == 0)</span></a>
+<a name="302"><span class="lineNum">     302 </span><span class="lineCov">         16 :         return IndexIterator(CellIndex{});</span></a>
 <a name="303"><span class="lineNum">     303 </span>            :       else</a>
-<a name="304"><span class="lineNum">     304 </span><span class="lineCov">        106 :         return IndexIterator(lowerBoundary);</span></a>
+<a name="304"><span class="lineNum">     304 </span><span class="lineCov">        388 :         return IndexIterator(lowerBoundary);</span></a>
 <a name="305"><span class="lineNum">     305 </span>            :     } else</a>
-<a name="306"><span class="lineNum">     306 </span><span class="lineCov">        110 :       return IndexIterator(lowerBoundary);</span></a>
+<a name="306"><span class="lineNum">     306 </span><span class="lineCov">        404 :       return IndexIterator(lowerBoundary);</span></a>
 <a name="307"><span class="lineNum">     307 </span>            :   }</a>
-<a name="308"><span class="lineNum">     308 </span><span class="lineCov">        216 :   static IndexIterator end() {</span></a>
+<a name="308"><span class="lineNum">     308 </span><span class="lineCov">        792 :   static IndexIterator end() {</span></a>
 <a name="309"><span class="lineNum">     309 </span>            :     // Todo: This if-else branching is quite slow? (~factor 2)</a>
-<a name="310"><span class="lineNum">     310 </span><span class="lineCov">        216 :     if (linearNumberCellsInDomain == 0)</span></a>
-<a name="311"><span class="lineNum">     311 </span><span class="lineCov">          4 :       return begin();</span></a>
+<a name="310"><span class="lineNum">     310 </span><span class="lineCov">        792 :     if (linearNumberCellsInDomain == 0)</span></a>
+<a name="311"><span class="lineNum">     311 </span><span class="lineCov">         16 :       return begin();</span></a>
 <a name="312"><span class="lineNum">     312 </span>            :     else</a>
-<a name="313"><span class="lineNum">     313 </span><span class="lineCov">        318 :       return ++IndexIterator(upperBoundary);</span></a>
+<a name="313"><span class="lineNum">     313 </span><span class="lineCov">       1164 :       return ++IndexIterator(upperBoundary);</span></a>
 <a name="314"><span class="lineNum">     314 </span>            :   }</a>
 <a name="315"><span class="lineNum">     315 </span>            : </a>
 <a name="316"><span class="lineNum">     316 </span>            :   static const char TNAME[];</a>

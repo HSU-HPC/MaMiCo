@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">13</td>
-            <td class="headerCovTableEntry">168</td>
-            <td class="headerCovTableEntryLo">7.7 %</td>
+            <td class="headerCovTableEntry">155</td>
+            <td class="headerCovTableEntryLo">8.4 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">3</td>
@@ -113,12 +113,12 @@
 <a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :   const std::vector&lt;unsigned int&gt; ranks = dataExchange.getTargetRanks(globalVectorIndex);</span></a>
 <a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :   const unsigned int ranksSize = (unsigned int)ranks.size();</span></a>
 <a name="53"><span class="lineNum">      53 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="54"><span class="lineNum">      54 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot;Rank &quot; &lt;&lt; IndexingService&lt;dim&gt;::getInstance().getRank() &lt;&lt; &quot;: write cell &quot; &lt;&lt; globalVectorIndex &lt;&lt; &quot; to send buffer;&quot;;</span></a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot; associated target ranks: &quot;;</span></a>
-<a name="56"><span class="lineNum">      56 </span><span class="lineNoCov">          0 :   for (unsigned int i = 0; i &lt; ranksSize; i++) {</span></a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; ranks[i] &lt;&lt; &quot; &quot;;</span></a>
+<a name="54"><span class="lineNum">      54 </span>            :   std::cout &lt;&lt; &quot;Rank &quot; &lt;&lt; IndexingService&lt;dim&gt;::getInstance().getRank() &lt;&lt; &quot;: write cell &quot; &lt;&lt; globalVectorIndex &lt;&lt; &quot; to send buffer;&quot;;</a>
+<a name="55"><span class="lineNum">      55 </span>            :   std::cout &lt;&lt; &quot; associated target ranks: &quot;;</a>
+<a name="56"><span class="lineNum">      56 </span>            :   for (unsigned int i = 0; i &lt; ranksSize; i++) {</a>
+<a name="57"><span class="lineNum">      57 </span>            :     std::cout &lt;&lt; ranks[i] &lt;&lt; &quot; &quot;;</a>
 <a name="58"><span class="lineNum">      58 </span>            :   }</a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; std::endl;</span></a>
+<a name="59"><span class="lineNum">      59 </span>            :   std::cout &lt;&lt; std::endl;</a>
 <a name="60"><span class="lineNum">      60 </span>            : #endif</a>
 <a name="61"><span class="lineNum">      61 </span>            : </a>
 <a name="62"><span class="lineNum">      62 </span>            :   // loop over ranks</a>
@@ -156,9 +156,9 @@
 <a name="94"><span class="lineNum">      94 </span><span class="lineNoCov">          0 :   const unsigned int globalIndex = CellIndex&lt;dim&gt;{CellIndex&lt;dim, IndexTrait::vector&gt;{tarch::la::Vector&lt;dim, int&gt;(globalVectorIndex)}}.get();</span></a>
 <a name="95"><span class="lineNum">      95 </span>            : </a>
 <a name="96"><span class="lineNum">      96 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="97"><span class="lineNum">      97 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot;Rank &quot; &lt;&lt; coupling::indexing::IndexingService&lt;dim&gt;::getInstance().getRank() &lt;&lt; &quot;: read cell &quot; &lt;&lt; globalVectorIndex &lt;&lt; &quot; (&quot; &lt;&lt; globalIndex</span></a>
+<a name="97"><span class="lineNum">      97 </span>            :   std::cout &lt;&lt; &quot;Rank &quot; &lt;&lt; coupling::indexing::IndexingService&lt;dim&gt;::getInstance().getRank() &lt;&lt; &quot;: read cell &quot; &lt;&lt; globalVectorIndex &lt;&lt; &quot; (&quot; &lt;&lt; globalIndex</a>
 <a name="98"><span class="lineNum">      98 </span>            :             &lt;&lt; &quot;) &quot;</a>
-<a name="99"><span class="lineNum">      99 </span><span class="lineNoCov">          0 :             &lt;&lt; &quot; from receive buffer&quot; &lt;&lt; std::endl;</span></a>
+<a name="99"><span class="lineNum">      99 </span>            :             &lt;&lt; &quot; from receive buffer&quot; &lt;&lt; std::endl;</a>
 <a name="100"><span class="lineNum">     100 </span>            : #endif</a>
 <a name="101"><span class="lineNum">     101 </span>            : </a>
 <a name="102"><span class="lineNum">     102 </span>            :   // loop over all received buffers</a>
@@ -190,13 +190,13 @@
 <a name="128"><span class="lineNum">     128 </span><span class="lineNoCov">          0 :   const std::vector&lt;unsigned int&gt; ranks = dataExchange.getSourceRanks(globalVectorIndex);</span></a>
 <a name="129"><span class="lineNum">     129 </span><span class="lineNoCov">          0 :   const unsigned int ranksSize = (unsigned int)ranks.size();</span></a>
 <a name="130"><span class="lineNum">     130 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="131"><span class="lineNum">     131 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot;Rank &quot; &lt;&lt; coupling::indexing::IndexingService&lt;dim&gt;::getInstance().getRank() &lt;&lt; &quot;: allocate receive buffers for cell &quot; &lt;&lt; globalVectorIndex</span></a>
-<a name="132"><span class="lineNum">     132 </span><span class="lineNoCov">          0 :             &lt;&lt; &quot;;&quot;;</span></a>
-<a name="133"><span class="lineNum">     133 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot; associated source ranks: &quot;;</span></a>
-<a name="134"><span class="lineNum">     134 </span><span class="lineNoCov">          0 :   for (unsigned int i = 0; i &lt; ranksSize; i++) {</span></a>
-<a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; ranks[i] &lt;&lt; &quot; &quot;;</span></a>
+<a name="131"><span class="lineNum">     131 </span>            :   std::cout &lt;&lt; &quot;Rank &quot; &lt;&lt; coupling::indexing::IndexingService&lt;dim&gt;::getInstance().getRank() &lt;&lt; &quot;: allocate receive buffers for cell &quot; &lt;&lt; globalVectorIndex</a>
+<a name="132"><span class="lineNum">     132 </span>            :             &lt;&lt; &quot;;&quot;;</a>
+<a name="133"><span class="lineNum">     133 </span>            :   std::cout &lt;&lt; &quot; associated source ranks: &quot;;</a>
+<a name="134"><span class="lineNum">     134 </span>            :   for (unsigned int i = 0; i &lt; ranksSize; i++) {</a>
+<a name="135"><span class="lineNum">     135 </span>            :     std::cout &lt;&lt; ranks[i] &lt;&lt; &quot; &quot;;</a>
 <a name="136"><span class="lineNum">     136 </span>            :   }</a>
-<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; std::endl;</span></a>
+<a name="137"><span class="lineNum">     137 </span>            :   std::cout &lt;&lt; std::endl;</a>
 <a name="138"><span class="lineNum">     138 </span>            : #endif</a>
 <a name="139"><span class="lineNum">     139 </span>            : </a>
 <a name="140"><span class="lineNum">     140 </span>            :   // loop over ranks</a>

@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">93</td>
+            <td class="headerCovTableEntry">80</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -135,10 +135,10 @@
 <a name="73"><span class="lineNum">      73 </span>            : </a>
 <a name="74"><span class="lineNum">      74 </span><span class="lineNoCov">          0 :   T&amp; operator[](unsigned int pos) {</span></a>
 <a name="75"><span class="lineNum">      75 </span>            : #ifdef NLM_DEBUG</a>
-<a name="76"><span class="lineNum">      76 </span><span class="lineNoCov">          0 :     if (pos &lt; 0 || pos &gt; _scalarSize - 1) {</span></a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR Field T&amp; operator[](int pos): pos out of range!&quot; &lt;&lt; std::endl;</span></a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;pos=&quot; &lt;&lt; pos &lt;&lt; &quot;, _scalarSize=&quot; &lt;&lt; _scalarSize &lt;&lt; std::endl;</span></a>
-<a name="79"><span class="lineNum">      79 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="76"><span class="lineNum">      76 </span>            :     if (pos &lt; 0 || pos &gt; _scalarSize - 1) {</a>
+<a name="77"><span class="lineNum">      77 </span>            :       std::cout &lt;&lt; &quot;ERROR Field T&amp; operator[](int pos): pos out of range!&quot; &lt;&lt; std::endl;</a>
+<a name="78"><span class="lineNum">      78 </span>            :       std::cout &lt;&lt; &quot;pos=&quot; &lt;&lt; pos &lt;&lt; &quot;, _scalarSize=&quot; &lt;&lt; _scalarSize &lt;&lt; std::endl;</a>
+<a name="79"><span class="lineNum">      79 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="80"><span class="lineNum">      80 </span>            :     }</a>
 <a name="81"><span class="lineNum">      81 </span>            : #endif</a>
 <a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :     return _data[pos];</span></a>
@@ -181,17 +181,17 @@
 <a name="119"><span class="lineNum">     119 </span>            : </a>
 <a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :   unsigned int idx(const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; pos, const unsigned int&amp; t) const {</span></a>
 <a name="121"><span class="lineNum">     121 </span>            : #ifdef NLM_DEBUG</a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :     for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="123"><span class="lineNum">     123 </span><span class="lineNoCov">          0 :       if (pos[d] &lt; 0 || pos[d] &gt; _spatialSize[d] - 1) {</span></a>
-<a name="124"><span class="lineNum">     124 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;ERROR Field idx(): pos out of range!&quot; &lt;&lt; std::endl;</span></a>
-<a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;pos=&quot; &lt;&lt; pos &lt;&lt; &quot;, _spatialSize=&quot; &lt;&lt; _spatialSize &lt;&lt; std::endl;</span></a>
-<a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
+<a name="122"><span class="lineNum">     122 </span>            :     for (unsigned int d = 0; d &lt; dim; d++) {</a>
+<a name="123"><span class="lineNum">     123 </span>            :       if (pos[d] &lt; 0 || pos[d] &gt; _spatialSize[d] - 1) {</a>
+<a name="124"><span class="lineNum">     124 </span>            :         std::cout &lt;&lt; &quot;ERROR Field idx(): pos out of range!&quot; &lt;&lt; std::endl;</a>
+<a name="125"><span class="lineNum">     125 </span>            :         std::cout &lt;&lt; &quot;pos=&quot; &lt;&lt; pos &lt;&lt; &quot;, _spatialSize=&quot; &lt;&lt; _spatialSize &lt;&lt; std::endl;</a>
+<a name="126"><span class="lineNum">     126 </span>            :         exit(EXIT_FAILURE);</a>
 <a name="127"><span class="lineNum">     127 </span>            :       }</a>
 <a name="128"><span class="lineNum">     128 </span>            :     }</a>
-<a name="129"><span class="lineNum">     129 </span><span class="lineNoCov">          0 :     if (t &lt; 0 || t &gt; _temporalSize - 1) {</span></a>
-<a name="130"><span class="lineNum">     130 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR Field idx(): t out of range!&quot; &lt;&lt; std::endl;</span></a>
-<a name="131"><span class="lineNum">     131 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;t=&quot; &lt;&lt; t &lt;&lt; &quot;, _temporalSize=&quot; &lt;&lt; _temporalSize &lt;&lt; std::endl;</span></a>
-<a name="132"><span class="lineNum">     132 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="129"><span class="lineNum">     129 </span>            :     if (t &lt; 0 || t &gt; _temporalSize - 1) {</a>
+<a name="130"><span class="lineNum">     130 </span>            :       std::cout &lt;&lt; &quot;ERROR Field idx(): t out of range!&quot; &lt;&lt; std::endl;</a>
+<a name="131"><span class="lineNum">     131 </span>            :       std::cout &lt;&lt; &quot;t=&quot; &lt;&lt; t &lt;&lt; &quot;, _temporalSize=&quot; &lt;&lt; _temporalSize &lt;&lt; std::endl;</a>
+<a name="132"><span class="lineNum">     132 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="133"><span class="lineNum">     133 </span>            :     }</a>
 <a name="134"><span class="lineNum">     134 </span>            : #endif</a>
 <a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 :     unsigned int idx = 0, step = 1;</span></a>

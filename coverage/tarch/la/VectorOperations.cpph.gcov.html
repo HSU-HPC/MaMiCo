@@ -37,12 +37,12 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntry">21</td>
             <td class="headerCovTableEntry">28</td>
-            <td class="headerCovTableEntryMed">82.1 %</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -78,12 +78,12 @@
 <a name="16"><span class="lineNum">      16 </span>            :  *      @author Philipp Neumann</a>
 <a name="17"><span class="lineNum">      17 </span>            :  *      @return result resulting vector</a>
 <a name="18"><span class="lineNum">      18 </span>            :  */</a>
-<a name="19"><span class="lineNum">      19 </span><span class="lineCov">    1715824 : template &lt;int size, class T&gt; tarch::la::Vector&lt;size, T&gt; operator+(const tarch::la::Vector&lt;size, T&gt;&amp; l, const tarch::la::Vector&lt;size, T&gt;&amp; r) {</span></a>
-<a name="20"><span class="lineNum">      20 </span><span class="lineCov">    1715824 :   tarch::la::Vector&lt;size, T&gt; result;</span></a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">    6847096 :   for (int i = 0; i &lt; size; i++) {</span></a>
-<a name="22"><span class="lineNum">      22 </span><span class="lineCov">    5131272 :     result[i] = l[i] + r[i];</span></a>
+<a name="19"><span class="lineNum">      19 </span><span class="lineCov">    6378512 : template &lt;int size, class T&gt; tarch::la::Vector&lt;size, T&gt; operator+(const tarch::la::Vector&lt;size, T&gt;&amp; l, const tarch::la::Vector&lt;size, T&gt;&amp; r) {</span></a>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">    6378512 :   tarch::la::Vector&lt;size, T&gt; result;</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">   25497848 :   for (int i = 0; i &lt; size; i++) {</span></a>
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">   19119336 :     result[i] = l[i] + r[i];</span></a>
 <a name="23"><span class="lineNum">      23 </span>            :   }</a>
-<a name="24"><span class="lineNum">      24 </span><span class="lineCov">    1715824 :   return result;</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineCov">    6378512 :   return result;</span></a>
 <a name="25"><span class="lineNum">      25 </span>            : }</a>
 <a name="26"><span class="lineNum">      26 </span>            : </a>
 <a name="27"><span class="lineNum">      27 </span>            : /** this file contains some methods for vector types.</a>
@@ -93,12 +93,12 @@
 <a name="31"><span class="lineNum">      31 </span>            :  *      @author Philipp Neumann</a>
 <a name="32"><span class="lineNum">      32 </span>            :  *      @return result resulting vector</a>
 <a name="33"><span class="lineNum">      33 </span>            :  */</a>
-<a name="34"><span class="lineNum">      34 </span><span class="lineCov">     744604 : template &lt;int size, class T&gt; tarch::la::Vector&lt;size, T&gt; operator-(const tarch::la::Vector&lt;size, T&gt;&amp; l, const tarch::la::Vector&lt;size, T&gt;&amp; r) {</span></a>
-<a name="35"><span class="lineNum">      35 </span><span class="lineCov">     744604 :   tarch::la::Vector&lt;size, T&gt; result;</span></a>
-<a name="36"><span class="lineNum">      36 </span><span class="lineCov">    2978416 :   for (int i = 0; i &lt; size; i++) {</span></a>
-<a name="37"><span class="lineNum">      37 </span><span class="lineCov">    2233812 :     result[i] = l[i] - r[i];</span></a>
+<a name="34"><span class="lineNum">      34 </span><span class="lineCov">    2742440 : template &lt;int size, class T&gt; tarch::la::Vector&lt;size, T&gt; operator-(const tarch::la::Vector&lt;size, T&gt;&amp; l, const tarch::la::Vector&lt;size, T&gt;&amp; r) {</span></a>
+<a name="35"><span class="lineNum">      35 </span><span class="lineCov">    2742440 :   tarch::la::Vector&lt;size, T&gt; result;</span></a>
+<a name="36"><span class="lineNum">      36 </span><span class="lineCov">   10969760 :   for (int i = 0; i &lt; size; i++) {</span></a>
+<a name="37"><span class="lineNum">      37 </span><span class="lineCov">    8227320 :     result[i] = l[i] - r[i];</span></a>
 <a name="38"><span class="lineNum">      38 </span>            :   }</a>
-<a name="39"><span class="lineNum">      39 </span><span class="lineCov">     744604 :   return result;</span></a>
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">    2742440 :   return result;</span></a>
 <a name="40"><span class="lineNum">      40 </span>            : }</a>
 <a name="41"><span class="lineNum">      41 </span>            : </a>
 <a name="42"><span class="lineNum">      42 </span>            : /** this file contains some methods for vector types.</a>
@@ -169,12 +169,12 @@
 <a name="107"><span class="lineNum">     107 </span>            :  *      @author Philipp Neumann</a>
 <a name="108"><span class="lineNum">     108 </span>            :  *      @return equal result; true: if they are equal, false otherwise.</a>
 <a name="109"><span class="lineNum">     109 </span>            :  */</a>
-<a name="110"><span class="lineNum">     110 </span><span class="lineCov">     343926 : template &lt;int size, class T&gt; bool operator==(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineCov">     343926 :   bool equal = true;</span></a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineCov">    1375644 :   for (int i = 0; i &lt; size; i++) {</span></a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineCov">    1031718 :     equal = equal &amp;&amp; (l[i] == r[i]);</span></a>
+<a name="110"><span class="lineNum">     110 </span><span class="lineCov">    1301886 : template &lt;int size, class T&gt; bool operator==(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineCov">    1301886 :   bool equal = true;</span></a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">    5207484 :   for (int i = 0; i &lt; size; i++) {</span></a>
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">    3905598 :     equal = equal &amp;&amp; (l[i] == r[i]);</span></a>
 <a name="114"><span class="lineNum">     114 </span>            :   }</a>
-<a name="115"><span class="lineNum">     115 </span><span class="lineCov">     343926 :   return equal;</span></a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineCov">    1301886 :   return equal;</span></a>
 <a name="116"><span class="lineNum">     116 </span>            : }</a>
 <a name="117"><span class="lineNum">     117 </span>            : </a>
 <a name="118"><span class="lineNum">     118 </span>            : /** This operator overloading compares two vectors and determins if they are NOT equal.</a>
@@ -208,12 +208,12 @@
 <a name="146"><span class="lineNum">     146 </span>            :  *      @tparam size Vector size</a>
 <a name="147"><span class="lineNum">     147 </span>            :  *      @author Philipp Neumann</a>
 <a name="148"><span class="lineNum">     148 </span>            :  */</a>
-<a name="149"><span class="lineNum">     149 </span><span class="lineCov">      12953 : template &lt;int size, class T&gt; std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const tarch::la::Vector&lt;size, T&gt;&amp; v) {</span></a>
-<a name="150"><span class="lineNum">     150 </span><span class="lineCov">      28059 :   for (int i = 0; i &lt; size - 1; i++) {</span></a>
-<a name="151"><span class="lineNum">     151 </span><span class="lineCov">      15106 :     os &lt;&lt; v[i] &lt;&lt; &quot; , &quot;;</span></a>
+<a name="149"><span class="lineNum">     149 </span><span class="lineCov">        136 : template &lt;int size, class T&gt; std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const tarch::la::Vector&lt;size, T&gt;&amp; v) {</span></a>
+<a name="150"><span class="lineNum">     150 </span><span class="lineCov">        408 :   for (int i = 0; i &lt; size - 1; i++) {</span></a>
+<a name="151"><span class="lineNum">     151 </span><span class="lineCov">        272 :     os &lt;&lt; v[i] &lt;&lt; &quot; , &quot;;</span></a>
 <a name="152"><span class="lineNum">     152 </span>            :   }</a>
-<a name="153"><span class="lineNum">     153 </span><span class="lineCov">      12953 :   os &lt;&lt; v[size - 1];</span></a>
-<a name="154"><span class="lineNum">     154 </span><span class="lineCov">      12953 :   return os;</span></a>
+<a name="153"><span class="lineNum">     153 </span><span class="lineCov">        136 :   os &lt;&lt; v[size - 1];</span></a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineCov">        136 :   return os;</span></a>
 <a name="155"><span class="lineNum">     155 </span>            : }</a>
 <a name="156"><span class="lineNum">     156 </span>            : </a>
 <a name="157"><span class="lineNum">     157 </span>            : } // namespace la</a>

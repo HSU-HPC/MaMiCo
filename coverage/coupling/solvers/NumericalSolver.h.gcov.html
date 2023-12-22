@@ -31,13 +31,13 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">142</td>
-            <td class="headerCovTableEntry">230</td>
-            <td class="headerCovTableEntryLo">61.7 %</td>
+            <td class="headerCovTableEntry">132</td>
+            <td class="headerCovTableEntry">200</td>
+            <td class="headerCovTableEntryLo">66.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">15</td>
@@ -427,13 +427,13 @@
 <a name="365"><span class="lineNum">     365 </span>            :    *  @returns i */</a>
 <a name="366"><span class="lineNum">     366 </span><span class="lineCov">   11734444 :   int get(int i) const {</span></a>
 <a name="367"><span class="lineNum">     367 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="368"><span class="lineNum">     368 </span><span class="lineCov">   11734444 :     if (i &lt; 0) {</span></a>
-<a name="369"><span class="lineNum">     369 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(i): i&lt;0!&quot; &lt;&lt; std::endl;</span></a>
-<a name="370"><span class="lineNum">     370 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="368"><span class="lineNum">     368 </span>            :     if (i &lt; 0) {</a>
+<a name="369"><span class="lineNum">     369 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(i): i&lt;0!&quot; &lt;&lt; std::endl;</a>
+<a name="370"><span class="lineNum">     370 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="371"><span class="lineNum">     371 </span>            :     }</a>
-<a name="372"><span class="lineNum">     372 </span><span class="lineCov">   11734444 :     if (i &gt; (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)) {</span></a>
-<a name="373"><span class="lineNum">     373 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(i): i&gt;max. Value!&quot; &lt;&lt; std::endl;</span></a>
-<a name="374"><span class="lineNum">     374 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="372"><span class="lineNum">     372 </span>            :     if (i &gt; (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)) {</a>
+<a name="373"><span class="lineNum">     373 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(i): i&gt;max. Value!&quot; &lt;&lt; std::endl;</a>
+<a name="374"><span class="lineNum">     374 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="375"><span class="lineNum">     375 </span>            :     }</a>
 <a name="376"><span class="lineNum">     376 </span>            : #endif</a>
 <a name="377"><span class="lineNum">     377 </span><span class="lineCov">   11734444 :     return i;</span></a>
@@ -441,34 +441,34 @@
 <a name="379"><span class="lineNum">     379 </span>            : </a>
 <a name="380"><span class="lineNum">     380 </span>            :   /** @brief returns linearized index and performs checks in debug mode</a>
 <a name="381"><span class="lineNum">     381 </span>            :    *  @returns the linearized index */</a>
-<a name="382"><span class="lineNum">     382 </span><span class="lineCov">    2850872 :   int get(int x, int y, int z) const {</span></a>
+<a name="382"><span class="lineNum">     382 </span><span class="lineCov">    2542080 :   int get(int x, int y, int z) const {</span></a>
 <a name="383"><span class="lineNum">     383 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="384"><span class="lineNum">     384 </span><span class="lineCov">    2850872 :     if (x &lt; 0) {</span></a>
-<a name="385"><span class="lineNum">     385 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): x&lt;0!&quot; &lt;&lt; std::endl;</span></a>
-<a name="386"><span class="lineNum">     386 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="384"><span class="lineNum">     384 </span>            :     if (x &lt; 0) {</a>
+<a name="385"><span class="lineNum">     385 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): x&lt;0!&quot; &lt;&lt; std::endl;</a>
+<a name="386"><span class="lineNum">     386 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="387"><span class="lineNum">     387 </span>            :     }</a>
-<a name="388"><span class="lineNum">     388 </span><span class="lineCov">    2850872 :     if (x &gt; _domainSizeX + 1) {</span></a>
-<a name="389"><span class="lineNum">     389 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): x&gt;max. Value!&quot; &lt;&lt; std::endl;</span></a>
-<a name="390"><span class="lineNum">     390 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="388"><span class="lineNum">     388 </span>            :     if (x &gt; _domainSizeX + 1) {</a>
+<a name="389"><span class="lineNum">     389 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): x&gt;max. Value!&quot; &lt;&lt; std::endl;</a>
+<a name="390"><span class="lineNum">     390 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="391"><span class="lineNum">     391 </span>            :     }</a>
-<a name="392"><span class="lineNum">     392 </span><span class="lineCov">    2850872 :     if (y &lt; 0) {</span></a>
-<a name="393"><span class="lineNum">     393 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): y&lt;0!&quot; &lt;&lt; std::endl;</span></a>
-<a name="394"><span class="lineNum">     394 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="392"><span class="lineNum">     392 </span>            :     if (y &lt; 0) {</a>
+<a name="393"><span class="lineNum">     393 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): y&lt;0!&quot; &lt;&lt; std::endl;</a>
+<a name="394"><span class="lineNum">     394 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="395"><span class="lineNum">     395 </span>            :     }</a>
-<a name="396"><span class="lineNum">     396 </span><span class="lineCov">    2850872 :     if (y &gt; _domainSizeY + 1) {</span></a>
-<a name="397"><span class="lineNum">     397 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): y&gt;max. Value!&quot; &lt;&lt; std::endl;</span></a>
-<a name="398"><span class="lineNum">     398 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="396"><span class="lineNum">     396 </span>            :     if (y &gt; _domainSizeY + 1) {</a>
+<a name="397"><span class="lineNum">     397 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): y&gt;max. Value!&quot; &lt;&lt; std::endl;</a>
+<a name="398"><span class="lineNum">     398 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="399"><span class="lineNum">     399 </span>            :     }</a>
-<a name="400"><span class="lineNum">     400 </span><span class="lineCov">    2850872 :     if (z &lt; 0) {</span></a>
-<a name="401"><span class="lineNum">     401 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): z&lt;0!&quot; &lt;&lt; std::endl;</span></a>
-<a name="402"><span class="lineNum">     402 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="400"><span class="lineNum">     400 </span>            :     if (z &lt; 0) {</a>
+<a name="401"><span class="lineNum">     401 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): z&lt;0!&quot; &lt;&lt; std::endl;</a>
+<a name="402"><span class="lineNum">     402 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="403"><span class="lineNum">     403 </span>            :     }</a>
-<a name="404"><span class="lineNum">     404 </span><span class="lineCov">    2850872 :     if (z &gt; _domainSizeZ + 1) {</span></a>
-<a name="405"><span class="lineNum">     405 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): z&gt;max. Value!&quot; &lt;&lt; std::endl;</span></a>
-<a name="406"><span class="lineNum">     406 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="404"><span class="lineNum">     404 </span>            :     if (z &gt; _domainSizeZ + 1) {</a>
+<a name="405"><span class="lineNum">     405 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::get(x,y,z): z&gt;max. Value!&quot; &lt;&lt; std::endl;</a>
+<a name="406"><span class="lineNum">     406 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="407"><span class="lineNum">     407 </span>            :     }</a>
 <a name="408"><span class="lineNum">     408 </span>            : #endif</a>
-<a name="409"><span class="lineNum">     409 </span><span class="lineCov">    2850872 :     return x + (_domainSizeX + 2) * (y + (_domainSizeY + 2) * z);</span></a>
+<a name="409"><span class="lineNum">     409 </span><span class="lineCov">    2542080 :     return x + (_domainSizeX + 2) * (y + (_domainSizeY + 2) * z);</span></a>
 <a name="410"><span class="lineNum">     410 </span>            :   }</a>
 <a name="411"><span class="lineNum">     411 </span>            : </a>
 <a name="412"><span class="lineNum">     412 </span>            :   /** @brief returns index in 2D parallel buffer with buffer dimensions</a>
@@ -476,13 +476,13 @@
 <a name="414"><span class="lineNum">     414 </span>            :    *  @returns the index in the buffer */</a>
 <a name="415"><span class="lineNum">     415 </span><span class="lineCov">    1103640 :   int getParBuf(int x, int y, int lengthx, int lengthy) const {</span></a>
 <a name="416"><span class="lineNum">     416 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="417"><span class="lineNum">     417 </span><span class="lineCov">    1103640 :     if (x &lt; 0 || x &gt; lengthx + 1) {</span></a>
-<a name="418"><span class="lineNum">     418 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::getParBuf(...): x out of range!&quot; &lt;&lt; std::endl;</span></a>
-<a name="419"><span class="lineNum">     419 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="417"><span class="lineNum">     417 </span>            :     if (x &lt; 0 || x &gt; lengthx + 1) {</a>
+<a name="418"><span class="lineNum">     418 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::getParBuf(...): x out of range!&quot; &lt;&lt; std::endl;</a>
+<a name="419"><span class="lineNum">     419 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="420"><span class="lineNum">     420 </span>            :     }</a>
-<a name="421"><span class="lineNum">     421 </span><span class="lineCov">    1103640 :     if (y &lt; 0 || y &gt; lengthy + 1) {</span></a>
-<a name="422"><span class="lineNum">     422 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::getParBuf(...): y out of range!&quot; &lt;&lt; std::endl;</span></a>
-<a name="423"><span class="lineNum">     423 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="421"><span class="lineNum">     421 </span>            :     if (y &lt; 0 || y &gt; lengthy + 1) {</a>
+<a name="422"><span class="lineNum">     422 </span>            :       std::cout &lt;&lt; &quot;ERROR NumericalSolver::getParBuf(...): y out of range!&quot; &lt;&lt; std::endl;</a>
+<a name="423"><span class="lineNum">     423 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="424"><span class="lineNum">     424 </span>            :     }</a>
 <a name="425"><span class="lineNum">     425 </span>            : #endif</a>
 <a name="426"><span class="lineNum">     426 </span><span class="lineCov">    1103640 :     return x + (lengthx + 2) * y;</span></a>

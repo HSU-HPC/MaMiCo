@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">114</td>
+            <td class="headerCovTableEntry">104</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -151,7 +151,7 @@
 <a name="89"><span class="lineNum">      89 </span>            :   } else {</a>
 <a name="90"><span class="lineNum">      90 </span><span class="lineNoCov">          0 :     cell.setMicroscopicMomentum((1.0 / cell.getMicroscopicMass()) * cell.getMicroscopicMomentum());</span></a>
 <a name="91"><span class="lineNum">      91 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="92"><span class="lineNum">      92 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;Obtain reference velocity &quot; &lt;&lt; cell.getMicroscopicMomentum() &lt;&lt; &quot; in cell &quot; &lt;&lt; index &lt;&lt; std::endl;</span></a>
+<a name="92"><span class="lineNum">      92 </span>            :     std::cout &lt;&lt; &quot;Obtain reference velocity &quot; &lt;&lt; cell.getMicroscopicMomentum() &lt;&lt; &quot; in cell &quot; &lt;&lt; index &lt;&lt; std::endl;</a>
 <a name="93"><span class="lineNum">      93 </span>            : #endif</a>
 <a name="94"><span class="lineNum">      94 </span>            :   }</a>
 <a name="95"><span class="lineNum">      95 </span>            : </a>
@@ -181,9 +181,9 @@
 <a name="119"><span class="lineNum">     119 </span><span class="lineNoCov">          0 : void coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;::processInnerMacroscopicCellBeforeSendingMDSolverData(</span></a>
 <a name="120"><span class="lineNum">     120 </span>            :     coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, const unsigned int&amp; index) {</a>
 <a name="121"><span class="lineNum">     121 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot;processInnerMacroscopicCellBeforeSendingMDSolverData(): Data &quot;</span></a>
+<a name="122"><span class="lineNum">     122 </span>            :   std::cout &lt;&lt; &quot;processInnerMacroscopicCellBeforeSendingMDSolverData(): Data &quot;</a>
 <a name="123"><span class="lineNum">     123 </span>            :                &quot;before averaging from cell &quot;</a>
-<a name="124"><span class="lineNum">     124 </span><span class="lineNoCov">          0 :             &lt;&lt; index &lt;&lt; &quot;Mass: &quot; &lt;&lt; cell.getMacroscopicMass() &lt;&lt; &quot; , momentum: &quot; &lt;&lt; cell.getMacroscopicMomentum() &lt;&lt; std::endl;</span></a>
+<a name="124"><span class="lineNum">     124 </span>            :             &lt;&lt; index &lt;&lt; &quot;Mass: &quot; &lt;&lt; cell.getMacroscopicMass() &lt;&lt; &quot; , momentum: &quot; &lt;&lt; cell.getMacroscopicMomentum() &lt;&lt; std::endl;</a>
 <a name="125"><span class="lineNum">     125 </span>            : #endif</a>
 <a name="126"><span class="lineNum">     126 </span>            : </a>
 <a name="127"><span class="lineNum">     127 </span>            :   // average sampled data from MD</a>
@@ -197,10 +197,10 @@
 <a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMomentum(tarch::la::Vector&lt;dim, double&gt;(0.0));</span></a>
 <a name="136"><span class="lineNum">     136 </span>            :   }</a>
 <a name="137"><span class="lineNum">     137 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot;Time step counter=&quot; &lt;&lt; _timestepCounter &lt;&lt; std::endl;</span></a>
-<a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; &quot;processInnerMacroscopicCellBeforeSendingMDSolverData(): Data &quot;</span></a>
+<a name="138"><span class="lineNum">     138 </span>            :   std::cout &lt;&lt; &quot;Time step counter=&quot; &lt;&lt; _timestepCounter &lt;&lt; std::endl;</a>
+<a name="139"><span class="lineNum">     139 </span>            :   std::cout &lt;&lt; &quot;processInnerMacroscopicCellBeforeSendingMDSolverData(): Data &quot;</a>
 <a name="140"><span class="lineNum">     140 </span>            :                &quot;from cell &quot;</a>
-<a name="141"><span class="lineNum">     141 </span><span class="lineNoCov">          0 :             &lt;&lt; index &lt;&lt; &quot;Mass: &quot; &lt;&lt; cell.getMacroscopicMass() &lt;&lt; &quot; , momentum: &quot; &lt;&lt; cell.getMacroscopicMomentum() &lt;&lt; std::endl;</span></a>
+<a name="141"><span class="lineNum">     141 </span>            :             &lt;&lt; index &lt;&lt; &quot;Mass: &quot; &lt;&lt; cell.getMacroscopicMass() &lt;&lt; &quot; , momentum: &quot; &lt;&lt; cell.getMacroscopicMomentum() &lt;&lt; std::endl;</a>
 <a name="142"><span class="lineNum">     142 </span>            : #endif</a>
 <a name="143"><span class="lineNum">     143 </span>            : </a>
 <a name="144"><span class="lineNum">     144 </span>            :   // cell.iterateConstCells(_massMapping);</a>
@@ -241,13 +241,13 @@
 <a name="179"><span class="lineNum">     179 </span>            :   // advance the simulation potentially differently</a>
 <a name="180"><span class="lineNum">     180 </span><span class="lineNoCov">          0 :   const double factor = _shiftTimestep + ((double)_timestepCounter) / ((double)_numberMDSteps);</span></a>
 <a name="181"><span class="lineNum">     181 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="182"><span class="lineNum">     182 </span><span class="lineNoCov">          0 :   if (factor &lt; _shiftTimestep || factor &gt; 1.0 + _shiftTimestep) {</span></a>
-<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;ERROR &quot;</span></a>
+<a name="182"><span class="lineNum">     182 </span>            :   if (factor &lt; _shiftTimestep || factor &gt; 1.0 + _shiftTimestep) {</a>
+<a name="183"><span class="lineNum">     183 </span>            :     std::cout &lt;&lt; &quot;ERROR &quot;</a>
 <a name="184"><span class="lineNum">     184 </span>            :                  &quot;coupling::transferstrategies::TransferStrategy4NieCoupling&lt;&quot;</a>
 <a name="185"><span class="lineNum">     185 </span>            :                  &quot;LinkedCell,dim&gt;::processInnerMacroscopicCellAfterMDTimestep(.&quot;</a>
 <a name="186"><span class="lineNum">     186 </span>            :                  &quot;.): factor out of range!&quot;</a>
-<a name="187"><span class="lineNum">     187 </span><span class="lineNoCov">          0 :               &lt;&lt; std::endl;</span></a>
-<a name="188"><span class="lineNum">     188 </span><span class="lineNoCov">          0 :     exit(EXIT_FAILURE);</span></a>
+<a name="187"><span class="lineNum">     187 </span>            :               &lt;&lt; std::endl;</a>
+<a name="188"><span class="lineNum">     188 </span>            :     exit(EXIT_FAILURE);</a>
 <a name="189"><span class="lineNum">     189 </span>            :   }</a>
 <a name="190"><span class="lineNum">     190 </span>            : #endif</a>
 <a name="191"><span class="lineNum">     191 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; velocity = (1.0 - factor) * _oldSolution[index] + factor * _newSolution[index];</span></a>

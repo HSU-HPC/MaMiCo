@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">122</td>
+            <td class="headerCovTableEntry">112</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-19 14:54:02</td>
+            <td class="headerValue">2023-12-22 15:04:02</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -77,7 +77,7 @@
 <a name="15"><span class="lineNum">      15 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; outputCellVector = _cellVector2;</span></a>
 <a name="16"><span class="lineNum">      16 </span>            : </a>
 <a name="17"><span class="lineNum">      17 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Initializing filter objects.&quot; &lt;&lt; std::endl;</span></a>
+<a name="18"><span class="lineNum">      18 </span>            :   std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Initializing filter objects.&quot; &lt;&lt; std::endl;</a>
 <a name="19"><span class="lineNum">      19 </span>            : #endif</a>
 <a name="20"><span class="lineNum">      20 </span><span class="lineNoCov">          0 :   bool firstIteration = true;</span></a>
 <a name="21"><span class="lineNum">      21 </span>            : </a>
@@ -270,8 +270,8 @@
 <a name="208"><span class="lineNum">     208 </span>            :   }</a>
 <a name="209"><span class="lineNum">     209 </span>            : </a>
 <a name="210"><span class="lineNum">     210 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; PRINT_PREFIX();</span></a>
-<a name="212"><span class="lineNum">     212 </span><span class="lineNoCov">          0 :   printOutputCellVector();</span></a>
+<a name="211"><span class="lineNum">     211 </span>            :   std::cout &lt;&lt; PRINT_PREFIX();</a>
+<a name="212"><span class="lineNum">     212 </span>            :   printOutputCellVector();</a>
 <a name="213"><span class="lineNum">     213 </span>            : #endif</a>
 <a name="214"><span class="lineNum">     214 </span>            : </a>
 <a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 :   return 0;</span></a>
@@ -309,7 +309,7 @@
 <a name="247"><span class="lineNum">     247 </span>            :       } else</a>
 <a name="248"><span class="lineNum">     248 </span><span class="lineNoCov">          0 :         _filters.insert(_filters.begin() + 1, new coupling::filtering::Copy&lt;dim&gt;(_cellVector2, _cellVector1, _filteredValues));</span></a>
 <a name="249"><span class="lineNum">     249 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="250"><span class="lineNum">     250 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Inserted new filter at index 0&quot; &lt;&lt; std::endl;</span></a>
+<a name="250"><span class="lineNum">     250 </span>            :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Inserted new filter at index 0&quot; &lt;&lt; std::endl;</a>
 <a name="251"><span class="lineNum">     251 </span>            : #endif</a>
 <a name="252"><span class="lineNum">     252 </span>            :     }</a>
 <a name="253"><span class="lineNum">     253 </span>            : </a>
@@ -320,7 +320,7 @@
 <a name="258"><span class="lineNum">     258 </span>            :       else</a>
 <a name="259"><span class="lineNum">     259 </span><span class="lineNoCov">          0 :         _filters.push_back(new coupling::filtering::FilterFromFunction&lt;dim&gt;(_cellVector2, _cellVector1, _filteredValues, applyScalar, applyVector));</span></a>
 <a name="260"><span class="lineNum">     260 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="261"><span class="lineNum">     261 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Appended new filter to sequence.&quot; &lt;&lt; std::endl;</span></a>
+<a name="261"><span class="lineNum">     261 </span>            :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Appended new filter to sequence.&quot; &lt;&lt; std::endl;</a>
 <a name="262"><span class="lineNum">     262 </span>            : #endif</a>
 <a name="263"><span class="lineNum">     263 </span>            :     }</a>
 <a name="264"><span class="lineNum">     264 </span>            : </a>
@@ -346,12 +346,12 @@
 <a name="284"><span class="lineNum">     284 </span><span class="lineNoCov">          0 :           _filters.insert(_filters.begin() + index + 1, new coupling::filtering::Copy&lt;dim&gt;(_cellVector1, _cellVector2, _filteredValues));</span></a>
 <a name="285"><span class="lineNum">     285 </span>            :       }</a>
 <a name="286"><span class="lineNum">     286 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="287"><span class="lineNum">     287 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Inserted new filter at index &quot; &lt;&lt; index &lt;&lt; std::endl;</span></a>
+<a name="287"><span class="lineNum">     287 </span>            :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Inserted new filter at index &quot; &lt;&lt; index &lt;&lt; std::endl;</a>
 <a name="288"><span class="lineNum">     288 </span>            : #endif</a>
 <a name="289"><span class="lineNum">     289 </span>            :     }</a>
 <a name="290"><span class="lineNum">     290 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="291"><span class="lineNum">     291 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; PRINT_PREFIX();</span></a>
-<a name="292"><span class="lineNum">     292 </span><span class="lineNoCov">          0 :     printOutputCellVector();</span></a>
+<a name="291"><span class="lineNum">     291 </span>            :     std::cout &lt;&lt; PRINT_PREFIX();</a>
+<a name="292"><span class="lineNum">     292 </span>            :     printOutputCellVector();</a>
 <a name="293"><span class="lineNum">     293 </span>            : #endif</a>
 <a name="294"><span class="lineNum">     294 </span>            :   } else</a>
 <a name="295"><span class="lineNum">     295 </span>            :     std::cout &lt;&lt; &quot;WARNING: Trying to add filter at runtime to non-modifiable &quot;</a>
@@ -364,7 +364,7 @@
 <a name="302"><span class="lineNum">     302 </span><span class="lineNoCov">          0 :     for (auto child : _childSequences) {</span></a>
 <a name="303"><span class="lineNum">     303 </span><span class="lineNoCov">          0 :       child-&gt;updateInputCellVector(getOutputCellVector());</span></a>
 <a name="304"><span class="lineNum">     304 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="305"><span class="lineNum">     305 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Reported change in output vector to child sequence &quot; &lt;&lt; child-&gt;getName() &lt;&lt; std::endl;</span></a>
+<a name="305"><span class="lineNum">     305 </span>            :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Reported change in output vector to child sequence &quot; &lt;&lt; child-&gt;getName() &lt;&lt; std::endl;</a>
 <a name="306"><span class="lineNum">     306 </span>            : #endif</a>
 <a name="307"><span class="lineNum">     307 </span>            :     }</a>
 <a name="308"><span class="lineNum">     308 </span>            :   }</a>
@@ -379,7 +379,7 @@
 <a name="317"><span class="lineNum">     317 </span><span class="lineNoCov">          0 :     _cellVector2.push_back(new coupling::datastructures::MacroscopicCell&lt;dim&gt;(*cell));</span></a>
 <a name="318"><span class="lineNum">     318 </span>            :   }</a>
 <a name="319"><span class="lineNum">     319 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="320"><span class="lineNum">     320 </span><span class="lineNoCov">          0 :   std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Initialized cell vectors.&quot; &lt;&lt; std::endl;</span></a>
+<a name="320"><span class="lineNum">     320 </span>            :   std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Initialized cell vectors.&quot; &lt;&lt; std::endl;</a>
 <a name="321"><span class="lineNum">     321 </span>            : #endif</a>
 <a name="322"><span class="lineNum">     322 </span><span class="lineNoCov">          0 : }</span></a>
 </pre>
