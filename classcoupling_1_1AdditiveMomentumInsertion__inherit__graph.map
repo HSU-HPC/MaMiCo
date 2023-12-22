@@ -1,0 +1,5 @@
+<map id="coupling::AdditiveMomentumInsertion&lt; LinkedCell, dim &gt;" name="coupling::AdditiveMomentumInsertion&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title="used to manipulate the momentum/velocity of the molecules contained in a macroscopic cell." alt="" coords="7,94,194,135"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1MomentumInsertion.html" title="used to manipulate the momentum/ velocity of the molecules contained in a macroscopic cell." alt="" coords="5,5,196,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,62,103,94,98,94,98,62"/>
+</map>

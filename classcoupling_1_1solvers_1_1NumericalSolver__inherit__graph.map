@@ -1,0 +1,10 @@
+<map id="coupling::solvers::NumericalSolver" name="coupling::solvers::NumericalSolver">
+<area shape="rect" id="Node000001" title="is a virtual base class for the interface for a numerical fluid solver for the Couette scenario" alt="" coords="34,94,158,135"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html" title="implements a simple one&#45;dimensional finite&#45;diffference solver for the Couette flow." alt="" coords="22,183,170,223"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="90,150,91,182,86,182,84,150"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="108,150,106,182,101,182,102,150"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1solvers_1_1LBCouetteSolver.html" title="implements a three&#45;dimensional Lattice&#45;Boltzmann Couette flow solver." alt="" coords="194,183,318,223"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="147,140,221,180,219,185,144,145"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1AbstractCouetteSolver.html" title=" " alt="" coords="5,5,187,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,62,99,94,93,94,93,62"/>
+</map>

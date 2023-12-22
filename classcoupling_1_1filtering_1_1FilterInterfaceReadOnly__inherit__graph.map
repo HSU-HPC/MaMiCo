@@ -1,0 +1,11 @@
+<map id="coupling::filtering::FilterInterfaceReadOnly&lt; dim &gt;" name="coupling::filtering::FilterInterfaceReadOnly&lt; dim &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="204,63,367,119"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1filtering_1_1Copy.html" title=" " alt="" coords="425,5,541,46"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="380,57,424,42,426,47,382,62"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1filtering_1_1Strouhal.html" title=" " alt="" coords="424,71,542,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="382,88,424,88,424,94,382,94"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1filtering_1_1WriteToFile.html" title=" " alt="" coords="415,136,551,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="382,120,420,133,419,138,381,125"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1FilterInterface.html" title=" " alt="" coords="5,71,156,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,88,203,88,203,94,171,94"/>
+</map>

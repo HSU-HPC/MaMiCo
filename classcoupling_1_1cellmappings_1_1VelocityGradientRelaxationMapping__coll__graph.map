@@ -1,0 +1,7 @@
+<map id="coupling::cellmappings::VelocityGradientRelaxationMapping&lt; LinkedCell, dim &gt;" name="coupling::cellmappings::VelocityGradientRelaxationMapping&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title="This class relaxes velocities of molecules towards an interpolated avergaged velocity value." alt="" coords="86,199,268,255"/>
+<area shape="rect" id="Node000002" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="5,5,138,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,62,60,117,64,147,75,174,98,197,95,200,71,176,59,148,54,117,60,61"/>
+<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="223,5,341,46"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="285,62,278,118,269,148,255,177,231,200,228,197,251,173,264,146,273,117,280,61"/>
+</map>

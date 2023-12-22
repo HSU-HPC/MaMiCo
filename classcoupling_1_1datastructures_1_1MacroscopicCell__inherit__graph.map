@@ -1,0 +1,5 @@
+<map id="coupling::datastructures::MacroscopicCell&lt; dim &gt;" name="coupling::datastructures::MacroscopicCell&lt; dim &gt;">
+<area shape="rect" id="Node000001" title="defines the cell type with cell&#45;averaged quantities only (no linked cells)." alt="" coords="31,5,197,46"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1datastructures_1_1MacroscopicCellWithLinkedCells.html" title="defines the cell type with cell&#45;averaged quantities. Derived from the class coupling::datastructures:..." alt="" coords="5,94,223,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,61,117,93,111,93,111,61"/>
+</map>

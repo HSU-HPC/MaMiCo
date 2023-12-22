@@ -1,0 +1,11 @@
+<map id="coupling::filtering::NLM&lt; dim, scope &gt;" name="coupling::filtering::NLM&lt; dim, scope &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="570,50,711,91"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1JunctorInterface.html" title=" " alt="" coords="277,5,406,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="422,38,546,52,570,55,569,61,546,57,421,43"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1filtering_1_1FilterInterface.html" title=" " alt="" coords="5,13,156,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="171,31,276,31,276,36,171,36"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1filtering_1_1Field.html" title=" " alt="" coords="283,85,400,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="415,105,479,104,546,97,580,89,581,94,546,102,479,109,415,111"/>
+<area shape="rect" id="Node000005" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="14,85,147,126"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="162,103,283,103,283,108,162,108"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="coupling::filtering::FilterJunction&lt; dim, inputc &gt;" name="coupling::filtering::FilterJunction&lt; dim, inputc &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="13,94,155,150"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1FilterSequence.html" title=" " alt="" coords="5,5,163,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,61,87,93,81,93,81,61"/>
+</map>

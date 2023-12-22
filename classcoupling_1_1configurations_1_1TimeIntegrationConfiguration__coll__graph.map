@@ -1,0 +1,5 @@
+<map id="coupling::configurations::TimeIntegrationConfiguration" name="coupling::configurations::TimeIntegrationConfiguration">
+<area shape="rect" id="Node000001" title="reads time integration configuration" alt="" coords="5,94,198,135"/>
+<area shape="rect" id="Node000002" href="$classtarch_1_1configuration_1_1Configuration.html" title=" " alt="" coords="37,5,166,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,62,104,94,99,94,99,62"/>
+</map>

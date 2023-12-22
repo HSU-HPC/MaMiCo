@@ -1,0 +1,5 @@
+<map id="coupling::filtering::Gauss&lt; dim, scope &gt;" name="coupling::filtering::Gauss&lt; dim, scope &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,156,135"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1FilterInterface.html" title=" " alt="" coords="5,5,156,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,62,83,94,78,94,78,62"/>
+</map>

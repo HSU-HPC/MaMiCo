@@ -1,0 +1,16 @@
+<map id="coupling::services::MacroscopicCellServiceImpl&lt; LinkedCell, dim &gt;" name="coupling::services::MacroscopicCellServiceImpl&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="697,187,890,242"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1services_1_1MacroscopicCellService.html" title=" " alt="" coords="245,5,412,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="428,48,548,78,612,99,675,125,722,154,762,184,759,189,719,158,672,130,611,104,546,83,426,53"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1sendrecv_1_1FromMacro2MD.html" title=" " alt="" coords="222,85,434,155"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="450,142,698,192,697,198,449,147"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send&#45;/ receive methodology." alt="" coords="5,140,173,196"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="187,145,221,139,222,144,189,151"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1sendrecv_1_1FromMD2Macro.html" title=" " alt="" coords="222,179,434,250"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="189,184,222,191,221,196,188,190"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="450,212,697,212,697,217,450,217"/>
+<area shape="rect" id="Node000006" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="262,274,394,315"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="409,292,534,285,604,276,673,262,735,240,736,245,674,267,605,281,535,290,410,297"/>
+<area shape="rect" id="Node000007" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="269,348,387,388"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="403,375,464,377,533,375,604,363,639,353,672,340,704,320,732,294,773,241,777,244,736,298,707,324,675,345,641,358,606,369,533,380,464,383,403,380"/>
+</map>

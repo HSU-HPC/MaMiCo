@@ -1,0 +1,9 @@
+<map id="coupling::transferstrategies::TransferStrategy4NieCoupling&lt; LinkedCell, dim &gt;" name="coupling::transferstrategies::TransferStrategy4NieCoupling&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="408,63,608,119"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1transferstrategies_1_1TransferStrategy.html" title=" " alt="" coords="5,5,240,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="256,33,384,52,417,60,415,65,383,58,255,39"/>
+<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="63,71,182,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,88,407,88,407,94,197,94"/>
+<area shape="rect" id="Node000004" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="63,136,182,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="196,141,407,105,408,111,197,146"/>
+</map>

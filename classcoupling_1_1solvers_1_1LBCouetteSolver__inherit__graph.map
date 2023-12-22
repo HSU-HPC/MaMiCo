@@ -1,0 +1,9 @@
+<map id="coupling::solvers::LBCouetteSolver" name="coupling::solvers::LBCouetteSolver">
+<area shape="rect" id="Node000001" title="implements a three&#45;dimensional Lattice&#45;Boltzmann Couette flow solver." alt="" coords="114,183,238,223"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1NumericalSolver.html" title="is a virtual base class for the interface for a numerical fluid solver for the Couette scenario" alt="" coords="34,94,158,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,144,160,180,156,184,122,148"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1solvers_1_1AbstractCouetteSolver.html" title=" " alt="" coords="5,5,187,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="99,62,99,94,93,94,93,62"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1interface_1_1PintableMacroSolver.html" title=" " alt="" coords="182,94,330,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="230,148,196,184,192,180,226,144"/>
+</map>

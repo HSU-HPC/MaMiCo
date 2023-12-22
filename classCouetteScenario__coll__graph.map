@@ -1,0 +1,50 @@
+<map id="CouetteScenario" name="CouetteScenario">
+<area shape="rect" id="Node000001" title="Versatile configurable Couette flow test for noise&#45;filtered multi&#45;instance Nie coupling." alt="" coords="1045,510,1162,536"/>
+<area shape="rect" id="Node000002" href="$classScenario.html" title=" " alt="" coords="733,134,805,160"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="821,151,870,162,924,181,978,209,1002,227,1023,249,1046,282,1064,319,1088,394,1100,463,1104,510,1099,510,1095,463,1083,396,1059,321,1041,285,1019,253,998,231,975,213,922,185,868,167,820,156"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1configurations_1_1MaMiCoConfiguration.html" title=" " alt="" coords="679,184,859,225"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="832,229,877,254,928,284,978,321,1023,364,1051,402,1073,443,1100,509,1095,511,1069,445,1046,405,1019,367,974,325,925,289,875,258,830,234"/>
+<area shape="rect" id="Node000004" href="$classtarch_1_1configuration_1_1Configuration.html" title=" " alt="" coords="5,111,135,151"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="89,96,127,46,153,23,183,6,264,3,420,5,643,11,658,30,664,50,663,70,659,91,652,131,656,151,667,170,681,182,677,186,663,174,651,153,647,131,653,90,658,70,658,51,653,33,640,16,420,10,264,8,185,11,156,28,131,50,93,99"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1configurations_1_1ParticleInsertionConfiguration.html" title="configuration for particle insertion algorithm (e.g.: USHER)." alt="" coords="195,20,391,61"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="120,101,183,71,217,59,219,64,185,76,123,105"/>
+<area shape="rect" id="Node000006" href="$classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html" title="momentum insertion configuration. friend class: NieTest" alt="" coords="184,85,401,126"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="150,119,183,115,184,121,150,124"/>
+<area shape="rect" id="Node000007" href="$classcoupling_1_1configurations_1_1ParallelTopologyConfiguration.html" title="reads parallel topology configuration. XYZ and ZYX are supported." alt="" coords="194,151,391,191"/>
+<area shape="poly" id="edge9_Node000007_Node000004" title=" " alt="" coords="150,143,194,150,193,156,149,148"/>
+<area shape="rect" id="Node000008" href="$classcoupling_1_1configurations_1_1TimeIntegrationConfiguration.html" title="reads time integration configuration" alt="" coords="197,216,389,257"/>
+<area shape="poly" id="edge11_Node000008_Node000004" title=" " alt="" coords="113,158,147,180,185,200,216,213,214,218,183,205,145,185,110,162"/>
+<area shape="rect" id="Node000009" href="$classcoupling_1_1configurations_1_1ThermostatConfiguration.html" title=" " alt="" coords="209,281,377,322"/>
+<area shape="poly" id="edge13_Node000009_Node000004" title=" " alt="" coords="93,163,132,216,157,243,185,266,209,279,207,283,183,270,153,247,128,220,89,166"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="407,29,466,32,529,43,589,64,617,79,643,98,655,117,657,135,658,153,667,170,682,181,678,186,663,174,652,155,651,136,650,118,639,102,614,84,587,69,527,48,466,37,406,34"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="417,115,527,132,642,159,666,170,698,181,696,186,664,175,640,164,526,137,416,120"/>
+<area shape="poly" id="edge8_Node000003_Node000007" title=" " alt="" coords="407,176,679,195,679,201,407,181"/>
+<area shape="poly" id="edge10_Node000003_Node000008" title=" " alt="" coords="404,231,641,218,678,214,679,219,642,223,405,236"/>
+<area shape="poly" id="edge12_Node000003_Node000009" title=" " alt="" coords="392,292,512,277,641,251,721,223,723,228,642,256,513,282,393,297"/>
+<area shape="rect" id="Node000010" href="$structcoupling_1_1configurations_1_1CouetteConfig.html" title="Configuration parameters for Couette flow scenario." alt="" coords="691,347,847,387"/>
+<area shape="poly" id="edge14_Node000001_Node000010" title=" " alt="" coords="863,375,943,395,984,410,1022,430,1046,448,1067,469,1096,508,1092,511,1063,473,1042,452,1019,434,982,415,941,400,862,380"/>
+<area shape="rect" id="Node000011" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="234,347,352,387"/>
+<area shape="poly" id="edge15_Node000010_Node000011" title=" " alt="" coords="367,364,691,364,691,370,367,370"/>
+<area shape="rect" id="Node000012" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="234,412,352,453"/>
+<area shape="poly" id="edge16_Node000010_Node000012" title=" " alt="" coords="367,421,641,385,690,377,691,382,642,390,368,426"/>
+<area shape="rect" id="Node000013" href="$classcoupling_1_1solvers_1_1AbstractCouetteSolver.html" title=" " alt="" coords="678,412,860,453"/>
+<area shape="poly" id="edge17_Node000001_Node000013" title=" " alt="" coords="875,445,948,459,1022,480,1080,507,1078,512,1020,485,947,465,874,450"/>
+<area shape="rect" id="Node000014" href="$classtarch_1_1utils_1_1MultiMDService.html" title=" " alt="" coords="665,477,873,502"/>
+<area shape="poly" id="edge18_Node000001_Node000014" title=" " alt="" coords="888,499,1044,514,1044,520,888,504"/>
+<area shape="rect" id="Node000015" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="227,477,359,518"/>
+<area shape="poly" id="edge19_Node000014_Node000015" title=" " alt="" coords="374,493,665,489,665,494,374,499"/>
+<area shape="rect" id="Node000016" href="$classcoupling_1_1services_1_1MultiMDCellService.html" title=" " alt="" coords="686,527,852,583"/>
+<area shape="poly" id="edge20_Node000001_Node000016" title=" " alt="" coords="867,552,942,549,1020,541,1054,534,1056,539,1021,546,942,554,867,557"/>
+<area shape="rect" id="Node000017" href="$structCouetteScenario_1_1CouplingBuffer.html" title="holds the buffers for the data transfer" alt="" coords="682,607,856,647"/>
+<area shape="poly" id="edge21_Node000001_Node000017" title=" " alt="" coords="870,612,945,597,1020,573,1055,554,1084,534,1087,538,1058,559,1022,578,946,602,871,617"/>
+<area shape="rect" id="Node000018" href="$classcoupling_1_1InstanceHandling.html" title=" " alt="" coords="681,672,857,713"/>
+<area shape="poly" id="edge22_Node000001_Node000018" title=" " alt="" coords="872,680,947,661,985,647,1019,628,1044,606,1066,581,1093,535,1098,537,1070,584,1048,610,1022,632,987,652,949,666,873,685"/>
+<area shape="rect" id="Node000019" href="$structCouetteScenario_1_1TimingValues.html" title="holds all the variables for the time measurement of a simulation" alt="" coords="668,737,870,762"/>
+<area shape="poly" id="edge23_Node000001_Node000019" title=" " alt="" coords="885,746,920,740,955,730,989,716,1019,697,1037,679,1053,659,1076,613,1090,569,1097,535,1103,537,1095,570,1081,615,1057,662,1041,683,1022,701,991,721,957,735,921,745,886,751"/>
+<area shape="rect" id="Node000020" href="$classcoupling_1_1MultiMDMediator.html" title=" " alt="" coords="682,787,856,827"/>
+<area shape="poly" id="edge24_Node000001_Node000020" title=" " alt="" coords="871,811,910,808,949,800,986,786,1019,765,1043,740,1062,710,1076,677,1086,643,1097,581,1099,536,1105,536,1102,581,1091,645,1081,679,1066,712,1047,743,1022,769,988,791,950,806,910,814,872,817"/>
+<area shape="rect" id="Node000021" href="$classcoupling_1_1services_1_1MultiMDCellService.html" title=" " alt="" coords="203,743,382,799"/>
+<area shape="poly" id="edge25_Node000020_Node000021" title=" " alt="" coords="398,776,682,798,682,803,397,781"/>
+<area shape="rect" id="Node000022" href="$classcoupling_1_1InstanceHandling.html" title=" " alt="" coords="203,823,382,863"/>
+<area shape="poly" id="edge26_Node000020_Node000022" title=" " alt="" coords="398,833,641,815,681,812,682,817,642,821,398,838"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="coupling::BoundaryForceController&lt; LinkedCell, dim &gt;" name="coupling::BoundaryForceController&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title="controller for forces acting at open MD boundaries" alt="" coords="5,39,223,79"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1NoBoundaryForce.html" title="dummy implementation, applying no boundary force." alt="" coords="277,5,456,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="238,40,276,35,276,40,238,45"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1ZhouBoundaryForceController.html" title="applies the boundary force from Zhou et al. in boundary cell." alt="" coords="271,71,462,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,72,271,76,270,81,238,77"/>
+</map>

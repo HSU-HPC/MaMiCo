@@ -1,0 +1,7 @@
+<map id="coupling::configurations::TransferStrategyConfiguration&lt; dim &gt;" name="coupling::configurations::TransferStrategyConfiguration&lt; dim &gt;">
+<area shape="rect" id="Node000001" title="transfer strategy configuration, i.e. algorithm/combin. of quantity transfer steps and quantity inter..." alt="" coords="23,109,264,150"/>
+<area shape="rect" id="Node000002" href="$classtarch_1_1configuration_1_1Configuration.html" title=" " alt="" coords="5,5,135,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,57,131,107,127,110,91,60"/>
+<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="159,5,277,46"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,60,160,110,156,107,192,57"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="coupling::UsherParticleInsertion&lt; LinkedCell, dim &gt;" name="coupling::UsherParticleInsertion&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title="handles particle insertion (via Usher algorithm) and random particle deletion." alt="" coords="5,94,210,135"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1ParticleInsertion.html" title="interface for particle insertion/removal on macroscopic cell basis." alt="" coords="23,5,192,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,62,110,94,105,94,105,62"/>
+</map>

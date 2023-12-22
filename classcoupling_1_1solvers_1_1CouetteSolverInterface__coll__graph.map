@@ -1,0 +1,7 @@
+<map id="coupling::solvers::CouetteSolverInterface&lt; dim &gt;" name="coupling::solvers::CouetteSolverInterface&lt; dim &gt;">
+<area shape="rect" id="Node000001" title="interface to couette solver" alt="" coords="407,41,561,97"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1interface_1_1MacroscopicSolverInterface.html" title="interface for the macroscopic, i.e. continuum solver" alt="" coords="5,5,195,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,41,407,59,406,65,210,46"/>
+<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="34,85,166,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="181,104,278,101,382,91,406,87,407,92,383,96,278,106,182,109"/>
+</map>

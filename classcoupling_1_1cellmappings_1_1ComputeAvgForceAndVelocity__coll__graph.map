@@ -1,0 +1,5 @@
+<map id="coupling::cellmappings::ComputeAvgForceAndVelocity&lt; LinkedCell, dim &gt;" name="coupling::cellmappings::ComputeAvgForceAndVelocity&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title="This class sums up all force/velocity vectors and counts molecules inside a linked cell." alt="" coords="5,124,210,180"/>
+<area shape="rect" id="Node000002" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="48,5,167,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,61,110,124,105,124,105,61"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classcoupling_1_1MomentumInsertion.html" title="used to manipulate the momentum/ velocity of the molecules contained in a macroscopic cell." alt="" coords="5,136,196,177"/>
+<area shape="rect" id="Node000001" href="$classcoupling_1_1AdditiveMomentumInsertion.html" title="used to manipulate the momentum/velocity of the molecules contained in a macroscopic cell." alt="" coords="274,5,461,46"/>
+<area shape="poly" id="edge27_Node000000_Node000001" title=" " alt="" coords="137,124,185,89,243,57,275,44,277,49,245,61,188,94,140,128"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1NieVelocityImposition.html" title="Velocity imposition scheme following the respective paper by Nie et al., J. Fluid...." alt="" coords="267,71,468,111"/>
+<area shape="poly" id="edge28_Node000000_Node000002" title=" " alt="" coords="201,129,281,109,282,115,202,134"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1NoMomentumInsertion.html" title="dummy class. Empty momentum insertion mechanism. Doesn&#39;t change anything." alt="" coords="264,136,471,177"/>
+<area shape="poly" id="edge29_Node000000_Node000003" title=" " alt="" coords="211,154,263,154,263,159,211,159"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1SetGivenVelocity4MomentumInsertion.html" title=" " alt="" coords="244,201,491,242"/>
+<area shape="poly" id="edge30_Node000000_Node000004" title=" " alt="" coords="202,178,282,198,281,203,201,184"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1VelocityGradientRelaxation.html" title="carries out velocity relaxation (similar to the SetMomentumMapping procedure)." alt="" coords="271,267,464,307"/>
+<area shape="poly" id="edge31_Node000000_Node000005" title=" " alt="" coords="140,184,188,219,245,251,277,264,275,269,243,256,185,224,137,189"/>
+<area shape="rect" id="Node000006" href="$classcoupling_1_1VelocityGradientRelaxationTopOnly.html" title="carries out velocity relaxation (similar to the SetMomentumMapping procedure)." alt="" coords="539,267,779,307"/>
+<area shape="poly" id="edge32_Node000005_Node000006" title=" " alt="" coords="479,284,539,284,539,290,479,290"/>
+</map>

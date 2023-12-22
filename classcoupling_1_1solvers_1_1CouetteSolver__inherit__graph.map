@@ -1,0 +1,5 @@
+<map id="coupling::solvers::CouetteSolver&lt; dim &gt;" name="coupling::solvers::CouetteSolver&lt; dim &gt;">
+<area shape="rect" id="Node000001" title="implements an analytic Couette flow solver." alt="" coords="8,109,155,150"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1AbstractCouetteSolver.html" title="interface for continuum/macro fluid solvers for the Couette scenario" alt="" coords="5,5,158,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,77,84,109,79,109,79,77"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="coupling::cellmappings::SetKineticEnergyMapping&lt; LinkedCell, dim &gt;" name="coupling::cellmappings::SetKineticEnergyMapping&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title="This class sets kinetic energy over several linked cells." alt="" coords="5,109,181,165"/>
+<area shape="rect" id="Node000002" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="34,5,152,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,62,96,109,90,109,90,62"/>
+</map>
