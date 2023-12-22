@@ -89,10 +89,6 @@ message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_CO
 set(COMPILETEST_MODES "Debug DebugOptimized RelWithDebInfo Release" CACHE STRING "Build mode list to be used for compiletest")
 message(STATUS ">> Build mode list to be used for compiletest : " ${COMPILETEST_MODES})
 
-# Enable coupling with indexing tests, default is off
-option(BUILD_WITH_TEST_INDEXING "Enable indexing tests, default is off." OFF)
-message(STATUS ">> Build with indexing tests : " ${BUILD_WITH_TEST_INDEXING})
-
 # Enable coupling with pint debug, default is off
 option(BUILD_WITH_PINT_DEBUG "Enable parallel-in-time integration debugging, default is off." OFF)
 message(STATUS ">> Build with PINT_DEBUG : " ${BUILD_WITH_PINT_DEBUG})
@@ -326,9 +322,6 @@ if(BUILD_WITH_PRECICE)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
 	target_link_libraries(mamico INTERFACE precice::precice)
 endif()
-if(BUILD_WITH_TEST_INDEXING)
-	target_compile_definitions(mamico INTERFACE TEST_INDEXING)
-endif()
 if(BUILD_WITH_PINT_DEBUG)
   target_compile_definitions(mamico INTERFACE PINT_DEBUG)
 endif()
@@ -386,7 +379,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
   target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
   target_compile_options(mamico INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE PINT_DEBUG)
+  if (NOT ENABLE_COVERAGE)
+    target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE PINT_DEBUG)
+  endif()
   target_compile_options(mamico INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(mamico INTERFACE MDCoupledError)
@@ -540,8 +535,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/indexing/CellIndex.cpph"
   "coupling/indexing/IndexingService.cpp"
   "coupling/indexing/Operations.h"
-  "coupling/indexing/Testing.cpph"
-  "coupling/indexing/Testing.h"
   "coupling/indexing/IndexingService.h"
   "coupling/indexing/CellIndex.h"
   "coupling/sendrecv/FromMacro2MDSendOnly.h"
@@ -648,6 +641,9 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/solvers/LBCouetteSolverStateTest.cpp"
   "test/unit/coupling/solvers/PintableLBCouetteSolverTest.cpp"
   "test/unit/getTestNames.cpp"
+  "test/unit/coupling/indexing/OperationsTest.cpp"
+  "test/unit/coupling/indexing/CellIndexTest.cpp"
+  "test/unit/coupling/indexing/IndexingServiceTest.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
@@ -784,7 +780,7 @@ if(ENABLE_COVERAGE)
     coverage
     # gather data
     COMMAND
-      ${LCOV} --ignore-errors unused  --directory . --capture --exclude */test/* --exclude '/usr/*' --exclude '*/simplemd/*' --output-file coverage.info
+      ${LCOV} --directory . --capture --exclude */test/* --exclude '/usr/*' --exclude '*/simplemd/*' --output-file coverage.info
     # generate report
     COMMAND ${GENHTML} --demangle-cpp -o coverage coverage.info
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -816,15 +812,18 @@ if (BUILD_TESTING)
     ${TEST_SOURCES}
   )
   set_target_properties(testmamico PROPERTIES CXX_STANDARD 17)
+  target_compile_definitions(testmamico PRIVATE MDCoupledError)
   target_link_libraries(testmamico PRIVATE mamico)
   target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
   target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
   target_link_libraries(testmamico PRIVATE cppunit)
 
   message(STATUS ">> Running cmake with GET_TEST_NAMES ON ...")
+  message(STATUS "(((((((((((((((((((((((((((((((((( SUBPROCESSES_START ")
   execute_process(COMMAND cmake -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON -DENABLE_COVERAGE=OFF -DBUILD_WITH_MPI=${BUILD_WITH_MPI} .)
   message(STATUS ">> Building getTestNames executable ...")
-  execute_process(COMMAND make getTestNames)
+  execute_process(COMMAND make -j4 getTestNames)
+  message(STATUS "SUBPROCESSES_END ))))))))))))))))))))))))))))))))))")
   execute_process(COMMAND ./getTestNames OUTPUT_VARIABLE TEST_NAMES)
   separate_arguments(TEST_NAMES UNIX_COMMAND ${TEST_NAMES})
 

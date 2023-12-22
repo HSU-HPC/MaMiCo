@@ -7,3 +7,5 @@ RUN apt install -y pybind11-dev python3-pybind11 python-is-python3 python3 pytho
 ENV PATH "/usr/lib/ccache:$PATH"
 ENV OMPI_ALLOW_RUN_AS_ROOT 1
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM 1
+RUN apt install -y --no-install-recommends doxygen
+RUN apt install -y graphviz lcov

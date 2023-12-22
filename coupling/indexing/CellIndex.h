@@ -50,26 +50,6 @@ template <IndexTrait t1, IndexTrait t2, IndexTrait... rest> constexpr bool is_or
   }
 }
 
-template <IndexTrait t> constexpr std::string_view print_trait() {
-  if constexpr (t == IndexTrait::vector)
-    return "vector";
-  if constexpr (t == IndexTrait::local)
-    return "local";
-  if constexpr (t == IndexTrait::md2macro)
-    return "md2macro";
-  if constexpr (t == IndexTrait::noGhost)
-    return "noGhost";
-}
-
-template <IndexTrait t1, IndexTrait... rest> constexpr std::string_view print_traitlist() {
-  using namespace std::string_literals;
-
-  if constexpr (sizeof...(rest) == 0) {
-    return print_trait<t1>();
-  } else {
-    return std::string_view{print_trait<t1>().data() + ", "s + print_traitlist<rest...>().data()};
-  }
-}
 } // namespace TraitOperations
 
 /**
@@ -313,7 +293,18 @@ public:
   private:
     CellIndex _idx;
   };
-  static IndexIterator begin() { return IndexIterator(lowerBoundary); }
+  static IndexIterator begin() {
+    // if constexpr is neccessary here (otherwise benchmark performance breaks, due to runtime if)
+    if constexpr (std::is_same_v<unsigned int, value_T>) {
+      // If this CellIndex is scalar and if the domain is empty, then lowerBoundary can not be converted to CellIndex
+      // Thus we have to return something else as an iterator for the empty domain
+      if (linearNumberCellsInDomain == 0)
+        return IndexIterator(CellIndex{});
+      else
+        return IndexIterator(lowerBoundary);
+    } else
+      return IndexIterator(lowerBoundary);
+  }
   static IndexIterator end() {
     // Todo: This if-else branching is quite slow? (~factor 2)
     if (linearNumberCellsInDomain == 0)
@@ -321,6 +312,8 @@ public:
     else
       return ++IndexIterator(upperBoundary);
   }
+
+  static const char TNAME[];
 
 private:
   value_T _index;

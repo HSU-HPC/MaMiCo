@@ -22,6 +22,11 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
   while (currFilterNode) {
     coupling::filtering::FilterInterface<dim>* newfilter = nullptr;
 
+    bool sequential = false;
+    if (const char* seqAttr = currFilterNode->Attribute("sequential"))
+      if (std::strcmp(seqAttr, "true") == 0)
+        sequential = true;
+
     // ###############################################################
     //  This is where you have to define how to handle each filter individually.
     //  Write To File
@@ -105,7 +110,11 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
       const char* extrapolation;
       extrapolation = currFilterNode->Attribute("extrapolation");
 
-      newfilter = new coupling::filtering::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int)d, sigma, extrapolation);
+      if (sequential)
+        newfilter = new coupling::filtering::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int)d, sigma, extrapolation);
+      else
+        newfilter = new coupling::filtering::Gauss<dim, coupling::indexing::IndexTrait::local>(inputCellVector, outputCellVector, _filteredValues,
+                                                                                               (unsigned int)d, sigma, extrapolation);
     }
 
     // POD
@@ -177,12 +186,9 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
 
 // sequential filtering
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    if (const char* sequential = currFilterNode->Attribute("sequential")) {
-      if (std::strcmp(sequential, "true") == 0)
-        _filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, _comm));
-      else
-        _filters.push_back(newfilter);
-    } else
+    if (sequential)
+      _filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, _comm));
+    else
 #endif
       _filters.push_back(newfilter);
 
