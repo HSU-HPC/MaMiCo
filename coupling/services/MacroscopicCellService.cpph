@@ -155,9 +155,11 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMa
 }
 
 template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMD2MacroPreProcess() {
+  // transfer strategy
   Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
 
+  // pre-process data before sending to macroscopic solver
   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
 }
@@ -189,13 +191,7 @@ template <class LinkedCell, unsigned int dim>
 double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(
     const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
     const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
-  // transfer strategy
-  Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);
-  Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
-
-  // pre-process data before sending to macroscopic solver
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
+  sendFromMD2MacroPreProcess();
 
   double runtime = applyFilterPipeline();
 

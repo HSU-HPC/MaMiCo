@@ -135,7 +135,7 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::bcastFromMacro2MD(
   // SendReceiveBuffer<MacroscopicCell,dim >::triggerReceivingCollective(indexConversion, dataExchange);
   SendReceiveBuffer<MacroscopicCell, dim>::triggerBcasts(rank);
 
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllBcasts(*dataExchangeFromMacroscopicCellServices[0]->getIndexConversion());
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllCollectiveOperations();
 
   for (unsigned int i = 0; i < dataExchangeFromMacroscopicCellServices.size(); ++i) {
     if (macroscopicCellsFromMamico[i].empty())

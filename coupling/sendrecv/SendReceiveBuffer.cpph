@@ -280,18 +280,17 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReduce(
 #endif
 }
 
-template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllBcasts(const coupling::IndexConversion<dim>& indexConversion) {
+template <class MacroscopicCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllCollectiveOperations() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   // if no requests have been allocated, return immediately
   if (!_requestsAllocated && (_requests == nullptr)) {
     return;
   }
   if (_requests == nullptr) {
-    std::cout << "ERROR coupling::SendReceiveBuffer::waitAllOperations(): _requests==NULL!" << std::endl;
+    std::cout << "ERROR coupling::SendReceiveBuffer::waitAllCollectiveOperations(): _requests==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
-  int err = MPI_Waitall(_bcastSize, _requests, MPI_STATUSES_IGNORE);
+  int err = MPI_Waitall(_bcastOrReduceSize, _requests, MPI_STATUSES_IGNORE);
   if (err != MPI_SUCCESS) {
     char* str = new char[MPI_MAX_ERROR_STRING];
     int len = -1;
@@ -322,9 +321,8 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReduce
     return;
   }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(globalVectorIndex);
-  const unsigned int ranksSize = (unsigned int)ranks.size();
-  std::cout << "Rank " << indexConversion.getThisRank() << ": allocate receive buffers for cell " << globalVectorIndex << ";";
+  const unsigned int ranksSize = (unsigned int)targetRanks.size();
+  std::cout << "Rank " << indexConversion.getThisRank() << ": allocate reduce buffers for cell " << globalVectorIndex << ";";
   std::cout << " associated source ranks: ";
   for (unsigned int i = 0; i < ranksSize; i++) {
     std::cout << ranks[i] << " ";
@@ -348,9 +346,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReduce
     const unsigned int subdomain = rank % intNumberProcesses;
     const unsigned int key = indexConversion.getThisRank() * intNumberProcesses + subdomain;
     subdomainMap[key].insert(rank);
-  }
-  if (subdomainMap.empty()) {
-    return;
   }
 
   // loop over source ranks
@@ -491,26 +486,26 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateBcastR
   }
 
   // determine number of MPI requests
-  _bcastSize = _bcastBuffer.size();
+  _bcastOrReduceSize = _bcastBuffer.size();
 
   // nop, that is no request allocations, if there are no MPI transfers
-  if (_bcastSize == 0) {
+  if (_bcastOrReduceSize == 0) {
     return;
   }
 
-  _requests = new MPI_Request[_bcastSize];
+  _requests = new MPI_Request[_bcastOrReduceSize];
   if (_requests == nullptr) {
     std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): _requests==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
   // TODO better method for checking whether groups changed
-  if (static_cast<unsigned int>(_bcastSize) == _subComms.size()) {
+  if (static_cast<unsigned int>(_bcastOrReduceSize) == _subComms.size()) {
     return;
   }
 
-  _subComms.resize(_bcastSize);
-  _subGroups.resize(_bcastSize);
+  _subComms.resize(_bcastOrReduceSize);
+  _subGroups.resize(_bcastOrReduceSize);
 
   MPI_Group group;
   MPI_Comm_group(MPI_COMM_WORLD, &group);
@@ -569,32 +564,32 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReduce
     return;
   }
   // determine number of MPI requests
-  _bcastSize = 0;
+  _bcastOrReduceSize = 0;
   for (std::pair<const unsigned int, BufferCollective>& buffer : _reduceBuffer) {
     const std::set<unsigned int>& nonRootRanks = buffer.second.nonRootRanks;
     if (!nonRootRanks.empty() && (nonRootRanks.size() > 1 || nonRootRanks.find(buffer.second.rootRank) == nonRootRanks.end())) {
-      _bcastSize += 1;
+      _bcastOrReduceSize += 1;
     }
   }
 
   // nop, that is no request allocations, if there are no MPI transfers
-  if (_bcastSize == 0) {
+  if (_bcastOrReduceSize == 0) {
     return;
   }
 
-  _requests = new MPI_Request[_bcastSize];
+  _requests = new MPI_Request[_bcastOrReduceSize];
   if (_requests == nullptr) {
     std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): _requests==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
   // TODO better method for checking whether groups changed
-  if (static_cast<unsigned int>(_bcastSize) == _subComms.size()) {
+  if (static_cast<unsigned int>(_bcastOrReduceSize) == _subComms.size()) {
     return;
   }
 
-  _subComms.resize(_bcastSize);
-  _subGroups.resize(_bcastSize);
+  _subComms.resize(_bcastOrReduceSize);
+  _subGroups.resize(_bcastOrReduceSize);
 
   MPI_Group group;
   MPI_Comm_group(MPI_COMM_WORLD, &group);

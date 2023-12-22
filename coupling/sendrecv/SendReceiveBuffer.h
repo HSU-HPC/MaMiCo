@@ -145,8 +145,8 @@ protected:
    */
   void waitAllOperations();
 
-  /** wait for all broadcast operations to complete */
-  void waitAllBcasts(const coupling::IndexConversion<dim>& indexConversion);
+  /** wait for all broadcast or reduce operations to complete */
+  void waitAllCollectiveOperations();
 
   /** allocates send and receive requests
    */
@@ -203,7 +203,7 @@ private:
 
   std::vector<MPI_Comm> _subComms;
   std::vector<MPI_Group> _subGroups;
-  int _bcastSize;
+  int _bcastOrReduceSize;
 
   static void elementWiseSum(void* in, void* inout, int* len, MPI_Datatype* datatype) {
     auto* output = (double*)inout;

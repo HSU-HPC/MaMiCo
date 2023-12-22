@@ -224,7 +224,7 @@ public:
     // Fall back on sequential operation when MPI is not available (avoids redundant implementation)
     sendFromMacro2MD(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return;
-#endif
+#else
 
     std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*> allDEs(_totalNumberMDSimulations);
     std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
@@ -256,6 +256,7 @@ public:
       delete de;
       de = nullptr;
     }
+#endif
   }
 
   /** Creates the sum over all instances' macroscopic cells, in order to reduce the amount of communication needed.
@@ -293,9 +294,9 @@ public:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
     // Fall back on sequential operation when MPI is not available (avoids redundant implementation)
     return sendFromMD2Macro(macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
-#endif
+#else
     double res = 0;
-    unsigned int size = macroscopicCellsFromMacroscopicSolver.size(); // we assume globalCellIndicesFromMacroscopicSolver to be of identical size
+    const unsigned int size = (unsigned int)macroscopicCellsFromMacroscopicSolver.size();
 
     preprocessingForMD2Macro(globalCellIndicesFromMacroscopicSolver, size);
 
@@ -358,6 +359,7 @@ public:
       macroscopicCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(_macroscopicCells[i]->getMacroscopicMomentum());
     }
     return res;
+#endif
   }
 
   /** collects data from MD simulations, averages over them (only macroscopic
