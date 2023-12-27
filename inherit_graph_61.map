@@ -1,3 +1,19 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title=" " alt="" coords="5,5,211,76"/>
+<area shape="rect" id="Node000000" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send&#45;/ receive methodology." alt="" coords="5,341,173,397"/>
+<area shape="rect" id="Node000001" href="$classcoupling_1_1sendrecv_1_1FromMD2Macro.html" title=" " alt="" coords="221,5,433,76"/>
+<area shape="poly" id="edge39_Node000000_Node000001" title=" " alt="" coords="97,325,113,272,138,208,173,143,194,113,219,85,232,74,235,79,223,89,199,116,177,146,143,210,118,273,103,327"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1sendrecv_1_1FromMD2MacroRecvOnly.html" title=" " alt="" coords="224,100,430,171"/>
+<area shape="poly" id="edge40_Node000000_Node000002" title=" " alt="" coords="108,326,153,253,184,214,219,180,234,169,237,173,222,184,188,218,158,256,113,329"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1sendrecv_1_1FromMacro2MD.html" title=" " alt="" coords="221,195,433,265"/>
+<area shape="poly" id="edge41_Node000000_Node000003" title=" " alt="" coords="137,329,219,274,240,263,242,268,222,279,140,334"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1sendrecv_1_1FromMacro2MDSendOnly.html" title=" " alt="" coords="224,289,430,360"/>
+<area shape="poly" id="edge42_Node000000_Node000004" title=" " alt="" coords="187,348,223,341,224,346,188,353"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1sendrecv_1_1FromMD2Macro.html" title="sends macroscopic cell information from MaMiCo to the macroscopic solver. Derived from the class coup..." alt="" coords="224,384,430,439"/>
+<area shape="poly" id="edge43_Node000000_Node000005" title=" " alt="" coords="189,384,224,390,223,395,188,389"/>
+<area shape="rect" id="Node000006" href="$classcoupling_1_1sendrecv_1_1FromMD2MacroRecvOnly.html" title="sends macroscopic cell information from MaMiCo to the macroscopic solver. Expects to only receive dat..." alt="" coords="239,464,415,519"/>
+<area shape="poly" id="edge44_Node000000_Node000006" title=" " alt="" coords="144,403,222,449,247,460,245,465,219,454,141,407"/>
+<area shape="rect" id="Node000007" href="$classcoupling_1_1sendrecv_1_1FromMacro2MD.html" title="SendReceiveBuffer for transfer of quantities from a macroscopic solver to the macroscopic cells...." alt="" coords="224,544,430,599"/>
+<area shape="poly" id="edge45_Node000000_Node000007" title=" " alt="" coords="116,408,161,470,190,502,222,529,241,541,238,545,219,533,186,505,157,473,112,411"/>
+<area shape="rect" id="Node000008" href="$classcoupling_1_1sendrecv_1_1FromMacro2MDSendOnly.html" title="SendReceiveBuffer for transfer of quantities from a macroscopic solver to the macroscopic cells...." alt="" coords="239,624,415,679"/>
+<area shape="poly" id="edge46_Node000000_Node000008" title=" " alt="" coords="105,410,123,456,147,510,181,563,222,609,240,622,237,626,219,613,176,566,143,512,118,458,100,412"/>
 </map>
