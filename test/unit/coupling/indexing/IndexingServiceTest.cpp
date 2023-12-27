@@ -354,12 +354,10 @@ public:
 
     service.init({12}, {2, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u);
 
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     // out of domain
     CPPUNIT_ASSERT_THROW(service.getUniqueRankForMacroscopicCell({1, 14, 1}, {12}), std::runtime_error);
     CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForMacroscopicCell({1, 1, 1}, {12}), 0u);
     CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForMacroscopicCell({7, 1, 1}, {12}), 1u);
-#endif
   }
 
 private:
