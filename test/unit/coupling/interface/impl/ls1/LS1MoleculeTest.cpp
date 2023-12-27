@@ -2,7 +2,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
-
+//add simulation in includes! dont rely on include chain!
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
 
 #include <sstream>
@@ -25,7 +25,9 @@ public:
 		coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0,0);
 		coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1,0);
 		coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2,0);
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 		coupling::interface::LS1StaticCommData::getInstance().setLocalCommunicator(MPI_COMM_WORLD);
+#endif
 		_testSimulation = new Simulation();
 		global_simulation = _testSimulation;
 		_testSimulation->disableFinalCheckpoint();

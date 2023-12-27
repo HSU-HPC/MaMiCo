@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mardyn version="20100525">
- <loglevel>ERROR</loglevel>
+  <loglevel>ERROR</loglevel>
   <refunits type="SI">
     <length unit="nm">0.34</length> <!-- was 0.0529177-->
     <mass unit="u">39.948</mass> <!-- was 1000-->
@@ -65,8 +65,8 @@
     <algorithm>
       <parallelisation type="DomainDecomposition">
 	      <!--<MPIGridDims> <x>1</x><y>1</y> <z>1</z> </MPIGridDims>-->
-	      <boundaries> <x>reflective</x><y>reflective</y><z>reflective</z> </boundaries>
-        <!--<boundaries> <x>periodic</x><y>periodic</y><z>periodic</z> </boundaries>-->
+	      <!--<boundaries> <x>reflective</x><y>reflective</y><z>reflective</z> </boundaries>-->
+        <boundaries> <x>periodic</x><y>periodic</y><z>periodic</z> </boundaries>
       </parallelisation>
 	<datastructure type="LinkedCells">
 	<cellsInCutoffRadius>1</cellsInCutoffRadius>

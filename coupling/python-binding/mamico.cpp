@@ -650,7 +650,6 @@ PYBIND11_MODULE(mamico, mamico) {
       "getMDSimulation",
       [](const simplemd::configurations::MolecularDynamicsConfiguration& c1, const coupling::configurations::MaMiCoConfiguration<3>& c2, void* comm) {
         #if defined(LS1_MARDYN)
-          assert((c2.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3, unsigned int>(1)));
           auto offset = c1.getDomainConfiguration().getGlobalDomainOffset();
           coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
           coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported

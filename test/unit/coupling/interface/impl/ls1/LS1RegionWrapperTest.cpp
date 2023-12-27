@@ -7,7 +7,9 @@
 
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 
+#include "tarch/la/Vector.h"
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
+
 
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
 
@@ -15,6 +17,7 @@ class LS1RegionWrapperTest : public CppUnit::TestFixture
 {
 	CPPUNIT_TEST_SUITE(LS1RegionWrapperTest);
 	CPPUNIT_TEST(testPointIsInRegion);
+	CPPUNIT_TEST(testRegionIsInRegion);
 	CPPUNIT_TEST(testSetRegion);
 	CPPUNIT_TEST(testPotentialEnergyAtPoint);
 	CPPUNIT_TEST(testAddAndDeleteParticle);
@@ -30,7 +33,9 @@ public:
 		coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0,0);
 		coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1,0);
 		coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2,0);
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 		coupling::interface::LS1StaticCommData::getInstance().setLocalCommunicator(MPI_COMM_WORLD);
+#endif
 		_testSimulation = new Simulation();
 		global_simulation = _testSimulation;
 		_testSimulation->disableFinalCheckpoint();
@@ -94,7 +99,7 @@ public:
 			}
 			wrapper.iteratorNext();
 		}
-		CPPUNIT_ASSERT_MESSAGE("Found after insertion", !(found ^ wrapper.isInRegion(position)));
+		CPPUNIT_ASSERT_MESSAGE("Found after insertion", found == wrapper.isInRegion(position));
 
 		//deletion
 		wrapper.deleteMolecule(tempParticle);
@@ -141,7 +146,7 @@ public:
 		//region centre
 		tarch::la::Vector<3,double> regionCenter = {(start[0]+end[0])/2, (start[1]+end[1])/2,(start[2]+end[2])/2};
 
-		//generate list of 20 random points less than 1000
+		//generate list of 24 random points less than 1000, then add the centre faces slightly perturbed to make total 30
 		const int numberOfPoints = 30;
 		std::vector<tarch::la::Vector<3,double>> pointsToCheck;
 		for(int i=0; i < numberOfPoints - 6; i++)
@@ -187,6 +192,48 @@ public:
 			CPPUNIT_ASSERT( wrapper.isInRegion(pointsToCheck[i]) == isPointInRegion[i] );
 		}
 	}
+	void testRegionIsInRegion()
+	{
+		//set up random seed
+		srand(time(NULL));
+
+		//set up startpoint with point values less than 250
+		double start[3] = {static_cast<double>(rand()%250),static_cast<double>(rand()%250),static_cast<double>(rand()%250)};
+
+		//set up endpoint with point values between 750-1000
+		double end[3] = {static_cast<double>(rand()%250+750),static_cast<double>(rand()%250+750),static_cast<double>(rand()%250+750)};
+
+		//generate list of 30 random regions less than 1000
+		const int numberOfPoints = 30;
+		std::vector<std::pair<tarch::la::Vector<3,double>, tarch::la::Vector<3,double>>> pointsToCheck;
+		for(int i=0; i < numberOfPoints; i++)
+		{
+			tarch::la::Vector<3,double> lower = {static_cast<double>(rand()%1000), static_cast<double>(rand()%1000), static_cast<double>(rand()%1000)};
+			tarch::la::Vector<3,double> upper = {lower[0] + static_cast<double>(rand()%500), lower[1] + static_cast<double>(rand()%500), lower[2] + static_cast<double>(rand()%500)};
+			pointsToCheck.push_back(std::make_pair(lower,upper));
+		}
+		//populate a bool vector with true if region is inside region
+		//if region is in region, both endpoints will be in region
+		std::array<bool,numberOfPoints> isPointInRegion;
+		for(int i = 0; i < numberOfPoints; i++)
+		{
+			isPointInRegion[i] = true;
+			for(int j = 0; j < 3; j++)
+			{
+				isPointInRegion[i] &= pointsToCheck[i].first[j] >= start[j] && pointsToCheck[i].second[j] < end[j];
+			}
+		}
+		//check all the regions
+		ls1::LS1RegionWrapper wrapper(start, end, _testSimulation);
+		for(int i = 0; i < numberOfPoints; i++)
+		{
+			double temp1[3]  = {pointsToCheck[i].first[0], pointsToCheck[i].first[1], pointsToCheck[i].first[2]};
+			double temp2[3]  = {pointsToCheck[i].second[0], pointsToCheck[i].second[1], pointsToCheck[i].second[2]};
+
+			CPPUNIT_ASSERT( wrapper.isInRegion(temp1,temp2) == isPointInRegion[i] );
+		}
+	}
+
 	void testSetRegion()
 	{
 		double start[3] = {0,0,0}, end[3] = {5,5,5};
