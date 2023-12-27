@@ -23,8 +23,8 @@
 // for debugging purposes only
 #include <iostream>
 
-//#define PYBIND_USE_DMALLOC
-// used for memory debugging
+// #define PYBIND_USE_DMALLOC
+//  used for memory debugging
 #ifdef PYBIND_USE_DMALLOC
 #include "dmalloc.h"
 #endif
@@ -180,12 +180,12 @@ int initMPI() {
   MPI_Init(&argc, &argv);
   delete[] argv;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  #if defined(LS1_MARDYN)
-    global_log = new Log::Logger(Log::Error);
-  #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    global_log->set_mpi_output_root(0);
-  #endif
-  #endif
+#if defined(LS1_MARDYN)
+  global_log = new Log::Logger(Log::Error);
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  global_log->set_mpi_output_root(0);
+#endif
+#endif
   return rank;
 }
 

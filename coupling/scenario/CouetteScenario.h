@@ -4,13 +4,12 @@
 #ifndef _COUPLING_SCENARIO_COUETTESCENARIO_H_
 #define _COUPLING_SCENARIO_COUETTESCENARIO_H_
 
-#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/ErrorEstimation.h"
 #include "coupling/InstanceHandling.h"
 #include "coupling/MultiMDMediator.h"
+#include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/LBCouetteSolver.h"
-#include "coupling/scenario/Scenario.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
@@ -76,28 +75,26 @@ public:
 
   /** triggers void init(), runOneCouplingCycle() and shutdown()
    *  @brief runs the simulation */
-  virtual void run() {
+  void run() override {
     init();
     if (_cfg.twsLoop) {
       twsLoop();
       return;
     }
-    for (int cycle = 0; cycle < _cfg.couplingCycles; cycle++)
-      runOneCouplingCycle(cycle);
+    _timeIntegrationService->run(_cfg.couplingCycles);
     shutdown();
   }
 
-private:
   /** triggers initMPI(), parseConfiguration(), and initSolvers()
    *  @brief initialises everthing necessary for the test */
-  void init() {
+  void init() override {
 #if defined(LS1_MARDYN)
-    global_log = new Log::Logger(Log::Error); //Info
+    global_log = new Log::Logger(Log::Error); // Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif
 #endif
-    initMPI();
+    getRootRank();
     parseConfigurations();
     initSolvers();
   }
@@ -107,7 +104,7 @@ private:
    * the macro to the micro solver (twoWayCoupling())
    *  @brief combines the functioniality necessary for a cycle of the coupled
    * simulation  */
-  void runOneCouplingCycle(int cycle) {
+  void runOneCouplingCycle(int cycle) override {
     advanceMacro(cycle);
     varyMD(cycle);
     advanceMicro(cycle);
@@ -115,7 +112,7 @@ private:
     twoWayCoupling(cycle);
     if (_cfg.totalNumberMDSimulations < 0) // dynamic MD
       _multiMDCellService->finishCycle(cycle, *_instanceHandling);
-    if (_rank == 0) {
+    if (_isRootRank) {
       // Output status info only every 10 seconds
       gettimeofday(&_tv.end, NULL);
       int runtime_ms = (int)(((_tv.end.tv_sec - _tv.output.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.output.tv_usec)) / 1000);
@@ -126,12 +123,16 @@ private:
     }
   }
 
+  coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { return _couetteSolver; }
+
+protected:
   /** @brief initialises all MPI variables  */
-  void initMPI() {
-    _rank = 0;
+  void getRootRank() {
+    int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
+    _isRootRank = (rank == 0);
   }
 
   /** @brief Executes the entire test several times for a range of time-window-size parameters */
@@ -163,29 +164,39 @@ private:
 
     _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
 
-    #if defined(LS1_MARDYN)
+#if defined(LS1_MARDYN)
     auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
     coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
-    
-    #endif
+
+#endif
   }
 
   /** @brief initialises the macro and micro solver according to the setup from
    * the xml file and pre-proccses them */
   void initSolvers() {
+    _timeIntegrationService = std::make_unique<coupling::services::ParallelTimeIntegrationService<3>>(_mamicoConfig, this);
+    _rank = _timeIntegrationService->getRank(); // returns the rank inside local time domain
+
+    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+
+    // init indexing
+    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                                                               ,
+                                                               _timeIntegrationService->getPintComm()
+#endif
+    );
+
     // for timing measurements
     _tv.micro = 0;
     _tv.macro = 0;
     _tv.filter = 0;
-
-    // allocate solvers
-    _couetteSolver = NULL;
-    _couetteSolver =
-        getCouetteSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
-                         _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     // even if _cfg.miSolverType == SYNTHETIC then
     // multiMDService, _mdSimulations, _mdSolverInterface etc need to be initialized
@@ -195,10 +206,18 @@ private:
     // SIMPLEMD would use depending e.g. on domain size and offset from
     // simpleMDConfig
 
+    unsigned int totNumMD;
     if (_cfg.totalNumberMDSimulations > 0)
-      _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _cfg.totalNumberMDSimulations);
+      totNumMD = _cfg.totalNumberMDSimulations;
     else // dynamic case, start with _cfg.lowerBoundNumberMDSimulations MD
-      _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _cfg.lowerBoundNumberMDSimulations);
+      totNumMD = _cfg.lowerBoundNumberMDSimulations;
+
+    _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), totNumMD
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                                                          ,
+                                                          _timeIntegrationService->getPintComm()
+#endif
+    );
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
     if (_instanceHandling == nullptr) {
@@ -207,7 +226,7 @@ private:
     }
 
     _mdStepCounter = 0;
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.start, NULL);
       gettimeofday(&_tv.output, NULL);
     }
@@ -224,14 +243,6 @@ private:
     _instanceHandling->setMDSolverInterface();
     _mdSolverInterface = _instanceHandling->getMDSolverInterface();
 
-    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
-        _couetteSolver, _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
-        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-
-    // init indexing
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
-    
     if (_cfg.twsLoop) {
       // initialise macroscopic cell service for multi-MD case and set single
       // cell services in each MD simulation
@@ -248,6 +259,12 @@ private:
     _multiMDCellService->constructFilterPipelines();
 
     _multiMDMediator = new coupling::MultiMDMediator<MY_LINKEDCELL, 3>(*_multiMDCellService, *_instanceHandling, *_multiMDService, couetteSolverInterface);
+
+    // allocate solvers
+    _couetteSolver = NULL;
+    _couetteSolver =
+        getCouetteSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
+                         _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // set couette solver interface in MamicoInterfaceProvider
@@ -311,7 +328,7 @@ private:
                                                                                 // signature
                            std::vector<std::array<unsigned int, 3>> cellIndices // not used either
                     ) {
-                      if (_rank == 0) {
+                      if (_isRootRank) {
                         gettimeofday(&_tv.start, NULL);
                       }
 
@@ -329,7 +346,7 @@ private:
                       }
                       // std::cout << "Generated masses!" << std::endl;
 
-                      if (_rank == 0) {
+                      if (_isRootRank) {
                         gettimeofday(&_tv.end, NULL);
                         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
                       }
@@ -341,7 +358,7 @@ private:
                     [this](std::vector<std::array<double, 3>> inputVectors,     // same as above
                            std::vector<std::array<unsigned int, 3>> cellIndices // same as above
                     ) {
-                      if (_rank == 0) {
+                      if (_isRootRank) {
                         gettimeofday(&_tv.start, NULL);
                       }
 
@@ -383,7 +400,7 @@ private:
                       }
                       // std::cout << "Generated momenta!" << std::endl;
 
-                      if (_rank == 0) {
+                      if (_isRootRank) {
                         gettimeofday(&_tv.end, NULL);
                         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
                       }
@@ -413,7 +430,7 @@ private:
                               _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     // finish time measurement for initialisation
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.end, NULL);
       double runtime = (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
       std::cout << "Initialization: " << (int)(runtime / 1000) << "ms" << std::endl;
@@ -428,7 +445,7 @@ private:
       _sum_noise = 0;
     }
 
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.start_total, NULL);
     }
     std::cout << "Finish CouetteScenario::initSolvers() " << std::endl;
@@ -439,7 +456,7 @@ private:
    *  @param cycle the number of the current coupling time step */
   void advanceMacro(int cycle) {
     if (_couetteSolver != NULL) {
-      if (_rank == 0) {
+      if (_isRootRank) {
         gettimeofday(&_tv.start, NULL);
       }
 
@@ -454,7 +471,7 @@ private:
         _couetteSolver->setWallVelocity(vel);
       }
       _couetteSolver->advance(_simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
-      if (_rank == 0) {
+      if (_isRootRank) {
         gettimeofday(&_tv.end, NULL);
         _tv.macro += (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
         // std::cout << "Finish _couetteSolver->advance " << std::endl;
@@ -511,7 +528,7 @@ private:
     }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Bcast(&addMDInstances, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&addMDInstances, 1, MPI_INT, 0, _timeIntegrationService->getPintComm());
 #endif
     if (addMDInstances < 0) {
       if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() + addMDInstances < _cfg.lowerBoundNumberMDSimulations) {
@@ -533,7 +550,7 @@ private:
    * data for the coupling
    *  @param cycle the number of the current coupling time step  */
   void advanceMicro(int cycle) {
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.start, NULL);
     }
     if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
@@ -544,7 +561,7 @@ private:
 
       _mdStepCounter += _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
 
-      if (_rank == 0) {
+      if (_isRootRank) {
         gettimeofday(&_tv.end, NULL);
         _tv.micro += (_tv.end.tv_sec - _tv.start.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start.tv_usec);
       }
@@ -640,7 +657,7 @@ private:
     }
 
     // finish time measurement for coupled simulation
-    if (_rank == 0) {
+    if (_isRootRank) {
       gettimeofday(&_tv.end, NULL);
       double time_total = (_tv.end.tv_sec - _tv.start_total.tv_sec) * 1000000 + (_tv.end.tv_usec - _tv.start_total.tv_usec);
       std::cout << "Finished all coupling cycles after " << time_total / 1000000 << " s" << std::endl;
@@ -850,7 +867,7 @@ private:
       return;
     // form file name and open file
     std::stringstream ss;
-    ss << "CouetteAvgMultiMDCells_" << _rank << "_" << couplingCycle << ".csv";
+    ss << "CouetteAvgMultiMDCells_" << _timeIntegrationService->getPintDomain() << "_" << _rank << "_" << couplingCycle << ".csv";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CouetteScenario::write2CSV(): Could not open file " << ss.str() << "!" << std::endl;
@@ -951,8 +968,8 @@ private:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      solver =
-          new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette", _cfg.lbNumberProcesses, 1);
+      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette",
+                                                      _cfg.lbNumberProcesses, 1, this);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -968,7 +985,6 @@ private:
       std::cout << "ERROR CouetteScenario::getCouetteSolver(): Unknown solver type!" << std::endl;
       exit(EXIT_FAILURE);
     }
-
     return solver;
   }
 
@@ -980,8 +996,7 @@ private:
    * the whole domain
    *  @param outerRegion
    *  @todo piet, what is the mamicoMeshsize & the outer layer  */
-  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(coupling::solvers::AbstractCouetteSolver<3>* couetteSolver,
-                                                                                tarch::la::Vector<3, double> mdOffset,
+  coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(const double dx, tarch::la::Vector<3, double> mdOffset,
                                                                                 tarch::la::Vector<3, double> mamicoMeshsize,
                                                                                 tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
                                                                                 unsigned int outerRegion) {
@@ -990,11 +1005,6 @@ private:
     if (_cfg.maSolverType == CouetteConfig::COUETTE_ANALYTICAL) {
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells, outerRegion);
     } else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      coupling::solvers::LBCouetteSolver* lbSolver = static_cast<coupling::solvers::LBCouetteSolver*>(couetteSolver);
-      if (lbSolver == NULL) {
-        std::cout << "ERROR CouetteScenario::getCouetteSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
       // compute number of cells of MD offset; detect any mismatches!
       tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
       for (unsigned int d = 0; d < 3; d++) {
@@ -1008,8 +1018,12 @@ private:
           exit(EXIT_FAILURE);
         }
       }
-      interface = new coupling::solvers::LBCouetteSolverInterface(lbSolver->getAvgNumberLBCells(), lbSolver->getNumberProcesses(), offsetMDDomain,
-                                                                  globalNumberMacroscopicCells, outerRegion);
+      tarch::la::Vector<3, unsigned int> cells_per_process{
+          tarch::la::Vector<3, int>{coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
+                                    coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
+                                    coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)}};
+      interface =
+          new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain, globalNumberMacroscopicCells, outerRegion);
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) {
@@ -1017,11 +1031,6 @@ private:
     }
 #endif
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
-      coupling::solvers::FiniteDifferenceSolver* fdSolver = static_cast<coupling::solvers::FiniteDifferenceSolver*>(couetteSolver);
-      if (fdSolver == NULL) {
-        std::cout << "ERROR CouetteScenario::getCouetteSolverInterface(...), rank=" << _rank << ": Could not convert abstract to LB solver!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
       // compute number of cells of MD offset; detect any mismatches!
       tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
       for (unsigned int d = 0; d < 3; d++) {
@@ -1035,8 +1044,12 @@ private:
           exit(EXIT_FAILURE);
         }
       }
-      interface = new coupling::solvers::LBCouetteSolverInterface(fdSolver->getAvgNumberLBCells(), fdSolver->getNumberProcesses(), offsetMDDomain,
-                                                                  globalNumberMacroscopicCells, outerRegion);
+      tarch::la::Vector<3, unsigned int> cells_per_process{
+          tarch::la::Vector<3, int>{coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 0),
+                                    coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
+                                    coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)}};
+      interface =
+          new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain, globalNumberMacroscopicCells, outerRegion);
     }
 
     if (interface == NULL) {
@@ -1078,8 +1091,10 @@ private:
     double filter;
   };
 
-  /** @brief the rank of the current MPI process */
+  /** @brief the rank of the current MPI process in the local time domain*/
   int _rank;
+  /** @brief if this is the world global root process */
+  bool _isRootRank;
   /** @todo Piet */
   int _tws;
   /** @brief the config data and information for SimpleMD */

@@ -3,6 +3,7 @@ The macro-micro-coupling tool for multiscale coupled molecular-continuum flow si
 
 ## Documentation
 * The source code documentation can be found [here](https://hsu-hpc.github.io/MaMiCo/)
+* The unit test code coverage is [here](https://hsu-hpc.github.io/MaMiCo/coverage/index.html)
 
 ## Requirements and optional dependencies
 To compile and execute MaMiCo on a linux system, you need at least:
@@ -16,6 +17,7 @@ Optional dependencies are:
 * [OpenFOAM](https://develop.openfoam.com/Development/openfoam/blob/develop/doc/Build.md), for coupling to CFD simulations with OpenFOAM.
 * [preCICE](https://precice.org/), for coupling with other solvers using the preCICE coupling library.
 * [ls1-MarDyn](https://www.ls1-mardyn.de/home.html), for coupling to MD simulations with ls1.
+* [LCOV](https://github.com/linux-test-project/lcov) and [gcc](https://gcc.gnu.org/), for test code coverage analysis.
 
 ## Build instructions
 * First clone this repository and create a new build directory:

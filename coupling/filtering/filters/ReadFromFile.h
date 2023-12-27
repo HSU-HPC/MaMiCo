@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-//#define DEBUG_READ_FROM_FILE
+// #define DEBUG_READ_FROM_FILE
 
 namespace coupling {
 namespace filtering {

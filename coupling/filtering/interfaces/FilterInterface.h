@@ -8,7 +8,7 @@
 
 #include "coupling/indexing/CellIndex.h"
 
-//#define DEBUG_FILTER_INTERFACE
+// #define DEBUG_FILTER_INTERFACE
 
 namespace coupling {
 namespace filtering {
