@@ -803,6 +803,7 @@ if (BUILD_TESTING)
     target_include_directories(getTestNames PRIVATE ${CPPUNIT_INCLUDE_DIRS})
     target_link_directories(getTestNames PRIVATE ${CPPUNIT_LIBRARY})
     target_link_libraries(getTestNames PRIVATE cppunit)
+    unset(GET_TEST_NAMES CACHE)
     return()
   endif()
 
