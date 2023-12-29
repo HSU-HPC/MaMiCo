@@ -321,11 +321,11 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReduce
     return;
   }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  const unsigned int ranksSize = (unsigned int)targetRanks.size();
+  const unsigned int ranksSize = (unsigned int)sourceRanks.size();
   std::cout << "Rank " << indexConversion.getThisRank() << ": allocate reduce buffers for cell " << globalVectorIndex << ";";
   std::cout << " associated source ranks: ";
   for (unsigned int i = 0; i < ranksSize; i++) {
-    std::cout << ranks[i] << " ";
+    std::cout << sourceRanks[i] << " ";
   }
   std::cout << std::endl;
 #endif

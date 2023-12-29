@@ -171,7 +171,7 @@ for e in file_type_to_comparator:
         p = subprocess.Popen(['diff'] + [str(p)
                              for p in output_file_pairs[k]], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if 0 == p.wait():
-            # Files are identical -> skip qualitative comparison
+            # Files are identical -> skip comparison of individual values
             print('Identical\n')
         else:
             file_type_to_comparator[e](*output_file_pairs[k])
