@@ -13,6 +13,8 @@
  * boundaries must be determined at runtime using IndexingService
  */
 
+// #DEFINE INDEXING_ENABLE_DIM2
+#ifdef INDEXING_ENABLE_DIM2
 // We must compile both, dim2 and dim3, so that both can be used (also in the same executable e.g. main_lammps.cpp)
 // Dim2    ///////////
 namespace coupling {
@@ -153,6 +155,7 @@ template <> unsigned int CellIndex<2, IndexTrait::vector, IndexTrait::local, Ind
 template <> tarch::la::Vector<2, unsigned int> CellIndex<2, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
 } // namespace indexing
 } // namespace coupling
+#endif
 
 // Dim3   //////////////////////////
 namespace coupling {
@@ -173,6 +176,7 @@ template <> BaseIndex<3> CellIndex<3>::upperBoundary{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3>::divisionFactor{};
+template <> const char CellIndex<3>::TNAME[] = "CellIndex<3>";
 
 // BaseIndex
 template <> BaseIndex<3> BaseIndex<3>::lowerBoundary{};
@@ -180,6 +184,7 @@ template <> BaseIndex<3> BaseIndex<3>::upperBoundary{};
 template <> tarch::la::Vector<3, unsigned int> BaseIndex<3>::numberCellsInDomain{};
 template <> unsigned int BaseIndex<3>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> BaseIndex<3>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::vector>::TNAME[] = "CellIndex<3, vector>";
 
 // scalar, local, !md2macro, !noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::local>::lowerBoundary{};
@@ -187,6 +192,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::local>::upperBoundary{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::local>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::local>::TNAME[] = "CellIndex<3, local>";
 
 // vector, local, !md2macro, !noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local>::lowerBoundary{};
@@ -194,6 +200,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local>::up
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::local>::TNAME[] = "CellIndex<3, vector, local>";
 
 /*
  * MD TO MACRO, INCL GHOST LAYER
@@ -205,6 +212,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::md2macro>::upperBoundary{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::md2macro>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::md2macro>::TNAME[] = "CellIndex<3, md2macro>";
 
 // vector, global, md2macro, !noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary{};
@@ -212,6 +220,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>:
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::TNAME[] = "CellIndex<3, vector, md2macro>";
 
 // scalar, local, md2macro, !noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary{};
@@ -219,6 +228,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::TNAME[] = "CellIndex<3, local, md2macro>";
 
 // vector, local, md2macro, !noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary{};
@@ -226,6 +236,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, Ind
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::TNAME[] = "CellIndex<3, vector, local, md2macro>";
 
 /*
  * !MD TO MACRO aka MAMICO INDEXING, EXCL GHOST LAYER
@@ -237,6 +248,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::noGhost>::upperBoundary{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, noGhost>";
 
 // vector, global, !md2macro, noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary{};
@@ -244,6 +256,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, vector, noGhost>";
 
 // scalar, local, !md2macro, noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary{};
@@ -251,6 +264,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::u
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, local, noGhost>";
 
 // vector, local, !md2macro, noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary{};
@@ -258,6 +272,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, Ind
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, vector, local, noGhost>";
 
 /*
  * MD TO MACRO, EXCL GHOST LAYER
@@ -269,6 +284,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, md2macro, noGhost>";
 
 // vector, global, md2macro, noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
@@ -276,6 +292,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, 
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, vector, md2macro, noGhost>";
 
 // scalar, local, md2macro, noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
@@ -283,6 +300,7 @@ template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, I
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+template <> const char CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, local, md2macro, noGhost>";
 
 // vector, local, md2macro, noGL
 template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
@@ -291,6 +309,9 @@ template <>
 tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
 template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+template <>
+const char CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::TNAME[] =
+    "CellIndex<3, vector, local, md2macro, noGhost>";
 } // namespace indexing
 } // namespace coupling
 
@@ -360,6 +381,11 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
   CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::noGhost>::upperBoundary;
   CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::setDomainParameters();
 
+// CellIndex<dim> and CellIndex<dim, IndexTrait::vector> have been set up, so from here on it is ok to do some basic conversions
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  _isInitialized = true;
+#endif
+
   // init boundaries of all global, m2m, GL excluding indexing types
   {
     CellIndex<dim> lowerBoundary{BaseIndex<dim>::lowerBoundary};
@@ -407,8 +433,7 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
   CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::md2macro>::upperBoundary;
   CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::setDomainParameters();
 
-// handle all local indexing types
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
+  // handle all local indexing types
 
   _numberProcesses = numberProcesses;
 
@@ -435,12 +460,6 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
                                                                           occurs...*/
         break;
 
-      // sanity check: empty local domain
-      if (lowerBoundary == CellIndex<dim /*global*/>::upperBoundary) {
-        using namespace std::string_literals;
-        throw std::runtime_error("IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s);
-      }
-
       //...increment by one if above is too high to be in local domain
       ++lowerBoundary;
     }
@@ -449,12 +468,6 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
       if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index
                                                                           occurs...*/
         break;
-
-      // sanity check: empty local domain
-      if (upperBoundary < lowerBoundary) {
-        using namespace std::string_literals;
-        throw std::runtime_error("IndexingService: ERROR: Empty local domain on rank "s + std::to_string(_rank) + "!"s);
-      }
 
       //...decrement by one if above is too high to be in local domain
       --upperBoundary;
@@ -517,115 +530,20 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
   CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary =
       CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary;
   CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
-
-#else // sequential scenario
-      // Copy all local indexing from global
-  CellIndex<dim, IndexTrait::local>::lowerBoundary = CellIndex<dim>::lowerBoundary;
-  CellIndex<dim, IndexTrait::local>::upperBoundary = CellIndex<dim>::upperBoundary;
-  CellIndex<dim, IndexTrait::local>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local>::lowerBoundary = CellIndex<dim, IndexTrait::vector>::lowerBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local>::upperBoundary = CellIndex<dim, IndexTrait::vector>::upperBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::noGhost>::lowerBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::noGhost>::upperBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::upperBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::md2macro>::lowerBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::md2macro>::upperBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary =
-      CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary =
-      CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
-#endif
-
-#ifdef TEST_INDEXING
-  // run tests
-
-  // get output file for boundaries
-  std::ofstream of;
-  {
-    using namespace std::string_literals;
-    of.open("indexbounds_rank"s + std::to_string(_rank) + ".txt"s);
-  }
-  try {
-    testing::printAllBoundaries<dim>(of);
-  } catch (const std::exception& e) {
-    std::cout << _rank << ": WARNING: IndexingService: Failed to call printAllBoundaries() " << e.what() << std::endl;
-  }
-  of.close();
-  // get output file for domains
-  {
-    using namespace std::string_literals;
-    of.open("indexdomains_rank"s + std::to_string(_rank) + ".txt"s);
-  }
-  try {
-    testing::printAllDomains<dim>(of);
-  } catch (const std::exception& e) {
-    std::cout << _rank << ": WARNING: IndexingService: Failed to call printAllDomains() " << e.what() << std::endl;
-  }
-  of.close();
-
-  try {
-    testing::checkAllTrivialConversions<dim>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::vector>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::local>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local>();
-
-    testing::checkAllTrivialConversions<dim, IndexTrait::md2macro>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>();
-
-    testing::checkAllTrivialConversions<dim, IndexTrait::noGhost>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::noGhost>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::noGhost>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>();
-
-    testing::checkAllTrivialConversions<dim, IndexTrait::md2macro, IndexTrait::noGhost>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
-    testing::checkAllTrivialConversions<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>();
-  } catch (const std::exception& e) {
-    std::cout << _rank << ": WARNING: IndexingService: Test indicated faulty conversion: " << e.what() << std::endl;
-  }
-
-  of.close();
-#endif
-
-#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-  _isInitialized = true;
-#endif
 }
 
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // unused in sequential scenario
 /*
  * This was in large parts stolen from IndexConversion.
  */
 template <unsigned int dim>
 std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const {
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if (!_isInitialized) {
+    throw std::runtime_error(std::string("coupling::indexing::convertToVector: IndexingService not initialized! "));
+  }
+#endif
+
   std::vector<unsigned int> ranks;
   // using the old meaning of 'globalNumberMacroscopicCells' from
   // IndexConversion
@@ -682,9 +600,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 
   return ranks;
 }
-#endif
 
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // unused in sequential scenario
 /*
  * This was in large parts stolen from IndexConversion.
  * Note that this uses the globalNumberMacroscopicCells definition excl. the
@@ -729,8 +645,9 @@ coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch:
 
   return _parallelTopology->getRank(processCoords);
 }
-#endif
 
 // declare specialisation of IndexingService
+#ifdef INDEXING_ENABLE_DIM2
 template class coupling::indexing::IndexingService<2>;
+#endif
 template class coupling::indexing::IndexingService<3>;

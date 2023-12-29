@@ -7,9 +7,6 @@
 #include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/paralleltopology/ParallelTopologyFactory.h"
 
-// Include CellIndex template class definition
-#include "CellIndex.h"
-
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -18,6 +15,15 @@ namespace coupling {
 namespace indexing {
 
 template <unsigned int dim> class IndexingService;
+
+}
+} // namespace coupling
+
+// Include CellIndex template class definition
+#include "CellIndex.h"
+
+namespace coupling {
+namespace indexing {
 
 template <unsigned int dim>
 std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex,
@@ -29,13 +35,7 @@ std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCel
 // Include non-member functions operating on indexes
 #include "Operations.h"
 
-// enable/disable tests
-// #define TEST_INDEXING
-
-#ifdef TEST_INDEXING
-// Inlcude index tests
-#include "Testing.h"
-#endif
+class IndexingServiceTest;
 
 /**
  * Singleton service class initialising lower and upper boundaries of all
@@ -110,7 +110,6 @@ public:
 #endif
   }
 
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   /**
    * Determines all ranks that contain a certain global BaseIndex.
    * Ripped from deprecated IndexConversion.
@@ -122,6 +121,7 @@ public:
    */
   std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const;
 
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   MPI_Comm getComm() const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (!_isInitialized) {
@@ -143,8 +143,11 @@ public:
     return _rank;
   }
 
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  bool isInitialized() const { return _isInitialized; }
+#endif
+
 private:
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   /**
    * Helper function used by getRanksForGlobalIndex().
    */
@@ -154,10 +157,12 @@ private:
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   MPI_Comm _comm;
 #endif
   unsigned int _rank;
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   bool _isInitialized = false;
 #endif
+  friend IndexingServiceTest;
 };
