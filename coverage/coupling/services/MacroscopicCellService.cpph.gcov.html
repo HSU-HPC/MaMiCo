@@ -32,17 +32,17 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">55</td>
-            <td class="headerCovTableEntry">211</td>
-            <td class="headerCovTableEntryLo">26.1 %</td>
+            <td class="headerCovTableEntry">228</td>
+            <td class="headerCovTableEntryLo">24.1 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-28 08:39:53</td>
+            <td class="headerValue">2023-12-29 08:21:24</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">3</td>
-            <td class="headerCovTableEntry">17</td>
-            <td class="headerCovTableEntryLo">17.6 %</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntryLo">14.3 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -175,342 +175,369 @@
 <a name="113"><span class="lineNum">     113 </span>            :   }</a>
 <a name="114"><span class="lineNum">     114 </span><span class="lineNoCov">          0 : }</span></a>
 <a name="115"><span class="lineNum">     115 </span>            : </a>
-<a name="116"><span class="lineNum">     116 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="117"><span class="lineNum">     117 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::sendFromMacro2MD(</span></a>
-<a name="118"><span class="lineNum">     118 </span>            :     const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
-<a name="119"><span class="lineNum">     119 </span>            :     const unsigned int* const globalCellIndicesFromMacroscopicSolver) {</a>
-<a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper1(this);</span></a>
-<a name="121"><span class="lineNum">     121 </span><span class="lineNoCov">          0 :   Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper2(this);</span></a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData wrapper3(this);</span></a>
-<a name="123"><span class="lineNum">     123 </span><span class="lineNoCov">          0 :   Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData wrapper4(this);</span></a>
+<a name="116"><span class="lineNum">     116 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::sendFromMacro2MDPreProcess() {</span></a>
+<a name="117"><span class="lineNum">     117 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper1(this);</span></a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineNoCov">          0 :   Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper2(this);</span></a>
+<a name="119"><span class="lineNum">     119 </span>            : </a>
+<a name="120"><span class="lineNum">     120 </span>            :   // pre-process macroscopic cells of coupling tool</a>
+<a name="121"><span class="lineNum">     121 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);</span></a>
+<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);</span></a>
+<a name="123"><span class="lineNum">     123 </span><span class="lineNoCov">          0 : }</span></a>
 <a name="124"><span class="lineNum">     124 </span>            : </a>
-<a name="125"><span class="lineNum">     125 </span>            :   // pre-process macroscopic cells of coupling tool</a>
-<a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);</span></a>
-<a name="127"><span class="lineNum">     127 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);</span></a>
+<a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::sendFromMacro2MDPostProcess() {</span></a>
+<a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData wrapper3(this);</span></a>
+<a name="127"><span class="lineNum">     127 </span><span class="lineNoCov">          0 :   Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData wrapper4(this);</span></a>
 <a name="128"><span class="lineNum">     128 </span>            : </a>
-<a name="129"><span class="lineNum">     129 </span>            :   // carry out send-receive steps</a>
-<a name="130"><span class="lineNum">     130 </span><span class="lineNoCov">          0 :   _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,</span></a>
-<a name="131"><span class="lineNum">     131 </span>            :                                  globalCellIndicesFromMacroscopicSolver);</a>
-<a name="132"><span class="lineNum">     132 </span>            : </a>
-<a name="133"><span class="lineNum">     133 </span>            :   // post-process inner macroscopic cells after receiving information from</a>
-<a name="134"><span class="lineNum">     134 </span>            :   // macroscopic solver</a>
-<a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);</span></a>
-<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);</span></a>
-<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="138"><span class="lineNum">     138 </span>            : </a>
-<a name="139"><span class="lineNum">     139 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="140"><span class="lineNum">     140 </span><span class="lineNoCov">          0 : double coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::sendFromMD2Macro(</span></a>
-<a name="141"><span class="lineNum">     141 </span>            :     const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
-<a name="142"><span class="lineNum">     142 </span>            :     const unsigned int* const globalCellIndicesFromMacroscopicSolver) {</a>
-<a name="143"><span class="lineNum">     143 </span>            :   // transfer strategy</a>
-<a name="144"><span class="lineNum">     144 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);</span></a>
-<a name="145"><span class="lineNum">     145 </span><span class="lineNoCov">          0 :   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);</span></a>
+<a name="129"><span class="lineNum">     129 </span>            :   // post-process inner macroscopic cells after receiving information from macroscopic solver</a>
+<a name="130"><span class="lineNum">     130 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);</span></a>
+<a name="131"><span class="lineNum">     131 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);</span></a>
+<a name="132"><span class="lineNum">     132 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="133"><span class="lineNum">     133 </span>            : </a>
+<a name="134"><span class="lineNum">     134 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::sendFromMacro2MD(</span></a>
+<a name="136"><span class="lineNum">     136 </span>            :     const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
+<a name="137"><span class="lineNum">     137 </span>            :     const unsigned int* const globalCellIndicesFromMacroscopicSolver) {</a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper1(this);</span></a>
+<a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 :   Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper2(this);</span></a>
+<a name="140"><span class="lineNum">     140 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellAfterReceivingMacroscopicSolverData wrapper3(this);</span></a>
+<a name="141"><span class="lineNum">     141 </span><span class="lineNoCov">          0 :   Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData wrapper4(this);</span></a>
+<a name="142"><span class="lineNum">     142 </span>            : </a>
+<a name="143"><span class="lineNum">     143 </span>            :   // pre-process macroscopic cells of coupling tool</a>
+<a name="144"><span class="lineNum">     144 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);</span></a>
+<a name="145"><span class="lineNum">     145 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);</span></a>
 <a name="146"><span class="lineNum">     146 </span>            : </a>
-<a name="147"><span class="lineNum">     147 </span>            :   // pre-process data before sending to macroscopic solver</a>
-<a name="148"><span class="lineNum">     148 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);</span></a>
-<a name="149"><span class="lineNum">     149 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);</span></a>
+<a name="147"><span class="lineNum">     147 </span>            :   // carry out send-receive steps</a>
+<a name="148"><span class="lineNum">     148 </span><span class="lineNoCov">          0 :   _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,</span></a>
+<a name="149"><span class="lineNum">     149 </span>            :                                  globalCellIndicesFromMacroscopicSolver);</a>
 <a name="150"><span class="lineNum">     150 </span>            : </a>
-<a name="151"><span class="lineNum">     151 </span>            :   timeval start;</a>
-<a name="152"><span class="lineNum">     152 </span>            :   timeval end;</a>
-<a name="153"><span class="lineNum">     153 </span><span class="lineNoCov">          0 :   double runtime = 0;</span></a>
-<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 :   if (_indexConversion-&gt;getThisRank() == 0) {</span></a>
-<a name="155"><span class="lineNum">     155 </span><span class="lineNoCov">          0 :     gettimeofday(&amp;start, NULL);</span></a>
-<a name="156"><span class="lineNum">     156 </span>            :   }</a>
-<a name="157"><span class="lineNum">     157 </span>            : </a>
-<a name="158"><span class="lineNum">     158 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="159"><span class="lineNum">     159 </span>            :   std::cout &lt;&lt; &quot;FP: Now applying per-instance filter pipeline for service ID: &quot; &lt;&lt; coupling::services::MacroscopicCellService&lt;dim&gt;::getID() &lt;&lt; std::endl;</a>
-<a name="160"><span class="lineNum">     160 </span>            : #endif</a>
+<a name="151"><span class="lineNum">     151 </span>            :   // post-process inner macroscopic cells after receiving information from</a>
+<a name="152"><span class="lineNum">     152 </span>            :   // macroscopic solver</a>
+<a name="153"><span class="lineNum">     153 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);</span></a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);</span></a>
+<a name="155"><span class="lineNum">     155 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="156"><span class="lineNum">     156 </span>            : </a>
+<a name="157"><span class="lineNum">     157 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::sendFromMD2MacroPreProcess() {</span></a>
+<a name="158"><span class="lineNum">     158 </span>            :   // transfer strategy</a>
+<a name="159"><span class="lineNum">     159 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellBeforeSendingMDSolverData wrapper1(this);</span></a>
+<a name="160"><span class="lineNum">     160 </span><span class="lineNoCov">          0 :   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);</span></a>
 <a name="161"><span class="lineNum">     161 </span>            : </a>
-<a name="162"><span class="lineNum">     162 </span><span class="lineNoCov">          0 :   if (_filterPipeline != nullptr) {</span></a>
-<a name="163"><span class="lineNum">     163 </span><span class="lineNoCov">          0 :     (*_filterPipeline)();</span></a>
-<a name="164"><span class="lineNum">     164 </span>            :   }</a>
-<a name="165"><span class="lineNum">     165 </span>            : </a>
-<a name="166"><span class="lineNum">     166 </span><span class="lineNoCov">          0 :   if (_indexConversion-&gt;getThisRank() == 0) {</span></a>
-<a name="167"><span class="lineNum">     167 </span><span class="lineNoCov">          0 :     gettimeofday(&amp;end, NULL);</span></a>
-<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 :     runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));</span></a>
-<a name="169"><span class="lineNum">     169 </span>            :   }</a>
-<a name="170"><span class="lineNum">     170 </span>            : </a>
-<a name="171"><span class="lineNum">     171 </span>            :   // carry out send-receive steps</a>
-<a name="172"><span class="lineNum">     172 </span><span class="lineNoCov">          0 :   _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,</span></a>
-<a name="173"><span class="lineNum">     173 </span>            :                                  globalCellIndicesFromMacroscopicSolver);</a>
-<a name="174"><span class="lineNum">     174 </span><span class="lineNoCov">          0 :   return runtime;</span></a>
-<a name="175"><span class="lineNum">     175 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="176"><span class="lineNum">     176 </span>            : </a>
-<a name="177"><span class="lineNum">     177 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="178"><span class="lineNum">     178 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::processInnerMacroscopicCellAfterMDTimestep() {</span></a>
-<a name="179"><span class="lineNum">     179 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep wrapper(this);</span></a>
-<a name="180"><span class="lineNum">     180 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);</span></a>
-<a name="181"><span class="lineNum">     181 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="162"><span class="lineNum">     162 </span>            :   // pre-process data before sending to macroscopic solver</a>
+<a name="163"><span class="lineNum">     163 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);</span></a>
+<a name="164"><span class="lineNum">     164 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);</span></a>
+<a name="165"><span class="lineNum">     165 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="166"><span class="lineNum">     166 </span>            : </a>
+<a name="167"><span class="lineNum">     167 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; double coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::applyFilterPipeline() {</span></a>
+<a name="168"><span class="lineNum">     168 </span>            :   timeval start;</a>
+<a name="169"><span class="lineNum">     169 </span>            :   timeval end;</a>
+<a name="170"><span class="lineNum">     170 </span><span class="lineNoCov">          0 :   double runtime = 0;</span></a>
+<a name="171"><span class="lineNum">     171 </span><span class="lineNoCov">          0 :   if (_indexConversion-&gt;getThisRank() == 0) {</span></a>
+<a name="172"><span class="lineNum">     172 </span><span class="lineNoCov">          0 :     gettimeofday(&amp;start, NULL);</span></a>
+<a name="173"><span class="lineNum">     173 </span>            :   }</a>
+<a name="174"><span class="lineNum">     174 </span>            : </a>
+<a name="175"><span class="lineNum">     175 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
+<a name="176"><span class="lineNum">     176 </span>            :   std::cout &lt;&lt; &quot;FP: Now applying per-instance filter pipeline for service ID: &quot; &lt;&lt; coupling::services::MacroscopicCellService&lt;dim&gt;::getID() &lt;&lt; std::endl;</a>
+<a name="177"><span class="lineNum">     177 </span>            : #endif</a>
+<a name="178"><span class="lineNum">     178 </span>            : </a>
+<a name="179"><span class="lineNum">     179 </span><span class="lineNoCov">          0 :   if (_filterPipeline != nullptr) {</span></a>
+<a name="180"><span class="lineNum">     180 </span><span class="lineNoCov">          0 :     (*_filterPipeline)();</span></a>
+<a name="181"><span class="lineNum">     181 </span>            :   }</a>
 <a name="182"><span class="lineNum">     182 </span>            : </a>
-<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::distributeMomentum(unsigned int t) {</span></a>
-<a name="184"><span class="lineNum">     184 </span><span class="lineNoCov">          0 :   if (_momentumInsertionType == coupling::configurations::MomentumInsertionConfiguration::NO_INSERTION) {</span></a>
-<a name="185"><span class="lineNum">     185 </span><span class="lineNoCov">          0 :     return;</span></a>
+<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :   if (_indexConversion-&gt;getThisRank() == 0) {</span></a>
+<a name="184"><span class="lineNum">     184 </span><span class="lineNoCov">          0 :     gettimeofday(&amp;end, NULL);</span></a>
+<a name="185"><span class="lineNum">     185 </span><span class="lineNoCov">          0 :     runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));</span></a>
 <a name="186"><span class="lineNum">     186 </span>            :   }</a>
-<a name="187"><span class="lineNum">     187 </span>            : </a>
-<a name="188"><span class="lineNum">     188 </span><span class="lineNoCov">          0 :   Wrapper4ComputeAndSetCurrentVelocity computeAndSetCurrentVelocity(this);</span></a>
-<a name="189"><span class="lineNum">     189 </span><span class="lineNoCov">          0 :   Wrapper4DistributeMomentum distributeMomentum(this, t);</span></a>
-<a name="190"><span class="lineNum">     190 </span>            : </a>
-<a name="191"><span class="lineNum">     191 </span>            :   // compute current velocity in all cells</a>
-<a name="192"><span class="lineNum">     192 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(computeAndSetCurrentVelocity);</span></a>
-<a name="193"><span class="lineNum">     193 </span>            :   // distribute momentum and synchronize molecules between processes</a>
-<a name="194"><span class="lineNum">     194 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(distributeMomentum);</span></a>
-<a name="195"><span class="lineNum">     195 </span><span class="lineNoCov">          0 :   _mdSolverInterface-&gt;synchronizeMoleculesAfterMomentumModification();</span></a>
-<a name="196"><span class="lineNum">     196 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="187"><span class="lineNum">     187 </span><span class="lineNoCov">          0 :   return runtime;</span></a>
+<a name="188"><span class="lineNum">     188 </span>            : }</a>
+<a name="189"><span class="lineNum">     189 </span>            : </a>
+<a name="190"><span class="lineNum">     190 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="191"><span class="lineNum">     191 </span><span class="lineNoCov">          0 : double coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::sendFromMD2Macro(</span></a>
+<a name="192"><span class="lineNum">     192 </span>            :     const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
+<a name="193"><span class="lineNum">     193 </span>            :     const unsigned int* const globalCellIndicesFromMacroscopicSolver) {</a>
+<a name="194"><span class="lineNum">     194 </span><span class="lineNoCov">          0 :   sendFromMD2MacroPreProcess();</span></a>
+<a name="195"><span class="lineNum">     195 </span>            : </a>
+<a name="196"><span class="lineNum">     196 </span><span class="lineNoCov">          0 :   double runtime = applyFilterPipeline();</span></a>
 <a name="197"><span class="lineNum">     197 </span>            : </a>
-<a name="198"><span class="lineNum">     198 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::computeAndStoreTemperature(double temperature) {</span></a>
-<a name="200"><span class="lineNum">     200 </span><span class="lineNoCov">          0 :   Wrapper4ComputeAndStoreTemperature wrapper(this, temperature);</span></a>
-<a name="201"><span class="lineNum">     201 </span><span class="lineNoCov">          0 :   _applyAccordingToConfiguration(wrapper);</span></a>
-<a name="202"><span class="lineNum">     202 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="198"><span class="lineNum">     198 </span>            :   // carry out send-receive steps</a>
+<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 :   _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,</span></a>
+<a name="200"><span class="lineNum">     200 </span>            :                                  globalCellIndicesFromMacroscopicSolver);</a>
+<a name="201"><span class="lineNum">     201 </span><span class="lineNoCov">          0 :   return runtime;</span></a>
+<a name="202"><span class="lineNum">     202 </span>            : }</a>
 <a name="203"><span class="lineNum">     203 </span>            : </a>
-<a name="204"><span class="lineNum">     204 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::perturbateVelocity() {</span></a>
-<a name="205"><span class="lineNum">     205 </span><span class="lineNoCov">          0 :   Wrapper4PerturbateVelocity wrapper(this);</span></a>
-<a name="206"><span class="lineNum">     206 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);</span></a>
-<a name="207"><span class="lineNum">     207 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="208"><span class="lineNum">     208 </span>            : </a>
-<a name="209"><span class="lineNum">     209 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::applyTemperatureToMolecules(unsigned int t) {</span></a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :   Wrapper4ApplyTemperature wrapper(this);</span></a>
-<a name="212"><span class="lineNum">     212 </span><span class="lineNoCov">          0 :   _applyAccordingToConfiguration(wrapper);</span></a>
-<a name="213"><span class="lineNum">     213 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="204"><span class="lineNum">     204 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="205"><span class="lineNum">     205 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::processInnerMacroscopicCellAfterMDTimestep() {</span></a>
+<a name="206"><span class="lineNum">     206 </span><span class="lineNoCov">          0 :   Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep wrapper(this);</span></a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);</span></a>
+<a name="208"><span class="lineNum">     208 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="209"><span class="lineNum">     209 </span>            : </a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::distributeMomentum(unsigned int t) {</span></a>
+<a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :   if (_momentumInsertionType == coupling::configurations::MomentumInsertionConfiguration::NO_INSERTION) {</span></a>
+<a name="212"><span class="lineNum">     212 </span><span class="lineNoCov">          0 :     return;</span></a>
+<a name="213"><span class="lineNum">     213 </span>            :   }</a>
 <a name="214"><span class="lineNum">     214 </span>            : </a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::applyBoundaryForce(unsigned int t) {</span></a>
-<a name="216"><span class="lineNum">     216 </span><span class="lineNoCov">          0 :   Wrapper4ApplyBoundaryForce wrapper(this);</span></a>
-<a name="217"><span class="lineNum">     217 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);</span></a>
-<a name="218"><span class="lineNum">     218 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="219"><span class="lineNum">     219 </span>            : </a>
-<a name="220"><span class="lineNum">     220 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="221"><span class="lineNum">     221 </span><span class="lineCov">          4 : coupling::IndexConversion&lt;dim&gt;* coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::initIndexConversion(</span></a>
-<a name="222"><span class="lineNum">     222 </span>            :     tarch::la::Vector&lt;dim, double&gt; macroscopicCellSize, tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses, unsigned int rank,</a>
-<a name="223"><span class="lineNum">     223 </span>            :     tarch::la::Vector&lt;dim, double&gt; globalMDDomainSize, tarch::la::Vector&lt;dim, double&gt; globalMDDomainOffset,</a>
-<a name="224"><span class="lineNum">     224 </span>            :     coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset) const {</a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineCov">          4 :   tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells(0);</span></a>
-<a name="226"><span class="lineNum">     226 </span><span class="lineCov">         16 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="227"><span class="lineNum">     227 </span><span class="lineCov">         12 :     globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);</span></a>
-<a name="228"><span class="lineNum">     228 </span><span class="lineCov">         12 :     if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] - globalMDDomainSize[d]) &gt; 1e-13) {</span></a>
-<a name="229"><span class="lineNum">     229 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;coupling::services::MacroscopicCellServiceImpl::&quot;</span></a>
-<a name="230"><span class="lineNum">     230 </span>            :                    &quot;initIndexConversion(): Deviation of domain size &gt; 1e-13!&quot;</a>
-<a name="231"><span class="lineNum">     231 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="232"><span class="lineNum">     232 </span>            :     }</a>
-<a name="233"><span class="lineNum">     233 </span>            :   }</a>
-<a name="234"><span class="lineNum">     234 </span><span class="lineCov">          4 :   coupling::IndexConversion&lt;dim&gt;* ic = new coupling::IndexConversion&lt;dim&gt;(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,</span></a>
-<a name="235"><span class="lineNum">     235 </span>            :                                                                           globalMDDomainOffset, parallelTopologyType, topologyOffset);</a>
-<a name="236"><span class="lineNum">     236 </span><span class="lineCov">          4 :   if (ic == NULL) {</span></a>
-<a name="237"><span class="lineNum">     237 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;coupling::services::MacroscopicCellServiceImpl::&quot;</span></a>
-<a name="238"><span class="lineNum">     238 </span>            :                  &quot;initIndexConversion(): ic==NULL!&quot;</a>
-<a name="239"><span class="lineNum">     239 </span><span class="lineNoCov">          0 :               &lt;&lt; std::endl;</span></a>
-<a name="240"><span class="lineNum">     240 </span><span class="lineNoCov">          0 :     exit(EXIT_FAILURE);</span></a>
-<a name="241"><span class="lineNum">     241 </span>            :   }</a>
-<a name="242"><span class="lineNum">     242 </span><span class="lineCov">          4 :   return ic;</span></a>
-<a name="243"><span class="lineNum">     243 </span>            : }</a>
-<a name="244"><span class="lineNum">     244 </span>            : </a>
-<a name="245"><span class="lineNum">     245 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="246"><span class="lineNum">     246 </span><span class="lineCov">          4 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::initIndexVectors4Usher(</span></a>
-<a name="247"><span class="lineNum">     247 </span>            :     tarch::la::Vector&lt;dim, unsigned int&gt; numberLinkedCellsPerMacroscopicCell) {</a>
-<a name="248"><span class="lineNum">     248 </span>            : </a>
-<a name="249"><span class="lineNum">     249 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;dim, unsigned int&gt; localNumberMacroscopicCells = _indexConversion-&gt;getLocalNumberMacroscopicCells();</span></a>
-<a name="250"><span class="lineNum">     250 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;dim, unsigned int&gt; firstNonGhostMacroscopicCell(1);</span></a>
-<a name="251"><span class="lineNum">     251 </span>            : </a>
-<a name="252"><span class="lineNum">     252 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; start(0);</span></a>
-<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; end = coupling::initRange&lt;dim&gt;(tarch::la::Vector&lt;dim, unsigned int&gt;(2));</span></a>
-<a name="254"><span class="lineNum">     254 </span><span class="lineCov">          4 :   tarch::la::Vector&lt;3, unsigned int&gt; loop(0);</span></a>
-<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          4 :   unsigned int loopCounter = 0;</span></a>
-<a name="256"><span class="lineNum">     256 </span>            : </a>
-<a name="257"><span class="lineNum">     257 </span><span class="lineCov">         12 :   for (loop[2] = start[2]; loop[2] &lt; end[2]; loop[2]++) {</span></a>
-<a name="258"><span class="lineNum">     258 </span><span class="lineCov">         24 :     for (loop[1] = start[1]; loop[1] &lt; end[1]; loop[1]++) {</span></a>
-<a name="259"><span class="lineNum">     259 </span><span class="lineCov">         48 :       for (loop[0] = start[0]; loop[0] &lt; end[0]; loop[0]++) {</span></a>
-<a name="260"><span class="lineNum">     260 </span><span class="lineCov">        128 :         for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="261"><span class="lineNum">     261 </span><span class="lineCov">         96 :           _usherCellOffset[loopCounter][d] = loop[d];</span></a>
-<a name="262"><span class="lineNum">     262 </span><span class="lineCov">         96 :           _usherCellStart[loopCounter][d] = firstNonGhostMacroscopicCell[d] + loop[d] * (localNumberMacroscopicCells[d] / 2);</span></a>
-<a name="263"><span class="lineNum">     263 </span><span class="lineCov">        192 :           _usherCellEnd[loopCounter][d] =</span></a>
-<a name="264"><span class="lineNum">     264 </span><span class="lineCov">         96 :               firstNonGhostMacroscopicCell[d] + (1 - loop[d]) * (localNumberMacroscopicCells[d] / 2) + loop[d] * localNumberMacroscopicCells[d];</span></a>
-<a name="265"><span class="lineNum">     265 </span><span class="lineCov">         96 :           _usherRange[loopCounter][d] = _usherCellEnd[loopCounter][d] - _usherCellStart[loopCounter][d];</span></a>
-<a name="266"><span class="lineNum">     266 </span>            :         }</a>
-<a name="267"><span class="lineNum">     267 </span><span class="lineCov">         32 :         for (unsigned int d = dim; d &lt; 3; d++) {</span></a>
-<a name="268"><span class="lineNum">     268 </span><span class="lineNoCov">          0 :           _usherCellOffset[loopCounter][d] = 0;</span></a>
-<a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :           _usherCellStart[loopCounter][d] = 0;</span></a>
-<a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :           _usherCellEnd[loopCounter][d] = 1;</span></a>
-<a name="271"><span class="lineNum">     271 </span>            :         }</a>
-<a name="272"><span class="lineNum">     272 </span>            : </a>
-<a name="273"><span class="lineNum">     273 </span><span class="lineCov">         32 :         loopCounter++;</span></a>
-<a name="274"><span class="lineNum">     274 </span>            :       }</a>
-<a name="275"><span class="lineNum">     275 </span>            :     }</a>
-<a name="276"><span class="lineNum">     276 </span>            :   } // loop over all staggered versions (-&gt; (0,0,0), (0,0,1), (0,1,0),....,</a>
-<a name="277"><span class="lineNum">     277 </span>            :     // (1,1,1) )</a>
-<a name="278"><span class="lineNum">     278 </span><span class="lineCov">          4 : }</span></a>
-<a name="279"><span class="lineNum">     279 </span>            : </a>
-<a name="280"><span class="lineNum">     280 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="281"><span class="lineNum">     281 </span><span class="lineNoCov">          0 : tarch::la::Vector&lt;dim, double&gt; coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::getPositionOfFirstLocalGhostCell() const {</span></a>
-<a name="282"><span class="lineNum">     282 </span>            :   // initialise with position of global first ghost cell</a>
-<a name="283"><span class="lineNum">     283 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; position = _indexConversion-&gt;getGlobalMDDomainOffset() - _indexConversion-&gt;getMacroscopicCellSize();</span></a>
-<a name="284"><span class="lineNum">     284 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="285"><span class="lineNum">     285 </span><span class="lineNoCov">          0 :     position[d] = position[d] + _indexConversion-&gt;getThisProcess()[d] * _indexConversion-&gt;getAverageLocalNumberMacroscopicCells()[d] *</span></a>
-<a name="286"><span class="lineNum">     286 </span><span class="lineNoCov">          0 :                                     _indexConversion-&gt;getMacroscopicCellSize()[d];</span></a>
-<a name="287"><span class="lineNum">     287 </span>            :   }</a>
-<a name="288"><span class="lineNum">     288 </span><span class="lineNoCov">          0 :   return position;</span></a>
-<a name="289"><span class="lineNum">     289 </span>            : }</a>
-<a name="290"><span class="lineNum">     290 </span>            : </a>
-<a name="291"><span class="lineNum">     291 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::distributeMass(unsigned int t) {</span></a>
-<a name="292"><span class="lineNum">     292 </span>            :   // nop if there is no particle insertion</a>
-<a name="293"><span class="lineNum">     293 </span><span class="lineNoCov">          0 :   if (_particleInsertionType == coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION) {</span></a>
-<a name="294"><span class="lineNum">     294 </span><span class="lineNoCov">          0 :     return;</span></a>
-<a name="295"><span class="lineNum">     295 </span>            :   }</a>
-<a name="296"><span class="lineNum">     296 </span>            :   // only insert mass every X time steps</a>
-<a name="297"><span class="lineNum">     297 </span><span class="lineNoCov">          0 :   if (!_particleInsertion-&gt;insertDeleteMassAtTimestep(t)) {</span></a>
-<a name="298"><span class="lineNum">     298 </span><span class="lineNoCov">          0 :     return;</span></a>
-<a name="299"><span class="lineNum">     299 </span>            :   }</a>
-<a name="300"><span class="lineNum">     300 </span>            : </a>
-<a name="301"><span class="lineNum">     301 </span>            :   // compute mean potential energy over all macroscopic cells and set the value</a>
-<a name="302"><span class="lineNum">     302 </span>            :   // in the macroscopic cell</a>
-<a name="303"><span class="lineNum">     303 </span><span class="lineNoCov">          0 :   coupling::cellmappings::ComputeMeanPotentialEnergyMapping&lt;LinkedCell, dim&gt; computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);</span></a>
-<a name="304"><span class="lineNum">     304 </span>            :   // macroscopic cell access</a>
-<a name="305"><span class="lineNum">     305 </span><span class="lineNoCov">          0 :   coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;* const macroscopicCells = _macroscopicCells.getMacroscopicCellsWithLinkedCells();</span></a>
-<a name="306"><span class="lineNum">     306 </span>            :   // start coordinate of first (ghost) cell</a>
-<a name="307"><span class="lineNum">     307 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; startPosition = getPositionOfFirstLocalGhostCell();</span></a>
-<a name="308"><span class="lineNum">     308 </span>            :   // buffers for temperature,momentum,mean velocity,pot. energy</a>
-<a name="309"><span class="lineNum">     309 </span><span class="lineNoCov">          0 :   double temperature(0.0);</span></a>
-<a name="310"><span class="lineNum">     310 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; momentum(0.0);</span></a>
-<a name="311"><span class="lineNum">     311 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; meanVelocity(0.0);</span></a>
-<a name="312"><span class="lineNum">     312 </span><span class="lineNoCov">          0 :   double potentialEnergy = 0.0;</span></a>
-<a name="313"><span class="lineNum">     313 </span>            :   // buffer for insertion/deletion action that has been carried out</a>
-<a name="314"><span class="lineNum">     314 </span>            :   typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action particleInsertionAction;</a>
-<a name="315"><span class="lineNum">     315 </span>            :   // true, if the costly operation of contructing the energy landscape is really</a>
-<a name="316"><span class="lineNum">     316 </span>            :   // required</a>
-<a name="317"><span class="lineNum">     317 </span>            :   bool constructEnergyLandscape;</a>
-<a name="318"><span class="lineNum">     318 </span>            : </a>
-<a name="319"><span class="lineNum">     319 </span>            :   // variables for internal looping --------------------------</a>
-<a name="320"><span class="lineNum">     320 </span>            :   // cellIndex used as loop counter</a>
-<a name="321"><span class="lineNum">     321 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;3, unsigned int&gt; cellIndex(0);</span></a>
-<a name="322"><span class="lineNum">     322 </span>            :   // loop over macroscopic cell domain (within MD domain) in a 2^dim-colour</a>
-<a name="323"><span class="lineNum">     323 </span>            :   // manner: For parallel simulations with an odd number of processes and</a>
-<a name="324"><span class="lineNum">     324 </span>            :   // periodic boundary conditions, a simple staggered loop over all macroscopic</a>
-<a name="325"><span class="lineNum">     325 </span>            :   // cells would imply that we insert particles on both sides of the global MD</a>
-<a name="326"><span class="lineNum">     326 </span>            :   // boundary in the same traversal. This can lead to strong forces and</a>
-<a name="327"><span class="lineNum">     327 </span>            :   // potential fields between inserted particles! So, we introduce another loop</a>
-<a name="328"><span class="lineNum">     328 </span>            :   // which subdivides each local domain into 2^D blocks and traverse each block</a>
-<a name="329"><span class="lineNum">     329 </span>            :   // in one loop traversal first.</a>
-<a name="330"><span class="lineNum">     330 </span><span class="lineNoCov">          0 :   for (unsigned int j = 0; j &lt; (1 &lt;&lt; dim); j++) {</span></a>
-<a name="331"><span class="lineNum">     331 </span>            :     // we have to at least carry out the construction of the energy landscape</a>
-<a name="332"><span class="lineNum">     332 </span>            :     // once for each sub-domain (since we do not know a priori if we need to</a>
-<a name="333"><span class="lineNum">     333 </span>            :     // insert particles or not)</a>
-<a name="334"><span class="lineNum">     334 </span><span class="lineNoCov">          0 :     constructEnergyLandscape = true;</span></a>
-<a name="335"><span class="lineNum">     335 </span>            :     // reduce size of usherCellStart-vector to be consistent with</a>
-<a name="336"><span class="lineNum">     336 </span>            :     // MDSolverInterface</a>
-<a name="337"><span class="lineNum">     337 </span><span class="lineNoCov">          0 :     const tarch::la::Vector&lt;dim, unsigned int&gt; usherCellStart = coupling::initDimVector&lt;dim&gt;(_usherCellStart[j]);</span></a>
-<a name="338"><span class="lineNum">     338 </span>            : </a>
-<a name="339"><span class="lineNum">     339 </span>            :     // loop over the block again in a 2^dim-colour manner: For each particle</a>
-<a name="340"><span class="lineNum">     340 </span>            :     // insertion within a macroscopic cell, the potential energy landscape needs</a>
-<a name="341"><span class="lineNum">     341 </span>            :     // to be reconstructed in the surrounding of the respective cell. This</a>
-<a name="342"><span class="lineNum">     342 </span>            :     // implies: - reset energy for molecules in this cell and the neighbours</a>
-<a name="343"><span class="lineNum">     343 </span>            :     //               - compute energy for all molecules of this cell and the</a>
-<a name="344"><span class="lineNum">     344 </span>            :     //               neighbours (= consider 5^dim cells!)</a>
-<a name="345"><span class="lineNum">     345 </span>            :     // So, it becomes apparent that re-computing the potential energy becomes</a>
-<a name="346"><span class="lineNum">     346 </span>            :     // quite expensive. Therefore, we loop over each block in a red-black</a>
-<a name="347"><span class="lineNum">     347 </span>            :     // manner. Doing so, each loop iteration over one &quot;colour&quot; of cells can be</a>
-<a name="348"><span class="lineNum">     348 </span>            :     // done without any re-computation of the potential energy as the molecules</a>
-<a name="349"><span class="lineNum">     349 </span>            :     // under consideration are independent from each other.</a>
-<a name="350"><span class="lineNum">     350 </span><span class="lineNoCov">          0 :     for (unsigned int i = 0; i &lt; (1 &lt;&lt; dim); i++) {</span></a>
-<a name="351"><span class="lineNum">     351 </span>            :       // setup potential energy landscape (i.e. computes the potential energy</a>
-<a name="352"><span class="lineNum">     352 </span>            :       // for all relevant molecules; here, we need to sweep over all molecules</a>
-<a name="353"><span class="lineNum">     353 </span>            :       // contained in the macroscopic cells of interest and compute their</a>
-<a name="354"><span class="lineNum">     354 </span>            :       // current potential energy). Only carry out this costly operation, if</a>
-<a name="355"><span class="lineNum">     355 </span>            :       // there have been modifications to the MD system OR this is the first</a>
-<a name="356"><span class="lineNum">     356 </span>            :       // consideration of this sub-domain. Besides, we skip this operation if</a>
-<a name="357"><span class="lineNum">     357 </span>            :       // the particle insertion does not require it (e.g. in case of rarefied</a>
-<a name="358"><span class="lineNum">     358 </span>            :       // gases, we possibly can come up with something better than USHER)</a>
-<a name="359"><span class="lineNum">     359 </span><span class="lineNoCov">          0 :       if (constructEnergyLandscape &amp;&amp; _particleInsertion-&gt;requiresPotentialEnergyLandscape()) {</span></a>
-<a name="360"><span class="lineNum">     360 </span><span class="lineNoCov">          0 :         _mdSolverInterface-&gt;setupPotentialEnergyLandscape(usherCellStart, _usherRange[j], _numberLinkedCellsPerMacroscopicCell);</span></a>
-<a name="361"><span class="lineNum">     361 </span>            :         // reset flag</a>
-<a name="362"><span class="lineNum">     362 </span><span class="lineNoCov">          0 :         constructEnergyLandscape = false;</span></a>
-<a name="363"><span class="lineNum">     363 </span>            :       }</a>
-<a name="364"><span class="lineNum">     364 </span>            : </a>
-<a name="365"><span class="lineNum">     365 </span>            :       // loop over all respective macroscopic cells (incrementing by 2 for</a>
-<a name="366"><span class="lineNum">     366 </span>            :       // 2^dim-colour-traversal)</a>
-<a name="367"><span class="lineNum">     367 </span><span class="lineNoCov">          0 :       for (cellIndex[2] = _usherCellStart[j][2] + _usherCellOffset[i][2]; cellIndex[2] &lt; _usherCellEnd[j][2]; cellIndex[2] = cellIndex[2] + 2) {</span></a>
-<a name="368"><span class="lineNum">     368 </span><span class="lineNoCov">          0 :         for (cellIndex[1] = _usherCellStart[j][1] + _usherCellOffset[i][1]; cellIndex[1] &lt; _usherCellEnd[j][1]; cellIndex[1] = cellIndex[1] + 2) {</span></a>
-<a name="369"><span class="lineNum">     369 </span><span class="lineNoCov">          0 :           for (cellIndex[0] = _usherCellStart[j][0] + _usherCellOffset[i][0]; cellIndex[0] &lt; _usherCellEnd[j][0]; cellIndex[0] = cellIndex[0] + 2) {</span></a>
-<a name="370"><span class="lineNum">     370 </span>            :             // determine macroscopic cell index</a>
-<a name="371"><span class="lineNum">     371 </span><span class="lineNoCov">          0 :             const unsigned int index = _indexConversion-&gt;getLocalCellIndex(coupling::initDimVector&lt;dim&gt;(cellIndex));</span></a>
-<a name="372"><span class="lineNum">     372 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="373"><span class="lineNum">     373 </span>            :             std::cout &lt;&lt; &quot;coupling::services::MacroscopicCellServiceImpl::&quot;</a>
-<a name="374"><span class="lineNum">     374 </span>            :                          &quot;distributeMass(): Insert mass in cell &quot;</a>
-<a name="375"><span class="lineNum">     375 </span>            :                       &lt;&lt; index &lt;&lt; std::endl;</a>
-<a name="376"><span class="lineNum">     376 </span>            : #endif</a>
-<a name="377"><span class="lineNum">     377 </span>            :             // compute cell position</a>
-<a name="378"><span class="lineNum">     378 </span><span class="lineNoCov">          0 :             tarch::la::Vector&lt;dim, double&gt; macroscopicCellPosition = startPosition;</span></a>
-<a name="379"><span class="lineNum">     379 </span><span class="lineNoCov">          0 :             for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="380"><span class="lineNum">     380 </span><span class="lineNoCov">          0 :               macroscopicCellPosition[d] += _indexConversion-&gt;getMacroscopicCellSize()[d] * cellIndex[d];</span></a>
-<a name="381"><span class="lineNum">     381 </span>            :             }</a>
-<a name="382"><span class="lineNum">     382 </span>            : </a>
-<a name="383"><span class="lineNum">     383 </span>            :             // compute current momentum and energy</a>
-<a name="384"><span class="lineNum">     384 </span><span class="lineNoCov">          0 :             _momentumController.computeMomentumAndMeanVelocity(macroscopicCells[index], momentum, meanVelocity);</span></a>
-<a name="385"><span class="lineNum">     385 </span><span class="lineNoCov">          0 :             temperature = macroscopicCells[index].getTemperature();</span></a>
-<a name="386"><span class="lineNum">     386 </span>            :             // compute potential energy for this macroscopic cell and store it</a>
-<a name="387"><span class="lineNum">     387 </span><span class="lineNoCov">          0 :             macroscopicCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);</span></a>
-<a name="388"><span class="lineNum">     388 </span><span class="lineNoCov">          0 :             potentialEnergy = computeMeanPotentialEnergyMapping.getPotentialEnergy();</span></a>
-<a name="389"><span class="lineNum">     389 </span><span class="lineNoCov">          0 :             macroscopicCells[index].setPotentialEnergy(potentialEnergy);</span></a>
-<a name="390"><span class="lineNum">     390 </span>            : </a>
-<a name="391"><span class="lineNum">     391 </span>            :             // insert/ delete mass</a>
-<a name="392"><span class="lineNum">     392 </span>            :             particleInsertionAction =</a>
-<a name="393"><span class="lineNum">     393 </span><span class="lineNoCov">          0 :                 _particleInsertion-&gt;insertDeleteMass(macroscopicCells[index], macroscopicCellPosition, _indexConversion-&gt;getMacroscopicCellSize(), meanVelocity,</span></a>
-<a name="394"><span class="lineNum">     394 </span><span class="lineNoCov">          0 :                                                      temperature, *_boundaryForceController);</span></a>
-<a name="395"><span class="lineNum">     395 </span>            :             // if insertion/ deletion was successful...</a>
-<a name="396"><span class="lineNum">     396 </span><span class="lineNoCov">          0 :             if (particleInsertionAction != coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::NoAction) {</span></a>
-<a name="397"><span class="lineNum">     397 </span>            :               // ... determine new potential energy of the system (assumption:</a>
-<a name="398"><span class="lineNum">     398 </span>            :               // symmetric potential energy)</a>
-<a name="399"><span class="lineNum">     399 </span><span class="lineNoCov">          0 :               macroscopicCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);</span></a>
-<a name="400"><span class="lineNum">     400 </span>            : </a>
-<a name="401"><span class="lineNum">     401 </span>            :               // ... reset momentum and temperature</a>
-<a name="402"><span class="lineNum">     402 </span><span class="lineNoCov">          0 :               _momentumController.setMomentum(macroscopicCells[index], momentum);</span></a>
-<a name="403"><span class="lineNum">     403 </span><span class="lineNoCov">          0 :               _kineticEnergyController.setTemperature(macroscopicCells[index], temperature);</span></a>
-<a name="404"><span class="lineNum">     404 </span>            :               // ... set flag to construct energy landscape for next insertion</a>
-<a name="405"><span class="lineNum">     405 </span>            :               // try</a>
-<a name="406"><span class="lineNum">     406 </span><span class="lineNoCov">          0 :               constructEnergyLandscape = true;</span></a>
-<a name="407"><span class="lineNum">     407 </span>            :             }</a>
-<a name="408"><span class="lineNum">     408 </span>            : </a>
-<a name="409"><span class="lineNum">     409 </span>            :           } // cellIndex(0)</a>
-<a name="410"><span class="lineNum">     410 </span>            :         }   // cellIndex(1)</a>
-<a name="411"><span class="lineNum">     411 </span>            :       }     // cellIndex(2)</a>
-<a name="412"><span class="lineNum">     412 </span>            :     }       // 2^dim-colour single cells (1&lt;&lt;dim)</a>
-<a name="413"><span class="lineNum">     413 </span>            : </a>
-<a name="414"><span class="lineNum">     414 </span>            :     // synchronize molecules between processes</a>
-<a name="415"><span class="lineNum">     415 </span><span class="lineNoCov">          0 :     _mdSolverInterface-&gt;synchronizeMoleculesAfterMassModification();</span></a>
-<a name="416"><span class="lineNum">     416 </span>            : </a>
-<a name="417"><span class="lineNum">     417 </span>            :   } // 2^dim-colour whole domain (1&lt;&lt;dim)</a>
-<a name="418"><span class="lineNum">     418 </span>            : </a>
-<a name="419"><span class="lineNum">     419 </span>            : #ifdef USHER_DEBUG</a>
-<a name="420"><span class="lineNum">     420 </span>            :   coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;* p = ((coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;*)_particleInsertion);</a>
-<a name="421"><span class="lineNum">     421 </span>            :   std::cout &lt;&lt; &quot;_particlesInserted = &quot; &lt;&lt; p-&gt;_particlesInserted &lt;&lt; std::endl;</a>
-<a name="422"><span class="lineNum">     422 </span>            :   std::cout &lt;&lt; &quot;_energyInserted     = &quot; &lt;&lt; p-&gt;_energyInserted &lt;&lt; std::endl;</a>
-<a name="423"><span class="lineNum">     423 </span>            :   std::cout &lt;&lt; &quot;_ZhouEnergyInserted = &quot; &lt;&lt; p-&gt;_ZhouEnergyInserted &lt;&lt; std::endl;</a>
-<a name="424"><span class="lineNum">     424 </span>            :   std::cout &lt;&lt; &quot;and&quot; &lt;&lt; std::endl;</a>
-<a name="425"><span class="lineNum">     425 </span>            :   std::cout &lt;&lt; &quot;_particlesRemoved  = &quot; &lt;&lt; p-&gt;_particlesRemoved &lt;&lt; std::endl;</a>
-<a name="426"><span class="lineNum">     426 </span>            :   std::cout &lt;&lt; &quot;_energyRemoved      = &quot; &lt;&lt; p-&gt;_energyRemoved &lt;&lt; std::endl;</a>
-<a name="427"><span class="lineNum">     427 </span>            :   std::cout &lt;&lt; &quot;_ZhouEnergyRemoved  = &quot; &lt;&lt; p-&gt;_ZhouEnergyRemoved &lt;&lt; std::endl;</a>
-<a name="428"><span class="lineNum">     428 </span>            :   std::cout &lt;&lt; &quot;Energy inserted per Operation: &quot;</a>
-<a name="429"><span class="lineNum">     429 </span>            :             &lt;&lt; ((p-&gt;_energyInserted + p-&gt;_ZhouEnergyInserted) - (p-&gt;_energyRemoved + p-&gt;_ZhouEnergyRemoved)) / (p-&gt;_particlesInserted + p-&gt;_particlesRemoved)</a>
-<a name="430"><span class="lineNum">     430 </span>            :             &lt;&lt; std::endl;</a>
-<a name="431"><span class="lineNum">     431 </span>            :   std::cout &lt;&lt; std::endl;</a>
-<a name="432"><span class="lineNum">     432 </span>            : #endif</a>
-<a name="433"><span class="lineNum">     433 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="434"><span class="lineNum">     434 </span>            : </a>
-<a name="435"><span class="lineNum">     435 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="436"><span class="lineNum">     436 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::plotEveryMicroscopicTimestep(unsigned int t) {</span></a>
-<a name="437"><span class="lineNum">     437 </span>            :   // trigger plotting</a>
-<a name="438"><span class="lineNum">     438 </span><span class="lineNoCov">          0 :   if ((_writeEveryMicroscopicTimestep != 0) &amp;&amp; (t % _writeEveryMicroscopicTimestep == 0)) {</span></a>
-<a name="439"><span class="lineNum">     439 </span><span class="lineNoCov">          0 :     coupling::MacroscopicCellPlotter&lt;LinkedCell, dim&gt; plotter(coupling::services::MacroscopicCellService&lt;dim&gt;::getID(), _microscopicFilename,</span></a>
-<a name="440"><span class="lineNum">     440 </span><span class="lineNoCov">          0 :                                                               _indexConversion-&gt;getThisRank(), t, *_indexConversion, _macroscopicCells, _mdSolverInterface);</span></a>
-<a name="441"><span class="lineNum">     441 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="442"><span class="lineNum">     442 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 :   Wrapper4ComputeAndSetCurrentVelocity computeAndSetCurrentVelocity(this);</span></a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineNoCov">          0 :   Wrapper4DistributeMomentum distributeMomentum(this, t);</span></a>
+<a name="217"><span class="lineNum">     217 </span>            : </a>
+<a name="218"><span class="lineNum">     218 </span>            :   // compute current velocity in all cells</a>
+<a name="219"><span class="lineNum">     219 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(computeAndSetCurrentVelocity);</span></a>
+<a name="220"><span class="lineNum">     220 </span>            :   // distribute momentum and synchronize molecules between processes</a>
+<a name="221"><span class="lineNum">     221 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(distributeMomentum);</span></a>
+<a name="222"><span class="lineNum">     222 </span><span class="lineNoCov">          0 :   _mdSolverInterface-&gt;synchronizeMoleculesAfterMomentumModification();</span></a>
+<a name="223"><span class="lineNum">     223 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="224"><span class="lineNum">     224 </span>            : </a>
+<a name="225"><span class="lineNum">     225 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::computeAndStoreTemperature(double temperature) {</span></a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :   Wrapper4ComputeAndStoreTemperature wrapper(this, temperature);</span></a>
+<a name="228"><span class="lineNum">     228 </span><span class="lineNoCov">          0 :   _applyAccordingToConfiguration(wrapper);</span></a>
+<a name="229"><span class="lineNum">     229 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="230"><span class="lineNum">     230 </span>            : </a>
+<a name="231"><span class="lineNum">     231 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::perturbateVelocity() {</span></a>
+<a name="232"><span class="lineNum">     232 </span><span class="lineNoCov">          0 :   Wrapper4PerturbateVelocity wrapper(this);</span></a>
+<a name="233"><span class="lineNum">     233 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);</span></a>
+<a name="234"><span class="lineNum">     234 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="235"><span class="lineNum">     235 </span>            : </a>
+<a name="236"><span class="lineNum">     236 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="237"><span class="lineNum">     237 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::applyTemperatureToMolecules(unsigned int t) {</span></a>
+<a name="238"><span class="lineNum">     238 </span><span class="lineNoCov">          0 :   Wrapper4ApplyTemperature wrapper(this);</span></a>
+<a name="239"><span class="lineNum">     239 </span><span class="lineNoCov">          0 :   _applyAccordingToConfiguration(wrapper);</span></a>
+<a name="240"><span class="lineNum">     240 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="241"><span class="lineNum">     241 </span>            : </a>
+<a name="242"><span class="lineNum">     242 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::applyBoundaryForce(unsigned int t) {</span></a>
+<a name="243"><span class="lineNum">     243 </span><span class="lineNoCov">          0 :   Wrapper4ApplyBoundaryForce wrapper(this);</span></a>
+<a name="244"><span class="lineNum">     244 </span><span class="lineNoCov">          0 :   _macroscopicCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);</span></a>
+<a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="246"><span class="lineNum">     246 </span>            : </a>
+<a name="247"><span class="lineNum">     247 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="248"><span class="lineNum">     248 </span><span class="lineCov">          4 : coupling::IndexConversion&lt;dim&gt;* coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::initIndexConversion(</span></a>
+<a name="249"><span class="lineNum">     249 </span>            :     tarch::la::Vector&lt;dim, double&gt; macroscopicCellSize, tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses, unsigned int rank,</a>
+<a name="250"><span class="lineNum">     250 </span>            :     tarch::la::Vector&lt;dim, double&gt; globalMDDomainSize, tarch::la::Vector&lt;dim, double&gt; globalMDDomainOffset,</a>
+<a name="251"><span class="lineNum">     251 </span>            :     coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset) const {</a>
+<a name="252"><span class="lineNum">     252 </span><span class="lineCov">          4 :   tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells(0);</span></a>
+<a name="253"><span class="lineNum">     253 </span><span class="lineCov">         16 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="254"><span class="lineNum">     254 </span><span class="lineCov">         12 :     globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);</span></a>
+<a name="255"><span class="lineNum">     255 </span><span class="lineCov">         12 :     if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] - globalMDDomainSize[d]) &gt; 1e-13) {</span></a>
+<a name="256"><span class="lineNum">     256 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;coupling::services::MacroscopicCellServiceImpl::&quot;</span></a>
+<a name="257"><span class="lineNum">     257 </span>            :                    &quot;initIndexConversion(): Deviation of domain size &gt; 1e-13!&quot;</a>
+<a name="258"><span class="lineNum">     258 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="259"><span class="lineNum">     259 </span>            :     }</a>
+<a name="260"><span class="lineNum">     260 </span>            :   }</a>
+<a name="261"><span class="lineNum">     261 </span><span class="lineCov">          4 :   coupling::IndexConversion&lt;dim&gt;* ic = new coupling::IndexConversion&lt;dim&gt;(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,</span></a>
+<a name="262"><span class="lineNum">     262 </span>            :                                                                           globalMDDomainOffset, parallelTopologyType, topologyOffset);</a>
+<a name="263"><span class="lineNum">     263 </span><span class="lineCov">          4 :   if (ic == NULL) {</span></a>
+<a name="264"><span class="lineNum">     264 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;coupling::services::MacroscopicCellServiceImpl::&quot;</span></a>
+<a name="265"><span class="lineNum">     265 </span>            :                  &quot;initIndexConversion(): ic==NULL!&quot;</a>
+<a name="266"><span class="lineNum">     266 </span><span class="lineNoCov">          0 :               &lt;&lt; std::endl;</span></a>
+<a name="267"><span class="lineNum">     267 </span><span class="lineNoCov">          0 :     exit(EXIT_FAILURE);</span></a>
+<a name="268"><span class="lineNum">     268 </span>            :   }</a>
+<a name="269"><span class="lineNum">     269 </span><span class="lineCov">          4 :   return ic;</span></a>
+<a name="270"><span class="lineNum">     270 </span>            : }</a>
+<a name="271"><span class="lineNum">     271 </span>            : </a>
+<a name="272"><span class="lineNum">     272 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="273"><span class="lineNum">     273 </span><span class="lineCov">          4 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::initIndexVectors4Usher(</span></a>
+<a name="274"><span class="lineNum">     274 </span>            :     tarch::la::Vector&lt;dim, unsigned int&gt; numberLinkedCellsPerMacroscopicCell) {</a>
+<a name="275"><span class="lineNum">     275 </span>            : </a>
+<a name="276"><span class="lineNum">     276 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;dim, unsigned int&gt; localNumberMacroscopicCells = _indexConversion-&gt;getLocalNumberMacroscopicCells();</span></a>
+<a name="277"><span class="lineNum">     277 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;dim, unsigned int&gt; firstNonGhostMacroscopicCell(1);</span></a>
+<a name="278"><span class="lineNum">     278 </span>            : </a>
+<a name="279"><span class="lineNum">     279 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; start(0);</span></a>
+<a name="280"><span class="lineNum">     280 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; end = coupling::initRange&lt;dim&gt;(tarch::la::Vector&lt;dim, unsigned int&gt;(2));</span></a>
+<a name="281"><span class="lineNum">     281 </span><span class="lineCov">          4 :   tarch::la::Vector&lt;3, unsigned int&gt; loop(0);</span></a>
+<a name="282"><span class="lineNum">     282 </span><span class="lineCov">          4 :   unsigned int loopCounter = 0;</span></a>
+<a name="283"><span class="lineNum">     283 </span>            : </a>
+<a name="284"><span class="lineNum">     284 </span><span class="lineCov">         12 :   for (loop[2] = start[2]; loop[2] &lt; end[2]; loop[2]++) {</span></a>
+<a name="285"><span class="lineNum">     285 </span><span class="lineCov">         24 :     for (loop[1] = start[1]; loop[1] &lt; end[1]; loop[1]++) {</span></a>
+<a name="286"><span class="lineNum">     286 </span><span class="lineCov">         48 :       for (loop[0] = start[0]; loop[0] &lt; end[0]; loop[0]++) {</span></a>
+<a name="287"><span class="lineNum">     287 </span><span class="lineCov">        128 :         for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="288"><span class="lineNum">     288 </span><span class="lineCov">         96 :           _usherCellOffset[loopCounter][d] = loop[d];</span></a>
+<a name="289"><span class="lineNum">     289 </span><span class="lineCov">         96 :           _usherCellStart[loopCounter][d] = firstNonGhostMacroscopicCell[d] + loop[d] * (localNumberMacroscopicCells[d] / 2);</span></a>
+<a name="290"><span class="lineNum">     290 </span><span class="lineCov">        192 :           _usherCellEnd[loopCounter][d] =</span></a>
+<a name="291"><span class="lineNum">     291 </span><span class="lineCov">         96 :               firstNonGhostMacroscopicCell[d] + (1 - loop[d]) * (localNumberMacroscopicCells[d] / 2) + loop[d] * localNumberMacroscopicCells[d];</span></a>
+<a name="292"><span class="lineNum">     292 </span><span class="lineCov">         96 :           _usherRange[loopCounter][d] = _usherCellEnd[loopCounter][d] - _usherCellStart[loopCounter][d];</span></a>
+<a name="293"><span class="lineNum">     293 </span>            :         }</a>
+<a name="294"><span class="lineNum">     294 </span><span class="lineCov">         32 :         for (unsigned int d = dim; d &lt; 3; d++) {</span></a>
+<a name="295"><span class="lineNum">     295 </span><span class="lineNoCov">          0 :           _usherCellOffset[loopCounter][d] = 0;</span></a>
+<a name="296"><span class="lineNum">     296 </span><span class="lineNoCov">          0 :           _usherCellStart[loopCounter][d] = 0;</span></a>
+<a name="297"><span class="lineNum">     297 </span><span class="lineNoCov">          0 :           _usherCellEnd[loopCounter][d] = 1;</span></a>
+<a name="298"><span class="lineNum">     298 </span>            :         }</a>
+<a name="299"><span class="lineNum">     299 </span>            : </a>
+<a name="300"><span class="lineNum">     300 </span><span class="lineCov">         32 :         loopCounter++;</span></a>
+<a name="301"><span class="lineNum">     301 </span>            :       }</a>
+<a name="302"><span class="lineNum">     302 </span>            :     }</a>
+<a name="303"><span class="lineNum">     303 </span>            :   } // loop over all staggered versions (-&gt; (0,0,0), (0,0,1), (0,1,0),....,</a>
+<a name="304"><span class="lineNum">     304 </span>            :     // (1,1,1) )</a>
+<a name="305"><span class="lineNum">     305 </span><span class="lineCov">          4 : }</span></a>
+<a name="306"><span class="lineNum">     306 </span>            : </a>
+<a name="307"><span class="lineNum">     307 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="308"><span class="lineNum">     308 </span><span class="lineNoCov">          0 : tarch::la::Vector&lt;dim, double&gt; coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::getPositionOfFirstLocalGhostCell() const {</span></a>
+<a name="309"><span class="lineNum">     309 </span>            :   // initialise with position of global first ghost cell</a>
+<a name="310"><span class="lineNum">     310 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; position = _indexConversion-&gt;getGlobalMDDomainOffset() - _indexConversion-&gt;getMacroscopicCellSize();</span></a>
+<a name="311"><span class="lineNum">     311 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="312"><span class="lineNum">     312 </span><span class="lineNoCov">          0 :     position[d] = position[d] + _indexConversion-&gt;getThisProcess()[d] * _indexConversion-&gt;getAverageLocalNumberMacroscopicCells()[d] *</span></a>
+<a name="313"><span class="lineNum">     313 </span><span class="lineNoCov">          0 :                                     _indexConversion-&gt;getMacroscopicCellSize()[d];</span></a>
+<a name="314"><span class="lineNum">     314 </span>            :   }</a>
+<a name="315"><span class="lineNum">     315 </span><span class="lineNoCov">          0 :   return position;</span></a>
+<a name="316"><span class="lineNum">     316 </span>            : }</a>
+<a name="317"><span class="lineNum">     317 </span>            : </a>
+<a name="318"><span class="lineNum">     318 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::distributeMass(unsigned int t) {</span></a>
+<a name="319"><span class="lineNum">     319 </span>            :   // nop if there is no particle insertion</a>
+<a name="320"><span class="lineNum">     320 </span><span class="lineNoCov">          0 :   if (_particleInsertionType == coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION) {</span></a>
+<a name="321"><span class="lineNum">     321 </span><span class="lineNoCov">          0 :     return;</span></a>
+<a name="322"><span class="lineNum">     322 </span>            :   }</a>
+<a name="323"><span class="lineNum">     323 </span>            :   // only insert mass every X time steps</a>
+<a name="324"><span class="lineNum">     324 </span><span class="lineNoCov">          0 :   if (!_particleInsertion-&gt;insertDeleteMassAtTimestep(t)) {</span></a>
+<a name="325"><span class="lineNum">     325 </span><span class="lineNoCov">          0 :     return;</span></a>
+<a name="326"><span class="lineNum">     326 </span>            :   }</a>
+<a name="327"><span class="lineNum">     327 </span>            : </a>
+<a name="328"><span class="lineNum">     328 </span>            :   // compute mean potential energy over all macroscopic cells and set the value</a>
+<a name="329"><span class="lineNum">     329 </span>            :   // in the macroscopic cell</a>
+<a name="330"><span class="lineNum">     330 </span><span class="lineNoCov">          0 :   coupling::cellmappings::ComputeMeanPotentialEnergyMapping&lt;LinkedCell, dim&gt; computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);</span></a>
+<a name="331"><span class="lineNum">     331 </span>            :   // macroscopic cell access</a>
+<a name="332"><span class="lineNum">     332 </span><span class="lineNoCov">          0 :   coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;* const macroscopicCells = _macroscopicCells.getMacroscopicCellsWithLinkedCells();</span></a>
+<a name="333"><span class="lineNum">     333 </span>            :   // start coordinate of first (ghost) cell</a>
+<a name="334"><span class="lineNum">     334 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; startPosition = getPositionOfFirstLocalGhostCell();</span></a>
+<a name="335"><span class="lineNum">     335 </span>            :   // buffers for temperature,momentum,mean velocity,pot. energy</a>
+<a name="336"><span class="lineNum">     336 </span><span class="lineNoCov">          0 :   double temperature(0.0);</span></a>
+<a name="337"><span class="lineNum">     337 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; momentum(0.0);</span></a>
+<a name="338"><span class="lineNum">     338 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; meanVelocity(0.0);</span></a>
+<a name="339"><span class="lineNum">     339 </span><span class="lineNoCov">          0 :   double potentialEnergy = 0.0;</span></a>
+<a name="340"><span class="lineNum">     340 </span>            :   // buffer for insertion/deletion action that has been carried out</a>
+<a name="341"><span class="lineNum">     341 </span>            :   typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action particleInsertionAction;</a>
+<a name="342"><span class="lineNum">     342 </span>            :   // true, if the costly operation of contructing the energy landscape is really</a>
+<a name="343"><span class="lineNum">     343 </span>            :   // required</a>
+<a name="344"><span class="lineNum">     344 </span>            :   bool constructEnergyLandscape;</a>
+<a name="345"><span class="lineNum">     345 </span>            : </a>
+<a name="346"><span class="lineNum">     346 </span>            :   // variables for internal looping --------------------------</a>
+<a name="347"><span class="lineNum">     347 </span>            :   // cellIndex used as loop counter</a>
+<a name="348"><span class="lineNum">     348 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;3, unsigned int&gt; cellIndex(0);</span></a>
+<a name="349"><span class="lineNum">     349 </span>            :   // loop over macroscopic cell domain (within MD domain) in a 2^dim-colour</a>
+<a name="350"><span class="lineNum">     350 </span>            :   // manner: For parallel simulations with an odd number of processes and</a>
+<a name="351"><span class="lineNum">     351 </span>            :   // periodic boundary conditions, a simple staggered loop over all macroscopic</a>
+<a name="352"><span class="lineNum">     352 </span>            :   // cells would imply that we insert particles on both sides of the global MD</a>
+<a name="353"><span class="lineNum">     353 </span>            :   // boundary in the same traversal. This can lead to strong forces and</a>
+<a name="354"><span class="lineNum">     354 </span>            :   // potential fields between inserted particles! So, we introduce another loop</a>
+<a name="355"><span class="lineNum">     355 </span>            :   // which subdivides each local domain into 2^D blocks and traverse each block</a>
+<a name="356"><span class="lineNum">     356 </span>            :   // in one loop traversal first.</a>
+<a name="357"><span class="lineNum">     357 </span><span class="lineNoCov">          0 :   for (unsigned int j = 0; j &lt; (1 &lt;&lt; dim); j++) {</span></a>
+<a name="358"><span class="lineNum">     358 </span>            :     // we have to at least carry out the construction of the energy landscape</a>
+<a name="359"><span class="lineNum">     359 </span>            :     // once for each sub-domain (since we do not know a priori if we need to</a>
+<a name="360"><span class="lineNum">     360 </span>            :     // insert particles or not)</a>
+<a name="361"><span class="lineNum">     361 </span><span class="lineNoCov">          0 :     constructEnergyLandscape = true;</span></a>
+<a name="362"><span class="lineNum">     362 </span>            :     // reduce size of usherCellStart-vector to be consistent with</a>
+<a name="363"><span class="lineNum">     363 </span>            :     // MDSolverInterface</a>
+<a name="364"><span class="lineNum">     364 </span><span class="lineNoCov">          0 :     const tarch::la::Vector&lt;dim, unsigned int&gt; usherCellStart = coupling::initDimVector&lt;dim&gt;(_usherCellStart[j]);</span></a>
+<a name="365"><span class="lineNum">     365 </span>            : </a>
+<a name="366"><span class="lineNum">     366 </span>            :     // loop over the block again in a 2^dim-colour manner: For each particle</a>
+<a name="367"><span class="lineNum">     367 </span>            :     // insertion within a macroscopic cell, the potential energy landscape needs</a>
+<a name="368"><span class="lineNum">     368 </span>            :     // to be reconstructed in the surrounding of the respective cell. This</a>
+<a name="369"><span class="lineNum">     369 </span>            :     // implies: - reset energy for molecules in this cell and the neighbours</a>
+<a name="370"><span class="lineNum">     370 </span>            :     //               - compute energy for all molecules of this cell and the</a>
+<a name="371"><span class="lineNum">     371 </span>            :     //               neighbours (= consider 5^dim cells!)</a>
+<a name="372"><span class="lineNum">     372 </span>            :     // So, it becomes apparent that re-computing the potential energy becomes</a>
+<a name="373"><span class="lineNum">     373 </span>            :     // quite expensive. Therefore, we loop over each block in a red-black</a>
+<a name="374"><span class="lineNum">     374 </span>            :     // manner. Doing so, each loop iteration over one &quot;colour&quot; of cells can be</a>
+<a name="375"><span class="lineNum">     375 </span>            :     // done without any re-computation of the potential energy as the molecules</a>
+<a name="376"><span class="lineNum">     376 </span>            :     // under consideration are independent from each other.</a>
+<a name="377"><span class="lineNum">     377 </span><span class="lineNoCov">          0 :     for (unsigned int i = 0; i &lt; (1 &lt;&lt; dim); i++) {</span></a>
+<a name="378"><span class="lineNum">     378 </span>            :       // setup potential energy landscape (i.e. computes the potential energy</a>
+<a name="379"><span class="lineNum">     379 </span>            :       // for all relevant molecules; here, we need to sweep over all molecules</a>
+<a name="380"><span class="lineNum">     380 </span>            :       // contained in the macroscopic cells of interest and compute their</a>
+<a name="381"><span class="lineNum">     381 </span>            :       // current potential energy). Only carry out this costly operation, if</a>
+<a name="382"><span class="lineNum">     382 </span>            :       // there have been modifications to the MD system OR this is the first</a>
+<a name="383"><span class="lineNum">     383 </span>            :       // consideration of this sub-domain. Besides, we skip this operation if</a>
+<a name="384"><span class="lineNum">     384 </span>            :       // the particle insertion does not require it (e.g. in case of rarefied</a>
+<a name="385"><span class="lineNum">     385 </span>            :       // gases, we possibly can come up with something better than USHER)</a>
+<a name="386"><span class="lineNum">     386 </span><span class="lineNoCov">          0 :       if (constructEnergyLandscape &amp;&amp; _particleInsertion-&gt;requiresPotentialEnergyLandscape()) {</span></a>
+<a name="387"><span class="lineNum">     387 </span><span class="lineNoCov">          0 :         _mdSolverInterface-&gt;setupPotentialEnergyLandscape(usherCellStart, _usherRange[j], _numberLinkedCellsPerMacroscopicCell);</span></a>
+<a name="388"><span class="lineNum">     388 </span>            :         // reset flag</a>
+<a name="389"><span class="lineNum">     389 </span><span class="lineNoCov">          0 :         constructEnergyLandscape = false;</span></a>
+<a name="390"><span class="lineNum">     390 </span>            :       }</a>
+<a name="391"><span class="lineNum">     391 </span>            : </a>
+<a name="392"><span class="lineNum">     392 </span>            :       // loop over all respective macroscopic cells (incrementing by 2 for</a>
+<a name="393"><span class="lineNum">     393 </span>            :       // 2^dim-colour-traversal)</a>
+<a name="394"><span class="lineNum">     394 </span><span class="lineNoCov">          0 :       for (cellIndex[2] = _usherCellStart[j][2] + _usherCellOffset[i][2]; cellIndex[2] &lt; _usherCellEnd[j][2]; cellIndex[2] = cellIndex[2] + 2) {</span></a>
+<a name="395"><span class="lineNum">     395 </span><span class="lineNoCov">          0 :         for (cellIndex[1] = _usherCellStart[j][1] + _usherCellOffset[i][1]; cellIndex[1] &lt; _usherCellEnd[j][1]; cellIndex[1] = cellIndex[1] + 2) {</span></a>
+<a name="396"><span class="lineNum">     396 </span><span class="lineNoCov">          0 :           for (cellIndex[0] = _usherCellStart[j][0] + _usherCellOffset[i][0]; cellIndex[0] &lt; _usherCellEnd[j][0]; cellIndex[0] = cellIndex[0] + 2) {</span></a>
+<a name="397"><span class="lineNum">     397 </span>            :             // determine macroscopic cell index</a>
+<a name="398"><span class="lineNum">     398 </span><span class="lineNoCov">          0 :             const unsigned int index = _indexConversion-&gt;getLocalCellIndex(coupling::initDimVector&lt;dim&gt;(cellIndex));</span></a>
+<a name="399"><span class="lineNum">     399 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
+<a name="400"><span class="lineNum">     400 </span>            :             std::cout &lt;&lt; &quot;coupling::services::MacroscopicCellServiceImpl::&quot;</a>
+<a name="401"><span class="lineNum">     401 </span>            :                          &quot;distributeMass(): Insert mass in cell &quot;</a>
+<a name="402"><span class="lineNum">     402 </span>            :                       &lt;&lt; index &lt;&lt; std::endl;</a>
+<a name="403"><span class="lineNum">     403 </span>            : #endif</a>
+<a name="404"><span class="lineNum">     404 </span>            :             // compute cell position</a>
+<a name="405"><span class="lineNum">     405 </span><span class="lineNoCov">          0 :             tarch::la::Vector&lt;dim, double&gt; macroscopicCellPosition = startPosition;</span></a>
+<a name="406"><span class="lineNum">     406 </span><span class="lineNoCov">          0 :             for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="407"><span class="lineNum">     407 </span><span class="lineNoCov">          0 :               macroscopicCellPosition[d] += _indexConversion-&gt;getMacroscopicCellSize()[d] * cellIndex[d];</span></a>
+<a name="408"><span class="lineNum">     408 </span>            :             }</a>
+<a name="409"><span class="lineNum">     409 </span>            : </a>
+<a name="410"><span class="lineNum">     410 </span>            :             // compute current momentum and energy</a>
+<a name="411"><span class="lineNum">     411 </span><span class="lineNoCov">          0 :             _momentumController.computeMomentumAndMeanVelocity(macroscopicCells[index], momentum, meanVelocity);</span></a>
+<a name="412"><span class="lineNum">     412 </span><span class="lineNoCov">          0 :             temperature = macroscopicCells[index].getTemperature();</span></a>
+<a name="413"><span class="lineNum">     413 </span>            :             // compute potential energy for this macroscopic cell and store it</a>
+<a name="414"><span class="lineNum">     414 </span><span class="lineNoCov">          0 :             macroscopicCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);</span></a>
+<a name="415"><span class="lineNum">     415 </span><span class="lineNoCov">          0 :             potentialEnergy = computeMeanPotentialEnergyMapping.getPotentialEnergy();</span></a>
+<a name="416"><span class="lineNum">     416 </span><span class="lineNoCov">          0 :             macroscopicCells[index].setPotentialEnergy(potentialEnergy);</span></a>
+<a name="417"><span class="lineNum">     417 </span>            : </a>
+<a name="418"><span class="lineNum">     418 </span>            :             // insert/ delete mass</a>
+<a name="419"><span class="lineNum">     419 </span>            :             particleInsertionAction =</a>
+<a name="420"><span class="lineNum">     420 </span><span class="lineNoCov">          0 :                 _particleInsertion-&gt;insertDeleteMass(macroscopicCells[index], macroscopicCellPosition, _indexConversion-&gt;getMacroscopicCellSize(), meanVelocity,</span></a>
+<a name="421"><span class="lineNum">     421 </span><span class="lineNoCov">          0 :                                                      temperature, *_boundaryForceController);</span></a>
+<a name="422"><span class="lineNum">     422 </span>            :             // if insertion/ deletion was successful...</a>
+<a name="423"><span class="lineNum">     423 </span><span class="lineNoCov">          0 :             if (particleInsertionAction != coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::NoAction) {</span></a>
+<a name="424"><span class="lineNum">     424 </span>            :               // ... determine new potential energy of the system (assumption:</a>
+<a name="425"><span class="lineNum">     425 </span>            :               // symmetric potential energy)</a>
+<a name="426"><span class="lineNum">     426 </span><span class="lineNoCov">          0 :               macroscopicCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);</span></a>
+<a name="427"><span class="lineNum">     427 </span>            : </a>
+<a name="428"><span class="lineNum">     428 </span>            :               // ... reset momentum and temperature</a>
+<a name="429"><span class="lineNum">     429 </span><span class="lineNoCov">          0 :               _momentumController.setMomentum(macroscopicCells[index], momentum);</span></a>
+<a name="430"><span class="lineNum">     430 </span><span class="lineNoCov">          0 :               _kineticEnergyController.setTemperature(macroscopicCells[index], temperature);</span></a>
+<a name="431"><span class="lineNum">     431 </span>            :               // ... set flag to construct energy landscape for next insertion</a>
+<a name="432"><span class="lineNum">     432 </span>            :               // try</a>
+<a name="433"><span class="lineNum">     433 </span><span class="lineNoCov">          0 :               constructEnergyLandscape = true;</span></a>
+<a name="434"><span class="lineNum">     434 </span>            :             }</a>
+<a name="435"><span class="lineNum">     435 </span>            : </a>
+<a name="436"><span class="lineNum">     436 </span>            :           } // cellIndex(0)</a>
+<a name="437"><span class="lineNum">     437 </span>            :         }   // cellIndex(1)</a>
+<a name="438"><span class="lineNum">     438 </span>            :       }     // cellIndex(2)</a>
+<a name="439"><span class="lineNum">     439 </span>            :     }       // 2^dim-colour single cells (1&lt;&lt;dim)</a>
+<a name="440"><span class="lineNum">     440 </span>            : </a>
+<a name="441"><span class="lineNum">     441 </span>            :     // synchronize molecules between processes</a>
+<a name="442"><span class="lineNum">     442 </span><span class="lineNoCov">          0 :     _mdSolverInterface-&gt;synchronizeMoleculesAfterMassModification();</span></a>
 <a name="443"><span class="lineNum">     443 </span>            : </a>
-<a name="444"><span class="lineNum">     444 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="445"><span class="lineNum">     445 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::plotEveryMacroscopicTimestep(unsigned int t) {</span></a>
-<a name="446"><span class="lineNum">     446 </span>            :   // trigger plotting</a>
-<a name="447"><span class="lineNum">     447 </span><span class="lineNoCov">          0 :   if ((_writeEveryMacroscopicTimestep != 0) &amp;&amp; (t % _writeEveryMacroscopicTimestep == 0)) {</span></a>
-<a name="448"><span class="lineNum">     448 </span><span class="lineNoCov">          0 :     coupling::MacroscopicCellPlotter&lt;LinkedCell, dim&gt; plotter(coupling::services::MacroscopicCellService&lt;dim&gt;::getID(), _macroscopicFilename,</span></a>
-<a name="449"><span class="lineNum">     449 </span><span class="lineNoCov">          0 :                                                               _indexConversion-&gt;getThisRank(), t, *_indexConversion, _macroscopicCells, _mdSolverInterface);</span></a>
-<a name="450"><span class="lineNum">     450 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="451"><span class="lineNum">     451 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="444"><span class="lineNum">     444 </span>            :   } // 2^dim-colour whole domain (1&lt;&lt;dim)</a>
+<a name="445"><span class="lineNum">     445 </span>            : </a>
+<a name="446"><span class="lineNum">     446 </span>            : #ifdef USHER_DEBUG</a>
+<a name="447"><span class="lineNum">     447 </span>            :   coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;* p = ((coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;*)_particleInsertion);</a>
+<a name="448"><span class="lineNum">     448 </span>            :   std::cout &lt;&lt; &quot;_particlesInserted = &quot; &lt;&lt; p-&gt;_particlesInserted &lt;&lt; std::endl;</a>
+<a name="449"><span class="lineNum">     449 </span>            :   std::cout &lt;&lt; &quot;_energyInserted     = &quot; &lt;&lt; p-&gt;_energyInserted &lt;&lt; std::endl;</a>
+<a name="450"><span class="lineNum">     450 </span>            :   std::cout &lt;&lt; &quot;_ZhouEnergyInserted = &quot; &lt;&lt; p-&gt;_ZhouEnergyInserted &lt;&lt; std::endl;</a>
+<a name="451"><span class="lineNum">     451 </span>            :   std::cout &lt;&lt; &quot;and&quot; &lt;&lt; std::endl;</a>
+<a name="452"><span class="lineNum">     452 </span>            :   std::cout &lt;&lt; &quot;_particlesRemoved  = &quot; &lt;&lt; p-&gt;_particlesRemoved &lt;&lt; std::endl;</a>
+<a name="453"><span class="lineNum">     453 </span>            :   std::cout &lt;&lt; &quot;_energyRemoved      = &quot; &lt;&lt; p-&gt;_energyRemoved &lt;&lt; std::endl;</a>
+<a name="454"><span class="lineNum">     454 </span>            :   std::cout &lt;&lt; &quot;_ZhouEnergyRemoved  = &quot; &lt;&lt; p-&gt;_ZhouEnergyRemoved &lt;&lt; std::endl;</a>
+<a name="455"><span class="lineNum">     455 </span>            :   std::cout &lt;&lt; &quot;Energy inserted per Operation: &quot;</a>
+<a name="456"><span class="lineNum">     456 </span>            :             &lt;&lt; ((p-&gt;_energyInserted + p-&gt;_ZhouEnergyInserted) - (p-&gt;_energyRemoved + p-&gt;_ZhouEnergyRemoved)) / (p-&gt;_particlesInserted + p-&gt;_particlesRemoved)</a>
+<a name="457"><span class="lineNum">     457 </span>            :             &lt;&lt; std::endl;</a>
+<a name="458"><span class="lineNum">     458 </span>            :   std::cout &lt;&lt; std::endl;</a>
+<a name="459"><span class="lineNum">     459 </span>            : #endif</a>
+<a name="460"><span class="lineNum">     460 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="461"><span class="lineNum">     461 </span>            : </a>
+<a name="462"><span class="lineNum">     462 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="463"><span class="lineNum">     463 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::plotEveryMicroscopicTimestep(unsigned int t) {</span></a>
+<a name="464"><span class="lineNum">     464 </span>            :   // trigger plotting</a>
+<a name="465"><span class="lineNum">     465 </span><span class="lineNoCov">          0 :   if ((_writeEveryMicroscopicTimestep != 0) &amp;&amp; (t % _writeEveryMicroscopicTimestep == 0)) {</span></a>
+<a name="466"><span class="lineNum">     466 </span><span class="lineNoCov">          0 :     coupling::MacroscopicCellPlotter&lt;LinkedCell, dim&gt; plotter(coupling::services::MacroscopicCellService&lt;dim&gt;::getID(), _microscopicFilename,</span></a>
+<a name="467"><span class="lineNum">     467 </span><span class="lineNoCov">          0 :                                                               _indexConversion-&gt;getThisRank(), t, *_indexConversion, _macroscopicCells, _mdSolverInterface);</span></a>
+<a name="468"><span class="lineNum">     468 </span><span class="lineNoCov">          0 :   }</span></a>
+<a name="469"><span class="lineNum">     469 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="470"><span class="lineNum">     470 </span>            : </a>
+<a name="471"><span class="lineNum">     471 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="472"><span class="lineNum">     472 </span><span class="lineNoCov">          0 : void coupling::services::MacroscopicCellServiceImpl&lt;LinkedCell, dim&gt;::plotEveryMacroscopicTimestep(unsigned int t) {</span></a>
+<a name="473"><span class="lineNum">     473 </span>            :   // trigger plotting</a>
+<a name="474"><span class="lineNum">     474 </span><span class="lineNoCov">          0 :   if ((_writeEveryMacroscopicTimestep != 0) &amp;&amp; (t % _writeEveryMacroscopicTimestep == 0)) {</span></a>
+<a name="475"><span class="lineNum">     475 </span><span class="lineNoCov">          0 :     coupling::MacroscopicCellPlotter&lt;LinkedCell, dim&gt; plotter(coupling::services::MacroscopicCellService&lt;dim&gt;::getID(), _macroscopicFilename,</span></a>
+<a name="476"><span class="lineNum">     476 </span><span class="lineNoCov">          0 :                                                               _indexConversion-&gt;getThisRank(), t, *_indexConversion, _macroscopicCells, _mdSolverInterface);</span></a>
+<a name="477"><span class="lineNum">     477 </span><span class="lineNoCov">          0 :   }</span></a>
+<a name="478"><span class="lineNum">     478 </span><span class="lineNoCov">          0 : }</span></a>
 </pre>
       </td>
     </tr>

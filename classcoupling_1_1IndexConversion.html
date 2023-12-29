@@ -190,6 +190,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5124e400d2168fbca007827ede28d876" id="r_a5124e400d2168fbca007827ede28d876"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5124e400d2168fbca007827ede28d876">getProcessCoordinates</a> (unsigned int rank) const</td></tr>
 <tr class="memdesc:a5124e400d2168fbca007827ede28d876"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the process coordinates for the rank 'rank'.  <br /></td></tr>
 <tr class="separator:a5124e400d2168fbca007827ede28d876"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebbd2e524ec4158893423fe4ae0f7b31" id="r_aebbd2e524ec4158893423fe4ae0f7b31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebbd2e524ec4158893423fe4ae0f7b31">getThisProcessCoordinates</a> (unsigned int rank) const</td></tr>
+<tr class="memdesc:aebbd2e524ec4158893423fe4ae0f7b31"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the process coordinates for the rank 'rank'.  <br /></td></tr>
+<tr class="separator:aebbd2e524ec4158893423fe4ae0f7b31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b46e4b46730b4375208ec87d1883902" id="r_a4b46e4b46730b4375208ec87d1883902"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4b46e4b46730b4375208ec87d1883902">getRank</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; processCoordinates) const</td></tr>
 <tr class="memdesc:a4b46e4b46730b4375208ec87d1883902"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the linearised index (i.e. rank) of the given process coordinates.  <br /></td></tr>
 <tr class="separator:a4b46e4b46730b4375208ec87d1883902"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -984,6 +987,34 @@ template&lt;unsigned int dim&gt; </div>
 
 <p>returns the coordinates of this process. </p>
 <dl class="section return"><dt>Returns</dt><dd>the coordinates of this process </dd></dl>
+
+</div>
+</div>
+<a id="aebbd2e524ec4158893423fe4ae0f7b31" name="aebbd2e524ec4158893423fe4ae0f7b31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebbd2e524ec4158893423fe4ae0f7b31">&#9670;&#160;</a></span>getThisProcessCoordinates()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt;::getThisProcessCoordinates </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>rank</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns the process coordinates for the rank 'rank'. </p>
+<p>Forwards the call to the ParallelTopology implementation modulo the number of processes on each dimension (wrap around). </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rank</td><td>the linearised/continuous rank of a process </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the process coordinates </dd></dl>
 
 </div>
 </div>

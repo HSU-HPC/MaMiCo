@@ -130,6 +130,16 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a814977deb14ac7dd1900e7f3459506e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a822d10175ed86052bad419e2a9e5b269" id="r_a822d10175ed86052bad419e2a9e5b269"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a822d10175ed86052bad419e2a9e5b269">sendFromMD2Macro</a> (const std::vector&lt; <a class="el" href="classcoupling_1_1datastructures_1_1MacroscopicCell.html">coupling::datastructures::MacroscopicCell</a>&lt; dim &gt; * &gt; &amp;macroscopicCellsFromMacroscopicSolver, const unsigned int *const globalCellIndicesFromMacroscopicSolver)</td></tr>
 <tr class="separator:a822d10175ed86052bad419e2a9e5b269"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd1ed880d54296b9e763e9c052cb5590" id="r_afd1ed880d54296b9e763e9c052cb5590"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd1ed880d54296b9e763e9c052cb5590">applyFilterPipeline</a> ()</td></tr>
+<tr class="separator:afd1ed880d54296b9e763e9c052cb5590"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64a9a36bc6ddc0e05b3121b6ee49a91b" id="r_a64a9a36bc6ddc0e05b3121b6ee49a91b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64a9a36bc6ddc0e05b3121b6ee49a91b">sendFromMacro2MDPreProcess</a> ()</td></tr>
+<tr class="separator:a64a9a36bc6ddc0e05b3121b6ee49a91b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fb2b43a035bbb40182098b42402bf34" id="r_a8fb2b43a035bbb40182098b42402bf34"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8fb2b43a035bbb40182098b42402bf34">sendFromMacro2MDPostProcess</a> ()</td></tr>
+<tr class="separator:a8fb2b43a035bbb40182098b42402bf34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fc22c6e85efb420f82d1d93deadb467" id="r_a8fc22c6e85efb420f82d1d93deadb467"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8fc22c6e85efb420f82d1d93deadb467">sendFromMD2MacroPreProcess</a> ()</td></tr>
+<tr class="separator:a8fc22c6e85efb420f82d1d93deadb467"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9242d6b2a413c299cb87d941446887d7" id="r_a9242d6b2a413c299cb87d941446887d7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9242d6b2a413c299cb87d941446887d7">sendFromMD2MacroPostProcess</a> ()</td></tr>
+<tr class="separator:a9242d6b2a413c299cb87d941446887d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2aab0f04a2ce5984dccbbfc50b46770f" id="r_a2aab0f04a2ce5984dccbbfc50b46770f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2aab0f04a2ce5984dccbbfc50b46770f">processInnerMacroscopicCellAfterMDTimestep</a> ()</td></tr>
 <tr class="separator:a2aab0f04a2ce5984dccbbfc50b46770f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03413c9008bebffec669db3155af7904" id="r_a03413c9008bebffec669db3155af7904"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03413c9008bebffec669db3155af7904">computeAndStoreTemperature</a> (double temperature)</td></tr>
@@ -421,6 +431,36 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>applies a boundary force to molecules which are close to an open boundary. </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="afd1ed880d54296b9e763e9c052cb5590" name="afd1ed880d54296b9e763e9c052cb5590"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd1ed880d54296b9e763e9c052cb5590">&#9670;&#160;</a></span>applyFilterPipeline()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::applyFilterPipeline </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>applies the filter pipeline and returns the runtime of this operation </p>
 
 <p>Implements <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a>.</p>
 
@@ -904,6 +944,64 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
+<a id="a8fb2b43a035bbb40182098b42402bf34" name="a8fb2b43a035bbb40182098b42402bf34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fb2b43a035bbb40182098b42402bf34">&#9670;&#160;</a></span>sendFromMacro2MDPostProcess()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::sendFromMacro2MDPostProcess </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a64a9a36bc6ddc0e05b3121b6ee49a91b" name="a64a9a36bc6ddc0e05b3121b6ee49a91b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64a9a36bc6ddc0e05b3121b6ee49a91b">&#9670;&#160;</a></span>sendFromMacro2MDPreProcess()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::sendFromMacro2MDPreProcess </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
 <a id="a822d10175ed86052bad419e2a9e5b269" name="a822d10175ed86052bad419e2a9e5b269"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a822d10175ed86052bad419e2a9e5b269">&#9670;&#160;</a></span>sendFromMD2Macro()</h2>
 
@@ -933,6 +1031,64 @@ template&lt;class LinkedCell , unsigned int dim&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>sends information from MD to the macroscopic solver. After the send/recv-operations (this also comprises the distributed memory parallelisation scenario), the information from the coupling tool is written to the buffer macroscopicCellsFromMacroscopicSolver together with the respective global cell indices (-&gt; globalCellIndicesFromMacroscopicSolver). </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a9242d6b2a413c299cb87d941446887d7" name="a9242d6b2a413c299cb87d941446887d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9242d6b2a413c299cb87d941446887d7">&#9670;&#160;</a></span>sendFromMD2MacroPostProcess()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::sendFromMD2MacroPostProcess </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a8fc22c6e85efb420f82d1d93deadb467" name="a8fc22c6e85efb420f82d1d93deadb467"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fc22c6e85efb420f82d1d93deadb467">&#9670;&#160;</a></span>sendFromMD2MacroPreProcess()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellServiceImpl.html">coupling::services::MacroscopicCellServiceImpl</a>&lt; LinkedCell, dim &gt;::sendFromMD2MacroPreProcess </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 <p>Implements <a class="el" href="classcoupling_1_1services_1_1MacroscopicCellService.html">coupling::services::MacroscopicCellService&lt; dim &gt;</a>.</p>
 

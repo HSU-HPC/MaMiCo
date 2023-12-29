@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-28 08:39:53</td>
+            <td class="headerValue">2023-12-29 08:21:24</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">48</td>
@@ -147,27 +147,27 @@
 <a name="85"><span class="lineNum">      85 </span>            :    * allowed</a>
 <a name="86"><span class="lineNum">      86 </span>            :    *    @param i index</a>
 <a name="87"><span class="lineNum">      87 </span>            :    */</a>
-<a name="88"><span class="lineNum">      88 </span><span class="lineCov">  166376726 :   T&amp; operator[](int i) {</span></a>
+<a name="88"><span class="lineNum">      88 </span><span class="lineCov">  166401590 :   T&amp; operator[](int i) {</span></a>
 <a name="89"><span class="lineNum">      89 </span>            : #if (TARCH_DEBUG == TARCH_YES)</a>
 <a name="90"><span class="lineNum">      90 </span>            :     if (i &lt; 0 || i &gt; size - 1) {</a>
 <a name="91"><span class="lineNum">      91 </span>            :       std::cout &lt;&lt; &quot;ERROR Vector T&amp; operator[]: i out of range!&quot; &lt;&lt; std::endl;</a>
 <a name="92"><span class="lineNum">      92 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="93"><span class="lineNum">      93 </span>            :     }</a>
 <a name="94"><span class="lineNum">      94 </span>            : #endif</a>
-<a name="95"><span class="lineNum">      95 </span><span class="lineCov">  166376726 :     return _entries[i];</span></a>
+<a name="95"><span class="lineNum">      95 </span><span class="lineCov">  166401590 :     return _entries[i];</span></a>
 <a name="96"><span class="lineNum">      96 </span>            :   }</a>
 <a name="97"><span class="lineNum">      97 </span>            :   /** @brief operator overloading; access to vector entries; both () and [] are</a>
 <a name="98"><span class="lineNum">      98 </span>            :    * allowed; !!! Attention: const</a>
 <a name="99"><span class="lineNum">      99 </span>            :    *    @param i index</a>
 <a name="100"><span class="lineNum">     100 </span>            :    */</a>
-<a name="101"><span class="lineNum">     101 </span><span class="lineCov">  341710742 :   const T&amp; operator[](int i) const {</span></a>
+<a name="101"><span class="lineNum">     101 </span><span class="lineCov">  341723174 :   const T&amp; operator[](int i) const {</span></a>
 <a name="102"><span class="lineNum">     102 </span>            : #if (TARCH_DEBUG == TARCH_YES)</a>
 <a name="103"><span class="lineNum">     103 </span>            :     if (i &lt; 0 || i &gt; size - 1) {</a>
 <a name="104"><span class="lineNum">     104 </span>            :       std::cout &lt;&lt; &quot;ERROR Vector const T&amp; operator[]: i out of range!&quot; &lt;&lt; std::endl;</a>
 <a name="105"><span class="lineNum">     105 </span>            :       exit(EXIT_FAILURE);</a>
 <a name="106"><span class="lineNum">     106 </span>            :     }</a>
 <a name="107"><span class="lineNum">     107 </span>            : #endif</a>
-<a name="108"><span class="lineNum">     108 </span><span class="lineCov">  341710742 :     return _entries[i];</span></a>
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">  341723174 :     return _entries[i];</span></a>
 <a name="109"><span class="lineNum">     109 </span>            :   }</a>
 <a name="110"><span class="lineNum">     110 </span>            :   /** @brief operator overloading; add a vector to this existing one (this)</a>
 <a name="111"><span class="lineNum">     111 </span>            :    *    @param v vector that has to be added</a>

@@ -116,6 +116,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a454ac39f50abbe6227bd4f9a4ac01b4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29673f31082702afbb6a2bfd120629b6" id="r_a29673f31082702afbb6a2bfd120629b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29673f31082702afbb6a2bfd120629b6">sendFromMD2Macro</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCellsFromMamico, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCellsFromMacroscopicSolver, const unsigned int *const globalCellIndicesFromMacroscopicSolver)</td></tr>
 <tr class="separator:a29673f31082702afbb6a2bfd120629b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64e836169698e2a05f6a3995bb17eb8d" id="r_a64e836169698e2a05f6a3995bb17eb8d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64e836169698e2a05f6a3995bb17eb8d">reduceFromMD2Macro</a> (std::vector&lt; <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; * &gt; &amp;dataExchange, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCellsFromMamico, const unsigned int *const globalCellIndicesFromMacroscopicSolver, const std::vector&lt; MacroscopicCell * &gt; &amp;reducedMacroscopicCellsFromMacroscopicSolver)</td></tr>
+<tr class="separator:a64e836169698e2a05f6a3995bb17eb8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22377601e9eedd921336c74ddbe98a5f" id="r_a22377601e9eedd921336c74ddbe98a5f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22377601e9eedd921336c74ddbe98a5f">sendFromMD2MacroNonBlocking</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCellsFromMamico, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCellsFromMacroscopicSolver, const unsigned int *const globalCellIndicesFromMacroscopicSolver)</td></tr>
 <tr class="separator:a22377601e9eedd921336c74ddbe98a5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a049ae410e6720afc9ff48b2c8cc056bc" id="r_a049ae410e6720afc9ff48b2c8cc056bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a049ae410e6720afc9ff48b2c8cc056bc">wait4SendFromMD2Macro</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCellsFromMacroscopicSolver, const unsigned int *const globalCellIndicesFromMacroscopicSolver)</td></tr>
@@ -130,10 +132,16 @@ Public Member Functions</h2></td></tr>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:a1afba71b2969f7542de1613f5781d7cd" id="r_a1afba71b2969f7542de1613f5781d7cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1afba71b2969f7542de1613f5781d7cd">writeToSendBuffer</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCells)</td></tr>
 <tr class="separator:a1afba71b2969f7542de1613f5781d7cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abcae9d36deb8807687d94b38905a5bc2" id="r_abcae9d36deb8807687d94b38905a5bc2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abcae9d36deb8807687d94b38905a5bc2">writeToReduceBuffer</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; &amp;dataExchange, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCells)</td></tr>
+<tr class="separator:abcae9d36deb8807687d94b38905a5bc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55251ebbd186c5baa027d17e4fce2b89" id="r_a55251ebbd186c5baa027d17e4fce2b89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55251ebbd186c5baa027d17e4fce2b89">allocateReceiveBuffers</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const unsigned int *const globalCellIndices, unsigned int numberCells)</td></tr>
 <tr class="separator:a55251ebbd186c5baa027d17e4fce2b89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a058a92e7281f5f402226d1aa2783bf75" id="r_a058a92e7281f5f402226d1aa2783bf75"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a058a92e7281f5f402226d1aa2783bf75">allocateReduceBufferForReceiving</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; &amp;dataExchange, const unsigned int *globalCellIndices, unsigned int numberCells)</td></tr>
+<tr class="separator:a058a92e7281f5f402226d1aa2783bf75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1fcdbc04931504673061ff9d971c9cb" id="r_ad1fcdbc04931504673061ff9d971c9cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1fcdbc04931504673061ff9d971c9cb">readFromReceiveBuffer</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCells, const unsigned int *const globalCellIndices)</td></tr>
 <tr class="separator:ad1fcdbc04931504673061ff9d971c9cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a402cb7830e342d2a7df527ea27f78e" id="r_a4a402cb7830e342d2a7df527ea27f78e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4a402cb7830e342d2a7df527ea27f78e">readFromReduceBuffer</a> (<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; &amp;dataExchange, const std::vector&lt; MacroscopicCell * &gt; &amp;macroscopicCells, const unsigned int *globalCellIndices)</td></tr>
+<tr class="separator:a4a402cb7830e342d2a7df527ea27f78e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -145,18 +153,43 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>deleteBuffers</b> ()<
 <tr class="memitem:a9bd72fb68447eabc785ce3aed6ba0806 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a9bd72fb68447eabc785ce3aed6ba0806"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a9bd72fb68447eabc785ce3aed6ba0806">writeToSendBuffer</a> (<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const MacroscopicCell &amp;cell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
 <tr class="memdesc:a9bd72fb68447eabc785ce3aed6ba0806 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="mdescLeft">&#160;</td><td class="mdescRight">fills all information that needs to be sent from a macroscopic cell into the send-buffer.  <br /></td></tr>
 <tr class="separator:a9bd72fb68447eabc785ce3aed6ba0806 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e8919bf747e67e799473a4c64803f18 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a3e8919bf747e67e799473a4c64803f18"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a3e8919bf747e67e799473a4c64803f18">writeToBcastBuffer</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const MacroscopicCell &amp;cell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
+<tr class="memdesc:a3e8919bf747e67e799473a4c64803f18 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="mdescLeft">&#160;</td><td class="mdescRight">fills all information that needs to be broadcast from a macroscopic cell into the broadcast-buffer.  <br /></td></tr>
+<tr class="separator:a3e8919bf747e67e799473a4c64803f18 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad89b964e680224692b2fe5b761b8e5dd inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_ad89b964e680224692b2fe5b761b8e5dd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ad89b964e680224692b2fe5b761b8e5dd">writeToReduceBuffer</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, const MacroscopicCell &amp;cell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
+<tr class="memdesc:ad89b964e680224692b2fe5b761b8e5dd inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="mdescLeft">&#160;</td><td class="mdescRight">fills all information that needs to be reduced to a macroscopic cell into the reduce-buffer.  <br /></td></tr>
+<tr class="separator:ad89b964e680224692b2fe5b761b8e5dd inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9e5523b41f37161ff5dd729e568981f inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_ae9e5523b41f37161ff5dd729e568981f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ae9e5523b41f37161ff5dd729e568981f">readFromReceiveBuffer</a> (<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, MacroscopicCell &amp;macroscopicCell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
 <tr class="separator:ae9e5523b41f37161ff5dd729e568981f inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af26de0918b1aae7c547f4d911191324f inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_af26de0918b1aae7c547f4d911191324f"><td class="memItemLeft" align="right" valign="top">
+void&#160;</td><td class="memItemRight" valign="bottom"><b>readFromCollectiveBuffer</b> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, MacroscopicCell &amp;macroscopicCell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
+<tr class="separator:af26de0918b1aae7c547f4d911191324f inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d2ac75f33e28082fa353f2f3d9b1bb2 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a0d2ac75f33e28082fa353f2f3d9b1bb2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a0d2ac75f33e28082fa353f2f3d9b1bb2">readFromReduceBuffer</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; &amp;dataExchange, MacroscopicCell &amp;macroscopicCell, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
+<tr class="separator:a0d2ac75f33e28082fa353f2f3d9b1bb2 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed64249b680aba8684a5d4d6d2e2c9a7 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_aed64249b680aba8684a5d4d6d2e2c9a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#aed64249b680aba8684a5d4d6d2e2c9a7">allocateReceiveBuffers</a> (<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
 <tr class="separator:aed64249b680aba8684a5d4d6d2e2c9a7 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76e31ec85963590767257eb3cce9ef98 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a76e31ec85963590767257eb3cce9ef98"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a76e31ec85963590767257eb3cce9ef98">allocateBcastBufferForReceiving</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
+<tr class="separator:a76e31ec85963590767257eb3cce9ef98 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2748eabcb7759648231d587729cf3dc inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_ae2748eabcb7759648231d587729cf3dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ae2748eabcb7759648231d587729cf3dc">allocateReduceBufferForReceiving</a> (const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;indexConversion, <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalVectorIndex)</td></tr>
+<tr class="separator:ae2748eabcb7759648231d587729cf3dc inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab01c2ff9aa52c53a3d19ed58d006bb4b inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_ab01c2ff9aa52c53a3d19ed58d006bb4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ab01c2ff9aa52c53a3d19ed58d006bb4b">triggerSending</a> (<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange)</td></tr>
 <tr class="separator:ab01c2ff9aa52c53a3d19ed58d006bb4b inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d79203dde739f20e0cbc5a833e855cf inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a1d79203dde739f20e0cbc5a833e855cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a1d79203dde739f20e0cbc5a833e855cf">triggerBcasts</a> (unsigned int rank)</td></tr>
+<tr class="separator:a1d79203dde739f20e0cbc5a833e855cf inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f6b03ec2453b2e19bab3c6cd9026550 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a5f6b03ec2453b2e19bab3c6cd9026550"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a5f6b03ec2453b2e19bab3c6cd9026550">triggerReceiving</a> (<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange</a>&lt; MacroscopicCell, dim &gt; &amp;dataExchange)</td></tr>
 <tr class="separator:a5f6b03ec2453b2e19bab3c6cd9026550 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a664c515e45f09531a83f06787163a3fe inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a664c515e45f09531a83f06787163a3fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a664c515e45f09531a83f06787163a3fe">triggerReduce</a> (unsigned int rank)</td></tr>
+<tr class="separator:a664c515e45f09531a83f06787163a3fe inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d2b34c46677abb4ae45c01876eacad9 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a1d2b34c46677abb4ae45c01876eacad9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a1d2b34c46677abb4ae45c01876eacad9">waitAllOperations</a> ()</td></tr>
 <tr class="separator:a1d2b34c46677abb4ae45c01876eacad9 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a298c972e2e241419b788faa9e8efe8bc inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a298c972e2e241419b788faa9e8efe8bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a298c972e2e241419b788faa9e8efe8bc">waitAllCollectiveOperations</a> ()</td></tr>
+<tr class="separator:a298c972e2e241419b788faa9e8efe8bc inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab87d172fee813a4ec7025110501363ad inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_ab87d172fee813a4ec7025110501363ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ab87d172fee813a4ec7025110501363ad">allocateRequests</a> ()</td></tr>
 <tr class="separator:ab87d172fee813a4ec7025110501363ad inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26c012503b9bfb2bf1f659a863439765 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a26c012503b9bfb2bf1f659a863439765"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a26c012503b9bfb2bf1f659a863439765">allocateBcastRequests</a> (unsigned int thisRank)</td></tr>
+<tr class="separator:a26c012503b9bfb2bf1f659a863439765 inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ea3197ac521ceea3783c3e4d085becf inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer" id="r_a5ea3197ac521ceea3783c3e4d085becf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a5ea3197ac521ceea3783c3e4d085becf">allocateReduceRequests</a> (unsigned int thisRank)</td></tr>
+<tr class="separator:a5ea3197ac521ceea3783c3e4d085becf inherit pro_methods_classcoupling_1_1sendrecv_1_1SendReceiveBuffer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class MacroscopicCell, unsigned int dim&gt;<br />
@@ -277,6 +310,56 @@ template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
 
 </div>
 </div>
+<a id="a058a92e7281f5f402226d1aa2783bf75" name="a058a92e7281f5f402226d1aa2783bf75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a058a92e7281f5f402226d1aa2783bf75">&#9670;&#160;</a></span>allocateReduceBufferForReceiving()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1sendrecv_1_1FromMD2Macro.html">coupling::sendrecv::FromMD2Macro</a>&lt; MacroscopicCell, dim &gt;::allocateReduceBufferForReceiving </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>indexConversion</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>dataExchange</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int *</td>          <td class="paramname"><span class="paramname"><em>globalCellIndices</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>numberCells</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>allocates the reduce receive buffers for the macroscopic solver. Since we do not know anything about the macroscopic solver, we only have a list of global vector cell indices available for possible cells to be received on this rank. For each global cell which is in the list, allocateReduceBufferForReceiving(...) of <a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send-/ receive methodology.">SendReceiveBuffer</a> is called. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">indexConversion</td><td></td></tr>
+    <tr><td class="paramname">dataExchange</td><td></td></tr>
+    <tr><td class="paramname">globalCellIndices</td><td></td></tr>
+    <tr><td class="paramname">numberCells</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ad1fcdbc04931504673061ff9d971c9cb" name="ad1fcdbc04931504673061ff9d971c9cb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad1fcdbc04931504673061ff9d971c9cb">&#9670;&#160;</a></span>readFromReceiveBuffer()</h2>
 
@@ -321,6 +404,92 @@ template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
     <tr><td class="paramname">dataExchange</td><td></td></tr>
     <tr><td class="paramname">macroscopicCells</td><td></td></tr>
     <tr><td class="paramname">globalCellIndices</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4a402cb7830e342d2a7df527ea27f78e" name="a4a402cb7830e342d2a7df527ea27f78e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a402cb7830e342d2a7df527ea27f78e">&#9670;&#160;</a></span>readFromReduceBuffer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1sendrecv_1_1FromMD2Macro.html">coupling::sendrecv::FromMD2Macro</a>&lt; MacroscopicCell, dim &gt;::readFromReduceBuffer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>dataExchange</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; MacroscopicCell * &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>macroscopicCells</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int *</td>          <td class="paramname"><span class="paramname"><em>globalCellIndices</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>reads information from the reduce buffer and stores the result in the list of macroscopic cells. Since this is a receive for the macroscopic cells on the side of the macroscopic solver, we just have a list of global cell indices and corresponding macrocsopic cell buffers. For each cell in this list, readFromReduceBuffer(...) of <a class="el" href="classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send-/ receive methodology.">SendReceiveBuffer</a> is called. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dataExchange</td><td></td></tr>
+    <tr><td class="paramname">macroscopicCells</td><td></td></tr>
+    <tr><td class="paramname">globalCellIndices</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a64e836169698e2a05f6a3995bb17eb8d" name="a64e836169698e2a05f6a3995bb17eb8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64e836169698e2a05f6a3995bb17eb8d">&#9670;&#160;</a></span>reduceFromMD2Macro()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1sendrecv_1_1FromMD2Macro.html">coupling::sendrecv::FromMD2Macro</a>&lt; MacroscopicCell, dim &gt;::reduceFromMD2Macro </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; * &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>dataExchange</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; MacroscopicCell * &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>macroscopicCellsFromMamico</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int *const</td>          <td class="paramname"><span class="paramname"><em>globalCellIndicesFromMacroscopicSolver</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; MacroscopicCell * &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>reducedMacroscopicCellsFromMacroscopicSolver</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>reduces information from the local macroscopic cells of MaMiCo (only inner non-ghost cells of this process) and sends it to the macroscopic solver. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dataExchange</td><td></td></tr>
+    <tr><td class="paramname">macroscopicCellsFromMamico</td><td></td></tr>
+    <tr><td class="paramname">reducedMacroscopicCellsFromMacroscopicSolver</td><td></td></tr>
+    <tr><td class="paramname">macroscopicCellsFromMacroscopicSolver</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -459,6 +628,50 @@ template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
     <tr><td class="paramname">dataExchange</td><td></td></tr>
     <tr><td class="paramname">macroscopicCellsFromMacroscopicSolver</td><td></td></tr>
     <tr><td class="paramname">globalCellIndicesFromMacroscopicSolver</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abcae9d36deb8807687d94b38905a5bc2" name="abcae9d36deb8807687d94b38905a5bc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcae9d36deb8807687d94b38905a5bc2">&#9670;&#160;</a></span>writeToReduceBuffer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class MacroscopicCell , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1sendrecv_1_1FromMD2Macro.html">coupling::sendrecv::FromMD2Macro</a>&lt; MacroscopicCell, dim &gt;::writeToReduceBuffer </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>indexConversion</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html">coupling::sendrecv::DataExchangeFromMD2Macro</a>&lt; dim &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>dataExchange</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; MacroscopicCell * &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>macroscopicCells</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>loops over the whole local Cartesian grid (only non-ghost cells!) and writes respective cells to reduce buffer. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">indexConversion</td><td></td></tr>
+    <tr><td class="paramname">dataExchange</td><td></td></tr>
+    <tr><td class="paramname">macroscopicCells</td><td></td></tr>
   </table>
   </dd>
 </dl>

@@ -110,8 +110,8 @@ Collaboration diagram for coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afc3c8ad0ccb3aef3f908ec1864bd78f7" id="r_afc3c8ad0ccb3aef3f908ec1864bd78f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc3c8ad0ccb3aef3f908ec1864bd78f7">DataExchangeFromMacro2MD</a> (<a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *interface, <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *indexConversion, unsigned int tagoffset=0)</td></tr>
-<tr class="separator:afc3c8ad0ccb3aef3f908ec1864bd78f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8046472cd0bfa168a0a2e06bde7093e5" id="r_a8046472cd0bfa168a0a2e06bde7093e5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8046472cd0bfa168a0a2e06bde7093e5">DataExchangeFromMacro2MD</a> (<a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *interface, const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *indexConversion, unsigned int tagoffset=0)</td></tr>
+<tr class="separator:a8046472cd0bfa168a0a2e06bde7093e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae288e928c9d42a5e49d07cf9a718dfd0" id="r_ae288e928c9d42a5e49d07cf9a718dfd0"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae288e928c9d42a5e49d07cf9a718dfd0">~DataExchangeFromMacro2MD</a> ()</td></tr>
 <tr class="separator:ae288e928c9d42a5e49d07cf9a718dfd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52b3e4b527c54c04dbf02ff3a74dd1f2" id="r_a52b3e4b527c54c04dbf02ff3a74dd1f2"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a52b3e4b527c54c04dbf02ff3a74dd1f2">getTargetRanks</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; dim, unsigned int &gt; globalCellIndex)</td></tr>
@@ -127,6 +127,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af0b89fef0b26d03d2bba57ada6dbf778" id="r_af0b89fef0b26d03d2bba57ada6dbf778"><td class="memItemLeft" align="right" valign="top"><a id="af0b89fef0b26d03d2bba57ada6dbf778" name="af0b89fef0b26d03d2bba57ada6dbf778"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setIndexConversion</b> (<a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *indexConversion)</td></tr>
 <tr class="separator:af0b89fef0b26d03d2bba57ada6dbf778"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1900596186842a9ee84e34ff40e09951" id="r_a1900596186842a9ee84e34ff40e09951"><td class="memItemLeft" align="right" valign="top"><a id="a1900596186842a9ee84e34ff40e09951" name="a1900596186842a9ee84e34ff40e09951"></a>
+const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>getIndexConversion</b> () const</td></tr>
+<tr class="separator:a1900596186842a9ee84e34ff40e09951"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcoupling_1_1sendrecv_1_1DataExchange"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classcoupling_1_1sendrecv_1_1DataExchange')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html">coupling::sendrecv::DataExchange&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;</a></td></tr>
 <tr class="memitem:a737ef9579997ea1740ce8856784f1a90 inherit pub_methods_classcoupling_1_1sendrecv_1_1DataExchange" id="r_a737ef9579997ea1740ce8856784f1a90"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchange.html#a737ef9579997ea1740ce8856784f1a90">DataExchange</a> (unsigned int tag)</td></tr>
 <tr class="separator:a737ef9579997ea1740ce8856784f1a90 inherit pub_methods_classcoupling_1_1sendrecv_1_1DataExchange"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -144,9 +147,9 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a65b0d986d1e55359b5acdde92d631513" id="r_a65b0d986d1e55359b5acdde92d631513"><td class="memItemLeft" align="right" valign="top"><a id="a65b0d986d1e55359b5acdde92d631513" name="a65b0d986d1e55359b5acdde92d631513"></a>
 <a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_interface</b></td></tr>
 <tr class="separator:a65b0d986d1e55359b5acdde92d631513"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab54a1c51c41340caa99c2cf19e19ddf3" id="r_ab54a1c51c41340caa99c2cf19e19ddf3"><td class="memItemLeft" align="right" valign="top"><a id="ab54a1c51c41340caa99c2cf19e19ddf3" name="ab54a1c51c41340caa99c2cf19e19ddf3"></a>
-<a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_indexConversion</b></td></tr>
-<tr class="separator:ab54a1c51c41340caa99c2cf19e19ddf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f94b371fe6a4045391cba454e37dcf2" id="r_a1f94b371fe6a4045391cba454e37dcf2"><td class="memItemLeft" align="right" valign="top"><a id="a1f94b371fe6a4045391cba454e37dcf2" name="a1f94b371fe6a4045391cba454e37dcf2"></a>
+const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_indexConversion</b></td></tr>
+<tr class="separator:a1f94b371fe6a4045391cba454e37dcf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
@@ -160,8 +163,8 @@ class coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &gt;</div><p>data exc
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html" title="data exchange from the MD solver to the macroscopic solver. Derived from the class coupling::sendrecv...">DataExchangeFromMD2Macro</a> </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="afc3c8ad0ccb3aef3f908ec1864bd78f7" name="afc3c8ad0ccb3aef3f908ec1864bd78f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc3c8ad0ccb3aef3f908ec1864bd78f7">&#9670;&#160;</a></span>DataExchangeFromMacro2MD()</h2>
+<a id="a8046472cd0bfa168a0a2e06bde7093e5" name="a8046472cd0bfa168a0a2e06bde7093e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8046472cd0bfa168a0a2e06bde7093e5">&#9670;&#160;</a></span>DataExchangeFromMacro2MD()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -179,7 +182,7 @@ template&lt;unsigned int dim&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *</td>          <td class="paramname"><span class="paramname"><em>indexConversion</em>, </span></td>
+          <td class="paramtype">const <a class="el" href="classcoupling_1_1IndexConversion.html">coupling::IndexConversion</a>&lt; dim &gt; *</td>          <td class="paramname"><span class="paramname"><em>indexConversion</em>, </span></td>
         </tr>
         <tr>
           <td class="paramkey"></td>

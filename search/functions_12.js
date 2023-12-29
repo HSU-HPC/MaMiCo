@@ -12,8 +12,10 @@ var searchData=
   ['transferstrategy4niecoupling_9',['TransferStrategy4NieCoupling',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4NieCoupling.html#a47787cef3dc469f7d94b209060e544bd',1,'coupling::transferstrategies::TransferStrategy4NieCoupling']]],
   ['transferstrategy4schwarzcoupling_10',['TransferStrategy4SchwarzCoupling',['../classcoupling_1_1transferstrategies_1_1TransferStrategy4SchwarzCoupling.html#a0e4f5a33ca2193654c1b8c34605136a3',1,'coupling::transferstrategies::TransferStrategy4SchwarzCoupling']]],
   ['transferstrategyconfiguration_11',['TransferStrategyConfiguration',['../classcoupling_1_1configurations_1_1TransferStrategyConfiguration.html#ade8ab7551a02e11f86623ea836dab703',1,'coupling::configurations::TransferStrategyConfiguration']]],
-  ['triggerreceiving_12',['triggerReceiving',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a5f6b03ec2453b2e19bab3c6cd9026550',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['triggersending_13',['triggerSending',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ab01c2ff9aa52c53a3d19ed58d006bb4b',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['twowaycoupling_14',['twoWayCoupling',['../classCouetteScenario.html#ab44da55e6dcc2ef872efc49b05334830',1,'CouetteScenario']]],
-  ['twsloop_15',['twsLoop',['../classCouetteScenario.html#a434ab00124be51cb5b781c017a3b5e4e',1,'CouetteScenario']]]
+  ['triggerbcasts_12',['triggerBcasts',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a1d79203dde739f20e0cbc5a833e855cf',1,'coupling::sendrecv::SendReceiveBuffer']]],
+  ['triggerreceiving_13',['triggerReceiving',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a5f6b03ec2453b2e19bab3c6cd9026550',1,'coupling::sendrecv::SendReceiveBuffer']]],
+  ['triggerreduce_14',['triggerReduce',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#a664c515e45f09531a83f06787163a3fe',1,'coupling::sendrecv::SendReceiveBuffer']]],
+  ['triggersending_15',['triggerSending',['../classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html#ab01c2ff9aa52c53a3d19ed58d006bb4b',1,'coupling::sendrecv::SendReceiveBuffer']]],
+  ['twowaycoupling_16',['twoWayCoupling',['../classCouetteScenario.html#ab44da55e6dcc2ef872efc49b05334830',1,'CouetteScenario']]],
+  ['twsloop_17',['twsLoop',['../classCouetteScenario.html#a434ab00124be51cb5b781c017a3b5e4e',1,'CouetteScenario']]]
 ];
