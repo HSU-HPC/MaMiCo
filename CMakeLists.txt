@@ -790,8 +790,20 @@ endif()
 # Testing
 #
 if (BUILD_TESTING)    
-  file(GLOB_RECURSE TEST_SOURCES "test/*Test.cpp")
+  file(GLOB_RECURSE TEST_SOURCES_TOP "test/*Test.cpp")
+  list(FILTER TEST_SOURCES_TOP EXCLUDE REGEX "impl") # remove tests corresponding to specific MD solvers
+  
+  if("${MD_SIM}" STREQUAL "SIMPLE_MD")
+    file(GLOB_RECURSE TEST_SOURCES_MD "test/unit/coupling/interface/impl/SimpleMD/*Test.cpp")
+  elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
+    file(GLOB_RECURSE TEST_SOURCES_MD "test/unit/coupling/interface/impl/ls1/*Test.cpp")
+  elseif("${MD_SIM}" STREQUAL "LAMMPS_MD" OR "${MD_SIM}" STREQUAL "LAMMPS_DPD")
+    file(GLOB_RECURSE TEST_SOURCES_MD "test/unit/coupling/interface/impl/LAMMPS/*Test.cpp")
+  else()
+    message(FATAL_ERROR "Could not determine the MD solver while compiling tests")
+  endif()
 
+  set(TEST_SOURCES ${TEST_SOURCES_TOP} ${TEST_SOURCES_MD})
   if(GET_TEST_NAMES)
     add_executable(getTestNames
       ${MAMICO_SOURCES}
