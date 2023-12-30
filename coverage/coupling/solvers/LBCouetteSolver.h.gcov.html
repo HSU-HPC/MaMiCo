@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-29 08:39:27</td>
+            <td class="headerValue">2023-12-30 18:25:01</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">29</td>
@@ -82,13 +82,13 @@
 <a name="20"><span class="lineNum">      20 </span>            : </a>
 <a name="21"><span class="lineNum">      21 </span>            : class coupling::solvers::LBCouetteSolverState : public coupling::interface::PintableMacroSolverState {</a>
 <a name="22"><span class="lineNum">      22 </span>            : public:</a>
-<a name="23"><span class="lineNum">      23 </span><span class="lineCov">       2732 :   LBCouetteSolverState(int size) : _pdf(size, 0) {}</span></a>
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">       2844 :   LBCouetteSolverState(int size) : _pdf(size, 0) {}</span></a>
 <a name="24"><span class="lineNum">      24 </span>            : </a>
 <a name="25"><span class="lineNum">      25 </span><span class="lineCov">        152 :   LBCouetteSolverState(int size, double* pdf) : LBCouetteSolverState(size) { std::copy(pdf, pdf + size, _pdf.data()); }</span></a>
 <a name="26"><span class="lineNum">      26 </span>            : </a>
 <a name="27"><span class="lineNum">      27 </span><span class="lineCov">          4 :   std::unique_ptr&lt;State&gt; clone() const override { return std::make_unique&lt;LBCouetteSolverState&gt;(*this); }</span></a>
 <a name="28"><span class="lineNum">      28 </span>            : </a>
-<a name="29"><span class="lineNum">      29 </span><span class="lineCov">       2888 :   ~LBCouetteSolverState() {}</span></a>
+<a name="29"><span class="lineNum">      29 </span><span class="lineCov">       3000 :   ~LBCouetteSolverState() {}</span></a>
 <a name="30"><span class="lineNum">      30 </span>            : </a>
 <a name="31"><span class="lineNum">      31 </span><span class="lineCov">          4 :   int getSizeBytes() const override { return sizeof(double) * _pdf.size(); }</span></a>
 <a name="32"><span class="lineNum">      32 </span>            : </a>

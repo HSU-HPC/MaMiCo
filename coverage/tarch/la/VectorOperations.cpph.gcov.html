@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-12-29 08:39:27</td>
+            <td class="headerValue">2023-12-30 18:25:01</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">21</td>
@@ -169,12 +169,12 @@
 <a name="107"><span class="lineNum">     107 </span>            :  *      @author Philipp Neumann</a>
 <a name="108"><span class="lineNum">     108 </span>            :  *      @return equal result; true: if they are equal, false otherwise.</a>
 <a name="109"><span class="lineNum">     109 </span>            :  */</a>
-<a name="110"><span class="lineNum">     110 </span><span class="lineCov">    1301886 : template &lt;int size, class T&gt; bool operator==(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineCov">    1301886 :   bool equal = true;</span></a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineCov">    5207484 :   for (int i = 0; i &lt; size; i++) {</span></a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineCov">    3905598 :     equal = equal &amp;&amp; (l[i] == r[i]);</span></a>
+<a name="110"><span class="lineNum">     110 </span><span class="lineCov">    5553414 : template &lt;int size, class T&gt; bool operator==(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineCov">    5553414 :   bool equal = true;</span></a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">   22213596 :   for (int i = 0; i &lt; size; i++) {</span></a>
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">   16660182 :     equal = equal &amp;&amp; (l[i] == r[i]);</span></a>
 <a name="114"><span class="lineNum">     114 </span>            :   }</a>
-<a name="115"><span class="lineNum">     115 </span><span class="lineCov">    1301886 :   return equal;</span></a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineCov">    5553414 :   return equal;</span></a>
 <a name="116"><span class="lineNum">     116 </span>            : }</a>
 <a name="117"><span class="lineNum">     117 </span>            : </a>
 <a name="118"><span class="lineNum">     118 </span>            : /** This operator overloading compares two vectors and determins if they are NOT equal.</a>
