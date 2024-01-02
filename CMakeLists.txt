@@ -791,7 +791,7 @@ endif()
 #
 if (BUILD_TESTING)    
   file(GLOB_RECURSE TEST_SOURCES_TOP "test/*Test.cpp")
-  list(FILTER TEST_SOURCES_TOP EXCLUDE REGEX "impl") # remove tests corresponding to specific MD solvers
+  list(FILTER TEST_SOURCES_TOP EXCLUDE REGEX "test/unit/coupling/interface/impl/") # remove tests corresponding to specific MD solvers
   
   if("${MD_SIM}" STREQUAL "SIMPLE_MD")
     file(GLOB_RECURSE TEST_SOURCES_MD "test/unit/coupling/interface/impl/SimpleMD/*Test.cpp")
