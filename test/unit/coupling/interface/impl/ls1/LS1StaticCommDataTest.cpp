@@ -15,7 +15,11 @@ class LS1StaticCommDataTest : public CppUnit::TestFixture
 {
 	CPPUNIT_TEST_SUITE(LS1StaticCommDataTest);
 	CPPUNIT_TEST(testSerialFunctions);
+
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 	CPPUNIT_TEST(testParallelFunctions);
+#endif
+
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -39,9 +43,10 @@ public:
 		for(int i = 0; i < 3; i++)
 			CPPUNIT_ASSERT( coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i) == offsets[i] );
 	}
+
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 	void testParallelFunctions()
 	{
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 		int rank, size;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -59,8 +64,8 @@ public:
 				&& coupling::interface::LS1StaticCommData::getInstance().getDomainGridDecomp()[1] == gridDec[1] 
 				&& coupling::interface::LS1StaticCommData::getInstance().getDomainGridDecomp()[2] == gridDec[2] );
 		MPI_Comm_free(&comm);
-#endif
 	}
+#endif
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(LS1StaticCommDataTest);
