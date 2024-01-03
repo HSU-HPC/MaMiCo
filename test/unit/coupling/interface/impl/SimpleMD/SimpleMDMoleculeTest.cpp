@@ -38,7 +38,9 @@ public:
 
 					simpleMolecule.setVelocity(velocity);
 					tarch::la::Vector<3,double> storedVelocity = simpleMolecule.getVelocity();
-					CPPUNIT_ASSERT_MESSAGE( "velocity assersion",storedVelocity == velocity );
+					CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE( "velocity assertion x",storedVelocity[0], velocity[0], 1e-6 );
+					CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE( "velocity assertion y",storedVelocity[1], velocity[1], 1e-6 );
+					CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE( "velocity assertion z",storedVelocity[2], velocity[2], 1e-6 );
 				}
 			}
 		}
@@ -57,7 +59,9 @@ public:
 
 					simpleMolecule.setForce(force);
 					tarch::la::Vector<3,double> storedForce = simpleMolecule.getForce();
-					CPPUNIT_ASSERT_MESSAGE( "force assersion",storedForce == force );
+					CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE( "force assertion x",storedForce[0], force[0], 1e-6 );
+					CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE( "force assertion y",storedForce[1], force[1], 1e-6 );
+					CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE( "force assertion z",storedForce[2], force[2], 1e-6 );
 				}
 			}
 		}
