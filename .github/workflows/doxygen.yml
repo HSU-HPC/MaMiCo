@@ -48,6 +48,7 @@ jobs:
           make -j2 testmamico
           ctest
           make coverage
+          mkdir -p ../docs/html
           mv coverage ../docs/html/coverage
 
       - name: Deploy
