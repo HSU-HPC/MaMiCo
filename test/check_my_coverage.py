@@ -111,7 +111,9 @@ df_coverage = df_coverage[mask_touched]
 
 if len(df_coverage) == 0:
     print('Sufficient test coverage for changed files.')
+    exit(0)
 else:
     print('You should write tests for:')
     print(df_coverage.to_string(index=False, formatters={
         c: '{:,.2%}'.format for c in df_coverage.columns[1:]}))
+    exit(1)
