@@ -7,21 +7,24 @@
 # BSD license, see the copyright notice in Mamico's main folder
 
 import sys
+
 sys.path.append('../../../build')
 sys.path.append('../../filtering/filters')
-import coloredlogs, logging
-import math
 import json
-import mamico.tarch.configuration
-from mamico.coupling.services import MultiMDCellService
-from mamico.coupling.solvers import CouetteSolverInterface
+import logging
+import math
+from configparser import ConfigParser
+
+import coloredlogs
 import mamico.coupling
+import mamico.tarch.configuration
 import mamico.tarch.utils
-import pythonfilters as pf
+import matplotlib.pyplot as mplt
 import numpy as np
 import pandas as pd
-from configparser import ConfigParser
-import matplotlib.pyplot as mplt
+import pythonfilters as pf
+from mamico.coupling.services import MultiMDCellService
+from mamico.coupling.solvers import CouetteSolverInterface
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -157,6 +160,7 @@ class KVSTest():
 
 
         from scipy.ndimage import gaussian_filter, median_filter
+
         #Add Gauss filter
         def gauss_sca05(data):
             print("Applying gaussian filter to a scalar property. sigma = 0.5.")
@@ -376,8 +380,8 @@ class KVSTest():
         dx = self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
         return [math.floor(domainSize[d]/dx[d]+0.5) for d in range(3)]
 
-from lbmpy.session import *
 from lbmpy.parameterization import Scaling
+from lbmpy.session import *
 
 lb_log = logging.getLogger('LBSolver')
 
