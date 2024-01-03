@@ -31,6 +31,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Doxygen Action
+        if: github.event_name == 'push'
         uses: mattnotmitt/doxygen-action@v1.1.0
         with:
           # Path to Doxyfile
@@ -50,6 +51,7 @@ jobs:
           mv coverage ../docs/html/coverage
 
       - name: Deploy
+        if: github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -67,9 +69,7 @@ jobs:
 
       - name: Install Python Packages
         if: github.event_name == 'pull_request'
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas beautifulsoup4
+        run: pip install pandas beautifulsoup4
 
       - name: Parse Coverage
         if: github.event_name == 'pull_request'
