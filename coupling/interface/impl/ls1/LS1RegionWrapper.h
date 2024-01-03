@@ -52,6 +52,10 @@ public:
         _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
     }
 
+    double getStartRegionAtDim(int dim) { return _startRegion[dim]; }
+
+    double getEndRegionAtDim(int dim) { return _endRegion[dim]; }
+
     void iteratorReset()
     {
         _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);

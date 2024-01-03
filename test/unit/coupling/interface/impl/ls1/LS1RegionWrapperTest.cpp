@@ -19,6 +19,7 @@ class LS1RegionWrapperTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testPointIsInRegion);
 	CPPUNIT_TEST(testRegionIsInRegion);
 	CPPUNIT_TEST(testSetRegion);
+	CPPUNIT_TEST(testGetRegion);
 	CPPUNIT_TEST(testPotentialEnergyAtPoint);
 	CPPUNIT_TEST(testAddAndDeleteParticle);
 	CPPUNIT_TEST(testResetIterator);
@@ -243,6 +244,29 @@ public:
 		wrapper.setRegion(start, end);
 		CPPUNIT_ASSERT(!wrapper.isInRegion({4,4,4}));
 	}
+
+	void testGetRegion()
+	{
+		//set up random seed
+		srand(time(NULL));
+
+		//20 random trials
+		for (int trial = 0; trial < 20; trial++)
+		{
+			//set up startpoint with point values less than 250
+			double start[3] = {static_cast<double>(rand()%250),static_cast<double>(rand()%250),static_cast<double>(rand()%250)};
+
+			//set up endpoint with point values between 750-1000
+			double end[3] = {static_cast<double>(rand()%250+750),static_cast<double>(rand()%250+750),static_cast<double>(rand()%250+750)};
+			ls1::LS1RegionWrapper wrapper(start, end, _testSimulation);
+			for (int i = 0; i < 3; i++)
+			{
+				CPPUNIT_ASSERT_DOUBLES_EQUAL( start[0], wrapper.getStartRegionAtDim(0), 1e-6 );
+				CPPUNIT_ASSERT_DOUBLES_EQUAL( end[0], wrapper.getEndRegionAtDim(0), 1e-6 );
+			}
+		}
+	}
+
 	void testPotentialEnergyAtPoint()
 	{
 		std::cout << "Particle density: " << _testSimulation->getTotalNumberOfMolecules() << 

@@ -42,7 +42,11 @@ public:
 	void testParallelFunctions()
 	{
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-		MPI_Comm comm = 2;
+		int rank, size;
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Comm_size(MPI_COMM_WORLD, &size);
+		MPI_Comm comm;
+		MPI_Comm_split(MPI_COMM_WORLD, rank, rank, &comm);
 		coupling::interface::LS1StaticCommData::getInstance().setLocalCommunicator(comm);
 		CPPUNIT_ASSERT( coupling::interface::LS1StaticCommData::getInstance().getLocalCommunicator() == comm );
 

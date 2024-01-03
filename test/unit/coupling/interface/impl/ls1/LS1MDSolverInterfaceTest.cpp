@@ -67,14 +67,14 @@ public:
 			siteInfo->FirstChildElement("mass")->QueryDoubleText(&mass);
 			siteInfo->FirstChildElement("sigma")->QueryDoubleText(&sigma);
 			siteInfo->FirstChildElement("epsilon")->QueryDoubleText(&epsilon);
-			CPPUNIT_ASSERT( mass == interface.getMoleculeMass() );
-			CPPUNIT_ASSERT( sigma == interface.getMoleculeSigma() );
-			CPPUNIT_ASSERT( epsilon == interface.getMoleculeEpsilon() );
-			CPPUNIT_ASSERT( interface.getKB() == 1.0);
+			CPPUNIT_ASSERT_DOUBLES_EQUAL( mass, interface.getMoleculeMass(), 1e-6 );
+			CPPUNIT_ASSERT_DOUBLES_EQUAL( sigma, interface.getMoleculeSigma(), 1e-6 );
+			CPPUNIT_ASSERT_DOUBLES_EQUAL( epsilon, interface.getMoleculeEpsilon(), 1e-6 );
+			CPPUNIT_ASSERT_DOUBLES_EQUAL( interface.getKB(), 1.0, 1e-6 );
 		}
 		else
 		{
-			CPPUNIT_ASSERT_MESSAGE( "XML node could not be found", false );
+			CPPUNIT_FAIL( "XML node could not be found" );
 		}
 		
 		siteInfo = fileHandle.FirstChildElement("mardyn").FirstChildElement("simulation").FirstChildElement("integrator").FirstChildElement("timestep").ToElement();
@@ -86,7 +86,7 @@ public:
 		}
 		else
 		{
-			CPPUNIT_ASSERT_MESSAGE( "XML node could not be found", false );
+			CPPUNIT_FAIL( "XML node could not be found" );
 		}
 	}
 	void testAddAndDeleteParticle()
