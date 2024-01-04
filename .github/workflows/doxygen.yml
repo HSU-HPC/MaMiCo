@@ -68,7 +68,7 @@ jobs:
         run: |
           echo 'PARSED_COVERAGE<<EOF' >> $GITHUB_OUTPUT
           python test/check_my_coverage.py >> $GITHUB_OUTPUT
-          [[ $? = 0 ]] && COVERAGE_REACTION="rocket" || COVERAGE_REACTION="eyes"
+          [[ -z "$(echo $GITHUB_OUTPUT | grep "PARSED_COVERAGE=Sufficient")" ]] && COVERAGE_REACTION="eyes" || COVERAGE_REACTION="rocket"
           echo 'EOF' >> $GITHUB_OUTPUT
           echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> $GITHUB_OUTPUT
 

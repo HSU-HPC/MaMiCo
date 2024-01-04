@@ -17,8 +17,15 @@ from bs4 import BeautifulSoup, Tag
 
 os.chdir(Path(__file__).parent.parent)
 
+if not Path('.git').is_dir():
+    print(f'{os.getcwd()} is not a git repository!', file=sys.stderr)
+    exit(1)
+
 # Look up target branch for pull request in CI/CD pipeline or default to master when running locally
-target_branch = os.environ['GITHUB_BASE_REF'] if 'GITHUB_BASE_REF' in os.environ else 'master'
+if 'GITHUB_BASE_REF' in os.environ:
+    target_branch = os.environ['GITHUB_BASE_REF'].strip()
+if len(target_branch) == 0:
+    target_branch = 'master'
 
 
 # Make sure to compare to the current target branch on the remote
@@ -35,7 +42,16 @@ touched_files = set(uncommited_files + changed_files)
 coverage_root = Path('build') / 'coverage'
 
 if not coverage_root.is_dir():
+    print(
+        f'No test coverage found in {str(coverage_root)}!', file=sys.stderr, end='')
+    coverage_root = Path('docs') / 'html' / \
+        'coverage'  # Check alternative location
+    print(f' (Switching to {str(coverage_root)})', file=sys.stderr)
+
+if not coverage_root.is_dir():
     print('Coverage has not been generated yet.', file=sys.stderr)
+    print(coverage_root.absolute())
+    os.system(f'ls {str(coverage_root.absolute())}')
     exit(1)
 
 
@@ -111,9 +127,7 @@ df_coverage = df_coverage[mask_touched]
 
 if len(df_coverage) == 0:
     print('Sufficient test coverage for changed files.')
-    exit(0)
 else:
     print('You should write tests for:')
     print(df_coverage.to_string(index=False, formatters={
         c: '{:,.2%}'.format for c in df_coverage.columns[1:]}))
-    exit(1)
