@@ -35,11 +35,13 @@ print('LS BEGIN:', file=sys.stderr)
 for f in Path('.').iterdir():
     print('-', f)
 print('LS END', file=sys.stderr)
-print('LS PARENT BEGIN:', file=sys.stderr)
-for f in Path('.').parent.iterdir():
-    print('-', f)
-print('LS PARENT END', file=sys.stderr)
-print(file=sys.stderr)
+if 'GITHUB_WORKSPACE' in os.environ:
+    print('LS GITHUB BEGIN:', file=sys.stderr)
+    print('GITHUB_WORKSPACE:', os.environ['GITHUB_WORKSPACE'], file=sys.stderr)
+    for f in Path(os.environ['GITHUB_WORKSPACE']).parent.iterdir():
+        print('-', f)
+    print('LS GITHUB END', file=sys.stderr)
+    print(file=sys.stderr)
 
 
 # Make sure to compare to the current target branch on the remote
