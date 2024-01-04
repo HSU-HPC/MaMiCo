@@ -15,7 +15,15 @@ class LS1StaticCommDataTest : public CppUnit::TestFixture
 {
 	CPPUNIT_TEST_SUITE(LS1StaticCommDataTest);
 	CPPUNIT_TEST(testSerialFunctions);
+<<<<<<< HEAD
 	CPPUNIT_TEST(testParallelFunctions);
+=======
+
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+	CPPUNIT_TEST(testParallelFunctions);
+#endif
+
+>>>>>>> master
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -39,9 +47,16 @@ public:
 		for(int i = 0; i < 3; i++)
 			CPPUNIT_ASSERT( coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i) == offsets[i] );
 	}
+<<<<<<< HEAD
 	void testParallelFunctions()
 	{
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+=======
+
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+	void testParallelFunctions()
+	{
+>>>>>>> master
 		int rank, size;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -55,9 +70,18 @@ public:
 			coupling::interface::LS1StaticCommData::getInstance().setDomainGridDecompAtDim(i,gridDec[i]);
 		for(int i = 0; i < 3; i++)
 			CPPUNIT_ASSERT( coupling::interface::LS1StaticCommData::getInstance().getDomainGridDecompAtDim(i) == gridDec[i] );
+<<<<<<< HEAD
 		CPPUNIT_ASSERT( coupling::interface::LS1StaticCommData::getInstance().getDomainGridDecomp() == gridDec );
 #endif
 	}
+=======
+		CPPUNIT_ASSERT( coupling::interface::LS1StaticCommData::getInstance().getDomainGridDecomp()[0] == gridDec[0] 
+				&& coupling::interface::LS1StaticCommData::getInstance().getDomainGridDecomp()[1] == gridDec[1] 
+				&& coupling::interface::LS1StaticCommData::getInstance().getDomainGridDecomp()[2] == gridDec[2] );
+		MPI_Comm_free(&comm);
+	}
+#endif
+>>>>>>> master
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(LS1StaticCommDataTest);

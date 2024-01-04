@@ -356,7 +356,6 @@ public:
 
     // out of domain
     CPPUNIT_ASSERT_THROW(service.getUniqueRankForMacroscopicCell({1, 14, 1}, {12}), std::runtime_error);
-
     CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForMacroscopicCell({1, 1, 1}, {12}), 0u);
     CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForMacroscopicCell({7, 1, 1}, {12}), 1u);
   }

@@ -433,8 +433,7 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
   CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::md2macro>::upperBoundary;
   CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::setDomainParameters();
 
-// handle all local indexing types
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
+  // handle all local indexing types
 
   _numberProcesses = numberProcesses;
 
@@ -531,52 +530,8 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
   CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary =
       CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary;
   CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
-
-#else // sequential scenario
-      // Copy all local indexing from global
-  CellIndex<dim, IndexTrait::local>::lowerBoundary = CellIndex<dim>::lowerBoundary;
-  CellIndex<dim, IndexTrait::local>::upperBoundary = CellIndex<dim>::upperBoundary;
-  CellIndex<dim, IndexTrait::local>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local>::lowerBoundary = CellIndex<dim, IndexTrait::vector>::lowerBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local>::upperBoundary = CellIndex<dim, IndexTrait::vector>::upperBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::noGhost>::lowerBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::upperBoundary = CellIndex<dim, IndexTrait::noGhost>::upperBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::upperBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::md2macro>::lowerBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary = CellIndex<dim, IndexTrait::md2macro>::upperBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary =
-      CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary =
-      CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary;
-  CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
-
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary =
-      CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary;
-  CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
-#endif
 }
 
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // unused in sequential scenario
 /*
  * This was in large parts stolen from IndexConversion.
  */
@@ -645,9 +600,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 
   return ranks;
 }
-#endif
 
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // unused in sequential scenario
 /*
  * This was in large parts stolen from IndexConversion.
  * Note that this uses the globalNumberMacroscopicCells definition excl. the
@@ -692,7 +645,6 @@ coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch:
 
   return _parallelTopology->getRank(processCoords);
 }
-#endif
 
 // declare specialisation of IndexingService
 #ifdef INDEXING_ENABLE_DIM2
