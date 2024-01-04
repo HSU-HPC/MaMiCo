@@ -22,17 +22,28 @@ if not Path('.git').is_dir():
     exit(1)
 
 # Look up target branch for pull request in CI/CD pipeline or default to master when running locally
+target_branch = ''
 if 'GITHUB_BASE_REF' in os.environ:
     target_branch = os.environ['GITHUB_BASE_REF'].strip()
 if len(target_branch) == 0:
     target_branch = 'master'
 
 
+# TODO remove (debugging)
+print('CWD:', os.getcwd(), file=sys.stderr)
+print('LS:', file=sys.stderr)
+os.system('ls -lah 2>&1')
+print(file=sys.stderr)
+
+
 # Make sure to compare to the current target branch on the remote
 subprocess.call(['git', 'fetch'], stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL)
-uncommited_files = [l.split(' ')[-1] for l in subprocess.check_output(
-    ['git', 'status', '--porcelain']).decode().strip().splitlines()]
+try:
+    uncommited_files = [l.split(' ')[-1] for l in subprocess.check_output(
+        ['git', 'status', '--porcelain']).decode().strip().splitlines()]
+except:
+    print('Could not get uncommited changes', file=sys.stderr)
 current_branch = subprocess.check_output(
     ['git', 'branch', '--show-current']).decode().strip()
 changed_files = subprocess.check_output(
