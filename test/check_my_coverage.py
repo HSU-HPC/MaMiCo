@@ -31,19 +31,22 @@ if len(target_branch) == 0:
 
 # TODO remove (debugging)
 print('CWD:', os.getcwd(), file=sys.stderr)
-print('LS:', file=sys.stderr)
-os.system('ls -lah 2>&1')
+print('LS BEGIN:', file=sys.stderr)
+for f in Path('.').iterdir():
+    print('-', f)
+print('LS END', file=sys.stderr)
+print('LS PARENT BEGIN:', file=sys.stderr)
+for f in Path('.').parent.iterdir():
+    print('-', f)
+print('LS PARENT END', file=sys.stderr)
 print(file=sys.stderr)
 
 
 # Make sure to compare to the current target branch on the remote
 subprocess.call(['git', 'fetch'], stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL)
-try:
-    uncommited_files = [l.split(' ')[-1] for l in subprocess.check_output(
-        ['git', 'status', '--porcelain']).decode().strip().splitlines()]
-except:
-    print('Could not get uncommited changes', file=sys.stderr)
+uncommited_files = [l.split(' ')[-1] for l in subprocess.check_output(
+    ['git', 'status', '--porcelain']).decode().strip().splitlines()]
 current_branch = subprocess.check_output(
     ['git', 'branch', '--show-current']).decode().strip()
 changed_files = subprocess.check_output(
