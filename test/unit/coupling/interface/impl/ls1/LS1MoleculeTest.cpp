@@ -15,6 +15,7 @@ class LS1MoleculeTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testPosition);
 	CPPUNIT_TEST(testVelocity);
 	CPPUNIT_TEST(testForce);
+	CPPUNIT_TEST(testSetPotentialEnergy);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -109,6 +110,7 @@ public:
 			
 		}
 	}
+
 	void testForce()
 	{
 		::Molecule ls1Molecule;
@@ -128,6 +130,13 @@ public:
 			}
 			
 		}
+	}
+
+	void testSetPotentialEnergy()
+	{
+		::Molecule ls1Molecule;
+		coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);
+		CPPUNIT_ASSERT_THROW( mamicoMolecule.setPotentialEnergy(0.0), std::runtime_error );
 	}
 private:
 	Simulation* _testSimulation;

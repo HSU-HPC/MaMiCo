@@ -29,6 +29,7 @@ class LS1RegionWrapperTest : public CppUnit::TestFixture
 public:
 	void setUp()
 	{
+		_ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/ls1gridconfig.xml";
 		global_log = new Log::Logger(Log::None);
 		global_log->set_mpi_output_root(0);
 		coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0,0);
@@ -40,7 +41,7 @@ public:
 		_testSimulation = new Simulation();
 		global_simulation = _testSimulation;
 		_testSimulation->disableFinalCheckpoint();
-		_testSimulation->readConfigFile("../test/unit/coupling/interface/impl/ls1/ls1gridconfig.xml");
+		_testSimulation->readConfigFile(_ls1ConfigFileName);
 		//_testSimulation->getDomain()->thermostatOff();
 		//_testSimulation->getDomain()->setExplosionHeuristics(false);
 		// after this point the mamico plugin exists and is accessible
@@ -80,11 +81,20 @@ public:
 		}
 		CPPUNIT_ASSERT_MESSAGE("Found before insertion", !found);
 
-		//insert particle at position
-		wrapper.setupIDcounterForParticleAddition();
+		//create particle
 		::Molecule blank;
 		coupling::interface::LS1Molecule tempParticle(&blank);
 		tempParticle.setPosition(position);
+
+		//make sure there is error if ID counter is not inited
+		CPPUNIT_ASSERT_THROW( wrapper.addMolecule(tempParticle),std::runtime_error );
+		CPPUNIT_ASSERT_THROW( wrapper.addMolecule(blank),std::runtime_error );
+
+		//delete particle that doesn't exist (no error)
+		CPPUNIT_ASSERT_NO_THROW( wrapper.deleteMolecule(tempParticle) );
+
+		//insert particle
+		wrapper.setupIDcounterForParticleAddition();
 		wrapper.addMolecule(tempParticle);
 
 		//verify that position is filled
@@ -354,6 +364,7 @@ public:
 	}
 private:
 	Simulation* _testSimulation;
+	std::string _ls1ConfigFileName;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(LS1RegionWrapperTest);

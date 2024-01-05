@@ -20,9 +20,9 @@
     <ensemble type="NVT">
       <temperature unit="reduced">1.10</temperature> <!--was 9.02542795570889975E-004-->
       <domain type="box">
-        <lx>10</lx>
-        <ly>10</ly>
-        <lz>10</lz>
+        <lx>40</lx>
+        <ly>40</ly>
+        <lz>40</lz>
         <!--<boxMin><x>10.0</x> <y>10.0</y> <z>2.5</z> </boxMin>-->
       </domain>
       <components>
@@ -55,7 +55,7 @@
 						</filler>
 						<object type="Cuboid">
 							<lower> <x>0</x> <y>0</y> <z>0</z> </lower>
-							<upper> <x>10</x> <y>10</y> <z>10</z> </upper>
+							<upper> <x>40</x> <y>40</y> <z>40</z> </upper>
 						</object>
 						<velocityAssigner type="EqualVelocityDistribution" enableRandomSeed="0"></velocityAssigner>
 					</objectgenerator>

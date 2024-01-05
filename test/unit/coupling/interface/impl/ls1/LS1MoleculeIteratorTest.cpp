@@ -26,6 +26,7 @@ class LS1MoleculeIteratorTest : public CppUnit::TestFixture
 public:
 	void setUp()
 	{
+		_ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/ls1fourparticleconfig.xml";
 		global_log = new Log::Logger(Log::None);
 		global_log->set_mpi_output_root(0);
 		coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0,0);
@@ -37,7 +38,7 @@ public:
 		_testSimulation = new Simulation();
 		global_simulation = _testSimulation;
 		_testSimulation->disableFinalCheckpoint();
-		_testSimulation->readConfigFile("../test/unit/coupling/interface/impl/ls1/ls1fourparticleconfig.xml");
+		_testSimulation->readConfigFile(_ls1ConfigFileName);
 		//_testSimulation->getDomain()->thermostatOff();
 		//_testSimulation->getDomain()->setExplosionHeuristics(false);
 		// after this point the mamico plugin exists and is accessible
@@ -146,6 +147,7 @@ public:
 
 private:
 	Simulation* _testSimulation;
+	std::string _ls1ConfigFileName;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(LS1MoleculeIteratorTest);

@@ -22,7 +22,7 @@ namespace ls1 {
 class LS1RegionWrapper
 {
 public:
-    LS1RegionWrapper(double startRegion[3], double endRegion[3], Simulation* simulation) :
+    LS1RegionWrapper(tarch::la::Vector<3,double> startRegion, tarch::la::Vector<3,double> endRegion, Simulation* simulation) :
         _locSimulation(simulation),
         _particleContainer(simulation->getMoleculeContainer()),
         _cutoff(simulation->getcutoffRadius()),
@@ -41,6 +41,9 @@ public:
         }
         _iterator = simulation->getMoleculeContainer()->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
     }
+
+    LS1RegionWrapper(double startRegion[3], double endRegion[3], Simulation* simulation):
+        LS1RegionWrapper(tarch::la::Vector<3,double>(startRegion[0],startRegion[1],startRegion[2]),tarch::la::Vector<3,double>(endRegion[0],endRegion[1],endRegion[2]), simulation) {}
 
     void setRegion(double startRegion[3], double endRegion[3])
     {

@@ -52,8 +52,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
       //ghost layer not allowed to have linked cells
       if(macroscopicCellIndex[0] == 0 || macroscopicCellIndex[1] == 0 || macroscopicCellIndex[2] == 0)
       {
-        std::cout << "ERROR in LS1MDSolverInterface::getLinkedCell(): ghost macroscopic cells may not have linked cells!" << std::endl;
-        exit(EXIT_FAILURE);
+        throw std::runtime_error("ERROR in LS1MDSolverInterface::getLinkedCell(): ghost macroscopic cells may not have linked cells!");
       }
 
       //size of the macroscopic cell
