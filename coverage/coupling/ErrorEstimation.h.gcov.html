@@ -31,17 +31,17 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">63</td>
-            <td class="headerCovTableEntry">67</td>
-            <td class="headerCovTableEntryHi">94.0 %</td>
+            <td class="headerCovTableEntry">60</td>
+            <td class="headerCovTableEntry">66</td>
+            <td class="headerCovTableEntryHi">90.9 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-03 21:00:22</td>
+            <td class="headerValue">2024-01-08 12:10:48</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">18</td>
-            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
             <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
@@ -130,7 +130,7 @@
 <a name="68"><span class="lineNum">      68 </span>            :    */</a>
 <a name="69"><span class="lineNum">      69 </span><span class="lineCov">         28 :   double getError(errorBaseQuantity BaseQuantity, errorType Type) {</span></a>
 <a name="70"><span class="lineNum">      70 </span>            : </a>
-<a name="71"><span class="lineNum">      71 </span>            :     double error;</a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineCov">         28 :     double error;</span></a>
 <a name="72"><span class="lineNum">      72 </span>            : </a>
 <a name="73"><span class="lineNum">      73 </span><span class="lineCov">         28 :     if (BaseQuantity == Velocity) {</span></a>
 <a name="74"><span class="lineNum">      74 </span>            : </a>
@@ -164,24 +164,24 @@
 <a name="102"><span class="lineNum">     102 </span>            :    *     @param errorBaseQuantity</a>
 <a name="103"><span class="lineNum">     103 </span>            :    *     @param errorType</a>
 <a name="104"><span class="lineNum">     104 </span>            :    */</a>
-<a name="105"><span class="lineNum">     105 </span><span class="lineCov">         20 :   double getCorrectorNumberOfSamples(errorBaseQuantity BaseQuantity, errorType Type) {</span></a>
+<a name="105"><span class="lineNum">     105 </span><span class="lineCov">         12 :   double getCorrectorNumberOfSamples(errorBaseQuantity BaseQuantity, errorType Type) {</span></a>
 <a name="106"><span class="lineNum">     106 </span>            : </a>
-<a name="107"><span class="lineNum">     107 </span><span class="lineCov">         20 :     if (BaseQuantity == Velocity) {</span></a>
+<a name="107"><span class="lineNum">     107 </span><span class="lineCov">         12 :     if (BaseQuantity == Velocity) {</span></a>
 <a name="108"><span class="lineNum">     108 </span>            : </a>
 <a name="109"><span class="lineNum">     109 </span><span class="lineCov">          8 :       return requiredSamplesV(Type == Relative ? _desiredRelErrorVelocity : _desiredAbsErrorVelocity, _temperature, _soundSpeed,</span></a>
 <a name="110"><span class="lineNum">     110 </span><span class="lineCov">          8 :                               Type == Relative ? _velocity : 1, _numberOfParticle, _particleMass);</span></a>
 <a name="111"><span class="lineNum">     111 </span>            : </a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineCov">         12 :     } else if (BaseQuantity == Density) {</span></a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          4 :     } else if (BaseQuantity == Density) {</span></a>
 <a name="113"><span class="lineNum">     113 </span>            : </a>
 <a name="114"><span class="lineNum">     114 </span><span class="lineCov">          4 :       return requiredSamplesD(_desiredRelErrorDensity, _temperature, _soundSpeed, _velocity, _particleMass, _numberOfParticle);</span></a>
 <a name="115"><span class="lineNum">     115 </span>            : </a>
-<a name="116"><span class="lineNum">     116 </span><span class="lineCov">          8 :     } else if (BaseQuantity == Temperature) {</span></a>
+<a name="116"><span class="lineNum">     116 </span><span class="lineNoCov">          0 :     } else if (BaseQuantity == Temperature) {</span></a>
 <a name="117"><span class="lineNum">     117 </span>            : </a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineCov">          4 :       return 3.0;</span></a>
+<a name="118"><span class="lineNum">     118 </span>            :       return 3.0;</a>
 <a name="119"><span class="lineNum">     119 </span>            : </a>
-<a name="120"><span class="lineNum">     120 </span><span class="lineCov">          4 :     } else if (BaseQuantity == Pressure) {</span></a>
+<a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :     } else if (BaseQuantity == Pressure) {</span></a>
 <a name="121"><span class="lineNum">     121 </span>            : </a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineCov">          4 :       return 4.0;</span></a>
+<a name="122"><span class="lineNum">     122 </span>            :       return 4.0;</a>
 <a name="123"><span class="lineNum">     123 </span>            :     }</a>
 <a name="124"><span class="lineNum">     124 </span>            : </a>
 <a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;Error Estimation::getCorrectorNumberOfSamples not a Valid quantity&quot; &lt;&lt; std::endl;</span></a>
@@ -333,7 +333,7 @@
 <a name="271"><span class="lineNum">     271 </span>            :    */</a>
 <a name="272"><span class="lineNum">     272 </span><span class="lineCov">         16 :   double veloyityFluctuation(double temperature, double numberOfParticle, double particleMass) {</span></a>
 <a name="273"><span class="lineNum">     273 </span>            : </a>
-<a name="274"><span class="lineNum">     274 </span><span class="lineCov">         16 :     return std::sqrt(_k * temperature / particleMass / numberOfParticle);</span></a>
+<a name="274"><span class="lineNum">     274 </span><span class="lineCov">          8 :     return std::sqrt(_k * temperature / particleMass / numberOfParticle);</span></a>
 <a name="275"><span class="lineNum">     275 </span>            :   }</a>
 <a name="276"><span class="lineNum">     276 </span>            : </a>
 <a name="277"><span class="lineNum">     277 </span>            :   /** sets the required absloute error of the velocity @param error */</a>

@@ -31,18 +31,18 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">10</td>
             <td class="headerCovTableEntry">11</td>
-            <td class="headerCovTableEntry">12</td>
-            <td class="headerCovTableEntryHi">91.7 %</td>
+            <td class="headerCovTableEntryHi">90.9 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-03 21:00:22</td>
+            <td class="headerValue">2024-01-08 12:10:48</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">8</td>
-            <td class="headerCovTableEntry">10</td>
-            <td class="headerCovTableEntryMed">80.0 %</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -115,7 +115,7 @@
 <a name="53"><span class="lineNum">      53 </span>            :   /** Returns the macroscopic cell size</a>
 <a name="54"><span class="lineNum">      54 </span>            :    *    @return _macroscopicCellSize</a>
 <a name="55"><span class="lineNum">      55 </span>            :    */</a>
-<a name="56"><span class="lineNum">      56 </span><span class="lineCov">          4 :   tarch::la::Vector&lt;dim, double&gt; getMacroscopicCellSize() const { return _macroscopicCellSize; }</span></a>
+<a name="56"><span class="lineNum">      56 </span>            :   tarch::la::Vector&lt;dim, double&gt; getMacroscopicCellSize() const { return _macroscopicCellSize; }</a>
 <a name="57"><span class="lineNum">      57 </span>            : </a>
 <a name="58"><span class="lineNum">      58 </span>            :   /** Returns the number of linked cell encapsulated within a macroscopic cell</a>
 <a name="59"><span class="lineNum">      59 </span>            :    *    @return _linkedCellsPerMacroscopicCell</a>
@@ -144,7 +144,7 @@
 <a name="82"><span class="lineNum">      82 </span><span class="lineCov">          4 :   MacroscopicCellConfiguration(tarch::la::Vector&lt;dim, double&gt; macroscopicCellSize, tarch::la::Vector&lt;dim, unsigned int&gt; linkedCellsPerMacroscopicCell,</span></a>
 <a name="83"><span class="lineNum">      83 </span>            :                                unsigned int writeEveryMicroscopicTimestep, std::string microscopicFilename, unsigned int writeEveryMacroscopicTimestep,</a>
 <a name="84"><span class="lineNum">      84 </span>            :                                std::string macroscopicFilename)</a>
-<a name="85"><span class="lineNum">      85 </span><span class="lineCov">          4 :       : _isValid(true), _macroscopicCellSize(macroscopicCellSize), _linkedCellsPerMacroscopicCell(linkedCellsPerMacroscopicCell),</span></a>
+<a name="85"><span class="lineNum">      85 </span><span class="lineCov">          8 :       : _isValid(true), _macroscopicCellSize(macroscopicCellSize), _linkedCellsPerMacroscopicCell(linkedCellsPerMacroscopicCell),</span></a>
 <a name="86"><span class="lineNum">      86 </span><span class="lineCov">          4 :         _writeEveryMicroscopicTimestep(writeEveryMicroscopicTimestep), _microscopicFilename(microscopicFilename),</span></a>
 <a name="87"><span class="lineNum">      87 </span><span class="lineCov">          8 :         _writeEveryMacroscopicTimestep(writeEveryMacroscopicTimestep), _macroscopicFilename(macroscopicFilename) {}</span></a>
 <a name="88"><span class="lineNum">      88 </span>            : </a>

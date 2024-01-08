@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">47</td>
-            <td class="headerCovTableEntry">166</td>
-            <td class="headerCovTableEntryLo">28.3 %</td>
+            <td class="headerCovTableEntry">163</td>
+            <td class="headerCovTableEntryLo">28.8 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-03 21:00:22</td>
+            <td class="headerValue">2024-01-08 12:10:48</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">4</td>
@@ -120,7 +120,7 @@
 <a name="58"><span class="lineNum">      58 </span>            :   // determine start and end coordinates for loop over inner macroscopic cells</a>
 <a name="59"><span class="lineNum">      59 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; start(1);</span></a>
 <a name="60"><span class="lineNum">      60 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; end = start + coupling::initRange&lt;dim&gt;(indexConversion.getLocalNumberMacroscopicCells());</span></a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineCov">          4 :   tarch::la::Vector&lt;3, unsigned int&gt; macroLoop(0);</span></a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineCov">          8 :   tarch::la::Vector&lt;3, unsigned int&gt; macroLoop(0);</span></a>
 <a name="62"><span class="lineNum">      62 </span>            : </a>
 <a name="63"><span class="lineNum">      63 </span>            :   // determine end coordinate for inner loop over linked cells (contained in each macroscopic cell)</a>
 <a name="64"><span class="lineNum">      64 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; endInnerLoop = coupling::initRange&lt;dim&gt;(numberLinkedCellsPerMacroscopicCell);</span></a>
@@ -137,7 +137,7 @@
 <a name="75"><span class="lineNum">      75 </span>            :   // call constructor on each macroscopic cell</a>
 <a name="76"><span class="lineNum">      76 </span><span class="lineCov">        112 :   for (unsigned int i = 0; i &lt; numberMacroscopicCells; i++) {</span></a>
 <a name="77"><span class="lineNum">      77 </span>            :     // initialise macroscopic cell</a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineCov">        108 :     coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;* newCell =</span></a>
+<a name="78"><span class="lineNum">      78 </span><span class="lineCov">        216 :     coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;* newCell =</span></a>
 <a name="79"><span class="lineNum">      79 </span><span class="lineCov">        108 :         new (&amp;cells[i]) coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;(numberLinkedCellsPerMacroscopicCell);</span></a>
 <a name="80"><span class="lineNum">      80 </span><span class="lineCov">        108 :     if (newCell == NULL) {</span></a>
 <a name="81"><span class="lineNum">      81 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR coupling::datastructures::MacroscopicCells::initMacroscopicCellsWithLinkedCells(): newCell==NULL&quot; &lt;&lt; std::endl;</span></a>
@@ -268,7 +268,7 @@
 <a name="206"><span class="lineNum">     206 </span><span class="lineNoCov">          0 :         a.apply(_macroscopicCellsWithLinkedCells[index], index);</span></a>
 <a name="207"><span class="lineNum">     207 </span>            :       }</a>
 <a name="208"><span class="lineNum">     208 </span>            :     }</a>
-<a name="209"><span class="lineNum">     209 </span><span class="lineNoCov">          0 :     break;</span></a>
+<a name="209"><span class="lineNum">     209 </span>            :     break;</a>
 <a name="210"><span class="lineNum">     210 </span>            :   default:</a>
 <a name="211"><span class="lineNum">     211 </span>            :     std::cout &lt;&lt; &quot;ERROR coupling::datastructures::MacroscopicCells::applyToLocalGhostMacroscopicCellsWithLinkedCells(): Only 1D/2D/3D supported!&quot; &lt;&lt; std::endl;</a>
 <a name="212"><span class="lineNum">     212 </span>            :     exit(EXIT_FAILURE);</a>
@@ -284,7 +284,7 @@
 <a name="222"><span class="lineNum">     222 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;3, unsigned int&gt; loop(0);</span></a>
 <a name="223"><span class="lineNum">     223 </span>            : </a>
 <a name="224"><span class="lineNum">     224 </span>            :   // we assume a lexicographic ordering of the cells. We can then just increment the linearIndex counter in each cellwise operation.</a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineNoCov">          0 :   a.beginCellIteration();</span></a>
+<a name="225"><span class="lineNum">     225 </span>            :   a.beginCellIteration();</a>
 <a name="226"><span class="lineNum">     226 </span><span class="lineNoCov">          0 :   unsigned int linearIndex = 0;</span></a>
 <a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :   for (loop[2] = 0; loop[2] &lt; end[2]; loop[2]++) {</span></a>
 <a name="228"><span class="lineNum">     228 </span><span class="lineNoCov">          0 :     for (loop[1] = 0; loop[1] &lt; end[1]; loop[1]++) {</span></a>
@@ -294,7 +294,7 @@
 <a name="232"><span class="lineNum">     232 </span>            :       }</a>
 <a name="233"><span class="lineNum">     233 </span>            :     }</a>
 <a name="234"><span class="lineNum">     234 </span>            :   }</a>
-<a name="235"><span class="lineNum">     235 </span><span class="lineNoCov">          0 :   a.endCellIteration();</span></a>
+<a name="235"><span class="lineNum">     235 </span>            :   a.endCellIteration();</a>
 <a name="236"><span class="lineNum">     236 </span><span class="lineNoCov">          0 : }</span></a>
 <a name="237"><span class="lineNum">     237 </span>            : </a>
 <a name="238"><span class="lineNum">     238 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
@@ -366,7 +366,7 @@
 <a name="304"><span class="lineNum">     304 </span>            : std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;</a>
 <a name="305"><span class="lineNum">     305 </span><span class="lineCov">          4 : coupling::datastructures::MacroscopicCells&lt;LinkedCell, dim&gt;::initMacroscopicCells(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion) const {</span></a>
 <a name="306"><span class="lineNum">     306 </span>            :   // determine total number of cells</a>
-<a name="307"><span class="lineNum">     307 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;dim, unsigned int&gt; localNumberCells = indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector&lt;dim, unsigned int&gt;(2);</span></a>
+<a name="307"><span class="lineNum">     307 </span><span class="lineCov">          8 :   const tarch::la::Vector&lt;dim, unsigned int&gt; localNumberCells = indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector&lt;dim, unsigned int&gt;(2);</span></a>
 <a name="308"><span class="lineNum">     308 </span><span class="lineCov">          4 :   unsigned int numberCells = localNumberCells[0];</span></a>
 <a name="309"><span class="lineNum">     309 </span><span class="lineCov">         12 :   for (unsigned int d = 1; d &lt; dim; d++) {</span></a>
 <a name="310"><span class="lineNum">     310 </span><span class="lineCov">          8 :     numberCells = numberCells * localNumberCells[d];</span></a>
@@ -382,7 +382,7 @@
 <a name="320"><span class="lineNum">     320 </span>            :     }</a>
 <a name="321"><span class="lineNum">     321 </span><span class="lineCov">        108 :     macroscopicCells.push_back(cell);</span></a>
 <a name="322"><span class="lineNum">     322 </span>            :   }</a>
-<a name="323"><span class="lineNum">     323 </span><span class="lineCov">          8 :   return macroscopicCells;</span></a>
+<a name="323"><span class="lineNum">     323 </span><span class="lineCov">          4 :   return macroscopicCells;</span></a>
 <a name="324"><span class="lineNum">     324 </span><span class="lineNoCov">          0 : }</span></a>
 </pre>
       </td>

@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">169</td>
+            <td class="headerCovTableEntry">165</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-03 21:00:22</td>
+            <td class="headerValue">2024-01-08 12:10:48</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -122,7 +122,7 @@
 <a name="60"><span class="lineNum">      60 </span>            : </a>
 <a name="61"><span class="lineNum">      61 </span>            :     // load sequences</a>
 <a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     loadSequencesFromXML(_config.FirstChildElement(&quot;filter-pipeline&quot;)-&gt;FirstChildElement(&quot;per-instance&quot;));</span></a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :     break;</span></a>
+<a name="63"><span class="lineNum">      63 </span>            :     break;</a>
 <a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :   case coupling::filtering::Scope::postMultiInstance:</span></a>
 <a name="65"><span class="lineNum">      65 </span>            :     // check for valid amount of input cells</a>
 <a name="66"><span class="lineNum">      66 </span>            :     // case 1: the input vector contains the entire global MD-To-Macro domain</a>
@@ -149,7 +149,7 @@
 <a name="87"><span class="lineNum">      87 </span>            :                                  &quot;parallelize the macroscopic solver so that it does not split the md2Macro-subdomain.&quot;);</a>
 <a name="88"><span class="lineNum">      88 </span>            :       }</a>
 <a name="89"><span class="lineNum">      89 </span>            :     }</a>
-<a name="90"><span class="lineNum">      90 </span><span class="lineNoCov">          0 :     break;</span></a>
+<a name="90"><span class="lineNum">      90 </span>            :     break;</a>
 <a name="91"><span class="lineNum">      91 </span>            :   }</a>
 <a name="92"><span class="lineNum">      92 </span><span class="lineNoCov">          0 : }</span></a>
 <a name="93"><span class="lineNum">      93 </span>            : </a>
@@ -242,7 +242,7 @@
 <a name="180"><span class="lineNum">     180 </span>            :   std::cout &lt;&lt; &quot;FP: Config is valid!&quot; &lt;&lt; std::endl;</a>
 <a name="181"><span class="lineNum">     181 </span>            : #endif</a>
 <a name="182"><span class="lineNum">     182 </span>            : </a>
-<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :   return true;</span></a>
+<a name="183"><span class="lineNum">     183 </span>            :   return true;</a>
 <a name="184"><span class="lineNum">     184 </span>            : }</a>
 <a name="185"><span class="lineNum">     185 </span>            : </a>
 <a name="186"><span class="lineNum">     186 </span><span class="lineNoCov">          0 : template &lt;unsigned int dim&gt; void coupling::filtering::FilterPipeline&lt;dim&gt;::loadSequencesFromXML(tinyxml2::XMLElement* node) {</span></a>
@@ -289,7 +289,7 @@
 <a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :     } catch (...) {</span></a>
 <a name="228"><span class="lineNum">     228 </span><span class="lineNoCov">          0 :       duplicate = false;</span></a>
 <a name="229"><span class="lineNum">     229 </span>            :     }</a>
-<a name="230"><span class="lineNum">     230 </span><span class="lineNoCov">          0 :     if (duplicate)</span></a>
+<a name="230"><span class="lineNum">     230 </span>            :     if (duplicate)</a>
 <a name="231"><span class="lineNum">     231 </span><span class="lineNoCov">          0 :       throw std::runtime_error(std::string(&quot;ERROR: Filter-Pipeline: Two or &quot;</span></a>
 <a name="232"><span class="lineNum">     232 </span>            :                                            &quot;more sequences of identical name &quot;)</a>
 <a name="233"><span class="lineNum">     233 </span><span class="lineNoCov">          0 :                                    .append(currSequenceNode-&gt;Value()));</span></a>

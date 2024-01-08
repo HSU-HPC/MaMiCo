@@ -31,18 +31,18 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">39</td>
-            <td class="headerCovTableEntry">45</td>
-            <td class="headerCovTableEntryMed">86.7 %</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntry">43</td>
+            <td class="headerCovTableEntryMed">88.4 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-03 21:00:22</td>
+            <td class="headerValue">2024-01-08 12:10:48</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">21</td>
-            <td class="headerCovTableEntry">28</td>
-            <td class="headerCovTableEntryMed">75.0 %</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntryMed">76.9 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -169,12 +169,12 @@
 <a name="107"><span class="lineNum">     107 </span>            :  *      @author Philipp Neumann</a>
 <a name="108"><span class="lineNum">     108 </span>            :  *      @return equal result; true: if they are equal, false otherwise.</a>
 <a name="109"><span class="lineNum">     109 </span>            :  */</a>
-<a name="110"><span class="lineNum">     110 </span><span class="lineCov">    1301886 : template &lt;int size, class T&gt; bool operator==(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineCov">    1301886 :   bool equal = true;</span></a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineCov">    5207484 :   for (int i = 0; i &lt; size; i++) {</span></a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineCov">    3905598 :     equal = equal &amp;&amp; (l[i] == r[i]);</span></a>
+<a name="110"><span class="lineNum">     110 </span><span class="lineCov">    1302578 : template &lt;int size, class T&gt; bool operator==(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineCov">    1302578 :   bool equal = true;</span></a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">    5210164 :   for (int i = 0; i &lt; size; i++) {</span></a>
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">    4246846 :     equal = equal &amp;&amp; (l[i] == r[i]);</span></a>
 <a name="114"><span class="lineNum">     114 </span>            :   }</a>
-<a name="115"><span class="lineNum">     115 </span><span class="lineCov">    1301886 :   return equal;</span></a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineCov">    1302578 :   return equal;</span></a>
 <a name="116"><span class="lineNum">     116 </span>            : }</a>
 <a name="117"><span class="lineNum">     117 </span>            : </a>
 <a name="118"><span class="lineNum">     118 </span>            : /** This operator overloading compares two vectors and determins if they are NOT equal.</a>
@@ -187,9 +187,9 @@
 <a name="125"><span class="lineNum">     125 </span><span class="lineCov">     242070 : template &lt;int size, class T&gt; bool operator!=(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></a>
 <a name="126"><span class="lineNum">     126 </span><span class="lineCov">     795480 :   for (int i = 0; i &lt; size; i++) {</span></a>
 <a name="127"><span class="lineNum">     127 </span><span class="lineCov">     553410 :     if (l[i] != r[i])</span></a>
-<a name="128"><span class="lineNum">     128 </span><span class="lineNoCov">          0 :       return true;</span></a>
+<a name="128"><span class="lineNum">     128 </span>            :       return true;</a>
 <a name="129"><span class="lineNum">     129 </span>            :   }</a>
-<a name="130"><span class="lineNum">     130 </span><span class="lineCov">     242070 :   return false;</span></a>
+<a name="130"><span class="lineNum">     130 </span>            :   return false;</a>
 <a name="131"><span class="lineNum">     131 </span>            : }</a>
 <a name="132"><span class="lineNum">     132 </span>            : </a>
 <a name="133"><span class="lineNum">     133 </span>            : /** this file contains some methods for vector types.</a>

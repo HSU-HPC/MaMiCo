@@ -31,13 +31,13 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">3</td>
-            <td class="headerCovTableEntry">6</td>
-            <td class="headerCovTableEntryLo">50.0 %</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-03 21:00:22</td>
+            <td class="headerValue">2024-01-08 12:10:48</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -116,15 +116,15 @@
 <a name="54"><span class="lineNum">      54 </span>            :    *    @param numberProcesses number of processes</a>
 <a name="55"><span class="lineNum">      55 </span>            :    */</a>
 <a name="56"><span class="lineNum">      56 </span>            :   template &lt;unsigned int dim&gt;</a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineCov">       6588 :   static coupling::paralleltopology::ParallelTopology&lt;dim&gt;* getParallelTopology(coupling::paralleltopology::ParallelTopologyType type,</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">       6612 :   static coupling::paralleltopology::ParallelTopology&lt;dim&gt;* getParallelTopology(coupling::paralleltopology::ParallelTopologyType type,</span></a>
 <a name="58"><span class="lineNum">      58 </span>            :                                                                                 tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,</a>
 <a name="59"><span class="lineNum">      59 </span>            :                                                                                 unsigned int topologyOffset) {</a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineCov">       6588 :     if (type == XYZ) {</span></a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineCov">       6588 :       return new coupling::paralleltopology::XYZTopology&lt;dim&gt;(numberProcesses, topologyOffset);</span></a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     } else if (type == ZYX) {</span></a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :       return new coupling::paralleltopology::ZYXTopology&lt;dim&gt;(numberProcesses, topologyOffset);</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineCov">       6604 :     if (type == XYZ) {</span></a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineCov">       6596 :       return new coupling::paralleltopology::XYZTopology&lt;dim&gt;(numberProcesses, topologyOffset);</span></a>
+<a name="62"><span class="lineNum">      62 </span><span class="lineCov">          8 :     } else if (type == ZYX) {</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineCov">          8 :       return new coupling::paralleltopology::ZYXTopology&lt;dim&gt;(numberProcesses, topologyOffset);</span></a>
 <a name="64"><span class="lineNum">      64 </span>            :     } else {</a>
-<a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 :       return NULL;</span></a>
+<a name="65"><span class="lineNum">      65 </span>            :       return NULL;</a>
 <a name="66"><span class="lineNum">      66 </span>            :     }</a>
 <a name="67"><span class="lineNum">      67 </span>            :   }</a>
 <a name="68"><span class="lineNum">      68 </span>            : };</a>
