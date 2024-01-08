@@ -84,11 +84,8 @@ public:
     // localNumberMDSimulations*topologyOffset/intNumberProcesses MD simulations
     // before the actual block of ranks
     for (unsigned int i = 0; i < _blockOffset; i++) {
-      _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceMacroOnly<dim>(
-          i, macroscopicSolverInterface, mdConfiguration.getMPIConfiguration().getNumberOfProcesses(), _multiMDService.getGlobalRank(),
-          mdConfiguration.getDomainConfiguration().getGlobalDomainSize(), mdConfiguration.getDomainConfiguration().getGlobalDomainOffset(),
-          mamicoConfiguration.getParallelTopologyConfiguration(), mamicoConfiguration.getMacroscopicCellConfiguration(),
-          (i / _localNumberMDSimulations) * _intNumberProcesses);
+      _macroscopicCellServices[i] = createMacroscopicCellServiceMacroOnly(i, macroscopicSolverInterface, mdConfiguration, _multiMDService, mamicoConfiguration, 
+      (i / _localNumberMDSimulations) * _intNumberProcesses);
       if (_macroscopicCellServices[i] == NULL) {
         std::cout << "ERROR "
                      "coupling::services::MultiMDCellService::MultiMDCellServic"
@@ -117,11 +114,8 @@ public:
     // allocate all macroscopic cell services for macro-only-solver AFTER
     // topology offset
     for (unsigned int i = _blockOffset + _localNumberMDSimulations; i < _totalNumberMDSimulations; i++) {
-      _macroscopicCellServices[i] = new coupling::services::MacroscopicCellServiceMacroOnly<dim>(
-          i, macroscopicSolverInterface, mdConfiguration.getMPIConfiguration().getNumberOfProcesses(), _multiMDService.getGlobalRank(),
-          mdConfiguration.getDomainConfiguration().getGlobalDomainSize(), mdConfiguration.getDomainConfiguration().getGlobalDomainOffset(),
-          mamicoConfiguration.getParallelTopologyConfiguration(), mamicoConfiguration.getMacroscopicCellConfiguration(),
-          (i / _localNumberMDSimulations) * _intNumberProcesses);
+      _macroscopicCellServices[i] = createMacroscopicCellServiceMacroOnly(i, macroscopicSolverInterface, mdConfiguration, _multiMDService, mamicoConfiguration, 
+      (i / _localNumberMDSimulations) * _intNumberProcesses);
       if (_macroscopicCellServices[i] == NULL) {
         std::cout << "ERROR "
                      "coupling::services::MultiMDCellService::MultiMDCellServic"
@@ -549,6 +543,20 @@ private:
       exit(EXIT_FAILURE);
     }
     return ic;
+  }
+
+  coupling::services::MacroscopicCellService<dim>* createMacroscopicCellServiceMacroOnly(
+    unsigned int ID, 
+    coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,
+    simplemd::configurations::MolecularDynamicsConfiguration& mdConfiguration,
+    tarch::utils::MultiMDService<dim>& multiMDService,
+    coupling::configurations::MaMiCoConfiguration<dim>& mamicoConfiguration,
+    unsigned int topologyOffset) const {
+    return new coupling::services::MacroscopicCellServiceMacroOnly<dim>(
+      ID, macroscopicSolverInterface, mdConfiguration.getMPIConfiguration().getNumberOfProcesses(), multiMDService.getGlobalRank(),
+      mdConfiguration.getDomainConfiguration().getGlobalDomainSize(), mdConfiguration.getDomainConfiguration().getGlobalDomainOffset(),
+      mamicoConfiguration.getParallelTopologyConfiguration(), mamicoConfiguration.getMacroscopicCellConfiguration(),
+      topologyOffset);
   }
 
   unsigned int _localNumberMDSimulations;
