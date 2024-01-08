@@ -39,25 +39,17 @@ public:
   virtual ~ZYXTopology() {}
 
   tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const {
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    unsigned int intNumberProcesses = _numberProcesses[0];
-    for (unsigned int d = 1; d < dim; d++) {
-      intNumberProcesses = intNumberProcesses * _numberProcesses[d];
-    }
-    if ((rank < _topologyOffset) || (rank > _topologyOffset + intNumberProcesses - 1)) {
-      std::cout << "Warning "
-                   "coupling::paralleltopology::ZYXTopology::"
-                   "getProcessCoordinates(): rank out of range!"
-                << std::endl;
-      std::cout << "Offset=" << _topologyOffset << ", rank=" << rank << std::endl;
-    }
-#endif
     tarch::la::Vector<dim, unsigned int> processCoordinates(0);
     unsigned int help = rank - _topologyOffset;
     for (unsigned int d = 0; d < dim; d++) {
       processCoordinates[d] = help / _divisionFactor4NumberProcesses[d];
       help = help - processCoordinates[d] * _divisionFactor4NumberProcesses[d];
     }
+#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+std::cout << "Rank=" << rank
+              << " corresponds to process coordinates=" << processCoordinates
+              << std::endl;
+#endif
     return processCoordinates;
   }
 
