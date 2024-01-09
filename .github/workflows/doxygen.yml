@@ -32,6 +32,7 @@ jobs:
         
     - name: Doxygen Action
       uses: mattnotmitt/doxygen-action@v1.1.0
+      if: github.event_name == 'push' || github.event.pull_request.merged
       with:
         # Path to Doxyfile
         doxyfile-path: "./Doxyfile" # default is ./Doxyfile
@@ -39,6 +40,7 @@ jobs:
         working-directory: "." # default is .
 
     - name: Get coverage
+      if: github.event_name == 'push' || github.event.pull_request.merged
       run: |
         mkdir build
         cd build
@@ -47,9 +49,11 @@ jobs:
         make -j2 testmamico
         ctest
         make coverage
+        mkdir -p ../docs/html # In case Doxygen did not run
         mv coverage ../docs/html/coverage
     
     - name: Deploy
+      if: github.event_name == 'push' || github.event.pull_request.merged
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
