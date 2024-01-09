@@ -5,6 +5,7 @@
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
+#include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/scenario/Scenario.h"
 #include "coupling/services/MultiMDCellService.h"
 #include "coupling/solvers/CouetteSolver.h"
@@ -28,8 +29,8 @@ using Log::global_log;
 #endif
 
 namespace coupling{
-namespace scenario {
-namespace precice {
+namespace scenario{
+namespace precice{
   class CouetteScenario;
 }
 }
@@ -61,7 +62,7 @@ public:
     }
   }
 
-  void run() {
+  void run () override {
     const unsigned int dim = 3;
     int rank;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -149,6 +150,10 @@ public:
         write2CSV(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices(), cycle, numberCells, domainOffset, cellSize, overLap, rank);
     }
   }
+
+  void init() override { throw std::runtime_error("not supported yet"); }
+  void runOneCouplingCycle(int cycle) override { throw std::runtime_error("not supported yet"); }
+  coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { throw std::runtime_error("not supported yet"); }
 
 private:
   tarch::la::Vector<3, double> getCellMidPoint(const tarch::la::Vector<3, int> cellIndex, const tarch::la::Vector<3, double> domainOffset,

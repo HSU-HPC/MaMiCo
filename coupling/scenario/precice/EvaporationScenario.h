@@ -64,7 +64,7 @@ public:
     }
   }
 
-  void run() {
+  void run() override {
     const unsigned int dim = 3;
     int rank;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -121,6 +121,7 @@ public:
     _preciceAdapter->setMeshes(_preciceInterface, domainOffset, cellSize);
     _preciceAdapter->initialize();
     int cycle = 0;
+#if defined(LS1_MARDYN)
     MettDeamonFeedrateDirector* mettDeamonFeedrateDirector = nullptr;
     std::list<PluginBase*>& plugins = *(global_simulation->getPluginList() );
     for (auto&& pit:plugins) {
@@ -130,17 +131,20 @@ public:
     }
     int updateFrequency = mettDeamonFeedrateDirector->getUpdateFreq();
     _preciceInterface->updateFeedrate(mettDeamonFeedrateDirector->getInitFeedrate());
+#endif
     while (_preciceAdapter->isCouplingOngoing()) {
       _preciceAdapter->readData(_preciceInterface);
       _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
       int numberOfMDTimesteps = _preciceAdapter->getMaxTimeStepSize()/mdConfig.getSimulationConfiguration().getDt();
       _instanceHandling->simulateTimesteps(numberOfMDTimesteps, mdStepCounter, *_multiMDCellService);
       mdStepCounter+=mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
+#if defined(LS1_MARDYN)
       if (mdStepCounter % updateFrequency == 0) {
         double feedrate = mettDeamonFeedrateDirector->getFeedrate();
         _preciceInterface->updateFeedrate(mettDeamonFeedrateDirector->getFeedrate());
         if (rank==0) std::cout << "updating CFD feedrate given by MDFD :" << feedrate << std::endl;
       }
+#endif
       _multiMDCellService->sendFromMD2Macro(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices());
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
       _preciceAdapter->writeData(_preciceInterface);
@@ -150,6 +154,10 @@ public:
         write2CSV(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices(), _preciceInterface, cycle, domainOffset, cellSize, rank);
     }
   }
+
+  void init() override { throw std::runtime_error("not supported yet"); }
+  void runOneCouplingCycle(int cycle) override { throw std::runtime_error("not supported yet"); }
+  coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { throw std::runtime_error("not supported yet"); }
 
 private:
   tarch::la::Vector<3, double> getCellMidPoint(const tarch::la::Vector<3, int> cellIndex, const tarch::la::Vector<3, double> domainOffset,

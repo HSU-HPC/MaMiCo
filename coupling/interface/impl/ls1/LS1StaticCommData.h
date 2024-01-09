@@ -1,9 +1,7 @@
 #ifndef LS1_STATIC_COMM_DATA_H_
 #define LS1_STATIC_COMM_DATA_H_
 
-//possibly bad practice? will phase out
 #include <string>
-#include <iostream>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif

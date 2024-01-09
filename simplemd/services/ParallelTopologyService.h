@@ -52,7 +52,7 @@ public:
                           const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary
 #if (MD_PARALLEL == MD_YES)
                           ,
-                          MPI_Comm communicator = MPI_COMM_WORLD
+                          MPI_Comm communicator
 #endif
   );
   ~ParallelTopologyService() {}

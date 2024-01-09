@@ -22,8 +22,8 @@
 
 #if defined(SIMPLE_MD)
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
-#include "coupling/solvers/CoupledMolecularDynamicsSimulation.h"
 #include "simplemd/LinkedCell.h"
+#include "simplemd/MolecularDynamicsSimulation.h"
 #define MY_LINKEDCELL simplemd::LinkedCell
 #elif defined(LAMMPS_MD) || defined(LAMMPS_DPD)
 #include "impl/LAMMPS/USER-MAMICO/mamico_cell.h"
@@ -108,43 +108,130 @@ public:
   virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) = 0;
 };
 
-/** define MD simulation from default MD code */
 #if defined(SIMPLE_MD)
-/** defines MD simulation from default MD code. Derived from the class
- *MDSimulation.
- *	@brief defines MD simulation from default MD code.
+/** defines a MDsimulation based on simplemd::MolecularDynamicsSimulation but for coupled MD simulations.
+ * Thus, the implementation of one timestep slightly differs from the one of the base class.
+ *	@brief defines MD simulation from default simple MD code.
  *  @author Philipp Neumann
  */
-class SimpleMDSimulation : public coupling::interface::MDSimulation {
+class SimpleMDSimulation : public coupling::interface::MDSimulation, public simplemd::MolecularDynamicsSimulation {
 public:
   SimpleMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
-      : coupling::interface::MDSimulation(), _molecularDynamicsSimulation(configuration) {}
+      : coupling::interface::MDSimulation(), simplemd::MolecularDynamicsSimulation(configuration), _macroscopicCellService(NULL), _couplingSwitchedOn(true) {}
+
   virtual ~SimpleMDSimulation() {}
 
-  virtual void switchOffCoupling() { _molecularDynamicsSimulation.switchOffCoupling(); }
-  virtual void switchOnCoupling() { _molecularDynamicsSimulation.switchOnCoupling(); }
+  virtual void switchOffCoupling() { _couplingSwitchedOn = false; }
+
+  virtual void switchOnCoupling() { _couplingSwitchedOn = true; }
+
   virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) {
     for (unsigned int t = firstTimestep; t < firstTimestep + numberTimesteps; t++) {
-      _molecularDynamicsSimulation.simulateOneCouplingTimestep(t);
+      simulateOneCouplingTimestep(t);
     }
   }
+
+  void simulateOneCouplingTimestep(const unsigned int& t) {
+    // if coupling is switched off, perform "normal" MD timestep
+    if (!_couplingSwitchedOn) {
+      simulateOneTimestep(t);
+      return;
+    }
+    if (_parallelTopologyService->isIdle()) {
+      return;
+    }
+
+    _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
+
+    // call to synchronise data in cells; needs to be at this point of the
+    // coupling algorithm as the particles need to be placed inside the correct
+    // sampling volumes (hence: after communication with neighbours and molecule
+    // updates); do it BEFORE quantities are manipulated as we can then also do
+    // some pre-processing here.
+    _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
+    // ------------ coupling step: distribute mass ---------------------
+    _macroscopicCellService->distributeMass(t);
+    // for isothermal simulations: apply thermostat
+    _macroscopicCellService->applyTemperatureToMolecules(t);
+
+    // ---------- from here: go on with usual MD algorithm
+    // ------------------------------
+
+    // compute forces. After this step, each molecule has received all force
+    // contributions from its neighbors.
+    _linkedCellService->iterateCellPairs(*_lennardJonesForce, false);
+
+    // distribute momentum -> some methods require modification of force terms,
+    // therefore we call it AFTER the force computation and before everything else
+    _macroscopicCellService->distributeMomentum(t);
+    // apply boundary forces
+    _macroscopicCellService->applyBoundaryForce(t);
+    // evaluate statistics
+    evaluateStatistics(t);
+
+    _boundaryTreatment->emptyGhostBoundaryCells();
+
+    // plot VTK output
+    if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
+      _vtkMoleculeWriter->setTimestep(t);
+      _moleculeService->iterateMolecules(*_vtkMoleculeWriter, false);
+    }
+
+// plot ADIOS2 output
+#if BUILD_WITH_ADIOS2
+    if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() != 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
+      _Adios2Writer->setTimestep(t);
+      _moleculeService->iterateMolecules(*_Adios2Writer, false);
+    }
+#endif
+
+    // write checkpoint
+    if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
+        (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
+      _moleculeService->writeCheckPoint(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
+    }
+    // reorganise memory if needed
+    if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
+        (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
+      _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
+    }
+    // plot also macroscopic cell information
+    _macroscopicCellService->plotEveryMicroscopicTimestep(t);
+
+    _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
+
+    // time integration. After this step, the velocities and the positions of the
+    // molecules have been updated.
+    _moleculeService->iterateMolecules(*_timeIntegrator, false);
+
+    // sort molecules into linked cells
+    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
+
+    if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
+      // if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
+    }
+  }
+
   virtual void sortMoleculesIntoCells() {
     // nop required, since the linked cells are very tightly linked to mamico
   }
 
   virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
-    _molecularDynamicsSimulation.setMacroscopicCellService(macroscopicCellService);
+    _macroscopicCellService = macroscopicCellService;
     // set the cell service also in singleton of mamico interface provider ->
     // typically not required in coupling, but makes the simulation state more
     // consistent compared to using LAMMPS
     coupling::interface::MamicoInterfaceProvider<simplemd::LinkedCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
         macroscopicCellService);
   }
-  virtual void init() { _molecularDynamicsSimulation.initServices(); }
+
+  virtual void init() { initServices(); }
+
   virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) {
-    _molecularDynamicsSimulation.initServices(multiMDService, localMDSimulation);
+    initServices(multiMDService, localMDSimulation);
   }
-  virtual void shutdown() { _molecularDynamicsSimulation.shutdownServices(); }
+
+  virtual void shutdown() { shutdownServices(); }
 
   virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) {
     getMoleculeService().writeCheckPoint(getParallelTopologyService(), filestem, t);
@@ -152,14 +239,18 @@ public:
 
   // function particularly needed to init MD solver interface -> should only be
   // called from factory
-  simplemd::BoundaryTreatment& getBoundaryTreatment() { return _molecularDynamicsSimulation.getBoundaryTreatment(); }
-  simplemd::services::ParallelTopologyService& getParallelTopologyService() { return _molecularDynamicsSimulation.getParallelTopologyService(); }
-  simplemd::services::MoleculeService& getMoleculeService() { return _molecularDynamicsSimulation.getMoleculeService(); }
-  simplemd::services::LinkedCellService& getLinkedCellService() { return _molecularDynamicsSimulation.getLinkedCellService(); }
-  const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() { return _molecularDynamicsSimulation.getMolecularPropertiesService(); }
+  simplemd::BoundaryTreatment& getBoundaryTreatment() { return *_boundaryTreatment; }
+  simplemd::services::ParallelTopologyService& getParallelTopologyService() { return *_parallelTopologyService; }
+  simplemd::services::MoleculeService& getMoleculeService() { return *_moleculeService; }
+  simplemd::services::LinkedCellService& getLinkedCellService() { return *_linkedCellService; }
+  const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() { return *_molecularPropertiesService; }
 
 private:
-  coupling::solvers::CoupledMolecularDynamicsSimulation _molecularDynamicsSimulation;
+  /** @brief the macroscopic cell service for the coupled md simulation  */
+  coupling::services::MacroscopicCellService<MD_DIM>* _macroscopicCellService;
+  /** @brief bool holding the current state of the coupling: true - coupled
+   * simulation and false - independent md simulation */
+  bool _couplingSwitchedOn;
 };
 #endif
 
@@ -779,8 +870,8 @@ private:
 class LS1MDSimulation : public coupling::interface::MDSimulation {
 private:
   const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
-  Simulation* simulation; //cannot name this _simulation, a global preprocessor marco with the name _simulation expands to *global_simulation
-  MamicoCoupling* ls1MamicoPlugin; //the plugin is only initialized after the simulation object reads xml, so cannot use it before that point
+  Simulation* simulation;          // cannot name this _simulation, a global preprocessor marco with the name _simulation expands to *global_simulation
+  MamicoCoupling* ls1MamicoPlugin; // the plugin is only initialized after the simulation object reads xml, so cannot use it before that point
   bool internalCouplingState;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm comm;
@@ -789,13 +880,15 @@ private:
 public:
   LS1MDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                    , MPI_Comm localComm
+                  ,
+                  MPI_Comm localComm
 #endif
-  ) : coupling::interface::MDSimulation(), _configuration(configuration) {
+                  )
+      : coupling::interface::MDSimulation(), _configuration(configuration) {
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     comm = localComm;
-    LS1StaticCommData::getInstance().setLocalCommunicator(comm); //needs to be done before creating the simulation object
+    LS1StaticCommData::getInstance().setLocalCommunicator(comm); // needs to be done before creating the simulation object
     const tarch::la::Vector<3, unsigned int> numberProcs = _configuration.getMPIConfiguration().getNumberOfProcesses();
     LS1StaticCommData::getInstance().setDomainGridDecompAtDim(0, numberProcs[0]);
     LS1StaticCommData::getInstance().setDomainGridDecompAtDim(1, numberProcs[1]);
@@ -809,22 +902,22 @@ public:
     ls1MamicoPlugin = nullptr;
   }
   virtual ~LS1MDSimulation() {
-    if(simulation != nullptr) {
+    if (simulation != nullptr) {
       delete simulation;
       simulation = nullptr;
     }
   }
   /** switches coupling on/off*/
-  virtual void switchOffCoupling() override { 
-    //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
+  virtual void switchOffCoupling() override {
+    // coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
     internalCouplingState = false;
-    if(ls1MamicoPlugin != nullptr)
+    if (ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOffCoupling();
   }
-  virtual void switchOnCoupling() override { 
-    //coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
+  virtual void switchOnCoupling() override {
+    // coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
     internalCouplingState = true;
-    if(ls1MamicoPlugin != nullptr)
+    if (ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOnCoupling();
   }
 
@@ -842,25 +935,23 @@ public:
   virtual void sortMoleculesIntoCells() override {}
 
   virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) override {
-    //coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
-    //    macroscopicCellService);
+    // coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
+    //     macroscopicCellService);
     global_simulation = simulation;
     PluginBase* searchedPlugin = simulation->getPlugin("MamicoCoupling");
-    if(searchedPlugin == nullptr)
-    {
+    if (searchedPlugin == nullptr) {
       std::cout << "ERROR: MaMiCo plugin not found!" << std::endl;
       exit(EXIT_FAILURE);
     }
     ls1MamicoPlugin = dynamic_cast<MamicoCoupling*>(searchedPlugin);
-    if(ls1MamicoPlugin != nullptr) {
+    if (ls1MamicoPlugin != nullptr) {
       ls1MamicoPlugin->setMamicoMacroscopicCellService(macroscopicCellService);
-    }
-    else {
+    } else {
       std::cout << "ERROR: Cast to Mamico plugin unsuccessful!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    //since this is the first time the plugin is accessed, set whatever preexisting coupling variable we had here for the first time
-    if(internalCouplingState)
+    // since this is the first time the plugin is accessed, set whatever preexisting coupling variable we had here for the first time
+    if (internalCouplingState)
       ls1MamicoPlugin->switchOnCoupling();
     else
       ls1MamicoPlugin->switchOffCoupling();

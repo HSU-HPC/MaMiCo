@@ -8,9 +8,9 @@
 #include "coupling/interface/impl/Espresso/EspressoMDMolecule.h"
 #include "coupling/interface/impl/Espresso/EspressoMDMoleculeIterator.h"
 #include "coupling/interface/impl/Espresso/EspressoMDSolverInterface.h"
-#include "test/integration/TestEspresso.h"
 #include "particle_data.hpp"
 #include "tarch/la/Vector.h"
+#include "test/integration/TestEspresso.h"
 
 /** test class to check addition and deletion of molecule in espresso. It derives from the scenario provided in TestEspresso.h,
  *  containing 8 particles in 2*2*2 domain. We call the add particle and delete particle methods provided in the interface classes

@@ -6,9 +6,9 @@
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
-#include "test/integration/Test.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
+#include "test/integration/Test.h"
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -37,7 +37,7 @@ private:
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
 
-    std::string fname = std::tmpnam(nullptr);
+    std::string fname = "mdconf.xml.tmp." + std::to_string(_rank);
     std::ofstream file(fname.c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CellIdxIterBench: Could not open file " << fname << "!" << std::endl;
@@ -91,7 +91,7 @@ private:
       exit(EXIT_FAILURE);
     }
 
-    fname = std::tmpnam(nullptr);
+    fname = "mamicoconf.xml.tmp." + std::to_string(_rank);
     file.open(fname.c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CellIdxIterBench: Could not open file " << fname << "!" << std::endl;

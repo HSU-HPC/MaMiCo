@@ -11,8 +11,8 @@
 #define FILTER_SEQUENTIAL true
 #define FILTER_PARALLEL false
 
-//#define DEBUG_SEQ_FILTER
-//#define DEBUG_SEQ_FILTER_VERBOSE
+// #define DEBUG_SEQ_FILTER
+// #define DEBUG_SEQ_FILTER_VERBOSE
 
 namespace coupling {
 namespace filtering {
