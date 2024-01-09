@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-08 12:10:48</td>
+            <td class="headerValue">2024-01-09 13:48:55</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">257</td>
@@ -76,7 +76,7 @@
 <a name="14"><span class="lineNum">      14 </span>            : </a>
 <a name="15"><span class="lineNum">      15 </span>            : #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
 <a name="16"><span class="lineNum">      16 </span><span class="lineCov">   10847872 :   if (!IndexingService&lt;dim&gt;::getInstance().isInitialized()) {</span></a>
-<a name="17"><span class="lineNum">      17 </span><span class="lineCov">         16 :     throw std::runtime_error(std::string(&quot;coupling::indexing::CellIndex::operator CellIndex(): IndexingService not initialized! (I.e. you attempted to convert &quot;</span></a>
+<a name="17"><span class="lineNum">      17 </span><span class="lineCov">          8 :     throw std::runtime_error(std::string(&quot;coupling::indexing::CellIndex::operator CellIndex(): IndexingService not initialized! (I.e. you attempted to convert &quot;</span></a>
 <a name="18"><span class="lineNum">      18 </span>            :                                          &quot;indices before defining their domains)&quot;));</a>
 <a name="19"><span class="lineNum">      19 </span>            :   }</a>
 <a name="20"><span class="lineNum">      20 </span>            : #endif</a>
@@ -85,7 +85,7 @@
 <a name="23"><span class="lineNum">      23 </span>            :   if constexpr (std::is_same_v&lt;CellIndex&lt;dim, converted_traits...&gt;, BaseIndex&lt;dim&gt;&gt;) {</a>
 <a name="24"><span class="lineNum">      24 </span>            :     // convert to vector if neccessary, then add offset, then construct a</a>
 <a name="25"><span class="lineNum">      25 </span>            :     // BaseIndex from that tarch::la::Vector</a>
-<a name="26"><span class="lineNum">      26 </span><span class="lineCov">   12695664 :     return BaseIndex&lt;dim&gt;{convertToVector&lt;dim, traits...&gt;(*this) + CellIndex&lt;dim, traits...&gt;::lowerBoundary.get()};</span></a>
+<a name="26"><span class="lineNum">      26 </span><span class="lineCov">    6347832 :     return BaseIndex&lt;dim&gt;{convertToVector&lt;dim, traits...&gt;(*this) + CellIndex&lt;dim, traits...&gt;::lowerBoundary.get()};</span></a>
 <a name="27"><span class="lineNum">      27 </span>            :   }</a>
 <a name="28"><span class="lineNum">      28 </span>            : </a>
 <a name="29"><span class="lineNum">      29 </span>            :   // conversion: BaseIndex -&gt; non-BaseIndex</a>
@@ -93,12 +93,12 @@
 <a name="31"><span class="lineNum">      31 </span>            :     // convert to scalar if neccessary + construct CellIndex&lt;dim,</a>
 <a name="32"><span class="lineNum">      32 </span>            :     // converted_traits...&gt;</a>
 <a name="33"><span class="lineNum">      33 </span>            :     if constexpr ((TraitOperations::is_same&lt;IndexTrait::vector&gt;(converted_traits) or ...)) {</a>
-<a name="34"><span class="lineNum">      34 </span><span class="lineCov">    4515940 :       return CellIndex&lt;dim, converted_traits...&gt;{(*this - CellIndex&lt;dim, converted_traits...&gt;::lowerBoundary).get()};</span></a>
+<a name="34"><span class="lineNum">      34 </span><span class="lineCov">     903188 :       return CellIndex&lt;dim, converted_traits...&gt;{(*this - CellIndex&lt;dim, converted_traits...&gt;::lowerBoundary).get()};</span></a>
 <a name="35"><span class="lineNum">      35 </span>            :     } else /* result index is not a vector */ {</a>
 <a name="36"><span class="lineNum">      36 </span>            :       // get scalar version of i_vec by first constructing a BaseIndex and then</a>
 <a name="37"><span class="lineNum">      37 </span>            :       // converting it</a>
 <a name="38"><span class="lineNum">      38 </span><span class="lineCov">    1791908 :       const unsigned int i_sca{// Get BaseIndex (i.e. traits=vector) and convert that to scalar</span></a>
-<a name="39"><span class="lineNum">      39 </span><span class="lineCov">    5375724 :                                convertToScalar&lt;dim, IndexTrait::vector, converted_traits...&gt;(CellIndex&lt;dim, IndexTrait::vector, converted_traits...&gt;(</span></a>
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">    1791908 :                                convertToScalar&lt;dim, IndexTrait::vector, converted_traits...&gt;(CellIndex&lt;dim, IndexTrait::vector, converted_traits...&gt;(</span></a>
 <a name="40"><span class="lineNum">      40 </span>            :                                    (*this - CellIndex&lt;dim, converted_traits...&gt;::lowerBoundary).get()))};</a>
 <a name="41"><span class="lineNum">      41 </span>            : </a>
 <a name="42"><span class="lineNum">      42 </span><span class="lineCov">    1791908 :       return CellIndex&lt;dim, converted_traits...&gt;{i_sca};</span></a>
@@ -109,7 +109,7 @@
 <a name="47"><span class="lineNum">      47 </span>            :   // call this -&gt; BaseIndex conversion</a>
 <a name="48"><span class="lineNum">      48 </span><span class="lineCov">    1804936 :   BaseIndex&lt;dim&gt; b{*this};</span></a>
 <a name="49"><span class="lineNum">      49 </span>            :   // call BaseIndex -&gt; target index type conversion</a>
-<a name="50"><span class="lineNum">      50 </span><span class="lineCov">    1804936 :   return CellIndex&lt;dim, converted_traits...&gt;{b};</span></a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineCov">    3609872 :   return CellIndex&lt;dim, converted_traits...&gt;{b};</span></a>
 <a name="51"><span class="lineNum">      51 </span>            : }</a>
 <a name="52"><span class="lineNum">      52 </span>            : </a>
 <a name="53"><span class="lineNum">      53 </span>            : // Overloading operator&lt;&lt; for CellIndex</a>
@@ -130,7 +130,7 @@
 <a name="68"><span class="lineNum">      68 </span>            : template &lt;unsigned int dim, IndexTrait... traits&gt;</a>
 <a name="69"><span class="lineNum">      69 </span><span class="lineCov">    2695096 : coupling::indexing::CellIndex&lt;dim, traits...&gt; operator-(const CellIndex&lt;dim, traits...&gt;&amp; i1, const CellIndex&lt;dim, traits...&gt;&amp; i2) {</span></a>
 <a name="70"><span class="lineNum">      70 </span>            :   if constexpr (std::is_same_v&lt;CellIndex&lt;dim, traits...&gt;, BaseIndex&lt;dim&gt;&gt;)</a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineCov">   10780384 :     return BaseIndex&lt;dim&gt;{i1.get() - i2.get()};</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineCov">    2695096 :     return BaseIndex&lt;dim&gt;{i1.get() - i2.get()};</span></a>
 <a name="72"><span class="lineNum">      72 </span>            :   else</a>
 <a name="73"><span class="lineNum">      73 </span>            :     return BaseIndex&lt;dim&gt;{i1} - BaseIndex&lt;dim&gt;{i2};</a>
 <a name="74"><span class="lineNum">      74 </span>            : }</a>

@@ -31,18 +31,18 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">13</td>
-            <td class="headerCovTableEntry">52</td>
-            <td class="headerCovTableEntryLo">25.0 %</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntry">56</td>
+            <td class="headerCovTableEntryLo">28.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-08 12:10:48</td>
+            <td class="headerValue">2024-01-09 13:48:55</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">2</td>
-            <td class="headerCovTableEntry">34</td>
-            <td class="headerCovTableEntryLo">5.9 %</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryLo">10.3 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -255,7 +255,7 @@
 <a name="193"><span class="lineNum">     193 </span><span class="lineNoCov">          0 :     for (unsigned int i = 0; i &lt; _numberCells; i++) {</span></a>
 <a name="194"><span class="lineNum">     194 </span><span class="lineNoCov">          0 :       a.handleCell(*(_linkedCells[i]), i);</span></a>
 <a name="195"><span class="lineNum">     195 </span>            :     }</a>
-<a name="196"><span class="lineNum">     196 </span>            :     a.endCellIteration();</a>
+<a name="196"><span class="lineNum">     196 </span><span class="lineNoCov">          0 :     a.endCellIteration();</span></a>
 <a name="197"><span class="lineNum">     197 </span><span class="lineNoCov">          0 :   }</span></a>
 <a name="198"><span class="lineNum">     198 </span>            : </a>
 <a name="199"><span class="lineNum">     199 </span>            :   /** This template function applies class A to all linked cells of this</a>
@@ -280,12 +280,12 @@
 <a name="218"><span class="lineNum">     218 </span>            :    *  @param blockSize represents the number of linked cells in all spatial</a>
 <a name="219"><span class="lineNum">     219 </span>            :    * directions.</a>
 <a name="220"><span class="lineNum">     220 </span>            :    */</a>
-<a name="221"><span class="lineNum">     221 </span>            :   unsigned int getNumberCells(tarch::la::Vector&lt;dim, unsigned int&gt; blockSize) const {</a>
-<a name="222"><span class="lineNum">     222 </span>            :     unsigned int num = 1;</a>
+<a name="221"><span class="lineNum">     221 </span><span class="lineCov">        108 :   unsigned int getNumberCells(tarch::la::Vector&lt;dim, unsigned int&gt; blockSize) const {</span></a>
+<a name="222"><span class="lineNum">     222 </span><span class="lineCov">        108 :     unsigned int num = 1;</span></a>
 <a name="223"><span class="lineNum">     223 </span><span class="lineCov">        432 :     for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
 <a name="224"><span class="lineNum">     224 </span><span class="lineCov">        324 :       num = num * blockSize[d];</span></a>
 <a name="225"><span class="lineNum">     225 </span>            :     }</a>
-<a name="226"><span class="lineNum">     226 </span>            :     return num;</a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineCov">        108 :     return num;</span></a>
 <a name="227"><span class="lineNum">     227 </span>            :   }</a>
 <a name="228"><span class="lineNum">     228 </span>            : </a>
 <a name="229"><span class="lineNum">     229 </span>            :   /** total number of linked cells contained in this macroscopic cell */</a>

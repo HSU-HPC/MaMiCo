@@ -37,12 +37,12 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-08 12:10:48</td>
+            <td class="headerValue">2024-01-09 13:48:55</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">9</td>
-            <td class="headerCovTableEntry">10</td>
-            <td class="headerCovTableEntryHi">90.0 %</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryHi">93.8 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -62,6 +62,14 @@
     <tr>
               <td class="coverFn"><a href="NumericalSolver.h.gcov.html#108">coupling::solvers::NumericalSolver::~NumericalSolver()</a></td>
               <td class="coverFnLo">0</td>
+            </tr>
+    <tr>
+              <td class="coverFn"><a href="NumericalSolver.h.gcov.html#208">coupling::solvers::NumericalSolver::getNumberProcesses() const</a></td>
+              <td class="coverFnHi">16</td>
+            </tr>
+    <tr>
+              <td class="coverFn"><a href="NumericalSolver.h.gcov.html#212">coupling::solvers::NumericalSolver::getAvgNumberLBCells() const</a></td>
+              <td class="coverFnHi">16</td>
             </tr>
     <tr>
               <td class="coverFn"><a href="NumericalSolver.h.gcov.html#446">coupling::solvers::NumericalSolver::plot(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;) const</a></td>
@@ -96,8 +104,24 @@
               <td class="coverFnHi">284</td>
             </tr>
     <tr>
+              <td class="coverFn"><a href="NumericalSolver.h.gcov.html#229">coupling::solvers::NumericalSolver::getAvgDomainSize(double, double, tarch::la::Vector&lt;3, unsigned int&gt;, int)</a></td>
+              <td class="coverFnHi">348</td>
+            </tr>
+    <tr>
               <td class="coverFn"><a href="NumericalSolver.h.gcov.html#334">coupling::solvers::NumericalSolver::getDomainSize(double, double, tarch::la::Vector&lt;3, unsigned int&gt;, int) const</a></td>
               <td class="coverFnHi">348</td>
+            </tr>
+    <tr>
+              <td class="coverFn"><a href="NumericalSolver.h.gcov.html#413">coupling::solvers::NumericalSolver::getParBuf(int, int, int, int) const</a></td>
+              <td class="coverFnHi">1103640</td>
+            </tr>
+    <tr>
+              <td class="coverFn"><a href="NumericalSolver.h.gcov.html#380">coupling::solvers::NumericalSolver::get(int, int, int) const</a></td>
+              <td class="coverFnHi">2542080</td>
+            </tr>
+    <tr>
+              <td class="coverFn"><a href="NumericalSolver.h.gcov.html#364">coupling::solvers::NumericalSolver::get(int) const</a></td>
+              <td class="coverFnHi">11734444</td>
             </tr>
   </table>
   <br>

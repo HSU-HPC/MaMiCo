@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">65</td>
+            <td class="headerCovTableEntry">68</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-08 12:10:48</td>
+            <td class="headerValue">2024-01-09 13:48:55</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -66,7 +66,7 @@
 <a name="4"><span class="lineNum">       4 </span><span class="lineNoCov">          0 : int coupling::filtering::FilterJunction&lt;dim, inputc&gt;::loadFiltersFromXML(</span></a>
 <a name="5"><span class="lineNum">       5 </span>            :     tinyxml2::XMLElement* sequenceNode) { // in our case &quot;junctionNode&quot; would be more precise</a>
 <a name="6"><span class="lineNum">       6 </span><span class="lineNoCov">          0 :   if (!sequenceNode)</span></a>
-<a name="7"><span class="lineNum">       7 </span>            :     return EXIT_FAILURE;</a>
+<a name="7"><span class="lineNum">       7 </span><span class="lineNoCov">          0 :     return EXIT_FAILURE;</span></a>
 <a name="8"><span class="lineNum">       8 </span>            : </a>
 <a name="9"><span class="lineNum">       9 </span>            :   // null if junction is empty</a>
 <a name="10"><span class="lineNum">      10 </span><span class="lineNoCov">          0 :   tinyxml2::XMLElement* currJunctorNode = sequenceNode-&gt;FirstChildElement();</span></a>
@@ -182,7 +182,7 @@
 <a name="120"><span class="lineNum">     120 </span>            :     // Unknown junctor identifier</a>
 <a name="121"><span class="lineNum">     121 </span>            :     else {</a>
 <a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;ERROR: Filter-Junction does not recognize junctor called &quot; &lt;&lt; currJunctorNode-&gt;Value() &lt;&lt; std::endl;</span></a>
-<a name="123"><span class="lineNum">     123 </span>            :       return EXIT_FAILURE;</a>
+<a name="123"><span class="lineNum">     123 </span><span class="lineNoCov">          0 :       return EXIT_FAILURE;</span></a>
 <a name="124"><span class="lineNum">     124 </span>            :     }</a>
 <a name="125"><span class="lineNum">     125 </span>            : </a>
 <a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :     coupling::filtering::FilterSequence&lt;dim&gt;::_filters.push_back(newjunctor);</span></a>
@@ -194,7 +194,7 @@
 <a name="132"><span class="lineNum">     132 </span>            :   printOutputCellVector();</a>
 <a name="133"><span class="lineNum">     133 </span>            : #endif</a>
 <a name="134"><span class="lineNum">     134 </span>            : </a>
-<a name="135"><span class="lineNum">     135 </span>            :   return 0;</a>
+<a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 :   return 0;</span></a>
 <a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 : }</span></a>
 </pre>
       </td>
