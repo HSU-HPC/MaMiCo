@@ -28,6 +28,7 @@ class LS1MDSolverInterfaceTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testAddAndDeleteParticle);
 	CPPUNIT_TEST(testGetCell);
 	CPPUNIT_TEST(testGetCellIterator);
+	CPPUNIT_TEST(testMassSync);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -314,8 +315,114 @@ public:
 				}//macZ
 			}//macY
 		}//macX
-
 	}
+
+	void testMassSync()
+	{
+		//setup
+		//create interface with macroscopic cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
+		tarch::la::Vector<3, double> macroscopicCellSize(10.0);
+		tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(2);
+		coupling::interface::LS1MDSolverInterface interface(macroscopicCellSize,linkedCellsPerMacroscopicCell);
+		int rank = 0;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
+		//create a particle, ensure that position is empty
+		tarch::la::Vector<3,double> position = {0.2,0.2,0.2};
+
+		//init
+		double bBoxMin[3];
+		double bBoxMax[3];
+		global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
+		for (int i = 0; i < 3; i++)
+		{
+			bBoxMin[i] = bBoxMin[i] - _testSimulation->getcutoffRadius();
+			bBoxMax[i] = bBoxMax[i] + _testSimulation->getcutoffRadius();
+		}
+		
+		ls1::LS1RegionWrapper wrapper(bBoxMin, bBoxMax, _testSimulation);
+
+		//initial mass sync to populate halos
+		interface.synchronizeMoleculesAfterMassModification();
+
+		//verify that position is empty
+		bool found = false;
+		while(wrapper.iteratorValid())
+		{
+			::Molecule* temp = wrapper.getParticleAtIterator();
+			if(temp->r(0) == position[0] && temp->r(1) == position[1] && temp->r(2) == position[2])
+			{
+				found = true;
+				break;
+			}
+			wrapper.iteratorNext();
+		}
+		CPPUNIT_ASSERT( !found );
+
+		//insert the particle
+		::Molecule blank;
+		coupling::interface::LS1Molecule tempParticle(&blank);
+		tempParticle.setPosition(position);
+		interface.addMoleculeToMDSimulation(tempParticle);
+
+		//create all shifted positions
+		std::array<tarch::la::Vector<3,double> ,7> shiftedPositions;
+		tarch::la::Vector<3,double> domainSpan = interface.getGlobalMDDomainSize();
+		for (int i = 1; i <= 7; i++)
+		{
+			int copy = i;
+			shiftedPositions[i-1][0] = position[0] + (copy & 1? domainSpan[0] : 0);
+			copy >>= 1;
+			shiftedPositions[i-1][1] = position[1] + (copy & 1? domainSpan[1] : 0);
+			copy >>= 1;
+			shiftedPositions[i-1][2] = position[2] + (copy & 1? domainSpan[2] : 0);
+		}
+		
+		//verify that the halo particle doesn't yet exist
+		for(tarch::la::Vector<3,double> curCheck : shiftedPositions)
+		{
+			wrapper.iteratorReset();
+			bool found = false;
+			while(wrapper.iteratorValid())
+			{
+				::Molecule* temp = wrapper.getParticleAtIterator();
+				if(temp->r(0) == curCheck[0] && temp->r(1) == curCheck[1] && temp->r(2) == curCheck[2])
+				{
+					found = true;
+					break;
+				}
+				wrapper.iteratorNext();
+			}
+			CPPUNIT_ASSERT( !found );
+		}
+
+		//sync
+		interface.synchronizeMoleculesAfterMassModification();
+
+		//verify that the particle now exists
+		for(tarch::la::Vector<3,double> curCheck : shiftedPositions)
+		{
+			wrapper.iteratorReset();
+			bool found = false;
+			while(wrapper.iteratorValid())
+			{
+				::Molecule* temp = wrapper.getParticleAtIterator();
+				if(temp->r(0) == curCheck[0] && temp->r(1) == curCheck[1] && temp->r(2) == curCheck[2])
+				{
+					found = true;
+					break;
+				}
+				wrapper.iteratorNext();
+			}
+			CPPUNIT_ASSERT( found == wrapper.isInRegion(curCheck) );
+		}
+
+		//delete the particle
+		interface.deleteMoleculeFromMDSimulation(tempParticle, wrapper);
+		interface.synchronizeMoleculesAfterMassModification(); //even though the interface no longer exists, sim does
+	}
+
 private:
 	Simulation* _testSimulation;
 	std::string _ls1ConfigFileName;
