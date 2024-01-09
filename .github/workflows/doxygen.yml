@@ -7,8 +7,6 @@ name: Doxygen Action
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 # Abort running jobs if a new one is triggered
 concurrency:
@@ -47,6 +45,7 @@ jobs:
         make -j2 testmamico
         ctest
         make coverage
+        mkdir -p ../docs/html # In case Doxygen did not run
         mv coverage ../docs/html/coverage
     
     - name: Deploy
