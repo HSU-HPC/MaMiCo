@@ -649,14 +649,14 @@ PYBIND11_MODULE(mamico, mamico) {
   coupling.def(
       "getMDSimulation",
       [](const simplemd::configurations::MolecularDynamicsConfiguration& c1, const coupling::configurations::MaMiCoConfiguration<3>& c2, void* comm) {
-        #if defined(LS1_MARDYN)
-          auto offset = c1.getDomainConfiguration().getGlobalDomainOffset();
-          coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
-          coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
-          coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
-          coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
-          
-        #endif
+#if defined(LS1_MARDYN)
+        auto offset = c1.getDomainConfiguration().getGlobalDomainOffset();
+        coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
+        coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
+        coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
+        coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
+
+#endif
         return coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(c1, c2, (MPI_Comm)comm);
       },
       "simpleMDConfig"_a, "mamicoConfig"_a, "localComm"_a, py::return_value_policy::take_ownership);
