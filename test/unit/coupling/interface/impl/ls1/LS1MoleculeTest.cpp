@@ -28,9 +28,7 @@ public:
     coupling::interface::LS1StaticCommData::getInstance().setLocalCommunicator(MPI_COMM_WORLD);
 #endif
   }
-  void tearDown() {
-
-  }
+  void tearDown() {}
   void testPosition() {
     ::Molecule ls1Molecule;
     coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);

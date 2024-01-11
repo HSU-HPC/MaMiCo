@@ -8,8 +8,8 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
-#include "tarch/la/Vector.h"
 #include "ls1/src/Domain.h"
+#include "tarch/la/Vector.h"
 
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
 
@@ -318,7 +318,7 @@ public:
 #endif
     std::stringstream countInfo;
     countInfo << "counted particles: " << particleCount << " actual number: " << _testSimulation->getDomain()->getglobalNumMolecules() << std::endl;
-    CPPUNIT_ASSERT_MESSAGE( countInfo.str(), particleCount == _testSimulation->getDomain()->getglobalNumMolecules());
+    CPPUNIT_ASSERT_MESSAGE(countInfo.str(), particleCount == _testSimulation->getDomain()->getglobalNumMolecules());
 
     // reset
     particleCount = 0;
@@ -336,7 +336,7 @@ public:
 #endif
     countInfo.clear();
     countInfo << "counted particles: " << particleCount << " actual number: " << _testSimulation->getDomain()->getglobalNumMolecules() << std::endl;
-    CPPUNIT_ASSERT_MESSAGE( countInfo.str(), particleCount == _testSimulation->getDomain()->getglobalNumMolecules());
+    CPPUNIT_ASSERT_MESSAGE(countInfo.str(), particleCount == _testSimulation->getDomain()->getglobalNumMolecules());
   }
 
 private:

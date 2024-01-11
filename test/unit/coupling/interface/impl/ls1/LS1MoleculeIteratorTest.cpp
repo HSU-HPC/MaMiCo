@@ -118,7 +118,6 @@ public:
                    firstMolecule.getVelocity() == moleculeIterator.getConst().getVelocity());
   }
   void testGet() {
-    std::cout<< "here" << std::endl;
     ls1::LS1RegionWrapper fullRegion(_testSimulation->getEnsemble()->domain()->rmin(), _testSimulation->getEnsemble()->domain()->rmax(), _testSimulation);
     coupling::interface::LS1MoleculeIterator moleculeIterator(fullRegion);
     moleculeIterator.begin();
