@@ -27,21 +27,9 @@ public:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     coupling::interface::LS1StaticCommData::getInstance().setLocalCommunicator(MPI_COMM_WORLD);
 #endif
-    _testSimulation = new Simulation();
-    global_simulation = _testSimulation;
-    _testSimulation->disableFinalCheckpoint();
-    _testSimulation->readConfigFile("../test/unit/coupling/interface/impl/ls1/ls1emptyconfig.xml");
-    //_testSimulation->getDomain()->thermostatOff();
-    //_testSimulation->getDomain()->setExplosionHeuristics(false);
-    // after this point the mamico plugin exists and is accessible
-    _testSimulation->prepare_start();
-    _testSimulation->preSimLoopSteps();
   }
   void tearDown() {
-    if (_testSimulation != nullptr) {
-      delete _testSimulation;
-      _testSimulation = nullptr;
-    }
+
   }
   void testPosition() {
     ::Molecule ls1Molecule;
@@ -64,7 +52,7 @@ public:
                 tarch::la::Vector<3, double> internalPosition{ls1Molecule.r(0), ls1Molecule.r(1), ls1Molecule.r(2)};
 
                 std::stringstream storedPosStr;
-                storedPosStr << "stored position assersion-> storedPosition: " << storedPosition << " position: " << position << std::endl;
+                storedPosStr << "stored position assertion-> storedPosition: " << storedPosition << " position: " << position << std::endl;
                 std::stringstream offsetCalcStr;
                 offsetCalcStr << "offset calculation-> storedPosition: " << storedPosition << " internal position: " << internalPosition
                               << " global offset: " << globalOffset << std::endl;
@@ -88,7 +76,7 @@ public:
 
           mamicoMolecule.setVelocity(velocity);
           tarch::la::Vector<3, double> storedVelocity = mamicoMolecule.getVelocity();
-          CPPUNIT_ASSERT_MESSAGE("velocity assersion", storedVelocity == velocity);
+          CPPUNIT_ASSERT_MESSAGE("velocity assertion", storedVelocity == velocity);
         }
       }
     }
@@ -104,7 +92,7 @@ public:
 
           mamicoMolecule.setForce(force);
           tarch::la::Vector<3, double> storedForce = mamicoMolecule.getForce();
-          CPPUNIT_ASSERT_MESSAGE("force assersion", storedForce == force);
+          CPPUNIT_ASSERT_MESSAGE("force assertion", storedForce == force);
         }
       }
     }
@@ -115,9 +103,6 @@ public:
     coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);
     CPPUNIT_ASSERT_THROW(mamicoMolecule.setPotentialEnergy(0.0), std::runtime_error);
   }
-
-private:
-  Simulation* _testSimulation;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(LS1MoleculeTest);

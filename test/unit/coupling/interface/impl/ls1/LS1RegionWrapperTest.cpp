@@ -9,6 +9,7 @@
 
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
 #include "tarch/la/Vector.h"
+#include "ls1/src/Domain.h"
 
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
 
@@ -26,7 +27,11 @@ class LS1RegionWrapperTest : public CppUnit::TestFixture {
 
 public:
   void setUp() {
+#ifdef MARDYN_AUTOPAS
+    _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/autopasgridconfig.xml";
+#else
     _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/ls1gridconfig.xml";
+#endif
     global_log = new Log::Logger(Log::None);
     global_log->set_mpi_output_root(0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, 0);
@@ -268,7 +273,7 @@ public:
           coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);
           mamicoMolecule.setPosition(position);
           double realPotential = mamicoMolecule.getPotentialEnergy();
-          CPPUNIT_ASSERT_MESSAGE("position assersion", mamicoMolecule.getPosition() == position);
+          CPPUNIT_ASSERT_MESSAGE("position assertion", mamicoMolecule.getPosition() == position);
           CPPUNIT_ASSERT_MESSAGE("potential assertion", pseudoPotential == realPotential);
         }
       }
@@ -294,12 +299,15 @@ public:
                    firstParticle->r(2) == fullRegion.getParticleAtIterator()->r(2));
   }
   void testIteration() {
-    ls1::LS1RegionWrapper fullRegion(_testSimulation->getEnsemble()->domain()->rmin(), _testSimulation->getEnsemble()->domain()->rmax(), _testSimulation);
+    double bBoxMin[3];
+    double bBoxMax[3];
+    global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
+    ls1::LS1RegionWrapper selfRegion(bBoxMin, bBoxMax, _testSimulation);
     long unsigned int particleCount = 0;
-    fullRegion.iteratorReset();
-    while (fullRegion.iteratorValid()) {
+    selfRegion.iteratorReset();
+    while (selfRegion.iteratorValid()) {
       particleCount++;
-      fullRegion.iteratorNext();
+      selfRegion.iteratorNext();
     }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -308,14 +316,16 @@ public:
     MPI_Allreduce(&particleCount, &globalCount, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
     particleCount = globalCount;
 #endif
-    CPPUNIT_ASSERT(particleCount == _testSimulation->getTotalNumberOfMolecules());
+    std::stringstream countInfo;
+    countInfo << "counted particles: " << particleCount << " actual number: " << _testSimulation->getDomain()->getglobalNumMolecules() << std::endl;
+    CPPUNIT_ASSERT_MESSAGE( countInfo.str(), particleCount == _testSimulation->getDomain()->getglobalNumMolecules());
 
     // reset
     particleCount = 0;
-    fullRegion.iteratorReset();
-    while (fullRegion.iteratorValid()) {
+    selfRegion.iteratorReset();
+    while (selfRegion.iteratorValid()) {
       particleCount++;
-      fullRegion.iteratorNext();
+      selfRegion.iteratorNext();
     }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -324,7 +334,9 @@ public:
     MPI_Allreduce(&particleCount, &globalCount, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
     particleCount = globalCount;
 #endif
-    CPPUNIT_ASSERT(particleCount == _testSimulation->getTotalNumberOfMolecules());
+    countInfo.clear();
+    countInfo << "counted particles: " << particleCount << " actual number: " << _testSimulation->getDomain()->getglobalNumMolecules() << std::endl;
+    CPPUNIT_ASSERT_MESSAGE( countInfo.str(), particleCount == _testSimulation->getDomain()->getglobalNumMolecules());
   }
 
 private:

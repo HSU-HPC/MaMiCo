@@ -6,6 +6,8 @@
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
 #include "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
 
+#include "ls1/src/Domain.h"
+
 #include <sstream>
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -23,7 +25,11 @@ class LS1MoleculeIteratorTest : public CppUnit::TestFixture {
 
 public:
   void setUp() {
-    _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/ls1fourparticleconfig.xml";
+#ifdef MARDYN_AUTOPAS
+    _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/autopasgridconfig.xml";
+#else
+    _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/ls1gridconfig.xml";
+#endif
     global_log = new Log::Logger(Log::None);
     global_log->set_mpi_output_root(0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, 0);
@@ -49,8 +55,12 @@ public:
     }
   }
   void testIteration() {
-    ls1::LS1RegionWrapper fullRegion(_testSimulation->getEnsemble()->domain()->rmin(), _testSimulation->getEnsemble()->domain()->rmax(), _testSimulation);
-    coupling::interface::LS1MoleculeIterator moleculeIterator(fullRegion);
+    // init
+    double bBoxMin[3];
+    double bBoxMax[3];
+    global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
+    ls1::LS1RegionWrapper selfRegion(bBoxMin, bBoxMax, _testSimulation);
+    coupling::interface::LS1MoleculeIterator moleculeIterator(selfRegion);
     long unsigned int particleCount = 0;
     moleculeIterator.begin();
     while (moleculeIterator.continueIteration()) {
@@ -108,6 +118,7 @@ public:
                    firstMolecule.getVelocity() == moleculeIterator.getConst().getVelocity());
   }
   void testGet() {
+    std::cout<< "here" << std::endl;
     ls1::LS1RegionWrapper fullRegion(_testSimulation->getEnsemble()->domain()->rmin(), _testSimulation->getEnsemble()->domain()->rmax(), _testSimulation);
     coupling::interface::LS1MoleculeIterator moleculeIterator(fullRegion);
     moleculeIterator.begin();

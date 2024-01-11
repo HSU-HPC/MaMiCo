@@ -32,7 +32,11 @@ class LS1MDSolverInterfaceTest : public CppUnit::TestFixture {
 
 public:
   void setUp() {
+#ifdef MARDYN_AUTOPAS
+    _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/autopasgridconfig.xml";
+#else
     _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/ls1gridconfig.xml";
+#endif
     global_log = new Log::Logger(Log::None);
     global_log->set_mpi_output_root(0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, 0);
