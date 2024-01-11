@@ -301,7 +301,10 @@ if(BUILD_WITH_ADIOS2)
   target_compile_definitions(mamico INTERFACE BUILD_WITH_ADIOS2)
 endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
-target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors -Wno-reorder)
+target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
+if("${MD_SIM}" STREQUAL "LS1_MARDYN") #to be removed when ls1 updates to use the latest autopas
+  target_compile_options(mamico INTERFACE -Wno-reorder)
+endif()
 if(BUILD_WITH_MPI)
   target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
@@ -655,7 +658,6 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/interface/impl/ls1/LS1MoleculeTest.cpp"
   "test/unit/coupling/interface/impl/ls1/LS1RegionWrapperTest.cpp"
   "test/unit/coupling/interface/impl/ls1/LS1StaticCommDataTest.cpp"
-  "test/unit/coupling/interface/MDSimulationFactoryTest.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
