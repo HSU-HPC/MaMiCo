@@ -28,9 +28,9 @@
 using Log::global_log;
 #endif
 
-namespace coupling{
-namespace scenario{
-namespace precice{
+namespace coupling {
+namespace scenario {
+namespace precice {
   class CouetteScenario;
 }
 }
@@ -124,6 +124,10 @@ public:
     double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
     while (_preciceAdapter->isCouplingOngoing()) {
+      if (_preciceAdapter->requiresWritingCheckpoint()) {
+        std::cout << "Writing checkpoint" << std::endl;
+        _instanceHandling->writeCheckpoint("checkpoint_restart_" + rank, 0);
+      }
       _preciceAdapter->readData(_preciceInterface);
       _multiMDCellService->sendFromMacro2MD(_preciceAdapter->getM2mCells(), _preciceAdapter->getM2mCellIndices());
       if (!scenarioConfig.couetteAnalytical) {
@@ -145,9 +149,13 @@ public:
       }
       _preciceAdapter->writeData(_preciceInterface);
       _preciceAdapter->advance(mamico_dt);
-      cycle++;
-      if (_preciceAdapter->getm2MCells().size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
-        write2CSV(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices(), cycle, numberCells, domainOffset, cellSize, overLap, rank);
+      if (_preciceAdapter->requiresReadingCheckpoint()) {
+        std::cout << "Reading checkpoint" << std::endl;
+      } else {
+        cycle++;
+        if (_preciceAdapter->getm2MCells().size() != 0 && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
+          write2CSV(_preciceAdapter->getm2MCells(), _preciceAdapter->getm2MCellIndices(), cycle, numberCells, domainOffset, cellSize, overLap, rank);
+      } 
     }
   }
 
@@ -236,18 +244,19 @@ private:
     const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
     const unsigned int _overlap;
     const double _massCell;
-    const bool _twoWayCoupling;
     const std::string _M2mMeshName;
     const std::string _m2MMeshName;
-    const coupling::preciceadapter::Data _M2mVelocity;
-    const coupling::preciceadapter::Data _m2MVelocity;
 
   public:
     PreciceInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell, const bool twoWayCoupling)
-        : _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _massCell{massCell}, _twoWayCoupling(twoWayCoupling),
-        _M2mMeshName("mamico-M2m-mesh"), _m2MMeshName("mamico-m2M-mesh"),
-        _M2mVelocity{"VelocityMacro", coupling::preciceadapter::DataType::vector}, 
-        _m2MVelocity{"VelocityMicro", coupling::preciceadapter::DataType::vector} {}
+        : coupling::preciceadapter::PreciceInterface<3>(twoWayCoupling), 
+        _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _massCell{massCell},
+        _M2mMeshName("mamico-M2m-mesh"), _m2MMeshName("mamico-m2M-mesh") {
+      coupling::preciceadapter::PreciceInterface<3>::addData(
+        _M2mMeshName, coupling::preciceadapter::Data{"VelocityMacro", coupling::preciceadapter::DataType::vector});
+      coupling::preciceadapter::PreciceInterface<3>::addData(
+        _m2MMeshName, coupling::preciceadapter::Data{"VelocityMicro", coupling::preciceadapter::DataType::vector});      
+    }
 
     virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
       bool rcv = true;
@@ -290,68 +299,17 @@ private:
     }
 
     std::string getMDToMacroscopicSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-      return "";
-    }
-
-    tarch::la::Vector<3, double> getMacroscopicToMDSolverMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-      return tarch::la::Vector<3, double>(0.0);
-    }
-
-    tarch::la::Vector<3, double> getMDToMacroscopicSolverMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-      return tarch::la::Vector<3, double>(0.0);
-    }
-
-    bool twoWayCoupling() override {
-      return _twoWayCoupling;
-    }
-
-    std::vector<coupling::preciceadapter::Data> getData(std::string meshName) override {
-      std::vector<coupling::preciceadapter::Data> vector;
-      if (meshName == _M2mMeshName) {
-        vector.push_back(_M2mVelocity);
-      } else if (meshName == _m2MMeshName) {
-        vector.push_back(_m2MVelocity);
-      } else {
-        std::cout << "PreciceInterface::getData: no mesh named " << meshName << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      return vector;
-    }
-
-    coupling::preciceadapter::Data getData(std::string meshName, std::string dataName) override {
-      coupling::preciceadapter::Data data;
-      if (meshName == _M2mMeshName && dataName == _M2mVelocity.name) {
-        data=_M2mVelocity;
-      } else if (meshName == _m2MMeshName && dataName == _m2MVelocity.name) {
-        data=_m2MVelocity;
-      } else {
-        std::cout << "PreciceInterface::getData: no mesh named " << meshName << " or no data named " << dataName << " or this data does not belong to this mesh" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      return data;
+      return _m2MMeshName;
     }
 
     void readVectorData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<3>* const cell, const double vx, const double vy, const double vz) override {
-      if (meshName != _M2mMeshName || dataName != _M2mVelocity.name) {
-        std::cout << "PreciceInterface::readVectorData: incorrect mesh name " << meshName << " or data name " << dataName << std::endl;
-        exit(EXIT_FAILURE);
-      }
       tarch::la::Vector<3, double> momentum{vx, vy, vz};
       momentum=momentum*_massCell;
       cell->setMicroscopicMass(_massCell);
       cell->setMicroscopicMomentum(momentum);
     }
 
-    void readScalarData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<3>* const cell, const double v) override {
-      std::cout << "PreciceInterface::readScalarData: should not be used" << std::endl;
-      exit(EXIT_FAILURE); 
-    }
-
     void writeVectorData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<3>* const cell, double& vx, double& vy, double& vz) {
-      if (meshName != _m2MMeshName || dataName != _m2MVelocity.name) {
-        std::cout << "PreciceInterface::readData: incorrect mesh name " << meshName << " or data name " << dataName << std::endl;
-        exit(EXIT_FAILURE)   ;
-      }
       tarch::la::Vector<3, double> velocity;
       if (cell->getMacroscopicMass() != 0.0) {
         velocity = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();
@@ -359,11 +317,6 @@ private:
       vx=velocity[0];
       vy=velocity[1];
       vz=velocity[2];
-    }
-
-    void writeScalarData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<3>* const cell, double& v) {
-      std::cout << "PreciceInterface::readScalarData: should not be used" << std::endl;
-      exit(EXIT_FAILURE); 
     }
   };
 
