@@ -13,8 +13,6 @@ class IndexConversionTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(IndexConversionTest);
   CPPUNIT_TEST(test3D);
   CPPUNIT_TEST(test2D);
-  //CPPUNIT_TEST(testUniqueRanks2D); // TODO there are no tests in here at all, just debug output
-  //CPPUNIT_TEST(testUniqueRanks3D); // So it does not make any sense to execute it at all
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -34,24 +32,6 @@ public:
     tarch::la::Vector<2, double> offset2D(0.0);
     std::cout << "Run 2D test..." << std::endl;
     _test2D(testGlobalNumberCells2D, testNumberProcesses2D, size2D, offset2D);
-  }
-
-  void testUniqueRanks3D() {
-    std::cout << "Run 3D test unique ranks..." << std::endl;
-    tarch::la::Vector<3, unsigned int> testGlobalNumberCells3D = tarch::la::Vector<3, unsigned int>(5);
-    tarch::la::Vector<3, unsigned int> testNumberProcesses3D = tarch::la::Vector<3, unsigned int>(2);
-    tarch::la::Vector<3, double> size3D(1.0);
-    tarch::la::Vector<3, double> offset3D(0.0);
-    _testUniqueRanks<3>(testGlobalNumberCells3D, testNumberProcesses3D, size3D, offset3D);
-  }
-
-  void testUniqueRanks2D() {
-    std::cout << "Run 2D test unique ranks..." << std::endl;
-    tarch::la::Vector<2, unsigned int> testGlobalNumberCells2D = tarch::la::Vector<2, unsigned int>(10);
-    tarch::la::Vector<2, unsigned int> testNumberProcesses2D = tarch::la::Vector<2, unsigned int>(3);
-    tarch::la::Vector<2, double> size2D(1.0);
-    tarch::la::Vector<2, double> offset2D(0.0);
-    _testUniqueRanks<2>(testGlobalNumberCells2D, testNumberProcesses2D, size2D, offset2D);
   }
 
 private:
@@ -170,22 +150,6 @@ private:
         } // number of processes
       }
     } // global number of macroscopic cells
-  }
-
-  template <unsigned int dim>
-  void _testUniqueRanks(const tarch::la::Vector<dim, unsigned int>& testGlobalNumberCells, const tarch::la::Vector<dim, unsigned int>& testNumberProcesses,
-                        const tarch::la::Vector<dim, double>& size, const tarch::la::Vector<dim, double>& offset) {
-    const coupling::IndexConversion<dim> indexConversion(testGlobalNumberCells, testNumberProcesses, 0, size, offset, coupling::paralleltopology::XYZ);
-    const tarch::la::Vector<3, unsigned int> end = coupling::initRange<dim>(testGlobalNumberCells + tarch::la::Vector<dim, unsigned int>(2));
-    tarch::la::Vector<3, unsigned int> loop(0);
-    for (loop[2] = 0; loop[2] < end[2]; loop[2]++) {
-      for (loop[1] = 0; loop[1] < end[1]; loop[1]++) {
-        for (loop[0] = 0; loop[0] < end[0]; loop[0]++) {
-          std::cout << "Unique rank for cell " << coupling::initDimVector<dim>(loop) << ": "
-                    << indexConversion.getUniqueRankForMacroscopicCell(coupling::initDimVector<dim>(loop)) << std::endl;
-        }
-      }
-    }
   }
 };
 

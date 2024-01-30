@@ -17,13 +17,13 @@ template <unsigned int dim> class ZYXTopology;
 /** In the ZYXTopology, the process coordinates convert to a rank as
  *  rank = x*ny*nz + y*nz + z = z + nz*(y+ny*x) (for 3D).
  *  topologyOffset is used for linearized access of multiple MD instances.
- *Derived class from the class ParallelTopology. E.g. assuming
- *ParallelTopologyType = XYZ and there is a cubic domain, splitted into 8
- *sub-domains (2 sub-domains in each dimension). Then the ordring of the MPI
- *processes is: Rank=0 for x=0,y=0,z=0. Rank=1 for x=1,y=0,z=0. Rank=2 for
- *x=0,y=1,z=0. Rank=3 for x=1,y=1,z=0. Rank=4 for x=0,y=0,z=1. Rank=5 for
- *x=1,y=0,z=1. Rank=6 for x=0,y=1,z=1. Rank=7 for x=1,y=1,z=1.
- *	@brief The XYZTopology orders the ranks in z-y-x manner.
+ *  Derived class from the class ParallelTopology. E.g. assuming
+ *  ParallelTopologyType = XYZ and there is a cubic domain, splitted into 8
+ *  sub-domains (2 sub-domains in each dimension). Then the ordering of the MPI
+ *  processes is: Rank=0 for x=0,y=0,z=0. Rank=1 for x=0,y=0,z=1. Rank=2 for
+ *  x=0,y=1,z=0. Rank=3 for x=0,y=1,z=1. Rank=4 for x=1,y=0,z=0. Rank=5 for
+ *  x=1,y=0,z=1. Rank=6 for x=1,y=1,z=0. Rank=7 for x=1,y=1,z=1.
+ *	@brief The ZYXTopology orders the ranks in z-y-x manner.
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  *	@todo Philipp could you please take a look on this class
@@ -39,25 +39,17 @@ public:
   virtual ~ZYXTopology() {}
 
   tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const {
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    unsigned int intNumberProcesses = _numberProcesses[0];
-    for (unsigned int d = 1; d < dim; d++) {
-      intNumberProcesses = intNumberProcesses * _numberProcesses[d];
-    }
-    if ((rank < _topologyOffset) || (rank > _topologyOffset + intNumberProcesses - 1)) {
-      std::cout << "Warning "
-                   "coupling::paralleltopology::ZYXTopology::"
-                   "getProcessCoordinates(): rank out of range!"
-                << std::endl;
-      std::cout << "Offset=" << _topologyOffset << ", rank=" << rank << std::endl;
-    }
-#endif
     tarch::la::Vector<dim, unsigned int> processCoordinates(0);
     unsigned int help = rank - _topologyOffset;
     for (unsigned int d = 0; d < dim; d++) {
       processCoordinates[d] = help / _divisionFactor4NumberProcesses[d];
       help = help - processCoordinates[d] * _divisionFactor4NumberProcesses[d];
     }
+#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+std::cout << "Rank=" << rank
+              << " corresponds to process coordinates=" << processCoordinates
+              << std::endl;
+#endif
     return processCoordinates;
   }
 
