@@ -32,16 +32,16 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">29</td>
+            <td class="headerCovTableEntry">28</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-09 13:48:55</td>
+            <td class="headerValue">2024-01-30 14:19:36</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">5</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
@@ -148,7 +148,7 @@
 <a name="86"><span class="lineNum">      86 </span><span class="lineNoCov">          0 :     bool inner = true;</span></a>
 <a name="87"><span class="lineNum">      87 </span><span class="lineNoCov">          0 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
 <a name="88"><span class="lineNum">      88 </span><span class="lineNoCov">          0 :       inner = inner &amp;&amp; (globalCellIndex[d] &gt; _innermostLayer &amp;&amp; globalCellIndex[d] &lt; 1 + globalNumberMacroscopicCells[d] - _innermostLayer);</span></a>
-<a name="89"><span class="lineNum">      89 </span><span class="lineNoCov">          0 :     bool outer = false;</span></a>
+<a name="89"><span class="lineNum">      89 </span>            :     bool outer = false;</a>
 <a name="90"><span class="lineNum">      90 </span><span class="lineNoCov">          0 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
 <a name="91"><span class="lineNum">      91 </span><span class="lineNoCov">          0 :       outer = outer || (globalCellIndex[d] &lt; _outermostLayer || globalCellIndex[d] &gt; 1 + globalNumberMacroscopicCells[d] - _outermostLayer);</span></a>
 <a name="92"><span class="lineNum">      92 </span><span class="lineNoCov">          0 :     return !inner &amp;&amp; !outer;</span></a>

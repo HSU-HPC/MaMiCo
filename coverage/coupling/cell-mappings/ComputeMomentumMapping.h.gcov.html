@@ -37,12 +37,12 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-09 13:48:55</td>
+            <td class="headerValue">2024-01-30 14:19:36</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">1</td>
-            <td class="headerCovTableEntry">7</td>
-            <td class="headerCovTableEntryLo">14.3 %</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">25.0 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -89,7 +89,7 @@
 <a name="27"><span class="lineNum">      27 </span>            :    *    @param mdSolverInterface</a>
 <a name="28"><span class="lineNum">      28 </span>            :    */</a>
 <a name="29"><span class="lineNum">      29 </span><span class="lineCov">          8 :   ComputeMomentumMapping(coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const mdSolverInterface)</span></a>
-<a name="30"><span class="lineNum">      30 </span><span class="lineCov">          8 :       : _mdSolverInterface(mdSolverInterface), _momentum(0.0), _meanVelocity(0.0), _particleCounter(0) {}</span></a>
+<a name="30"><span class="lineNum">      30 </span><span class="lineCov">         16 :       : _mdSolverInterface(mdSolverInterface), _momentum(0.0), _meanVelocity(0.0), _particleCounter(0) {}</span></a>
 <a name="31"><span class="lineNum">      31 </span>            : </a>
 <a name="32"><span class="lineNum">      32 </span>            :   /** Destructor */</a>
 <a name="33"><span class="lineNum">      33 </span><span class="lineNoCov">          0 :   ~ComputeMomentumMapping() {}</span></a>

@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">104</td>
+            <td class="headerCovTableEntry">102</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-09 13:48:55</td>
+            <td class="headerValue">2024-01-30 14:19:36</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -271,7 +271,7 @@
 <a name="209"><span class="lineNum">     209 </span>            :                                                                                                     const unsigned int index) {</a>
 <a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, unsigned int&gt; globalIndex(</span></a>
 <a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :       coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;::_indexConversion.convertLocalToGlobalVectorCellIndex(</span></a>
-<a name="212"><span class="lineNum">     212 </span><span class="lineNoCov">          0 :           coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;::_indexConversion.getLocalVectorCellIndex(index)));</span></a>
+<a name="212"><span class="lineNum">     212 </span>            :           coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;::_indexConversion.getLocalVectorCellIndex(index)));</a>
 <a name="213"><span class="lineNum">     213 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberCells(</span></a>
 <a name="214"><span class="lineNum">     214 </span><span class="lineNoCov">          0 :       coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;::_indexConversion.getGlobalNumberMacroscopicCells());</span></a>
 <a name="215"><span class="lineNum">     215 </span>            : </a>
@@ -303,7 +303,7 @@
 <a name="241"><span class="lineNum">     241 </span>            : </a>
 <a name="242"><span class="lineNum">     242 </span>            :   // compute mass flux for each boundary</a>
 <a name="243"><span class="lineNum">     243 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="244"><span class="lineNum">     244 </span><span class="lineNoCov">          0 :     double surface = 1.0;</span></a>
+<a name="244"><span class="lineNum">     244 </span>            :     double surface = 1.0;</a>
 <a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 :     for (unsigned int e = 0; e &lt; d; e++) {</span></a>
 <a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :       surface = surface * meshsize[e];</span></a>
 <a name="247"><span class="lineNum">     247 </span>            :     }</a>

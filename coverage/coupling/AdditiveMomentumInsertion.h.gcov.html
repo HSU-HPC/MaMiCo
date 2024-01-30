@@ -32,16 +32,16 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">18</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-09 13:48:55</td>
+            <td class="headerValue">2024-01-30 14:19:36</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">4</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
@@ -127,7 +127,7 @@
 <a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 :     if (tarch::la::dot(momentum, momentum) != 0.0) {</span></a>
 <a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :       coupling::cellmappings::ComputeMassMapping&lt;LinkedCell, dim&gt; computeMassMapping(coupling::MomentumInsertion&lt;LinkedCell, dim&gt;::_mdSolverInterface);</span></a>
 <a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :       cell.iterateConstCells(computeMassMapping);</span></a>
-<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :       unsigned int numberParticles = computeMassMapping.getNumberOfParticles();</span></a>
+<a name="68"><span class="lineNum">      68 </span>            :       unsigned int numberParticles = computeMassMapping.getNumberOfParticles();</a>
 <a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :       coupling::cellmappings::SetMomentumMapping&lt;LinkedCell, dim&gt; setMomentumMapping(zeroMomentum, momentum, numberParticles,</span></a>
 <a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :                                                                                      coupling::MomentumInsertion&lt;LinkedCell, dim&gt;::_mdSolverInterface);</span></a>
 <a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :       cell.iterateCells(setMomentumMapping);</span></a>

@@ -32,17 +32,17 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">9</td>
-            <td class="headerCovTableEntry">14</td>
-            <td class="headerCovTableEntryLo">64.3 %</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-09 13:48:55</td>
+            <td class="headerValue">2024-01-30 14:19:36</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">3</td>
-            <td class="headerCovTableEntry">6</td>
-            <td class="headerCovTableEntryLo">50.0 %</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -1095,7 +1095,7 @@
 <a name="1033"><span class="lineNum">    1033 </span><span class="lineCov">          4 :   XMLError QueryIntAttribute(const char *name, int *value) const {</span></a>
 <a name="1034"><span class="lineNum">    1034 </span><span class="lineCov">          4 :     const XMLAttribute *a = FindAttribute(name);</span></a>
 <a name="1035"><span class="lineNum">    1035 </span><span class="lineCov">          4 :     if (!a) {</span></a>
-<a name="1036"><span class="lineNum">    1036 </span><span class="lineNoCov">          0 :       return XML_NO_ATTRIBUTE;</span></a>
+<a name="1036"><span class="lineNum">    1036 </span>            :       return XML_NO_ATTRIBUTE;</a>
 <a name="1037"><span class="lineNum">    1037 </span>            :     }</a>
 <a name="1038"><span class="lineNum">    1038 </span><span class="lineCov">          4 :     return a-&gt;QueryIntValue(value);</span></a>
 <a name="1039"><span class="lineNum">    1039 </span>            :   }</a>
@@ -1119,7 +1119,7 @@
 <a name="1057"><span class="lineNum">    1057 </span><span class="lineCov">          4 :   XMLError QueryDoubleAttribute(const char *name, double *value) const {</span></a>
 <a name="1058"><span class="lineNum">    1058 </span><span class="lineCov">          4 :     const XMLAttribute *a = FindAttribute(name);</span></a>
 <a name="1059"><span class="lineNum">    1059 </span><span class="lineCov">          4 :     if (!a) {</span></a>
-<a name="1060"><span class="lineNum">    1060 </span><span class="lineNoCov">          0 :       return XML_NO_ATTRIBUTE;</span></a>
+<a name="1060"><span class="lineNum">    1060 </span>            :       return XML_NO_ATTRIBUTE;</a>
 <a name="1061"><span class="lineNum">    1061 </span>            :     }</a>
 <a name="1062"><span class="lineNum">    1062 </span><span class="lineCov">          4 :     return a-&gt;QueryDoubleValue(value);</span></a>
 <a name="1063"><span class="lineNum">    1063 </span>            :   }</a>
