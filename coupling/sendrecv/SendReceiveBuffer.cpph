@@ -27,6 +27,22 @@ template <class MacroscopicCell, unsigned int dim> coupling::sendrecv::SendRecei
     delete[] _requests;
     _requests = NULL;
   }
+  for (MPI_Comm& subcomm : _subComms) {
+    if (subcomm != MPI_COMM_NULL) {
+      MPI_Comm_free(&subcomm);
+      subcomm = MPI_COMM_NULL;
+    }
+  }
+  for (MPI_Group& subgroup : _subGroups) {
+    if (subgroup != MPI_GROUP_NULL) {
+      MPI_Group_free(&subgroup);
+      subgroup = MPI_GROUP_NULL;
+    }
+  }
+  _subComms.clear();
+  _subGroups.clear();
+
+  MPI_Op_free(&elementWiseSumOperation);
 #endif
 }
 
@@ -299,6 +315,20 @@ template <class MacroscopicCell, unsigned int dim> void coupling::sendrecv::Send
     exit(EXIT_FAILURE);
   }
   delete[] _requests;
+  /*
+  for (MPI_Comm& subcomm : _subComms) {
+    if (subcomm != MPI_COMM_NULL) {
+      MPI_Comm_free(&subcomm);
+      subcomm = MPI_COMM_NULL;
+    }
+  }
+  for (MPI_Group& subgroup : _subGroups) {
+    if (subgroup != MPI_GROUP_NULL) {
+      MPI_Group_free(&subgroup);
+      subgroup = MPI_GROUP_NULL;
+    }
+  }
+  */
   _requests = nullptr;
   _requestsAllocated = false;
 #endif
