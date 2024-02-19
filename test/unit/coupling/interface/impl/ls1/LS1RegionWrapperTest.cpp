@@ -5,10 +5,12 @@
 #include <ctime>
 #include <vector>
 
+#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
-
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
+
 #include "ls1/src/Domain.h"
+#include "ls1/src/parallel/DomainDecompBase.h"
 #include "tarch/la/Vector.h"
 
 #define MY_LINKEDCELL ls1::LS1RegionWrapper

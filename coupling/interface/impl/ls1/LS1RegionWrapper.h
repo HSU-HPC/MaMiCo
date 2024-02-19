@@ -8,12 +8,15 @@
 #include "ls1/src/Simulation.h"
 #include "ls1/src/ensemble/EnsembleBase.h"
 #include "ls1/src/molecules/Molecule.h"
-#include "ls1/src/parallel/DomainDecompMPIBase.h"
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/particleContainer/RegionParticleIterator.h"
 
 #include "coupling/interface/Molecule.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+
+#ifdef ENABLE_MPI
+#include "ls1/src/parallel/DomainDecompMPIBase.h"
+#endif
 
 #include "tarch/la/Vector.h"
 

@@ -4,6 +4,7 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 // add simulation in includes! dont rely on include chain!
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
+#include "coupling/CouplingMDDefinitions.h"
 
 #include <sstream>
 

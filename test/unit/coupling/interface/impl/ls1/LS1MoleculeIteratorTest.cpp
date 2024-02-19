@@ -3,10 +3,12 @@
 
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 
+#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/interface/impl/ls1/LS1Molecule.h"
 #include "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
 
 #include "ls1/src/Domain.h"
+#include "ls1/src/parallel/DomainDecompBase.h"
 
 #include <sstream>
 
