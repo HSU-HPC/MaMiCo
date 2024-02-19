@@ -43,6 +43,12 @@ message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Enable the MPI library for parallel build, default is OFF
 option(BUILD_WITH_MPI "Enable the MPI library for parallel build, default is OFF." OFF)
+if(BUILD_WITH_MPI)
+  option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
+  if(USE_COLLECTIVE_MPI)
+    add_compile_definitions(USE_COLLECTIVE_MPI)
+  endif()
+endif()
 message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 # Dimension for MD build, default is MDDim3
 set(MDDim MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")

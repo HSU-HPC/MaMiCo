@@ -483,8 +483,11 @@ protected:
       fillSendBuffer(_cfg.density, *_couetteSolver, _multiMDCellService->getIndexConversion(), _buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
     }
     if (_cfg.macro2Md) {
-      // _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer); /* NOTE: replaced by collective operation below */
+#ifdef USE_COLLECTIVE_MPI
       _multiMDCellService->bcastFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
+#else
+      _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
+#endif
       // std::cout << "Finish _multiMDCellService->sendFromMacro2MD " <<
       // std::endl;
     }
@@ -570,9 +573,11 @@ protected:
 
       // send back data from MD instances and merge it
       if (_cfg.md2Macro) {
-        //_tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer); /* NOTE: replaced by collective operation
-        // below */
+#ifdef USE_COLLECTIVE_MPI
         _tv.filter += _multiMDCellService->reduceFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+#else
+        _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+#endif
         // std::cout << "Finish _multiMDCellService->sendFromMD2Macro " <<
         // std::endl;
       }
@@ -583,9 +588,11 @@ protected:
         //_buf does not get used here: Instead, the synthetic MD in the
         // SYNTHETICMD_SEQUENCE generates values. To prevent segfaults, it has
         // to be nonempty, though.
-        //_tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer); /* NOTE: replaced by collective operation
-        // below */
+#ifdef USE_COLLECTIVE_MPI
         _tv.filter += _multiMDCellService->reduceFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+#else
+        _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+#endif
       }
     }
   }
