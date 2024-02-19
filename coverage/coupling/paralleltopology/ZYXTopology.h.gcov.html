@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-02-19 16:30:57</td>
+            <td class="headerValue">2024-02-19 21:44:30</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">8</td>
@@ -108,41 +108,39 @@
 <a name="46"><span class="lineNum">      46 </span><span class="lineCov">       1600 :       help = help - processCoordinates[d] * _divisionFactor4NumberProcesses[d];</span></a>
 <a name="47"><span class="lineNum">      47 </span>            :     }</a>
 <a name="48"><span class="lineNum">      48 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="49"><span class="lineNum">      49 </span>            : std::cout &lt;&lt; &quot;Rank=&quot; &lt;&lt; rank</a>
-<a name="50"><span class="lineNum">      50 </span>            :               &lt;&lt; &quot; corresponds to process coordinates=&quot; &lt;&lt; processCoordinates</a>
-<a name="51"><span class="lineNum">      51 </span>            :               &lt;&lt; std::endl;</a>
-<a name="52"><span class="lineNum">      52 </span>            : #endif</a>
-<a name="53"><span class="lineNum">      53 </span><span class="lineCov">        560 :     return processCoordinates;</span></a>
-<a name="54"><span class="lineNum">      54 </span>            :   }</a>
-<a name="55"><span class="lineNum">      55 </span>            : </a>
-<a name="56"><span class="lineNum">      56 </span>            :   /** computes the rank as shown above, see second formula of class definition</a>
-<a name="57"><span class="lineNum">      57 </span>            :    */</a>
-<a name="58"><span class="lineNum">      58 </span><span class="lineCov">        144 :   unsigned int getRank(tarch::la::Vector&lt;dim, unsigned int&gt; processCoordinates) const {</span></a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineCov">        144 :     unsigned int rank = processCoordinates[0];</span></a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineCov">        408 :     for (unsigned int d = 1; d &lt; dim; d++) {</span></a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineCov">        264 :       rank = rank * _numberProcesses[d] + processCoordinates[d];</span></a>
-<a name="62"><span class="lineNum">      62 </span>            :     }</a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineCov">        144 :     return rank + _topologyOffset;</span></a>
-<a name="64"><span class="lineNum">      64 </span>            :   }</a>
-<a name="65"><span class="lineNum">      65 </span>            : </a>
-<a name="66"><span class="lineNum">      66 </span>            : private:</a>
-<a name="67"><span class="lineNum">      67 </span>            :   /** sets the division factor for each vector entry. For ZYX, this corresponds</a>
-<a name="68"><span class="lineNum">      68 </span>            :    * to (in 3D) (ny*nz,nz,1) and to (2D) (ny,1). */</a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineCov">         24 :   tarch::la::Vector&lt;dim, unsigned int&gt; initDivisionFactor(tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses) const {</span></a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineCov">         24 :     tarch::la::Vector&lt;dim, unsigned int&gt; div(1);</span></a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineCov">         60 :     for (int d = dim - 2; d &gt; -1; d--) {</span></a>
-<a name="72"><span class="lineNum">      72 </span><span class="lineCov">         36 :       div[d] = div[d + 1] * numberProcesses[d + 1];</span></a>
-<a name="73"><span class="lineNum">      73 </span>            :     }</a>
-<a name="74"><span class="lineNum">      74 </span><span class="lineCov">         24 :     return div;</span></a>
-<a name="75"><span class="lineNum">      75 </span>            :   }</a>
-<a name="76"><span class="lineNum">      76 </span>            : </a>
-<a name="77"><span class="lineNum">      77 </span>            :   /* number of processes */</a>
-<a name="78"><span class="lineNum">      78 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _numberProcesses;</a>
-<a name="79"><span class="lineNum">      79 </span>            :   /* division factor */</a>
-<a name="80"><span class="lineNum">      80 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _divisionFactor4NumberProcesses;</a>
-<a name="81"><span class="lineNum">      81 </span>            :   const unsigned int _topologyOffset;</a>
-<a name="82"><span class="lineNum">      82 </span>            : };</a>
-<a name="83"><span class="lineNum">      83 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_PARALLELTOPOLOGY_ZYXTOPOLOGY_H_</a>
+<a name="49"><span class="lineNum">      49 </span>            :     std::cout &lt;&lt; &quot;Rank=&quot; &lt;&lt; rank &lt;&lt; &quot; corresponds to process coordinates=&quot; &lt;&lt; processCoordinates &lt;&lt; std::endl;</a>
+<a name="50"><span class="lineNum">      50 </span>            : #endif</a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">        560 :     return processCoordinates;</span></a>
+<a name="52"><span class="lineNum">      52 </span>            :   }</a>
+<a name="53"><span class="lineNum">      53 </span>            : </a>
+<a name="54"><span class="lineNum">      54 </span>            :   /** computes the rank as shown above, see second formula of class definition</a>
+<a name="55"><span class="lineNum">      55 </span>            :    */</a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineCov">        144 :   unsigned int getRank(tarch::la::Vector&lt;dim, unsigned int&gt; processCoordinates) const {</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">        144 :     unsigned int rank = processCoordinates[0];</span></a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineCov">        408 :     for (unsigned int d = 1; d &lt; dim; d++) {</span></a>
+<a name="59"><span class="lineNum">      59 </span><span class="lineCov">        264 :       rank = rank * _numberProcesses[d] + processCoordinates[d];</span></a>
+<a name="60"><span class="lineNum">      60 </span>            :     }</a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineCov">        144 :     return rank + _topologyOffset;</span></a>
+<a name="62"><span class="lineNum">      62 </span>            :   }</a>
+<a name="63"><span class="lineNum">      63 </span>            : </a>
+<a name="64"><span class="lineNum">      64 </span>            : private:</a>
+<a name="65"><span class="lineNum">      65 </span>            :   /** sets the division factor for each vector entry. For ZYX, this corresponds</a>
+<a name="66"><span class="lineNum">      66 </span>            :    * to (in 3D) (ny*nz,nz,1) and to (2D) (ny,1). */</a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineCov">         24 :   tarch::la::Vector&lt;dim, unsigned int&gt; initDivisionFactor(tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses) const {</span></a>
+<a name="68"><span class="lineNum">      68 </span><span class="lineCov">         24 :     tarch::la::Vector&lt;dim, unsigned int&gt; div(1);</span></a>
+<a name="69"><span class="lineNum">      69 </span><span class="lineCov">         60 :     for (int d = dim - 2; d &gt; -1; d--) {</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">         36 :       div[d] = div[d + 1] * numberProcesses[d + 1];</span></a>
+<a name="71"><span class="lineNum">      71 </span>            :     }</a>
+<a name="72"><span class="lineNum">      72 </span><span class="lineCov">         24 :     return div;</span></a>
+<a name="73"><span class="lineNum">      73 </span>            :   }</a>
+<a name="74"><span class="lineNum">      74 </span>            : </a>
+<a name="75"><span class="lineNum">      75 </span>            :   /* number of processes */</a>
+<a name="76"><span class="lineNum">      76 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _numberProcesses;</a>
+<a name="77"><span class="lineNum">      77 </span>            :   /* division factor */</a>
+<a name="78"><span class="lineNum">      78 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _divisionFactor4NumberProcesses;</a>
+<a name="79"><span class="lineNum">      79 </span>            :   const unsigned int _topologyOffset;</a>
+<a name="80"><span class="lineNum">      80 </span>            : };</a>
+<a name="81"><span class="lineNum">      81 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_PARALLELTOPOLOGY_ZYXTOPOLOGY_H_</a>
 </pre>
       </td>
     </tr>
