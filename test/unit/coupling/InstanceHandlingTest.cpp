@@ -81,8 +81,8 @@ public:
       _instanceHandling->rmSimulationBlock();
       CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations());
       _instanceHandling->addSimulationBlock();
-      auto* mdSolverInterface = _instanceHandling->addMDSimulation(totalNumberOfMDSimulations, totalNumberOfMDSimulations);
-      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations()+1);
+      auto* mdSolverInterface = _instanceHandling->addMDSimulation(_multiMDService->getLocalNumberOfMDSimulations(), _multiMDService->getLocalNumberOfMDSimulations());
+      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations()+1);
       CPPUNIT_ASSERT(mdSolverInterface != nullptr);
       _instanceHandling->rmMDSimulation(_instanceHandling->getSimpleMD().size()-1);
       CPPUNIT_ASSERT(_instanceHandling->getSimpleMD()[_instanceHandling->getSimpleMD().size()-1] == nullptr);
