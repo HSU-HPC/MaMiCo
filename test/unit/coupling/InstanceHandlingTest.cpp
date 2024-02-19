@@ -28,13 +28,15 @@ public:
         
         std::string filename("../test/unit/coupling/couette.xml");
         tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",_simpleMDConfig);
+        _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
         
     if (!_simpleMDConfig.isValid()) {
       std::cout << "ERROR InstanceHandlingTest: Invalid SimpleMD config!" << std::endl;
       exit(EXIT_FAILURE);
     }
+    
         
-        _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), 2
+        _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _cfg.totalNumberMDSimulations
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 ,MPI_COMM_WORLD
 #endif
@@ -122,6 +124,8 @@ private:
     coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
     simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
     coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
+    coupling::configurations::CouetteConfig _cfg;
+
  
  
 };
