@@ -166,10 +166,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateBcastB
   // determine the ranks from which we need to receive information of this macroscopic cell
   const std::vector<unsigned int> sourceRanks = dataExchange.getSourceRanks(globalVectorIndex);
   const std::vector<unsigned int> targetRanks = dataExchange.getTargetRanks(globalVectorIndex);
-  /*if(indexConversion.getThisRank() == 15) {
-    std::cout << globalVectorIndex << " <---> " << indexConversion.getGlobalCellIndex(globalVectorIndex) << " => "
-              << sourceRanks << " ==> " << targetRanks << std::endl;
-  }*/
   if (sourceRanks.empty()) {
     return;
   }
@@ -236,13 +232,7 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerBcasts(
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   int counter = 0;
-  // if(thisRank == 23) std::cout << thisRank << " sendrecvBuffer size " << _sendRecvBuffer.size() << std::endl;
   for (std::pair<const unsigned int, BufferCollective>& buffer : _bcastBuffer) {
-    /*if(thisRank == 23) {
-      std::cout <<thisRank << "=====" << buffer.second.cellIndices << "=====" <<buffer.second.sourceRank << "===>" << buffer.second.targetRanks << std::endl;
-    }*/
-    // std::cout << thisRank << " : Bcast buffer size " << buffer.second.buffer.size() << " from " << buffer.second.sourceRank << " to " <<
-    // buffer.second.targetRanks << std::endl;
     int err = MPI_Ibcast(buffer.second.buffer.data(), static_cast<int>(buffer.second.buffer.size()), MPI_DOUBLE, 0, _subComms[counter], &_requests[counter]);
     if (err != MPI_SUCCESS) {
       char* str = new char[MPI_MAX_ERROR_STRING];
