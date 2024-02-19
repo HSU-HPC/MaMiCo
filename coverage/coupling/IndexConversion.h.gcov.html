@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-30 14:19:36</td>
+            <td class="headerValue">2024-02-19 15:33:54</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -264,151 +264,156 @@
 <a name="202"><span class="lineNum">     202 </span>            :    *  @param rank the linearised/continuous rank of a process</a>
 <a name="203"><span class="lineNum">     203 </span>            :    *  @returns the process coordinates */</a>
 <a name="204"><span class="lineNum">     204 </span>            :   tarch::la::Vector&lt;dim, unsigned int&gt; getProcessCoordinates(unsigned int rank) const;</a>
-<a name="205"><span class="lineNum">     205 </span>            :   /** Forwards the call to the ParallelTopology implementation.</a>
-<a name="206"><span class="lineNum">     206 </span>            :    *  @brief returns the linearised index (i.e. rank) of the given process</a>
-<a name="207"><span class="lineNum">     207 </span>            :    * coordinates.</a>
-<a name="208"><span class="lineNum">     208 </span>            :    *  @param processCoordinates the vector coordinates of a process</a>
-<a name="209"><span class="lineNum">     209 </span>            :    *  @returns the rank for the given coordinates of a process  */</a>
-<a name="210"><span class="lineNum">     210 </span>            :   unsigned int getRank(tarch::la::Vector&lt;dim, unsigned int&gt; processCoordinates) const;</a>
-<a name="211"><span class="lineNum">     211 </span>            :   /** If the cell is contained in the MD volume, the rank is uniquely chosen by</a>
-<a name="212"><span class="lineNum">     212 </span>            :    * using the process which contains the macroscopic cell as non-ghost (i.e.</a>
-<a name="213"><span class="lineNum">     213 </span>            :    * real inner) cell. If the cell is a global ghost cell, we choose the rank</a>
-<a name="214"><span class="lineNum">     214 </span>            :    * according to the block-decomposition of the grid applied to the complete</a>
-<a name="215"><span class="lineNum">     215 </span>            :    * grid incl. the ghost layer.</a>
-<a name="216"><span class="lineNum">     216 </span>            :    *  @brief returns the unique rank for a macroscopic cell.</a>
-<a name="217"><span class="lineNum">     217 </span>            :    *  @param globalCellIndex the global vector coordinates of a macroscopic cell</a>
-<a name="218"><span class="lineNum">     218 </span>            :    *  @returns the rank for the given macroscopic cell */</a>
-<a name="219"><span class="lineNum">     219 </span>            :   unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector&lt;dim, unsigned int&gt; globalCellIndex) const;</a>
-<a name="220"><span class="lineNum">     220 </span>            :   /** returns all ranks which contain a copy (as ghost or non-ghost cell) of the</a>
-<a name="221"><span class="lineNum">     221 </span>            :    * macroscopic cell with this global cell index. This function only supports</a>
-<a name="222"><span class="lineNum">     222 </span>            :    * 1D, 2D, 3D.</a>
-<a name="223"><span class="lineNum">     223 </span>            :    *  @param globalCellIndex the global vector coordinates of a macroscopic cell</a>
-<a name="224"><span class="lineNum">     224 </span>            :    *  @returns all ranks for the given macroscopic cell */</a>
-<a name="225"><span class="lineNum">     225 </span>            :   std::vector&lt;unsigned int&gt; getRanksForMacroscopicCell(tarch::la::Vector&lt;dim, unsigned int&gt; globalCellIndex) const;</a>
-<a name="226"><span class="lineNum">     226 </span>            : </a>
-<a name="227"><span class="lineNum">     227 </span>            :   // ------------------------ VALIDATION</a>
-<a name="228"><span class="lineNum">     228 </span>            :   // --------------------------------------------</a>
-<a name="229"><span class="lineNum">     229 </span>            :   /** Should only be used for debugging and validation purposes.</a>
-<a name="230"><span class="lineNum">     230 </span>            :    *  @brief checks if the global vector cell index is in a well-defined range.</a>
-<a name="231"><span class="lineNum">     231 </span>            :    *  @param globalCellIndex the global vector coordinates of a macroscopic cell</a>
-<a name="232"><span class="lineNum">     232 </span>            :    *  @returns a bool, indicating if the given global index is valid (true) or</a>
-<a name="233"><span class="lineNum">     233 </span>            :    * not (false) */</a>
-<a name="234"><span class="lineNum">     234 </span>            :   bool isValidGlobalVectorCellIndex(tarch::la::Vector&lt;dim, unsigned int&gt; globalCellIndex) const;</a>
-<a name="235"><span class="lineNum">     235 </span>            :   /** Should only be used for debugging and validation purposes.</a>
-<a name="236"><span class="lineNum">     236 </span>            :    *  @brief checks if the local vector cell index is in a well-defined range.</a>
-<a name="237"><span class="lineNum">     237 </span>            :    *  @param localCellIndex the local (only valid on this rank) vector</a>
-<a name="238"><span class="lineNum">     238 </span>            :    * coordinates of a macroscopic cell</a>
-<a name="239"><span class="lineNum">     239 </span>            :    *  @returns a bool, indicating if the given local index is valid (true) or</a>
-<a name="240"><span class="lineNum">     240 </span>            :    * not (false)  */</a>
-<a name="241"><span class="lineNum">     241 </span>            :   bool isValidLocalVectorCellIndex(tarch::la::Vector&lt;dim, unsigned int&gt; localCellIndex) const;</a>
-<a name="242"><span class="lineNum">     242 </span>            :   /** Should only be used for debugging and validation purposes.</a>
-<a name="243"><span class="lineNum">     243 </span>            :    *  @brief checks if the global cell index is in a well-defined range.</a>
-<a name="244"><span class="lineNum">     244 </span>            :    *  @param globalIndex global continuous/linearised index of a cell</a>
-<a name="245"><span class="lineNum">     245 </span>            :    *  @returns a bool, indicating if the given global index is valid (true) or</a>
-<a name="246"><span class="lineNum">     246 </span>            :    * not (false) */</a>
-<a name="247"><span class="lineNum">     247 </span>            :   bool isValidGlobalCellIndex(unsigned int globalIndex) const;</a>
-<a name="248"><span class="lineNum">     248 </span>            :   /** Should only be used for debugging and validation purposes.</a>
-<a name="249"><span class="lineNum">     249 </span>            :    *  @brief checks if the local cell index is in a well-defined range.</a>
-<a name="250"><span class="lineNum">     250 </span>            :    *  @param localIndex local continuous/linearised index of a cell</a>
-<a name="251"><span class="lineNum">     251 </span>            :    *  @returns a bool, indicating if the given local index is valid (true) or</a>
-<a name="252"><span class="lineNum">     252 </span>            :    * not (false) */</a>
-<a name="253"><span class="lineNum">     253 </span>            :   bool isValidLocalCellIndex(unsigned int localIndex) const;</a>
-<a name="254"><span class="lineNum">     254 </span>            : </a>
-<a name="255"><span class="lineNum">     255 </span>            : private:</a>
-<a name="256"><span class="lineNum">     256 </span>            :   /** We add the ghost layer influence inside this function.</a>
-<a name="257"><span class="lineNum">     257 </span>            :    *  This function is supposed to be only called with a member variable for</a>
-<a name="258"><span class="lineNum">     258 </span>            :    * numberCells.</a>
-<a name="259"><span class="lineNum">     259 </span>            :    *  @brief converts a vector cell index into a linearised cell index using a</a>
-<a name="260"><span class="lineNum">     260 </span>            :    * predefined number of cells.</a>
-<a name="261"><span class="lineNum">     261 </span>            :    *  @param vectorCellIndex vector cell index</a>
-<a name="262"><span class="lineNum">     262 </span>            :    *  @param numberCells total number of cells</a>
-<a name="263"><span class="lineNum">     263 </span>            :    *  @returns a linearised cell index  */</a>
-<a name="264"><span class="lineNum">     264 </span>            :   unsigned int getCellIndex(tarch::la::Vector&lt;dim, unsigned int&gt; vectorCellIndex, const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; numberCells) const;</a>
-<a name="265"><span class="lineNum">     265 </span>            : </a>
-<a name="266"><span class="lineNum">     266 </span>            :   /** Example: we have 31x46x50 macroscopic cells split onto 10x12x5 processes.</a>
-<a name="267"><span class="lineNum">     267 </span>            :    *  Then, this method will return the floor (cells/processes), which in our</a>
-<a name="268"><span class="lineNum">     268 </span>            :    * case yields (3x3x10) (-&gt; floor(31/10)=3, floor(46/12)=3, floor(50/5) = 10).</a>
-<a name="269"><span class="lineNum">     269 </span>            :    *  @brief returns the average number of local macroscopic cells on each</a>
-<a name="270"><span class="lineNum">     270 </span>            :    * process.</a>
-<a name="271"><span class="lineNum">     271 </span>            :    *  @param initAverageLocalNumberMacroscopicCells average number of</a>
-<a name="272"><span class="lineNum">     272 </span>            :    * macroscopic cells per process</a>
-<a name="273"><span class="lineNum">     273 </span>            :    *  @param globalNumberMacroscopicCells total number of macroscopic cells</a>
-<a name="274"><span class="lineNum">     274 </span>            :    *  @param numberProcesses total number of mpi processes</a>
-<a name="275"><span class="lineNum">     275 </span>            :    *  @returns the average number of macroscopic cells on each process */</a>
-<a name="276"><span class="lineNum">     276 </span>            :   tarch::la::Vector&lt;dim, unsigned int&gt; initAverageLocalNumberMacroscopicCells(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells,</a>
-<a name="277"><span class="lineNum">     277 </span>            :                                                                               tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses) const;</a>
-<a name="278"><span class="lineNum">     278 </span>            : </a>
-<a name="279"><span class="lineNum">     279 </span>            :   /** For Nx x Ny x Nz processes, the method returns the average local number of</a>
-<a name="280"><span class="lineNum">     280 </span>            :    *  macroscopic cells for all processes from [1;Nx-1]x[1;Ny-1]x[1;Nz-1].</a>
-<a name="281"><span class="lineNum">     281 </span>            :    *  For the other processes (at the right/back/top boundary), the number of</a>
-<a name="282"><span class="lineNum">     282 </span>            :    * cells is filled up so that the global number of macroscopic cells is</a>
-<a name="283"><span class="lineNum">     283 </span>            :    * reached.</a>
-<a name="284"><span class="lineNum">     284 </span>            :    *  @brief this method returns the exact number of local macroscopic cells.</a>
-<a name="285"><span class="lineNum">     285 </span>            :    *  @param initLocalNumberMacroscopicCells the total number of macroscopic</a>
-<a name="286"><span class="lineNum">     286 </span>            :    * cells on this process</a>
-<a name="287"><span class="lineNum">     287 </span>            :    *  @param globalNumberMacroscopicCells the total number of macroscopic cells</a>
-<a name="288"><span class="lineNum">     288 </span>            :    *  @param numberProcesses total number of mpi processes</a>
-<a name="289"><span class="lineNum">     289 </span>            :    *  @returns the number of macroscopic cells on this process */</a>
-<a name="290"><span class="lineNum">     290 </span>            :   tarch::la::Vector&lt;dim, unsigned int&gt; initLocalNumberMacroscopicCells(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells,</a>
-<a name="291"><span class="lineNum">     291 </span>            :                                                                        tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses, unsigned int rank) const;</a>
-<a name="292"><span class="lineNum">     292 </span>            : </a>
-<a name="293"><span class="lineNum">     293 </span>            :   /** We add the ghost layer influence inside this function.</a>
-<a name="294"><span class="lineNum">     294 </span>            :    *  @brief checks if the index is in a valid range.</a>
-<a name="295"><span class="lineNum">     295 </span>            :    *  @param index vector index of a cell</a>
-<a name="296"><span class="lineNum">     296 </span>            :    *  @param range vector range of cells</a>
-<a name="297"><span class="lineNum">     297 </span>            :    *  @returns a bool indicating if index is valid (true) or not (false) */</a>
-<a name="298"><span class="lineNum">     298 </span>            :   bool isValidVectorCellIndex(tarch::la::Vector&lt;dim, unsigned int&gt; index, const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; range) const;</a>
-<a name="299"><span class="lineNum">     299 </span>            : </a>
-<a name="300"><span class="lineNum">     300 </span>            :   /** @brief returns true, if the index is smaller than the range.</a>
-<a name="301"><span class="lineNum">     301 </span>            :    *  @param index continuous/linearised index of a cell</a>
-<a name="302"><span class="lineNum">     302 </span>            :    *  @param range continuous/linearised range of cells</a>
-<a name="303"><span class="lineNum">     303 </span>            :    *  @returns a bool indicating if index is valid (true) or not (false) */</a>
-<a name="304"><span class="lineNum">     304 </span>            :   bool isValidCellIndex(unsigned int index, const unsigned int&amp; range) const;</a>
-<a name="305"><span class="lineNum">     305 </span>            : </a>
-<a name="306"><span class="lineNum">     306 </span>            :   /** @brief initialises the size of macroscopic cells</a>
-<a name="307"><span class="lineNum">     307 </span>            :    *  @param globalMDDomainSize the total size of the md domain as a vector</a>
-<a name="308"><span class="lineNum">     308 </span>            :    *  @param globalNumberMacroscopicCells the global number of macroscopic cells</a>
-<a name="309"><span class="lineNum">     309 </span>            :    *  @returns the macroscopic cell size for the setup */</a>
-<a name="310"><span class="lineNum">     310 </span>            :   tarch::la::Vector&lt;dim, double&gt; initMacroscopicCellSize(const tarch::la::Vector&lt;dim, double&gt;&amp; globalMDDomainSize,</a>
-<a name="311"><span class="lineNum">     311 </span>            :                                                          const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; globalNumberMacroscopicCells) const;</a>
-<a name="312"><span class="lineNum">     312 </span>            : </a>
-<a name="313"><span class="lineNum">     313 </span>            :   /** type of parallel topology used in the simulation */</a>
-<a name="314"><span class="lineNum">     314 </span>            :   const coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;</a>
-<a name="315"><span class="lineNum">     315 </span>            :   /** a pointer to the parallel topology */</a>
-<a name="316"><span class="lineNum">     316 </span>            :   const coupling::paralleltopology::ParallelTopology&lt;dim&gt;* _parallelTopology;</a>
-<a name="317"><span class="lineNum">     317 </span>            :   /** the total number of processes. We assume a block-domain decomposition. */</a>
-<a name="318"><span class="lineNum">     318 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _numberProcesses;</a>
-<a name="319"><span class="lineNum">     319 </span>            :   /** rank of current process */</a>
-<a name="320"><span class="lineNum">     320 </span>            :   const unsigned int _rank;</a>
-<a name="321"><span class="lineNum">     321 </span>            :   /** the coordinates of the current process. */</a>
-<a name="322"><span class="lineNum">     322 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _thisProcess;</a>
-<a name="323"><span class="lineNum">     323 </span>            :   /** global number of (inner) macroscopic cells. In total this number is</a>
-<a name="324"><span class="lineNum">     324 </span>            :    * extended by 2 in order to account for an</a>
-<a name="325"><span class="lineNum">     325 </span>            :    *  additional ghost layer surrounding the global domain.  */</a>
-<a name="326"><span class="lineNum">     326 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _globalNumberMacroscopicCells;</a>
-<a name="327"><span class="lineNum">     327 </span>            :   /** average number of local macroscopic cells */</a>
-<a name="328"><span class="lineNum">     328 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _averageLocalNumberMacroscopicCells;</a>
-<a name="329"><span class="lineNum">     329 </span>            :   /** local number of macroscopic cells for this process. In total, this number</a>
-<a name="330"><span class="lineNum">     330 </span>            :    * is extended by 2 in order to account for an additional ghost layer</a>
-<a name="331"><span class="lineNum">     331 </span>            :    * surrounding the local domain. */</a>
-<a name="332"><span class="lineNum">     332 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _localNumberMacroscopicCells;</a>
-<a name="333"><span class="lineNum">     333 </span>            :   /** division factors (in 3D, its (1,g(0)+2,(g(0)+2)*(g(1)+2)) ) for the global</a>
-<a name="334"><span class="lineNum">     334 </span>            :    * number of macroscopic cells. */</a>
-<a name="335"><span class="lineNum">     335 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _divisionFactor4GlobalNumberMacroscopicCells;</a>
-<a name="336"><span class="lineNum">     336 </span>            :   /** division factors (in 3D, its (1,g(0)+2,(g(0)+2)*(g(1)+2)) ) for the local</a>
-<a name="337"><span class="lineNum">     337 </span>            :    * number of macroscopic cells. */</a>
-<a name="338"><span class="lineNum">     338 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _divisionFactor4LocalNumberMacroscopicCells;</a>
-<a name="339"><span class="lineNum">     339 </span>            :   /** global MD domain size. */</a>
-<a name="340"><span class="lineNum">     340 </span>            :   const tarch::la::Vector&lt;dim, double&gt; _globalMDDomainSize;</a>
-<a name="341"><span class="lineNum">     341 </span>            :   /** offset (lower,left... corner) of MD domain. */</a>
-<a name="342"><span class="lineNum">     342 </span>            :   const tarch::la::Vector&lt;dim, double&gt; _globalMDDomainOffset;</a>
-<a name="343"><span class="lineNum">     343 </span>            :   /** size of macroscopic cell. */</a>
-<a name="344"><span class="lineNum">     344 </span>            :   const tarch::la::Vector&lt;dim, double&gt; _macroscopicCellSize;</a>
-<a name="345"><span class="lineNum">     345 </span>            : };</a>
-<a name="346"><span class="lineNum">     346 </span>            : </a>
-<a name="347"><span class="lineNum">     347 </span>            : #include &quot;IndexConversion.cpph&quot;</a>
-<a name="348"><span class="lineNum">     348 </span>            : </a>
-<a name="349"><span class="lineNum">     349 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_INDEXCONVERSION_H_</a>
+<a name="205"><span class="lineNum">     205 </span>            :   /** Forwards the call to the ParallelTopology implementation modulo the number of processes on each dimension (wrap around).</a>
+<a name="206"><span class="lineNum">     206 </span>            :    *  @brief returns the process coordinates for the rank 'rank'.</a>
+<a name="207"><span class="lineNum">     207 </span>            :    *  @param rank the linearised/continuous rank of a process</a>
+<a name="208"><span class="lineNum">     208 </span>            :    *  @returns the process coordinates */</a>
+<a name="209"><span class="lineNum">     209 </span>            :   tarch::la::Vector&lt;dim, unsigned int&gt; getThisProcessCoordinates(unsigned int rank) const;</a>
+<a name="210"><span class="lineNum">     210 </span>            :   /** Forwards the call to the ParallelTopology implementation.</a>
+<a name="211"><span class="lineNum">     211 </span>            :    *  @brief returns the linearised index (i.e. rank) of the given process</a>
+<a name="212"><span class="lineNum">     212 </span>            :    * coordinates.</a>
+<a name="213"><span class="lineNum">     213 </span>            :    *  @param processCoordinates the vector coordinates of a process</a>
+<a name="214"><span class="lineNum">     214 </span>            :    *  @returns the rank for the given coordinates of a process  */</a>
+<a name="215"><span class="lineNum">     215 </span>            :   unsigned int getRank(tarch::la::Vector&lt;dim, unsigned int&gt; processCoordinates) const;</a>
+<a name="216"><span class="lineNum">     216 </span>            :   /** If the cell is contained in the MD volume, the rank is uniquely chosen by</a>
+<a name="217"><span class="lineNum">     217 </span>            :    * using the process which contains the macroscopic cell as non-ghost (i.e.</a>
+<a name="218"><span class="lineNum">     218 </span>            :    * real inner) cell. If the cell is a global ghost cell, we choose the rank</a>
+<a name="219"><span class="lineNum">     219 </span>            :    * according to the block-decomposition of the grid applied to the complete</a>
+<a name="220"><span class="lineNum">     220 </span>            :    * grid incl. the ghost layer.</a>
+<a name="221"><span class="lineNum">     221 </span>            :    *  @brief returns the unique rank for a macroscopic cell.</a>
+<a name="222"><span class="lineNum">     222 </span>            :    *  @param globalCellIndex the global vector coordinates of a macroscopic cell</a>
+<a name="223"><span class="lineNum">     223 </span>            :    *  @returns the rank for the given macroscopic cell */</a>
+<a name="224"><span class="lineNum">     224 </span>            :   unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector&lt;dim, unsigned int&gt; globalCellIndex) const;</a>
+<a name="225"><span class="lineNum">     225 </span>            :   /** returns all ranks which contain a copy (as ghost or non-ghost cell) of the</a>
+<a name="226"><span class="lineNum">     226 </span>            :    * macroscopic cell with this global cell index. This function only supports</a>
+<a name="227"><span class="lineNum">     227 </span>            :    * 1D, 2D, 3D.</a>
+<a name="228"><span class="lineNum">     228 </span>            :    *  @param globalCellIndex the global vector coordinates of a macroscopic cell</a>
+<a name="229"><span class="lineNum">     229 </span>            :    *  @returns all ranks for the given macroscopic cell */</a>
+<a name="230"><span class="lineNum">     230 </span>            :   std::vector&lt;unsigned int&gt; getRanksForMacroscopicCell(tarch::la::Vector&lt;dim, unsigned int&gt; globalCellIndex) const;</a>
+<a name="231"><span class="lineNum">     231 </span>            : </a>
+<a name="232"><span class="lineNum">     232 </span>            :   // ------------------------ VALIDATION</a>
+<a name="233"><span class="lineNum">     233 </span>            :   // --------------------------------------------</a>
+<a name="234"><span class="lineNum">     234 </span>            :   /** Should only be used for debugging and validation purposes.</a>
+<a name="235"><span class="lineNum">     235 </span>            :    *  @brief checks if the global vector cell index is in a well-defined range.</a>
+<a name="236"><span class="lineNum">     236 </span>            :    *  @param globalCellIndex the global vector coordinates of a macroscopic cell</a>
+<a name="237"><span class="lineNum">     237 </span>            :    *  @returns a bool, indicating if the given global index is valid (true) or</a>
+<a name="238"><span class="lineNum">     238 </span>            :    * not (false) */</a>
+<a name="239"><span class="lineNum">     239 </span>            :   bool isValidGlobalVectorCellIndex(tarch::la::Vector&lt;dim, unsigned int&gt; globalCellIndex) const;</a>
+<a name="240"><span class="lineNum">     240 </span>            :   /** Should only be used for debugging and validation purposes.</a>
+<a name="241"><span class="lineNum">     241 </span>            :    *  @brief checks if the local vector cell index is in a well-defined range.</a>
+<a name="242"><span class="lineNum">     242 </span>            :    *  @param localCellIndex the local (only valid on this rank) vector</a>
+<a name="243"><span class="lineNum">     243 </span>            :    * coordinates of a macroscopic cell</a>
+<a name="244"><span class="lineNum">     244 </span>            :    *  @returns a bool, indicating if the given local index is valid (true) or</a>
+<a name="245"><span class="lineNum">     245 </span>            :    * not (false)  */</a>
+<a name="246"><span class="lineNum">     246 </span>            :   bool isValidLocalVectorCellIndex(tarch::la::Vector&lt;dim, unsigned int&gt; localCellIndex) const;</a>
+<a name="247"><span class="lineNum">     247 </span>            :   /** Should only be used for debugging and validation purposes.</a>
+<a name="248"><span class="lineNum">     248 </span>            :    *  @brief checks if the global cell index is in a well-defined range.</a>
+<a name="249"><span class="lineNum">     249 </span>            :    *  @param globalIndex global continuous/linearised index of a cell</a>
+<a name="250"><span class="lineNum">     250 </span>            :    *  @returns a bool, indicating if the given global index is valid (true) or</a>
+<a name="251"><span class="lineNum">     251 </span>            :    * not (false) */</a>
+<a name="252"><span class="lineNum">     252 </span>            :   bool isValidGlobalCellIndex(unsigned int globalIndex) const;</a>
+<a name="253"><span class="lineNum">     253 </span>            :   /** Should only be used for debugging and validation purposes.</a>
+<a name="254"><span class="lineNum">     254 </span>            :    *  @brief checks if the local cell index is in a well-defined range.</a>
+<a name="255"><span class="lineNum">     255 </span>            :    *  @param localIndex local continuous/linearised index of a cell</a>
+<a name="256"><span class="lineNum">     256 </span>            :    *  @returns a bool, indicating if the given local index is valid (true) or</a>
+<a name="257"><span class="lineNum">     257 </span>            :    * not (false) */</a>
+<a name="258"><span class="lineNum">     258 </span>            :   bool isValidLocalCellIndex(unsigned int localIndex) const;</a>
+<a name="259"><span class="lineNum">     259 </span>            : </a>
+<a name="260"><span class="lineNum">     260 </span>            : private:</a>
+<a name="261"><span class="lineNum">     261 </span>            :   /** We add the ghost layer influence inside this function.</a>
+<a name="262"><span class="lineNum">     262 </span>            :    *  This function is supposed to be only called with a member variable for</a>
+<a name="263"><span class="lineNum">     263 </span>            :    * numberCells.</a>
+<a name="264"><span class="lineNum">     264 </span>            :    *  @brief converts a vector cell index into a linearised cell index using a</a>
+<a name="265"><span class="lineNum">     265 </span>            :    * predefined number of cells.</a>
+<a name="266"><span class="lineNum">     266 </span>            :    *  @param vectorCellIndex vector cell index</a>
+<a name="267"><span class="lineNum">     267 </span>            :    *  @param numberCells total number of cells</a>
+<a name="268"><span class="lineNum">     268 </span>            :    *  @returns a linearised cell index  */</a>
+<a name="269"><span class="lineNum">     269 </span>            :   unsigned int getCellIndex(tarch::la::Vector&lt;dim, unsigned int&gt; vectorCellIndex, const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; numberCells) const;</a>
+<a name="270"><span class="lineNum">     270 </span>            : </a>
+<a name="271"><span class="lineNum">     271 </span>            :   /** Example: we have 31x46x50 macroscopic cells split onto 10x12x5 processes.</a>
+<a name="272"><span class="lineNum">     272 </span>            :    *  Then, this method will return the floor (cells/processes), which in our</a>
+<a name="273"><span class="lineNum">     273 </span>            :    * case yields (3x3x10) (-&gt; floor(31/10)=3, floor(46/12)=3, floor(50/5) = 10).</a>
+<a name="274"><span class="lineNum">     274 </span>            :    *  @brief returns the average number of local macroscopic cells on each</a>
+<a name="275"><span class="lineNum">     275 </span>            :    * process.</a>
+<a name="276"><span class="lineNum">     276 </span>            :    *  @param initAverageLocalNumberMacroscopicCells average number of</a>
+<a name="277"><span class="lineNum">     277 </span>            :    * macroscopic cells per process</a>
+<a name="278"><span class="lineNum">     278 </span>            :    *  @param globalNumberMacroscopicCells total number of macroscopic cells</a>
+<a name="279"><span class="lineNum">     279 </span>            :    *  @param numberProcesses total number of mpi processes</a>
+<a name="280"><span class="lineNum">     280 </span>            :    *  @returns the average number of macroscopic cells on each process */</a>
+<a name="281"><span class="lineNum">     281 </span>            :   tarch::la::Vector&lt;dim, unsigned int&gt; initAverageLocalNumberMacroscopicCells(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells,</a>
+<a name="282"><span class="lineNum">     282 </span>            :                                                                               tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses) const;</a>
+<a name="283"><span class="lineNum">     283 </span>            : </a>
+<a name="284"><span class="lineNum">     284 </span>            :   /** For Nx x Ny x Nz processes, the method returns the average local number of</a>
+<a name="285"><span class="lineNum">     285 </span>            :    *  macroscopic cells for all processes from [1;Nx-1]x[1;Ny-1]x[1;Nz-1].</a>
+<a name="286"><span class="lineNum">     286 </span>            :    *  For the other processes (at the right/back/top boundary), the number of</a>
+<a name="287"><span class="lineNum">     287 </span>            :    * cells is filled up so that the global number of macroscopic cells is</a>
+<a name="288"><span class="lineNum">     288 </span>            :    * reached.</a>
+<a name="289"><span class="lineNum">     289 </span>            :    *  @brief this method returns the exact number of local macroscopic cells.</a>
+<a name="290"><span class="lineNum">     290 </span>            :    *  @param initLocalNumberMacroscopicCells the total number of macroscopic</a>
+<a name="291"><span class="lineNum">     291 </span>            :    * cells on this process</a>
+<a name="292"><span class="lineNum">     292 </span>            :    *  @param globalNumberMacroscopicCells the total number of macroscopic cells</a>
+<a name="293"><span class="lineNum">     293 </span>            :    *  @param numberProcesses total number of mpi processes</a>
+<a name="294"><span class="lineNum">     294 </span>            :    *  @returns the number of macroscopic cells on this process */</a>
+<a name="295"><span class="lineNum">     295 </span>            :   tarch::la::Vector&lt;dim, unsigned int&gt; initLocalNumberMacroscopicCells(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberMacroscopicCells,</a>
+<a name="296"><span class="lineNum">     296 </span>            :                                                                        tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses, unsigned int rank) const;</a>
+<a name="297"><span class="lineNum">     297 </span>            : </a>
+<a name="298"><span class="lineNum">     298 </span>            :   /** We add the ghost layer influence inside this function.</a>
+<a name="299"><span class="lineNum">     299 </span>            :    *  @brief checks if the index is in a valid range.</a>
+<a name="300"><span class="lineNum">     300 </span>            :    *  @param index vector index of a cell</a>
+<a name="301"><span class="lineNum">     301 </span>            :    *  @param range vector range of cells</a>
+<a name="302"><span class="lineNum">     302 </span>            :    *  @returns a bool indicating if index is valid (true) or not (false) */</a>
+<a name="303"><span class="lineNum">     303 </span>            :   bool isValidVectorCellIndex(tarch::la::Vector&lt;dim, unsigned int&gt; index, const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; range) const;</a>
+<a name="304"><span class="lineNum">     304 </span>            : </a>
+<a name="305"><span class="lineNum">     305 </span>            :   /** @brief returns true, if the index is smaller than the range.</a>
+<a name="306"><span class="lineNum">     306 </span>            :    *  @param index continuous/linearised index of a cell</a>
+<a name="307"><span class="lineNum">     307 </span>            :    *  @param range continuous/linearised range of cells</a>
+<a name="308"><span class="lineNum">     308 </span>            :    *  @returns a bool indicating if index is valid (true) or not (false) */</a>
+<a name="309"><span class="lineNum">     309 </span>            :   bool isValidCellIndex(unsigned int index, const unsigned int&amp; range) const;</a>
+<a name="310"><span class="lineNum">     310 </span>            : </a>
+<a name="311"><span class="lineNum">     311 </span>            :   /** @brief initialises the size of macroscopic cells</a>
+<a name="312"><span class="lineNum">     312 </span>            :    *  @param globalMDDomainSize the total size of the md domain as a vector</a>
+<a name="313"><span class="lineNum">     313 </span>            :    *  @param globalNumberMacroscopicCells the global number of macroscopic cells</a>
+<a name="314"><span class="lineNum">     314 </span>            :    *  @returns the macroscopic cell size for the setup */</a>
+<a name="315"><span class="lineNum">     315 </span>            :   tarch::la::Vector&lt;dim, double&gt; initMacroscopicCellSize(const tarch::la::Vector&lt;dim, double&gt;&amp; globalMDDomainSize,</a>
+<a name="316"><span class="lineNum">     316 </span>            :                                                          const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; globalNumberMacroscopicCells) const;</a>
+<a name="317"><span class="lineNum">     317 </span>            : </a>
+<a name="318"><span class="lineNum">     318 </span>            :   /** type of parallel topology used in the simulation */</a>
+<a name="319"><span class="lineNum">     319 </span>            :   const coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;</a>
+<a name="320"><span class="lineNum">     320 </span>            :   /** a pointer to the parallel topology */</a>
+<a name="321"><span class="lineNum">     321 </span>            :   const coupling::paralleltopology::ParallelTopology&lt;dim&gt;* _parallelTopology;</a>
+<a name="322"><span class="lineNum">     322 </span>            :   /** the total number of processes. We assume a block-domain decomposition. */</a>
+<a name="323"><span class="lineNum">     323 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _numberProcesses;</a>
+<a name="324"><span class="lineNum">     324 </span>            :   /** rank of current process */</a>
+<a name="325"><span class="lineNum">     325 </span>            :   const unsigned int _rank;</a>
+<a name="326"><span class="lineNum">     326 </span>            :   /** the coordinates of the current process. */</a>
+<a name="327"><span class="lineNum">     327 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _thisProcess;</a>
+<a name="328"><span class="lineNum">     328 </span>            :   /** global number of (inner) macroscopic cells. In total this number is</a>
+<a name="329"><span class="lineNum">     329 </span>            :    * extended by 2 in order to account for an</a>
+<a name="330"><span class="lineNum">     330 </span>            :    *  additional ghost layer surrounding the global domain.  */</a>
+<a name="331"><span class="lineNum">     331 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _globalNumberMacroscopicCells;</a>
+<a name="332"><span class="lineNum">     332 </span>            :   /** average number of local macroscopic cells */</a>
+<a name="333"><span class="lineNum">     333 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _averageLocalNumberMacroscopicCells;</a>
+<a name="334"><span class="lineNum">     334 </span>            :   /** local number of macroscopic cells for this process. In total, this number</a>
+<a name="335"><span class="lineNum">     335 </span>            :    * is extended by 2 in order to account for an additional ghost layer</a>
+<a name="336"><span class="lineNum">     336 </span>            :    * surrounding the local domain. */</a>
+<a name="337"><span class="lineNum">     337 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _localNumberMacroscopicCells;</a>
+<a name="338"><span class="lineNum">     338 </span>            :   /** division factors (in 3D, its (1,g(0)+2,(g(0)+2)*(g(1)+2)) ) for the global</a>
+<a name="339"><span class="lineNum">     339 </span>            :    * number of macroscopic cells. */</a>
+<a name="340"><span class="lineNum">     340 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _divisionFactor4GlobalNumberMacroscopicCells;</a>
+<a name="341"><span class="lineNum">     341 </span>            :   /** division factors (in 3D, its (1,g(0)+2,(g(0)+2)*(g(1)+2)) ) for the local</a>
+<a name="342"><span class="lineNum">     342 </span>            :    * number of macroscopic cells. */</a>
+<a name="343"><span class="lineNum">     343 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _divisionFactor4LocalNumberMacroscopicCells;</a>
+<a name="344"><span class="lineNum">     344 </span>            :   /** global MD domain size. */</a>
+<a name="345"><span class="lineNum">     345 </span>            :   const tarch::la::Vector&lt;dim, double&gt; _globalMDDomainSize;</a>
+<a name="346"><span class="lineNum">     346 </span>            :   /** offset (lower,left... corner) of MD domain. */</a>
+<a name="347"><span class="lineNum">     347 </span>            :   const tarch::la::Vector&lt;dim, double&gt; _globalMDDomainOffset;</a>
+<a name="348"><span class="lineNum">     348 </span>            :   /** size of macroscopic cell. */</a>
+<a name="349"><span class="lineNum">     349 </span>            :   const tarch::la::Vector&lt;dim, double&gt; _macroscopicCellSize;</a>
+<a name="350"><span class="lineNum">     350 </span>            : };</a>
+<a name="351"><span class="lineNum">     351 </span>            : </a>
+<a name="352"><span class="lineNum">     352 </span>            : #include &quot;IndexConversion.cpph&quot;</a>
+<a name="353"><span class="lineNum">     353 </span>            : </a>
+<a name="354"><span class="lineNum">     354 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_INDEXCONVERSION_H_</a>
 </pre>
       </td>
     </tr>

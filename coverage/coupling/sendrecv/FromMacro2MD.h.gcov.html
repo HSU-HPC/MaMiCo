@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-01-30 14:19:36</td>
+            <td class="headerValue">2024-02-19 15:33:54</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -67,112 +67,127 @@
 <a name="5"><span class="lineNum">       5 </span>            : #ifndef _MOLECULARDYNAMICS_COUPLING_SENDRECV_FROMMACRO2MD_H_</a>
 <a name="6"><span class="lineNum">       6 </span>            : #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_FROMMACRO2MD_H_</a>
 <a name="7"><span class="lineNum">       7 </span>            : </a>
-<a name="8"><span class="lineNum">       8 </span>            : #include &quot;coupling/sendrecv/SendReceiveBuffer.h&quot;</a>
-<a name="9"><span class="lineNum">       9 </span>            : #include &lt;vector&gt;</a>
-<a name="10"><span class="lineNum">      10 </span>            : </a>
-<a name="11"><span class="lineNum">      11 </span>            : namespace coupling {</a>
-<a name="12"><span class="lineNum">      12 </span>            : namespace sendrecv {</a>
-<a name="13"><span class="lineNum">      13 </span>            : template &lt;class MacroscopicCell, unsigned int dim&gt; class FromMacro2MD;</a>
-<a name="14"><span class="lineNum">      14 </span>            : }</a>
-<a name="15"><span class="lineNum">      15 </span>            : } // namespace coupling</a>
-<a name="16"><span class="lineNum">      16 </span>            : </a>
-<a name="17"><span class="lineNum">      17 </span>            : /** extends the generic SendReceiveBuffer for transfer of quantities from a</a>
-<a name="18"><span class="lineNum">      18 </span>            :  *macroscopic solver to the macroscopic cells of the coupling tool (incl. ghost</a>
-<a name="19"><span class="lineNum">      19 </span>            :  *cells).</a>
-<a name="20"><span class="lineNum">      20 </span>            :  *      @brief SendReceiveBuffer for transfer of quantities from a macroscopic</a>
-<a name="21"><span class="lineNum">      21 </span>            :  *solver to the macroscopic cells. Derived from the class</a>
-<a name="22"><span class="lineNum">      22 </span>            :  *coupling::sendrecv::SendReceiveBuffer</a>
-<a name="23"><span class="lineNum">      23 </span>            :  *      @tparam MacroscopicCell cell type</a>
-<a name="24"><span class="lineNum">      24 </span>            :  *      @tparam dim Number of dimensions; it can be 1, 2 or 3</a>
-<a name="25"><span class="lineNum">      25 </span>            :  *  @author Philipp Neumann</a>
-<a name="26"><span class="lineNum">      26 </span>            :  */</a>
-<a name="27"><span class="lineNum">      27 </span>            : template &lt;class MacroscopicCell, unsigned int dim&gt; class coupling::sendrecv::FromMacro2MD : public coupling::sendrecv::SendReceiveBuffer&lt;MacroscopicCell, dim&gt; {</a>
-<a name="28"><span class="lineNum">      28 </span>            : </a>
-<a name="29"><span class="lineNum">      29 </span>            : public:</a>
-<a name="30"><span class="lineNum">      30 </span>            :   /** Constructor, just calling the constructor of the</a>
-<a name="31"><span class="lineNum">      31 </span>            :    * coupling::sendrecv::SendReceiveBuffer  */</a>
-<a name="32"><span class="lineNum">      32 </span><span class="lineCov">          4 :   FromMacro2MD() : coupling::sendrecv::SendReceiveBuffer&lt;MacroscopicCell, dim&gt;() {}</span></a>
-<a name="33"><span class="lineNum">      33 </span>            :   /** Destructor */</a>
-<a name="34"><span class="lineNum">      34 </span><span class="lineNoCov">          0 :   virtual ~FromMacro2MD() {}</span></a>
-<a name="35"><span class="lineNum">      35 </span>            : </a>
-<a name="36"><span class="lineNum">      36 </span>            :   /** sends information from the local macroscopic cells of a macroscopic solver</a>
-<a name="37"><span class="lineNum">      37 </span>            :    * to the macroscopic cells of MaMico (ghost cells are also allowed). Since</a>
-<a name="38"><span class="lineNum">      38 </span>            :    * the macroscopic solver can have an arbitrary distribution of cells on the</a>
-<a name="39"><span class="lineNum">      39 </span>            :    * processes, the buffer for sending the cell data is provided to this</a>
-<a name="40"><span class="lineNum">      40 </span>            :    * function in terms of an array of macroscopic cells including the respective</a>
-<a name="41"><span class="lineNum">      41 </span>            :    * global cell indices. This function calls sendFromMacro2MDNonBlocking(..)</a>
-<a name="42"><span class="lineNum">      42 </span>            :    * and immediately subsequently wait4SendFromMacro2MD(...). Those two methods</a>
-<a name="43"><span class="lineNum">      43 </span>            :    * may alternatively be used, e.g., for &quot;non-blocking&quot; communication.</a>
-<a name="44"><span class="lineNum">      44 </span>            :    *    @param indexConversion</a>
-<a name="45"><span class="lineNum">      45 </span>            :    *    @param dataExchange</a>
-<a name="46"><span class="lineNum">      46 </span>            :    *    @param macroscopicCellsFromMamico</a>
-<a name="47"><span class="lineNum">      47 </span>            :    *    @param macroscopicCellsFromMacroscopicSolver</a>
-<a name="48"><span class="lineNum">      48 </span>            :    *    @param globalCellIndicesFromMacroscopicSolver</a>
-<a name="49"><span class="lineNum">      49 </span>            :    */</a>
-<a name="50"><span class="lineNum">      50 </span>            :   void sendFromMacro2MD(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
-<a name="51"><span class="lineNum">      51 </span>            :                         const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMamico,</a>
-<a name="52"><span class="lineNum">      52 </span>            :                         const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
-<a name="53"><span class="lineNum">      53 </span>            :                         const unsigned int* const globalCellIndicesFromMacroscopicSolver);</a>
-<a name="54"><span class="lineNum">      54 </span>            : </a>
-<a name="55"><span class="lineNum">      55 </span>            :   /** sends data from macro to MD. After returning, the data transfer may not be</a>
-<a name="56"><span class="lineNum">      56 </span>            :    * completely finished, similar to a IRecv/ISend-call by MPI. Please use</a>
-<a name="57"><span class="lineNum">      57 </span>            :    * wait4SendFromMacro2MD(...) to guarantee that the data transfer has been</a>
-<a name="58"><span class="lineNum">      58 </span>            :    * finished.</a>
-<a name="59"><span class="lineNum">      59 </span>            :    *    @param indexConversion</a>
-<a name="60"><span class="lineNum">      60 </span>            :    *    @param dataExchange</a>
-<a name="61"><span class="lineNum">      61 </span>            :    *    @param macroscopicCellsFromMacroscopicSolver</a>
-<a name="62"><span class="lineNum">      62 </span>            :    *    @param globalCellIndicesFromMacroscopicSolver</a>
-<a name="63"><span class="lineNum">      63 </span>            :    */</a>
-<a name="64"><span class="lineNum">      64 </span>            :   void sendFromMacro2MDNonBlocking(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
-<a name="65"><span class="lineNum">      65 </span>            :                                    const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
-<a name="66"><span class="lineNum">      66 </span>            :                                    const unsigned int* const globalCellIndicesFromMacroscopicSolver);</a>
-<a name="67"><span class="lineNum">      67 </span>            : </a>
-<a name="68"><span class="lineNum">      68 </span>            :   /** waits for the data transfer--instantiated by</a>
-<a name="69"><span class="lineNum">      69 </span>            :    * sendFromMacro2MDNonBlocking(..)--to be finished and fills the information</a>
-<a name="70"><span class="lineNum">      70 </span>            :    * into the macroscopic cells from Mamico.</a>
-<a name="71"><span class="lineNum">      71 </span>            :    *    @param indexConversion</a>
-<a name="72"><span class="lineNum">      72 </span>            :    *    @param dataExchange</a>
-<a name="73"><span class="lineNum">      73 </span>            :    *    @param macroscopicCellsFromMamico</a>
-<a name="74"><span class="lineNum">      74 </span>            :    */</a>
-<a name="75"><span class="lineNum">      75 </span>            :   void wait4SendFromMacro2MD(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
-<a name="76"><span class="lineNum">      76 </span>            :                              const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMamico);</a>
-<a name="77"><span class="lineNum">      77 </span>            : </a>
-<a name="78"><span class="lineNum">      78 </span>            : private:</a>
-<a name="79"><span class="lineNum">      79 </span>            :   /** given a list of macroscopic cells (from the macroscopic solver), the data</a>
-<a name="80"><span class="lineNum">      80 </span>            :    * from these cells are written to the send buffer.</a>
-<a name="81"><span class="lineNum">      81 </span>            :    *    @param indexConversion</a>
-<a name="82"><span class="lineNum">      82 </span>            :    *    @param dataExchange</a>
-<a name="83"><span class="lineNum">      83 </span>            :    *    @param macroscopicCells</a>
-<a name="84"><span class="lineNum">      84 </span>            :    *    @param globalCellIndices</a>
-<a name="85"><span class="lineNum">      85 </span>            :    */</a>
-<a name="86"><span class="lineNum">      86 </span>            :   void writeToSendBuffer(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
-<a name="87"><span class="lineNum">      87 </span>            :                          const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCells, const unsigned int* const globalCellIndices);</a>
-<a name="88"><span class="lineNum">      88 </span>            : </a>
-<a name="89"><span class="lineNum">      89 </span>            :   /** allocates the receive buffers for the macroscopic solver. Since we want to</a>
-<a name="90"><span class="lineNum">      90 </span>            :    * obtain data on the side of MaMiCo, we can just loop over all local</a>
-<a name="91"><span class="lineNum">      91 </span>            :    * macroscopic cells of the coupling tool and call allocateReceiveBuffers(...)</a>
-<a name="92"><span class="lineNum">      92 </span>            :    * of the SendReceiveBuffer for each respective cell.</a>
-<a name="93"><span class="lineNum">      93 </span>            :    *    @param indexConversion</a>
-<a name="94"><span class="lineNum">      94 </span>            :    *    @param dataExchange</a>
-<a name="95"><span class="lineNum">      95 </span>            :    */</a>
-<a name="96"><span class="lineNum">      96 </span>            :   void allocateReceiveBuffers(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange);</a>
+<a name="8"><span class="lineNum">       8 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromMacro2MD.h&quot;</a>
+<a name="9"><span class="lineNum">       9 </span>            : #include &quot;coupling/sendrecv/SendReceiveBuffer.h&quot;</a>
+<a name="10"><span class="lineNum">      10 </span>            : #include &lt;vector&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>            : </a>
+<a name="12"><span class="lineNum">      12 </span>            : namespace coupling {</a>
+<a name="13"><span class="lineNum">      13 </span>            : namespace sendrecv {</a>
+<a name="14"><span class="lineNum">      14 </span>            : template &lt;class MacroscopicCell, unsigned int dim&gt; class FromMacro2MD;</a>
+<a name="15"><span class="lineNum">      15 </span>            : }</a>
+<a name="16"><span class="lineNum">      16 </span>            : } // namespace coupling</a>
+<a name="17"><span class="lineNum">      17 </span>            : </a>
+<a name="18"><span class="lineNum">      18 </span>            : /** extends the generic SendReceiveBuffer for transfer of quantities from a</a>
+<a name="19"><span class="lineNum">      19 </span>            :  *macroscopic solver to the macroscopic cells of the coupling tool (incl. ghost</a>
+<a name="20"><span class="lineNum">      20 </span>            :  *cells).</a>
+<a name="21"><span class="lineNum">      21 </span>            :  *      @brief SendReceiveBuffer for transfer of quantities from a macroscopic</a>
+<a name="22"><span class="lineNum">      22 </span>            :  *solver to the macroscopic cells. Derived from the class</a>
+<a name="23"><span class="lineNum">      23 </span>            :  *coupling::sendrecv::SendReceiveBuffer</a>
+<a name="24"><span class="lineNum">      24 </span>            :  *      @tparam MacroscopicCell cell type</a>
+<a name="25"><span class="lineNum">      25 </span>            :  *      @tparam dim Number of dimensions; it can be 1, 2 or 3</a>
+<a name="26"><span class="lineNum">      26 </span>            :  *  @author Philipp Neumann</a>
+<a name="27"><span class="lineNum">      27 </span>            :  */</a>
+<a name="28"><span class="lineNum">      28 </span>            : template &lt;class MacroscopicCell, unsigned int dim&gt; class coupling::sendrecv::FromMacro2MD : public coupling::sendrecv::SendReceiveBuffer&lt;MacroscopicCell, dim&gt; {</a>
+<a name="29"><span class="lineNum">      29 </span>            : </a>
+<a name="30"><span class="lineNum">      30 </span>            : public:</a>
+<a name="31"><span class="lineNum">      31 </span>            :   /** Constructor, just calling the constructor of the</a>
+<a name="32"><span class="lineNum">      32 </span>            :    * coupling::sendrecv::SendReceiveBuffer  */</a>
+<a name="33"><span class="lineNum">      33 </span><span class="lineCov">          4 :   FromMacro2MD() : coupling::sendrecv::SendReceiveBuffer&lt;MacroscopicCell, dim&gt;() {}</span></a>
+<a name="34"><span class="lineNum">      34 </span>            :   /** Destructor */</a>
+<a name="35"><span class="lineNum">      35 </span><span class="lineNoCov">          0 :   virtual ~FromMacro2MD() {}</span></a>
+<a name="36"><span class="lineNum">      36 </span>            : </a>
+<a name="37"><span class="lineNum">      37 </span>            :   /** sends information from the local macroscopic cells of a macroscopic solver</a>
+<a name="38"><span class="lineNum">      38 </span>            :    * to the macroscopic cells of MaMico (ghost cells are also allowed). Since</a>
+<a name="39"><span class="lineNum">      39 </span>            :    * the macroscopic solver can have an arbitrary distribution of cells on the</a>
+<a name="40"><span class="lineNum">      40 </span>            :    * processes, the buffer for sending the cell data is provided to this</a>
+<a name="41"><span class="lineNum">      41 </span>            :    * function in terms of an array of macroscopic cells including the respective</a>
+<a name="42"><span class="lineNum">      42 </span>            :    * global cell indices. This function calls sendFromMacro2MDNonBlocking(..)</a>
+<a name="43"><span class="lineNum">      43 </span>            :    * and immediately subsequently wait4SendFromMacro2MD(...). Those two methods</a>
+<a name="44"><span class="lineNum">      44 </span>            :    * may alternatively be used, e.g., for &quot;non-blocking&quot; communication.</a>
+<a name="45"><span class="lineNum">      45 </span>            :    *    @param indexConversion</a>
+<a name="46"><span class="lineNum">      46 </span>            :    *    @param dataExchange</a>
+<a name="47"><span class="lineNum">      47 </span>            :    *    @param macroscopicCellsFromMamico</a>
+<a name="48"><span class="lineNum">      48 </span>            :    *    @param macroscopicCellsFromMacroscopicSolver</a>
+<a name="49"><span class="lineNum">      49 </span>            :    *    @param globalCellIndicesFromMacroscopicSolver</a>
+<a name="50"><span class="lineNum">      50 </span>            :    */</a>
+<a name="51"><span class="lineNum">      51 </span>            :   void sendFromMacro2MD(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
+<a name="52"><span class="lineNum">      52 </span>            :                         const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMamico,</a>
+<a name="53"><span class="lineNum">      53 </span>            :                         const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
+<a name="54"><span class="lineNum">      54 </span>            :                         const unsigned int* const globalCellIndicesFromMacroscopicSolver);</a>
+<a name="55"><span class="lineNum">      55 </span>            : </a>
+<a name="56"><span class="lineNum">      56 </span>            :   void bcastFromMacro2MD(std::vector&lt;coupling::sendrecv::DataExchangeFromMacro2MD&lt;dim&gt;*&gt;&amp; dataExchangeFromMacroscopicCellServices,</a>
+<a name="57"><span class="lineNum">      57 </span>            :                          const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
+<a name="58"><span class="lineNum">      58 </span>            :                          const unsigned int* const globalCellIndicesFromMacroscopicSolver,</a>
+<a name="59"><span class="lineNum">      59 </span>            :                          std::vector&lt;std::vector&lt;MacroscopicCell*&gt;&gt; allMacroscopicCellsFromMacroscopicCellServices);</a>
+<a name="60"><span class="lineNum">      60 </span>            : </a>
+<a name="61"><span class="lineNum">      61 </span>            :   /** sends data from macro to MD. After returning, the data transfer may not be</a>
+<a name="62"><span class="lineNum">      62 </span>            :    * completely finished, similar to a IRecv/ISend-call by MPI. Please use</a>
+<a name="63"><span class="lineNum">      63 </span>            :    * wait4SendFromMacro2MD(...) to guarantee that the data transfer has been</a>
+<a name="64"><span class="lineNum">      64 </span>            :    * finished.</a>
+<a name="65"><span class="lineNum">      65 </span>            :    *    @param indexConversion</a>
+<a name="66"><span class="lineNum">      66 </span>            :    *    @param dataExchange</a>
+<a name="67"><span class="lineNum">      67 </span>            :    *    @param macroscopicCellsFromMacroscopicSolver</a>
+<a name="68"><span class="lineNum">      68 </span>            :    *    @param globalCellIndicesFromMacroscopicSolver</a>
+<a name="69"><span class="lineNum">      69 </span>            :    */</a>
+<a name="70"><span class="lineNum">      70 </span>            :   void sendFromMacro2MDNonBlocking(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
+<a name="71"><span class="lineNum">      71 </span>            :                                    const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMacroscopicSolver,</a>
+<a name="72"><span class="lineNum">      72 </span>            :                                    const unsigned int* const globalCellIndicesFromMacroscopicSolver);</a>
+<a name="73"><span class="lineNum">      73 </span>            : </a>
+<a name="74"><span class="lineNum">      74 </span>            :   /** waits for the data transfer--instantiated by</a>
+<a name="75"><span class="lineNum">      75 </span>            :    * sendFromMacro2MDNonBlocking(..)--to be finished and fills the information</a>
+<a name="76"><span class="lineNum">      76 </span>            :    * into the macroscopic cells from Mamico.</a>
+<a name="77"><span class="lineNum">      77 </span>            :    *    @param indexConversion</a>
+<a name="78"><span class="lineNum">      78 </span>            :    *    @param dataExchange</a>
+<a name="79"><span class="lineNum">      79 </span>            :    *    @param macroscopicCellsFromMamico</a>
+<a name="80"><span class="lineNum">      80 </span>            :    */</a>
+<a name="81"><span class="lineNum">      81 </span>            :   void wait4SendFromMacro2MD(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
+<a name="82"><span class="lineNum">      82 </span>            :                              const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCellsFromMamico);</a>
+<a name="83"><span class="lineNum">      83 </span>            : </a>
+<a name="84"><span class="lineNum">      84 </span>            : private:</a>
+<a name="85"><span class="lineNum">      85 </span>            :   /** given a list of macroscopic cells (from the macroscopic solver), the data</a>
+<a name="86"><span class="lineNum">      86 </span>            :    * from these cells are written to the send buffer.</a>
+<a name="87"><span class="lineNum">      87 </span>            :    *    @param indexConversion</a>
+<a name="88"><span class="lineNum">      88 </span>            :    *    @param dataExchange</a>
+<a name="89"><span class="lineNum">      89 </span>            :    *    @param macroscopicCells</a>
+<a name="90"><span class="lineNum">      90 </span>            :    *    @param globalCellIndices</a>
+<a name="91"><span class="lineNum">      91 </span>            :    */</a>
+<a name="92"><span class="lineNum">      92 </span>            :   void writeToSendBuffer(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
+<a name="93"><span class="lineNum">      93 </span>            :                          const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCells, const unsigned int* const globalCellIndices);</a>
+<a name="94"><span class="lineNum">      94 </span>            : </a>
+<a name="95"><span class="lineNum">      95 </span>            :   void writeToSendBufferCollective(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
+<a name="96"><span class="lineNum">      96 </span>            :                                    const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCells, const unsigned int* const globalCellIndices);</a>
 <a name="97"><span class="lineNum">      97 </span>            : </a>
-<a name="98"><span class="lineNum">      98 </span>            :   /** reads information from the receive buffer and stores the result in the</a>
-<a name="99"><span class="lineNum">      99 </span>            :    * macroscopic cells. Since this is a receive for the macroscopic cells on the</a>
-<a name="100"><span class="lineNum">     100 </span>            :    * side of the coupling tool, we can consider a Cartesian grid topology for</a>
-<a name="101"><span class="lineNum">     101 </span>            :    * the macroscopic cells. For each cell, readFromReceiveBuffer(...) of</a>
-<a name="102"><span class="lineNum">     102 </span>            :    * SendReceiveBuffer is called.</a>
-<a name="103"><span class="lineNum">     103 </span>            :    *    @param indexConversion</a>
-<a name="104"><span class="lineNum">     104 </span>            :    *    @param dataExchange</a>
-<a name="105"><span class="lineNum">     105 </span>            :    *    @param macroscopicCells</a>
-<a name="106"><span class="lineNum">     106 </span>            :    */</a>
-<a name="107"><span class="lineNum">     107 </span>            :   void readFromReceiveBuffer(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
-<a name="108"><span class="lineNum">     108 </span>            :                              const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCells);</a>
-<a name="109"><span class="lineNum">     109 </span>            : };</a>
-<a name="110"><span class="lineNum">     110 </span>            : </a>
-<a name="111"><span class="lineNum">     111 </span>            : #include &quot;FromMacro2MD.cpph&quot;</a>
-<a name="112"><span class="lineNum">     112 </span>            : </a>
-<a name="113"><span class="lineNum">     113 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_SENDRECV_FROMMACRO2MD_H_</a>
+<a name="98"><span class="lineNum">      98 </span>            :   /** allocates the receive buffers for the macroscopic solver. Since we want to</a>
+<a name="99"><span class="lineNum">      99 </span>            :    * obtain data on the side of MaMiCo, we can just loop over all local</a>
+<a name="100"><span class="lineNum">     100 </span>            :    * macroscopic cells of the coupling tool and call allocateReceiveBuffers(...)</a>
+<a name="101"><span class="lineNum">     101 </span>            :    * of the SendReceiveBuffer for each respective cell.</a>
+<a name="102"><span class="lineNum">     102 </span>            :    *    @param indexConversion</a>
+<a name="103"><span class="lineNum">     103 </span>            :    *    @param dataExchange</a>
+<a name="104"><span class="lineNum">     104 </span>            :    */</a>
+<a name="105"><span class="lineNum">     105 </span>            :   void allocateReceiveBuffers(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange);</a>
+<a name="106"><span class="lineNum">     106 </span>            : </a>
+<a name="107"><span class="lineNum">     107 </span>            :   void allocateReceiveBuffersCollective(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion,</a>
+<a name="108"><span class="lineNum">     108 </span>            :                                         coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange);</a>
+<a name="109"><span class="lineNum">     109 </span>            : </a>
+<a name="110"><span class="lineNum">     110 </span>            :   /** reads information from the receive buffer and stores the result in the</a>
+<a name="111"><span class="lineNum">     111 </span>            :    * macroscopic cells. Since this is a receive for the macroscopic cells on the</a>
+<a name="112"><span class="lineNum">     112 </span>            :    * side of the coupling tool, we can consider a Cartesian grid topology for</a>
+<a name="113"><span class="lineNum">     113 </span>            :    * the macroscopic cells. For each cell, readFromReceiveBuffer(...) of</a>
+<a name="114"><span class="lineNum">     114 </span>            :    * SendReceiveBuffer is called.</a>
+<a name="115"><span class="lineNum">     115 </span>            :    *    @param indexConversion</a>
+<a name="116"><span class="lineNum">     116 </span>            :    *    @param dataExchange</a>
+<a name="117"><span class="lineNum">     117 </span>            :    *    @param macroscopicCells</a>
+<a name="118"><span class="lineNum">     118 </span>            :    */</a>
+<a name="119"><span class="lineNum">     119 </span>            :   void readFromReceiveBuffer(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
+<a name="120"><span class="lineNum">     120 </span>            :                              const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCells);</a>
+<a name="121"><span class="lineNum">     121 </span>            : </a>
+<a name="122"><span class="lineNum">     122 </span>            :   void readFromCollectiveBuffer(const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion, coupling::sendrecv::DataExchange&lt;MacroscopicCell, dim&gt;&amp; dataExchange,</a>
+<a name="123"><span class="lineNum">     123 </span>            :                                 const std::vector&lt;MacroscopicCell*&gt;&amp; macroscopicCells);</a>
+<a name="124"><span class="lineNum">     124 </span>            : };</a>
+<a name="125"><span class="lineNum">     125 </span>            : </a>
+<a name="126"><span class="lineNum">     126 </span>            : #include &quot;FromMacro2MD.cpph&quot;</a>
+<a name="127"><span class="lineNum">     127 </span>            : </a>
+<a name="128"><span class="lineNum">     128 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_SENDRECV_FROMMACRO2MD_H_</a>
 </pre>
       </td>
     </tr>
