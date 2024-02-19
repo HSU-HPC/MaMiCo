@@ -8,6 +8,9 @@
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/services/MultiMDCellService.h"
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#include <mpi.h>
+#endif
 
 
 
@@ -33,7 +36,7 @@ public:
         
         _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), 2
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-,1
+,_timeIntegrationService->getPintComm()
 #endif
     );
         
