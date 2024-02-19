@@ -5,6 +5,7 @@
 #include "coupling/InstanceHandling.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+#include "coupling/configurations/CouetteConfiguration.h"
 #include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/services/MultiMDCellService.h"
