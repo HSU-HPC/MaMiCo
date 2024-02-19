@@ -5,6 +5,8 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_INTERFACE_MOLECULE_H_
 #define _MOLECULARDYNAMICS_COUPLING_INTERFACE_MOLECULE_H_
 
+#include "tarch/la/Vector.h"
+
 namespace coupling {
 namespace interface {
 template <unsigned int dim> class Molecule;

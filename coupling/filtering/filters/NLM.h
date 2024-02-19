@@ -9,7 +9,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class NLM;
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> class NLM;
 }
 } // namespace coupling
 
@@ -21,10 +21,10 @@ template <unsigned int dim> class NLM;
  *  @author Piet Jarmatz
  *
  */
-template <unsigned int dim> class coupling::filtering::NLM : public coupling::filtering::JunctorInterface<dim, 2, 1> {
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> class coupling::filtering::NLM : public coupling::filtering::JunctorInterface<dim, 2, 1> {
 public:
-  using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::local,
-                                                    coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
+  using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, scope..., coupling::indexing::IndexTrait::md2macro,
+                                                    coupling::indexing::IndexTrait::noGhost>;
 
   NLM(const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_unfiltered,
       const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_prefiltered,
