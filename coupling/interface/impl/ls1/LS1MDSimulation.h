@@ -2,6 +2,7 @@
 
 #include "coupling/interface/MDSimulation.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "ls1/src/Domain.h"
 #include "ls1/src/Simulation.h"
 #include "ls1/src/plugins/MamicoCoupling.h"
 
@@ -51,12 +52,16 @@ public:
   virtual void switchOffCoupling() override {
     // coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOff();
     internalCouplingState = false;
+    simulation->getDomain()->thermostatOn();
+    simulation->getDomain()->setExplosionHeuristics(true);
     if (ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOffCoupling();
   }
   virtual void switchOnCoupling() override {
     // coupling::interface::LS1MamicoCouplingSwitch::getInstance().setCouplingStateOn();
     internalCouplingState = true;
+    simulation->getDomain()->thermostatOff();
+    simulation->getDomain()->setExplosionHeuristics(false);
     if (ls1MamicoPlugin != nullptr)
       ls1MamicoPlugin->switchOnCoupling();
   }
@@ -101,6 +106,8 @@ public:
     // parse file
     const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
     simulation->readConfigFile(filename);
+    simulation->getDomain()->thermostatOff();
+    simulation->getDomain()->setExplosionHeuristics(false);
     // after this point the mamico plugin exists and is accessible
     simulation->prepare_start();
     simulation->preSimLoopSteps();

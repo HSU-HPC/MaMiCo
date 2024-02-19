@@ -36,6 +36,7 @@
 #include "coupling/interface/impl/ls1/LS1MDSimulation.h"
 #include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
+#include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
 #endif
 
@@ -145,7 +146,9 @@ public:
 #elif defined(LAMMPS_DPD)
     mdSolverInterface = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
 #elif defined(LS1_MARDYN)
-    mdSolverInterface = new coupling::interface::LS1MDSolverInterface();
+    mdSolverInterface =
+        new coupling::interface::LS1MDSolverInterface(mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
+                                                      mamicoConfiguration.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell());
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(mdSolverInterface);
 #endif
 

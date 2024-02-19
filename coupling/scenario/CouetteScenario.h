@@ -165,7 +165,6 @@ protected:
     _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
 
 #if defined(LS1_MARDYN)
-    assert((_mamicoConfig.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3, unsigned int>(1)));
     auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
     coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
