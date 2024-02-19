@@ -380,6 +380,10 @@ elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
     target_link_libraries(mamico INTERFACE adios2::adios2)
   endif()
 endif()
+if(ENABLE_COVERAGE)
+  target_compile_options(mamico INTERFACE --coverage)
+  target_link_libraries(mamico INTERFACE gcov)
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
   target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
@@ -774,9 +778,6 @@ target_link_libraries(benchmarks PRIVATE mamico)
 # Coverage
 #
 if(ENABLE_COVERAGE)
-  target_compile_options(mamico INTERFACE -O0 --coverage)
-  target_link_libraries(mamico INTERFACE gcov)
-
   # find required tools
   find_program(LCOV lcov REQUIRED)
   find_program(GENHTML genhtml REQUIRED)
