@@ -74,7 +74,7 @@ public:
       
 
       _instanceHandling->switchOnCoupling();
-      unsigned int  totalNumberOfMDSimulations = _multiMDService->getTotalNumberOfMDSimulations();
+//      unsigned int  totalNumberOfMDSimulations = _multiMDService->getTotalNumberOfMDSimulations();
       _instanceHandling->addSimulationBlock();
 //      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations()+1);
       CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations()+1);
