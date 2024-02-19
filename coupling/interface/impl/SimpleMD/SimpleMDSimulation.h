@@ -1,5 +1,5 @@
 #pragma once
-#include "MDSimulation.h"
+#include "coupling/interface/MDSimulation.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "simplemd/MolecularDynamicsSimulation.h"
 

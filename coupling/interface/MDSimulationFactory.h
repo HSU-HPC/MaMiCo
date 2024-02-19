@@ -14,7 +14,7 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
-#include "coupling/interface/MDSimulationFactory/MDSimulation.h"
+#include "coupling/interface/MDSimulation.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/la/ScalarOperations.h"
@@ -24,16 +24,16 @@
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "simplemd/LinkedCell.h"
 #define MY_LINKEDCELL simplemd::LinkedCell
-#include "coupling/interface/MDSimulationFactory/SimpleMDSimulation.h"
+#include "coupling/interface/impl/SimpleMD/SimpleMDSimulation.h"
 #elif defined(LAMMPS_MD) || defined(LAMMPS_DPD)
 #if defined(LAMMPS_MD)
-#include "coupling/interface/MDSimulationFactory/LammpsMDSimulation.h"
+#include "coupling/interface/impl/LAMMPS/LammpsMDSimulation.h"
 #else // LAMMPS_DPD
-#include "coupling/interface/MDSimulationFactory/LammpsDPDSimulation.h"
+#include "coupling/interface/impl/LAMMPS/LammpsDPDSimulation.h"
 #endif
 #define MY_LINKEDCELL LAMMPS_NS::MamicoCell
 #elif defined(LS1_MARDYN)
-#include "coupling/interface/MDSimulationFactory/LS1MDSimulation.h"
+#include "coupling/interface/impl/ls1/LS1MDSimulation.h"
 #include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
@@ -160,7 +160,8 @@ public:
 
   /** shuts down the MD solver interfaces and deletes the interface if required
      (depending on the respective MD simulation) */
-  void shutdownMDSolverInterface() {
+  void
+  shutdownMDSolverInterface() {
 #if defined(SIMPLE_MD)
     coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>* interface =
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
