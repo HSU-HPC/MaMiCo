@@ -308,6 +308,9 @@ if(BUILD_WITH_ADIOS2)
 endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
+if("${MD_SIM}" STREQUAL "LS1_MARDYN") #to be removed when ls1 updates to use the latest autopas
+  target_compile_options(mamico INTERFACE -Wno-reorder)
+endif()
 if(BUILD_WITH_MPI)
   target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
@@ -604,6 +607,11 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/impl/SimpleMD/SimpleMDMoleculeIterator.h"
   "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
   "coupling/interface/impl/SimpleMD/SimpleMDMolecule.h"
+  "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
+  "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
+  "coupling/interface/impl/ls1/LS1StaticCommData.h"
+  "coupling/interface/impl/ls1/LS1Molecule.h"
+  "coupling/interface/impl/ls1/LS1RegionWrapper.h"
   "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolverInterface.h"
   "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolver.h"
   "coupling/interface/impl/macroscopictestsolvers/MacroscopicSolverFactory.h"
@@ -654,6 +662,12 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/indexing/OperationsTest.cpp"
   "test/unit/coupling/indexing/CellIndexTest.cpp"
   "test/unit/coupling/indexing/IndexingServiceTest.cpp"
+  "test/unit/coupling/interface/impl/SimpleMD/SimpleMDMoleculeTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MDSolverInterfaceTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MoleculeIteratorTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MoleculeTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1RegionWrapperTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1StaticCommDataTest.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
