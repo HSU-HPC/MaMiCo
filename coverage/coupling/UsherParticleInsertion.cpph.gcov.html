@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-02-19 15:33:54</td>
+            <td class="headerValue">2024-02-19 16:30:57</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -295,89 +295,90 @@
 <a name="233"><span class="lineNum">     233 </span><span class="lineNoCov">          0 :         molecule.setPotentialEnergy(0.0);</span></a>
 <a name="234"><span class="lineNum">     234 </span>            : #ifdef USHER_DEBUG</a>
 <a name="235"><span class="lineNum">     235 </span>            :         std::cout &lt;&lt; &quot;low energy hole&quot; &lt;&lt; std::endl;</a>
-<a name="236"><span class="lineNum">     236 </span>            : #endif</a>
-<a name="237"><span class="lineNum">     237 </span><span class="lineNoCov">          0 :         return coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Insertion;</span></a>
-<a name="238"><span class="lineNum">     238 </span>            :       }</a>
-<a name="239"><span class="lineNum">     239 </span>            : </a>
-<a name="240"><span class="lineNum">     240 </span>            :       // control step size</a>
-<a name="241"><span class="lineNum">     241 </span><span class="lineNoCov">          0 :       if (energy &gt; U_overlap) {</span></a>
-<a name="242"><span class="lineNum">     242 </span><span class="lineNoCov">          0 :         stepSize = rSigma - sigma * pow(epsilon_times_4 / energy, (1.0 / 12.0));</span></a>
-<a name="243"><span class="lineNum">     243 </span>            : </a>
-<a name="244"><span class="lineNum">     244 </span>            :       } else {</a>
-<a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 :         stepSize = fabs(energy - U_0) / absForce;</span></a>
-<a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :         if (stepSize &gt; stepRef) {</span></a>
-<a name="247"><span class="lineNum">     247 </span><span class="lineNoCov">          0 :           stepSize = stepRef;</span></a>
-<a name="248"><span class="lineNum">     248 </span>            :         }</a>
-<a name="249"><span class="lineNum">     249 </span>            :       }</a>
-<a name="250"><span class="lineNum">     250 </span>            : #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
-<a name="251"><span class="lineNum">     251 </span><span class="lineNoCov">          0 :       if (stepSize &lt;= 0.0) {</span></a>
-<a name="252"><span class="lineNum">     252 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;findParticlePosition(): ERROR &quot;</span></a>
-<a name="253"><span class="lineNum">     253 </span>            :                      &quot;coupling::UsherParticleInsertion::findParticlePosition():&quot;</a>
-<a name="254"><span class="lineNum">     254 </span>            :                      &quot; Stepsize is smaller than/ equal zero!&quot;</a>
-<a name="255"><span class="lineNum">     255 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
-<a name="256"><span class="lineNum">     256 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
-<a name="257"><span class="lineNum">     257 </span>            :       }</a>
-<a name="258"><span class="lineNum">     258 </span>            : #endif</a>
-<a name="259"><span class="lineNum">     259 </span>            : </a>
-<a name="260"><span class="lineNum">     260 </span>            :       // update particle position</a>
-<a name="261"><span class="lineNum">     261 </span><span class="lineNoCov">          0 :       positionOld = position;</span></a>
-<a name="262"><span class="lineNum">     262 </span><span class="lineNoCov">          0 :       position = position + (stepSize * signAl / absForce) * force;</span></a>
-<a name="263"><span class="lineNum">     263 </span>            : </a>
-<a name="264"><span class="lineNum">     264 </span><span class="lineNoCov">          0 :       molecule.setPosition(position);</span></a>
-<a name="265"><span class="lineNum">     265 </span>            : </a>
-<a name="266"><span class="lineNum">     266 </span>            :       // restart searching if the new position of the particle is outside the</a>
-<a name="267"><span class="lineNum">     267 </span>            :       // macroscopic cell</a>
-<a name="268"><span class="lineNum">     268 </span><span class="lineNoCov">          0 :       for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :         restartSearch = restartSearch || (position[d] &gt;= upperRightBoundaries[d]) || (position[d] &lt;= lowerLeftBoundaries[d]);</span></a>
-<a name="270"><span class="lineNum">     270 </span>            :       }</a>
-<a name="271"><span class="lineNum">     271 </span><span class="lineNoCov">          0 :       if (restartSearch) {</span></a>
-<a name="272"><span class="lineNum">     272 </span>            :         break;</a>
-<a name="273"><span class="lineNum">     273 </span>            :       }</a>
-<a name="274"><span class="lineNum">     274 </span>            : </a>
-<a name="275"><span class="lineNum">     275 </span>            :       // determine force and energy that act on molecule</a>
-<a name="276"><span class="lineNum">     276 </span><span class="lineNoCov">          0 :       _mdSolverInterface-&gt;calculateForceAndEnergy(molecule);</span></a>
-<a name="277"><span class="lineNum">     277 </span><span class="lineNoCov">          0 :       energy = molecule.getPotentialEnergy();</span></a>
-<a name="278"><span class="lineNum">     278 </span><span class="lineNoCov">          0 :       energy += boundaryForceController.getPotentialEnergy(position);</span></a>
-<a name="279"><span class="lineNum">     279 </span><span class="lineNoCov">          0 :       force = molecule.getForce();</span></a>
-<a name="280"><span class="lineNum">     280 </span><span class="lineNoCov">          0 :       force += boundaryForceController.getForce(position);</span></a>
-<a name="281"><span class="lineNum">     281 </span><span class="lineNoCov">          0 :       signAl = (int)((energy - U_0) / fabs(energy - U_0));</span></a>
-<a name="282"><span class="lineNum">     282 </span>            : </a>
-<a name="283"><span class="lineNum">     283 </span><span class="lineNoCov">          0 :       absForce = std::sqrt(tarch::la::dot(force, force));</span></a>
-<a name="284"><span class="lineNum">     284 </span><span class="lineNoCov">          0 :       xiOld = xiloc;</span></a>
-<a name="285"><span class="lineNum">     285 </span><span class="lineNoCov">          0 :       xiloc = fabs(energy - U_0) / fabs(U_0);</span></a>
-<a name="286"><span class="lineNum">     286 </span>            : </a>
-<a name="287"><span class="lineNum">     287 </span><span class="lineNoCov">          0 :       if (xiloc &lt; xiMax) {</span></a>
-<a name="288"><span class="lineNum">     288 </span><span class="lineNoCov">          0 :         success++;</span></a>
-<a name="289"><span class="lineNum">     289 </span>            :       }</a>
-<a name="290"><span class="lineNum">     290 </span>            : </a>
-<a name="291"><span class="lineNum">     291 </span>            :       // restart searching if the difference energy-U_0 increases</a>
-<a name="292"><span class="lineNum">     292 </span><span class="lineNoCov">          0 :       if (xiloc &gt; xiOld) {</span></a>
-<a name="293"><span class="lineNum">     293 </span>            :         break;</a>
-<a name="294"><span class="lineNum">     294 </span>            :       }</a>
-<a name="295"><span class="lineNum">     295 </span>            :     }</a>
-<a name="296"><span class="lineNum">     296 </span><span class="lineNoCov">          0 :     if (success &gt; 0) {</span></a>
-<a name="297"><span class="lineNum">     297 </span><span class="lineNoCov">          0 :       molecule.setPosition(positionOld);</span></a>
-<a name="298"><span class="lineNum">     298 </span><span class="lineNoCov">          0 :       _mdSolverInterface-&gt;calculateForceAndEnergy(molecule);</span></a>
-<a name="299"><span class="lineNum">     299 </span>            : </a>
-<a name="300"><span class="lineNum">     300 </span>            : #ifdef USHER_DEBUG</a>
-<a name="301"><span class="lineNum">     301 </span>            :       _energyInserted += molecule.getPotentialEnergy();</a>
-<a name="302"><span class="lineNum">     302 </span>            :       _ZhouEnergyInserted += boundaryForceController.getPotentialEnergy(positionOld);</a>
-<a name="303"><span class="lineNum">     303 </span>            :       _particlesInserted++;</a>
-<a name="304"><span class="lineNum">     304 </span>            :       energy = molecule.getPotentialEnergy();</a>
-<a name="305"><span class="lineNum">     305 </span>            :       energy += boundaryForceController.getPotentialEnergy(positionOld);</a>
-<a name="306"><span class="lineNum">     306 </span>            :       if (fabs(energy - U_0) / fabs(U_0) &gt;= xiMax)</a>
-<a name="307"><span class="lineNum">     307 </span>            :         std::cout &lt;&lt; &quot;USHER critical ERROR: fabs(energy-U_0)/fabs(U_0) &gt;= xiMax&quot; &lt;&lt; std::endl;</a>
-<a name="308"><span class="lineNum">     308 </span>            :       std::cout &lt;&lt; &quot;Finished with energy = &quot; &lt;&lt; energy &lt;&lt; &quot; after &quot; &lt;&lt; i &lt;&lt; &quot; restarts and &quot; &lt;&lt; loci &lt;&lt; &quot; iterations&quot; &lt;&lt; std::endl;</a>
-<a name="309"><span class="lineNum">     309 </span>            : #endif</a>
-<a name="310"><span class="lineNum">     310 </span>            : </a>
-<a name="311"><span class="lineNum">     311 </span><span class="lineNoCov">          0 :       return coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Insertion;</span></a>
-<a name="312"><span class="lineNum">     312 </span>            :     }</a>
-<a name="313"><span class="lineNum">     313 </span>            :   }</a>
-<a name="314"><span class="lineNum">     314 </span>            : #ifdef USHER_DEBUG</a>
-<a name="315"><span class="lineNum">     315 </span>            :   std::cout &lt;&lt; &quot;Failed&quot; &lt;&lt; std::endl;</a>
-<a name="316"><span class="lineNum">     316 </span>            : #endif</a>
-<a name="317"><span class="lineNum">     317 </span>            :   return coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::NoAction;</a>
-<a name="318"><span class="lineNum">     318 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="236"><span class="lineNum">     236 </span>            :         _particlesInserted++;</a>
+<a name="237"><span class="lineNum">     237 </span>            : #endif</a>
+<a name="238"><span class="lineNum">     238 </span><span class="lineNoCov">          0 :         return coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Insertion;</span></a>
+<a name="239"><span class="lineNum">     239 </span>            :       }</a>
+<a name="240"><span class="lineNum">     240 </span>            : </a>
+<a name="241"><span class="lineNum">     241 </span>            :       // control step size</a>
+<a name="242"><span class="lineNum">     242 </span><span class="lineNoCov">          0 :       if (energy &gt; U_overlap) {</span></a>
+<a name="243"><span class="lineNum">     243 </span><span class="lineNoCov">          0 :         stepSize = rSigma - sigma * pow(epsilon_times_4 / energy, (1.0 / 12.0));</span></a>
+<a name="244"><span class="lineNum">     244 </span>            : </a>
+<a name="245"><span class="lineNum">     245 </span>            :       } else {</a>
+<a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :         stepSize = fabs(energy - U_0) / absForce;</span></a>
+<a name="247"><span class="lineNum">     247 </span><span class="lineNoCov">          0 :         if (stepSize &gt; stepRef) {</span></a>
+<a name="248"><span class="lineNum">     248 </span><span class="lineNoCov">          0 :           stepSize = stepRef;</span></a>
+<a name="249"><span class="lineNum">     249 </span>            :         }</a>
+<a name="250"><span class="lineNum">     250 </span>            :       }</a>
+<a name="251"><span class="lineNum">     251 </span>            : #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
+<a name="252"><span class="lineNum">     252 </span><span class="lineNoCov">          0 :       if (stepSize &lt;= 0.0) {</span></a>
+<a name="253"><span class="lineNum">     253 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;findParticlePosition(): ERROR &quot;</span></a>
+<a name="254"><span class="lineNum">     254 </span>            :                      &quot;coupling::UsherParticleInsertion::findParticlePosition():&quot;</a>
+<a name="255"><span class="lineNum">     255 </span>            :                      &quot; Stepsize is smaller than/ equal zero!&quot;</a>
+<a name="256"><span class="lineNum">     256 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
+<a name="257"><span class="lineNum">     257 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
+<a name="258"><span class="lineNum">     258 </span>            :       }</a>
+<a name="259"><span class="lineNum">     259 </span>            : #endif</a>
+<a name="260"><span class="lineNum">     260 </span>            : </a>
+<a name="261"><span class="lineNum">     261 </span>            :       // update particle position</a>
+<a name="262"><span class="lineNum">     262 </span><span class="lineNoCov">          0 :       positionOld = position;</span></a>
+<a name="263"><span class="lineNum">     263 </span><span class="lineNoCov">          0 :       position = position + (stepSize * signAl / absForce) * force;</span></a>
+<a name="264"><span class="lineNum">     264 </span>            : </a>
+<a name="265"><span class="lineNum">     265 </span><span class="lineNoCov">          0 :       molecule.setPosition(position);</span></a>
+<a name="266"><span class="lineNum">     266 </span>            : </a>
+<a name="267"><span class="lineNum">     267 </span>            :       // restart searching if the new position of the particle is outside the</a>
+<a name="268"><span class="lineNum">     268 </span>            :       // macroscopic cell</a>
+<a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :       for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :         restartSearch = restartSearch || (position[d] &gt;= upperRightBoundaries[d]) || (position[d] &lt;= lowerLeftBoundaries[d]);</span></a>
+<a name="271"><span class="lineNum">     271 </span>            :       }</a>
+<a name="272"><span class="lineNum">     272 </span><span class="lineNoCov">          0 :       if (restartSearch) {</span></a>
+<a name="273"><span class="lineNum">     273 </span>            :         break;</a>
+<a name="274"><span class="lineNum">     274 </span>            :       }</a>
+<a name="275"><span class="lineNum">     275 </span>            : </a>
+<a name="276"><span class="lineNum">     276 </span>            :       // determine force and energy that act on molecule</a>
+<a name="277"><span class="lineNum">     277 </span><span class="lineNoCov">          0 :       _mdSolverInterface-&gt;calculateForceAndEnergy(molecule);</span></a>
+<a name="278"><span class="lineNum">     278 </span><span class="lineNoCov">          0 :       energy = molecule.getPotentialEnergy();</span></a>
+<a name="279"><span class="lineNum">     279 </span><span class="lineNoCov">          0 :       energy += boundaryForceController.getPotentialEnergy(position);</span></a>
+<a name="280"><span class="lineNum">     280 </span><span class="lineNoCov">          0 :       force = molecule.getForce();</span></a>
+<a name="281"><span class="lineNum">     281 </span><span class="lineNoCov">          0 :       force += boundaryForceController.getForce(position);</span></a>
+<a name="282"><span class="lineNum">     282 </span><span class="lineNoCov">          0 :       signAl = (int)((energy - U_0) / fabs(energy - U_0));</span></a>
+<a name="283"><span class="lineNum">     283 </span>            : </a>
+<a name="284"><span class="lineNum">     284 </span><span class="lineNoCov">          0 :       absForce = std::sqrt(tarch::la::dot(force, force));</span></a>
+<a name="285"><span class="lineNum">     285 </span><span class="lineNoCov">          0 :       xiOld = xiloc;</span></a>
+<a name="286"><span class="lineNum">     286 </span><span class="lineNoCov">          0 :       xiloc = fabs(energy - U_0) / fabs(U_0);</span></a>
+<a name="287"><span class="lineNum">     287 </span>            : </a>
+<a name="288"><span class="lineNum">     288 </span><span class="lineNoCov">          0 :       if (xiloc &lt; xiMax) {</span></a>
+<a name="289"><span class="lineNum">     289 </span><span class="lineNoCov">          0 :         success++;</span></a>
+<a name="290"><span class="lineNum">     290 </span>            :       }</a>
+<a name="291"><span class="lineNum">     291 </span>            : </a>
+<a name="292"><span class="lineNum">     292 </span>            :       // restart searching if the difference energy-U_0 increases</a>
+<a name="293"><span class="lineNum">     293 </span><span class="lineNoCov">          0 :       if (xiloc &gt; xiOld) {</span></a>
+<a name="294"><span class="lineNum">     294 </span>            :         break;</a>
+<a name="295"><span class="lineNum">     295 </span>            :       }</a>
+<a name="296"><span class="lineNum">     296 </span>            :     }</a>
+<a name="297"><span class="lineNum">     297 </span><span class="lineNoCov">          0 :     if (success &gt; 0) {</span></a>
+<a name="298"><span class="lineNum">     298 </span><span class="lineNoCov">          0 :       molecule.setPosition(positionOld);</span></a>
+<a name="299"><span class="lineNum">     299 </span><span class="lineNoCov">          0 :       _mdSolverInterface-&gt;calculateForceAndEnergy(molecule);</span></a>
+<a name="300"><span class="lineNum">     300 </span>            : </a>
+<a name="301"><span class="lineNum">     301 </span>            : #ifdef USHER_DEBUG</a>
+<a name="302"><span class="lineNum">     302 </span>            :       _energyInserted += molecule.getPotentialEnergy();</a>
+<a name="303"><span class="lineNum">     303 </span>            :       _ZhouEnergyInserted += boundaryForceController.getPotentialEnergy(positionOld);</a>
+<a name="304"><span class="lineNum">     304 </span>            :       _particlesInserted++;</a>
+<a name="305"><span class="lineNum">     305 </span>            :       energy = molecule.getPotentialEnergy();</a>
+<a name="306"><span class="lineNum">     306 </span>            :       energy += boundaryForceController.getPotentialEnergy(positionOld);</a>
+<a name="307"><span class="lineNum">     307 </span>            :       if (fabs(energy - U_0) / fabs(U_0) &gt;= xiMax)</a>
+<a name="308"><span class="lineNum">     308 </span>            :         std::cout &lt;&lt; &quot;USHER critical ERROR: fabs(energy-U_0)/fabs(U_0) &gt;= xiMax&quot; &lt;&lt; std::endl;</a>
+<a name="309"><span class="lineNum">     309 </span>            :       std::cout &lt;&lt; &quot;Finished with energy = &quot; &lt;&lt; energy &lt;&lt; &quot; after &quot; &lt;&lt; i &lt;&lt; &quot; restarts and &quot; &lt;&lt; loci &lt;&lt; &quot; iterations&quot; &lt;&lt; std::endl;</a>
+<a name="310"><span class="lineNum">     310 </span>            : #endif</a>
+<a name="311"><span class="lineNum">     311 </span>            : </a>
+<a name="312"><span class="lineNum">     312 </span><span class="lineNoCov">          0 :       return coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Insertion;</span></a>
+<a name="313"><span class="lineNum">     313 </span>            :     }</a>
+<a name="314"><span class="lineNum">     314 </span>            :   }</a>
+<a name="315"><span class="lineNum">     315 </span>            : #ifdef USHER_DEBUG</a>
+<a name="316"><span class="lineNum">     316 </span>            :   std::cout &lt;&lt; &quot;Failed&quot; &lt;&lt; std::endl;</a>
+<a name="317"><span class="lineNum">     317 </span>            : #endif</a>
+<a name="318"><span class="lineNum">     318 </span>            :   return coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::NoAction;</a>
+<a name="319"><span class="lineNum">     319 </span><span class="lineNoCov">          0 : }</span></a>
 </pre>
       </td>
     </tr>
