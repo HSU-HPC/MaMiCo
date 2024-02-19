@@ -40,7 +40,7 @@ public:
 #endif
     );
         
-        tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>("couette.xml", "mamico", _mamicoConfig);
+        tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>("../test/unit/coupling/couette.xml", "mamico", _mamicoConfig);
     if (!_mamicoConfig.isValid()) {
       std::cout << "ERROR InstanceHandlingTest: Invalid MaMiCo config!" << std::endl;
       exit(EXIT_FAILURE);
@@ -87,7 +87,7 @@ public:
 
       coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = nullptr;
       
-      _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(_instanceHandling->getMDSolverInterface(), couetteSolverInterface, _simpleMDConfig, _mamicoConfig, "couette.xml", *_multiMDService);
+      _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(_instanceHandling->getMDSolverInterface(), couetteSolverInterface, _simpleMDConfig, _mamicoConfig, "../test/unit/coupling/couette.xml", *_multiMDService);
       
       
       _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
