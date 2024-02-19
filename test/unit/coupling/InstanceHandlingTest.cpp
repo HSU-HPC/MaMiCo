@@ -26,7 +26,7 @@ public:
     
     void test() {
         
-        std::string filename("couette.xml");
+        std::string filename("../test/couette.xml");
         tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",_simpleMDConfig);
         
     if (!_simpleMDConfig.isValid()) {
