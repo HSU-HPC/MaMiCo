@@ -207,7 +207,10 @@ public:
   /** returns a new molecule iterator for a certain linked cell */
   virtual coupling::interface::MoleculeIterator<ls1::LS1RegionWrapper, 3>* getMoleculeIterator(ls1::LS1RegionWrapper& cell) {
     return new coupling::interface::LS1MoleculeIterator(cell);
-  } private : ls1::LS1RegionWrapper _fullDomainWrapper;
+  }
+
+private:
+  ls1::LS1RegionWrapper _fullDomainWrapper;
   tarch::la::Vector<3, double> _linkedCellSize;
 };
 #endif

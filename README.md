@@ -17,6 +17,7 @@ Optional dependencies are:
 * [OpenFOAM](https://develop.openfoam.com/Development/openfoam/blob/develop/doc/Build.md), for coupling to CFD simulations with OpenFOAM.
 * [preCICE](https://precice.org/), for coupling with other solvers using the preCICE coupling library.
 * [ls1-MarDyn](https://www.ls1-mardyn.de/home.html), for coupling to MD simulations with ls1.
+* [LAMMPS](https://lammps.org/), for coupling to MD simulations with LAMMPS.
 * [LCOV](https://github.com/linux-test-project/lcov) and [gcc](https://gcc.gnu.org/), for test code coverage analysis.
 
 ## Build instructions
@@ -49,6 +50,11 @@ Optional dependencies are:
 * Follow the instructions on the [ls1 repository](https://github.com/ls1mardyn/ls1-mardyn) to build with cmake, however remember to enable the MAMICO_COUPLING flag, and provide the MaMiCo base directory in the MAMICO_SRC_DIR variable.
 
 * Make MaMiCo as normal, choosing LS1_MARDYN as your MD library.
+
+### Additional instructions to build with LAMMPS
+1. [Download the LAMMPS source code](https://docs.lammps.org/Install_git.html), [build it using CMake](https://docs.lammps.org/Build_cmake.html) with the option `-DBUILD_SHARED_LIBS=ON`, and install it using `make install`.  
+2. Make LAMMPS available through pgk-config with `export PKG_CONFIG_PATH=/home/$(whoami)/.local/lib/pkgconfig`.
+3. Create a symbolic link to the LAMMPS header files in the MaMiCo root folder using `ln -s <path to LAMMPS>/src <path to MaMiCo>/lammps`
 
 ## Input file construction and first runs
 * The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. 

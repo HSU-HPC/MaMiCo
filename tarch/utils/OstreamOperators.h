@@ -1,5 +1,9 @@
 #pragma once
 
+#include <map>
+#include <set>
+#include <vector>
+
 template <class T> std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
   os << "[";
   for (auto& item : v) {

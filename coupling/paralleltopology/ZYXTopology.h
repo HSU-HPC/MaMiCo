@@ -46,9 +46,7 @@ public:
       help = help - processCoordinates[d] * _divisionFactor4NumberProcesses[d];
     }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-std::cout << "Rank=" << rank
-              << " corresponds to process coordinates=" << processCoordinates
-              << std::endl;
+    std::cout << "Rank=" << rank << " corresponds to process coordinates=" << processCoordinates << std::endl;
 #endif
     return processCoordinates;
   }
