@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pandas as pd
 from bs4 import BeautifulSoup, Tag
+import numpy as np
 
 os.chdir(Path(__file__).parent.parent)
 
@@ -66,12 +67,12 @@ if not coverage_root.is_dir():
 
 if not coverage_root.is_dir():
     print('Coverage has not been generated yet.', file=sys.stderr)
-    print(coverage_root.absolute())
-    os.system(f'ls {str(coverage_root.absolute())}')
     exit(1)
 
 
 def iterate_coverage_indices(folder):
+    if not folder.exists():
+        return []
     index_files = []
     for f in folder.iterdir():
         if f.is_dir():
@@ -116,8 +117,9 @@ def get_test_coverage(index_files):
                     elif '%' in s:
                         values.append(float(s[:-2]) / 100)
 
-                # assert (len(data.keys()) == len(values))
-                if len(data.keys()) != len(values):
+                if len(data.keys()) - 1 == len(values):
+                    values.append(np.nan)  # Has no function coverage
+                elif len(data.keys()) != len(values):
                     print(f'Error in {f}')
                     continue
 
@@ -132,7 +134,7 @@ def get_test_coverage(index_files):
 
 df_coverage = get_test_coverage(coverage_index_files)
 
-# Remove completely tested
+# Remove completely tested (100% line coverage)
 mask_not_completed = ~(
     df_coverage[df_coverage.columns[1:]] >= 1).apply(all, axis=1)
 df_coverage = df_coverage[mask_not_completed]

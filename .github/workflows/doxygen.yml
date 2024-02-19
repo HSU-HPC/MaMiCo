@@ -37,7 +37,7 @@ jobs:
           # Working directory
           working-directory: "." # default is .
       - name: Doxygen Action
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' # Only update documentation when PR was merged
         uses: mattnotmitt/doxygen-action@v1.1.0
         with:
           # Path to Doxyfile
@@ -71,11 +71,19 @@ jobs:
         if: github.event_name == 'pull_request'
         id: "parse_coverage"
         run: |
+          chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
           echo 'PARSED_COVERAGE<<EOF' >> $GITHUB_OUTPUT
           python test/check_my_coverage.py >> $GITHUB_OUTPUT
-          [[ -z "$(echo $GITHUB_OUTPUT | grep "PARSED_COVERAGE=Sufficient")" ]] && COVERAGE_REACTION="eyes" || COVERAGE_REACTION="rocket"
+          if [[ -z "$(echo $GITHUB_OUTPUT | grep "PARSED_COVERAGE=Sufficient")" ]]; then
+            COVERAGE_REACTION="eyes"
+          else
+            COVERAGE_REACTION="rocket"
+          fi
           echo 'EOF' >> $GITHUB_OUTPUT
           echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> $GITHUB_OUTPUT
+
+          echo DEBUG
+          echo $GITHUB_OUTPUT
 
       - name: Comment Test Coverage
         if: github.event_name == 'pull_request'
