@@ -5,6 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SENDRECV_FROMMACRO2MD_H_
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_FROMMACRO2MD_H_
 
+#include "coupling/sendrecv/DataExchangeFromMacro2MD.h"
 #include "coupling/sendrecv/SendReceiveBuffer.h"
 #include <vector>
 
@@ -52,6 +53,11 @@ public:
                         const std::vector<MacroscopicCell*>& macroscopicCellsFromMacroscopicSolver,
                         const unsigned int* const globalCellIndicesFromMacroscopicSolver);
 
+  void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromMacroscopicCellServices,
+                         const std::vector<MacroscopicCell*>& macroscopicCellsFromMacroscopicSolver,
+                         const unsigned int* const globalCellIndicesFromMacroscopicSolver,
+                         std::vector<std::vector<MacroscopicCell*>> allMacroscopicCellsFromMacroscopicCellServices);
+
   /** sends data from macro to MD. After returning, the data transfer may not be
    * completely finished, similar to a IRecv/ISend-call by MPI. Please use
    * wait4SendFromMacro2MD(...) to guarantee that the data transfer has been
@@ -86,6 +92,9 @@ private:
   void writeToSendBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                          const std::vector<MacroscopicCell*>& macroscopicCells, const unsigned int* const globalCellIndices);
 
+  void writeToSendBufferCollective(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                   const std::vector<MacroscopicCell*>& macroscopicCells, const unsigned int* const globalCellIndices);
+
   /** allocates the receive buffers for the macroscopic solver. Since we want to
    * obtain data on the side of MaMiCo, we can just loop over all local
    * macroscopic cells of the coupling tool and call allocateReceiveBuffers(...)
@@ -94,6 +103,9 @@ private:
    * 	@param dataExchange
    */
   void allocateReceiveBuffers(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange);
+
+  void allocateReceiveBuffersCollective(const coupling::IndexConversion<dim>& indexConversion,
+                                        coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange);
 
   /** reads information from the receive buffer and stores the result in the
    * macroscopic cells. Since this is a receive for the macroscopic cells on the
@@ -106,6 +118,9 @@ private:
    */
   void readFromReceiveBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                              const std::vector<MacroscopicCell*>& macroscopicCells);
+
+  void readFromCollectiveBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                const std::vector<MacroscopicCell*>& macroscopicCells);
 };
 
 #include "FromMacro2MD.cpph"

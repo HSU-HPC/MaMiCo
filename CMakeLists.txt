@@ -293,6 +293,12 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+if(BUILD_WITH_MPI)
+  option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
+  if(USE_COLLECTIVE_MPI)
+    target_compile_definitions(mamico INTERFACE USE_COLLECTIVE_MPI)
+  endif()
+endif()
 if(BUILD_WITH_EIGEN)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
 	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
@@ -373,6 +379,10 @@ elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
     target_compile_definitions(mamico INTERFACE ENABLE_ADIOS2)
     target_link_libraries(mamico INTERFACE adios2::adios2)
   endif()
+endif()
+if(ENABLE_COVERAGE)
+  target_compile_options(mamico INTERFACE --coverage)
+  target_link_libraries(mamico INTERFACE gcov)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
@@ -768,9 +778,6 @@ target_link_libraries(benchmarks PRIVATE mamico)
 # Coverage
 #
 if(ENABLE_COVERAGE)
-  target_compile_options(mamico INTERFACE -O0 --coverage)
-  target_link_libraries(mamico INTERFACE gcov)
-
   # find required tools
   find_program(LCOV lcov REQUIRED)
   find_program(GENHTML genhtml REQUIRED)
