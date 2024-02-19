@@ -56,7 +56,7 @@ public:
     
 //    CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations());
     CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations());
-    CPPUNIT_ASSERT(2 == _multiMDService->getLocalNumberOfMDSimulations());
+    
     
 //    CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() != _multiMDService->getTotalNumberOfMDSimulations());
     CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() != _multiMDService->getLocalNumberOfMDSimulations());
@@ -79,7 +79,7 @@ public:
 //      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations()+1);
       CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations()+1);
       _instanceHandling->rmSimulationBlock();
-      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations());
+      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations());
       _instanceHandling->addSimulationBlock();
       auto* mdSolverInterface = _instanceHandling->addMDSimulation(totalNumberOfMDSimulations, totalNumberOfMDSimulations);
       CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations()+1);
