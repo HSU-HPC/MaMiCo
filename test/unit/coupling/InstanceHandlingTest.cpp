@@ -52,11 +52,14 @@ public:
     }
     
 //    CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations());
+      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations());
 //    CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == 2);
     CPPUNIT_ASSERT(2 == _multiMDService->getTotalNumberOfMDSimulations());
-    CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() != _multiMDService->getTotalNumberOfMDSimulations());
+//    CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() != _multiMDService->getTotalNumberOfMDSimulations());
+    CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() != _multiMDService->getLocalNumberOfMDSimulations());
     _instanceHandling->setMDSolverInterface();
-    CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() == _multiMDService->getTotalNumberOfMDSimulations());
+//    CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() == _multiMDService->getTotalNumberOfMDSimulations());
+    CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() == _multiMDService->getLocalNumberOfMDSimulations());
     // equilibrate MD
       _instanceHandling->switchOffCoupling();
       unsigned int t = 5;
@@ -70,7 +73,8 @@ public:
       _instanceHandling->switchOnCoupling();
       unsigned int  totalNumberOfMDSimulations = _multiMDService->getTotalNumberOfMDSimulations();
       _instanceHandling->addSimulationBlock();
-      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations()+1);
+//      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations()+1);
+      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations()+1);
       _instanceHandling->rmSimulationBlock();
       CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations());
       _instanceHandling->addSimulationBlock();
