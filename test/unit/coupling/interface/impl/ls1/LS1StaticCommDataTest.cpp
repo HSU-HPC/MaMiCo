@@ -2,6 +2,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "coupling/CouplingMDDefinitions.h"
 
 #include <array>
 
