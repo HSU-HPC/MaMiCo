@@ -8,7 +8,9 @@
 #include "ls1/src/Simulation.h"
 #include "ls1/src/ensemble/EnsembleBase.h"
 #include "ls1/src/molecules/Molecule.h"
+#ifdef ENABLE_MPI
 #include "ls1/src/parallel/DomainDecompMPIBase.h"
+#endif
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/particleContainer/RegionParticleIterator.h"
 
