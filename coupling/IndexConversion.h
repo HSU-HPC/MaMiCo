@@ -202,6 +202,11 @@ public:
    *  @param rank the linearised/continuous rank of a process
    *  @returns the process coordinates */
   tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const;
+  /** Forwards the call to the ParallelTopology implementation modulo the number of processes on each dimension (wrap around).
+   *  @brief returns the process coordinates for the rank 'rank'.
+   *  @param rank the linearised/continuous rank of a process
+   *  @returns the process coordinates */
+  tarch::la::Vector<dim, unsigned int> getThisProcessCoordinates(unsigned int rank) const;
   /** Forwards the call to the ParallelTopology implementation.
    *  @brief returns the linearised index (i.e. rank) of the given process
    * coordinates.
