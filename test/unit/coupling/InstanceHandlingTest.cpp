@@ -53,6 +53,8 @@ public:
     
 //    CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations());
     CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations());
+    CPPUNIT_ASSERT(0 == _multiMDService->getLocalNumberOfMDSimulations());
+    
 //    CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() != _multiMDService->getTotalNumberOfMDSimulations());
     CPPUNIT_ASSERT(_instanceHandling->getMDSolverInterface().size() != _multiMDService->getLocalNumberOfMDSimulations());
     _instanceHandling->setMDSolverInterface();
