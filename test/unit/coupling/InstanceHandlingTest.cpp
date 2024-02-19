@@ -36,7 +36,7 @@ public:
         
         _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), 2
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-,_timeIntegrationService->getPintComm()
+,MPI_COMM_WORLD
 #endif
     );
         
