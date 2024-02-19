@@ -26,3 +26,5 @@ docs/
 *.checkpoint
 /runcouette
 /runkvs
+# Symbolic link to LAMMPS source files
+/lammps

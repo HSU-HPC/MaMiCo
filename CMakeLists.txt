@@ -330,7 +330,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Fu
 endif()
 # we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
 target_link_libraries(mamico INTERFACE libsimplemd)
-if("${MD_SIM}" STREQUAL "LAMMPS_MD")
+if("${MD_SIM}" STREQUAL "LAMMPS_MD" OR "${MD_SIM}" STREQUAL "LAMMPS_DPD")
   target_link_libraries(mamico INTERFACE ${LAMMPS_LINK_LIBRARIES})
   target_include_directories(mamico INTERFACE ${LAMMPS_INCLUDE_DIRS})
   #target_compile_options(mamico INTERFACE ${LAMMPS_CFLAGS_OTHER})
@@ -426,7 +426,7 @@ if("${MD_SIM}" STREQUAL "LAMMPS_MD")
     ${MAMICO_SOURCES}
     "tarch/tinyxml2/tinyxml2.cpp"
     "tarch/utils/RandomNumberService.cpp"
-    "coupling/test/integration/main_lammps.cpp"
+    "test/integration/main_lammps.cpp"
   )
   add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
   set_target_properties(test_lammps PROPERTIES CXX_STANDARD 17)
