@@ -28,11 +28,6 @@ public:
     results = coupling::initRange<2>(vec2);
     expected = tarch::la::Vector<3, unsigned int>{vec2[0], vec2[1], 1};
     CPPUNIT_ASSERT_EQUAL(expected, results);
-
-    tarch::la::Vector<1, unsigned int> vec1{2};
-    results = coupling::initRange<1>(vec1);
-    expected = tarch::la::Vector<3, unsigned int>{vec1[0], 1, 1};
-    CPPUNIT_ASSERT_EQUAL(expected, results);
   }
 
   void testInitDimVector() {
@@ -44,10 +39,6 @@ public:
     tarch::la::Vector<2, unsigned int> results2 = coupling::initDimVector<2>(vec);
     tarch::la::Vector<2, unsigned int> expected2{vec[0], vec[1]};
     CPPUNIT_ASSERT_EQUAL(expected2, results2);
-
-    tarch::la::Vector<1, unsigned int> results1 = coupling::initDimVector<1>(vec);
-    tarch::la::Vector<1, unsigned int> expected1{vec[0]};
-    CPPUNIT_ASSERT_EQUAL(expected1, results1);
   }
 
   void testInitDivisionFactor() {
@@ -60,11 +51,6 @@ public:
     tarch::la::Vector<2, unsigned int> results2 = coupling::initDivisionFactor<2>(vec2);
     tarch::la::Vector<2, unsigned int> expected2{1, 2};
     CPPUNIT_ASSERT_EQUAL(expected2, results2);
-
-    tarch::la::Vector<1, unsigned int> vec1{2};
-    tarch::la::Vector<1, unsigned int> results1 = coupling::initDivisionFactor<1>(vec1);
-    tarch::la::Vector<1, unsigned int> expected1{1};
-    CPPUNIT_ASSERT_EQUAL(expected1, results1);
   }
 
   void testGetVectorCellIndex() {

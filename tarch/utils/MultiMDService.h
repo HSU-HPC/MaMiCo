@@ -59,6 +59,7 @@ public:
   unsigned int getGlobalRank() const { return _globalRank; }
   unsigned int getGlobalSize() const { return _globalSize; }
 
+  // TODO: unused function
   void setTotalNumberMDSimulations(unsigned int n) { _totalNumberMDSimulations = n; }
   unsigned int getTotalNumberOfMDSimulations() { return _totalNumberMDSimulations; }
 
