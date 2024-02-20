@@ -69,11 +69,11 @@ private:
 
   /*
    * Auxilliary functions providing an interface between low-level double
-   * buffers used by MPI and Macro Cells.
+   * buffers used by MPI and Coupling Cells.
    */
-  void macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::CouplingCell<dim>* cell);
+  void couplingCellToBuffer(std::vector<double>& buf, const coupling::datastructures::CouplingCell<dim>* cell);
 
-  void bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::CouplingCell<dim>* cell);
+  void bufferToCouplingCell(const std::vector<double>& buf, coupling::datastructures::CouplingCell<dim>* cell);
 
   // The sequentialized Filter
   coupling::filtering::FilterInterface<dim>* _filter;
@@ -93,7 +93,7 @@ private:
   // located at which global index TODO: use CellIndex?
   std::vector<unsigned int> _cellRanks;
 
-  // Buffers macro cells for MPI communication
+  // Buffers coupling cells for MPI communication
   std::vector<double> _cellbuf;
 
   // Used by the processing rank to remember its local domain
