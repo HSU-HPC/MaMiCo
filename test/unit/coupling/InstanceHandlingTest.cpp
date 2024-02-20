@@ -87,7 +87,7 @@ public:
       _instanceHandling->rmMDSimulation(_instanceHandling->getSimpleMD().size()-1);
       CPPUNIT_ASSERT(_instanceHandling->getSimpleMD()[_instanceHandling->getSimpleMD().size()-1] == nullptr);
       _instanceHandling->rmSimulationBlock();
-      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations());
+      CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations());
       
       _instanceHandling->writeCheckpoint("restart_checkpoint",0);
       std::ifstream inputFile("restart_checkpoint_0_0.checkpoint");
