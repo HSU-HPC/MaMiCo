@@ -92,6 +92,13 @@ public:
       _instanceHandling->writeCheckpoint("restart_checkpoint",0);
       std::ifstream inputFile("restart_checkpoint_0_0.checkpoint");
       CPPUNIT_ASSERT(inputFile.is_open());
+      if (!inputFile.is_open()) {
+      std::cout << "ERROR InstanceHandlingTest: restart_checkpoint_0_0.checkpoint!" << std::endl;
+      exit(EXIT_FAILURE);
+      }else{
+      std::cout << "restart_checkpoint_0_0.checkpoint read!" << std::endl;
+      }
+        
       
 
       coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = nullptr;
