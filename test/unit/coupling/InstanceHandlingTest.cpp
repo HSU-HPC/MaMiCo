@@ -106,11 +106,11 @@ public:
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(_instanceHandling->getMDSolverInterface(), couetteSolverInterface, _simpleMDConfig, _mamicoConfig, "../test/unit/coupling/couette.xml", *_multiMDService);
       
       
-      _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
+      //_instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
       
-      _simpleMDConfig.getDomainConfigurationNonConst().setInitFromCheckpoint(false);
+      //_simpleMDConfig.getDomainConfigurationNonConst().setInitFromCheckpoint(false);
 
-      _instanceHandling->simulateTimesteps(t, T, *_multiMDCellService);
+      //_instanceHandling->simulateTimesteps(t, T, *_multiMDCellService);
       
       
       
