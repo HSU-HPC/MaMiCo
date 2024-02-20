@@ -19,7 +19,7 @@ coupling::UsherParticleInsertion<LinkedCell, dim>::UsherParticleInsertion(unsign
 
 template <class LinkedCell, unsigned int dim>
 typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherParticleInsertion<LinkedCell, dim>::insertDeleteMass(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
+    coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
     const tarch::la::Vector<dim, double>& macroscopicCellSize, const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
     const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController) {
   typename coupling::ParticleInsertion<LinkedCell, dim>::Action action = coupling::ParticleInsertion<LinkedCell, dim>::NoAction;
@@ -48,7 +48,7 @@ typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherPar
 
 template <class LinkedCell, unsigned int dim>
 typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherParticleInsertion<LinkedCell, dim>::insertParticle(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
+    coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
     const tarch::la::Vector<dim, double>& macroscopicCellSize, const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
     const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController) {
   coupling::datastructures::Molecule<dim> molecule;
@@ -80,7 +80,7 @@ typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherPar
 
 template <class LinkedCell, unsigned int dim>
 typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-coupling::UsherParticleInsertion<LinkedCell, dim>::deleteParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+coupling::UsherParticleInsertion<LinkedCell, dim>::deleteParticle(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                   const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController) {
   // count particles with computeMassMapping
   coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> computeMassMapping(_mdSolverInterface);
@@ -105,7 +105,7 @@ coupling::UsherParticleInsertion<LinkedCell, dim>::deleteParticle(coupling::data
 
 template <class LinkedCell, unsigned int dim>
 typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherParticleInsertion<LinkedCell, dim>::findParticlePosition(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& thisCell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
+    coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& thisCell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
     const tarch::la::Vector<dim, double>& macroscopicCellSize, coupling::datastructures::Molecule<dim>& molecule,
     const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController) {
   // count particles with computeMassMapping

@@ -44,7 +44,7 @@ public:
    *  @param cell macroscopic cell
    *  @param currentMacroscopicCellIndex index of the macroscopic cell
    */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                               const unsigned int& currentMacroscopicCellIndex) const {
     coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> massMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);

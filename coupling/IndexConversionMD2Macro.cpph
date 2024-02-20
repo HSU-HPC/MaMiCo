@@ -5,9 +5,9 @@
 
 // Member functions of coupling::IndexConversionMD2Macro
 template <unsigned int dim>
-void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim>*> m2mDomainCells,
+void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coupling::datastructures::CouplingCell<dim>*> m2mDomainCells,
                                                                 std::vector<tarch::la::Vector<dim, unsigned int>> m2mDomainGlobalIndices,
-                                                                std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outerCells,
+                                                                std::vector<coupling::datastructures::CouplingCell<dim>*>& outerCells,
                                                                 std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices) {
   // In this case, we ~only~ have m2m cells!
   outerCells = {};
@@ -30,10 +30,10 @@ void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coup
 }
 
 template <unsigned int dim>
-void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCells,
-                                                                std::vector<coupling::datastructures::MacroscopicCell<dim>*>& m2mDomainCells,
+void coupling::IndexConversionMD2Macro<dim>::initMD2MacroDomain(std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCells,
+                                                                std::vector<coupling::datastructures::CouplingCell<dim>*>& m2mDomainCells,
                                                                 std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
-                                                                std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outerCells,
+                                                                std::vector<coupling::datastructures::CouplingCell<dim>*>& outerCells,
                                                                 std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices) {
   if (inputCells.empty()) {
     throw std::runtime_error("Input cell vector is emtpy.");
@@ -118,7 +118,7 @@ tarch::la::Vector<dim, unsigned int> coupling::IndexConversionMD2Macro<dim>::get
   //	std::cout << "Global: " << globalCellIndex << " GlobalVector: " << globalVectorCellIndex;
   // }
   for (unsigned int d = 0; d < dim; d++) {
-    if (globalVectorCellIndex[d] < 1 || globalVectorCellIndex[d] > _ic->getGlobalNumberMacroscopicCells()[d] - 3)
+    if (globalVectorCellIndex[d] < 1 || globalVectorCellIndex[d] > _ic->getGlobalNumberCouplingCells()[d] - 3)
       globalVectorCellIndex[d] = INT_MAX;
     else if (noGL)
       globalVectorCellIndex[d] -= 1;
@@ -133,7 +133,7 @@ template <unsigned int dim>
 tarch::la::Vector<dim, unsigned int> coupling::IndexConversionMD2Macro<dim>::getLocalVectorCellIndex(unsigned int localCellIndex, bool noGL) const {
   tarch::la::Vector<dim, unsigned int> localVectorCellIndex = _ic->getLocalVectorCellIndex(localCellIndex);
   for (unsigned int d = 0; d < dim; d++) {
-    if (localVectorCellIndex[d] < 1 || localVectorCellIndex[d] > _ic->getLocalNumberMacroscopicCells()[d])
+    if (localVectorCellIndex[d] < 1 || localVectorCellIndex[d] > _ic->getLocalNumberCouplingCells()[d])
       localVectorCellIndex[d] = INT_MAX;
     else if (noGL)
       localVectorCellIndex[d] -= 1;

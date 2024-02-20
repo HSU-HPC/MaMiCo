@@ -197,7 +197,7 @@ public:
   }
 
   /** send data from macroscopic solver to all MD simulations */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                         const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
     // just send information to all MD instances. This is currently
     // sequentialized inside MacroscopicCellService/SendRecvBuffer
@@ -212,7 +212,7 @@ public:
   }
 
   /** broadcasts data from macroscopic solver to all MD simulations */
-  void bcastFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  void bcastFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                          const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
     // Fall back on sequential operation when MPI is not available (avoids redundant implementation)
@@ -221,14 +221,14 @@ public:
 #else
 
     std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*> allDEs(_totalNumberMDSimulations);
-    std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
+    std::vector<std::vector<coupling::datastructures::CouplingCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
       if (nullptr == _macroscopicCellServices[i])
         continue;
       allDEs[i] = new coupling::sendrecv::DataExchangeFromMacro2MD<dim>(_macroscopicSolverInterface, &_macroscopicCellServices[i]->getIndexConversion(),
                                                                         _macroscopicCellServices[i]->getID());
       if (auto* v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[i])) {
-        allMacroscopicCellsFromMamico[i] = v->getMacroscopicCells().getMacroscopicCells();
+        allMacroscopicCellsFromMamico[i] = v->getCouplingCells().getCouplingCells();
       }
     }
 
@@ -238,7 +238,7 @@ public:
       _macroscopicCellServices[i]->sendFromMacro2MDPreProcess();
     }
 
-    coupling::sendrecv::FromMacro2MD<coupling::datastructures::MacroscopicCell<dim>, dim> fromMacro2MD;
+    coupling::sendrecv::FromMacro2MD<coupling::datastructures::CouplingCell<dim>, dim> fromMacro2MD;
     fromMacro2MD.bcastFromMacro2MD(allDEs, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver, allMacroscopicCellsFromMamico);
 
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
@@ -269,12 +269,12 @@ public:
       if (0 != _warmupPhase[n])
         continue;
       if (auto* v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[n])) {
-        for (unsigned int i = 0; i < v->getMacroscopicCells().getMacroscopicCells().size(); ++i) {
+        for (unsigned int i = 0; i < v->getCouplingCells().getCouplingCells().size(); ++i) {
           if (_sumMacroscopicCells.size() <= i) {
-            _sumMacroscopicCells.emplace_back(new coupling::datastructures::MacroscopicCell<dim>());
+            _sumMacroscopicCells.emplace_back(new coupling::datastructures::CouplingCell<dim>());
           }
-          _sumMacroscopicCells[i]->addMacroscopicMass(v->getMacroscopicCells().getMacroscopicCells()[i]->getMacroscopicMass());
-          _sumMacroscopicCells[i]->addMacroscopicMomentum(v->getMacroscopicCells().getMacroscopicCells()[i]->getMacroscopicMomentum());
+          _sumMacroscopicCells[i]->addMacroscopicMass(v->getCouplingCells().getCouplingCells()[i]->getMacroscopicMass());
+          _sumMacroscopicCells[i]->addMacroscopicMomentum(v->getCouplingCells().getCouplingCells()[i]->getMacroscopicMomentum());
         }
       }
     }
@@ -283,7 +283,7 @@ public:
   /** reduce data from MD simulations, averages over them (only macroscopic
    * mass/momentum is considered) and writes the result back into
    * macroscopicCellsFromMacroscopicSolver. */
-  double reduceFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  double reduceFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                             const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
     // Fall back on sequential operation when MPI is not available (avoids redundant implementation)
@@ -307,13 +307,13 @@ public:
     sumUpMacroscopicCellsFromMamico();
 
     // reset macroscopic data (only those should be used by macroscopic solver anyway) in cells
-    for (coupling::datastructures::MacroscopicCell<dim>*& macroscopicCell : _macroscopicCells) {
+    for (coupling::datastructures::CouplingCell<dim>*& macroscopicCell : _macroscopicCells) {
       macroscopicCell->setMacroscopicMass(0.0);
       macroscopicCell->setMacroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
     }
 
     std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>*> allDEs(_totalNumberMDSimulations);
-    std::vector<std::vector<coupling::datastructures::MacroscopicCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
+    std::vector<std::vector<coupling::datastructures::CouplingCell<dim>*>> allMacroscopicCellsFromMamico(_totalNumberMDSimulations);
     coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface =
         coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().getMacroscopicSolverInterface();
     unsigned int totalNumberEquilibratedMDSimulations = 0;
@@ -359,7 +359,7 @@ public:
   /** collects data from MD simulations, averages over them (only macroscopic
    * mass/momentum is considered) and writes the result back into
    * macroscopicCellsFromMacroscopicSolver. */
-  double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                           const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
     double res = 0;
     const unsigned int size = (unsigned int)macroscopicCellsFromMacroscopicSolver.size();
@@ -425,7 +425,7 @@ public:
     if (_macroscopicCells.empty()) {
       // Allocate & init _macroscopicCells
       for (unsigned int c = _macroscopicCells.size(); c < size; c++)
-        _macroscopicCells.push_back(new coupling::datastructures::MacroscopicCell<dim>());
+        _macroscopicCells.push_back(new coupling::datastructures::CouplingCell<dim>());
     }
 
     /*
@@ -727,9 +727,9 @@ private:
 
   // const coupling::IndexConversion<dim> _indexConversion; /* Used for index
   // conversions during filtering TODO after merge with dynamic-md*/
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _macroscopicCells; /** used to store in MD data in sendFromMD2Macro */
-  std::vector<unsigned int> _cellIndices;                                         /** used to store in indexing of the above */
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*>
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _macroscopicCells; /** used to store in MD data in sendFromMD2Macro */
+  std::vector<unsigned int> _cellIndices;                                      /** used to store in indexing of the above */
+  std::vector<coupling::datastructures::CouplingCell<dim>*>
       _sumMacroscopicCells; /** used to reduce all local macroscopic cells before sending from md 2 macro */
 
   simplemd::configurations::MolecularDynamicsConfiguration& _mdConfiguration;
@@ -756,6 +756,6 @@ private:
    */
   coupling::filtering::FilterPipeline<dim>* _postMultiInstanceFilterPipeline;
   /* Buffer for copying data from MD to macro */
-  coupling::sendrecv::FromMD2Macro<coupling::datastructures::MacroscopicCell<dim>, dim> _fromMD2Macro;
+  coupling::sendrecv::FromMD2Macro<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_MULTIMDCELLSERVICE_H_

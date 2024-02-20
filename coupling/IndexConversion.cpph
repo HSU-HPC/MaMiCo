@@ -189,11 +189,11 @@ template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::Index
   return _averageLocalNumberMacroscopicCells;
 }
 
-template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getLocalNumberMacroscopicCells() const {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getLocalNumberCouplingCells() const {
   return _localNumberMacroscopicCells;
 }
 
-template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getGlobalNumberMacroscopicCells() const {
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getGlobalNumberCouplingCells() const {
   return _globalNumberMacroscopicCells;
 }
 

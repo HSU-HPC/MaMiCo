@@ -21,7 +21,7 @@
 #include "coupling/configurations/ParticleInsertionConfiguration.h"
 #include "coupling/configurations/ThermostatConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
-#include "coupling/datastructures/MacroscopicCells.h"
+#include "coupling/datastructures/CouplingCells.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
@@ -57,11 +57,11 @@ public:
   virtual double applyFilterPipeline() = 0;
   virtual void sendFromMacro2MDPreProcess() = 0;
   virtual void sendFromMacro2MDPostProcess() = 0;
-  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                                 const unsigned int* const globalCellIndicesFromMacroscopicSolver) = 0;
   virtual void sendFromMD2MacroPreProcess() = 0;
   virtual void sendFromMD2MacroPostProcess() = 0;
-  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                                   const unsigned int* const globalCellIndicesFromMacroscopicSolver) = 0;
   virtual void processInnerMacroscopicCellAfterMDTimestep() = 0;
   virtual void computeAndStoreTemperature(double temperature) = 0;
@@ -177,7 +177,7 @@ public:
    *  parallelisation via MPI) and writes the respective information to the
    * macroscopic cells of the tool
    */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                         const unsigned int* const globalCellIndicesFromMacroscopicSolver);
 
   /** sends information from MD to the macroscopic solver. After the
@@ -187,7 +187,7 @@ public:
    * the respective global cell indices
    *  (-> globalCellIndicesFromMacroscopicSolver).
    */
-  double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                           const unsigned int* const globalCellIndicesFromMacroscopicSolver);
 
   /** applies the filter pipeline and returns the runtime of this operation */
@@ -263,7 +263,7 @@ public:
    * ~MacroscopicCellServiceImpl()
    */
   void initFiltering() {
-    _filterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells.getMacroscopicCells(), coupling::filtering::Scope::perInstance,
+    _filterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells.getCouplingCells(), coupling::filtering::Scope::perInstance,
                                                                    _multiMDService, _filterPipelineConfiguration);
   }
 
@@ -291,7 +291,7 @@ public:
 
   /** returns the macroscopic cells. This functions is meant to be used in test
    * scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
-  coupling::datastructures::MacroscopicCells<LinkedCell, dim>& getMacroscopicCells() { return _macroscopicCells; }
+  coupling::datastructures::CouplingCells<LinkedCell, dim>& getCouplingCells() { return _macroscopicCells; }
 
 private:
 // ------------------- INCLUDE WRAPPER DEFINITIONS
@@ -313,7 +313,7 @@ private:
 
   std::function<void(Wrapper&)> initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration& thermostatConfiguration) {
     if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::all)
-      return [this](Wrapper& wrapper) { _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper); };
+      return [this](Wrapper& wrapper) { _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper); };
     else if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::outerLayers)
       return [this, &thermostatConfiguration](Wrapper& wrapper) {
         _macroscopicCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCells(wrapper, thermostatConfiguration.getCells2Use());
@@ -336,13 +336,13 @@ private:
   coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
 
   /** for quantity transfer between solvers */
-  coupling::sendrecv::FromMacro2MD<coupling::datastructures::MacroscopicCell<dim>, dim> _fromMacro2MD;
+  coupling::sendrecv::FromMacro2MD<coupling::datastructures::CouplingCell<dim>, dim> _fromMacro2MD;
   coupling::sendrecv::DataExchangeFromMacro2MD<dim> _deFromMacro2MD;
-  coupling::sendrecv::FromMD2Macro<coupling::datastructures::MacroscopicCell<dim>, dim> _fromMD2Macro;
+  coupling::sendrecv::FromMD2Macro<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;
 
   /** storage for macroscopic cells in coupling tool */
-  coupling::datastructures::MacroscopicCells<LinkedCell, dim> _macroscopicCells;
+  coupling::datastructures::CouplingCells<LinkedCell, dim> _macroscopicCells;
 
   /** filter pipeline, used to apply filters in sendFromMD2Macro */
   coupling::filtering::FilterPipeline<dim>* _filterPipeline;

@@ -7,7 +7,7 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/IndexConversion.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
 #include "tarch/la/Matrix.h"

@@ -5,7 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_MOMENTUMINSERTION_H_
 #define _MOLECULARDYNAMICS_COUPLING_MOMENTUMINSERTION_H_
 
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "tarch/la/Vector.h"
 
 namespace coupling {
@@ -40,7 +40,7 @@ public:
    * distributes is over all molecules.
    *  @param cell the macroscopic cell to insert the momentum
    *  @param fraction the fraction of momentum to use */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                               const unsigned int& currentMacroscopicCellIndex) const = 0;
 
 protected:

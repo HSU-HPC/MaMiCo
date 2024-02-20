@@ -2,8 +2,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_MACROSCOPICCELL_H_
-#define _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_MACROSCOPICCELL_H_
+#ifndef _MOLECULARDYNAMICS_COUPLING_DATA_STRUCTURES_COUPLINGCELL_H_
+#define _MOLECULARDYNAMICS_COUPLING_DATA_STRUCTURES_COUPLINGCELL_H_
 
 #include "tarch/la/Vector.h"
 #include <cstdlib>
@@ -14,29 +14,29 @@
 namespace coupling {
 namespace datastructures {
 
-template <unsigned int dim> class MacroscopicCell;
-template <class LinkedCell, unsigned int dim> class MacroscopicCellWithLinkedCells;
+template <unsigned int dim> class CouplingCell;
+template <class LinkedCell, unsigned int dim> class CouplingCellWithLinkedCells;
 } // namespace datastructures
 } // namespace coupling
 
-/** describes a quadratic/ cubic macroscopic cell filled with fluid (no linked
+/** describes a quadratic/ cubic coupling cell filled with fluid (no linked
  *cells). Base class for the class
- *coupling::datastructures::MacroscopicCellWithLinkedCells
+ *coupling::datastructures::CouplingCellWithLinkedCells
  *	@brief defines the cell type with cell-averaged quantities only (no
  *linked cells).
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <unsigned int dim> class coupling::datastructures::MacroscopicCell {
+template <unsigned int dim> class coupling::datastructures::CouplingCell {
 public:
-  /** Constructor: initialises the macroscopic cell with zero values.
+  /** Constructor: initialises the coupling cell with zero values.
    */
-  MacroscopicCell()
+  CouplingCell()
       : _microscopicMass(0.0), _microscopicMomentum(0.0), _macroscopicMass(0.0), _macroscopicMomentum(0.0), _potentialEnergy(0.0), _temperature(0.0),
         _currentVelocity(0.0) {}
 
   /** Destructor */
-  virtual ~MacroscopicCell() {}
+  virtual ~CouplingCell() {}
 
   /** sets the microscopic mass
    * @param mass Mass*/
@@ -64,10 +64,10 @@ public:
    * @returns _microscopicMomentum Momentum*/
   const tarch::la::Vector<dim, double>& getMacroscopicMomentum() const { return _macroscopicMomentum; }
 
-  /** returns the mean potential energy over the macroscopic cell
+  /** returns the mean potential energy over the coupling cell
    * @returns _potentialEnergy potential energy*/
   const double& getPotentialEnergy() const { return _potentialEnergy; }
-  /** sets the mean potential energy over the macroscopic cell
+  /** sets the mean potential energy over the coupling cell
    * @param potentialEnergy potential energy*/
   void setPotentialEnergy(const double& potentialEnergy) { _potentialEnergy = potentialEnergy; }
 
@@ -113,7 +113,7 @@ public:
    *  from the microscopic to the macroscopic simulation */
   tarch::la::Vector<dim, double> _macroscopicMomentum;
 
-  /** holds the mean potential energy within the macroscopic cell. This value is
+  /** holds the mean potential energy within the coupling cell. This value is
    * needed as a reference potential energy value for the USHER scheme.
    */
   double _potentialEnergy;
@@ -125,34 +125,33 @@ public:
   tarch::la::Vector<dim, double> _currentVelocity;
 };
 
-/** describes a quadratic/ cubic macroscopic cell filled with fluid. It is built
+/** describes a quadratic/ cubic coupling cell filled with fluid. It is built
  *up by a certain number of linked cells (from the MD algorithm). The linked
  *  cells need to exactly fill this cell; no overlap/ non-fitting boundaries
  *  shall be allowed.
- *  We can use the MacroscopicCell-structure to evaluate macroscopic quantities
+ *  We can use the CouplingCell-structure to evaluate macroscopic quantities
  *  over a certain MD volume and then map macroscopic conserved quantities
  *  between macro- and microscopic simulations.
  *	@brief defines the cell type with cell-averaged quantities. Derived from
- *the class coupling::datastructures::MacroscopicCell
+ *the class coupling::datastructures::CouplingCell
  *	@tparam LinkedCell linked cells that build up the
- *MacroscopicCellWithLinkedCells
+ *CouplingCellWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::datastructures::MacroscopicCellWithLinkedCells : public coupling::datastructures::MacroscopicCell<dim> {
+template <class LinkedCell, unsigned int dim> class coupling::datastructures::CouplingCellWithLinkedCells : public coupling::datastructures::CouplingCell<dim> {
 public:
-  /** Constructor: initialises the macroscopic cell based on the assumption of
+  /** Constructor: initialises the coupling cell based on the assumption of
    * having blockSize linked cells;
    *  @param blockSize represents the number of linked cells in all spatial
    * directions.
    */
-  MacroscopicCellWithLinkedCells(tarch::la::Vector<dim, unsigned int> blockSize)
-      : coupling::datastructures::MacroscopicCell<dim>(), _numberCells(getNumberCells(blockSize)), _linkedCells(NULL) {
+  CouplingCellWithLinkedCells(tarch::la::Vector<dim, unsigned int> blockSize)
+      : coupling::datastructures::CouplingCell<dim>(), _numberCells(getNumberCells(blockSize)), _linkedCells(NULL) {
 
     _linkedCells = new LinkedCell*[_numberCells];
     if (_linkedCells == NULL) {
-      std::cout << "ERROR coupling::datastructures::MacroscopicCellWithLinkedCells: "
+      std::cout << "ERROR coupling::datastructures::CouplingCellWithLinkedCells: "
                    "_linkedCells == NULL"
                 << std::endl;
       exit(EXIT_FAILURE);
@@ -163,7 +162,7 @@ public:
     }
   }
   /** Destructor */
-  virtual ~MacroscopicCellWithLinkedCells() {
+  virtual ~CouplingCellWithLinkedCells() {
     if (_linkedCells != NULL) {
       for (unsigned int i = 0; i < _numberCells; i++) {
         _linkedCells[i] = NULL;
@@ -173,18 +172,18 @@ public:
     }
   }
 
-  /** adds a linked cell to the macroscopic cell and puts it at position index.
+  /** adds a linked cell to the coupling cell and puts it at position index.
    * We refer to the lexicographic ordering of the linked cells here.
-   * @param cell the linked cell that should be inserted into the macroscopic
+   * @param cell the linked cell that should be inserted into the coupling
    * cell
    * @param index specifies the position, at which cell shoeld be inserted
    */
   void addLinkedCell(LinkedCell& cell, const unsigned int& index) { _linkedCells[index] = &cell; }
 
   /** This template fuction applies class A to all linked cells of this
-   *macroscopic cell. The syntax is exactly the same as for regular cell
+   *coupling cell. The syntax is exactly the same as for regular cell
    *mappings so that a general cell mapping can also be directly applied to
-   *single macroscopic cells only.
+   *single coupling cells only.
    *	@tparam A
    * 	@param a
    */
@@ -197,9 +196,9 @@ public:
   }
 
   /** This template function applies class A to all linked cells of this
-   *macroscopic cell. The syntax is exactly the same as for regular cell
+   *coupling cell. The syntax is exactly the same as for regular cell
    *mappings so that a general cell mapping can also be directly applied to
-   *single macroscopic cells only. This method is const, i.e. id does not modify
+   *single coupling cells only. This method is const, i.e. id does not modify
    *anything except for the object a. This allows for further optimisations.
    *	@tparam A
    * 	@param a
@@ -226,12 +225,12 @@ private:
     return num;
   }
 
-  /** total number of linked cells contained in this macroscopic cell */
+  /** total number of linked cells contained in this coupling cell */
   const unsigned int _numberCells;
 
   /** holds pointers to all linked cells that describe the microscopic dynamics
-   * within the macroscopic cell */
+   * within the coupling cell */
   LinkedCell** _linkedCells;
 };
 
-#endif // _MOLECULARDYNAMICS_COUPLING_DATA_STRUCTURES_MACROSCOPICCELL_H_
+#endif // _MOLECULARDYNAMICS_COUPLING_DATA_STRUCTURES_COUPLINGCELL_H_

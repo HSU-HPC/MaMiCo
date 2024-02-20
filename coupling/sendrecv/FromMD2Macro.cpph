@@ -46,7 +46,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::writeToReduceBuffer
                                                                                  coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
                                                                                  const std::vector<MacroscopicCell*>& macroscopicCells) {
   const tarch::la::Vector<3, unsigned int> start(1);
-  const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells());
+  const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells());
   tarch::la::Vector<3, unsigned int> loop(0);
 
   for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
@@ -140,7 +140,7 @@ void coupling::sendrecv::FromMD2Macro<MacroscopicCell, dim>::writeToSendBuffer(c
                                                                                coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                                                                                const std::vector<MacroscopicCell*>& macroscopicCells) {
   const tarch::la::Vector<3, unsigned int> start(1);
-  const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells());
+  const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells());
   tarch::la::Vector<3, unsigned int> loop(0);
 
   for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {

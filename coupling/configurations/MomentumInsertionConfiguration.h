@@ -158,7 +158,7 @@ public:
   MomentumInsertion<LinkedCell, dim>*
   interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
                           const coupling::IndexConversion<dim>& indexConversion,
-                          const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells,
+                          const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells,
                           unsigned int numberMDTimestepsPerCouplingCycle) const {
     if (_insertionType == ADDITIVE_MOMENTUM_INSERTION) {
       return new coupling::AdditiveMomentumInsertion<LinkedCell, dim>(mdSolverInterface, numberMDTimestepsPerCouplingCycle);

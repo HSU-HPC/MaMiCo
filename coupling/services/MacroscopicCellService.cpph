@@ -30,7 +30,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::MacroscopicCell
       _macroscopicCells(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell(), *_indexConversion, mdSolverInterface), _filterPipeline(nullptr),
       _filterPipelineConfiguration(filterPipelineConfiguration), _multiMDService(multiMDService),
       _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(
-          mdSolverInterface, *_indexConversion, _macroscopicCells.getMacroscopicCellsWithLinkedCells(), numberMDTimestepsPerCouplingCycle)),
+          mdSolverInterface, *_indexConversion, _macroscopicCells.getCouplingCellsWithLinkedCells(), numberMDTimestepsPerCouplingCycle)),
       _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
       _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface)),
       _numberLinkedCellsPerMacroscopicCell(macroscopicCellConfiguration.getNumberLinkedCellsPerMacroscopicCell()),
@@ -83,7 +83,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::MacroscopicCell
 
   // init vector of inner (MD Domain/non-ghost) cells and their indices
   // TODO: REMOVE
-  // initInnerMacroscopicCells(_macroscopicCells.getMacroscopicCells());
+  // initInnerMacroscopicCells(_macroscopicCells.getCouplingCells());
 }
 
 template <class LinkedCell, unsigned int dim> coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::~MacroscopicCellServiceImpl<LinkedCell, dim>() {
@@ -118,8 +118,8 @@ template <class LinkedCell, unsigned int dim> void coupling::services::Macroscop
   Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper2(this);
 
   // pre-process macroscopic cells of coupling tool
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper1);
+  _macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(wrapper2);
 }
 
 template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMacro2MDPostProcess() {
@@ -127,13 +127,13 @@ template <class LinkedCell, unsigned int dim> void coupling::services::Macroscop
   Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData wrapper4(this);
 
   // post-process inner macroscopic cells after receiving information from macroscopic solver
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper3);
+  _macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(wrapper4);
 }
 
 template <class LinkedCell, unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(
-    const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+    const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
     const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
   Wrapper4ProcessInnerMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper1(this);
   Wrapper4ProcessOuterMacroscopicCellBeforeReceivingMacroscopicSolverData wrapper2(this);
@@ -141,17 +141,17 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMa
   Wrapper4ProcessOuterMacroscopicCellAfterReceivingMacroscopicSolverData wrapper4(this);
 
   // pre-process macroscopic cells of coupling tool
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper1);
+  _macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(wrapper2);
 
   // carry out send-receive steps
-  _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,
+  _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD, _macroscopicCells.getCouplingCells(), macroscopicCellsFromMacroscopicSolver,
                                  globalCellIndicesFromMacroscopicSolver);
 
   // post-process inner macroscopic cells after receiving information from
   // macroscopic solver
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper3);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper4);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper3);
+  _macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(wrapper4);
 }
 
 template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMD2MacroPreProcess() {
@@ -160,8 +160,8 @@ template <class LinkedCell, unsigned int dim> void coupling::services::Macroscop
   Wrapper4ProcessOuterMacroscopicCellBeforeSendingMDSolverData wrapper2(this);
 
   // pre-process data before sending to macroscopic solver
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper1);
-  _macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(wrapper2);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper1);
+  _macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(wrapper2);
 }
 
 template <class LinkedCell, unsigned int dim> double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::applyFilterPipeline() {
@@ -189,14 +189,14 @@ template <class LinkedCell, unsigned int dim> double coupling::services::Macrosc
 
 template <class LinkedCell, unsigned int dim>
 double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(
-    const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+    const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
     const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
   sendFromMD2MacroPreProcess();
 
   double runtime = applyFilterPipeline();
 
   // carry out send-receive steps
-  _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, _macroscopicCells.getMacroscopicCells(), macroscopicCellsFromMacroscopicSolver,
+  _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, _macroscopicCells.getCouplingCells(), macroscopicCellsFromMacroscopicSolver,
                                  globalCellIndicesFromMacroscopicSolver);
   return runtime;
 }
@@ -204,7 +204,7 @@ double coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::sendFrom
 template <class LinkedCell, unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::processInnerMacroscopicCellAfterMDTimestep() {
   Wrapper4ProcessInnerMacroscopicCellAfterMDTimestep wrapper(this);
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper);
 }
 
 template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::distributeMomentum(unsigned int t) {
@@ -216,9 +216,9 @@ template <class LinkedCell, unsigned int dim> void coupling::services::Macroscop
   Wrapper4DistributeMomentum distributeMomentum(this, t);
 
   // compute current velocity in all cells
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(computeAndSetCurrentVelocity);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(computeAndSetCurrentVelocity);
   // distribute momentum and synchronize molecules between processes
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(distributeMomentum);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(distributeMomentum);
   _mdSolverInterface->synchronizeMoleculesAfterMomentumModification();
 }
 
@@ -230,7 +230,7 @@ void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::computeAnd
 
 template <class LinkedCell, unsigned int dim> void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::perturbateVelocity() {
   Wrapper4PerturbateVelocity wrapper(this);
-  _macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(wrapper);
+  _macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper);
 }
 
 template <class LinkedCell, unsigned int dim>
@@ -273,7 +273,7 @@ template <class LinkedCell, unsigned int dim>
 void coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::initIndexVectors4Usher(
     tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell) {
 
-  const tarch::la::Vector<dim, unsigned int> localNumberMacroscopicCells = _indexConversion->getLocalNumberMacroscopicCells();
+  const tarch::la::Vector<dim, unsigned int> localNumberMacroscopicCells = _indexConversion->getLocalNumberCouplingCells();
   const tarch::la::Vector<dim, unsigned int> firstNonGhostMacroscopicCell(1);
 
   const tarch::la::Vector<3, unsigned int> start(0);
@@ -329,7 +329,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::Macroscop
   // in the macroscopic cell
   coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell, dim> computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);
   // macroscopic cell access
-  coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells = _macroscopicCells.getMacroscopicCellsWithLinkedCells();
+  coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells = _macroscopicCells.getCouplingCellsWithLinkedCells();
   // start coordinate of first (ghost) cell
   const tarch::la::Vector<dim, double> startPosition = getPositionOfFirstLocalGhostCell();
   // buffers for temperature,momentum,mean velocity,pot. energy

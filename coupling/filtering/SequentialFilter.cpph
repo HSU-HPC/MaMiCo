@@ -30,8 +30,8 @@ coupling::filtering::SequentialFilter<dim>::SequentialFilter(coupling::filtering
                                                             /*global*/ coupling::indexing::IndexTrait::md2macro,
                                                             coupling::indexing::IndexTrait::noGhost>::linearNumberCellsInDomain;
       for (unsigned int c = 0; c < numcells; c++) {
-        _inputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
-        _outputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
+        _inputCells_Global.push_back(new coupling::datastructures::CouplingCell<dim>());
+        _outputCells_Global.push_back(new coupling::datastructures::CouplingCell<dim>());
       }
       _cellRanks.resize(numcells);
     } // end: if rank processing rank
@@ -252,7 +252,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::pro
 }
 
 template <unsigned int dim>
-void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell) {
+void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::CouplingCell<dim>* cell) {
   // Resize if buffer is too small to contain cell data
   if (buf.capacity() < 4 + 3 * dim) {
     buf.resize(4 + 3 * dim);
@@ -287,7 +287,7 @@ void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::ve
 }
 
 template <unsigned int dim>
-void coupling::filtering::SequentialFilter<dim>::bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell) {
+void coupling::filtering::SequentialFilter<dim>::bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::CouplingCell<dim>* cell) {
   if (buf.capacity() < 4 + 3 * dim)
     throw std::runtime_error("Buffer too small for cell data!");
 

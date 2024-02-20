@@ -7,7 +7,7 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/IndexConversion.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
 #include "tarch/la/Matrix.h"
@@ -51,10 +51,10 @@ public:
                                     const unsigned int& currentLocalMacroscopicCellIndex,
                                     coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
                                     const coupling::IndexConversion<dim>& indexConversion,
-                                    const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells)
+                                    const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells)
       : _mdSolverInterface(mdSolverInterface), _indexConversion(indexConversion),
-        _globalNumberCellsWithGhostLayer(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2)),
-        _localNumberCellsWithGhostLayer(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2)),
+        _globalNumberCellsWithGhostLayer(indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2)),
+        _localNumberCellsWithGhostLayer(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2)),
         _globalVectorCellIndex(indexConversion.convertLocalToGlobalVectorCellIndex(indexConversion.getLocalVectorCellIndex(currentLocalMacroscopicCellIndex))),
         _localVectorCellIndex(indexConversion.getLocalVectorCellIndex(currentLocalMacroscopicCellIndex)),
         _domainOffset(indexConversion.getGlobalMDDomainOffset()), _cellSize(indexConversion.getMacroscopicCellSize()), _macroscopicCells(macroscopicCells),
@@ -203,7 +203,7 @@ protected:
   const tarch::la::Vector<dim, unsigned int> _localVectorCellIndex;
   const tarch::la::Vector<dim, double> _domainOffset;
   const tarch::la::Vector<dim, double> _cellSize;
-  const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const _macroscopicCells;
+  const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const _macroscopicCells;
   /** relaxation factor for velocity relaxation */
   const double _velocityRelaxationFactor;
   /** current velocity in this macroscopic cell */
@@ -450,7 +450,7 @@ public:
                                            const unsigned int& currentLocalMacroscopicCellIndex,
                                            coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
                                            const coupling::IndexConversion<dim>& indexConversion,
-                                           const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells)
+                                           const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells)
       : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, currentLocalMacroscopicCellIndex,
                                                                                    mdSolverInterface, indexConversion, macroscopicCells) {
     // the following snippet is basically a replacement of the method

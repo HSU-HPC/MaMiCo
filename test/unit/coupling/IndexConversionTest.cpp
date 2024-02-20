@@ -92,7 +92,7 @@ private:
                 for (unsigned int rank = 0; rank < numberRanks; rank++) {
                   coupling::IndexConversion<3> conversion(globalNumberMacroscopicCells, numberProcesses, rank, size, offset, coupling::paralleltopology::XYZ);
                   const tarch::la::Vector<3, unsigned int> wholeLocalDomain =
-                      conversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2);
+                      conversion.getLocalNumberCouplingCells() + tarch::la::Vector<3, unsigned int>(2);
 
                   // loop over all cells in the local domain
                   for (unsigned int z = 0; z < wholeLocalDomain[2]; z++) {
@@ -132,7 +132,7 @@ private:
             // loop over all local process configurations
             for (unsigned int rank = 0; rank < numberRanks; rank++) {
               coupling::IndexConversion<2> conversion(globalNumberMacroscopicCells, numberProcesses, rank, size, offset, coupling::paralleltopology::XYZ);
-              const tarch::la::Vector<2, unsigned int> wholeLocalDomain = conversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<2, unsigned int>(2);
+              const tarch::la::Vector<2, unsigned int> wholeLocalDomain = conversion.getLocalNumberCouplingCells() + tarch::la::Vector<2, unsigned int>(2);
 
               // loop over all cells in the local domain
               for (unsigned int y = 0; y < wholeLocalDomain[1]; y++) {

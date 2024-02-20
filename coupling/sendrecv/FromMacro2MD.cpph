@@ -43,7 +43,7 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::allocateReceiveBuff
   // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
   const tarch::la::Vector<3, unsigned int> start(0);
   const tarch::la::Vector<3, unsigned int> end =
-      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+      start + coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2));
   tarch::la::Vector<3, unsigned int> loop(0);
 
   for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
@@ -90,7 +90,7 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromReceiveBuff
   // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
   const tarch::la::Vector<3, unsigned int> start(0);
   const tarch::la::Vector<3, unsigned int> end =
-      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+      start + coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2));
   tarch::la::Vector<3, unsigned int> loop(0);
 
   for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
@@ -166,7 +166,7 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::allocateReceiveBuff
   // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
   const tarch::la::Vector<3, unsigned int> start(0);
   const tarch::la::Vector<3, unsigned int> end =
-      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+      start + coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2));
   tarch::la::Vector<3, unsigned int> loop(0);
 
   for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
@@ -191,7 +191,7 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromCollectiveB
   // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
   const tarch::la::Vector<3, unsigned int> start(0);
   const tarch::la::Vector<3, unsigned int> end =
-      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+      start + coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2));
   tarch::la::Vector<3, unsigned int> loop(0);
 
   for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {

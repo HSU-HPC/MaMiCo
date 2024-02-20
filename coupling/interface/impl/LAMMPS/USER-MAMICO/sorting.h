@@ -49,7 +49,7 @@ public:
   void printMolecules(const coupling::IndexConversion<dim> &indexConversion, LAMMPS_NS::Sorting<dim>::PrintType printType) {
     tarch::la::Vector<3, unsigned int> loop(0);
     const tarch::la::Vector<3, unsigned int> end =
-        coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+        coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2));
 
     for (loop[2] = 0; loop[2] < end[2]; loop[2]++) {
       for (loop[1] = 0; loop[1] < end[1]; loop[1]++) {
@@ -142,7 +142,7 @@ public:
     // reset all non-ghost cells
 
     if (clearCellLists) {
-      const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1);
+      const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(1);
       tarch::la::Vector<3, unsigned int> end = coupling::initRange<dim>(localCells);
       tarch::la::Vector<3, unsigned int> start(0);
       for (unsigned int d = 0; d < dim; d++)
@@ -176,7 +176,7 @@ public:
         // check if this is a global non-ghost cell and throw error otherwise
         bool isInnerCell = true;
         for (unsigned int d = 0; d < dim; d++) {
-          isInnerCell = isInnerCell && (vectorIndex[d] > 0) && (vectorIndex[d] < indexConversion.getGlobalNumberMacroscopicCells()[d] + 1);
+          isInnerCell = isInnerCell && (vectorIndex[d] > 0) && (vectorIndex[d] < indexConversion.getGlobalNumberCouplingCells()[d] + 1);
         }
         if (!isInnerCell) {
           std::cout << "ERROR Sorting::updateNonGhostCells: Molecule is not "
@@ -202,7 +202,7 @@ private:
   /** sets the ghost flag in all local mamico cells and removes all particle ids
    * from the cells */
   void flagAndResetCells(const coupling::IndexConversion<dim> &indexConversion) {
-    const tarch::la::Vector<dim, unsigned int> localNumberCells = tarch::la::Vector<dim, unsigned int>(2) + indexConversion.getLocalNumberMacroscopicCells();
+    const tarch::la::Vector<dim, unsigned int> localNumberCells = tarch::la::Vector<dim, unsigned int>(2) + indexConversion.getLocalNumberCouplingCells();
     tarch::la::Vector<3, unsigned int> loop(0);
     tarch::la::Vector<3, unsigned int> end = coupling::initRange<dim>(localNumberCells);
 
@@ -262,7 +262,7 @@ private:
         // further check if this is a ghost cell and throw and error otherwise
         bool isGhostCell = false;
         for (unsigned int d = 0; d < dim; d++) {
-          isGhostCell = isGhostCell || (vectorIndex[d] == 0) || (vectorIndex[d] == indexConversion.getLocalNumberMacroscopicCells()[d] + 1);
+          isGhostCell = isGhostCell || (vectorIndex[d] == 0) || (vectorIndex[d] == indexConversion.getLocalNumberCouplingCells()[d] + 1);
         }
         if (!isGhostCell) {
           std::cout << "ERROR Sorting::updateGhostCells: Molecule is not "
@@ -298,7 +298,7 @@ private:
    * mamico cells */
   tarch::la::Vector<dim, double> getLocalSize(const coupling::IndexConversion<dim> &indexConversion) const {
     const tarch::la::Vector<dim, double> meshsize = indexConversion.getMacroscopicCellSize();
-    const tarch::la::Vector<dim, unsigned int> localNumberCells = indexConversion.getLocalNumberMacroscopicCells();
+    const tarch::la::Vector<dim, unsigned int> localNumberCells = indexConversion.getLocalNumberCouplingCells();
     tarch::la::Vector<dim, double> localSize(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       localSize[d] = meshsize[d] * (localNumberCells[d] + 2);

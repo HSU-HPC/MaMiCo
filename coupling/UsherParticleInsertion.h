@@ -11,7 +11,7 @@
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/ComputeTemperatureMapping.h"
 #include "coupling/cell-mappings/DeleteParticleMapping.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/datastructures/Molecule.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "tarch/utils/RandomNumberService.h"
@@ -75,9 +75,8 @@ public:
    *  @returns the type of action which was applied
    * (coupling::ParticleInsertion::Action) */
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                   const tarch::la::Vector<dim, double>& macroscopicCellPosition, const tarch::la::Vector<dim, double>& macroscopicCellSize,
-                   const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
+  insertDeleteMass(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
+                   const tarch::la::Vector<dim, double>& macroscopicCellSize, const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
                    const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController);
 
   /** @brief since the Usher algorithm requires the potential energy landscape,
@@ -115,7 +114,7 @@ private:
    *  @returns NoAction or Insertion, depending on the applied action
    *  (coupling::ParticleInsertion::Action) */
   typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
+  insertParticle(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
                  const tarch::la::Vector<dim, double>& macroscopicCellSize, const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
                  const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController);
 
@@ -127,7 +126,7 @@ private:
    *  @returns NoAction or Deletion, depending on the action applied
    *  (coupling::ParticleInsertion::Action)*/
   typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  deleteParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  deleteParticle(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                  const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController);
 
 protected:
@@ -145,7 +144,7 @@ protected:
    *  @returns NoAction or Insertion, depending on the result of the Usher
    * method applied here (coupling::ParticleInsertion::Action)*/
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  findParticlePosition(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& thisCell,
+  findParticlePosition(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& thisCell,
                        const tarch::la::Vector<dim, double>& macroscopicCellPosition, const tarch::la::Vector<dim, double>& macroscopicCellSize,
                        coupling::datastructures::Molecule<dim>& molecule, const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController);
 

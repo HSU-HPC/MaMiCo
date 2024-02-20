@@ -89,9 +89,9 @@ public:
    *  @param outerCells Vector containing all outer cells.
    *  @param outerIndices Vector containing all outer indices.
    */
-  void initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim>*> m2mDomainCells,
+  void initMD2MacroDomain(std::vector<coupling::datastructures::CouplingCell<dim>*> m2mDomainCells,
                           std::vector<tarch::la::Vector<dim, unsigned int>> m2mGlobalCellIndices,
-                          std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outerCells,
+                          std::vector<coupling::datastructures::CouplingCell<dim>*>& outerCells,
                           std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices);
 
   /** This alternative chooses a subspace of the cell (and index) input based on
@@ -111,10 +111,9 @@ public:
    *  @param m2mIndices Output vector where indices of those outer cells shall
    * be placed.
    */
-  void initMD2MacroDomain(std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCells,
-                          std::vector<coupling::datastructures::MacroscopicCell<dim>*>& m2mDomainCells,
-                          std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices,
-                          std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outerCells,
+  void initMD2MacroDomain(std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCells,
+                          std::vector<coupling::datastructures::CouplingCell<dim>*>& m2mDomainCells,
+                          std::vector<tarch::la::Vector<dim, unsigned int>>& m2mIndices, std::vector<coupling::datastructures::CouplingCell<dim>*>& outerCells,
                           std::vector<tarch::la::Vector<dim, unsigned int>>& outerIndices);
 
   /** For all d < dim, lowerBoundaries[d] < upperBoundaries[d].

@@ -41,7 +41,7 @@ public:
   /** @brief the microscopicMass and -Momentum are set to 0
    *  @param cell macroscopic cell to process
    *  @param index index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index) {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
@@ -52,7 +52,7 @@ public:
   /** @brief the microscopicMass and -Momentum are set to 0
    *  @param cell macroscopic cell to process
    *  @param index index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index) {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
@@ -64,7 +64,7 @@ public:
    * macroscopic quantities
    *  @param cell macroscopic cell to process
    *  @param index index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index) {
     cell.iterateConstCells(_massMapping);
     cell.iterateConstCells(_momentumMapping);

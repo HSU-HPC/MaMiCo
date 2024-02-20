@@ -245,7 +245,7 @@ public:
       throw std::runtime_error("velocity.ndim() != 4");
     if (density.ndim() != 3)
       throw std::runtime_error("density.ndim() != 3");
-    auto numcells = _idcv.getGlobalNumberMacroscopicCells();
+    auto numcells = _idcv.getGlobalNumberCouplingCells();
     for (unsigned int d = 0; d < 3; d++) {
       if (velocity.shape(d) != numcells[d])
         throw std::runtime_error("velocity.shape(" + std::to_string(d) + ") should be " + std::to_string(numcells[d]) + " but is " +
@@ -277,7 +277,7 @@ public:
   }
 
   py::array_t<double>* loadRecvVelocity() {
-    auto numcells = _idcv.getGlobalNumberMacroscopicCells() - tarch::la::Vector<3, unsigned int>(2 * _outerRegion);
+    auto numcells = _idcv.getGlobalNumberCouplingCells() - tarch::la::Vector<3, unsigned int>(2 * _outerRegion);
     std::vector<unsigned int> shape = {numcells[0], numcells[1], numcells[2], 3};
     py::array_t<double>* res = new py::array_t<double>(shape);
 
@@ -303,7 +303,7 @@ public:
   }
 
   py::array_t<double>* loadRecvDensity(double cellmass) {
-    auto numcells = _idcv.getGlobalNumberMacroscopicCells() - tarch::la::Vector<3, unsigned int>(2 * _outerRegion);
+    auto numcells = _idcv.getGlobalNumberCouplingCells() - tarch::la::Vector<3, unsigned int>(2 * _outerRegion);
     std::vector<unsigned int> shape = {numcells[0], numcells[1], numcells[2]};
     py::array_t<double>* res = new py::array_t<double>(shape);
 
@@ -322,9 +322,9 @@ public:
     return res;
   }
 
-  std::vector<coupling::datastructures::MacroscopicCell<3>*> _sendBuffer;
+  std::vector<coupling::datastructures::CouplingCell<3>*> _sendBuffer;
   unsigned int* _globalCellIndices4SendBuffer;
-  std::vector<coupling::datastructures::MacroscopicCell<3>*> _recvBuffer;
+  std::vector<coupling::datastructures::CouplingCell<3>*> _recvBuffer;
   unsigned int* _globalCellIndices4RecvBuffer;
 
 private:
@@ -335,7 +335,7 @@ private:
   void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroscopicSolverInterface,
                           unsigned int rank) {
     // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
+    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<3, unsigned int>(2));
     const unsigned int num = cells[0] * cells[1] * cells[2];
 
     // delete all potential entries of sendBuffer
@@ -371,7 +371,7 @@ private:
           containsThisRank = containsThisRank || (ranks[k] == rank);
         }
         if (containsThisRank) {
-          _sendBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+          _sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
           indices[_sendBuffer.size() - 1] = i;
         }
       }
@@ -383,7 +383,7 @@ private:
                           unsigned int rank) {
 
     // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
+    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<3, unsigned int>(2));
     const unsigned int num = cells[0] * cells[1] * cells[2];
 
     // delete all potential entries of sendBuffer
@@ -415,7 +415,7 @@ private:
           containsThisRank = containsThisRank || (ranks[k] == rank);
         }
         if (containsThisRank) {
-          _recvBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+          _recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
           // set linearized index
           indices[_recvBuffer.size() - 1] = i;
         }
@@ -425,7 +425,7 @@ private:
   }
 
   /** deletes the buffer */
-  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& buffer) {
+  void deleteBuffer(std::vector<coupling::datastructures::CouplingCell<3>*>& buffer) {
     // delete all potential entries of buffer
     for (unsigned int i = 0; i < buffer.size(); i++) {
       if (buffer[i] != NULL) {

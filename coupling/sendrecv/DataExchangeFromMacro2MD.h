@@ -6,7 +6,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGEFROMMACRO2MD_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "coupling/sendrecv/DataExchange.h"
 
@@ -32,7 +32,7 @@ template <unsigned int dim> class DataExchangeFromMacro2MD;
  *  @author Philipp Neumann
  */
 template <unsigned int dim>
-class coupling::sendrecv::DataExchangeFromMacro2MD : public coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim> {
+class coupling::sendrecv::DataExchangeFromMacro2MD : public coupling::sendrecv::DataExchange<coupling::datastructures::CouplingCell<dim>, dim> {
 
 public:
   /** Constructor
@@ -42,7 +42,7 @@ public:
    */
   DataExchangeFromMacro2MD(coupling::interface::MacroscopicSolverInterface<dim>* interface, const coupling::IndexConversion<dim>* indexConversion,
                            unsigned int tagoffset = 0)
-      : coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim>(TAG_FROM_MACRO2MD + tagoffset), _interface(interface),
+      : coupling::sendrecv::DataExchange<coupling::datastructures::CouplingCell<dim>, dim>(TAG_FROM_MACRO2MD + tagoffset), _interface(interface),
         _indexConversion(indexConversion) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "DataExchangeFromMacro2MD initialised..." << std::endl;
@@ -86,7 +86,7 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void readFromCell(double* const buffer, const coupling::datastructures::MacroscopicCell<dim>& cell) {
+  virtual void readFromCell(double* const buffer, const coupling::datastructures::CouplingCell<dim>& cell) {
     buffer[0] = cell.getMicroscopicMass();
     for (unsigned int d = 0; d < dim; d++) {
       buffer[d + 1] = cell.getMicroscopicMomentum()[d];
@@ -97,7 +97,7 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void writeToCell(const double* const buffer, coupling::datastructures::MacroscopicCell<dim>& cell) {
+  virtual void writeToCell(const double* const buffer, coupling::datastructures::CouplingCell<dim>& cell) {
     tarch::la::Vector<dim, double> microscopicMomentum(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       microscopicMomentum[d] = buffer[1 + d];

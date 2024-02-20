@@ -63,7 +63,7 @@ public:
       exit(EXIT_FAILURE);
     }
     const coupling::IndexConversion<dim>& indexConversion = macroscopicCellService->getIndexConversion();
-    coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells = macroscopicCellService->getMacroscopicCells();
+    coupling::datastructures::CouplingCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells = macroscopicCellService->getCouplingCells();
     const std::vector<tarch::la::Vector<2, unsigned int>> numberMoleculesPerMacroscopicCell = initNumberMoleculesPerMacroscopicCell(indexConversion);
 
     // instantiate a molecule extractor
@@ -174,11 +174,11 @@ private:
 
   /** loops over all macroscopic cells on this process and checks for the number of molecules in each cell. Further, we plot the molecule positions of each
    * cell. */
-  void testMolecules(coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells,
+  void testMolecules(coupling::datastructures::CouplingCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells,
                      coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim>& moleculeExtractor,
                      const coupling::IndexConversion<dim>& indexConversion,
                      const std::vector<tarch::la::Vector<2, unsigned int>>& numberMoleculesPerMacroscopicCell) {
-    const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberMacroscopicCells();
+    const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberCouplingCells();
     tarch::la::Vector<dim, unsigned int> loop(0);
     if (dim == 2) {
       for (loop[1] = 1; loop[1] < localCells[1] + 1; loop[1]++) {
@@ -187,7 +187,7 @@ private:
           const unsigned int localIndex = indexConversion.getLocalCellIndex(loop);
           const unsigned int globalIndex = indexConversion.convertLocalToGlobalCellIndex(localIndex);
           // determine number of molecules in this cell, based on cell structure
-          (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
+          (macroscopicCells.getCouplingCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
           const unsigned int numberMoleculesFound = (unsigned int)moleculeExtractor.getExtractedMolecules().size();
           // determine the number of molecules as it was expected
           const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerMacroscopicCell);
@@ -210,7 +210,7 @@ private:
             const unsigned int localIndex = indexConversion.getLocalCellIndex(loop);
             const unsigned int globalIndex = indexConversion.convertLocalToGlobalCellIndex(localIndex);
             // determine number of molecules in this cell, based on cell structure
-            (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
+            (macroscopicCells.getCouplingCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
             const unsigned int numberMoleculesFound = (unsigned int)moleculeExtractor.getExtractedMolecules().size();
             // determine the number of molecules as it was expected
             const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerMacroscopicCell);

@@ -6,7 +6,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_STRATEGY_H_
 
 #include "coupling/IndexConversion.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 
 namespace coupling {
@@ -42,7 +42,7 @@ public:
    * macro solver is applied
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
@@ -68,7 +68,7 @@ public:
    * macro solver is applied
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that are not part the
@@ -96,7 +96,7 @@ public:
    * -Momentum have been filled in with data from the macroscopic solver.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                               const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
@@ -124,7 +124,7 @@ public:
    * -Momentum have been filled in with data from the macroscopic solver.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                               const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells are part of the outer MD
@@ -151,7 +151,7 @@ public:
    * noise reduction invocation.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
@@ -180,7 +180,7 @@ public:
    * noise reduction invocation.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells are part of the outer MD
@@ -204,7 +204,7 @@ public:
    * of the MD domain; it is not applied in the outer macroscopic cells.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                           const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that cover parts of the

@@ -63,11 +63,11 @@ public:
     }
   }
 
-  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                                 const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
     _fromMacro2MD.sendFromMacro2MD(*_indexConversion, _deFromMacro2MD, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
   }
-  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
+  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& macroscopicCellsFromMacroscopicSolver,
                                   const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
     _fromMD2Macro.sendFromMD2Macro(*_indexConversion, _deFromMD2Macro, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return 0;
@@ -135,9 +135,9 @@ private:
   coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
 
   /** for quantity transfer between solvers */
-  coupling::sendrecv::FromMacro2MDSendOnly<coupling::datastructures::MacroscopicCell<dim>, dim> _fromMacro2MD;
+  coupling::sendrecv::FromMacro2MDSendOnly<coupling::datastructures::CouplingCell<dim>, dim> _fromMacro2MD;
   coupling::sendrecv::DataExchangeFromMacro2MD<dim> _deFromMacro2MD;
-  coupling::sendrecv::FromMD2MacroRecvOnly<coupling::datastructures::MacroscopicCell<dim>, dim> _fromMD2Macro;
+  coupling::sendrecv::FromMD2MacroRecvOnly<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;
 };
 

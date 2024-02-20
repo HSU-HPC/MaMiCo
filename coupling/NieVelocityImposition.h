@@ -46,7 +46,7 @@ public:
    *  @param cell to the macroscopic cell will the momentum be inserted
    *  @param currentLocalMacroscopicCell local linearised index for the
    * macroscopic cell */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                               const unsigned int& currentLocalMacroscopicCellIndex) const {
     // nop if this is not an imposition cell
     if (!isInsideImpositionLayer(currentLocalMacroscopicCellIndex)) {
@@ -80,7 +80,7 @@ private:
    *  @returns a bool, that indicates if the given cell index is located in the
    * imposition layer (true) or not (false) */
   bool isInsideImpositionLayer(const unsigned int& currentLocalMacroscopicCellIndex) const {
-    const tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(_indexConversion.getGlobalNumberMacroscopicCells());
+    const tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(_indexConversion.getGlobalNumberCouplingCells());
     const tarch::la::Vector<dim, unsigned int> globalCellIndex(
         _indexConversion.getGlobalVectorCellIndex(_indexConversion.convertLocalToGlobalCellIndex(currentLocalMacroscopicCellIndex)));
     bool inner = true;

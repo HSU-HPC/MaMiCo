@@ -40,14 +40,14 @@ public:
     return result;
   }
 
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim>*> getMacroscopicCells4Sending() {
-    std::vector<coupling::datastructures::MacroscopicCell<dim>*> result;
+  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getMacroscopicCells4Sending() {
+    std::vector<coupling::datastructures::CouplingCell<dim>*> result;
     return result;
   }
   virtual unsigned int* getMacroscopicCellIndices4Sending() { return NULL; }
 
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim>*> getMacroscopicCells4Receiving() {
-    std::vector<coupling::datastructures::MacroscopicCell<dim>*> result;
+  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getMacroscopicCells4Receiving() {
+    std::vector<coupling::datastructures::CouplingCell<dim>*> result;
     return result;
   }
   virtual unsigned int* getMacroscopicCellIndices4Receiving() { return NULL; }

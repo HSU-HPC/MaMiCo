@@ -51,7 +51,7 @@ public:
    * macro solver is transferred
    *  @param cell the macroscopic cell to process
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index) {
     // reset buffers for sampling mass and momentum in each inner macroscopic
     // cell
@@ -77,7 +77,7 @@ public:
    *  @brief the averaging operation is applied to the cell
    *  @param cell the macroscopic cell to process
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                           const unsigned int& index) {
     // compute total mass/momentum from previous samples
     const double oldMass = (_sampleCounter - 1) * cell.getMacroscopicMass();

@@ -10,7 +10,7 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/IndexConversion.h"
-#include "coupling/datastructures/MacroscopicCells.h"
+#include "coupling/datastructures/CouplingCells.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "simplemd/LinkedCell.h"
 #include "tarch/la/Vector.h"
@@ -98,7 +98,7 @@ private:
     ~WriteIndex() {}
     void beginCellIteration() {}
     void endCellIteration() {}
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
       tarch::la::Vector<dim, unsigned int> localIndex = _indexConversion.getLocalVectorCellIndex(index);
       tarch::la::Vector<dim, double> convertLocal(0.0);
       for (unsigned int d = 0; d < dim; d++) {
@@ -117,7 +117,7 @@ private:
     ~PrintIndex() {}
     void beginCellIteration() {}
     void endCellIteration() {}
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
       std::cout << cell.getMicroscopicMomentum() << std::endl;
     }
   };
@@ -135,17 +135,17 @@ private:
                                                          testInterface->getGlobalMDDomainOffset(), coupling::paralleltopology::XYZ);
     const tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell(2);
 
-    coupling::datastructures::MacroscopicCells<simplemd::LinkedCell, dim> macroscopicCells(numberLinkedCellsPerMacroscopicCell, indexConversion, testInterface);
+    coupling::datastructures::CouplingCells<simplemd::LinkedCell, dim> macroscopicCells(numberLinkedCellsPerMacroscopicCell, indexConversion, testInterface);
     WriteIndex<dim> writeIndex(indexConversion);
     PrintIndex<dim> printIndex;
 
     // write indices to inner macroscopic cells
-    macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(writeIndex);
-    macroscopicCells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(printIndex);
+    macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(writeIndex);
+    macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(printIndex);
 
     // write indices to outer macroscopic cells
-    macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(writeIndex);
-    macroscopicCells.applyToLocalGhostMacroscopicCellsWithLinkedCells(printIndex);
+    macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(writeIndex);
+    macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(printIndex);
 
     delete testInterface;
     testInterface = NULL;

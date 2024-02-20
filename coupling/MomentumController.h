@@ -8,7 +8,7 @@
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/SetMomentumMapping.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "tarch/la/Vector.h"
 
 namespace coupling {
@@ -40,7 +40,7 @@ public:
    * to
    *  @param meanVelocity vector to which the mean velocity of the cell will be
    * written to*/
-  void computeMomentumAndMeanVelocity(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& momentum,
+  void computeMomentumAndMeanVelocity(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& momentum,
                                       tarch::la::Vector<dim, double>& meanVelocity) {
     cell.iterateConstCells(_computeMomentumMapping);
     momentum = _computeMomentumMapping.getMomentum();
@@ -51,7 +51,7 @@ public:
    * @param cell the macroscopic cell, for which the values shall be calculated
    *  @param momentum vector to which the momentum of the cell will be written
    * to */
-  void computeMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& momentum) {
+  void computeMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& momentum) {
     cell.iterateConstCells(_computeMomentumMapping);
     momentum = _computeMomentumMapping.getMomentum();
   }
@@ -60,7 +60,7 @@ public:
    *  @param cell the macroscopic cell, for which the values shall be calculated
    *  @param meanVelocity vector to which the mean velocity of the cell will be
    * written to*/
-  void computeMeanVelocity(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& meanVelocity) {
+  void computeMeanVelocity(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, tarch::la::Vector<dim, double>& meanVelocity) {
     cell.iterateConstCells(_computeMomentumMapping);
     meanVelocity = _computeMomentumMapping.getMeanVelocity();
   }
@@ -75,7 +75,7 @@ public:
    *  @brief sets the momentum of a macroscopic cell to the input value.
    *  @param cell the macroscopic cell in which the momentum shall be changed
    *  @param newMomentum the value to which the momentum will be set */
-  void setMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& newMomentum) {
+  void setMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& newMomentum) {
     tarch::la::Vector<dim, double> currentMomentum(0.0);
     computeMomentum(cell, currentMomentum);
     cell.iterateConstCells(_computeMassMapping);

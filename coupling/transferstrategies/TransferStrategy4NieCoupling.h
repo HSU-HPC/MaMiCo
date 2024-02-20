@@ -51,7 +51,7 @@ public:
    * microscopic mass buffer
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index);
 
   /** stores velocity values in new cont.-velocity field solution and sets
@@ -60,14 +60,14 @@ public:
    *  @brief converts momentum into velocity values;
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                               const unsigned int& index);
 
   // virtual void beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
 
   /** @brief divides accumulated mass and momentum values by time step counter.
    */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index);
 
   // virtual void endProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
@@ -79,12 +79,12 @@ public:
    * and accumulates mass/momentum for sampling
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                           const unsigned int& index);
 
 private:
   /** returns the local number of macroscopic cells incl. ghost layers */
-  unsigned int getLocalNumberMacroscopicCells(const coupling::IndexConversion<dim>& indexConversion) const;
+  unsigned int getLocalNumberCouplingCells(const coupling::IndexConversion<dim>& indexConversion) const;
   /** computes the mass flux in the outermost inner macroscopic cells. For all
    * other cells, 0.0 is returned. */
   double computeMassFlux(const double& mass, const tarch::la::Vector<dim, double>& velocity, const unsigned int index);

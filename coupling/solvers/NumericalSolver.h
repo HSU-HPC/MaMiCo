@@ -15,7 +15,7 @@
 #include <mpi.h>
 #endif
 #include "coupling/IndexConversion.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/solvers/CouetteSolver.h"
@@ -202,7 +202,7 @@ public:
    *  @param recvIndice the indices to connect the data from the buffer with
    * macroscopic cells
    *  @param indexConversion instance of the indexConversion */
-  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
                                    const coupling::IndexConversion<3>& indexConversion) = 0;
 
   /** @brief returns the number of process, regards parallel runs

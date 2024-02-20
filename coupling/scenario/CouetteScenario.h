@@ -182,7 +182,7 @@ protected:
 
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
         _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberMacroscopicCells(_simpleMDConfig, _mamicoConfig),
+        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberCouplingCells(_simpleMDConfig, _mamicoConfig),
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     // init indexing
@@ -724,8 +724,8 @@ protected:
   }
 
   /** computes global number of macroscopic cells from configs. Required by couette solver interface before MacroscopicCellService is initialised! */
-  tarch::la::Vector<3, unsigned int> getGlobalNumberMacroscopicCells(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
-                                                                     const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig) const {
+  tarch::la::Vector<3, unsigned int> getGlobalNumberCouplingCells(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
+                                                                  const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig) const {
     tarch::la::Vector<3, double> domainSize(simpleMDConfig.getDomainConfiguration().getGlobalDomainSize());
     tarch::la::Vector<3, double> dx(mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
     tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
@@ -742,7 +742,7 @@ protected:
    *  @param couetteSolverInterface interface for the continuum solver */
   void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) {
     // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
+    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<3, unsigned int>(2));
     const unsigned int num = cells[0] * cells[1] * cells[2];
     // delete all potential entries of sendBuffer
     deleteBuffer(_buf.sendBuffer);
@@ -779,7 +779,7 @@ protected:
           containsThisRank = containsThisRank || (ranks[k] == (unsigned int)_rank);
         }
         if (containsThisRank) {
-          _buf.sendBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+          _buf.sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
           if (_buf.sendBuffer[_buf.sendBuffer.size() - 1] == NULL) {
             std::cout << "ERROR CouetteScenario::allocateSendBuffer: sendBuffer[" << _buf.sendBuffer.size() - 1 << "]==NULL!" << std::endl;
             exit(EXIT_FAILURE);
@@ -807,7 +807,7 @@ protected:
   void allocateRecvBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) {
 
     // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
+    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<3, unsigned int>(2));
     const unsigned int num = cells[0] * cells[1] * cells[2];
 
     // delete all potential entries of sendBuffer
@@ -842,7 +842,7 @@ protected:
           containsThisRank = containsThisRank || (ranks[k] == (unsigned int)_rank);
         }
         if (containsThisRank) {
-          _buf.recvBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+          _buf.recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
           if (_buf.recvBuffer[_buf.recvBuffer.size() - 1] == NULL) {
             std::cout << "ERROR CouetteScenario::allocateRecvBuffer: recvBuffer[" << _buf.recvBuffer.size() - 1 << "]==NULL!" << std::endl;
             exit(EXIT_FAILURE);
@@ -871,7 +871,7 @@ protected:
    *  @param recvIndices the indices for the macr cells in the buffer
    *  @param indexConversion an instance of the indexConversion
    *  @param couplingCycle the current number of coupling cycle */
-  void write2CSV(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
+  void write2CSV(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
                  const coupling::IndexConversion<3>& indexConversion, int couplingCycle) const {
     if (recvBuffer.size() == 0)
       return;
@@ -906,7 +906,7 @@ protected:
 
   /** @brief deletes the data in the buffer for the macro to md transfer
    *  @param sendBuffer the buffer to be cleaned */
-  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& sendBuffer) const {
+  void deleteBuffer(std::vector<coupling::datastructures::CouplingCell<3>*>& sendBuffer) const {
     // delete all potential entries of sendBuffer
     for (unsigned int i = 0; i < sendBuffer.size(); i++) {
       if (sendBuffer[i] != NULL) {
@@ -925,7 +925,7 @@ protected:
    *  @param globalCellIndices4SendBuffer the global linearized indices of the
    * macroscopic cells in the buffer  */
   void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,
-                      const coupling::IndexConversion<3>& indexConversion, std::vector<coupling::datastructures::MacroscopicCell<3>*>& sendBuffer,
+                      const coupling::IndexConversion<3>& indexConversion, std::vector<coupling::datastructures::CouplingCell<3>*>& sendBuffer,
                       const unsigned int* const globalCellIndices4SendBuffer) const {
     using coupling::configurations::CouetteConfig;
     const unsigned int size = sendBuffer.size();
@@ -1076,11 +1076,11 @@ protected:
    *  @brief holds the buffers for the data transfer */
   struct CouplingBuffer {
     /** @brief the buffer for data transfer from macro to md */
-    std::vector<coupling::datastructures::MacroscopicCell<3>*> sendBuffer;
+    std::vector<coupling::datastructures::CouplingCell<3>*> sendBuffer;
     /** @brief the global indices of the macroscopic cells in the sendBuffer */
     unsigned int* globalCellIndices4SendBuffer;
     /** @brief the buffer for data transfer from md to macro */
-    std::vector<coupling::datastructures::MacroscopicCell<3>*> recvBuffer;
+    std::vector<coupling::datastructures::CouplingCell<3>*> recvBuffer;
     /** @brief the global indices of the macroscopic cells in the recvBuffer*/
     unsigned int* globalCellIndices4RecvBuffer;
   };

@@ -31,7 +31,7 @@ public:
    *  @param cell the macroscopic cell to apply no force
    *  @param currentLocalMacroscopicCellIndex the linearised local index of the
    * macroscopic cell*/
-  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                   const unsigned int& currentLocalMacroscopicCellIndex) {}
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_NOBOUNDARYFORCE_H_

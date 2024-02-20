@@ -5,7 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_
 #define _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_
 
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 
 namespace coupling {
@@ -36,7 +36,7 @@ public:
    * @param cell the macroscopic boundary cell to apply the boundary force
    * @param currentLocalMacroscopicCellIndex the index of the macroscopic cell
    */
-  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                   const unsigned int& currentLocalMacroscopicCellIndex) = 0;
 
   /** @brief calculates the potential energy for a given position

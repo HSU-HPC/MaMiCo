@@ -57,7 +57,7 @@ public:
     const tarch::la::Vector<3, unsigned int> mdCellOffset(floor(mdDomainOffset[0] / dx + 0.5), floor(mdDomainOffset[1] / dx + 0.5),
                                                           floor(mdDomainOffset[2] / dx + 0.5));
     coupling::solvers::LBCouetteSolverInterface interface(solver.getAvgNumberLBCells(), processes, mdCellOffset, globalNumberMacroscopicCells, overlapStrip);
-    std::vector<coupling::datastructures::MacroscopicCell<3>*> recvBuffer;
+    std::vector<coupling::datastructures::CouplingCell<3>*> recvBuffer;
     unsigned int* globalCellIndices = initRecvBuffer(recvBuffer, globalNumberMacroscopicCells, interface, indexConversion, density, dx);
     if (rank == 0) {
       std::cout << "Introduce MD domain at offset=" << mdDomainOffset << " and with size " << mdDomainSize << std::endl;
@@ -122,7 +122,7 @@ private:
     }
   }
 
-  unsigned int* initRecvBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer,
+  unsigned int* initRecvBuffer(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer,
                                tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells, coupling::solvers::LBCouetteSolverInterface& interface,
                                const coupling::IndexConversion<3>& indexConversion, const double density, const double dx) {
     // compute avg. mass in this cell
@@ -151,7 +151,7 @@ private:
           // if this cell shall be received by the current (target) rank, create a cell in the recvBuffer and store the index in the vector
           if (contained) {
             myIndex.push_back(indexConversion.getGlobalCellIndex(coords));
-            recvBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+            recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
             if (recvBuffer[recvBuffer.size() - 1] == NULL) {
               std::cout << "ERROR TestLBCouetteSolver::initRecvBuffer(): recBuffer[..]==NULL!" << std::endl;
               exit(EXIT_FAILURE);

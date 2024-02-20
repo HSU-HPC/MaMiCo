@@ -48,7 +48,7 @@ public:
    *  @brief the data received from the macro solver is processed
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                               const unsigned int& index);
 
   /** @brief the momentum is converted to velocity (velocity = momentum/mass)
@@ -57,20 +57,20 @@ public:
    *  @brief the data received from the macro solver is processed
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                               const unsigned int& index);
 
   /** @brief the data collected during the md time steps is averaged
    * (/numberMDSteps)
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index);
 
   /** @brief the macroscopic quantities are reseted (0)
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index);
 
   /** @brief the _timestepCounter is incremented and if sample()==true the
@@ -81,7 +81,7 @@ public:
    * macroscopic quantities
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                           const unsigned int& index);
 
 protected:

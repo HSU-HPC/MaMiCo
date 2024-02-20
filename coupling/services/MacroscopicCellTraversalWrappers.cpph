@@ -24,7 +24,7 @@ public:
   virtual ~Wrapper() {}
   virtual void beginCellIteration() = 0;
   virtual void endCellIteration() = 0;
-  virtual void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) = 0;
+  virtual void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) = 0;
 
 protected:
   coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>* _thisPtr;
@@ -40,7 +40,7 @@ public:
 
   void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData(); }
   void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData(); }
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(cell, index);
   }
 };
@@ -56,7 +56,7 @@ public:
   void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData(); }
   void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData(); }
 
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(cell, index);
   }
 };
@@ -71,7 +71,7 @@ public:
 
   void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData(); }
   void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData(); }
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(cell, index);
   }
 };
@@ -86,7 +86,7 @@ public:
 
   void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData(); }
   void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData(); }
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(cell, index);
   }
 };
@@ -99,7 +99,7 @@ public:
 
   void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(); }
   void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(); }
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellBeforeSendingMDSolverData(cell, index);
   }
 };
@@ -112,7 +112,7 @@ public:
 
   void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterMacroscopicCellsBeforeSendingMDSolverData(); }
   void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterMacroscopicCellsBeforeSendingMDSolverData(); }
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     Wrapper::_thisPtr->_transferStrategy->processOuterMacroscopicCellBeforeSendingMDSolverData(cell, index);
   }
 };
@@ -125,7 +125,7 @@ public:
 
   void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerMacroscopicCellsAfterMDTimestep(); }
   void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerMacroscopicCellsAfterMDTimestep(); }
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     Wrapper::_thisPtr->_transferStrategy->processInnerMacroscopicCellAfterMDTimestep(cell, index);
   }
 };
@@ -138,7 +138,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(Wrapper::_thisPtr->_mdSolverInterface);
     cell.iterateConstCells(computeMomentumMapping);
     const tarch::la::Vector<dim, double> velocity = computeMomentumMapping.getMeanVelocity();
@@ -154,7 +154,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     const double temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
     Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell, index);
     Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell, temperature);
@@ -174,7 +174,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     // if this value is -1.0, we just set the temperature in the cell according
     // to current temperature...
     if (_temperature == -1.0) {
@@ -197,7 +197,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(Wrapper::_thisPtr->_mdSolverInterface);
     cell.iterateConstCells(computeMomentumMapping);
 
@@ -219,7 +219,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     const double temperature = cell.getTemperature();
     Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell, temperature);
   }
@@ -233,7 +233,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
     Wrapper::_thisPtr->_boundaryForceController->applyBoundaryForce(cell, index);
   }
 };

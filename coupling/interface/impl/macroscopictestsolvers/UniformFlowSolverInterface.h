@@ -41,10 +41,10 @@ public:
   }
 
   /** add every macroscopic cell with mass and momentum to the send buffer */
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim>*> getMacroscopicCells4Sending() {
-    std::vector<coupling::datastructures::MacroscopicCell<dim>*> result;
+  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getMacroscopicCells4Sending() {
+    std::vector<coupling::datastructures::CouplingCell<dim>*> result;
     for (unsigned int i = 0; i < _totalNumberMacroscopicCells; i++) {
-      result.push_back(new coupling::datastructures::MacroscopicCell<dim>());
+      result.push_back(new coupling::datastructures::CouplingCell<dim>());
       if (result[i] == NULL) {
         std::cout << "ERROR coupling::interface::UniformFlowSolverInterface: result[i]==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -68,8 +68,8 @@ public:
   }
 
   /** nothing is received */
-  virtual std::vector<coupling::datastructures::MacroscopicCell<dim>*> getMacroscopicCells4Receiving() {
-    std::vector<coupling::datastructures::MacroscopicCell<dim>*> result;
+  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getMacroscopicCells4Receiving() {
+    std::vector<coupling::datastructures::CouplingCell<dim>*> result;
     return result;
   }
   virtual unsigned int* getMacroscopicCellIndices4Receiving() { return NULL; }

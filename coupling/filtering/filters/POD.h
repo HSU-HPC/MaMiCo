@@ -23,8 +23,8 @@ template <unsigned int dim> class POD;
  */
 template <unsigned int dim> class coupling::filtering::POD : public coupling::filtering::FilterInterface<dim> {
 public:
-  POD(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector,
+  POD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
+      const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
       MPI_Comm comm,
 #endif
@@ -89,7 +89,7 @@ private:
   unsigned int _cycleCounter;   // coupling cycle counter, indicates how many data
                                 // snapshots are available already
   unsigned int _spatialIndex;   // cell counter, should run from zero to
-                                // getLocalNumberMacroscopicCells()-1 within an
+                                // getLocalNumberCouplingCells()-1 within an
                                 // iteration of ProcessInnerMacroscopicCell
   unsigned int _t;              // active temporal index, iterates cyclic between zero and
                                 // _timeWindowSize

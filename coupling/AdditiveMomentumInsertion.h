@@ -8,7 +8,7 @@
 #include "coupling/MomentumInsertion.h"
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/SetMomentumMapping.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "tarch/la/Vector.h"
 
 /** @brief everything necessary for coupling operations, is defined in here */
@@ -52,7 +52,7 @@ public:
    *  @brief inserts momentum to the cell
    *  @param cell macroscopic cell to insert momentum to
    *  @param currentMacroscopicCellIndex macroscopic cell index of the cell */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                               const unsigned int& currentMacroscopicCellIndex) const {
     const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();
     // determine fraction of momentum that is to be inserted in this frame
