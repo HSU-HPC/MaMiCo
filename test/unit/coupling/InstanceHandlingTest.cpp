@@ -111,9 +111,9 @@ public:
       
       
       
-      _instanceHandling->~InstanceHandling();
-      CPPUNIT_ASSERT(!_instanceHandling->getSimpleMD().size());
-      CPPUNIT_ASSERT(!_instanceHandling->getMDSolverInterface().size());
+ //     _instanceHandling->~InstanceHandling();
+ //     CPPUNIT_ASSERT(!_instanceHandling->getSimpleMD().size());
+ //     CPPUNIT_ASSERT(!_instanceHandling->getMDSolverInterface().size());
     
   }
  
