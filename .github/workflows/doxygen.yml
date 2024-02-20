@@ -71,6 +71,10 @@ jobs:
         if: github.event_name == 'pull_request'
         id: "parse_coverage"
         run: |
+          echo all files:
+          pwd
+          find ..
+          echo ""
           chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
           echo 'PARSED_COVERAGE<<EOF' >> $GITHUB_OUTPUT
           python test/check_my_coverage.py >> $GITHUB_OUTPUT
