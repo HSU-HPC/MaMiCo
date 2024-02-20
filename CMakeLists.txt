@@ -138,7 +138,26 @@ endif()
 
 if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(LS1_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ls1" CACHE PATH "ls1 source directory")
-  set(LS1_BUILD_DIR_NAME "build" CACHE STRING "ls1 build directory name")
+  set(LS1_BUILD_DIR_NAMES "build-seq;build-par;build" CACHE STRING "ls1 build directory names. First one working is used")
+  list(LENGTH LS1_BUILD_DIR_NAMES NUM_BUILD_DIRS)
+  # we have to use the last one anyway (no other options left in list), so skip that check
+  MATH(EXPR NUM_BUILD_DIRS "${NUM_BUILD_DIRS}-1")
+  set(BUILD_CANDIDATE_IDX 0)
+  list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
+  while(BUILD_CANDIDATE_IDX LESS NUM_BUILD_DIRS)
+    # check if this build dir works
+    if(EXISTS "${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}")
+      load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX CANDIDATE_CACHE_ ENABLE_MPI PRECISION)
+    endif()
+    if(CANDIDATE_CACHE_PRECISION AND (CANDIDATE_CACHE_ENABLE_MPI STREQUAL BUILD_WITH_MPI))
+      # this candidate build dir seems good, stop searching and try it
+      break()
+    endif()
+    # this candidate build dir does not work, try next one in list
+    MATH(EXPR BUILD_CANDIDATE_IDX "${BUILD_CANDIDATE_IDX}+1")
+    list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
+  endwhile()
+  message(STATUS ">> LS1 build directory used: " ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME})
   load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX LS1_CACHE_ ENABLE_AUTOPAS ENABLE_MPI PRECISION ENABLE_VTK ENABLE_ADIOS2 CMAKE_BUILD_TYPE)
   if(NOT LS1_CACHE_PRECISION)
     message(FATAL_ERROR "Could not read the ls1 build cache. Please ensure the path to the ls1 root folder and the name of the build folder are correct.")
