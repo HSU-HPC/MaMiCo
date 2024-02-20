@@ -27,7 +27,8 @@ public:
     
     void test() {
         
-        std::string filename("../test/unit/coupling/couette.xml");
+        const char * filename("../test/unit/coupling/couette.xml");
+         //std::string filename("../test/unit/coupling/couette.xml");
         tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",_simpleMDConfig);
         _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
         
@@ -43,7 +44,7 @@ public:
 #endif
     );
         
-        tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>("../test/unit/coupling/couette.xml", "mamico", _mamicoConfig);
+        tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>(filename, "mamico", _mamicoConfig);
     if (!_mamicoConfig.isValid()) {
       std::cout << "ERROR InstanceHandlingTest: Invalid MaMiCo config!" << std::endl;
       exit(EXIT_FAILURE);
@@ -100,27 +101,12 @@ public:
       }
         
       
-
-      coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = nullptr;
-      
-      _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(_instanceHandling->getMDSolverInterface(), couetteSolverInterface, _simpleMDConfig, _mamicoConfig, "../test/unit/coupling/couette.xml", *_multiMDService);
-      
-      
-      //_instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
-      
-      //_simpleMDConfig.getDomainConfigurationNonConst().setInitFromCheckpoint(false);
-
-      //_instanceHandling->simulateTimesteps(t, T, *_multiMDCellService);
       
       
       
-      
-      
-      
-      
- //     _instanceHandling->~InstanceHandling();
- //     CPPUNIT_ASSERT(!_instanceHandling->getSimpleMD().size());
- //     CPPUNIT_ASSERT(!_instanceHandling->getMDSolverInterface().size());
+      _instanceHandling->~InstanceHandling();
+      CPPUNIT_ASSERT(!_instanceHandling->getSimpleMD().size());
+      CPPUNIT_ASSERT(!_instanceHandling->getMDSolverInterface().size());
     
   }
  
