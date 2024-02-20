@@ -52,6 +52,9 @@ uncommited_files = [l.split(' ')[-1] for l in subprocess.check_output(
     ['git', 'status', '--porcelain']).decode().strip().splitlines()]
 current_branch = subprocess.check_output(
     ['git', 'branch', '--show-current']).decode().strip()
+if len(current_branch) == 0:
+    print('Could not determine current branch!', file=sys.stderr)
+    exit(1)
 changed_files = subprocess.check_output(
     ['git', 'diff', '--name-only', f'origin/{target_branch}...{current_branch}']).decode().strip().splitlines()
 touched_files = set(uncommited_files + changed_files)
