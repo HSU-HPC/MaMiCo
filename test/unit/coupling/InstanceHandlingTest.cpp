@@ -117,7 +117,6 @@ private:
     tarch::utils::MultiMDService<3>* _multiMDService;
     coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
     simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
-    coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
     coupling::configurations::CouetteConfig _cfg;
 
  
