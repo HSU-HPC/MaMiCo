@@ -11,10 +11,11 @@
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/particleContainer/RegionParticleIterator.h"
 
+#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/interface/Molecule.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 
-#ifdef ENABLE_MPI
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include "ls1/src/parallel/DomainDecompMPIBase.h"
 #endif
 
@@ -81,7 +82,7 @@ public:
       _curParticleID = _locSimulation->getTotalNumberOfMolecules() + 1;
       _IDIncrementor = 1;
 
-#ifdef ENABLE_MPI
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
       int curRank = _locSimulation->domainDecomposition().getRank();
       _curParticleID += curRank + 1;
       _IDIncrementor = _locSimulation->domainDecomposition().getNumProcs();
