@@ -24,18 +24,12 @@ class EspressoMDSolverInterface : public MDSolverInterface<ParticleList, 3> {
 public:
   ~EspressoMDSolverInterface() {}
 
-  ParticleList& getLinkedCell(const tarch::la::Vector<3, unsigned int>& couplingCellIndex, const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
-                              const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell, const coupling::IndexConversion<3>& indexConversion) {
-    for (unsigned int d = 0; d < 3; d++) {
-      if (couplingCellIndex[d] == 0) {
-        std::cout << "ERROR EspressoMDSolverInterface::getLinkedCell(): coupling cell outside range for linked cells!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
+  ParticleList& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
+                              const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell) {
     tarch::la::Vector<3, unsigned int> index(0);
 
     for (unsigned int d = 0; d < 3; d++) {
-      index[d] = index[d] + (couplingCellIndex[d] - 1) * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
+      index[d] = index[d] + couplingCellIndex.get()[d] * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
     }
     int id = (index[0] + dd.cell_grid[0] * (index[1] + dd.cell_grid[1] * index[2]));
 

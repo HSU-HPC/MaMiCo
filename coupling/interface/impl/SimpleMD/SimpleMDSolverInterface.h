@@ -120,20 +120,13 @@ public:
         _dt(dt) {}
   ~SimpleMDSolverInterface() {}
 
-  simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int>& couplingCellIndex,
-                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInCouplingCell,
-                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell,
-                                      const coupling::IndexConversion<MD_DIM>& indexConversion) {
+  simplemd::LinkedCell& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInCouplingCell,
+                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell) {
     // no linked cells found in outer region!
-    for (unsigned int d = 0; d < MD_DIM; d++) {
-      if (couplingCellIndex[d] == 0) {
-        std::cout << "ERROR SimpleMDSolverInterface::getLinkedCell(): coupling cell outside range for linked cells!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
+
     tarch::la::Vector<MD_DIM, unsigned int> index(_linkedCellService.getLocalIndexOfFirstCell());
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      index[d] = index[d] + (couplingCellIndex[d] - 1) * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
+      index[d] = index[d] + couplingCellIndex.get()[d] * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
     }
     return _linkedCellService.getLinkedCell(index);
   }

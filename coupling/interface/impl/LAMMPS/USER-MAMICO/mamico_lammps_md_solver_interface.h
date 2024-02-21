@@ -77,13 +77,11 @@ public:
    * coupling cell. These coordinates thus lie in a range
    * (0,linkedCellsPerCouplingCell-1).
    */
-  virtual LAMMPS_NS::MamicoCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& couplingCellIndex,
-                                               const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
-                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell,
-                                               const coupling::IndexConversion<dim>& indexConversion) {
+  virtual LAMMPS_NS::MamicoCell& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
+                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) {
     // we currently embed one cell per coupling cell. It is hence sufficient
     // to use the same enumeration as used for the coupling cells
-    const unsigned int index = indexConversion.getLocalCellIndex(couplingCellIndex);
+    const unsigned int index = I02{couplingCellIndex}.get();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Return linked cell at macro-cell " << couplingCellIndex << " no. " << linkedCellInCouplingCell << ", assuming " << linkedCellsPerCouplingCell
               << " linked cells per cell: " << index << std::endl;
