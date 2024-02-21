@@ -14,7 +14,7 @@
 #endif
 
 /** tests several properties of the ErrorEstimation.
- *  @author Vahid Jafarimann
+ *  @author Vahid Jafari
  */
 class InstanceHandlingTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(InstanceHandlingTest);
@@ -30,10 +30,8 @@ public:
                                                                                                                            _simpleMDConfig);
     _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
 
-    if (!_simpleMDConfig.isValid()) {
-      std::cout << "ERROR InstanceHandlingTest: Invalid SimpleMD config!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
+    if (!_simpleMDConfig.isValid())
+      CPPUNIT_FAIL("ERROR InstanceHandlingTest: Invalid SimpleMD config!");
 
     _multiMDService = new tarch::utils::MultiMDService<3>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _cfg.totalNumberMDSimulations
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -43,15 +41,11 @@ public:
     );
 
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>(filename, "mamico", _mamicoConfig);
-    if (!_mamicoConfig.isValid()) {
-      std::cout << "ERROR InstanceHandlingTest: Invalid MaMiCo config!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
+    if (!_mamicoConfig.isValid())
+      CPPUNIT_FAIL("ERROR InstanceHandlingTest: Invalid MaMiCo config!");
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
-    if (_instanceHandling == nullptr) {
-      std::cout << "ERROR InstanceHandlingTest::initSolvers() : _instanceHandling == NULL!" << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
+    if (_instanceHandling == nullptr)
+      CPPUNIT_FAIL("ERROR InstanceHandlingTest::initSolvers() : _instanceHandling == NULL!");
 
     //    CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getTotalNumberOfMDSimulations());
     CPPUNIT_ASSERT(_instanceHandling->getSimpleMD().size() == _multiMDService->getLocalNumberOfMDSimulations());
@@ -90,12 +84,7 @@ public:
     _instanceHandling->writeCheckpoint("restart_checkpoint", 0);
     std::ifstream inputFile("restart_checkpoint_0_0.checkpoint");
     CPPUNIT_ASSERT(inputFile.is_open());
-    if (!inputFile.is_open()) {
-      std::cout << "ERROR InstanceHandlingTest: restart_checkpoint_0_0.checkpoint!" << std::endl;
-      exit(EXIT_FAILURE);
-    } else {
-      std::cout << "restart_checkpoint_0_0.checkpoint read!" << std::endl;
-    }
+    std::cout << "restart_checkpoint_0_0.checkpoint read!" << std::endl;
 
     _instanceHandling->~InstanceHandling();
     CPPUNIT_ASSERT(!_instanceHandling->getSimpleMD().size());
