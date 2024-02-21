@@ -45,13 +45,13 @@ public:
 
   /** @brief stores the old cont.-velocity field solution and resets time step
    * counter */
-  virtual void beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData();
+  virtual void beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData();
 
   /** @brief store old microscopic mass in excess-mass buffer and reset
    * microscopic mass buffer
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index);
 
   /** stores velocity values in new cont.-velocity field solution and sets
@@ -60,26 +60,26 @@ public:
    *  @brief converts momentum into velocity values;
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                               const unsigned int& index);
 
-  // virtual void beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
+  // virtual void beginProcessInnerCouplingCellsBeforeSendingMDSolverData();
 
   /** @brief divides accumulated mass and momentum values by time step counter.
    */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index);
 
-  // virtual void endProcessInnerMacroscopicCellsBeforeSendingMDSolverData();
+  // virtual void endProcessInnerCouplingCellsBeforeSendingMDSolverData();
 
   /** @brief increments time step counter */
-  virtual void beginProcessInnerMacroscopicCellsAfterMDTimestep();
+  virtual void beginProcessInnerCouplingCellsAfterMDTimestep();
 
   /** @brief computes current velocity (linear time interpolation) in this cell
    * and accumulates mass/momentum for sampling
    *  @param cell the macroscopic cell to be processed
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                           const unsigned int& index);
 
 private:

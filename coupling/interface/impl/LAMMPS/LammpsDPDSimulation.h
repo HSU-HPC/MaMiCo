@@ -48,7 +48,7 @@ public:
     unsigned int localNumberCells = 1;
     const tarch::la::Vector<MDSIMULATIONFACTORY_DIMENSION, unsigned int> numberProcs = _configuration.getMPIConfiguration().getNumberOfProcesses();
     const tarch::la::Vector<MDSIMULATIONFACTORY_DIMENSION, double> domainSize = _configuration.getDomainConfiguration().getGlobalDomainSize();
-    const tarch::la::Vector<MDSIMULATIONFACTORY_DIMENSION, double> meshsize = _mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize();
+    const tarch::la::Vector<MDSIMULATIONFACTORY_DIMENSION, double> meshsize = _mamicoConfiguration.getMacroscopicCellConfiguration().getCouplingCellSize();
     // determine max. number of cells required on each process
     for (unsigned int d = 0; d < MDSIMULATIONFACTORY_DIMENSION; d++) {
       const unsigned int cells = (unsigned int)ceil(domainSize[d] / meshsize[d] / numberProcs[d]);
@@ -92,8 +92,8 @@ public:
   }
 
   // set macroscopic cell service to MamicoInterfaceProvider
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
+  virtual void setCouplingCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setCouplingCellService(
         macroscopicCellService);
   }
 

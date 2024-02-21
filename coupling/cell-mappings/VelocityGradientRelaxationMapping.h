@@ -57,7 +57,7 @@ public:
         _localNumberCellsWithGhostLayer(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2)),
         _globalVectorCellIndex(indexConversion.convertLocalToGlobalVectorCellIndex(indexConversion.getLocalVectorCellIndex(currentLocalMacroscopicCellIndex))),
         _localVectorCellIndex(indexConversion.getLocalVectorCellIndex(currentLocalMacroscopicCellIndex)),
-        _domainOffset(indexConversion.getGlobalMDDomainOffset()), _cellSize(indexConversion.getMacroscopicCellSize()), _macroscopicCells(macroscopicCells),
+        _domainOffset(indexConversion.getGlobalMDDomainOffset()), _cellSize(indexConversion.getCouplingCellSize()), _macroscopicCells(macroscopicCells),
         _velocityRelaxationFactor(velocityRelaxationFactor), _currentVelocity(currentVelocity), _innerLowerLeft(getInnerLowerLeftCorner()),
         _innerUpperRight(getInnerUpperRightCorner()), _outerLowerLeft(getOuterLowerLeftCorner()), _outerUpperRight(getOuterUpperRightCorner()),
         _currentLocalMacroscopicCellIndex(currentLocalMacroscopicCellIndex), _ignoreThisCell(ignoreThisCell(currentLocalMacroscopicCellIndex)) {}
@@ -226,25 +226,25 @@ private:
    *	@returns the inner lower left corner of the cell
    */
   tarch::la::Vector<dim, double> getInnerLowerLeftCorner() const {
-    return _indexConversion.getGlobalMDDomainOffset() + 1.5 * _indexConversion.getMacroscopicCellSize();
+    return _indexConversion.getGlobalMDDomainOffset() + 1.5 * _indexConversion.getCouplingCellSize();
   }
   /**
    *	@returns the inner upper right corner of the cell
    */
   tarch::la::Vector<dim, double> getInnerUpperRightCorner() const {
-    return _indexConversion.getGlobalMDDomainOffset() + _indexConversion.getGlobalMDDomainSize() - 1.5 * _indexConversion.getMacroscopicCellSize();
+    return _indexConversion.getGlobalMDDomainOffset() + _indexConversion.getGlobalMDDomainSize() - 1.5 * _indexConversion.getCouplingCellSize();
   }
   /**
    *	@returns the outer lower left corner of the cell
    */
   tarch::la::Vector<dim, double> getOuterLowerLeftCorner() const {
-    return _indexConversion.getGlobalMDDomainOffset() + 0.5 * _indexConversion.getMacroscopicCellSize();
+    return _indexConversion.getGlobalMDDomainOffset() + 0.5 * _indexConversion.getCouplingCellSize();
   }
   /**
    *	@returns the outer upper right corner of the cell
    */
   tarch::la::Vector<dim, double> getOuterUpperRightCorner() const {
-    return _indexConversion.getGlobalMDDomainOffset() + _indexConversion.getGlobalMDDomainSize() - 0.5 * _indexConversion.getMacroscopicCellSize();
+    return _indexConversion.getGlobalMDDomainOffset() + _indexConversion.getGlobalMDDomainSize() - 0.5 * _indexConversion.getCouplingCellSize();
   }
 
   /** creates a macroscopic cell index for the second order interpolation.

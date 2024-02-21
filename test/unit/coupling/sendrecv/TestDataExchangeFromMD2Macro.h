@@ -109,10 +109,10 @@ public:
       // (non-ghost) global cell of last rank
       const tarch::la::Vector<dim, unsigned int> start =
           tarch::la::Vector<dim, unsigned int>(1) +
-          (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) * _indexConversion.getAverageLocalNumberMacroscopicCells()[0];
+          (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) * _indexConversion.getAverageLocalNumberCouplingCells()[0];
 
       numberCells = (_indexConversion.getGlobalNumberMacroscopicCells() - (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) *
-                                                                              _indexConversion.getAverageLocalNumberMacroscopicCells()[0])[0];
+                                                                              _indexConversion.getAverageLocalNumberCouplingCells()[0])[0];
       for (unsigned int i = 0; i < numberCells; i++) {
         cells.push_back(new TestCell<dim>());
         if (cells[i] == NULL) {
@@ -142,7 +142,7 @@ public:
 
       if (isSource) {
         // we only plan with cubic sub-domains on the processes...
-        const unsigned int numberLocalCells = _indexConversion.getAverageLocalNumberMacroscopicCells()[0];
+        const unsigned int numberLocalCells = _indexConversion.getAverageLocalNumberCouplingCells()[0];
 
         globalCellIndices = new unsigned int[numberLocalCells];
         for (unsigned int i = 0; i < numberLocalCells; i++) {

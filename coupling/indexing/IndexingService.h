@@ -76,7 +76,7 @@ public:
   ) {
     // read relevant data from configs
     const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
-    const auto macroscopicCellSize{mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
+    const auto macroscopicCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
 
     // calculate total number of macroscopic cells on all ranks in Base Domain
     tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);

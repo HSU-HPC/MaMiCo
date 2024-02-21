@@ -2,8 +2,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLPLOTTER_H_
-#define _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLPLOTTER_H_
+#ifndef _MOLECULARDYNAMICS_COUPLING_COUPLINGCELLPLOTTER_H_
+#define _MOLECULARDYNAMICS_COUPLING_COUPLINGCELLPLOTTER_H_
 
 #include "coupling/IndexConversion.h"
 #include "coupling/KineticEnergyController.h"
@@ -17,7 +17,7 @@
 #include <sstream>
 
 namespace coupling {
-template <class LinkedCell, unsigned int dim> class MacroscopicCellPlotter;
+template <class LinkedCell, unsigned int dim> class CouplingCellPlotter;
 }
 
 /** @brief plots the macroscopic cell data.
@@ -26,7 +26,7 @@ template <class LinkedCell, unsigned int dim> class MacroscopicCellPlotter;
  * linked cells in the molecular dynamics simulation
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3*/
-template <class LinkedCell, unsigned int dim> class coupling::MacroscopicCellPlotter {
+template <class LinkedCell, unsigned int dim> class coupling::CouplingCellPlotter {
 public:
   /** @brief a simple constructor
    *  @param ID the id of the md simulation
@@ -36,15 +36,15 @@ public:
    *  @param indexConversion indexConversion instance of the current simulation
    *  @param cells macroscopic cells to plot
    *  @param mdSolverInterface interface of the md solver */
-  MacroscopicCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, const coupling::IndexConversion<dim>& indexConversion,
-                         coupling::datastructures::CouplingCells<LinkedCell, dim>& cells,
-                         coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
+  CouplingCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, const coupling::IndexConversion<dim>& indexConversion,
+                      coupling::datastructures::CouplingCells<LinkedCell, dim>& cells,
+                      coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     plotMoleculeFile(ID, filename, rank, t, cells, mdSolverInterface);
     plotMacroscopicCellFile(ID, filename, rank, t, indexConversion, cells, mdSolverInterface);
   }
 
   /** @brief a simple destructor*/
-  ~MacroscopicCellPlotter() {}
+  ~CouplingCellPlotter() {}
 
 private:
   /** the file will contain the velocity, position, and potentials of the
@@ -162,8 +162,8 @@ private:
     tarch::la::Vector<3, double> original(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       original[d] =
-          indexConversion.getGlobalMDDomainOffset()[d] - 0.5 * indexConversion.getMacroscopicCellSize()[d] +
-          indexConversion.getAverageLocalNumberMacroscopicCells()[d] * indexConversion.getThisProcess()[d] * indexConversion.getMacroscopicCellSize()[d];
+          indexConversion.getGlobalMDDomainOffset()[d] - 0.5 * indexConversion.getCouplingCellSize()[d] +
+          indexConversion.getAverageLocalNumberCouplingCells()[d] * indexConversion.getThisProcess()[d] * indexConversion.getCouplingCellSize()[d];
     }
     // open file
     open(ID, filename, "MacroscopicCells", rank, t, ofCell);
@@ -182,7 +182,7 @@ private:
     ofCell << std::endl;
     ofCell << "SPACING ";
     for (unsigned int d = 0; d < dim; d++) {
-      ofCell << indexConversion.getMacroscopicCellSize()[d] << " ";
+      ofCell << indexConversion.getCouplingCellSize()[d] << " ";
     }
     for (unsigned int d = dim; d < 3; d++) {
       ofCell << "1.0 ";
@@ -229,7 +229,7 @@ private:
     ss << filename << "_" << fileType << "_" << ID << "_" << rank << "_" << t << ".vtk";
     of.open(ss.str().c_str());
     if (!of.is_open()) {
-      std::cout << "ERROR coupling::MacroscopicCellPlotter: Could not open file " << ss.str() << "!" << std::endl;
+      std::cout << "ERROR coupling::CouplingCellPlotter: Could not open file " << ss.str() << "!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -395,4 +395,4 @@ private:
     unsigned int _moleculeCounter;
   };
 };
-#endif // _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLPLOTTER_H_
+#endif // _MOLECULARDYNAMICS_COUPLING_COUPLINGCELLPLOTTER_H_

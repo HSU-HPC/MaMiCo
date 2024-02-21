@@ -126,9 +126,8 @@ private:
 
     tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
     for (unsigned int d = 0; d < 3; d++)
-      globalNumberMacroscopicCells[d] = (unsigned int)floor(_simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] /
-                                                                _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[d] +
-                                                            0.5);
+      globalNumberMacroscopicCells[d] = (unsigned int)floor(
+          _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] / _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[d] + 0.5);
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface =
         new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells, _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 

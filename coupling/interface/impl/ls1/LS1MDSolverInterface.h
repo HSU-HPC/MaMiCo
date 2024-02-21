@@ -48,7 +48,7 @@ public:
     }
 
     // size of the macroscopic cell
-    tarch::la::Vector<3, double> macroCellSize(indexConversion.getMacroscopicCellSize());
+    tarch::la::Vector<3, double> macroCellSize(indexConversion.getCouplingCellSize());
 
     // conversion to global
     using coupling::indexing::CellIndex;

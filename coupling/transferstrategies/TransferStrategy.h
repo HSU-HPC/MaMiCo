@@ -42,24 +42,24 @@ public:
    * macro solver is applied
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
    * MD domain; it is not applied in the outer macroscopic cells. Is called
    * before the
-   * processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData() method
+   * processInnerCouplingCellBeforeReceivingMacroscopicSolverData() method
    *  @brief the method is called before the cells are processed, e.g. general
    * values might be set here */
-  virtual void beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
+  virtual void beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
    * MD domain; it is not applied in the outer macroscopic cells. Is called
-   * after the processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData()
+   * after the processInnerCouplingCellBeforeReceivingMacroscopicSolverData()
    * method
    *  @brief the method is called after the cells are processed, e.g. some
    * general evaluation might happen like sum/counter */
-  virtual void endProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
+  virtual void endProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() {}
 
   /** Here, you might e.g. reset all macroscopic cell values to zero.
    *  This method is only applied to outer macroscopic cells that are not part
@@ -68,22 +68,22 @@ public:
    * macro solver is applied
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that are not part the
    * inner MD domain; it is not applied to the ghost layer Is called before the
-   * processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData() method
+   * processOuterCouplingCellBeforeReceivingMacroscopicSolverData() method
    *  @brief the method is called before the outer cells are processed, e.g.
    * general values might be set here */
-  virtual void beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
+  virtual void beginProcessOuterCouplingCellsBeforeReceivingMacroscopicSolverData() {}
 
   /** This method is only applied to macroscopic cells that are not part the
    * inner MD domain; it is not applied to the ghost layer Is called after the
-   * processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData() method
+   * processOuterCouplingCellBeforeReceivingMacroscopicSolverData() method
    *  @brief the method is called after the outer cells are processed, e.g.
    * general values might be set here */
-  virtual void endProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData() {}
+  virtual void endProcessOuterCouplingCellsBeforeReceivingMacroscopicSolverData() {}
 
   /** These values might be manipulated within this function. Example: Mass and
    * momentum have been transferred from the macroscopic solver to MD, but only
@@ -96,22 +96,22 @@ public:
    * -Momentum have been filled in with data from the macroscopic solver.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                               const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
    * MD domain; it is not applied the outer macroscopic cells. Is called before
-   * the processInnerMacroscopicCellAfterReceivingMacroscopicSolverData() method
+   * the processInnerCouplingCellAfterReceivingMacroscopicSolverData() method
    *  @brief the method is called before the inner cells are processed, e.g.
    * general values might be set here */
-  virtual void beginProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
+  virtual void beginProcessInnerCouplingCellsAfterReceivingMacroscopicSolverData() {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
    * MD domain; it is not applied the outer macroscopic cells. Is called after
-   * the processInnerMacroscopicCellAfterReceivingMacroscopicSolverData() method
+   * the processInnerCouplingCellAfterReceivingMacroscopicSolverData() method
    *  @brief the method is called after the inner cells are processed, e.g.
    * general values might be set here */
-  virtual void endProcessInnerMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
+  virtual void endProcessInnerCouplingCellsAfterReceivingMacroscopicSolverData() {}
 
   /** These values might be manipulated within this function. Example: Mass and
    * momentum have been transferred from the macroscopic solver to MD, but only
@@ -124,22 +124,22 @@ public:
    * -Momentum have been filled in with data from the macroscopic solver.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                               const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells are part of the outer MD
    * domain; it is not applied the inner macroscopic cells. Is called before the
-   * processOuterMacroscopicCellAfterReceivingMacroscopicSolverData() method
+   * processOuterCouplingCellAfterReceivingMacroscopicSolverData() method
    *  @brief the method is called before the outer cells are processed, e.g.
    * general values might be set here */
-  virtual void beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
+  virtual void beginProcessOuterCouplingCellsAfterReceivingMacroscopicSolverData() {}
 
   /** This method is only applied to macroscopic cells are part of the outer MD
    * domain; it is not applied the inner macroscopic cells. Is called after the
-   * processOuterMacroscopicCellAfterReceivingMacroscopicSolverData() method
+   * processOuterCouplingCellAfterReceivingMacroscopicSolverData() method
    *  @brief the method is called after the outer cells are processed, e.g.
    * general values might be set here */
-  virtual void endProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData() {}
+  virtual void endProcessOuterCouplingCellsAfterReceivingMacroscopicSolverData() {}
 
   /** Example: Compute mass and momentum and store the results in
    *  macroscopicMass and -Momentum. The total mass and momentum from the MD
@@ -151,22 +151,22 @@ public:
    * noise reduction invocation.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
    * MD domain; it is not applied the outer macroscopic cells. Is called before
-   * the processInnerMacroscopicCellBeforeSendingMDSolverData() method
+   * the processInnerCouplingCellBeforeSendingMDSolverData() method
    *  @brief the method is called before the inner cell data is send, e.g.
    * general values might be set here */
-  virtual void beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData() {}
+  virtual void beginProcessInnerCouplingCellsBeforeSendingMDSolverData() {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
    * MD domain; it is not applied the outer macroscopic cells. Is called after
-   * the processInnerMacroscopicCellBeforeSendingMDSolverData() method
+   * the processInnerCouplingCellBeforeSendingMDSolverData() method
    *  @brief the method is called after the inner cell data is send, e.g.
    * general values might be set here */
-  virtual void endProcessInnerMacroscopicCellsBeforeSendingMDSolverData() {}
+  virtual void endProcessInnerCouplingCellsBeforeSendingMDSolverData() {}
 
   /** is called for every macroscopic cell before sending the macroscopicMass
    * and -Momentum data to the macroscopic solver and before noise reduction
@@ -180,22 +180,22 @@ public:
    * noise reduction invocation.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processOuterCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                     const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells are part of the outer MD
    * domain; it is not applied the inner macroscopic cells. Is called before the
-   * processOuterMacroscopicCellBeforeSendingMDSolverData() method
+   * processOuterCouplingCellBeforeSendingMDSolverData() method
    *  @brief the method is called before the outer cells are processed, e.g.
    * general values might be set here */
-  virtual void beginProcessOuterMacroscopicCellsBeforeSendingMDSolverData() {}
+  virtual void beginProcessOuterCouplingCellsBeforeSendingMDSolverData() {}
 
   /** This method is only applied to macroscopic cells are part of the outer MD
    * domain; it is not applied the inner macroscopic cells. Is called after the
-   * processOuterMacroscopicCellBeforeSendingMDSolverData() method
+   * processOuterCouplingCellBeforeSendingMDSolverData() method
    *  @brief the method is called after the outer cells are processed, e.g.
    * general values might be set here */
-  virtual void endProcessOuterMacroscopicCellsBeforeSendingMDSolverData() {}
+  virtual void endProcessOuterCouplingCellsBeforeSendingMDSolverData() {}
 
   /** required to collect cell data during an MD simulation. For example, if we
    * need time-averaged data within a macroscopic cell, we can compute mass and
@@ -204,22 +204,22 @@ public:
    * of the MD domain; it is not applied in the outer macroscopic cells.
    *  @param cell the macroscopic cell to apply
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                           const unsigned int& index) {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
    * MD domain; it is not applied the outer macroscopic cells. Is called before
-   * the processInnerMacroscopicCellAfterMDTimestep() method
+   * the processInnerCouplingCellAfterMDTimestep() method
    *  @brief the method is called before the inner cell data is send, e.g.
    * general values might be set here */
-  virtual void beginProcessInnerMacroscopicCellsAfterMDTimestep() {}
+  virtual void beginProcessInnerCouplingCellsAfterMDTimestep() {}
 
   /** This method is only applied to macroscopic cells that cover parts of the
    * MD domain; it is not applied the outer macroscopic cells. Is called after
-   * the processInnerMacroscopicCellAfterMDTimestep() method
+   * the processInnerCouplingCellAfterMDTimestep() method
    *  @brief the method is called after the inner cell data is send, e.g.
    * general values might be set here */
-  virtual void endProcessInnerMacroscopicCellsAfterMDTimestep() {}
+  virtual void endProcessInnerCouplingCellsAfterMDTimestep() {}
 
 protected:
   /** interface for the md solver */

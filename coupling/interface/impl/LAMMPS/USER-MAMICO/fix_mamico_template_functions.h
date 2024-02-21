@@ -24,7 +24,7 @@ template <unsigned int dim> void LAMMPS_NS::FixMamico::modifyMDSystem() {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   std::cout << "FixMamico, Rank " << indexConversion.getThisRank() << ": Process inner cells after MD timestep" << std::endl;
 #endif
-  macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
+  macroscopicCellService->processInnerCouplingCellAfterMDTimestep();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   std::cout << "FixMamico, Rank " << indexConversion.getThisRank() << ": Distribute mass" << std::endl;
 #endif

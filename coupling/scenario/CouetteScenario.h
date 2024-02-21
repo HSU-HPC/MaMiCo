@@ -181,8 +181,8 @@ protected:
     _rank = _timeIntegrationService->getRank(); // returns the rank inside local time domain
 
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface = getCouetteSolverInterface(
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0], _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-        _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize(), getGlobalNumberCouplingCells(_simpleMDConfig, _mamicoConfig),
+        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0], _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), getGlobalNumberCouplingCells(_simpleMDConfig, _mamicoConfig),
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     // init indexing
@@ -263,14 +263,14 @@ protected:
     // allocate solvers
     _couetteSolver = NULL;
     _couetteSolver =
-        getCouetteSolver(_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0],
+        getCouetteSolver(_mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0],
                          _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
 
     if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
-      _instanceHandling->setMacroscopicCellServices(*_multiMDCellService);
+      _instanceHandling->setCouplingCellServices(*_multiMDCellService);
       // compute and store temperature in macroscopic cells (temp=1.1
       // everywhere)
       _multiMDCellService->computeAndStoreTemperature(_cfg.temp);
@@ -309,14 +309,13 @@ protected:
       // set couette solver interface in MamicoInterfaceProvider
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
-      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicCellService(
-          &(_multiMDCellService->getMacroscopicCellService(0)));
+      coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setCouplingCellService(&(_multiMDCellService->getCouplingCellService(0)));
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMDSolverInterface(_mdSolverInterface[0]);
 
       // Create new FilterFromFunction instance and insert it into Filtering
       // System.
       try {
-        _multiMDCellService->getMacroscopicCellService(0)
+        _multiMDCellService->getCouplingCellService(0)
             .getFilterPipeline()
             ->getSequence(SYNTHETICMD_SEQUENCE)
             ->addFilter(
@@ -335,9 +334,9 @@ protected:
                       // std::cout << "Entering synthetic MD scalar..." <<
                       // std::endl;
                       // TODO: replace usage of deprecated IndexConversion
-                      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+                      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getCouplingCellService(0).getIndexConversion();
                       const unsigned int size = inputScalars.size();
-                      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+                      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getCouplingCellSize());
                       const double mass = (_cfg.density) * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
 
                       std::vector<double> syntheticMasses;
@@ -365,9 +364,9 @@ protected:
                       // std::cout << "Entering synthetic MD vector." <<
                       // std::endl;
 
-                      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+                      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getCouplingCellService(0).getIndexConversion();
                       const unsigned int size = inputVectors.size();
-                      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+                      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getCouplingCellSize());
                       const double mass = (_cfg.density) * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
 
                       using coupling::indexing::IndexTrait;
@@ -514,11 +513,11 @@ protected:
       mass /= _buf.recvBuffer.size();
 
       double soundSpeed =
-          (1 / std::sqrt(3)) * (_mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0] /
+          (1 / std::sqrt(3)) * (_mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0] /
                                 (_simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()));
-      double cellVolume = _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[0] *
-                          _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[1] *
-                          _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[2];
+      double cellVolume = _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0] *
+                          _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[1] *
+                          _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[2];
 
       coupling::error::ErrorEstimation errorControl(vel[0], _cfg.temp, mass, _simpleMDConfig.getMoleculeConfiguration().getMass(), soundSpeed,
                                                     _multiMDService->getTotalNumberOfMDSimulations(), cellVolume);
@@ -600,9 +599,9 @@ protected:
   void computeSNR(int cycle) {
     if (_cfg.computeSNR && cycle >= _cfg.filterInitCycles) {
       std::cout << cycle - _cfg.filterInitCycles << ", ";
-      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getMacroscopicCellService(0).getIndexConversion();
+      const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getCouplingCellService(0).getIndexConversion();
       const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
-      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getCouplingCellSize());
       const double mass = _cfg.density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
       for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++) {
 
@@ -636,29 +635,29 @@ protected:
         static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
             ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
                             _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
-                            _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
+                            _multiMDCellService->getCouplingCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
       }
 #if (BUILD_WITH_OPENFOAM)
       else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
         static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
             ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
                             _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
-                            _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
+                            _multiMDCellService->getCouplingCellService(0).getIndexConversion(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
       }
 #endif
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
         static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
-            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getCouplingCellService(0).getIndexConversion());
       }
 #if (BUILD_WITH_OPENFOAM)
       else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM && cycle >= _cfg.filterInitCycles && _couetteSolver != NULL) {
         static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
-            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion());
+            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getCouplingCellService(0).getIndexConversion());
       }
 #endif
     }
     // write data to csv-compatible file for evaluation
-    write2CSV(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getMacroscopicCellService(0).getIndexConversion(), cycle + 1);
+    write2CSV(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer, _multiMDCellService->getCouplingCellService(0).getIndexConversion(), cycle + 1);
   }
 
   /** @brief finalize the time measurement, and cleans up at the end of the
@@ -727,7 +726,7 @@ protected:
   tarch::la::Vector<3, unsigned int> getGlobalNumberCouplingCells(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
                                                                   const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig) const {
     tarch::la::Vector<3, double> domainSize(simpleMDConfig.getDomainConfiguration().getGlobalDomainSize());
-    tarch::la::Vector<3, double> dx(mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize());
+    tarch::la::Vector<3, double> dx(mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize());
     tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
     for (unsigned int d = 0; d < 3; d++) {
       int buf = floor(domainSize[d] / dx[d] + 0.5);
@@ -930,7 +929,7 @@ protected:
     using coupling::configurations::CouetteConfig;
     const unsigned int size = sendBuffer.size();
     const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
-    const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getMacroscopicCellSize());
+    const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getCouplingCellSize());
 
     for (unsigned int i = 0; i < size; i++) {
       // get global cell index vector

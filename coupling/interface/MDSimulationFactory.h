@@ -47,9 +47,9 @@ namespace coupling {
 namespace interface {
 
 /** factory to produced md simulation, md solver interface (for mamico) and the
- *macroscopic cell service using singleton pattern.
+ *coupling cell service using singleton pattern.
  *	@brief factory to produced md simulation, md solver interface (for
- *mamico) and the macroscopic cell service
+ *mamico) and the coupling cell service
  *  @author Philipp Neumann
  */
 class SimulationAndInterfaceFactory {
@@ -133,7 +133,7 @@ public:
       exit(EXIT_FAILURE);
     }
     mdSolverInterface = new coupling::interface::SimpleMDSolverInterface(
-        mamicoConfiguration.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell(), simpleMDSimulation->getBoundaryTreatment(),
+        mamicoConfiguration.getCouplingCellConfiguration().getNumberLinkedCellsPerCouplingCell(), simpleMDSimulation->getBoundaryTreatment(),
         simpleMDSimulation->getParallelTopologyService(), simpleMDSimulation->getMoleculeService(), simpleMDSimulation->getLinkedCellService(),
         simpleMDSimulation->getMolecularPropertiesService(), (simpleMDSimulation->getParallelTopologyService()).getLocalBoundaryInformation(),
         configuration.getSimulationConfiguration().getDt());
@@ -146,9 +146,8 @@ public:
 #elif defined(LAMMPS_DPD)
     mdSolverInterface = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
 #elif defined(LS1_MARDYN)
-    mdSolverInterface =
-        new coupling::interface::LS1MDSolverInterface(mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
-                                                      mamicoConfiguration.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell());
+    mdSolverInterface = new coupling::interface::LS1MDSolverInterface(mamicoConfiguration.getCouplingCellConfiguration().getCouplingCellSize(),
+                                                                      mamicoConfiguration.getCouplingCellConfiguration().getNumberLinkedCellsPerCouplingCell());
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(mdSolverInterface);
 #endif
 
@@ -163,8 +162,7 @@ public:
 
   /** shuts down the MD solver interfaces and deletes the interface if required
      (depending on the respective MD simulation) */
-  void
-  shutdownMDSolverInterface() {
+  void shutdownMDSolverInterface() {
 #if defined(SIMPLE_MD)
     coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>* interface =
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();

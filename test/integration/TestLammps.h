@@ -42,7 +42,7 @@ public:
     }
     coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicSolverInterface(NULL);
     coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMDSolverInterface(NULL);
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicCellService(NULL);
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setCouplingCellService(NULL);
     if (_lammps != NULL) {
       delete _lammps;
       _lammps = NULL;
@@ -318,7 +318,7 @@ protected:
       exit(EXIT_FAILURE);
     }
     std::cout << "Set macroscopic cell service in MamicoInterfaceProvider..." << std::endl;
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setMacroscopicCellService(_macroscopicCellService);
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setCouplingCellService(_macroscopicCellService);
   }
 
   /** this loads some dummy solver interface which basically does nothing at all. */

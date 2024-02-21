@@ -89,7 +89,7 @@ class KVSTest():
                 "macroscopic-solver", "viscosity") / self.cfg.getfloat("microscopic-solver", "density")
             # dx LB in Mamico Units
             self.dx = self.mamicoConfig.getMacroscopicCellConfiguration(
-            ).getMacroscopicCellSize()[0]
+            ).getCouplingCellSize()[0]
             # time intervall of one coupling cycle, in Mamico Units
             self.dt = self.simpleMDConfig.getSimulationConfiguration().getDt() * \
                 self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
@@ -317,7 +317,7 @@ class KVSTest():
             self.t = self.t + steps * self.dt_LB
 
             cellmass = (self.cfg.getfloat("microscopic-solver", "density")
-                        * np.prod(self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()))
+                        * np.prod(self.mamicoConfig.getMacroscopicCellConfiguration().getCouplingCellSize()))
             numcells = self.getGlobalNumberCouplingCells()
             mdpos = json.loads(self.cfg.get("domain", "md-pos"))
             # Convert center of MD domain in SI units to offset of MD domain as cell index
@@ -388,7 +388,7 @@ class KVSTest():
 
     def getGlobalNumberCouplingCells(self):
         domainSize = self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()
-        dx = self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
+        dx = self.mamicoConfig.getMacroscopicCellConfiguration().getCouplingCellSize()
         return [math.floor(domainSize[d]/dx[d]+0.5) for d in range(3)]
 
 

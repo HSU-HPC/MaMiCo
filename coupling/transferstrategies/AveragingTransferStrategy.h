@@ -42,7 +42,7 @@ public:
   virtual ~AveragingTransferStrategy() {}
 
   /** @brief reset the sample counter before processing any cell */
-  virtual void beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData() {
+  virtual void beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() {
     // reset sample counter for each coupling cycle
     _sampleCounter = 0;
   }
@@ -51,7 +51,7 @@ public:
    * macro solver is transferred
    *  @param cell the macroscopic cell to process
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                                const unsigned int& index) {
     // reset buffers for sampling mass and momentum in each inner macroscopic
     // cell
@@ -61,7 +61,7 @@ public:
 
   /** @brief values are reseted before the cells are processes and on rank=0
    * info is written to the stdstream */
-  virtual void beginProcessInnerMacroscopicCellsAfterMDTimestep() {
+  virtual void beginProcessInnerCouplingCellsAfterMDTimestep() {
     // output information of last sampling...
     if (_rank == 0) {
       std::cout << "Global quantities of sampling no. " << _sampleCounter << " on rank 0: mass=" << _avgMass << ", momentum=" << _avgMomentum << std::endl;
@@ -77,7 +77,7 @@ public:
    *  @brief the averaging operation is applied to the cell
    *  @param cell the macroscopic cell to process
    *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                           const unsigned int& index) {
     // compute total mass/momentum from previous samples
     const double oldMass = (_sampleCounter - 1) * cell.getMacroscopicMass();

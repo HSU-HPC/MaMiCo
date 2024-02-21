@@ -11,7 +11,7 @@
 
 namespace coupling {
 namespace configurations {
-template <unsigned int dim> class MacroscopicCellConfiguration;
+template <unsigned int dim> class CouplingCellConfiguration;
 }
 } // namespace coupling
 
@@ -21,15 +21,15 @@ template <unsigned int dim> class MacroscopicCellConfiguration;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <unsigned int dim> class coupling::configurations::MacroscopicCellConfiguration : public tarch::configuration::Configuration {
+template <unsigned int dim> class coupling::configurations::CouplingCellConfiguration : public tarch::configuration::Configuration {
 public:
   /** Constructor, initializes the class  */
-  MacroscopicCellConfiguration()
+  CouplingCellConfiguration()
       : _isValid(true), _macroscopicCellSize(0.0), _linkedCellsPerMacroscopicCell(0), _writeEveryMicroscopicTimestep(0), _microscopicFilename(""),
         _writeEveryMacroscopicTimestep(0), _macroscopicFilename("") {}
 
   /** Destructor */
-  ~MacroscopicCellConfiguration() {}
+  ~CouplingCellConfiguration() {}
 
   /** parseSubtag
    * 	@param node
@@ -53,12 +53,12 @@ public:
   /** Returns the macroscopic cell size
    * 	@return _macroscopicCellSize
    */
-  tarch::la::Vector<dim, double> getMacroscopicCellSize() const { return _macroscopicCellSize; }
+  tarch::la::Vector<dim, double> getCouplingCellSize() const { return _macroscopicCellSize; }
 
   /** Returns the number of linked cell encapsulated within a macroscopic cell
    * 	@return _linkedCellsPerMacroscopicCell
    */
-  tarch::la::Vector<dim, unsigned int> getNumberLinkedCellsPerMacroscopicCell() const { return _linkedCellsPerMacroscopicCell; }
+  tarch::la::Vector<dim, unsigned int> getNumberLinkedCellsPerCouplingCell() const { return _linkedCellsPerMacroscopicCell; }
 
   /** Returns step interval, at which the micro infos is to be written out
    * 	@return _writeEveryMicroscopicTimestep
@@ -79,9 +79,9 @@ public:
   std::string getMacroscopicFilename() const { return _macroscopicFilename; }
 
 protected:
-  MacroscopicCellConfiguration(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> linkedCellsPerMacroscopicCell,
-                               unsigned int writeEveryMicroscopicTimestep, std::string microscopicFilename, unsigned int writeEveryMacroscopicTimestep,
-                               std::string macroscopicFilename)
+  CouplingCellConfiguration(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> linkedCellsPerMacroscopicCell,
+                            unsigned int writeEveryMicroscopicTimestep, std::string microscopicFilename, unsigned int writeEveryMacroscopicTimestep,
+                            std::string macroscopicFilename)
       : _isValid(true), _macroscopicCellSize(macroscopicCellSize), _linkedCellsPerMacroscopicCell(linkedCellsPerMacroscopicCell),
         _writeEveryMicroscopicTimestep(writeEveryMicroscopicTimestep), _microscopicFilename(microscopicFilename),
         _writeEveryMacroscopicTimestep(writeEveryMacroscopicTimestep), _macroscopicFilename(macroscopicFilename) {}

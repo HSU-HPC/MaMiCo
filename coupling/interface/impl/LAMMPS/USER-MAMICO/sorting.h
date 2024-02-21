@@ -281,12 +281,12 @@ private:
    * cells */
   tarch::la::Vector<dim, double> getLocalOffset(const coupling::IndexConversion<dim> &indexConversion) const {
     // init local offset to global MD offset (very lower left of ghost layer)
-    const tarch::la::Vector<dim, double> meshsize = indexConversion.getMacroscopicCellSize();
+    const tarch::la::Vector<dim, double> meshsize = indexConversion.getCouplingCellSize();
     tarch::la::Vector<dim, double> localOffset = indexConversion.getGlobalMDDomainOffset() - meshsize;
 
     // shift lower offset to the correct process
     const tarch::la::Vector<dim, unsigned int> thisProcess = indexConversion.getThisProcess();
-    const tarch::la::Vector<dim, unsigned int> avgNumberCells = indexConversion.getAverageLocalNumberMacroscopicCells();
+    const tarch::la::Vector<dim, unsigned int> avgNumberCells = indexConversion.getAverageLocalNumberCouplingCells();
     for (unsigned int d = 0; d < dim; d++) {
       localOffset[d] += meshsize[d] * thisProcess[d] * avgNumberCells[d];
     }
@@ -297,7 +297,7 @@ private:
   /** returns the local domain size of this process, including a ghost layer of
    * mamico cells */
   tarch::la::Vector<dim, double> getLocalSize(const coupling::IndexConversion<dim> &indexConversion) const {
-    const tarch::la::Vector<dim, double> meshsize = indexConversion.getMacroscopicCellSize();
+    const tarch::la::Vector<dim, double> meshsize = indexConversion.getCouplingCellSize();
     const tarch::la::Vector<dim, unsigned int> localNumberCells = indexConversion.getLocalNumberCouplingCells();
     tarch::la::Vector<dim, double> localSize(0.0);
     for (unsigned int d = 0; d < dim; d++) {

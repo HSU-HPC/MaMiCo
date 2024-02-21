@@ -442,7 +442,7 @@ protected:
           (coupling::services::MacroscopicCellServiceImpl<MarDynCell, 3> *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance()
               .getMacroscopicCellService();
     }
-    _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
+    _macroscopicCellService->processInnerCouplingCellAfterMDTimestep();
     // TODO move distribute momentum after force accumulation (if required)
     _macroscopicCellService->distributeMass(_simstep);
     _macroscopicCellService->distributeMomentum(_simstep);

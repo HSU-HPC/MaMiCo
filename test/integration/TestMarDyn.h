@@ -221,7 +221,7 @@ protected:
       exit(EXIT_FAILURE);
     }
     std::cout << "Set macroscopic cell service in MaMiCoInterfaceProvider.." << std::endl;
-    coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().setMacroscopicCellService(_macroscopicCellService);
+    coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().setCouplingCellService(_macroscopicCellService);
 
     coupling::services::MacroscopicCellService<3>* macroCellService =
         coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMacroscopicCellService();

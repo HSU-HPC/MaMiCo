@@ -616,7 +616,7 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("switchOffCoupling", &coupling::interface::MDSimulation::switchOffCoupling)
       .def("switchOnCoupling", &coupling::interface::MDSimulation::switchOnCoupling)
       .def("simulateTimesteps", &coupling::interface::MDSimulation::simulateTimesteps, "numberTimesteps"_a = 1, "firstTimestep"_a)
-      .def("setMacroscopicCellService", &coupling::interface::MDSimulation::setMacroscopicCellService)
+      .def("setCouplingCellService", &coupling::interface::MDSimulation::setCouplingCellService)
       .def("shutdown", &coupling::interface::MDSimulation::shutdown);
 
   py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService")
@@ -693,8 +693,8 @@ PYBIND11_MODULE(mamico, mamico) {
   //		return
   // coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
   //	}, py::return_value_policy::reference );
-  coupling.def("setMacroscopicCellService", [](coupling::services::MacroscopicCellService<3>* service) {
-    coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicCellService(service);
+  coupling.def("setCouplingCellService", [](coupling::services::MacroscopicCellService<3>* service) {
+    coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setCouplingCellService(service);
   });
 
   py::class_<coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>>(services, "MultiMDCellService")

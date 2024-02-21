@@ -90,7 +90,7 @@ public:
       LinkedCellsForCoupling *cells = (LinkedCellsForCoupling *)_mySimulation->getMolecules();
 
       // size of the macroscopic cells
-      tarch::la::Vector<3, double> macroCellSize = indexConversion.getMacroscopicCellSize();
+      tarch::la::Vector<3, double> macroCellSize = indexConversion.getCouplingCellSize();
       // size of the md cells
       double *mdCellsize = cells->cellLength();
       // the requested 3D cell index vector

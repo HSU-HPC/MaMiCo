@@ -5,7 +5,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MAMICOCONFIGURATION_H_
 
 #include "coupling/configurations/BoundaryForceConfiguration.h"
-#include "coupling/configurations/MacroscopicCellConfiguration.h"
+#include "coupling/configurations/CouplingCellConfiguration.h"
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
 #include "coupling/configurations/ParallelTopologyConfiguration.h"
 #include "coupling/configurations/ParticleInsertionConfiguration.h"
@@ -65,7 +65,7 @@ public:
   /**
    *  @return _macroscopicCellConfiguration
    */
-  const coupling::configurations::MacroscopicCellConfiguration<dim>& getMacroscopicCellConfiguration() const { return _macroscopicCellConfiguration; }
+  const coupling::configurations::CouplingCellConfiguration<dim>& getCouplingCellConfiguration() const { return _macroscopicCellConfiguration; }
 
   /**
    *  @return _particleInsertionConfiguration
@@ -155,7 +155,7 @@ public:
 
 private:
   bool _isValid;
-  coupling::configurations::MacroscopicCellConfiguration<dim> _macroscopicCellConfiguration;
+  coupling::configurations::CouplingCellConfiguration<dim> _macroscopicCellConfiguration;
   coupling::configurations::ParticleInsertionConfiguration _particleInsertionConfiguration;
   coupling::configurations::MomentumInsertionConfiguration _momentumInsertionConfiguration;
   coupling::configurations::BoundaryForceConfiguration<dim> _boundaryForceConfiguration;

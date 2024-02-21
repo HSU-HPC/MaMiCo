@@ -181,7 +181,7 @@ public:
    */
   void simulateTimesteps(const unsigned int& t, unsigned int& T, coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {
     for (unsigned int i = 0; i < _mdSimulations.size(); ++i) {
-      coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setMacroscopicCellService(&multiMDCellService.getMacroscopicCellService(i));
+      coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setCouplingCellService(&multiMDCellService.getCouplingCellService(i));
       coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
 
       if (_mdSimulations[i] != nullptr) {
@@ -250,8 +250,7 @@ public:
    * corresponding MD solver interface.
    * 	@param index
    */
-  void
-  rmMDSimulation(const unsigned int& index) {
+  void rmMDSimulation(const unsigned int& index) {
     if (_mdSimulations[index] != nullptr) {
       _mdSimulations[index]->shutdown();
       delete _mdSimulations[index];
@@ -278,9 +277,9 @@ public:
    * macroscopic cell service for multi-MD case
    * 	@param multiMDCellService
    */
-  void setMacroscopicCellServices(coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {
+  void setCouplingCellServices(coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {
     for (unsigned int i = 0; i < _mdSimulations.size(); ++i) {
-      _mdSimulations[i]->setMacroscopicCellService(&(multiMDCellService.getMacroscopicCellService(i)));
+      _mdSimulations[i]->setCouplingCellService(&(multiMDCellService.getCouplingCellService(i)));
     }
   }
 

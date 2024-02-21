@@ -150,7 +150,7 @@ public:
    * included in this vector.
    *  @brief returns the "average" number of local coupling cells.
    *  @returns the average number of coupling cells per rank (dimensional)*/
-  tarch::la::Vector<dim, unsigned int> getAverageLocalNumberMacroscopicCells() const;
+  tarch::la::Vector<dim, unsigned int> getAverageLocalNumberCouplingCells() const;
 
   /** The ghost layer is not included in this vector.
    *  @brief returns the local number of coupling cells on this process.
@@ -182,7 +182,7 @@ public:
   tarch::la::Vector<dim, double> getGlobalMDDomainOffset() const;
   /** @brief returns the vector size of each coupling cell.
    *  @returns the size of the coupling cells (dimensional) */
-  tarch::la::Vector<dim, double> getMacroscopicCellSize() const;
+  tarch::la::Vector<dim, double> getCouplingCellSize() const;
 
   coupling::paralleltopology::ParallelTopologyType getParallelTopologyType() const;
 

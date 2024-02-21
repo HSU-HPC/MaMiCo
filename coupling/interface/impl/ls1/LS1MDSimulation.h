@@ -79,8 +79,8 @@ public:
   // unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
   virtual void sortMoleculesIntoCells() override {}
 
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) override {
-    // coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
+  virtual void setCouplingCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) override {
+    // coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setCouplingCellService(
     //     macroscopicCellService);
     global_simulation = simulation;
     PluginBase* searchedPlugin = simulation->getPlugin("MamicoCoupling");
