@@ -5,7 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_MDSOLVERINTERFACE_H_
 #define _MOLECULARDYNAMICS_COUPLING_MDSOLVERINTERFACE_H_
 
-#include "coupling/IndexConversion.h"
+#include "coupling/indexing/IndexTypes.h"
 #include "coupling/interface/Molecule.h"
 #include "coupling/interface/MoleculeIterator.h"
 #include "tarch/la/Vector.h"
@@ -24,6 +24,8 @@ template <class LinkedCell, unsigned int dim> class MDSolverInterface;
  */
 template <class LinkedCell, unsigned int dim> class coupling::interface::MDSolverInterface {
 public:
+  using CellIndex_T = I11;
+
   /** Destructor */
   virtual ~MDSolverInterface() {}
 
@@ -40,13 +42,11 @@ public:
    *	@param macroscopicCellIndex
    *	@param linkedCellInMacroscopicCell
    *	@param linkedCellsPerMacroscopicCell
-   *	@param indexConversion
    *	@returns a particular linked cell inside a macroscopic cell.
    */
-  virtual LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& macroscopicCellIndex,
+  virtual LinkedCell& getLinkedCell(const CellIndex_T& macroscopicCellIndex,
                                     const tarch::la::Vector<dim, unsigned int>& linkedCellInMacroscopicCell,
-                                    const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell,
-                                    const coupling::IndexConversion<dim>& indexConversion) = 0;
+                                    const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell) = 0;
 
   /** This function specifies the global size of the box-shaped MD domain
    *  @returns the global size of the box-shaped MD domain */

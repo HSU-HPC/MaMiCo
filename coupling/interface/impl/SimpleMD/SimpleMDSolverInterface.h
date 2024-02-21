@@ -120,20 +120,14 @@ public:
         _dt(dt) {}
   ~SimpleMDSolverInterface() {}
 
-  simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int>& macroscopicCellIndex,
+  simplemd::LinkedCell& getLinkedCell(const CellIndex_T& macroscopicCellIndex,
                                       const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInMacroscopicCell,
-                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerMacroscopicCell,
-                                      const coupling::IndexConversion<MD_DIM>& indexConversion) {
+                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerMacroscopicCell) {
     // no linked cells found in outer region!
-    for (unsigned int d = 0; d < MD_DIM; d++) {
-      if (macroscopicCellIndex[d] == 0) {
-        std::cout << "ERROR SimpleMDSolverInterface::getLinkedCell(): macroscopic cell outside range for linked cells!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
+    
     tarch::la::Vector<MD_DIM, unsigned int> index(_linkedCellService.getLocalIndexOfFirstCell());
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      index[d] = index[d] + (macroscopicCellIndex[d] - 1) * linkedCellsPerMacroscopicCell[d] + linkedCellInMacroscopicCell[d];
+      index[d] = index[d] + macroscopicCellIndex.get()[d] * linkedCellsPerMacroscopicCell[d] + linkedCellInMacroscopicCell[d];
     }
     return _linkedCellService.getLinkedCell(index);
   }

@@ -76,13 +76,12 @@ public:
    * macroscopic cell. These coordinates thus lie in a range
    * (0,linkedCellsPerMacroscopicCell-1).
    */
-  virtual LAMMPS_NS::MamicoCell &getLinkedCell(const tarch::la::Vector<dim, unsigned int> &macroscopicCellIndex,
+  virtual LAMMPS_NS::MamicoCell &getLinkedCell(const CellIndex_T& macroscopicCellIndex,
                                                const tarch::la::Vector<dim, unsigned int> &linkedCellInMacroscopicCell,
-                                               const tarch::la::Vector<dim, unsigned int> &linkedCellsPerMacroscopicCell,
-                                               const coupling::IndexConversion<dim> &indexConversion) {
+                                               const tarch::la::Vector<dim, unsigned int> &linkedCellsPerMacroscopicCell) {
     // we currently embed one cell per macroscopic cell. It is hence sufficient
     // to use the same enumeration as used for the macroscopic cells
-    const unsigned int index = indexConversion.getLocalCellIndex(macroscopicCellIndex);
+    const unsigned int index = I02{macroscopicCellIndex}.get();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Return linked cell at macro-cell " << macroscopicCellIndex << " no. " << linkedCellInMacroscopicCell << ", assuming "
               << linkedCellsPerMacroscopicCell << " linked cells per cell: " << index << std::endl;
