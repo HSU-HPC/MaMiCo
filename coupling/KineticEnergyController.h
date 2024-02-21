@@ -31,8 +31,8 @@ public:
   /** @brief a simple destructor*/
   ~KineticEnergyController() {}
 
-  /** @brief computes and returns the kinetic energy within a macroscopic cell
-   *  @param cell macroscopic cell to compute the kinetic energy for
+  /** @brief computes and returns the kinetic energy within a coupling cell
+   *  @param cell coupling cell to compute the kinetic energy for
    *  @returns the kinetic energy in the cell */
   double computeKineticEnergy(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) const {
     coupling::cellmappings::ComputeKineticEnergyMapping<LinkedCell, dim> computeKineticEnergyMapping(_mdSolverInterface);
@@ -40,8 +40,8 @@ public:
     return computeKineticEnergyMapping.getKineticEnergy();
   }
 
-  /** @brief computes and returns the temperature within a macroscopic cell
-   *  @param cell macroscopic cell to compute the temperature in
+  /** @brief computes and returns the temperature within a coupling cell
+   *  @param cell coupling cell to compute the temperature in
    *  @returns the temperature in the cell */
   double computeTemperature(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) const {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(_mdSolverInterface);
@@ -55,9 +55,9 @@ public:
 
   /** Therefore, the mean velocity is computed first. Afterwards the deviation
    * from the mean velocity are rescaled such that momentum is conserved.
-   *  @brief sets the kinetic energy within a macroscopic cell to the input
+   *  @brief sets the kinetic energy within a coupling cell to the input
    * value.
-   *  @param cell the macroscopic cell to set the kinetic energy in
+   *  @param cell the coupling cell to set the kinetic energy in
    *  @param kineticEnergy the value the kinetic energy shall be set to*/
   void setKineticEnergy(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const double& kineticEnergy) const {
     // determine mass, momentum and old kinetic energy
@@ -79,7 +79,7 @@ public:
    * we set: v_molecule = v_mean +
    * sqrt(temperature/current_temperature)*(v_molecule-v_mean)
    *  @brief sets the temperature within the cell to 'temperature'.
-   *  @param cell the macroscopic cell the temperature shall be applied in
+   *  @param cell the coupling cell the temperature shall be applied in
    *  @param temperature the value the temperature shall be set at*/
   void setTemperature(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const double& temperature) const {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(_mdSolverInterface);

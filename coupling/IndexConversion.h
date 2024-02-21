@@ -33,7 +33,7 @@ template <unsigned int dim> class IndexConversion;
 template <unsigned int dim> class coupling::IndexConversion : private tarch::utils::Uncopyable {
 public:
   /** @brief constructor for Multi-MD simulations.
-   *  @param globalNumberMacroscopicCells total number of coupling cells of
+   *  @param globalNumberCouplingCells total number of coupling cells of
    * the md simulation
    *  @param numberProcesses number of mpi processes in application
    *  @param rank rank of this mpi process
@@ -42,11 +42,11 @@ public:
    * ParallelTopologyFactory.h
    *  @param topologyOffset the total number of processes for a md simulation,
    * e.g. for two md simulations on eight ranks it would be 4; */
-  IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
+  IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
                   tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim, double> globalMDDomainOffset,
                   coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset);
   /** @brief constructor for single-MD simulations
-   *  @param globalNumberMacroscopicCells total number of coupling cells of
+   *  @param globalNumberCouplingCells total number of coupling cells of
    * the md simulation
    *  @param numberProcesses number of mpi processes in application
    *  @param rank rank of this mpi process
@@ -55,10 +55,10 @@ public:
    * coordinate origin
    *  @param parallelTopologyType the type of parallel topology see
    * ParallelTopologyFactory.h */
-  IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
+  IndexConversion(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
                   tarch::la::Vector<dim, double> globalMDDomainSize, tarch::la::Vector<dim, double> globalMDDomainOffset,
                   coupling::paralleltopology::ParallelTopologyType parallelTopologyType)
-      : IndexConversion<dim>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset, parallelTopologyType, 0) {}
+      : IndexConversion<dim>(globalNumberCouplingCells, numberProcesses, rank, globalMDDomainSize, globalMDDomainOffset, parallelTopologyType, 0) {}
   /** @brief Destructor */
   ~IndexConversion();
 
@@ -67,7 +67,7 @@ public:
   /** We assume a lexicographic ordering of the coupling cells for this
    * purpose. Besides, we assume the number of global coupling cells to be
    * extended by a global ghost layer (so that we have
-   * globalNumberMacroscopicCells_d+2 cells in each direction).
+   * globalNumberCouplingCells_d+2 cells in each direction).
    *  @brief returns the linearised global cell index from a global cell index
    * vector.
    *  @param globalCellIndex the global cell index as a vector (according to the
@@ -79,7 +79,7 @@ public:
   /** We assume a lexicographic ordering of the coupling cells for this
    * purpose. Besides, we assume the number of local coupling cells to be
    * extended by a global ghost layer (so that we have
-   * globalNumberMacroscopicCells_d+2 cells in each direction).
+   * globalNumberCouplingCells_d+2 cells in each direction).
    *  @brief returns the linearised global cell index from a local cell index
    * vector.
    *  @param localCellIndex the local (only valid on this rank) cell index as a
@@ -273,13 +273,13 @@ private:
    * case yields (3x3x10) (-> floor(31/10)=3, floor(46/12)=3, floor(50/5) = 10).
    *  @brief returns the average number of local coupling cells on each
    * process.
-   *  @param initAverageLocalNumberMacroscopicCells average number of
+   *  @param initAverageLocalNumberCouplingCells average number of
    * coupling cells per process
-   *  @param globalNumberMacroscopicCells total number of coupling cells
+   *  @param globalNumberCouplingCells total number of coupling cells
    *  @param numberProcesses total number of mpi processes
    *  @returns the average number of coupling cells on each process */
-  tarch::la::Vector<dim, unsigned int> initAverageLocalNumberMacroscopicCells(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
-                                                                              tarch::la::Vector<dim, unsigned int> numberProcesses) const;
+  tarch::la::Vector<dim, unsigned int> initAverageLocalNumberCouplingCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
+                                                                           tarch::la::Vector<dim, unsigned int> numberProcesses) const;
 
   /** For Nx x Ny x Nz processes, the method returns the average local number of
    *  coupling cells for all processes from [1;Nx-1]x[1;Ny-1]x[1;Nz-1].
@@ -287,13 +287,13 @@ private:
    * cells is filled up so that the global number of coupling cells is
    * reached.
    *  @brief this method returns the exact number of local coupling cells.
-   *  @param initLocalNumberMacroscopicCells the total number of macroscopic
+   *  @param initLocalNumberCouplingCells the total number of macroscopic
    * cells on this process
-   *  @param globalNumberMacroscopicCells the total number of coupling cells
+   *  @param globalNumberCouplingCells the total number of coupling cells
    *  @param numberProcesses total number of mpi processes
    *  @returns the number of coupling cells on this process */
-  tarch::la::Vector<dim, unsigned int> initLocalNumberMacroscopicCells(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
-                                                                       tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank) const;
+  tarch::la::Vector<dim, unsigned int> initLocalNumberCouplingCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
+                                                                    tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank) const;
 
   /** We add the ghost layer influence inside this function.
    *  @brief checks if the index is in a valid range.
@@ -310,10 +310,10 @@ private:
 
   /** @brief initialises the size of coupling cells
    *  @param globalMDDomainSize the total size of the md domain as a vector
-   *  @param globalNumberMacroscopicCells the global number of coupling cells
+   *  @param globalNumberCouplingCells the global number of coupling cells
    *  @returns the coupling cell size for the setup */
-  tarch::la::Vector<dim, double> initMacroscopicCellSize(const tarch::la::Vector<dim, double>& globalMDDomainSize,
-                                                         const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const;
+  tarch::la::Vector<dim, double> initCouplingCellSize(const tarch::la::Vector<dim, double>& globalMDDomainSize,
+                                                      const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const;
 
   /** type of parallel topology used in the simulation */
   const coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;
@@ -328,25 +328,25 @@ private:
   /** global number of (inner) coupling cells. In total this number is
    * extended by 2 in order to account for an
    *  additional ghost layer surrounding the global domain.  */
-  const tarch::la::Vector<dim, unsigned int> _globalNumberMacroscopicCells;
+  const tarch::la::Vector<dim, unsigned int> _globalNumberCouplingCells;
   /** average number of local coupling cells */
-  const tarch::la::Vector<dim, unsigned int> _averageLocalNumberMacroscopicCells;
+  const tarch::la::Vector<dim, unsigned int> _averageLocalNumberCouplingCells;
   /** local number of coupling cells for this process. In total, this number
    * is extended by 2 in order to account for an additional ghost layer
    * surrounding the local domain. */
-  const tarch::la::Vector<dim, unsigned int> _localNumberMacroscopicCells;
+  const tarch::la::Vector<dim, unsigned int> _localNumberCouplingCells;
   /** division factors (in 3D, its (1,g(0)+2,(g(0)+2)*(g(1)+2)) ) for the global
    * number of coupling cells. */
-  const tarch::la::Vector<dim, unsigned int> _divisionFactor4GlobalNumberMacroscopicCells;
+  const tarch::la::Vector<dim, unsigned int> _divisionFactor4GlobalNumberCouplingCells;
   /** division factors (in 3D, its (1,g(0)+2,(g(0)+2)*(g(1)+2)) ) for the local
    * number of coupling cells. */
-  const tarch::la::Vector<dim, unsigned int> _divisionFactor4LocalNumberMacroscopicCells;
+  const tarch::la::Vector<dim, unsigned int> _divisionFactor4LocalNumberCouplingCells;
   /** global MD domain size. */
   const tarch::la::Vector<dim, double> _globalMDDomainSize;
   /** offset (lower,left... corner) of MD domain. */
   const tarch::la::Vector<dim, double> _globalMDDomainOffset;
   /** size of coupling cell. */
-  const tarch::la::Vector<dim, double> _macroscopicCellSize;
+  const tarch::la::Vector<dim, double> _couplingCellSize;
 };
 
 #include "IndexConversion.cpph"

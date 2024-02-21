@@ -17,12 +17,12 @@ template <class LinkedCell, unsigned int dim> class InstanceHandling;
  *Initialization, execution of MD time steps and shutdown are abstracted into
  *this class. In order to launch a new MF simulatio, a slot has to be chosen
  *first (either manualy or using coupling::MultiMDMediator). Then
- *MultiMDCellService initializes a new MacroscopicCellService via
+ *MultiMDCellService initializes a new CouplingCellService via
  *MultiMDMediator. In the activated slot, a new MD simulation is launched. The
  *new MD instance has to be equilibrated first and then it can be coupled to the
  *simulation. In order to remove a MD simulation, the MD simulation and its
  *corresponding MDSolverInterface are shut down. Then, the respective instance
- *of the MacroscopicCellService is removed. Finally, the selected slot will be
+ *of the CouplingCellService is removed. Finally, the selected slot will be
  *set to inactive. This slot is now available again for the launch of a new MD
  *instance in the future.
  *	@brief Simulation slots are managed (i.e., added/removed) via this
@@ -250,8 +250,7 @@ public:
    * corresponding MD solver interface.
    * 	@param index
    */
-  void
-  rmMDSimulation(const unsigned int& index) {
+  void rmMDSimulation(const unsigned int& index) {
     if (_mdSimulations[index] != nullptr) {
       _mdSimulations[index]->shutdown();
       delete _mdSimulations[index];
@@ -275,7 +274,7 @@ public:
   }
 
   /** sets single cell services in each MD simulation after initialising
-   * macroscopic cell service for multi-MD case
+   * coupling cell service for multi-MD case
    * 	@param multiMDCellService
    */
   void setCouplingCellServices(coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {

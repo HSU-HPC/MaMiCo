@@ -90,7 +90,7 @@ private:
                                 // snapshots are available already
   unsigned int _spatialIndex;   // cell counter, should run from zero to
                                 // getLocalNumberCouplingCells()-1 within an
-                                // iteration of ProcessInnerMacroscopicCell
+                                // iteration of ProcessInnerCouplingCell
   unsigned int _t;              // active temporal index, iterates cyclic between zero and
                                 // _timeWindowSize
   Eigen::MatrixXd* _data;       // set of snapshots (sampled by transferStrategy)

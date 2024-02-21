@@ -18,7 +18,7 @@ template <unsigned int dim> class FilterInterface;
 
 /**
  * Generic interface for filters that are to be applied to data of
- * coupling::MacroscopicCells before MD to Macro transfer. Implementations can
+ * coupling::CouplingCells before MD to Macro transfer. Implementations can
  * be found in coupling/filtering/filters.
  *
  * If you wish to use a filter that does not alter its input data, i.e that is
@@ -154,7 +154,7 @@ public:
 
   /*
    * Used by filter implementations to iterate over physical properties stored
-   * in a MacroscopicCell.
+   * in a CouplingCell.
    *
    * Examplary usage:
    * 'for(auto scalar : _scalarAccessFunctionPairs)' loops over all scalar

@@ -4,13 +4,13 @@
 // www5.in.tum.de/mamico
 
 template <class LinkedCell, unsigned int dim>
-coupling::datastructures::CouplingCells<LinkedCell, dim>::CouplingCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell,
+coupling::datastructures::CouplingCells<LinkedCell, dim>::CouplingCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
                                                                         const coupling::IndexConversion<dim>& indexConversion,
                                                                         coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface)
-    : _couplingCellsWithLinkedCells(initCouplingCellsWithLinkedCells(numberLinkedCellsPerMacroscopicCell, indexConversion, mdSolverInterface)),
+    : _couplingCellsWithLinkedCells(initCouplingCellsWithLinkedCells(numberLinkedCellsPerCouplingCell, indexConversion, mdSolverInterface)),
       _couplingCells(initCouplingCells(indexConversion)), _indexConversion(indexConversion) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Macroscopic cells initialised..." << std::endl;
+  std::cout << "Coupling cells initialised..." << std::endl;
 #endif
 }
 
@@ -47,7 +47,7 @@ const std::vector<coupling::datastructures::CouplingCell<dim>*>& coupling::datas
 template <class LinkedCell, unsigned int dim>
 coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
 coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithLinkedCells(
-    tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell, const coupling::IndexConversion<dim>& indexConversion,
+    tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, const coupling::IndexConversion<dim>& indexConversion,
     coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const {
   // determine local number of coupling cells
   unsigned int numberCouplingCells = 1;
@@ -61,7 +61,7 @@ coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithL
   tarch::la::Vector<3, unsigned int> macroLoop(0);
 
   // determine end coordinate for inner loop over linked cells (contained in each coupling cell)
-  const tarch::la::Vector<3, unsigned int> endInnerLoop = coupling::initRange<dim>(numberLinkedCellsPerMacroscopicCell);
+  const tarch::la::Vector<3, unsigned int> endInnerLoop = coupling::initRange<dim>(numberLinkedCellsPerCouplingCell);
 
   // allocate coupling cells
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* cells =
@@ -76,7 +76,7 @@ coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithL
   for (unsigned int i = 0; i < numberCouplingCells; i++) {
     // initialise coupling cell
     coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* newCell =
-        new (&cells[i]) coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>(numberLinkedCellsPerMacroscopicCell);
+        new (&cells[i]) coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>(numberLinkedCellsPerCouplingCell);
     if (newCell == NULL) {
       std::cout << "ERROR coupling::datastructures::CouplingCells::initCouplingCellsWithLinkedCells(): newCell==NULL" << std::endl;
       exit(EXIT_FAILURE);
@@ -100,7 +100,7 @@ coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithL
             for (linkedLoop[0] = 0; linkedLoop[0] < endInnerLoop[0]; linkedLoop[0]++) {
               tarch::la::Vector<dim, unsigned int> linkedCellIndex = coupling::initDimVector<dim>(linkedLoop);
               cells[linearisedIndex].addLinkedCell(
-                  mdSolverInterface->getLinkedCell(couplingCellIndex, linkedCellIndex, numberLinkedCellsPerMacroscopicCell, indexConversion), linkedCounter);
+                  mdSolverInterface->getLinkedCell(couplingCellIndex, linkedCellIndex, numberLinkedCellsPerCouplingCell, indexConversion), linkedCounter);
 
               linkedCounter++;
             }

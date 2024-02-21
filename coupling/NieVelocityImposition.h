@@ -43,13 +43,13 @@ public:
   virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1; }
 
   /** @brief inserts momentum to a cell
-   *  @param cell to the macroscopic cell will the momentum be inserted
-   *  @param currentLocalMacroscopicCell local linearised index for the
-   * macroscopic cell */
+   *  @param cell to the coupling cell will the momentum be inserted
+   *  @param currentLocalCouplingCell local linearised index for the
+   * coupling cell */
   virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentLocalMacroscopicCellIndex) const {
+                              const unsigned int& currentLocalCouplingCellIndex) const {
     // nop if this is not an imposition cell
-    if (!isInsideImpositionLayer(currentLocalMacroscopicCellIndex)) {
+    if (!isInsideImpositionLayer(currentLocalCouplingCellIndex)) {
       return;
     }
     // set continuum velocity
@@ -67,7 +67,7 @@ public:
   }
 
 private:
-  /** returns true if the local cell at index currentLocalMacroscopicCell is
+  /** returns true if the local cell at index currentLocalCouplingCell is
    * inside the layer of imposition cells, given by outermostLayer and
    * innermostLayer. For, e.g., outermostLayer=2 and innermostLayer=3, the
    * layers for imposition are located in the 3rd and 4th strip of cells (we
@@ -75,20 +75,20 @@ private:
    * actually ghost-layer of cells which surrounds the MD domain).
    *  @brief based on the cell index, the function tells if the cell is inside
    * the imposition layer
-   *  @param currentLocalMacroscopicCell local linearised index of a macroscopic
+   *  @param currentLocalCouplingCell local linearised index of a macroscopic
    * cell to check
    *  @returns a bool, that indicates if the given cell index is located in the
    * imposition layer (true) or not (false) */
-  bool isInsideImpositionLayer(const unsigned int& currentLocalMacroscopicCellIndex) const {
-    const tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(_indexConversion.getGlobalNumberCouplingCells());
+  bool isInsideImpositionLayer(const unsigned int& currentLocalCouplingCellIndex) const {
+    const tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells(_indexConversion.getGlobalNumberCouplingCells());
     const tarch::la::Vector<dim, unsigned int> globalCellIndex(
-        _indexConversion.getGlobalVectorCellIndex(_indexConversion.convertLocalToGlobalCellIndex(currentLocalMacroscopicCellIndex)));
+        _indexConversion.getGlobalVectorCellIndex(_indexConversion.convertLocalToGlobalCellIndex(currentLocalCouplingCellIndex)));
     bool inner = true;
     for (unsigned int d = 0; d < dim; d++)
-      inner = inner && (globalCellIndex[d] > _innermostLayer && globalCellIndex[d] < 1 + globalNumberMacroscopicCells[d] - _innermostLayer);
+      inner = inner && (globalCellIndex[d] > _innermostLayer && globalCellIndex[d] < 1 + globalNumberCouplingCells[d] - _innermostLayer);
     bool outer = false;
     for (unsigned int d = 0; d < dim; d++)
-      outer = outer || (globalCellIndex[d] < _outermostLayer || globalCellIndex[d] > 1 + globalNumberMacroscopicCells[d] - _outermostLayer);
+      outer = outer || (globalCellIndex[d] < _outermostLayer || globalCellIndex[d] > 1 + globalNumberCouplingCells[d] - _outermostLayer);
     return !inner && !outer;
   }
 

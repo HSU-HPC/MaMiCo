@@ -19,18 +19,18 @@ template <class LinkedCell, unsigned int dim> class CouplingCells;
 /**
  *	@brief provides access to the coupling cells.
  *	@tparam LinkedCell linked cells that build up the
- *MacroscopicCellWithLinkedCells
+ *CouplingCellWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
 template <class LinkedCell, unsigned int dim> class coupling::datastructures::CouplingCells {
 public:
   /** Constructor: initialises the coupling cell
-   *	@param numberLinkedCellsPerMacroscopicCell
+   *	@param numberLinkedCellsPerCouplingCell
    * 	@param indexConversion
    * 	@param mdSolverInterface
    */
-  CouplingCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell, const coupling::IndexConversion<dim>& indexConversion,
+  CouplingCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, const coupling::IndexConversion<dim>& indexConversion,
                 coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface);
   /** Destructor */
   ~CouplingCells();
@@ -44,26 +44,26 @@ public:
    */
   const std::vector<coupling::datastructures::CouplingCell<dim>*>& getCouplingCells() const;
 
-  /** apply the function apply(MacroscopicCell&,const unsigned int&) of a
+  /** apply the function apply(CouplingCell&,const unsigned int&) of a
    * generic class A to all local non-ghost coupling cells. This
-   * functionality is used from the MacroscopicCellService to apply various
+   * functionality is used from the CouplingCellService to apply various
    * functionalities (such as momentum transfer) to the coupling cells which
    * cover the MD domain.
    */
   template <class A> void applyToLocalNonGhostCouplingCellsWithLinkedCells(A& a);
-  /** apply the function apply(MacroscopicCell&,const unsigned int&) of a
+  /** apply the function apply(CouplingCell&,const unsigned int&) of a
    *generic class A to all local ghost coupling cells.
    *	@tparam A
    * 	@param a */
   template <class A> void applyToLocalGhostCouplingCellsWithLinkedCells(A& a);
-  /** apply the function apply(MacroscopicCell&,const unsigned int&) of a
+  /** apply the function apply(CouplingCell&,const unsigned int&) of a
    * generic class A to all local coupling cells. We can have the same
    * traversal by applying both applyToLocalGhostCouplingCellsWithLinkedCells
    * and applyToLocalNonGhostCouplingCellsWithLinkedCells. However, this
    * implementation is more efficient.
    */
   template <class A> void applyToAllLocalCouplingCellsWithLinkedCells(A& a);
-  /** apply the function apply(MacroscopicCell&,const unsigned int&) of a
+  /** apply the function apply(CouplingCell&,const unsigned int&) of a
    *generic class A to the first layer of GLOBAL non-ghost cells. If a cell is a
    *local ghost cell (due to parallelization, not due to being located outside
    *MD domain!), it will not be handled by this method. If a cell is a local
@@ -82,13 +82,12 @@ public:
 private:
   /** initialises the coupling cells: creates the buffer for the cells and
    * embeds linked cells into the coupling cells.
-   * 	@param numberLinkedCellsPerMacroscopicCell
+   * 	@param numberLinkedCellsPerCouplingCell
    * 	@param indexConversion
    * 	@param mdSolverInterface
    */
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
-  initCouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell,
-                                   const coupling::IndexConversion<dim>& indexConversion,
+  initCouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, const coupling::IndexConversion<dim>& indexConversion,
                                    coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const;
   /** initialises the coupling cells (without linked cells). This method
    * needs to be used in the constructor AFTER initialising the

@@ -13,8 +13,8 @@ template <class LinkedCell, unsigned int dim> class BoundaryForceController;
 }
 
 /** There is an interface method applyBoundaryForce which triggers potential
- * boundary forcing in each macroscopic cell that is located at the very outer
- * MD boundary (first layer of non-ghost macroscopic cells).
+ * boundary forcing in each coupling cell that is located at the very outer
+ * MD boundary (first layer of non-ghost coupling cells).
  *  @brief controller for forces acting at open MD boundaries
  *  @tparam LinkedCell the LinkedCell class is given by the implementation of
  * linked cells in the molecular dynamics simulation
@@ -30,14 +30,14 @@ public:
   /**@brief A simple destructor*/
   virtual ~BoundaryForceController() {}
 
-  /** iterates over all linked cells of the given macroscopic cell and applies
+  /** iterates over all linked cells of the given coupling cell and applies
    * the cellmapping for the boundary force
    * @brief applies the boundary force on a boundary cell
    * @param cell the macroscopic boundary cell to apply the boundary force
-   * @param currentLocalMacroscopicCellIndex the index of the macroscopic cell
+   * @param currentLocalCouplingCellIndex the index of the coupling cell
    */
   virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                  const unsigned int& currentLocalMacroscopicCellIndex) = 0;
+                                  const unsigned int& currentLocalCouplingCellIndex) = 0;
 
   /** @brief calculates the potential energy for a given position
    *  @param position the position for which the potential energy will be

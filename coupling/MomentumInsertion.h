@@ -13,7 +13,7 @@ template <class LinkedCell, unsigned int dim> class MomentumInsertion;
 }
 
 /** @brief used to manipulate the momentum/ velocity of the molecules contained
- * in a macroscopic cell.
+ * in a coupling cell.
  *  @author Philipp Neumann
  *  @tparam LinkedCell the LinkedCell class is given by the implementation of
  * linked cells in the molecular dynamics simulation
@@ -34,14 +34,14 @@ public:
   virtual unsigned int getTimeIntervalPerMomentumInsertion() const = 0;
 
   /** This method does not conserve the kinetic energy of the respective
-   * macroscopic cell. To conserve the energy as well, see the description of
+   * coupling cell. To conserve the energy as well, see the description of
    * MomentumController on details how to do that.
-   *  @brief inserts a fraction from the momentum of the macroscopic cell and
+   *  @brief inserts a fraction from the momentum of the coupling cell and
    * distributes is over all molecules.
-   *  @param cell the macroscopic cell to insert the momentum
+   *  @param cell the coupling cell to insert the momentum
    *  @param fraction the fraction of momentum to use */
   virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentMacroscopicCellIndex) const = 0;
+                              const unsigned int& currentCouplingCellIndex) const = 0;
 
 protected:
   /** interface to the md solver */
