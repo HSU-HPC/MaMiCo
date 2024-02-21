@@ -15,7 +15,7 @@ template <class LinkedCell, unsigned int dim> class TransferStrategy;
 }
 } // namespace coupling
 
-/** interface for transfer strategy, that is for macroscopic cell operations
+/** interface for transfer strategy, that is for coupling cell operations
  * that are carried out before/after send/recv-operations between the two
  * solvers, or in each MD step for sampling purposes.
  *  @author Philipp Neumann
@@ -35,50 +35,50 @@ public:
   /** @brief a dummy destructor */
   virtual ~TransferStrategy() {}
 
-  /** Here, you might e.g. reset all macroscopic cell values to zero.
-   *  This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied in the outer macroscopic cells.
-   *  @brief is called on the inner macroscopic cells before the data from the
+  /** Here, you might e.g. reset all coupling cell values to zero.
+   *  This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied in the outer coupling cells.
+   *  @brief is called on the inner coupling cells before the data from the
    * macro solver is applied
-   *  @param cell the macroscopic cell to apply
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to apply
+   *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                               const unsigned int& index) {}
+                                                                            const unsigned int& index) {}
 
-  /** This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied in the outer macroscopic cells. Is called
+  /** This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied in the outer coupling cells. Is called
    * before the
    * processInnerCouplingCellBeforeReceivingMacroscopicSolverData() method
    *  @brief the method is called before the cells are processed, e.g. general
    * values might be set here */
   virtual void beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() {}
 
-  /** This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied in the outer macroscopic cells. Is called
+  /** This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied in the outer coupling cells. Is called
    * after the processInnerCouplingCellBeforeReceivingMacroscopicSolverData()
    * method
    *  @brief the method is called after the cells are processed, e.g. some
    * general evaluation might happen like sum/counter */
   virtual void endProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() {}
 
-  /** Here, you might e.g. reset all macroscopic cell values to zero.
-   *  This method is only applied to outer macroscopic cells that are not part
+  /** Here, you might e.g. reset all coupling cell values to zero.
+   *  This method is only applied to outer coupling cells that are not part
    * of the inner MD domain; it is not applied to the cells in the ghost layer
-   *  @brief is called on the outer macroscopic cells before the data from the
+   *  @brief is called on the outer coupling cells before the data from the
    * macro solver is applied
-   *  @param cell the macroscopic cell to apply
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to apply
+   *  @param index the index of the coupling cell */
   virtual void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                               const unsigned int& index) {}
+                                                                            const unsigned int& index) {}
 
-  /** This method is only applied to macroscopic cells that are not part the
+  /** This method is only applied to coupling cells that are not part the
    * inner MD domain; it is not applied to the ghost layer Is called before the
    * processOuterCouplingCellBeforeReceivingMacroscopicSolverData() method
    *  @brief the method is called before the outer cells are processed, e.g.
    * general values might be set here */
   virtual void beginProcessOuterCouplingCellsBeforeReceivingMacroscopicSolverData() {}
 
-  /** This method is only applied to macroscopic cells that are not part the
+  /** This method is only applied to coupling cells that are not part the
    * inner MD domain; it is not applied to the ghost layer Is called after the
    * processOuterCouplingCellBeforeReceivingMacroscopicSolverData() method
    *  @brief the method is called after the outer cells are processed, e.g.
@@ -90,24 +90,24 @@ public:
    * the difference between MD and macroscopic solver shall be introduced to MD.
    * Then, this function determines this difference and stores the result again
    * in microscopicMass and -Momentum. This method is only applied to
-   * macroscopic cells that cover parts of the MD domain; it is not applied in
-   * the outer macroscopic cells.
-   *  @brieff is called for every macroscopic cell after the microscopicMass and
+   * coupling cells that cover parts of the MD domain; it is not applied in
+   * the outer coupling cells.
+   *  @brieff is called for every coupling cell after the microscopicMass and
    * -Momentum have been filled in with data from the macroscopic solver.
-   *  @param cell the macroscopic cell to apply
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to apply
+   *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                              const unsigned int& index) {}
+                                                                           const unsigned int& index) {}
 
-  /** This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied the outer macroscopic cells. Is called before
+  /** This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied the outer coupling cells. Is called before
    * the processInnerCouplingCellAfterReceivingMacroscopicSolverData() method
    *  @brief the method is called before the inner cells are processed, e.g.
    * general values might be set here */
   virtual void beginProcessInnerCouplingCellsAfterReceivingMacroscopicSolverData() {}
 
-  /** This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied the outer macroscopic cells. Is called after
+  /** This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied the outer coupling cells. Is called after
    * the processInnerCouplingCellAfterReceivingMacroscopicSolverData() method
    *  @brief the method is called after the inner cells are processed, e.g.
    * general values might be set here */
@@ -118,24 +118,24 @@ public:
    * the difference between MD and macroscopic solver shall be introduced to MD.
    * Then, this function determines this difference and stores the result again
    * in microscopicMass and -Momentum. This method is only applied to
-   * macroscopic cells in the outer parts of the MD domain; it is not applied in
+   * coupling cells in the outer parts of the MD domain; it is not applied in
    * the ghost layer.
-   *  @brief is called for every macroscopic cell after the microscopicMass and
+   *  @brief is called for every coupling cell after the microscopicMass and
    * -Momentum have been filled in with data from the macroscopic solver.
-   *  @param cell the macroscopic cell to apply
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to apply
+   *  @param index the index of the coupling cell */
   virtual void processOuterCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                              const unsigned int& index) {}
+                                                                           const unsigned int& index) {}
 
-  /** This method is only applied to macroscopic cells are part of the outer MD
-   * domain; it is not applied the inner macroscopic cells. Is called before the
+  /** This method is only applied to coupling cells are part of the outer MD
+   * domain; it is not applied the inner coupling cells. Is called before the
    * processOuterCouplingCellAfterReceivingMacroscopicSolverData() method
    *  @brief the method is called before the outer cells are processed, e.g.
    * general values might be set here */
   virtual void beginProcessOuterCouplingCellsAfterReceivingMacroscopicSolverData() {}
 
-  /** This method is only applied to macroscopic cells are part of the outer MD
-   * domain; it is not applied the inner macroscopic cells. Is called after the
+  /** This method is only applied to coupling cells are part of the outer MD
+   * domain; it is not applied the inner coupling cells. Is called after the
    * processOuterCouplingCellAfterReceivingMacroscopicSolverData() method
    *  @brief the method is called after the outer cells are processed, e.g.
    * general values might be set here */
@@ -144,78 +144,78 @@ public:
   /** Example: Compute mass and momentum and store the results in
    *  macroscopicMass and -Momentum. The total mass and momentum from the MD
    * system will then be sent to the macroscopic solver. This method is only
-   * applied to macroscopic cells that cover parts of the MD domain; it is not
-   * applied in the outer macroscopic cells.
-   *  @brief is called for every macroscopic cell before sending the
+   * applied to coupling cells that cover parts of the MD domain; it is not
+   * applied in the outer coupling cells.
+   *  @brief is called for every coupling cell before sending the
    * macroscopicMass and -Momentum data to the macroscopic solver and before
    * noise reduction invocation.
-   *  @param cell the macroscopic cell to apply
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to apply
+   *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                    const unsigned int& index) {}
+                                                                 const unsigned int& index) {}
 
-  /** This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied the outer macroscopic cells. Is called before
+  /** This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied the outer coupling cells. Is called before
    * the processInnerCouplingCellBeforeSendingMDSolverData() method
    *  @brief the method is called before the inner cell data is send, e.g.
    * general values might be set here */
   virtual void beginProcessInnerCouplingCellsBeforeSendingMDSolverData() {}
 
-  /** This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied the outer macroscopic cells. Is called after
+  /** This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied the outer coupling cells. Is called after
    * the processInnerCouplingCellBeforeSendingMDSolverData() method
    *  @brief the method is called after the inner cell data is send, e.g.
    * general values might be set here */
   virtual void endProcessInnerCouplingCellsBeforeSendingMDSolverData() {}
 
-  /** is called for every macroscopic cell before sending the macroscopicMass
+  /** is called for every coupling cell before sending the macroscopicMass
    * and -Momentum data to the macroscopic solver and before noise reduction
    * invocation. Example: Compute mass and momentum and store the results in
    *  macroscopicMass and -Momentum. The total mass and momentum from the MD
    * system will then be sent to the macroscopic solver. This method is only
-   * applied to outer macroscopic cells, that is cells that are located outside
+   * applied to outer coupling cells, that is cells that are located outside
    * the MD domain.
-   *  @brief is called for outer macroscopic cell before sending the
+   *  @brief is called for outer coupling cell before sending the
    * macroscopicMass and -Momentum data to the macroscopic solver and before
    * noise reduction invocation.
-   *  @param cell the macroscopic cell to apply
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to apply
+   *  @param index the index of the coupling cell */
   virtual void processOuterCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                    const unsigned int& index) {}
+                                                                 const unsigned int& index) {}
 
-  /** This method is only applied to macroscopic cells are part of the outer MD
-   * domain; it is not applied the inner macroscopic cells. Is called before the
+  /** This method is only applied to coupling cells are part of the outer MD
+   * domain; it is not applied the inner coupling cells. Is called before the
    * processOuterCouplingCellBeforeSendingMDSolverData() method
    *  @brief the method is called before the outer cells are processed, e.g.
    * general values might be set here */
   virtual void beginProcessOuterCouplingCellsBeforeSendingMDSolverData() {}
 
-  /** This method is only applied to macroscopic cells are part of the outer MD
-   * domain; it is not applied the inner macroscopic cells. Is called after the
+  /** This method is only applied to coupling cells are part of the outer MD
+   * domain; it is not applied the inner coupling cells. Is called after the
    * processOuterCouplingCellBeforeSendingMDSolverData() method
    *  @brief the method is called after the outer cells are processed, e.g.
    * general values might be set here */
   virtual void endProcessOuterCouplingCellsBeforeSendingMDSolverData() {}
 
   /** required to collect cell data during an MD simulation. For example, if we
-   * need time-averaged data within a macroscopic cell, we can compute mass and
+   * need time-averaged data within a coupling cell, we can compute mass and
    * momentum in each timestep and add it to the microscopicMass and -Momentum
-   * buffers. This method is only applied to macroscopic cells that cover parts
-   * of the MD domain; it is not applied in the outer macroscopic cells.
-   *  @param cell the macroscopic cell to apply
-   *  @param index the index of the macroscopic cell */
+   * buffers. This method is only applied to coupling cells that cover parts
+   * of the MD domain; it is not applied in the outer coupling cells.
+   *  @param cell the coupling cell to apply
+   *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                          const unsigned int& index) {}
+                                                       const unsigned int& index) {}
 
-  /** This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied the outer macroscopic cells. Is called before
+  /** This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied the outer coupling cells. Is called before
    * the processInnerCouplingCellAfterMDTimestep() method
    *  @brief the method is called before the inner cell data is send, e.g.
    * general values might be set here */
   virtual void beginProcessInnerCouplingCellsAfterMDTimestep() {}
 
-  /** This method is only applied to macroscopic cells that cover parts of the
-   * MD domain; it is not applied the outer macroscopic cells. Is called after
+  /** This method is only applied to coupling cells that cover parts of the
+   * MD domain; it is not applied the outer coupling cells. Is called after
    * the processInnerCouplingCellAfterMDTimestep() method
    *  @brief the method is called after the inner cell data is send, e.g.
    * general values might be set here */

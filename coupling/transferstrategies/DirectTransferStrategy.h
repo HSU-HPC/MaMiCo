@@ -39,10 +39,10 @@ public:
   virtual ~DirectTransferStrategy() {}
 
   /** @brief the microscopicMass and -Momentum are set to 0
-   *  @param cell macroscopic cell to process
-   *  @param index index of the macroscopic cell */
+   *  @param cell coupling cell to process
+   *  @param index index of the coupling cell */
   virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                               const unsigned int& index) {
+                                                                            const unsigned int& index) {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
     cell.setMicroscopicMass(0.0);
@@ -50,10 +50,10 @@ public:
   }
 
   /** @brief the microscopicMass and -Momentum are set to 0
-   *  @param cell macroscopic cell to process
-   *  @param index index of the macroscopic cell */
+   *  @param cell coupling cell to process
+   *  @param index index of the coupling cell */
   virtual void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                               const unsigned int& index) {
+                                                                            const unsigned int& index) {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
     cell.setMicroscopicMass(0.0);
@@ -62,10 +62,10 @@ public:
 
   /** @brief the mass and momentum is evaluated for the cell and written to the
    * macroscopic quantities
-   *  @param cell macroscopic cell to process
-   *  @param index index of the macroscopic cell */
+   *  @param cell coupling cell to process
+   *  @param index index of the coupling cell */
   virtual void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                    const unsigned int& index) {
+                                                                 const unsigned int& index) {
     cell.iterateConstCells(_massMapping);
     cell.iterateConstCells(_momentumMapping);
     cell.setMacroscopicMass(_massMapping.getMass());

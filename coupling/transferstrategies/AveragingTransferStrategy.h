@@ -19,7 +19,7 @@ template <class LinkedCell, unsigned int dim> class AveragingTransferStrategy;
 }
 } // namespace coupling
 
-/** this class is used for pure averaging operations on the macroscopic cells.
+/** this class is used for pure averaging operations on the coupling cells.
  *  This can be used e.g. to measure errors in averaging over time, to estimate
  * number of samples etc.
  *  @author Philipp Neumann
@@ -49,10 +49,10 @@ public:
 
   /** @brief macroscopicMass and -Momentum are reset before the data from the
    * macro solver is transferred
-   *  @param cell the macroscopic cell to process
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to process
+   *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                               const unsigned int& index) {
+                                                                            const unsigned int& index) {
     // reset buffers for sampling mass and momentum in each inner macroscopic
     // cell
     cell.setMacroscopicMass(0.0);
@@ -75,10 +75,10 @@ public:
 
   /** the macroscopicMass and -Momentum are averaged over all md time steps
    *  @brief the averaging operation is applied to the cell
-   *  @param cell the macroscopic cell to process
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to process
+   *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                          const unsigned int& index) {
+                                                       const unsigned int& index) {
     // compute total mass/momentum from previous samples
     const double oldMass = (_sampleCounter - 1) * cell.getMacroscopicMass();
     const tarch::la::Vector<dim, double> oldMomentum = ((double)(_sampleCounter - 1)) * cell.getMacroscopicMomentum();

@@ -49,26 +49,26 @@ public:
 
   /** @brief store old microscopic mass in excess-mass buffer and reset
    * microscopic mass buffer
-   *  @param cell the macroscopic cell to be processed
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to be processed
+   *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                               const unsigned int& index);
+                                                                            const unsigned int& index);
 
   /** stores velocity values in new cont.-velocity field solution and sets
    * correct velocity value for first MD time step in microscopic momentum
    * buffer.
    *  @brief converts momentum into velocity values;
-   *  @param cell the macroscopic cell to be processed
-   *  @param index the index of the macroscopic cell */
+   *  @param cell the coupling cell to be processed
+   *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                              const unsigned int& index);
+                                                                           const unsigned int& index);
 
   // virtual void beginProcessInnerCouplingCellsBeforeSendingMDSolverData();
 
   /** @brief divides accumulated mass and momentum values by time step counter.
    */
   virtual void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                    const unsigned int& index);
+                                                                 const unsigned int& index);
 
   // virtual void endProcessInnerCouplingCellsBeforeSendingMDSolverData();
 
@@ -77,15 +77,14 @@ public:
 
   /** @brief computes current velocity (linear time interpolation) in this cell
    * and accumulates mass/momentum for sampling
-   *  @param cell the macroscopic cell to be processed
-   *  @param index the index of the macroscopic cell */
-  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                          const unsigned int& index);
+   *  @param cell the coupling cell to be processed
+   *  @param index the index of the coupling cell */
+  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index);
 
 private:
-  /** returns the local number of macroscopic cells incl. ghost layers */
+  /** returns the local number of coupling cells incl. ghost layers */
   unsigned int getLocalNumberCouplingCells(const coupling::IndexConversion<dim>& indexConversion) const;
-  /** computes the mass flux in the outermost inner macroscopic cells. For all
+  /** computes the mass flux in the outermost inner coupling cells. For all
    * other cells, 0.0 is returned. */
   double computeMassFlux(const double& mass, const tarch::la::Vector<dim, double>& velocity, const unsigned int index);
   /** class to compute the amount of mass in every single cell*/
