@@ -88,7 +88,7 @@ class KVSTest():
             kinVisc = self.cfg.getfloat(
                 "macroscopic-solver", "viscosity") / self.cfg.getfloat("microscopic-solver", "density")
             # dx LB in Mamico Units
-            self.dx = self.mamicoConfig.getMacroscopicCellConfiguration(
+            self.dx = self.mamicoConfig.getCouplingCellConfiguration(
             ).getCouplingCellSize()[0]
             # time intervall of one coupling cycle, in Mamico Units
             self.dt = self.simpleMDConfig.getSimulationConfiguration().getDt() * \
@@ -162,9 +162,9 @@ class KVSTest():
         self.multiMDCellService.constructFilterPipelines()
 
         for i in range(self.localMDInstances):
-            self.simpleMD[i].setMacroscopicCellService(
-                self.multiMDCellService.getMacroscopicCellService(i))
-            self.multiMDCellService.getMacroscopicCellService(i).computeAndStoreTemperature(
+            self.simpleMD[i].setCouplingCellService(
+                self.multiMDCellService.getCouplingCellService(i))
+            self.multiMDCellService.getCouplingCellService(i).computeAndStoreTemperature(
                 self.cfg.getfloat("microscopic-solver", "temperature"))
 
         from scipy.ndimage import gaussian_filter, median_filter
@@ -261,7 +261,7 @@ class KVSTest():
                 "Applying gaussian filter to a 3d property. Filtering on X-axis only. sigma = 1.")
             return gaussian_filter(data, truncate=1.0, sigma=(1, 0, 0, 0), mode="mirror")
 
-        mcs = self.multiMDCellService.getMacroscopicCellService(0)
+        mcs = self.multiMDCellService.getCouplingCellService(0)
 
         # fff testing
         # mcs.addFilterToSequence(filter_sequence="gauss-wtf", filter_index=0, scalar_filter_func = gauss_sca1, vector_filter_func=gauss_vec1)
@@ -283,7 +283,7 @@ class KVSTest():
         # mcs.addFilterToSequence(filter_sequence="gauss-45", filter_index=0, scalar_filter_func = gauss_sca45, vector_filter_func=gauss_vec45)
         # mcs.addFilterToSequence(filter_sequence="gauss-5", filter_index=0, scalar_filter_func = gauss_sca5, vector_filter_func=gauss_vec5)
 
-        self.buf = mamico.coupling.Buffer(self.multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
+        self.buf = mamico.coupling.Buffer(self.multiMDCellService.getCouplingCellService(0).getIndexConversion(),
                                           self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
@@ -317,7 +317,7 @@ class KVSTest():
             self.t = self.t + steps * self.dt_LB
 
             cellmass = (self.cfg.getfloat("microscopic-solver", "density")
-                        * np.prod(self.mamicoConfig.getMacroscopicCellConfiguration().getCouplingCellSize()))
+                        * np.prod(self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()))
             numcells = self.getGlobalNumberCouplingCells()
             mdpos = json.loads(self.cfg.get("domain", "md-pos"))
             # Convert center of MD domain in SI units to offset of MD domain as cell index
@@ -346,11 +346,11 @@ class KVSTest():
     def advanceMicro(self, cycle):
         numT = self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
         for i in range(self.localMDInstances):
-            mamico.coupling.setMacroscopicCellService(
-                self.multiMDCellService.getMacroscopicCellService(i))
+            mamico.coupling.setCouplingCellService(
+                self.multiMDCellService.getCouplingCellService(i))
             mamico.coupling.setMDSolverInterface(self.mdSolverInterface[i])
             self.simpleMD[i].simulateTimesteps(numT, self.mdStepCounter)
-            self.multiMDCellService.getMacroscopicCellService(
+            self.multiMDCellService.getCouplingCellService(
                 i).plotEveryMacroscopicTimestep(cycle)
         self.mdStepCounter = self.mdStepCounter + numT
 
@@ -388,7 +388,7 @@ class KVSTest():
 
     def getGlobalNumberCouplingCells(self):
         domainSize = self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()
-        dx = self.mamicoConfig.getMacroscopicCellConfiguration().getCouplingCellSize()
+        dx = self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()
         return [math.floor(domainSize[d]/dx[d]+0.5) for d in range(3)]
 
 

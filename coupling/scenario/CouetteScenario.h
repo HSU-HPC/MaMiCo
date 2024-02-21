@@ -244,12 +244,12 @@ protected:
     _mdSolverInterface = _instanceHandling->getMDSolverInterface();
 
     if (_cfg.twsLoop) {
-      // initialise macroscopic cell service for multi-MD case and set single
+      // initialise coupling cell service for multi-MD case and set single
       // cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(_mdSolverInterface, couetteSolverInterface, _simpleMDConfig,
                                                                                          _mamicoConfig, "couette.xml", *_multiMDService, _tws);
     } else {
-      // initialise macroscopic cell service for multi-MD case and set single
+      // initialise coupling cell service for multi-MD case and set single
       // cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(_mdSolverInterface, couetteSolverInterface, _simpleMDConfig,
                                                                                          _mamicoConfig, "couette.xml", *_multiMDService);
@@ -271,7 +271,7 @@ protected:
       coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicSolverInterface(couetteSolverInterface);
 
       _instanceHandling->setCouplingCellServices(*_multiMDCellService);
-      // compute and store temperature in macroscopic cells (temp=1.1
+      // compute and store temperature in coupling cells (temp=1.1
       // everywhere)
       _multiMDCellService->computeAndStoreTemperature(_cfg.temp);
     }
@@ -336,8 +336,8 @@ protected:
                       // TODO: replace usage of deprecated IndexConversion
                       const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getCouplingCellService(0).getIndexConversion();
                       const unsigned int size = inputScalars.size();
-                      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getCouplingCellSize());
-                      const double mass = (_cfg.density) * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
+                      const tarch::la::Vector<3, double> couplingCellSize(indexConversion.getCouplingCellSize());
+                      const double mass = (_cfg.density) * couplingCellSize[0] * couplingCellSize[1] * couplingCellSize[2];
 
                       std::vector<double> syntheticMasses;
                       for (unsigned int i = 0; i < size; i++) {
@@ -366,16 +366,16 @@ protected:
 
                       const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getCouplingCellService(0).getIndexConversion();
                       const unsigned int size = inputVectors.size();
-                      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getCouplingCellSize());
-                      const double mass = (_cfg.density) * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
+                      const tarch::la::Vector<3, double> couplingCellSize(indexConversion.getCouplingCellSize());
+                      const double mass = (_cfg.density) * couplingCellSize[0] * couplingCellSize[1] * couplingCellSize[2];
 
                       using coupling::indexing::IndexTrait;
                       using coupling::indexing::CellIndex;
 
                       const tarch::la::Vector<3, double> md2MacroDomainOffset = {
-                          CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[0] * macroscopicCellSize[0],
-                          CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[1] * macroscopicCellSize[1],
-                          CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[2] * macroscopicCellSize[2],
+                          CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[0] * couplingCellSize[0],
+                          CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[1] * couplingCellSize[1],
+                          CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get()[2] * couplingCellSize[2],
                       };
 
                       std::normal_distribution<double> distribution(0.0, _cfg.noiseSigma);
@@ -385,9 +385,9 @@ protected:
                         CellIndex<3, IndexTrait::vector> globalIndex(
                             CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>{i}); // construct global CellIndex from buffer
                                                                                                             // and convert it to vector
-                        tarch::la::Vector<3, double> cellMidPoint(md2MacroDomainOffset - 0.5 * macroscopicCellSize);
+                        tarch::la::Vector<3, double> cellMidPoint(md2MacroDomainOffset - 0.5 * couplingCellSize);
                         for (unsigned int d = 0; d < 3; d++) {
-                          cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex.get()[d]) * macroscopicCellSize[d];
+                          cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex.get()[d]) * couplingCellSize[d];
                         }
 
                         // compute momentum
@@ -601,8 +601,8 @@ protected:
       std::cout << cycle - _cfg.filterInitCycles << ", ";
       const coupling::IndexConversion<3>& indexConversion = _multiMDCellService->getCouplingCellService(0).getIndexConversion();
       const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
-      const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getCouplingCellSize());
-      const double mass = _cfg.density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
+      const tarch::la::Vector<3, double> couplingCellSize(indexConversion.getCouplingCellSize());
+      const double mass = _cfg.density * couplingCellSize[0] * couplingCellSize[1] * couplingCellSize[2];
       for (unsigned int i = 0; i < _buf.recvBuffer.size(); i++) {
 
         /// todo@ use more cells
@@ -611,9 +611,9 @@ protected:
           // get global cell index vector
           const tarch::la::Vector<3, unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(_buf.globalCellIndices4RecvBuffer[i]));
           // determine cell midpoint
-          tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * macroscopicCellSize);
+          tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * couplingCellSize);
           for (unsigned int d = 0; d < 3; d++) {
-            cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * macroscopicCellSize[d];
+            cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * couplingCellSize[d];
           }
           double vx_macro = _couetteSolver->getVelocity(cellMidPoint)[0];
           double vx_filter = (1 / mass * _buf.recvBuffer[i]->getMacroscopicMomentum())[0];
@@ -722,21 +722,21 @@ protected:
     std::cout << "Finish CouetteScenario::shutdown() " << std::endl;
   }
 
-  /** computes global number of macroscopic cells from configs. Required by couette solver interface before MacroscopicCellService is initialised! */
+  /** computes global number of coupling cells from configs. Required by couette solver interface before CouplingCellService is initialised! */
   tarch::la::Vector<3, unsigned int> getGlobalNumberCouplingCells(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
                                                                   const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig) const {
     tarch::la::Vector<3, double> domainSize(simpleMDConfig.getDomainConfiguration().getGlobalDomainSize());
     tarch::la::Vector<3, double> dx(mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize());
-    tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
+    tarch::la::Vector<3, unsigned int> globalNumberCouplingCells(0);
     for (unsigned int d = 0; d < 3; d++) {
       int buf = floor(domainSize[d] / dx[d] + 0.5);
-      globalNumberMacroscopicCells[d] = (unsigned int)buf;
+      globalNumberCouplingCells[d] = (unsigned int)buf;
     }
-    return globalNumberMacroscopicCells;
+    return globalNumberCouplingCells;
   }
 
   /** This is only done on rank 0.
-   *  @brief allocates the send buffer (with values for all macroscopic cells).
+   *  @brief allocates the send buffer (with values for all coupling cells).
    *  @param indexConversion instance of the indexConversion
    *  @param couetteSolverInterface interface for the continuum solver */
   void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) {
@@ -746,7 +746,7 @@ protected:
     // delete all potential entries of sendBuffer
     deleteBuffer(_buf.sendBuffer);
     // count number of cells to be sent from this process; therefore, loop over
-    // all global macroscopic cells...
+    // all global coupling cells...
     unsigned int numCellsSent = 0;
     for (unsigned int i = 0; i < num; i++) {
       // ... and find out, if the current cell should be send to MD from this
@@ -801,7 +801,7 @@ protected:
     _buf.globalCellIndices4SendBuffer = indices;
   }
 
-  /** allocates the recv-buffer. This buffer contains all global inner macroscopic cells, but only on rank 0. On all other ranks, no cells are stored and a NULL
+  /** allocates the recv-buffer. This buffer contains all global inner coupling cells, but only on rank 0. On all other ranks, no cells are stored and a NULL
    * ptr is returned */
   void allocateRecvBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& couetteSolverInterface) {
 
@@ -865,7 +865,7 @@ protected:
     _buf.globalCellIndices4RecvBuffer = indices;
   }
 
-  /** @brief write macroscopic cells that have been received from MD to csv file
+  /** @brief write coupling cells that have been received from MD to csv file
    *  @param recvBuffer the buffer for the data, which comes from md
    *  @param recvIndices the indices for the macr cells in the buffer
    *  @param indexConversion an instance of the indexConversion
@@ -922,25 +922,25 @@ protected:
    *  @param indexConversion an instance of the indexConversion
    *  @param sendBuffer the bufffer to send data from macro to micro
    *  @param globalCellIndices4SendBuffer the global linearized indices of the
-   * macroscopic cells in the buffer  */
+   * coupling cells in the buffer  */
   void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,
                       const coupling::IndexConversion<3>& indexConversion, std::vector<coupling::datastructures::CouplingCell<3>*>& sendBuffer,
                       const unsigned int* const globalCellIndices4SendBuffer) const {
     using coupling::configurations::CouetteConfig;
     const unsigned int size = sendBuffer.size();
     const tarch::la::Vector<3, double> domainOffset(indexConversion.getGlobalMDDomainOffset());
-    const tarch::la::Vector<3, double> macroscopicCellSize(indexConversion.getCouplingCellSize());
+    const tarch::la::Vector<3, double> couplingCellSize(indexConversion.getCouplingCellSize());
 
     for (unsigned int i = 0; i < size; i++) {
       // get global cell index vector
       const tarch::la::Vector<3, unsigned int> globalIndex(indexConversion.getGlobalVectorCellIndex(globalCellIndices4SendBuffer[i]));
       // determine cell midpoint
-      tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * macroscopicCellSize);
+      tarch::la::Vector<3, double> cellMidPoint(domainOffset - 0.5 * couplingCellSize);
       for (unsigned int d = 0; d < 3; d++) {
-        cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * macroscopicCellSize[d];
+        cellMidPoint[d] = cellMidPoint[d] + ((double)globalIndex[d]) * couplingCellSize[d];
       }
 
-      double mass = density * macroscopicCellSize[0] * macroscopicCellSize[1] * macroscopicCellSize[2];
+      double mass = density * couplingCellSize[0] * couplingCellSize[1] * couplingCellSize[2];
       if (_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD)
         mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(cellMidPoint);
       // compute momentum
@@ -1003,18 +1003,18 @@ protected:
    *  @param couetteSolver the macro/continuum solver
    *  @param mdOffset the offset of the md domain from (0.0.0)
    *  @param mamicoMeshsize
-   *  @param globalNumberMacroscopicCells the total number macroscopic cells for
+   *  @param globalNumberCouplingCells the total number coupling cells for
    * the whole domain
    *  @param outerRegion
    *  @todo piet, what is the mamicoMeshsize & the outer layer  */
   coupling::interface::MacroscopicSolverInterface<3>* getCouetteSolverInterface(const double dx, tarch::la::Vector<3, double> mdOffset,
                                                                                 tarch::la::Vector<3, double> mamicoMeshsize,
-                                                                                tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
+                                                                                tarch::la::Vector<3, unsigned int> globalNumberCouplingCells,
                                                                                 unsigned int outerRegion) {
     using coupling::configurations::CouetteConfig;
     coupling::interface::MacroscopicSolverInterface<3>* interface = NULL;
     if (_cfg.maSolverType == CouetteConfig::COUETTE_ANALYTICAL) {
-      interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells, outerRegion);
+      interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberCouplingCells, outerRegion);
     } else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
       // compute number of cells of MD offset; detect any mismatches!
       tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
@@ -1034,11 +1034,11 @@ protected:
                                     coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
                                     coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)}};
       interface =
-          new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain, globalNumberMacroscopicCells, outerRegion);
+          new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain, globalNumberCouplingCells, outerRegion);
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) {
-      interface = new coupling::solvers::FoamSolverInterface<3>(globalNumberMacroscopicCells, outerRegion);
+      interface = new coupling::solvers::FoamSolverInterface<3>(globalNumberCouplingCells, outerRegion);
     }
 #endif
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
@@ -1060,7 +1060,7 @@ protected:
                                     coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 1),
                                     coupling::solvers::NumericalSolver::getAvgDomainSize(_cfg.channelheight, dx, _cfg.lbNumberProcesses, 2)}};
       interface =
-          new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain, globalNumberMacroscopicCells, outerRegion);
+          new coupling::solvers::LBCouetteSolverInterface(cells_per_process, _cfg.lbNumberProcesses, offsetMDDomain, globalNumberCouplingCells, outerRegion);
     }
 
     if (interface == NULL) {
@@ -1070,17 +1070,17 @@ protected:
     return interface;
   }
 
-  /** the buffers store macroscopic cells, so momentum and density will be
+  /** the buffers store coupling cells, so momentum and density will be
    * transferred
    *  @brief holds the buffers for the data transfer */
   struct CouplingBuffer {
     /** @brief the buffer for data transfer from macro to md */
     std::vector<coupling::datastructures::CouplingCell<3>*> sendBuffer;
-    /** @brief the global indices of the macroscopic cells in the sendBuffer */
+    /** @brief the global indices of the coupling cells in the sendBuffer */
     unsigned int* globalCellIndices4SendBuffer;
     /** @brief the buffer for data transfer from md to macro */
     std::vector<coupling::datastructures::CouplingCell<3>*> recvBuffer;
-    /** @brief the global indices of the macroscopic cells in the recvBuffer*/
+    /** @brief the global indices of the coupling cells in the recvBuffer*/
     unsigned int* globalCellIndices4RecvBuffer;
   };
 
