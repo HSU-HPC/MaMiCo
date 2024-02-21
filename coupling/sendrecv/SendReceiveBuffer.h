@@ -5,11 +5,14 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SENDRECV_SENDRECEIVEBUFFER_H_
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_SENDRECEIVEBUFFER_H_
 
+#include "DataExchangeFromMD2Macro.h"
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/sendrecv/DataExchange.h"
 #include "tarch/la/Vector.h"
+#include <algorithm>
 #include <map>
+#include <set>
 #include <string.h>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
@@ -49,6 +52,26 @@ protected:
   void writeToSendBuffer(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, const MacroscopicCell& cell,
                          tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
+  /** @brief fills all information that needs to be broadcast from a macroscopic cell
+   * into the broadcast-buffer.
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param cell
+   * 	@param globalVectorIndex
+   */
+  void writeToBcastBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                          const MacroscopicCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
+  /** @brief fills all information that needs to be reduced to a macroscopic cell
+   * into the reduce-buffer.
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param cell
+   * 	@param globalVectorIndex
+   */
+  void writeToReduceBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                           const MacroscopicCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
   /** reads the information from the receive-buffer and fills it into a
    * macroscopic cell.
    * 	@param dataExchange
@@ -58,6 +81,19 @@ protected:
   void readFromReceiveBuffer(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, MacroscopicCell& macroscopicCell,
                              tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
+  void readFromCollectiveBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                MacroscopicCell& macroscopicCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
+  /** reads the information from the reduce-buffer and fills it into a
+   * macroscopic cell.
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param macroscopicCell
+   * 	@param globalVectorIndex
+   */
+  void readFromReduceBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
+                            MacroscopicCell& macroscopicCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
   /** according to rule by dataExchange, the receive buffers are allocated. This
    * function adds a contribution for the cell at globalVectorIndex.
    * 	@param dataExchange
@@ -65,11 +101,34 @@ protected:
    */
   void allocateReceiveBuffers(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
 
+  /** Allocates buffer for receiving in the context of the broadcast operation
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param globalVectorIndex
+   */
+  void allocateBcastBufferForReceiving(const coupling::IndexConversion<dim>& indexConversion,
+                                       coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                       tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
+  /** Allocates buffer for receiving in the context of the reduce operation
+   * 	@param indexConversion
+   * 	@param dataExchange
+   * 	@param globalVectorIndex
+   */
+  void allocateReduceBufferForReceiving(const coupling::IndexConversion<dim>& indexConversion,
+                                        coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                        tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+
   /** triggers the MPI-sending on the respective buffers. No sending for
    * information transfer from/ to this rank.
    * 	@param dataExchange
    */
   void triggerSending(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange);
+
+  /** triggers the MPI-broadcast on the respective buffers.
+   * 	@param rank
+   */
+  void triggerBcasts(unsigned int rank);
 
   /** triggers the MPI-receiving on the respective buffers. No receiving of
    * information from/to this rank.
@@ -77,13 +136,31 @@ protected:
    */
   void triggerReceiving(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange);
 
+  /** triggers the MPI-reduce on the respective buffers.
+   * 	@param rank
+   */
+  void triggerReduce(unsigned int rank);
+
   /** wait for all send and receive operations to complete.
    */
   void waitAllOperations();
 
+  /** wait for all broadcast or reduce operations to complete */
+  void waitAllCollectiveOperations();
+
   /** allocates send and receive requests
    */
   void allocateRequests();
+
+  /** allocates broadcast request
+   * 	@param thisRank
+   */
+  void allocateBcastRequests(unsigned int thisRank);
+
+  /** allocates reduce request
+   * 	@param thisRank
+   */
+  void allocateReduceRequests(unsigned int thisRank);
 
 private:
   /** data structure for send- and receive-buffer. */
@@ -92,6 +169,15 @@ private:
     unsigned int bufferSize;
 
     BufferWithID() : buffer(NULL), bufferSize(0) {}
+  };
+
+  struct BufferCollective {
+    std::vector<double> buffer;
+    std::set<unsigned int> nonRootRanks;
+    std::set<unsigned int> cellIndices;
+    unsigned int rootRank;
+
+    BufferCollective() : buffer(), nonRootRanks(), cellIndices(), rootRank(-1) {}
   };
 
   /** deletes everything inside a given buffer
@@ -103,12 +189,31 @@ private:
    * identified by a respective rank. */
   std::map<unsigned int, BufferWithID> _receiveBuffer;
   std::map<unsigned int, BufferWithID> _sendBuffer;
+
+  /** members for collective communication */
+  std::map<unsigned int, BufferCollective> _bcastBuffer;
+  std::map<unsigned int, BufferCollective> _reduceBuffer;
+
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   bool _requestsAllocated; /** flag that will always be reset after every send
                               operation. Triggers instantiation of requests */
   MPI_Request* _requests;
   int _receiveSize; /** number of receive requests */
   int _sendSize;    /** number of send requests */
+
+  std::vector<MPI_Comm> _subComms;
+  std::vector<MPI_Group> _subGroups;
+  int _bcastOrReduceSize;
+
+  static void elementWiseSum(void* in, void* inout, int* len, MPI_Datatype* datatype) {
+    auto* output = (double*)inout;
+    auto* input = (double*)in;
+    for (int i = 0; i < *len; ++i) {
+      output[i] += input[i];
+    }
+  }
+
+  MPI_Op elementWiseSumOperation;
 #endif
 };
 

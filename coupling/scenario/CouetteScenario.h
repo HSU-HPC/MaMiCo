@@ -165,7 +165,6 @@ protected:
     _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
 
 #if defined(LS1_MARDYN)
-    assert((_mamicoConfig.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3, unsigned int>(1)));
     auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
     coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
@@ -483,7 +482,11 @@ protected:
       fillSendBuffer(_cfg.density, *_couetteSolver, _multiMDCellService->getIndexConversion(), _buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
     }
     if (_cfg.macro2Md) {
+#ifdef USE_COLLECTIVE_MPI
+      _multiMDCellService->bcastFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
+#else
       _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
+#endif
       // std::cout << "Finish _multiMDCellService->sendFromMacro2MD " <<
       // std::endl;
     }
@@ -569,7 +572,11 @@ protected:
 
       // send back data from MD instances and merge it
       if (_cfg.md2Macro) {
+#ifdef USE_COLLECTIVE_MPI
+        _tv.filter += _multiMDCellService->reduceFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+#else
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+#endif
         // std::cout << "Finish _multiMDCellService->sendFromMD2Macro " <<
         // std::endl;
       }
@@ -580,7 +587,11 @@ protected:
         //_buf does not get used here: Instead, the synthetic MD in the
         // SYNTHETICMD_SEQUENCE generates values. To prevent segfaults, it has
         // to be nonempty, though.
+#ifdef USE_COLLECTIVE_MPI
+        _tv.filter += _multiMDCellService->reduceFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+#else
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+#endif
       }
     }
   }

@@ -33,6 +33,10 @@
 #define TAG_FROM_MACRO2MD 500000
 
 #include "tarch/la/Vector.h"
+#include "tarch/utils/OstreamOperators.h"
+#include <map>
+#include <set>
+#include <vector>
 
 namespace coupling {
 /** This is an enum for the macroscopic solver ID

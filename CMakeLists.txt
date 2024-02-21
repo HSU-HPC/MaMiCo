@@ -138,7 +138,26 @@ endif()
 
 if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(LS1_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ls1" CACHE PATH "ls1 source directory")
-  set(LS1_BUILD_DIR_NAME "build" CACHE STRING "ls1 build directory name")
+  set(LS1_BUILD_DIR_NAMES "build-seq;build-par;build" CACHE STRING "ls1 build directory names. First one working is used")
+  list(LENGTH LS1_BUILD_DIR_NAMES NUM_BUILD_DIRS)
+  # we have to use the last one anyway (no other options left in list), so skip that check
+  MATH(EXPR NUM_BUILD_DIRS "${NUM_BUILD_DIRS}-1")
+  set(BUILD_CANDIDATE_IDX 0)
+  list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
+  while(BUILD_CANDIDATE_IDX LESS NUM_BUILD_DIRS)
+    # check if this build dir works
+    if(EXISTS "${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}")
+      load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX CANDIDATE_CACHE_ ENABLE_MPI PRECISION)
+    endif()
+    if(CANDIDATE_CACHE_PRECISION AND (CANDIDATE_CACHE_ENABLE_MPI STREQUAL BUILD_WITH_MPI))
+      # this candidate build dir seems good, stop searching and try it
+      break()
+    endif()
+    # this candidate build dir does not work, try next one in list
+    MATH(EXPR BUILD_CANDIDATE_IDX "${BUILD_CANDIDATE_IDX}+1")
+    list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
+  endwhile()
+  message(STATUS ">> LS1 build directory used: " ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME})
   load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX LS1_CACHE_ ENABLE_AUTOPAS ENABLE_MPI PRECISION ENABLE_VTK ENABLE_ADIOS2 CMAKE_BUILD_TYPE)
   if(NOT LS1_CACHE_PRECISION)
     message(FATAL_ERROR "Could not read the ls1 build cache. Please ensure the path to the ls1 root folder and the name of the build folder are correct.")
@@ -293,6 +312,12 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+if(BUILD_WITH_MPI)
+  option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
+  if(USE_COLLECTIVE_MPI)
+    target_compile_definitions(mamico INTERFACE USE_COLLECTIVE_MPI)
+  endif()
+endif()
 if(BUILD_WITH_EIGEN)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
 	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
@@ -302,6 +327,9 @@ if(BUILD_WITH_ADIOS2)
 endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
+if("${MD_SIM}" STREQUAL "LS1_MARDYN") #to be removed when ls1 updates to use the latest autopas
+  target_compile_options(mamico INTERFACE -Wno-reorder)
+endif()
 if(BUILD_WITH_MPI)
   target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
@@ -330,7 +358,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Fu
 endif()
 # we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
 target_link_libraries(mamico INTERFACE libsimplemd)
-if("${MD_SIM}" STREQUAL "LAMMPS_MD")
+if("${MD_SIM}" STREQUAL "LAMMPS_MD" OR "${MD_SIM}" STREQUAL "LAMMPS_DPD")
   target_link_libraries(mamico INTERFACE ${LAMMPS_LINK_LIBRARIES})
   target_include_directories(mamico INTERFACE ${LAMMPS_INCLUDE_DIRS})
   #target_compile_options(mamico INTERFACE ${LAMMPS_CFLAGS_OTHER})
@@ -426,7 +454,7 @@ if("${MD_SIM}" STREQUAL "LAMMPS_MD")
     ${MAMICO_SOURCES}
     "tarch/tinyxml2/tinyxml2.cpp"
     "tarch/utils/RandomNumberService.cpp"
-    "coupling/test/integration/main_lammps.cpp"
+    "test/integration/main_lammps.cpp"
   )
   add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
   set_target_properties(test_lammps PROPERTIES CXX_STANDARD 17)
@@ -598,6 +626,11 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/impl/SimpleMD/SimpleMDMoleculeIterator.h"
   "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
   "coupling/interface/impl/SimpleMD/SimpleMDMolecule.h"
+  "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
+  "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
+  "coupling/interface/impl/ls1/LS1StaticCommData.h"
+  "coupling/interface/impl/ls1/LS1Molecule.h"
+  "coupling/interface/impl/ls1/LS1RegionWrapper.h"
   "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolverInterface.h"
   "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolver.h"
   "coupling/interface/impl/macroscopictestsolvers/MacroscopicSolverFactory.h"
@@ -648,6 +681,12 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/indexing/OperationsTest.cpp"
   "test/unit/coupling/indexing/CellIndexTest.cpp"
   "test/unit/coupling/indexing/IndexingServiceTest.cpp"
+  "test/unit/coupling/interface/impl/SimpleMD/SimpleMDMoleculeTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MDSolverInterfaceTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MoleculeIteratorTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MoleculeTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1RegionWrapperTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1StaticCommDataTest.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"

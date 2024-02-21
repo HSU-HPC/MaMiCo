@@ -17,7 +17,7 @@ coupling::IndexConversion<dim>::IndexConversion(tarch::la::Vector<dim, unsigned 
       // independent from other members in init.
       _numberProcesses(numberProcesses), _rank(rank),
       // depends on parallel-topology
-      _thisProcess(getProcessCoordinates(rank)),
+      _thisProcess(getThisProcessCoordinates(rank)),
       // independent from other members in init.
       _globalNumberMacroscopicCells(globalNumberMacroscopicCells),
       // independent from other members in init.
@@ -109,6 +109,14 @@ template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::Index
 
 template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getProcessCoordinates(unsigned int rank) const {
   return _parallelTopology->getProcessCoordinates(rank);
+}
+
+template <unsigned int dim> tarch::la::Vector<dim, unsigned int> coupling::IndexConversion<dim>::getThisProcessCoordinates(unsigned int rank) const {
+  tarch::la::Vector<dim, unsigned int> processCoordinates = getProcessCoordinates(rank);
+  for (unsigned int d = 0; d < dim; ++d) {
+    processCoordinates[d] = processCoordinates[d] % _numberProcesses[d];
+  }
+  return processCoordinates;
 }
 
 template <unsigned int dim> unsigned int coupling::IndexConversion<dim>::getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
