@@ -13,20 +13,21 @@ import sys
 from configparser import ConfigParser
 
 import coloredlogs
-import mamico.coupling
-import mamico.tarch.configuration
-import mamico.tarch.utils
 import matplotlib.pyplot as mplt
 import numpy as np
 import pandas as pd
 import pythonfilters as pf
 from lbmpy.parameterization import Scaling
 from lbmpy.session import *
-from mamico.coupling.services import MultiMDCellService
-from mamico.coupling.solvers import CouetteSolverInterface
 
 sys.path.append('../../../build')
 sys.path.append('../../filtering/filters')
+
+import mamico.coupling
+import mamico.tarch.configuration
+import mamico.tarch.utils
+from mamico.coupling.services import MultiMDCellService
+from mamico.coupling.solvers import CouetteSolverInterface
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
