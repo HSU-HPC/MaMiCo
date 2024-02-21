@@ -1,3 +1,4 @@
+#include "coupling/services/CouplingCellService.h"
 #include "coupling/configurations/BoundaryForceConfiguration.h"
 #include "coupling/configurations/CouplingCellConfiguration.h"
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
@@ -8,7 +9,6 @@
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
-#include "coupling/services/CouplingCellService.h"
 #include "simplemd/LinkedCell.h"
 #include "tarch/utils/MultiMDService.h"
 #include <cppunit/TestFixture.h>
@@ -40,14 +40,14 @@ public:
     TestParallelTopologyConfiguration parallelTopologyConfiguration;
     TestThermostatConfiguration thermostatConfiguration;
     const unsigned int numberOfTimeSteps = 1;
-    TestCouplingCellConfiguration<dim> macroscopicCellConfiguration;
+    TestCouplingCellConfiguration<dim> couplingCellConfiguration;
     const char* filterPipelineConfigurationFile = nullptr;
     tarch::utils::MultiMDService<dim> multiMDService{tarch::la::Vector<dim, unsigned int>{1}, 1};
     const unsigned int topologyOffset = 1;
     new coupling::services::CouplingCellServiceImpl<simplemd::LinkedCell, dim>(
         1, mdSolverInterface, macroscopicSolverInterface, numberOfProcesses, globalRank, particleInsertionConfiguration, momentumInsertionConfiguration,
         boundaryForceConfiguration, transferStrategyConfiguration, parallelTopologyConfiguration, thermostatConfiguration, numberOfTimeSteps,
-        macroscopicCellConfiguration, filterPipelineConfigurationFile, multiMDService, topologyOffset);
+        couplingCellConfiguration, filterPipelineConfigurationFile, multiMDService, topologyOffset);
   }
 
 private:
@@ -56,9 +56,9 @@ private:
     TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>() {}
     virtual ~TestMDSolverInterface() {}
 
-    simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& macroscopicCellIndex,
-                                        const tarch::la::Vector<dim, unsigned int>& linkedCellInMacroscopicCell,
-                                        const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell,
+    simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& couplingCellIndex,
+                                        const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
+                                        const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell,
                                         const coupling::IndexConversion<dim>& indexConversion) override {
       return _linkedcell;
     }
@@ -75,9 +75,9 @@ private:
                                     tarch::la::Vector<dim, double>& initialVelocity) const override {}
     virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, simplemd::LinkedCell& cell) override {}
     virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) override {}
-    virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstMacroscopicCell,
-                                               const tarch::la::Vector<dim, unsigned int>& rangeMacroscopicCells,
-                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell) override {}
+    virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstCouplingCell,
+                                               const tarch::la::Vector<dim, unsigned int>& rangeCouplingCells,
+                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) override {}
     virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double>& position) override {
       return tarch::la::Vector<dim, unsigned int>(0);
     }

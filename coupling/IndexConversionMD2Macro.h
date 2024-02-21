@@ -201,7 +201,7 @@ public:
     // offset of md2macro domain relative to MD domain
     for (unsigned int d = 0; d < dim; d++) {
       offset[d] += _ic->getCouplingCellSize()[d] * (*_lowerBoundaryAllRanks)[d]; // offset of md2macro domain
-                                                                                    // relative to MD domain
+                                                                                 // relative to MD domain
     }
 
     // std::cout << offset << std::endl << std::endl;

@@ -32,10 +32,12 @@ public:
    *  @param outerRegion defines, how many cell layers will be sent to the macro
    * solver */
   CouetteSolverInterface(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, unsigned int outerRegion = 1)
-      : coupling::interface::MacroscopicSolverInterface<dim>(), _outerRegion(outerRegion), _globalNumberCouplingCells(globalNumberCouplingCells) {}
+      : coupling::interface::MacroscopicSolverInterface<dim>(), _outerRegion(outerRegion), _globalNumberCouplingCells(globalNumberCouplingCells) {
+  }
 
   /** @brief a dummy destructor */
-  virtual ~CouetteSolverInterface() {}
+  virtual ~CouetteSolverInterface() {
+  }
 
   /** with this function one can check, which data needs so be send from micro
    * to macro solver for the correct Couette scenario setup, all (inner) cells

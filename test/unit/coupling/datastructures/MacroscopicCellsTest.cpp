@@ -2,8 +2,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _MOLECULARDYNAMICS_COUPLING_TESTS_MACROSCOPICCELLSTEST_H_
-#define _MOLECULARDYNAMICS_COUPLING_TESTS_MACROSCOPICCELLSTEST_H_
+#ifndef _MOLECULARDYNAMICS_COUPLING_TESTS_COUPLINGCELLSTEST_H_
+#define _MOLECULARDYNAMICS_COUPLING_TESTS_COUPLINGCELLSTEST_H_
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -15,45 +15,40 @@
 #include "simplemd/LinkedCell.h"
 #include "tarch/la/Vector.h"
 
-
-/** tests the access to the macroscopic cells in class MacroscopicCells.
+/** tests the access to the coupling cells in class CouplingCells.
  *  Therefore, we define two classes which just set the local vector cell
- * indices in the macroscopic cells and print the values. We loop over both
+ * indices in the coupling cells and print the values. We loop over both
  * ghost cells and non-ghost cells and can check the output. This test is
  * carried out for 1D,2D,3D.
  *  @author Philipp Neumann
  */
-class MacroscopicCellsTest : public CppUnit::TestFixture {
-  CPPUNIT_TEST_SUITE(MacroscopicCellsTest);
+class CouplingCellsTest : public CppUnit::TestFixture {
+  CPPUNIT_TEST_SUITE(CouplingCellsTest);
 // this test is only required in sequential mode
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
-  CPPUNIT_TEST(testMacroscopicCells<1>);
-  CPPUNIT_TEST(testMacroscopicCells<2>);
-  CPPUNIT_TEST(testMacroscopicCells<3>);
+  CPPUNIT_TEST(testCouplingCells<1>);
+  CPPUNIT_TEST(testCouplingCells<2>);
+  CPPUNIT_TEST(testCouplingCells<3>);
 #endif
   CPPUNIT_TEST_SUITE_END();
+
 public:
-  void setUp() {
+  void setUp() {}
 
-  }
-
-  void tearDown() {
-
-  }
+  void tearDown() {}
 
 private:
-  /** test interface; only implements the getLinkedCell method (required in initialisation of macroscopic cells) and
+  /** test interface; only implements the getLinkedCell method (required in initialisation of coupling cells) and
    *  strictly returns its only linked cell ;-) The MD domain is considered to be the unit square/box.
    */
   template <unsigned int dim> class TestMDSolverInterface : public coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim> {
   public:
-    TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>() {
-    } virtual ~TestMDSolverInterface() {
-    }
+    TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>() {}
+    virtual ~TestMDSolverInterface() {}
 
-    virtual simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& macroscopicCellIndex,
-                                                const tarch::la::Vector<dim, unsigned int>& linkedCellInMacroscopicCell,
-                                                const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell,
+    virtual simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& couplingCellIndex,
+                                                const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
+                                                const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell,
                                                 const coupling::IndexConversion<dim>& indexConversion) {
       return _linkedcell;
     }
@@ -72,9 +67,9 @@ private:
                                     tarch::la::Vector<dim, double>& initialVelocity) const {}
     virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, simplemd::LinkedCell& cell) {}
     virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) {}
-    virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstMacroscopicCell,
-                                               const tarch::la::Vector<dim, unsigned int>& rangeMacroscopicCells,
-                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell) {}
+    virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstCouplingCell,
+                                               const tarch::la::Vector<dim, unsigned int>& rangeCouplingCells,
+                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) {}
     virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double>& position) {
       return tarch::la::Vector<dim, unsigned int>(0);
     }
@@ -82,14 +77,13 @@ private:
     virtual void synchronizeMoleculesAfterMassModification() {}
     virtual void synchronizeMoleculesAfterMomentumModification() {}
     virtual double getDt() { return 1.0; }
-    virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, dim>* getMoleculeIterator(simplemd::LinkedCell& cell) {
-      return NULL;
-    }
+    virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, dim>* getMoleculeIterator(simplemd::LinkedCell& cell) { return NULL; }
 
-    private : simplemd::LinkedCell _linkedcell;
+  private:
+    simplemd::LinkedCell _linkedcell;
   };
 
-  /** test class for loop over macroscopic cells; writes the local vector cell index into each cell's microscopic-momentum
+  /** test class for loop over coupling cells; writes the local vector cell index into each cell's microscopic-momentum
    *  buffer.
    */
   template <unsigned int dim> class WriteIndex {
@@ -110,7 +104,7 @@ private:
   private:
     const coupling::IndexConversion<dim>& _indexConversion;
   };
-  /** test class to print local cell index (-> microscopic momentum buffer) of macroscopic cells */
+  /** test class to print local cell index (-> microscopic momentum buffer) of coupling cells */
   template <unsigned int dim> class PrintIndex {
   public:
     PrintIndex() {}
@@ -122,10 +116,10 @@ private:
     }
   };
 
-  template <unsigned int dim> void testMacroscopicCells() {
+  template <unsigned int dim> void testCouplingCells() {
     TestMDSolverInterface<dim>* testInterface = new TestMDSolverInterface<dim>();
     if (testInterface == NULL) {
-      std::cout << "ERROR MacroscopicCellsTest::testMacroscopicCells(): testInterface==NULL!" << std::endl;
+      std::cout << "ERROR CouplingCellsTest::testCouplingCells(): testInterface==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
     const tarch::la::Vector<dim, unsigned int> globalNumberCells(3);
@@ -133,25 +127,25 @@ private:
     const unsigned int rank = 0;
     const coupling::IndexConversion<dim> indexConversion(globalNumberCells, numberProcesses, rank, testInterface->getGlobalMDDomainSize(),
                                                          testInterface->getGlobalMDDomainOffset(), coupling::paralleltopology::XYZ);
-    const tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell(2);
+    const tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell(2);
 
-    coupling::datastructures::CouplingCells<simplemd::LinkedCell, dim> macroscopicCells(numberLinkedCellsPerMacroscopicCell, indexConversion, testInterface);
+    coupling::datastructures::CouplingCells<simplemd::LinkedCell, dim> couplingCells(numberLinkedCellsPerCouplingCell, indexConversion, testInterface);
     WriteIndex<dim> writeIndex(indexConversion);
     PrintIndex<dim> printIndex;
 
-    // write indices to inner macroscopic cells
-    macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(writeIndex);
-    macroscopicCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(printIndex);
+    // write indices to inner coupling cells
+    couplingCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(writeIndex);
+    couplingCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(printIndex);
 
-    // write indices to outer macroscopic cells
-    macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(writeIndex);
-    macroscopicCells.applyToLocalGhostCouplingCellsWithLinkedCells(printIndex);
+    // write indices to outer coupling cells
+    couplingCells.applyToLocalGhostCouplingCellsWithLinkedCells(writeIndex);
+    couplingCells.applyToLocalGhostCouplingCellsWithLinkedCells(printIndex);
 
     delete testInterface;
     testInterface = NULL;
   }
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(MacroscopicCellsTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(CouplingCellsTest);
 
-#endif // _MOLECULARDYNAMICS_COUPLING_TESTS_MACROSCOPICCELLSTEST_H_
+#endif // _MOLECULARDYNAMICS_COUPLING_TESTS_COUPLINGCELLSTEST_H_

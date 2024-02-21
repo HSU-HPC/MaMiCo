@@ -40,22 +40,32 @@ public:
   /** returns acroscopic solver interface
    *  @return _macroscopicSolverInterface
    */
-  coupling::interface::MacroscopicSolverInterface<dim>* getMacroscopicSolverInterface() { return _macroscopicSolverInterface; }
+  coupling::interface::MacroscopicSolverInterface<dim>* getMacroscopicSolverInterface() {
+    return _macroscopicSolverInterface;
+  }
 
   /** sets MD solver interface
    *  @param mdSolverInterface
    */
-  void setMDSolverInterface(coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) { _mdSolverInterface = mdSolverInterface; }
+  void
+  setMDSolverInterface(coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) {
+    _mdSolverInterface = mdSolverInterface;
+  }
 
   /** returns MD solver interface
    *  @return _mdSolverInterface
    */
-  coupling::interface::MDSolverInterface<LinkedCell, dim>* getMDSolverInterface() { return _mdSolverInterface; }
+  coupling::interface::MDSolverInterface<LinkedCell, dim>* getMDSolverInterface() {
+    return _mdSolverInterface;
+  }
 
   /** sets coupling cell service
    *  @return couplingCellService
    */
-  void setCouplingCellService(coupling::services::CouplingCellService<dim>* couplingCellService) { _couplingCellService = couplingCellService; }
+  void
+  setCouplingCellService(coupling::services::CouplingCellService<dim>* couplingCellService) {
+    _couplingCellService = couplingCellService;
+  }
 
   /** returns coupling cell service
    *  @return _couplingCellService

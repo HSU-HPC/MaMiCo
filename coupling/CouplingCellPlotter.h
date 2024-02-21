@@ -161,9 +161,8 @@ private:
         coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2));
     tarch::la::Vector<3, double> original(0.0);
     for (unsigned int d = 0; d < dim; d++) {
-      original[d] =
-          indexConversion.getGlobalMDDomainOffset()[d] - 0.5 * indexConversion.getCouplingCellSize()[d] +
-          indexConversion.getAverageLocalNumberCouplingCells()[d] * indexConversion.getThisProcess()[d] * indexConversion.getCouplingCellSize()[d];
+      original[d] = indexConversion.getGlobalMDDomainOffset()[d] - 0.5 * indexConversion.getCouplingCellSize()[d] +
+                    indexConversion.getAverageLocalNumberCouplingCells()[d] * indexConversion.getThisProcess()[d] * indexConversion.getCouplingCellSize()[d];
     }
     // open file
     open(ID, filename, "MacroscopicCells", rank, t, ofCell);
