@@ -7,6 +7,7 @@
 #include "tarch/la/Vector.h"
 #include "tarch/tinyxml2/tinyxml2.h"
 #include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 
@@ -28,7 +29,7 @@ public:
     conffile.LoadFile(filename.c_str());
     node = conffile.FirstChildElement(topleveltag.c_str());
     if (node == NULL) {
-      std::cout << "Could not read input file " << filename << std::endl;
+      std::cout << "Could not read input file " << std::filesystem::absolute(filename) << std::endl;
       exit(EXIT_FAILURE);
     }
 

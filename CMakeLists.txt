@@ -138,7 +138,26 @@ endif()
 
 if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(LS1_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ls1" CACHE PATH "ls1 source directory")
-  set(LS1_BUILD_DIR_NAME "build" CACHE STRING "ls1 build directory name")
+  set(LS1_BUILD_DIR_NAMES "build-seq;build-par;build" CACHE STRING "ls1 build directory names. First one working is used")
+  list(LENGTH LS1_BUILD_DIR_NAMES NUM_BUILD_DIRS)
+  # we have to use the last one anyway (no other options left in list), so skip that check
+  MATH(EXPR NUM_BUILD_DIRS "${NUM_BUILD_DIRS}-1")
+  set(BUILD_CANDIDATE_IDX 0)
+  list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
+  while(BUILD_CANDIDATE_IDX LESS NUM_BUILD_DIRS)
+    # check if this build dir works
+    if(EXISTS "${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}")
+      load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX CANDIDATE_CACHE_ ENABLE_MPI PRECISION)
+    endif()
+    if(CANDIDATE_CACHE_PRECISION AND (CANDIDATE_CACHE_ENABLE_MPI STREQUAL BUILD_WITH_MPI))
+      # this candidate build dir seems good, stop searching and try it
+      break()
+    endif()
+    # this candidate build dir does not work, try next one in list
+    MATH(EXPR BUILD_CANDIDATE_IDX "${BUILD_CANDIDATE_IDX}+1")
+    list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
+  endwhile()
+  message(STATUS ">> LS1 build directory used: " ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME})
   load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX LS1_CACHE_ ENABLE_AUTOPAS ENABLE_MPI PRECISION ENABLE_VTK ENABLE_ADIOS2 CMAKE_BUILD_TYPE)
   if(NOT LS1_CACHE_PRECISION)
     message(FATAL_ERROR "Could not read the ls1 build cache. Please ensure the path to the ls1 root folder and the name of the build folder are correct.")
@@ -485,7 +504,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/services/CouplingCellService.h"
   "coupling/ErrorEstimation.h"
   "coupling/ParticleInsertion.h"
-  "coupling/IndexConversionMD2Macro.cpph"
   "coupling/SetGivenVelocity4MomentumInsertion.h"
   "coupling/MomentumController.h"
   "coupling/filtering/FilterPipeline.cpph"
@@ -544,7 +562,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/cell-mappings/NieVelocityImpositionMapping.h"
   "coupling/cell-mappings/ZhouBoundaryForce.h"
   "coupling/ZhouBoundaryForceController.h"
-  "coupling/IndexConversionMD2Macro.h"
   "coupling/indexing/CellIndex.cpph"
   "coupling/indexing/IndexingService.cpp"
   "coupling/indexing/Operations.h"
@@ -563,12 +580,10 @@ set(CLANGFORMAT_SOURCES
   "coupling/sendrecv/SendReceiveBuffer.cpph"
   "coupling/sendrecv/FromMacro2MD.cpph"
   "coupling/sendrecv/FromMD2Macro.h"
-  "coupling/IndexConversion.cpph"
   "coupling/UsherParticleInsertion.cpph"
   "coupling/NoBoundaryForce.h"
   "coupling/CouplingMDDefinitions.h"
   "coupling/AdditiveMomentumInsertion.h"
-  "coupling/IndexConversion.h"
   "coupling/transferstrategies/AveragingTransferStrategy.h"
   "coupling/transferstrategies/TransferStrategy4NieCoupling.h"
   "coupling/transferstrategies/TransferStrategy4SchwarzCoupling.h"
@@ -659,6 +674,7 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/solvers/LBCouetteSolverStateTest.cpp"
   "test/unit/coupling/solvers/PintableLBCouetteSolverTest.cpp"
   "test/unit/getTestNames.cpp"
+  "test/unit/coupling/InstanceHandlingTest.cpp"
   "test/unit/coupling/indexing/OperationsTest.cpp"
   "test/unit/coupling/indexing/CellIndexTest.cpp"
   "test/unit/coupling/indexing/IndexingServiceTest.cpp"
@@ -671,7 +687,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
-  "coupling/MPIIndexConversion.h"
   "coupling/InstanceHandling.h"
   "coupling/MomentumInsertion.h"
   "simplemd/services/ExternalForceService.cpp"
