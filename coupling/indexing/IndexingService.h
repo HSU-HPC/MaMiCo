@@ -26,8 +26,7 @@ namespace coupling {
 namespace indexing {
 
 template <unsigned int dim>
-std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex,
-                                                 const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells);
+std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells);
 
 } // namespace indexing
 } // namespace coupling
@@ -56,7 +55,7 @@ public:
     return singleton;
   }
 
-  void init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
+  void init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
             coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
             ,
@@ -76,18 +75,18 @@ public:
   ) {
     // read relevant data from configs
     const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
-    const auto macroscopicCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
+    const auto couplingCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
 
-    // calculate total number of macroscopic cells on all ranks in Base Domain
-    tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
+    // calculate total number of coupling cells on all ranks in Base Domain
+    tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells(0);
     for (unsigned int d = 0; d < dim; d++) {
-      globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
+      globalNumberCouplingCells[d] = (unsigned int)floor(globalMDDomainSize[d] / couplingCellSize[d] + 0.5);
 
-      if (fabs((globalNumberMacroscopicCells[d]) * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13)
+      if (fabs((globalNumberCouplingCells[d]) * couplingCellSize[d] - globalMDDomainSize[d]) > 1e-13)
         std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
     }
 
-    init(globalNumberMacroscopicCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+    init(globalNumberCouplingCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
          mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), msi, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
          ,
@@ -96,7 +95,7 @@ public:
     );
   }
 
-  void init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
+  void init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
             coupling::paralleltopology::ParallelTopologyType type, coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
             ,
@@ -115,7 +114,7 @@ public:
    * Ripped from deprecated IndexConversion.
    *
    * @param globalCellIndex index to be looked up
-   * @param globalNumberMacroscopicCells global number of cells in BaseIndex
+   * @param globalNumberCouplingCells global number of cells in BaseIndex
    * domain EXCLUDING global ghost layer cells.
    * @returns vector of all cells which contain the index
    */
@@ -153,7 +152,7 @@ private:
    */
   // TODO inline in getRanksForGlobalIndex()
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
-                                               const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const;
+                                            const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const;
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;
