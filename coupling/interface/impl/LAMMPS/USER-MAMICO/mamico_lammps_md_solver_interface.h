@@ -25,16 +25,16 @@
 #include "lammps/modify.h"
 #include "lammps/neighbor.h"
 #include "lammps/random_park.h"
-#include "sorting.h"
 #include "lammps/timer.h"
 #include "lammps/update.h"
 #include "lammps/verlet.h"
+#include "sorting.h"
 // the following three lines were included since we had issues when compiling
 // with walberla -> compiler flag stcxx and INT64_MAX do not fit
 // -> use LAMMPS_SMALLSMALL or so as compiler flag to build library
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
-//#define MAXBIGINT INT_MAX
+// #define MAXBIGINT INT_MAX
 
 #include <iomanip>
 #include <iostream>
@@ -53,39 +53,40 @@ namespace LAMMPS_NS {
  */
 template <unsigned int dim> class MamicoLammpsMDSolverInterface : public coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim> {
 public:
-  MamicoLammpsMDSolverInterface(LAMMPS *lmp, int seed, int numberCells, double cutoffRadius)
+  MamicoLammpsMDSolverInterface(LAMMPS* lmp, int seed, int numberCells, double cutoffRadius)
       : coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim>(), _lmp(lmp), _sorting(numberCells, lmp),
         _cutOffRadiusSquared(cutoffRadius * cutoffRadius), _cutOffRadius(cutoffRadius), _atomType(1), _precision(10), _tolerance(1.0e-8),
         _random(new RanPark(lmp, seed)) {
     if (_random == NULL)
       _lmp->error->all(FLERR, "Could not allocated new RanPark!");
-  } virtual ~MamicoLammpsMDSolverInterface() {
+  }
+  virtual ~MamicoLammpsMDSolverInterface() {
     delete _random;
     _random = NULL;
     _lmp = NULL;
   }
 
-  /** returns a particular linked cell inside a macroscopic cell.
-   *  The macroscopic cells are currently located on the same process as the
+  /** returns a particular linked cell inside a coupling cell.
+   *  The coupling cells are currently located on the same process as the
    * respective linked cells. However, several linked cells may be part of a
-   * macroscopic cell. The macroscopic cells also contain a ghost layer which
-   * surrounds each local domain; the very first macroscopic cell inside the
+   * coupling cell. The coupling cells also contain a ghost layer which
+   * surrounds each local domain; the very first coupling cell inside the
    * global MD domain (or local MD domain) is thus given by coordinates (1,1,1)
-   * (or (1,1) in 2D, respectively). The index linkedCellInMacroscopicCell
+   * (or (1,1) in 2D, respectively). The index linkedCellInCouplingCell
    * corresponds to the coordinates of the linked cell inside the given
-   * macroscopic cell. These coordinates thus lie in a range
-   * (0,linkedCellsPerMacroscopicCell-1).
+   * coupling cell. These coordinates thus lie in a range
+   * (0,linkedCellsPerCouplingCell-1).
    */
-  virtual LAMMPS_NS::MamicoCell &getLinkedCell(const tarch::la::Vector<dim, unsigned int> &macroscopicCellIndex,
-                                               const tarch::la::Vector<dim, unsigned int> &linkedCellInMacroscopicCell,
-                                               const tarch::la::Vector<dim, unsigned int> &linkedCellsPerMacroscopicCell,
-                                               const coupling::IndexConversion<dim> &indexConversion) {
-    // we currently embed one cell per macroscopic cell. It is hence sufficient
-    // to use the same enumeration as used for the macroscopic cells
-    const unsigned int index = indexConversion.getLocalCellIndex(macroscopicCellIndex);
+  virtual LAMMPS_NS::MamicoCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& couplingCellIndex,
+                                               const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
+                                               const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell,
+                                               const coupling::IndexConversion<dim>& indexConversion) {
+    // we currently embed one cell per coupling cell. It is hence sufficient
+    // to use the same enumeration as used for the coupling cells
+    const unsigned int index = indexConversion.getLocalCellIndex(couplingCellIndex);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Return linked cell at macro-cell " << macroscopicCellIndex << " no. " << linkedCellInMacroscopicCell << ", assuming "
-              << linkedCellsPerMacroscopicCell << " linked cells per cell: " << index << std::endl;
+    std::cout << "Return linked cell at macro-cell " << couplingCellIndex << " no. " << linkedCellInCouplingCell << ", assuming " << linkedCellsPerCouplingCell
+              << " linked cells per cell: " << index << std::endl;
 #endif
     return _sorting.getMamicoCell(index);
   }
@@ -151,8 +152,8 @@ public:
    * sampled from a Maxwellian assuming a mean flow velocity 'meanVelocity' and
    * a temperature 'temperature' of the fluid.
    */
-  virtual void getInitialVelocity(const tarch::la::Vector<dim, double> &meanVelocity, const double &kB, const double &temperature,
-                                  tarch::la::Vector<dim, double> &initialVelocity) const {
+  virtual void getInitialVelocity(const tarch::la::Vector<dim, double>& meanVelocity, const double& kB, const double& temperature,
+                                  tarch::la::Vector<dim, double>& initialVelocity) const {
     const double stdDeviation = std::sqrt(dim * kB * temperature / getMoleculeMass()); // temperature-based std-deviation of
                                                                                        // gaussian distr.
 
@@ -177,9 +178,9 @@ public:
    * process-local deletion. The synch. is carried out afterwards in
    *  synchronizeMoleculesAfterMassModification.
    */
-  virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim> &molecule, LAMMPS_NS::MamicoCell &cell) {
+  virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, LAMMPS_NS::MamicoCell& cell) {
     const tarch::la::Vector<dim, double> pos = molecule.getPosition(); // position of molecule
-    Atom *atom = _lmp->atom;
+    Atom* atom = _lmp->atom;
 
     // ------ the following code was copied and modified from delete_atoms.cpp
     // ------------------ delete atom from lammps store state before delete
@@ -187,7 +188,7 @@ public:
 
     // delete local atom
     // reset nlocal
-    AtomVec *avec = atom->avec;
+    AtomVec* avec = atom->avec;
     int nlocal = atom->nlocal;
 
     int i = 0;
@@ -214,15 +215,15 @@ public:
     // -> we cannot put this to synchronizeMoleculesAfterMassModification(),
     // since the local numbering of existing atoms might
     //    have already changed as well...
-    const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
+    const coupling::IndexConversion<dim>& indexConversion =
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
     _sorting.updateNonGhostCells(indexConversion);
   }
 
   /** adds the molecule to the MD simulation. */
-  virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim> &molecule) {
-    const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
+  virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) {
+    const coupling::IndexConversion<dim>& indexConversion =
+        coupling::interface::MamicoInterfaceProvider<MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
 
     const int nlocal_previous = _lmp->atom->nlocal;              // no. of atoms before insertion
     tarch::la::Vector<dim, double> pos = molecule.getPosition(); // position of molecule
@@ -240,7 +241,7 @@ public:
     _lmp->atom->avec->create_atom(_atomType, posVec);
     int nlocal = _lmp->atom->nlocal;
     for (int m = 0; m < _lmp->modify->nfix; m++) {
-      Fix *fix = _lmp->modify->fix[m];
+      Fix* fix = _lmp->modify->fix[m];
       if (fix->create_attribute)
         for (int i = nlocal_previous; i < nlocal; i++)
           fix->set_arrays(i);
@@ -284,14 +285,14 @@ public:
   }
 
   /** sets up the potential energy landscape over the domain spanned by
-   * indexOfFirstMacroscopicCell and rangeCoordinates. The first vector denotes
+   * indexOfFirstCouplingCell and rangeCoordinates. The first vector denotes
    * the position of the lower,left,front corner of the domain, rangeCoordinates
-   * the number of macroscopic cells in each spatial direction in which the
+   * the number of coupling cells in each spatial direction in which the
    *  potential energy needs to be computed.
    */
-  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int> &indexOfFirstMacroscopicCell,
-                                             const tarch::la::Vector<dim, unsigned int> &rangeMacroscopicCells,
-                                             const tarch::la::Vector<dim, unsigned int> &linkedCellsPerMacroscopicCell) {
+  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstCouplingCell,
+                                             const tarch::la::Vector<dim, unsigned int>& rangeCouplingCells,
+                                             const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) {
     // nop, potential energy is evaluated for each atom separately when calling
     // getPotentialEnergy()
   }
@@ -303,14 +304,14 @@ public:
    * linked cells and the cell itself to determine potential energy and forces
    * acting on the molecule at position 'position'.
    */
-  virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double> &position) {
-    // currently, we have one mamico(linked) cell per macroscopic cell, so we
-    // can just use the indexing of the macroscopic cells of MaMiCo note:
+  virtual tarch::la::Vector<dim, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<dim, double>& position) {
+    // currently, we have one mamico(linked) cell per coupling cell, so we
+    // can just use the indexing of the coupling cells of MaMiCo note:
     // typically, one should not really access other coupling modules from an
     // interface; however, since this method is expected to be only called AFTER
     // all initialisation processes are finished, this is safe
-    const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
+    const coupling::IndexConversion<dim>& indexConversion =
+        coupling::interface::MamicoInterfaceProvider<MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
     tarch::la::Vector<dim, unsigned int> vectorIndex = indexConversion.getGlobalVectorCellIndex(position);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Linked cell index for position " << position << ": " << vectorIndex << "( global index), corresponds to local vector index of ";
@@ -327,10 +328,10 @@ public:
    * cells. Therefore, another molecule inside the linked cells may even
    * coincide with "molecule". The results are stored within the molecule.
    */
-  virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim> &molecule) {
+  virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim>& molecule) {
     // helper variables and molecule position
-    const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
+    const coupling::IndexConversion<dim>& indexConversion =
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
     const tarch::la::Vector<dim, double> position1 = molecule.getPosition();
     const tarch::la::Vector<dim, unsigned int> cellIndex = getLinkedCellIndexForMoleculePosition(position1);
 
@@ -365,8 +366,8 @@ public:
     for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
       for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
         for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-          LAMMPS_NS::MamicoCell &cell = _sorting.getMamicoCell(indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop)));
-          coupling::interface::MoleculeIterator<MamicoCell, dim> *it = getMoleculeIterator(cell);
+          LAMMPS_NS::MamicoCell& cell = _sorting.getMamicoCell(indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop)));
+          coupling::interface::MoleculeIterator<MamicoCell, dim>* it = getMoleculeIterator(cell);
           for (it->begin(); it->continueIteration(); it->next()) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
             std::cout << "MamicoLammpsMDSolverInterface::calculateForceAndEnergy(): "
@@ -424,7 +425,7 @@ public:
     } else {
       const bool compress_flag = true; // we always want to compress our data TODO CHECK
       if (_lmp->atom->molecular == 0 && compress_flag) {
-        int *tag = _lmp->atom->tag;
+        int* tag = _lmp->atom->tag;
         for (int i = 0; i < _lmp->atom->nlocal; i++)
           tag[i] = 0;
         _lmp->atom->tag_extend();
@@ -444,7 +445,7 @@ public:
     // of lists, so we
     //  choose the "else"-branch from verlet.cpp
     {
-      Verlet *verlet = (Verlet *)_lmp->update->integrate;
+      Verlet* verlet = (Verlet*)_lmp->update->integrate;
       if (verlet == NULL) {
         std::cout << "ERROR synchronizeMoleculesAfterMassModification(): Could not "
                      "cast Integrate* to Verlet*! Only verlet-integration supported!"
@@ -477,8 +478,8 @@ public:
 
     // one more sorting for all cells, since the molecules might have been
     // reordered in parallel exchange
-    const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
+    const coupling::IndexConversion<dim>& indexConversion =
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
     _sorting.updateAllCells(indexConversion);
   }
 
@@ -502,7 +503,7 @@ public:
   }
 
   /** returns a new molecule iterator for a certain linked cell */
-  virtual coupling::interface::MoleculeIterator<LAMMPS_NS::MamicoCell, dim> *getMoleculeIterator(LAMMPS_NS::MamicoCell &cell) {
+  virtual coupling::interface::MoleculeIterator<LAMMPS_NS::MamicoCell, dim>* getMoleculeIterator(LAMMPS_NS::MamicoCell& cell) {
     LAMMPS_NS::MoleculeInformation info;
     if (cell.isGhostCell()) {
       info._x = _sorting.getGhostAtomPositions();
@@ -518,19 +519,16 @@ public:
 
   /** update all cell information -> forward call to _sorting. This is required
      once per time step before the actual coupling */
-  void
-  updateAllCells(const coupling::IndexConversion<dim> &indexConversion) {
-    _sorting.updateAllCells(indexConversion);
-  }
+  void updateAllCells(const coupling::IndexConversion<dim>& indexConversion) { _sorting.updateAllCells(indexConversion); }
 
   /** prints molecules in all cells/inner cells/only ghost cells. For debugging
    * purposes only. */
-  void printMolecules(const coupling::IndexConversion<dim> &indexConversion, typename LAMMPS_NS::Sorting<dim>::PrintType printType) {
+  void printMolecules(const coupling::IndexConversion<dim>& indexConversion, typename LAMMPS_NS::Sorting<dim>::PrintType printType) {
     _sorting.printMolecules(indexConversion, printType);
   }
 
 private:
-  LAMMPS *_lmp;
+  LAMMPS* _lmp;
   Sorting<dim> _sorting;
   const double _cutOffRadiusSquared;
   const double _cutOffRadius;
@@ -538,7 +536,7 @@ private:
                                  // Currently, it is hard-coded and set to 1.
   const unsigned int _precision; // number of digits for number-to-string conversion
   const double _tolerance;       // tolerance in number-to-string conversion
-  RanPark *_random;              // random number generator
+  RanPark* _random;              // random number generator
 };
 
 } // namespace LAMMPS_NS

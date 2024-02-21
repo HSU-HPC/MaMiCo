@@ -18,7 +18,7 @@ namespace LAMMPS_NS {
  */
 template <unsigned int dim> class MamicoLammpsMolecule : public coupling::interface::Molecule<dim> {
 public:
-  MamicoLammpsMolecule(double **x, double **v, double **f, int n, double cutoff)
+  MamicoLammpsMolecule(double** x, double** v, double** f, int n, double cutoff)
       : coupling::interface::Molecule<dim>(), _x(x), _v(v), _f(f), _n(n), _cutOffRadiusSquared(cutoff * cutoff), _tolerance(1.0e-8) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Allocate MamicoLammpsMolecule for molecule " << _n << std::endl;
@@ -26,12 +26,9 @@ public:
   }
 
   // default constructor; no access possible, only null pointers
-  MamicoLammpsMolecule()
-      : coupling::interface::Molecule<dim>(), _x(NULL), _v(NULL), _f(NULL), _n(-1) {
-  }
+  MamicoLammpsMolecule() : coupling::interface::Molecule<dim>(), _x(NULL), _v(NULL), _f(NULL), _n(-1) {}
 
-  virtual tarch::la::Vector<dim, double>
-  getVelocity() const {
+  virtual tarch::la::Vector<dim, double> getVelocity() const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     if (_v == NULL) {
       std::cout << "ERROR getVelocity(): _v==NULL!" << std::endl;
@@ -43,7 +40,7 @@ public:
       vel[d] = _v[_n][d];
     return vel;
   }
-  virtual void setVelocity(const tarch::la::Vector<dim, double> &vel) {
+  virtual void setVelocity(const tarch::la::Vector<dim, double>& vel) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     if (_v == NULL) {
       std::cout << "ERROR setVelocity(): _v==NULL!" << std::endl;
@@ -60,7 +57,7 @@ public:
       pos[d] = _x[_n][d];
     return pos;
   }
-  virtual void setPosition(const tarch::la::Vector<dim, double> &pos) {
+  virtual void setPosition(const tarch::la::Vector<dim, double>& pos) {
     for (unsigned int d = 0; d < dim; d++)
       _x[_n][d] = pos[d];
   }
@@ -77,7 +74,7 @@ public:
       force[d] = _f[_n][d];
     return force;
   }
-  virtual void setForce(const tarch::la::Vector<dim, double> &force) {
+  virtual void setForce(const tarch::la::Vector<dim, double>& force) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     if (_f == NULL) {
       std::cout << "ERROR setForce(): _f==NULL!" << std::endl;
@@ -94,12 +91,12 @@ public:
    */
   virtual double getPotentialEnergy() const {
     // helper variables and molecule position
-    const coupling::IndexConversion<dim> &indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
+    const coupling::IndexConversion<dim>& indexConversion =
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
     const tarch::la::Vector<dim, double> position1 = getPosition();
-    const tarch::la::Vector<dim, unsigned int> linkedCellInMacroscopicCell(0);
-    const tarch::la::Vector<dim, unsigned int> linkedCellsPerMacroscopicCell(1);
-    coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim> *mdSolverInterface =
+    const tarch::la::Vector<dim, unsigned int> linkedCellInCouplingCell(0);
+    const tarch::la::Vector<dim, unsigned int> linkedCellsPerCouplingCell(1);
+    coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim>* mdSolverInterface =
         coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface();
     const tarch::la::Vector<dim, unsigned int> cellIndex = mdSolverInterface->getLinkedCellIndexForMoleculePosition(position1);
 
@@ -132,7 +129,7 @@ public:
     for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
       for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
         for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-          const tarch::la::Vector<dim, unsigned int> macroscopicCellIndex = coupling::initDimVector<dim>(loop);
+          const tarch::la::Vector<dim, unsigned int> couplingCellIndex = coupling::initDimVector<dim>(loop);
           // we take a copy instead of a reference since we do not want to have
           // conflicts in the access of the underlying molecule iterators;
           // Example VTK-plotting: the Mamico-plotter iterates over cells and
@@ -141,8 +138,8 @@ public:
           //                       molecule that
           //                          the "outer" VTK cell iterator points to
           LAMMPS_NS::MamicoCell cell =
-              mdSolverInterface->getLinkedCell(macroscopicCellIndex, linkedCellInMacroscopicCell, linkedCellsPerMacroscopicCell, indexConversion);
-          coupling::interface::MoleculeIterator<MamicoCell, dim> *it = mdSolverInterface->getMoleculeIterator(cell);
+              mdSolverInterface->getLinkedCell(couplingCellIndex, linkedCellInCouplingCell, linkedCellsPerCouplingCell, indexConversion);
+          coupling::interface::MoleculeIterator<MamicoCell, dim>* it = mdSolverInterface->getMoleculeIterator(cell);
           for (it->begin(); it->continueIteration(); it->next()) {
             const tarch::la::Vector<dim, double> rij = it->getConst().getPosition() - position1;
             const double rij2 = tarch::la::dot(rij, rij);
@@ -172,14 +169,14 @@ public:
     return potEnergy;
   }
 
-  virtual void setPotentialEnergy(const double &energy) {
+  virtual void setPotentialEnergy(const double& energy) {
     // nop, since we never explicitly store the energy
   }
 
 private:
-  double **_x;
-  double **_v;
-  double **_f;
+  double** _x;
+  double** _v;
+  double** _f;
   int _n;
   double _cutOffRadiusSquared;
   double _tolerance;

@@ -38,10 +38,10 @@ typedef Molecule MardynMolecule;
 class MarDynMDSolverInterface : public coupling::interface::MDSolverInterface<MarDynCell, 3> {
 
 public:
-  MarDynMDSolverInterface(MarDynCoupledSimulation *simulation)
+  MarDynMDSolverInterface(MarDynCoupledSimulation* simulation)
       : coupling::interface::MDSolverInterface<MarDynCell, 3>(), _mySimulation(simulation), _cutoffRadius(_mySimulation->getLJCutoff()), _tolerance(1.0e-8) {
     if (_mySimulation->getContainerType() == 0) {
-      LinkedCells *lc = (LinkedCells *)_mySimulation->getMolecules();
+      LinkedCells* lc = (LinkedCells*)_mySimulation->getMolecules();
       _haloWidthInNumCells = 2 * (int)(lc->getHaloWidthNumCells());
     } else {
       std::cout << "MarDynMDSolver Constructor - ERROR: unsupported container type!" << std::endl;
@@ -60,51 +60,50 @@ public:
     _marDynCellPtrStorage.clear();
   }
 
-  /** returns a particular linked cell inside a macroscopic cell.
-   *  The macroscopic cells are currently located on the same process as the
+  /** returns a particular linked cell inside a coupling cell.
+   *  The coupling cells are currently located on the same process as the
    * respective linked cells. However, several linked cells may be part of a
-   * macroscopic cell. The macroscopic cells also contain a ghost layer which
-   * surrounds each local domain; the very first macroscopic cell inside the
+   * coupling cell. The coupling cells also contain a ghost layer which
+   * surrounds each local domain; the very first coupling cell inside the
    * global MD domain (or local MD domain) is thus given by coordinates (1,1,1)
-   * (or (1,1) in 2D, respectively). The index linkedCellInMacroscopicCell
+   * (or (1,1) in 2D, respectively). The index linkedCellInCouplingCell
    * corresponds to the coordinates of the linked cell inside the given
-   * macroscopic cell. These coordinates thus lie in a range
-   * (0,linkedCellsPerMacroscopicCell-1).
+   * coupling cell. These coordinates thus lie in a range
+   * (0,linkedCellsPerCouplingCell-1).
    */
-  virtual MarDynCell &getLinkedCell(const tarch::la::Vector<3, unsigned int> &macroscopicCellIndex,
-                                    const tarch::la::Vector<3, unsigned int> &linkedCellInMacroscopic,
-                                    const tarch::la::Vector<3, unsigned int> &linkedCellsPerMacroscopicCell,
-                                    const coupling::IndexConversion<3> &indexConversion) {
+  virtual MarDynCell& getLinkedCell(const tarch::la::Vector<3, unsigned int>& couplingCellIndex,
+                                    const tarch::la::Vector<3, unsigned int>& linkedCellInMacroscopic,
+                                    const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell, const coupling::IndexConversion<3>& indexConversion) {
     // no linked cells found in outer region
     for (unsigned int d = 0; d < 3; d++) {
-      if (macroscopicCellIndex[d] == 0) {
+      if (couplingCellIndex[d] == 0) {
         std::cout << "ERROR in MarDynMDSolverInterface::getLinkedCell(): "
-                     "macroscopic cell index out of range for linked cells!"
+                     "coupling cell index out of range for linked cells!"
                   << std::endl;
         exit(EXIT_FAILURE);
       }
     }
 
-    MarDynCell *cell;
+    MarDynCell* cell;
     if (_mySimulation->getContainerType() == 0) {
-      LinkedCellsForCoupling *cells = (LinkedCellsForCoupling *)_mySimulation->getMolecules();
+      LinkedCellsForCoupling* cells = (LinkedCellsForCoupling*)_mySimulation->getMolecules();
 
-      // size of the macroscopic cells
+      // size of the coupling cells
       tarch::la::Vector<3, double> macroCellSize = indexConversion.getCouplingCellSize();
       // size of the md cells
-      double *mdCellsize = cells->cellLength();
+      double* mdCellsize = cells->cellLength();
       // the requested 3D cell index vector
       tarch::la::Vector<3, unsigned int> requestedCellIndex(0);
       // number of cells in each dimension
-      int *boxWidthInNumCells = cells->boxWidthInNumCells();
+      int* boxWidthInNumCells = cells->boxWidthInNumCells();
 
       // compute requested cell index vector
       for (int d = 0; d < 3; d++) {
-        requestedCellIndex[d] = (int)floor(macroscopicCellIndex[d] * macroCellSize[d] / mdCellsize[d]);
+        requestedCellIndex[d] = (int)floor(couplingCellIndex[d] * macroCellSize[d] / mdCellsize[d]);
         // adjust requested cell index if multiple linked cells per macroscopic
         // cell are used
-        if (linkedCellsPerMacroscopicCell[d] > 1)
-          requestedCellIndex[d] -= (linkedCellsPerMacroscopicCell[d] - 1) - linkedCellInMacroscopic[d];
+        if (linkedCellsPerCouplingCell[d] > 1)
+          requestedCellIndex[d] -= (linkedCellsPerCouplingCell[d] - 1) - linkedCellInMacroscopic[d];
       }
       // compute the Mardyn cell index of the requested cell
       unsigned int cellIndex =
@@ -161,8 +160,8 @@ public:
   virtual double getMoleculeEpsilon() const { return _mySimulation->getEnsemble()->component(0)->ljcenter(0).eps(); }
 
   /* sets a random velocity in the vector 'initialVelocity' */
-  virtual void getInitialVelocity(const tarch::la::Vector<3, double> &meanVelocity, const double &kB, const double &temperature,
-                                  tarch::la::Vector<3, double> &initialVelocity) const {
+  virtual void getInitialVelocity(const tarch::la::Vector<3, double>& meanVelocity, const double& kB, const double& temperature,
+                                  tarch::la::Vector<3, double>& initialVelocity) const {
     // temperature based standard deviation of gaussian distribution
     const double standardDeviation = std::sqrt(kB * 3 * temperature / getMoleculeMass());
 
@@ -179,11 +178,11 @@ public:
   }
 
   /* deletes the molecule from the MD simulation */
-  virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<3> &molecule, MarDynCell &cell) {
+  virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<3>& molecule, MarDynCell& cell) {
     // molecule position
     const tarch::la::Vector<3, double> position = molecule.getPosition();
 
-    MardynMolecule *curMolecule;
+    MardynMolecule* curMolecule;
     bool success = false;
     bool moleculeFound = true;
     tarch::la::Vector<3, double> curMoleculePosition(0.0);
@@ -222,7 +221,7 @@ public:
   }
 
   /* adds the molecule to the MD simulation */
-  virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<3> &molecule) {
+  virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<3>& molecule) {
     // create a MarDynMolecule and set molecule id to maxiID+1
     MardynMolecule mdmw;
     const tarch::la::Vector<3, double> pos(molecule.getPosition());
@@ -242,23 +241,23 @@ public:
   }
 
   /* sets up the potential energy landscape */
-  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<3, unsigned int> &indexOfFirstMacroscopicCell,
-                                             const tarch::la::Vector<3, unsigned int> &rangeMacroscopicCells,
-                                             const tarch::la::Vector<3, unsigned int> &linkedCellsPerMacroscopicCell) {
+  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<3, unsigned int>& indexOfFirstCouplingCell,
+                                             const tarch::la::Vector<3, unsigned int>& rangeCouplingCells,
+                                             const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell) {
     // The potential energy is calculated for each molecule individually using
     // the getPotentialEnergy() method of the MoleculeWrapper interface.
     // Therefore this method does nothing for now.
   }
 
   /* returns the local index vector */
-  virtual tarch::la::Vector<3, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<3, double> &position) {
+  virtual tarch::la::Vector<3, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<3, double>& position) {
     tarch::la::Vector<3, double> cellLength(0.0);
     tarch::la::Vector<3, double> haloBoundingBoxMin(0.0);
     tarch::la::Vector<3, unsigned int> cellIndex(0);
 
     // get cell length and halo bounding box values for all dimensions
     if (_mySimulation->getContainerType() == 0) {
-      LinkedCells *cells = (LinkedCells *)_mySimulation->getMolecules();
+      LinkedCells* cells = (LinkedCells*)_mySimulation->getMolecules();
       for (int d = 0; d < 3; d++) {
         cellLength[d] = (cells->cellLength())[d];
         haloBoundingBoxMin[d] = cells->getBoundingBoxMin(d) - cells->get_halo_L(d);
@@ -278,14 +277,14 @@ public:
   }
 
   /** calculates force and energy for a molecule */
-  virtual void calculateForceAndEnergy(coupling::interface::Molecule<3> &molecule) {
+  virtual void calculateForceAndEnergy(coupling::interface::Molecule<3>& molecule) {
     // the requested force and energy
     tarch::la::Vector<3, double> force(0.0);
     double potentialEnergy = 0.0;
     // molecule position
     const tarch::la::Vector<3, double> moleculePosition = molecule.getPosition();
     bool moleculeFound = false;
-    Molecule *moleculeInSim = NULL;
+    Molecule* moleculeInSim = NULL;
     // use a legacy cell processor  (the vectorized version seems not to work
     // for molecules that are not part of the sim)
     LegacyCellProcessor legacyCellProcessor(_cutoffRadius, _mySimulation->getLJCutoff(), _mySimulation->getTersoffCutoff(),
@@ -293,7 +292,7 @@ public:
 
     if (_mySimulation->getContainerType() == 0) {
       // get cell index for the molecule
-      LinkedCells *lc = (LinkedCells *)_mySimulation->getMolecules();
+      LinkedCells* lc = (LinkedCells*)_mySimulation->getMolecules();
       Molecule refMolecule;
       for (int d = 0; d < 3; d++)
         refMolecule.setr(d, molecule.getPosition()[d]);
@@ -370,22 +369,17 @@ public:
   virtual double getDt() { return _mySimulation->getTimestepLength(); }
 
   /* returns a new molecule iterator for a certain linked cell */
-  virtual coupling::interface::MoleculeIterator<MarDynCell, 3> *getMoleculeIterator(MarDynCell &cell) {
-    return new MarDynMoleculeIterator(cell);
-  }
+  virtual coupling::interface::MoleculeIterator<MarDynCell, 3>* getMoleculeIterator(MarDynCell& cell) { return new MarDynMoleculeIterator(cell); }
 
   // returns a pointer to the MarDynCoupledSimulation belonging to this
   // interface
-  MarDynCoupledSimulation *
-  getSimulation() {
-    return _mySimulation;
-  }
+  MarDynCoupledSimulation* getSimulation() { return _mySimulation; }
 
 protected:
   // calculates the force of a Molecule that is not in the Mardyn simulation
-  tarch::la::Vector<3, double> calculateForce(Molecule *molecule, tarch::la::Vector<3, unsigned int> cellIndexVector) {
-    LinkedCellsForCoupling *cells = (LinkedCellsForCoupling *)_mySimulation->getMolecules();
-    int *boxWidthInNumCells = cells->boxWidthInNumCells();
+  tarch::la::Vector<3, double> calculateForce(Molecule* molecule, tarch::la::Vector<3, unsigned int> cellIndexVector) {
+    LinkedCellsForCoupling* cells = (LinkedCellsForCoupling*)_mySimulation->getMolecules();
+    int* boxWidthInNumCells = cells->boxWidthInNumCells();
     tarch::la::Vector<3, double> force(0.0);
     tarch::la::Vector<3, double> position1(molecule->r(0), molecule->r(1), molecule->r(2));
     const double cutoffSquared = _cutoffRadius * _cutoffRadius;
@@ -408,7 +402,7 @@ protected:
           unsigned int cellIndex =
               (loop[2] * (boxWidthInNumCells[1] + _haloWidthInNumCells) + loop[1]) * (boxWidthInNumCells[0] + _haloWidthInNumCells) + loop[0];
           MarDynCell cell(cells->getCellPointer(cellIndex), _cutoffRadius);
-          coupling::interface::MoleculeIterator<MarDynCell, 3> *mdmi(getMoleculeIterator(cell));
+          coupling::interface::MoleculeIterator<MarDynCell, 3>* mdmi(getMoleculeIterator(cell));
 
           // loop through all molecules of the current cell
           for (mdmi->begin(); mdmi->continueIteration(); mdmi->next()) {
@@ -429,7 +423,7 @@ protected:
   }
 
   // the simulation object
-  MarDynCoupledSimulation *_mySimulation;
+  MarDynCoupledSimulation* _mySimulation;
   // the amount of halo cells in each dimension
   int _haloWidthInNumCells;
   // the cutoff radius of the simulation
@@ -441,7 +435,7 @@ protected:
    * pointers to avoid memory leak the pointers are stored and this vector
    * cleared in the Destructor
    */
-  std::vector<MarDynCell *> _marDynCellPtrStorage;
+  std::vector<MarDynCell*> _marDynCellPtrStorage;
 };
 
 #endif /* MARDYNMDSOLVERINTERFACE_H_ */

@@ -31,7 +31,7 @@ public:
    */
   virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return false; }
 
-  /** returns the ranks on which the macroscopic solver holds/requires data of the macroscopic cell
+  /** returns the ranks on which the macroscopic solver holds/requires data of the coupling cell
    *  at index globalCellIndex.
    */
   virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
@@ -40,17 +40,17 @@ public:
     return result;
   }
 
-  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getMacroscopicCells4Sending() {
+  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getCouplingCells4Sending() {
     std::vector<coupling::datastructures::CouplingCell<dim>*> result;
     return result;
   }
-  virtual unsigned int* getMacroscopicCellIndices4Sending() { return NULL; }
+  virtual unsigned int* getCouplingCellIndices4Sending() { return NULL; }
 
-  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getMacroscopicCells4Receiving() {
+  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getCouplingCells4Receiving() {
     std::vector<coupling::datastructures::CouplingCell<dim>*> result;
     return result;
   }
-  virtual unsigned int* getMacroscopicCellIndices4Receiving() { return NULL; }
+  virtual unsigned int* getCouplingCellIndices4Receiving() { return NULL; }
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_INTERFACE_VOIDMACROSCOPICSOLVERINTERFACE_H_

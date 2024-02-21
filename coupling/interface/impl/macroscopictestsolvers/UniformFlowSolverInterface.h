@@ -19,10 +19,10 @@ template <unsigned int dim> class UniformFlowSolverInterface;
  */
 template <unsigned int dim> class coupling::interface::UniformFlowSolverInterface : public coupling::interface::TestMacroscopicSolverInterface<dim> {
 public:
-  UniformFlowSolverInterface(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, double massPerMacroscopicCell,
-                             tarch::la::Vector<dim, double> momentumPerMacroscopicCell)
-      : TestMacroscopicSolverInterface<dim>(), _totalNumberMacroscopicCells(initTotalNumberMacroscopicCells(globalNumberMacroscopicCells)),
-        _massPerMacroscopicCell(massPerMacroscopicCell), _momentumPerMacroscopicCell(momentumPerMacroscopicCell) {}
+  UniformFlowSolverInterface(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, double massPerCouplingCell,
+                             tarch::la::Vector<dim, double> momentumPerCouplingCell)
+      : TestMacroscopicSolverInterface<dim>(), _totalNumberCouplingCells(initTotalNumberCouplingCells(globalNumberCouplingCells)),
+        _massPerCouplingCell(massPerCouplingCell), _momentumPerCouplingCell(momentumPerCouplingCell) {}
   virtual ~UniformFlowSolverInterface() {}
 
   /** no values are received. */
@@ -40,51 +40,51 @@ public:
     return result;
   }
 
-  /** add every macroscopic cell with mass and momentum to the send buffer */
-  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getMacroscopicCells4Sending() {
+  /** add every coupling cell with mass and momentum to the send buffer */
+  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getCouplingCells4Sending() {
     std::vector<coupling::datastructures::CouplingCell<dim>*> result;
-    for (unsigned int i = 0; i < _totalNumberMacroscopicCells; i++) {
+    for (unsigned int i = 0; i < _totalNumberCouplingCells; i++) {
       result.push_back(new coupling::datastructures::CouplingCell<dim>());
       if (result[i] == NULL) {
         std::cout << "ERROR coupling::interface::UniformFlowSolverInterface: result[i]==NULL!" << std::endl;
         exit(EXIT_FAILURE);
       }
-      result[i]->setMicroscopicMass(_massPerMacroscopicCell);
-      result[i]->setMicroscopicMomentum(_momentumPerMacroscopicCell);
+      result[i]->setMicroscopicMass(_massPerCouplingCell);
+      result[i]->setMicroscopicMomentum(_momentumPerCouplingCell);
     }
     return result;
   }
   /** add every index to the send buffer */
-  virtual unsigned int* getMacroscopicCellIndices4Sending() {
-    unsigned int* indices = new unsigned int[_totalNumberMacroscopicCells];
+  virtual unsigned int* getCouplingCellIndices4Sending() {
+    unsigned int* indices = new unsigned int[_totalNumberCouplingCells];
     if (indices == NULL) {
       std::cout << "ERROR coupling::interface::UniformFlowSolverInterface: indices==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    for (unsigned int i = 0; i < _totalNumberMacroscopicCells; i++) {
+    for (unsigned int i = 0; i < _totalNumberCouplingCells; i++) {
       indices[i] = i;
     }
     return indices;
   }
 
   /** nothing is received */
-  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getMacroscopicCells4Receiving() {
+  virtual std::vector<coupling::datastructures::CouplingCell<dim>*> getCouplingCells4Receiving() {
     std::vector<coupling::datastructures::CouplingCell<dim>*> result;
     return result;
   }
-  virtual unsigned int* getMacroscopicCellIndices4Receiving() { return NULL; }
+  virtual unsigned int* getCouplingCellIndices4Receiving() { return NULL; }
 
 private:
-  /** total number of macroscopic cells incl. ghost layers */
-  const unsigned int _totalNumberMacroscopicCells;
-  /** mass and momentum that is assumed to be placed in each macroscopic cell on this solver's side. */
-  const double _massPerMacroscopicCell;
-  const tarch::la::Vector<dim, double> _momentumPerMacroscopicCell;
+  /** total number of coupling cells incl. ghost layers */
+  const unsigned int _totalNumberCouplingCells;
+  /** mass and momentum that is assumed to be placed in each coupling cell on this solver's side. */
+  const double _massPerCouplingCell;
+  const tarch::la::Vector<dim, double> _momentumPerCouplingCell;
 
-  /** returns the total number of macroscopic cells incl. ghost layers */
-  unsigned int initTotalNumberMacroscopicCells(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells) const {
+  /** returns the total number of coupling cells incl. ghost layers */
+  unsigned int initTotalNumberCouplingCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells) const {
     // total number cells = global number cells + ghost layers
-    tarch::la::Vector<dim, unsigned int> totalNumberCells = globalNumberMacroscopicCells + tarch::la::Vector<dim, unsigned int>(2);
+    tarch::la::Vector<dim, unsigned int> totalNumberCells = globalNumberCouplingCells + tarch::la::Vector<dim, unsigned int>(2);
     unsigned int num = totalNumberCells[0];
     for (unsigned int d = 1; d < dim; d++) {
       num = num * totalNumberCells[d];

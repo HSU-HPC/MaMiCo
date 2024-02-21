@@ -17,12 +17,12 @@ class coupling::interface::Helper {
 public:
   template <unsigned int dim>
   static tarch::la::Vector<dim, unsigned int> getGlobalNumberCouplingCells(tarch::la::Vector<dim, double> mdDomainSize,
-                                                                           tarch::la::Vector<dim, double> macroscopicCellSize) {
-    tarch::la::Vector<dim, unsigned int> numberMacroscopicCells(0);
+                                                                           tarch::la::Vector<dim, double> couplingCellSize) {
+    tarch::la::Vector<dim, unsigned int> numberCouplingCells(0);
     for (unsigned int d = 0; d < dim; d++) {
-      numberMacroscopicCells[d] = (unsigned int)floor(mdDomainSize[d] / macroscopicCellSize[d] + 0.5);
+      numberCouplingCells[d] = (unsigned int)floor(mdDomainSize[d] / couplingCellSize[d] + 0.5);
     }
-    return numberMacroscopicCells;
+    return numberCouplingCells;
   }
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_INTERFACE_MACROSCOPICTESTSOLVERSHELPER_H_

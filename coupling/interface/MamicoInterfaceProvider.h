@@ -52,15 +52,15 @@ public:
    */
   coupling::interface::MDSolverInterface<LinkedCell, dim>* getMDSolverInterface() { return _mdSolverInterface; }
 
-  /** sets macroscopic cell service
+  /** sets coupling cell service
    *  @return couplingCellService
    */
   void setCouplingCellService(coupling::services::CouplingCellService<dim>* couplingCellService) { _couplingCellService = couplingCellService; }
 
-  /** returns macroscopic cell service
+  /** returns coupling cell service
    *  @return _couplingCellService
    */
-  coupling::services::CouplingCellService<dim>* getMacroscopicCellService() { return _couplingCellService; }
+  coupling::services::CouplingCellService<dim>* getCouplingCellService() { return _couplingCellService; }
 
 private:
   /** Private constructor, creation throgh a pointer and set functions
