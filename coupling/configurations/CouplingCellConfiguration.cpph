@@ -21,18 +21,18 @@ template <unsigned int dim> void coupling::configurations::CouplingCellConfigura
   tarch::la::Vector<dim, int> getCells(-1);
   int buffer = -1;
 
-  // parse macroscopic cell size
-  tarch::configuration::ParseConfiguration::readVectorMandatory<dim, double>(_macroscopicCellSize, node, MACROSCOPIC_CELL_SIZE);
+  // parse coupling cell size
+  tarch::configuration::ParseConfiguration::readVectorMandatory<dim, double>(_couplingCellSize, node, MACROSCOPIC_CELL_SIZE);
   for (unsigned int d = 0; d < dim; d++) {
-    if (_macroscopicCellSize[d] <= 0.0) {
+    if (_couplingCellSize[d] <= 0.0) {
       std::cout << "ERROR coupling::configurations::CouplingCellConfiguration: ";
-      std::cout << "Macroscopic cell size " << d << " is smaller than or equal zero!" << std::endl;
+      std::cout << "Coupling cell size " << d << " is smaller than or equal zero!" << std::endl;
       _isValid = false;
       exit(EXIT_FAILURE);
     }
   }
 
-  // parse linked cells per macroscopic cell
+  // parse linked cells per coupling cell
   tarch::configuration::ParseConfiguration::readVectorMandatory<dim, int>(getCells, node, LINKED_CELLS_PER_MACROSCOPIC_CELL);
   for (unsigned int d = 0; d < dim; d++) {
     if (getCells[d] <= 0) {
@@ -41,7 +41,7 @@ template <unsigned int dim> void coupling::configurations::CouplingCellConfigura
       _isValid = false;
       exit(EXIT_FAILURE);
     }
-    _linkedCellsPerMacroscopicCell[d] = (unsigned int)getCells[d];
+    _linkedCellsPerCouplingCell[d] = (unsigned int)getCells[d];
   }
 
   // parse write-every-microscopic-timestep

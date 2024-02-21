@@ -63,9 +63,9 @@ public:
   bool isValid() const { return _isValid; }
 
   /**
-   *  @return _macroscopicCellConfiguration
+   *  @return _couplingCellConfiguration
    */
-  const coupling::configurations::CouplingCellConfiguration<dim>& getCouplingCellConfiguration() const { return _macroscopicCellConfiguration; }
+  const coupling::configurations::CouplingCellConfiguration<dim>& getCouplingCellConfiguration() const { return _couplingCellConfiguration; }
 
   /**
    *  @return _particleInsertionConfiguration
@@ -155,7 +155,7 @@ public:
 
 private:
   bool _isValid;
-  coupling::configurations::CouplingCellConfiguration<dim> _macroscopicCellConfiguration;
+  coupling::configurations::CouplingCellConfiguration<dim> _couplingCellConfiguration;
   coupling::configurations::ParticleInsertionConfiguration _particleInsertionConfiguration;
   coupling::configurations::MomentumInsertionConfiguration _momentumInsertionConfiguration;
   coupling::configurations::BoundaryForceConfiguration<dim> _boundaryForceConfiguration;
@@ -172,4 +172,4 @@ private:
 };
 #include "coupling/configurations/MaMiCoConfiguration.cpph"
 
-#endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MACROSCOPICCELLCONFIGURATION_H_
+#endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MAMICOCONFIGURATION_H_
