@@ -34,10 +34,10 @@ public:
   virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1; }
 
   /** @brief a dummy function, which doesn't do anything
-   * @param cell the macroscopic cell to not change
-   * @param currentMacroscopicCellIndex the local linearised index of the cell*/
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentMacroscopicCellIndex) const {}
+   * @param cell the coupling cell to not change
+   * @param currentCouplingCellIndex the local linearised index of the cell*/
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                              const unsigned int& currentCouplingCellIndex) const {}
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_NOMOMENTUMINSERTION_H_

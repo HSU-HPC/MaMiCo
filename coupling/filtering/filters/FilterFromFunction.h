@@ -25,8 +25,8 @@ template <unsigned int dim> class FilterFromFunction;
 template <unsigned int dim> class coupling::filtering::FilterFromFunction : public coupling::filtering::FilterInterface<dim> {
 public:
   FilterFromFunction(
-      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, std::array<bool, 7> filteredValues,
+      const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
+      const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, std::array<bool, 7> filteredValues,
       const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
       const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector)
       : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "FFF"), _applyScalar(applyScalar),

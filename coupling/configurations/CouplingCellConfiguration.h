@@ -2,8 +2,8 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MACROSCOPICCELLCONFIGURATION_H_
-#define _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MACROSCOPICCELLCONFIGURATION_H_
+#ifndef _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_COUPLINGCELLCONFIGURATION_H_
+#define _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_COUPLINGCELLCONFIGURATION_H_
 
 #include "tarch/configuration/Configuration.h"
 #include "tarch/la/Vector.h"
@@ -11,25 +11,25 @@
 
 namespace coupling {
 namespace configurations {
-template <unsigned int dim> class MacroscopicCellConfiguration;
+template <unsigned int dim> class CouplingCellConfiguration;
 }
 } // namespace coupling
 
-/** configuration for output of macroscopic cell data to vtk files. Derive from
+/** configuration for output of coupling cell data to vtk files. Derive from
  *the class tarch::configuration::Configuration
- *	@brief configuration for output of macroscopic cell data to vtk files.
+ *	@brief configuration for output of coupling cell data to vtk files.
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <unsigned int dim> class coupling::configurations::MacroscopicCellConfiguration : public tarch::configuration::Configuration {
+template <unsigned int dim> class coupling::configurations::CouplingCellConfiguration : public tarch::configuration::Configuration {
 public:
   /** Constructor, initializes the class  */
-  MacroscopicCellConfiguration()
-      : _isValid(true), _macroscopicCellSize(0.0), _linkedCellsPerMacroscopicCell(0), _writeEveryMicroscopicTimestep(0), _microscopicFilename(""),
+  CouplingCellConfiguration()
+      : _isValid(true), _couplingCellSize(0.0), _linkedCellsPerCouplingCell(0), _writeEveryMicroscopicTimestep(0), _microscopicFilename(""),
         _writeEveryMacroscopicTimestep(0), _macroscopicFilename("") {}
 
   /** Destructor */
-  ~MacroscopicCellConfiguration() {}
+  ~CouplingCellConfiguration() {}
 
   /** parseSubtag
    * 	@param node
@@ -50,15 +50,15 @@ public:
    */
   bool isValid() const { return _isValid; }
 
-  /** Returns the macroscopic cell size
-   * 	@return _macroscopicCellSize
+  /** Returns the coupling cell size
+   * 	@return _couplingCellSize
    */
-  tarch::la::Vector<dim, double> getMacroscopicCellSize() const { return _macroscopicCellSize; }
+  tarch::la::Vector<dim, double> getCouplingCellSize() const { return _couplingCellSize; }
 
-  /** Returns the number of linked cell encapsulated within a macroscopic cell
-   * 	@return _linkedCellsPerMacroscopicCell
+  /** Returns the number of linked cell encapsulated within a coupling cell
+   * 	@return _linkedCellsPerCouplingCell
    */
-  tarch::la::Vector<dim, unsigned int> getNumberLinkedCellsPerMacroscopicCell() const { return _linkedCellsPerMacroscopicCell; }
+  tarch::la::Vector<dim, unsigned int> getNumberLinkedCellsPerCouplingCell() const { return _linkedCellsPerCouplingCell; }
 
   /** Returns step interval, at which the micro infos is to be written out
    * 	@return _writeEveryMicroscopicTimestep
@@ -79,29 +79,29 @@ public:
   std::string getMacroscopicFilename() const { return _macroscopicFilename; }
 
 protected:
-  MacroscopicCellConfiguration(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> linkedCellsPerMacroscopicCell,
-                               unsigned int writeEveryMicroscopicTimestep, std::string microscopicFilename, unsigned int writeEveryMacroscopicTimestep,
-                               std::string macroscopicFilename)
-      : _isValid(true), _macroscopicCellSize(macroscopicCellSize), _linkedCellsPerMacroscopicCell(linkedCellsPerMacroscopicCell),
+  CouplingCellConfiguration(tarch::la::Vector<dim, double> couplingCellSize, tarch::la::Vector<dim, unsigned int> linkedCellsPerCouplingCell,
+                            unsigned int writeEveryMicroscopicTimestep, std::string microscopicFilename, unsigned int writeEveryMacroscopicTimestep,
+                            std::string macroscopicFilename)
+      : _isValid(true), _couplingCellSize(couplingCellSize), _linkedCellsPerCouplingCell(linkedCellsPerCouplingCell),
         _writeEveryMicroscopicTimestep(writeEveryMicroscopicTimestep), _microscopicFilename(microscopicFilename),
         _writeEveryMacroscopicTimestep(writeEveryMacroscopicTimestep), _macroscopicFilename(macroscopicFilename) {}
 
 private:
-  static const std::string MACROSCOPIC_CELL_SIZE;
-  static const std::string LINKED_CELLS_PER_MACROSCOPIC_CELL;
+  static const std::string COUPLING_CELL_SIZE;
+  static const std::string LINKED_CELLS_PER_COUPLING_CELL;
   static const std::string WRITE_EVERY_MICROSCOPIC_TIMESTEP;
   static const std::string WRITE_EVERY_MACROSCOPIC_TIMESTEP;
   static const std::string MICROSCOPIC_FILENAME;
   static const std::string MACROSCOPIC_FILENAME;
 
   bool _isValid;
-  tarch::la::Vector<dim, double> _macroscopicCellSize;
-  tarch::la::Vector<dim, unsigned int> _linkedCellsPerMacroscopicCell;
+  tarch::la::Vector<dim, double> _couplingCellSize;
+  tarch::la::Vector<dim, unsigned int> _linkedCellsPerCouplingCell;
   unsigned int _writeEveryMicroscopicTimestep;
   std::string _microscopicFilename;
   unsigned int _writeEveryMacroscopicTimestep;
   std::string _macroscopicFilename;
 };
-#include "coupling/configurations/MacroscopicCellConfiguration.cpph"
+#include "coupling/configurations/CouplingCellConfiguration.cpph"
 
-#endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MACROSCOPICCELLCONFIGURATION_H_
+#endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_COUPLINGCELLCONFIGURATION_H_

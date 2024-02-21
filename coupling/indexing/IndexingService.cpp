@@ -317,7 +317,7 @@ const char CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2ma
 
 // raw date based variant of init
 template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
+void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                                                     tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType type,
                                                     unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -325,9 +325,9 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
                                                     MPI_Comm comm
 #endif
 ) {
-  coupling::interface::MacroscopicSolverInterface<dim>* msi = new coupling::solvers::CouetteSolverInterface<dim>(globalNumberMacroscopicCells, outerRegion);
+  coupling::interface::MacroscopicSolverInterface<dim>* msi = new coupling::solvers::CouetteSolverInterface<dim>(globalNumberCouplingCells, outerRegion);
 
-  init(globalNumberMacroscopicCells, numberProcesses, type, msi, rank
+  init(globalNumberCouplingCells, numberProcesses, type, msi, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
        ,
        comm
@@ -337,7 +337,7 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
 
 // delegated init, this does the main work
 template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells,
+void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                                                     tarch::la::Vector<dim, unsigned int> numberProcesses,
                                                     coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
                                                     coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
@@ -358,13 +358,13 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
   }
 #endif
 
-  // TODO: make this globalNumberMacroscopicCells and remove all usages of the
+  // TODO: make this globalNumberCouplingCells and remove all usages of the
   // old meaning (seen above)
-  const auto globalNumberMacroscopicCellsInclGL{globalNumberMacroscopicCells + tarch::la::Vector<dim, unsigned int>{2}};
+  const auto globalNumberCouplingCellsInclGL{globalNumberCouplingCells + tarch::la::Vector<dim, unsigned int>{2}};
 
   // init boundaries of all global, non-m2m, GL including indexing types
   CellIndex<dim>::lowerBoundary = {0};
-  CellIndex<dim>::upperBoundary = tarch::la::Vector<dim, int>{globalNumberMacroscopicCellsInclGL - tarch::la::Vector<dim, unsigned int>{1}};
+  CellIndex<dim>::upperBoundary = tarch::la::Vector<dim, int>{globalNumberCouplingCellsInclGL - tarch::la::Vector<dim, unsigned int>{1}};
   CellIndex<dim>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector>::lowerBoundary = CellIndex<dim>::lowerBoundary;
@@ -373,8 +373,7 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
 
   // init boundaries of all global, non-m2m, GL excluding indexing types
   CellIndex<dim, IndexTrait::noGhost>::lowerBoundary = {1};
-  CellIndex<dim, IndexTrait::noGhost>::upperBoundary =
-      tarch::la::Vector<dim, int>{globalNumberMacroscopicCellsInclGL - tarch::la::Vector<dim, unsigned int>{2}};
+  CellIndex<dim, IndexTrait::noGhost>::upperBoundary = tarch::la::Vector<dim, int>{globalNumberCouplingCellsInclGL - tarch::la::Vector<dim, unsigned int>{2}};
   CellIndex<dim, IndexTrait::noGhost>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::noGhost>::lowerBoundary;
@@ -545,9 +544,9 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 #endif
 
   std::vector<unsigned int> ranks;
-  // using the old meaning of 'globalNumberMacroscopicCells' from
+  // using the old meaning of 'globalNumberCouplingCells' from
   // IndexConversion
-  const auto globalNumberMacroscopicCells = BaseIndex<dim>::numberCellsInDomain - tarch::la::Vector<dim, unsigned int>{2};
+  const auto globalNumberCouplingCells = BaseIndex<dim>::numberCellsInDomain - tarch::la::Vector<dim, unsigned int>{2};
 
   // start and end coordinates of neighboured cells.
   tarch::la::Vector<3, unsigned int> start(0);
@@ -561,7 +560,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
     if ((unsigned int)globalCellIndex.get()[d] > 0) {
       start[d] = (unsigned int)globalCellIndex.get()[d] - 1;
     }
-    end[d] = globalNumberMacroscopicCells[d] + 1;
+    end[d] = globalNumberCouplingCells[d] + 1;
     if ((unsigned int)globalCellIndex.get()[d] < end[d]) {
       end[d] = (unsigned int)globalCellIndex.get()[d] + 1;
     }
@@ -579,7 +578,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
         }
 
         // determine the unique rank for this cell
-        const unsigned int rank = getUniqueRankForMacroscopicCell(thisGlobalCellIndex, globalNumberMacroscopicCells);
+        const unsigned int rank = getUniqueRankForCouplingCell(thisGlobalCellIndex, globalNumberCouplingCells);
 
         // add this rank to the vector with all ranks if we did not add this one
         // before
@@ -603,43 +602,43 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 
 /*
  * This was in large parts stolen from IndexConversion.
- * Note that this uses the globalNumberMacroscopicCells definition excl. the
+ * Note that this uses the globalNumberCouplingCells definition excl. the
  * ghost layer.
  */
 template <unsigned int dim>
 unsigned int
-coupling::indexing::IndexingService<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
-                                                                          const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const {
+coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
+                                                                       const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const {
   // vector containing avg number of macro cells, not counting global GL.
-  tarch::la::Vector<dim, unsigned int> averageLocalNumberMacroscopicCells{0};
+  tarch::la::Vector<dim, unsigned int> averageLocalNumberCouplingCells{0};
   for (unsigned int d = 0; d < dim; d++) {
-    if (globalCellIndex[d] >= globalNumberMacroscopicCells[d] + 2) { // greater or equal to the total global number incl GL (+2)
+    if (globalCellIndex[d] >= globalNumberCouplingCells[d] + 2) { // greater or equal to the total global number incl GL (+2)
       using namespace std::string_literals;
-      throw std::runtime_error("IndexingService: getUniqueRankForMacroscopicCell(): Global cell index greater than global size in dim "s + std::to_string(d));
+      throw std::runtime_error("IndexingService: getUniqueRankForCouplingCell(): Global cell index greater than global size in dim "s + std::to_string(d));
     }
-    if (globalNumberMacroscopicCells[d] % _numberProcesses[d] != 0) {
+    if (globalNumberCouplingCells[d] % _numberProcesses[d] != 0) {
       std::stringstream ss;
-      ss << "IndexingService: getUniqueRankForMacroscopicCell(): ERROR: Number "
-            "of macroscopic cells must be divisible by number of processes! ";
-      ss << "globalNumberMacroscopicCells = " << globalNumberMacroscopicCells;
+      ss << "IndexingService: getUniqueRankForCouplingCell(): ERROR: Number "
+            "of coupling cells must be divisible by number of processes! ";
+      ss << "globalNumberCouplingCells = " << globalNumberCouplingCells;
       ss << ", numberProcesses = " << _numberProcesses;
       throw std::runtime_error(ss.str());
     }
-    averageLocalNumberMacroscopicCells[d] = globalNumberMacroscopicCells[d] / _numberProcesses[d];
+    averageLocalNumberCouplingCells[d] = globalNumberCouplingCells[d] / _numberProcesses[d];
   }
 
   tarch::la::Vector<dim, unsigned int> processCoords(0);
   for (unsigned int d = 0; d < dim; d++) {
     // special case: cell in first section
-    if (globalCellIndex[d] < averageLocalNumberMacroscopicCells[d] + 1) {
+    if (globalCellIndex[d] < averageLocalNumberCouplingCells[d] + 1) {
       processCoords[d] = 0;
       // special case: cell in last section
-    } else if (globalCellIndex[d] > averageLocalNumberMacroscopicCells[d] * (_numberProcesses[d] - 1)) {
+    } else if (globalCellIndex[d] > averageLocalNumberCouplingCells[d] * (_numberProcesses[d] - 1)) {
       processCoords[d] = _numberProcesses[d] - 1;
       // all other cases
     } else {
       // remove ghost layer contribution from vector index (...-1)
-      processCoords[d] = (globalCellIndex[d] - 1) / averageLocalNumberMacroscopicCells[d];
+      processCoords[d] = (globalCellIndex[d] - 1) / averageLocalNumberCouplingCells[d];
     }
   }
 

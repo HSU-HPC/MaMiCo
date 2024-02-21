@@ -18,8 +18,8 @@ class LBCouetteSolverInterface;
  *  the outer region to MD. What "outer" means is specified by the arguments of
  * the interface; moreover, we do not send the ghost layer data from Couette to
  * MD. "inner" refers to "not outer" ;-) By default, the argument outerRegion is
- * set to 1: this yields that only the first non-ghost layer of macroscopic
- * cells shall be sent to MD, and all other inner macroscopic cells are received
+ * set to 1: this yields that only the first non-ghost layer of coupling
+ * cells shall be sent to MD, and all other inner coupling cells are received
  * from MD.
  *  @brief interface for the LBCouetteSolver
  *  @author Philipp Neumann  */
@@ -32,32 +32,32 @@ public:
    * solver is parallelised
    *  @param offsetMDDomain offset (measured in cell units) of the MD domain
    * (excluding any (LB/MD) ghost layers)
-   *  @param globalNumberMacroscopicCells the total number of macroscopic cells
+   *  @param globalNumberCouplingCells the total number of coupling cells
    *  @param outerRegion defines, how many cell layers will be sent to the macro
    * solver */
   LBCouetteSolverInterface(tarch::la::Vector<3, unsigned int> avgNumberLBCells, tarch::la::Vector<3, unsigned int> numberProcesses,
-                           tarch::la::Vector<3, unsigned int> offsetMDDomain, tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
+                           tarch::la::Vector<3, unsigned int> offsetMDDomain, tarch::la::Vector<3, unsigned int> globalNumberCouplingCells,
                            unsigned int outerRegion = 1)
       : _avgNumberLBCells(avgNumberLBCells), _numberProcesses(numberProcesses), _offsetMDDomain(offsetMDDomain), _outerRegion(outerRegion),
-        _globalNumberMacroscopicCells(globalNumberMacroscopicCells) {}
+        _globalNumberCouplingCells(globalNumberCouplingCells) {}
   ~LBCouetteSolverInterface() {}
 
   /** with this function one can check, which data needs so be send from micro
    * to macro solver for the correct Couette scenario setup, all (inner) cells
    * need to be received
-   *  @brief checks for a given macroscopic cell, if it needs to be received
+   *  @brief checks for a given coupling cell, if it needs to be received
    * (true) ro not (false)
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns a bool, which indicates if the cell will be received*/
   bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     bool recv = true;
     for (unsigned int d = 0; d < 3; d++) {
-      recv = recv && (globalCellIndex[d] > _outerRegion) && (globalCellIndex[d] < _globalNumberMacroscopicCells[d] + 1 - _outerRegion);
+      recv = recv && (globalCellIndex[d] > _outerRegion) && (globalCellIndex[d] < _globalNumberCouplingCells[d] + 1 - _outerRegion);
     }
     return recv;
   }
 
-  /** send all macroscopic cell data within a boundary strip to MD. Only send
+  /** send all coupling cell data within a boundary strip to MD. Only send
    * data that are not in the ghost layer and not part of the inner region.
    *  @brief checks for a given cell if it needs to be send (true) or not
    * (false)
@@ -66,12 +66,12 @@ public:
   bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
     bool outer = false;
     for (unsigned int d = 0; d < 3; d++) {
-      outer = outer || (globalCellIndex[d] < 1) || (globalCellIndex[d] > _globalNumberMacroscopicCells[d]);
+      outer = outer || (globalCellIndex[d] < 1) || (globalCellIndex[d] > _globalNumberCouplingCells[d]);
     }
     return (!outer) && (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
   }
 
-  /** @brief returns for a given macroscopic cell index, which rank holds the
+  /** @brief returns for a given coupling cell index, which rank holds the
    * correct data
    *  @oaram globalCellIndex global dimensioned cell index to check for
    *  @returns a vector containing all correct ranks  */
@@ -129,7 +129,7 @@ public:
    * valid information. We therefore need to come up with a special
    * implementation for getSourceRanks(). This implementation only returns one
    * rank per cell, that is the rank which holds the non-ghost cell copy.
-   *  @brief returns for a given macroscopic cell index, which source rank holds
+   *  @brief returns for a given coupling cell index, which source rank holds
    * the correct data
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns the vector of the correct rank  */
@@ -168,8 +168,8 @@ private:
   /** @brief defines an offset of cells which is considered to be the outer
    * region */
   const unsigned int _outerRegion;
-  /** @brief global number of macroscopic cells */
-  const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
+  /** @brief global number of coupling cells */
+  const tarch::la::Vector<3, unsigned int> _globalNumberCouplingCells;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVERINTERFACE_H_

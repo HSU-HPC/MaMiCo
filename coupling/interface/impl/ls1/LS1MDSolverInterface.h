@@ -23,46 +23,46 @@ class LS1MDSolverInterface;
 
 class coupling::interface::LS1MDSolverInterface : public coupling::interface::MDSolverInterface<ls1::LS1RegionWrapper, 3> {
 public:
-  LS1MDSolverInterface(tarch::la::Vector<3, double> macroscopicCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell)
+  LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell)
       : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {
     _fullDomainWrapper.setupIDcounterForParticleAddition();
     for (int i = 0; i < 3; i++)
-      _linkedCellSize[i] = macroscopicCellSize[i] / linkedCellsPerMacroscopicCell[i];
+      _linkedCellSize[i] = couplingCellSize[i] / linkedCellsPerCouplingCell[i];
   }
-  /** returns a particular linked cell inside a macroscopic cell.
-   *  The macroscopic cells are currently located on the same process as the respective linked cells.
-   *  However, several linked cells may be part of a macroscopic cell.
-   *  The macroscopic cells also contain a ghost layer which surrounds each local domain; the very
-   *  first macroscopic cell inside the global MD domain (or local MD domain) is thus given by coordinates
+  /** returns a particular linked cell inside a coupling cell.
+   *  The coupling cells are currently located on the same process as the respective linked cells.
+   *  However, several linked cells may be part of a coupling cell.
+   *  The coupling cells also contain a ghost layer which surrounds each local domain; the very
+   *  first coupling cell inside the global MD domain (or local MD domain) is thus given by coordinates
    *  (1,1,1) (or (1,1) in 2D, respectively).
-   *  The index linkedCellInMacroscopicCell corresponds to the coordinates of the linked cell inside the
-   *  given macroscopic cell. These coordinates thus lie in a range (0,linkedCellsPerMacroscopicCell-1).
+   *  The index linkedCellInCouplingCell corresponds to the coordinates of the linked cell inside the
+   *  given coupling cell. These coordinates thus lie in a range (0,linkedCellsPerCouplingCell-1).
    */
-  virtual ls1::LS1RegionWrapper& getLinkedCell(const tarch::la::Vector<3, unsigned int>& macroscopicCellIndex,
-                                               const tarch::la::Vector<3, unsigned int>& linkedCellInMacroscopicCell,
-                                               const tarch::la::Vector<3, unsigned int>& linkedCellsPerMacroscopicCell,
+  virtual ls1::LS1RegionWrapper& getLinkedCell(const tarch::la::Vector<3, unsigned int>& couplingCellIndex,
+                                               const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
+                                               const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell,
                                                const coupling::IndexConversion<3>& indexConversion) {
     // ghost layer not allowed to have linked cells
-    if (macroscopicCellIndex[0] == 0 || macroscopicCellIndex[1] == 0 || macroscopicCellIndex[2] == 0) {
-      throw std::runtime_error("ERROR in LS1MDSolverInterface::getLinkedCell(): ghost macroscopic cells may not have linked cells!");
+    if (couplingCellIndex[0] == 0 || couplingCellIndex[1] == 0 || couplingCellIndex[2] == 0) {
+      throw std::runtime_error("ERROR in LS1MDSolverInterface::getLinkedCell(): ghost coupling cells may not have linked cells!");
     }
 
-    // size of the macroscopic cell
-    tarch::la::Vector<3, double> macroCellSize(indexConversion.getMacroscopicCellSize());
+    // size of the coupling cell
+    tarch::la::Vector<3, double> macroCellSize(indexConversion.getCouplingCellSize());
 
     // conversion to global
     using coupling::indexing::CellIndex;
     using coupling::indexing::IndexTrait;
-    CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({(int)macroscopicCellIndex[0], (int)macroscopicCellIndex[1], (int)macroscopicCellIndex[2]});
+    CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({(int)couplingCellIndex[0], (int)couplingCellIndex[1], (int)couplingCellIndex[2]});
     CellIndex<3, IndexTrait::vector, IndexTrait::noGhost> globalIndex(localIndex);
 
     // We have unbroken MD domain, which we will divide into region iterators
-    // So we split the MD into the same grid as the macro, and give the macroscopic cell the corresponding region
+    // So we split the MD into the same grid as the macro, and give the coupling cell the corresponding region
     double regionOffset[3], regionEndpoint[3];
     double currentLinkedCellSize;
     for (int i = 0; i < 3; i++) {
-      currentLinkedCellSize = macroCellSize[i] / linkedCellsPerMacroscopicCell[i];
-      regionOffset[i] = (globalIndex.get()[i] * macroCellSize[i]) + (linkedCellInMacroscopicCell[i] * currentLinkedCellSize);
+      currentLinkedCellSize = macroCellSize[i] / linkedCellsPerCouplingCell[i];
+      regionOffset[i] = (globalIndex.get()[i] * macroCellSize[i]) + (linkedCellInCouplingCell[i] * currentLinkedCellSize);
       regionEndpoint[i] = regionOffset[i] + currentLinkedCellSize;
     }
 
@@ -130,14 +130,14 @@ public:
    */
   virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<3>& molecule) { _fullDomainWrapper.addMolecule(molecule); }
 
-  /** sets up the potential energy landscape over the domain spanned by indexOfFirstMacroscopicCell and
+  /** sets up the potential energy landscape over the domain spanned by indexOfFirstCouplingCell and
    *  rangeCoordinates. The first vector denotes the position of the lower,left,front corner of the
-   *  domain, rangeCoordinates the number of macroscopic cells in each spatial direction in which the
+   *  domain, rangeCoordinates the number of coupling cells in each spatial direction in which the
    *  potential energy needs to be computed.
    */
-  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<3, unsigned int>& indexOfFirstMacroscopicCell,
-                                             const tarch::la::Vector<3, unsigned int>& rangeMacroscopicCells,
-                                             const tarch::la::Vector<3, unsigned int>& linkedCellsPerMacroscopicCell) {}
+  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<3, unsigned int>& indexOfFirstCouplingCell,
+                                             const tarch::la::Vector<3, unsigned int>& rangeCouplingCells,
+                                             const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell) {}
 
   /** returns the local index vector (w.r.t. lexicographic ordering of the linked cells in the MD simulation,
    *  see getLinkedCell()) for the linked cell that the position 'position' belongs to. This method is

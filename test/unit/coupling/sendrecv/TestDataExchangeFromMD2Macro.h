@@ -32,10 +32,10 @@ public:
     std::vector<unsigned int> vec;
     // empty target ranks if this is a global cell at the lower or upper end of the diagonal (inside ghost layer)
     if ((globalCellIndex == tarch::la::Vector<dim, unsigned int>(0)) ||
-        (globalCellIndex == _indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1))) {
+        (globalCellIndex == _indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(1))) {
       return vec;
     }
-    const unsigned int rank = _indexConversion.getUniqueRankForMacroscopicCell(globalCellIndex);
+    const unsigned int rank = _indexConversion.getUniqueRankForCouplingCell(globalCellIndex);
     int numberProcesses = 1;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_size(MPI_COMM_WORLD, &numberProcesses);
@@ -60,11 +60,11 @@ public:
     std::vector<unsigned int> vec;
     // empty source ranks if this is a global cell at the lower or upper end of the diagonal (inside ghost layer)
     if ((globalCellIndex == tarch::la::Vector<dim, unsigned int>(0)) ||
-        (globalCellIndex == _indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1))) {
+        (globalCellIndex == _indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(1))) {
       return vec;
     }
 
-    const unsigned int rank = _indexConversion.getUniqueRankForMacroscopicCell(globalCellIndex);
+    const unsigned int rank = _indexConversion.getUniqueRankForCouplingCell(globalCellIndex);
 
     for (unsigned int d = 1; d < dim; d++) {
       isSource = isSource && (globalCellIndex[d] == globalCellIndex[0]);
@@ -77,7 +77,7 @@ public:
     return vec;
   }
 
-  /** local rule to read from macroscopic cell and write data to (e.g. send) buffer */
+  /** local rule to read from coupling cell and write data to (e.g. send) buffer */
   virtual void readFromCell(double* const buffer, const TestCell<dim>& cell) {
     tarch::la::Vector<dim, double> b1 = cell.getBuffer1();
     for (unsigned int d = 0; d < dim; d++) {
@@ -86,7 +86,7 @@ public:
     buffer[dim] = cell.getBuffer2();
   }
 
-  /** local rule to read from receive buffer and write data to macroscopic cell */
+  /** local rule to read from receive buffer and write data to coupling cell */
   virtual void writeToCell(const double* const buffer, TestCell<dim>& cell) {
     tarch::la::Vector<dim, double> b1(0.0);
     for (unsigned int d = 0; d < dim; d++) {
@@ -96,7 +96,7 @@ public:
     cell.setBuffer2(buffer[dim]);
   }
 
-  /** returns the number of doubles that are sent per macroscopic cell. */
+  /** returns the number of doubles that are sent per coupling cell. */
   virtual unsigned int getDoublesPerCell() const { return dim + 1; }
 
   /** initialises the buffers required on the processes which by incrementing 1 are obtained from process coordinates (n,n,n).
@@ -109,10 +109,10 @@ public:
       // (non-ghost) global cell of last rank
       const tarch::la::Vector<dim, unsigned int> start =
           tarch::la::Vector<dim, unsigned int>(1) +
-          (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) * _indexConversion.getAverageLocalNumberMacroscopicCells()[0];
+          (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) * _indexConversion.getAverageLocalNumberCouplingCells()[0];
 
-      numberCells = (_indexConversion.getGlobalNumberMacroscopicCells() - (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) *
-                                                                              _indexConversion.getAverageLocalNumberMacroscopicCells()[0])[0];
+      numberCells = (_indexConversion.getGlobalNumberCouplingCells() - (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) *
+                                                                           _indexConversion.getAverageLocalNumberCouplingCells()[0])[0];
       for (unsigned int i = 0; i < numberCells; i++) {
         cells.push_back(new TestCell<dim>());
         if (cells[i] == NULL) {
@@ -142,7 +142,7 @@ public:
 
       if (isSource) {
         // we only plan with cubic sub-domains on the processes...
-        const unsigned int numberLocalCells = _indexConversion.getAverageLocalNumberMacroscopicCells()[0];
+        const unsigned int numberLocalCells = _indexConversion.getAverageLocalNumberCouplingCells()[0];
 
         globalCellIndices = new unsigned int[numberLocalCells];
         for (unsigned int i = 0; i < numberLocalCells; i++) {
@@ -174,7 +174,7 @@ protected:
 };
 
 /** same as TestDataExchangeFromMD2Macro, but with inverted target and source ranks, i.e. the original target ranks are
- *  the current source ranks. Since we hold certain macroscopic cells on several Mamico-blocks (due to the ghost cells),
+ *  the current source ranks. Since we hold certain coupling cells on several Mamico-blocks (due to the ghost cells),
  *  we use a modified target ranks-vector (based on the indexConversion).
  */
 template <unsigned int dim> class TestDataExchangeFromMacro2MD : public TestDataExchangeFromMD2Macro<dim> {
@@ -184,7 +184,7 @@ public:
   virtual ~TestDataExchangeFromMacro2MD() {}
 
   virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    return TestDataExchangeFromMD2Macro<dim>::_indexConversion.getRanksForMacroscopicCell(globalCellIndex);
+    return TestDataExchangeFromMD2Macro<dim>::_indexConversion.getRanksForCouplingCell(globalCellIndex);
   }
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     return TestDataExchangeFromMD2Macro<dim>::getTargetRanks(globalCellIndex);

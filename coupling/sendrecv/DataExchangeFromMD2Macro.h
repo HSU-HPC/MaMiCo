@@ -6,7 +6,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGEFROMMD2MACRO_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "coupling/sendrecv/DataExchange.h"
 
@@ -18,11 +18,11 @@ template <unsigned int dim> class DataExchangeFromMD2Macro;
 
 /** data exchange from MD, that is the coupling tool, to the macroscopic solver.
  *We transfer the buffers macroscopicMass and macroscopicMomentum of the
- *MacroscopicCell. The target ranks are determined by the getRanks()-method of
+ *CouplingCell. The target ranks are determined by the getRanks()-method of
  *the macroscopic solver interface: the macroscopic solver interface thus needs
  *to know on which ranks information from the MD simulation are required as
  *input. The source ranks arise from the unique rank determination within the
- *IndexConversion. We only allow transfer of non-ghost macroscopic cells to the
+ *IndexConversion. We only allow transfer of non-ghost coupling cells to the
  *macroscopic solver, i.e. cells which are completely embedded into the MD
  *domain.
  *	@brief data exchange from the MD solver to the macroscopic solver.
@@ -32,7 +32,7 @@ template <unsigned int dim> class DataExchangeFromMD2Macro;
  *  @author Philipp Neumann
  */
 template <unsigned int dim>
-class coupling::sendrecv::DataExchangeFromMD2Macro : public coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim> {
+class coupling::sendrecv::DataExchangeFromMD2Macro : public coupling::sendrecv::DataExchange<coupling::datastructures::CouplingCell<dim>, dim> {
 
 public:
   /** Constructor
@@ -42,7 +42,7 @@ public:
    */
   DataExchangeFromMD2Macro(coupling::interface::MacroscopicSolverInterface<dim>* interface, const coupling::IndexConversion<dim>* indexConversion,
                            unsigned int tagoffset = 0)
-      : coupling::sendrecv::DataExchange<coupling::datastructures::MacroscopicCell<dim>, dim>(TAG_FROM_MD2MACRO + tagoffset), _interface(interface),
+      : coupling::sendrecv::DataExchange<coupling::datastructures::CouplingCell<dim>, dim>(TAG_FROM_MD2MACRO + tagoffset), _interface(interface),
         _indexConversion(indexConversion) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "DataExchangeFromMD2Macro initialised..." << std::endl;
@@ -77,29 +77,29 @@ public:
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     std::vector<unsigned int> sourceRanks;
     if (_interface->receiveMacroscopicQuantityFromMDSolver(globalCellIndex)) {
-      sourceRanks.push_back(_indexConversion->getUniqueRankForMacroscopicCell(globalCellIndex));
+      sourceRanks.push_back(_indexConversion->getUniqueRankForCouplingCell(globalCellIndex));
     }
     return sourceRanks;
   }
 
-  /** local rule to read from macroscopic cell and write data to (e.g. send)
+  /** local rule to read from coupling cell and write data to (e.g. send)
    * buffer. We only send the macroscopic mass and macroscopic momentum from MD
    * to the macroscopic solver.
    * 	@param buffer
    * 	@param cell
    */
-  virtual void readFromCell(double* const buffer, const coupling::datastructures::MacroscopicCell<dim>& cell) {
+  virtual void readFromCell(double* const buffer, const coupling::datastructures::CouplingCell<dim>& cell) {
     buffer[0] = cell.getMacroscopicMass();
     for (unsigned int d = 0; d < dim; d++) {
       buffer[d + 1] = cell.getMacroscopicMomentum()[d];
     }
   }
 
-  /** local rule to read from receive buffer and write data to macroscopic cell
+  /** local rule to read from receive buffer and write data to coupling cell
    * 	@param buffer
    * 	@param cell
    */
-  virtual void writeToCell(const double* const buffer, coupling::datastructures::MacroscopicCell<dim>& cell) {
+  virtual void writeToCell(const double* const buffer, coupling::datastructures::CouplingCell<dim>& cell) {
     tarch::la::Vector<dim, double> macroscopicMomentum(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       macroscopicMomentum[d] = buffer[1 + d];
@@ -108,7 +108,7 @@ public:
     cell.setMacroscopicMass(buffer[0]);
   }
 
-  /** returns the number of doubles that are sent per macroscopic cell. @return
+  /** returns the number of doubles that are sent per coupling cell. @return
    * 1+dim  */
   virtual unsigned int getDoublesPerCell() const {
     // 1 double: macroscopic mass; dim doubles: macroscopic momentum

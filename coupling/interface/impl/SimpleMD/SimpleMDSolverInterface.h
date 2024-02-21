@@ -36,8 +36,8 @@ private:
   simplemd::BoundaryTreatment& _boundaryTreatment;
   const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& _localBoundaryInformation;
 
-  /** number of linked cells in each macroscopic cell */
-  const tarch::la::Vector<MD_DIM, unsigned int> _numberOfLinkedCellsPerMacroscopicCell;
+  /** number of linked cells in each coupling cell */
+  const tarch::la::Vector<MD_DIM, unsigned int> _numberOfLinkedCellsPerCouplingCell;
 
   const double _sigma6;
   const double _epsilon;
@@ -47,14 +47,14 @@ private:
   const double _dt;
 
   tarch::la::Vector<MD_DIM, unsigned int>
-  computeNumberOfLinkedCellsPerMacroscopicCells(const tarch::la::Vector<MD_DIM, unsigned int>& localNumberOfMacroscopicCells) const {
+  computeNumberOfLinkedCellsPerCouplingCells(const tarch::la::Vector<MD_DIM, unsigned int>& localNumberOfCouplingCells) const {
     tarch::la::Vector<MD_DIM, unsigned int> numberOfLinkedCells(0);
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      numberOfLinkedCells[d] = _linkedCellService.getLocalNumberOfCells()[d] / localNumberOfMacroscopicCells[d];
+      numberOfLinkedCells[d] = _linkedCellService.getLocalNumberOfCells()[d] / localNumberOfCouplingCells[d];
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-      if (numberOfLinkedCells[d] * localNumberOfMacroscopicCells[d] != _linkedCellService.getLocalNumberOfCells()[d]) {
-        std::cout << "ERROR coupling::interface::SimpleMDSolverInterface: Number of linked cells is not a multiple of the macroscopic cells!" << std::endl;
-        std::cout << "Number linked cells: " << numberOfLinkedCells << ", macroscopic cells: " << localNumberOfMacroscopicCells << std::endl;
+      if (numberOfLinkedCells[d] * localNumberOfCouplingCells[d] != _linkedCellService.getLocalNumberOfCells()[d]) {
+        std::cout << "ERROR coupling::interface::SimpleMDSolverInterface: Number of linked cells is not a multiple of the coupling cells!" << std::endl;
+        std::cout << "Number linked cells: " << numberOfLinkedCells << ", coupling cells: " << localNumberOfCouplingCells << std::endl;
         std::cout << "Local number of linked cells: " << _linkedCellService.getLocalNumberOfCells() << std::endl;
         exit(EXIT_FAILURE);
       }
@@ -101,14 +101,14 @@ private:
   }
 
 public:
-  SimpleMDSolverInterface(tarch::la::Vector<MD_DIM, unsigned int> numberLinkedCellsPerMacroscopicCell, simplemd::BoundaryTreatment& boundaryTreatment,
+  SimpleMDSolverInterface(tarch::la::Vector<MD_DIM, unsigned int> numberLinkedCellsPerCouplingCell, simplemd::BoundaryTreatment& boundaryTreatment,
                           simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
                           simplemd::services::LinkedCellService& linkedCellService,
                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                           const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& localBoundaryInformation, const double& dt)
       : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService),
         _molecularPropertiesService(molecularPropertiesService), _boundaryTreatment(boundaryTreatment), _localBoundaryInformation(localBoundaryInformation),
-        _numberOfLinkedCellsPerMacroscopicCell(numberLinkedCellsPerMacroscopicCell),
+        _numberOfLinkedCellsPerCouplingCell(numberLinkedCellsPerCouplingCell),
         _sigma6(molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
                 molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
                 molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma()),
@@ -120,14 +120,13 @@ public:
         _dt(dt) {}
   ~SimpleMDSolverInterface() {}
 
-  simplemd::LinkedCell& getLinkedCell(const CellIndex_T& macroscopicCellIndex,
-                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInMacroscopicCell,
-                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerMacroscopicCell) {
+  simplemd::LinkedCell& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInCouplingCell,
+                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell) {
     // no linked cells found in outer region!
-    
+
     tarch::la::Vector<MD_DIM, unsigned int> index(_linkedCellService.getLocalIndexOfFirstCell());
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      index[d] = index[d] + macroscopicCellIndex.get()[d] * linkedCellsPerMacroscopicCell[d] + linkedCellInMacroscopicCell[d];
+      index[d] = index[d] + couplingCellIndex.get()[d] * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
     }
     return _linkedCellService.getLinkedCell(index);
   }
@@ -221,9 +220,9 @@ public:
     return cellVectorIndex;
   }
 
-  void setupPotentialEnergyLandscape(const tarch::la::Vector<MD_DIM, unsigned int>& indexOfFirstMacroscopicCell,
-                                     const tarch::la::Vector<MD_DIM, unsigned int>& rangeMacroscopicCells,
-                                     const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerMacroscopicCell) {
+  void setupPotentialEnergyLandscape(const tarch::la::Vector<MD_DIM, unsigned int>& indexOfFirstCouplingCell,
+                                     const tarch::la::Vector<MD_DIM, unsigned int>& rangeCouplingCells,
+                                     const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell) {
     simplemd::cellmappings::ResetPotentialEnergyMapping resetPotentialEnergyMapping;
     simplemd::cellmappings::LennardJonesPotentialEnergyMapping potentialEnergyMapping(_molecularPropertiesService);
     tarch::la::Vector<MD_DIM, unsigned int> rangeLinkedCellsExtended(0);
@@ -231,16 +230,16 @@ public:
     // compute coordinates of the first linked cell and the range of linked cells to be considered
     for (unsigned int d = 0; d < MD_DIM; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      if (indexOfFirstMacroscopicCell[d] == 0) {
-        std::cout << "ERROR setupPotentialEnergyLandscape: " << indexOfFirstMacroscopicCell[d] << std::endl;
+      if (indexOfFirstCouplingCell[d] == 0) {
+        std::cout << "ERROR setupPotentialEnergyLandscape: " << indexOfFirstCouplingCell[d] << std::endl;
         exit(EXIT_FAILURE);
       }
 #endif
 
-      firstLinkedCell[d] = (indexOfFirstMacroscopicCell[d] - 1) * linkedCellsPerMacroscopicCell[d];
+      firstLinkedCell[d] = (indexOfFirstCouplingCell[d] - 1) * linkedCellsPerCouplingCell[d];
       // we need to loop over one more layer of linked cells since firstLinkedCell(d) already starts one linked cell earlier
       // (e.g. already in linked cell ghost layer)
-      rangeLinkedCellsExtended[d] = rangeMacroscopicCells[d] * linkedCellsPerMacroscopicCell[d] + _linkedCellService.getLocalIndexOfFirstCell()[d];
+      rangeLinkedCellsExtended[d] = rangeCouplingCells[d] * linkedCellsPerCouplingCell[d] + _linkedCellService.getLocalIndexOfFirstCell()[d];
     }
 
     // reset potential energy first for the molecules in all relevant linked cells
