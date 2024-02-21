@@ -31,18 +31,18 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">7</td>
-            <td class="headerCovTableEntry">37</td>
-            <td class="headerCovTableEntryLo">18.9 %</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntryLo">63.2 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-02-21 10:13:02</td>
+            <td class="headerValue">2024-02-21 12:45:43</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
             <td class="headerCovTableEntry">6</td>
-            <td class="headerCovTableEntryLo">16.7 %</td>
+            <td class="headerCovTableEntryLo">33.3 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -97,21 +97,21 @@
 <a name="35"><span class="lineNum">      35 </span>            :   };</a>
 <a name="36"><span class="lineNum">      36 </span>            : </a>
 <a name="37"><span class="lineNum">      37 </span>            :   /** Constructor, initializes the class  */</a>
-<a name="38"><span class="lineNum">      38 </span>            :   BoundaryForceConfiguration() : _insertionType(NO_BOUNDARYFORCE), _density(0.0), _temperature(0.0), _isValid(true) {}</a>
+<a name="38"><span class="lineNum">      38 </span><span class="lineCov">        232 :   BoundaryForceConfiguration() : _insertionType(NO_BOUNDARYFORCE), _density(0.0), _temperature(0.0), _isValid(true) {}</span></a>
 <a name="39"><span class="lineNum">      39 </span>            : </a>
 <a name="40"><span class="lineNum">      40 </span>            :   /** Destructor */</a>
-<a name="41"><span class="lineNum">      41 </span><span class="lineCov">          4 :   virtual ~BoundaryForceConfiguration() {}</span></a>
+<a name="41"><span class="lineNum">      41 </span><span class="lineCov">        236 :   virtual ~BoundaryForceConfiguration() {}</span></a>
 <a name="42"><span class="lineNum">      42 </span>            : </a>
 <a name="43"><span class="lineNum">      43 </span>            :   /** parseSubtag</a>
 <a name="44"><span class="lineNum">      44 </span>            :    *    @param node</a>
 <a name="45"><span class="lineNum">      45 </span>            :    */</a>
-<a name="46"><span class="lineNum">      46 </span><span class="lineNoCov">          0 :   void parseSubtag(tinyxml2::XMLElement* node) {</span></a>
-<a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :     std::string value;</span></a>
-<a name="48"><span class="lineNum">      48 </span><span class="lineNoCov">          0 :     tarch::configuration::ParseConfiguration::readStringMandatory(value, node, &quot;type&quot;);</span></a>
-<a name="49"><span class="lineNum">      49 </span><span class="lineNoCov">          0 :     const std::string boundaries[6] = {&quot;west&quot;, &quot;east&quot;, &quot;south&quot;, &quot;north&quot;, &quot;bottom&quot;, &quot;top&quot;};</span></a>
+<a name="46"><span class="lineNum">      46 </span><span class="lineCov">          4 :   void parseSubtag(tinyxml2::XMLElement* node) {</span></a>
+<a name="47"><span class="lineNum">      47 </span><span class="lineCov">          4 :     std::string value;</span></a>
+<a name="48"><span class="lineNum">      48 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readStringMandatory(value, node, &quot;type&quot;);</span></a>
+<a name="49"><span class="lineNum">      49 </span><span class="lineCov">         28 :     const std::string boundaries[6] = {&quot;west&quot;, &quot;east&quot;, &quot;south&quot;, &quot;north&quot;, &quot;bottom&quot;, &quot;top&quot;};</span></a>
 <a name="50"><span class="lineNum">      50 </span>            : </a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :     if (value == &quot;zhou-boundary-force&quot;) {</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :       _insertionType = ZHOU;</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          4 :     if (value == &quot;zhou-boundary-force&quot;) {</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          4 :       _insertionType = ZHOU;</span></a>
 <a name="53"><span class="lineNum">      53 </span><span class="lineNoCov">          0 :     } else if (value == &quot;none&quot;) {</span></a>
 <a name="54"><span class="lineNum">      54 </span><span class="lineNoCov">          0 :       _insertionType = NO_BOUNDARYFORCE;</span></a>
 <a name="55"><span class="lineNum">      55 </span>            :     } else {</a>
@@ -125,13 +125,13 @@
 <a name="63"><span class="lineNum">      63 </span>            :     // once read, the user can still use the flags, even in the NO_BOUNDARYFORCE</a>
 <a name="64"><span class="lineNum">      64 </span>            :     // case, to e.g. determine a setup with boundary forcing using external</a>
 <a name="65"><span class="lineNum">      65 </span>            :     // implementations</a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :     for (unsigned int d = 0; d &lt; 2 * dim; d++) {</span></a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readBoolMandatory(_boundary[d], node, boundaries[d]);</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">         28 :     for (unsigned int d = 0; d &lt; 2 * dim; d++) {</span></a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineCov">         48 :       tarch::configuration::ParseConfiguration::readBoolMandatory(_boundary[d], node, boundaries[d]);</span></a>
 <a name="68"><span class="lineNum">      68 </span>            :     }</a>
 <a name="69"><span class="lineNum">      69 </span>            : </a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :     if (_insertionType == ZHOU) {</span></a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(_density, node, &quot;density&quot;);</span></a>
-<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :       if (_density &lt;= 0.0) {</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">          4 :     if (_insertionType == ZHOU) {</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(_density, node, &quot;density&quot;);</span></a>
+<a name="72"><span class="lineNum">      72 </span><span class="lineCov">          4 :       if (_density &lt;= 0.0) {</span></a>
 <a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;ERROR coupling::BoundaryForceConfiguration: density is &quot;</span></a>
 <a name="74"><span class="lineNum">      74 </span>            :                      &quot;smaller than zero! Density=&quot;</a>
 <a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 :                   &lt;&lt; _density;</span></a>
@@ -139,8 +139,8 @@
 <a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
 <a name="78"><span class="lineNum">      78 </span>            :       }</a>
 <a name="79"><span class="lineNum">      79 </span>            : </a>
-<a name="80"><span class="lineNum">      80 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(_temperature, node, &quot;temperature&quot;);</span></a>
-<a name="81"><span class="lineNum">      81 </span><span class="lineNoCov">          0 :       if (_temperature &lt;= 0.0) {</span></a>
+<a name="80"><span class="lineNum">      80 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(_temperature, node, &quot;temperature&quot;);</span></a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineCov">          4 :       if (_temperature &lt;= 0.0) {</span></a>
 <a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;ERROR coupling::BoundaryForceConfiguration: temperature &quot;</span></a>
 <a name="83"><span class="lineNum">      83 </span>            :                      &quot;is smaller than zero! Temperature=&quot;</a>
 <a name="84"><span class="lineNum">      84 </span><span class="lineNoCov">          0 :                   &lt;&lt; _temperature;</span></a>
@@ -148,12 +148,12 @@
 <a name="86"><span class="lineNum">      86 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
 <a name="87"><span class="lineNum">      87 </span>            :       }</a>
 <a name="88"><span class="lineNum">      88 </span>            :     }</a>
-<a name="89"><span class="lineNum">      89 </span><span class="lineNoCov">          0 :   }</span></a>
+<a name="89"><span class="lineNum">      89 </span><span class="lineCov">         28 :   }</span></a>
 <a name="90"><span class="lineNum">      90 </span>            : </a>
 <a name="91"><span class="lineNum">      91 </span>            :   /** Returns name of xml tag that is associated to the configuration.</a>
 <a name="92"><span class="lineNum">      92 </span>            :    *    @return name of xml tag that is associated to the configuration</a>
 <a name="93"><span class="lineNum">      93 </span>            :    */</a>
-<a name="94"><span class="lineNum">      94 </span><span class="lineNoCov">          0 :   std::string getTag() const { return &quot;boundary-force&quot;; }</span></a>
+<a name="94"><span class="lineNum">      94 </span><span class="lineCov">          8 :   std::string getTag() const { return &quot;boundary-force&quot;; }</span></a>
 <a name="95"><span class="lineNum">      95 </span>            : </a>
 <a name="96"><span class="lineNum">      96 </span>            :   /** checks if the configuration is valid. This operation usually fails, if</a>
 <a name="97"><span class="lineNum">      97 </span>            :    *e.g.</a>
@@ -163,7 +163,7 @@
 <a name="101"><span class="lineNum">     101 </span>            :    *  3. If a tag ain't optional and parseSubtag() was not called (first case)</a>
 <a name="102"><span class="lineNum">     102 </span>            :    *    @return _isValid</a>
 <a name="103"><span class="lineNum">     103 </span>            :    */</a>
-<a name="104"><span class="lineNum">     104 </span><span class="lineNoCov">          0 :   bool isValid() const { return _isValid; }</span></a>
+<a name="104"><span class="lineNum">     104 </span><span class="lineCov">          4 :   bool isValid() const { return _isValid; }</span></a>
 <a name="105"><span class="lineNum">     105 </span>            : </a>
 <a name="106"><span class="lineNum">     106 </span>            :   /** Returns boundary force type.</a>
 <a name="107"><span class="lineNum">     107 </span>            :    *    @return _insertionType</a>

@@ -31,13 +31,13 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">11</td>
             <td class="headerCovTableEntry">12</td>
-            <td class="headerCovTableEntryMed">75.0 %</td>
+            <td class="headerCovTableEntryHi">91.7 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-02-21 10:13:02</td>
+            <td class="headerValue">2024-02-21 12:45:43</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -599,7 +599,7 @@
 <a name="537"><span class="lineNum">     537 </span>            :       Text:             the text string</a>
 <a name="538"><span class="lineNum">     538 </span>            :       @endverbatim</a>
 <a name="539"><span class="lineNum">     539 </span>            :   */</a>
-<a name="540"><span class="lineNum">     540 </span><span class="lineNoCov">          0 :   const char *Value() const { return _value.GetStr(); }</span></a>
+<a name="540"><span class="lineNum">     540 </span><span class="lineCov">         28 :   const char *Value() const { return _value.GetStr(); }</span></a>
 <a name="541"><span class="lineNum">     541 </span>            : </a>
 <a name="542"><span class="lineNum">     542 </span>            :   /** Set the Value of an XML node.</a>
 <a name="543"><span class="lineNum">     543 </span>            :       @sa Value()</a>
@@ -624,7 +624,7 @@
 <a name="562"><span class="lineNum">     562 </span>            :   */</a>
 <a name="563"><span class="lineNum">     563 </span>            :   const XMLElement *FirstChildElement(const char *value = 0) const;</a>
 <a name="564"><span class="lineNum">     564 </span>            : </a>
-<a name="565"><span class="lineNum">     565 </span><span class="lineCov">          4 :   XMLElement *FirstChildElement(const char *value = 0) { return const_cast&lt;XMLElement *&gt;(const_cast&lt;const XMLNode *&gt;(this)-&gt;FirstChildElement(value)); }</span></a>
+<a name="565"><span class="lineNum">     565 </span><span class="lineCov">         40 :   XMLElement *FirstChildElement(const char *value = 0) { return const_cast&lt;XMLElement *&gt;(const_cast&lt;const XMLNode *&gt;(this)-&gt;FirstChildElement(value)); }</span></a>
 <a name="566"><span class="lineNum">     566 </span>            : </a>
 <a name="567"><span class="lineNum">     567 </span>            :   /// Get the last child node, or null if none exists.</a>
 <a name="568"><span class="lineNum">     568 </span>            :   const XMLNode *LastChild() const { return _lastChild; }</a>
@@ -660,7 +660,7 @@
 <a name="598"><span class="lineNum">     598 </span>            :   /// supplied name.</a>
 <a name="599"><span class="lineNum">     599 </span>            :   const XMLElement *NextSiblingElement(const char *value = 0) const;</a>
 <a name="600"><span class="lineNum">     600 </span>            : </a>
-<a name="601"><span class="lineNum">     601 </span><span class="lineNoCov">          0 :   XMLElement *NextSiblingElement(const char *value = 0) { return const_cast&lt;XMLElement *&gt;(const_cast&lt;const XMLNode *&gt;(this)-&gt;NextSiblingElement(value)); }</span></a>
+<a name="601"><span class="lineNum">     601 </span><span class="lineCov">         44 :   XMLElement *NextSiblingElement(const char *value = 0) { return const_cast&lt;XMLElement *&gt;(const_cast&lt;const XMLNode *&gt;(this)-&gt;NextSiblingElement(value)); }</span></a>
 <a name="602"><span class="lineNum">     602 </span>            : </a>
 <a name="603"><span class="lineNum">     603 </span>            :   /**</a>
 <a name="604"><span class="lineNum">     604 </span>            :       Add a child node as the last (right) child.</a>
@@ -1092,12 +1092,12 @@
 <a name="1030"><span class="lineNum">    1030 </span>            :      value will still be 10</a>
 <a name="1031"><span class="lineNum">    1031 </span>            :       @endverbatim</a>
 <a name="1032"><span class="lineNum">    1032 </span>            :   */</a>
-<a name="1033"><span class="lineNum">    1033 </span><span class="lineCov">          4 :   XMLError QueryIntAttribute(const char *name, int *value) const {</span></a>
-<a name="1034"><span class="lineNum">    1034 </span><span class="lineCov">          4 :     const XMLAttribute *a = FindAttribute(name);</span></a>
-<a name="1035"><span class="lineNum">    1035 </span><span class="lineCov">          4 :     if (!a) {</span></a>
+<a name="1033"><span class="lineNum">    1033 </span><span class="lineCov">         56 :   XMLError QueryIntAttribute(const char *name, int *value) const {</span></a>
+<a name="1034"><span class="lineNum">    1034 </span><span class="lineCov">         56 :     const XMLAttribute *a = FindAttribute(name);</span></a>
+<a name="1035"><span class="lineNum">    1035 </span><span class="lineCov">         56 :     if (!a) {</span></a>
 <a name="1036"><span class="lineNum">    1036 </span>            :       return XML_NO_ATTRIBUTE;</a>
 <a name="1037"><span class="lineNum">    1037 </span>            :     }</a>
-<a name="1038"><span class="lineNum">    1038 </span><span class="lineCov">          4 :     return a-&gt;QueryIntValue(value);</span></a>
+<a name="1038"><span class="lineNum">    1038 </span><span class="lineCov">         56 :     return a-&gt;QueryIntValue(value);</span></a>
 <a name="1039"><span class="lineNum">    1039 </span>            :   }</a>
 <a name="1040"><span class="lineNum">    1040 </span>            :   /// See QueryIntAttribute()</a>
 <a name="1041"><span class="lineNum">    1041 </span>            :   XMLError QueryUnsignedAttribute(const char *name, unsigned int *value) const {</a>
@@ -1116,12 +1116,12 @@
 <a name="1054"><span class="lineNum">    1054 </span>            :     return a-&gt;QueryBoolValue(value);</a>
 <a name="1055"><span class="lineNum">    1055 </span>            :   }</a>
 <a name="1056"><span class="lineNum">    1056 </span>            :   /// See QueryIntAttribute()</a>
-<a name="1057"><span class="lineNum">    1057 </span><span class="lineCov">          4 :   XMLError QueryDoubleAttribute(const char *name, double *value) const {</span></a>
-<a name="1058"><span class="lineNum">    1058 </span><span class="lineCov">          4 :     const XMLAttribute *a = FindAttribute(name);</span></a>
-<a name="1059"><span class="lineNum">    1059 </span><span class="lineCov">          4 :     if (!a) {</span></a>
+<a name="1057"><span class="lineNum">    1057 </span><span class="lineCov">         36 :   XMLError QueryDoubleAttribute(const char *name, double *value) const {</span></a>
+<a name="1058"><span class="lineNum">    1058 </span><span class="lineCov">         36 :     const XMLAttribute *a = FindAttribute(name);</span></a>
+<a name="1059"><span class="lineNum">    1059 </span><span class="lineCov">         36 :     if (!a) {</span></a>
 <a name="1060"><span class="lineNum">    1060 </span>            :       return XML_NO_ATTRIBUTE;</a>
 <a name="1061"><span class="lineNum">    1061 </span>            :     }</a>
-<a name="1062"><span class="lineNum">    1062 </span><span class="lineCov">          4 :     return a-&gt;QueryDoubleValue(value);</span></a>
+<a name="1062"><span class="lineNum">    1062 </span><span class="lineCov">         36 :     return a-&gt;QueryDoubleValue(value);</span></a>
 <a name="1063"><span class="lineNum">    1063 </span>            :   }</a>
 <a name="1064"><span class="lineNum">    1064 </span>            :   /// See QueryIntAttribute()</a>
 <a name="1065"><span class="lineNum">    1065 </span>            :   XMLError QueryFloatAttribute(const char *name, float *value) const {</a>
