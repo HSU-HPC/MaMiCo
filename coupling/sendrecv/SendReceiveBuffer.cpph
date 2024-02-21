@@ -668,7 +668,7 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer
   using namespace coupling::indexing;
   const unsigned int globalIndex = CellIndex<dim>{CellIndex<dim, IndexTrait::vector>{tarch::la::Vector<dim, int>(globalVectorIndex)}}.get();
 
-  // determine the ranks which need to receive information of this macroscopic
+  // determine the ranks which need to receive information of this coupling
   // cell
   const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(globalVectorIndex);
   const unsigned int ranksSize = (unsigned int)ranks.size();

@@ -99,9 +99,9 @@ private:
     }
     file << R"mamicoconf(
     <mamico>
-      <macroscopic-cell-configuration
+      <coupling-cell-configuration
         cell-size="2.5 ; 2.5 ; 2.5"
-        linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+        linked-cells-per-coupling-cell="1 ; 1 ; 1"
         write-every-microscopic-timestep="0"
         microscopic-filename="CouplingCell_micro"
         write-every-macroscopic-timestep="0"

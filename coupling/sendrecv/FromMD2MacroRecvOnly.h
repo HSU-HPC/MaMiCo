@@ -91,7 +91,7 @@ private:
                               const unsigned int* const globalCellIndices, unsigned int numberCells);
 
   /** reads information from the receive buffer and stores the result in the
-   * list of coupling cells. Since this is a receive for the macroscopic
+   * list of coupling cells. Since this is a receive for the coupling
    * cells on the side of the macroscopic solver, we just have a list of global
    * cell indices and corresponding macrocsopic cell buffers. For each cell in
    * this list, readFromReceiveBuffer(...) of SendReceiveBuffer is called.

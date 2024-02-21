@@ -4,10 +4,10 @@
 // www5.in.tum.de/mamico
 #include "tarch/configuration/ParseConfiguration.h"
 
-template <unsigned int dim> const std::string coupling::configurations::CouplingCellConfiguration<dim>::MACROSCOPIC_CELL_SIZE("cell-size");
+template <unsigned int dim> const std::string coupling::configurations::CouplingCellConfiguration<dim>::COUPLING_CELL_SIZE("cell-size");
 
 template <unsigned int dim>
-const std::string coupling::configurations::CouplingCellConfiguration<dim>::LINKED_CELLS_PER_MACROSCOPIC_CELL("linked-cells-per-macroscopic-cell");
+const std::string coupling::configurations::CouplingCellConfiguration<dim>::LINKED_CELLS_PER_COUPLING_CELL("linked-cells-per-coupling-cell");
 
 template <unsigned int dim>
 const std::string coupling::configurations::CouplingCellConfiguration<dim>::WRITE_EVERY_MICROSCOPIC_TIMESTEP("write-every-microscopic-timestep");
@@ -22,7 +22,7 @@ template <unsigned int dim> void coupling::configurations::CouplingCellConfigura
   int buffer = -1;
 
   // parse coupling cell size
-  tarch::configuration::ParseConfiguration::readVectorMandatory<dim, double>(_couplingCellSize, node, MACROSCOPIC_CELL_SIZE);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<dim, double>(_couplingCellSize, node, COUPLING_CELL_SIZE);
   for (unsigned int d = 0; d < dim; d++) {
     if (_couplingCellSize[d] <= 0.0) {
       std::cout << "ERROR coupling::configurations::CouplingCellConfiguration: ";
@@ -33,11 +33,11 @@ template <unsigned int dim> void coupling::configurations::CouplingCellConfigura
   }
 
   // parse linked cells per coupling cell
-  tarch::configuration::ParseConfiguration::readVectorMandatory<dim, int>(getCells, node, LINKED_CELLS_PER_MACROSCOPIC_CELL);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<dim, int>(getCells, node, LINKED_CELLS_PER_COUPLING_CELL);
   for (unsigned int d = 0; d < dim; d++) {
     if (getCells[d] <= 0) {
       std::cout << "ERROR coupling::configurations::CouplingCellConfiguration: ";
-      std::cout << LINKED_CELLS_PER_MACROSCOPIC_CELL << " is smaller or equal zero in component " << d << "!" << std::endl;
+      std::cout << LINKED_CELLS_PER_COUPLING_CELL << " is smaller or equal zero in component " << d << "!" << std::endl;
       _isValid = false;
       exit(EXIT_FAILURE);
     }
@@ -69,4 +69,4 @@ template <unsigned int dim> void coupling::configurations::CouplingCellConfigura
   tarch::configuration::ParseConfiguration::readStringMandatory(_macroscopicFilename, node, MACROSCOPIC_FILENAME);
 }
 
-template <unsigned int dim> std::string coupling::configurations::CouplingCellConfiguration<dim>::getTag() const { return "macroscopic-cell-configuration"; }
+template <unsigned int dim> std::string coupling::configurations::CouplingCellConfiguration<dim>::getTag() const { return "coupling-cell-configuration"; }

@@ -27,7 +27,7 @@ public:
   /** Destructor */
   virtual ~MDSolverInterface() {}
 
-  /** This function specifies a particular linked cell inside a macroscopic
+  /** This function specifies a particular linked cell inside a coupling
    *cell. The coupling cells are currently located on the same process as the
    *respective linked cells. However, several linked cells may be part of a
    *coupling cell. The coupling cells also contain a ghost layer which

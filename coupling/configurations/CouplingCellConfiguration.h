@@ -87,8 +87,8 @@ protected:
         _writeEveryMacroscopicTimestep(writeEveryMacroscopicTimestep), _macroscopicFilename(macroscopicFilename) {}
 
 private:
-  static const std::string MACROSCOPIC_CELL_SIZE;
-  static const std::string LINKED_CELLS_PER_MACROSCOPIC_CELL;
+  static const std::string COUPLING_CELL_SIZE;
+  static const std::string LINKED_CELLS_PER_COUPLING_CELL;
   static const std::string WRITE_EVERY_MICROSCOPIC_TIMESTEP;
   static const std::string WRITE_EVERY_MACROSCOPIC_TIMESTEP;
   static const std::string MICROSCOPIC_FILENAME;

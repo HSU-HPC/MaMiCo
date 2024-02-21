@@ -75,7 +75,7 @@ private:
    * actually ghost-layer of cells which surrounds the MD domain).
    *  @brief based on the cell index, the function tells if the cell is inside
    * the imposition layer
-   *  @param currentLocalCouplingCell local linearised index of a macroscopic
+   *  @param currentLocalCouplingCell local linearised index of a coupling
    * cell to check
    *  @returns a bool, that indicates if the given cell index is located in the
    * imposition layer (true) or not (false) */

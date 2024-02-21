@@ -133,7 +133,7 @@ protected:
   /** the result is stored in the position entry of the molecule 'molecule'.
    *  The method returns Insertion if a position has been found and NoAction
    * otherwise.
-   *  @brief determines the position of a new particle within the macroscopic
+   *  @brief determines the position of a new particle within the coupling
    * cell
    *  @param thisCell the coupling cell to check if an action is necessary
    *  @param couplingCellPosition the postion of the coupling cell

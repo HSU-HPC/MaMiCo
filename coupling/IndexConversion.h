@@ -190,7 +190,7 @@ public:
   // ----------------------------------
   /** @brief returns the global vector cell index of the coupling cell in
    * which a point is
-   *  @param position vector of the point to get the corresponding macroscopic
+   *  @param position vector of the point to get the corresponding coupling
    * cell
    *  @returns the corresponding index for the global vector cell */
   tarch::la::Vector<dim, unsigned int> getGlobalVectorCellIndex(tarch::la::Vector<dim, double> position) const;
@@ -287,7 +287,7 @@ private:
    * cells is filled up so that the global number of coupling cells is
    * reached.
    *  @brief this method returns the exact number of local coupling cells.
-   *  @param initLocalNumberCouplingCells the total number of macroscopic
+   *  @param initLocalNumberCouplingCells the total number of coupling
    * cells on this process
    *  @param globalNumberCouplingCells the total number of coupling cells
    *  @param numberProcesses total number of mpi processes

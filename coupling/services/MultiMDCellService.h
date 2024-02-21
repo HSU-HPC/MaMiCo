@@ -150,8 +150,8 @@ public:
     }
 
     // TODO: fix free bug/possible memory leak here
-    for (auto macroscopic_cell : _couplingCells) {
-      delete macroscopic_cell;
+    for (auto coupling_cell : _couplingCells) {
+      delete coupling_cell;
     }
     _couplingCells.clear();
     // delete [] _couplingCells.data();

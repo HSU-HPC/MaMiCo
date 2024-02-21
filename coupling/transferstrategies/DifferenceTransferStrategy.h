@@ -73,7 +73,7 @@ public:
     const tarch::la::Vector<dim, double> diffMomentum = cell.getMicroscopicMomentum() - cell.getMacroscopicMomentum();
     cell.setMicroscopicMass(diffMass);
     cell.setMicroscopicMomentum(diffMomentum);
-    // reset macroscopic-buffers
+    // reset coupling cell buffers
     cell.setMacroscopicMass(0.0);
     cell.setMacroscopicMomentum(_zero);
   }

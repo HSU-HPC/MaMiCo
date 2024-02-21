@@ -33,7 +33,7 @@ public:
   /** iterates over all linked cells of the given coupling cell and applies
    * the cellmapping for the boundary force
    * @brief applies the boundary force on a boundary cell
-   * @param cell the macroscopic boundary cell to apply the boundary force
+   * @param cell the boundary coupling cell to apply the boundary force
    * @param currentLocalCouplingCellIndex the index of the coupling cell
    */
   virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,

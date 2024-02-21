@@ -2,7 +2,7 @@
 
 <!-- example for a mamico configuration, as used in form of sub-tags in extended xml-files -->
 <mamico>
-  <macroscopic-cell-configuration
+  <coupling-cell-configuration
     cell-size="2.5 ; 2.5; 2.5"
     write-every-microscopic-timestep="0"
     microscopic-filename="CouplingCell_micro"

@@ -19,7 +19,7 @@ template <unsigned int dim> class DataExchangeFromMacro2MD;
 /** data exchange from the macroscopic solver to the MD solver, that is to the
  *coupling tool. We transfer the buffers microscopicMass and microscopicMomentum
  *of the CouplingCell. The target ranks are determined by the
- *getRanksForCouplingCell() method of IndexConversion: since macroscopic
+ *getRanksForCouplingCell() method of IndexConversion: since coupling
  *cells may exist on different ranks (due to ghost layers), this method
  *determines all ranks with a particular coupling cell and returns a vector
  *with all required ranks (see also documentation of IndexConversion). The

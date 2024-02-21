@@ -72,7 +72,7 @@ public:
    * (0,linkedCellsPerCouplingCell-1).
    */
   virtual MarDynCell& getLinkedCell(const tarch::la::Vector<3, unsigned int>& couplingCellIndex,
-                                    const tarch::la::Vector<3, unsigned int>& linkedCellInMacroscopic,
+                                    const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
                                     const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell, const coupling::IndexConversion<3>& indexConversion) {
     // no linked cells found in outer region
     for (unsigned int d = 0; d < 3; d++) {
@@ -100,10 +100,10 @@ public:
       // compute requested cell index vector
       for (int d = 0; d < 3; d++) {
         requestedCellIndex[d] = (int)floor(couplingCellIndex[d] * macroCellSize[d] / mdCellsize[d]);
-        // adjust requested cell index if multiple linked cells per macroscopic
+        // adjust requested cell index if multiple linked cells per coupling
         // cell are used
         if (linkedCellsPerCouplingCell[d] > 1)
-          requestedCellIndex[d] -= (linkedCellsPerCouplingCell[d] - 1) - linkedCellInMacroscopic[d];
+          requestedCellIndex[d] -= (linkedCellsPerCouplingCell[d] - 1) - linkedCellInCouplingCell[d];
       }
       // compute the Mardyn cell index of the requested cell
       unsigned int cellIndex =

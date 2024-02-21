@@ -53,7 +53,7 @@ public:
    *  @param index the index of the coupling cell */
   virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                                                                             const unsigned int& index) {
-    // reset buffers for sampling mass and momentum in each inner macroscopic
+    // reset buffers for sampling mass and momentum in each inner coupling
     // cell
     cell.setMacroscopicMass(0.0);
     cell.setMacroscopicMomentum(tarch::la::Vector<dim, double>(0.0));

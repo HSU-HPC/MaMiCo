@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
   <mamico>
-    <macroscopic-cell-configuration
+    <coupling-cell-configuration
       cell-size="2.5 ; 2.5; 2.5"
-      linked-cells-per-macroscopic-cell=" 1 ; 1 ; 1"
+      linked-cells-per-coupling-cell=" 1 ; 1 ; 1"
       write-every-microscopic-timestep="1000"
       microscopic-filename="CouplingCell_micro"
       write-every-macroscopic-timestep="1"

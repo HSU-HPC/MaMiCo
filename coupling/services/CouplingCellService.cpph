@@ -346,7 +346,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
   tarch::la::Vector<3, unsigned int> cellIndex(0);
   // loop over coupling cell domain (within MD domain) in a 2^dim-colour
   // manner: For parallel simulations with an odd number of processes and
-  // periodic boundary conditions, a simple staggered loop over all macroscopic
+  // periodic boundary conditions, a simple staggered loop over all coupling
   // cells would imply that we insert particles on both sides of the global MD
   // boundary in the same traversal. This can lead to strong forces and
   // potential fields between inserted particles! So, we introduce another loop
