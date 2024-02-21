@@ -54,15 +54,15 @@ mdSolverInterface = [mamico.coupling.getMDSolverInterface(simpleMDConfig, mamico
                                                           simpleMD[i]) for i in range(localMDInstances)]
 
 domainSize = simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()
-dx = mamicoConfig.getMacroscopicCellConfiguration().getCouplingCellSize()
-globalNumberMacroscopicCells = [math.floor(
+dx = mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()
+globalNumberCouplingCells = [math.floor(
     domainSize[d]/dx[d]+0.5) for d in range(3)]
 
 print("domainSize = " + str(domainSize))
 print("dx = " + str(dx))
-print("globalNumberMacroscopicCells = " + str(globalNumberMacroscopicCells))
+print("globalNumberCouplingCells = " + str(globalNumberCouplingCells))
 
-macroscopicSolverInterface = CouetteSolverInterface(globalNumberMacroscopicCells,
+macroscopicSolverInterface = CouetteSolverInterface(globalNumberCouplingCells,
                                                     mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
 
 mamico.coupling.setMacroscopicSolverInterface(macroscopicSolverInterface)
@@ -71,12 +71,12 @@ multiMDCellService = MultiMDCellService(mdSolverInterface, macroscopicSolverInte
                                         simpleMDConfig, rank, numMD, mamicoConfig, multiMDService)
 
 for i in range(localMDInstances):
-    simpleMD[i].setMacroscopicCellService(
-        multiMDCellService.getMacroscopicCellService(i))
-    multiMDCellService.getMacroscopicCellService(
+    simpleMD[i].setCouplingCellService(
+        multiMDCellService.getCouplingCellService(i))
+    multiMDCellService.getCouplingCellService(
         i).computeAndStoreTemperature(1.1)
 
-buf = mamico.coupling.Buffer(multiMDCellService.getMacroscopicCellService(0).getIndexConversion(),
+buf = mamico.coupling.Buffer(multiMDCellService.getCouplingCellService(0).getIndexConversion(),
                              macroscopicSolverInterface, rank)
 
 mamico.tarch.utils.finalizeMPI()

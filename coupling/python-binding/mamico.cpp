@@ -342,7 +342,7 @@ private:
     deleteBuffer(_sendBuffer);
 
     // count number of cells to be sent from this process; therefore, loop over
-    // all global macroscopic cells...
+    // all global coupling cells...
     unsigned int numCellsSent = 0;
     for (unsigned int i = 0; i < num; i++) {
       // ... and find out, if the current cell should be send to MD from this
@@ -554,8 +554,7 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("__repr__",
            [](const coupling::configurations::MaMiCoConfiguration<3>& c) { return "<MaMiCoConfiguration read from XML tag \"" + c.getTag() + "\">"; })
       .def("isValid", &coupling::configurations::MaMiCoConfiguration<3>::isValid)
-      .def("getMacroscopicCellConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMacroscopicCellConfiguration,
-           py::return_value_policy::reference)
+      .def("getCouplingCellConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getCouplingCellConfiguration, py::return_value_policy::reference)
       .def("getParticleInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParticleInsertionConfiguration,
            py::return_value_policy::reference)
       .def("getMomentumInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMomentumInsertionConfiguration,
@@ -568,13 +567,13 @@ PYBIND11_MODULE(mamico, mamico) {
            py::return_value_policy::reference)
       .def("getThermostatConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getThermostatConfiguration, py::return_value_policy::reference);
 
-  py::class_<coupling::configurations::MacroscopicCellConfiguration<3>>(configuration, "MacroscopicCellConfiguration")
-      .def("getMacroscopicCellSize", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicCellSize)
-      .def("getNumberLinkedCellsPerMacroscopicCell", &coupling::configurations::MacroscopicCellConfiguration<3>::getNumberLinkedCellsPerMacroscopicCell)
-      .def("getWriteEveryMicroscopicTimestep", &coupling::configurations::MacroscopicCellConfiguration<3>::getWriteEveryMicroscopicTimestep)
-      .def("getMicroscopicFilename", &coupling::configurations::MacroscopicCellConfiguration<3>::getMicroscopicFilename)
-      .def("getWriteEveryMacroscopicTimestep", &coupling::configurations::MacroscopicCellConfiguration<3>::getWriteEveryMacroscopicTimestep)
-      .def("getMacroscopicFilename", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicFilename);
+  py::class_<coupling::configurations::CouplingCellConfiguration<3>>(configuration, "CouplingCellConfiguration")
+      .def("getCouplingCellSize", &coupling::configurations::CouplingCellConfiguration<3>::getCouplingCellSize)
+      .def("getNumberLinkedCellsPerCouplingCell", &coupling::configurations::CouplingCellConfiguration<3>::getNumberLinkedCellsPerCouplingCell)
+      .def("getWriteEveryMicroscopicTimestep", &coupling::configurations::CouplingCellConfiguration<3>::getWriteEveryMicroscopicTimestep)
+      .def("getMicroscopicFilename", &coupling::configurations::CouplingCellConfiguration<3>::getMicroscopicFilename)
+      .def("getWriteEveryMacroscopicTimestep", &coupling::configurations::CouplingCellConfiguration<3>::getWriteEveryMacroscopicTimestep)
+      .def("getMacroscopicFilename", &coupling::configurations::CouplingCellConfiguration<3>::getMacroscopicFilename);
 
   py::class_<coupling::configurations::ParticleInsertionConfiguration>(configuration, "ParticleInsertionConfiguration")
       .def("getParticleInsertionType", &coupling::configurations::ParticleInsertionConfiguration::getParticleInsertionType);
@@ -619,13 +618,13 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("setCouplingCellService", &coupling::interface::MDSimulation::setCouplingCellService)
       .def("shutdown", &coupling::interface::MDSimulation::shutdown);
 
-  py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService")
-      .def("computeAndStoreTemperature", &coupling::services::MacroscopicCellService<3>::computeAndStoreTemperature)
-      .def("getIndexConversion", &coupling::services::MacroscopicCellService<3>::getIndexConversion, py::return_value_policy::reference)
-      .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep)
+  py::class_<coupling::services::CouplingCellService<3>>(services, "CouplingCellService")
+      .def("computeAndStoreTemperature", &coupling::services::CouplingCellService<3>::computeAndStoreTemperature)
+      .def("getIndexConversion", &coupling::services::CouplingCellService<3>::getIndexConversion, py::return_value_policy::reference)
+      .def("plotEveryMacroscopicTimestep", &coupling::services::CouplingCellService<3>::plotEveryMacroscopicTimestep)
       .def(
           "addFilterToSequence",
-          [](coupling::services::MacroscopicCellService<3>* service, const char* filter_sequence, int filter_index,
+          [](coupling::services::CouplingCellService<3>* service, const char* filter_sequence, int filter_index,
              // use of std::optional is neccessary because pybind11 doesnt
              // support implicit None conversion for STL datatypes
              std::optional<std::function<py::array_t<double>(py::array_t<double>)>> scalar_filter_func,
@@ -693,7 +692,7 @@ PYBIND11_MODULE(mamico, mamico) {
   //		return
   // coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
   //	}, py::return_value_policy::reference );
-  coupling.def("setCouplingCellService", [](coupling::services::MacroscopicCellService<3>* service) {
+  coupling.def("setCouplingCellService", [](coupling::services::CouplingCellService<3>* service) {
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setCouplingCellService(service);
   });
 
@@ -708,8 +707,7 @@ PYBIND11_MODULE(mamico, mamico) {
            }),
            "mdSolverInterfaces"_a, "macroscopicSolverInterface"_a, "simpleMDConfig"_a, "rank"_a = 0, "totalNumberMDSimulations"_a = 1, "mamicoConfig"_a,
            "xmlConfigFilename"_a, "multiMDService"_a)
-      .def("getMacroscopicCellService", &coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>::getMacroscopicCellService,
-           py::return_value_policy::reference)
+      .def("getCouplingCellService", &coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>::getCouplingCellService, py::return_value_policy::reference)
       .def("sendFromMacro2MD", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service,
                                   CouplingBuffer& buf) { service.sendFromMacro2MD(buf._sendBuffer, buf._globalCellIndices4SendBuffer); })
       .def("sendFromMD2Macro", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service,
