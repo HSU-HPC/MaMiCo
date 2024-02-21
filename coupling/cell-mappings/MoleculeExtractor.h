@@ -14,12 +14,12 @@ template <class LinkedCell, unsigned int dim> class MoleculeExtractor;
 }
 } // namespace coupling
 
-/** extracts molecule information from a given macroscopic cell and stores all
+/** extracts molecule information from a given coupling cell and stores all
  *molecule positions in a vector. This class is only meant for testing purposes!
  *  If you need individual access to molecules + some functionality, please do
  *so in a separate cell-mapping and call it from the respective transfer
  *strategy instance.
- *	@brief This class extracts molecule information from a given macroscopic
+ *	@brief This class extracts molecule information from a given coupling
  *cell and stores all molecule positions in a vector.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3

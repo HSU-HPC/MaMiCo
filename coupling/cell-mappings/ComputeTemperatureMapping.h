@@ -16,7 +16,7 @@ template <class LinkedCell, unsigned int dim> class ComputeTemperatureMapping;
 } // namespace coupling
 
 /**
- *	@brief This class computes the temperature in a certain (macroscopic)
+ *	@brief This class computes the temperature in a certain (coupling)
  *cell.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3

@@ -25,7 +25,7 @@ template <class LinkedCell, unsigned int dim> class coupling::cellmappings::SetM
 public:
   /** obtains the old momentum over the region of interest. Besides,
    *  obtains the new momentum that shall be set and the number of particles
-   *  contained in the macroscopic cell.
+   *  contained in the coupling cell.
    *	@param oldMomentum
    *	@param newMomentum
    *	@param numberParticles

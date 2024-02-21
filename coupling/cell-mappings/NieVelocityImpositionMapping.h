@@ -35,11 +35,11 @@ template <class LinkedCell, unsigned int dim> class NieVelocityImpositionMapping
 template <class LinkedCell, unsigned int dim> class coupling::cellmappings::NieVelocityImpositionMapping {
 public:
   /** Constructor
-   *	@param continuumVelocity    current velocity in this macroscopic cell
+   *	@param continuumVelocity    current velocity in this coupling cell
    *(=velocity from continuum solver)
    *	@param avgMDVelocity		current avg. velocity of molecules
    *	@param avgForce				average force within this
-   *macroscopic cell
+   *coupling cell
    *	@param mdSolverInterface	MD solver interface, required for
    *molecule iterator and molecule mass
    */
@@ -79,12 +79,12 @@ public:
 private:
   /** MD solver interface, required for molecule iterator and molecule mass */
   coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
-  /** current velocity in this macroscopic cell (=velocity from continuum
+  /** current velocity in this coupling cell (=velocity from continuum
    * solver) */
   const tarch::la::Vector<dim, double> _continuumVelocity;
   /** current avg. velocity of molecules */
   const tarch::la::Vector<dim, double> _avgMDVelocity;
-  /** average force within this macroscopic cell */
+  /** average force within this coupling cell */
   const tarch::la::Vector<dim, double> _avgForce;
 };
 
