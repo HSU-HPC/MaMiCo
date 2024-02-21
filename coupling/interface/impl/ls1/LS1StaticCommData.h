@@ -1,6 +1,7 @@
 #ifndef LS1_STATIC_COMM_DATA_H_
 #define LS1_STATIC_COMM_DATA_H_
 
+#include "coupling/CouplingMDDefinitions.h"
 #include <string>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>

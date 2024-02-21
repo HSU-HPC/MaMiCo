@@ -2,6 +2,8 @@
 
 #include "coupling/interface/MDSimulation.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "coupling/CouplingMDDefinitions.h"
+
 #include "ls1/src/Domain.h"
 #include "ls1/src/Simulation.h"
 #include "ls1/src/plugins/MamicoCoupling.h"

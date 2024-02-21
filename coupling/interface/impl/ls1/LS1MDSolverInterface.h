@@ -209,8 +209,7 @@ public:
     return new coupling::interface::LS1MoleculeIterator(cell);
   }
 
-private:
-  ls1::LS1RegionWrapper _fullDomainWrapper;
+  private : ls1::LS1RegionWrapper _fullDomainWrapper;
   tarch::la::Vector<3, double> _linkedCellSize;
 };
 #endif
