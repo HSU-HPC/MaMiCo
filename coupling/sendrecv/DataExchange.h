@@ -9,7 +9,7 @@
 
 namespace coupling {
 namespace sendrecv {
-template <class MacroscopicCell, unsigned int dim> class DataExchange;
+template <class CouplingCell, unsigned int dim> class DataExchange;
 }
 } // namespace coupling
 
@@ -19,11 +19,11 @@ template <class MacroscopicCell, unsigned int dim> class DataExchange;
  *communication, e.g. make sure that each source rank matches to a target rank
  *etc.
  *	@brief generic class for the the data exchange purposes.
- *	@tparam MacroscopicCell cell type
+ *	@tparam CouplingCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class MacroscopicCell, unsigned int dim> class coupling::sendrecv::DataExchange {
+template <class CouplingCell, unsigned int dim> class coupling::sendrecv::DataExchange {
 public:
   /** Constructor: assign an tag (_tag) to the DataExchange.
    * @param tag
@@ -38,32 +38,32 @@ public:
 
   /** returns the ranks to which a particular cell (at index globalCellIndex)
    * should be sent. This method should globally define the target ranks for
-   * each global cell index of a macroscopic cell.
+   * each global cell index of a coupling cell.
    * 	@param globalCellIndex unique global cell index
    */
   virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
   /** returns all ranks from which a particular cell (at index globalCellIndex)
    * is sent. This method should globally define the source ranks for each
-   * global cell index of a macroscopic cell.
+   * global cell index of a coupling cell.
    * @param globalCellIndex unique global cell index
    */
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
 
-  /** local rule to read from a macroscopic cell and write data to (e.g. send)
+  /** local rule to read from a coupling cell and write data to (e.g. send)
    * buffer
    * 	@param buffer
    * 	@param cell
    */
-  virtual void readFromCell(double* const buffer, const MacroscopicCell& cell) = 0;
+  virtual void readFromCell(double* const buffer, const CouplingCell& cell) = 0;
 
-  /** local rule to read from receive buffer and write data to macroscopic cell
+  /** local rule to read from receive buffer and write data to coupling cell
    * 	@param buffer
    * 	@param cell
    */
-  virtual void writeToCell(const double* const buffer, MacroscopicCell& cell) = 0;
+  virtual void writeToCell(const double* const buffer, CouplingCell& cell) = 0;
 
-  /** returns the number of doubles that are sent per macroscopic cell. */
+  /** returns the number of doubles that are sent per coupling cell. */
   virtual unsigned int getDoublesPerCell() const = 0;
 
 private:

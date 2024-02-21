@@ -152,7 +152,7 @@ private:
    * Helper function used by getRanksForGlobalIndex().
    */
   // TODO inline in getRanksForGlobalIndex()
-  unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
+  unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
                                                const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const;
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const

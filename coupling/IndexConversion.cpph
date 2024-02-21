@@ -325,7 +325,7 @@ coupling::IndexConversion<dim>::initMacroscopicCellSize(const tarch::la::Vector<
 }
 
 template <unsigned int dim>
-unsigned int coupling::IndexConversion<dim>::getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+unsigned int coupling::IndexConversion<dim>::getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
   tarch::la::Vector<dim, unsigned int> processCoords(0);
   for (unsigned int d = 0; d < dim; d++) {
     // special case: cell in first section
@@ -345,7 +345,7 @@ unsigned int coupling::IndexConversion<dim>::getUniqueRankForMacroscopicCell(tar
 }
 
 template <unsigned int dim>
-std::vector<unsigned int> coupling::IndexConversion<dim>::getRanksForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+std::vector<unsigned int> coupling::IndexConversion<dim>::getRanksForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
   std::vector<unsigned int> ranks;
 
   // start and end coordinates of neighboured cells.
@@ -378,7 +378,7 @@ std::vector<unsigned int> coupling::IndexConversion<dim>::getRanksForMacroscopic
         }
 
         // determine the unique rank for this cell
-        const unsigned int rank = getUniqueRankForMacroscopicCell(thisGlobalCellIndex);
+        const unsigned int rank = getUniqueRankForCouplingCell(thisGlobalCellIndex);
 
         // add this rank to the vector with all ranks if we did not add this one
         // before

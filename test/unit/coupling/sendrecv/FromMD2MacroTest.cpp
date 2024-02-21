@@ -13,7 +13,7 @@
 #include <mpi.h>
 #endif
 
-/** tests the communication from a block of macroscopic cells (such as the block of MaMiCo) to a selection of cells of a possible
+/** tests the communication from a block of coupling cells (such as the block of MaMiCo) to a selection of cells of a possible
  *  macroscopic solver.
  *  @author Philipp Neumann
  */
@@ -55,7 +55,7 @@ public:
     const tarch::la::Vector<dim, double> mdDomainOffset(0.0);
     // output information
     if (rank == 0) {
-      std::cout << "Global number macroscopic cells: " << globalNumberMacroscopicCells << std::endl;
+      std::cout << "Global number coupling cells: " << globalNumberMacroscopicCells << std::endl;
       std::cout << "Number processes: " << numberProcesses << std::endl;
     }
 

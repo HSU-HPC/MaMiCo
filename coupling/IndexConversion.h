@@ -221,13 +221,13 @@ public:
    *  @brief returns the unique rank for a coupling cell.
    *  @param globalCellIndex the global vector coordinates of a coupling cell
    *  @returns the rank for the given coupling cell */
-  unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const;
+  unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const;
   /** returns all ranks which contain a copy (as ghost or non-ghost cell) of the
    * coupling cell with this global cell index. This function only supports
    * 1D, 2D, 3D.
    *  @param globalCellIndex the global vector coordinates of a coupling cell
    *  @returns all ranks for the given coupling cell */
-  std::vector<unsigned int> getRanksForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const;
+  std::vector<unsigned int> getRanksForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex) const;
 
   // ------------------------ VALIDATION
   // --------------------------------------------

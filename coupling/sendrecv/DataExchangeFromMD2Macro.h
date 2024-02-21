@@ -18,11 +18,11 @@ template <unsigned int dim> class DataExchangeFromMD2Macro;
 
 /** data exchange from MD, that is the coupling tool, to the macroscopic solver.
  *We transfer the buffers macroscopicMass and macroscopicMomentum of the
- *MacroscopicCell. The target ranks are determined by the getRanks()-method of
+ *CouplingCell. The target ranks are determined by the getRanks()-method of
  *the macroscopic solver interface: the macroscopic solver interface thus needs
  *to know on which ranks information from the MD simulation are required as
  *input. The source ranks arise from the unique rank determination within the
- *IndexConversion. We only allow transfer of non-ghost macroscopic cells to the
+ *IndexConversion. We only allow transfer of non-ghost coupling cells to the
  *macroscopic solver, i.e. cells which are completely embedded into the MD
  *domain.
  *	@brief data exchange from the MD solver to the macroscopic solver.
@@ -77,12 +77,12 @@ public:
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     std::vector<unsigned int> sourceRanks;
     if (_interface->receiveMacroscopicQuantityFromMDSolver(globalCellIndex)) {
-      sourceRanks.push_back(_indexConversion->getUniqueRankForMacroscopicCell(globalCellIndex));
+      sourceRanks.push_back(_indexConversion->getUniqueRankForCouplingCell(globalCellIndex));
     }
     return sourceRanks;
   }
 
-  /** local rule to read from macroscopic cell and write data to (e.g. send)
+  /** local rule to read from coupling cell and write data to (e.g. send)
    * buffer. We only send the macroscopic mass and macroscopic momentum from MD
    * to the macroscopic solver.
    * 	@param buffer
@@ -95,7 +95,7 @@ public:
     }
   }
 
-  /** local rule to read from receive buffer and write data to macroscopic cell
+  /** local rule to read from receive buffer and write data to coupling cell
    * 	@param buffer
    * 	@param cell
    */
@@ -108,7 +108,7 @@ public:
     cell.setMacroscopicMass(buffer[0]);
   }
 
-  /** returns the number of doubles that are sent per macroscopic cell. @return
+  /** returns the number of doubles that are sent per coupling cell. @return
    * 1+dim  */
   virtual unsigned int getDoublesPerCell() const {
     // 1 double: macroscopic mass; dim doubles: macroscopic momentum
