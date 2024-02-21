@@ -9,7 +9,7 @@
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolverInterface.h"
-#include "coupling/services/MacroscopicCellService.h"
+#include "coupling/services/CouplingCellService.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "test/integration/Test.h"
 #include <sstream>
@@ -28,13 +28,13 @@
 template <unsigned int dim> class TestLammps : public Test {
 public:
   TestLammps(int argc, char** argv, std::string name)
-      : Test(name), _lammps(NULL), _macroSolverInterface(NULL), _macroscopicCellService(NULL), _argc(argc), _argv(argv) {}
+      : Test(name), _lammps(NULL), _macroSolverInterface(NULL), _couplingCellService(NULL), _argc(argc), _argv(argv) {}
 
   /** if existent, deletes test configuration */
   virtual ~TestLammps() {
-    if (_macroscopicCellService != NULL) {
-      delete _macroscopicCellService;
-      _macroscopicCellService = NULL;
+    if (_couplingCellService != NULL) {
+      delete _couplingCellService;
+      _couplingCellService = NULL;
     }
     if (_macroSolverInterface != NULL) {
       delete _macroSolverInterface;
@@ -57,7 +57,7 @@ public:
    *  getMoleculeSigma() -> is always 1.0 (LJ case)
    *  getMoleculeEpsilon() -> is always 1.0 (LJ case)
    *  getDt()
-   *  Implicitly, we also test the method getLinkedCell() since this one is automatically invoked in the setup phase of the macroscopic cell service;
+   *  Implicitly, we also test the method getLinkedCell() since this one is automatically invoked in the setup phase of the coupling cell service;
    *  We can hence check the output from the couts in a first place.
    */
   virtual void run() {
@@ -72,7 +72,7 @@ public:
     }
     std::cout << "Load void macroscopic solver configuration..." << std::endl;
     loadMacroscopicSolverConfiguration();
-    std::cout << "Load MaMiCo configuration and init macroscopic cell service..." << std::endl;
+    std::cout << "Load MaMiCo configuration and init coupling cell service..." << std::endl;
     loadMamicoTestConfiguration();
     // test molecule mass
     tmp = coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getMoleculeMass();
@@ -220,7 +220,7 @@ protected:
     }
   }
 
-  /** load mamico configuration and initialse macroscopic cell service; should be called after
+  /** load mamico configuration and initialse coupling cell service; should be called after
    *  loadLammpsTestConfiguration() and loadMacroscopicSolverConfiguration(). We assume a valid configuration file
    *  for this test setup in the file mamico_lammps_test_configuration.xml.
    */
@@ -289,14 +289,14 @@ protected:
     std::cout << "Parse config " << mamicoLammpsTestConfiguration << std::endl;
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<dim>>(mamicoLammpsTestConfiguration, "mamico",
                                                                                                                      config);
-    std::cout << "Init macroscopic cell service..." << std::endl;
-    if (_macroscopicCellService != NULL) {
-      delete _macroscopicCellService;
-      _macroscopicCellService = NULL;
+    std::cout << "Init coupling cell service..." << std::endl;
+    if (_couplingCellService != NULL) {
+      delete _couplingCellService;
+      _couplingCellService = NULL;
     }
     tarch::utils::MultiMDService<dim> multiMDService{numberProcesses, 1};
 
-    _macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>(
+    _couplingCellService = new coupling::services::CouplingCellServiceImpl<LAMMPS_NS::MamicoCell, dim>(
         0, // arg #1
         coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface(),
         coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicSolverInterface(),
@@ -308,17 +308,17 @@ protected:
         config.getTransferStrategyConfiguration(),
         config.getParallelTopologyConfiguration(), // arg #10
         config.getThermostatConfiguration(),
-        numberMDTimestepsPerCouplingCycle,        // arg #12
-        config.getMacroscopicCellConfiguration(), // arg #13
-        mamicoLammpsTestConfiguration.c_str(),    // arg #14
-        multiMDService                            // arg #15
+        numberMDTimestepsPerCouplingCycle,     // arg #12
+        config.getCouplingCellConfiguration(), // arg #13
+        mamicoLammpsTestConfiguration.c_str(), // arg #14
+        multiMDService                         // arg #15
     );
-    if (_macroscopicCellService == NULL) {
-      std::cout << "ERROR TestLammps: _macroscopicCellService==NULL!" << std::endl;
+    if (_couplingCellService == NULL) {
+      std::cout << "ERROR TestLammps: _couplingCellService==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    std::cout << "Set macroscopic cell service in MamicoInterfaceProvider..." << std::endl;
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setCouplingCellService(_macroscopicCellService);
+    std::cout << "Set coupling cell service in MamicoInterfaceProvider..." << std::endl;
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().setCouplingCellService(_couplingCellService);
   }
 
   /** this loads some dummy solver interface which basically does nothing at all. */
@@ -365,7 +365,7 @@ protected:
   LAMMPS_NS::LAMMPS* _lammps;
   /** test solver interface */
   coupling::interface::VoidMacroscopicSolverInterface<dim>* _macroSolverInterface;
-  coupling::services::MacroscopicCellService<dim>* _macroscopicCellService;
+  coupling::services::CouplingCellService<dim>* _couplingCellService;
   /** arguments from commandline */
   int _argc;
   char** _argv;

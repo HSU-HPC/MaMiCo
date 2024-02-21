@@ -5,9 +5,9 @@
       cell-size="2.5 ; 2.5; 2.5"
       linked-cells-per-macroscopic-cell=" 1 ; 1 ; 1"
       write-every-microscopic-timestep="1000"
-      microscopic-filename="MacroscopicCell_micro"
+      microscopic-filename="CouplingCell_micro"
       write-every-macroscopic-timestep="1"
-      macroscopic-filename="MacroscopicCell_macro"
+      macroscopic-filename="CouplingCell_macro"
     />
     <particle-insertion type="none" maximum-number-of-iterations="20" maximum-number-of-restarts="10" />
     <momentum-insertion type="velocity-gradient-relaxation" velocity-relaxation-factor="0.05" />

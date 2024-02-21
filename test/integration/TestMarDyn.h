@@ -14,7 +14,7 @@
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolverInterface.h"
-#include "coupling/services/MacroscopicCellService.h"
+#include "coupling/services/CouplingCellService.h"
 #include "test/integration/Test.h"
 
 #include "coupling/interface/impl/MarDyn/MarDynCell.h"
@@ -34,12 +34,12 @@ public:
   TestMarDyn(int argc, char** argv, std::string name)
       : Test(name),
         //_mamicoInterface(NULL),
-        _marDyn(NULL), _marDynMDsolver(NULL), _macroSolverInterface(NULL), _macroscopicCellService(NULL), _argc(argc), _argv(argv) {}
+        _marDyn(NULL), _marDynMDsolver(NULL), _macroSolverInterface(NULL), _couplingCellService(NULL), _argc(argc), _argv(argv) {}
 
   virtual ~TestMarDyn() {
-    if (_macroscopicCellService != NULL) {
-      delete _macroscopicCellService;
-      _macroscopicCellService = NULL;
+    if (_couplingCellService != NULL) {
+      delete _couplingCellService;
+      _couplingCellService = NULL;
     }
     if (_macroSolverInterface != NULL) {
       delete _macroSolverInterface;
@@ -125,7 +125,7 @@ public:
     std::cout << "Load Macroscopic solver test configuration.." << std::endl;
     loadMacroscopicSolverConfiguration();
 
-    std::cout << "Load MaMiCo test configuration and init macroscopic cell service.." << std::endl;
+    std::cout << "Load MaMiCo test configuration and init coupling cell service.." << std::endl;
     loadMamicoTestConfiguration();
 
     std::cout << "Initialization done." << std::endl;
@@ -139,7 +139,7 @@ public:
     std::cout << "Load Macroscopic solver test configuration.." << std::endl;
     loadMacroscopicSolverConfiguration();
 
-    std::cout << "Load MaMiCo test configuration and init macroscopic cell service.." << std::endl;
+    std::cout << "Load MaMiCo test configuration and init coupling cell service.." << std::endl;
     loadMamicoTestConfiguration();
 
     std::cout << "Initialization done." << std::endl;
@@ -153,8 +153,8 @@ protected:
       _marDyn = NULL;
     }
     tarch::la::Vector<3, double> mamicoCellSize(2.5);
-    tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(1);
-    _marDyn = new MarDynCoupledSimulation(mamicoCellSize, linkedCellsPerMacroscopicCell);
+    tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell(1);
+    _marDyn = new MarDynCoupledSimulation(mamicoCellSize, linkedCellsPerCouplingCell);
 
     // initialize mardyn
     if (fileExists(testConfiguration.c_str())) {
@@ -192,7 +192,7 @@ protected:
     coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().setMacroscopicSolverInterface(_macroSolverInterface);
   }
 
-  /** loads the MaMiCo configuration and initializes the macroscopic cells service;
+  /** loads the MaMiCo configuration and initializes the coupling cells service;
    *	should be called after loadMarDynTestConfiguration() and loadMacroscopicSolverConfiguration().
    */
   void loadMamicoTestConfiguration() {
@@ -205,26 +205,26 @@ protected:
     std::cout << "Parse config: " << mamicoTestConfig << std::endl;
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>(mamicoTestConfig, "mamico", config);
 
-    std::cout << "Init macroscopic cell service.." << std::endl;
-    if (_macroscopicCellService != NULL) {
-      delete _macroscopicCellService;
-      _macroscopicCellService = NULL;
+    std::cout << "Init coupling cell service.." << std::endl;
+    if (_couplingCellService != NULL) {
+      delete _couplingCellService;
+      _couplingCellService = NULL;
     }
-    _macroscopicCellService = new coupling::services::MacroscopicCellServiceImpl<MarDynCell, 3>(
+    _couplingCellService = new coupling::services::CouplingCellServiceImpl<MarDynCell, 3>(
         0, coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMDSolverInterface(),
         coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMacroscopicSolverInterface(), numberProcesses, rank,
         config.getParticleInsertionConfiguration(), config.getMomentumInsertionConfiguration(), config.getBoundaryForceConfiguration(),
         config.getTransferStrategyConfiguration(), config.getParallelTopologyConfiguration(), numberMDTimestepsPerCouplingCycle,
-        config.getMacroscopicCellConfiguration());
-    if (_macroscopicCellService == NULL) {
-      std::cout << "ERROR TestMarDyn: _macroscopicCellService==NULL!" << std::endl;
+        config.getCouplingCellConfiguration());
+    if (_couplingCellService == NULL) {
+      std::cout << "ERROR TestMarDyn: _couplingCellService==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    std::cout << "Set macroscopic cell service in MaMiCoInterfaceProvider.." << std::endl;
-    coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().setCouplingCellService(_macroscopicCellService);
+    std::cout << "Set coupling cell service in MaMiCoInterfaceProvider.." << std::endl;
+    coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().setCouplingCellService(_couplingCellService);
 
-    coupling::services::MacroscopicCellService<3>* macroCellService =
-        coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMacroscopicCellService();
+    coupling::services::CouplingCellService<3>* macroCellService =
+        coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getCouplingCellService();
     std::cout << "init test macro cell service: " << (macroCellService == NULL) << std::endl;
   }
 
@@ -234,7 +234,7 @@ protected:
   MarDynMDSolverInterface* _marDynMDsolver;
   // test solver interface
   coupling::interface::VoidMacroscopicSolverInterface<3>* _macroSolverInterface;
-  coupling::services::MacroscopicCellService<3>* _macroscopicCellService;
+  coupling::services::CouplingCellService<3>* _couplingCellService;
   // command line arguments
   int _argc;
   char** _argv;
