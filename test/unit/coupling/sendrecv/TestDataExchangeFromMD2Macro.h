@@ -32,7 +32,7 @@ public:
     std::vector<unsigned int> vec;
     // empty target ranks if this is a global cell at the lower or upper end of the diagonal (inside ghost layer)
     if ((globalCellIndex == tarch::la::Vector<dim, unsigned int>(0)) ||
-        (globalCellIndex == _indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1))) {
+        (globalCellIndex == _indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(1))) {
       return vec;
     }
     const unsigned int rank = _indexConversion.getUniqueRankForCouplingCell(globalCellIndex);
@@ -60,7 +60,7 @@ public:
     std::vector<unsigned int> vec;
     // empty source ranks if this is a global cell at the lower or upper end of the diagonal (inside ghost layer)
     if ((globalCellIndex == tarch::la::Vector<dim, unsigned int>(0)) ||
-        (globalCellIndex == _indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1))) {
+        (globalCellIndex == _indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(1))) {
       return vec;
     }
 
@@ -111,8 +111,8 @@ public:
           tarch::la::Vector<dim, unsigned int>(1) +
           (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) * _indexConversion.getAverageLocalNumberCouplingCells()[0];
 
-      numberCells = (_indexConversion.getGlobalNumberMacroscopicCells() - (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) *
-                                                                              _indexConversion.getAverageLocalNumberCouplingCells()[0])[0];
+      numberCells = (_indexConversion.getGlobalNumberCouplingCells() - (_indexConversion.getNumberProcesses() - tarch::la::Vector<dim, unsigned int>(1)) *
+                                                                           _indexConversion.getAverageLocalNumberCouplingCells()[0])[0];
       for (unsigned int i = 0; i < numberCells; i++) {
         cells.push_back(new TestCell<dim>());
         if (cells[i] == NULL) {
