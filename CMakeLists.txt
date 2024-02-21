@@ -678,6 +678,7 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/solvers/LBCouetteSolverStateTest.cpp"
   "test/unit/coupling/solvers/PintableLBCouetteSolverTest.cpp"
   "test/unit/getTestNames.cpp"
+  "test/unit/coupling/InstanceHandlingTest.cpp"
   "test/unit/coupling/indexing/OperationsTest.cpp"
   "test/unit/coupling/indexing/CellIndexTest.cpp"
   "test/unit/coupling/indexing/IndexingServiceTest.cpp"
