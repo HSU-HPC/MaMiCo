@@ -154,7 +154,7 @@ public:
    * conntinuum solver
    *  @param recvBuffer holds the data from the md solver
    *  @param recvIndice the indices to connect the data from the buffer with
-   * macroscopic cells
+   * coupling cells
    *  @param indexConversion instance of the indexConversion */
   void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
                            const coupling::IndexConversion<3>& indexConversion) override {

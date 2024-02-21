@@ -154,7 +154,7 @@ public:
    *  @param overlapStrip the number of cells in the overlap layer;
    *                      The overlap of md and macro cells
    *  @param indexConversion instance of the indexConversion
-   *  @param recvIndice the macroscopic indices that will be received
+   *  @param recvIndice the coupling cell indices that will be received
    *  @param size the number of cells that will be received */
   void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
                      const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size) {
@@ -168,8 +168,8 @@ public:
         std::cout << "ERROR NumericalSolver::setMDBoundary(): offset does not match!" << std::endl;
         exit(EXIT_FAILURE);
       }
-      _globalNumberMacroscopicCells[d] = (floor(mdDomainSize[d] / _dx + 0.5));
-      if (fabs(_globalNumberMacroscopicCells[d] * _dx - mdDomainSize[d]) / _dx > 1.0e-8) {
+      _globalNumberCouplingCells[d] = (floor(mdDomainSize[d] / _dx + 0.5));
+      if (fabs(_globalNumberCouplingCells[d] * _dx - mdDomainSize[d]) / _dx > 1.0e-8) {
         std::cout << "ERROR NumericalSolver::setMDBoundary(): globalNumber "
                      "does not match!"
                   << std::endl;
@@ -186,7 +186,7 @@ public:
           bool isMDCell = true;
           for (int d = 0; d < 3; d++) {
             isMDCell = isMDCell && (globalCoords[d] > _offset[d] + (int)overlapStrip - 1) &&
-                       (globalCoords[d] < _offset[d] + _globalNumberMacroscopicCells[d] - (int)overlapStrip);
+                       (globalCoords[d] < _offset[d] + _globalNumberCouplingCells[d] - (int)overlapStrip);
           }
           if (isMDCell) {
             _flag[get(x, y, z)] = MD_BOUNDARY;
@@ -200,7 +200,7 @@ public:
    * conntinuum solver
    *  @param recvBuffer holds the data from the md solver
    *  @param recvIndice the indices to connect the data from the buffer with
-   * macroscopic cells
+   * coupling cells
    *  @param indexConversion instance of the indexConversion */
   virtual void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
                                    const coupling::IndexConversion<3>& indexConversion) = 0;
@@ -601,8 +601,8 @@ protected:
   tarch::la::Vector<6, int> _parallelNeighbours{(-1)};
   /** @brief offset of the md domain */
   tarch::la::Vector<3, int> _offset{(-1)};
-  /** @brief the total number of macroscopic cells of the coupled simulation */
-  tarch::la::Vector<3, int> _globalNumberMacroscopicCells{(-1)};
+  /** @brief the total number of coupling cells of the coupled simulation */
+  tarch::la::Vector<3, int> _globalNumberCouplingCells{(-1)};
   const Scenario* _scen;
 };
 
