@@ -124,8 +124,7 @@ public:
     return _density[index];
   }
 
-  void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
-                           const coupling::IndexConversion<3>& indexConversion) override {
+  void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const I00* const recvIndices) override {
     if (skipRank()) {
       return;
     }
@@ -133,13 +132,13 @@ public:
 #pragma omp parallel for
     for (unsigned int i = 0; i < size; i++) {
       // determine cell index of this cell in continuum domain
-      tarch::la::Vector<3, unsigned int> globalCellCoords = indexConversion.getGlobalVectorCellIndex(recvIndices[i]);
+      tarch::la::Vector<3, unsigned int> globalCellCoords{I01{recvIndices[i]}.get()};
       globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
       globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
       globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index ";
-      std::cout << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": " << globalCellCoords << std::endl;
+      std::cout << I01{recvIndices[i]} << ": " << globalCellCoords << std::endl;
 #endif
       const int index = get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)

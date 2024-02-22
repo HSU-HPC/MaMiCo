@@ -149,14 +149,12 @@ public:
    * 	@tparam LinkedCell type of the cell
    * 	@tparam dim Number of dimensions; it can be 1, 2 or 3
    * 	@param mdSolverInterface
-   * 	@param indexConversion
    * 	@param couplingCells
    * 	@param numberMDTimestepsPerCouplingCycle
    * 	@return momentum insertion config
    */
   template <class LinkedCell, unsigned int dim>
   MomentumInsertion<LinkedCell, dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                                                              const coupling::IndexConversion<dim>& indexConversion,
                                                               const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells,
                                                               unsigned int numberMDTimestepsPerCouplingCycle) const {
     if (_insertionType == ADDITIVE_MOMENTUM_INSERTION) {
@@ -164,13 +162,13 @@ public:
     } else if (_insertionType == DIRECT_VELOCITY_INSERTION) {
       return new coupling::SetGivenVelocity4MomentumInsertion<LinkedCell, dim>(mdSolverInterface);
     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION) {
-      return new coupling::VelocityGradientRelaxation<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, indexConversion, couplingCells);
+      return new coupling::VelocityGradientRelaxation<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, couplingCells);
     } else if (_insertionType == NO_INSERTION) {
       return new coupling::NoMomentumInsertion<LinkedCell, dim>(mdSolverInterface);
     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION_TOPONLY) {
-      return new coupling::VelocityGradientRelaxationTopOnly<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, indexConversion, couplingCells);
+      return new coupling::VelocityGradientRelaxationTopOnly<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, couplingCells);
     } else if (_insertionType == NIE_VELOCITY_IMPOSITION) {
-      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, indexConversion, _outerOverlap, _innerOverlap);
+      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, _outerOverlap, _innerOverlap);
     }
     return NULL;
   }

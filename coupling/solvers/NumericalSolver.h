@@ -14,7 +14,6 @@
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
-#include "coupling/IndexConversion.h"
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/services/ParallelTimeIntegrationService.h"
@@ -153,11 +152,10 @@ public:
    *  @param mdDomainSize total 3d size of the md domain
    *  @param overlapStrip the number of cells in the overlap layer;
    *                      The overlap of md and macro cells
-   *  @param indexConversion instance of the indexConversion
    *  @param recvIndice the coupling cell indices that will be received
    *  @param size the number of cells that will be received */
   void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
-                     const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size) {
+                     const I00* const recvIndice, unsigned int size) {
     if (skipRank()) {
       return;
     }
@@ -200,10 +198,8 @@ public:
    * conntinuum solver
    *  @param recvBuffer holds the data from the md solver
    *  @param recvIndice the indices to connect the data from the buffer with
-   * coupling cells
-   *  @param indexConversion instance of the indexConversion */
-  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
-                                   const coupling::IndexConversion<3>& indexConversion) = 0;
+   * coupling cells*/
+  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const I00* const recvIndices) = 0;
 
   /** @brief returns the number of process, regards parallel runs
    *  @returns the number of processes */

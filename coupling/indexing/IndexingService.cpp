@@ -335,6 +335,8 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
   }
 #endif
 
+  _couplingCellSize = couplingCellSize;
+
   // TODO: make this globalNumberCouplingCells and remove all usages of the
   // old meaning (seen above)
   const auto globalNumberCouplingCellsInclGL{globalNumberCouplingCells + tarch::la::Vector<dim, unsigned int>{2}};
