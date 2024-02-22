@@ -1,8 +1,8 @@
 #pragma once
 
-#include "coupling/configurations/MaMiCoConfiguration.h"
+//#include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
-#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+//#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 // parallel topologies
 #include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/paralleltopology/ParallelTopologyFactory.h"
@@ -65,8 +65,10 @@ public:
 
   // Config unpacking variant of init
   template <unsigned int mddim>
-  typename std::enable_if<mddim == MD_DIM>::type init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
-                                                      const coupling::configurations::MaMiCoConfiguration<mddim>& mamicoConfig,
+  typename std::enable_if<mddim == MD_DIM>::type init(const tarch::la::Vector<MD_DIM, double>& globalMDDomainSize,
+                                                      const tarch::la::Vector<MD_DIM, double>& couplingCellSize,
+                                                      const tarch::la::Vector<MD_DIM, unsigned int>& mdNumberProcesses,
+                                                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
                                                       coupling::interface::MacroscopicSolverInterface<mddim>* msi, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                       ,
@@ -74,8 +76,8 @@ public:
 #endif
   ) {
     // read relevant data from configs
-    const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
-    const auto couplingCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
+    //const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
+    //const auto couplingCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
 
     // calculate total number of coupling cells on all ranks in Base Domain
     tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells(0);
@@ -86,8 +88,7 @@ public:
         std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
     }
 
-    init(globalNumberCouplingCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-         mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), msi, rank
+    init(globalNumberCouplingCells, mdNumberProcesses, parallelTopologyType, msi, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
          ,
          comm
