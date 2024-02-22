@@ -188,8 +188,8 @@ protected:
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().init(
         _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), ,
-        couetteSolverInterface, (unsigned int)_rank
+        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)_rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         ,
         _timeIntegrationService->getPintComm()
@@ -754,7 +754,8 @@ protected:
     for (unsigned int i = 0; i < num; i++) {
       // ... and find out, if the current cell should be send to MD from this
       // couette solver process
-      if (couetteSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
+      I00 todo_rewrite_this_entire_function_very_much_later{i};
+      if (!I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
         std::vector<unsigned int> ranks = couetteSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
         bool containsThisRank = false;
         for (unsigned int k = 0; k < ranks.size(); k++) {
@@ -774,7 +775,8 @@ protected:
 
     // allocate sendBuffer and initialise all entries, incl. indices
     for (unsigned int i = 0; i < num; i++) {
-      if (couetteSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
+      I00 todo_rewrite_this_entire_function_very_much_later{i};
+      if (!I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
         std::vector<unsigned int> ranks = couetteSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
         bool containsThisRank = false;
         for (unsigned int k = 0; k < ranks.size(); k++) {
@@ -817,7 +819,8 @@ protected:
     // determine number of cells that should be received
     unsigned int numCellsRecv = 0;
     for (unsigned int i = 0; i < num; i++) {
-      if (couetteSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
+      I00 todo_rewrite_this_entire_function_very_much_later{i};
+      if (I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
         std::vector<unsigned int> ranks = couetteSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
         bool containsThisRank = false;
         for (unsigned int k = 0; k < ranks.size(); k++) {
@@ -837,7 +840,8 @@ protected:
 
     // allocate recvBuffer and initialise all entries, incl. indices
     for (unsigned int i = 0; i < num; i++) {
-      if (couetteSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
+      I00 todo_rewrite_this_entire_function_very_much_later{i};
+      if (I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
         std::vector<unsigned int> ranks = couetteSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
         bool containsThisRank = false;
         for (unsigned int k = 0; k < ranks.size(); k++) {

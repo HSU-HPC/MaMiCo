@@ -128,14 +128,10 @@ private:
     for (unsigned int d = 0; d < 3; d++)
       globalNumberCouplingCells[d] = (unsigned int)floor(
           _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] / _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[d] + 0.5);
-    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface =
-        new coupling::solvers::CouetteSolverInterface<3>(globalNumberCouplingCells, _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-    _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-    _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
-    _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), couetteSolverInterface, (unsigned int)_rank);
-    delete couetteSolverInterface;
+    coupling::indexing::IndexingService<3>::getInstance().init(
+        _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)_rank);
   }
 
   void shutdown() {}

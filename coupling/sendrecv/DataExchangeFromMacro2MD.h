@@ -60,7 +60,8 @@ public:
   virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
     // if we need information on MD side, return the respective ranks via
     // IndexConversion
-    if (_interface->sendMacroscopicQuantityToMDSolver(globalCellIndex)) {
+    I01 todo_rewrite_this_entire_function_very_much_later{(tarch::la::Vector<dim, int>)(globalCellIndex)};
+    if (!I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
       return _indexConversion->getRanksForCouplingCell(globalCellIndex);
       // otherwise return empty vector
     }
@@ -74,7 +75,8 @@ public:
    *need information on MD side, otherwise empty vector
    */
   virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    if (_interface->sendMacroscopicQuantityToMDSolver(globalCellIndex)) {
+    I01 todo_rewrite_this_entire_function_very_much_later{(tarch::la::Vector<dim, int>)(globalCellIndex)};
+    if (!I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
       return _interface->getSourceRanks(globalCellIndex);
     }
     return std::vector<unsigned int>();

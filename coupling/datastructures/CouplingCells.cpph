@@ -89,8 +89,8 @@ coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithL
       for (macroLoop[0] = start[0]; macroLoop[0] < end[0]; macroLoop[0]++) {
 
         // determine coupling cell index
-        tarch::la::Vector<dim, unsigned int> couplingCellIndex = coupling::initDimVector<dim>(macroLoop);
-        const unsigned int linearisedIndex = indexConversion.getLocalCellIndex(couplingCellIndex);
+        I03 couplingCellIndex{{(int)macroLoop[0], (int)macroLoop[1], (int)macroLoop[2]}};
+        const unsigned int linearisedIndex = coupling::indexing::convertToScalar(couplingCellIndex);
 
         // loop over linked cells inside this coupling cell
         unsigned int linkedCounter = 0;
@@ -99,8 +99,8 @@ coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithL
           for (linkedLoop[1] = 0; linkedLoop[1] < endInnerLoop[1]; linkedLoop[1]++) {
             for (linkedLoop[0] = 0; linkedLoop[0] < endInnerLoop[0]; linkedLoop[0]++) {
               tarch::la::Vector<dim, unsigned int> linkedCellIndex = coupling::initDimVector<dim>(linkedLoop);
-              cells[linearisedIndex].addLinkedCell(
-                  mdSolverInterface->getLinkedCell(couplingCellIndex, linkedCellIndex, numberLinkedCellsPerCouplingCell, indexConversion), linkedCounter);
+              cells[linearisedIndex].addLinkedCell(mdSolverInterface->getLinkedCell(couplingCellIndex, linkedCellIndex, numberLinkedCellsPerCouplingCell),
+                                                   linkedCounter);
 
               linkedCounter++;
             }

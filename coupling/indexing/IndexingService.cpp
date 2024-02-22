@@ -314,7 +314,7 @@ template <> const char I15::TNAME[] = "CellIndex<3, vector, local, md2macro, noG
 // delegated init, this does the main work
 template <unsigned int dim>
 void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
-                                                    tarch::la::Vector<dim, unsigned int> numberProcesses,
+                                                    tarch::la::Vector<dim, unsigned int> numberProcesses, const tarch::la::Vector<3, double>& couplingCellSize,
                                                     coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
                                                     const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
