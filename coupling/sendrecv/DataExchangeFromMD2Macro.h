@@ -7,9 +7,9 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/datastructures/CouplingCell.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "coupling/sendrecv/DataExchange.h"
-#include "coupling/indexing/IndexingService.h"
 
 namespace coupling {
 namespace sendrecv {

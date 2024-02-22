@@ -92,6 +92,20 @@ coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithL
         I03 couplingCellIndex{{(int)macroLoop[0], (int)macroLoop[1], (int)macroLoop[2]}};
         const unsigned int linearisedIndex = coupling::indexing::convertToScalar(couplingCellIndex);
 
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+        if (linearisedIndex >= numberCouplingCells) {
+          // I11::numberCellsInDomain and indexConversion.getLocalNumberCouplingCells() should be equal.
+          std::cout << "I11::numberCellsInDomain = " << I11::numberCellsInDomain << std::endl;
+          std::cout << "indexConversion.getLocalNumberCouplingCells() = " << indexConversion.getLocalNumberCouplingCells() << std::endl;
+          std::cout << "linearisedIndex = " << linearisedIndex << std::endl;
+          std::cout << "numberCouplingCells = " << numberCouplingCells << std::endl;
+          std::cout << "macroLoop[0] = " << macroLoop[0] << std::endl;
+          std::cout << "macroLoop[1] = " << macroLoop[1] << std::endl;
+          std::cout << "macroLoop[2] = " << macroLoop[2] << std::endl;
+          throw std::runtime_error(std::string("CouplingCells::initCouplingCellsWithLinkedCells: linearisedIndex out of range!"));
+        }
+#endif
+
         // loop over linked cells inside this coupling cell
         unsigned int linkedCounter = 0;
         tarch::la::Vector<3, unsigned int> linkedLoop(0);

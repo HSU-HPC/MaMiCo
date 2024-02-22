@@ -468,8 +468,8 @@ PYBIND11_MODULE(mamico, mamico) {
       [](const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
          const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
          const unsigned int rank) {
-        return coupling::indexing::IndexingService<3>::getInstance().init(globalMDDomainSize, mdNumberProcesses, couplingCellSize, parallelTopologyType,
-                                                                          outerRegion, rank);
+        return coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(globalMDDomainSize, mdNumberProcesses, couplingCellSize,
+                                                                                    parallelTopologyType, outerRegion, rank);
       },
       "Calls init of the IndexingService singleton object");
   ///////////////////////////////////////////////////////////////////////////////////
