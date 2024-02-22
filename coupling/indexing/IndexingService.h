@@ -1,6 +1,7 @@
 #pragma once
 
 // parallel topologies
+#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/paralleltopology/ParallelTopologyFactory.h"
 
@@ -16,7 +17,6 @@ template <unsigned int dim> class IndexingService;
 }
 } // namespace coupling
 
-#include "coupling/configurations/MaMiCoConfiguration.h"
 // Include CellIndex template class definition
 #include "coupling/indexing/IndexTypes.h"
 
@@ -63,9 +63,9 @@ public:
 
   // Config unpacking variant of init
   template <unsigned int mddim>
-  typename std::enable_if<mddim == MD_DIM>::type
-  init(const tarch::la::Vector<MD_DIM, double>& globalMDDomainSize, const tarch::la::Vector<MD_DIM, double>& couplingCellSize,
-       const tarch::la::Vector<MD_DIM, unsigned int>& mdNumberProcesses, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+  typename std::enable_if<mddim == 3>::type
+  init(const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, double>& couplingCellSize,
+       const tarch::la::Vector<3, unsigned int>& mdNumberProcesses, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
        unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
        ,
