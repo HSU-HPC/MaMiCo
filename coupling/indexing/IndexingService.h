@@ -62,17 +62,15 @@ public:
 #endif
   );
 
-  void initWithMDSize(const tarch::la::Vector<3, double>& globalMDDomainSize, 
-    const tarch::la::Vector<3, double>& globalMDDomainOffset,
-    const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
-                      const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-                      unsigned int outerRegion, unsigned int rank
+  void initWithMDSize(const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, double>& globalMDDomainOffset,
+                      const tarch::la::Vector<3, unsigned int>& mdNumberProcesses, const tarch::la::Vector<3, double>& couplingCellSize,
+                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion, unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                       ,
                       MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
-    
+
     _globalMDDomainSize = globalMDDomainSize;
     _globalMDDomainOffset = globalMDDomainOffset;
 
@@ -151,7 +149,7 @@ public:
   /** @brief returns the offset, i.e. the lower,left... corner coordinate, of
    * the MD domain.
    *  @returns the offset of the MD domain */
-  tarch::la::Vector<dim, double> getGlobalMDDomainOffset() const{
+  tarch::la::Vector<dim, double> getGlobalMDDomainOffset() const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (!_isInitialized) {
       throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainOffset() before initalization! "));
@@ -162,7 +160,7 @@ public:
 
   /** @brief returns the vector size of each coupling cell.
    *  @returns the size of the coupling cells (dimensional) */
-  tarch::la::Vector<dim, double> getCouplingCellSize() const{
+  tarch::la::Vector<dim, double> getCouplingCellSize() const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (!_isInitialized) {
       throw std::runtime_error(std::string("IndexingService: Called getCouplingCellSize() before initalization! "));

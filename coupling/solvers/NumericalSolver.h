@@ -154,7 +154,8 @@ public:
    *                      The overlap of md and macro cells
    *  @param recvIndice the coupling cell indices that will be received
    *  @param size the number of cells that will be received */
-  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip, const I00* const recvIndice, unsigned int size) {
+  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
+                     const I00* const recvIndice, unsigned int size) {
     if (skipRank()) {
       return;
     }

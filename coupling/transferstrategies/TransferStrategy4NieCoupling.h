@@ -35,9 +35,8 @@ public:
    *  @param massFluxBoundary indicates at which boundary mass shall be
    * transferred (true) or not (false); in their order the entries refer to:
    * west, east, south, north, bottom, top boundary  */
-  TransferStrategy4NieCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                               unsigned int numberMDSteps, double shiftTimestep,
-                               tarch::la::Vector<2 * dim, bool> massFluxBoundary);
+  TransferStrategy4NieCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDSteps,
+                               double shiftTimestep, tarch::la::Vector<2 * dim, bool> massFluxBoundary);
 
   /** @brief a dummy destructor */
   virtual ~TransferStrategy4NieCoupling();
@@ -50,7 +49,8 @@ public:
    * microscopic mass buffer
    *  @param cell the coupling cell to be processed
    *  @param index the index of the coupling cell */
-  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override;
+  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override;
 
   /** stores velocity values in new cont.-velocity field solution and sets
    * correct velocity value for first MD time step in microscopic momentum
@@ -58,7 +58,8 @@ public:
    *  @brief converts momentum into velocity values;
    *  @param cell the coupling cell to be processed
    *  @param index the index of the coupling cell */
-  void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override;
+  void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                   I02 index) override;
 
   // virtual void beginProcessInnerCouplingCellsBeforeSendingMDSolverData();
 

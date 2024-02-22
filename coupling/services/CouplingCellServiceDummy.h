@@ -27,22 +27,20 @@ template <unsigned int dim> class CouplingCellServiceDummy;
  */
 template <unsigned int dim> class coupling::services::CouplingCellServiceDummy : public coupling::services::CouplingCellService<dim> {
 public:
-  CouplingCellServiceDummy(
-      unsigned int ID,
-      coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,                // interface to macroscopic solver
-      tarch::la::Vector<dim, unsigned int> numberProcesses,                                            // number of processes in all directions
-      unsigned int rank,                                                                               // current rank
-      tarch::la::Vector<dim, double> globalMDDomainSize,                                               // domain size of MD simulation -> required for
-                                                                                                      
-      tarch::la::Vector<dim, double> globalMDDomainOffset,                                             // domain offset of MD simulation
-                                                                                                       
-      const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,    // configuration for parallel topology
-      const coupling::configurations::CouplingCellConfiguration<dim>& couplingCellConfiguration, // configuration for coupling cells
-                                                                                                       // and respective plotting
-      unsigned int topologyOffset)
-      : coupling::services::CouplingCellService<dim>(ID),
-        _macroscopicSolverInterface(macroscopicSolverInterface), _deFromMacro2MD(_macroscopicSolverInterface, ID),
-        _deFromMD2Macro(_macroscopicSolverInterface, ID) {
+  CouplingCellServiceDummy(unsigned int ID,
+                           coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface, // interface to macroscopic solver
+                           tarch::la::Vector<dim, unsigned int> numberProcesses,                             // number of processes in all directions
+                           unsigned int rank,                                                                // current rank
+                           tarch::la::Vector<dim, double> globalMDDomainSize,                                // domain size of MD simulation -> required for
+
+                           tarch::la::Vector<dim, double> globalMDDomainOffset, // domain offset of MD simulation
+
+                           const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration, // configuration for parallel topology
+                           const coupling::configurations::CouplingCellConfiguration<dim>& couplingCellConfiguration,    // configuration for coupling cells
+                                                                                                                         // and respective plotting
+                           unsigned int topologyOffset)
+      : coupling::services::CouplingCellService<dim>(ID), _macroscopicSolverInterface(macroscopicSolverInterface),
+        _deFromMacro2MD(_macroscopicSolverInterface, ID), _deFromMD2Macro(_macroscopicSolverInterface, ID) {
     if (_macroscopicSolverInterface == NULL) {
       std::cout << "ERROR "
                    "coupling::services::CouplingCellServiceDummy::"
@@ -56,11 +54,11 @@ public:
   virtual ~CouplingCellServiceDummy() {}
 
   void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                const I00* const globalCellIndicesFromMacroscopicSolver) override {
+                        const I00* const globalCellIndicesFromMacroscopicSolver) override {
     _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
   }
   double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                  const I00* const globalCellIndicesFromMacroscopicSolver) override {
+                          const I00* const globalCellIndicesFromMacroscopicSolver) override {
     _fromMD2Macro.sendFromMD2Macro(_deFromMD2Macro, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return 0;
   }
@@ -80,7 +78,6 @@ public:
   virtual void plotEveryMacroscopicTimestep(unsigned int t) {}
 
 private:
-
   /** interface for macroscopic solver */
   coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
 

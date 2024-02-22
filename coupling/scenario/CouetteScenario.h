@@ -188,11 +188,10 @@ protected:
 
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
-        _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-        _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-         _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
-        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)_rank
+        _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
+        _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+        (unsigned int)_rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
         ,
         _timeIntegrationService->getPintComm()
@@ -333,7 +332,7 @@ protected:
                       }
 
                       // std::cout << "Entering synthetic MD scalar..." << std::endl;
-                      
+
                       const unsigned int size = inputScalars.size();
                       auto dx = coupling::indexing::IndexingService<3>::getInstance().getCouplingCellSize();
                       const tarch::la::Vector<3, double> couplingCellSize(dx);
@@ -362,7 +361,7 @@ protected:
                       }
 
                       // std::cout << "Entering synthetic MD vector." << std::endl;
-                      
+
                       const unsigned int size = inputVectors.size();
                       auto dx = coupling::indexing::IndexingService<3>::getInstance().getCouplingCellSize();
                       const tarch::la::Vector<3, double> couplingCellSize(dx);
@@ -624,25 +623,21 @@ protected:
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle == _cfg.filterInitCycles) {
         static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
             ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
-                            _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
+                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
       }
 #if (BUILD_WITH_OPENFOAM)
       else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
         static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
             ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
-                            _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
+                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _buf.globalCellIndices4RecvBuffer, _buf.recvBuffer.size());
       }
 #endif
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
-        static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
-            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+        static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
       }
 #if (BUILD_WITH_OPENFOAM)
       else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM && cycle >= _cfg.filterInitCycles && _couetteSolver != NULL) {
-        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
-            ->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
+        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)->setMDBoundaryValues(_buf.recvBuffer, _buf.globalCellIndices4RecvBuffer);
       }
 #endif
     }
@@ -725,15 +720,15 @@ protected:
     return globalNumberCouplingCells;
   }
 
-  /** 
+  /**
    *  @brief allocates the send buffer (with values for all coupling cells).
    *  @param couetteSolverInterface interface for the continuum solver */
   void allocateSendBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
     deleteBuffer(_buf.sendBuffer);
     unsigned int numCellsSent = 0;
-    for (auto idx : I00()) 
-      if (!I12::contains(idx)) 
-        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) 
+    for (auto idx : I00())
+      if (!I12::contains(idx))
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank))
           numCellsSent++;
     // allocate array for cell indices
     I00* indices = new I00[numCellsSent];
@@ -741,10 +736,10 @@ protected:
       throw std::runtime_error(std::string("ERROR allocateSendBuffer(): indices==NULL!"));
     // allocate sendBuffer and initialise all entries, incl. indices
     for (auto idx : I00())
-      if (!I12::contains(idx)) 
+      if (!I12::contains(idx))
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           _buf.sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
-          if (_buf.sendBuffer.back() == NULL) 
+          if (_buf.sendBuffer.back() == NULL)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateSendBuffer: sendBuffer.back()==NULL!"));
           indices[_buf.sendBuffer.size() - 1] = idx;
         }
@@ -756,20 +751,20 @@ protected:
   void allocateRecvBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
     deleteBuffer(_buf.recvBuffer);
     unsigned int numCellsRecv = 0;
-    for (auto idx : I00()) 
-      if (I12::contains(idx)) 
-        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) 
+    for (auto idx : I00())
+      if (I12::contains(idx))
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank))
           numCellsRecv++;
     // allocate array for cell indices
     I00* indices = new I00[numCellsRecv];
     if (indices == NULL)
       throw std::runtime_error(std::string("ERROR allocateRecvBuffer(): indices==NULL!"));
     // allocate recvBuffer and initialise all entries, incl. indices
-    for (auto idx : I00()) 
-      if (I12::contains(idx)) 
+    for (auto idx : I00())
+      if (I12::contains(idx))
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           _buf.recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
-          if (_buf.recvBuffer.back() == NULL) 
+          if (_buf.recvBuffer.back() == NULL)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateRecvBuffer: recvBuffer.back() == NULL!"));
           // set linearized index
           indices[_buf.recvBuffer.size() - 1] = idx;
@@ -781,8 +776,7 @@ protected:
    *  @param recvBuffer the buffer for the data, which comes from md
    *  @param recvIndices the indices for the macr cells in the buffer
    *  @param couplingCycle the current number of coupling cycle */
-  void write2CSV(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const I00* const recvIndices,
-      int couplingCycle) const {
+  void write2CSV(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const I00* const recvIndices, int couplingCycle) const {
     if (recvBuffer.size() == 0)
       return;
     if (_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0)
@@ -804,8 +798,7 @@ protected:
       if (recvBuffer[i]->getMacroscopicMass() != 0.0) {
         vel = (1.0 / recvBuffer[i]->getMacroscopicMass()) * vel;
       }
-      file << I01{recvIndices[i]} << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; "
-           << recvBuffer[i]->getMacroscopicMass() << ";";
+      file << I01{recvIndices[i]} << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; " << recvBuffer[i]->getMacroscopicMass() << ";";
       file << std::endl;
     }
 
@@ -833,8 +826,7 @@ protected:
    *  @param globalCellIndices4SendBuffer the global linearized indices of the
    * coupling cells in the buffer  */
   void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,
-                      std::vector<coupling::datastructures::CouplingCell<3>*>& sendBuffer,
-                      const I00* const globalCellIndices4SendBuffer) const {
+                      std::vector<coupling::datastructures::CouplingCell<3>*>& sendBuffer, const I00* const globalCellIndices4SendBuffer) const {
     using coupling::configurations::CouetteConfig;
     using namespace coupling::indexing;
     const tarch::la::Vector<3, double> dx(IndexingService<3>::getInstance().getCouplingCellSize());

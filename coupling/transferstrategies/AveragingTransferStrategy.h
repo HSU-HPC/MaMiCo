@@ -7,8 +7,8 @@
 
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
-#include "coupling/transferstrategies/TransferStrategy.h"
 #include "coupling/indexing/IndexingService.h"
+#include "coupling/transferstrategies/TransferStrategy.h"
 #include <list>
 #include <map>
 
@@ -50,7 +50,8 @@ public:
    * macro solver is transferred
    *  @param cell the coupling cell to process
    *  @param index the index of the coupling cell */
-  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
+  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset buffers for sampling mass and momentum in each inner coupling
     // cell
     cell.setMacroscopicMass(0.0);

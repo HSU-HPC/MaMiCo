@@ -115,8 +115,7 @@ public:
    */
   template <class LinkedCell>
   coupling::transferstrategies::TransferStrategy<LinkedCell, dim>*
-  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                          unsigned int numberOfMDTimesteps) const {
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberOfMDTimesteps) const {
     if (_type == DirectTransferStrategy) {
       return new coupling::transferstrategies::DirectTransferStrategy<LinkedCell, dim>(mdSolverInterface);
     } else if (_type == DifferenceTransferStrategy) {
@@ -124,8 +123,8 @@ public:
     } else if (_type == TransferStrategy4SchwarzCoupling) {
       return new coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>(mdSolverInterface, numberOfMDTimesteps);
     } else if (_type == TransferStrategy4NieCoupling) {
-      return new coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>(mdSolverInterface,numberOfMDTimesteps,
-                                                                                             _shiftTimestep, _massFluxBoundary);
+      return new coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>(mdSolverInterface, numberOfMDTimesteps, _shiftTimestep,
+                                                                                             _massFluxBoundary);
     } else if (_type == AveragingTransferStrategy) {
       return new coupling::transferstrategies::AveragingTransferStrategy<LinkedCell, dim>(mdSolverInterface);
     } else {

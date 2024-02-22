@@ -331,15 +331,15 @@ private:
   const unsigned int _outerRegion; // defines an offset of cells which is
                                    // considered to be the outer region
 
-  /** 
+  /**
    *  @brief allocates the send buffer (with values for all coupling cells).
    *  @param couetteSolverInterface interface for the continuum solver */
   void allocateSendBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
     deleteBuffer(_buf.sendBuffer);
     unsigned int numCellsSent = 0;
-    for (auto idx : I00()) 
-      if (!I12::contains(idx)) 
-        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) 
+    for (auto idx : I00())
+      if (!I12::contains(idx))
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank))
           numCellsSent++;
     // allocate array for cell indices
     I00* indices = new I00[numCellsSent];
@@ -347,10 +347,10 @@ private:
       throw std::runtime_error(std::string("ERROR allocateSendBuffer(): indices==NULL!"));
     // allocate sendBuffer and initialise all entries, incl. indices
     for (auto idx : I00())
-      if (!I12::contains(idx)) 
+      if (!I12::contains(idx))
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           _buf.sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
-          if (_buf.sendBuffer.back() == NULL) 
+          if (_buf.sendBuffer.back() == NULL)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateSendBuffer: sendBuffer.back()==NULL!"));
           indices[_buf.sendBuffer.size() - 1] = idx;
         }
@@ -362,20 +362,20 @@ private:
   void allocateRecvBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
     deleteBuffer(_buf.recvBuffer);
     unsigned int numCellsRecv = 0;
-    for (auto idx : I00()) 
-      if (I12::contains(idx)) 
-        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) 
+    for (auto idx : I00())
+      if (I12::contains(idx))
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank))
           numCellsRecv++;
     // allocate array for cell indices
     I00* indices = new I00[numCellsRecv];
     if (indices == NULL)
       throw std::runtime_error(std::string("ERROR allocateRecvBuffer(): indices==NULL!"));
     // allocate recvBuffer and initialise all entries, incl. indices
-    for (auto idx : I00()) 
-      if (I12::contains(idx)) 
+    for (auto idx : I00())
+      if (I12::contains(idx))
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           _buf.recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
-          if (_buf.recvBuffer.back() == NULL) 
+          if (_buf.recvBuffer.back() == NULL)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateRecvBuffer: recvBuffer.back() == NULL!"));
           // set linearized index
           indices[_buf.recvBuffer.size() - 1] = idx;
@@ -423,9 +423,8 @@ PYBIND11_MODULE(mamico, mamico) {
       [](const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
          const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
          const unsigned int rank) {
-        return coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(globalMDDomainSize, 
-          tarch::la::Vector<3, double>{0,0,0}, mdNumberProcesses, couplingCellSize,
-                                                                                    parallelTopologyType, outerRegion, rank);
+        return coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
+            globalMDDomainSize, tarch::la::Vector<3, double>{0, 0, 0}, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank);
       },
       "Calls init of the IndexingService singleton object");
   ///////////////////////////////////////////////////////////////////////////////////

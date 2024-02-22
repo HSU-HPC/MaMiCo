@@ -22,13 +22,13 @@
 #include "coupling/configurations/ThermostatConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
 #include "coupling/datastructures/CouplingCells.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
 #include "coupling/sendrecv/DataExchangeFromMacro2MD.h"
 #include "coupling/sendrecv/FromMD2Macro.h"
 #include "coupling/sendrecv/FromMacro2MD.h"
-#include "coupling/indexing/IndexingService.h"
 #include "tarch/utils/MultiMDService.h"
 
 #include "coupling/filtering/FilterPipeline.h"
@@ -176,8 +176,7 @@ public:
    *  parallelisation via MPI) and writes the respective information to the
    * coupling cells of the tool
    */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                        const I00* const indices) override;
+  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) override;
 
   /** sends information from MD to the macroscopic solver. After the
    * send/recv-operations (this also comprises the distributed memory

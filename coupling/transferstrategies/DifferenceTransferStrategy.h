@@ -31,8 +31,7 @@ public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface for the md solver
    *  @param numberMDSteps number of md steps within one coupling time step */
-  DifferenceTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                             unsigned int numberMDsteps)
+  DifferenceTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDsteps)
       : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _numberMDsteps(numberMDsteps), _zero(0.0),
         _massMapping(mdSolverInterface), _momentumMapping(mdSolverInterface) {}
 
@@ -42,7 +41,8 @@ public:
   /** @brief
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
+  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset quantities
     cell.setMicroscopicMass(0.0);
     cell.setMicroscopicMomentum(_zero);
@@ -51,7 +51,8 @@ public:
   /** @brief the microscopicMass and -Momentum are reseted to zero
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
+  void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset quantities
     cell.setMicroscopicMass(0.0);
     cell.setMicroscopicMomentum(_zero);
@@ -61,7 +62,8 @@ public:
    * and stored in the macroscopic quantity
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
+  void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                   I02 index) override {
     // compute difference between macroscopic and microscopic mass and momentum
     // values; this value is set in the microscopic data buffer of the
     // coupling cell.

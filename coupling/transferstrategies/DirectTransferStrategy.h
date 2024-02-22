@@ -39,7 +39,8 @@ public:
   /** @brief the microscopicMass and -Momentum are set to 0
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
+  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
     cell.setMicroscopicMass(0.0);
@@ -49,7 +50,8 @@ public:
   /** @brief the microscopicMass and -Momentum are set to 0
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
+  void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
     cell.setMicroscopicMass(0.0);

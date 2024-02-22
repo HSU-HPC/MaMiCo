@@ -31,8 +31,7 @@ public:
    *  @param indexConversion an instance of the indexConversion
    *  @param numberMDSteps number of md time steps within one coupling time step
    */
-  TransferStrategy4SchwarzCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                                   unsigned int numberMDSteps)
+  TransferStrategy4SchwarzCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDSteps)
       : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _massMapping(mdSolverInterface),
         _momentumMapping(mdSolverInterface), _timestepCounter(0), _sampleCounter(0), _numberMDSteps(numberMDSteps), _sampleEveryTimestep(1) {}
 
@@ -48,7 +47,8 @@ public:
    *  @brief the data received from the macro solver is processed
    *  @param cell the coupling cell to be processed
    *  @param index the index of the coupling cell */
-  void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override;
+  void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                   I02 index) override;
 
   /** @brief the momentum is converted to velocity (velocity = momentum/mass)
    * and stored in the microscopicMomentum the mass is not applied, therefore
@@ -56,7 +56,8 @@ public:
    *  @brief the data received from the macro solver is processed
    *  @param cell the coupling cell to be processed
    *  @param index the index of the coupling cell */
-  void processOuterCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override;
+  void processOuterCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                   I02 index) override;
 
   /** @brief the data collected during the md time steps is averaged
    * (/numberMDSteps)
