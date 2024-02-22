@@ -20,7 +20,7 @@ template <unsigned int dim> class IndexingService;
 } // namespace coupling
 
 // Include CellIndex template class definition
-#include "CellIndex.h"
+#include "coupling/indexing/IndexTypes.h"
 
 namespace coupling {
 namespace indexing {

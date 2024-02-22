@@ -171,12 +171,12 @@ namespace indexing {
  */
 
 // scalar, global, !md2macro, !noGL
-template <> BaseIndex<3> CellIndex<3>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3>::divisionFactor{};
-template <> const char CellIndex<3>::TNAME[] = "CellIndex<3>";
+template <> BaseIndex<3> I00::lowerBoundary{};
+template <> BaseIndex<3> I00::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I00::numberCellsInDomain{};
+template <> unsigned int I00::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I00::divisionFactor{};
+template <> const char I00::TNAME[] = "CellIndex<3>";
 
 // BaseIndex
 template <> BaseIndex<3> BaseIndex<3>::lowerBoundary{};
@@ -187,130 +187,130 @@ template <> tarch::la::Vector<3, unsigned int> BaseIndex<3>::divisionFactor{};
 template <> const char CellIndex<3, IndexTrait::vector>::TNAME[] = "CellIndex<3, vector>";
 
 // scalar, local, !md2macro, !noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::local>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::local>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::local>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::local>::TNAME[] = "CellIndex<3, local>";
+template <> BaseIndex<3> I02::lowerBoundary{};
+template <> BaseIndex<3> I02::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I02::numberCellsInDomain{};
+template <> unsigned int I02::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I02::divisionFactor{};
+template <> const char I02::TNAME[] = "CellIndex<3, local>";
 
 // vector, local, !md2macro, !noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::local>::TNAME[] = "CellIndex<3, vector, local>";
+template <> BaseIndex<3> I03::lowerBoundary{};
+template <> BaseIndex<3> I03::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I03::numberCellsInDomain{};
+template <> unsigned int I03::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I03::divisionFactor{};
+template <> const char I03::TNAME[] = "CellIndex<3, vector, local>";
 
 /*
  * MD TO MACRO, INCL GHOST LAYER
  */
 
 // scalar, global, md2macro, !noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::md2macro>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::md2macro>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::md2macro>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::md2macro>::TNAME[] = "CellIndex<3, md2macro>";
+template <> BaseIndex<3> I04::lowerBoundary{};
+template <> BaseIndex<3> I04::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I04::numberCellsInDomain{};
+template <> unsigned int I04::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I04::divisionFactor{};
+template <> const char I04::TNAME[] = "CellIndex<3, md2macro>";
 
 // vector, global, md2macro, !noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::md2macro>::TNAME[] = "CellIndex<3, vector, md2macro>";
+template <> BaseIndex<3> I05::lowerBoundary{};
+template <> BaseIndex<3> I05::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I05::numberCellsInDomain{};
+template <> unsigned int I05::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I05::divisionFactor{};
+template <> const char I05::TNAME[] = "CellIndex<3, vector, md2macro>";
 
 // scalar, local, md2macro, !noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::local, IndexTrait::md2macro>::TNAME[] = "CellIndex<3, local, md2macro>";
+template <> BaseIndex<3> I06::lowerBoundary{};
+template <> BaseIndex<3> I06::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I06::numberCellsInDomain{};
+template <> unsigned int I06 ::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I06::divisionFactor{};
+template <> const char I06::TNAME[] = "CellIndex<3, local, md2macro>";
 
 // vector, local, md2macro, !noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::TNAME[] = "CellIndex<3, vector, local, md2macro>";
+template <> BaseIndex<3> I07::lowerBoundary{};
+template <> BaseIndex<3> I07::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I07::numberCellsInDomain{};
+template <> unsigned int I07::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I07::divisionFactor{};
+template <> const char I07::TNAME[] = "CellIndex<3, vector, local, md2macro>";
 
 /*
  * !MD TO MACRO aka MAMICO INDEXING, EXCL GHOST LAYER
  */
 
 // scalar, global, !md2macro, noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::noGhost>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::noGhost>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::noGhost>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::noGhost>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, noGhost>";
+template <> BaseIndex<3> I08::lowerBoundary{};
+template <> BaseIndex<3> I08::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I08::numberCellsInDomain{};
+template <> unsigned int I08::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I08::divisionFactor{};
+template <> const char I08::TNAME[] = "CellIndex<3, noGhost>";
 
 // vector, global, !md2macro, noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, vector, noGhost>";
+template <> BaseIndex<3> I09::lowerBoundary{};
+template <> BaseIndex<3> I09::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I09::numberCellsInDomain{};
+template <> unsigned int I09::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I09::divisionFactor{};
+template <> const char I09::TNAME[] = "CellIndex<3, vector, noGhost>";
 
 // scalar, local, !md2macro, noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::local, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, local, noGhost>";
+template <> BaseIndex<3> I10::lowerBoundary{};
+template <> BaseIndex<3> I10::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I10::numberCellsInDomain{};
+template <> unsigned int I10::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I10::divisionFactor{};
+template <> const char I10::TNAME[] = "CellIndex<3, local, noGhost>";
 
 // vector, local, !md2macro, noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, vector, local, noGhost>";
+template <> BaseIndex<3> I11::lowerBoundary{};
+template <> BaseIndex<3> I11::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I11::numberCellsInDomain{};
+template <> unsigned int I11::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I11::divisionFactor{};
+template <> const char I11::TNAME[] = "CellIndex<3, vector, local, noGhost>";
 
 /*
  * MD TO MACRO, EXCL GHOST LAYER
  */
 
 // scalar, global, md2macro, noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::md2macro, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, md2macro, noGhost>";
+template <> BaseIndex<3> I12::lowerBoundary{};
+template <> BaseIndex<3> I12::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I12::numberCellsInDomain{};
+template <> unsigned int I12::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I12::divisionFactor{};
+template <> const char I12::TNAME[] = "CellIndex<3, md2macro, noGhost>";
 
 // vector, global, md2macro, noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, vector, md2macro, noGhost>";
+template <> BaseIndex<3> I13::lowerBoundary{};
+template <> BaseIndex<3> I13::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I13::numberCellsInDomain{};
+template <> unsigned int I13::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I13::divisionFactor{};
+template <> const char I13::TNAME[] = "CellIndex<3, vector, md2macro, noGhost>";
 
 // scalar, local, md2macro, noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
-template <> const char CellIndex<3, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::TNAME[] = "CellIndex<3, local, md2macro, noGhost>";
+template <> BaseIndex<3> I14::lowerBoundary{};
+template <> BaseIndex<3> I14::upperBoundary{};
+template <> tarch::la::Vector<3, unsigned int> I14::numberCellsInDomain{};
+template <> unsigned int I14::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I14::divisionFactor{};
+template <> const char I14::TNAME[] = "CellIndex<3, local, md2macro, noGhost>";
 
 // vector, local, md2macro, noGL
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary{};
-template <> BaseIndex<3> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary{};
+template <> BaseIndex<3> I15::lowerBoundary{};
+template <> BaseIndex<3> I15::upperBoundary{};
 template <>
-tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::numberCellsInDomain{};
-template <> unsigned int CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain{};
-template <> tarch::la::Vector<3, unsigned int> CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::divisionFactor{};
+tarch::la::Vector<3, unsigned int> I15::numberCellsInDomain{};
+template <> unsigned int I15::linearNumberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I15::divisionFactor{};
 template <>
-const char CellIndex<3, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::TNAME[] =
+const char I15::TNAME[] =
     "CellIndex<3, vector, local, md2macro, noGhost>";
 } // namespace indexing
 } // namespace coupling
