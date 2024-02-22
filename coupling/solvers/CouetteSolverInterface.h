@@ -29,7 +29,7 @@ template <unsigned int dim> class coupling::solvers::CouetteSolverInterface : pu
 public:
   /** @brief a simple constructor
    *  @param globalNumberCouplingCells the total number of coupling cells
-   *  @param outerRegion defines, how many cell layers will be sent to the macro
+   *  @param outerRegion defines, how many cell layers will be sent to the MD
    * solver */
   CouetteSolverInterface(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, unsigned int outerRegion = 1)
       : coupling::interface::MacroscopicSolverInterface<dim>(), _outerRegion(outerRegion), _globalNumberCouplingCells(globalNumberCouplingCells) {
@@ -39,35 +39,7 @@ public:
   virtual ~CouetteSolverInterface() {
   }
 
-  /** with this function one can check, which data needs so be send from micro
-   * to macro solver for the correct Couette scenario setup, all (inner) cells
-   * need to be received
-   *  @brief checks for a given coupling cell, if it needs to be received or
-   * not
-   *  @param globalCellIndex global dimensioned cell index to check for
-   *  @returns a bool, which indicates if a cell will be received (true) or not
-   * (false) */
-  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    bool recv = true;
-    for (unsigned int d = 0; d < dim; d++) {
-      recv = recv && (globalCellIndex[d] > _outerRegion) && (globalCellIndex[d] < _globalNumberCouplingCells[d] + 1 - _outerRegion);
-    }
-    return recv;
-  }
-
-  /** send all coupling cell data within a boundary strip to MD. Only send
-   * data that are not in the ghost layer and not part of the inner region.
-   *  @brief checks for a given cell if it needs to be send or not
-   *  @param globalCellIndex global dimensioned cell index to check for
-   *  @returns a bool, which indicates if a cell will be send (true) or not
-   * (false)  */
-  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
-    bool outer = false;
-    for (unsigned int d = 0; d < dim; d++) {
-      outer = outer || (globalCellIndex[d] < 1) || (globalCellIndex[d] > _globalNumberCouplingCells[d]);
-    }
-    return (!outer) && (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
-  }
+  virtual unsigned int getOuterRegion() { return _outerRegion; }
 
   /** @brief calculates for a coupling cell index, which rank holds it
    *  @param globalCellIndex global dimensioned cell index to check for

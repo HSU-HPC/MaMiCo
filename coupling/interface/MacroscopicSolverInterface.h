@@ -28,23 +28,13 @@ public:
   /** Destructor */
   virtual ~MacroscopicSolverInterface() {}
 
-  /** This function specifies if the cell at position globalCellIndex shall be
-   *received from the MD solver It does not send the cell, but only steers the
-   *process.
-   *	@param globalCellIndex
-   *	@returns true if the cell at position globalCellIndex shall be received
-   *from the MD solver, false otherwise.
+  /* This function defines an offset of cells which is considered to be the outer region.
+   * It replaces the legacy functions 'receiveMacroscopicQuantityFromMDSolver' and 'sendMacroscopicQuantityToMDSolver'
+   * from older versions of MaMiCo. Data are sent to MD solver for cells that are not in the ghost layer
+   * and not part of the inner region. Data needs so be send from micro to macro solver for all inner cells.
+   *  @return number of cells in outer region per direction at each boundary, e.g. 3
    */
-  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
-
-  /** This function specifies if the cell at position globalCellIndex shall be
-   *sent to the MD solver. It does not send the cell, but only steers the
-   *process.
-   *	@param globalCellIndex
-   *	@returns true if the cell at position globalCellIndex shall be sent to
-   *the MD solver, false otherwise.
-   */
-  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual unsigned int getOuterRegion() = 0;
 
   /** This function determines all the ranks on which the macroscopic solver
    *holds data of the coupling cell at index globalCellIndex. By default,

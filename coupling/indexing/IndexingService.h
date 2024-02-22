@@ -1,8 +1,5 @@
 #pragma once
 
-#include "coupling/configurations/MaMiCoConfiguration.h"
-#include "coupling/interface/MacroscopicSolverInterface.h"
-#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 // parallel topologies
 #include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/paralleltopology/ParallelTopologyFactory.h"
@@ -19,6 +16,7 @@ template <unsigned int dim> class IndexingService;
 }
 } // namespace coupling
 
+#include "coupling/configurations/MaMiCoConfiguration.h"
 // Include CellIndex template class definition
 #include "coupling/indexing/IndexTypes.h"
 
@@ -44,7 +42,7 @@ class IndexingServiceTest;
  * @param simpleMDConfig config object of SimpleMD instance used in coupling
  * @param mamicoConfig config object containg general information of coupling
  * process
- * @param msi pointer to interface of coupled macroscopic solver
+ * @param outer region
  *
  * @author Felix Maurer
  */
@@ -65,17 +63,18 @@ public:
 
   // Config unpacking variant of init
   template <unsigned int mddim>
-  typename std::enable_if<mddim == MD_DIM>::type init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
-                                                      const coupling::configurations::MaMiCoConfiguration<mddim>& mamicoConfig,
-                                                      coupling::interface::MacroscopicSolverInterface<mddim>* msi, const unsigned int rank
+  typename std::enable_if<mddim == MD_DIM>::type
+  init(const tarch::la::Vector<MD_DIM, double>& globalMDDomainSize, const tarch::la::Vector<MD_DIM, unsigned int>& mdNumberProcesses,
+       const tarch::la::Vector<MD_DIM, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+       unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                                                      ,
-                                                      MPI_Comm comm = MPI_COMM_WORLD
+       ,
+       MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
     // read relevant data from configs
-    const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
-    const auto couplingCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
+    // const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
+    // const auto couplingCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
 
     // calculate total number of coupling cells on all ranks in Base Domain
     tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells(0);
@@ -86,22 +85,13 @@ public:
         std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
     }
 
-    init(globalNumberCouplingCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-         mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), msi, rank
+    init(globalNumberCouplingCells, mdNumberProcesses, parallelTopologyType, outerRegion, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
          ,
          comm
 #endif
     );
   }
-
-  void init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-            coupling::paralleltopology::ParallelTopologyType type, coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-            ,
-            MPI_Comm comm
-#endif
-  );
 
   void finalize() {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)

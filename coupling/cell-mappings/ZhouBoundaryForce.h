@@ -7,6 +7,7 @@
 
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
+#include "coupling/interface/MoleculeIterator.h"
 #include <cmath>
 #include <iostream>
 

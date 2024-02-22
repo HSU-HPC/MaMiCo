@@ -186,10 +186,13 @@ protected:
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     // init indexing
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank
+    coupling::indexing::IndexingService<3>::getInstance().init(
+        _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), ,
+        couetteSolverInterface, (unsigned int)_rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                                                               ,
-                                                               _timeIntegrationService->getPintComm()
+        ,
+        _timeIntegrationService->getPintComm()
 #endif
     );
 
