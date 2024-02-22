@@ -64,8 +64,8 @@ public:
   // Config unpacking variant of init
   template <unsigned int mddim>
   typename std::enable_if<mddim == MD_DIM>::type
-  init(const tarch::la::Vector<MD_DIM, double>& globalMDDomainSize, const tarch::la::Vector<MD_DIM, double>& couplingCellSize,
-       const tarch::la::Vector<MD_DIM, unsigned int>& mdNumberProcesses, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+  init(const tarch::la::Vector<MD_DIM, double>& globalMDDomainSize, const tarch::la::Vector<MD_DIM, unsigned int>& mdNumberProcesses,
+       const tarch::la::Vector<MD_DIM, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
        unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
        ,

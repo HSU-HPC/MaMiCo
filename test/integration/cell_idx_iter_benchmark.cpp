@@ -131,7 +131,10 @@ private:
     coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface =
         new coupling::solvers::CouetteSolverInterface<3>(globalNumberCouplingCells, _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
+    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
+    _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+    _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
+    _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), couetteSolverInterface, (unsigned int)_rank);
     delete couetteSolverInterface;
   }
 
