@@ -28,3 +28,10 @@ docs/
 /runkvs
 # Symbolic link to LAMMPS source files
 /lammps
+
+# TODO: Only temporary:
+# Removed files of old indexing system (keep locally to make the project compile)
+# Use the following version of these files locally:
+# IndexConversion.h    https://raw.githubusercontent.com/HSU-HPC/MaMiCo/4f5c3aeea9a3a4aa407d8438b921b476332b491d/coupling/IndexConversion.h
+# IndexConversion.cpph https://raw.githubusercontent.com/HSU-HPC/MaMiCo/4f5c3aeea9a3a4aa407d8438b921b476332b491d/coupling/IndexConversion.cpph
+/coupling/IndexConversion.*
