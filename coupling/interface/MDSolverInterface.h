@@ -5,17 +5,17 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_MDSOLVERINTERFACE_H_
 #define _MOLECULARDYNAMICS_COUPLING_MDSOLVERINTERFACE_H_
 
-#include "coupling/indexing/IndexTypes.h"
-#include "coupling/interface/Molecule.h"
-#include "coupling/interface/MoleculeIterator.h"
-#include "tarch/la/Vector.h"
-#include <list>
-
 namespace coupling {
 namespace interface {
 template <class LinkedCell, unsigned int dim> class MDSolverInterface;
 }
 } // namespace coupling
+
+#include "coupling/indexing/IndexingService.h"
+#include "coupling/interface/Molecule.h"
+#include "coupling/interface/MoleculeIterator.h"
+#include "tarch/la/Vector.h"
+#include <list>
 
 /** This class provides
  *	@brief interface to the MD simulation

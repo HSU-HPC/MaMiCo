@@ -1,6 +1,5 @@
 // Include header
 #include "IndexingService.h"
-#include "coupling/solvers/CouetteSolverInterface.h" // to create default msi
 
 #include <algorithm>
 #include <iterator>
@@ -315,32 +314,12 @@ const char I15::TNAME[] =
 } // namespace indexing
 } // namespace coupling
 
-// raw date based variant of init
-template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
-                                                    tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType type,
-                                                    unsigned int outerRegion, const unsigned int rank
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                                                    ,
-                                                    MPI_Comm comm
-#endif
-) {
-  coupling::interface::MacroscopicSolverInterface<dim>* msi = new coupling::solvers::CouetteSolverInterface<dim>(globalNumberCouplingCells, outerRegion);
-
-  init(globalNumberCouplingCells, numberProcesses, type, msi, rank
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-       ,
-       comm
-#endif
-  );
-}
-
 // delegated init, this does the main work
 template <unsigned int dim>
 void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                                                     tarch::la::Vector<dim, unsigned int> numberProcesses,
                                                     coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-                                                    coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
+                                                    unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                     ,
                                                     MPI_Comm comm
@@ -386,34 +365,12 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
 #endif
 
   // init boundaries of all global, m2m, GL excluding indexing types
-  {
-    CellIndex<dim> lowerBoundary{BaseIndex<dim>::lowerBoundary};
-    while (not msi->receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int>{CellIndex<dim, IndexTrait::vector>{lowerBoundary}.get()})) {
-      // sanity check: empty m2m domain
-      if (lowerBoundary == BaseIndex<dim>::upperBoundary) {
-        std::cout << "IndexingService: WARNING: Empty MD-To-Macro domain!" << std::endl;
-        break;
-      }
-
-      // increment by one if above is too low to be in md-to-macro domain
-      ++lowerBoundary;
-    }
-    CellIndex<dim> upperBoundary{BaseIndex<dim>::upperBoundary};
-    while (not msi->receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int>{CellIndex<dim, IndexTrait::vector>{upperBoundary}.get()})) {
-      // sanity check: empty m2m domain
-      if (upperBoundary < lowerBoundary) {
-        std::cout << "IndexingService: WARNING: Empty MD-To-Macro domain!" << std::endl;
-        break;
-      }
-
-      // decrement by one if above is too high to be in md-to-macro domain
-      --upperBoundary;
-    }
-
-    CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = lowerBoundary;
-    CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = upperBoundary;
-    CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
-  }
+  
+  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = 
+  	BaseIndex<dim>{tarch::la::Vector<dim, int>{outerRegion+1}};
+  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = 
+  	BaseIndex<dim>::upperBoundary - BaseIndex<dim>{tarch::la::Vector<dim, int>{outerRegion+1}};
+  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary =
       CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary;
