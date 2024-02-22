@@ -59,11 +59,11 @@ public:
   virtual void sendFromMacro2MDPreProcess() = 0;
   virtual void sendFromMacro2MDPostProcess() = 0;
   virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                const unsigned int* const globalCellIndicesFromMacroscopicSolver) = 0;
+                                const I00* const indices) = 0;
   virtual void sendFromMD2MacroPreProcess() = 0;
   virtual void sendFromMD2MacroPostProcess() = 0;
   virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                  const unsigned int* const globalCellIndicesFromMacroscopicSolver) = 0;
+                                  const I00* const indices) = 0;
   virtual void processInnerCouplingCellAfterMDTimestep() = 0;
   virtual void computeAndStoreTemperature(double temperature) = 0;
   virtual void applyTemperatureToMolecules(unsigned int t) = 0;
@@ -177,17 +177,17 @@ public:
    * coupling cells of the tool
    */
   void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                        const unsigned int* const globalCellIndicesFromMacroscopicSolver);
+                        const I00* const indices) override;
 
   /** sends information from MD to the macroscopic solver. After the
    * send/recv-operations (this also comprises the distributed memory
    * parallelisation scenario), the information from the coupling tool is
    * written to the buffer couplingCellsFromMacroscopicSolver together with
    * the respective global cell indices
-   *  (-> globalCellIndicesFromMacroscopicSolver).
+   *  (-> indices).
    */
   double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                          const unsigned int* const globalCellIndicesFromMacroscopicSolver);
+                          const I00* const indices) override;
 
   /** applies the filter pipeline and returns the runtime of this operation */
   double applyFilterPipeline();

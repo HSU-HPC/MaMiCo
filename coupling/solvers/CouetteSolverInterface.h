@@ -39,12 +39,12 @@ public:
   virtual ~CouetteSolverInterface() {
   }
 
-  virtual unsigned int getOuterRegion() { return _outerRegion; }
+  unsigned int getOuterRegion() override { return _outerRegion; }
 
   /** @brief calculates for a coupling cell index, which rank holds it
    *  @param globalCellIndex global dimensioned cell index to check for
    *  @returns returns the rank on which the data is located */
-  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  std::vector<unsigned int> getRanks(I01 idx) override {
     std::vector<unsigned int> ranks;
     ranks.push_back(0);
     return ranks;

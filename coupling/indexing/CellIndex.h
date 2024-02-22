@@ -235,6 +235,16 @@ public:
     return true;
   }
 
+  tarch::la::Vector<dim, double> getCellMidPoint() const {
+    BaseIndex<dim> globalIndex{*this};
+    tarch::la::Vector<dim, double> cellMidPoint(IndexingService<dim>::getInstance().getGlobalMDDomainOffset() 
+      - 0.5 * IndexingService<dim>::getInstance().getCouplingCellSize());
+    for (unsigned int d = 0; d < dim; d++) 
+      cellMidPoint[d] += ((double)(globalIndex.get()[d])) 
+        * IndexingService<dim>::getInstance().getCouplingCellSize()[d];
+    return cellMidPoint;
+  }
+
   /**
    * Defines where this type of cell index starts counting.
    * Read inclusively, e.g.: lowerBoundary = {1,2,3} means {1,2,3} is the first

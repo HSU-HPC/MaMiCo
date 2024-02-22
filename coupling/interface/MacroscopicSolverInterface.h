@@ -37,7 +37,7 @@ public:
   virtual unsigned int getOuterRegion() = 0;
 
   /** This function determines all the ranks on which the macroscopic solver
-   *holds data of the coupling cell at index globalCellIndex. By default,
+   *holds data of the coupling cell at index idx. By default,
    *this method is used for send/recv operations. However, there are situations
    *where the target and source rank definitions (target rank=rank of
    *macroscopic solver that shall receive data from MD; source rank=rank of
@@ -48,33 +48,33 @@ public:
    *able to provide valid data on every process for each cell instance (e.g., if
    *this cell is part of a ghost layer). For this case, the method
    *getSourceRanks() and getTargetRanks() can be implemented accordingly.
-   *	@param globalCellIndex
+   *	@param idx
    *	@return all the ranks on which the macroscopic solver holds data of the
-   *coupling cell at index globalCellIndex.
+   *coupling cell at index idx.
    */
-  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual std::vector<unsigned int> getRanks(I01 idx) = 0;
 
   /** This function determines the source ranks for the global coupling cell
-   *at index globalCellIndex. A "source rank" is defined as a rank of the
-   *macroscopic solver that provides a valid copy of the cell at globalCellIndex
+   *at index idx. A "source rank" is defined as a rank of the
+   *macroscopic solver that provides a valid copy of the cell at idx
    *to the coupling tool. You may have multiple source ranks; however, each
    *source rank should hold a valid copy. Default: return all ranks that the
-   *cell at globalCellIndex is associated to.
-   *	@param globalCellIndex
+   *cell at idx is associated to.
+   *	@param idx
    *	@return the source ranks for the global coupling cell at index
-   *globalCellIndex.
+   *idx.
    */
-  virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return getRanks(globalCellIndex); }
+  virtual std::vector<unsigned int> getSourceRanks(I01 idx) { return getRanks(idx); }
 
   /** This function determines the target ranks for the global coupling cell
-   *at index globalCellIndex. A "target rank" is defined as a rank of the
-   *macroscopic solver that obtains a valid copy of the cell at globalCellIndex
+   *at index idx. A "target rank" is defined as a rank of the
+   *macroscopic solver that obtains a valid copy of the cell at idx
    *from the coupling tool. You may have multiple target ranks. Default: return
-   *all ranks that the cell at globalCellIndex is associated to.
-   *	@param globalCellIndex
+   *all ranks that the cell at idx is associated to.
+   *	@param idx
    *	@return the target ranks for the global coupling cell at index
-   *globalCellIndex
+   *idx
    */
-  virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return getRanks(globalCellIndex); }
+  virtual std::vector<unsigned int> getTargetRanks(I01 idx) { return getRanks(idx); }
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_INTERFACE_MACROSCOPICSOLVERINTERFACE_H_

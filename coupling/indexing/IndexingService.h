@@ -62,8 +62,9 @@ public:
 #endif
   );
 
-  // Config unpacking variant of init
-  void initWithMDSize(const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
+  void initWithMDSize(const tarch::la::Vector<3, double>& globalMDDomainSize, 
+    const tarch::la::Vector<3, double>& globalMDDomainOffset,
+    const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
                       const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
                       unsigned int outerRegion, unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -71,9 +72,9 @@ public:
                       MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
-    // read relevant data from configs
-    // const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
-    // const auto couplingCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
+    
+    _globalMDDomainSize = globalMDDomainSize;
+    _globalMDDomainOffset = globalMDDomainOffset;
 
     // calculate total number of coupling cells on all ranks in Base Domain
     tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells(0);
@@ -135,6 +136,41 @@ public:
   bool isInitialized() const { return _isInitialized; }
 #endif
 
+  /** returns the global domain size of the MD domain (excl. ghost layer which
+   * naturally is not part of MD).
+   *  @returns the total size of the md simulation domain (dimensional) */
+  tarch::la::Vector<dim, double> getGlobalMDDomainSize() const {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!_isInitialized) {
+      throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainSize() before initalization! "));
+    }
+#endif
+    return _globalMDDomainSize;
+  }
+
+  /** @brief returns the offset, i.e. the lower,left... corner coordinate, of
+   * the MD domain.
+   *  @returns the offset of the MD domain */
+  tarch::la::Vector<dim, double> getGlobalMDDomainOffset() const{
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!_isInitialized) {
+      throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainOffset() before initalization! "));
+    }
+#endif
+    return _globalMDDomainOffset;
+  }
+
+  /** @brief returns the vector size of each coupling cell.
+   *  @returns the size of the coupling cells (dimensional) */
+  tarch::la::Vector<dim, double> getCouplingCellSize() const{
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!_isInitialized) {
+      throw std::runtime_error(std::string("IndexingService: Called getCouplingCellSize() before initalization! "));
+    }
+#endif
+    return _couplingCellSize;
+  }
+
 private:
   /**
    * Helper function used by getRanksForGlobalIndex().
@@ -152,5 +188,8 @@ private:
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   bool _isInitialized = false;
 #endif
+  tarch::la::Vector<dim, double> _globalMDDomainSize;
+  tarch::la::Vector<dim, double> _globalMDDomainOffset;
+  tarch::la::Vector<dim, double> _couplingCellSize;
   friend IndexingServiceTest;
 };

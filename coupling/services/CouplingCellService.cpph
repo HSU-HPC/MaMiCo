@@ -119,7 +119,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 template <class LinkedCell, unsigned int dim>
 void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(
     const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-    const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+    const I00* const indices) {
   Wrapper4ProcessInnerCouplingCellBeforeReceivingMacroscopicSolverData wrapper1(this);
   Wrapper4ProcessOuterCouplingCellBeforeReceivingMacroscopicSolverData wrapper2(this);
   Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData wrapper3(this);
@@ -131,7 +131,7 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro
 
   // carry out send-receive steps
   _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, _couplingCells.getCouplingCells(), couplingCellsFromMacroscopicSolver,
-                                 globalCellIndicesFromMacroscopicSolver);
+                                 indices);
 
   // post-process inner coupling cells after receiving information from
   // macroscopic solver
@@ -175,14 +175,14 @@ template <class LinkedCell, unsigned int dim> double coupling::services::Couplin
 template <class LinkedCell, unsigned int dim>
 double coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(
     const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-    const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+    const I00* const indices) {
   sendFromMD2MacroPreProcess();
 
   double runtime = applyFilterPipeline();
 
   // carry out send-receive steps
   _fromMD2Macro.sendFromMD2Macro(_deFromMD2Macro, _couplingCells.getCouplingCells(), couplingCellsFromMacroscopicSolver,
-                                 globalCellIndicesFromMacroscopicSolver);
+                                 indices);
   return runtime;
 }
 
@@ -271,6 +271,7 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVect
 
 template <class LinkedCell, unsigned int dim>
 tarch::la::Vector<dim, double> coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::getPositionOfFirstLocalGhostCell() const {
+    using namespace coupling::indexing;
   // initialise with position of global first ghost cell
 //    coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector,
 //    coupling::indexing::IndexTrait::local> localIndex({0, 0, 0});
@@ -279,9 +280,9 @@ tarch::la::Vector<dim, double> coupling::services::CouplingCellServiceImpl<Linke
 //    coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::noGhost> globalIndex(localIndex);
     I09 globalIndex{localIndex};
     
-    tarch::la::Vector<dim, double> position(IndexingService::getInstance().getGlobalMDDomainOffset());
+    tarch::la::Vector<dim, double> position(IndexingService<3>::getInstance().getGlobalMDDomainOffset());
     for (unsigned int d = 0; d < dim; d++) {
-        position[d] += globalIndex.get()[d] * IndexingService::getInstance().getCouplingCellSize()[d];
+        position[d] += globalIndex.get()[d] * IndexingService<3>::getInstance().getCouplingCellSize()[d];
     }
     
 /*    
@@ -385,8 +386,9 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 #endif
             // compute cell position
             tarch::la::Vector<dim, double> couplingCellPosition = startPosition;
+            auto dx = coupling::indexing::IndexingService<3>::getInstance().getCouplingCellSize();
             for (unsigned int d = 0; d < dim; d++) {
-              couplingCellPosition[d] += _indexConversion->getCouplingCellSize()[d] * cellIndex[d];
+              couplingCellPosition[d] += dx[d] * cellIndex[d];
             }
 
             // compute current momentum and energy
@@ -398,7 +400,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
             couplingCells[index].setPotentialEnergy(potentialEnergy);
 
             // insert/ delete mass
-            particleInsertionAction = _particleInsertion->insertDeleteMass(couplingCells[index], couplingCellPosition, _indexConversion->getCouplingCellSize(),
+            particleInsertionAction = _particleInsertion->insertDeleteMass(couplingCells[index], couplingCellPosition, dx,
                                                                            meanVelocity, temperature, *_boundaryForceController);
             // if insertion/ deletion was successful...
             if (particleInsertionAction != coupling::ParticleInsertion<LinkedCell, dim>::NoAction) {

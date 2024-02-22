@@ -55,12 +55,12 @@ public:
 
   virtual ~CouplingCellServiceDummy() {}
 
-  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
+                                const I00* const globalCellIndicesFromMacroscopicSolver) override {
     _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
   }
-  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                  const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+  double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
+                                  const I00* const globalCellIndicesFromMacroscopicSolver) override {
     _fromMD2Macro.sendFromMD2Macro(_deFromMD2Macro, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return 0;
   }

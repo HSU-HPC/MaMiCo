@@ -42,20 +42,20 @@ public:
         _globalNumberCouplingCells(globalNumberCouplingCells) {}
   ~LBCouetteSolverInterface() {}
 
-  unsigned int getOuterRegion() { return _outerRegion; }
+  unsigned int getOuterRegion() override { return _outerRegion; }
 
   /** @brief returns for a given coupling cell index, which rank holds the
    * correct data
-   *  @oaram globalCellIndex global dimensioned cell index to check for
+   *  @oaram idx global dimensioned cell index to check for
    *  @returns a vector containing all correct ranks  */
-  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  std::vector<unsigned int> getRanks(I01 idx) override {
     std::vector<unsigned int> ranks;
     // determine global index of cell in LB simulation
-    tarch::la::Vector<3, unsigned int> globalLBCellIndex(globalCellIndex + _offsetMDDomain);
+    tarch::la::Vector<3, unsigned int> globalLBCellIndex(tarch::la::Vector<3, unsigned int>(idx.get()) + _offsetMDDomain);
     // modify global LB cell index due to ghost layer
     for (int d = 0; d < 3; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "LB cell index for global cell index " << globalCellIndex << ": " << globalLBCellIndex << std::endl;
+      std::cout << "LB cell index for global cell index " << idx << ": " << globalLBCellIndex << std::endl;
 #endif
       if (globalLBCellIndex[d] > 0) {
         globalLBCellIndex[d]--;
@@ -87,7 +87,7 @@ public:
       }
     }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Ranks for cell " << globalCellIndex << ":";
+    std::cout << "Ranks for cell " << idx << ":";
     for (unsigned int i = 0; i < ranks.size(); i++) {
       std::cout << " " << ranks[i];
     }
@@ -104,15 +104,15 @@ public:
    * rank per cell, that is the rank which holds the non-ghost cell copy.
    *  @brief returns for a given coupling cell index, which source rank holds
    * the correct data
-   *  @param globalCellIndex global dimensioned cell index to check for
+   *  @param idx global dimensioned cell index to check for
    *  @returns the vector of the correct rank  */
-  virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) {
+  std::vector<unsigned int> getSourceRanks(I01 idx) override {
     // determine global index of cell in LB simulation
-    tarch::la::Vector<3, unsigned int> globalLBCellIndex(globalCellIndex + _offsetMDDomain);
+    tarch::la::Vector<3, unsigned int> globalLBCellIndex(tarch::la::Vector<3, unsigned int>(idx.get()) + _offsetMDDomain);
     // modify global LB cell index due to ghost layer
     for (int d = 0; d < 3; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "LB cell index for global cell index " << globalCellIndex << ": " << globalLBCellIndex << std::endl;
+      std::cout << "LB cell index for global cell index " << idx << ": " << globalLBCellIndex << std::endl;
 #endif
       if (globalLBCellIndex[d] > 0) {
         globalLBCellIndex[d]--;
@@ -125,7 +125,7 @@ public:
     std::vector<unsigned int> ranks;
     ranks.push_back(rank);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Source rank for cell " << globalCellIndex << ": " << ranks[0] << std::endl;
+    std::cout << "Source rank for cell " << idx << ": " << ranks[0] << std::endl;
 #endif
     return ranks;
   }
