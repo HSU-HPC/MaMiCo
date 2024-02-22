@@ -28,6 +28,7 @@
 #include "coupling/sendrecv/DataExchangeFromMacro2MD.h"
 #include "coupling/sendrecv/FromMD2Macro.h"
 #include "coupling/sendrecv/FromMacro2MD.h"
+#include "coupling/indexing/IndexingService.h"
 #include "tarch/utils/MultiMDService.h"
 
 #include "coupling/filtering/FilterPipeline.h"
@@ -72,8 +73,6 @@ public:
   virtual void perturbateVelocity() = 0;
   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
   virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
-  virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
-  virtual void updateIndexConversion(const unsigned int& topologyOffset) = 0;
 
   virtual void initFiltering() {
     throw std::runtime_error("MacroscopicCellService: Error: Called "
@@ -241,21 +240,6 @@ public:
   void plotEveryMicroscopicTimestep(unsigned int t);
   void plotEveryMacroscopicTimestep(unsigned int t);
 
-  /** returns a reference to the index conversion object. Some external classes
-   * may require information on macroscopic cell size etc. which can then be
-   * easily accessed. This is thus not required by the internal mechanisms of
-   * the coupling tool.
-   */
-  const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
-
-  void updateIndexConversion(const unsigned int& topologyOffset) {
-    auto* newIndexConversion = initIndexConversion(_indexConversion->getMacroscopicCellSize(), _indexConversion->getNumberProcesses(),
-                                                   _indexConversion->getThisRank(), _indexConversion->getGlobalMDDomainSize(),
-                                                   _indexConversion->getGlobalMDDomainOffset(), _indexConversion->getParallelTopologyType(), topologyOffset);
-
-    delete _indexConversion;
-    _indexConversion = newIndexConversion;
-  }
 
   /**
    * Initialises the _filterPipeline member. Called from _multiMDCellService's
@@ -297,14 +281,6 @@ private:
 // ------------------- INCLUDE WRAPPER DEFINITIONS
 // -------------------------------------
 #include "MacroscopicCellTraversalWrappers.cpph"
-  /** initialises the IndexConversion object at start up. This is the very first
-   * thing to be done in the constructor since nearly all subsequent operations
-   * depend on indexing of cells.
-   */
-  coupling::IndexConversion<dim>* initIndexConversion(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> numberProcesses,
-                                                      unsigned int rank, tarch::la::Vector<dim, double> globalMDDomainSize,
-                                                      tarch::la::Vector<dim, double> globalMDDomainOffset,
-                                                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset) const;
 
   /** initialises the index structures for USHER scheme */
   void initIndexVectors4Usher(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerMacroscopicCell);
@@ -324,8 +300,6 @@ private:
       return [](Wrapper& wrapper) {};
   }
 
-  /** needed to determine cell range, ranks etc. */
-  coupling::IndexConversion<dim>* _indexConversion;
   /** number of MD time steps in each coupling cycle */
   const unsigned int _numberMDTimestepsPerCouplingCycle;
 

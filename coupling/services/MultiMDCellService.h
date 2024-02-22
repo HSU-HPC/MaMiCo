@@ -36,13 +36,7 @@ public:
                      tarch::utils::MultiMDService<dim>& multiMDService, int tws = 0)
       : _multiMDService(multiMDService), _tws(tws), _intNumberProcesses(computeScalarNumberProcesses()), _mdConfiguration(mdConfiguration),
         _mamicoConfiguration(mamicoConfiguration), _filterPipelineConfiguration(filterPipelineConfiguration),
-        _macroscopicSolverInterface(macroscopicSolverInterface),
-        _indexConversion(initIndexConversion(_mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize(),
-                                             _multiMDService.getNumberProcessesPerMDSimulation(), _multiMDService.getGlobalRank(),
-                                             _mdConfiguration.getDomainConfiguration().getGlobalDomainSize(),
-                                             _mdConfiguration.getDomainConfiguration().getGlobalDomainOffset(),
-                                             _mamicoConfiguration.getParallelTopologyConfiguration().getParallelTopologyType(), computeTopologyOffset())),
-        _postMultiInstanceFilterPipeline(nullptr) {
+        _macroscopicSolverInterface(macroscopicSolverInterface), _postMultiInstanceFilterPipeline(nullptr) {
     _topologyOffset = computeTopologyOffset();
     _localNumberMDSimulations = multiMDService.getLocalNumberOfMDSimulations();
     _totalNumberMDSimulations = multiMDService.getTotalNumberOfMDSimulations();
@@ -144,10 +138,6 @@ public:
       delete[] _macroscopicCellServices;
       _macroscopicCellServices = NULL;
     }
-    if (_indexConversion != nullptr) {
-      delete _indexConversion;
-      _indexConversion = nullptr;
-    }
 
     // TODO: fix free bug/possible memory leak here
     for (auto macroscopic_cell : _macroscopicCells) {
@@ -225,7 +215,7 @@ public:
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
       if (nullptr == _macroscopicCellServices[i])
         continue;
-      allDEs[i] = new coupling::sendrecv::DataExchangeFromMacro2MD<dim>(_macroscopicSolverInterface, &_macroscopicCellServices[i]->getIndexConversion(),
+      allDEs[i] = new coupling::sendrecv::DataExchangeFromMacro2MD<dim>(_macroscopicSolverInterface,
                                                                         _macroscopicCellServices[i]->getID());
       if (auto* v = dynamic_cast<MacroscopicCellServiceImpl<LinkedCell, dim>*>(_macroscopicCellServices[i])) {
         allMacroscopicCellsFromMamico[i] = v->getMacroscopicCells().getMacroscopicCells();
@@ -320,7 +310,7 @@ public:
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
       if (nullptr == _macroscopicCellServices[i] || 0 != _warmupPhase[i])
         continue; // Only reduce using equilibrated MD simulation instances
-      allDEs[i] = new coupling::sendrecv::DataExchangeFromMD2Macro<dim>(_macroscopicSolverInterface, &_macroscopicCellServices[i]->getIndexConversion(),
+      allDEs[i] = new coupling::sendrecv::DataExchangeFromMD2Macro<dim>(_macroscopicSolverInterface,
                                                                         _macroscopicCellServices[i]->getID());
       totalNumberEquilibratedMDSimulations += 1;
     }
@@ -497,10 +487,6 @@ public:
         unsigned int newIndex = i * newLocalNumberMDSimulations + j;
 
         newMacroscopicCellServices[newIndex] = _macroscopicCellServices[index];
-        if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
-          // Need to update topology offset in indexconversion->paralleltopology
-          newMacroscopicCellServices[newIndex]->updateIndexConversion((newIndex / newLocalNumberMDSimulations) * _intNumberProcesses);
-        }
       }
 
       auto pos = _warmupPhase.begin() + newLocalNumberMDSimulations * i - i;
@@ -542,9 +528,7 @@ public:
         if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
           // Need to update topologoy offset in
           // indexconversion->paralleltopology
-          if (newMacroscopicCellServices[newIndex] != nullptr) {
-            newMacroscopicCellServices[newIndex]->updateIndexConversion((newIndex / newLocalNumberMDSimulations) * _intNumberProcesses);
-          }
+
         }
       }
       newMacroscopicCellServices[(i + 1) * newLocalNumberMDSimulations - 1] = nullptr;
@@ -619,7 +603,6 @@ public:
 
   unsigned int getLocalNumberOfMDSimulations() const { return _localNumberMDSimulations; }
 
-  const coupling::IndexConversion<dim>& getIndexConversion() const { return _macroscopicCellServices[0]->getIndexConversion(); }
 
   void finishCycle(const unsigned int& cycle, coupling::InstanceHandling<LinkedCell, dim>& instanceHandling) {
     // TODO this should be move to somewhere else (MDMediator?)
@@ -676,31 +659,6 @@ private:
     return np;
   }
 
-  coupling::IndexConversion<dim>* initIndexConversion(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> numberProcesses,
-                                                      unsigned int rank, tarch::la::Vector<dim, double> globalMDDomainSize,
-                                                      tarch::la::Vector<dim, double> globalMDDomainOffset,
-                                                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-                                                      unsigned int topologyOffset) const {
-
-    tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
-    for (unsigned int d = 0; d < dim; d++) {
-      globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
-      if (fabs(globalNumberMacroscopicCells[d] * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13) {
-        std::cout << "coupling::services::MultiMDCellService::initIndexConversi"
-                     "on(): Deviation of domain size > 1e-13!"
-                  << std::endl;
-      }
-    }
-    coupling::IndexConversion<dim>* ic = new coupling::IndexConversion<dim>(globalNumberMacroscopicCells, numberProcesses, rank, globalMDDomainSize,
-                                                                            globalMDDomainOffset, parallelTopologyType, topologyOffset);
-    if (ic == NULL) {
-      std::cout << "coupling::services::MultiMDCellService::initIndexConversion"
-                   "(): ic==NULL!"
-                << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    return ic;
-  }
 
   coupling::services::MacroscopicCellService<dim>*
   createMacroscopicCellServiceMacroOnly(unsigned int ID, coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,
@@ -736,8 +694,6 @@ private:
   coupling::configurations::MaMiCoConfiguration<dim>& _mamicoConfiguration;
   const std::string _filterPipelineConfiguration;
   coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
-
-  coupling::IndexConversion<dim>* _indexConversion;
 
   unsigned int _blockOffset;
   std::vector<bool> _listActiveMDSimulations; /** One entry per (in-)active md
