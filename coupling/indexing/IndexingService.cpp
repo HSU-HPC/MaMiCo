@@ -314,7 +314,7 @@ template <> const char I15::TNAME[] = "CellIndex<3, vector, local, md2macro, noG
 // delegated init, this does the main work
 template <unsigned int dim>
 void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
-                                                    tarch::la::Vector<dim, unsigned int> numberProcesses,
+                                                    tarch::la::Vector<dim, unsigned int> numberProcesses, const tarch::la::Vector<3, double>& couplingCellSize,
                                                     coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
                                                     const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -363,9 +363,9 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
 
   // init boundaries of all global, m2m, GL excluding indexing types
 
-  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = BaseIndex<dim>{tarch::la::Vector<dim, int>{outerRegion + 1}};
+  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = BaseIndex<dim>{tarch::la::Vector<dim, int>{(int)(outerRegion + 1)}};
   CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary =
-      BaseIndex<dim>::upperBoundary - BaseIndex<dim>{tarch::la::Vector<dim, int>{outerRegion + 1}};
+      BaseIndex<dim>::upperBoundary - BaseIndex<dim>{tarch::la::Vector<dim, int>{(int)(outerRegion + 1)}};
   CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary =

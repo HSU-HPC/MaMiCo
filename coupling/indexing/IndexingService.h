@@ -1,6 +1,7 @@
 #pragma once
 
 // parallel topologies
+#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/paralleltopology/ParallelTopologyFactory.h"
 
@@ -16,7 +17,6 @@ template <unsigned int dim> class IndexingService;
 }
 } // namespace coupling
 
-#include "coupling/configurations/MaMiCoConfiguration.h"
 // Include CellIndex template class definition
 #include "coupling/indexing/IndexTypes.h"
 
@@ -54,7 +54,8 @@ public:
   }
 
   void init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-            coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion, const unsigned int rank
+            const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion,
+            const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
             ,
             MPI_Comm comm = MPI_COMM_WORLD
@@ -62,14 +63,12 @@ public:
   );
 
   // Config unpacking variant of init
-  template <unsigned int mddim>
-  typename std::enable_if<mddim == MD_DIM>::type
-  init(const tarch::la::Vector<MD_DIM, double>& globalMDDomainSize, const tarch::la::Vector<MD_DIM, unsigned int>& mdNumberProcesses,
-       const tarch::la::Vector<MD_DIM, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-       unsigned int outerRegion, const unsigned int rank
+  void init(const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
+            const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+            unsigned int outerRegion, unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-       ,
-       MPI_Comm comm = MPI_COMM_WORLD
+            ,
+            MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
     // read relevant data from configs
@@ -85,7 +84,7 @@ public:
         std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
     }
 
-    init(globalNumberCouplingCells, mdNumberProcesses, parallelTopologyType, outerRegion, rank
+    init(globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
          ,
          comm

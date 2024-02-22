@@ -347,7 +347,8 @@ private:
     for (unsigned int i = 0; i < num; i++) {
       // ... and find out, if the current cell should be send to MD from this
       // solver process
-      if (macroscopicSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
+      I00 todo_rewrite_this_entire_function_very_much_later{i};
+      if (!I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
         std::vector<unsigned int> ranks = macroscopicSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
         bool containsThisRank = false;
         for (unsigned int k = 0; k < ranks.size(); k++) {
@@ -364,7 +365,8 @@ private:
 
     // allocate sendBuffer and initialise all entries, incl. indices
     for (unsigned int i = 0; i < num; i++) {
-      if (macroscopicSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
+      I00 todo_rewrite_this_entire_function_very_much_later{i};
+      if (!I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
         std::vector<unsigned int> ranks = macroscopicSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
         bool containsThisRank = false;
         for (unsigned int k = 0; k < ranks.size(); k++) {
@@ -392,7 +394,8 @@ private:
     // determine number of cells that should be received
     unsigned int numCellsRecv = 0;
     for (unsigned int i = 0; i < num; i++) {
-      if (macroscopicSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
+      I00 todo_rewrite_this_entire_function_very_much_later{i};
+      if (I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
         std::vector<unsigned int> ranks = macroscopicSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
         bool containsThisRank = false;
         for (unsigned int k = 0; k < ranks.size(); k++) {
@@ -408,7 +411,8 @@ private:
 
     // allocate recvBuffer and initialise all entries, incl. indices
     for (unsigned int i = 0; i < num; i++) {
-      if (macroscopicSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
+      I00 todo_rewrite_this_entire_function_very_much_later{i};
+      if (I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
         std::vector<unsigned int> ranks = macroscopicSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
         bool containsThisRank = false;
         for (unsigned int k = 0; k < ranks.size(); k++) {
@@ -461,9 +465,12 @@ PYBIND11_MODULE(mamico, mamico) {
   utils.def("finalizeMPI", &MPI_Finalize, "Calls MPI_Finalize");
   utils.def(
       "initIndexing",
-      [](const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig, const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig,
-         coupling::interface::MacroscopicSolverInterface<3>* msi,
-         const unsigned int rank) { return coupling::indexing::IndexingService<3>::getInstance().init(simpleMDConfig, mamicoConfig, msi, rank); },
+      [](const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
+         const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
+         const unsigned int rank) {
+        return coupling::indexing::IndexingService<3>::getInstance().init(globalMDDomainSize, mdNumberProcesses, couplingCellSize, parallelTopologyType,
+                                                                          outerRegion, rank);
+      },
       "Calls init of the IndexingService singleton object");
   ///////////////////////////////////////////////////////////////////////////////////
   // Bindings for all simplemd configuration classes and getter functions

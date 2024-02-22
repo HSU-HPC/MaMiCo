@@ -153,7 +153,11 @@ class KVSTest():
             self.macroscopicSolverInterface)
 
         mamico.tarch.utils.initIndexing(
-            self.simpleMDConfig, self.mamicoConfig, self.macroscopicSolverInterface, self.rank)
+            self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), 
+            self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+            self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), 
+            self.mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
+            self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap() , self.rank)
 
         self.multiMDCellService = MultiMDCellService(self.mdSolverInterface, self.macroscopicSolverInterface,
                                                      self.simpleMDConfig, self.rank, self.cfg.getint(

@@ -42,34 +42,7 @@ public:
         _globalNumberCouplingCells(globalNumberCouplingCells) {}
   ~LBCouetteSolverInterface() {}
 
-  /** with this function one can check, which data needs so be send from micro
-   * to macro solver for the correct Couette scenario setup, all (inner) cells
-   * need to be received
-   *  @brief checks for a given coupling cell, if it needs to be received
-   * (true) ro not (false)
-   *  @param globalCellIndex global dimensioned cell index to check for
-   *  @returns a bool, which indicates if the cell will be received*/
-  bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
-    bool recv = true;
-    for (unsigned int d = 0; d < 3; d++) {
-      recv = recv && (globalCellIndex[d] > _outerRegion) && (globalCellIndex[d] < _globalNumberCouplingCells[d] + 1 - _outerRegion);
-    }
-    return recv;
-  }
-
-  /** send all coupling cell data within a boundary strip to MD. Only send
-   * data that are not in the ghost layer and not part of the inner region.
-   *  @brief checks for a given cell if it needs to be send (true) or not
-   * (false)
-   *  @param globalCellIndex global dimensioned cell index to check for
-   *  @returns a bool, which indicates if the cell will be send */
-  bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) {
-    bool outer = false;
-    for (unsigned int d = 0; d < 3; d++) {
-      outer = outer || (globalCellIndex[d] < 1) || (globalCellIndex[d] > _globalNumberCouplingCells[d]);
-    }
-    return (!outer) && (!receiveMacroscopicQuantityFromMDSolver(globalCellIndex));
-  }
+  unsigned int getOuterRegion() { return _outerRegion; }
 
   /** @brief returns for a given coupling cell index, which rank holds the
    * correct data
