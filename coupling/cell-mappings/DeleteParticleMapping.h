@@ -17,7 +17,7 @@ template <class LinkedCell, unsigned int dim> class DeleteParticleMapping;
 } // namespace coupling
 
 /**
- *	@brief This class deletes a certain particle from a macroscopic cell.
+ *	@brief This class deletes a certain particle from a coupling cell.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann

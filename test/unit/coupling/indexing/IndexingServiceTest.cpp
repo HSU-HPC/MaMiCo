@@ -47,7 +47,7 @@ public:
     if (_size == 4)
       numberProcesses = {2, 2, 1};
 
-    IndexingService<3>::getInstance().init({12}, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+    IndexingService<3>::getInstance().initWithCells({12}, numberProcesses, {1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
   }
 
   void tearDown() { IndexingService<3>::getInstance().finalize(); }
@@ -344,20 +344,20 @@ public:
     auto& service = IndexingService<3>::getInstance();
 
     // re-initialization
-    CPPUNIT_ASSERT_NO_THROW(service.init({12}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+    CPPUNIT_ASSERT_NO_THROW(service.initWithCells({12}, {1, 1, 1}, {1}, coupling::paralleltopology::XYZ, 3, 0u));
 
     // empty MD2M domain
-    CPPUNIT_ASSERT_NO_THROW(service.init({6}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+    CPPUNIT_ASSERT_NO_THROW(service.initWithCells({6}, {1, 1, 1}, {1}, coupling::paralleltopology::XYZ, 3, 0u));
 
     // non divisible domain
-    CPPUNIT_ASSERT_THROW(service.init({6, 6, 7}, {1, 1, 2}, coupling::paralleltopology::XYZ, 3, 0u), std::runtime_error);
+    CPPUNIT_ASSERT_THROW(service.initWithCells({6, 6, 7}, {1, 1, 2}, {1}, coupling::paralleltopology::XYZ, 3, 0u), std::runtime_error);
 
-    service.init({12}, {2, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u);
+    service.initWithCells({12}, {2, 1, 1}, {1}, coupling::paralleltopology::XYZ, 3, 0u);
 
     // out of domain
-    CPPUNIT_ASSERT_THROW(service.getUniqueRankForMacroscopicCell({1, 14, 1}, {12}), std::runtime_error);
-    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForMacroscopicCell({1, 1, 1}, {12}), 0u);
-    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForMacroscopicCell({7, 1, 1}, {12}), 1u);
+    CPPUNIT_ASSERT_THROW(service.getUniqueRankForCouplingCell({1, 14, 1}, {12}), std::runtime_error);
+    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({1, 1, 1}, {12}), 0u);
+    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({7, 1, 1}, {12}), 1u);
   }
 
 private:

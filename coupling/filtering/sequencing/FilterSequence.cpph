@@ -11,8 +11,8 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
     return EXIT_FAILURE;
   tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector = _inputCellVector;
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> outputCellVector = _cellVector2;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector = _inputCellVector;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> outputCellVector = _cellVector2;
 
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
@@ -313,8 +313,8 @@ void coupling::filtering::FilterSequence<dim>::addFilter(
 // TODO: inline in constructor
 template <unsigned int dim> void coupling::filtering::FilterSequence<dim>::initCellVectors() {
   for (auto cell : _inputCellVector) {
-    _cellVector1.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
-    _cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+    _cellVector1.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
+    _cellVector2.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
   }
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initialized cell vectors." << std::endl;

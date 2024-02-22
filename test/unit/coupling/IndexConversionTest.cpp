@@ -35,19 +35,19 @@ public:
   }
 
 private:
-
   template <unsigned int dim>
-  void _perform_tests(const coupling::IndexConversion<dim>& conversion, tarch::la::Vector<dim, unsigned int> localVectorCellIndex, unsigned int localCellIndex){
-    if(!conversion.isValidLocalCellIndex(localCellIndex)){
+  void _perform_tests(const coupling::IndexConversion<dim>& conversion, tarch::la::Vector<dim, unsigned int> localVectorCellIndex,
+                      unsigned int localCellIndex) {
+    if (!conversion.isValidLocalCellIndex(localCellIndex)) {
       std::stringstream msg;
       msg << "ERROR IndexConversionTest: Local cell index out of range!" << std::endl;
       msg << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
       CPPUNIT_FAIL(msg.str());
     }
-    
+
     tarch::la::Vector<dim, unsigned int> vec = conversion.getLocalVectorCellIndex(localCellIndex);
     // check that conversion from and to vector/scalar index works
-    if(vec != localVectorCellIndex){
+    if (vec != localVectorCellIndex) {
       std::stringstream msg;
       msg << "ERROR IndexConversionTest: Conversion local indices failed!" << std::endl;
       msg << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
@@ -56,15 +56,15 @@ private:
     }
 
     vec = conversion.convertLocalToGlobalVectorCellIndex(vec);
-    if(!conversion.isValidGlobalVectorCellIndex(vec)){
+    if (!conversion.isValidGlobalVectorCellIndex(vec)) {
       std::stringstream msg;
       msg << "ERROR IndexConversionTest: Global vector cell index out of range!" << std::endl;
       msg << "Local vector cell index: " << localVectorCellIndex << ", global vector cell index: " << vec << std::endl;
       CPPUNIT_FAIL(msg.str());
-    }    
+    }
 
     vec = conversion.convertGlobalToLocalVectorCellIndex(vec);
-    if(vec != localVectorCellIndex){
+    if (vec != localVectorCellIndex) {
       std::stringstream msg;
       msg << "ERROR IndexConversionTest: Conversion from global to local indices failed!" << std::endl;
       msg << "Local vector index: " << localVectorCellIndex << ", local cell index: " << localCellIndex << std::endl;
@@ -79,7 +79,7 @@ private:
     for (unsigned int zg = 1; zg < testGlobalNumberCells[2]; zg++) {
       for (unsigned int yg = 1; yg < testGlobalNumberCells[1]; yg++) {
         for (unsigned int xg = 1; xg < testGlobalNumberCells[0]; xg++) {
-          const tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(xg, yg, zg);
+          const tarch::la::Vector<3, unsigned int> globalNumberCouplingCells(xg, yg, zg);
 
           // loop over all number of process configurations
           for (unsigned int znp = 1; znp < testNumberProcesses[2]; znp++) {
@@ -90,9 +90,8 @@ private:
 
                 // loop over all local process configurations
                 for (unsigned int rank = 0; rank < numberRanks; rank++) {
-                  coupling::IndexConversion<3> conversion(globalNumberMacroscopicCells, numberProcesses, rank, size, offset, coupling::paralleltopology::XYZ);
-                  const tarch::la::Vector<3, unsigned int> wholeLocalDomain =
-                      conversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2);
+                  coupling::IndexConversion<3> conversion(globalNumberCouplingCells, numberProcesses, rank, size, offset, coupling::paralleltopology::XYZ);
+                  const tarch::la::Vector<3, unsigned int> wholeLocalDomain = conversion.getLocalNumberCouplingCells() + tarch::la::Vector<3, unsigned int>(2);
 
                   // loop over all cells in the local domain
                   for (unsigned int z = 0; z < wholeLocalDomain[2]; z++) {
@@ -113,7 +112,7 @@ private:
           } // number of processes
         }
       }
-    } // global number of macroscopic cells
+    } // global number of  coupling cells
   }
 
   void _test2D(const tarch::la::Vector<2, unsigned int>& testGlobalNumberCells, const tarch::la::Vector<2, unsigned int>& testNumberProcesses,
@@ -121,7 +120,7 @@ private:
     // loop over all global number cell-configurations
     for (unsigned int yg = 1; yg < testGlobalNumberCells[1]; yg++) {
       for (unsigned int xg = 1; xg < testGlobalNumberCells[0]; xg++) {
-        const tarch::la::Vector<2, unsigned int> globalNumberMacroscopicCells(xg, yg);
+        const tarch::la::Vector<2, unsigned int> globalNumberCouplingCells(xg, yg);
 
         // loop over all number of process configurations
         for (unsigned int ynp = 1; ynp < testNumberProcesses[1]; ynp++) {
@@ -131,8 +130,8 @@ private:
 
             // loop over all local process configurations
             for (unsigned int rank = 0; rank < numberRanks; rank++) {
-              coupling::IndexConversion<2> conversion(globalNumberMacroscopicCells, numberProcesses, rank, size, offset, coupling::paralleltopology::XYZ);
-              const tarch::la::Vector<2, unsigned int> wholeLocalDomain = conversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<2, unsigned int>(2);
+              coupling::IndexConversion<2> conversion(globalNumberCouplingCells, numberProcesses, rank, size, offset, coupling::paralleltopology::XYZ);
+              const tarch::la::Vector<2, unsigned int> wholeLocalDomain = conversion.getLocalNumberCouplingCells() + tarch::la::Vector<2, unsigned int>(2);
 
               // loop over all cells in the local domain
               for (unsigned int y = 0; y < wholeLocalDomain[1]; y++) {
@@ -149,7 +148,7 @@ private:
           }
         } // number of processes
       }
-    } // global number of macroscopic cells
+    } // global number of coupling cells
   }
 };
 

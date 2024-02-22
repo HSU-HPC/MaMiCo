@@ -13,7 +13,7 @@ namespace interface {
 class SimpleMDSimulation : public coupling::interface::MDSimulation, public simplemd::MolecularDynamicsSimulation {
 public:
   SimpleMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
-      : coupling::interface::MDSimulation(), simplemd::MolecularDynamicsSimulation(configuration), _macroscopicCellService(NULL), _couplingSwitchedOn(true) {}
+      : coupling::interface::MDSimulation(), simplemd::MolecularDynamicsSimulation(configuration), _couplingCellService(NULL), _couplingSwitchedOn(true) {}
 
   virtual ~SimpleMDSimulation() {}
 
@@ -44,11 +44,11 @@ public:
     // sampling volumes (hence: after communication with neighbours and molecule
     // updates); do it BEFORE quantities are manipulated as we can then also do
     // some pre-processing here.
-    _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
+    _couplingCellService->processInnerCouplingCellAfterMDTimestep();
     // ------------ coupling step: distribute mass ---------------------
-    _macroscopicCellService->distributeMass(t);
+    _couplingCellService->distributeMass(t);
     // for isothermal simulations: apply thermostat
-    _macroscopicCellService->applyTemperatureToMolecules(t);
+    _couplingCellService->applyTemperatureToMolecules(t);
 
     // ---------- from here: go on with usual MD algorithm
     // ------------------------------
@@ -59,9 +59,9 @@ public:
 
     // distribute momentum -> some methods require modification of force terms,
     // therefore we call it AFTER the force computation and before everything else
-    _macroscopicCellService->distributeMomentum(t);
+    _couplingCellService->distributeMomentum(t);
     // apply boundary forces
-    _macroscopicCellService->applyBoundaryForce(t);
+    _couplingCellService->applyBoundaryForce(t);
     // evaluate statistics
     evaluateStatistics(t);
 
@@ -91,8 +91,8 @@ public:
         (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
       _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
     }
-    // plot also macroscopic cell information
-    _macroscopicCellService->plotEveryMicroscopicTimestep(t);
+    // plot also coupling cell information
+    _couplingCellService->plotEveryMicroscopicTimestep(t);
 
     _linkedCellService->iterateCells(*_emptyLinkedListsMapping, false);
 
@@ -112,13 +112,13 @@ public:
     // nop required, since the linked cells are very tightly linked to mamico
   }
 
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
-    _macroscopicCellService = macroscopicCellService;
+  virtual void setCouplingCellService(coupling::services::CouplingCellService<MDSIMULATIONFACTORY_DIMENSION>* couplingCellService) {
+    _couplingCellService = couplingCellService;
     // set the cell service also in singleton of mamico interface provider ->
     // typically not required in coupling, but makes the simulation state more
     // consistent compared to using LAMMPS
-    coupling::interface::MamicoInterfaceProvider<simplemd::LinkedCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
-        macroscopicCellService);
+    coupling::interface::MamicoInterfaceProvider<simplemd::LinkedCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setCouplingCellService(
+        couplingCellService);
   }
 
   virtual void init() { initServices(); }
@@ -142,8 +142,8 @@ public:
   const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() { return *_molecularPropertiesService; }
 
 private:
-  /** @brief the macroscopic cell service for the coupled md simulation  */
-  coupling::services::MacroscopicCellService<MD_DIM>* _macroscopicCellService;
+  /** @brief the coupling cell service for the coupled md simulation  */
+  coupling::services::CouplingCellService<MD_DIM>* _couplingCellService;
   /** @brief bool holding the current state of the coupling: true - coupled
    * simulation and false - independent md simulation */
   bool _couplingSwitchedOn;

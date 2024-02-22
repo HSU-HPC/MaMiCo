@@ -11,7 +11,7 @@
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/ComputeTemperatureMapping.h"
 #include "coupling/cell-mappings/DeleteParticleMapping.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "coupling/datastructures/Molecule.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "tarch/utils/RandomNumberService.h"
@@ -65,9 +65,9 @@ public:
    * this either the inserteParticle() er deleteParticle() method, or just
    * returns without an action
    *  @brief checks if a particle needs to be inserted or deleted in a cell
-   *  @param cell the macroscopic cell to check if an action is necessary
-   *  @param macroscopicCellPosition the postion of the macroscopic cell
-   *  @param macroscopicCellSize the size of the macroscopic cell per direction
+   *  @param cell the coupling cell to check if an action is necessary
+   *  @param couplingCellPosition the postion of the coupling cell
+   *  @param couplingCellSize the size of the coupling cell per direction
    *  @param meanVelocity the mean velocity of all particles in the cell
    *  @param temperature the temperature in the cell
    *  @param boundaryForceController an instance of the boundary force
@@ -75,9 +75,8 @@ public:
    *  @returns the type of action which was applied
    * (coupling::ParticleInsertion::Action) */
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                   const tarch::la::Vector<dim, double>& macroscopicCellPosition, const tarch::la::Vector<dim, double>& macroscopicCellSize,
-                   const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
+  insertDeleteMass(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& couplingCellPosition,
+                   const tarch::la::Vector<dim, double>& couplingCellSize, const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
                    const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController);
 
   /** @brief since the Usher algorithm requires the potential energy landscape,
@@ -104,10 +103,10 @@ public:
 
 private:
   /** Returns Insertion on success and NoAction otherwise.
-   *  @brief tries to insert a particle in the respective macroscopic cell.
-   *  @param cell the macroscopic cell to check if an action is necessary
-   *  @param macroscopicCellPosition the postion of the macroscopic cell
-   *  @param macroscopicCellSize the size of the macroscopic cell per direction
+   *  @brief tries to insert a particle in the respective coupling cell.
+   *  @param cell the coupling cell to check if an action is necessary
+   *  @param couplingCellPosition the postion of the coupling cell
+   *  @param couplingCellSize the size of the coupling cell per direction
    *  @param meanVelocity the mean velocity of all particles in the cell
    *  @param temperature the temperature in the cell
    *  @param boundaryForceController an instance of the boundary force
@@ -115,38 +114,38 @@ private:
    *  @returns NoAction or Insertion, depending on the applied action
    *  (coupling::ParticleInsertion::Action) */
   typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& macroscopicCellPosition,
-                 const tarch::la::Vector<dim, double>& macroscopicCellSize, const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
+  insertParticle(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& couplingCellPosition,
+                 const tarch::la::Vector<dim, double>& couplingCellSize, const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
                  const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController);
 
   /** Returns Deletion on success and NoAction otherwise.
-   *  @brief tries to delete a particle from the macroscopic cell.
-   *  @param cell the macroscopic cell to check if an action is necessary
+   *  @brief tries to delete a particle from the coupling cell.
+   *  @param cell the coupling cell to check if an action is necessary
    *  @param boundaryForceController an instance of the boundary force
    * controller in application
    *  @returns NoAction or Deletion, depending on the action applied
    *  (coupling::ParticleInsertion::Action)*/
   typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  deleteParticle(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
+  deleteParticle(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
                  const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController);
 
 protected:
   /** the result is stored in the position entry of the molecule 'molecule'.
    *  The method returns Insertion if a position has been found and NoAction
    * otherwise.
-   *  @brief determines the position of a new particle within the macroscopic
+   *  @brief determines the position of a new particle within the coupling
    * cell
-   *  @param thisCell the macroscopic cell to check if an action is necessary
-   *  @param macroscopicCellPosition the postion of the macroscopic cell
-   *  @param macroscopicCellSize the size of the macroscopic cell per direction
+   *  @param thisCell the coupling cell to check if an action is necessary
+   *  @param couplingCellPosition the postion of the coupling cell
+   *  @param couplingCellSize the size of the coupling cell per direction
    *  @param molecule the molecule which shall be inserted
    *  @param boundaryForceController an instance of the boundary force
    * controller in application
    *  @returns NoAction or Insertion, depending on the result of the Usher
    * method applied here (coupling::ParticleInsertion::Action)*/
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  findParticlePosition(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& thisCell,
-                       const tarch::la::Vector<dim, double>& macroscopicCellPosition, const tarch::la::Vector<dim, double>& macroscopicCellSize,
+  findParticlePosition(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& thisCell,
+                       const tarch::la::Vector<dim, double>& couplingCellPosition, const tarch::la::Vector<dim, double>& couplingCellSize,
                        coupling::datastructures::Molecule<dim>& molecule, const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController);
 
   /** @brief collects all the parameters necessary for the Usher algorithm

@@ -30,7 +30,7 @@
 #include "coupling/interface/MoleculeIterator.h"
 #include "coupling/interface/impl/MarDyn/LinkedCellsForCoupling.h"
 #include "coupling/interface/impl/MarDyn/MarDynCell.h"
-#include "coupling/services/MacroscopicCellService.h"
+#include "coupling/services/CouplingCellService.h"
 
 #include <fstream>
 #include <iostream>
@@ -58,17 +58,17 @@ class MarDynCoupledSimulation : public Simulation {
 public:
   //	Constructor that sets the needed mamico cell values for
   // LinkedCellsForCoupling and the MPI grid dimensions
-  MarDynCoupledSimulation(tarch::la::Vector<3, double> mamicoCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell,
+  MarDynCoupledSimulation(tarch::la::Vector<3, double> mamicoCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell,
                           tarch::la::Vector<3, unsigned int> mpiGridDimensions)
-      : Simulation(), _mamicoCellSize(mamicoCellSize), _linkedCellsPerMacroscopicCell(linkedCellsPerMacroscopicCell), _macroscopicCellService(NULL),
-        _couplingOn(true), _mpiGridDimensions(mpiGridDimensions), ensemble(NULL) {
+      : Simulation(), _mamicoCellSize(mamicoCellSize), _linkedCellsPerCouplingCell(linkedCellsPerCouplingCell), _couplingCellService(NULL), _couplingOn(true),
+        _mpiGridDimensions(mpiGridDimensions), ensemble(NULL) {
     global_simulation = this;
   }
 
   // same as other constructor but without the MPI grid dimensions as input
-  MarDynCoupledSimulation(tarch::la::Vector<3, double> mamicoCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell)
-      : Simulation(), _mamicoCellSize(mamicoCellSize), _linkedCellsPerMacroscopicCell(linkedCellsPerMacroscopicCell), _macroscopicCellService(NULL),
-        _couplingOn(true), _mpiGridDimensions(tarch::la::Vector<3, unsigned int>(0)), ensemble(NULL) {
+  MarDynCoupledSimulation(tarch::la::Vector<3, double> mamicoCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell)
+      : Simulation(), _mamicoCellSize(mamicoCellSize), _linkedCellsPerCouplingCell(linkedCellsPerCouplingCell), _couplingCellService(NULL), _couplingOn(true),
+        _mpiGridDimensions(tarch::la::Vector<3, unsigned int>(0)), ensemble(NULL) {
     global_simulation = this;
   }
 
@@ -81,17 +81,17 @@ public:
   ParticleContainerType getContainerType() { return _particleContainerType; }
 
   // returns a pointer to the cell processor that is used in the simulation
-  CellProcessor *getCellProcessor() { return _cellProcessor; }
+  CellProcessor* getCellProcessor() { return _cellProcessor; }
 
   // returns a pointer to the particle pairs handler that is used in the
   // simulation
-  ParticlePairsHandler *getParticlePairsHandler() { return _particlePairsHandler; }
+  ParticlePairsHandler* getParticlePairsHandler() { return _particlePairsHandler; }
 
   /* adapted from MarDyn Simulation.cpp, enhanced with search for
    * 'LinkedCellsForCoupling' and new domain decomposition initialization; some
    * parts not relevant for the coupling removed
    */
-  void initConfigOldstyle(const std::string &inputfilename) {
+  void initConfigOldstyle(const std::string& inputfilename) {
     global_log->info() << "init oldstyle config file: " << inputfilename << std::endl;
 
     // open filestream to the input file
@@ -134,7 +134,7 @@ public:
         if (phaseSpaceFileFormat == "OldStyle") {
           std::string phaseSpaceFileName;
           inputfilestream >> phaseSpaceFileName;
-          _inputReader = (InputBase *)new InputOldstyle();
+          _inputReader = (InputBase*)new InputOldstyle();
           _inputReader->setPhaseSpaceFile(phaseSpaceFileName);
           _inputReader->setPhaseSpaceHeaderFile(phaseSpaceFileName);
           _inputReader->readPhaseSpaceHeader(_domain, timestepLength);
@@ -176,7 +176,7 @@ public:
           if (_mpiGridDimensions[0] > 0 && _mpiGridDimensions[1] > 0 && _mpiGridDimensions[2] > 0) {
             int gridDims[3]{(int)_mpiGridDimensions[0], (int)_mpiGridDimensions[1], (int)_mpiGridDimensions[2]};
             delete _domainDecomposition;
-            _domainDecomposition = (DomainDecompBase *)new DomainDecomposition(gridDims);
+            _domainDecomposition = (DomainDecompBase*)new DomainDecomposition(gridDims);
           }
         }
 #endif
@@ -207,8 +207,8 @@ public:
         } else if (token == "LinkedCellsForCoupling") {
           // LINKED CELLS FOR COUPLING
           // check if mamico values are set, abort otherwise
-          if (_mamicoCellSize[0] == 0.0 || _mamicoCellSize[1] == 0.0 || _mamicoCellSize[2] == 0.0 || _linkedCellsPerMacroscopicCell[0] == 0 ||
-              _linkedCellsPerMacroscopicCell[1] == 0 || _linkedCellsPerMacroscopicCell[2] == 0) {
+          if (_mamicoCellSize[0] == 0.0 || _mamicoCellSize[1] == 0.0 || _mamicoCellSize[2] == 0.0 || _linkedCellsPerCouplingCell[0] == 0 ||
+              _linkedCellsPerCouplingCell[1] == 0 || _linkedCellsPerCouplingCell[2] == 0) {
             global_log->error() << "Input file demands 'LinkedCellsForCoupling' as particle "
                                    "container, "
                                    "but mamico values are not set. Use the right constructor!"
@@ -225,7 +225,7 @@ public:
           }
           if (this->_LJCutoffRadius == 0.0)
             _LJCutoffRadius = this->_cutoffRadius;
-          _moleculeContainer = new LinkedCellsForCoupling(_mamicoCellSize, _linkedCellsPerMacroscopicCell, bBoxMin, bBoxMax, _cutoffRadius);
+          _moleculeContainer = new LinkedCellsForCoupling(_mamicoCellSize, _linkedCellsPerCouplingCell, bBoxMin, bBoxMax, _cutoffRadius);
           // LINKED CELLS FOR COUPLING
         } else {
           global_log->error() << "UNKOWN DATASTRUCTURE: " << token << std::endl;
@@ -344,11 +344,11 @@ public:
     _initSimulation = 0;
     _initStatistics = 0;
 
-    // set macroscopic cell service for coupling actions
-    if (_macroscopicCellService == NULL) {
-      _macroscopicCellService =
-          (coupling::services::MacroscopicCellServiceImpl<MarDynCell, 3> *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance()
-              .getMacroscopicCellService();
+    // set coupling cell service for coupling actions
+    if (_couplingCellService == NULL) {
+      _couplingCellService =
+          (coupling::services::CouplingCellServiceImpl<MarDynCell, 3>*)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance()
+              .getCouplingCellService();
     }
 
     // set the Ensemble and update global variables
@@ -365,7 +365,7 @@ public:
   }
 
   // simulates one MD timestep
-  void simulateOneMDTimestep(const unsigned int &timestep) {
+  void simulateOneMDTimestep(const unsigned int& timestep) {
     _simstep = timestep;
 
     global_log->debug() << "timestep: " << getSimulationStep() << std::endl;
@@ -420,7 +420,7 @@ public:
   // removes the molecule with id 'id' from the molecule container
   bool removeMoleculeFromContainer(unsigned long id) {
     bool found = false;
-    Molecule *curMolecule;
+    Molecule* curMolecule;
 
     // loop through molecules in the particle container
     for (curMolecule = _moleculeContainer->begin(); curMolecule != _moleculeContainer->end(); curMolecule = _moleculeContainer->next()) {
@@ -435,31 +435,31 @@ public:
   }
 
 protected:
-  // calls the three coupling methods of the MacroscopicCellService
+  // calls the three coupling methods of the CouplingCellService
   void executeCouplingSteps() {
-    if (_macroscopicCellService == NULL) {
-      _macroscopicCellService =
-          (coupling::services::MacroscopicCellServiceImpl<MarDynCell, 3> *)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance()
-              .getMacroscopicCellService();
+    if (_couplingCellService == NULL) {
+      _couplingCellService =
+          (coupling::services::CouplingCellServiceImpl<MarDynCell, 3>*)coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance()
+              .getCouplingCellService();
     }
-    _macroscopicCellService->processInnerMacroscopicCellAfterMDTimestep();
+    _couplingCellService->processInnerCouplingCellAfterMDTimestep();
     // TODO move distribute momentum after force accumulation (if required)
-    _macroscopicCellService->distributeMass(_simstep);
-    _macroscopicCellService->distributeMomentum(_simstep);
-    _macroscopicCellService->applyTemperatureToMolecules(_simstep);
+    _couplingCellService->distributeMass(_simstep);
+    _couplingCellService->distributeMomentum(_simstep);
+    _couplingCellService->applyTemperatureToMolecules(_simstep);
   }
 
   // MaMiCo values needed for the initialization of LinkedCellsForCoupling
   tarch::la::Vector<3, double> _mamicoCellSize;
-  tarch::la::Vector<3, unsigned int> _linkedCellsPerMacroscopicCell;
-  // the macroscopic cell service to execute the coupling steps
-  coupling::services::MacroscopicCellServiceImpl<MarDynCell, 3> *_macroscopicCellService;
+  tarch::la::Vector<3, unsigned int> _linkedCellsPerCouplingCell;
+  // the coupling cell service to execute the coupling steps
+  coupling::services::CouplingCellServiceImpl<MarDynCell, 3>* _couplingCellService;
   // used to check if coupling steps shall be executed
   bool _couplingOn;
   // grid dimensions for the MPI initialization
   tarch::la::Vector<3, unsigned int> _mpiGridDimensions;
 
-  CanonicalEnsemble *ensemble;
+  CanonicalEnsemble* ensemble;
 };
 
 #endif /* MARDYNCOUPLEDSIMULATION_H_ */

@@ -99,13 +99,13 @@ private:
     }
     file << R"mamicoconf(
     <mamico>
-      <macroscopic-cell-configuration
+      <coupling-cell-configuration
         cell-size="2.5 ; 2.5 ; 2.5"
-        linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+        linked-cells-per-coupling-cell="1 ; 1 ; 1"
         write-every-microscopic-timestep="0"
-        microscopic-filename="MacroscopicCell_micro"
+        microscopic-filename="CouplingCell_micro"
         write-every-macroscopic-timestep="0"
-        macroscopic-filename="MacroscopicCell_macro"
+        macroscopic-filename="CouplingCell_macro"
       />
       <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
       <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
@@ -124,16 +124,14 @@ private:
       exit(EXIT_FAILURE);
     }
 
-    tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(0);
+    tarch::la::Vector<3, unsigned int> globalNumberCouplingCells(0);
     for (unsigned int d = 0; d < 3; d++)
-      globalNumberMacroscopicCells[d] = (unsigned int)floor(_simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] /
-                                                                _mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()[d] +
-                                                            0.5);
-    coupling::interface::MacroscopicSolverInterface<3>* couetteSolverInterface =
-        new coupling::solvers::CouetteSolverInterface<3>(globalNumberMacroscopicCells, _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-
-    coupling::indexing::IndexingService<3>::getInstance().init(_simpleMDConfig, _mamicoConfig, couetteSolverInterface, (unsigned int)_rank);
-    delete couetteSolverInterface;
+      globalNumberCouplingCells[d] = (unsigned int)floor(
+          _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] / _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[d] + 0.5);
+    coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
+        _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
+        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)_rank);
   }
 
   void shutdown() {}

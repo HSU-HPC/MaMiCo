@@ -18,7 +18,7 @@ template <class LinkedCell, unsigned int dim> class ComputeMeanPotentialEnergyMa
 
 /**
  *	@brief This class computes the mean potential energy over this
- *macroscopic cell.
+ *coupling cell.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann

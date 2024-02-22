@@ -57,7 +57,7 @@ public:
   template <Testmode mode> void testAll() {
     // Simulate size = 4 MPI ranks, even if executed sequentially
     for (_rank = 0; _rank < 4; _rank++) {
-      IndexingService<3>::getInstance().init({12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, _rank);
+      IndexingService<3>::getInstance().initWithCells({12}, {2, 2, 1}, {1}, coupling::paralleltopology::XYZ, 3, _rank);
       runtests<mode, T00>();
       runtests<mode, T01>();
       runtests<mode, T02>();
@@ -137,7 +137,7 @@ public:
   template <class T> void testLoop() {
     // We want a different domain decomposition here (to test empty domains), so we have to set up that
     IndexingService<3>::getInstance().finalize();
-    IndexingService<3>::getInstance().init({12}, {4, 1, 1}, coupling::paralleltopology::XYZ, 3, _rank);
+    IndexingService<3>::getInstance().initWithCells({12}, {4, 1, 1}, {1}, coupling::paralleltopology::XYZ, 3, _rank);
 
     unsigned int count = 0;
     T foo;
@@ -160,7 +160,7 @@ public:
 
     // Cleanup (in case other tests follow later after calling this function) / reset to previous state
     IndexingService<3>::getInstance().finalize();
-    IndexingService<3>::getInstance().init({12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, _rank);
+    IndexingService<3>::getInstance().initWithCells({12}, {2, 2, 1}, {1}, coupling::paralleltopology::XYZ, 3, _rank);
   }
 
   void testOperatorStream() {

@@ -1,9 +1,7 @@
 #pragma once
 
-#include "coupling/configurations/MaMiCoConfiguration.h"
-#include "coupling/interface/MacroscopicSolverInterface.h"
-#include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 // parallel topologies
+#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/paralleltopology/ParallelTopology.h"
 #include "coupling/paralleltopology/ParallelTopologyFactory.h"
 
@@ -20,14 +18,13 @@ template <unsigned int dim> class IndexingService;
 } // namespace coupling
 
 // Include CellIndex template class definition
-#include "CellIndex.h"
+#include "coupling/indexing/IndexTypes.h"
 
 namespace coupling {
 namespace indexing {
 
 template <unsigned int dim>
-std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex,
-                                                 const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells);
+std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells);
 
 } // namespace indexing
 } // namespace coupling
@@ -45,7 +42,7 @@ class IndexingServiceTest;
  * @param simpleMDConfig config object of SimpleMD instance used in coupling
  * @param mamicoConfig config object containg general information of coupling
  * process
- * @param msi pointer to interface of coupled macroscopic solver
+ * @param outer region
  *
  * @author Felix Maurer
  */
@@ -56,53 +53,44 @@ public:
     return singleton;
   }
 
-  void init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-            coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion, const unsigned int rank
+  void initWithCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
+                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion,
+                     const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-            ,
-            MPI_Comm comm = MPI_COMM_WORLD
+                     ,
+                     MPI_Comm comm = MPI_COMM_WORLD
 #endif
   );
 
   // Config unpacking variant of init
-  template <unsigned int mddim>
-  typename std::enable_if<mddim == MD_DIM>::type init(const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig,
-                                                      const coupling::configurations::MaMiCoConfiguration<mddim>& mamicoConfig,
-                                                      coupling::interface::MacroscopicSolverInterface<mddim>* msi, const unsigned int rank
+  void initWithMDSize(const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
+                      const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                      unsigned int outerRegion, unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                                                      ,
-                                                      MPI_Comm comm = MPI_COMM_WORLD
+                      ,
+                      MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
     // read relevant data from configs
-    const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
-    const auto macroscopicCellSize{mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()};
+    // const auto globalMDDomainSize{simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()};
+    // const auto couplingCellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
 
-    // calculate total number of macroscopic cells on all ranks in Base Domain
-    tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(0);
+    // calculate total number of coupling cells on all ranks in Base Domain
+    tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells(0);
     for (unsigned int d = 0; d < dim; d++) {
-      globalNumberMacroscopicCells[d] = (unsigned int)floor(globalMDDomainSize[d] / macroscopicCellSize[d] + 0.5);
+      globalNumberCouplingCells[d] = (unsigned int)floor(globalMDDomainSize[d] / couplingCellSize[d] + 0.5);
 
-      if (fabs((globalNumberMacroscopicCells[d]) * macroscopicCellSize[d] - globalMDDomainSize[d]) > 1e-13)
+      if (fabs((globalNumberCouplingCells[d]) * couplingCellSize[d] - globalMDDomainSize[d]) > 1e-13)
         std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
     }
 
-    init(globalNumberMacroscopicCells, simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-         mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), msi, rank
+    initWithCells(globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-         ,
-         comm
+                  ,
+                  comm
 #endif
     );
   }
-
-  void init(tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-            coupling::paralleltopology::ParallelTopologyType type, coupling::interface::MacroscopicSolverInterface<dim>* msi, const unsigned int rank
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-            ,
-            MPI_Comm comm
-#endif
-  );
 
   void finalize() {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -115,7 +103,7 @@ public:
    * Ripped from deprecated IndexConversion.
    *
    * @param globalCellIndex index to be looked up
-   * @param globalNumberMacroscopicCells global number of cells in BaseIndex
+   * @param globalNumberCouplingCells global number of cells in BaseIndex
    * domain EXCLUDING global ghost layer cells.
    * @returns vector of all cells which contain the index
    */
@@ -152,8 +140,8 @@ private:
    * Helper function used by getRanksForGlobalIndex().
    */
   // TODO inline in getRanksForGlobalIndex()
-  unsigned int getUniqueRankForMacroscopicCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
-                                               const tarch::la::Vector<dim, unsigned int>& globalNumberMacroscopicCells) const;
+  unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
+                                            const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const;
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;

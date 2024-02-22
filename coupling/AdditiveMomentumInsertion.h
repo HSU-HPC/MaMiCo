@@ -8,7 +8,7 @@
 #include "coupling/MomentumInsertion.h"
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/SetMomentumMapping.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
 #include "tarch/la/Vector.h"
 
 /** @brief everything necessary for coupling operations, is defined in here */
@@ -17,10 +17,10 @@ template <class LinkedCell, unsigned int dim> class AdditiveMomentumInsertion;
 }
 
 /** This class allows to add momentum to molecules. In each MD timestep, it
- * takes a respective fraction from the momentum buffer of a macroscopic cell
- * and adds this momentum to the molecules of the macroscopic cell.
+ * takes a respective fraction from the momentum buffer of a coupling cell
+ * and adds this momentum to the molecules of the coupling cell.
  *  @brief used to manipulate the momentum/velocity of the molecules contained
- * in a macroscopic cell.
+ * in a coupling cell.
  *  @tparam LinkedCell the LinkedCell class is given by the implementation of
  * linked cells in the molecular dynamics simulation
  *  @tparam dim the integer dim refers to the spacial dimension of the
@@ -45,15 +45,15 @@ public:
    *  @returns 1 */
   virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1; }
 
-  /** inserts the momentum of the macroscopic cell and distributes it over all
+  /** inserts the momentum of the coupling cell and distributes it over all
    * molecules. This method does not conserve the kinetic energy of the
-   * respective macroscopic cell. To conserve the energy as well, see the
+   * respective coupling cell. To conserve the energy as well, see the
    * description of MomentumController on details how to do that.
    *  @brief inserts momentum to the cell
-   *  @param cell macroscopic cell to insert momentum to
-   *  @param currentMacroscopicCellIndex macroscopic cell index of the cell */
-  virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentMacroscopicCellIndex) const {
+   *  @param cell coupling cell to insert momentum to
+   *  @param currentCouplingCellIndex coupling cell index of the cell */
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                              const unsigned int& currentCouplingCellIndex) const {
     const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();
     // determine fraction of momentum that is to be inserted in this frame
     double fraction = 1.0 / ((_numberMDTimestepsPerCouplingCycle / timeIntervalMomentumInsertion) +

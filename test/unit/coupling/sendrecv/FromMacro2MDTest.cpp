@@ -19,8 +19,8 @@ class FromMacro2MDTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(FromMacro2MDTest);
   // TODO While this code is named "test", it just prints debug output, but does not execute any tests
   // Thus there is no reason to execute it at all
-  //CPPUNIT_TEST(test<2>);
-  //CPPUNIT_TEST(test<3>);
+  // CPPUNIT_TEST(test<2>);
+  // CPPUNIT_TEST(test<3>);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -43,26 +43,26 @@ public:
     }
 
     // define domain sizes for cells and MD
-    const tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells(5 * oneDir + 2);
-    unsigned int numberCellsInclBoundary = globalNumberMacroscopicCells[0] + 2;
+    const tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells(5 * oneDir + 2);
+    unsigned int numberCellsInclBoundary = globalNumberCouplingCells[0] + 2;
     for (unsigned int d = 1; d < dim; d++) {
-      numberCellsInclBoundary = numberCellsInclBoundary * (globalNumberMacroscopicCells[d] + 2);
+      numberCellsInclBoundary = numberCellsInclBoundary * (globalNumberCouplingCells[d] + 2);
     }
     const tarch::la::Vector<dim, unsigned int> numberProcesses(oneDir);
     const tarch::la::Vector<dim, double> mdDomainSize(1.0);
     const tarch::la::Vector<dim, double> mdDomainOffset(0.0);
     // output information
     if (rank == 0) {
-      std::cout << "Global number macroscopic cells: " << globalNumberMacroscopicCells << std::endl;
+      std::cout << "Global number coupling cells: " << globalNumberCouplingCells << std::endl;
       std::cout << "Number processes: " << numberProcesses << std::endl;
     }
 
     // init new indexing system
-    coupling::indexing::IndexingService<dim>::getInstance().init(globalNumberMacroscopicCells, numberProcesses, 
-      coupling::paralleltopology::XYZ, 3, (unsigned int)rank);
+    coupling::indexing::IndexingService<dim>::getInstance().init(globalNumberCouplingCells, numberProcesses, coupling::paralleltopology::XYZ, 3,
+                                                                 (unsigned int)rank);
 
     // define functional objects
-    coupling::IndexConversion<dim> indexConversion(globalNumberMacroscopicCells, numberProcesses, rank, mdDomainSize, mdDomainOffset,
+    coupling::IndexConversion<dim> indexConversion(globalNumberCouplingCells, numberProcesses, rank, mdDomainSize, mdDomainOffset,
                                                    coupling::paralleltopology::XYZ);
     coupling::sendrecv::FromMacro2MD<TestCell<dim>, dim> fromMacro2MD;
     TestDataExchangeFromMacro2MD<dim> testDataExchangeFromMacro2MD(10, indexConversion);

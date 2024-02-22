@@ -7,6 +7,7 @@
 
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
+#include "coupling/interface/MoleculeIterator.h"
 #include <cmath>
 #include <iostream>
 
@@ -17,9 +18,9 @@ template <class LinkedCell, unsigned int dim> class ZhouBoundaryForce;
 } // namespace coupling
 
 /** applies the Zhou boundary force to all molecules assuming a cut-off radius
- *r_c=2.5. We only consider molecules in the outermost macroscopic cell. Thus,
+ *r_c=2.5. We only consider molecules in the outermost coupling cell. Thus,
  *the current method will only be employed to molecules within a
- *distance=min(r_c,size of macroscopic cell). The force is based on the research
+ *distance=min(r_c,size of coupling cell). The force is based on the research
  *paper: W.J. Zhou, H.B. Luan, Y.L. He, J. Sun, W.Q. Tao. A study on boundary
  *force model used in multiscale simulations with non-periodic boundary
  *condition Microfluid Nanofluid 16(3): 587-595, 2014
