@@ -5,7 +5,7 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_
 #define _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_
 
-#include "coupling/datastructures/CouplingCell.h"
+#include "coupling/datastructures/CouplingCellWithLinkedCells.h"
 #include "coupling/interface/MDSolverInterface.h"
 
 namespace coupling {
