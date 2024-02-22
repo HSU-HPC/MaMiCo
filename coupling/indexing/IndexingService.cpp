@@ -304,13 +304,10 @@ template <> const char I14::TNAME[] = "CellIndex<3, local, md2macro, noGhost>";
 // vector, local, md2macro, noGL
 template <> BaseIndex<3> I15::lowerBoundary{};
 template <> BaseIndex<3> I15::upperBoundary{};
-template <>
-tarch::la::Vector<3, unsigned int> I15::numberCellsInDomain{};
+template <> tarch::la::Vector<3, unsigned int> I15::numberCellsInDomain{};
 template <> unsigned int I15::linearNumberCellsInDomain{};
 template <> tarch::la::Vector<3, unsigned int> I15::divisionFactor{};
-template <>
-const char I15::TNAME[] =
-    "CellIndex<3, vector, local, md2macro, noGhost>";
+template <> const char I15::TNAME[] = "CellIndex<3, vector, local, md2macro, noGhost>";
 } // namespace indexing
 } // namespace coupling
 
@@ -318,8 +315,8 @@ const char I15::TNAME[] =
 template <unsigned int dim>
 void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                                                     tarch::la::Vector<dim, unsigned int> numberProcesses,
-                                                    coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-                                                    unsigned int outerRegion, const unsigned int rank
+                                                    coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
+                                                    const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                     ,
                                                     MPI_Comm comm
@@ -365,11 +362,10 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
 #endif
 
   // init boundaries of all global, m2m, GL excluding indexing types
-  
-  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = 
-  	BaseIndex<dim>{tarch::la::Vector<dim, int>{outerRegion+1}};
-  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = 
-  	BaseIndex<dim>::upperBoundary - BaseIndex<dim>{tarch::la::Vector<dim, int>{outerRegion+1}};
+
+  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = BaseIndex<dim>{tarch::la::Vector<dim, int>{outerRegion + 1}};
+  CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary =
+      BaseIndex<dim>::upperBoundary - BaseIndex<dim>{tarch::la::Vector<dim, int>{outerRegion + 1}};
   CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary =

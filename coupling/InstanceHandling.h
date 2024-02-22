@@ -250,7 +250,8 @@ public:
    * corresponding MD solver interface.
    * 	@param index
    */
-  void rmMDSimulation(const unsigned int& index) {
+  void
+  rmMDSimulation(const unsigned int& index) {
     if (_mdSimulations[index] != nullptr) {
       _mdSimulations[index]->shutdown();
       delete _mdSimulations[index];

@@ -30,10 +30,10 @@ public:
 
   /* This function defines an offset of cells which is considered to be the outer region.
    * It replaces the legacy functions 'receiveMacroscopicQuantityFromMDSolver' and 'sendMacroscopicQuantityToMDSolver'
-   * from older versions of MaMiCo. Data are sent to MD solver for cells that are not in the ghost layer 
+   * from older versions of MaMiCo. Data are sent to MD solver for cells that are not in the ghost layer
    * and not part of the inner region. Data needs so be send from micro to macro solver for all inner cells.
    *  @return number of cells in outer region per direction at each boundary, e.g. 3
-  */
+   */
   virtual unsigned int getOuterRegion() = 0;
 
   /** This function determines all the ranks on which the macroscopic solver
