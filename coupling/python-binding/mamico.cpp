@@ -323,109 +323,64 @@ public:
   }
 
   std::vector<coupling::datastructures::CouplingCell<3>*> _sendBuffer;
-  unsigned int* _globalCellIndices4SendBuffer;
+  I00* _globalCellIndices4SendBuffer;
   std::vector<coupling::datastructures::CouplingCell<3>*> _recvBuffer;
-  unsigned int* _globalCellIndices4RecvBuffer;
+  I00* _globalCellIndices4RecvBuffer;
 
 private:
-  const coupling::IndexConversion<3>& _idcv;
   const unsigned int _outerRegion; // defines an offset of cells which is
                                    // considered to be the outer region
 
-  void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroscopicSolverInterface,
-                          unsigned int rank) {
-    // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<3, unsigned int>(2));
-    const unsigned int num = cells[0] * cells[1] * cells[2];
-
-    // delete all potential entries of sendBuffer
-    deleteBuffer(_sendBuffer);
-
-    // count number of cells to be sent from this process; therefore, loop over
-    // all global coupling cells...
+  /** 
+   *  @brief allocates the send buffer (with values for all coupling cells).
+   *  @param couetteSolverInterface interface for the continuum solver */
+  void allocateSendBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
+    deleteBuffer(_buf.sendBuffer);
     unsigned int numCellsSent = 0;
-    for (unsigned int i = 0; i < num; i++) {
-      // ... and find out, if the current cell should be send to MD from this
-      // solver process
-      I00 todo_rewrite_this_entire_function_very_much_later{i};
-      if (!I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
-        std::vector<unsigned int> ranks = macroscopicSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
-        }
-        if (containsThisRank) {
+    for (auto idx : I00()) 
+      if (!I12::contains(idx)) 
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) 
           numCellsSent++;
-        }
-      }
-    }
-
     // allocate array for cell indices
-    unsigned int* indices = new unsigned int[numCellsSent];
-
+    I00* indices = new I00[numCellsSent];
+    if (indices == NULL)
+      throw std::runtime_error(std::string("ERROR allocateSendBuffer(): indices==NULL!"));
     // allocate sendBuffer and initialise all entries, incl. indices
-    for (unsigned int i = 0; i < num; i++) {
-      I00 todo_rewrite_this_entire_function_very_much_later{i};
-      if (!I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
-        std::vector<unsigned int> ranks = macroscopicSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
+    for (auto idx : I00())
+      if (!I12::contains(idx)) 
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
+          _buf.sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
+          if (_buf.sendBuffer.back() == NULL) 
+            throw std::runtime_error(std::string("ERROR CouetteScenario::allocateSendBuffer: sendBuffer.back()==NULL!"));
+          indices[_buf.sendBuffer.size() - 1] = idx;
         }
-        if (containsThisRank) {
-          _sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
-          indices[_sendBuffer.size() - 1] = i;
-        }
-      }
-    }
-    _globalCellIndices4SendBuffer = indices;
+    _buf.globalCellIndices4SendBuffer = indices;
   }
 
-  void allocateRecvBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroscopicSolverInterface,
-                          unsigned int rank) {
-
-    // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberCouplingCells() + tarch::la::Vector<3, unsigned int>(2));
-    const unsigned int num = cells[0] * cells[1] * cells[2];
-
-    // delete all potential entries of sendBuffer
-    deleteBuffer(_recvBuffer);
-
-    // determine number of cells that should be received
+  /** allocates the recv-buffer. This buffer contains all global inner coupling cells, but only on rank 0. On all other ranks, no cells are stored and a NULL
+   * ptr is returned */
+  void allocateRecvBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
+    deleteBuffer(_buf.recvBuffer);
     unsigned int numCellsRecv = 0;
-    for (unsigned int i = 0; i < num; i++) {
-      I00 todo_rewrite_this_entire_function_very_much_later{i};
-      if (I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
-        std::vector<unsigned int> ranks = macroscopicSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
-        }
-        if (containsThisRank) {
+    for (auto idx : I00()) 
+      if (I12::contains(idx)) 
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) 
           numCellsRecv++;
-        }
-      }
-    }
     // allocate array for cell indices
-    unsigned int* indices = new unsigned int[numCellsRecv];
-
+    I00* indices = new I00[numCellsRecv];
+    if (indices == NULL)
+      throw std::runtime_error(std::string("ERROR allocateRecvBuffer(): indices==NULL!"));
     // allocate recvBuffer and initialise all entries, incl. indices
-    for (unsigned int i = 0; i < num; i++) {
-      I00 todo_rewrite_this_entire_function_very_much_later{i};
-      if (I12::contains(todo_rewrite_this_entire_function_very_much_later)) {
-        std::vector<unsigned int> ranks = macroscopicSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
-        }
-        if (containsThisRank) {
-          _recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
+    for (auto idx : I00()) 
+      if (I12::contains(idx)) 
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
+          _buf.recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
+          if (_buf.recvBuffer.back() == NULL) 
+            throw std::runtime_error(std::string("ERROR CouetteScenario::allocateRecvBuffer: recvBuffer.back() == NULL!"));
           // set linearized index
-          indices[_recvBuffer.size() - 1] = i;
+          indices[_buf.recvBuffer.size() - 1] = idx;
         }
-      }
-    }
-    _globalCellIndices4RecvBuffer = indices;
+    _buf.globalCellIndices4RecvBuffer = indices;
   }
 
   /** deletes the buffer */
@@ -468,7 +423,8 @@ PYBIND11_MODULE(mamico, mamico) {
       [](const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
          const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
          const unsigned int rank) {
-        return coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(globalMDDomainSize, mdNumberProcesses, couplingCellSize,
+        return coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(globalMDDomainSize, 
+          tarch::la::Vector<3, double>{0,0,0}, mdNumberProcesses, couplingCellSize,
                                                                                     parallelTopologyType, outerRegion, rank);
       },
       "Calls init of the IndexingService singleton object");
