@@ -8,6 +8,7 @@
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/transferstrategies/TransferStrategy.h"
+#include "coupling/indexing/IndexingService.h"
 #include <list>
 #include <map>
 
@@ -31,18 +32,16 @@ template <class LinkedCell, unsigned int dim>
 class coupling::transferstrategies::AveragingTransferStrategy : public coupling::transferstrategies::TransferStrategy<LinkedCell, dim> {
 public:
   /** @brief a simple constructor
-   *  @param mdSolverInterface interface for the md solver
-   *  @param indexConversion instance of the indexConversion*/
-  AveragingTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                            const coupling::IndexConversion<dim>& indexConversion)
-      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion), _massMapping(mdSolverInterface),
-        _momentumMapping(mdSolverInterface), _sampleCounter(0), _rank(indexConversion.getThisRank()) {}
+   *  @param mdSolverInterface interface for the md solver*/
+  AveragingTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
+      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _massMapping(mdSolverInterface),
+        _momentumMapping(mdSolverInterface), _sampleCounter(0), _rank(coupling::indexing::IndexingService<dim>::getInstance().getRank()) {}
 
   /** @brief a dummy destructor */
   virtual ~AveragingTransferStrategy() {}
 
   /** @brief reset the sample counter before processing any cell */
-  virtual void beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() {
+  void beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() override {
     // reset sample counter for each coupling cycle
     _sampleCounter = 0;
   }
@@ -51,8 +50,7 @@ public:
    * macro solver is transferred
    *  @param cell the coupling cell to process
    *  @param index the index of the coupling cell */
-  virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                            const unsigned int& index) {
+  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
     // reset buffers for sampling mass and momentum in each inner coupling
     // cell
     cell.setMacroscopicMass(0.0);
@@ -61,7 +59,7 @@ public:
 
   /** @brief values are reseted before the cells are processes and on rank=0
    * info is written to the stdstream */
-  virtual void beginProcessInnerCouplingCellsAfterMDTimestep() {
+  void beginProcessInnerCouplingCellsAfterMDTimestep() override {
     // output information of last sampling...
     if (_rank == 0) {
       std::cout << "Global quantities of sampling no. " << _sampleCounter << " on rank 0: mass=" << _avgMass << ", momentum=" << _avgMomentum << std::endl;
@@ -77,8 +75,7 @@ public:
    *  @brief the averaging operation is applied to the cell
    *  @param cell the coupling cell to process
    *  @param index the index of the coupling cell */
-  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                       const unsigned int& index) {
+  void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
     // compute total mass/momentum from previous samples
     const double oldMass = (_sampleCounter - 1) * cell.getMacroscopicMass();
     const tarch::la::Vector<dim, double> oldMomentum = ((double)(_sampleCounter - 1)) * cell.getMacroscopicMomentum();

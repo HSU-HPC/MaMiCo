@@ -5,7 +5,6 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_STRATEGY_H_
 #define _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_STRATEGY_H_
 
-#include "coupling/IndexConversion.h"
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 
@@ -26,11 +25,9 @@ template <class LinkedCell, unsigned int dim> class TransferStrategy;
 template <class LinkedCell, unsigned int dim> class coupling::transferstrategies::TransferStrategy {
 public:
   /** @brief a simple destructor
-   *  @param mdSolverInterface interface to md solver
-   *  @param indexConversion an instance of the indexConversion for the current
-   * simulation  */
-  TransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const coupling::IndexConversion<dim>& indexConversion)
-      : _mdSolverInterface(mdSolverInterface), _indexConversion(indexConversion) {}
+   *  @param mdSolverInterface interface to md solver */
+  TransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
+      : _mdSolverInterface(mdSolverInterface) {}
 
   /** @brief a dummy destructor */
   virtual ~TransferStrategy() {}
@@ -42,8 +39,7 @@ public:
    * macro solver is applied
    *  @param cell the coupling cell to apply
    *  @param index the index of the coupling cell */
-  virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                            const unsigned int& index) {}
+  virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {}
 
   /** This method is only applied to coupling cells that cover parts of the
    * MD domain; it is not applied in the outer coupling cells. Is called
@@ -68,8 +64,7 @@ public:
    * macro solver is applied
    *  @param cell the coupling cell to apply
    *  @param index the index of the coupling cell */
-  virtual void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                            const unsigned int& index) {}
+  virtual void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {}
 
   /** This method is only applied to coupling cells that are not part the
    * inner MD domain; it is not applied to the ghost layer Is called before the
@@ -96,8 +91,7 @@ public:
    * -Momentum have been filled in with data from the macroscopic solver.
    *  @param cell the coupling cell to apply
    *  @param index the index of the coupling cell */
-  virtual void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                           const unsigned int& index) {}
+  virtual void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {}
 
   /** This method is only applied to coupling cells that cover parts of the
    * MD domain; it is not applied the outer coupling cells. Is called before
@@ -124,8 +118,7 @@ public:
    * -Momentum have been filled in with data from the macroscopic solver.
    *  @param cell the coupling cell to apply
    *  @param index the index of the coupling cell */
-  virtual void processOuterCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                           const unsigned int& index) {}
+  virtual void processOuterCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {}
 
   /** This method is only applied to coupling cells are part of the outer MD
    * domain; it is not applied the inner coupling cells. Is called before the
@@ -151,8 +144,7 @@ public:
    * noise reduction invocation.
    *  @param cell the coupling cell to apply
    *  @param index the index of the coupling cell */
-  virtual void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                 const unsigned int& index) {}
+  virtual void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {}
 
   /** This method is only applied to coupling cells that cover parts of the
    * MD domain; it is not applied the outer coupling cells. Is called before
@@ -180,8 +172,7 @@ public:
    * noise reduction invocation.
    *  @param cell the coupling cell to apply
    *  @param index the index of the coupling cell */
-  virtual void processOuterCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                 const unsigned int& index) {}
+  virtual void processOuterCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {}
 
   /** This method is only applied to coupling cells are part of the outer MD
    * domain; it is not applied the inner coupling cells. Is called before the
@@ -204,8 +195,7 @@ public:
    * of the MD domain; it is not applied in the outer coupling cells.
    *  @param cell the coupling cell to apply
    *  @param index the index of the coupling cell */
-  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                       const unsigned int& index) {}
+  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {}
 
   /** This method is only applied to coupling cells that cover parts of the
    * MD domain; it is not applied the outer coupling cells. Is called before
@@ -224,7 +214,5 @@ public:
 protected:
   /** interface for the md solver */
   coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
-  /** an instance of the indexConversion current setup */
-  const coupling::IndexConversion<dim>& _indexConversion;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_TRANSFERSTRATEGIES_STRATEGY_H_
