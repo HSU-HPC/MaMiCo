@@ -186,7 +186,7 @@ protected:
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     // init indexing
-    coupling::indexing::IndexingService<3>::getInstance().init(
+    coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
         _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
         _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)_rank

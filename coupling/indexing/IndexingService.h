@@ -53,22 +53,22 @@ public:
     return singleton;
   }
 
-  void init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-            const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion,
-            const unsigned int rank
+  void initWithCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
+                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion,
+                     const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-            ,
-            MPI_Comm comm = MPI_COMM_WORLD
+                     ,
+                     MPI_Comm comm = MPI_COMM_WORLD
 #endif
   );
 
   // Config unpacking variant of init
-  void init(const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
-            const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
-            unsigned int outerRegion, unsigned int rank
+  void initWithMDSize(const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
+                      const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                      unsigned int outerRegion, unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-            ,
-            MPI_Comm comm = MPI_COMM_WORLD
+                      ,
+                      MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
     // read relevant data from configs
@@ -84,10 +84,10 @@ public:
         std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
     }
 
-    init(globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
+    initWithCells(globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-         ,
-         comm
+                  ,
+                  comm
 #endif
     );
   }

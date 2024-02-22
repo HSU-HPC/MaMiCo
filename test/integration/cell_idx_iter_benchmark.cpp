@@ -128,7 +128,7 @@ private:
     for (unsigned int d = 0; d < 3; d++)
       globalNumberCouplingCells[d] = (unsigned int)floor(
           _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] / _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[d] + 0.5);
-    coupling::indexing::IndexingService<3>::getInstance().init(
+    coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
         _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
         _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)_rank);

@@ -56,10 +56,9 @@ private:
     TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>() {}
     virtual ~TestMDSolverInterface() {}
 
-    simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& couplingCellIndex,
+    simplemd::LinkedCell& getLinkedCell(const typename coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>::CellIndex_T& couplingCellIndex,
                                         const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
-                                        const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell,
-                                        const coupling::IndexConversion<dim>& indexConversion) override {
+                                        const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) override {
       return _linkedcell;
     }
 
@@ -94,9 +93,8 @@ private:
   template <unsigned int dim> class TestMacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
   public:
     ~TestMacroscopicSolverInterface() {}
-    bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return true; };
-    bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return true; };
     std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {1}; };
+    unsigned int getOuterRegion() {return 1;}
   };
 
   class TestParticleInsertionConfiguration : public coupling::configurations::ParticleInsertionConfiguration {

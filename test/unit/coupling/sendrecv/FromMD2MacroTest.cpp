@@ -6,6 +6,7 @@
 #include "coupling/sendrecv/FromMD2Macro.h"
 #include "test/unit/coupling/sendrecv/TestCell.h"
 #include "test/unit/coupling/sendrecv/TestDataExchangeFromMD2Macro.h"
+#include "coupling/indexing/IndexingService.h"
 #include <cmath>
 #include <unistd.h>
 #include <vector>
