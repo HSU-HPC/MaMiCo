@@ -15,7 +15,7 @@ const coupling::datastructures::CouplingCell<dim>* coupling::datastructures::Cou
 
 template <class CellIndexT, unsigned int dim> void coupling::datastructures::CouplingCells<CellIndexT, dim>::operator<<(CouplingCell<dim>* couplingCell) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  if (_couplingCell.size() >= CouplingCellType::linearNumberCellsInDomain) {
+  if (_couplingCells.size() >= CellIndexT::linearNumberCellsInDomain) {
     std::cout << "CouplingCells<" << CellIndexT::TNAME << "," << dim << "> can only hold " << CellIndexT::linearNumberCellsInDomain << " coupling cells!"
               << std::endl;
     std::exit(EXIT_FAILURE);

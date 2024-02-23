@@ -9,7 +9,7 @@ coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::Couplin
   _couplingCellsWithLinkedCells = initCouplingCellsWithLinkedCells(numberLinkedCellsPerCouplingCell, mdSolverInterface);
   CouplingCells<I02, dim>::_couplingCells = initCouplingCells();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Coupling cells with linked cells of type " << CellIndexT::TNAME << " initialised..." << std::endl;
+  std::cout << "Coupling cells with linked cells of type " << I02::TNAME << " initialised..." << std::endl;
 #endif
 }
 
