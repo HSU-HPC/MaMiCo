@@ -264,28 +264,7 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVect
 
 template <class LinkedCell, unsigned int dim>
 tarch::la::Vector<dim, double> coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::getPositionOfFirstLocalGhostCell() const {
-  using namespace coupling::indexing;
-  // initialise with position of global first ghost cell
-  //    coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector,
-  //    coupling::indexing::IndexTrait::local> localIndex({0, 0, 0});
-  /*  I03 localIndex({0, 0, 0});
-
-    I09 globalIndex{localIndex};
-
-    tarch::la::Vector<dim, double> position(IndexingService<3>::getInstance().getGlobalMDDomainOffset());
-    for (unsigned int d = 0; d < dim; d++) {
-      position[d] += globalIndex.get()[d] * IndexingService<3>::getInstance().getCouplingCellSize()[d];
-    }
-    */
   tarch::la::Vector<dim, double> position = I03{{0}}.getMidpoint() - 0.5 * IDXS.getCouplingCellSize();
-
-  /*
-    tarch::la::Vector<dim, double> position = _indexConversion->getGlobalMDDomainOffset() - _indexConversion->getCouplingCellSize();
-    for (unsigned int d = 0; d < dim; d++) {
-      position[d] = position[d] + _indexConversion->getThisProcess()[d] * _indexConversion->getAverageLocalNumberCouplingCells()[d] *
-                                      _indexConversion->getCouplingCellSize()[d];
-    }*/
-
   return position;
 }
 
