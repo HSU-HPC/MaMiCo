@@ -47,76 +47,62 @@ protected:
    * into the send-buffer.
    * 	@param dataExchange
    * 	@param cell
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const CouplingCell& cell,
-                         tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const CouplingCell& cell, I01 idx);
 
   /** @brief fills all information that needs to be broadcast from a coupling cell
    * into the broadcast-buffer.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param cell
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void writeToBcastBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                          const CouplingCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void writeToBcastBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const CouplingCell& cell, I01 idx);
 
   /** @brief fills all information that needs to be reduced to a coupling cell
    * into the reduce-buffer.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param cell
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void writeToReduceBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                           const CouplingCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void writeToReduceBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const CouplingCell& cell, I01 idx);
 
   /** reads the information from the receive-buffer and fills it into a
    * coupling cell.
    * 	@param dataExchange
    * 	@param couplingCell
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, CouplingCell& couplingCell,
-                             tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, CouplingCell& couplingCell, I01 idx);
 
-  void readFromCollectiveBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                CouplingCell& couplingCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, CouplingCell& couplingCell, I01 idx);
 
   /** reads the information from the reduce-buffer and fills it into a
    * coupling cell.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param couplingCell
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void readFromReduceBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
-                            CouplingCell& couplingCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, CouplingCell& couplingCell, I01 idx);
 
   /** according to rule by dataExchange, the receive buffers are allocated. This
-   * function adds a contribution for the cell at globalVectorIndex.
+   * function adds a contribution for the cell at idx.
    * 	@param dataExchange
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, I01 idx);
 
   /** Allocates buffer for receiving in the context of the broadcast operation
-   * 	@param indexConversion
    * 	@param dataExchange
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void allocateBcastBufferForReceiving(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                       tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void allocateBcastBufferForReceiving(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, I01 idx);
 
   /** Allocates buffer for receiving in the context of the reduce operation
-   * 	@param indexConversion
    * 	@param dataExchange
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void allocateReduceBufferForReceiving(const coupling::IndexConversion<dim>& indexConversion,
-                                        coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                        tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void allocateReduceBufferForReceiving(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, I01 idx);
 
   /** triggers the MPI-sending on the respective buffers. No sending for
    * information transfer from/ to this rank.

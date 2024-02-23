@@ -36,19 +36,19 @@ public:
    * _tag*/
   unsigned int getTag() const { return _tag; }
 
-  /** returns the ranks to which a particular cell (at index globalCellIndex)
+  /** returns the ranks to which a particular cell (at index idx)
    * should be sent. This method should globally define the target ranks for
    * each global cell index of a coupling cell.
-   * 	@param globalCellIndex unique global cell index
+   * 	@param idx unique global cell index
    */
-  virtual std::vector<unsigned int> getTargetRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual std::vector<unsigned int> getTargetRanks(I01 idx) = 0;
 
-  /** returns all ranks from which a particular cell (at index globalCellIndex)
+  /** returns all ranks from which a particular cell (at index idx)
    * is sent. This method should globally define the source ranks for each
    * global cell index of a coupling cell.
-   * @param globalCellIndex unique global cell index
+   * @param idx unique global cell index
    */
-  virtual std::vector<unsigned int> getSourceRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual std::vector<unsigned int> getSourceRanks(I01 idx) = 0;
 
   /** local rule to read from a coupling cell and write data to (e.g. send)
    * buffer
