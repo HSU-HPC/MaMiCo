@@ -16,14 +16,13 @@ template <class LinkedCell, unsigned int dim> class CouplingCellsWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  */
 template <class LinkedCell, unsigned int dim>
-class coupling::datastructures::CouplingCellsWithLinkedCells : public coupling::datastructures::CouplingCells<dim> {
+class coupling::datastructures::CouplingCellsWithLinkedCells : public coupling::datastructures::CouplingCells<I02, dim> {
 public:
   /** Constructor: initialises the coupling cell with linked cells
    *	@param numberLinkedCellsPerCouplingCell
-   * 	@param indexConversion
    * 	@param mdSolverInterface
    */
-  CouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, const coupling::IndexConversion<dim>& indexConversion,
+  CouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
                                coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface);
   /** Destructor */
   ~CouplingCellsWithLinkedCells();
@@ -71,17 +70,15 @@ private:
   /** initialises the coupling cells: creates the buffer for the cells and
    * embeds linked cells into the coupling cells.
    * 	@param numberLinkedCellsPerCouplingCell
-   * 	@param indexConversion
    * 	@param mdSolverInterface
    */
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
-  initCouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, const coupling::IndexConversion<dim>& indexConversion,
+  initCouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
                                    coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const;
 
   /** initialises the coupling cells (without linked cells).
-   * 	@param indexConversion
    */
-  std::vector<coupling::datastructures::CouplingCell<dim>*> initCouplingCells(const coupling::IndexConversion<dim>& indexConversion) const;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> initCouplingCells() const;
   /** holds the coupling cells with linked cells. */
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* _couplingCellsWithLinkedCells;
 };

@@ -11,7 +11,7 @@
 
 namespace coupling {
 namespace datastructures {
-template <unsigned int dim> class CouplingCells;
+template <class CellIndexT, unsigned int dim> class CouplingCells;
 } // namespace datastructures
 } // namespace coupling
 
@@ -21,20 +21,20 @@ template <unsigned int dim> class CouplingCells;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <unsigned int dim> class coupling::datastructures::CouplingCells {
-public:
-  /** Constructor: initialises the coupling cell
-   * 	@param mdSolverInterface
-   */
-  CouplingCells(const coupling::IndexConversion<dim>& indexConversion);
-  /** Destructor */
-  ~CouplingCells();
+template <class CellIndexT, unsigned int dim> class coupling::datastructures::CouplingCells {
 
+public:
   /** returns vector-of-pointers to coupling cells without access to linked
    * cells. We use this structure for data exchange between macroscopic and MD
    * solver.
    */
   const std::vector<coupling::datastructures::CouplingCell<dim>*>& getCouplingCells() const;
+
+  /** returns a pointer to the coupling cell without access to linked cells. */
+  const coupling::datastructures::CouplingCell<dim>* operator[](CellIndexT index) const;
+
+  /** adds a new coupling cell to the datastructure at the next index (will only work if the data structure is not yet full)*/
+  void operator<<(coupling::datastructures::CouplingCell<dim>* couplingCell);
 
 protected:
   /** holds pointers to all coupling cells with linked cells, but without
