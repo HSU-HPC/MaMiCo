@@ -268,15 +268,16 @@ tarch::la::Vector<dim, double> coupling::services::CouplingCellServiceImpl<Linke
   // initialise with position of global first ghost cell
   //    coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector,
   //    coupling::indexing::IndexTrait::local> localIndex({0, 0, 0});
-  I03 localIndex({0, 0, 0});
+/*  I03 localIndex({0, 0, 0});
 
-  //    coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::noGhost> globalIndex(localIndex);
   I09 globalIndex{localIndex};
 
   tarch::la::Vector<dim, double> position(IndexingService<3>::getInstance().getGlobalMDDomainOffset());
   for (unsigned int d = 0; d < dim; d++) {
     position[d] += globalIndex.get()[d] * IndexingService<3>::getInstance().getCouplingCellSize()[d];
   }
+  */
+  tarch::la::Vector<dim, double> position = I03{{0}}.getMidpoint() - 0.5 * IDXS.getCouplingCellSize();
 
   /*
     tarch::la::Vector<dim, double> position = _indexConversion->getGlobalMDDomainOffset() - _indexConversion->getCouplingCellSize();

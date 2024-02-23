@@ -29,6 +29,7 @@
 #include "coupling/sendrecv/DataExchangeFromMacro2MD.h"
 #include "coupling/sendrecv/FromMD2Macro.h"
 #include "coupling/sendrecv/FromMacro2MD.h"
+#include "coupling/indexing/IndexingService.h"
 #include "tarch/utils/MultiMDService.h"
 
 #include "coupling/filtering/FilterPipeline.h"

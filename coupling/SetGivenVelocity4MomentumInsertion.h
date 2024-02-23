@@ -42,10 +42,8 @@ public:
    * MomentumController on details how to do that.
    *  @brief updates the momentum based on the microscopic momentum
    *  @param cell coupling cell
-   *  @param currentCouplingCellIndex index of the coupling cell
    */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentCouplingCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) const {
     coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> massMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
 

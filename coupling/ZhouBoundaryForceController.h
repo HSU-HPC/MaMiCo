@@ -42,10 +42,8 @@ public:
    * the cellmapping for the Zhou boundary force
    * @brief applies the Zhou boundary force on a boundary cell
    * @param cell the macroscopic boundary cell to apply the boundary force
-   * @param currentLocalCouplingCellIndex the index of the coupling cell
    */
-  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                  const unsigned int& currentLocalCouplingCellIndex) {
+  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) {
     cell.iterateCells(_zhouBoundaryForce);
   }
 
