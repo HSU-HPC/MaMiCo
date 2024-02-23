@@ -7,9 +7,9 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/datastructures/CouplingCell.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
-#include "coupling/indexing/IndexingService.h"
 #include "tarch/la/Matrix.h"
 #include <iostream>
 
@@ -271,7 +271,7 @@ private:
       // determine normalised position
       normalisedPosition[d] = (position[d] - (IDXS.getGlobalMDDomainOffset()[d] - 0.5 * cellSize[d]) - globalCellIndex[d] * cellSize[d]) / cellSize[d];
     }
-    unsigned int lowerLeftIndex = I02{I03{tarch::la::Vector<3,int>{lowerLeftCellIndex}}}.get();
+    unsigned int lowerLeftIndex = I02{I03{tarch::la::Vector<3, int>{lowerLeftCellIndex}}}.get();
 
     if (dim == 2) {
       std::cout << "Not implemented correctly yet!" << std::endl;
@@ -421,8 +421,11 @@ public:
    *variable from within this constructor (called after base object is
    *constructed)
    */
-  VelocityGradientRelaxationTopOnlyMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity, const I02& cellIndex, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
-      : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, cellIndex, mdSolverInterface, couplingCells) {
+  VelocityGradientRelaxationTopOnlyMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity, const I02& cellIndex,
+                                           coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                                           const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
+      : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, cellIndex, mdSolverInterface,
+                                                                                   couplingCells) {
 
     // the following snippet is basically a replacement of the method
     // ignoreThisCell(). Since this function is called in the constructor of the

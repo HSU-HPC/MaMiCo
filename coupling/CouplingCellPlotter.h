@@ -34,7 +34,8 @@ public:
    *  @param t number of time step to plot
    *  @param cells coupling cells to plot
    *  @param mdSolverInterface interface of the md solver */
-  CouplingCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>& cells,
+  CouplingCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,
+                      datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>& cells,
                       coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     plotMoleculeFile(ID, filename, rank, t, cells, mdSolverInterface);
     plotCouplingCellFile(ID, filename, rank, t, cells, mdSolverInterface);

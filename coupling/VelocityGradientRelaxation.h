@@ -52,7 +52,7 @@ public:
   /** @brief returns the time step interval for the momentum insertion, always
    * one for this method
    *  @return the time step interval for momentum insertion */
- unsigned int getTimeIntervalPerMomentumInsertion() const override { return 1; }
+  unsigned int getTimeIntervalPerMomentumInsertion() const override { return 1; }
 
   /** This method does not conserve the kinetic energy of the respective
    * coupling cell. To conserve the energy as well, see the description of

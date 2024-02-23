@@ -338,6 +338,16 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
   }
 #endif
 
+  for (unsigned int d = 0; d < dim; d++)
+    if (globalNumberCouplingCells[d] % numberProcesses[d] != 0) {
+      std::stringstream ss;
+      ss << "IndexingService: initWithCells(): ERROR: Number "
+            "of macroscopic cells must be divisible by number of processes! ";
+      ss << "globalNumberMacroscopicCells = " << globalNumberCouplingCells;
+      ss << ", numberProcesses = " << numberProcesses;
+      throw std::runtime_error(ss.str());
+    }
+
   _couplingCellSize = couplingCellSize;
 
   // TODO: make this globalNumberCouplingCells and remove all usages of the
@@ -419,7 +429,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
       boxMin[i] = backWeight * globalNumberCouplingCells[i] / totalWeight;
       boxMax[i] = boxMin[i] + (subdomainWeights[i][coords[i]] * globalNumberCouplingCells[i] / totalWeight);
     }
-    CellIndex<dim, IndexTrait::local>::lowerBoundary = BaseIndex<dim>{boxMin + tarch::la::Vector<dim, int>{1}};
+    CellIndex<dim, IndexTrait::local>::lowerBoundary = BaseIndex<dim>{boxMin};
     CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{1}};
     CellIndex<dim, IndexTrait::local>::setDomainParameters();
   }

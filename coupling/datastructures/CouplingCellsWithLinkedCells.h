@@ -2,6 +2,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLSWITHLINKEDCELLS_H_
 
 #include "CouplingCells.h"
+#include "coupling/datastructures/CouplingCellWithLinkedCells.h"
 
 namespace coupling {
 namespace datastructures {
