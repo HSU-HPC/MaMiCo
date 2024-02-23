@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-from pandas import read_csv 
 import math
+
 import matplotlib.pyplot as mplt
+from pandas import read_csv
 
 #Variation of helper script plot.py made for comparing exactly four filter .csv outputs.
 #This version of plot4 works on mass only. It does not compute an SNR or use CS data.
