@@ -273,7 +273,7 @@ public:
 
   /** returns the coupling cells. This functions is meant to be used in test
    * scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
-  coupling::datastructures::CouplingCells<LinkedCell, dim>& getCouplingCells() { return _couplingCells; }
+  coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>& getCouplingCells() { return _couplingCells; }
 
 private:
 // ------------------- INCLUDE WRAPPER DEFINITIONS
@@ -314,7 +314,7 @@ private:
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;
 
   /** storage for coupling cells in coupling tool */
-  coupling::datastructures::CouplingCells<LinkedCell, dim> _couplingCells;
+  coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim> _couplingCells;
 
   /** filter pipeline, used to apply filters in sendFromMD2Macro */
   coupling::filtering::FilterPipeline<dim>* _filterPipeline;
