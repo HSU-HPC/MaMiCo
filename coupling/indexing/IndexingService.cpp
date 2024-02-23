@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 
 /*
  * Define specialisations of CellIndex.
@@ -313,7 +314,8 @@ template <> const char I15::TNAME[] = "CellIndex<3, vector, local, md2macro, noG
 
 // delegated init, this does the main work
 template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
+void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights,
+                                                             tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                                                              tarch::la::Vector<dim, unsigned int> numberProcesses,
                                                              const tarch::la::Vector<3, double>& couplingCellSize,
                                                              coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
@@ -325,6 +327,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 ) {
 
   _rank = rank;
+  _parallelTopologyType = parallelTopologyType;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   _comm = comm;
 #endif
@@ -400,36 +403,24 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
   _parallelTopology =
       coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, _numberProcesses, parallelTopologyOffset);
 
-  std::vector<unsigned int> ranks; // used to store ranks in which certain indices occur
-
+  auto coords = _parallelTopology->getProcessCoordinates(_rank);
+  tarch::la::Vector<3, int> boxMin, boxMax;
   // init boundaries of all local, non-m2m, GL including indexing types
   {
-    BaseIndex<dim> lowerBoundary{CellIndex<dim /*global*/>::lowerBoundary};
-    BaseIndex<dim> upperBoundary{CellIndex<dim /*global*/>::upperBoundary};
-
-    // TODO: determine these two analyticaly (i.e. calculate domain bounds): you
-    // dont need to iterate over all global indices.
-    while (true) {
-      ranks = getRanksForGlobalIndex(lowerBoundary);
-      if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index
-                                                                          occurs...*/
-        break;
-
-      //...increment by one if above is too high to be in local domain
-      ++lowerBoundary;
+    for (unsigned int i = 0; i < dim; i++) {
+      const auto backWeight = std::reduce(subdomainWeights[i].begin(), subdomainWeights[i].begin() + coords[i], 0u);
+      const auto totalWeight = std::reduce(subdomainWeights[i].begin() + coords[i], subdomainWeights[i].end(), backWeight);
+#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+      std::cout << "Dim: " << i << " totalWeight: " << totalWeight << " backWeight: " << backWeight << " coords: " << coords[0] << ", " << coords[1] << ", "
+                << coords[2] << std::endl;
+#endif
+      // calculate box bounds from cumulative weights of previous ranks, and the
+      // weight of the current rank
+      boxMin[i] = backWeight * globalNumberCouplingCells[i] / totalWeight;
+      boxMax[i] = boxMin[i] + (subdomainWeights[i][coords[i]] * globalNumberCouplingCells[i] / totalWeight);
     }
-    while (true) {
-      ranks = getRanksForGlobalIndex(upperBoundary);
-      if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) /*if _rank is found in ranks in which the tested index
-                                                                          occurs...*/
-        break;
-
-      //...decrement by one if above is too high to be in local domain
-      --upperBoundary;
-    }
-
-    CellIndex<dim, IndexTrait::local>::lowerBoundary = lowerBoundary;
-    CellIndex<dim, IndexTrait::local>::upperBoundary = upperBoundary;
+    CellIndex<dim, IndexTrait::local>::lowerBoundary = BaseIndex<dim>{boxMin + tarch::la::Vector<dim, int>{1}};
+    CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{1}};
     CellIndex<dim, IndexTrait::local>::setDomainParameters();
   }
 
