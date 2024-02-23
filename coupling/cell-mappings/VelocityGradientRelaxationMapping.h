@@ -105,7 +105,7 @@ public:
         // get newVelocity (microscopicMomentum) with second-order interpolation
         interpolateVelocitySecondOrder(couplingCellIndex, normalisedPosition, secondCake, newVelocity);
         // get current velocity directly from coupling cell
-        oldVelocity = _couplingCells[_cellIdx].getCurrentVelocity();
+        oldVelocity = _couplingCells[_cellIdx.get()].getCurrentVelocity();
 
         velocity += _velocityRelaxationFactor * (newVelocity - oldVelocity);
         wrapper.setVelocity(velocity);
@@ -173,7 +173,7 @@ protected:
    *any velocity relaxation (-> used to speed up the code)
    */
   bool ignoreThisCell(const I02& idx) const {
-    const tarch::la::Vector<dim, unsigned int> globalIndex = I01{idx}.get();
+    const tarch::la::Vector<dim, unsigned int> globalIndex{I01{idx}.get()};
     bool innerCell = true;
     for (unsigned int d = 0; d < dim; d++) {
       innerCell = innerCell && ((globalIndex[d] > 2) && (globalIndex[d] < I01::numberCellsInDomain[d] - 3));
@@ -226,15 +226,16 @@ private:
    *	@param secondCake
    *	@param res
    */
-  void createCouplingCellIndex4SecondOrderInterpolation(const tarch::la::Vector<dim, double>& position, tarch::la::Vector<dim, double>& normalisedPosition, bool& secondCake, I02* res) const {
+  void createCouplingCellIndex4SecondOrderInterpolation(const tarch::la::Vector<dim, double>& position, tarch::la::Vector<dim, double>& normalisedPosition,
+                                                        bool& secondCake, I02* res) const {
     // compute lower left cell index and normalised position;
     // the normalised position is chosen such that the origin (0,0...,0)
     // coincides with the lower left... coupling cell's midpoint
 
     tarch::la::Vector<dim, double> cellMidpoint = _cellIdx.getCellMidPoint();
     auto cellSize = IDXS.getCouplingCellSize();
-    tarch::la::Vector<dim, unsigned int> globalCellIndex = I01{_cellIdx}.get();
-    tarch::la::Vector<dim, unsigned int> lowerLeftCellIndex = I03{_cellIdx}.get();
+    tarch::la::Vector<dim, unsigned int> globalCellIndex{I01{_cellIdx}.get()};
+    tarch::la::Vector<dim, unsigned int> lowerLeftCellIndex{I03{_cellIdx}.get()};
 
     // determine cell mid point and normalised position in this loop
     for (unsigned int d = 0; d < dim; d++) {
@@ -270,7 +271,7 @@ private:
       // determine normalised position
       normalisedPosition[d] = (position[d] - (IDXS.getGlobalMDDomainOffset()[d] - 0.5 * cellSize[d]) - globalCellIndex[d] * cellSize[d]) / cellSize[d];
     }
-    unsigned int lowerLeftIndex = I02{I03{lowerLeftCellIndex}}.get();
+    unsigned int lowerLeftIndex = I02{I03{tarch::la::Vector<3,int>{lowerLeftCellIndex}}}.get();
 
     if (dim == 2) {
       std::cout << "Not implemented correctly yet!" << std::endl;
@@ -420,19 +421,16 @@ public:
    *variable from within this constructor (called after base object is
    *constructed)
    */
-  VelocityGradientRelaxationTopOnlyMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity, const I02& cellIndex,
-                                           coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                                           const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
-      : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, cellIndex, mdSolverInterface,
-                                                                                   couplingCelloupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>::_ignoreThisCell =
-        (I01{cellIndex}.get()[dim - 1] < coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell,s) {
+  VelocityGradientRelaxationTopOnlyMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity, const I02& cellIndex, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
+      : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, cellIndex, mdSolverInterface, couplingCells) {
+
     // the following snippet is basically a replacement of the method
     // ignoreThisCell(). Since this function is called in the constructor of the
     // based class, we cannot overwrite it; hence, we solve it by overwriting
     // the respective variable from within this constructor (called after base
     // object is constructed)
     coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>::_ignoreThisCell =
-        (I01{cellIndex}.get()[dim - 1] < coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>::I01::numberCellsInDomain[dim - 1] - 3);
+        (I01{cellIndex}.get()[dim - 1] < (int)(I01::numberCellsInDomain[dim - 1]) - 3);
   }
 
 protected:

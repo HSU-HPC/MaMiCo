@@ -156,7 +156,7 @@ public:
   void endCellIteration() override {}
   void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     const double temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
-    Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell);
+    Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell, index);
     Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell, temperature);
   }
 };

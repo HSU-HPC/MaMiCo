@@ -350,7 +350,7 @@ private:
     void endCellIteration() {}
 
     /** @brief aplication of the vtkMoleculePlotter to the coupling cells*/
-    void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) {
       coupling::cellmappings::VTKMoleculePlotter<LinkedCell, dim> vtkMoleculePlotter(_moleculeVelocities, _moleculePositions, _moleculePotentials,
                                                                                      _appendFloatZeros, _mdSolverInterface);
       cell.iterateConstCells(vtkMoleculePlotter);
