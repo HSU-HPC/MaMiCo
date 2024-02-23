@@ -43,7 +43,7 @@ public:
   /** returns 1 since momentum shall be inserted in every time step
    *  @brief returns the interval of time steps for momentum insertion
    *  @returns 1 */
-  virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1; }
+  unsigned int getTimeIntervalPerMomentumInsertion() const override { return 1; }
 
   /** inserts the momentum of the coupling cell and distributes it over all
    * molecules. This method does not conserve the kinetic energy of the
@@ -52,7 +52,7 @@ public:
    *  @brief inserts momentum to the cell
    *  @param cell coupling cell to insert momentum to
    *  @param currentCouplingCellIndex coupling cell index of the cell */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) const {
+  void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 idx) const override {
     const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();
     // determine fraction of momentum that is to be inserted in this frame
     double fraction = 1.0 / ((_numberMDTimestepsPerCouplingCycle / timeIntervalMomentumInsertion) +

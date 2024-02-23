@@ -9,6 +9,7 @@
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
+#include "coupling/indexing/IndexingService.h"
 #include "tarch/la/Matrix.h"
 #include <iostream>
 
@@ -225,8 +226,7 @@ private:
    *	@param secondCake
    *	@param res
    */
-  void createCouplingCellIndex4SecondOrderInterpolation(const tarch::la::Vector<dim, double>& position, tarch::la::Vector<dim, double>& normalisedPosition,
-                                                        bool& secondCake, I02* res) const {
+  void createCouplingCellIndex4SecondOrderInterpolation(const tarch::la::Vector<dim, double>& position, tarch::la::Vector<dim, double>& normalisedPosition, bool& secondCake, I02* res) const {
     // compute lower left cell index and normalised position;
     // the normalised position is chosen such that the origin (0,0...,0)
     // coincides with the lower left... coupling cell's midpoint
@@ -424,7 +424,8 @@ public:
                                            coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
                                            const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
       : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, cellIndex, mdSolverInterface,
-                                                                                   couplingCells) {
+                                                                                   couplingCelloupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>::_ignoreThisCell =
+        (I01{cellIndex}.get()[dim - 1] < coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell,s) {
     // the following snippet is basically a replacement of the method
     // ignoreThisCell(). Since this function is called in the constructor of the
     // based class, we cannot overwrite it; hence, we solve it by overwriting

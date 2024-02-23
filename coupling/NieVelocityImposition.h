@@ -37,15 +37,15 @@ public:
 
   /** @brief momentum shall be inserted in every md time step, so this returns 1
    *  @returns the time step interval for momentum insertion, always 1 */
-  virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1; }
+  unsigned int getTimeIntervalPerMomentumInsertion() const override { return 1; }
 
   /** @brief inserts momentum to a cell
    *  @param cell to the coupling cell will the momentum be inserted
-   *  @param currentLocalCouplingCellIndex local linearised index for the
+   *  @param idx local linearised index for the
    * coupling cell */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& currentLocalCouplingCellIndex) const {
+  void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 idx) const override {
     // nop if this is not an imposition cell
-    if (!isInsideImpositionLayer(currentLocalCouplingCellIndex)) {
+    if (!isInsideImpositionLayer(idx)) {
       return;
     }
     // set continuum velocity
@@ -77,11 +77,12 @@ private:
    * imposition layer (true) or not (false) */
   bool isInsideImpositionLayer(I01 globalCellIndex) const {
     bool inner = true;
+    tarch::la::Vector<dim, unsigned int> globalIndexUnsigned{globalCellIndex.get()};
     for (unsigned int d = 0; d < dim; d++)
-      inner = inner && (globalCellIndex[d] > _innermostLayer && globalCellIndex[d] < 1 + I09::numberCellsInDomain[d] - _innermostLayer);
+      inner = inner && (globalIndexUnsigned[d] > _innermostLayer && globalIndexUnsigned[d] < 1 + I09::numberCellsInDomain[d] - _innermostLayer);
     bool outer = false;
     for (unsigned int d = 0; d < dim; d++)
-      outer = outer || (globalCellIndex[d] < _outermostLayer || globalCellIndex[d] > 1 + I09::numberCellsInDomain[d] - _outermostLayer);
+      outer = outer || (globalIndexUnsigned[d] < _outermostLayer || globalIndexUnsigned[d] > 1 + I09::numberCellsInDomain[d] - _outermostLayer);
     return !inner && !outer;
   }
 

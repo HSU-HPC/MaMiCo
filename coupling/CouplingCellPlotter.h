@@ -153,7 +153,7 @@ private:
       break;
     }
 
-    tarch::la::Vector<3, double> original = I11{{0}}.getMidpoint() - 0.5 * IDXS.getCouplingCellSize();
+    tarch::la::Vector<3, double> original = I11{{0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();
 
     // open file
     open(ID, filename, "CouplingCells", rank, t, ofCell);
@@ -178,7 +178,7 @@ private:
       ofCell << "1.0 ";
     }
     ofCell << std::endl;
-    ofCell << "POINT_DATA " << numberCells[0] * numberCells[1] * numberCells[2] << std::endl << std::endl;
+    ofCell << "POINT_DATA " << I02::linearNumberCellsInDomain << std::endl << std::endl;
     ofCell << microscopicMasses.str() << std::endl << std::endl;
     microscopicMasses.clear();
     microscopicMasses.str("");

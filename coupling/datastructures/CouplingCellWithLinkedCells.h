@@ -74,7 +74,7 @@ public:
   template <class A> void iterateCells(A& a) {
     a.beginCellIteration();
     for (unsigned int i = 0; i < _numberCells; i++) {
-      a.handleCell(*(_linkedCells[i]), i);
+      a.handleCell(*(_linkedCells[i]));
     }
     a.endCellIteration();
   }
@@ -90,7 +90,7 @@ public:
   template <class A> void iterateConstCells(A& a) const {
     a.beginCellIteration();
     for (unsigned int i = 0; i < _numberCells; i++) {
-      a.handleCell(*(_linkedCells[i]), i);
+      a.handleCell(*(_linkedCells[i]));
     }
     a.endCellIteration();
   }
