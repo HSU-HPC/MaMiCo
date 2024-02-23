@@ -24,7 +24,7 @@ public:
   virtual ~Wrapper() {}
   virtual void beginCellIteration() = 0;
   virtual void endCellIteration() = 0;
-  virtual void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) = 0;
+  virtual void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) = 0;
 
 protected:
   coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* _thisPtr;
@@ -38,9 +38,9 @@ public:
   Wrapper4ProcessInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr)
       : Wrapper(thisPtr) {}
 
-  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData(); }
-  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData(); }
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData(); }
+  void endCellIteration() override { Wrapper::_thisPtr->_transferStrategy->endProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData(); }
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     Wrapper::_thisPtr->_transferStrategy->processInnerCouplingCellBeforeReceivingMacroscopicSolverData(cell, index);
   }
 };
@@ -53,10 +53,10 @@ public:
   Wrapper4ProcessOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr)
       : Wrapper(thisPtr) {}
 
-  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterCouplingCellsBeforeReceivingMacroscopicSolverData(); }
-  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterCouplingCellsBeforeReceivingMacroscopicSolverData(); }
+  void beginCellIteration() override { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterCouplingCellsBeforeReceivingMacroscopicSolverData(); }
+  void endCellIteration() override { Wrapper::_thisPtr->_transferStrategy->endProcessOuterCouplingCellsBeforeReceivingMacroscopicSolverData(); }
 
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     Wrapper::_thisPtr->_transferStrategy->processOuterCouplingCellBeforeReceivingMacroscopicSolverData(cell, index);
   }
 };
@@ -69,9 +69,9 @@ public:
   Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr)
       : Wrapper(thisPtr) {}
 
-  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerCouplingCellsAfterReceivingMacroscopicSolverData(); }
-  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerCouplingCellsAfterReceivingMacroscopicSolverData(); }
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerCouplingCellsAfterReceivingMacroscopicSolverData(); }
+  void endCellIteration() override { Wrapper::_thisPtr->_transferStrategy->endProcessInnerCouplingCellsAfterReceivingMacroscopicSolverData(); }
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     Wrapper::_thisPtr->_transferStrategy->processInnerCouplingCellAfterReceivingMacroscopicSolverData(cell, index);
   }
 };
@@ -84,9 +84,9 @@ public:
   Wrapper4ProcessOuterCouplingCellAfterReceivingMacroscopicSolverData(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr)
       : Wrapper(thisPtr) {}
 
-  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterCouplingCellsAfterReceivingMacroscopicSolverData(); }
-  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterCouplingCellsAfterReceivingMacroscopicSolverData(); }
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterCouplingCellsAfterReceivingMacroscopicSolverData(); }
+  void endCellIteration() override { Wrapper::_thisPtr->_transferStrategy->endProcessOuterCouplingCellsAfterReceivingMacroscopicSolverData(); }
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     Wrapper::_thisPtr->_transferStrategy->processOuterCouplingCellAfterReceivingMacroscopicSolverData(cell, index);
   }
 };
@@ -97,9 +97,9 @@ class Wrapper4ProcessInnerCouplingCellBeforeSendingMDSolverData : public Wrapper
 public:
   Wrapper4ProcessInnerCouplingCellBeforeSendingMDSolverData(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerCouplingCellsBeforeSendingMDSolverData(); }
-  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerCouplingCellsBeforeSendingMDSolverData(); }
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerCouplingCellsBeforeSendingMDSolverData(); }
+  void endCellIteration() override { Wrapper::_thisPtr->_transferStrategy->endProcessInnerCouplingCellsBeforeSendingMDSolverData(); }
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     Wrapper::_thisPtr->_transferStrategy->processInnerCouplingCellBeforeSendingMDSolverData(cell, index);
   }
 };
@@ -110,9 +110,9 @@ class Wrapper4ProcessOuterCouplingCellBeforeSendingMDSolverData : public Wrapper
 public:
   Wrapper4ProcessOuterCouplingCellBeforeSendingMDSolverData(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterCouplingCellsBeforeSendingMDSolverData(); }
-  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessOuterCouplingCellsBeforeSendingMDSolverData(); }
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override { Wrapper::_thisPtr->_transferStrategy->beginProcessOuterCouplingCellsBeforeSendingMDSolverData(); }
+  void endCellIteration() override { Wrapper::_thisPtr->_transferStrategy->endProcessOuterCouplingCellsBeforeSendingMDSolverData(); }
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     Wrapper::_thisPtr->_transferStrategy->processOuterCouplingCellBeforeSendingMDSolverData(cell, index);
   }
 };
@@ -123,9 +123,9 @@ class Wrapper4ProcessInnerCouplingCellAfterMDTimestep : public Wrapper {
 public:
   Wrapper4ProcessInnerCouplingCellAfterMDTimestep(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration() { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerCouplingCellsAfterMDTimestep(); }
-  void endCellIteration() { Wrapper::_thisPtr->_transferStrategy->endProcessInnerCouplingCellsAfterMDTimestep(); }
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override { Wrapper::_thisPtr->_transferStrategy->beginProcessInnerCouplingCellsAfterMDTimestep(); }
+  void endCellIteration() override { Wrapper::_thisPtr->_transferStrategy->endProcessInnerCouplingCellsAfterMDTimestep(); }
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     Wrapper::_thisPtr->_transferStrategy->processInnerCouplingCellAfterMDTimestep(cell, index);
   }
 };
@@ -136,9 +136,9 @@ class Wrapper4ComputeAndSetCurrentVelocity : public Wrapper {
 public:
   Wrapper4ComputeAndSetCurrentVelocity(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration() {}
-  void endCellIteration() {}
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override {}
+  void endCellIteration() override {}
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(Wrapper::_thisPtr->_mdSolverInterface);
     cell.iterateConstCells(computeMomentumMapping);
     const tarch::la::Vector<dim, double> velocity = computeMomentumMapping.getMeanVelocity();
@@ -152,11 +152,11 @@ class Wrapper4DistributeMomentum : public Wrapper {
 public:
   Wrapper4DistributeMomentum(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr, unsigned int t) : Wrapper(thisPtr) {}
 
-  void beginCellIteration() {}
-  void endCellIteration() {}
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override {}
+  void endCellIteration() override {}
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     const double temperature = Wrapper::_thisPtr->_kineticEnergyController.computeTemperature(cell);
-    Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell, index);
+    Wrapper::_thisPtr->_momentumInsertion->insertMomentum(cell);
     Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell, temperature);
   }
 };
@@ -172,9 +172,9 @@ public:
   Wrapper4ComputeAndStoreTemperature(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr, double temperature)
       : Wrapper(thisPtr), _temperature(temperature) {}
 
-  void beginCellIteration() {}
-  void endCellIteration() {}
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override {}
+  void endCellIteration() override {}
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     // if this value is -1.0, we just set the temperature in the cell according
     // to current temperature...
     if (_temperature == -1.0) {
@@ -195,9 +195,9 @@ class Wrapper4PerturbateVelocity : public Wrapper {
 public:
   Wrapper4PerturbateVelocity(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration() {}
-  void endCellIteration() {}
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override {}
+  void endCellIteration() override {}
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> computeMomentumMapping(Wrapper::_thisPtr->_mdSolverInterface);
     cell.iterateConstCells(computeMomentumMapping);
 
@@ -217,9 +217,9 @@ class Wrapper4ApplyTemperature : public Wrapper {
 public:
   Wrapper4ApplyTemperature(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration() {}
-  void endCellIteration() {}
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+  void beginCellIteration() override {}
+  void endCellIteration() override {}
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
     const double temperature = cell.getTemperature();
     Wrapper::_thisPtr->_kineticEnergyController.setTemperature(cell, temperature);
   }
@@ -231,10 +231,10 @@ class Wrapper4ApplyBoundaryForce : public Wrapper {
 public:
   Wrapper4ApplyBoundaryForce(coupling::services::CouplingCellServiceImpl<LinkedCell, dim>* thisPtr) : Wrapper(thisPtr) {}
 
-  void beginCellIteration() {}
-  void endCellIteration() {}
-  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
-    Wrapper::_thisPtr->_boundaryForceController->applyBoundaryForce(cell, index);
+  void beginCellIteration() override {}
+  void endCellIteration() override {}
+  void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) override {
+    Wrapper::_thisPtr->_boundaryForceController->applyBoundaryForce(cell);
   }
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_COUPLINGCELLTRAVERSALWRAPPERS_H_

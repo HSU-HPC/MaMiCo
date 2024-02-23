@@ -34,10 +34,8 @@ public:
    * the cellmapping for the boundary force
    * @brief applies the boundary force on a boundary cell
    * @param cell the boundary coupling cell to apply the boundary force
-   * @param currentLocalCouplingCellIndex the index of the coupling cell
    */
-  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                  const unsigned int& currentLocalCouplingCellIndex) = 0;
+  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) = 0;
 
   /** @brief calculates the potential energy for a given position
    *  @param position the position for which the potential energy will be

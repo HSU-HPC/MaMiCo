@@ -40,8 +40,7 @@ public:
    * distributes is over all molecules.
    *  @param cell the coupling cell to insert the momentum
    *  @param fraction the fraction of momentum to use */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentCouplingCellIndex) const = 0;
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) const = 0;
 
 protected:
   /** interface to the md solver */

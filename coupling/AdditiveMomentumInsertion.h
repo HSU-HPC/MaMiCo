@@ -52,8 +52,7 @@ public:
    *  @brief inserts momentum to the cell
    *  @param cell coupling cell to insert momentum to
    *  @param currentCouplingCellIndex coupling cell index of the cell */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentCouplingCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) const {
     const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();
     // determine fraction of momentum that is to be inserted in this frame
     double fraction = 1.0 / ((_numberMDTimestepsPerCouplingCycle / timeIntervalMomentumInsertion) +
