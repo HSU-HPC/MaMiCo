@@ -54,7 +54,7 @@ public:
   }
 
   void initWithCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion,
+                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
                      const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                      ,
@@ -63,13 +63,13 @@ public:
   ) {
     // regular grid
     tarch::la::Vector<dim, std::vector<unsigned int>> subdomainWeights;
-    for (unsigned int i = 0; i < dim, i++) {
-      subdomainWeights.reserve(numberProcesses[i]);
-      for (int j = 0; j < mdNumberProcesses[i]; j++) {
-        subdomainWeights.push_back(1);
+    for (unsigned int i = 0; i < dim; i++) {
+      subdomainWeights[i].reserve(numberProcesses[i]);
+      for (unsigned int j = 0; j < numberProcesses[i]; j++) {
+        subdomainWeights[i].push_back(1);
       }
     }
-    initWithCells(subdomainWeights, globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
+    initWithCells(subdomainWeights, globalNumberCouplingCells, numberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                   ,
                   comm
@@ -79,7 +79,7 @@ public:
 
   void initWithCells(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                      tarch::la::Vector<dim, unsigned int> numberProcesses, const tarch::la::Vector<3, double>& couplingCellSize,
-                     coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion, const unsigned int rank
+                     coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                      ,
                      MPI_Comm comm = MPI_COMM_WORLD
@@ -96,14 +96,14 @@ public:
   ) {
     // regular grid
     tarch::la::Vector<dim, std::vector<unsigned int>> subdomainWeights;
-    for (unsigned int i = 0; i < dim, i++) {
-      subdomainWeights.reserve(mdNumberProcesses[i]);
-      for (int j = 0; j < mdNumberProcesses[i]; j++) {
-        subdomainWeights.push_back(1);
+    for (unsigned int i = 0; i < dim; i++) {
+      subdomainWeights[i].reserve(mdNumberProcesses[i]);
+      for (unsigned int j = 0; j < mdNumberProcesses[i]; j++) {
+        subdomainWeights[i].push_back(1);
       }
     }
 
-    initWithMDSize(subdomainWeights, globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
+    initWithMDSize(subdomainWeights, globalMDDomainSize, globalMDDomainOffset, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                    ,
                    comm

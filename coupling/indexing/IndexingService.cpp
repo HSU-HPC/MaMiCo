@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 
 /*
  * Define specialisations of CellIndex.
@@ -402,10 +403,10 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
       coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, _numberProcesses, parallelTopologyOffset);
 
   auto coords = _parallelTopology->getProcessCoordinates(_rank);
-  tarch::la::Vector<3, unsigned int> boxMin, boxMax;
+  tarch::la::Vector<3, int> boxMin, boxMax;
   // init boundaries of all local, non-m2m, GL including indexing types
   {
-    for (int i = 0; i < dim; i++) {
+    for (unsigned int i = 0; i < dim; i++) {
       const auto backWeight = std::reduce(subdomainWeights[i].begin(), subdomainWeights[i].begin() + coords[i], 0u);
       const auto totalWeight = std::reduce(subdomainWeights[i].begin() + coords[i], subdomainWeights[i].end(), backWeight);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -414,11 +415,11 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 #endif
       // calculate box bounds from cumulative weights of previous ranks, and the
       // weight of the current rank
-      boxMin[i] = static_cast<double>(backWeight) * globalNumberCouplingCells[i] / totalWeight;
-      boxMax[i] = boxMin[i] + (static_cast<double>(subdomainWeights[i][coords[i]]) * globalNumberCouplingCells[i] / totalWeight);
+      boxMin[i] = backWeight * globalNumberCouplingCells[i] / totalWeight;
+      boxMax[i] = boxMin[i] + (subdomainWeights[i][coords[i]] * globalNumberCouplingCells[i] / totalWeight);
     }
-    CellIndex<dim, IndexTrait::local>::lowerBoundary{boxMin};
-    CellIndex<dim, IndexTrait::local>::upperBoundary{boxMax};
+    CellIndex<dim, IndexTrait::local>::lowerBoundary = BaseIndex<dim>{boxMin + tarch::la::Vector<dim, int>{1}};
+    CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{1}};
     CellIndex<dim, IndexTrait::local>::setDomainParameters();
   }
 
