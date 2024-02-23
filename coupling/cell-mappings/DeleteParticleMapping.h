@@ -49,7 +49,7 @@ public:
    *	@param cell
    *	@param cellIndex
    */
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     // return, if we already deleted the respective particle
     if (_particleCounter > _particle) {
       return;

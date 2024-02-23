@@ -129,9 +129,10 @@ private:
       globalNumberCouplingCells[d] = (unsigned int)floor(
           _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[d] / _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[d] + 0.5);
     coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
-        _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-        _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
-        _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)_rank);
+        _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
+        _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+        (unsigned int)_rank);
   }
 
   void shutdown() {}

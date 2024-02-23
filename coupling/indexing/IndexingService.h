@@ -54,8 +54,32 @@ public:
   }
 
   void initWithCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion,
-                     const unsigned int rank
+                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                     unsigned int outerRegion, const unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                     ,
+                     MPI_Comm comm = MPI_COMM_WORLD
+#endif
+  ) {
+    // regular grid
+    tarch::la::Vector<dim, std::vector<unsigned int>> subdomainWeights;
+    for (unsigned int i = 0; i < dim; i++) {
+      subdomainWeights[i].reserve(numberProcesses[i]);
+      for (unsigned int j = 0; j < numberProcesses[i]; j++) {
+        subdomainWeights[i].push_back(1);
+      }
+    }
+    initWithCells(subdomainWeights, globalNumberCouplingCells, numberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                  ,
+                  comm
+#endif
+    );
+  }
+
+  void initWithCells(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
+                     tarch::la::Vector<dim, unsigned int> numberProcesses, const tarch::la::Vector<3, double>& couplingCellSize,
+                     coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                      ,
                      MPI_Comm comm = MPI_COMM_WORLD
@@ -70,7 +94,31 @@ public:
                       MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
+    // regular grid
+    tarch::la::Vector<dim, std::vector<unsigned int>> subdomainWeights;
+    for (unsigned int i = 0; i < dim; i++) {
+      subdomainWeights[i].reserve(mdNumberProcesses[i]);
+      for (unsigned int j = 0; j < mdNumberProcesses[i]; j++) {
+        subdomainWeights[i].push_back(1);
+      }
+    }
 
+    initWithMDSize(subdomainWeights, globalMDDomainSize, globalMDDomainOffset, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                   ,
+                   comm
+#endif
+    );
+  }
+  void initWithMDSize(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, const tarch::la::Vector<3, double>& globalMDDomainSize,
+                      const tarch::la::Vector<3, double>& globalMDDomainOffset, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
+                      const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                      unsigned int outerRegion, unsigned int rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+                      ,
+                      MPI_Comm comm = MPI_COMM_WORLD
+#endif
+  ) {
     _globalMDDomainSize = globalMDDomainSize;
     _globalMDDomainOffset = globalMDDomainOffset;
 
@@ -83,7 +131,7 @@ public:
         std::cout << "IndexingService: Deviation of domain size > 1e-13!" << std::endl;
     }
 
-    initWithCells(globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
+    initWithCells(subdomainWeights, globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                   ,
                   comm
@@ -114,7 +162,7 @@ public:
   MPI_Comm getComm() const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (!_isInitialized) {
-      throw std::runtime_error(std::string("IndexingService: Called index system getComm() before initalization! "));
+      throw std::runtime_error(std::string("IndexingService: Called index system getComm() before initialization! "));
     }
 #endif
 
@@ -125,7 +173,7 @@ public:
   unsigned int getRank() const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (!_isInitialized) {
-      throw std::runtime_error(std::string("IndexingService: Called index system getRank() before initalization! "));
+      throw std::runtime_error(std::string("IndexingService: Called index system getRank() before initialization! "));
     }
 #endif
 
@@ -180,6 +228,10 @@ public:
     return _scalarNumberProcesses;
   }
 
+  void updateTopologyOffset(unsigned int newOffset) {
+    _parallelTopology = coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(_parallelTopologyType, _numberProcesses, newOffset);
+  }
+
 private:
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
                                             const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const;
@@ -197,5 +249,6 @@ private:
   tarch::la::Vector<dim, double> _globalMDDomainSize;
   tarch::la::Vector<dim, double> _globalMDDomainOffset;
   tarch::la::Vector<dim, double> _couplingCellSize;
+  coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;
   friend IndexingServiceTest;
 };

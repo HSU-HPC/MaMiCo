@@ -9,7 +9,7 @@
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/VTKMoleculePlotter.h"
-#include "coupling/datastructures/CouplingCells.h"
+#include "coupling/datastructures/CouplingCellsWithLinkedCells.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "tarch/la/Vector.h"
 #include <fstream>
@@ -34,7 +34,7 @@ public:
    *  @param t number of time step to plot
    *  @param cells coupling cells to plot
    *  @param mdSolverInterface interface of the md solver */
-  CouplingCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, coupling::datastructures::CouplingCells<LinkedCell, dim>& cells,
+  CouplingCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>& cells,
                       coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     plotMoleculeFile(ID, filename, rank, t, cells, mdSolverInterface);
     plotCouplingCellFile(ID, filename, rank, t, cells, mdSolverInterface);
@@ -54,7 +54,7 @@ private:
    *  @param cells coupling cells to plot
    *  @param mdSolverInterface interface of the md solver */
   void plotMoleculeFile(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,
-                        coupling::datastructures::CouplingCells<LinkedCell, dim>& cells,
+                        coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>& cells,
                         coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     // open files
     std::ofstream moleculeFile;
@@ -111,7 +111,7 @@ private:
    *  @param cells coupling cells to plot
    *  @param mdSolverInterface interface of the md solver */
   void plotCouplingCellFile(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,
-                            coupling::datastructures::CouplingCells<LinkedCell, dim>& cells,
+                            coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>& cells,
                             coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     // stringstreams for all cell properties of interest
     std::stringstream microscopicMasses;
