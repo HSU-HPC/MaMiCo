@@ -498,7 +498,7 @@ set(CLANGFORMAT_SOURCES
   "tarch/la/Matrix.h"
   "tarch/TarchDefinitions.h"
   "coupling/services/MultiMDCellService.h"
-  "coupling/services/CouplingCellServiceMacroOnly.h"
+  "coupling/services/CouplingCellServiceDummy.h"
   "coupling/services/CouplingCellService.cpph"
   "coupling/services/CouplingCellTraversalWrappers.cpph"
   "coupling/services/CouplingCellService.h"

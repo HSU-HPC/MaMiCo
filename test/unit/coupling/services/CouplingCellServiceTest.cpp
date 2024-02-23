@@ -1,3 +1,4 @@
+#include "coupling/CouplingMDDefinitions.h"
 #include "coupling/services/CouplingCellService.h"
 #include "coupling/configurations/BoundaryForceConfiguration.h"
 #include "coupling/configurations/CouplingCellConfiguration.h"
@@ -14,6 +15,8 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+using namespace coupling::indexing;
+
 /**
  *  @author Louis Viot
  */
@@ -29,10 +32,14 @@ public:
   void tearDown() {}
 
   template <unsigned int dim> void test() {
+    int rank = 0;
+    const tarch::la::Vector<dim, unsigned int> numberOfProcesses{1, 1, 1};
+
+    IndexingService<3>::getInstance().initWithCells({1}, numberOfProcesses, {1}, coupling::paralleltopology::XYZ, 1, rank);
+
     coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>* mdSolverInterface = new TestMDSolverInterface<dim>();
     coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface = new TestMacroscopicSolverInterface<dim>();
-    const tarch::la::Vector<dim, unsigned int> numberOfProcesses{1};
-    const unsigned int globalRank = 1;
+
     TestParticleInsertionConfiguration particleInsertionConfiguration;
     TestMomentumInsertionConfiguration momentumInsertionConfiguration;
     TestBoundaryForceConfiguration<dim> boundaryForceConfiguration;
@@ -45,7 +52,7 @@ public:
     tarch::utils::MultiMDService<dim> multiMDService{tarch::la::Vector<dim, unsigned int>{1}, 1};
     const unsigned int topologyOffset = 1;
     new coupling::services::CouplingCellServiceImpl<simplemd::LinkedCell, dim>(
-        1, mdSolverInterface, macroscopicSolverInterface, numberOfProcesses, globalRank, particleInsertionConfiguration, momentumInsertionConfiguration,
+        1, mdSolverInterface, macroscopicSolverInterface, numberOfProcesses, rank, particleInsertionConfiguration, momentumInsertionConfiguration,
         boundaryForceConfiguration, transferStrategyConfiguration, parallelTopologyConfiguration, thermostatConfiguration, numberOfTimeSteps,
         couplingCellConfiguration, filterPipelineConfigurationFile, multiMDService, topologyOffset);
   }
@@ -56,10 +63,9 @@ private:
     TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>() {}
     virtual ~TestMDSolverInterface() {}
 
-    simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& couplingCellIndex,
+    simplemd::LinkedCell& getLinkedCell(const typename coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>::CellIndex_T& couplingCellIndex,
                                         const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
-                                        const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell,
-                                        const coupling::IndexConversion<dim>& indexConversion) override {
+                                        const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) override {
       return _linkedcell;
     }
 
@@ -94,9 +100,8 @@ private:
   template <unsigned int dim> class TestMacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
   public:
     ~TestMacroscopicSolverInterface() {}
-    bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return true; };
-    bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return true; };
     std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {1}; };
+    unsigned int getOuterRegion() {return 1;}
   };
 
   class TestParticleInsertionConfiguration : public coupling::configurations::ParticleInsertionConfiguration {

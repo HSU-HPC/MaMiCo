@@ -4,66 +4,56 @@
 // www5.in.tum.de/mamico
 
 template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::allocateReceiveBuffers(const coupling::IndexConversion<dim>& indexConversion,
-                                                                                         coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                         const unsigned int* const globalCellIndices,
-                                                                                         unsigned int numberCells) {
-  for (unsigned int i = 0; i < numberCells; i++) {
-    const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
-
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(dataExchange, globalVectorIndex);
-  }
+void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
+                                                                                         const I00* const globalCellIndices, unsigned int numberCells) {
+  for (unsigned int i = 0; i < numberCells; i++)
+    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(dataExchange, globalCellIndices[i]);
 }
 
 template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::readFromReceiveBuffer(const coupling::IndexConversion<dim>& indexConversion,
-                                                                                        coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
+void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
                                                                                         const std::vector<CouplingCell*>& couplingCells,
-                                                                                        const unsigned int* const globalCellIndices) {
+                                                                                        const I00* const globalCellIndices) {
   const unsigned int numberCells = (unsigned int)couplingCells.size();
-  for (unsigned int i = 0; i < numberCells; i++) {
-    const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, *couplingCells[i], globalVectorIndex);
-  }
+  for (unsigned int i = 0; i < numberCells; i++)
+    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, *couplingCells[i], globalCellIndices[i]);
 }
 
 template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::sendFromMD2Macro(const coupling::IndexConversion<dim>& indexConversion,
-                                                                                   coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
+void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::sendFromMD2Macro(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
                                                                                    const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-                                                                                   const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
-  sendFromMD2MacroNonBlocking(indexConversion, dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
-  wait4SendFromMD2Macro(indexConversion, dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+                                                                                   const I00* const globalCellIndicesFromMacroscopicSolver) {
+  sendFromMD2MacroNonBlocking(dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+  wait4SendFromMD2Macro(dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
 }
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::sendFromMD2MacroNonBlocking(
-    const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-    const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver, const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+    coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
+    const I00* const globalCellIndicesFromMacroscopicSolver) {
   const unsigned int numberCellsFromMacroscopicSolver = (unsigned int)couplingCellsFromMacroscopicSolver.size();
 
   // empty send and receive buffers
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffers();
 
   // allocate the receive buffers and trigger the MPI-recv
-  allocateReceiveBuffers(indexConversion, dataExchange, globalCellIndicesFromMacroscopicSolver, numberCellsFromMacroscopicSolver);
+  allocateReceiveBuffers(dataExchange, globalCellIndicesFromMacroscopicSolver, numberCellsFromMacroscopicSolver);
   // fill the send buffers
-  // writeToSendBuffer(indexConversion,dataExchange,couplingCellsFromMamico); // no sending
+  // writeToSendBuffer(dataExchange,couplingCellsFromMamico); // no sending
 
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateRequests();
 
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerReceiving(dataExchange);
-  // coupling::sendrecv::SendReceiveBuffer<CouplingCell,dim>::triggerSending(indexConversion,dataExchange); // no sending
+  // coupling::sendrecv::SendReceiveBuffer<CouplingCell,dim>::triggerSending(dataExchange); // no sending
 }
 
 template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::wait4SendFromMD2Macro(const coupling::IndexConversion<dim>& indexConversion,
-                                                                                        coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
+void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::wait4SendFromMD2Macro(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
                                                                                         const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-                                                                                        const unsigned int* const globalCellIndicesFromMacroscopicSolver) {
+                                                                                        const I00* const globalCellIndicesFromMacroscopicSolver) {
   // wait for all send- and receive operations to complete
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::waitAllOperations();
 
   // fill information from receive buffers into the coupling cells
-  readFromReceiveBuffer(indexConversion, dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+  readFromReceiveBuffer(dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
 }

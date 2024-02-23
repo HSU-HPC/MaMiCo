@@ -1,3 +1,4 @@
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/solvers/LBCouetteSolver.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>

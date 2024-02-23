@@ -34,7 +34,7 @@ public:
     if (_size == 4)
       numberProcesses = {2, 2, 1};
 
-    IndexingService<3>::getInstance().init({12}, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+    IndexingService<3>::getInstance().initWithCells({12}, numberProcesses, {1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
   }
 
   void tearDown() { IndexingService<3>::getInstance().finalize(); }

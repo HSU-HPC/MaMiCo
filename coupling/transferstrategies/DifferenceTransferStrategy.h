@@ -30,11 +30,9 @@ class coupling::transferstrategies::DifferenceTransferStrategy : public coupling
 public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface for the md solver
-   *  @param indexConversion instance of the indexConversion
    *  @param numberMDSteps number of md steps within one coupling time step */
-  DifferenceTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                             const coupling::IndexConversion<dim>& indexConversion, unsigned int numberMDsteps)
-      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion), _numberMDsteps(numberMDsteps), _zero(0.0),
+  DifferenceTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDsteps)
+      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _numberMDsteps(numberMDsteps), _zero(0.0),
         _massMapping(mdSolverInterface), _momentumMapping(mdSolverInterface) {}
 
   /** @brief a dummy destructor */
@@ -43,8 +41,8 @@ public:
   /** @brief
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  virtual void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                            const unsigned int& index) {
+  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset quantities
     cell.setMicroscopicMass(0.0);
     cell.setMicroscopicMomentum(_zero);
@@ -53,8 +51,8 @@ public:
   /** @brief the microscopicMass and -Momentum are reseted to zero
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  virtual void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                            const unsigned int& index) {
+  void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset quantities
     cell.setMicroscopicMass(0.0);
     cell.setMicroscopicMomentum(_zero);
@@ -64,8 +62,8 @@ public:
    * and stored in the macroscopic quantity
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  virtual void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                           const unsigned int& index) {
+  void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                   I02 index) override {
     // compute difference between macroscopic and microscopic mass and momentum
     // values; this value is set in the microscopic data buffer of the
     // coupling cell.
@@ -82,8 +80,7 @@ public:
    * amount of md time steps)
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  virtual void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                 const unsigned int& index) {
+  void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
     // average quantities
     const double mass = cell.getMacroscopicMass() / ((double)_numberMDsteps);
     const tarch::la::Vector<dim, double> momentum = cell.getMacroscopicMomentum() * (1.0 / ((double)_numberMDsteps));
@@ -95,8 +92,7 @@ public:
    * value
    *  @param cell coupling cell to process
    *  @param index index of the coupling cell */
-  virtual void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                       const unsigned int& index) {
+  void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
     cell.iterateConstCells(_massMapping);
     const double mass = _massMapping.getMass();
     cell.iterateConstCells(_momentumMapping);

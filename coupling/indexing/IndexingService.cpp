@@ -313,13 +313,14 @@ template <> const char I15::TNAME[] = "CellIndex<3, vector, local, md2macro, noG
 
 // delegated init, this does the main work
 template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
-                                                    tarch::la::Vector<dim, unsigned int> numberProcesses, const tarch::la::Vector<3, double>& couplingCellSize,
-                                                    coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
-                                                    const unsigned int rank
+void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
+                                                             tarch::la::Vector<dim, unsigned int> numberProcesses,
+                                                             const tarch::la::Vector<3, double>& couplingCellSize,
+                                                             coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
+                                                             const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                                                    ,
-                                                    MPI_Comm comm
+                                                             ,
+                                                             MPI_Comm comm
 #endif
 ) {
 
@@ -333,6 +334,8 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
     std::cout << "IndexingService: WARNING: Initializing twice! " << std::endl;
   }
 #endif
+
+  _couplingCellSize = couplingCellSize;
 
   // TODO: make this globalNumberCouplingCells and remove all usages of the
   // old meaning (seen above)
@@ -389,11 +392,11 @@ void coupling::indexing::IndexingService<dim>::init(tarch::la::Vector<dim, unsig
 
   _numberProcesses = numberProcesses;
 
-  unsigned int scalarNumberProcesses = _numberProcesses[0];
+  _scalarNumberProcesses = _numberProcesses[0];
   for (unsigned int d = 1; d < dim; d++)
-    scalarNumberProcesses *= _numberProcesses[d];
+    _scalarNumberProcesses *= _numberProcesses[d];
 
-  const unsigned int parallelTopologyOffset = (_rank / scalarNumberProcesses) * scalarNumberProcesses; // copied from IndexConversion
+  const unsigned int parallelTopologyOffset = (_rank / _scalarNumberProcesses) * _scalarNumberProcesses; // copied from IndexConversion
   _parallelTopology =
       coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, _numberProcesses, parallelTopologyOffset);
 
@@ -492,7 +495,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   if (!_isInitialized) {
-    throw std::runtime_error(std::string("coupling::indexing::convertToVector: IndexingService not initialized! "));
+    throw std::runtime_error(std::string("coupling::indexing::getRanksForGlobalIndex: IndexingService not initialized! "));
   }
 #endif
 
@@ -596,6 +599,17 @@ coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(tarch::la
   }
 
   return _parallelTopology->getRank(processCoords);
+}
+
+template <unsigned int dim> unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex) const {
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if (!_isInitialized) {
+    throw std::runtime_error(std::string("coupling::indexing::getUniqueRankForCouplingCell: IndexingService not initialized! "));
+  }
+#endif
+
+  return getUniqueRankForCouplingCell((tarch::la::Vector<dim, unsigned int>)(globalCellIndex.get()), I09::numberCellsInDomain);
 }
 
 // declare specialisation of IndexingService

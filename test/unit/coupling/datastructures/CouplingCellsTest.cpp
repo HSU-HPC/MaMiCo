@@ -46,10 +46,11 @@ private:
     TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>() {}
     virtual ~TestMDSolverInterface() {}
 
-    virtual simplemd::LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& couplingCellIndex,
+    using CellIndex_T = typename coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>::CellIndex_T;
+
+    virtual simplemd::LinkedCell& getLinkedCell(const CellIndex_T& couplingCellIndex,
                                                 const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
-                                                const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell,
-                                                const coupling::IndexConversion<dim>& indexConversion) {
+                                                const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) {
       return _linkedcell;
     }
 

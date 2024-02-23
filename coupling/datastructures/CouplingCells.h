@@ -6,7 +6,6 @@
 #define _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLS_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/IndexConversion.h"
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 
@@ -25,7 +24,6 @@ template <unsigned int dim> class CouplingCells;
 template <unsigned int dim> class coupling::datastructures::CouplingCells {
 public:
   /** Constructor: initialises the coupling cell
-   * 	@param indexConversion
    * 	@param mdSolverInterface
    */
   CouplingCells(const coupling::IndexConversion<dim>& indexConversion);
@@ -44,8 +42,6 @@ protected:
    * operations.
    */
   std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;
-  /** needed for index conversion. */
-  const coupling::IndexConversion<dim>& _indexConversion;
 };
 
 #include "CouplingCells.cpph"

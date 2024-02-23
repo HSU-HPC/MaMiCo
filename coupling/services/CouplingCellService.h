@@ -22,6 +22,7 @@
 #include "coupling/configurations/ThermostatConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
 #include "coupling/datastructures/CouplingCells.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
@@ -58,11 +59,11 @@ public:
   virtual void sendFromMacro2MDPreProcess() = 0;
   virtual void sendFromMacro2MDPostProcess() = 0;
   virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                const unsigned int* const globalCellIndicesFromMacroscopicSolver) = 0;
+                                const I00* const indices) = 0;
   virtual void sendFromMD2MacroPreProcess() = 0;
   virtual void sendFromMD2MacroPostProcess() = 0;
   virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                  const unsigned int* const globalCellIndicesFromMacroscopicSolver) = 0;
+                                  const I00* const indices) = 0;
   virtual void processInnerCouplingCellAfterMDTimestep() = 0;
   virtual void computeAndStoreTemperature(double temperature) = 0;
   virtual void applyTemperatureToMolecules(unsigned int t) = 0;
@@ -72,8 +73,6 @@ public:
   virtual void perturbateVelocity() = 0;
   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
   virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
-  virtual const coupling::IndexConversion<dim>& getIndexConversion() const = 0;
-  virtual void updateIndexConversion(const unsigned int& topologyOffset) = 0;
 
   virtual void initFiltering() {
     throw std::runtime_error("CouplingCellService: Error: Called "
@@ -177,18 +176,17 @@ public:
    *  parallelisation via MPI) and writes the respective information to the
    * coupling cells of the tool
    */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                        const unsigned int* const globalCellIndicesFromMacroscopicSolver);
+  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) override;
 
   /** sends information from MD to the macroscopic solver. After the
    * send/recv-operations (this also comprises the distributed memory
    * parallelisation scenario), the information from the coupling tool is
    * written to the buffer couplingCellsFromMacroscopicSolver together with
    * the respective global cell indices
-   *  (-> globalCellIndicesFromMacroscopicSolver).
+   *  (-> indices).
    */
   double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                          const unsigned int* const globalCellIndicesFromMacroscopicSolver);
+                          const I00* const indices) override;
 
   /** applies the filter pipeline and returns the runtime of this operation */
   double applyFilterPipeline();
@@ -241,22 +239,6 @@ public:
   void plotEveryMicroscopicTimestep(unsigned int t);
   void plotEveryMacroscopicTimestep(unsigned int t);
 
-  /** returns a reference to the index conversion object. Some external classes
-   * may require information on coupling cell size etc. which can then be
-   * easily accessed. This is thus not required by the internal mechanisms of
-   * the coupling tool.
-   */
-  const coupling::IndexConversion<dim>& getIndexConversion() const { return *_indexConversion; }
-
-  void updateIndexConversion(const unsigned int& topologyOffset) {
-    auto* newIndexConversion = initIndexConversion(_indexConversion->getCouplingCellSize(), _indexConversion->getNumberProcesses(),
-                                                   _indexConversion->getThisRank(), _indexConversion->getGlobalMDDomainSize(),
-                                                   _indexConversion->getGlobalMDDomainOffset(), _indexConversion->getParallelTopologyType(), topologyOffset);
-
-    delete _indexConversion;
-    _indexConversion = newIndexConversion;
-  }
-
   /**
    * Initialises the _filterPipeline member. Called from _multiMDCellService's
    * constructFilterPipelines(). Make sure to delete _filterPipeline in
@@ -297,14 +279,6 @@ private:
 // ------------------- INCLUDE WRAPPER DEFINITIONS
 // -------------------------------------
 #include "CouplingCellTraversalWrappers.cpph"
-  /** initialises the IndexConversion object at start up. This is the very first
-   * thing to be done in the constructor since nearly all subsequent operations
-   * depend on indexing of cells.
-   */
-  coupling::IndexConversion<dim>* initIndexConversion(tarch::la::Vector<dim, double> couplingCellSize, tarch::la::Vector<dim, unsigned int> numberProcesses,
-                                                      unsigned int rank, tarch::la::Vector<dim, double> globalMDDomainSize,
-                                                      tarch::la::Vector<dim, double> globalMDDomainOffset,
-                                                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int topologyOffset) const;
 
   /** initialises the index structures for USHER scheme */
   void initIndexVectors4Usher(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell);
@@ -324,8 +298,6 @@ private:
       return [](Wrapper& wrapper) {};
   }
 
-  /** needed to determine cell range, ranks etc. */
-  coupling::IndexConversion<dim>* _indexConversion;
   /** number of MD time steps in each coupling cycle */
   const unsigned int _numberMDTimestepsPerCouplingCycle;
 
