@@ -189,21 +189,21 @@ public:
                           const I00* const indices) override;
 
   /** applies the filter pipeline and returns the runtime of this operation */
-  double applyFilterPipeline();
+  double applyFilterPipeline() override;
 
-  void sendFromMacro2MDPreProcess();
+  void sendFromMacro2MDPreProcess() override;
 
-  void sendFromMacro2MDPostProcess();
+  void sendFromMacro2MDPostProcess() override;
 
-  void sendFromMD2MacroPreProcess();
+  void sendFromMD2MacroPreProcess() override;
 
-  void sendFromMD2MacroPostProcess() {}
+  void sendFromMD2MacroPostProcess() override {}
 
   /** carries out coupling-dependent operations (such as sampling) on the
    * non-ghost coupling cells after each MD time step. This method needs thus
    * to be called from the MD simulation.
    */
-  void processInnerCouplingCellAfterMDTimestep();
+  void processInnerCouplingCellAfterMDTimestep() override;
 
   /** sets the temperature value in all coupling cells. If the value of
    * temperature is -1.0, we set the local temperature of each coupling cell
@@ -211,45 +211,45 @@ public:
    * the given temperature in all cells. In the latter case, this also resembles
    * a first thermostat-like operation.
    */
-  void computeAndStoreTemperature(double temperature);
+  void computeAndStoreTemperature(double temperature) override;
 
   /** applies a thermostat in all non-ghost coupling cells. */
-  void applyTemperatureToMolecules(unsigned int t);
+  void applyTemperatureToMolecules(unsigned int t) override;
 
   /** applies a boundary force to molecules which are close to an open boundary.
    */
-  void applyBoundaryForce(unsigned int t);
+  void applyBoundaryForce(unsigned int t) override;
 
   /** distributes mass in the system. */
-  void distributeMass(unsigned int t);
+  void distributeMass(unsigned int t) override;
 
   /** distributes momentum in MD. Should typically be called after force
    * accumulation since momentum distribution may depend on current forces. */
-  void distributeMomentum(unsigned int t);
+  void distributeMomentum(unsigned int t) override;
 
   /** applies a new velocity to each particle according to its cell's mean
    * velocity. */
-  void perturbateVelocity();
+  void perturbateVelocity() override;
 
   /** plots coupling cell and molecule information at some time step t. The
    * correct triggering of plotting needs to be established from the main
    * coupling loop which is outside the coupling tool (not included in this
    * function).
    */
-  void plotEveryMicroscopicTimestep(unsigned int t);
-  void plotEveryMacroscopicTimestep(unsigned int t);
+  void plotEveryMicroscopicTimestep(unsigned int t) override;
+  void plotEveryMacroscopicTimestep(unsigned int t) override;
 
   /**
    * Initialises the _filterPipeline member. Called from _multiMDCellService's
    * constructFilterPipelines(). Make sure to delete _filterPipeline in
    * ~CouplingCellServiceImpl()
    */
-  void initFiltering() {
+  void initFiltering() override {
     _filterPipeline = new coupling::filtering::FilterPipeline<dim>(_couplingCells.getCouplingCells(), coupling::filtering::Scope::perInstance, _multiMDService,
                                                                    _filterPipelineConfiguration);
   }
 
-  const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const { return _filterPipeline; }
+  const coupling::filtering::FilterPipeline<dim>* getFilterPipeline() const override { return _filterPipeline; }
 
   /**
    * Creates a new filter from scratch and appends it to a sequence that is part
