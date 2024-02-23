@@ -104,7 +104,7 @@ private:
     ~PrintIndex() {}
     void beginCellIteration() {}
     void endCellIteration() {}
-    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const I02& index) {
       std::cout << cell.getMicroscopicMomentum() << std::endl;
     }
   };
@@ -117,10 +117,9 @@ private:
     }
     const tarch::la::Vector<dim, unsigned int> globalNumberCells(3);
     const tarch::la::Vector<dim, unsigned int> numberProcesses(1);
-    const unsigned int rank = 0;
     const tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell(2);
 
-    coupling::datastructures::CouplingCells<simplemd::LinkedCell, dim> couplingCells(numberLinkedCellsPerCouplingCell, testInterface);
+    coupling::datastructures::CouplingCellsWithLinkedCells<simplemd::LinkedCell, dim> couplingCells{numberLinkedCellsPerCouplingCell, testInterface};
     WriteIndex<dim> writeIndex;
     PrintIndex<dim> printIndex;
 
