@@ -188,7 +188,7 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
     exit(EXIT_FAILURE);
   }
 #endif
-  const tarch::la::Vector<dim, double> velocity = (1.0 - factor) * _oldSolution[index.get] + factor * _newSolution[index.get];
+  const tarch::la::Vector<dim, double> velocity = (1.0 - factor) * _oldSolution[index.get()] + factor * _newSolution[index.get()];
   cell.setMicroscopicMomentum(velocity);
 }
 
@@ -217,7 +217,7 @@ double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, di
     // compute normal vector (pointing inwards MD domain)
     if ((index.get()[d] == 1) && _massFluxBoundary[2 * d]) {
       n[d] = 1; /*_totalMass+=mass;_cellCount++;*/
-    } else if ((index.get()[d] == I09::numberCellsInDomain[d]) && _massFluxBoundary[2 * d + 1]) {
+    } else if ((index.get()[d] == (int)I09::numberCellsInDomain[d]) && _massFluxBoundary[2 * d + 1]) {
       n[d] = -1; /*_totalMass+=mass;_cellCount++;*/
     }
   }
