@@ -61,7 +61,7 @@ public:
                      MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
-    //regular grid
+    // regular grid
     tarch::la::Vector<dim, std::vector<unsigned int>> subdomainWeights;
     for (unsigned int i = 0; i < dim, i++) {
       subdomainWeights.reserve(numberProcesses[i]);
@@ -77,10 +77,9 @@ public:
     );
   }
 
-  void initWithCells(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights,
-    tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion,
-                     const unsigned int rank
+  void initWithCells(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
+                     tarch::la::Vector<dim, unsigned int> numberProcesses, const tarch::la::Vector<3, double>& couplingCellSize,
+                     coupling::paralleltopology::ParallelTopologyType type, unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                      ,
                      MPI_Comm comm = MPI_COMM_WORLD
@@ -95,7 +94,7 @@ public:
                       MPI_Comm comm = MPI_COMM_WORLD
 #endif
   ) {
-    //regular grid
+    // regular grid
     tarch::la::Vector<dim, std::vector<unsigned int>> subdomainWeights;
     for (unsigned int i = 0; i < dim, i++) {
       subdomainWeights.reserve(mdNumberProcesses[i]);
@@ -106,15 +105,15 @@ public:
 
     initWithMDSize(subdomainWeights, globalNumberCouplingCells, mdNumberProcesses, couplingCellSize, parallelTopologyType, outerRegion, rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-                  ,
-                  comm
+                   ,
+                   comm
 #endif
     );
   }
-  void initWithMDSize(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights,
-  const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, double>& globalMDDomainOffset,
-                      const tarch::la::Vector<3, unsigned int>& mdNumberProcesses, const tarch::la::Vector<3, double>& couplingCellSize,
-                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion, unsigned int rank
+  void initWithMDSize(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, const tarch::la::Vector<3, double>& globalMDDomainSize,
+                      const tarch::la::Vector<3, double>& globalMDDomainOffset, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
+                      const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                      unsigned int outerRegion, unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                       ,
                       MPI_Comm comm = MPI_COMM_WORLD
