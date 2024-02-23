@@ -327,6 +327,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 ) {
 
   _rank = rank;
+  _parallelTopologyType = parallelTopologyType;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   _comm = comm;
 #endif

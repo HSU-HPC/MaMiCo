@@ -54,8 +54,8 @@ public:
   }
 
   void initWithCells(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, tarch::la::Vector<dim, unsigned int> numberProcesses,
-                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
-                     const unsigned int rank
+                     const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
+                     unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                      ,
                      MPI_Comm comm = MPI_COMM_WORLD
@@ -228,6 +228,10 @@ public:
     return _scalarNumberProcesses;
   }
 
+  void updateTopologyOffset(unsigned int newOffset) {
+    _parallelTopology = coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(_parallelTopologyType, _numberProcesses, newOffset);
+  }
+
 private:
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
                                             const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const;
@@ -245,5 +249,6 @@ private:
   tarch::la::Vector<dim, double> _globalMDDomainSize;
   tarch::la::Vector<dim, double> _globalMDDomainOffset;
   tarch::la::Vector<dim, double> _couplingCellSize;
+  coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;
   friend IndexingServiceTest;
 };
