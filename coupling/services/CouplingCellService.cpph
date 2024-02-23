@@ -257,7 +257,7 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVect
 
 template <class LinkedCell, unsigned int dim>
 tarch::la::Vector<dim, double> coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::getPositionOfFirstLocalGhostCell() const {
-  tarch::la::Vector<dim, double> position = I03{{0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();
+  tarch::la::Vector<dim, double> position = I03{{0, 0, 0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();
   return position;
 }
 

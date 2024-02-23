@@ -154,7 +154,7 @@ private:
       break;
     }
 
-    tarch::la::Vector<3, double> original = I11{{0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();
+    tarch::la::Vector<3, double> original = I11{{0, 0, 0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();
 
     // open file
     open(ID, filename, "CouplingCells", rank, t, ofCell);
