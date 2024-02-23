@@ -12,7 +12,6 @@ template <class LinkedCell, unsigned int dim> class BoundaryForceController;
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 
-
 /** There is an interface method applyBoundaryForce which triggers potential
  * boundary forcing in each coupling cell that is located at the very outer
  * MD boundary (first layer of non-ghost coupling cells).

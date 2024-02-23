@@ -45,8 +45,7 @@ public:
    * gradient relaxation */
   VelocityGradientRelaxation(double relaxationParam, coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
                              const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
-      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _couplingCells(couplingCells),
-        _relaxationParam(relaxationParam) {}
+      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _couplingCells(couplingCells), _relaxationParam(relaxationParam) {}
   /** @brief a dummy destructor */
   virtual ~VelocityGradientRelaxation() {}
 
@@ -62,8 +61,7 @@ public:
    * velocity gradient relaxation method
    *  @param cell the coupling cell to insert momentum to
    *  @param currentLocalCouplingCellIndex the coupling cell's index */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const I02& currentLocalCouplingCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& currentLocalCouplingCellIndex) const {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     tarch::la::Vector<dim, double> oldVelocity(0.0);
     cell.iterateConstCells(momentumMapping);
@@ -72,8 +70,7 @@ public:
     // set new momentum (based on velocity stored in microscopic
     // momentum-buffer)
     coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim> velocityGradientRelaxation(
-        _relaxationParam, oldVelocity, currentLocalCouplingCellIndex, coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface,
-        _couplingCells);
+        _relaxationParam, oldVelocity, currentLocalCouplingCellIndex, coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface, _couplingCells);
     cell.iterateCells(velocityGradientRelaxation);
   }
 
@@ -123,8 +120,7 @@ public:
    * velocity gradient relaxation method
    *  @param cell the coupling cell to insert momentum to
    *  @param currentLocalCouplingCellIndex the coupling cell's index */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const I02& currentLocalCouplingCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& currentLocalCouplingCellIndex) const {
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     tarch::la::Vector<dim, double> oldVelocity(0.0);
     cell.iterateConstCells(momentumMapping);
@@ -135,8 +131,7 @@ public:
     // momentum-buffer)
     coupling::cellmappings::VelocityGradientRelaxationTopOnlyMapping<LinkedCell, dim> velocityGradientRelaxation(
         coupling::VelocityGradientRelaxation<LinkedCell, dim>::_relaxationParam, oldVelocity, currentLocalCouplingCellIndex,
-        coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface,
-        coupling::VelocityGradientRelaxation<LinkedCell, dim>::_couplingCells);
+        coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface, coupling::VelocityGradientRelaxation<LinkedCell, dim>::_couplingCells);
     cell.iterateCells(velocityGradientRelaxation);
   }
 };

@@ -28,10 +28,9 @@ public:
    *  @param mdSolverInterface interface to the md solver
    *  @param outermostLayer the index of the outermost cell layer
    *  @param innermostLayer the index of the innermost cell layer */
-  NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                        const unsigned int& outermostLayer, const unsigned int& innermostLayer)
-      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer),
-        _innermostLayer(innermostLayer) {}
+  NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const unsigned int& outermostLayer,
+                        const unsigned int& innermostLayer)
+      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer) {}
 
   /** @brief a simple destructor */
   virtual ~NieVelocityImposition() {}
@@ -44,8 +43,7 @@ public:
    *  @param cell to the coupling cell will the momentum be inserted
    *  @param currentLocalCouplingCellIndex local linearised index for the
    * coupling cell */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const I02& currentLocalCouplingCellIndex) const {
+  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& currentLocalCouplingCellIndex) const {
     // nop if this is not an imposition cell
     if (!isInsideImpositionLayer(currentLocalCouplingCellIndex)) {
       return;

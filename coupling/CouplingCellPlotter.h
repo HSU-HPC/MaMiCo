@@ -34,8 +34,7 @@ public:
    *  @param t number of time step to plot
    *  @param cells coupling cells to plot
    *  @param mdSolverInterface interface of the md solver */
-  CouplingCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,
-                      coupling::datastructures::CouplingCells<LinkedCell, dim>& cells,
+  CouplingCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, coupling::datastructures::CouplingCells<LinkedCell, dim>& cells,
                       coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     plotMoleculeFile(ID, filename, rank, t, cells, mdSolverInterface);
     plotCouplingCellFile(ID, filename, rank, t, cells, mdSolverInterface);
@@ -156,7 +155,6 @@ private:
 
     tarch::la::Vector<3, double> original = I11{{0}}.getMidpoint() - 0.5 * IDXS.getCouplingCellSize();
 
-  
     // open file
     open(ID, filename, "CouplingCells", rank, t, ofCell);
     Writer4Cells writer(microscopicMasses, macroscopicMasses, microscopicMomenta, macroscopicMomenta, meanVelocities, masses, energies, temperatures,

@@ -43,9 +43,7 @@ public:
    * @brief applies the Zhou boundary force on a boundary cell
    * @param cell the macroscopic boundary cell to apply the boundary force
    */
-  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) {
-    cell.iterateCells(_zhouBoundaryForce);
-  }
+  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) { cell.iterateCells(_zhouBoundaryForce); }
 
   /** @brief calculates the potential energy for a given position
    *  @param position the position for which the potential energy will be
