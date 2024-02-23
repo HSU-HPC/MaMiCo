@@ -45,8 +45,7 @@ public:
    *	@param mdSolverInterface
    *	@param couplingCells
    */
-  VelocityGradientRelaxationMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity,
-                                    const I02& cellIndex,
+  VelocityGradientRelaxationMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity, const I02& cellIndex,
                                     coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
                                     const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
       : _mdSolverInterface(mdSolverInterface), _couplingCells(couplingCells), _velocityRelaxationFactor(velocityRelaxationFactor),
@@ -115,9 +114,8 @@ public:
           if (normalisedPosition[d] > 2.0) {
             std::cout << "ERROR cellmappings::VelocityGradientRelaxationMapping: "
                          "normalisedPosition>2.0! "
-                      << "Local vector index=" << I03{_cellIdx} << " , global vector index=" << I01{_cellIdx}
-                      << ", currentLocalCellIndex=" << _cellIdx << ", Norm. position=" << normalisedPosition
-                      << ", Actual position=" << position << std::endl;
+                      << "Local vector index=" << I03{_cellIdx} << " , global vector index=" << I01{_cellIdx} << ", currentLocalCellIndex=" << _cellIdx
+                      << ", Norm. position=" << normalisedPosition << ", Actual position=" << position << std::endl;
             for (unsigned int i = 0; i < 10; i++) {
               std::cout << couplingCellIndex[i] << " ";
             }
@@ -203,9 +201,7 @@ private:
   /**
    *	@returns the inner lower left corner of the cell
    */
-  tarch::la::Vector<dim, double> getInnerLowerLeftCorner() const {
-    return IDXS.getGlobalMDDomainOffset() + 1.5 * IDXS.getCouplingCellSize();
-  }
+  tarch::la::Vector<dim, double> getInnerLowerLeftCorner() const { return IDXS.getGlobalMDDomainOffset() + 1.5 * IDXS.getCouplingCellSize(); }
   /**
    *	@returns the inner upper right corner of the cell
    */
@@ -215,9 +211,7 @@ private:
   /**
    *	@returns the outer lower left corner of the cell
    */
-  tarch::la::Vector<dim, double> getOuterLowerLeftCorner() const {
-    return IDXS.getGlobalMDDomainOffset() + 0.5 * IDXS.getCouplingCellSize();
-  }
+  tarch::la::Vector<dim, double> getOuterLowerLeftCorner() const { return IDXS.getGlobalMDDomainOffset() + 0.5 * IDXS.getCouplingCellSize(); }
   /**
    *	@returns the outer upper right corner of the cell
    */
@@ -231,11 +225,12 @@ private:
    *	@param secondCake
    *	@param res
    */
-  void createCouplingCellIndex4SecondOrderInterpolation(const tarch::la::Vector<dim, double>& position, tarch::la::Vector<dim, double>& normalisedPosition, bool& secondCake, I02* res) const {
+  void createCouplingCellIndex4SecondOrderInterpolation(const tarch::la::Vector<dim, double>& position, tarch::la::Vector<dim, double>& normalisedPosition,
+                                                        bool& secondCake, I02* res) const {
     // compute lower left cell index and normalised position;
     // the normalised position is chosen such that the origin (0,0...,0)
     // coincides with the lower left... coupling cell's midpoint
-    
+
     tarch::la::Vector<dim, double> cellMidpoint = _cellIdx.getCellMidPoint();
     auto cellSize = IDXS.getCouplingCellSize();
     tarch::la::Vector<dim, unsigned int> globalCellIndex = I01{_cellIdx}.get();
@@ -244,7 +239,7 @@ private:
     // determine cell mid point and normalised position in this loop
     for (unsigned int d = 0; d < dim; d++) {
       // determine mid point of current coupling cell
-      
+
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       if ((position[d] < cellMidpoint[d] - 0.5 * cellSize[d]) || (position[d] > cellMidpoint[d] + 0.5 * cellSize[d])) {
         std::cout << "ERROR "
@@ -425,12 +420,11 @@ public:
    *variable from within this constructor (called after base object is
    *constructed)
    */
-  VelocityGradientRelaxationTopOnlyMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity,
-                                           const I02& cellIndex,
+  VelocityGradientRelaxationTopOnlyMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity, const I02& cellIndex,
                                            coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
                                            const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
-      : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, cellIndex,
-                                                                                   mdSolverInterface, couplingCells) {
+      : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, cellIndex, mdSolverInterface,
+                                                                                   couplingCells) {
     // the following snippet is basically a replacement of the method
     // ignoreThisCell(). Since this function is called in the constructor of the
     // based class, we cannot overwrite it; hence, we solve it by overwriting
