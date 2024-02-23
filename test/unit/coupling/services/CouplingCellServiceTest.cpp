@@ -100,7 +100,7 @@ private:
   public:
     ~TestMacroscopicSolverInterface() {}
     std::vector<unsigned int> getRanks(I01 globalCellIndex) override { return {1}; };
-    unsigned int getOuterRegion() {return 1;}
+    unsigned int getOuterRegion() override {return 1;}
   };
 
   class TestParticleInsertionConfiguration : public coupling::configurations::ParticleInsertionConfiguration {

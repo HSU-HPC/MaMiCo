@@ -93,8 +93,8 @@ private:
     void beginCellIteration() {}
     void endCellIteration() {}
     void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const I02& index) {
-      tarch::la::Vector<dim, double> localIndex{(double)(index.get()[0]),(double)(index.get()[1]),(double)(index.get()[2])};
-      cell.setMicroscopicMomentum(localIndex);
+      tarch::la::Vector<dim, double> testdata{1};
+      cell.setMicroscopicMomentum(testdata);
     }
   };
   /** test class to print local cell index (-> microscopic momentum buffer) of coupling cells */
