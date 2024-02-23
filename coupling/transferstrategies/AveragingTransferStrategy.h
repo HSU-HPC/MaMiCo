@@ -35,7 +35,7 @@ public:
    *  @param mdSolverInterface interface for the md solver*/
   AveragingTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
       : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _massMapping(mdSolverInterface),
-        _momentumMapping(mdSolverInterface), _sampleCounter(0), _rank(coupling::indexing::IndexingService<dim>::getInstance().getRank()) {}
+        _momentumMapping(mdSolverInterface), _sampleCounter(0), _rank(IDXS.getRank()) {}
 
   /** @brief a dummy destructor */
   virtual ~AveragingTransferStrategy() {}

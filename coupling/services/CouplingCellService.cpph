@@ -149,7 +149,7 @@ template <class LinkedCell, unsigned int dim> double coupling::services::Couplin
   timeval start;
   timeval end;
   double runtime = 0;
-  if (coupling::indexing::IndexingService<dim>::getInstance().getRank() == 0) {
+  if (IDXS.getRank() == 0) {
     gettimeofday(&start, NULL);
   }
 
@@ -161,7 +161,7 @@ template <class LinkedCell, unsigned int dim> double coupling::services::Couplin
     (*_filterPipeline)();
   }
 
-  if (coupling::indexing::IndexingService<dim>::getInstance().getRank() == 0) {
+  if (IDXS.getRank() == 0) {
     gettimeofday(&end, NULL);
     runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
   }
@@ -438,17 +438,15 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 template <class LinkedCell, unsigned int dim> void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::plotEveryMicroscopicTimestep(unsigned int t) {
   // trigger plotting
   if ((_writeEveryMicroscopicTimestep != 0) && (t % _writeEveryMicroscopicTimestep == 0)) {
-    coupling::CouplingCellPlotter<LinkedCell, dim> plotter(coupling::services::CouplingCellService<dim>::getID(), _microscopicFilename,
-                                                           coupling::indexing::IndexingService<dim>::getInstance().getRank(), t, _couplingCells,
-                                                           _mdSolverInterface);
+    coupling::CouplingCellPlotter<LinkedCell, dim> plotter(coupling::services::CouplingCellService<dim>::getID(), _microscopicFilename, IDXS.getRank(), t,
+                                                           _couplingCells, _mdSolverInterface);
   }
 }
 
 template <class LinkedCell, unsigned int dim> void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::plotEveryMacroscopicTimestep(unsigned int t) {
   // trigger plotting
   if ((_writeEveryMacroscopicTimestep != 0) && (t % _writeEveryMacroscopicTimestep == 0)) {
-    coupling::CouplingCellPlotter<LinkedCell, dim> plotter(coupling::services::CouplingCellService<dim>::getID(), _macroscopicFilename,
-                                                           coupling::indexing::IndexingService<dim>::getInstance().getRank(), t, _couplingCells,
-                                                           _mdSolverInterface);
+    coupling::CouplingCellPlotter<LinkedCell, dim> plotter(coupling::services::CouplingCellService<dim>::getID(), _macroscopicFilename, IDXS.getRank(), t,
+                                                           _couplingCells, _mdSolverInterface);
   }
 }

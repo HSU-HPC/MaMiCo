@@ -5,10 +5,9 @@
 
 template <class LinkedCell, unsigned int dim>
 coupling::datastructures::CouplingCells<LinkedCell, dim>::CouplingCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
-                                                                        const coupling::IndexConversion<dim>& indexConversion,
                                                                         coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface)
-    : _couplingCellsWithLinkedCells(initCouplingCellsWithLinkedCells(numberLinkedCellsPerCouplingCell, indexConversion, mdSolverInterface)),
-      _couplingCells(initCouplingCells(indexConversion)), _indexConversion(indexConversion) {
+    : _couplingCellsWithLinkedCells(initCouplingCellsWithLinkedCells(numberLinkedCellsPerCouplingCell, mdSolverInterface)),
+      _couplingCells(initCouplingCells()) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   std::cout << "Coupling cells initialised..." << std::endl;
 #endif
@@ -47,18 +46,9 @@ const std::vector<coupling::datastructures::CouplingCell<dim>*>& coupling::datas
 template <class LinkedCell, unsigned int dim>
 coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
 coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithLinkedCells(
-    tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, const coupling::IndexConversion<dim>& indexConversion,
-    coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const {
+    tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const {
   // determine local number of coupling cells
-  unsigned int numberCouplingCells = 1;
-  for (unsigned int d = 0; d < dim; d++) {
-    numberCouplingCells = numberCouplingCells * (indexConversion.getLocalNumberCouplingCells()[d] + 2);
-  }
-
-  // determine start and end coordinates for loop over inner coupling cells
-  const tarch::la::Vector<3, unsigned int> start(1);
-  const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells());
-  tarch::la::Vector<3, unsigned int> macroLoop(0);
+  unsigned int numberCouplingCells = I02::linearNumberCellsInDomain;
 
   // determine end coordinate for inner loop over linked cells (contained in each coupling cell)
   const tarch::la::Vector<3, unsigned int> endInnerLoop = coupling::initRange<dim>(numberLinkedCellsPerCouplingCell);
@@ -83,46 +73,33 @@ coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithL
     }
   }
 
-  // loop over inner coupling cells and set pointers to linked cells
-  for (macroLoop[2] = start[2]; macroLoop[2] < end[2]; macroLoop[2]++) {
-    for (macroLoop[1] = start[1]; macroLoop[1] < end[1]; macroLoop[1]++) {
-      for (macroLoop[0] = start[0]; macroLoop[0] < end[0]; macroLoop[0]++) {
-
-        // determine coupling cell index
-        I03 couplingCellIndex{{(int)macroLoop[0], (int)macroLoop[1], (int)macroLoop[2]}};
-        const unsigned int linearisedIndex = coupling::indexing::convertToScalar(couplingCellIndex);
+  for (auto idx : I10()) {
+    unsigned int item = I02{idx}.get();
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-        if (linearisedIndex >= numberCouplingCells) {
-          // I11::numberCellsInDomain and indexConversion.getLocalNumberCouplingCells() should be equal.
-          std::cout << "I11::numberCellsInDomain = " << I11::numberCellsInDomain << std::endl;
-          std::cout << "indexConversion.getLocalNumberCouplingCells() = " << indexConversion.getLocalNumberCouplingCells() << std::endl;
-          std::cout << "linearisedIndex = " << linearisedIndex << std::endl;
-          std::cout << "numberCouplingCells = " << numberCouplingCells << std::endl;
-          std::cout << "macroLoop[0] = " << macroLoop[0] << std::endl;
-          std::cout << "macroLoop[1] = " << macroLoop[1] << std::endl;
-          std::cout << "macroLoop[2] = " << macroLoop[2] << std::endl;
-          throw std::runtime_error(std::string("CouplingCells::initCouplingCellsWithLinkedCells: linearisedIndex out of range!"));
-        }
+    if (item >= numberCouplingCells) {
+      std::cout << "I02::numberCellsInDomain = " << I02::numberCellsInDomain << std::endl;
+      std::cout << "I10::numberCellsInDomain = " << I10::numberCellsInDomain << std::endl;
+      std::cout << "item = " << item << std::endl;
+      std::cout << "numberCouplingCells = " << numberCouplingCells << std::endl;
+      throw std::runtime_error(std::string("CouplingCells::initCouplingCellsWithLinkedCells: item out of range!"));
+    }
 #endif
 
-        // loop over linked cells inside this coupling cell
-        unsigned int linkedCounter = 0;
-        tarch::la::Vector<3, unsigned int> linkedLoop(0);
-        for (linkedLoop[2] = 0; linkedLoop[2] < endInnerLoop[2]; linkedLoop[2]++) {
-          for (linkedLoop[1] = 0; linkedLoop[1] < endInnerLoop[1]; linkedLoop[1]++) {
-            for (linkedLoop[0] = 0; linkedLoop[0] < endInnerLoop[0]; linkedLoop[0]++) {
-              tarch::la::Vector<dim, unsigned int> linkedCellIndex = coupling::initDimVector<dim>(linkedLoop);
-              cells[linearisedIndex].addLinkedCell(mdSolverInterface->getLinkedCell(couplingCellIndex, linkedCellIndex, numberLinkedCellsPerCouplingCell),
-                                                   linkedCounter);
+    // loop over linked cells inside this coupling cell
+    unsigned int linkedCounter = 0;
+    tarch::la::Vector<3, unsigned int> linkedLoop(0);
+    for (linkedLoop[2] = 0; linkedLoop[2] < endInnerLoop[2]; linkedLoop[2]++) {
+      for (linkedLoop[1] = 0; linkedLoop[1] < endInnerLoop[1]; linkedLoop[1]++) {
+        for (linkedLoop[0] = 0; linkedLoop[0] < endInnerLoop[0]; linkedLoop[0]++) {
+          tarch::la::Vector<dim, unsigned int> linkedCellIndex = coupling::initDimVector<dim>(linkedLoop);
+          cells[item].addLinkedCell(mdSolverInterface->getLinkedCell(idx, linkedCellIndex, numberLinkedCellsPerCouplingCell), linkedCounter);
 
-              linkedCounter++;
-            }
-          }
-        } // loop (linked cells in coupling cell)
+          linkedCounter++;
+        }
       }
-    }
-  } // loop (inner coupling cells)
+    } // loop (linked cells in coupling cell)
+  }   // loop (inner coupling cells)
 
   return cells;
 }
@@ -130,153 +107,44 @@ coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCellsWithL
 template <class LinkedCell, unsigned int dim>
 template <class A>
 void coupling::datastructures::CouplingCells<LinkedCell, dim>::applyToLocalNonGhostCouplingCellsWithLinkedCells(A& a) {
-  const tarch::la::Vector<3, unsigned int> start(1);
-  const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(_indexConversion.getLocalNumberCouplingCells());
-  tarch::la::Vector<3, unsigned int> loop(0);
-
   a.beginCellIteration();
-  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
-    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
-      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-        const tarch::la::Vector<dim, unsigned int> vectorIndex = coupling::initDimVector<dim>(loop);
-        const unsigned int linearIndex = _indexConversion.getLocalCellIndex(vectorIndex);
-        a.apply(_couplingCellsWithLinkedCells[linearIndex], linearIndex);
-      }
-    }
-  }
+  for (auto idx : I10())
+    a.apply(_couplingCellsWithLinkedCells[I02{idx}.get()], idx);
   a.endCellIteration();
 }
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
 void coupling::datastructures::CouplingCells<LinkedCell, dim>::applyToLocalGhostCouplingCellsWithLinkedCells(A& a) {
-  const tarch::la::Vector<dim, unsigned int> totalNumberCells = _indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2);
-  tarch::la::Vector<dim, unsigned int> loop(0);
-  unsigned int index = 0;
-
   a.beginCellIteration();
-  switch (dim) {
-  case 1:
-    // left boundary
-    loop[0] = 0;
-    index = _indexConversion.getLocalCellIndex(loop);
-    a.apply(_couplingCellsWithLinkedCells[index], index);
-    // right boundary
-    loop[0] = totalNumberCells[0] - 1;
-    index = _indexConversion.getLocalCellIndex(loop);
-    a.apply(_couplingCellsWithLinkedCells[index], index);
-    break;
-  case 2:
-    // lower and upper boundary
-    for (loop[0] = 0; loop[0] < totalNumberCells[0]; loop[0]++) {
-      loop[1] = 0;
-      index = _indexConversion.getLocalCellIndex(loop);
-      a.apply(_couplingCellsWithLinkedCells[index], index);
-      loop[1] = totalNumberCells[1] - 1;
-      index = _indexConversion.getLocalCellIndex(loop);
-      a.apply(_couplingCellsWithLinkedCells[index], index);
-    }
-    // left and right boundary
-    for (loop[1] = 1; loop[1] < totalNumberCells[1] - 1; loop[1]++) {
-      loop[0] = 0;
-      index = _indexConversion.getLocalCellIndex(loop);
-      a.apply(_couplingCellsWithLinkedCells[index], index);
-      loop[0] = totalNumberCells[0] - 1;
-      index = _indexConversion.getLocalCellIndex(loop);
-      a.apply(_couplingCellsWithLinkedCells[index], index);
-    }
-    break;
-  case 3:
-    // top/ bottom boundary
-    for (loop[1] = 0; loop[1] < totalNumberCells[1]; loop[1]++) {
-      for (loop[0] = 0; loop[0] < totalNumberCells[0]; loop[0]++) {
-        loop[2] = 0;
-        index = _indexConversion.getLocalCellIndex(loop);
-        a.apply(_couplingCellsWithLinkedCells[index], index);
-        loop[2] = totalNumberCells[2] - 1;
-        index = _indexConversion.getLocalCellIndex(loop);
-        a.apply(_couplingCellsWithLinkedCells[index], index);
-      }
-    }
-    // front/ back boundary
-    for (loop[2] = 1; loop[2] < totalNumberCells[2] - 1; loop[2]++) {
-      for (loop[0] = 0; loop[0] < totalNumberCells[0]; loop[0]++) {
-        loop[1] = 0;
-        index = _indexConversion.getLocalCellIndex(loop);
-        a.apply(_couplingCellsWithLinkedCells[index], index);
-        loop[1] = totalNumberCells[1] - 1;
-        index = _indexConversion.getLocalCellIndex(loop);
-        a.apply(_couplingCellsWithLinkedCells[index], index);
-      }
-    }
-    // left/ right boundary
-    for (loop[2] = 1; loop[2] < totalNumberCells[2] - 1; loop[2]++) {
-      for (loop[1] = 1; loop[1] < totalNumberCells[1] - 1; loop[1]++) {
-        loop[0] = 0;
-        index = _indexConversion.getLocalCellIndex(loop);
-        a.apply(_couplingCellsWithLinkedCells[index], index);
-        loop[0] = totalNumberCells[0] - 1;
-        index = _indexConversion.getLocalCellIndex(loop);
-        a.apply(_couplingCellsWithLinkedCells[index], index);
-      }
-    }
-    break;
-  default:
-    std::cout << "ERROR coupling::datastructures::CouplingCells::applyToLocalGhostCouplingCellsWithLinkedCells(): Only 1D/2D/3D supported!" << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  for (auto idx : I02())
+    if (!I10::contains(idx))
+      a.apply(_couplingCellsWithLinkedCells[idx.get()], idx);
   a.endCellIteration();
 }
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
 void coupling::datastructures::CouplingCells<LinkedCell, dim>::applyToAllLocalCouplingCellsWithLinkedCells(A& a) {
-  const tarch::la::Vector<3, unsigned int> end =
-      coupling::initRange<dim>(_indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2));
-  tarch::la::Vector<3, unsigned int> loop(0);
-
-  // we assume a lexicographic ordering of the cells. We can then just increment the linearIndex counter in each cellwise operation.
   a.beginCellIteration();
-  unsigned int linearIndex = 0;
-  for (loop[2] = 0; loop[2] < end[2]; loop[2]++) {
-    for (loop[1] = 0; loop[1] < end[1]; loop[1]++) {
-      for (loop[0] = 0; loop[0] < end[0]; loop[0]++) {
-        a.apply(_couplingCellsWithLinkedCells[linearIndex], linearIndex);
-        linearIndex++;
-      }
-    }
-  }
+  for (auto idx : I02())
+    a.apply(_couplingCellsWithLinkedCells[idx.get()], idx);
   a.endCellIteration();
 }
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
 void coupling::datastructures::CouplingCells<LinkedCell, dim>::applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A& a) {
-  // global coordinate of first non-ghost cell
-  const tarch::la::Vector<dim, unsigned int> globalLowerLeftCorner(1);
-  // global coordinate of last non-ghost cell
-  const tarch::la::Vector<dim, unsigned int> globalUpperRightCorner(_indexConversion.getGlobalNumberCouplingCells());
-  // start and end coordinates for all local non-ghost cells
-  const tarch::la::Vector<3, unsigned int> start(1);
-  const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(_indexConversion.getLocalNumberCouplingCells());
-  tarch::la::Vector<3, unsigned int> loop(0);
-
   a.beginCellIteration();
-  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
-    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
-      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-        // get global coordinate of local cell
-        const tarch::la::Vector<dim, unsigned> globalCoord = _indexConversion.convertLocalToGlobalVectorCellIndex(coupling::initDimVector<dim>(loop));
-        bool isBoundary = false;
-        for (unsigned int d = 0; d < dim; d++) {
-          isBoundary = isBoundary || (globalCoord[d] == globalLowerLeftCorner[d]) || (globalCoord[d] == globalUpperRightCorner[d]);
-        }
-        if (isBoundary) {
-          const unsigned int linearIndex = _indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop));
-          a.apply(_couplingCellsWithLinkedCells[linearIndex], linearIndex);
-        }
-      }
+  for (auto idx : I10()) {
+    // get global coordinate of local cell
+    const tarch::la::Vector<dim, unsigned> globalCoord = I01{idx}.get();
+    bool isBoundary = false;
+    for (unsigned int d = 0; d < dim; d++) {
+      isBoundary = isBoundary || (globalCoord[d] == 1) || (globalCoord[d] == I09::numberCellsInDomain[d]);
     }
+    if (isBoundary)
+      a.apply(_couplingCellsWithLinkedCells[I02{idx}.get()], idx);
   }
   a.endCellIteration();
 }
@@ -287,42 +155,24 @@ void coupling::datastructures::CouplingCells<LinkedCell, dim>::applyXLayersOfGlo
   // global coordinate of first non-ghost cell
   const tarch::la::Vector<dim, unsigned int> globalLowerLeftCorner(1 + layers2Use);
   // global coordinate of last non-ghost cell
-  const tarch::la::Vector<dim, unsigned int> globalUpperRightCorner(_indexConversion.getGlobalNumberCouplingCells() -
-                                                                    tarch::la::Vector<dim, unsigned int>(layers2Use));
-  // start and end coordinates for all local non-ghost cells
-  const tarch::la::Vector<3, unsigned int> start(1);
-  const tarch::la::Vector<3, unsigned int> end = start + coupling::initRange<dim>(_indexConversion.getLocalNumberCouplingCells());
-  tarch::la::Vector<3, unsigned int> loop(0);
-
+  const tarch::la::Vector<dim, unsigned int> globalUpperRightCorner(I09::numberCellsInDomain - tarch::la::Vector<dim, unsigned int>(layers2Use));
   a.beginCellIteration();
-  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
-    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
-      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-        // get global coordinate of local cell
-        const tarch::la::Vector<dim, unsigned> globalCoord = _indexConversion.convertLocalToGlobalVectorCellIndex(coupling::initDimVector<dim>(loop));
-        bool isBoundary = false;
-        for (unsigned int d = 0; d < dim; d++) {
-          isBoundary = isBoundary || (globalCoord[d] <= globalLowerLeftCorner[d]) || (globalCoord[d] >= globalUpperRightCorner[d]);
-        }
-        if (isBoundary) {
-          const unsigned int linearIndex = _indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop));
-          a.apply(_couplingCellsWithLinkedCells[linearIndex], linearIndex);
-        }
-      }
+  for (auto idx : I10()) {
+    // get global coordinate of local cell
+    const tarch::la::Vector<dim, unsigned> globalCoord = I01{idx}.get();
+    bool isBoundary = false;
+    for (unsigned int d = 0; d < dim; d++) {
+      isBoundary = isBoundary || (globalCoord[d] <= globalLowerLeftCorner[d]) || (globalCoord[d] >= globalUpperRightCorner[d]);
     }
+    if (isBoundary)
+      a.apply(_couplingCellsWithLinkedCells[I02{idx}.get()], idx);
   }
   a.endCellIteration();
 }
 
 template <class LinkedCell, unsigned int dim>
-std::vector<coupling::datastructures::CouplingCell<dim>*>
-coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCells(const coupling::IndexConversion<dim>& indexConversion) const {
-  // determine total number of cells
-  const tarch::la::Vector<dim, unsigned int> localNumberCells = indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2);
-  unsigned int numberCells = localNumberCells[0];
-  for (unsigned int d = 1; d < dim; d++) {
-    numberCells = numberCells * localNumberCells[d];
-  }
+std::vector<coupling::datastructures::CouplingCell<dim>*> coupling::datastructures::CouplingCells<LinkedCell, dim>::initCouplingCells() const {
+  unsigned int numberCells = I02::linearNumberCellsInDomain;
 
   // init vector with pointers to cells-with-linked-cells
   std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells;

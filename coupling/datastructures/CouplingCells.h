@@ -6,7 +6,6 @@
 #define _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLS_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/IndexConversion.h"
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 
@@ -27,10 +26,9 @@ template <class LinkedCell, unsigned int dim> class coupling::datastructures::Co
 public:
   /** Constructor: initialises the coupling cell
    *	@param numberLinkedCellsPerCouplingCell
-   * 	@param indexConversion
    * 	@param mdSolverInterface
    */
-  CouplingCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, const coupling::IndexConversion<dim>& indexConversion,
+  CouplingCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
                 coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface);
   /** Destructor */
   ~CouplingCells();
@@ -75,26 +73,22 @@ public:
    */
   template <class A> void applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A& a);
 
-  /** \todo Helene!!
-   */
   template <class A> void applyXLayersOfGlobalNonGhostCellsWithLinkedCells(A& a, unsigned int layers2Use);
 
 private:
   /** initialises the coupling cells: creates the buffer for the cells and
    * embeds linked cells into the coupling cells.
    * 	@param numberLinkedCellsPerCouplingCell
-   * 	@param indexConversion
    * 	@param mdSolverInterface
    */
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
-  initCouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, const coupling::IndexConversion<dim>& indexConversion,
+  initCouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
                                    coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const;
   /** initialises the coupling cells (without linked cells). This method
    * needs to be used in the constructor AFTER initialising the
    * _couplingCellsWithLinkedCells.
-   * 	@param indexConversion
    */
-  std::vector<coupling::datastructures::CouplingCell<dim>*> initCouplingCells(const coupling::IndexConversion<dim>& indexConversion) const;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> initCouplingCells() const;
 
   /** holds the coupling cells with linked cells. */
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* _couplingCellsWithLinkedCells;
@@ -103,8 +97,6 @@ private:
    * operations.
    */
   std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;
-  /** needed for index conversion. */
-  const coupling::IndexConversion<dim>& _indexConversion;
 };
 #include "CouplingCells.cpph"
 

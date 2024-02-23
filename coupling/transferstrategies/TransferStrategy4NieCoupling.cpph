@@ -197,7 +197,7 @@ double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, di
                                                                                                     const tarch::la::Vector<dim, double>& velocity,
                                                                                                     const I01 index) {
   // meshsize and volume of cell
-  const tarch::la::Vector<dim, double> meshsize(coupling::indexing::IndexingService<dim>::getInstance().getCouplingCellSize());
+  const tarch::la::Vector<dim, double> meshsize(IDXS.getCouplingCellSize());
   double volume = 1.0;
   for (unsigned int d = 0; d < dim; d++) {
     volume = volume * meshsize[d];

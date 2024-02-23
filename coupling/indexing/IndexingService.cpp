@@ -392,11 +392,11 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 
   _numberProcesses = numberProcesses;
 
-  unsigned int scalarNumberProcesses = _numberProcesses[0];
+  _scalarNumberProcesses = _numberProcesses[0];
   for (unsigned int d = 1; d < dim; d++)
-    scalarNumberProcesses *= _numberProcesses[d];
+    _scalarNumberProcesses *= _numberProcesses[d];
 
-  const unsigned int parallelTopologyOffset = (_rank / scalarNumberProcesses) * scalarNumberProcesses; // copied from IndexConversion
+  const unsigned int parallelTopologyOffset = (_rank / _scalarNumberProcesses) * _scalarNumberProcesses; // copied from IndexConversion
   _parallelTopology =
       coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, _numberProcesses, parallelTopologyOffset);
 
@@ -495,7 +495,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   if (!_isInitialized) {
-    throw std::runtime_error(std::string("coupling::indexing::convertToVector: IndexingService not initialized! "));
+    throw std::runtime_error(std::string("coupling::indexing::getRanksForGlobalIndex: IndexingService not initialized! "));
   }
 #endif
 
@@ -599,6 +599,17 @@ coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(tarch::la
   }
 
   return _parallelTopology->getRank(processCoords);
+}
+
+template <unsigned int dim> unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex) const {
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if (!_isInitialized) {
+    throw std::runtime_error(std::string("coupling::indexing::getUniqueRankForCouplingCell: IndexingService not initialized! "));
+  }
+#endif
+
+  return getUniqueRankForCouplingCell((tarch::la::Vector<dim, unsigned int>)(globalCellIndex.get()), I09::numberCellsInDomain);
 }
 
 // declare specialisation of IndexingService

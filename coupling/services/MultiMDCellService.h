@@ -482,7 +482,7 @@ public:
 
         newCouplingCellServices[newIndex] = _couplingCellServices[index];
         if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
-          coupling::indexing::IndexingService<dim>::getInstance().updateTopologyOffset((newIndex / newLocalNumberMDSimulations) * _intNumberProcesses);
+          IDXS.updateTopologyOffset((newIndex / newLocalNumberMDSimulations) * _intNumberProcesses);
         }
       }
 
@@ -523,7 +523,7 @@ public:
         unsigned int newIndex = i * newLocalNumberMDSimulations + j;
         newCouplingCellServices[newIndex] = _couplingCellServices[index];
         if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
-          coupling::indexing::IndexingService<dim>::getInstance().updateTopologyOffset((newIndex / newLocalNumberMDSimulations) * _intNumberProcesses);
+          IDXS.updateTopologyOffset((newIndex / newLocalNumberMDSimulations) * _intNumberProcesses);
         }
       }
       newCouplingCellServices[(i + 1) * newLocalNumberMDSimulations - 1] = nullptr;

@@ -32,6 +32,8 @@
 #define TAG_FROM_MD2MACRO 100000
 #define TAG_FROM_MACRO2MD 500000
 
+#define IDXS coupling::indexing::IndexingService<dim>::getInstance()
+
 #include "tarch/la/Vector.h"
 #include "tarch/utils/OstreamOperators.h"
 #include <map>

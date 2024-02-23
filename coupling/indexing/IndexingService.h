@@ -108,6 +108,8 @@ public:
    */
   std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const;
 
+  unsigned int getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex) const;
+
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   MPI_Comm getComm() const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -169,15 +171,21 @@ public:
     return _couplingCellSize;
   }
 
+  unsigned int getScalarNumberProcesses() const {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!_isInitialized) {
+      throw std::runtime_error(std::string("IndexingService: Called getScalarNumberProcesses() before initalization! "));
+    }
+#endif
+    return _scalarNumberProcesses;
+  }
+
 private:
-  /**
-   * Helper function used by getRanksForGlobalIndex().
-   */
-  // TODO inline in getRanksForGlobalIndex()
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
                                             const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const;
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
+  unsigned int _scalarNumberProcesses;
   const coupling::paralleltopology::ParallelTopology<dim>* _parallelTopology;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   MPI_Comm _comm;
