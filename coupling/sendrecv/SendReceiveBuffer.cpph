@@ -132,11 +132,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromCollec
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   const unsigned int globalIndex = indexConversion.getGlobalCellIndex(globalVectorIndex);
 
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Rank " << indexConversion.getThisRank() << ": read cell " << globalVectorIndex << " (" << globalIndex << ") "
-            << " from receive buffer" << std::endl;
-#endif
-
   // loop over all received buffers
   for (typename std::map<unsigned int, BufferCollective>::const_iterator it = _bcastBuffer.begin(); it != _bcastBuffer.end(); it++) {
 
@@ -465,11 +460,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReduce
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   const unsigned int globalIndex = indexConversion.getGlobalCellIndex(globalVectorIndex);
 
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Rank " << indexConversion.getThisRank() << ": read cell " << globalVectorIndex << " (" << globalIndex << ") "
-            << " from receive buffer" << std::endl;
-#endif
-
   // loop over all received buffers
   for (typename std::map<unsigned int, BufferCollective>::const_iterator it = _reduceBuffer.begin(); it != _reduceBuffer.end(); it++) {
 
@@ -716,12 +706,6 @@ void coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiv
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   using namespace coupling::indexing;
   const unsigned int globalIndex = CellIndex<dim>{CellIndex<dim, IndexTrait::vector>{tarch::la::Vector<dim, int>(globalVectorIndex)}}.get();
-
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Rank " << coupling::indexing::IndexingService<dim>::getInstance().getRank() << ": read cell " << globalVectorIndex << " (" << globalIndex
-            << ") "
-            << " from receive buffer" << std::endl;
-#endif
 
   // loop over all received buffers
   for (typename std::map<unsigned int, BufferWithID>::const_iterator it = _receiveBuffer.begin(); it != _receiveBuffer.end(); it++) {
