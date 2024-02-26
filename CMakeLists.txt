@@ -331,7 +331,7 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN") #to be removed when ls1 updates to use the
   target_compile_options(mamico INTERFACE -Wno-reorder)
 endif()
 if(BUILD_WITH_MPI)
-  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
+  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
     target_compile_options(mamico INTERFACE -Wno-uninitialized)

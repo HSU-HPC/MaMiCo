@@ -438,19 +438,11 @@ public:
         _cellIndices.push_back(globalCellIndicesFromMacroscopicSolver[i]);
     }
 
-#ifdef ENABLE_POST_MULTI_INSTANCE_FILTERING
-    /*
-     * If this is the first coupling step, we must init the post multi instance
-     * filter pipeline operating on averaged cell data. If you wish to not use post multi-instance filtering
-     * in deployment, you can simply leave the corresponding XML-Subtag empty.
-     * The ENABLE_POST_MULTI_INSTANCE_FILTERING flag is used for debugging purposes and shall be removed later.
-     */
     if (_postMultiInstanceFilterPipeline == nullptr) {
       // Init filter pipeline
       _postMultiInstanceFilterPipeline = new coupling::filtering::FilterPipeline<dim>(_macroscopicCells, coupling::filtering::Scope::postMultiInstance,
                                                                                       _multiMDService, _filterPipelineConfiguration.c_str());
     }
-#endif
   }
 
   /** removes the last simulation which has been added.
