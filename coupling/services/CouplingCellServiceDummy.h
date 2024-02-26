@@ -62,20 +62,20 @@ public:
     _fromMD2Macro.sendFromMD2Macro(_deFromMD2Macro, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
     return 0;
   }
-  virtual double applyFilterPipeline() { return 0; }
-  virtual void sendFromMacro2MDPreProcess() {}
-  virtual void sendFromMacro2MDPostProcess() {}
-  virtual void sendFromMD2MacroPreProcess() {}
-  virtual void sendFromMD2MacroPostProcess() {}
-  virtual void processInnerCouplingCellAfterMDTimestep() {}
-  virtual void computeAndStoreTemperature(double temperature) {}
-  virtual void applyTemperatureToMolecules(unsigned int t) {}
-  virtual void distributeMass(unsigned int t) {}
-  virtual void distributeMomentum(unsigned int t) {}
-  virtual void perturbateVelocity() {}
-  virtual void applyBoundaryForce(unsigned int t) {}
-  virtual void plotEveryMicroscopicTimestep(unsigned int t) {}
-  virtual void plotEveryMacroscopicTimestep(unsigned int t) {}
+  double applyFilterPipeline() override { return 0; }
+  void sendFromMacro2MDPreProcess() override {}
+  void sendFromMacro2MDPostProcess() override {}
+  void sendFromMD2MacroPreProcess() override {}
+  void sendFromMD2MacroPostProcess() override {}
+  void processInnerCouplingCellAfterMDTimestep() override {}
+  void computeAndStoreTemperature(double temperature) override {}
+  void applyTemperatureToMolecules(unsigned int t) override {}
+  void distributeMass(unsigned int t) override {}
+  void distributeMomentum(unsigned int t) override {}
+  void perturbateVelocity() override {}
+  void applyBoundaryForce(unsigned int t) override {}
+  void plotEveryMicroscopicTimestep(unsigned int t) override {}
+  void plotEveryMacroscopicTimestep(unsigned int t) override {}
 
 private:
   /** interface for macroscopic solver */

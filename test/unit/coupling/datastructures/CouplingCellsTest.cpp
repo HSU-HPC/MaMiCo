@@ -9,8 +9,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/IndexConversion.h"
-#include "coupling/datastructures/CouplingCells.h"
+#include "coupling/datastructures/CouplingCellsWithLinkedCells.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "simplemd/LinkedCell.h"
 #include "tarch/la/Vector.h"
@@ -89,21 +88,14 @@ private:
    */
   template <unsigned int dim> class WriteIndex {
   public:
-    WriteIndex(const coupling::IndexConversion<dim>& indexConversion) : _indexConversion(indexConversion) {}
+    WriteIndex() {}
     ~WriteIndex() {}
     void beginCellIteration() {}
     void endCellIteration() {}
-    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
-      tarch::la::Vector<dim, unsigned int> localIndex = _indexConversion.getLocalVectorCellIndex(index);
-      tarch::la::Vector<dim, double> convertLocal(0.0);
-      for (unsigned int d = 0; d < dim; d++) {
-        convertLocal[d] = localIndex[d];
-      }
-      cell.setMicroscopicMomentum(convertLocal);
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const I02& index) {
+      tarch::la::Vector<dim, double> testdata{1};
+      cell.setMicroscopicMomentum(testdata);
     }
-
-  private:
-    const coupling::IndexConversion<dim>& _indexConversion;
   };
   /** test class to print local cell index (-> microscopic momentum buffer) of coupling cells */
   template <unsigned int dim> class PrintIndex {
@@ -112,7 +104,7 @@ private:
     ~PrintIndex() {}
     void beginCellIteration() {}
     void endCellIteration() {}
-    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const unsigned int& index) {
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, dim>& cell, const I02& index) {
       std::cout << cell.getMicroscopicMomentum() << std::endl;
     }
   };
@@ -125,13 +117,10 @@ private:
     }
     const tarch::la::Vector<dim, unsigned int> globalNumberCells(3);
     const tarch::la::Vector<dim, unsigned int> numberProcesses(1);
-    const unsigned int rank = 0;
-    const coupling::IndexConversion<dim> indexConversion(globalNumberCells, numberProcesses, rank, testInterface->getGlobalMDDomainSize(),
-                                                         testInterface->getGlobalMDDomainOffset(), coupling::paralleltopology::XYZ);
     const tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell(2);
 
-    coupling::datastructures::CouplingCells<simplemd::LinkedCell, dim> couplingCells(numberLinkedCellsPerCouplingCell, indexConversion, testInterface);
-    WriteIndex<dim> writeIndex(indexConversion);
+    coupling::datastructures::CouplingCellsWithLinkedCells<simplemd::LinkedCell, dim> couplingCells{numberLinkedCellsPerCouplingCell, testInterface};
+    WriteIndex<dim> writeIndex;
     PrintIndex<dim> printIndex;
 
     // write indices to inner coupling cells

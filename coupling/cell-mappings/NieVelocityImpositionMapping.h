@@ -6,7 +6,6 @@
 #define _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_NIEVELOCITYIMPOSITIONMAPPING_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/IndexConversion.h"
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
@@ -60,9 +59,8 @@ public:
 
   /** This function computes average force contribution inside this linked cell
    *	@param cell
-   *	@param cellIndex
    */
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
 
     it->begin();

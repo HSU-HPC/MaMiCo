@@ -42,7 +42,6 @@ public:
    *	@param couplingCellIndex
    *	@param linkedCellInCouplingCell
    *	@param linkedCellsPerCouplingCell
-   *	@param indexConversion
    *	@returns a particular linked cell inside a coupling cell.
    */
   virtual LinkedCell& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,

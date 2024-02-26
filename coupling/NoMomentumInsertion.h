@@ -31,13 +31,11 @@ public:
    * insertions
    *  @todo We could set this to be zero? Since it does anything
    *  @returns the time step interval for momentum insertion */
-  virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1; }
+  unsigned int getTimeIntervalPerMomentumInsertion() const override { return 1; }
 
   /** @brief a dummy function, which doesn't do anything
-   * @param cell the coupling cell to not change
-   * @param currentCouplingCellIndex the local linearised index of the cell*/
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentCouplingCellIndex) const {}
+   * @param cell the coupling cell to not change */
+  void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 idx) const override {}
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_NOMOMENTUMINSERTION_H_

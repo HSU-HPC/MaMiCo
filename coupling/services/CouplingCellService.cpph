@@ -225,13 +225,6 @@ template <class LinkedCell, unsigned int dim>
 void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVectors4Usher(
     tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell) {
 
-  //  using namespace coupling::indexing;
-  const tarch::la::Vector<dim, unsigned int> localNumberCouplingCells =
-      coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::noGhost>::numberCellsInDomain();
-
-  //  const tarch::la::Vector<dim, unsigned int> localNumberCouplingCells = I10::numberCellsInDomain();
-
-  //  _indexConversion->localNumberCouplingCells();
   const tarch::la::Vector<dim, unsigned int> firstNonGhostCouplingCell(1);
 
   const tarch::la::Vector<3, unsigned int> start(0);
@@ -244,9 +237,9 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVect
       for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
         for (unsigned int d = 0; d < dim; d++) {
           _usherCellOffset[loopCounter][d] = loop[d];
-          _usherCellStart[loopCounter][d] = firstNonGhostCouplingCell[d] + loop[d] * (localNumberCouplingCells[d] / 2);
+          _usherCellStart[loopCounter][d] = firstNonGhostCouplingCell[d] + loop[d] * (I10::numberCellsInDomain[d] / 2);
           _usherCellEnd[loopCounter][d] =
-              firstNonGhostCouplingCell[d] + (1 - loop[d]) * (localNumberCouplingCells[d] / 2) + loop[d] * localNumberCouplingCells[d];
+              firstNonGhostCouplingCell[d] + (1 - loop[d]) * (I10::numberCellsInDomain[d] / 2) + loop[d] * I10::numberCellsInDomain[d];
           _usherRange[loopCounter][d] = _usherCellEnd[loopCounter][d] - _usherCellStart[loopCounter][d];
         }
         for (unsigned int d = dim; d < 3; d++) {
@@ -264,27 +257,7 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVect
 
 template <class LinkedCell, unsigned int dim>
 tarch::la::Vector<dim, double> coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::getPositionOfFirstLocalGhostCell() const {
-  using namespace coupling::indexing;
-  // initialise with position of global first ghost cell
-  //    coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector,
-  //    coupling::indexing::IndexTrait::local> localIndex({0, 0, 0});
-  I03 localIndex({0, 0, 0});
-
-  //    coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::noGhost> globalIndex(localIndex);
-  I09 globalIndex{localIndex};
-
-  tarch::la::Vector<dim, double> position(IndexingService<3>::getInstance().getGlobalMDDomainOffset());
-  for (unsigned int d = 0; d < dim; d++) {
-    position[d] += globalIndex.get()[d] * IndexingService<3>::getInstance().getCouplingCellSize()[d];
-  }
-
-  /*
-    tarch::la::Vector<dim, double> position = _indexConversion->getGlobalMDDomainOffset() - _indexConversion->getCouplingCellSize();
-    for (unsigned int d = 0; d < dim; d++) {
-      position[d] = position[d] + _indexConversion->getThisProcess()[d] * _indexConversion->getAverageLocalNumberCouplingCells()[d] *
-                                      _indexConversion->getCouplingCellSize()[d];
-    }*/
-
+  tarch::la::Vector<dim, double> position = I03{{0, 0, 0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();
   return position;
 }
 
@@ -369,9 +342,8 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
           for (cellIndex[0] = _usherCellStart[j][0] + _usherCellOffset[i][0]; cellIndex[0] < _usherCellEnd[j][0]; cellIndex[0] = cellIndex[0] + 2) {
             // determine coupling cell index
             // coupling::indexing::CellIndex<3, vector, coupling::indexing::IndexTrait::local>
-            I03 localCellIndex{coupling::initDimVector<dim>(cellIndex)};
+            I03 localCellIndex{(tarch::la::Vector<dim, int>)cellIndex};
             const unsigned int index = I02{localCellIndex}.get();
-//            const unsigned int index = _indexConversion->getLocalCellIndex(coupling::initDimVector<dim>(cellIndex));
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
             std::cout << "coupling::services::CouplingCellServiceImpl::"
                          "distributeMass(): Insert mass in cell "

@@ -7,7 +7,6 @@
 #include "coupling/configurations/ParticleInsertionConfiguration.h"
 #include "coupling/configurations/ThermostatConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
-#include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "simplemd/LinkedCell.h"
@@ -100,8 +99,8 @@ private:
   template <unsigned int dim> class TestMacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
   public:
     ~TestMacroscopicSolverInterface() {}
-    std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) override { return {1}; };
-    unsigned int getOuterRegion() {return 1;}
+    std::vector<unsigned int> getRanks(I01 globalCellIndex) override { return {1}; };
+    unsigned int getOuterRegion() override {return 1;}
   };
 
   class TestParticleInsertionConfiguration : public coupling::configurations::ParticleInsertionConfiguration {

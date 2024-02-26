@@ -47,9 +47,8 @@ public:
    *deletes the molecule from MD simulation. It does nothiung, if the particle
    *is already deleted.
    *	@param cell
-   *	@param cellIndex
    */
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     // return, if we already deleted the respective particle
     if (_particleCounter > _particle) {
       return;

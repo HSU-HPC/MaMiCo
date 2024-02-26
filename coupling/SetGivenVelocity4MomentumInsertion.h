@@ -35,17 +35,15 @@ public:
   /** @brief returns 1, since momentum insertions will be applied in every md
    * timestep
    *  @returns the time step interval for momentum insertion */
-  virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1; }
+  unsigned int getTimeIntervalPerMomentumInsertion() const override { return 1; }
 
   /** This method does not conserve the kinetic energy of the respective
    * coupling cell. To conserve the energy as well, see the description of
    * MomentumController on details how to do that.
    *  @brief updates the momentum based on the microscopic momentum
    *  @param cell coupling cell
-   *  @param currentCouplingCellIndex index of the coupling cell
    */
-  virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                              const unsigned int& currentCouplingCellIndex) const {
+  void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 idx) const override {
     coupling::cellmappings::ComputeMassMapping<LinkedCell, dim> massMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> momentumMapping(coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
 

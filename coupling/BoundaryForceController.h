@@ -5,12 +5,12 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_
 #define _MOLECULARDYNAMICS_COUPLING_BOUNDARYFORCECONTROLLER_H_
 
+#include "coupling/datastructures/CouplingCellWithLinkedCells.h"
+#include "coupling/interface/MDSolverInterface.h"
+
 namespace coupling {
 template <class LinkedCell, unsigned int dim> class BoundaryForceController;
 }
-
-#include "coupling/datastructures/CouplingCell.h"
-#include "coupling/interface/MDSolverInterface.h"
 
 /** There is an interface method applyBoundaryForce which triggers potential
  * boundary forcing in each coupling cell that is located at the very outer
@@ -34,10 +34,8 @@ public:
    * the cellmapping for the boundary force
    * @brief applies the boundary force on a boundary cell
    * @param cell the boundary coupling cell to apply the boundary force
-   * @param currentLocalCouplingCellIndex the index of the coupling cell
    */
-  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
-                                  const unsigned int& currentLocalCouplingCellIndex) = 0;
+  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) = 0;
 
   /** @brief calculates the potential energy for a given position
    *  @param position the position for which the potential energy will be

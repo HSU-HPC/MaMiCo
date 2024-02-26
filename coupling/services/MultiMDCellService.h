@@ -675,7 +675,6 @@ private:
   const int _tws;
   const unsigned int _intNumberProcesses;
 
-  // const coupling::IndexConversion<dim> _indexConversion; /* Used for index
   // conversions during filtering TODO after merge with dynamic-md*/
   std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;    /** used to store in MD data in sendFromMD2Macro */
   std::vector<I00> _cellIndices;                                               /** used to store in indexing of the above */

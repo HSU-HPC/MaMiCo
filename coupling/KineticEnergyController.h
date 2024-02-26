@@ -12,6 +12,7 @@
 #include "coupling/cell-mappings/SetKineticEnergyMapping.h"
 #include "coupling/cell-mappings/SetTemperatureMapping.h"
 #include "coupling/datastructures/CouplingCell.h"
+#include "coupling/datastructures/CouplingCellWithLinkedCells.h"
 
 namespace coupling {
 template <class LinkedCell, unsigned int dim> class KineticEnergyController;
