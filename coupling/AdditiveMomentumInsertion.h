@@ -51,7 +51,7 @@ public:
    * description of MomentumController on details how to do that.
    *  @brief inserts momentum to the cell
    *  @param cell coupling cell to insert momentum to
-   *  @param currentCouplingCellIndex coupling cell index of the cell */
+   *  @param idx coupling cell index of the cell */
   void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 idx) const override {
     const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();
     // determine fraction of momentum that is to be inserted in this frame

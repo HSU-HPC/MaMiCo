@@ -49,7 +49,6 @@ public:
   /** applies a certain temperature over several linked cells, by changing the
    *velocity (velocity fluctuation).
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);

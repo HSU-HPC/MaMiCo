@@ -28,7 +28,6 @@ class coupling::transferstrategies::TransferStrategy4SchwarzCoupling : public co
 public:
   /** @brief a simple
    *  @param mdSolverInterface interface for the md solver
-   *  @param indexConversion an instance of the indexConversion
    *  @param numberMDSteps number of md time steps within one coupling time step
    */
   TransferStrategy4SchwarzCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDSteps)

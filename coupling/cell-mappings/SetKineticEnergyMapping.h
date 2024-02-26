@@ -51,7 +51,6 @@ public:
   /** sets new velocity: still with same mean, but re-scale the deviation for
    *correct thermal energy
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);

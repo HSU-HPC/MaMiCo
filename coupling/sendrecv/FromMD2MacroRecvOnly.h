@@ -78,7 +78,6 @@ private:
    * vector cell indices available for possible cells to be received on this
    * rank. For each global cell which is in the list,
    * allocateReceiveBuffers(...) of SendReceiveBuffer is called.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param globalCellIndices
    * 	@param numberCells

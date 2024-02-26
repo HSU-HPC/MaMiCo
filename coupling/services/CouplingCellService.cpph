@@ -344,7 +344,6 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
             // coupling::indexing::CellIndex<3, vector, coupling::indexing::IndexTrait::local>
             I03 localCellIndex{(tarch::la::Vector<dim, int>)cellIndex};
             const unsigned int index = I02{localCellIndex}.get();
-//            const unsigned int index = _indexConversion->getLocalCellIndex(coupling::initDimVector<dim>(cellIndex));
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
             std::cout << "coupling::services::CouplingCellServiceImpl::"
                          "distributeMass(): Insert mass in cell "

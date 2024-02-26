@@ -40,7 +40,6 @@ public:
    * function in terms of an array of coupling cells including the respective
    * global cell indices. This function basically calls for these purposes
    * sendFromMD2MacroNonBlocking(...) and wait4SendFromMD2Macro(...) in a row.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param couplingCellsFromMamico
    * 	@param couplingCellsFromMacroscopicSolver
@@ -63,7 +62,6 @@ public:
   /** triggers the send/recv operations for data transfer. After returning,
    * these data transfers do not necessarily need to be finished, according to
    * ISend/IRecv in MPI.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param couplingCellsFromMamico
    * 	@param couplingCellsFromMacroscopicSolver
@@ -76,7 +74,6 @@ public:
   /** waits for the send operation--instantiated by
    * sendFromMD2MacroNonBlocking(...)--to be finished and writes the data to
    * couplingCellsFromMacroscopicSolver.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param couplingCellsFromMacroscopicSolver
    * 	@param globalCellIndicesFromMacroscopicSolver
@@ -88,7 +85,6 @@ private:
   /** loops over the whole local Cartesian grid (only non-ghost cells!) and
    * writes respective cells to send buffer. For each cell,
    * writeToSendBuffer(...) of SendReceiveBuffer is used.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param couplingCells
    */
@@ -96,7 +92,6 @@ private:
 
   /** loops over the whole local Cartesian grid (only non-ghost cells!) and
    * writes respective cells to reduce buffer.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param couplingCells
    */
@@ -107,7 +102,6 @@ private:
    * vector cell indices available for possible cells to be received on this
    * rank. For each global cell which is in the list,
    * allocateReceiveBuffers(...) of SendReceiveBuffer is called.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param globalCellIndices
    * 	@param numberCells
@@ -119,7 +113,6 @@ private:
    * vector cell indices available for possible cells to be received on this
    * rank. For each global cell which is in the list,
    * allocateReduceBufferForReceiving(...) of SendReceiveBuffer is called.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param globalCellIndices
    * 	@param numberCells
@@ -132,7 +125,6 @@ private:
    * cells on the side of the macroscopic solver, we just have a list of global
    * cell indices and corresponding coupling cell buffers. For each cell in
    * this list, readFromReceiveBuffer(...) of SendReceiveBuffer is called.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param couplingCells
    * 	@param globalCellIndices

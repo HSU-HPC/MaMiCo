@@ -47,7 +47,6 @@ public:
 
   /** superimposes a random perturbation to the mean velocity in all directions
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
 

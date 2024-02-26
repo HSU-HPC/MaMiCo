@@ -411,7 +411,7 @@ public:
    *microscopicmomentum-buffers).
    *	@param velocityRelaxationFactor
    *	@param currentVelocity
-   *	@param currentLocalCouplingCellIndex
+   *	@param cellIndex
    *	@param mdSolverInterface
    *	@param couplingCells
    *	@note  the method ignoreThisCell() of the class

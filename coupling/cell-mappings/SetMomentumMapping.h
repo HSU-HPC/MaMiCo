@@ -50,7 +50,6 @@ public:
   /** applies a certain momentum over several linked cells, by steering the
    *velocity.
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
