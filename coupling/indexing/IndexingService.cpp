@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <numeric>
+#include <sstream>
 
 /*
  * Define specialisations of CellIndex.
