@@ -288,7 +288,7 @@ void coupling::datastructures::MacroscopicCells<LinkedCell, dim>::applyXLayersOf
         const tarch::la::Vector<dim, unsigned> globalCoord = _indexConversion.convertLocalToGlobalVectorCellIndex(coupling::initDimVector<dim>(loop));
         bool isBoundary = false;
         for (unsigned int d = 0; d < dim; d++) {
-          isBoundary = isBoundary || (globalCoord[d] <= globalLowerLeftCorner[d]) || (globalCoord[d] >= globalUpperRightCorner[d]);
+          isBoundary = isBoundary || (globalCoord[d] < globalLowerLeftCorner[d]) || (globalCoord[d] > globalUpperRightCorner[d]);
         }
         if (isBoundary) {
           const unsigned int linearIndex = _indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop));
