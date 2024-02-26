@@ -70,7 +70,6 @@ public:
    *the difference between the two with the velocity relaxation factor add it to
    *the velocity of the molecule and applies it to the molecule.
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
     // if this coupling cell is not interesting, skip it immediately

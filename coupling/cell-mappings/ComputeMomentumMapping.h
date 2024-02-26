@@ -56,7 +56,6 @@ public:
   /** counts the molecules inside a linked cell and sums up the of the velocity
    *of all particles inside the cell and saves it as momentum.
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);

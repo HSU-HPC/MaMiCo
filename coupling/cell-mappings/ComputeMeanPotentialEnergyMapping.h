@@ -57,7 +57,6 @@ public:
   /** counts the molecules inside a linked cell and sums up the of the mean
    *potential energy of all particles inside the cell.
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);

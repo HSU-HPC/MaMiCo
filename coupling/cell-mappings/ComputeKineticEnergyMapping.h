@@ -44,7 +44,6 @@ public:
 
   /** sums up the specific kinetic energy of all molecules inside a linked cell.
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
 

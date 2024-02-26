@@ -56,7 +56,6 @@ public:
   /** sums up the velocity fluctuation (from the mean flow velocity) of all
    *particles
    *	@param cell
-   *	@param cellIndex
    */
   void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
