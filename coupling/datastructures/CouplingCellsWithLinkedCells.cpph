@@ -167,7 +167,7 @@ void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::ap
     auto globalCoord = (tarch::la::Vector<dim, unsigned>)I01{idx}.get();
     bool isBoundary = false;
     for (unsigned int d = 0; d < dim; d++) {
-      isBoundary = isBoundary || (globalCoord[d] <= globalLowerLeftCorner[d]) || (globalCoord[d] >= globalUpperRightCorner[d]);
+      isBoundary = isBoundary || (globalCoord[d] < globalLowerLeftCorner[d]) || (globalCoord[d] > globalUpperRightCorner[d]);
     }
     if (isBoundary)
       a.apply(_couplingCellsWithLinkedCells[I02{idx}.get()], idx);

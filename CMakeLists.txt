@@ -684,6 +684,7 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/interface/impl/ls1/LS1MoleculeTest.cpp"
   "test/unit/coupling/interface/impl/ls1/LS1RegionWrapperTest.cpp"
   "test/unit/coupling/interface/impl/ls1/LS1StaticCommDataTest.cpp"
+  "test/unit/coupling/datastructures/CouplingCellsWithLinkedCellsTest.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
