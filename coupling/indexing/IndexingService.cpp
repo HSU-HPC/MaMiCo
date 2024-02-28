@@ -342,8 +342,8 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
     if (globalNumberCouplingCells[d] % numberProcesses[d] != 0) {
       std::stringstream ss;
       ss << "IndexingService: initWithCells(): ERROR: Number "
-            "of macroscopic cells must be divisible by number of processes! ";
-      ss << "globalNumberMacroscopicCells = " << globalNumberCouplingCells;
+            "of coupling cells must be divisible by number of processes! ";
+      ss << "globalNumberCouplingCells = " << globalNumberCouplingCells;
       ss << ", numberProcesses = " << numberProcesses;
       throw std::runtime_error(ss.str());
     }
@@ -352,8 +352,8 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
     if (globalNumberCouplingCells[d] % totalWeight != 0) {
       std::stringstream ss;
       ss << "IndexingService: initWithCells(): ERROR: Number "
-            "of macroscopic cells must be divisible by total subdomain weights! ";
-      ss << "globalNumberMacroscopicCells = " << globalNumberCouplingCells;
+            "of coupling cells must be divisible by total subdomain weights! ";
+      ss << "globalNumberCouplingCells = " << globalNumberCouplingCells;
       ss << ", total weights for axis " << d << " = " << totalWeight;
       throw std::runtime_error(ss.str());
     }
