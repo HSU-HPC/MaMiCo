@@ -38,7 +38,7 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MDNonBlo
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange) {
-  for (auto idx : I02())
+  for (auto idx : I10())
     coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(dataExchange, idx);
 }
 
@@ -64,7 +64,7 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::wait4SendFromMacro2MD(
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
                                                                                 const std::vector<CouplingCell*>& couplingCells) {
-  for (auto idx : I02()) {
+  for (auto idx : I10()) {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, *couplingCells.at(idx.get()), idx);
 #else
@@ -121,14 +121,14 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::writeToSendBufferColle
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::allocateReceiveBuffersCollective(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange) {
-  for (auto idx : I02())
+  for (auto idx : I10())
     coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateBcastBufferForReceiving(dataExchange, idx);
 }
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::readFromCollectiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
                                                                                    const std::vector<CouplingCell*>& couplingCells) {
-  for (auto idx : I02())
+  for (auto idx : I10())
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromCollectiveBuffer(dataExchange, *couplingCells.at(idx.get()), idx);
 #else

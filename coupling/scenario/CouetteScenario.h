@@ -726,7 +726,7 @@ protected:
   void allocateSendBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
     deleteBuffer(_buf.sendBuffer);
     unsigned int numCellsSent = 0;
-    for (auto idx : I00())
+    for (auto idx : I08())
       if (!I12::contains(idx))
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank))
           numCellsSent++;
@@ -735,7 +735,7 @@ protected:
     if (indices == NULL)
       throw std::runtime_error(std::string("ERROR allocateSendBuffer(): indices==NULL!"));
     // allocate sendBuffer and initialise all entries, incl. indices
-    for (auto idx : I00())
+    for (auto idx : I08())
       if (!I12::contains(idx))
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           _buf.sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
@@ -751,7 +751,7 @@ protected:
   void allocateRecvBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
     deleteBuffer(_buf.recvBuffer);
     unsigned int numCellsRecv = 0;
-    for (auto idx : I00())
+    for (auto idx : I08())
       if (I12::contains(idx))
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank))
           numCellsRecv++;
@@ -760,7 +760,7 @@ protected:
     if (indices == NULL)
       throw std::runtime_error(std::string("ERROR allocateRecvBuffer(): indices==NULL!"));
     // allocate recvBuffer and initialise all entries, incl. indices
-    for (auto idx : I00())
+    for (auto idx : I08())
       if (I12::contains(idx))
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           _buf.recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
