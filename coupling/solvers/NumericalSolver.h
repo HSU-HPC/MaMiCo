@@ -235,12 +235,12 @@ private:
   tarch::la::Vector<3, unsigned int> getProcessCoordinates() const {
     tarch::la::Vector<3, unsigned int> coords(0);
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    int rank;
-    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
+    constexpr int dim = 3;
+    unsigned int rank = IDXS.getRank();
     // determine rank coordinates
-    coords[2] = ((unsigned int)rank) / (_processes[0] * _processes[1]);
-    coords[1] = (((unsigned int)rank) - coords[2] * _processes[0] * _processes[1]) / _processes[0];
-    coords[0] = ((unsigned int)rank) - coords[2] * _processes[0] * _processes[1] - coords[1] * _processes[0];
+    coords[2] = rank / (_processes[0] * _processes[1]);
+    coords[1] = (rank - coords[2] * _processes[0] * _processes[1]) / _processes[0];
+    coords[0] = rank - coords[2] * _processes[0] * _processes[1] - coords[1] * _processes[0];
 #endif
     return coords;
   }

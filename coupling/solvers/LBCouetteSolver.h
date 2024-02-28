@@ -218,7 +218,7 @@ public:
       std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << I01{recvIndices[i]} << ": " << globalCellCoords << std::endl;
 #endif
       const int index = get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
       if (_flag[index] != MD_BOUNDARY) {
         std::cout << "ERROR LBCouetteSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl;
         exit(EXIT_FAILURE);
