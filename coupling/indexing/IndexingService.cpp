@@ -339,7 +339,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
   }
 #endif
 
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; d++) {
     if (globalNumberCouplingCells[d] % numberProcesses[d] != 0) {
       std::stringstream ss;
       ss << "IndexingService: initWithCells(): ERROR: Number "
@@ -349,7 +349,16 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
       throw std::runtime_error(ss.str());
     }
 
-  _couplingCellSize = couplingCellSize;
+    const auto totalWeight = std::reduce(subdomainWeights[i].begin(), subdomainWeights[i].end(), 0u);
+    if (globalNumberCouplingCells[d] % totalWeight != 0) {
+      std::stringstream ss;
+      ss << "IndexingService: initWithCells(): ERROR: Number "
+            "of macroscopic cells must be divisible by total subdomain weights! ";
+      ss << "globalNumberMacroscopicCells = " << globalNumberCouplingCells;
+      ss << ", total weights for axis " << i << " = " << totalWeight;
+      throw std::runtime_error(ss.str());
+    }
+  }
 
   // TODO: make this globalNumberCouplingCells and remove all usages of the
   // old meaning (seen above)

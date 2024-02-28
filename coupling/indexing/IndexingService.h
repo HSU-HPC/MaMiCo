@@ -121,6 +121,8 @@ public:
   ) {
     _globalMDDomainSize = globalMDDomainSize;
     _globalMDDomainOffset = globalMDDomainOffset;
+    _couplingCellSize = couplingCellSize;
+    _initedWithMDSize = true;
 
     // calculate total number of coupling cells on all ranks in Base Domain
     tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells(0);
@@ -192,6 +194,9 @@ public:
     if (!_isInitialized) {
       throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainSize() before initalization! "));
     }
+    if (!_initedWithMDSize) {
+      throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainSize() without calling initWithMDSize()! "));
+    }
 #endif
     return _globalMDDomainSize;
   }
@@ -204,6 +209,9 @@ public:
     if (!_isInitialized) {
       throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainOffset() before initalization! "));
     }
+    if (!_initedWithMDSize) {
+      throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainSize() without calling initWithMDSize()! "));
+    }
 #endif
     return _globalMDDomainOffset;
   }
@@ -214,6 +222,9 @@ public:
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (!_isInitialized) {
       throw std::runtime_error(std::string("IndexingService: Called getCouplingCellSize() before initalization! "));
+    }
+    if (!_initedWithMDSize) {
+      throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainSize() without calling initWithMDSize()! "));
     }
 #endif
     return _couplingCellSize;
@@ -246,6 +257,7 @@ private:
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   bool _isInitialized = false;
 #endif
+  bool _initedWithMDSize = false;
   tarch::la::Vector<dim, double> _globalMDDomainSize;
   tarch::la::Vector<dim, double> _globalMDDomainOffset;
   tarch::la::Vector<dim, double> _couplingCellSize;
