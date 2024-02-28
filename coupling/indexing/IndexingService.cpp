@@ -318,7 +318,6 @@ template <unsigned int dim>
 void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights,
                                                              tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                                                              tarch::la::Vector<dim, unsigned int> numberProcesses,
-                                                             const tarch::la::Vector<3, double>& couplingCellSize,
                                                              coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
                                                              const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -349,13 +348,13 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
       throw std::runtime_error(ss.str());
     }
 
-    const auto totalWeight = std::reduce(subdomainWeights[i].begin(), subdomainWeights[i].end(), 0u);
+    const auto totalWeight = std::reduce(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);
     if (globalNumberCouplingCells[d] % totalWeight != 0) {
       std::stringstream ss;
       ss << "IndexingService: initWithCells(): ERROR: Number "
             "of macroscopic cells must be divisible by total subdomain weights! ";
       ss << "globalNumberMacroscopicCells = " << globalNumberCouplingCells;
-      ss << ", total weights for axis " << i << " = " << totalWeight;
+      ss << ", total weights for axis " << d << " = " << totalWeight;
       throw std::runtime_error(ss.str());
     }
   }

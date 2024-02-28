@@ -85,10 +85,10 @@ private:
     int getLayer(tarch::la::Vector<3, int> index, tarch::la::Vector<3, unsigned int> size) {
       for (int d = 0; d < 3; d++) {
         CPPUNIT_ASSERT(index[d] >= 0);
-        CPPUNIT_ASSERT(index[d] <= size[d] - 1);
+        CPPUNIT_ASSERT(index[d] <= static_cast<int>(size[d]) - 1);
         if (index[d] == 0)
           return 0;
-        if (index[d] == size[d] - 1)
+        if (index[d] == static_cast<int>(size[d]) - 1)
           return 0;
         CPPUNIT_ASSERT(size[d] > 2);
       }
@@ -123,7 +123,7 @@ public:
     const tarch::la::Vector<3, unsigned int> globalNumberCells(12);
     tarch::la::Vector<3, unsigned int> numberProcesses{(unsigned int)_size, 1, 1};
     _testInterface = new TestMDSolverInterface();
-    IndexingService<3>::getInstance().initWithCells(globalNumberCells, numberProcesses, {1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+    IndexingService<3>::getInstance().initWithCells(globalNumberCells, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
     const tarch::la::Vector<3, unsigned int> numberLinkedCellsPerCouplingCell(2);
     _cells =
         std::make_unique<coupling::datastructures::CouplingCellsWithLinkedCells<simplemd::LinkedCell, 3>>(numberLinkedCellsPerCouplingCell, _testInterface);

@@ -34,7 +34,7 @@ public:
     int rank = 0;
     const tarch::la::Vector<dim, unsigned int> numberOfProcesses{1, 1, 1};
 
-    IndexingService<3>::getInstance().initWithCells({1}, numberOfProcesses, {1}, coupling::paralleltopology::XYZ, 1, rank);
+    IndexingService<3>::getInstance().initWithCells({1}, numberOfProcesses, coupling::paralleltopology::XYZ, 1, rank);
 
     coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>* mdSolverInterface = new TestMDSolverInterface<dim>();
     coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface = new TestMacroscopicSolverInterface<dim>();

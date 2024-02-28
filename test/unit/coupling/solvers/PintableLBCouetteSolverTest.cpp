@@ -38,7 +38,7 @@ public:
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
 
-    coupling::indexing::IndexingService<3>::getInstance().initWithCells({12}, {1}, {1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+    coupling::indexing::IndexingService<3>::getInstance().initWithCells({12}, {1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
 
     // Temporal fine solver
     F = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, "LBCouette",
