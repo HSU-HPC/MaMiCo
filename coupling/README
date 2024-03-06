@@ -6,16 +6,16 @@
 This folder contains the coupling tool mamico. Folder structure:
 
 ./
-contains general controller and insertion classes to control/insert macroscopic averaged quantities (e.g., mass, momentum, temperature), as well as the IndexConversion class which allows to convert macroscopic cell coordinate indices between global and local (in case of MPI-distributed simulations) representations. The controller and insertion classes make use of cell mappings (see cell-mappings/) to bring cellwise functionality onto the macroscopic cell structure.
+contains general controller and insertion classes to control/insert macroscopic averaged quantities (e.g., mass, momentum, temperature), as well as the IndexConversion class which allows to convert coupling cell coordinate indices between global and local (in case of MPI-distributed simulations) representations. The controller and insertion classes make use of cell mappings (see cell-mappings/) to bring cellwise functionality onto the coupling cell structure.
 
 cell-mappings/
-contains classes to compute averaged quantities from MD simulations, or to modify molecular quantities on a macroscopic cell basis, i.e. molecules are treated per macroscopic cell.
+contains classes to compute averaged quantities from MD simulations, or to modify molecular quantities on a coupling cell basis, i.e. molecules are treated per coupling cell.
 
 configurations/
 contains classes to read XML-based configuration input.
 
 datastructures/
-contains implementations of the macroscopic cell data structure and a simple molecule implementation. The latter is used in conversions from original MD simulation-based molecules to mamico molecules.
+contains implementations of the coupling cell data structure and a simple molecule implementation. The latter is used in conversions from original MD simulation-based molecules to mamico molecules.
 
 interface/
 contains the definition of interface classes to interface MD and continuum solvers. Besides, implementations of these interfaces for various solvers can be found in interface/impl/.
@@ -24,10 +24,10 @@ paralleltopology/
 contains implementations of different parallel domain decompositions, i.e. different process coordinate-to-rank mappings.
 
 sendrecv/
-contains classes which handle the MPI-based data exchange between continuum solver and mamico. Since the macroscopic cells are located and stored on the respective same (MPI) process as the MD simulation, no particular exchange from MD to mamico is required.
+contains classes which handle the MPI-based data exchange between continuum solver and mamico. Since the coupling cells are located and stored on the respective same (MPI) process as the MD simulation, no particular exchange from MD to mamico is required.
 
 services/
-basically contains the MacroscopicCellService which is the core of mamico and puts together the macroscopic cell management, data exchange with the continuum and MD solver, and coupling algorithmics, including macroscopic cell traversal.
+basically contains the CouplingCellService which is the core of mamico and puts together the coupling cell management, data exchange with the continuum and MD solver, and coupling algorithmics, including coupling cell traversal.
 
 solvers/
 contains the modified SimpledMD simulation for coupling (inherited from simplemd/MolecularDynamicsSimulation) as well as a dummy continuum solver which is used for different test purposes.
@@ -37,4 +37,4 @@ contains various test case implementations for different mamico-MD couplings. Cu
 For details on the installation and executing the tests for each MD solver, please read tests/README.
 
 transferstrategies/
-contains coupling algorithmics to be employed to the macroscopic cells of mamico. Averaging/Difference/DirectTransferStrategy are mostly for testing purposes, while TransferStrategy4SchwarzCoupling corresponds to a state-based coupling approach using velocity relaxation.
+contains coupling algorithmics to be employed to the coupling cells of mamico. Averaging/Difference/DirectTransferStrategy are mostly for testing purposes, while TransferStrategy4SchwarzCoupling corresponds to a state-based coupling approach using velocity relaxation.

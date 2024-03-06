@@ -53,9 +53,6 @@ public:
     for (int d = dim - 2; d > -1; d--) {
       index = _numberProcesses[d] * index + processCoordinates[d];
     }
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Process coordinates=" << processCoordinates << " correspond to rank=" << index + _topologyOffset << std::endl;
-#endif
     return index + _topologyOffset;
   }
 

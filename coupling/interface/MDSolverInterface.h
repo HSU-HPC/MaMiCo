@@ -5,17 +5,17 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_MDSOLVERINTERFACE_H_
 #define _MOLECULARDYNAMICS_COUPLING_MDSOLVERINTERFACE_H_
 
-#include "coupling/IndexConversion.h"
-#include "coupling/interface/Molecule.h"
-#include "coupling/interface/MoleculeIterator.h"
-#include "tarch/la/Vector.h"
-#include <list>
-
 namespace coupling {
 namespace interface {
 template <class LinkedCell, unsigned int dim> class MDSolverInterface;
 }
 } // namespace coupling
+
+#include "coupling/indexing/IndexingService.h"
+#include "coupling/interface/Molecule.h"
+#include "coupling/interface/MoleculeIterator.h"
+#include "tarch/la/Vector.h"
+#include <list>
 
 /** This class provides
  *	@brief interface to the MD simulation
@@ -24,29 +24,28 @@ template <class LinkedCell, unsigned int dim> class MDSolverInterface;
  */
 template <class LinkedCell, unsigned int dim> class coupling::interface::MDSolverInterface {
 public:
+  using CellIndex_T = I11;
+
   /** Destructor */
   virtual ~MDSolverInterface() {}
 
-  /** This function specifies a particular linked cell inside a macroscopic
-   *cell. The macroscopic cells are currently located on the same process as the
+  /** This function specifies a particular linked cell inside a coupling
+   *cell. The coupling cells are currently located on the same process as the
    *respective linked cells. However, several linked cells may be part of a
-   *macroscopic cell. The macroscopic cells also contain a ghost layer which
-   *surrounds each local domain; the very first macroscopic cell inside the
+   *coupling cell. The coupling cells also contain a ghost layer which
+   *surrounds each local domain; the very first coupling cell inside the
    *global MD domain (or local MD domain) is thus given by coordinates (1,1,1)
-   *(or (1,1) in 2D, respectively). The index linkedCellInMacroscopicCell
+   *(or (1,1) in 2D, respectively). The index linkedCellInCouplingCell
    *corresponds to the coordinates of the linked cell inside the given
-   *macroscopic cell. These coordinates thus lie in a range
-   *(0,linkedCellsPerMacroscopicCell-1).
-   *	@param macroscopicCellIndex
-   *	@param linkedCellInMacroscopicCell
-   *	@param linkedCellsPerMacroscopicCell
-   *	@param indexConversion
-   *	@returns a particular linked cell inside a macroscopic cell.
+   *coupling cell. These coordinates thus lie in a range
+   *(0,linkedCellsPerCouplingCell-1).
+   *	@param couplingCellIndex
+   *	@param linkedCellInCouplingCell
+   *	@param linkedCellsPerCouplingCell
+   *	@returns a particular linked cell inside a coupling cell.
    */
-  virtual LinkedCell& getLinkedCell(const tarch::la::Vector<dim, unsigned int>& macroscopicCellIndex,
-                                    const tarch::la::Vector<dim, unsigned int>& linkedCellInMacroscopicCell,
-                                    const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell,
-                                    const coupling::IndexConversion<dim>& indexConversion) = 0;
+  virtual LinkedCell& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
+                                    const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) = 0;
 
   /** This function specifies the global size of the box-shaped MD domain
    *  @returns the global size of the box-shaped MD domain */
@@ -96,17 +95,17 @@ public:
   virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) = 0;
 
   /** This function sets up the potential energy landscape over the domain
-   *spanned by indexOfFirstMacroscopicCell and rangeCoordinates. The first
+   *spanned by indexOfFirstCouplingCell and rangeCoordinates. The first
    *vector denotes the position of the lower,left,front corner of the domain,
-   *rangeCoordinates the number of macroscopic cells in each spatial direction
+   *rangeCoordinates the number of coupling cells in each spatial direction
    *in which the potential energy needs to be computed.
-   *	@param indexOfFirstMacroscopicCell
-   *	@param rangeMacroscopicCells
-   *	@param linkedCellsPerMacroscopicCell
+   *	@param indexOfFirstCouplingCell
+   *	@param rangeCouplingCells
+   *	@param linkedCellsPerCouplingCell
    */
-  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstMacroscopicCell,
-                                             const tarch::la::Vector<dim, unsigned int>& rangeMacroscopicCells,
-                                             const tarch::la::Vector<dim, unsigned int>& linkedCellsPerMacroscopicCell) = 0;
+  virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstCouplingCell,
+                                             const tarch::la::Vector<dim, unsigned int>& rangeCouplingCells,
+                                             const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) = 0;
 
   /** This function specifies the local index vector (w.r.t. lexicographic
    *ordering of the linked cells in the MD simulation, for the linked cell that

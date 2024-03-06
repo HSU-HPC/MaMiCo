@@ -18,7 +18,7 @@ template <class LinkedCell, unsigned int dim> class ComputeMeanPotentialEnergyMa
 
 /**
  *	@brief This class computes the mean potential energy over this
- *macroscopic cell.
+ *coupling cell.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
@@ -57,9 +57,8 @@ public:
   /** counts the molecules inside a linked cell and sums up the of the mean
    *potential energy of all particles inside the cell.
    *	@param cell
-   *	@param cellIndex
    */
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {

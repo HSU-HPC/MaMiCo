@@ -165,9 +165,9 @@ public:
 
   void testGetCell() {
     // setup
-    // create interface with macroscopic cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
-    tarch::la::Vector<3, double> macroscopicCellSize(10.0);
-    tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(2);
+    // create interface with coupling cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
+    tarch::la::Vector<3, double> couplingCellSize(10.0);
+    tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell(2);
     // index converter
     tarch::la::Vector<3, unsigned int> globalNumberCells(4); // hence size becomes 40x40x40
     tarch::la::Vector<3, unsigned int> numberProcesses(1);
@@ -178,7 +178,7 @@ public:
       numberProcesses[i] = _domainGridDecomposition[i];
 #endif
     coupling::indexing::IndexingService<3>::getInstance().init(globalNumberCells, numberProcesses, coupling::paralleltopology::ZYX, 3, (unsigned int)rank);
-    coupling::interface::LS1MDSolverInterface interface(macroscopicCellSize, linkedCellsPerMacroscopicCell);
+    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
     const coupling::IndexConversion<3> indexConversion(globalNumberCells, numberProcesses, rank, interface.getGlobalMDDomainSize(),
                                                        interface.getGlobalMDDomainOffset(), coupling::paralleltopology::ZYX);
 
@@ -189,25 +189,23 @@ public:
     for (unsigned int macX = 1; macX <= globalNumberCells[0] / numberProcesses[0]; macX++) {
       for (unsigned int macY = 1; macY <= globalNumberCells[1] / numberProcesses[1]; macY++) {
         for (unsigned int macZ = 1; macZ <= globalNumberCells[2] / numberProcesses[2]; macZ++) {
-          for (unsigned int linkX = 0; linkX < linkedCellsPerMacroscopicCell[0]; linkX++) {
-            for (unsigned int linkY = 0; linkY < linkedCellsPerMacroscopicCell[1]; linkY++) {
-              for (unsigned int linkZ = 0; linkZ < linkedCellsPerMacroscopicCell[2]; linkZ++) {
-                ls1::LS1RegionWrapper cell = interface.getLinkedCell({macX, macY, macZ}, {linkX, linkY, linkZ}, linkedCellsPerMacroscopicCell, indexConversion);
+          for (unsigned int linkX = 0; linkX < linkedCellsPerCouplingCell[0]; linkX++) {
+            for (unsigned int linkY = 0; linkY < linkedCellsPerCouplingCell[1]; linkY++) {
+              for (unsigned int linkZ = 0; linkZ < linkedCellsPerCouplingCell[2]; linkZ++) {
+                ls1::LS1RegionWrapper cell = interface.getLinkedCell({macX, macY, macZ}, {linkX, linkY, linkZ}, linkedCellsPerCouplingCell, indexConversion);
 
                 tarch::la::Vector<3, double> receivedStart = {cell.getStartRegionAtDim(0), cell.getStartRegionAtDim(1), cell.getStartRegionAtDim(2)};
                 tarch::la::Vector<3, double> receivedEnd = {cell.getEndRegionAtDim(0), cell.getEndRegionAtDim(1), cell.getEndRegionAtDim(2)};
                 tarch::la::Vector<3, double> actualStart = {
                     // hacked for 2x2x1
-                    ((macX - 1) * macroscopicCellSize[0]) +
-                        (linkX * macroscopicCellSize[0] / linkedCellsPerMacroscopicCell[0] +
-                         ((rank / numberProcesses[0]) * macroscopicCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
-                    ((macY - 1) * macroscopicCellSize[1]) +
-                        (linkY * macroscopicCellSize[1] / linkedCellsPerMacroscopicCell[1] +
-                         ((rank % numberProcesses[0]) * macroscopicCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
-                    ((macZ - 1) * macroscopicCellSize[2]) + (linkZ * macroscopicCellSize[2] / linkedCellsPerMacroscopicCell[2])};
-                tarch::la::Vector<3, double> actualEnd = {actualStart[0] + macroscopicCellSize[0] / linkedCellsPerMacroscopicCell[0],
-                                                          actualStart[1] + macroscopicCellSize[1] / linkedCellsPerMacroscopicCell[1],
-                                                          actualStart[2] + macroscopicCellSize[2] / linkedCellsPerMacroscopicCell[2]};
+                    ((macX - 1) * couplingCellSize[0]) + (linkX * couplingCellSize[0] / linkedCellsPerCouplingCell[0] +
+                                                          ((rank / numberProcesses[0]) * couplingCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
+                    ((macY - 1) * couplingCellSize[1]) + (linkY * couplingCellSize[1] / linkedCellsPerCouplingCell[1] +
+                                                          ((rank % numberProcesses[0]) * couplingCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
+                    ((macZ - 1) * couplingCellSize[2]) + (linkZ * couplingCellSize[2] / linkedCellsPerCouplingCell[2])};
+                tarch::la::Vector<3, double> actualEnd = {actualStart[0] + couplingCellSize[0] / linkedCellsPerCouplingCell[0],
+                                                          actualStart[1] + couplingCellSize[1] / linkedCellsPerCouplingCell[1],
+                                                          actualStart[2] + couplingCellSize[2] / linkedCellsPerCouplingCell[2]};
                 CPPUNIT_ASSERT_DOUBLES_EQUAL(receivedStart[0], actualStart[0], 1e-6);
                 CPPUNIT_ASSERT_DOUBLES_EQUAL(receivedStart[1], actualStart[1], 1e-6);
                 CPPUNIT_ASSERT_DOUBLES_EQUAL(receivedStart[2], actualStart[2], 1e-6);
@@ -225,9 +223,9 @@ public:
 
   void testGetCellIterator() {
     // identical setup as testGetCell()
-    // create interface with macroscopic cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
-    tarch::la::Vector<3, double> macroscopicCellSize(10.0);
-    tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(2);
+    // create interface with coupling cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
+    tarch::la::Vector<3, double> couplingCellSize(10.0);
+    tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell(2);
     // index converter
     tarch::la::Vector<3, unsigned int> globalNumberCells(4); // hence size becomes 40x40x40
     tarch::la::Vector<3, unsigned int> numberProcesses(1);
@@ -238,7 +236,7 @@ public:
       numberProcesses[i] = _domainGridDecomposition[i];
 #endif
     coupling::indexing::IndexingService<3>::getInstance().init(globalNumberCells, numberProcesses, coupling::paralleltopology::ZYX, 3, (unsigned int)rank);
-    coupling::interface::LS1MDSolverInterface interface(macroscopicCellSize, linkedCellsPerMacroscopicCell);
+    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
     const coupling::IndexConversion<3> indexConversion(globalNumberCells, numberProcesses, rank, interface.getGlobalMDDomainSize(),
                                                        interface.getGlobalMDDomainOffset(), coupling::paralleltopology::ZYX);
 
@@ -249,22 +247,21 @@ public:
     for (unsigned int macX = 1; macX <= globalNumberCells[0] / numberProcesses[0]; macX++) {
       for (unsigned int macY = 1; macY <= globalNumberCells[1] / numberProcesses[1]; macY++) {
         for (unsigned int macZ = 1; macZ <= globalNumberCells[2] / numberProcesses[2]; macZ++) {
-          for (unsigned int linkX = 0; linkX < linkedCellsPerMacroscopicCell[0]; linkX++) {
-            for (unsigned int linkY = 0; linkY < linkedCellsPerMacroscopicCell[1]; linkY++) {
-              for (unsigned int linkZ = 0; linkZ < linkedCellsPerMacroscopicCell[2]; linkZ++) {
-                ls1::LS1RegionWrapper cell = interface.getLinkedCell({macX, macY, macZ}, {linkX, linkY, linkZ}, linkedCellsPerMacroscopicCell, indexConversion);
+          for (unsigned int linkX = 0; linkX < linkedCellsPerCouplingCell[0]; linkX++) {
+            for (unsigned int linkY = 0; linkY < linkedCellsPerCouplingCell[1]; linkY++) {
+              for (unsigned int linkZ = 0; linkZ < linkedCellsPerCouplingCell[2]; linkZ++) {
+                ls1::LS1RegionWrapper cell = interface.getLinkedCell({macX, macY, macZ}, {linkX, linkY, linkZ}, linkedCellsPerCouplingCell, indexConversion);
 
-                double actualStart[3] = {// hacked for 2x2x1
-                                         ((macX - 1) * macroscopicCellSize[0]) +
-                                             (linkX * macroscopicCellSize[0] / linkedCellsPerMacroscopicCell[0] +
-                                              ((rank / numberProcesses[0]) * macroscopicCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
-                                         ((macY - 1) * macroscopicCellSize[1]) +
-                                             (linkY * macroscopicCellSize[1] / linkedCellsPerMacroscopicCell[1] +
-                                              ((rank % numberProcesses[0]) * macroscopicCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
-                                         ((macZ - 1) * macroscopicCellSize[2]) + (linkZ * macroscopicCellSize[2] / linkedCellsPerMacroscopicCell[2])};
-                double actualEnd[3] = {actualStart[0] + macroscopicCellSize[0] / linkedCellsPerMacroscopicCell[0],
-                                       actualStart[1] + macroscopicCellSize[1] / linkedCellsPerMacroscopicCell[1],
-                                       actualStart[2] + macroscopicCellSize[2] / linkedCellsPerMacroscopicCell[2]};
+                double actualStart[3] = {
+                    // hacked for 2x2x1
+                    ((macX - 1) * couplingCellSize[0]) + (linkX * couplingCellSize[0] / linkedCellsPerCouplingCell[0] +
+                                                          ((rank / numberProcesses[0]) * couplingCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
+                    ((macY - 1) * couplingCellSize[1]) + (linkY * couplingCellSize[1] / linkedCellsPerCouplingCell[1] +
+                                                          ((rank % numberProcesses[0]) * couplingCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
+                    ((macZ - 1) * couplingCellSize[2]) + (linkZ * couplingCellSize[2] / linkedCellsPerCouplingCell[2])};
+                double actualEnd[3] = {actualStart[0] + couplingCellSize[0] / linkedCellsPerCouplingCell[0],
+                                       actualStart[1] + couplingCellSize[1] / linkedCellsPerCouplingCell[1],
+                                       actualStart[2] + couplingCellSize[2] / linkedCellsPerCouplingCell[2]};
                 coupling::interface::MoleculeIterator<ls1::LS1RegionWrapper, 3>* receivedIterator = interface.getMoleculeIterator(cell);
                 receivedIterator->begin();
                 RegionParticleIterator ls1Iterator =
@@ -294,10 +291,10 @@ public:
 
   void testMassSync() {
     // setup
-    // create interface with macroscopic cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
-    tarch::la::Vector<3, double> macroscopicCellSize(10.0);
-    tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(2);
-    coupling::interface::LS1MDSolverInterface interface(macroscopicCellSize, linkedCellsPerMacroscopicCell);
+    // create interface with coupling cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
+    tarch::la::Vector<3, double> couplingCellSize(10.0);
+    tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell(2);
+    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
     int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);

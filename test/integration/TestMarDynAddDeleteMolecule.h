@@ -74,21 +74,21 @@ private:
     MarDynMoleculeWrapper testMolecule;
     testMolecule.setMolecule(&internalMolecule, sim->getcutoffRadius());
 
-    coupling::services::MacroscopicCellService<3>* macroCellService =
-        coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getMacroscopicCellService();
+    coupling::services::CouplingCellService<3>* macroCellService =
+        coupling::interface::MamicoInterfaceProvider<MarDynCell, 3>::getInstance().getCouplingCellService();
 
-    const tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell(1);
-    const tarch::la::Vector<3, unsigned int> linkedCellInMacroscopicCell(0);
+    const tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell(1);
+    const tarch::la::Vector<3, unsigned int> linkedCellInCouplingCell(0);
     tarch::la::Vector<3, unsigned int> deleteCellIndexVector(1);
 
-    // macroscopic cell index
+    // coupling cell index
     tarch::la::Vector<3, unsigned int> macroCellIndex(1);
     for (int d = 0; d < 3; d++)
       macroCellIndex[d] = 1 + (int)floor(position[d] / 2.5);
 
     std::cout << "macro cell index: " << macroCellIndex << std::endl;
 
-    MarDynCell& mc = mdsi->getLinkedCell(macroCellIndex, linkedCellInMacroscopicCell, linkedCellsPerMacroscopicCell, macroCellService->getIndexConversion());
+    MarDynCell& mc = mdsi->getLinkedCell(macroCellIndex, linkedCellInCouplingCell, linkedCellsPerCouplingCell, macroCellService->getIndexConversion());
 
     mdsi->deleteMoleculeFromMDSimulation(testMolecule, mc);
     std::cout << "molecule count in cell after: " << mc.getParticleCell()->getParticlePointers().size() << std::endl;

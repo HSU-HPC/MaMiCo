@@ -17,12 +17,12 @@ template <class LinkedCell, unsigned int dim> class InstanceHandling;
  *Initialization, execution of MD time steps and shutdown are abstracted into
  *this class. In order to launch a new MF simulatio, a slot has to be chosen
  *first (either manualy or using coupling::MultiMDMediator). Then
- *MultiMDCellService initializes a new MacroscopicCellService via
+ *MultiMDCellService initializes a new CouplingCellService via
  *MultiMDMediator. In the activated slot, a new MD simulation is launched. The
  *new MD instance has to be equilibrated first and then it can be coupled to the
  *simulation. In order to remove a MD simulation, the MD simulation and its
  *corresponding MDSolverInterface are shut down. Then, the respective instance
- *of the MacroscopicCellService is removed. Finally, the selected slot will be
+ *of the CouplingCellService is removed. Finally, the selected slot will be
  *set to inactive. This slot is now available again for the launch of a new MD
  *instance in the future.
  *	@brief Simulation slots are managed (i.e., added/removed) via this
@@ -181,7 +181,7 @@ public:
    */
   void simulateTimesteps(const unsigned int& t, unsigned int& T, coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {
     for (unsigned int i = 0; i < _mdSimulations.size(); ++i) {
-      coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setMacroscopicCellService(&multiMDCellService.getMacroscopicCellService(i));
+      coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setCouplingCellService(&multiMDCellService.getCouplingCellService(i));
       coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
 
       if (_mdSimulations[i] != nullptr) {
@@ -275,12 +275,12 @@ public:
   }
 
   /** sets single cell services in each MD simulation after initialising
-   * macroscopic cell service for multi-MD case
+   * coupling cell service for multi-MD case
    * 	@param multiMDCellService
    */
-  void setMacroscopicCellServices(coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {
+  void setCouplingCellServices(coupling::services::MultiMDCellService<LinkedCell, dim>& multiMDCellService) {
     for (unsigned int i = 0; i < _mdSimulations.size(); ++i) {
-      _mdSimulations[i]->setMacroscopicCellService(&(multiMDCellService.getMacroscopicCellService(i)));
+      _mdSimulations[i]->setCouplingCellService(&(multiMDCellService.getCouplingCellService(i)));
     }
   }
 

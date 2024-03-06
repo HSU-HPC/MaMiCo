@@ -81,9 +81,9 @@ public:
   // unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
   virtual void sortMoleculesIntoCells() override {}
 
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) override {
-    // coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
-    //     macroscopicCellService);
+  virtual void setCouplingCellService(coupling::services::CouplingCellService<MDSIMULATIONFACTORY_DIMENSION>* couplingCellService) override {
+    // coupling::interface::MamicoInterfaceProvider<ls1::LS1RegionWrapper, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setCouplingCellService(
+    //     couplingCellService);
     global_simulation = simulation;
     PluginBase* searchedPlugin = simulation->getPlugin("MamicoCoupling");
     if (searchedPlugin == nullptr) {
@@ -92,7 +92,7 @@ public:
     }
     ls1MamicoPlugin = dynamic_cast<MamicoCoupling*>(searchedPlugin);
     if (ls1MamicoPlugin != nullptr) {
-      ls1MamicoPlugin->setMamicoMacroscopicCellService(macroscopicCellService);
+      ls1MamicoPlugin->setMamicoCouplingCellService(couplingCellService);
     } else {
       std::cout << "ERROR: Cast to Mamico plugin unsuccessful!" << std::endl;
       exit(EXIT_FAILURE);

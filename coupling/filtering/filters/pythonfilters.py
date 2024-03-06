@@ -6,9 +6,9 @@
 # Helmut Schmidt University, Hamburg. Chair for High Performance Computing
 # BSD license, see the copyright notice in Mamico's main folder
 
-import numpy as np
 #TODO: Clashes with other plots
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Collection of filter classes written in Python. 
 # These cannot be added via .xml configuration but rather via mamico.MacrosocopicCellService.addFilterToSequence() at runtime.
@@ -25,6 +25,7 @@ def returnCellData(cellData):
 
 
 from scipy import fftpack
+
 DEBUG_STROUHAL_PYTHON = True
 
 # WARNING: ONLY USE THIS IN A VELOCITY-ONLY FILTER SEQUENCE.
@@ -76,6 +77,7 @@ class StrouhalPython():
         print("STROUHAL-PYTHON: Done plotting. ")
 
 from scipy.ndimage import gaussian_filter
+
 DEBUG_GAUSS_PYTHON = True
 
 class GaussPython():

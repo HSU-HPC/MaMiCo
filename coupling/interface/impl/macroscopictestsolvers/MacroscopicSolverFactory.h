@@ -41,14 +41,14 @@ public:
 
   template <unsigned int dim>
   coupling::interface::TestMacroscopicSolverInterface<dim>*
-  getTestMacroscopicSolverInterface(SolverType type, tarch::la::Vector<dim, unsigned int> globalNumberMacroscopicCells, double massPerMacroscopicCell,
-                                    tarch::la::Vector<dim, double> momentumPerMacroscopicCell) {
+  getTestMacroscopicSolverInterface(SolverType type, tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, double massPerCouplingCell,
+                                    tarch::la::Vector<dim, double> momentumPerCouplingCell) {
     switch (type) {
     case VOID_MACROSCOPIC_SOLVER:
       return new coupling::interface::VoidMacroscopicSolverInterface<dim>();
       break;
     case UNIFORM_FLOW_SOLVER:
-      return new coupling::interface::UniformFlowSolverInterface<dim>(globalNumberMacroscopicCells, massPerMacroscopicCell, momentumPerMacroscopicCell);
+      return new coupling::interface::UniformFlowSolverInterface<dim>(globalNumberCouplingCells, massPerCouplingCell, momentumPerCouplingCell);
     default:
       break;
     }
