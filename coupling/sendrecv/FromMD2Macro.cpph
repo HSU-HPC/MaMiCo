@@ -43,12 +43,14 @@ void coupling::sendrecv::FromMD2Macro<CouplingCell, dim>::reduceFromMD2Macro(std
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMD2Macro<CouplingCell, dim>::writeToReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
                                                                               const std::vector<CouplingCell*>& couplingCells) {
-  for (auto idx : I10())
+  for (auto idx : I10()) {
+    auto scalarGlobalIdx = I00{idx}.get();
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToReduceBuffer(dataExchange, *couplingCells.at(idx.get()), idx);
+    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToReduceBuffer(dataExchange, *couplingCells.at(scalarGlobalIdx), idx);
 #else
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToReduceBuffer(dataExchange, *couplingCells[idx.get()], idx);
+    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToReduceBuffer(dataExchange, *couplingCells[scalarGlobalIdx], idx);
 #endif
+  }
 }
 
 template <class CouplingCell, unsigned int dim>
@@ -113,12 +115,14 @@ void coupling::sendrecv::FromMD2Macro<CouplingCell, dim>::allocateReceiveBuffers
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMD2Macro<CouplingCell, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
                                                                             const std::vector<CouplingCell*>& couplingCells) {
-  for (auto idx : I10())
+  for (auto idx : I10()) {
+    auto scalarGlobalIdx = I00{idx}.get();
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, *couplingCells.at(idx.get()), idx);
+    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, *couplingCells.at(scalarGlobalIdx), idx);
 #else
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, *couplingCells[idx.get()], idx);
+    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, *couplingCells[scalarGlobalIdx], idx);
 #endif
+  }
 }
 
 template <class CouplingCell, unsigned int dim>

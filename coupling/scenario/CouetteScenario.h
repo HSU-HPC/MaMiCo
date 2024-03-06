@@ -793,13 +793,13 @@ protected:
     // loop over received cells; read macroscopic mass+momentum buffers and
     // write cell index, mass and velocity to one line in the csv-file
     const unsigned int numCellsRecv = recvBuffer.size();
+    file << "I01_x,I01_y,I01_z,vel_x,vel_y,vel_z,mass" << std::endl;
     for (unsigned int i = 0; i < numCellsRecv; i++) {
       tarch::la::Vector<3, double> vel(recvBuffer[i]->getMacroscopicMomentum());
       if (recvBuffer[i]->getMacroscopicMass() != 0.0) {
         vel = (1.0 / recvBuffer[i]->getMacroscopicMass()) * vel;
       }
-      file << I01{recvIndices[i]} << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; " << recvBuffer[i]->getMacroscopicMass() << ";";
-      file << std::endl;
+      file << I01{recvIndices[i]} << "," << vel[0] << "," << vel[1] << "," << vel[2] << "," << recvBuffer[i]->getMacroscopicMass() << std::endl;
     }
 
     // close file
