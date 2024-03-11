@@ -1,12 +1,12 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLSWITHLINKEDCELLS_H_
 #define _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLSWITHLINKEDCELLS_H_
 
-#include "CouplingCells.h"
+#include "CellContainer.h"
 #include "coupling/datastructures/CouplingCellWithLinkedCells.h"
 
 namespace coupling {
 namespace datastructures {
-template <class LinkedCell, unsigned int dim> class CouplingCellsWithLinkedCells;
+template <class LinkedCell, unsigned int dim> class LinkedCellContainer;
 } // namespace datastructures
 } // namespace coupling
 
@@ -17,20 +17,20 @@ template <class LinkedCell, unsigned int dim> class CouplingCellsWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  */
 template <class LinkedCell, unsigned int dim>
-class coupling::datastructures::CouplingCellsWithLinkedCells : public coupling::datastructures::CouplingCells<I02, dim> {
+class coupling::datastructures::LinkedCellContainer : public coupling::datastructures::CellContainer<I02, dim> {
 public:
   /** Constructor: initialises the coupling cell with linked cells
    *	@param numberLinkedCellsPerCouplingCell
    * 	@param mdSolverInterface
    */
-  CouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
+  LinkedCellContainer(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
                                coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface);
   /** Destructor */
-  ~CouplingCellsWithLinkedCells();
+  ~LinkedCellContainer();
 
   /** returns the pointer to the coupling cells with access to linked cell
    * structur. */
-  coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* getCouplingCellsWithLinkedCells();
+  coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* getLinkedCellContainer();
 
   /** apply the function apply(CouplingCell&,const unsigned int&) of a
    * generic class A to all local non-ghost coupling cells. This
@@ -74,7 +74,7 @@ private:
    * 	@param mdSolverInterface
    */
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
-  initCouplingCellsWithLinkedCells(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
+  initLinkedCellContainer(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
                                    coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const;
 
   /** initialises the coupling cells (without linked cells).
@@ -84,6 +84,6 @@ private:
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* _couplingCellsWithLinkedCells;
 };
 
-#include "CouplingCellsWithLinkedCells.cpph"
+#include "LinkedCellContainer.cpph"
 
 #endif // _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLSWITHLINKEDCELLS_H_

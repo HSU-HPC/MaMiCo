@@ -23,8 +23,8 @@ coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::CouplingCellServic
       _mdSolverInterface(mdSolverInterface), _macroscopicSolverInterface(macroscopicSolverInterface), _deFromMacro2MD(_macroscopicSolverInterface, ID),
       _deFromMD2Macro(_macroscopicSolverInterface, ID), _couplingCells(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell(), mdSolverInterface),
       _filterPipeline(nullptr), _filterPipelineConfiguration(filterPipelineConfiguration), _multiMDService(multiMDService),
-      _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(
-          mdSolverInterface, _couplingCells.getCouplingCellsWithLinkedCells(), numberMDTimestepsPerCouplingCycle)),
+      _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface, _couplingCells.getLinkedCellContainer(),
+                                                                                                 numberMDTimestepsPerCouplingCycle)),
       _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
       _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface)),
       _numberLinkedCellsPerCouplingCell(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell()),
@@ -275,7 +275,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
   // in the coupling cell
   coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell, dim> computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);
   // coupling cell access
-  coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells = _couplingCells.getCouplingCellsWithLinkedCells();
+  coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells = _couplingCells.getLinkedCellContainer();
   // start coordinate of first (ghost) cell
   const tarch::la::Vector<dim, double> startPosition = getPositionOfFirstLocalGhostCell();
   // buffers for temperature,momentum,mean velocity,pot. energy

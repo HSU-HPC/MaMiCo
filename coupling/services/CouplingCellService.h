@@ -21,7 +21,7 @@
 #include "coupling/configurations/ParticleInsertionConfiguration.h"
 #include "coupling/configurations/ThermostatConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
-#include "coupling/datastructures/CouplingCells.h"
+#include "coupling/datastructures/CellContainer.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
@@ -273,7 +273,7 @@ public:
 
   /** returns the coupling cells. This functions is meant to be used in test
    * scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */
-  coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>& getCouplingCells() { return _couplingCells; }
+  coupling::datastructures::LinkedCellContainer<LinkedCell, dim>& getCouplingCells() { return _couplingCells; }
 
 private:
 // ------------------- INCLUDE WRAPPER DEFINITIONS
@@ -314,7 +314,7 @@ private:
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;
 
   /** storage for coupling cells in coupling tool */
-  coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim> _couplingCells;
+  coupling::datastructures::LinkedCellContainer<LinkedCell, dim> _couplingCells;
 
   /** filter pipeline, used to apply filters in sendFromMD2Macro */
   coupling::filtering::FilterPipeline<dim>* _filterPipeline;

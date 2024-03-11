@@ -2,8 +2,7 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLS_H_
-#define _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLS_H_
+#pragma once
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/datastructures/CouplingCell.h"
@@ -11,17 +10,17 @@
 
 namespace coupling {
 namespace datastructures {
-template <class CellIndexT, unsigned int dim> class CouplingCells;
+template <class CellIndexT, unsigned int dim> class CellContainer;
 } // namespace datastructures
 } // namespace coupling
 
 /**
  *	@brief provides access to the coupling cells. Base class for the class
- *coupling::datastructures::CouplingCellsWithLinkedCells
+ *coupling::datastructures::LinkedCellContainer
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class CellIndexT, unsigned int dim> class coupling::datastructures::CouplingCells {
+template <class CellIndexT, unsigned int dim> class coupling::datastructures::CellContainer {
 
 public:
   /** returns vector-of-pointers to coupling cells without access to linked
@@ -44,6 +43,4 @@ protected:
   std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;
 };
 
-#include "CouplingCells.cpph"
-
-#endif // _MOLECULARDYNAMICS_COUPLING_DATASTRUCTURES_COUPLINGCELLS_H_
+#include "CellContainer.cpph"

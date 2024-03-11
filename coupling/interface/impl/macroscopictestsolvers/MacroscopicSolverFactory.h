@@ -56,8 +56,8 @@ public:
     return NULL;
   }
 
-  private : MacroscopicSolverFactory() {
-  }
+private:
+  MacroscopicSolverFactory() {}
   ~MacroscopicSolverFactory() {}
 };
 

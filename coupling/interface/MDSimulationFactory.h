@@ -162,8 +162,7 @@ public:
 
   /** shuts down the MD solver interfaces and deletes the interface if required
      (depending on the respective MD simulation) */
-  void
-  shutdownMDSolverInterface() {
+  void shutdownMDSolverInterface() {
 #if defined(SIMPLE_MD)
     coupling::interface::MDSolverInterface<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>* interface =
         coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();

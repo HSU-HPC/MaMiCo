@@ -32,12 +32,10 @@ public:
    *  @param outerRegion defines, how many cell layers will be sent to the MD
    * solver */
   CouetteSolverInterface(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, unsigned int outerRegion = 1)
-      : coupling::interface::MacroscopicSolverInterface<dim>(), _outerRegion(outerRegion), _globalNumberCouplingCells(globalNumberCouplingCells) {
-  }
+      : coupling::interface::MacroscopicSolverInterface<dim>(), _outerRegion(outerRegion), _globalNumberCouplingCells(globalNumberCouplingCells) {}
 
   /** @brief a dummy destructor */
-  virtual ~CouetteSolverInterface() {
-  }
+  virtual ~CouetteSolverInterface() {}
 
   unsigned int getOuterRegion() override { return _outerRegion; }
 

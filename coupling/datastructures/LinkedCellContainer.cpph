@@ -4,20 +4,20 @@
 // www5.in.tum.de/mamico
 
 template <class LinkedCell, unsigned int dim>
-coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::CouplingCellsWithLinkedCells(
+coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::LinkedCellContainer(
     tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) {
-  _couplingCellsWithLinkedCells = initCouplingCellsWithLinkedCells(numberLinkedCellsPerCouplingCell, mdSolverInterface);
-  CouplingCells<I02, dim>::_couplingCells = initCouplingCells();
+  _couplingCellsWithLinkedCells = initLinkedCellContainer(numberLinkedCellsPerCouplingCell, mdSolverInterface);
+  CellContainer<I02, dim>::_couplingCells = initCouplingCells();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   std::cout << "Coupling cells with linked cells of type " << I02::TNAME << " initialised..." << std::endl;
 #endif
 }
 
 template <class LinkedCell, unsigned int dim>
-coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::~CouplingCellsWithLinkedCells<LinkedCell, dim>() {
+coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::~LinkedCellContainer<LinkedCell, dim>() {
   // de-init all coupling cells and then free the allocated memory (C-style array)
   if (_couplingCellsWithLinkedCells != NULL) {
-    auto size = coupling::datastructures::CouplingCells<I02, dim>::_couplingCells.size();
+    auto size = coupling::datastructures::CellContainer<I02, dim>::_couplingCells.size();
     for (unsigned int i = 0; i < size; i++) {
       coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* cell = &_couplingCellsWithLinkedCells[i];
       cell->~CouplingCellWithLinkedCells();
@@ -29,13 +29,13 @@ coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::~Coupli
 
 template <class LinkedCell, unsigned int dim>
 coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
-coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::getCouplingCellsWithLinkedCells() {
+coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::getLinkedCellContainer() {
   return _couplingCellsWithLinkedCells;
 }
 
 template <class LinkedCell, unsigned int dim>
 coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
-coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::initCouplingCellsWithLinkedCells(
+coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::initLinkedCellContainer(
     tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const {
   // determine local number of coupling cells
   unsigned int numberCouplingCells = I02::linearNumberCellsInDomain;
@@ -48,7 +48,7 @@ coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::initCou
       (coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*)malloc(
           sizeof(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>) * numberCouplingCells);
   if (cells == NULL) {
-    std::cout << "ERROR coupling::datastructures::CouplingCells::initCouplingCells(): cells==NULL!" << std::endl;
+    std::cout << "ERROR coupling::datastructures::LinkedCellContainer::initCouplingCells(): cells==NULL!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -58,7 +58,7 @@ coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::initCou
     coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* newCell =
         new (&cells[i]) coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>(numberLinkedCellsPerCouplingCell);
     if (newCell == NULL) {
-      std::cout << "ERROR coupling::datastructures::CouplingCells::initCouplingCellsWithLinkedCells(): newCell==NULL" << std::endl;
+      std::cout << "ERROR coupling::datastructures::LinkedCellContainer::initLinkedCellContainer(): newCell==NULL" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -72,7 +72,7 @@ coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::initCou
       std::cout << "I10::numberCellsInDomain = " << I10::numberCellsInDomain << std::endl;
       std::cout << "item = " << item << std::endl;
       std::cout << "numberCouplingCells = " << numberCouplingCells << std::endl;
-      throw std::runtime_error(std::string("CouplingCells::initCouplingCellsWithLinkedCells: item out of range!"));
+      throw std::runtime_error(std::string("LinkedCellContainer::initLinkedCellContainer: item out of range!"));
     }
 #endif
 
@@ -94,14 +94,14 @@ coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::initCou
   return cells;
 }
 template <class LinkedCell, unsigned int dim>
-std::vector<coupling::datastructures::CouplingCell<dim>*> coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::initCouplingCells() const {
+std::vector<coupling::datastructures::CouplingCell<dim>*> coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::initCouplingCells() const {
   unsigned int numberCells = I02::linearNumberCellsInDomain;
   // init vector with pointers to cells-with-linked-cells
   std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells;
   for (unsigned int i = 0; i < numberCells; i++) {
     coupling::datastructures::CouplingCell<dim>* cell = dynamic_cast<coupling::datastructures::CouplingCell<dim>*>(&_couplingCellsWithLinkedCells[i]);
     if (cell == NULL) {
-      std::cout << "ERROR coupling::datastructures::CouplingCellsWithLinkedCells::initCouplingCells(): dynamic_cast failed!" << std::endl;
+      std::cout << "ERROR coupling::datastructures::LinkedCellContainer::initCouplingCells(): dynamic_cast failed!" << std::endl;
       exit(EXIT_FAILURE);
     }
     couplingCells.push_back(cell);
@@ -111,7 +111,7 @@ std::vector<coupling::datastructures::CouplingCell<dim>*> coupling::datastructur
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::applyToLocalNonGhostCouplingCellsWithLinkedCells(A& a) {
+void coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::applyToLocalNonGhostCouplingCellsWithLinkedCells(A& a) {
   a.beginCellIteration();
   for (auto idx : I10())
     a.apply(_couplingCellsWithLinkedCells[I02{idx}.get()], idx);
@@ -120,7 +120,7 @@ void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::ap
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::applyToLocalGhostCouplingCellsWithLinkedCells(A& a) {
+void coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::applyToLocalGhostCouplingCellsWithLinkedCells(A& a) {
   a.beginCellIteration();
   for (auto idx : I02())
     if (!I10::contains(idx))
@@ -130,7 +130,7 @@ void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::ap
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::applyToAllLocalCouplingCellsWithLinkedCells(A& a) {
+void coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::applyToAllLocalCouplingCellsWithLinkedCells(A& a) {
   a.beginCellIteration();
   for (auto idx : I02())
     a.apply(_couplingCellsWithLinkedCells[idx.get()], idx);
@@ -139,7 +139,7 @@ void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::ap
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A& a) {
+void coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(A& a) {
   a.beginCellIteration();
   for (auto idx : I10()) {
     // get global coordinate of local cell
@@ -156,7 +156,7 @@ void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::ap
 
 template <class LinkedCell, unsigned int dim>
 template <class A>
-void coupling::datastructures::CouplingCellsWithLinkedCells<LinkedCell, dim>::applyXLayersOfGlobalNonGhostCellsWithLinkedCells(A& a, unsigned int layers2Use) {
+void coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::applyXLayersOfGlobalNonGhostCellsWithLinkedCells(A& a, unsigned int layers2Use) {
   // global coordinate of first non-ghost cell
   const tarch::la::Vector<dim, unsigned int> globalLowerLeftCorner(1 + layers2Use);
   // global coordinate of last non-ghost cell

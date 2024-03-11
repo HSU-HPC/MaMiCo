@@ -17,8 +17,8 @@ template <unsigned int dim> class FilterInterface;
 } // namespace coupling
 
 /**
- * Generic interface for filters that are to be applied to data of
- * coupling::CouplingCells before MD to Macro transfer. Implementations can
+ * Generic interface for filters that are to be applied to
+ * coupling::CellContainer before MD to Macro transfer. Implementations can
  * be found in coupling/filtering/filters.
  *
  * If you wish to use a filter that does not alter its input data, i.e that is

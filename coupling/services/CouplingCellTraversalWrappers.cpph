@@ -7,14 +7,14 @@
 
 /** the following wrappers and smaller functional classes are included in the
  * CouplingCellServiceImpl for internal use in this class only. They are used
- * together with the applyTo...() methods of CouplingCells to bring
+ * together with the applyTo...() methods of CellContainer to bring
  *  functionality which is defined cellwise onto the grid of coupling cells.
  *  @author Philipp Neumann
  */
 
 /** wrapper to carry out functionality on a single coupling cell. This
  * function can be called on several coupling cells using the callback
- * patterns of CouplingCells. In the following, several wrappers are provided
+ * patterns of CellContainer. In the following, several wrappers are provided
  * for the TransferStrategy as well as some further functional stuff which is
  * required from the CouplingCellServiceImpl.
  */

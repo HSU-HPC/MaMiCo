@@ -24,9 +24,8 @@ template <unsigned int dim> class FoamSolverInterface;
 template <unsigned int dim> class coupling::solvers::FoamSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
 public:
   FoamSolverInterface(tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells, unsigned int outerRegion = 1)
-      : coupling::interface::MacroscopicSolverInterface<dim>(), _outerRegion(outerRegion), _globalNumberCouplingCells(globalNumberCouplingCells) {
-  } virtual ~FoamSolverInterface() {
-  }
+      : coupling::interface::MacroscopicSolverInterface<dim>(), _outerRegion(outerRegion), _globalNumberCouplingCells(globalNumberCouplingCells) {}
+  virtual ~FoamSolverInterface() {}
 
   /** receive all (inner) cells */
   virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) {

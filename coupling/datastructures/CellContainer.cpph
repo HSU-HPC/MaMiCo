@@ -4,19 +4,19 @@
 // www5.in.tum.de/mamico
 
 template <class CellIndexT, unsigned int dim>
-const std::vector<coupling::datastructures::CouplingCell<dim>*>& coupling::datastructures::CouplingCells<CellIndexT, dim>::getCouplingCells() const {
+const std::vector<coupling::datastructures::CouplingCell<dim>*>& coupling::datastructures::CellContainer<CellIndexT, dim>::getCouplingCells() const {
   return _couplingCells;
 }
 
 template <class CellIndexT, unsigned int dim>
-const coupling::datastructures::CouplingCell<dim>* coupling::datastructures::CouplingCells<CellIndexT, dim>::operator[](CellIndexT idx) const {
+const coupling::datastructures::CouplingCell<dim>* coupling::datastructures::CellContainer<CellIndexT, dim>::operator[](CellIndexT idx) const {
   return _couplingCells[indexing::convertToScalar(idx)];
 }
 
-template <class CellIndexT, unsigned int dim> void coupling::datastructures::CouplingCells<CellIndexT, dim>::operator<<(CouplingCell<dim>* couplingCell) {
+template <class CellIndexT, unsigned int dim> void coupling::datastructures::CellContainer<CellIndexT, dim>::operator<<(CouplingCell<dim>* couplingCell) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   if (_couplingCells.size() >= CellIndexT::linearNumberCellsInDomain) {
-    std::cout << "CouplingCells<" << CellIndexT::TNAME << "," << dim << "> can only hold " << CellIndexT::linearNumberCellsInDomain << " coupling cells!"
+    std::cout << "CellContainer<" << CellIndexT::TNAME << "," << dim << "> can only hold " << CellIndexT::linearNumberCellsInDomain << " coupling cells!"
               << std::endl;
     std::exit(EXIT_FAILURE);
   }
