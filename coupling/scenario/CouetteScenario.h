@@ -751,24 +751,22 @@ protected:
   void allocateRecvBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
     deleteBuffer(_buf.recvBuffer);
     unsigned int numCellsRecv = 0;
-    for (auto idx : I08())
-      if (I12::contains(idx))
-        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank))
-          numCellsRecv++;
+    for (auto idx : I12())
+      if (tarch::utils::contains(msi.getTargetRanks(idx), (unsigned int)_rank))
+        numCellsRecv++;
     // allocate array for cell indices
     I00* indices = new I00[numCellsRecv];
     if (indices == NULL)
       throw std::runtime_error(std::string("ERROR allocateRecvBuffer(): indices==NULL!"));
     // allocate recvBuffer and initialise all entries, incl. indices
-    for (auto idx : I08())
-      if (I12::contains(idx))
-        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
-          _buf.recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
-          if (_buf.recvBuffer.back() == NULL)
-            throw std::runtime_error(std::string("ERROR CouetteScenario::allocateRecvBuffer: recvBuffer.back() == NULL!"));
-          // set linearized index
-          indices[_buf.recvBuffer.size() - 1] = idx;
-        }
+    for (auto idx : I12())
+      if (tarch::utils::contains(msi.getTargetRanks(idx), (unsigned int)_rank)) {
+        _buf.recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
+        if (_buf.recvBuffer.back() == NULL)
+          throw std::runtime_error(std::string("ERROR CouetteScenario::allocateRecvBuffer: recvBuffer.back() == NULL!"));
+        // set linearized index
+        indices[_buf.recvBuffer.size() - 1] = idx;
+      }
     _buf.globalCellIndices4RecvBuffer = indices;
   }
 

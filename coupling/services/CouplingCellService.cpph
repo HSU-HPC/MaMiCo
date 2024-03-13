@@ -351,7 +351,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 #endif
             // compute cell position
             tarch::la::Vector<dim, double> couplingCellPosition = startPosition;
-            auto dx = coupling::indexing::IndexingService<3>::getInstance().getCouplingCellSize();
+            auto dx = coupling::indexing::IndexingService<dim>::getInstance().getCouplingCellSize();
             for (unsigned int d = 0; d < dim; d++) {
               couplingCellPosition[d] += dx[d] * cellIndex[d];
             }

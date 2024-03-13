@@ -38,7 +38,7 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MDNonBlo
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange) {
-  for (auto idx : I10())
+  for (auto idx : I02()) // Original code on master also allocated ghost cells ¯\_(ツ)_/¯
     coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(dataExchange, idx);
 }
 
@@ -47,7 +47,7 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::writeToSendBuffer(coup
                                                                             const std::vector<CouplingCell*>& couplingCells,
                                                                             const I00* const globalCellIndices) {
   const unsigned int numberCells = (unsigned int)couplingCells.size();
-  for (unsigned int i = 0; i < numberCells; i++)
+  for (unsigned int i = 0; i < numberCells; i++) 
     coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, *couplingCells[i], globalCellIndices[i]);
 }
 
