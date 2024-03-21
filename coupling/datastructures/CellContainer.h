@@ -23,12 +23,6 @@ template <class CellIndexT, unsigned int dim> class CellContainer;
 template <class CellIndexT, unsigned int dim> class coupling::datastructures::CellContainer {
 
 public:
-  /** returns vector-of-pointers to coupling cells without access to linked
-   * cells. We use this structure for data exchange between macroscopic and MD
-   * solver.
-   */
-  const std::vector<coupling::datastructures::CouplingCell<dim>*>& getCouplingCells() const;
-
   /** returns a pointer to the coupling cell without access to linked cells. */
   const coupling::datastructures::CouplingCell<dim>* operator[](CellIndexT index) const;
 
