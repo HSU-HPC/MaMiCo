@@ -5,10 +5,14 @@
 #ifndef _COUETTECONFIG_H_
 #define _COUETTECONFIG_H_
 
+#include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/la/Vector.h"
+
+using tarch::configuration::ParseConfiguration;
 
 namespace coupling {
 namespace configurations {
+
 struct CouetteConfig;
 }
 } // namespace coupling
@@ -47,10 +51,9 @@ public:
   static CouetteConfig parseCouetteConfiguration(const std::string& filename) {
     CouetteConfig _cfg;
 
-    tinyxml2::XMLDocument conffile;
-    tinyxml2::XMLElement* node = NULL;
-    conffile.LoadFile(filename.c_str());
-    node = conffile.FirstChildElement("couette-test");
+    ParseConfiguration::XMLConfiguration xmlConfig = ParseConfiguration::XMLConfiguration::load(filename);
+    tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement("couette-test");
+
     if (node == NULL) {
       std::cout << "Could not read input file " << filename
                 << ": missing element "
