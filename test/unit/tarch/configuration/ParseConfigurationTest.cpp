@@ -1,6 +1,10 @@
 #include "tarch/configuration/ParseConfiguration.h"
+#include "coupling/CouplingMDDefinitions.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+#include <mpi.h>
+#endif
 
 using namespace tarch;
 using namespace configuration;
@@ -12,19 +16,26 @@ class ParseConfigurationTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testParseConfigurationWithoutRoot);
   CPPUNIT_TEST_SUITE_END();
 
-  const char* const filenameConfigWithRoot = "/tmp/mamicotest_ParseConfigurationTest_testParseConfigurationWithRoot";
-  const char* const filenameConfigWithoutRoot = "/tmp/mamicotest_ParseConfigurationTest_testParseConfigurationWithoutRoot";
-
 public:
   void setUp() {
-    std::ofstream(filenameConfigWithRoot)
+    int rank = 0;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
+    std::stringstream ss;
+    ss <<  "/tmp/mamicotest_ParseConfigurationTest_testParseConfigurationWithRoot" << "_" << rank;
+    _filenameConfigWithRoot = ss.str();
+    std::ofstream(_filenameConfigWithRoot.c_str())
         << "<?xml version=\"1.0\"?>\n<mamico-configuration>\n\t<foo></foo>\n\t<bar></bar>\n</mamico-configuration>";
-    std::ofstream(filenameConfigWithoutRoot) << "<?xml version=\"1.0\"?>\n<foo></foo>\n<bar></bar>";
+    ss.str(std::string());
+    ss <<  "/tmp/mamicotest_ParseConfigurationTest_testParseConfigurationWithoutRoot" << "_" << rank;
+    _filenameConfigWithoutRoot = ss.str();
+    std::ofstream(_filenameConfigWithoutRoot) << "<?xml version=\"1.0\"?>\n<foo></foo>\n<bar></bar>";
   }
 
   void tearDown() {
-    std::remove(filenameConfigWithRoot);
-    std::remove(filenameConfigWithoutRoot);
+    std::remove(_filenameConfigWithRoot);
+    std::remove(_filenameConfigWithoutRoot);
   }
 
   void testParseXML() {
@@ -54,16 +65,20 @@ public:
   }
 
   void testParseConfigurationWithRoot() {
-    auto cfg = ParseConfiguration::XMLConfiguration::load(filenameConfigWithRoot);
+    auto cfg = ParseConfiguration::XMLConfiguration::load(_filenameConfigWithRoot);
     CPPUNIT_ASSERT(cfg.error == tinyxml2::XML_NO_ERROR);
     CPPUNIT_ASSERT(cfg.root->FirstChildElement("foo") != NULL);
   }
 
   void testParseConfigurationWithoutRoot() {
-    auto cfg = ParseConfiguration::XMLConfiguration::load(filenameConfigWithoutRoot);
+    auto cfg = ParseConfiguration::XMLConfiguration::load(_filenameConfigWithoutRoot);
     CPPUNIT_ASSERT(cfg.error == tinyxml2::XML_NO_ERROR);
     CPPUNIT_ASSERT(cfg.root->FirstChildElement("foo") != NULL);
   }
+
+private:
+  std::string _filenameConfigWithRoot;
+  std::string _filenameConfigWithoutRoot;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ParseConfigurationTest);
