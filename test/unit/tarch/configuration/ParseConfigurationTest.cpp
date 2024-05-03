@@ -34,8 +34,8 @@ public:
   }
 
   void tearDown() {
-    std::remove(_filenameConfigWithRoot);
-    std::remove(_filenameConfigWithoutRoot);
+    std::remove(_filenameConfigWithRoot.c_str());
+    std::remove(_filenameConfigWithoutRoot.c_str());
   }
 
   void testParseXML() {
