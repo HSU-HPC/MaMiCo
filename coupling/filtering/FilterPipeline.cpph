@@ -11,7 +11,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
                                                          const char* cfgpath)
     :
 
-      _scope(scope)
+      _config(ParseConfiguration::XMLConfiguration::load(cfgpath)), _scope(scope)
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
       ,
       _comm(multiMDService.getLocalCommunicator())
@@ -21,7 +21,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
   using namespace std::string_literals;
 
   // check if provided file is written in proper XML
-  if (_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR) {
+  if (_config.error != tinyxml2::XML_NO_ERROR) {
     std::cout << "Filter Pipeline config path: " << cfgpath << std::endl;
     throw std::runtime_error("Could not read config for Filter-Pipeline: XML syntax error.");
   }
@@ -59,7 +59,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     }
 
     // load sequences
-    loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"));
+    loadSequencesFromXML(_config.root->FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"));
     break;
   case coupling::filtering::Scope::postMultiInstance:
     // check for valid amount of input cells
@@ -67,7 +67,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     if (inputCells.size() == CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
       std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
       _outerCells = {};
-      loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
+      loadSequencesFromXML(_config.root->FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     }
     // case 2: the input vector is empty
     else if (inputCells.size() == 0) {
@@ -77,7 +77,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     // case 3: the input vector contains a nonexpected amount of cells
     else {
       // check if the post-multi-instance filter-pipeline actually contains XML sequences, otherwise ignore
-      if (_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")->FirstChildElement()) {
+      if (_config.root->FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")->FirstChildElement()) {
         throw std::runtime_error("postMultiInstance FilterPipeline has received an unexpected number of cells: "s + std::to_string(inputCells.size()) + "\n" +
                                  "Expected: "s +
                                  std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) +
@@ -133,9 +133,9 @@ coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<di
 }
 
 // Private functions of coupling::filtering::FilterPipeline:
-template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile) {
+template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig) {
   // Check main node
-  tinyxml2::XMLElement* node = cfgfile.FirstChildElement("filter-pipeline");
+  tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement("filter-pipeline");
   if (!node) {
     std::cout << "ERROR: Could not read config for Filter-Pipeline: missing "
                  "element <filter-pipeline>"
