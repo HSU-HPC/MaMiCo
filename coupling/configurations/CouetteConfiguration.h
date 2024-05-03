@@ -49,7 +49,7 @@ public:
    * 	@param filename
    */
   static CouetteConfig parseCouetteConfiguration(const std::string& filename) {
-    CouetteConfig _cfg;
+    CouetteConfig cfg;
 
     ParseConfiguration::XMLConfiguration xmlConfig = ParseConfiguration::XMLConfiguration::load(filename);
     tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement("couette-test");
@@ -94,27 +94,27 @@ public:
       std::cout << "Could not read input file " << filename << ": Missing subtag: domain" << std::endl;
       exit(EXIT_FAILURE);
     }
-    tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.channelheight, subtag, "channelheight");
-    tarch::configuration::ParseConfiguration::readVectorMandatory<3, double>(_cfg.wallVelocity, subtag, "wall-velocity");
-    _cfg.wallInitCycles = 0;
-    tarch::configuration::ParseConfiguration::readIntOptional(_cfg.wallInitCycles, subtag, "wall-init-cycles");
-    if (_cfg.wallInitCycles > 0)
-      tarch::configuration::ParseConfiguration::readVectorMandatory<3, double>(_cfg.wallInitVelocity, subtag, "wall-init-velocity");
-    _cfg.wallOscillations = 0;
-    tarch::configuration::ParseConfiguration::readDoubleOptional(_cfg.wallOscillations, subtag, "wall-oscillations");
+    tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.channelheight, subtag, "channelheight");
+    tarch::configuration::ParseConfiguration::readVectorMandatory<3, double>(cfg.wallVelocity, subtag, "wall-velocity");
+    cfg.wallInitCycles = 0;
+    tarch::configuration::ParseConfiguration::readIntOptional(cfg.wallInitCycles, subtag, "wall-init-cycles");
+    if (cfg.wallInitCycles > 0)
+      tarch::configuration::ParseConfiguration::readVectorMandatory<3, double>(cfg.wallInitVelocity, subtag, "wall-init-velocity");
+    cfg.wallOscillations = 0;
+    tarch::configuration::ParseConfiguration::readDoubleOptional(cfg.wallOscillations, subtag, "wall-oscillations");
 
     subtag = node->FirstChildElement("coupling");
     if (subtag == NULL) {
       std::cout << "Could not read input file couette.xml: Missing subtag: coupling" << std::endl;
       exit(EXIT_FAILURE);
     }
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.couplingCycles, subtag, "coupling-cycles");
-    tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.twoWayCoupling, subtag, "two-way-coupling");
-    tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.md2Macro, subtag, "send-from-md-to-macro");
-    tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.macro2Md, subtag, "send-from-macro-to-md");
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.filterInitCycles, subtag, "filter-init-cycles");
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.csvEveryTimestep, subtag, "write-csv-every-timestep");
-    tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.computeSNR, subtag, "compute-snr");
+    tarch::configuration::ParseConfiguration::readIntMandatory(cfg.couplingCycles, subtag, "coupling-cycles");
+    tarch::configuration::ParseConfiguration::readBoolMandatory(cfg.twoWayCoupling, subtag, "two-way-coupling");
+    tarch::configuration::ParseConfiguration::readBoolMandatory(cfg.md2Macro, subtag, "send-from-md-to-macro");
+    tarch::configuration::ParseConfiguration::readBoolMandatory(cfg.macro2Md, subtag, "send-from-macro-to-md");
+    tarch::configuration::ParseConfiguration::readIntMandatory(cfg.filterInitCycles, subtag, "filter-init-cycles");
+    tarch::configuration::ParseConfiguration::readIntMandatory(cfg.csvEveryTimestep, subtag, "write-csv-every-timestep");
+    tarch::configuration::ParseConfiguration::readBoolMandatory(cfg.computeSNR, subtag, "compute-snr");
 
     subtag = node->FirstChildElement("microscopic-solver");
     if (subtag == NULL) {
@@ -127,21 +127,21 @@ public:
     std::string type;
     tarch::configuration::ParseConfiguration::readStringMandatory(type, subtag, "type");
     if (type == "md") {
-      _cfg.miSolverType = SIMPLEMD;
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp, subtag, "temperature");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps, subtag, "equilibration-steps");
+      cfg.miSolverType = SIMPLEMD;
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.temp, subtag, "temperature");
+      tarch::configuration::ParseConfiguration::readIntMandatory(cfg.equSteps, subtag, "equilibration-steps");
 
       std::string num_MD;
       tarch::configuration::ParseConfiguration::readStringMandatory(num_MD, subtag, "number-md-simulations");
       if (num_MD == "dynamic") {
-        _cfg.totalNumberMDSimulations = -1;
-        _cfg.lowerBoundNumberMDSimulations = 1;
-        tarch::configuration::ParseConfiguration::readIntOptional(_cfg.lowerBoundNumberMDSimulations, subtag, "min-number-md");
-        tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.absVelErrStart, subtag, "error-start");
-        tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.absVelErrEnd, subtag, "error-end");
+        cfg.totalNumberMDSimulations = -1;
+        cfg.lowerBoundNumberMDSimulations = 1;
+        tarch::configuration::ParseConfiguration::readIntOptional(cfg.lowerBoundNumberMDSimulations, subtag, "min-number-md");
+        tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.absVelErrStart, subtag, "error-start");
+        tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.absVelErrEnd, subtag, "error-end");
       } else {
-        tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
-        if (_cfg.totalNumberMDSimulations < 1) {
+        tarch::configuration::ParseConfiguration::readIntMandatory(cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
+        if (cfg.totalNumberMDSimulations < 1) {
           std::cout << "Could not read input file " << filename
                     << ": "
                        "number-md-simulations < 1"
@@ -150,17 +150,17 @@ public:
         }
       }
     } else if (type == "synthetic") {
-      _cfg.miSolverType = SYNTHETIC;
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.noiseSigma, subtag, "noise-sigma");
-      _cfg.totalNumberMDSimulations = 1;
-      tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
+      cfg.miSolverType = SYNTHETIC;
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.noiseSigma, subtag, "noise-sigma");
+      cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readIntOptional(cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
     } else if (type == "ls1") {
-      _cfg.miSolverType = LS1;
+      cfg.miSolverType = LS1;
 
-      _cfg.totalNumberMDSimulations = 1;
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp, subtag, "temperature");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps, subtag, "equilibration-steps");
-      tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
+      cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.temp, subtag, "temperature");
+      tarch::configuration::ParseConfiguration::readIntMandatory(cfg.equSteps, subtag, "equilibration-steps");
+      tarch::configuration::ParseConfiguration::readIntOptional(cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
     } else {
       std::cout << "Could not read input file " << filename
                 << ": Unknown microscopic "
@@ -168,7 +168,7 @@ public:
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.density, subtag, "density");
+    tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.density, subtag, "density");
 
     subtag = node->FirstChildElement("macroscopic-solver");
     if (subtag == NULL) {
@@ -178,16 +178,16 @@ public:
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _cfg.lbNumberProcesses = tarch::la::Vector<3, unsigned int>(1);
+    cfg.lbNumberProcesses = tarch::la::Vector<3, unsigned int>(1);
     tarch::configuration::ParseConfiguration::readStringMandatory(type, subtag, "type");
     if (type == "lb") {
-      _cfg.maSolverType = COUETTE_LB;
-      tarch::configuration::ParseConfiguration::readVectorMandatory<3, unsigned int>(_cfg.lbNumberProcesses, subtag, "number-of-processes");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, "plot-every-timestep");
+      cfg.maSolverType = COUETTE_LB;
+      tarch::configuration::ParseConfiguration::readVectorMandatory<3, unsigned int>(cfg.lbNumberProcesses, subtag, "number-of-processes");
+      tarch::configuration::ParseConfiguration::readIntMandatory(cfg.plotEveryTimestep, subtag, "plot-every-timestep");
     } else if (type == "fd") {
-      _cfg.maSolverType = COUETTE_FD;
-      tarch::configuration::ParseConfiguration::readVectorMandatory<3, unsigned int>(_cfg.lbNumberProcesses, subtag, "number-of-processes");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, "plot-every-timestep");
+      cfg.maSolverType = COUETTE_FD;
+      tarch::configuration::ParseConfiguration::readVectorMandatory<3, unsigned int>(cfg.lbNumberProcesses, subtag, "number-of-processes");
+      tarch::configuration::ParseConfiguration::readIntMandatory(cfg.plotEveryTimestep, subtag, "plot-every-timestep");
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (type == "foam") {
@@ -205,8 +205,8 @@ public:
     }
 #endif
     else if (type == "analytical") {
-      _cfg.maSolverType = COUETTE_ANALYTICAL;
-      if (!(_cfg.wallVelocity[1] == 0.0 && _cfg.wallVelocity[2] == 0.0)) {
+      cfg.maSolverType = COUETTE_ANALYTICAL;
+      if (!(cfg.wallVelocity[1] == 0.0 && cfg.wallVelocity[2] == 0.0)) {
         std::cout << "analytic solver only supports flow in x-direction" << std::endl;
         exit(EXIT_FAILURE);
       }
@@ -219,23 +219,23 @@ public:
     }
     double vis;
     tarch::configuration::ParseConfiguration::readDoubleMandatory(vis, subtag, "viscosity");
-    _cfg.kinVisc = vis / _cfg.density;
-    tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.initAdvanceCycles, subtag, "init-advance-cycles");
+    cfg.kinVisc = vis / cfg.density;
+    tarch::configuration::ParseConfiguration::readIntMandatory(cfg.initAdvanceCycles, subtag, "init-advance-cycles");
 
     subtag = node->FirstChildElement("tws-loop");
     if (subtag == NULL)
-      _cfg.twsLoop = false;
+      cfg.twsLoop = false;
     else {
-      _cfg.twsLoop = true;
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.twsLoopMin, subtag, "min");
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.twsLoopMax, subtag, "max");
-      _cfg.twsLoopStep = 1;
-      tarch::configuration::ParseConfiguration::readIntOptional(_cfg.twsLoopStep, subtag, "step");
+      cfg.twsLoop = true;
+      tarch::configuration::ParseConfiguration::readIntMandatory(cfg.twsLoopMin, subtag, "min");
+      tarch::configuration::ParseConfiguration::readIntMandatory(cfg.twsLoopMax, subtag, "max");
+      cfg.twsLoopStep = 1;
+      tarch::configuration::ParseConfiguration::readIntOptional(cfg.twsLoopStep, subtag, "step");
     }
 
-    if (_cfg.miSolverType == SYNTHETIC) {
-      if (_cfg.macro2Md || _cfg.totalNumberMDSimulations > 1 || _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 ||
-          _cfg.lbNumberProcesses[2] != 1) {
+    if (cfg.miSolverType == SYNTHETIC) {
+      if (cfg.macro2Md || cfg.totalNumberMDSimulations > 1 || cfg.lbNumberProcesses[0] != 1 || cfg.lbNumberProcesses[1] != 1 ||
+          cfg.lbNumberProcesses[2] != 1) {
         std::cout << "Invalid configuration: Synthetic MD runs sequentially on "
                      "rank 0 only. "
                   << "It does neither support parallel communication nor "
@@ -244,8 +244,8 @@ public:
         exit(EXIT_FAILURE);
       }
     }
-    if (_cfg.maSolverType == COUETTE_ANALYTICAL) {
-      if (_cfg.twoWayCoupling) {
+    if (cfg.maSolverType == COUETTE_ANALYTICAL) {
+      if (cfg.twoWayCoupling) {
         std::cout << "Invalid configuration: COUETTE_ANALYTICAL does not "
                      "support twoWayCoupling"
                   << std::endl;
@@ -253,7 +253,7 @@ public:
       }
     }
 
-    return _cfg;
+    return cfg;
   }
 
 #if (BUILD_WITH_OPENFOAM)

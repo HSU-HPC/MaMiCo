@@ -26,7 +26,7 @@ public:
     ss <<  "/tmp/mamicotest_ParseConfigurationTest_testParseConfigurationWithRoot" << "_" << rank;
     _filenameConfigWithRoot = ss.str();
     std::ofstream(_filenameConfigWithRoot.c_str())
-        << "<?xml version=\"1.0\"?>\n<mamico-configuration>\n\t<foo></foo>\n\t<bar></bar>\n</mamico-configuration>";
+        << "<?xml version=\"1.0\"?>\n<scenario-configuration>\n\t<foo></foo>\n\t<bar></bar>\n</scenario-configuration>";
     ss.str(std::string());
     ss <<  "/tmp/mamicotest_ParseConfigurationTest_testParseConfigurationWithoutRoot" << "_" << rank;
     _filenameConfigWithoutRoot = ss.str();

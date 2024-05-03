@@ -45,10 +45,10 @@ public:
     static XMLConfiguration load(const std::string filename) {
       tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
       tinyxml2::XMLError error = doc->LoadFile(filename.c_str());
-      tinyxml2::XMLNode* root = doc->FirstChildElement("mamico-configuration");
+      tinyxml2::XMLNode* root = doc->FirstChildElement("scenario-configuration");
       if (root == NULL) {
         root = doc;
-        std::cout << "No root node <mamico-configuration> found in configuration file. (Using legacy format without XML root node.)" << std::endl;
+        std::cout << "No root node <scenario-configuration> found in configuration file. (Using legacy format without XML root node.)" << std::endl;
       }
       return XMLConfiguration(root, error);
     }
