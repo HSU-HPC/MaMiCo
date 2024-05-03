@@ -31,13 +31,13 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">69</td>
-            <td class="headerCovTableEntry">149</td>
-            <td class="headerCovTableEntryLo">46.3 %</td>
+            <td class="headerCovTableEntry">67</td>
+            <td class="headerCovTableEntry">147</td>
+            <td class="headerCovTableEntryLo">45.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-02-21 12:45:43</td>
+            <td class="headerValue">2024-05-03 14:00:07</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">1</td>
@@ -67,350 +67,353 @@
 <a name="5"><span class="lineNum">       5 </span>            : #ifndef _COUETTECONFIG_H_</a>
 <a name="6"><span class="lineNum">       6 </span>            : #define _COUETTECONFIG_H_</a>
 <a name="7"><span class="lineNum">       7 </span>            : </a>
-<a name="8"><span class="lineNum">       8 </span>            : #include &quot;tarch/la/Vector.h&quot;</a>
-<a name="9"><span class="lineNum">       9 </span>            : </a>
-<a name="10"><span class="lineNum">      10 </span>            : namespace coupling {</a>
-<a name="11"><span class="lineNum">      11 </span>            : namespace configurations {</a>
-<a name="12"><span class="lineNum">      12 </span>            : struct CouetteConfig;</a>
-<a name="13"><span class="lineNum">      13 </span>            : }</a>
-<a name="14"><span class="lineNum">      14 </span>            : } // namespace coupling</a>
-<a name="15"><span class="lineNum">      15 </span>            : /** Configuration parameters for Couette flow scenario</a>
-<a name="16"><span class="lineNum">      16 </span>            :  *      @brief Configuration parameters for Couette flow scenario</a>
-<a name="17"><span class="lineNum">      17 </span>            :  *</a>
-<a name="18"><span class="lineNum">      18 </span>            :  *</a>
-<a name="19"><span class="lineNum">      19 </span>            :  *      @author Niklas Wittmer</a>
-<a name="20"><span class="lineNum">      20 </span>            :  */</a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          4 : struct coupling::configurations::CouetteConfig {</span></a>
-<a name="22"><span class="lineNum">      22 </span>            : </a>
-<a name="23"><span class="lineNum">      23 </span>            : private:</a>
-<a name="24"><span class="lineNum">      24 </span>            :   // CouetteConfig(){}</a>
-<a name="25"><span class="lineNum">      25 </span>            : </a>
-<a name="26"><span class="lineNum">      26 </span>            : public:</a>
-<a name="27"><span class="lineNum">      27 </span>            :   /** Defines the type of continuum solver for the coupled simulation  */</a>
-<a name="28"><span class="lineNum">      28 </span>            :   enum MacroSolverType {</a>
-<a name="29"><span class="lineNum">      29 </span>            :     COUETTE_ANALYTICAL = 0, ///&lt; the analytical couette solver is used</a>
-<a name="30"><span class="lineNum">      30 </span>            :                             ///&lt; (coupling::solvers::CouetteSolver)</a>
-<a name="31"><span class="lineNum">      31 </span>            :     COUETTE_LB = 1,         ///&lt; the Lattice-Bolzmann solver is used</a>
-<a name="32"><span class="lineNum">      32 </span>            :                             ///&lt; (coupling::solvers::LBCouetteSolver)</a>
-<a name="33"><span class="lineNum">      33 </span>            :     COUETTE_FD = 2,         ///&lt; the 1d finite-difference solver is used</a>
-<a name="34"><span class="lineNum">      34 </span>            :                             ///&lt; (coupling::solvers::FiniteDifferenceSolver)</a>
-<a name="35"><span class="lineNum">      35 </span>            :     COUETTE_FOAM = 3        ///&lt; the IcoFoam solver is used (coupling::solvers::IcoFoam)</a>
-<a name="36"><span class="lineNum">      36 </span>            :   };</a>
-<a name="37"><span class="lineNum">      37 </span>            :   /** Defines the type of md solver for the coupled simulation  */</a>
-<a name="38"><span class="lineNum">      38 </span>            :   enum MicroSolverType {</a>
-<a name="39"><span class="lineNum">      39 </span>            :     SIMPLEMD = 0,  ///&lt; the SimpleMD solver is used</a>
-<a name="40"><span class="lineNum">      40 </span>            :     SYNTHETIC = 1, ///&lt; the synthetic solver is used</a>
-<a name="41"><span class="lineNum">      41 </span>            :     LS1 = 2        ///&lt; the LS1 solver is used</a>
-<a name="42"><span class="lineNum">      42 </span>            :   };</a>
-<a name="43"><span class="lineNum">      43 </span>            : </a>
-<a name="44"><span class="lineNum">      44 </span>            :   /** @brief creates CouetteConfig if all elements exist and can be read</a>
-<a name="45"><span class="lineNum">      45 </span>            :    *    @param filename</a>
-<a name="46"><span class="lineNum">      46 </span>            :    */</a>
-<a name="47"><span class="lineNum">      47 </span><span class="lineCov">          4 :   static CouetteConfig parseCouetteConfiguration(const std::string&amp; filename) {</span></a>
-<a name="48"><span class="lineNum">      48 </span><span class="lineCov">          4 :     CouetteConfig _cfg;</span></a>
-<a name="49"><span class="lineNum">      49 </span>            : </a>
-<a name="50"><span class="lineNum">      50 </span><span class="lineCov">          4 :     tinyxml2::XMLDocument conffile;</span></a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* node = NULL;</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          4 :     conffile.LoadFile(filename.c_str());</span></a>
-<a name="53"><span class="lineNum">      53 </span><span class="lineCov">          4 :     node = conffile.FirstChildElement(&quot;couette-test&quot;);</span></a>
-<a name="54"><span class="lineNum">      54 </span><span class="lineCov">          4 :     if (node == NULL) {</span></a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
-<a name="56"><span class="lineNum">      56 </span>            :                 &lt;&lt; &quot;: missing element &quot;</a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :                    &quot;&lt;couette-test&gt;&quot;</span></a>
-<a name="58"><span class="lineNum">      58 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="60"><span class="lineNum">      60 </span>            :     }</a>
-<a name="61"><span class="lineNum">      61 </span>            : </a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* n_mamico = node-&gt;NextSiblingElement();</span></a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineCov">          4 :     if (n_mamico == NULL) {</span></a>
-<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename &lt;&lt; &quot;: missing element &lt;mamico&gt;&quot; &lt;&lt; std::endl;</span></a>
-<a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="66"><span class="lineNum">      66 </span>            :     }</a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* n_md = n_mamico-&gt;NextSiblingElement();</span></a>
-<a name="68"><span class="lineNum">      68 </span><span class="lineCov">          4 :     if (n_md == NULL) {</span></a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
-<a name="70"><span class="lineNum">      70 </span>            :                 &lt;&lt; &quot;: missing element &quot;</a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :                    &quot;&lt;molecular-dynamics&gt;&quot;</span></a>
-<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="74"><span class="lineNum">      74 </span>            :     }</a>
-<a name="75"><span class="lineNum">      75 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* n_fp = n_md-&gt;NextSiblingElement();</span></a>
-<a name="76"><span class="lineNum">      76 </span><span class="lineCov">          4 :     if (n_fp == NULL) {</span></a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
-<a name="78"><span class="lineNum">      78 </span>            :                 &lt;&lt; &quot;: missing element &quot;</a>
-<a name="79"><span class="lineNum">      79 </span><span class="lineNoCov">          0 :                    &quot;&lt;filter-pipeline&gt;&quot;</span></a>
-<a name="80"><span class="lineNum">      80 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="81"><span class="lineNum">      81 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="82"><span class="lineNum">      82 </span>            :     }</a>
-<a name="83"><span class="lineNum">      83 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* n_unexpected = n_fp-&gt;NextSiblingElement();</span></a>
-<a name="84"><span class="lineNum">      84 </span><span class="lineCov">          4 :     if (n_unexpected != NULL) {</span></a>
-<a name="85"><span class="lineNum">      85 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename &lt;&lt; &quot;: unknown element &quot; &lt;&lt; n_unexpected-&gt;Name() &lt;&lt; std::endl;</span></a>
-<a name="86"><span class="lineNum">      86 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="87"><span class="lineNum">      87 </span>            :     }</a>
-<a name="88"><span class="lineNum">      88 </span>            : </a>
-<a name="89"><span class="lineNum">      89 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* subtag = node-&gt;FirstChildElement(&quot;domain&quot;);</span></a>
-<a name="90"><span class="lineNum">      90 </span><span class="lineCov">          4 :     if (subtag == NULL) {</span></a>
-<a name="91"><span class="lineNum">      91 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename &lt;&lt; &quot;: Missing subtag: domain&quot; &lt;&lt; std::endl;</span></a>
-<a name="92"><span class="lineNum">      92 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="93"><span class="lineNum">      93 </span>            :     }</a>
-<a name="94"><span class="lineNum">      94 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.channelheight, subtag, &quot;channelheight&quot;);</span></a>
-<a name="95"><span class="lineNum">      95 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readVectorMandatory&lt;3, double&gt;(_cfg.wallVelocity, subtag, &quot;wall-velocity&quot;);</span></a>
-<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          4 :     _cfg.wallInitCycles = 0;</span></a>
-<a name="97"><span class="lineNum">      97 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntOptional(_cfg.wallInitCycles, subtag, &quot;wall-init-cycles&quot;);</span></a>
-<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          4 :     if (_cfg.wallInitCycles &gt; 0)</span></a>
-<a name="99"><span class="lineNum">      99 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;3, double&gt;(_cfg.wallInitVelocity, subtag, &quot;wall-init-velocity&quot;);</span></a>
-<a name="100"><span class="lineNum">     100 </span><span class="lineCov">          4 :     _cfg.wallOscillations = 0;</span></a>
-<a name="101"><span class="lineNum">     101 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readDoubleOptional(_cfg.wallOscillations, subtag, &quot;wall-oscillations&quot;);</span></a>
-<a name="102"><span class="lineNum">     102 </span>            : </a>
-<a name="103"><span class="lineNum">     103 </span><span class="lineCov">          4 :     subtag = node-&gt;FirstChildElement(&quot;coupling&quot;);</span></a>
-<a name="104"><span class="lineNum">     104 </span><span class="lineCov">          4 :     if (subtag == NULL) {</span></a>
-<a name="105"><span class="lineNum">     105 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file couette.xml: Missing subtag: coupling&quot; &lt;&lt; std::endl;</span></a>
-<a name="106"><span class="lineNum">     106 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="107"><span class="lineNum">     107 </span>            :     }</a>
-<a name="108"><span class="lineNum">     108 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.couplingCycles, subtag, &quot;coupling-cycles&quot;);</span></a>
-<a name="109"><span class="lineNum">     109 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.twoWayCoupling, subtag, &quot;two-way-coupling&quot;);</span></a>
-<a name="110"><span class="lineNum">     110 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.md2Macro, subtag, &quot;send-from-md-to-macro&quot;);</span></a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.macro2Md, subtag, &quot;send-from-macro-to-md&quot;);</span></a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.filterInitCycles, subtag, &quot;filter-init-cycles&quot;);</span></a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.csvEveryTimestep, subtag, &quot;write-csv-every-timestep&quot;);</span></a>
-<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readBoolMandatory(_cfg.computeSNR, subtag, &quot;compute-snr&quot;);</span></a>
-<a name="115"><span class="lineNum">     115 </span>            : </a>
-<a name="116"><span class="lineNum">     116 </span><span class="lineCov">          4 :     subtag = node-&gt;FirstChildElement(&quot;microscopic-solver&quot;);</span></a>
-<a name="117"><span class="lineNum">     117 </span><span class="lineCov">          4 :     if (subtag == NULL) {</span></a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
-<a name="119"><span class="lineNum">     119 </span>            :                 &lt;&lt; &quot;: Missing subtag: &quot;</a>
-<a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :                    &quot;microscopic-solver&quot;</span></a>
-<a name="121"><span class="lineNum">     121 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="123"><span class="lineNum">     123 </span>            :     }</a>
-<a name="124"><span class="lineNum">     124 </span><span class="lineCov">          4 :     std::string type;</span></a>
-<a name="125"><span class="lineNum">     125 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readStringMandatory(type, subtag, &quot;type&quot;);</span></a>
-<a name="126"><span class="lineNum">     126 </span><span class="lineCov">          4 :     if (type == &quot;md&quot;) {</span></a>
-<a name="127"><span class="lineNum">     127 </span><span class="lineCov">          4 :       _cfg.miSolverType = SIMPLEMD;</span></a>
-<a name="128"><span class="lineNum">     128 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp, subtag, &quot;temperature&quot;);</span></a>
-<a name="129"><span class="lineNum">     129 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps, subtag, &quot;equilibration-steps&quot;);</span></a>
-<a name="130"><span class="lineNum">     130 </span>            : </a>
-<a name="131"><span class="lineNum">     131 </span><span class="lineCov">          4 :       std::string num_MD;</span></a>
-<a name="132"><span class="lineNum">     132 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readStringMandatory(num_MD, subtag, &quot;number-md-simulations&quot;);</span></a>
-<a name="133"><span class="lineNum">     133 </span><span class="lineCov">          4 :       if (num_MD == &quot;dynamic&quot;) {</span></a>
-<a name="134"><span class="lineNum">     134 </span><span class="lineNoCov">          0 :         _cfg.totalNumberMDSimulations = -1;</span></a>
-<a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 :         _cfg.lowerBoundNumberMDSimulations = 1;</span></a>
-<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 :         tarch::configuration::ParseConfiguration::readIntOptional(_cfg.lowerBoundNumberMDSimulations, subtag, &quot;min-number-md&quot;);</span></a>
-<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 :         tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.absVelErrStart, subtag, &quot;error-start&quot;);</span></a>
-<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :         tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.absVelErrEnd, subtag, &quot;error-end&quot;);</span></a>
-<a name="139"><span class="lineNum">     139 </span>            :       } else {</a>
-<a name="140"><span class="lineNum">     140 </span><span class="lineCov">          4 :         tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.totalNumberMDSimulations, subtag, &quot;number-md-simulations&quot;);</span></a>
-<a name="141"><span class="lineNum">     141 </span><span class="lineCov">          4 :         if (_cfg.totalNumberMDSimulations &lt; 1) {</span></a>
-<a name="142"><span class="lineNum">     142 </span><span class="lineNoCov">          0 :           std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
-<a name="143"><span class="lineNum">     143 </span>            :                     &lt;&lt; &quot;: &quot;</a>
-<a name="144"><span class="lineNum">     144 </span><span class="lineNoCov">          0 :                        &quot;number-md-simulations &lt; 1&quot;</span></a>
-<a name="145"><span class="lineNum">     145 </span><span class="lineNoCov">          0 :                     &lt;&lt; std::endl;</span></a>
-<a name="146"><span class="lineNum">     146 </span><span class="lineNoCov">          0 :           exit(EXIT_FAILURE);</span></a>
-<a name="147"><span class="lineNum">     147 </span>            :         }</a>
-<a name="148"><span class="lineNum">     148 </span>            :       }</a>
-<a name="149"><span class="lineNum">     149 </span><span class="lineCov">          4 :     } else if (type == &quot;synthetic&quot;) {</span></a>
-<a name="150"><span class="lineNum">     150 </span><span class="lineNoCov">          0 :       _cfg.miSolverType = SYNTHETIC;</span></a>
-<a name="151"><span class="lineNum">     151 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.noiseSigma, subtag, &quot;noise-sigma&quot;);</span></a>
-<a name="152"><span class="lineNum">     152 </span><span class="lineNoCov">          0 :       _cfg.totalNumberMDSimulations = 1;</span></a>
-<a name="153"><span class="lineNum">     153 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations, subtag, &quot;number-md-simulations&quot;);</span></a>
-<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 :     } else if (type == &quot;ls1&quot;) {</span></a>
-<a name="155"><span class="lineNum">     155 </span><span class="lineNoCov">          0 :       _cfg.miSolverType = LS1;</span></a>
-<a name="156"><span class="lineNum">     156 </span>            : </a>
-<a name="157"><span class="lineNum">     157 </span><span class="lineNoCov">          0 :       _cfg.totalNumberMDSimulations = 1;</span></a>
-<a name="158"><span class="lineNum">     158 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.temp, subtag, &quot;temperature&quot;);</span></a>
-<a name="159"><span class="lineNum">     159 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.equSteps, subtag, &quot;equilibration-steps&quot;);</span></a>
-<a name="160"><span class="lineNum">     160 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.totalNumberMDSimulations, subtag, &quot;number-md-simulations&quot;);</span></a>
-<a name="161"><span class="lineNum">     161 </span>            :     } else {</a>
-<a name="162"><span class="lineNum">     162 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
-<a name="163"><span class="lineNum">     163 </span>            :                 &lt;&lt; &quot;: Unknown microscopic &quot;</a>
-<a name="164"><span class="lineNum">     164 </span><span class="lineNoCov">          0 :                    &quot;solver type!&quot;</span></a>
-<a name="165"><span class="lineNum">     165 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="166"><span class="lineNum">     166 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="167"><span class="lineNum">     167 </span>            :     }</a>
-<a name="168"><span class="lineNum">     168 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readDoubleMandatory(_cfg.density, subtag, &quot;density&quot;);</span></a>
-<a name="169"><span class="lineNum">     169 </span>            : </a>
-<a name="170"><span class="lineNum">     170 </span><span class="lineCov">          4 :     subtag = node-&gt;FirstChildElement(&quot;macroscopic-solver&quot;);</span></a>
-<a name="171"><span class="lineNum">     171 </span><span class="lineCov">          4 :     if (subtag == NULL) {</span></a>
-<a name="172"><span class="lineNum">     172 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
-<a name="173"><span class="lineNum">     173 </span>            :                 &lt;&lt; &quot;: Missing subtag: &quot;</a>
-<a name="174"><span class="lineNum">     174 </span><span class="lineNoCov">          0 :                    &quot;macroscopic-solver&quot;</span></a>
-<a name="175"><span class="lineNum">     175 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="176"><span class="lineNum">     176 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="177"><span class="lineNum">     177 </span>            :     }</a>
-<a name="178"><span class="lineNum">     178 </span><span class="lineCov">         20 :     _cfg.lbNumberProcesses = tarch::la::Vector&lt;3, unsigned int&gt;(1);</span></a>
-<a name="179"><span class="lineNum">     179 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readStringMandatory(type, subtag, &quot;type&quot;);</span></a>
-<a name="180"><span class="lineNum">     180 </span><span class="lineCov">          4 :     if (type == &quot;lb&quot;) {</span></a>
-<a name="181"><span class="lineNum">     181 </span><span class="lineNoCov">          0 :       _cfg.maSolverType = COUETTE_LB;</span></a>
-<a name="182"><span class="lineNum">     182 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;3, unsigned int&gt;(_cfg.lbNumberProcesses, subtag, &quot;number-of-processes&quot;);</span></a>
-<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, &quot;plot-every-timestep&quot;);</span></a>
-<a name="184"><span class="lineNum">     184 </span><span class="lineCov">          4 :     } else if (type == &quot;fd&quot;) {</span></a>
-<a name="185"><span class="lineNum">     185 </span><span class="lineCov">          4 :       _cfg.maSolverType = COUETTE_FD;</span></a>
-<a name="186"><span class="lineNum">     186 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;3, unsigned int&gt;(_cfg.lbNumberProcesses, subtag, &quot;number-of-processes&quot;);</span></a>
-<a name="187"><span class="lineNum">     187 </span><span class="lineCov">          8 :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, &quot;plot-every-timestep&quot;);</span></a>
-<a name="188"><span class="lineNum">     188 </span>            :     }</a>
-<a name="189"><span class="lineNum">     189 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
-<a name="190"><span class="lineNum">     190 </span>            :     else if (type == &quot;foam&quot;) {</a>
-<a name="191"><span class="lineNum">     191 </span>            :       _cfg.maSolverType = COUETTE_FOAM;</a>
-<a name="192"><span class="lineNum">     192 </span>            :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, &quot;plot-every-timestep&quot;);</a>
-<a name="193"><span class="lineNum">     193 </span>            :       tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.directory, subtag, &quot;foam-setup-directory&quot;);</a>
-<a name="194"><span class="lineNum">     194 </span>            :       tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.folder, subtag, &quot;foam-setup-folder&quot;);</a>
-<a name="195"><span class="lineNum">     195 </span>            :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;12, unsigned int&gt;(_cfg.foam.boundariesWithMD, subtag, &quot;boundaries-with-MD&quot;);</a>
-<a name="196"><span class="lineNum">     196 </span>            :       if (!_cfg.twoWayCoupling &amp;&amp; _cfg.foam.boundariesWithMD != tarch::la::Vector&lt;12, unsigned int&gt;{0}) {</a>
-<a name="197"><span class="lineNum">     197 </span>            :         std::cout &lt;&lt; &quot;ERROR: Two-way coupling is disabled, but boundaries with &quot;</a>
-<a name="198"><span class="lineNum">     198 </span>            :                      &quot;MD for openfoam were defined&quot;</a>
-<a name="199"><span class="lineNum">     199 </span>            :                   &lt;&lt; std::endl;</a>
-<a name="200"><span class="lineNum">     200 </span>            :         exit(EXIT_FAILURE);</a>
-<a name="201"><span class="lineNum">     201 </span>            :       }</a>
-<a name="202"><span class="lineNum">     202 </span>            :     }</a>
-<a name="203"><span class="lineNum">     203 </span>            : #endif</a>
-<a name="204"><span class="lineNum">     204 </span><span class="lineNoCov">          0 :     else if (type == &quot;analytical&quot;) {</span></a>
-<a name="205"><span class="lineNum">     205 </span><span class="lineNoCov">          0 :       _cfg.maSolverType = COUETTE_ANALYTICAL;</span></a>
-<a name="206"><span class="lineNum">     206 </span><span class="lineNoCov">          0 :       if (!(_cfg.wallVelocity[1] == 0.0 &amp;&amp; _cfg.wallVelocity[2] == 0.0)) {</span></a>
-<a name="207"><span class="lineNum">     207 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;analytic solver only supports flow in x-direction&quot; &lt;&lt; std::endl;</span></a>
-<a name="208"><span class="lineNum">     208 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
-<a name="209"><span class="lineNum">     209 </span>            :       }</a>
-<a name="210"><span class="lineNum">     210 </span>            :     } else {</a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
-<a name="212"><span class="lineNum">     212 </span>            :                 &lt;&lt; &quot;: Unknown macroscopic &quot;</a>
-<a name="213"><span class="lineNum">     213 </span><span class="lineNoCov">          0 :                    &quot;solver type!&quot;</span></a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
-<a name="216"><span class="lineNum">     216 </span>            :     }</a>
-<a name="217"><span class="lineNum">     217 </span><span class="lineCov">          4 :     double vis;</span></a>
-<a name="218"><span class="lineNum">     218 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readDoubleMandatory(vis, subtag, &quot;viscosity&quot;);</span></a>
-<a name="219"><span class="lineNum">     219 </span><span class="lineCov">          4 :     _cfg.kinVisc = vis / _cfg.density;</span></a>
-<a name="220"><span class="lineNum">     220 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.initAdvanceCycles, subtag, &quot;init-advance-cycles&quot;);</span></a>
-<a name="221"><span class="lineNum">     221 </span>            : </a>
-<a name="222"><span class="lineNum">     222 </span><span class="lineCov">          4 :     subtag = node-&gt;FirstChildElement(&quot;tws-loop&quot;);</span></a>
-<a name="223"><span class="lineNum">     223 </span><span class="lineCov">          4 :     if (subtag == NULL)</span></a>
-<a name="224"><span class="lineNum">     224 </span><span class="lineCov">          4 :       _cfg.twsLoop = false;</span></a>
-<a name="225"><span class="lineNum">     225 </span>            :     else {</a>
-<a name="226"><span class="lineNum">     226 </span><span class="lineNoCov">          0 :       _cfg.twsLoop = true;</span></a>
-<a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.twsLoopMin, subtag, &quot;min&quot;);</span></a>
-<a name="228"><span class="lineNum">     228 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.twsLoopMax, subtag, &quot;max&quot;);</span></a>
-<a name="229"><span class="lineNum">     229 </span><span class="lineNoCov">          0 :       _cfg.twsLoopStep = 1;</span></a>
-<a name="230"><span class="lineNum">     230 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntOptional(_cfg.twsLoopStep, subtag, &quot;step&quot;);</span></a>
-<a name="231"><span class="lineNum">     231 </span>            :     }</a>
-<a name="232"><span class="lineNum">     232 </span>            : </a>
-<a name="233"><span class="lineNum">     233 </span><span class="lineCov">          4 :     if (_cfg.miSolverType == SYNTHETIC) {</span></a>
-<a name="234"><span class="lineNum">     234 </span><span class="lineNoCov">          0 :       if (_cfg.macro2Md || _cfg.totalNumberMDSimulations &gt; 1 || _cfg.lbNumberProcesses[0] != 1 || _cfg.lbNumberProcesses[1] != 1 ||</span></a>
-<a name="235"><span class="lineNum">     235 </span><span class="lineNoCov">          0 :           _cfg.lbNumberProcesses[2] != 1) {</span></a>
-<a name="236"><span class="lineNum">     236 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;Invalid configuration: Synthetic MD runs sequentially on &quot;</span></a>
-<a name="237"><span class="lineNum">     237 </span>            :                      &quot;rank 0 only. &quot;</a>
-<a name="238"><span class="lineNum">     238 </span>            :                   &lt;&lt; &quot;It does neither support parallel communication nor &quot;</a>
-<a name="239"><span class="lineNum">     239 </span><span class="lineNoCov">          0 :                      &quot;multi-instance sampling&quot;</span></a>
-<a name="240"><span class="lineNum">     240 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
-<a name="241"><span class="lineNum">     241 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
-<a name="242"><span class="lineNum">     242 </span>            :       }</a>
-<a name="243"><span class="lineNum">     243 </span>            :     }</a>
-<a name="244"><span class="lineNum">     244 </span><span class="lineCov">          4 :     if (_cfg.maSolverType == COUETTE_ANALYTICAL) {</span></a>
-<a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 :       if (_cfg.twoWayCoupling) {</span></a>
-<a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;Invalid configuration: COUETTE_ANALYTICAL does not &quot;</span></a>
-<a name="247"><span class="lineNum">     247 </span><span class="lineNoCov">          0 :                      &quot;support twoWayCoupling&quot;</span></a>
-<a name="248"><span class="lineNum">     248 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
-<a name="249"><span class="lineNum">     249 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
-<a name="250"><span class="lineNum">     250 </span>            :       }</a>
-<a name="251"><span class="lineNum">     251 </span>            :     }</a>
-<a name="252"><span class="lineNum">     252 </span>            : </a>
-<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          8 :     return _cfg;</span></a>
-<a name="254"><span class="lineNum">     254 </span><span class="lineCov">          4 :   }</span></a>
+<a name="8"><span class="lineNum">       8 </span>            : #include &quot;tarch/configuration/ParseConfiguration.h&quot;</a>
+<a name="9"><span class="lineNum">       9 </span>            : #include &quot;tarch/la/Vector.h&quot;</a>
+<a name="10"><span class="lineNum">      10 </span>            : </a>
+<a name="11"><span class="lineNum">      11 </span>            : using tarch::configuration::ParseConfiguration;</a>
+<a name="12"><span class="lineNum">      12 </span>            : </a>
+<a name="13"><span class="lineNum">      13 </span>            : namespace coupling {</a>
+<a name="14"><span class="lineNum">      14 </span>            : namespace configurations {</a>
+<a name="15"><span class="lineNum">      15 </span>            : </a>
+<a name="16"><span class="lineNum">      16 </span>            : struct CouetteConfig;</a>
+<a name="17"><span class="lineNum">      17 </span>            : }</a>
+<a name="18"><span class="lineNum">      18 </span>            : } // namespace coupling</a>
+<a name="19"><span class="lineNum">      19 </span>            : /** Configuration parameters for Couette flow scenario</a>
+<a name="20"><span class="lineNum">      20 </span>            :  *      @brief Configuration parameters for Couette flow scenario</a>
+<a name="21"><span class="lineNum">      21 </span>            :  *</a>
+<a name="22"><span class="lineNum">      22 </span>            :  *</a>
+<a name="23"><span class="lineNum">      23 </span>            :  *      @author Niklas Wittmer</a>
+<a name="24"><span class="lineNum">      24 </span>            :  */</a>
+<a name="25"><span class="lineNum">      25 </span><span class="lineCov">          4 : struct coupling::configurations::CouetteConfig {</span></a>
+<a name="26"><span class="lineNum">      26 </span>            : </a>
+<a name="27"><span class="lineNum">      27 </span>            : private:</a>
+<a name="28"><span class="lineNum">      28 </span>            :   // CouetteConfig(){}</a>
+<a name="29"><span class="lineNum">      29 </span>            : </a>
+<a name="30"><span class="lineNum">      30 </span>            : public:</a>
+<a name="31"><span class="lineNum">      31 </span>            :   /** Defines the type of continuum solver for the coupled simulation  */</a>
+<a name="32"><span class="lineNum">      32 </span>            :   enum MacroSolverType {</a>
+<a name="33"><span class="lineNum">      33 </span>            :     COUETTE_ANALYTICAL = 0, ///&lt; the analytical couette solver is used</a>
+<a name="34"><span class="lineNum">      34 </span>            :                             ///&lt; (coupling::solvers::CouetteSolver)</a>
+<a name="35"><span class="lineNum">      35 </span>            :     COUETTE_LB = 1,         ///&lt; the Lattice-Bolzmann solver is used</a>
+<a name="36"><span class="lineNum">      36 </span>            :                             ///&lt; (coupling::solvers::LBCouetteSolver)</a>
+<a name="37"><span class="lineNum">      37 </span>            :     COUETTE_FD = 2,         ///&lt; the 1d finite-difference solver is used</a>
+<a name="38"><span class="lineNum">      38 </span>            :                             ///&lt; (coupling::solvers::FiniteDifferenceSolver)</a>
+<a name="39"><span class="lineNum">      39 </span>            :     COUETTE_FOAM = 3        ///&lt; the IcoFoam solver is used (coupling::solvers::IcoFoam)</a>
+<a name="40"><span class="lineNum">      40 </span>            :   };</a>
+<a name="41"><span class="lineNum">      41 </span>            :   /** Defines the type of md solver for the coupled simulation  */</a>
+<a name="42"><span class="lineNum">      42 </span>            :   enum MicroSolverType {</a>
+<a name="43"><span class="lineNum">      43 </span>            :     SIMPLEMD = 0,  ///&lt; the SimpleMD solver is used</a>
+<a name="44"><span class="lineNum">      44 </span>            :     SYNTHETIC = 1, ///&lt; the synthetic solver is used</a>
+<a name="45"><span class="lineNum">      45 </span>            :     LS1 = 2        ///&lt; the LS1 solver is used</a>
+<a name="46"><span class="lineNum">      46 </span>            :   };</a>
+<a name="47"><span class="lineNum">      47 </span>            : </a>
+<a name="48"><span class="lineNum">      48 </span>            :   /** @brief creates CouetteConfig if all elements exist and can be read</a>
+<a name="49"><span class="lineNum">      49 </span>            :    *    @param filename</a>
+<a name="50"><span class="lineNum">      50 </span>            :    */</a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          4 :   static CouetteConfig parseCouetteConfiguration(const std::string&amp; filename) {</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          4 :     CouetteConfig cfg;</span></a>
+<a name="53"><span class="lineNum">      53 </span>            : </a>
+<a name="54"><span class="lineNum">      54 </span><span class="lineCov">          4 :     ParseConfiguration::XMLConfiguration xmlConfig = ParseConfiguration::XMLConfiguration::load(filename);</span></a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* node = xmlConfig.root-&gt;FirstChildElement(&quot;couette-test&quot;);</span></a>
+<a name="56"><span class="lineNum">      56 </span>            : </a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">          4 :     if (node == NULL) {</span></a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
+<a name="59"><span class="lineNum">      59 </span>            :                 &lt;&lt; &quot;: missing element &quot;</a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :                    &quot;&lt;couette-test&gt;&quot;</span></a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="63"><span class="lineNum">      63 </span>            :     }</a>
+<a name="64"><span class="lineNum">      64 </span>            : </a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* n_mamico = node-&gt;NextSiblingElement();</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">          4 :     if (n_mamico == NULL) {</span></a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename &lt;&lt; &quot;: missing element &lt;mamico&gt;&quot; &lt;&lt; std::endl;</span></a>
+<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="69"><span class="lineNum">      69 </span>            :     }</a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* n_md = n_mamico-&gt;NextSiblingElement();</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineCov">          4 :     if (n_md == NULL) {</span></a>
+<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
+<a name="73"><span class="lineNum">      73 </span>            :                 &lt;&lt; &quot;: missing element &quot;</a>
+<a name="74"><span class="lineNum">      74 </span><span class="lineNoCov">          0 :                    &quot;&lt;molecular-dynamics&gt;&quot;</span></a>
+<a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="76"><span class="lineNum">      76 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="77"><span class="lineNum">      77 </span>            :     }</a>
+<a name="78"><span class="lineNum">      78 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* n_fp = n_md-&gt;NextSiblingElement();</span></a>
+<a name="79"><span class="lineNum">      79 </span><span class="lineCov">          4 :     if (n_fp == NULL) {</span></a>
+<a name="80"><span class="lineNum">      80 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
+<a name="81"><span class="lineNum">      81 </span>            :                 &lt;&lt; &quot;: missing element &quot;</a>
+<a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :                    &quot;&lt;filter-pipeline&gt;&quot;</span></a>
+<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="84"><span class="lineNum">      84 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="85"><span class="lineNum">      85 </span>            :     }</a>
+<a name="86"><span class="lineNum">      86 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* n_unexpected = n_fp-&gt;NextSiblingElement();</span></a>
+<a name="87"><span class="lineNum">      87 </span><span class="lineCov">          4 :     if (n_unexpected != NULL) {</span></a>
+<a name="88"><span class="lineNum">      88 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename &lt;&lt; &quot;: unknown element &quot; &lt;&lt; n_unexpected-&gt;Name() &lt;&lt; std::endl;</span></a>
+<a name="89"><span class="lineNum">      89 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="90"><span class="lineNum">      90 </span>            :     }</a>
+<a name="91"><span class="lineNum">      91 </span>            : </a>
+<a name="92"><span class="lineNum">      92 </span><span class="lineCov">          4 :     tinyxml2::XMLElement* subtag = node-&gt;FirstChildElement(&quot;domain&quot;);</span></a>
+<a name="93"><span class="lineNum">      93 </span><span class="lineCov">          4 :     if (subtag == NULL) {</span></a>
+<a name="94"><span class="lineNum">      94 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename &lt;&lt; &quot;: Missing subtag: domain&quot; &lt;&lt; std::endl;</span></a>
+<a name="95"><span class="lineNum">      95 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="96"><span class="lineNum">      96 </span>            :     }</a>
+<a name="97"><span class="lineNum">      97 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.channelheight, subtag, &quot;channelheight&quot;);</span></a>
+<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readVectorMandatory&lt;3, double&gt;(cfg.wallVelocity, subtag, &quot;wall-velocity&quot;);</span></a>
+<a name="99"><span class="lineNum">      99 </span><span class="lineCov">          4 :     cfg.wallInitCycles = 0;</span></a>
+<a name="100"><span class="lineNum">     100 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntOptional(cfg.wallInitCycles, subtag, &quot;wall-init-cycles&quot;);</span></a>
+<a name="101"><span class="lineNum">     101 </span><span class="lineCov">          4 :     if (cfg.wallInitCycles &gt; 0)</span></a>
+<a name="102"><span class="lineNum">     102 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;3, double&gt;(cfg.wallInitVelocity, subtag, &quot;wall-init-velocity&quot;);</span></a>
+<a name="103"><span class="lineNum">     103 </span><span class="lineCov">          4 :     cfg.wallOscillations = 0;</span></a>
+<a name="104"><span class="lineNum">     104 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readDoubleOptional(cfg.wallOscillations, subtag, &quot;wall-oscillations&quot;);</span></a>
+<a name="105"><span class="lineNum">     105 </span>            : </a>
+<a name="106"><span class="lineNum">     106 </span><span class="lineCov">          4 :     subtag = node-&gt;FirstChildElement(&quot;coupling&quot;);</span></a>
+<a name="107"><span class="lineNum">     107 </span><span class="lineCov">          4 :     if (subtag == NULL) {</span></a>
+<a name="108"><span class="lineNum">     108 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file couette.xml: Missing subtag: coupling&quot; &lt;&lt; std::endl;</span></a>
+<a name="109"><span class="lineNum">     109 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="110"><span class="lineNum">     110 </span>            :     }</a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntMandatory(cfg.couplingCycles, subtag, &quot;coupling-cycles&quot;);</span></a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readBoolMandatory(cfg.twoWayCoupling, subtag, &quot;two-way-coupling&quot;);</span></a>
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readBoolMandatory(cfg.md2Macro, subtag, &quot;send-from-md-to-macro&quot;);</span></a>
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readBoolMandatory(cfg.macro2Md, subtag, &quot;send-from-macro-to-md&quot;);</span></a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntMandatory(cfg.filterInitCycles, subtag, &quot;filter-init-cycles&quot;);</span></a>
+<a name="116"><span class="lineNum">     116 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntMandatory(cfg.csvEveryTimestep, subtag, &quot;write-csv-every-timestep&quot;);</span></a>
+<a name="117"><span class="lineNum">     117 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readBoolMandatory(cfg.computeSNR, subtag, &quot;compute-snr&quot;);</span></a>
+<a name="118"><span class="lineNum">     118 </span>            : </a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">          4 :     subtag = node-&gt;FirstChildElement(&quot;microscopic-solver&quot;);</span></a>
+<a name="120"><span class="lineNum">     120 </span><span class="lineCov">          4 :     if (subtag == NULL) {</span></a>
+<a name="121"><span class="lineNum">     121 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
+<a name="122"><span class="lineNum">     122 </span>            :                 &lt;&lt; &quot;: Missing subtag: &quot;</a>
+<a name="123"><span class="lineNum">     123 </span><span class="lineNoCov">          0 :                    &quot;microscopic-solver&quot;</span></a>
+<a name="124"><span class="lineNum">     124 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="126"><span class="lineNum">     126 </span>            :     }</a>
+<a name="127"><span class="lineNum">     127 </span><span class="lineCov">          4 :     std::string type;</span></a>
+<a name="128"><span class="lineNum">     128 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readStringMandatory(type, subtag, &quot;type&quot;);</span></a>
+<a name="129"><span class="lineNum">     129 </span><span class="lineCov">          4 :     if (type == &quot;md&quot;) {</span></a>
+<a name="130"><span class="lineNum">     130 </span><span class="lineCov">          4 :       cfg.miSolverType = SIMPLEMD;</span></a>
+<a name="131"><span class="lineNum">     131 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.temp, subtag, &quot;temperature&quot;);</span></a>
+<a name="132"><span class="lineNum">     132 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.equSteps, subtag, &quot;equilibration-steps&quot;);</span></a>
+<a name="133"><span class="lineNum">     133 </span>            : </a>
+<a name="134"><span class="lineNum">     134 </span><span class="lineCov">          4 :       std::string num_MD;</span></a>
+<a name="135"><span class="lineNum">     135 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readStringMandatory(num_MD, subtag, &quot;number-md-simulations&quot;);</span></a>
+<a name="136"><span class="lineNum">     136 </span><span class="lineCov">          4 :       if (num_MD == &quot;dynamic&quot;) {</span></a>
+<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 :         cfg.totalNumberMDSimulations = -1;</span></a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :         cfg.lowerBoundNumberMDSimulations = 1;</span></a>
+<a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 :         tarch::configuration::ParseConfiguration::readIntOptional(cfg.lowerBoundNumberMDSimulations, subtag, &quot;min-number-md&quot;);</span></a>
+<a name="140"><span class="lineNum">     140 </span><span class="lineNoCov">          0 :         tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.absVelErrStart, subtag, &quot;error-start&quot;);</span></a>
+<a name="141"><span class="lineNum">     141 </span><span class="lineNoCov">          0 :         tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.absVelErrEnd, subtag, &quot;error-end&quot;);</span></a>
+<a name="142"><span class="lineNum">     142 </span>            :       } else {</a>
+<a name="143"><span class="lineNum">     143 </span><span class="lineCov">          4 :         tarch::configuration::ParseConfiguration::readIntMandatory(cfg.totalNumberMDSimulations, subtag, &quot;number-md-simulations&quot;);</span></a>
+<a name="144"><span class="lineNum">     144 </span><span class="lineCov">          4 :         if (cfg.totalNumberMDSimulations &lt; 1) {</span></a>
+<a name="145"><span class="lineNum">     145 </span><span class="lineNoCov">          0 :           std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
+<a name="146"><span class="lineNum">     146 </span>            :                     &lt;&lt; &quot;: &quot;</a>
+<a name="147"><span class="lineNum">     147 </span><span class="lineNoCov">          0 :                        &quot;number-md-simulations &lt; 1&quot;</span></a>
+<a name="148"><span class="lineNum">     148 </span><span class="lineNoCov">          0 :                     &lt;&lt; std::endl;</span></a>
+<a name="149"><span class="lineNum">     149 </span><span class="lineNoCov">          0 :           exit(EXIT_FAILURE);</span></a>
+<a name="150"><span class="lineNum">     150 </span>            :         }</a>
+<a name="151"><span class="lineNum">     151 </span>            :       }</a>
+<a name="152"><span class="lineNum">     152 </span><span class="lineCov">          4 :     } else if (type == &quot;synthetic&quot;) {</span></a>
+<a name="153"><span class="lineNum">     153 </span><span class="lineNoCov">          0 :       cfg.miSolverType = SYNTHETIC;</span></a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.noiseSigma, subtag, &quot;noise-sigma&quot;);</span></a>
+<a name="155"><span class="lineNum">     155 </span><span class="lineNoCov">          0 :       cfg.totalNumberMDSimulations = 1;</span></a>
+<a name="156"><span class="lineNum">     156 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntOptional(cfg.totalNumberMDSimulations, subtag, &quot;number-md-simulations&quot;);</span></a>
+<a name="157"><span class="lineNum">     157 </span><span class="lineNoCov">          0 :     } else if (type == &quot;ls1&quot;) {</span></a>
+<a name="158"><span class="lineNum">     158 </span><span class="lineNoCov">          0 :       cfg.miSolverType = LS1;</span></a>
+<a name="159"><span class="lineNum">     159 </span>            : </a>
+<a name="160"><span class="lineNum">     160 </span><span class="lineNoCov">          0 :       cfg.totalNumberMDSimulations = 1;</span></a>
+<a name="161"><span class="lineNum">     161 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.temp, subtag, &quot;temperature&quot;);</span></a>
+<a name="162"><span class="lineNum">     162 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.equSteps, subtag, &quot;equilibration-steps&quot;);</span></a>
+<a name="163"><span class="lineNum">     163 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntOptional(cfg.totalNumberMDSimulations, subtag, &quot;number-md-simulations&quot;);</span></a>
+<a name="164"><span class="lineNum">     164 </span>            :     } else {</a>
+<a name="165"><span class="lineNum">     165 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
+<a name="166"><span class="lineNum">     166 </span>            :                 &lt;&lt; &quot;: Unknown microscopic &quot;</a>
+<a name="167"><span class="lineNum">     167 </span><span class="lineNoCov">          0 :                    &quot;solver type!&quot;</span></a>
+<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="169"><span class="lineNum">     169 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="170"><span class="lineNum">     170 </span>            :     }</a>
+<a name="171"><span class="lineNum">     171 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.density, subtag, &quot;density&quot;);</span></a>
+<a name="172"><span class="lineNum">     172 </span>            : </a>
+<a name="173"><span class="lineNum">     173 </span><span class="lineCov">          4 :     subtag = node-&gt;FirstChildElement(&quot;macroscopic-solver&quot;);</span></a>
+<a name="174"><span class="lineNum">     174 </span><span class="lineCov">          4 :     if (subtag == NULL) {</span></a>
+<a name="175"><span class="lineNum">     175 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
+<a name="176"><span class="lineNum">     176 </span>            :                 &lt;&lt; &quot;: Missing subtag: &quot;</a>
+<a name="177"><span class="lineNum">     177 </span><span class="lineNoCov">          0 :                    &quot;macroscopic-solver&quot;</span></a>
+<a name="178"><span class="lineNum">     178 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="179"><span class="lineNum">     179 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="180"><span class="lineNum">     180 </span>            :     }</a>
+<a name="181"><span class="lineNum">     181 </span><span class="lineCov">         20 :     cfg.lbNumberProcesses = tarch::la::Vector&lt;3, unsigned int&gt;(1);</span></a>
+<a name="182"><span class="lineNum">     182 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readStringMandatory(type, subtag, &quot;type&quot;);</span></a>
+<a name="183"><span class="lineNum">     183 </span><span class="lineCov">          4 :     if (type == &quot;lb&quot;) {</span></a>
+<a name="184"><span class="lineNum">     184 </span><span class="lineNoCov">          0 :       cfg.maSolverType = COUETTE_LB;</span></a>
+<a name="185"><span class="lineNum">     185 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;3, unsigned int&gt;(cfg.lbNumberProcesses, subtag, &quot;number-of-processes&quot;);</span></a>
+<a name="186"><span class="lineNum">     186 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.plotEveryTimestep, subtag, &quot;plot-every-timestep&quot;);</span></a>
+<a name="187"><span class="lineNum">     187 </span><span class="lineCov">          4 :     } else if (type == &quot;fd&quot;) {</span></a>
+<a name="188"><span class="lineNum">     188 </span><span class="lineCov">          4 :       cfg.maSolverType = COUETTE_FD;</span></a>
+<a name="189"><span class="lineNum">     189 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;3, unsigned int&gt;(cfg.lbNumberProcesses, subtag, &quot;number-of-processes&quot;);</span></a>
+<a name="190"><span class="lineNum">     190 </span><span class="lineCov">          8 :       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.plotEveryTimestep, subtag, &quot;plot-every-timestep&quot;);</span></a>
+<a name="191"><span class="lineNum">     191 </span>            :     }</a>
+<a name="192"><span class="lineNum">     192 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
+<a name="193"><span class="lineNum">     193 </span>            :     else if (type == &quot;foam&quot;) {</a>
+<a name="194"><span class="lineNum">     194 </span>            :       _cfg.maSolverType = COUETTE_FOAM;</a>
+<a name="195"><span class="lineNum">     195 </span>            :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, &quot;plot-every-timestep&quot;);</a>
+<a name="196"><span class="lineNum">     196 </span>            :       tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.directory, subtag, &quot;foam-setup-directory&quot;);</a>
+<a name="197"><span class="lineNum">     197 </span>            :       tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.folder, subtag, &quot;foam-setup-folder&quot;);</a>
+<a name="198"><span class="lineNum">     198 </span>            :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;12, unsigned int&gt;(_cfg.foam.boundariesWithMD, subtag, &quot;boundaries-with-MD&quot;);</a>
+<a name="199"><span class="lineNum">     199 </span>            :       if (!_cfg.twoWayCoupling &amp;&amp; _cfg.foam.boundariesWithMD != tarch::la::Vector&lt;12, unsigned int&gt;{0}) {</a>
+<a name="200"><span class="lineNum">     200 </span>            :         std::cout &lt;&lt; &quot;ERROR: Two-way coupling is disabled, but boundaries with &quot;</a>
+<a name="201"><span class="lineNum">     201 </span>            :                      &quot;MD for openfoam were defined&quot;</a>
+<a name="202"><span class="lineNum">     202 </span>            :                   &lt;&lt; std::endl;</a>
+<a name="203"><span class="lineNum">     203 </span>            :         exit(EXIT_FAILURE);</a>
+<a name="204"><span class="lineNum">     204 </span>            :       }</a>
+<a name="205"><span class="lineNum">     205 </span>            :     }</a>
+<a name="206"><span class="lineNum">     206 </span>            : #endif</a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineNoCov">          0 :     else if (type == &quot;analytical&quot;) {</span></a>
+<a name="208"><span class="lineNum">     208 </span><span class="lineNoCov">          0 :       cfg.maSolverType = COUETTE_ANALYTICAL;</span></a>
+<a name="209"><span class="lineNum">     209 </span><span class="lineNoCov">          0 :       if (!(cfg.wallVelocity[1] == 0.0 &amp;&amp; cfg.wallVelocity[2] == 0.0)) {</span></a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;analytic solver only supports flow in x-direction&quot; &lt;&lt; std::endl;</span></a>
+<a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
+<a name="212"><span class="lineNum">     212 </span>            :       }</a>
+<a name="213"><span class="lineNum">     213 </span>            :     } else {</a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Could not read input file &quot; &lt;&lt; filename</span></a>
+<a name="215"><span class="lineNum">     215 </span>            :                 &lt;&lt; &quot;: Unknown macroscopic &quot;</a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineNoCov">          0 :                    &quot;solver type!&quot;</span></a>
+<a name="217"><span class="lineNum">     217 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="218"><span class="lineNum">     218 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
+<a name="219"><span class="lineNum">     219 </span>            :     }</a>
+<a name="220"><span class="lineNum">     220 </span><span class="lineCov">          4 :     double vis;</span></a>
+<a name="221"><span class="lineNum">     221 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readDoubleMandatory(vis, subtag, &quot;viscosity&quot;);</span></a>
+<a name="222"><span class="lineNum">     222 </span><span class="lineCov">          4 :     cfg.kinVisc = vis / cfg.density;</span></a>
+<a name="223"><span class="lineNum">     223 </span><span class="lineCov">          4 :     tarch::configuration::ParseConfiguration::readIntMandatory(cfg.initAdvanceCycles, subtag, &quot;init-advance-cycles&quot;);</span></a>
+<a name="224"><span class="lineNum">     224 </span>            : </a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineCov">          4 :     subtag = node-&gt;FirstChildElement(&quot;tws-loop&quot;);</span></a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineCov">          4 :     if (subtag == NULL)</span></a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineCov">          4 :       cfg.twsLoop = false;</span></a>
+<a name="228"><span class="lineNum">     228 </span>            :     else {</a>
+<a name="229"><span class="lineNum">     229 </span><span class="lineNoCov">          0 :       cfg.twsLoop = true;</span></a>
+<a name="230"><span class="lineNum">     230 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.twsLoopMin, subtag, &quot;min&quot;);</span></a>
+<a name="231"><span class="lineNum">     231 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.twsLoopMax, subtag, &quot;max&quot;);</span></a>
+<a name="232"><span class="lineNum">     232 </span><span class="lineNoCov">          0 :       cfg.twsLoopStep = 1;</span></a>
+<a name="233"><span class="lineNum">     233 </span><span class="lineNoCov">          0 :       tarch::configuration::ParseConfiguration::readIntOptional(cfg.twsLoopStep, subtag, &quot;step&quot;);</span></a>
+<a name="234"><span class="lineNum">     234 </span>            :     }</a>
+<a name="235"><span class="lineNum">     235 </span>            : </a>
+<a name="236"><span class="lineNum">     236 </span><span class="lineCov">          4 :     if (cfg.miSolverType == SYNTHETIC) {</span></a>
+<a name="237"><span class="lineNum">     237 </span><span class="lineNoCov">          0 :       if (cfg.macro2Md || cfg.totalNumberMDSimulations &gt; 1 || cfg.lbNumberProcesses[0] != 1 || cfg.lbNumberProcesses[1] != 1 ||</span></a>
+<a name="238"><span class="lineNum">     238 </span><span class="lineNoCov">          0 :           cfg.lbNumberProcesses[2] != 1) {</span></a>
+<a name="239"><span class="lineNum">     239 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;Invalid configuration: Synthetic MD runs sequentially on &quot;</span></a>
+<a name="240"><span class="lineNum">     240 </span>            :                      &quot;rank 0 only. &quot;</a>
+<a name="241"><span class="lineNum">     241 </span>            :                   &lt;&lt; &quot;It does neither support parallel communication nor &quot;</a>
+<a name="242"><span class="lineNum">     242 </span><span class="lineNoCov">          0 :                      &quot;multi-instance sampling&quot;</span></a>
+<a name="243"><span class="lineNum">     243 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
+<a name="244"><span class="lineNum">     244 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
+<a name="245"><span class="lineNum">     245 </span>            :       }</a>
+<a name="246"><span class="lineNum">     246 </span>            :     }</a>
+<a name="247"><span class="lineNum">     247 </span><span class="lineCov">          4 :     if (cfg.maSolverType == COUETTE_ANALYTICAL) {</span></a>
+<a name="248"><span class="lineNum">     248 </span><span class="lineNoCov">          0 :       if (cfg.twoWayCoupling) {</span></a>
+<a name="249"><span class="lineNum">     249 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;Invalid configuration: COUETTE_ANALYTICAL does not &quot;</span></a>
+<a name="250"><span class="lineNum">     250 </span><span class="lineNoCov">          0 :                      &quot;support twoWayCoupling&quot;</span></a>
+<a name="251"><span class="lineNum">     251 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
+<a name="252"><span class="lineNum">     252 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
+<a name="253"><span class="lineNum">     253 </span>            :       }</a>
+<a name="254"><span class="lineNum">     254 </span>            :     }</a>
 <a name="255"><span class="lineNum">     255 </span>            : </a>
-<a name="256"><span class="lineNum">     256 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
-<a name="257"><span class="lineNum">     257 </span>            :   /** @brief holds the variables necessary for the interface to the IcoFoam</a>
-<a name="258"><span class="lineNum">     258 </span>            :    * solver  */</a>
-<a name="259"><span class="lineNum">     259 </span>            :   struct FoamConfig {</a>
-<a name="260"><span class="lineNum">     260 </span>            :     /** @brief the path to the directory, where the folder with the IcoFoam</a>
-<a name="261"><span class="lineNum">     261 </span>            :      * OpenFOAM setup files are */</a>
-<a name="262"><span class="lineNum">     262 </span>            :     std::string directory;</a>
-<a name="263"><span class="lineNum">     263 </span>            :     /** @brief the name of the OpenFOAM folder */</a>
-<a name="264"><span class="lineNum">     264 </span>            :     std::string folder;</a>
-<a name="265"><span class="lineNum">     265 </span>            :     /** @brief the cubic mesh with a cubic hole has 12 boundaries, this vector</a>
-<a name="266"><span class="lineNum">     266 </span>            :      * tells which of them</a>
-<a name="267"><span class="lineNum">     267 </span>            :      *         shall be coupled with the md; The order has to be the same as in</a>
-<a name="268"><span class="lineNum">     268 </span>            :      * the blockMeshDict */</a>
-<a name="269"><span class="lineNum">     269 </span>            :     tarch::la::Vector&lt;12, unsigned int&gt; boundariesWithMD;</a>
-<a name="270"><span class="lineNum">     270 </span>            :   };</a>
-<a name="271"><span class="lineNum">     271 </span>            : #endif</a>
-<a name="272"><span class="lineNum">     272 </span>            : </a>
-<a name="273"><span class="lineNum">     273 </span>            :   /** @brief channel is always expected to have origin at (0.0,0.0,0.0) and to</a>
-<a name="274"><span class="lineNum">     274 </span>            :    * be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0) */</a>
-<a name="275"><span class="lineNum">     275 </span>            :   double channelheight;</a>
-<a name="276"><span class="lineNum">     276 </span>            :   /** @brief velocity of moving wall (lower boundary moves) */</a>
-<a name="277"><span class="lineNum">     277 </span>            :   tarch::la::Vector&lt;3, double&gt; wallVelocity;</a>
-<a name="278"><span class="lineNum">     278 </span>            :   /** @brief number of coupling cycles that will be done, while the wall</a>
-<a name="279"><span class="lineNum">     279 </span>            :    * velocity is the wallInitVelocity */</a>
-<a name="280"><span class="lineNum">     280 </span>            :   int wallInitCycles;</a>
-<a name="281"><span class="lineNum">     281 </span>            :   /** @brief the velocity at the moving wall (z=0) while the wallInitCycles*/</a>
-<a name="282"><span class="lineNum">     282 </span>            :   tarch::la::Vector&lt;3, double&gt; wallInitVelocity;</a>
-<a name="283"><span class="lineNum">     283 </span>            :   /** @brief total number of oscillation periods of the oscillating wall</a>
-<a name="284"><span class="lineNum">     284 </span>            :    * velocity*/</a>
-<a name="285"><span class="lineNum">     285 </span>            :   double wallOscillations;</a>
-<a name="286"><span class="lineNum">     286 </span>            :   /** @brief number of coupling cycles, that is continuum time steps; MD/DPD:</a>
-<a name="287"><span class="lineNum">     287 </span>            :    * 1000 */</a>
-<a name="288"><span class="lineNum">     288 </span>            :   int couplingCycles;</a>
-<a name="289"><span class="lineNum">     289 </span>            :   /** @brief true if data will be send &amp; received from the md to the continuum</a>
-<a name="290"><span class="lineNum">     290 </span>            :    * solver */</a>
-<a name="291"><span class="lineNum">     291 </span>            :   bool md2Macro;</a>
-<a name="292"><span class="lineNum">     292 </span>            :   /** @brief true if data will be send &amp; received from the continuum to the md</a>
-<a name="293"><span class="lineNum">     293 </span>            :    * solver  */</a>
-<a name="294"><span class="lineNum">     294 </span>            :   bool macro2Md;</a>
-<a name="295"><span class="lineNum">     295 </span>            :   /** @brief true if the signal to noise ratio shall be evaluated */</a>
-<a name="296"><span class="lineNum">     296 </span>            :   bool computeSNR;</a>
-<a name="297"><span class="lineNum">     297 </span>            :   /** @brief true if from the md solver will be applied as boundary condition</a>
-<a name="298"><span class="lineNum">     298 </span>            :    * for the continuum solver */</a>
-<a name="299"><span class="lineNum">     299 </span>            :   bool twoWayCoupling;</a>
-<a name="300"><span class="lineNum">     300 </span>            :   /** @brief number of coupling cycles before a filter is applied*/</a>
-<a name="301"><span class="lineNum">     301 </span>            :   int filterInitCycles;</a>
-<a name="302"><span class="lineNum">     302 </span>            :   /** @brief the time step interval for writing the md data to csv files  */</a>
-<a name="303"><span class="lineNum">     303 </span>            :   int csvEveryTimestep;</a>
-<a name="304"><span class="lineNum">     304 </span>            :   /** @brief the type of continuum solver */</a>
-<a name="305"><span class="lineNum">     305 </span>            :   MacroSolverType maSolverType;</a>
-<a name="306"><span class="lineNum">     306 </span>            :   /** @brief the type of md solver */</a>
-<a name="307"><span class="lineNum">     307 </span>            :   MicroSolverType miSolverType;</a>
-<a name="308"><span class="lineNum">     308 </span>            :   /** @brief the general density of the fluid under consideration */</a>
-<a name="309"><span class="lineNum">     309 </span>            :   double density;</a>
-<a name="310"><span class="lineNum">     310 </span>            :   /** @brief the kinematic viscosity of the fluid under consideration */</a>
-<a name="311"><span class="lineNum">     311 </span>            :   double kinVisc;</a>
-<a name="312"><span class="lineNum">     312 </span>            :   /** @brief only for LB couette solver: number of processes */</a>
-<a name="313"><span class="lineNum">     313 </span>            :   tarch::la::Vector&lt;3, unsigned int&gt; lbNumberProcesses;</a>
-<a name="314"><span class="lineNum">     314 </span>            :   /** @brief  only for LB couette solver: VTK plotting per time step */</a>
-<a name="315"><span class="lineNum">     315 </span>            :   int plotEveryTimestep;</a>
-<a name="316"><span class="lineNum">     316 </span>            :   /** @brief number of cycles the continuum solver is advanced before the</a>
-<a name="317"><span class="lineNum">     317 </span>            :    * coupling is enabled */</a>
-<a name="318"><span class="lineNum">     318 </span>            :   int initAdvanceCycles;</a>
-<a name="319"><span class="lineNum">     319 </span>            :   /** @brief the start temperature for the fluid under consideration */</a>
-<a name="320"><span class="lineNum">     320 </span>            :   double temp;</a>
-<a name="321"><span class="lineNum">     321 </span>            :   /** @brief number of equilibartion time steps = number of time steps that</a>
-<a name="322"><span class="lineNum">     322 </span>            :    * the md will run before the coupling is enabled */</a>
-<a name="323"><span class="lineNum">     323 </span>            :   int equSteps;</a>
-<a name="324"><span class="lineNum">     324 </span>            :   /** @brief the number of md simulation instances in a multi-instance</a>
-<a name="325"><span class="lineNum">     325 </span>            :    * coupling, -1 = dynamic */</a>
-<a name="326"><span class="lineNum">     326 </span>            :   int totalNumberMDSimulations;</a>
-<a name="327"><span class="lineNum">     327 </span>            :   /** @brief the minimum number of md simulation instances in dynamic MD coupling  */</a>
-<a name="328"><span class="lineNum">     328 </span>            :   int lowerBoundNumberMDSimulations;</a>
-<a name="329"><span class="lineNum">     329 </span>            :   /** @brief only for dynamic MD: target absolute velocity error at start of all coupling cycles */</a>
-<a name="330"><span class="lineNum">     330 </span>            :   double absVelErrStart;</a>
-<a name="331"><span class="lineNum">     331 </span>            :   /** @brief only for dynamic MD: target absolute velocity error at end of all coupling cycles */</a>
-<a name="332"><span class="lineNum">     332 </span>            :   double absVelErrEnd;</a>
-<a name="333"><span class="lineNum">     333 </span>            :   /** @brief the sigma for the random noise in the case of synthetic md solver</a>
-<a name="334"><span class="lineNum">     334 </span>            :    */</a>
-<a name="335"><span class="lineNum">     335 </span>            :   double noiseSigma;</a>
-<a name="336"><span class="lineNum">     336 </span>            :   /** @todo piet */</a>
-<a name="337"><span class="lineNum">     337 </span>            :   bool twsLoop;</a>
-<a name="338"><span class="lineNum">     338 </span>            :   /** @todo piet*/</a>
-<a name="339"><span class="lineNum">     339 </span>            :   int twsLoopMin;</a>
-<a name="340"><span class="lineNum">     340 </span>            :   /** @todo piet */</a>
-<a name="341"><span class="lineNum">     341 </span>            :   int twsLoopMax;</a>
-<a name="342"><span class="lineNum">     342 </span>            :   /** @todo piet */</a>
-<a name="343"><span class="lineNum">     343 </span>            :   int twsLoopStep;</a>
-<a name="344"><span class="lineNum">     344 </span>            : </a>
-<a name="345"><span class="lineNum">     345 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
-<a name="346"><span class="lineNum">     346 </span>            :   /** @brief the configurations for the OpenFoam solver */</a>
-<a name="347"><span class="lineNum">     347 </span>            :   FoamConfig foam;</a>
-<a name="348"><span class="lineNum">     348 </span>            : #endif</a>
-<a name="349"><span class="lineNum">     349 </span>            : };</a>
-<a name="350"><span class="lineNum">     350 </span>            : </a>
+<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          8 :     return cfg;</span></a>
+<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          4 :   }</span></a>
+<a name="258"><span class="lineNum">     258 </span>            : </a>
+<a name="259"><span class="lineNum">     259 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
+<a name="260"><span class="lineNum">     260 </span>            :   /** @brief holds the variables necessary for the interface to the IcoFoam</a>
+<a name="261"><span class="lineNum">     261 </span>            :    * solver  */</a>
+<a name="262"><span class="lineNum">     262 </span>            :   struct FoamConfig {</a>
+<a name="263"><span class="lineNum">     263 </span>            :     /** @brief the path to the directory, where the folder with the IcoFoam</a>
+<a name="264"><span class="lineNum">     264 </span>            :      * OpenFOAM setup files are */</a>
+<a name="265"><span class="lineNum">     265 </span>            :     std::string directory;</a>
+<a name="266"><span class="lineNum">     266 </span>            :     /** @brief the name of the OpenFOAM folder */</a>
+<a name="267"><span class="lineNum">     267 </span>            :     std::string folder;</a>
+<a name="268"><span class="lineNum">     268 </span>            :     /** @brief the cubic mesh with a cubic hole has 12 boundaries, this vector</a>
+<a name="269"><span class="lineNum">     269 </span>            :      * tells which of them</a>
+<a name="270"><span class="lineNum">     270 </span>            :      *         shall be coupled with the md; The order has to be the same as in</a>
+<a name="271"><span class="lineNum">     271 </span>            :      * the blockMeshDict */</a>
+<a name="272"><span class="lineNum">     272 </span>            :     tarch::la::Vector&lt;12, unsigned int&gt; boundariesWithMD;</a>
+<a name="273"><span class="lineNum">     273 </span>            :   };</a>
+<a name="274"><span class="lineNum">     274 </span>            : #endif</a>
+<a name="275"><span class="lineNum">     275 </span>            : </a>
+<a name="276"><span class="lineNum">     276 </span>            :   /** @brief channel is always expected to have origin at (0.0,0.0,0.0) and to</a>
+<a name="277"><span class="lineNum">     277 </span>            :    * be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0) */</a>
+<a name="278"><span class="lineNum">     278 </span>            :   double channelheight;</a>
+<a name="279"><span class="lineNum">     279 </span>            :   /** @brief velocity of moving wall (lower boundary moves) */</a>
+<a name="280"><span class="lineNum">     280 </span>            :   tarch::la::Vector&lt;3, double&gt; wallVelocity;</a>
+<a name="281"><span class="lineNum">     281 </span>            :   /** @brief number of coupling cycles that will be done, while the wall</a>
+<a name="282"><span class="lineNum">     282 </span>            :    * velocity is the wallInitVelocity */</a>
+<a name="283"><span class="lineNum">     283 </span>            :   int wallInitCycles;</a>
+<a name="284"><span class="lineNum">     284 </span>            :   /** @brief the velocity at the moving wall (z=0) while the wallInitCycles*/</a>
+<a name="285"><span class="lineNum">     285 </span>            :   tarch::la::Vector&lt;3, double&gt; wallInitVelocity;</a>
+<a name="286"><span class="lineNum">     286 </span>            :   /** @brief total number of oscillation periods of the oscillating wall</a>
+<a name="287"><span class="lineNum">     287 </span>            :    * velocity*/</a>
+<a name="288"><span class="lineNum">     288 </span>            :   double wallOscillations;</a>
+<a name="289"><span class="lineNum">     289 </span>            :   /** @brief number of coupling cycles, that is continuum time steps; MD/DPD:</a>
+<a name="290"><span class="lineNum">     290 </span>            :    * 1000 */</a>
+<a name="291"><span class="lineNum">     291 </span>            :   int couplingCycles;</a>
+<a name="292"><span class="lineNum">     292 </span>            :   /** @brief true if data will be send &amp; received from the md to the continuum</a>
+<a name="293"><span class="lineNum">     293 </span>            :    * solver */</a>
+<a name="294"><span class="lineNum">     294 </span>            :   bool md2Macro;</a>
+<a name="295"><span class="lineNum">     295 </span>            :   /** @brief true if data will be send &amp; received from the continuum to the md</a>
+<a name="296"><span class="lineNum">     296 </span>            :    * solver  */</a>
+<a name="297"><span class="lineNum">     297 </span>            :   bool macro2Md;</a>
+<a name="298"><span class="lineNum">     298 </span>            :   /** @brief true if the signal to noise ratio shall be evaluated */</a>
+<a name="299"><span class="lineNum">     299 </span>            :   bool computeSNR;</a>
+<a name="300"><span class="lineNum">     300 </span>            :   /** @brief true if from the md solver will be applied as boundary condition</a>
+<a name="301"><span class="lineNum">     301 </span>            :    * for the continuum solver */</a>
+<a name="302"><span class="lineNum">     302 </span>            :   bool twoWayCoupling;</a>
+<a name="303"><span class="lineNum">     303 </span>            :   /** @brief number of coupling cycles before a filter is applied*/</a>
+<a name="304"><span class="lineNum">     304 </span>            :   int filterInitCycles;</a>
+<a name="305"><span class="lineNum">     305 </span>            :   /** @brief the time step interval for writing the md data to csv files  */</a>
+<a name="306"><span class="lineNum">     306 </span>            :   int csvEveryTimestep;</a>
+<a name="307"><span class="lineNum">     307 </span>            :   /** @brief the type of continuum solver */</a>
+<a name="308"><span class="lineNum">     308 </span>            :   MacroSolverType maSolverType;</a>
+<a name="309"><span class="lineNum">     309 </span>            :   /** @brief the type of md solver */</a>
+<a name="310"><span class="lineNum">     310 </span>            :   MicroSolverType miSolverType;</a>
+<a name="311"><span class="lineNum">     311 </span>            :   /** @brief the general density of the fluid under consideration */</a>
+<a name="312"><span class="lineNum">     312 </span>            :   double density;</a>
+<a name="313"><span class="lineNum">     313 </span>            :   /** @brief the kinematic viscosity of the fluid under consideration */</a>
+<a name="314"><span class="lineNum">     314 </span>            :   double kinVisc;</a>
+<a name="315"><span class="lineNum">     315 </span>            :   /** @brief only for LB couette solver: number of processes */</a>
+<a name="316"><span class="lineNum">     316 </span>            :   tarch::la::Vector&lt;3, unsigned int&gt; lbNumberProcesses;</a>
+<a name="317"><span class="lineNum">     317 </span>            :   /** @brief  only for LB couette solver: VTK plotting per time step */</a>
+<a name="318"><span class="lineNum">     318 </span>            :   int plotEveryTimestep;</a>
+<a name="319"><span class="lineNum">     319 </span>            :   /** @brief number of cycles the continuum solver is advanced before the</a>
+<a name="320"><span class="lineNum">     320 </span>            :    * coupling is enabled */</a>
+<a name="321"><span class="lineNum">     321 </span>            :   int initAdvanceCycles;</a>
+<a name="322"><span class="lineNum">     322 </span>            :   /** @brief the start temperature for the fluid under consideration */</a>
+<a name="323"><span class="lineNum">     323 </span>            :   double temp;</a>
+<a name="324"><span class="lineNum">     324 </span>            :   /** @brief number of equilibartion time steps = number of time steps that</a>
+<a name="325"><span class="lineNum">     325 </span>            :    * the md will run before the coupling is enabled */</a>
+<a name="326"><span class="lineNum">     326 </span>            :   int equSteps;</a>
+<a name="327"><span class="lineNum">     327 </span>            :   /** @brief the number of md simulation instances in a multi-instance</a>
+<a name="328"><span class="lineNum">     328 </span>            :    * coupling, -1 = dynamic */</a>
+<a name="329"><span class="lineNum">     329 </span>            :   int totalNumberMDSimulations;</a>
+<a name="330"><span class="lineNum">     330 </span>            :   /** @brief the minimum number of md simulation instances in dynamic MD coupling  */</a>
+<a name="331"><span class="lineNum">     331 </span>            :   int lowerBoundNumberMDSimulations;</a>
+<a name="332"><span class="lineNum">     332 </span>            :   /** @brief only for dynamic MD: target absolute velocity error at start of all coupling cycles */</a>
+<a name="333"><span class="lineNum">     333 </span>            :   double absVelErrStart;</a>
+<a name="334"><span class="lineNum">     334 </span>            :   /** @brief only for dynamic MD: target absolute velocity error at end of all coupling cycles */</a>
+<a name="335"><span class="lineNum">     335 </span>            :   double absVelErrEnd;</a>
+<a name="336"><span class="lineNum">     336 </span>            :   /** @brief the sigma for the random noise in the case of synthetic md solver</a>
+<a name="337"><span class="lineNum">     337 </span>            :    */</a>
+<a name="338"><span class="lineNum">     338 </span>            :   double noiseSigma;</a>
+<a name="339"><span class="lineNum">     339 </span>            :   /** @todo piet */</a>
+<a name="340"><span class="lineNum">     340 </span>            :   bool twsLoop;</a>
+<a name="341"><span class="lineNum">     341 </span>            :   /** @todo piet*/</a>
+<a name="342"><span class="lineNum">     342 </span>            :   int twsLoopMin;</a>
+<a name="343"><span class="lineNum">     343 </span>            :   /** @todo piet */</a>
+<a name="344"><span class="lineNum">     344 </span>            :   int twsLoopMax;</a>
+<a name="345"><span class="lineNum">     345 </span>            :   /** @todo piet */</a>
+<a name="346"><span class="lineNum">     346 </span>            :   int twsLoopStep;</a>
+<a name="347"><span class="lineNum">     347 </span>            : </a>
+<a name="348"><span class="lineNum">     348 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
+<a name="349"><span class="lineNum">     349 </span>            :   /** @brief the configurations for the OpenFoam solver */</a>
+<a name="350"><span class="lineNum">     350 </span>            :   FoamConfig foam;</a>
 <a name="351"><span class="lineNum">     351 </span>            : #endif</a>
+<a name="352"><span class="lineNum">     352 </span>            : };</a>
+<a name="353"><span class="lineNum">     353 </span>            : </a>
+<a name="354"><span class="lineNum">     354 </span>            : #endif</a>
 </pre>
       </td>
     </tr>

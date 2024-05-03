@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-02-21 12:45:43</td>
+            <td class="headerValue">2024-05-03 14:00:07</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -73,7 +73,7 @@
 <a name="11"><span class="lineNum">      11 </span>            :                                                          const char* cfgpath)</a>
 <a name="12"><span class="lineNum">      12 </span>            :     :</a>
 <a name="13"><span class="lineNum">      13 </span>            : </a>
-<a name="14"><span class="lineNum">      14 </span><span class="lineNoCov">          0 :       _scope(scope)</span></a>
+<a name="14"><span class="lineNum">      14 </span><span class="lineNoCov">          0 :       _config(ParseConfiguration::XMLConfiguration::load(cfgpath)), _scope(scope)</span></a>
 <a name="15"><span class="lineNum">      15 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
 <a name="16"><span class="lineNum">      16 </span>            :       ,</a>
 <a name="17"><span class="lineNum">      17 </span><span class="lineNoCov">          0 :       _comm(multiMDService.getLocalCommunicator())</span></a>
@@ -83,7 +83,7 @@
 <a name="21"><span class="lineNum">      21 </span>            :   using namespace std::string_literals;</a>
 <a name="22"><span class="lineNum">      22 </span>            : </a>
 <a name="23"><span class="lineNum">      23 </span>            :   // check if provided file is written in proper XML</a>
-<a name="24"><span class="lineNum">      24 </span><span class="lineNoCov">          0 :   if (_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR) {</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineNoCov">          0 :   if (_config.error != tinyxml2::XML_NO_ERROR) {</span></a>
 <a name="25"><span class="lineNum">      25 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;Filter Pipeline config path: &quot; &lt;&lt; cfgpath &lt;&lt; std::endl;</span></a>
 <a name="26"><span class="lineNum">      26 </span><span class="lineNoCov">          0 :     throw std::runtime_error(&quot;Could not read config for Filter-Pipeline: XML syntax error.&quot;);</span></a>
 <a name="27"><span class="lineNum">      27 </span>            :   }</a>
@@ -121,7 +121,7 @@
 <a name="59"><span class="lineNum">      59 </span>            :     }</a>
 <a name="60"><span class="lineNum">      60 </span>            : </a>
 <a name="61"><span class="lineNum">      61 </span>            :     // load sequences</a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     loadSequencesFromXML(_config.FirstChildElement(&quot;filter-pipeline&quot;)-&gt;FirstChildElement(&quot;per-instance&quot;));</span></a>
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     loadSequencesFromXML(_config.root-&gt;FirstChildElement(&quot;filter-pipeline&quot;)-&gt;FirstChildElement(&quot;per-instance&quot;));</span></a>
 <a name="63"><span class="lineNum">      63 </span>            :     break;</a>
 <a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :   case coupling::filtering::Scope::postMultiInstance:</span></a>
 <a name="65"><span class="lineNum">      65 </span>            :     // check for valid amount of input cells</a>
@@ -129,7 +129,7 @@
 <a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :     if (inputCells.size() == CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::linearNumberCellsInDomain) {</span></a>
 <a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :       std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));</span></a>
 <a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :       _outerCells = {};</span></a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :       loadSequencesFromXML(_config.FirstChildElement(&quot;filter-pipeline&quot;)-&gt;FirstChildElement(&quot;post-multi-instance&quot;));</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :       loadSequencesFromXML(_config.root-&gt;FirstChildElement(&quot;filter-pipeline&quot;)-&gt;FirstChildElement(&quot;post-multi-instance&quot;));</span></a>
 <a name="71"><span class="lineNum">      71 </span>            :     }</a>
 <a name="72"><span class="lineNum">      72 </span>            :     // case 2: the input vector is empty</a>
 <a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :     else if (inputCells.size() == 0) {</span></a>
@@ -139,7 +139,7 @@
 <a name="77"><span class="lineNum">      77 </span>            :     // case 3: the input vector contains a nonexpected amount of cells</a>
 <a name="78"><span class="lineNum">      78 </span>            :     else {</a>
 <a name="79"><span class="lineNum">      79 </span>            :       // check if the post-multi-instance filter-pipeline actually contains XML sequences, otherwise ignore</a>
-<a name="80"><span class="lineNum">      80 </span><span class="lineNoCov">          0 :       if (_config.FirstChildElement(&quot;filter-pipeline&quot;)-&gt;FirstChildElement(&quot;post-multi-instance&quot;)-&gt;FirstChildElement()) {</span></a>
+<a name="80"><span class="lineNum">      80 </span><span class="lineNoCov">          0 :       if (_config.root-&gt;FirstChildElement(&quot;filter-pipeline&quot;)-&gt;FirstChildElement(&quot;post-multi-instance&quot;)-&gt;FirstChildElement()) {</span></a>
 <a name="81"><span class="lineNum">      81 </span><span class="lineNoCov">          0 :         throw std::runtime_error(&quot;postMultiInstance FilterPipeline has received an unexpected number of cells: &quot;s + std::to_string(inputCells.size()) + &quot;\n&quot; +</span></a>
 <a name="82"><span class="lineNum">      82 </span>            :                                  &quot;Expected: &quot;s +</a>
 <a name="83"><span class="lineNum">      83 </span>            :                                  std::to_string(CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::linearNumberCellsInDomain) +</a>
@@ -195,9 +195,9 @@
 <a name="133"><span class="lineNum">     133 </span>            : }</a>
 <a name="134"><span class="lineNum">     134 </span>            : </a>
 <a name="135"><span class="lineNum">     135 </span>            : // Private functions of coupling::filtering::FilterPipeline:</a>
-<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 : template &lt;unsigned int dim&gt; bool coupling::filtering::FilterPipeline&lt;dim&gt;::configIsValid(tinyxml2::XMLDocument&amp; cfgfile) {</span></a>
+<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 : template &lt;unsigned int dim&gt; bool coupling::filtering::FilterPipeline&lt;dim&gt;::configIsValid(ParseConfiguration::XMLConfiguration&amp; xmlConfig) {</span></a>
 <a name="137"><span class="lineNum">     137 </span>            :   // Check main node</a>
-<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :   tinyxml2::XMLElement* node = cfgfile.FirstChildElement(&quot;filter-pipeline&quot;);</span></a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :   tinyxml2::XMLElement* node = xmlConfig.root-&gt;FirstChildElement(&quot;filter-pipeline&quot;);</span></a>
 <a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 :   if (!node) {</span></a>
 <a name="140"><span class="lineNum">     140 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;ERROR: Could not read config for Filter-Pipeline: missing &quot;</span></a>
 <a name="141"><span class="lineNum">     141 </span>            :                  &quot;element &lt;filter-pipeline&gt;&quot;</a>

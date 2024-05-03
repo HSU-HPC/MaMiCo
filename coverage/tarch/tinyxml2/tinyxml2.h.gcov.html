@@ -31,13 +31,13 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">11</td>
             <td class="headerCovTableEntry">12</td>
-            <td class="headerCovTableEntryHi">91.7 %</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryHi">92.3 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-02-21 12:45:43</td>
+            <td class="headerValue">2024-05-03 14:00:07</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -568,7 +568,7 @@
 <a name="506"><span class="lineNum">     506 </span>            :   /// Get the XMLDocument that owns this XMLNode.</a>
 <a name="507"><span class="lineNum">     507 </span>            :   const XMLDocument *GetDocument() const { return _document; }</a>
 <a name="508"><span class="lineNum">     508 </span>            :   /// Get the XMLDocument that owns this XMLNode.</a>
-<a name="509"><span class="lineNum">     509 </span>            :   XMLDocument *GetDocument() { return _document; }</a>
+<a name="509"><span class="lineNum">     509 </span><span class="lineCov">         20 :   XMLDocument *GetDocument() { return _document; }</span></a>
 <a name="510"><span class="lineNum">     510 </span>            : </a>
 <a name="511"><span class="lineNum">     511 </span>            :   /// Safely cast to an Element, or null.</a>
 <a name="512"><span class="lineNum">     512 </span>            :   virtual XMLElement *ToElement() { return 0; }</a>
@@ -624,7 +624,7 @@
 <a name="562"><span class="lineNum">     562 </span>            :   */</a>
 <a name="563"><span class="lineNum">     563 </span>            :   const XMLElement *FirstChildElement(const char *value = 0) const;</a>
 <a name="564"><span class="lineNum">     564 </span>            : </a>
-<a name="565"><span class="lineNum">     565 </span><span class="lineCov">         40 :   XMLElement *FirstChildElement(const char *value = 0) { return const_cast&lt;XMLElement *&gt;(const_cast&lt;const XMLNode *&gt;(this)-&gt;FirstChildElement(value)); }</span></a>
+<a name="565"><span class="lineNum">     565 </span><span class="lineCov">         68 :   XMLElement *FirstChildElement(const char *value = 0) { return const_cast&lt;XMLElement *&gt;(const_cast&lt;const XMLNode *&gt;(this)-&gt;FirstChildElement(value)); }</span></a>
 <a name="566"><span class="lineNum">     566 </span>            : </a>
 <a name="567"><span class="lineNum">     567 </span>            :   /// Get the last child node, or null if none exists.</a>
 <a name="568"><span class="lineNum">     568 </span>            :   const XMLNode *LastChild() const { return _lastChild; }</a>
