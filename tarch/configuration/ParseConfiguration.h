@@ -64,7 +64,7 @@ public:
     XMLConfiguration xmlConfig = XMLConfiguration::load(filename);
     tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement(topleveltag.c_str());
     if (node == NULL) {
-      std::cout << "Could not read input file " << std::filesystem::absolute(filename) << " (missing or invalid)" << std::endl;
+      std::cout << "Could not read input file " << filename << " (missing or invalid)" << std::endl;
       exit(EXIT_FAILURE);
     }
     config.parseSubtag(node);
