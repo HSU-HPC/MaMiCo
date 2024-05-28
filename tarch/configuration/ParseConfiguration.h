@@ -44,7 +44,7 @@ public:
    */
   static void readDoubleMandatory(double& storage, tinyxml2::XMLElement* node, std::string tag) {
     double value;
-    if (node->QueryDoubleAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR) {
+    if (node->QueryDoubleAttribute(tag.c_str(), &value) != tinyxml2::XML_SUCCESS) {
       std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
@@ -80,7 +80,7 @@ public:
    */
   static void readIntMandatory(int& storage, tinyxml2::XMLElement* node, std::string tag) {
     int value;
-    if (node->QueryIntAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR) {
+    if (node->QueryIntAttribute(tag.c_str(), &value) != tinyxml2::XML_SUCCESS) {
       std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
