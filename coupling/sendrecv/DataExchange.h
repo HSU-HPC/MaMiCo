@@ -6,6 +6,7 @@
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGE_H_
 
 #include "tarch/la/Vector.h"
+#include "coupling/datastructures/CouplingCell.h"
 
 namespace coupling {
 namespace sendrecv {
@@ -23,7 +24,7 @@ template <class CouplingCell, unsigned int dim> class DataExchange;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class CouplingCell, unsigned int dim> class coupling::sendrecv::DataExchange {
+template <unsigned int dim> class coupling::sendrecv::DataExchange {
 public:
   /** Constructor: assign an tag (_tag) to the DataExchange.
    * @param tag
@@ -55,13 +56,13 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void readFromCell(double* const buffer, const CouplingCell& cell) = 0;
+  virtual void readFromCell(double* const buffer, const coupling::datastructures::CouplingCell<dim>& cell) = 0;
 
   /** local rule to read from receive buffer and write data to coupling cell
    * 	@param buffer
    * 	@param cell
    */
-  virtual void writeToCell(const double* const buffer, CouplingCell& cell) = 0;
+  virtual void writeToCell(const double* const buffer, const coupling::datastructures::CouplingCell<dim>& cell) = 0;
 
   /** returns the number of doubles that are sent per coupling cell. */
   virtual unsigned int getDoublesPerCell() const = 0;

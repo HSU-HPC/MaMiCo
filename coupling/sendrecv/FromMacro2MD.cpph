@@ -5,28 +5,27 @@
 
 #pragma region sequential operations
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                           const std::vector<CouplingCell*>& couplingCellsFromMamico,
-                                                                           const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-                                                                           const I00* const globalCellIndicesFromMacroscopicSolver) {
+template <class CellContainerMacroT, class CouplingCell, unsigned int dim>
+void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MD(const coupling::datastructures::CellContainer<dim> couplingCellContainer,
+                        const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) {
   // send data
-  sendFromMacro2MDNonBlocking(dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+  sendFromMacro2MDNonBlocking(dataExchange, couplingCellContainerFromMacroscopicSolver);
   // wait for MPI calls to be finished and fill coupling cells from Mamico
-  wait4SendFromMacro2MD(dataExchange, couplingCellsFromMamico);
+  wait4SendFromMacro2MD(dataExchange, couplingCellContainer);
 }
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                      const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-                                                                                      const I00* const globalCellIndicesFromMacroscopicSolver) {
+                                                                                      const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver,
+                                                                                      const coupling::datastructures::CellContainer<dim> couplingCellContainer) 
+{
   // empty send and receive buffers
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffers();
 
   // allocate the receive buffers and trigger the MPI-recv
-  allocateReceiveBuffers(dataExchange);
+  allocateReceiveBuffers(dataExchange, couplingCellContainer);
   // fill the send buffers
-  writeToSendBuffer(dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+  writeToSendBuffer(dataExchange, couplingCellContainerFromMacroscopicSolver);
 
   // allocate all requests -> needs to be called AFTER all buffers are filled
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateRequests();
@@ -37,40 +36,43 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MDNonBlo
 }
 
 template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange) {
-  for (auto idx : I10())
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(dataExchange, idx);
+void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange
+                                                                                  const coupling::datastructures::CellContainer<dim>& couplingCellContainer) {
+  // for (auto idx : I10())
+  //   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(dataExchange, idx);
+  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(dataExchange, couplingCellContainer);
 }
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                            const std::vector<CouplingCell*>& couplingCells,
-                                                                            const I00* const globalCellIndices) {
-  const unsigned int numberCells = (unsigned int)couplingCells.size();
-  for (unsigned int i = 0; i < numberCells; i++)
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, *couplingCells[i], globalCellIndices[i]);
+                                                                           const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) {
+  // const unsigned int numberCells = (unsigned int)couplingCells.size();
+  // for (unsigned int i = 0; i < numberCells; i++)
+  //   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, *couplingCells[i], globalCellIndices[i]);
+  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, couplingCellContainerFromMacroscopicSolver);
 }
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                const std::vector<CouplingCell*>& couplingCellsFromMamico) {
+                                                                                const coupling::datastructures::CellContainer<dim>& couplingCellContainer) {
   // wait for all send- and receive operations to complete
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::waitAllOperations();
 
   // fill information from receive buffers into the coupling cells
-  readFromReceiveBuffer(dataExchange, couplingCellsFromMamico);
+  readFromReceiveBuffer(dataExchange, couplingCellContainer);
 }
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                const std::vector<CouplingCell*>& couplingCells) {
-  for (auto idx : I10()) {
-#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, *couplingCells.at(idx.get()), idx);
-#else
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, *couplingCells[idx.get()], idx);
-#endif
-  }
+                                                                                const coupling::datastructures::CellContainer<dim>& couplingCellContainer) {
+//   for (auto idx : I10()) {
+// #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+//     coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, *couplingCells.at(idx.get()), idx);
+// #else
+//     coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, *couplingCells[idx.get()], idx);
+// #endif
+//   }
+  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, couplingCellContainer);
 }
 
 #pragma endregion // sequential operations

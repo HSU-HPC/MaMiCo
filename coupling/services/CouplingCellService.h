@@ -176,7 +176,7 @@ public:
    *  parallelisation via MPI) and writes the respective information to the
    * coupling cells of the tool
    */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) override;
+  void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macroscopicSolverCellContainer) override;
 
   /** sends information from MD to the macroscopic solver. After the
    * send/recv-operations (this also comprises the distributed memory
@@ -185,8 +185,7 @@ public:
    * the respective global cell indices
    *  (-> indices).
    */
-  double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                          const I00* const indices) override;
+  double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer& macroscopicSolverCellContainer) override;
 
   /** applies the filter pipeline and returns the runtime of this operation */
   double applyFilterPipeline() override;

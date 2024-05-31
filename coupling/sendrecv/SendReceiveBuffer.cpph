@@ -2,7 +2,7 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder
 
-template <class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::SendReceiveBuffer() {
+template <class CellContainerT, class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::SendReceiveBuffer() {
   deleteBuffers();
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   _requestsAllocated = false;
@@ -20,7 +20,7 @@ template <class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveB
 #endif
 }
 
-template <class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::~SendReceiveBuffer<CouplingCell, dim>() {
+template <class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::~SendReceiveBuffer<CellContainerT, CouplingCell, dim>() {
   deleteBuffers();
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   if (_requests != NULL) {
@@ -46,7 +46,7 @@ template <class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveB
 #endif
 }
 
-template <class CouplingCell, unsigned int dim>
+template <class CellContainerT, class CouplingCell, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffer(std::map<unsigned int, BufferWithID>& buffer) {
   for (typename std::map<unsigned int, BufferWithID>::iterator it = buffer.begin(); it != buffer.end(); it++) {
     if ((it->second).buffer != NULL) {
@@ -58,7 +58,7 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffer(std:
   buffer.clear();
 }
 
-template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffers() {
+template <class CellContainerT, class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffers() {
   deleteBuffer(_sendBuffer);
   deleteBuffer(_receiveBuffer);
   _bcastBuffer.clear();
@@ -211,7 +211,7 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateBcastBuff
   } // rank
 }
 
-template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerBcasts(const unsigned int thisRank) {
+template <class CellContainerT, class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerBcasts(const unsigned int thisRank) {
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   int counter = 0;
@@ -629,117 +629,133 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReduceReq
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                 const CouplingCell& couplingCell, I01 idx) {
-  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
-  const unsigned int globalIndex = I00{idx}.get();
+                                                                                 CellContainerT& cellContainer) {
+  for(auto pair : cellContainer) {
+    I01* idx;
+    coupling::datastructures::CouplingCell<dim>* couplingCell;
+    std::tie(couplingCell, idx) = pair;
 
-  // determine the ranks which need to receive information of this coupling
-  // cell
-  const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(idx);
-  const unsigned int ranksSize = (unsigned int)ranks.size();
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Rank " << IDXS.getRank() << ": write cell " << idx << " to send buffer;";
-  std::cout << " associated target ranks: ";
-  for (unsigned int i = 0; i < ranksSize; i++) {
-    std::cout << ranks[i] << " ";
+    const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
+    const unsigned int globalIndex = I00{*idx}.get();
+
+    // determine the ranks which need to receive information of this coupling
+    // cell
+    const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(*idx);
+    const unsigned int ranksSize = (unsigned int)ranks.size();
+  #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+    std::cout << "Rank " << IDXS.getRank() << ": write cell " << *idx << " to send buffer;";
+    std::cout << " associated target ranks: ";
+    for (unsigned int i = 0; i < ranksSize; i++) {
+      std::cout << ranks[i] << " ";
+    }
+    std::cout << std::endl;
+  #endif
+
+    // loop over ranks
+    for (unsigned int i = 0; i < ranksSize; i++) {
+
+      // get iterator to map
+      typename std::map<unsigned int, BufferWithID>::iterator thisBuffer = _sendBuffer.find(ranks[i]);
+      if (thisBuffer == _sendBuffer.end()) {
+        _sendBuffer[ranks[i]] = BufferWithID();
+        thisBuffer = _sendBuffer.find(ranks[i]);
+      }
+
+      // increment buffer size and realloc buffer
+      const unsigned int firstPos = (thisBuffer->second).bufferSize * doublesPerCell;
+      (thisBuffer->second).bufferSize++;
+      (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
+      if ((thisBuffer->second).buffer == NULL) {
+        std::cout << "ERROR coupling::SendReceiveBuffer::writeToSendBuffer(): realloc yields NULL ptr!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      // write global cell index and call to specialised function to read from coupling cell and write to send buffer
+      (thisBuffer->second).buffer[firstPos] = (double)globalIndex;
+
+      dataExchange.readFromCell(&((thisBuffer->second).buffer[firstPos + 1]), *couplingCell);
+    } // rank
   }
-  std::cout << std::endl;
-#endif
-
-  // loop over ranks
-  for (unsigned int i = 0; i < ranksSize; i++) {
-
-    // get iterator to map
-    typename std::map<unsigned int, BufferWithID>::iterator thisBuffer = _sendBuffer.find(ranks[i]);
-    if (thisBuffer == _sendBuffer.end()) {
-      _sendBuffer[ranks[i]] = BufferWithID();
-      thisBuffer = _sendBuffer.find(ranks[i]);
-    }
-
-    // increment buffer size and realloc buffer
-    const unsigned int firstPos = (thisBuffer->second).bufferSize * doublesPerCell;
-    (thisBuffer->second).bufferSize++;
-    (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
-    if ((thisBuffer->second).buffer == NULL) {
-      std::cout << "ERROR coupling::SendReceiveBuffer::writeToSendBuffer(): realloc yields NULL ptr!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-
-    // write global cell index and call to specialised function to read from coupling cell and write to send buffer
-    (thisBuffer->second).buffer[firstPos] = (double)globalIndex;
-
-    dataExchange.readFromCell(&((thisBuffer->second).buffer[firstPos + 1]), couplingCell);
-  } // rank
 }
 
 template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                     CouplingCell& couplingCell, I01 idx) {
-  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
-  using namespace coupling::indexing;
+void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, 
+                                                                                     CellContainerT& cellContainer) {
+  for(auto pair : cellContainer) {
+    I01* idx;
+    coupling::datastructures::CouplingCell<dim>* couplingCell;
+    std::tie(couplingCell, idx) = pair;
 
-  const unsigned int globalIndex = I00{idx}.get();
+    const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
+    using namespace coupling::indexing;
 
-  // loop over all received buffers
-  for (typename std::map<unsigned int, BufferWithID>::const_iterator it = _receiveBuffer.begin(); it != _receiveBuffer.end(); it++) {
+    const unsigned int globalIndex = I00{*idx}.get();
 
-    // loop over all received cells of this buffer
-    const unsigned int bufferSize = (it->second).bufferSize;
-    for (unsigned int i = 0; i < bufferSize; i++) {
+    // loop over all received buffers
+    for (typename std::map<unsigned int, BufferWithID>::const_iterator it = _receiveBuffer.begin(); it != _receiveBuffer.end(); it++) {
 
-      // determine global cell index for this coupling cell
-      const unsigned int thisIndex = (unsigned int)(it->second).buffer[i * doublesPerCell];
+      // loop over all received cells of this buffer
+      const unsigned int bufferSize = (it->second).bufferSize;
+      for (unsigned int i = 0; i < bufferSize; i++) {
 
-      // if this is the correct cell, write data into coupling cell and return
-      if (thisIndex == globalIndex) {
-        // read receive buffer and write to coupling cell (use specialised function)
-        dataExchange.writeToCell(&((it->second).buffer[i * doublesPerCell + 1]), couplingCell);
-        return;
-      }
-    } // loop over buffer
-  }   // loop over all buffers
+        // determine global cell index for this coupling cell
+        const unsigned int thisIndex = (unsigned int)(it->second).buffer[i * doublesPerCell];
+
+        // if this is the correct cell, write data into coupling cell and return
+        if (thisIndex == globalIndex) {
+          // read receive buffer and write to coupling cell (use specialised function)
+          dataExchange.writeToCell(&((it->second).buffer[i * doublesPerCell + 1]), *couplingCell);
+          return;
+        }
+      } // loop over buffer
+    }   // loop over all buffers
+  }
 }
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                      I01 idx) {
-  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
+                                                                                      CellContainerT& cellContainer) {
+  for(auto pair : cellContainer) {
+    I01* idx;
+    std::tie(std::ignore, idx) = pair;
+    const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
-  // determine the ranks from which we need to receive information of this coupling cell
-  const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(idx);
-  const unsigned int ranksSize = (unsigned int)ranks.size();
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "Rank " << IDXS.getRank() << ": allocate receive buffers for cell " << idx << ";";
-  std::cout << " associated source ranks: ";
-  for (unsigned int i = 0; i < ranksSize; i++) {
-    std::cout << ranks[i] << " ";
+    // determine the ranks from which we need to receive information of this coupling cell
+    const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(*idx);
+    const unsigned int ranksSize = (unsigned int)ranks.size();
+  #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+    std::cout << "Rank " << IDXS.getRank() << ": allocate receive buffers for cell " << idx << ";";
+    std::cout << " associated source ranks: ";
+    for (unsigned int i = 0; i < ranksSize; i++) {
+      std::cout << ranks[i] << " ";
+    }
+    std::cout << std::endl;
+  #endif
+
+    // loop over ranks
+    for (unsigned int i = 0; i < ranksSize; i++) {
+
+      // get iterator to map
+      typename std::map<unsigned int, BufferWithID>::iterator thisBuffer = _receiveBuffer.find(ranks[i]);
+      if (thisBuffer == _receiveBuffer.end()) {
+        _receiveBuffer[ranks[i]] = BufferWithID();
+        thisBuffer = _receiveBuffer.find(ranks[i]);
+      }
+
+      // increment buffer size and realloc buffer
+      const unsigned int firstPos = (thisBuffer->second).bufferSize * doublesPerCell;
+      (thisBuffer->second).bufferSize++;
+      (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
+      if ((thisBuffer->second).buffer == NULL) {
+        std::cout << "ERROR coupling::SendReceiveBuffer::allocateReceiveBuffers(): realloc yields NULL ptr!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      // set all values to -1.0
+      for (unsigned int j = firstPos; j < firstPos + doublesPerCell; j++) {
+        (thisBuffer->second).buffer[j] = -1.0;
+      }
+    } // rank
   }
-  std::cout << std::endl;
-#endif
-
-  // loop over ranks
-  for (unsigned int i = 0; i < ranksSize; i++) {
-
-    // get iterator to map
-    typename std::map<unsigned int, BufferWithID>::iterator thisBuffer = _receiveBuffer.find(ranks[i]);
-    if (thisBuffer == _receiveBuffer.end()) {
-      _receiveBuffer[ranks[i]] = BufferWithID();
-      thisBuffer = _receiveBuffer.find(ranks[i]);
-    }
-
-    // increment buffer size and realloc buffer
-    const unsigned int firstPos = (thisBuffer->second).bufferSize * doublesPerCell;
-    (thisBuffer->second).bufferSize++;
-    (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
-    if ((thisBuffer->second).buffer == NULL) {
-      std::cout << "ERROR coupling::SendReceiveBuffer::allocateReceiveBuffers(): realloc yields NULL ptr!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    // set all values to -1.0
-    for (unsigned int j = firstPos; j < firstPos + doublesPerCell; j++) {
-      (thisBuffer->second).buffer[j] = -1.0;
-    }
-  } // rank
 }
 
 template <class CouplingCell, unsigned int dim>

@@ -6,7 +6,7 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/datastructures/CouplingCell.h"
-#include "coupling/interface/MDSolverInterface.h"
+#include "coupling/indexing/IndexingService.h"
 
 namespace coupling {
 namespace datastructures {
@@ -23,11 +23,42 @@ template <class CellIndexT, unsigned int dim> class CellContainer;
 template <class CellIndexT, unsigned int dim> class coupling::datastructures::CellContainer {
 
 public:
+  
   /** returns a pointer to the coupling cell without access to linked cells. */
   const coupling::datastructures::CouplingCell<dim>* operator[](CellIndexT index) const;
 
   /** adds a new coupling cell to the datastructure at the next index (will only work if the data structure is not yet full)*/
   void operator<<(coupling::datastructures::CouplingCell<dim>* couplingCell);
+
+  class Iterator {
+  public:
+    using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::iterator;
+
+    Iterator(CouplingCellIterator itCouplingCells) : _itCouplingCells(itCouplingCells) {}
+
+    std::pair<coupling::datastructures::CouplingCell<dim>*, I01*> operator*() const { 
+      return std::make_pair(*_itCouplingCells, new CellIndexT(std::distance(_couplingCells.begin(), _itCouplingCells))); 
+    }
+
+    Iterator& operator++() { return *this; }
+
+    Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
+
+    friend bool operator==(const Iterator& a, const Iterator& b) {
+      return *(a._itCouplingCells) == *(b._itCouplingCells); 
+    }
+
+    friend bool operator!=(const Iterator& a, const Iterator& b) { 
+      return *(a._itCouplingCells) != *(b._itCouplingCells); 
+    }
+
+  private:
+    CouplingCellIterator _itCouplingCells;
+  };
+
+  Iterator begin() { return Iterator(_couplingCells.begin()); }
+  Iterator end()   { return Iterator(_couplingCells.end()); }
+
 
 protected:
   /** holds pointers to all coupling cells with linked cells, but without

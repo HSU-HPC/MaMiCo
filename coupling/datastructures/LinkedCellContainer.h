@@ -3,6 +3,7 @@
 
 #include "CellContainer.h"
 #include "coupling/datastructures/CouplingCellWithLinkedCells.h"
+#include "coupling/interface/MDSolverInterface.h"
 
 namespace coupling {
 namespace datastructures {

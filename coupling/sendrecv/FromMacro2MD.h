@@ -25,12 +25,12 @@ template <class CouplingCell, unsigned int dim> class FromMacro2MD;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class CouplingCell, unsigned int dim> class coupling::sendrecv::FromMacro2MD : public coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim> {
+template <class CellContainerT, class CouplingCell, unsigned int dim> class coupling::sendrecv::FromMacro2MD : public coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim> {
 
 public:
   /** Constructor, just calling the constructor of the
    * coupling::sendrecv::SendReceiveBuffer  */
-  FromMacro2MD() : coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>() {}
+  FromMacro2MD() : coupling::sendrecv::SendReceiveBuffer<CellContainerT, CouplingCell, dim>() {}
   /** Destructor */
   virtual ~FromMacro2MD() {}
 
@@ -47,8 +47,8 @@ public:
    * 	@param couplingCellsFromMacroscopicSolver
    * 	@param globalCellIndicesFromMacroscopicSolver
    */
-  void sendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCellsFromMamico,
-                        const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver, const I00* const globalCellIndicesFromMacroscopicSolver);
+  void sendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::CellContainer<dim> couplingCellContainer,
+                        const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver);
 
   void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices,
                          const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver, const I00* const globalCellIndicesFromMacroscopicSolver,

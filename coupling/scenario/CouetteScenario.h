@@ -476,13 +476,13 @@ protected:
 
       // extract data from couette solver and send them to MD (can take any
       // index-conversion object)
-      fillSendBuffer(_cfg.density, *_couetteSolver, _buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
+      fillSendBuffer(_cfg.density, *_couetteSolver, _buf.sendBuffer);
     }
     if (_cfg.macro2Md) {
 #ifdef USE_COLLECTIVE_MPI
       _multiMDCellService->bcastFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
 #else
-      _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer, _buf.globalCellIndices4SendBuffer);
+      _multiMDCellService->sendFromMacro2MD(_buf.sendBuffer);
 #endif
       // std::cout << "Finish _multiMDCellService->sendFromMacro2MD " <<
       // std::endl;
@@ -665,11 +665,11 @@ protected:
     }
 
     // free buffers/arrays
-    deleteBuffer(_buf.sendBuffer);
-    if (_buf.globalCellIndices4SendBuffer != NULL) {
-      delete[] _buf.globalCellIndices4SendBuffer;
-      _buf.globalCellIndices4SendBuffer = NULL;
-    }
+    // deleteBuffer(_buf.sendBuffer);
+    // if (_buf.globalCellIndices4SendBuffer != NULL) {
+    //   delete[] _buf.globalCellIndices4SendBuffer;
+    //   _buf.globalCellIndices4SendBuffer = NULL;
+    // }
     deleteBuffer(_buf.recvBuffer);
     if (_buf.globalCellIndices4RecvBuffer != NULL) {
       delete[] _buf.globalCellIndices4RecvBuffer;
@@ -724,26 +724,33 @@ protected:
    *  @brief allocates the send buffer (with values for all coupling cells).
    *  @param couetteSolverInterface interface for the continuum solver */
   void allocateSendBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
-    deleteBuffer(_buf.sendBuffer);
+    // deleteBuffer(_buf.sendBuffer);
+    std::vector<I01*> indices;
+    std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells;
     unsigned int numCellsSent = 0;
-    for (auto idx : I08())
-      if (!I12::contains(idx))
-        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank))
-          numCellsSent++;
-    // allocate array for cell indices
-    I00* indices = new I00[numCellsSent];
-    if (indices == NULL)
-      throw std::runtime_error(std::string("ERROR allocateSendBuffer(): indices==NULL!"));
-    // allocate sendBuffer and initialise all entries, incl. indices
-    for (auto idx : I08())
-      if (!I12::contains(idx))
+    for (auto idx : I08()) {
+      if (!I12::contains(idx)) {
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
-          _buf.sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
-          if (_buf.sendBuffer.back() == NULL)
-            throw std::runtime_error(std::string("ERROR CouetteScenario::allocateSendBuffer: sendBuffer.back()==NULL!"));
-          indices[_buf.sendBuffer.size() - 1] = idx;
+          indices.push_back(&idx);
+          couplingCells.push_back(new coupling::datastructures::CouplingCell<3>());
         }
-    _buf.globalCellIndices4SendBuffer = indices;
+      }
+    }
+    _buf.sendBuffer{couplingCells, indices};
+    // // allocate array for cell indices
+    // I00* indices = new I00[numCellsSent];
+    // if (indices == NULL)
+    //   throw std::runtime_error(std::string("ERROR allocateSendBuffer(): indices==NULL!"));
+    // // allocate sendBuffer and initialise all entries, incl. indices
+    // for (auto idx : I08())
+    //   if (!I12::contains(idx))
+    //     if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
+    //       _buf.sendBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
+    //       if (_buf.sendBuffer.back() == NULL)
+    //         throw std::runtime_error(std::string("ERROR CouetteScenario::allocateSendBuffer: sendBuffer.back()==NULL!"));
+    //       indices[_buf.sendBuffer.size() - 1] = idx;
+    //     }
+    // _buf.globalCellIndices4SendBuffer = indices;
   }
 
   /** allocates the recv-buffer. This buffer contains all global inner coupling cells, but only on rank 0. On all other ranks, no cells are stored and a NULL
@@ -826,19 +833,23 @@ protected:
    *  @param globalCellIndices4SendBuffer the global linearized indices of the
    * coupling cells in the buffer  */
   void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,
-                      std::vector<coupling::datastructures::CouplingCell<3>*>& sendBuffer, const I00* const globalCellIndices4SendBuffer) const {
+                      coupling::datastructures::FlexibleCellContainer<3>& sendBuffer) const {
     using coupling::configurations::CouetteConfig;
     using namespace coupling::indexing;
     const tarch::la::Vector<3, double> dx(IndexingService<3>::getInstance().getCouplingCellSize());
     double mass = density * dx[0] * dx[1] * dx[2];
-    for (unsigned int i = 0; i < sendBuffer.size(); i++) {
-      auto midPoint = globalCellIndices4SendBuffer[i].getCellMidPoint();
+    for (auto pair : sendBuffer) {
+    // for (unsigned int i = 0; i < sendBuffer.size(); i++) {
+      I01* idx;
+      coupling::datastructures::CouplingCell<3>* couplingCell;
+      std::tie(idx, couplingCell) = pair;
+      auto midPoint = (*idx).getCellMidPoint();
       if (_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD)
         mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(midPoint);
       // compute momentum
       tarch::la::Vector<3, double> momentum(mass * couetteSolver.getVelocity(midPoint));
-      sendBuffer[i]->setMicroscopicMass(mass);
-      sendBuffer[i]->setMicroscopicMomentum(momentum);
+      couplingCell->setMicroscopicMass(mass);
+      couplingCell->setMicroscopicMomentum(momentum);
     }
   }
 
@@ -967,9 +978,7 @@ protected:
    *  @brief holds the buffers for the data transfer */
   struct CouplingBuffer {
     /** @brief the buffer for data transfer from macro to md */
-    std::vector<coupling::datastructures::CouplingCell<3>*> sendBuffer;
-    /** @brief the global indices of the coupling cells in the sendBuffer */
-    I00* globalCellIndices4SendBuffer;
+    coupling::datastructures::FlexibleCellContainer<3> macro2MDbuffer;
     /** @brief the buffer for data transfer from md to macro */
     std::vector<coupling::datastructures::CouplingCell<3>*> recvBuffer;
     /** @brief the global indices of the coupling cells in the recvBuffer*/

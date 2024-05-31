@@ -4,6 +4,11 @@
 // www5.in.tum.de/mamico
 
 template <class CellIndexT, unsigned int dim>
+const std::vector<coupling::datastructures::CouplingCell<dim>*>& coupling::datastructures::CellContainer<CellIndexT, dim>::getCouplingCells() const {
+  return _couplingCells;
+}
+
+template <class CellIndexT, unsigned int dim>
 const coupling::datastructures::CouplingCell<dim>* coupling::datastructures::CellContainer<CellIndexT, dim>::operator[](CellIndexT idx) const {
   return _couplingCells[indexing::convertToScalar(idx)];
 }
