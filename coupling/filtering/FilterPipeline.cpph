@@ -91,7 +91,14 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
 }
 
 // member functions of coupling::filtering::FilterPipeline
-template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::operator()() {
+template <unsigned int dim> double coupling::filtering::FilterPipeline<dim>::operator()() {
+  timeval start;
+  timeval end;
+  double runtime = 0;
+  if (IDXS.getRank() == 0) {
+    gettimeofday(&start, NULL);
+  }
+
   for (coupling::filtering::FilterSequence<dim>* sequence : _sequences) {
     // finalize FS's filter vector
     if (sequence->isModifiable()) {
@@ -119,6 +126,12 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::opera
         *(_md2MacroCells[i]) = *(sequenceOutputCells[i]);
     }
   }
+
+  if (IDXS.getRank() == 0) {
+    gettimeofday(&end, NULL);
+    runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
+  }
+  return runtime;
 }
 
 template <unsigned int dim>

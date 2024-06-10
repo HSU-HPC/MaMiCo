@@ -60,8 +60,10 @@ public:
    * Applies each FilterSequence in order of their appearance in the config
    * file. Ouput of the specified output-FilterSequence will be written to
    * _md2MacroCells.
+   * 
+   * @returns The runtime of the filter pipeline in usec.
    */
-  void operator()();
+  double operator()();
 
   /*
    * Getters for FilterSequences.
