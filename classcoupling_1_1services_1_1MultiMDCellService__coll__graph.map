@@ -1,7 +1,7 @@
 <map id="coupling::services::MultiMDCellService&lt; LinkedCell, dim &gt;" name="coupling::services::MultiMDCellService&lt; LinkedCell, dim &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="581,13,723,69"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1sendrecv_1_1FromMD2Macro.html" title=" " alt="" coords="222,5,434,76"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="449,38,581,38,581,43,449,43"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="580,13,721,69"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1sendrecv_1_1FromMD2Macro.html" title=" " alt="" coords="221,5,433,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="448,38,579,38,579,43,448,43"/>
 <area shape="rect" id="Node000003" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send&#45;/ receive methodology." alt="" coords="5,13,173,69"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="188,38,222,38,222,43,188,43"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="188,38,220,38,220,43,188,43"/>
 </map>

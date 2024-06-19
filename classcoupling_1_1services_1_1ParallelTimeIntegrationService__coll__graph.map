@@ -1,9 +1,9 @@
 <map id="coupling::services::ParallelTimeIntegrationService&lt; dim &gt;" name="coupling::services::ParallelTimeIntegrationService&lt; dim &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="115,199,320,255"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1configurations_1_1TimeIntegrationConfiguration.html" title="reads time integration configuration" alt="" coords="5,95,198,136"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,144,190,197,187,200,131,148"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="115,198,320,253"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1configurations_1_1TimeIntegrationConfiguration.html" title="reads time integration configuration" alt="" coords="5,94,198,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,143,190,195,187,199,131,147"/>
 <area shape="rect" id="Node000003" href="$classtarch_1_1configuration_1_1Configuration.html" title=" " alt="" coords="37,5,166,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,62,104,95,99,95,99,62"/>
-<area shape="rect" id="Node000004" href="$classScenario.html" title=" " alt="" coords="221,103,294,129"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="250,144,230,199,225,198,245,142"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,62,104,94,99,94,99,62"/>
+<area shape="rect" id="Node000004" href="$classScenario.html" title=" " alt="" coords="221,102,294,127"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="250,143,230,198,225,196,245,141"/>
 </map>

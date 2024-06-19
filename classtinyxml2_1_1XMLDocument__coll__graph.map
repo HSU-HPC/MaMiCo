@@ -1,37 +1,37 @@
 <map id="tinyxml2::XMLDocument" name="tinyxml2::XMLDocument">
-<area shape="rect" id="Node000001" title=" " alt="" coords="1072,171,1233,197"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1072,158,1233,183"/>
 <area shape="rect" id="Node000002" href="$classtinyxml2_1_1XMLNode.html" title=" " alt="" coords="1348,104,1481,130"/>
-<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="1220,164,1360,128,1362,133,1222,169"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1382,141,1355,156,1325,168,1279,178,1234,184,1233,179,1278,173,1323,163,1353,151,1380,136"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="1233,151,1347,128,1348,133,1234,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1377,140,1325,160,1279,168,1234,173,1233,167,1278,163,1323,155,1375,135"/>
 <area shape="poly" id="edge3_Node000002_Node000002" title=" " alt="" coords="1391,87,1399,80,1415,78,1429,80,1438,86,1441,96,1437,105,1432,103,1435,95,1434,89,1427,85,1415,83,1401,85,1394,91"/>
 <area shape="rect" id="Node000003" href="$classtinyxml2_1_1StrPair.html" title=" " alt="" coords="1095,82,1210,107"/>
 <area shape="poly" id="edge4_Node000002_Node000003" title=" " alt="" coords="1226,98,1348,109,1347,114,1225,103"/>
-<area shape="rect" id="Node000004" href="$classtinyxml2_1_1MemPool.html" title=" " alt="" coords="463,71,592,97"/>
-<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="572,63,625,48,658,46,690,48,962,50,1081,54,1233,67,1279,71,1325,81,1383,101,1381,106,1323,86,1279,77,1233,72,1081,60,962,55,690,53,658,51,626,53,574,68"/>
-<area shape="rect" id="Node000005" href="$classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="719,75,929,116"/>
-<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="607,68,625,67,658,65,691,67,731,72,730,78,690,72,658,70,626,72,608,74"/>
-<area shape="rect" id="Node000009" href="$classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="718,323,930,364"/>
-<area shape="poly" id="edge14_Node000009_Node000004" title=" " alt="" coords="570,102,647,141,692,167,702,184,706,200,705,230,704,259,708,274,716,289,735,307,758,321,755,325,732,311,712,292,703,276,698,260,699,230,701,201,697,186,688,171,644,146,568,106"/>
-<area shape="rect" id="Node000010" href="$classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="730,238,918,279"/>
-<area shape="poly" id="edge18_Node000010_Node000004" title=" " alt="" coords="608,91,653,106,674,119,692,134,704,155,705,175,706,195,716,214,746,236,743,240,712,218,701,196,700,176,699,156,688,138,671,123,650,111,606,96"/>
-<area shape="rect" id="Node000011" href="$classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="714,163,934,204"/>
-<area shape="poly" id="edge22_Node000011_Node000004" title=" " alt="" coords="608,79,650,86,692,100,705,112,716,126,775,161,772,165,713,130,701,116,689,105,649,91,607,85"/>
-<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="918,118,1102,168,1101,173,917,123"/>
-<area shape="rect" id="Node000006" href="$classtinyxml2_1_1DynArray.html" title=" " alt="" coords="453,259,601,314"/>
-<area shape="poly" id="edge8_Node000005_Node000006" title=" " alt="" coords="574,247,639,199,713,150,777,114,780,119,716,154,642,203,577,251"/>
-<area shape="poly" id="edge15_Node000009_Node000006" title=" " alt="" coords="596,318,626,328,672,337,718,341,717,347,671,342,625,333,595,323"/>
-<area shape="poly" id="edge19_Node000010_Node000006" title=" " alt="" coords="617,304,626,306,658,309,690,306,736,293,778,277,780,282,738,298,691,311,658,314,625,311,616,310"/>
-<area shape="poly" id="edge23_Node000011_Node000006" title=" " alt="" coords="616,284,654,276,689,261,697,253,700,244,704,235,713,224,750,203,752,207,716,229,709,237,705,246,701,256,692,265,656,281,618,289"/>
-<area shape="rect" id="Node000007" href="$structtinyxml2_1_1MemPoolT_1_1Block.html" title=" " alt="" coords="229,266,366,307"/>
-<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="381,284,453,284,453,289,381,289"/>
-<area shape="rect" id="Node000008" href="$uniontinyxml2_1_1MemPoolT_1_1Chunk.html" title=" " alt="" coords="5,266,143,307"/>
-<area shape="poly" id="edge12_Node000005_Node000008" title=" " alt="" coords="110,254,171,207,253,151,349,97,400,74,452,56,518,39,570,34,624,37,691,48,734,58,775,72,773,77,733,63,690,53,623,43,571,39,519,45,454,61,402,79,352,102,256,156,174,211,113,258"/>
-<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="158,284,228,284,228,289,158,289"/>
-<area shape="poly" id="edge11_Node000008_Node000008" title=" " alt="" coords="54,249,61,242,74,240,86,242,94,248,97,256,96,266,91,265,92,257,90,251,84,247,74,245,63,247,57,253"/>
-<area shape="poly" id="edge16_Node000009_Node000008" title=" " alt="" coords="114,314,167,350,230,381,300,401,373,411,447,413,520,409,590,400,654,389,758,362,759,367,655,394,591,406,521,415,447,419,373,417,299,406,228,386,164,355,111,319"/>
-<area shape="poly" id="edge20_Node000010_Node000008" title=" " alt="" coords="137,311,246,349,314,367,388,381,465,388,542,386,618,372,654,360,689,344,697,338,701,329,705,320,712,310,738,291,766,277,768,282,741,296,716,314,709,323,706,332,701,341,692,349,656,365,619,377,543,391,465,393,387,386,313,372,245,354,135,316"/>
-<area shape="poly" id="edge24_Node000011_Node000008" title=" " alt="" coords="157,265,228,252,426,223,625,200,714,191,714,196,626,205,427,228,229,257,158,271"/>
-<area shape="poly" id="edge13_Node000001_Node000009" title=" " alt="" coords="895,315,969,284,1046,247,1131,195,1134,199,1049,252,971,289,897,320"/>
-<area shape="poly" id="edge17_Node000001_Node000010" title=" " alt="" coords="931,232,1092,195,1093,200,932,237"/>
-<area shape="poly" id="edge21_Node000001_Node000011" title=" " alt="" coords="949,181,1071,181,1071,186,949,186"/>
+<area shape="rect" id="Node000004" href="$classtinyxml2_1_1MemPool.html" title=" " alt="" coords="463,52,592,78"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="607,57,625,56,714,53,974,50,1088,54,1233,67,1279,72,1325,81,1383,101,1381,106,1323,86,1279,77,1233,72,1087,59,974,55,714,58,625,61,607,62"/>
+<area shape="rect" id="Node000005" href="$classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="719,68,929,108"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="607,61,625,61,690,61,719,64,718,70,690,66,625,66,607,67"/>
+<area shape="rect" id="Node000009" href="$classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="718,310,930,351"/>
+<area shape="poly" id="edge14_Node000009_Node000004" title=" " alt="" coords="570,83,645,123,692,154,702,171,706,187,705,217,704,246,707,260,716,276,735,294,758,307,755,312,732,298,712,279,703,262,698,246,699,217,700,188,697,173,688,158,642,127,567,88"/>
+<area shape="rect" id="Node000010" href="$classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="730,225,918,266"/>
+<area shape="poly" id="edge18_Node000010_Node000004" title=" " alt="" coords="608,76,653,94,674,107,692,123,704,144,705,164,706,182,716,201,746,222,743,227,712,204,701,184,700,164,699,145,688,127,671,112,650,99,606,81"/>
+<area shape="rect" id="Node000011" href="$classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="714,150,934,191"/>
+<area shape="poly" id="edge22_Node000011_Node000004" title=" " alt="" coords="608,67,650,76,692,92,705,105,716,118,769,147,766,152,713,122,701,108,689,97,649,81,607,72"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="923,110,1099,154,1097,160,922,115"/>
+<area shape="rect" id="Node000006" href="$classtinyxml2_1_1DynArray.html" title=" " alt="" coords="453,245,601,301"/>
+<area shape="poly" id="edge8_Node000005_Node000006" title=" " alt="" coords="596,235,643,205,688,169,700,153,713,137,737,120,763,106,766,111,740,124,716,140,704,156,692,173,646,209,599,240"/>
+<area shape="poly" id="edge15_Node000009_Node000006" title=" " alt="" coords="594,305,626,316,672,325,718,329,717,334,671,330,625,321,592,310"/>
+<area shape="poly" id="edge19_Node000010_Node000006" title=" " alt="" coords="617,291,626,292,658,295,690,292,736,280,778,264,780,269,738,285,691,297,658,301,625,297,616,296"/>
+<area shape="poly" id="edge23_Node000011_Node000006" title=" " alt="" coords="616,271,654,263,689,247,697,240,700,231,704,221,713,211,750,189,752,194,716,215,709,224,705,233,701,243,692,252,656,268,618,276"/>
+<area shape="rect" id="Node000007" href="$structtinyxml2_1_1MemPoolT_1_1Block.html" title=" " alt="" coords="229,253,366,294"/>
+<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="381,271,453,271,453,276,381,276"/>
+<area shape="rect" id="Node000008" href="$uniontinyxml2_1_1MemPoolT_1_1Chunk.html" title=" " alt="" coords="5,253,143,294"/>
+<area shape="poly" id="edge12_Node000005_Node000008" title=" " alt="" coords="108,240,168,192,251,134,348,78,399,55,452,37,494,28,538,25,624,30,703,45,768,64,766,70,702,51,623,35,538,30,495,34,454,42,401,60,350,83,254,138,172,196,111,245"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="158,271,228,271,228,276,158,276"/>
+<area shape="poly" id="edge11_Node000008_Node000008" title=" " alt="" coords="54,235,61,229,74,226,86,228,94,234,97,243,96,252,91,252,92,244,90,238,84,233,74,231,63,234,57,239"/>
+<area shape="poly" id="edge16_Node000009_Node000008" title=" " alt="" coords="112,301,166,340,197,358,230,373,301,394,375,404,450,406,523,401,594,391,658,377,762,349,764,354,660,383,595,396,524,406,450,411,374,409,300,399,228,378,194,363,163,344,109,306"/>
+<area shape="poly" id="edge20_Node000010_Node000008" title=" " alt="" coords="135,297,244,337,313,356,387,371,464,378,542,376,618,362,654,350,689,334,697,326,701,318,704,307,712,297,738,278,765,264,767,268,741,283,716,300,709,310,706,320,701,329,692,338,656,355,619,367,543,382,464,384,386,376,312,361,243,343,133,303"/>
+<area shape="poly" id="edge24_Node000011_Node000008" title=" " alt="" coords="157,252,228,239,426,209,625,187,714,177,714,183,626,192,427,215,229,244,158,257"/>
+<area shape="poly" id="edge13_Node000001_Node000009" title=" " alt="" coords="895,302,969,271,1046,234,1131,182,1134,186,1049,239,971,276,897,307"/>
+<area shape="poly" id="edge17_Node000001_Node000010" title=" " alt="" coords="931,218,1092,181,1093,187,932,223"/>
+<area shape="poly" id="edge21_Node000001_Node000011" title=" " alt="" coords="949,168,1071,168,1071,173,949,173"/>
 </map>
