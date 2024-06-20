@@ -270,7 +270,7 @@ public:
   /** reduce data from MD simulations, averages over them (only macroscopic
    * mass/momentum is considered) and writes the result back into
    * couplingCellsFromMacroscopicSolver.
-   * 
+   *
    * @returns The runtime of filtering related code in usec.
    */
   double reduceFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) {
@@ -347,8 +347,8 @@ public:
   /** collects data from MD simulations, averages over them (only macroscopic
    * mass/momentum is considered) and writes the result back into
    * couplingCellsFromMacroscopicSolver.
-   * 
-   * @returns The runtime of filtering related code in usec. 
+   *
+   * @returns The runtime of filtering related code in usec.
    */
   double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) {
     double res = 0;

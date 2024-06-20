@@ -115,7 +115,8 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macroscopicSolverCellContainer) {
+void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(
+    const coupling::datastructures::FlexibleCellContainer<dim>& macroscopicSolverCellContainer) {
   Wrapper4ProcessInnerCouplingCellBeforeReceivingMacroscopicSolverData wrapper1(this);
   Wrapper4ProcessOuterCouplingCellBeforeReceivingMacroscopicSolverData wrapper2(this);
   Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData wrapper3(this);
