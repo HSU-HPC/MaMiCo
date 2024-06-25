@@ -14,7 +14,7 @@ coupling::datastructures::MacroscopicCells<LinkedCell, dim>::MacroscopicCells(ta
 #endif
 }
 
-template <class LinkedCell, unsigned int dim> coupling::datastructures::MacroscopicCells<LinkedCell, dim>::~MacroscopicCells<LinkedCell, dim>() {
+template <class LinkedCell, unsigned int dim> coupling::datastructures::MacroscopicCells<LinkedCell, dim>::~MacroscopicCells() {
   // delete pointers and clear vector
   const unsigned int size = (unsigned int)_macroscopicCells.size();
   for (unsigned int i = 0; i < size; i++) {

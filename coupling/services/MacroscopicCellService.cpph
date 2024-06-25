@@ -86,7 +86,7 @@ coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::MacroscopicCell
   // initInnerMacroscopicCells(_macroscopicCells.getMacroscopicCells());
 }
 
-template <class LinkedCell, unsigned int dim> coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::~MacroscopicCellServiceImpl<LinkedCell, dim>() {
+template <class LinkedCell, unsigned int dim> coupling::services::MacroscopicCellServiceImpl<LinkedCell, dim>::~MacroscopicCellServiceImpl() {
   // free memory and delete objects
   if (_particleInsertion != NULL) {
     delete _particleInsertion;
