@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-import sys
 import math
-import mamico.tarch.utils
+import sys
+
+import mamico.coupling
 import mamico.tarch.configuration
-import mamico.coupling 
-from mamico.coupling.solvers import CouetteSolverInterface
+import mamico.tarch.utils
 from mamico.coupling.services import MultiMDCellService
+from mamico.coupling.solvers import CouetteSolverInterface
 
 rank = mamico.tarch.utils.initMPI()
 print("rank = " + str(rank))

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import csv
+
 from numpy import random
 
 with open('original_signal.csv', 'w', newline='') as f1, \

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import numpy as np
+import matplotlib.colors as clrs
 import matplotlib.pyplot as plt
-import matplotlib.colors as clrs 
+import numpy as np
 from matplotlib import rcParams
 from pandas import read_csv
 
