@@ -6,8 +6,9 @@ name: CTest
 on: 
   push:
     branches-ignore:
-      # If you want the CI to not run, call your branch work-in-progress by naming it `something-WIP`
+      # If you want the CI to not run, call your branch work-in-progress by naming it `something-WIP` or `something_WIP`  
       - '*-WIP'
+      - '*_WIP'
   pull_request:
     branches:
       - master

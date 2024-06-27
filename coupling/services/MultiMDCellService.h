@@ -266,7 +266,10 @@ public:
 
   /** reduce data from MD simulations, averages over them (only macroscopic
    * mass/momentum is considered) and writes the result back into
-   * couplingCellsFromMacroscopicSolver. */
+   * couplingCellsFromMacroscopicSolver.
+   *
+   * @returns The runtime of filtering related code in usec.
+   */
   double reduceFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_NO)
     // Fall back on sequential operation when MPI is not available (avoids redundant implementation)
@@ -327,7 +330,7 @@ public:
     std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
 #endif
 
-    (*_postMultiInstanceFilterPipeline)();
+    res += (*_postMultiInstanceFilterPipeline)();
 
     // store data in couplingCellsFromMacroscopicSolver
     for (unsigned int i = 0; i < size; i++) {
@@ -383,7 +386,7 @@ public:
     std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
 #endif
 
-    (*_postMultiInstanceFilterPipeline)();
+    res += (*_postMultiInstanceFilterPipeline)();
 
     // store data in couplingCellsFromMacroscopicSolver
     for (unsigned int i = 0; i < size; i++) {

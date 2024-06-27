@@ -115,7 +115,12 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 }
 
 template <class LinkedCell, unsigned int dim>
+<<<<<<< HEAD
 void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2mdCouplingCellContainer) {
+=======
+void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(
+    const coupling::datastructures::FlexibleCellContainer<dim>& macroscopicSolverCellContainer) {
+>>>>>>> origin/refactor2402-WIP
   Wrapper4ProcessInnerCouplingCellBeforeReceivingMacroscopicSolverData wrapper1(this);
   Wrapper4ProcessOuterCouplingCellBeforeReceivingMacroscopicSolverData wrapper2(this);
   Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData wrapper3(this);
@@ -145,26 +150,10 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 }
 
 template <class LinkedCell, unsigned int dim> double coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::applyFilterPipeline() {
-  timeval start;
-  timeval end;
-  double runtime = 0;
-  if (IDXS.getRank() == 0) {
-    gettimeofday(&start, NULL);
-  }
-
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << "FP: Now applying per-instance filter pipeline for service ID: " << coupling::services::CouplingCellService<dim>::getID() << std::endl;
 #endif
-
-  if (_filterPipeline != nullptr) {
-    (*_filterPipeline)();
-  }
-
-  if (IDXS.getRank() == 0) {
-    gettimeofday(&end, NULL);
-    runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
-  }
-  return runtime;
+  return (*_filterPipeline)();
 }
 
 template <class LinkedCell, unsigned int dim>

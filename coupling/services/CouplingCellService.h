@@ -182,6 +182,8 @@ public:
    * written to the buffer couplingCellsFromMacroscopicSolver together with
    * the respective global cell indices
    *  (-> indices).
+   *
+   * @returns The runtime of filtering related code in usec.
    */
   double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer& macroscopicSolverCellContainer) override;
 
