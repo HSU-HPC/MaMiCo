@@ -115,7 +115,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macroscopicSolverCellContainer) {
+void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2mdCouplingCellContainer) {
   Wrapper4ProcessInnerCouplingCellBeforeReceivingMacroscopicSolverData wrapper1(this);
   Wrapper4ProcessOuterCouplingCellBeforeReceivingMacroscopicSolverData wrapper2(this);
   Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData wrapper3(this);
@@ -126,7 +126,7 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro
   _couplingCells.applyToLocalGhostCouplingCellsWithLinkedCells(wrapper2);
 
   // carry out send-receive steps
-  _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, _couplingCellContainer, macroscopicSolverCellContainer);
+  _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, _couplingCellContainer, macro2mdCouplingCellContainer);
 
   // post-process inner coupling cells after receiving information from
   // macroscopic solver

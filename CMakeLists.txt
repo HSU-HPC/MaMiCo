@@ -639,7 +639,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/MDSolverInterface.h"
   "coupling/interface/PintableMacroSolver.h"
   "coupling/KineticEnergyController.h"
-  "coupling/solvers/FiniteDifferenceSolver.h"
   "coupling/solvers/FDCouetteSolver.h"
   "coupling/solvers/IcoFoamInterface.h"
   "coupling/solvers/LBCouetteSolver.h"

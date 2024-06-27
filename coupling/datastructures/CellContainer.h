@@ -30,6 +30,8 @@ public:
   /** adds a new coupling cell to the datastructure at the next index (will only work if the data structure is not yet full)*/
   void operator<<(coupling::datastructures::CouplingCell<dim>* couplingCell);
 
+  int size() const {return _couplingCells.size();}
+
   class Iterator {
   public:
     using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::iterator;

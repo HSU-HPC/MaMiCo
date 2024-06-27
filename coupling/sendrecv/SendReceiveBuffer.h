@@ -20,7 +20,7 @@
 
 namespace coupling {
 namespace sendrecv {
-template <class CouplingCell, unsigned int dim> class SendReceiveBuffer;
+template <class CellIndexT, unsigned int dim> class SendReceiveBuffer;
 }
 } // namespace coupling
 
@@ -32,7 +32,7 @@ template <class CouplingCell, unsigned int dim> class SendReceiveBuffer;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class CouplingCell, unsigned int dim> class coupling::sendrecv::SendReceiveBuffer {
+template <class CellIndexT, unsigned int dim> class coupling::sendrecv::SendReceiveBuffer {
 public:
   /** Constructor */
   SendReceiveBuffer();

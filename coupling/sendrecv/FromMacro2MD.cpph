@@ -16,8 +16,8 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MD(const
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                      const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver,
-                                                                                      const coupling::datastructures::CellContainer<dim> couplingCellContainer) 
+                                                                                      const coupling::datastructures::CellContainer<dim> couplingCellContainer,
+                                                                                      const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) 
 {
   // empty send and receive buffers
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffers();

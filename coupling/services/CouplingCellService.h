@@ -58,12 +58,10 @@ public:
   virtual double applyFilterPipeline() = 0;
   virtual void sendFromMacro2MDPreProcess() = 0;
   virtual void sendFromMacro2MDPostProcess() = 0;
-  virtual void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                const I00* const indices) = 0;
+  virtual void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2mdCouplingCellContainer) = 0;
   virtual void sendFromMD2MacroPreProcess() = 0;
   virtual void sendFromMD2MacroPostProcess() = 0;
-  virtual double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                                  const I00* const indices) = 0;
+  virtual double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) = 0;
   virtual void processInnerCouplingCellAfterMDTimestep() = 0;
   virtual void computeAndStoreTemperature(double temperature) = 0;
   virtual void applyTemperatureToMolecules(unsigned int t) = 0;
@@ -307,7 +305,7 @@ private:
   coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
 
   /** for quantity transfer between solvers */
-  coupling::sendrecv::FromMacro2MD<coupling::datastructures::CouplingCell<dim>, dim> _fromMacro2MD;
+  coupling::sendrecv::FromMacro2MD<CellIndexT, dim> _fromMacro2MD;
   coupling::sendrecv::DataExchangeFromMacro2MD<dim> _deFromMacro2MD;
   coupling::sendrecv::FromMD2Macro<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;

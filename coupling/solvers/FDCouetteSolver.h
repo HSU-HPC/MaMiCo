@@ -155,13 +155,16 @@ public:
    *  @param recvBuffer holds the data from the md solver
    *  @param recvIndice the indices to connect the data from the buffer with
    * coupling cells */
-  void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const I00* const recvIndices) override {
+  
+  void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& md2macroBuffer) override {
     if (skipRank()) {
       return;
     }
-    const unsigned int size = (unsigned int)recvBuffer.size();
 #pragma omp parallel for
-    for (unsigned int i = 0; i < size; i++) {
+    for (auto pair : md2macroBuffer) {
+      I01* idx;
+      coupling::datastructures::CouplingCell<3>* couplingCell;
+      std::tie(couplingCell, idx) = pair;
       // determine cell index of this cell in continuum domain
       tarch::la::Vector<3, unsigned int> globalCellCoords{I01{recvIndices[i]}.get()};
       globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;

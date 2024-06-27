@@ -22,13 +22,15 @@ template <unsigned int dim> class FlexibleCellContainer;
 template <unsigned int dim> class coupling::datastructures::FlexibleCellContainer {
 public:
 
-  FlexibleCellContainer(std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells, std::vector<I01*> idxs): _couplingCells(couplingCells), _idxs(idxs) {
-    if (_couplingCells.size() != idxs.size()) {
-      std::cout << "FlexibleCellContainer<" << dim << "> has different number of coupling cells (" << couplingCells.size() << ") than indices (" << idxs.size() << ")" << std::endl;
-                << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
+  void operator<<(std::pair<coupling::datastructures::CouplingCell<dim>*, I01*> pair) {
+    I01* idx;
+    coupling::datastructures::CouplingCell<dim>* couplingCell;
+    std::tie(couplingCell, idx) = pair;
+    _couplingCells.push_back(couplingCell);
+    _idxs.push_back(idx);
   }
+
+  int size() const {return _couplingCells.size();}
 
   class Iterator {
   public:

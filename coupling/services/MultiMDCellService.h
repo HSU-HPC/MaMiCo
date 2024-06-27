@@ -187,15 +187,12 @@ public:
   }
 
   /** send data from macroscopic solver to all MD simulations */
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) {
+  void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2mdCouplingCellContainer) {
     // just send information to all MD instances. This is currently
     // sequentialized inside CouplingCellService/SendRecvBuffer
     for (unsigned int i = 0; i < _totalNumberMDSimulations; i++) {
-      // std::cout << "Rank " <<
-      //_couplingCellServices[i]->getIndexConversion().getThisRank() << ":
-      // Send from macro to MD for Simulation no. " << i << std::endl;
       if (_couplingCellServices[i] != nullptr) {
-        _couplingCellServices[i]->sendFromMacro2MD(couplingCellsFromMacroscopicSolver, indices);
+        _couplingCellServices[i]->sendFromMacro2MD(macro2mdCouplingCellContainer);
       }
     }
   }
@@ -344,9 +341,9 @@ public:
   /** collects data from MD simulations, averages over them (only macroscopic
    * mass/momentum is considered) and writes the result back into
    * couplingCellsFromMacroscopicSolver. */
-  double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) {
+  double sendFromMD2Macro(const coupling::datastructures::CellContainer<I12, dim>& md2macroCouplingCells) {
     double res = 0;
-    const unsigned int size = (unsigned int)couplingCellsFromMacroscopicSolver.size();
+    const unsigned int size = (unsigned int)md2macroCouplingCells.size();
 
     preprocessingForMD2Macro(indices, size);
 
