@@ -9,8 +9,8 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
   // null if junction is empty
   tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
 
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> inputCellVector = _inputCellVector_parted;
-  std::array<std::vector<coupling::datastructures::MacroscopicCell<dim>*>, inputc> outputCellVector = _cellVector2_parted;
+  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> inputCellVector = _inputCellVector_parted;
+  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> outputCellVector = _cellVector2_parted;
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initializing junctor objects." << std::endl;
 #endif

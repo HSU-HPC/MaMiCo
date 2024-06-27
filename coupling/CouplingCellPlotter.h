@@ -2,49 +2,46 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
-#ifndef _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLPLOTTER_H_
-#define _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLPLOTTER_H_
+#ifndef _MOLECULARDYNAMICS_COUPLING_COUPLINGCELLPLOTTER_H_
+#define _MOLECULARDYNAMICS_COUPLING_COUPLINGCELLPLOTTER_H_
 
-#include "coupling/IndexConversion.h"
 #include "coupling/KineticEnergyController.h"
 #include "coupling/cell-mappings/ComputeMassMapping.h"
 #include "coupling/cell-mappings/ComputeMomentumMapping.h"
 #include "coupling/cell-mappings/VTKMoleculePlotter.h"
-#include "coupling/datastructures/MacroscopicCells.h"
+#include "coupling/datastructures/LinkedCellContainer.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "tarch/la/Vector.h"
 #include <fstream>
 #include <sstream>
 
 namespace coupling {
-template <class LinkedCell, unsigned int dim> class MacroscopicCellPlotter;
+template <class LinkedCell, unsigned int dim> class CouplingCellPlotter;
 }
 
-/** @brief plots the macroscopic cell data.
+/** @brief plots the coupling cell data.
  *  @author Philipp Neumann
  *  @tparam LinkedCell the LinkedCell class is given by the implementation of
  * linked cells in the molecular dynamics simulation
  *  @tparam dim  refers to the spacial dimension of the simulation, can be 1, 2,
  * or 3*/
-template <class LinkedCell, unsigned int dim> class coupling::MacroscopicCellPlotter {
+template <class LinkedCell, unsigned int dim> class coupling::CouplingCellPlotter {
 public:
   /** @brief a simple constructor
    *  @param ID the id of the md simulation
    *  @param filename name for the file
    *  @param rank mpi rank of the current process
    *  @param t number of time step to plot
-   *  @param indexConversion indexConversion instance of the current simulation
-   *  @param cells macroscopic cells to plot
+   *  @param cells coupling cells to plot
    *  @param mdSolverInterface interface of the md solver */
-  MacroscopicCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, const coupling::IndexConversion<dim>& indexConversion,
-                         coupling::datastructures::MacroscopicCells<LinkedCell, dim>& cells,
-                         coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
+  CouplingCellPlotter(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, datastructures::LinkedCellContainer<LinkedCell, dim>& cells,
+                      coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     plotMoleculeFile(ID, filename, rank, t, cells, mdSolverInterface);
-    plotMacroscopicCellFile(ID, filename, rank, t, indexConversion, cells, mdSolverInterface);
+    plotCouplingCellFile(ID, filename, rank, t, cells, mdSolverInterface);
   }
 
   /** @brief a simple destructor*/
-  ~MacroscopicCellPlotter() {}
+  ~CouplingCellPlotter() {}
 
 private:
   /** the file will contain the velocity, position, and potentials of the
@@ -54,10 +51,10 @@ private:
    *  @param filename name for the file
    *  @param rank mpi rank of the current process
    *  @param t number of time step to plot
-   *  @param cells macroscopic cells to plot
+   *  @param cells coupling cells to plot
    *  @param mdSolverInterface interface of the md solver */
   void plotMoleculeFile(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,
-                        coupling::datastructures::MacroscopicCells<LinkedCell, dim>& cells,
+                        coupling::datastructures::LinkedCellContainer<LinkedCell, dim>& cells,
                         coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     // open files
     std::ofstream moleculeFile;
@@ -81,7 +78,7 @@ private:
       break;
     }
     Writer4Molecules writer(moleculeVelocities, moleculePositions, moleculePotentials, appendFloatZeros, mdSolverInterface);
-    cells.applyToLocalNonGhostMacroscopicCellsWithLinkedCells(writer);
+    cells.applyToLocalNonGhostCouplingCellsWithLinkedCells(writer);
     // open file and write info
     open(ID, filename, "Molecules", rank, t, moleculeFile);
     moleculeFile << "# vtk DataFile Version 2.0" << std::endl;
@@ -105,18 +102,17 @@ private:
     moleculeFile.close();
   }
 
-  /** @brief writes molecule information + macroscopic cell information to VTK
+  /** @brief writes molecule information + coupling cell information to VTK
    * file.
    *  @param ID the id of the md simulation
    *  @param filename name for the file
    *  @param rank mpi rank of the current process
    *  @param t number of time step to plot
-   *  @param indexConversion indexConversion instance of the current simulation
-   *  @param cells macroscopic cells to plot
+   *  @param cells coupling cells to plot
    *  @param mdSolverInterface interface of the md solver */
-  void plotMacroscopicCellFile(unsigned int ID, std::string filename, unsigned int rank, unsigned int t, const coupling::IndexConversion<dim>& indexConversion,
-                               coupling::datastructures::MacroscopicCells<LinkedCell, dim>& cells,
-                               coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
+  void plotCouplingCellFile(unsigned int ID, std::string filename, unsigned int rank, unsigned int t,
+                            coupling::datastructures::LinkedCellContainer<LinkedCell, dim>& cells,
+                            coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface) {
     // stringstreams for all cell properties of interest
     std::stringstream microscopicMasses;
     microscopicMasses << "SCALARS microscopicMassBuffer float 1" << std::endl;
@@ -156,25 +152,19 @@ private:
     default:
       break;
     }
-    // number of points
-    const tarch::la::Vector<3, unsigned int> numberCells =
-        coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
-    tarch::la::Vector<3, double> original(0.0);
-    for (unsigned int d = 0; d < dim; d++) {
-      original[d] =
-          indexConversion.getGlobalMDDomainOffset()[d] - 0.5 * indexConversion.getMacroscopicCellSize()[d] +
-          indexConversion.getAverageLocalNumberMacroscopicCells()[d] * indexConversion.getThisProcess()[d] * indexConversion.getMacroscopicCellSize()[d];
-    }
+
+    tarch::la::Vector<3, double> original = I11{{0, 0, 0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();
+
     // open file
-    open(ID, filename, "MacroscopicCells", rank, t, ofCell);
+    open(ID, filename, "CouplingCells", rank, t, ofCell);
     Writer4Cells writer(microscopicMasses, macroscopicMasses, microscopicMomenta, macroscopicMomenta, meanVelocities, masses, energies, temperatures,
-                        appendFloatZeros, indexConversion, mdSolverInterface);
-    cells.applyToAllLocalMacroscopicCellsWithLinkedCells(writer);
+                        appendFloatZeros, mdSolverInterface);
+    cells.applyToAllLocalCouplingCellsWithLinkedCells(writer);
     ofCell << "# vtk DataFile Version 2.0" << std::endl;
     ofCell << "generated by MaMiCo (Philipp Neumann)" << std::endl;
     ofCell << "ASCII" << std::endl << std::endl;
     ofCell << "DATASET STRUCTURED_POINTS" << std::endl;
-    ofCell << "DIMENSIONS " << numberCells[0] << " " << numberCells[1] << " " << numberCells[2] << std::endl;
+    ofCell << "DIMENSIONS " << I03::numberCellsInDomain << std::endl;
     ofCell << "ORIGIN ";
     for (unsigned int d = 0; d < 3; d++) {
       ofCell << original[d] << " ";
@@ -182,13 +172,13 @@ private:
     ofCell << std::endl;
     ofCell << "SPACING ";
     for (unsigned int d = 0; d < dim; d++) {
-      ofCell << indexConversion.getMacroscopicCellSize()[d] << " ";
+      ofCell << IDXS.getCouplingCellSize()[d] << " ";
     }
     for (unsigned int d = dim; d < 3; d++) {
       ofCell << "1.0 ";
     }
     ofCell << std::endl;
-    ofCell << "POINT_DATA " << numberCells[0] * numberCells[1] * numberCells[2] << std::endl << std::endl;
+    ofCell << "POINT_DATA " << I02::linearNumberCellsInDomain << std::endl << std::endl;
     ofCell << microscopicMasses.str() << std::endl << std::endl;
     microscopicMasses.clear();
     microscopicMasses.str("");
@@ -229,12 +219,12 @@ private:
     ss << filename << "_" << fileType << "_" << ID << "_" << rank << "_" << t << ".vtk";
     of.open(ss.str().c_str());
     if (!of.is_open()) {
-      std::cout << "ERROR coupling::MacroscopicCellPlotter: Could not open file " << ss.str() << "!" << std::endl;
+      std::cout << "ERROR coupling::CouplingCellPlotter: Could not open file " << ss.str() << "!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
 
-  /** @brief class for writing macroscopic cell data to stringstreams.
+  /** @brief class for writing coupling cell data to stringstreams.
    *  @author Philipp Neumann*/
   class Writer4Cells {
   public:
@@ -249,16 +239,15 @@ private:
      *  @param temperatures stream for the temperatures
      *  @param appendFloatZeros string containing '0' to add in the case of 1d
      * or 2d
-     *  @param indexConversion instance of the indexConversion class
      *  @param mdSolverInterface interface of the md solver */
     Writer4Cells(std::stringstream& microscopicMasses, std::stringstream& macroscopicMasses, std::stringstream& microscopicMomenta,
                  std::stringstream& macroscopicMomenta, std::stringstream& meanVelocities, std::stringstream& masses, std::stringstream& energies,
-                 std::stringstream& temperatures, const std::string& appendFloatZeros, const coupling::IndexConversion<dim>& indexConversion,
+                 std::stringstream& temperatures, const std::string& appendFloatZeros,
                  coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
         : _microscopicMasses(microscopicMasses), _macroscopicMasses(macroscopicMasses), _microscopicMomenta(microscopicMomenta),
           _macroscopicMomenta(macroscopicMomenta), _meanVelocities(meanVelocities), _masses(masses), _energies(energies), _temperatures(temperatures),
           _appendFloatZeros(appendFloatZeros), _computeMassMapping(mdSolverInterface), _computeMomentumMapping(mdSolverInterface),
-          _kineticEnergyController(mdSolverInterface), _indexConversion(indexConversion) {}
+          _kineticEnergyController(mdSolverInterface) {}
 
     /** @brief a simple destructor*/
     ~Writer4Cells() {}
@@ -272,21 +261,15 @@ private:
     void endCellIteration() {}
 
     /** @brief writes the data from the cell to the stringstreams
-     *  @param cell macroscopic cell
-     *  @param index linearised index of the macroscopic cell*/
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+     *  @param cell coupling cell
+     *  @param index linearised index of the coupling cell*/
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) {
       // compute local quantities from molecules, if this is an inner cell
-      const tarch::la::Vector<dim, unsigned int> end = _indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(1);
-      const tarch::la::Vector<dim, unsigned int> localIndex = _indexConversion.getLocalVectorCellIndex(index);
-      bool isInnerCell = true;
-      for (unsigned int d = 0; d < dim; d++) {
-        isInnerCell = isInnerCell && (localIndex[d] > 0) && (localIndex[d] < end[d]);
-      }
       double mass = 0.0;
       tarch::la::Vector<dim, double> meanVelocity(0.0);
       double temperature = 0.0;
 
-      if (isInnerCell) {
+      if (I10::contains(index)) {
         cell.iterateConstCells(_computeMassMapping);
         mass = _computeMassMapping.getMass();
         cell.iterateConstCells(_computeMomentumMapping);
@@ -339,11 +322,9 @@ private:
     coupling::cellmappings::ComputeMomentumMapping<LinkedCell, dim> _computeMomentumMapping;
     /** instance of the KineticEnergyController*/
     coupling::KineticEnergyController<LinkedCell, dim> _kineticEnergyController;
-    /** instance of the indexConversion*/
-    const coupling::IndexConversion<dim>& _indexConversion;
   };
 
-  /** We make use of the traversal callback pattern of MacroscopicCells.
+  /** We make use of the traversal callback pattern of CouplingCells.
    *  @brief class for writing molecule data to stringstreams.
    *  @author Philipp Neumann */
   class Writer4Molecules {
@@ -368,8 +349,8 @@ private:
      * writer to the cells */
     void endCellIteration() {}
 
-    /** @brief aplication of the vtkMoleculePlotter to the macroscopic cells*/
-    void apply(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+    /** @brief aplication of the vtkMoleculePlotter to the coupling cells*/
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const I02& index) {
       coupling::cellmappings::VTKMoleculePlotter<LinkedCell, dim> vtkMoleculePlotter(_moleculeVelocities, _moleculePositions, _moleculePotentials,
                                                                                      _appendFloatZeros, _mdSolverInterface);
       cell.iterateConstCells(vtkMoleculePlotter);
@@ -395,4 +376,4 @@ private:
     unsigned int _moleculeCounter;
   };
 };
-#endif // _MOLECULARDYNAMICS_COUPLING_MACROSCOPICCELLPLOTTER_H_
+#endif // _MOLECULARDYNAMICS_COUPLING_COUPLINGCELLPLOTTER_H_

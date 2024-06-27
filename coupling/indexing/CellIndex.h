@@ -53,12 +53,12 @@ template <IndexTrait t1, IndexTrait t2, IndexTrait... rest> constexpr bool is_or
 } // namespace TraitOperations
 
 /**
- * Index used to describe spatial location of a MacroscopicCell.
+ * Index used to describe spatial location of a CouplingCell.
  * Since various different ways of expressing this location are useful for
  * different applications, IndexTraits are used to describe the context of this
  * index. \n
  *
- * All commonly used (arithmetic) operations on MacroscopicCell indices are
+ * All commonly used (arithmetic) operations on CouplingCell indices are
  * provided as well as seamless conversion between any two ways of expressing
  * these indices. (cf. user-defined conversion function below)\n
  *
@@ -233,6 +233,15 @@ public:
     }
 
     return true;
+  }
+
+  tarch::la::Vector<dim, double> getCellMidPoint() const {
+    BaseIndex<dim> globalIndex{*this};
+    tarch::la::Vector<dim, double> cellMidPoint(IndexingService<dim>::getInstance().getGlobalMDDomainOffset() -
+                                                0.5 * IndexingService<dim>::getInstance().getCouplingCellSize());
+    for (unsigned int d = 0; d < dim; d++)
+      cellMidPoint[d] += ((double)(globalIndex.get()[d])) * IndexingService<dim>::getInstance().getCouplingCellSize()[d];
+    return cellMidPoint;
   }
 
   /**

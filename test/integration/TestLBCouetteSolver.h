@@ -42,11 +42,11 @@ public:
     }
     const tarch::la::Vector<3, double> mdDomainOffset(10.0, 10.0, 2.5);
     const tarch::la::Vector<3, double> mdDomainSize(30.0, 30.0, 30.0);
-    const tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells(floor(mdDomainSize[0] / dx + 0.5), floor(mdDomainSize[1] / dx + 0.5),
-                                                                          floor(mdDomainSize[2] / dx + 0.5));
+    const tarch::la::Vector<3, unsigned int> globalNumberCouplingCells(floor(mdDomainSize[0] / dx + 0.5), floor(mdDomainSize[1] / dx + 0.5),
+                                                                       floor(mdDomainSize[2] / dx + 0.5));
     const unsigned int overlapStrip = 2;
     const coupling::IndexConversion<3> indexConversion(
-        globalNumberMacroscopicCells,                // number of global macroscopic cells
+        globalNumberCouplingCells,                   // number of global coupling cells
         tarch::la::Vector<3, unsigned int>(1, 1, 1), // number of processes for MD; should not matter in this test
         0,                                           // current rank of MD -> should not matter
         mdDomainSize,                                // MD domain size
@@ -56,9 +56,9 @@ public:
     );
     const tarch::la::Vector<3, unsigned int> mdCellOffset(floor(mdDomainOffset[0] / dx + 0.5), floor(mdDomainOffset[1] / dx + 0.5),
                                                           floor(mdDomainOffset[2] / dx + 0.5));
-    coupling::solvers::LBCouetteSolverInterface interface(solver.getAvgNumberLBCells(), processes, mdCellOffset, globalNumberMacroscopicCells, overlapStrip);
-    std::vector<coupling::datastructures::MacroscopicCell<3>*> recvBuffer;
-    unsigned int* globalCellIndices = initRecvBuffer(recvBuffer, globalNumberMacroscopicCells, interface, indexConversion, density, dx);
+    coupling::solvers::LBCouetteSolverInterface interface(solver.getAvgNumberLBCells(), processes, mdCellOffset, globalNumberCouplingCells, overlapStrip);
+    std::vector<coupling::datastructures::CouplingCell<3>*> recvBuffer;
+    unsigned int* globalCellIndices = initRecvBuffer(recvBuffer, globalNumberCouplingCells, interface, indexConversion, density, dx);
     if (rank == 0) {
       std::cout << "Introduce MD domain at offset=" << mdDomainOffset << " and with size " << mdDomainSize << std::endl;
     }
@@ -72,7 +72,7 @@ public:
         std::cout << "Finish time step " << i << "..." << std::endl;
       }
     }
-    outputRanks(interface, solver.getAvgNumberLBCells(), processes, globalNumberMacroscopicCells, mdCellOffset);
+    outputRanks(interface, solver.getAvgNumberLBCells(), processes, globalNumberCouplingCells, mdCellOffset);
     // delete pointers
     if (globalCellIndices != NULL) {
       delete[] globalCellIndices;
@@ -89,7 +89,7 @@ public:
 
 private:
   void outputRanks(coupling::solvers::LBCouetteSolverInterface& interface, const tarch::la::Vector<3, unsigned int> avgNumberLBCells,
-                   const tarch::la::Vector<3, unsigned int> processes, const tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells,
+                   const tarch::la::Vector<3, unsigned int> processes, const tarch::la::Vector<3, unsigned int> globalNumberCouplingCells,
                    const tarch::la::Vector<3, unsigned int> mdCellOffset) {
 // only carry out tests for interface on rank 0 (these tests do not depend on parallel parameters)
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -102,11 +102,11 @@ private:
     std::cout << "Test LBCouetteSolverInterface..." << std::endl;
 
     std::cout << "Avg. number LB cells=" << avgNumberLBCells << ", no. processes=" << processes << std::endl;
-    std::cout << "MD offset=" << mdCellOffset << ", MD size=" << globalNumberMacroscopicCells << std::endl;
+    std::cout << "MD offset=" << mdCellOffset << ", MD size=" << globalNumberCouplingCells << std::endl;
     tarch::la::Vector<3, unsigned int> coords(0);
-    for (coords[2] = 0; coords[2] < globalNumberMacroscopicCells[2] + 2; coords[2]++) {
-      for (coords[1] = 0; coords[1] < globalNumberMacroscopicCells[1] + 2; coords[1]++) {
-        for (coords[0] = 0; coords[0] < globalNumberMacroscopicCells[0] + 2; coords[0]++) {
+    for (coords[2] = 0; coords[2] < globalNumberCouplingCells[2] + 2; coords[2]++) {
+      for (coords[1] = 0; coords[1] < globalNumberCouplingCells[1] + 2; coords[1]++) {
+        for (coords[0] = 0; coords[0] < globalNumberCouplingCells[0] + 2; coords[0]++) {
           std::vector<unsigned int> ranks = interface.getRanks(coords);
           std::cout << "Macro-cell " << coords << " corresponds to LB cell " << coords + mdCellOffset << " and is located on ranks ";
           for (unsigned int i = 0; i < ranks.size(); i++) {
@@ -122,8 +122,8 @@ private:
     }
   }
 
-  unsigned int* initRecvBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer,
-                               tarch::la::Vector<3, unsigned int> globalNumberMacroscopicCells, coupling::solvers::LBCouetteSolverInterface& interface,
+  unsigned int* initRecvBuffer(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer,
+                               tarch::la::Vector<3, unsigned int> globalNumberCouplingCells, coupling::solvers::LBCouetteSolverInterface& interface,
                                const coupling::IndexConversion<3>& indexConversion, const double density, const double dx) {
     // compute avg. mass in this cell
     const double mass = density * dx * dx * dx;
@@ -134,12 +134,12 @@ private:
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
 
-    // loop over all global macroscopic cells
+    // loop over all global coupling cells
     std::vector<unsigned int> myIndex;
     recvBuffer.clear();
-    for (coords[2] = 0; coords[2] < globalNumberMacroscopicCells[2] + 2; coords[2]++) {
-      for (coords[1] = 0; coords[1] < globalNumberMacroscopicCells[1] + 2; coords[1]++) {
-        for (coords[0] = 0; coords[0] < globalNumberMacroscopicCells[0] + 2; coords[0]++) {
+    for (coords[2] = 0; coords[2] < globalNumberCouplingCells[2] + 2; coords[2]++) {
+      for (coords[1] = 0; coords[1] < globalNumberCouplingCells[1] + 2; coords[1]++) {
+        for (coords[0] = 0; coords[0] < globalNumberCouplingCells[0] + 2; coords[0]++) {
 
           // check if this cell is located on the current (target) rank
           std::vector<unsigned int> ranks = interface.getTargetRanks(coords);
@@ -151,16 +151,16 @@ private:
           // if this cell shall be received by the current (target) rank, create a cell in the recvBuffer and store the index in the vector
           if (contained) {
             myIndex.push_back(indexConversion.getGlobalCellIndex(coords));
-            recvBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
+            recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
             if (recvBuffer[recvBuffer.size() - 1] == NULL) {
               std::cout << "ERROR TestLBCouetteSolver::initRecvBuffer(): recBuffer[..]==NULL!" << std::endl;
               exit(EXIT_FAILURE);
             }
             recvBuffer[recvBuffer.size() - 1]->setMacroscopicMass(mass);
             // set a reference velocity between 0 and one in each component of the velocity vector for testing
-            tarch::la::Vector<3, double> localVel(((double)coords[0]) / (globalNumberMacroscopicCells[0] + 2),
-                                                  ((double)coords[1]) / (globalNumberMacroscopicCells[1] + 2),
-                                                  ((double)coords[2]) / (globalNumberMacroscopicCells[2] + 2));
+            tarch::la::Vector<3, double> localVel(((double)coords[0]) / (globalNumberCouplingCells[0] + 2),
+                                                  ((double)coords[1]) / (globalNumberCouplingCells[1] + 2),
+                                                  ((double)coords[2]) / (globalNumberCouplingCells[2] + 2));
             std::cout << "Global cell=" << coords << ", mass=" << mass << ", vel=" << localVel << std::endl;
             recvBuffer[recvBuffer.size() - 1]->setMacroscopicMomentum(mass * localVel);
           }

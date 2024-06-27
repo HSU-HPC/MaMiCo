@@ -54,17 +54,17 @@ public:
 
     // extract information on current process -> required for exact evaluation of quantities in respective,
     // subsequently called test methods
-    coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>* macroscopicCellService =
-        (coupling::services::MacroscopicCellServiceImpl<LAMMPS_NS::MamicoCell, dim>*)
+    coupling::services::CouplingCellServiceImpl<LAMMPS_NS::MamicoCell, dim>* couplingCellService =
+        (coupling::services::CouplingCellServiceImpl<LAMMPS_NS::MamicoCell, dim>*)
             coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance()
-                .getMacroscopicCellService();
-    if (macroscopicCellService == NULL) {
-      std::cout << "ERROR: Could not cast pointer to MacroscopicCellServiceImpl!" << std::endl;
+                .getCouplingCellService();
+    if (couplingCellService == NULL) {
+      std::cout << "ERROR: Could not cast pointer to CouplingCellServiceImpl!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    const coupling::IndexConversion<dim>& indexConversion = macroscopicCellService->getIndexConversion();
-    coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells = macroscopicCellService->getMacroscopicCells();
-    const std::vector<tarch::la::Vector<2, unsigned int>> numberMoleculesPerMacroscopicCell = initNumberMoleculesPerMacroscopicCell(indexConversion);
+    const coupling::IndexConversion<dim>& indexConversion = couplingCellService->getIndexConversion();
+    coupling::datastructures::CellContainer<LAMMPS_NS::MamicoCell, dim>& couplingCells = couplingCellService->getCouplingCells();
+    const std::vector<tarch::la::Vector<2, unsigned int>> numberMoleculesPerCouplingCell = initNumberMoleculesPerCouplingCell(indexConversion);
 
     // instantiate a molecule extractor
     coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim> moleculeExtractor(
@@ -75,110 +75,110 @@ public:
     TestLammps<dim>::_lammps->input->one("run 1");
     std::cout << "Check cell sorting via molecule extraction..." << std::endl;
 
-    // test all macroscopic cells and contained molecules on correctness
-    testMolecules(macroscopicCells, moleculeExtractor, indexConversion, numberMoleculesPerMacroscopicCell);
+    // test all coupling cells and contained molecules on correctness
+    testMolecules(couplingCells, moleculeExtractor, indexConversion, numberMoleculesPerCouplingCell);
   }
 
 private:
-  /** returns the pairs (global macroscopic cell index, number molecules in this cell) in a vector. The number is hard-coded, oriented at the setup described
+  /** returns the pairs (global coupling cell index, number molecules in this cell) in a vector. The number is hard-coded, oriented at the setup described
    * above. */
-  std::vector<tarch::la::Vector<2, unsigned int>> initNumberMoleculesPerMacroscopicCell(const coupling::IndexConversion<dim>& indexConversion) const {
-    std::vector<tarch::la::Vector<2, unsigned int>> moleculesPerMacroscopicCell;
+  std::vector<tarch::la::Vector<2, unsigned int>> initNumberMoleculesPerCouplingCell(const coupling::IndexConversion<dim>& indexConversion) const {
+    std::vector<tarch::la::Vector<2, unsigned int>> moleculesPerCouplingCell;
     tarch::la::Vector<2, unsigned int> buffer(0);
     if (dim == 2) {
       buffer[0] = 7;
       buffer[1] = 0;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 9;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 19;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 21;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
 
       buffer[0] = 8;
       buffer[1] = 2;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 10;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 20;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 22;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
 
       buffer[0] = 13;
       buffer[1] = 1;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 15;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 25;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 27;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
 
       buffer[0] = 14;
       buffer[1] = 3;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 16;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 26;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
       buffer[0] = 28;
-      moleculesPerMacroscopicCell.push_back(buffer);
+      moleculesPerCouplingCell.push_back(buffer);
     } else {
       for (int layer = 0; layer < 4; layer++) {
         buffer[0] = 43 + layer * 36;
         buffer[1] = 0;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 45 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 55 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 57 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
 
         buffer[0] = 44 + layer * 36;
         buffer[1] = 2;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 46 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 56 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 58 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
 
         buffer[0] = 49 + layer * 36;
         buffer[1] = 1;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 51 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 61 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 63 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
 
         buffer[0] = 50 + layer * 36;
         buffer[1] = 3;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 52 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 62 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
         buffer[0] = 64 + layer * 36;
-        moleculesPerMacroscopicCell.push_back(buffer);
+        moleculesPerCouplingCell.push_back(buffer);
       }
     }
 
-    return moleculesPerMacroscopicCell;
+    return moleculesPerCouplingCell;
   }
 
-  /** loops over all macroscopic cells on this process and checks for the number of molecules in each cell. Further, we plot the molecule positions of each
+  /** loops over all coupling cells on this process and checks for the number of molecules in each cell. Further, we plot the molecule positions of each
    * cell. */
-  void testMolecules(coupling::datastructures::MacroscopicCells<LAMMPS_NS::MamicoCell, dim>& macroscopicCells,
+  void testMolecules(coupling::datastructures::CellContainer<LAMMPS_NS::MamicoCell, dim>& couplingCells,
                      coupling::cellmappings::MoleculeExtractor<LAMMPS_NS::MamicoCell, dim>& moleculeExtractor,
                      const coupling::IndexConversion<dim>& indexConversion,
-                     const std::vector<tarch::la::Vector<2, unsigned int>>& numberMoleculesPerMacroscopicCell) {
-    const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberMacroscopicCells();
+                     const std::vector<tarch::la::Vector<2, unsigned int>>& numberMoleculesPerCouplingCell) {
+    const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberCouplingCells();
     tarch::la::Vector<dim, unsigned int> loop(0);
     if (dim == 2) {
       for (loop[1] = 1; loop[1] < localCells[1] + 1; loop[1]++) {
@@ -187,10 +187,10 @@ private:
           const unsigned int localIndex = indexConversion.getLocalCellIndex(loop);
           const unsigned int globalIndex = indexConversion.convertLocalToGlobalCellIndex(localIndex);
           // determine number of molecules in this cell, based on cell structure
-          (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
+          (couplingCells.getLinkedCellContainer())[localIndex].iterateConstCells(moleculeExtractor);
           const unsigned int numberMoleculesFound = (unsigned int)moleculeExtractor.getExtractedMolecules().size();
           // determine the number of molecules as it was expected
-          const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerMacroscopicCell);
+          const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerCouplingCell);
           if (numberMoleculesFound != numberMoleculesExpected) {
             std::cout << "ERROR TestLammpsMoleculeIterator: Found molecules=" << numberMoleculesFound << ", expected=" << numberMoleculesExpected << std::endl;
             std::cout << "This process: " << indexConversion.getThisProcess() << "; considered (global cell): " << globalIndex << std::endl;
@@ -210,10 +210,10 @@ private:
             const unsigned int localIndex = indexConversion.getLocalCellIndex(loop);
             const unsigned int globalIndex = indexConversion.convertLocalToGlobalCellIndex(localIndex);
             // determine number of molecules in this cell, based on cell structure
-            (macroscopicCells.getMacroscopicCellsWithLinkedCells())[localIndex].iterateConstCells(moleculeExtractor);
+            (couplingCells.getLinkedCellContainer())[localIndex].iterateConstCells(moleculeExtractor);
             const unsigned int numberMoleculesFound = (unsigned int)moleculeExtractor.getExtractedMolecules().size();
             // determine the number of molecules as it was expected
-            const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerMacroscopicCell);
+            const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerCouplingCell);
             if (numberMoleculesFound != numberMoleculesExpected) {
               std::cout << "ERROR TestLammpsMoleculeIterator: Found molecules=" << numberMoleculesFound << ", expected=" << numberMoleculesExpected
                         << std::endl;
@@ -230,15 +230,15 @@ private:
     }
   }
 
-  /** searches for the number of molecules for the macroscopic cell at global cell index "globalIndex" and returns this number from the vector. If no respective
+  /** searches for the number of molecules for the coupling cell at global cell index "globalIndex" and returns this number from the vector. If no respective
    *  global cell is found, an error is thrown.
    */
   unsigned int findNumberMolecules(const unsigned int& globalIndex,
-                                   const std::vector<tarch::la::Vector<2, unsigned int>>& numberMoleculesPerMacroscopicCell) const {
-    const unsigned int size = (unsigned int)numberMoleculesPerMacroscopicCell.size();
+                                   const std::vector<tarch::la::Vector<2, unsigned int>>& numberMoleculesPerCouplingCell) const {
+    const unsigned int size = (unsigned int)numberMoleculesPerCouplingCell.size();
     for (unsigned int i = 0; i < size; i++) {
-      if (globalIndex == numberMoleculesPerMacroscopicCell[i][0]) {
-        return numberMoleculesPerMacroscopicCell[i][1];
+      if (globalIndex == numberMoleculesPerCouplingCell[i][0]) {
+        return numberMoleculesPerCouplingCell[i][1];
       }
     }
 

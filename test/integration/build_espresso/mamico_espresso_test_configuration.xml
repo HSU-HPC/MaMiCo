@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 
 <mamico>
-  <macroscopic-cell-configuration
+  <coupling-cell-configuration
     cell-size="2.5 ; 2.5 ; 2.5"
-    linked-cells-per-macroscopic-cell=" 2 ; 2 ; 2"
+    linked-cells-per-coupling-cell=" 2 ; 2 ; 2"
     write-every-microscopic-timestep="0"
-    microscopic-filename="MacroscopicCell_micro"
+    microscopic-filename="CouplingCell_micro"
     write-every-macroscopic-timestep="0"
-    macroscopic-filename="MacroscopicCell_macro"
+    macroscopic-filename="CouplingCell_macro"
   />
   <particle-insertion type="none" />
   <momentum-insertion type="velocity-gradient-relaxation" velocity-relaxation-factor="0.05" />

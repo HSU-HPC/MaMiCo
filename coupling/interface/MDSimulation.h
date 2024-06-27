@@ -1,6 +1,6 @@
 #pragma once
 
-#include "coupling/services/MacroscopicCellService.h"
+#include "coupling/services/CouplingCellService.h"
 
 namespace coupling {
 namespace interface {
@@ -33,10 +33,10 @@ public:
   /** sortMoleculesIntoCells*/
   virtual void sortMoleculesIntoCells() = 0;
 
-  /** setMacroscopicCellService
-   *	@param macroscopicCellService
+  /** setCouplingCellService
+   *	@param couplingCellService
    */
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) = 0;
+  virtual void setCouplingCellService(coupling::services::CouplingCellService<MDSIMULATIONFACTORY_DIMENSION>* couplingCellService) = 0;
 
   /** initialises the _molecularDynamicsSimulation solver
    *	@sa simplemd::MolecularDynamicsSimulation::initServices()

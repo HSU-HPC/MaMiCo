@@ -22,7 +22,7 @@ using Log::global_log;
 class LinkedCellsForCoupling : public LinkedCells {
 
 public:
-  LinkedCellsForCoupling(tarch::la::Vector<3, double> mamicoCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerMacroscopicCell, double bBoxMin[3],
+  LinkedCellsForCoupling(tarch::la::Vector<3, double> mamicoCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell, double bBoxMin[3],
                          double bBoxMax[3], double cutoffRadius) {
     _cutoffRadius = cutoffRadius;
     _LJCutoffRadius = cutoffRadius;
@@ -38,7 +38,7 @@ public:
     int cellCount = 1;
     for (int d = 0; d < 3; d++) {
       // calculate cell length
-      _cellLength[d] = mamicoCellSize[d] / linkedCellsPerMacroscopicCell[d];
+      _cellLength[d] = mamicoCellSize[d] / linkedCellsPerCouplingCell[d];
 
       // set number of cells
       _boxWidthInNumCells[d] = (_boundingBoxMax[d] - _boundingBoxMin[d]) / _cellLength[d];
@@ -94,7 +94,7 @@ public:
   ~LinkedCellsForCoupling() {}
 
   // returns a pointer to the ParticleCell at the provided index
-  ParticleCell *getCellPointer(int index) { return &_cells[index]; }
+  ParticleCell* getCellPointer(int index) { return &_cells[index]; }
 };
 
 #endif /* COUPLING_INTERFACE_IMPL_MARDYN_LINKEDCELLSFORCOUPLING_H_ */

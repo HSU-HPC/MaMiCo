@@ -38,16 +38,12 @@ public:
   /** @brief Destructor*/
   virtual ~ZhouBoundaryForceController() {}
 
-  /** iterates over all linked cells of the given macroscopic cell and applies
+  /** iterates over all linked cells of the given coupling cell and applies
    * the cellmapping for the Zhou boundary force
    * @brief applies the Zhou boundary force on a boundary cell
    * @param cell the macroscopic boundary cell to apply the boundary force
-   * @param currentLocalMacroscopicCellIndex the index of the macroscopic cell
    */
-  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                  const unsigned int& currentLocalMacroscopicCellIndex) {
-    cell.iterateCells(_zhouBoundaryForce);
-  }
+  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) { cell.iterateCells(_zhouBoundaryForce); }
 
   /** @brief calculates the potential energy for a given position
    *  @param position the position for which the potential energy will be

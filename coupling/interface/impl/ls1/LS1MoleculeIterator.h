@@ -23,14 +23,10 @@ class LS1MoleculeIterator;
 
 class coupling::interface::LS1MoleculeIterator : public coupling::interface::MoleculeIterator<ls1::LS1RegionWrapper, 3> {
 public:
-  LS1MoleculeIterator(ls1::LS1RegionWrapper& cell) : coupling::interface::MoleculeIterator<ls1::LS1RegionWrapper, 3>(cell) {
-  }
+  LS1MoleculeIterator(ls1::LS1RegionWrapper& cell) : coupling::interface::MoleculeIterator<ls1::LS1RegionWrapper, 3>(cell) {}
 
   /** sets the iterator to the first element */
-  virtual void
-  begin() {
-    _cell.iteratorReset();
-  }
+  virtual void begin() { _cell.iteratorReset(); }
 
   /** returns true, if the iterator should continue the molecule traversal */
   virtual bool continueIteration() const { return _cell.iteratorValid(); }
@@ -45,13 +41,13 @@ public:
   }
 
   /** returns a const reference to the current molecule for pure reading purposes */
-  virtual const coupling::interface::Molecule<3>&
-  getConst() {
+  virtual const coupling::interface::Molecule<3>& getConst() {
     _tempMolecule.setMolecule(_cell.getParticleAtIterator());
     return _tempMolecule;
   }
 
-  private : coupling::interface::LS1Molecule _tempMolecule;
+private:
+  coupling::interface::LS1Molecule _tempMolecule;
 };
 
 #endif

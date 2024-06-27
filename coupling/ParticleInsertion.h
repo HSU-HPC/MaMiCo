@@ -13,7 +13,7 @@ namespace coupling {
 template <class LinkedCell, unsigned int dim> class ParticleInsertion;
 }
 
-/** @brief interface for particle insertion/removal on macroscopic cell basis.
+/** @brief interface for particle insertion/removal on coupling cell basis.
  *  @author Philipp Neumann
  *  @tparam LinkedCell the LinkedCell class is given by the implementation of
  * linked cells in the molecular dynamics simulation
@@ -31,11 +31,11 @@ public:
   };
 
   /**
-   *  @brief adds or removes particles to the macroscopic cell, simulates a mass
+   *  @brief adds or removes particles to the coupling cell, simulates a mass
    * flow.
-   *  @param cell the macroscopic cell to insert or delete mass
-   *  @param macroscopicCellPosition position of the cell given as a vector
-   *  @param macroscopicCellSize size of the macroscopic cell given as a vector
+   *  @param cell the coupling cell to insert or delete mass
+   *  @param couplingCellPosition position of the cell given as a vector
+   *  @param couplingCellSize size of the coupling cell given as a vector
    *  @param meanVelocity the mean velocity in the cell as a vector
    *  @param temperature the current temperature in the cell
    *  @param boundaryForceController an instance of the boundaryForceController
@@ -43,9 +43,8 @@ public:
    *  @returns the type of coupling::ParticleInsertion::Action that was applied
    */
   virtual typename coupling::ParticleInsertion<LinkedCell, dim>::Action
-  insertDeleteMass(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                   const tarch::la::Vector<dim, double>& macroscopicCellPosition, const tarch::la::Vector<dim, double>& macroscopicCellSize,
-                   const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
+  insertDeleteMass(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, const tarch::la::Vector<dim, double>& couplingCellPosition,
+                   const tarch::la::Vector<dim, double>& couplingCellSize, const tarch::la::Vector<dim, double>& meanVelocity, const double& temperature,
                    const coupling::BoundaryForceController<LinkedCell, dim>& boundaryForceController) = 0;
 
   /** returns true, if the particle insertion requires information on the

@@ -31,15 +31,13 @@ public:
    */
   Molecule(const tarch::la::Vector<dim, double>& position, const tarch::la::Vector<dim, double>& velocity, const tarch::la::Vector<dim, double>& force,
            const double& potentialEnergy)
-      : coupling::interface::Molecule<dim>(), _position(position), _velocity(velocity), _force(force), _potentialEnergy(potentialEnergy) {
-  } Molecule()
+      : coupling::interface::Molecule<dim>(), _position(position), _velocity(velocity), _force(force), _potentialEnergy(potentialEnergy) {}
+  Molecule()
       : coupling::interface::Molecule<dim>(), _position(tarch::la::Vector<dim, double>(0.0)), _velocity(tarch::la::Vector<dim, double>(0.0)),
-        _force(tarch::la::Vector<dim, double>(0.0)), _potentialEnergy(0.0) {
-  }
+        _force(tarch::la::Vector<dim, double>(0.0)), _potentialEnergy(0.0) {}
 
   /** Destructor */
-  virtual ~Molecule() {
-  }
+  virtual ~Molecule() {}
 
   /** returns the velocity of the molecule
    * @return _velocity Velocity*/

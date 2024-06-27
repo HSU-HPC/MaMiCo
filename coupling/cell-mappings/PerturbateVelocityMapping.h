@@ -47,9 +47,8 @@ public:
 
   /** superimposes a random perturbation to the mean velocity in all directions
    *	@param cell
-   *	@param cellIndex
    */
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
 
     double stdDeviation = std::sqrt(dim * _kB * _temperature / _molecularMass);
 

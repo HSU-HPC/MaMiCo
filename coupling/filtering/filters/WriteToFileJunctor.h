@@ -25,11 +25,11 @@ template <unsigned int dim> class coupling::filtering::WriteToFileJunctor : publ
 public:
   WriteToFileJunctor(
       // first cell data set
-      const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector1,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim>*> outputCellVector1,
+      const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector1,
+      const std::vector<coupling::datastructures::CouplingCell<dim>*> outputCellVector1,
 
       // second cell data set
-      const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector2,
+      const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector2,
       // no secondary output cells
 
       //"global" parameters for both WriteToFile instances

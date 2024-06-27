@@ -31,9 +31,9 @@ template <unsigned int dim> class AsymmetricalFilterJunction;
 template <unsigned int dim> class coupling::filtering::AsymmetricalFilterJunction : public coupling::filtering::FilterSequence<dim> {
 public:
   AsymmetricalFilterJunction(const char* name,
-                             const std::vector<coupling::datastructures::MacroscopicCell<dim>*> primaryInputCellVector,   // primary input of sequence.
-                             const std::vector<coupling::datastructures::MacroscopicCell<dim>*> secondaryInputCellVector, // additional data, presented as
-                                                                                                                          // macro cells as well
+                             const std::vector<coupling::datastructures::CouplingCell<dim>*> primaryInputCellVector,   // primary input of sequence.
+                             const std::vector<coupling::datastructures::CouplingCell<dim>*> secondaryInputCellVector, // additional data, presented as
+                                                                                                                       // macro cells as well
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                              MPI_Comm comm,
 #endif
@@ -50,8 +50,8 @@ public:
 
     // allocate and init secondary cell vectors
     for (auto cell : _inputCellVector_secondary) {
-      _cellVector1_secondary.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
-      _cellVector2_secondary.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+      _cellVector1_secondary.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
+      _cellVector2_secondary.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
     }
 #ifdef DEBUG_FILTER_JUNCTION_ASYM
     std::cout << PRINT_PREFIX() << "Initialized secondary cell vectors." << std::endl;
@@ -87,10 +87,10 @@ public:
   }
 
 private:
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCellVector_secondary;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCellVector_secondary;
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _cellVector1_secondary;
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _cellVector2_secondary;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _cellVector1_secondary;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _cellVector2_secondary;
 };
 
 // inlcude implementation
