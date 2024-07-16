@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-06-19 11:26:51</td>
+            <td class="headerValue">2024-07-16 15:22:12</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">1</td>
@@ -253,12 +253,12 @@
 <a name="191"><span class="lineNum">     191 </span>            :     }</a>
 <a name="192"><span class="lineNum">     192 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
 <a name="193"><span class="lineNum">     193 </span>            :     else if (type == &quot;foam&quot;) {</a>
-<a name="194"><span class="lineNum">     194 </span>            :       _cfg.maSolverType = COUETTE_FOAM;</a>
-<a name="195"><span class="lineNum">     195 </span>            :       tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, &quot;plot-every-timestep&quot;);</a>
-<a name="196"><span class="lineNum">     196 </span>            :       tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.directory, subtag, &quot;foam-setup-directory&quot;);</a>
-<a name="197"><span class="lineNum">     197 </span>            :       tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.folder, subtag, &quot;foam-setup-folder&quot;);</a>
-<a name="198"><span class="lineNum">     198 </span>            :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;12, unsigned int&gt;(_cfg.foam.boundariesWithMD, subtag, &quot;boundaries-with-MD&quot;);</a>
-<a name="199"><span class="lineNum">     199 </span>            :       if (!_cfg.twoWayCoupling &amp;&amp; _cfg.foam.boundariesWithMD != tarch::la::Vector&lt;12, unsigned int&gt;{0}) {</a>
+<a name="194"><span class="lineNum">     194 </span>            :       cfg.maSolverType = COUETTE_FOAM;</a>
+<a name="195"><span class="lineNum">     195 </span>            :       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.plotEveryTimestep, subtag, &quot;plot-every-timestep&quot;);</a>
+<a name="196"><span class="lineNum">     196 </span>            :       tarch::configuration::ParseConfiguration::readStringMandatory(cfg.foam.directory, subtag, &quot;foam-setup-directory&quot;);</a>
+<a name="197"><span class="lineNum">     197 </span>            :       tarch::configuration::ParseConfiguration::readStringMandatory(cfg.foam.folder, subtag, &quot;foam-setup-folder&quot;);</a>
+<a name="198"><span class="lineNum">     198 </span>            :       tarch::configuration::ParseConfiguration::readVectorMandatory&lt;12, unsigned int&gt;(cfg.foam.boundariesWithMD, subtag, &quot;boundaries-with-MD&quot;);</a>
+<a name="199"><span class="lineNum">     199 </span>            :       if (!cfg.twoWayCoupling &amp;&amp; cfg.foam.boundariesWithMD != tarch::la::Vector&lt;12, unsigned int&gt;{0}) {</a>
 <a name="200"><span class="lineNum">     200 </span>            :         std::cout &lt;&lt; &quot;ERROR: Two-way coupling is disabled, but boundaries with &quot;</a>
 <a name="201"><span class="lineNum">     201 </span>            :                      &quot;MD for openfoam were defined&quot;</a>
 <a name="202"><span class="lineNum">     202 </span>            :                   &lt;&lt; std::endl;</a>
