@@ -66,13 +66,13 @@ public:
 
   void testParseConfigurationWithRoot() {
     auto cfg = ParseConfiguration::XMLConfiguration::load(_filenameConfigWithRoot);
-    CPPUNIT_ASSERT(cfg.error == tinyxml2::XML_NO_ERROR);
+    CPPUNIT_ASSERT(cfg.error == tinyxml2::XML_SUCCESS);
     CPPUNIT_ASSERT(cfg.root->FirstChildElement("foo") != NULL);
   }
 
   void testParseConfigurationWithoutRoot() {
     auto cfg = ParseConfiguration::XMLConfiguration::load(_filenameConfigWithoutRoot);
-    CPPUNIT_ASSERT(cfg.error == tinyxml2::XML_NO_ERROR);
+    CPPUNIT_ASSERT(cfg.error == tinyxml2::XML_SUCCESS);
     CPPUNIT_ASSERT(cfg.root->FirstChildElement("foo") != NULL);
   }
 
