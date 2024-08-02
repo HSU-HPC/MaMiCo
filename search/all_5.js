@@ -16,5 +16,7 @@ var searchData=
   ['errorbasequantity_13',['errorBaseQuantity',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967a',1,'coupling::error::ErrorEstimation']]],
   ['errorestimation_14',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html',1,'coupling::error::ErrorEstimation'],['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation::ErrorEstimation()']]],
   ['errorid_15',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],
-  ['errortype_16',['errorType',['../classcoupling_1_1error_1_1ErrorEstimation.html#a3ed1fc36c80690f4d115cecba42316ff',1,'coupling::error::ErrorEstimation']]]
+  ['errorlinenum_16',['ErrorLineNum',['../classtinyxml2_1_1XMLDocument.html#a57400f816dbe7799ece33615ead9ab76',1,'tinyxml2::XMLDocument']]],
+  ['errorstr_17',['ErrorStr',['../classtinyxml2_1_1XMLDocument.html#ae97fff2402a0d01e0509c430b37996b3',1,'tinyxml2::XMLDocument']]],
+  ['errortype_18',['errorType',['../classcoupling_1_1error_1_1ErrorEstimation.html#a3ed1fc36c80690f4d115cecba42316ff',1,'coupling::error::ErrorEstimation']]]
 ];

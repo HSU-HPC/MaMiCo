@@ -91,7 +91,10 @@ $(function(){ initResizable(false); });
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pri-types">Private Types</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-static-methods">Static Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classtinyxml2_1_1XMLElement-members.html">List of all members</a>  </div>
@@ -115,58 +118,62 @@ Collaboration diagram for tinyxml2::XMLElement:</div>
 <div class="dyncontent">
 <div class="center"><img src="classtinyxml2_1_1XMLElement__coll__graph.png" border="0" usemap="#atinyxml2_1_1XMLElement_coll__map" alt="Collaboration graph"/></div>
 <map name="atinyxml2_1_1XMLElement_coll__map" id="atinyxml2_1_1XMLElement_coll__map">
-<area shape="rect" title=" " alt="" coords="1078,99,1227,125"/>
-<area shape="rect" href="classtinyxml2_1_1XMLNode.html" title=" " alt="" coords="757,194,891,219"/>
-<area shape="poly" title=" " alt="" coords="885,186,1104,123,1106,128,887,191"/>
-<area shape="poly" title=" " alt="" coords="793,176,804,170,824,167,843,169,854,175,858,185,852,195,848,192,852,184,850,179,841,174,824,172,806,175,796,181"/>
-<area shape="rect" href="classtinyxml2_1_1XMLDocument.html" title=" " alt="" coords="1072,340,1233,366"/>
-<area shape="poly" title=" " alt="" coords="907,208,978,221,1014,233,1049,248,1079,269,1106,293,1144,338,1140,342,1103,297,1076,273,1046,253,1012,238,976,227,906,214"/>
-<area shape="poly" title=" " alt="" coords="1113,335,1047,302,957,268,853,222,855,217,959,263,1049,297,1115,330"/>
-<area shape="rect" href="classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="719,540,929,580"/>
-<area shape="poly" title=" " alt="" coords="888,530,966,493,1046,445,1098,403,1137,365,1140,368,1101,407,1049,449,968,497,890,535"/>
-<area shape="rect" href="classtinyxml2_1_1MemPool.html" title=" " alt="" coords="463,239,592,265"/>
-<area shape="poly" title=" " alt="" coords="607,237,757,214,757,219,607,242"/>
-<area shape="poly" title=" " alt="" coords="540,278,573,354,597,397,627,437,643,451,657,460,692,479,716,495,787,537,784,541,713,499,689,483,654,465,640,455,623,440,593,400,568,356,535,280"/>
-<area shape="rect" href="classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="718,365,930,406"/>
-<area shape="poly" title=" " alt="" coords="608,262,651,275,692,294,705,305,716,318,785,362,782,367,713,322,701,309,689,298,649,280,606,267"/>
-<area shape="rect" href="classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="730,268,918,308"/>
-<area shape="poly" title=" " alt="" coords="608,254,691,263,730,268,729,273,690,268,607,260"/>
-<area shape="rect" href="classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="714,445,934,486"/>
-<area shape="poly" title=" " alt="" coords="553,274,622,342,668,380,716,415,768,442,766,447,713,419,664,384,619,346,549,278"/>
-<area shape="rect" href="classtinyxml2_1_1XMLAttribute.html" title=" " alt="" coords="748,44,900,70"/>
-<area shape="poly" title=" " alt="" coords="564,228,626,185,659,157,688,127,695,115,699,103,703,92,713,80,747,63,749,68,716,85,707,94,704,105,700,117,692,130,662,161,629,189,567,233"/>
-<area shape="rect" href="classtinyxml2_1_1DynArray.html" title=" " alt="" coords="453,436,601,492"/>
-<area shape="poly" title=" " alt="" coords="586,497,626,516,672,531,719,542,718,547,671,536,624,521,584,502"/>
-<area shape="poly" title=" " alt="" coords="616,438,744,404,745,409,617,443"/>
-<area shape="poly" title=" " alt="" coords="549,421,581,378,601,357,624,339,667,321,729,305,730,310,669,326,627,343,605,361,585,381,554,424"/>
-<area shape="poly" title=" " alt="" coords="617,492,626,494,659,496,693,495,756,483,757,489,693,500,659,502,625,499,616,497"/>
-<area shape="rect" href="structtinyxml2_1_1MemPoolT_1_1Block.html" title=" " alt="" coords="229,444,366,484"/>
-<area shape="poly" title=" " alt="" coords="381,461,453,461,453,467,381,467"/>
-<area shape="rect" href="uniontinyxml2_1_1MemPoolT_1_1Chunk.html" title=" " alt="" coords="5,444,143,484"/>
-<area shape="poly" title=" " alt="" coords="141,488,229,515,360,537,492,551,615,557,718,559,718,564,615,562,492,556,359,543,228,520,139,493"/>
-<area shape="poly" title=" " alt="" coords="158,461,228,461,228,467,158,467"/>
-<area shape="poly" title=" " alt="" coords="54,426,61,419,74,417,86,419,94,425,97,434,96,443,91,443,92,434,90,428,84,424,74,422,63,424,57,430"/>
-<area shape="poly" title=" " alt="" coords="157,442,228,429,360,414,492,402,717,387,718,392,493,407,361,419,229,434,158,447"/>
-<area shape="poly" title=" " alt="" coords="109,431,170,384,253,326,349,269,400,245,452,224,518,201,572,186,599,184,626,186,657,193,692,206,705,217,716,230,776,265,773,269,713,234,701,221,689,210,655,198,626,191,599,189,573,192,519,206,454,229,402,249,352,274,256,331,174,388,113,435"/>
-<area shape="poly" title=" " alt="" coords="158,481,229,493,358,509,460,517,561,516,690,501,764,484,765,489,691,506,561,521,460,523,358,514,228,498,157,486"/>
-<area shape="poly" title=" " alt="" coords="945,375,1047,366,1071,363,1072,368,1048,371,946,380"/>
-<area shape="poly" title=" " alt="" coords="934,307,958,312,1083,337,1082,342,957,317,933,313"/>
-<area shape="poly" title=" " alt="" coords="915,437,1047,395,1121,364,1123,369,1049,400,917,442"/>
-<area shape="rect" href="classtinyxml2_1_1StrPair.html" title=" " alt="" coords="470,46,584,71"/>
-<area shape="poly" title=" " alt="" coords="600,74,646,89,692,108,759,151,809,191,806,195,756,155,689,113,644,94,599,79"/>
-<area shape="poly" title=" " alt="" coords="600,56,748,55,748,60,600,61"/>
-<area shape="poly" title=" " alt="" coords="915,70,1078,97,1077,102,914,75"/>
-<area shape="poly" title=" " alt="" coords="793,27,804,20,824,18,843,20,854,26,858,36,852,45,848,43,852,35,850,30,841,25,824,23,806,25,796,31"/>
+<area shape="rect" title=" " alt="" coords="810,108,959,133"/>
+<area shape="rect" href="classtinyxml2_1_1XMLNode.html" title=" " alt="" coords="502,250,635,276"/>
+<area shape="poly" title=" " alt="" coords="588,236,622,200,667,167,702,152,738,140,809,125,810,130,740,145,704,157,670,172,626,204,591,240"/>
+<area shape="poly" title=" " alt="" coords="544,233,552,226,569,224,584,226,593,232,596,241,592,251,587,249,591,241,589,235,582,231,569,229,554,231,547,237"/>
+<area shape="rect" href="classtinyxml2_1_1XMLDocument.html" title=" " alt="" coords="1134,336,1295,361"/>
+<area shape="poly" title=" " alt="" coords="624,243,668,234,760,222,832,218,904,221,996,234,1055,247,1111,273,1160,303,1199,333,1196,337,1157,308,1108,277,1054,252,995,239,904,226,832,223,760,228,669,239,625,248"/>
+<area shape="rect" href="classtinyxml2_1_1DynArray.html" title=" " alt="" coords="812,284,957,340"/>
+<area shape="poly" title=" " alt="" coords="641,277,669,282,812,302,811,308,668,288,640,282"/>
+<area shape="poly" title=" " alt="" coords="1165,332,1109,311,1053,290,995,275,927,264,873,260,749,258,668,258,636,260,635,254,668,252,749,252,873,255,927,259,996,270,1054,285,1111,306,1167,327"/>
+<area shape="rect" href="classtinyxml2_1_1StrPair.html" title=" " alt="" coords="248,101,362,126"/>
+<area shape="poly" title=" " alt="" coords="329,136,363,172,405,205,457,230,509,247,507,252,455,235,403,210,359,176,325,140"/>
+<area shape="poly" title=" " alt="" coords="348,92,415,67,492,47,637,25,697,18,754,17,809,22,866,36,928,59,997,93,1037,118,1073,149,1106,184,1135,219,1181,286,1208,334,1204,336,1177,289,1131,222,1102,187,1070,153,1034,123,994,97,925,64,864,41,808,27,753,22,698,24,638,30,494,52,416,72,350,97"/>
+<area shape="rect" href="classtinyxml2_1_1XMLAttribute.html" title=" " alt="" coords="493,101,644,126"/>
+<area shape="poly" title=" " alt="" coords="378,111,493,111,493,116,378,116"/>
+<area shape="poly" title=" " alt="" coords="973,319,1133,337,1133,342,972,324"/>
+<area shape="rect" href="classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="778,688,991,729"/>
+<area shape="poly" title=" " alt="" coords="924,677,994,621,1054,572,1079,550,1108,518,1139,475,1167,430,1204,360,1209,363,1172,433,1144,478,1112,521,1083,554,1058,576,997,625,927,681"/>
+<area shape="rect" href="classtinyxml2_1_1MemPool.html" title=" " alt="" coords="241,382,370,408"/>
+<area shape="poly" title=" " alt="" coords="323,368,357,331,379,312,403,297,452,277,501,266,502,272,453,282,405,301,382,317,361,335,327,372"/>
+<area shape="poly" title=" " alt="" coords="321,421,368,519,391,564,406,588,446,620,491,646,539,666,589,682,688,701,778,708,777,713,688,706,588,687,537,671,489,650,443,624,402,591,386,567,363,521,317,423"/>
+<area shape="rect" href="classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="777,364,992,405"/>
+<area shape="poly" title=" " alt="" coords="386,391,776,384,776,389,386,396"/>
+<area shape="rect" href="classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="789,571,980,611"/>
+<area shape="poly" title=" " alt="" coords="349,412,515,490,604,528,669,552,729,567,789,578,788,583,728,573,668,558,602,533,513,495,347,417"/>
+<area shape="rect" href="classtinyxml2_1_1MemPoolT.html" title=" " alt="" coords="773,429,996,470"/>
+<area shape="poly" title=" " alt="" coords="385,399,750,432,773,435,773,440,749,438,385,404"/>
+<area shape="poly" title=" " alt="" coords="312,366,344,282,369,234,402,191,428,168,457,149,516,125,518,130,459,154,431,172,406,194,374,237,348,285,317,368"/>
+<area shape="rect" href="classtinyxml2_1_1DynArray.html" title=" " alt="" coords="494,559,643,615"/>
+<area shape="poly" title=" " alt="" coords="651,619,669,626,825,685,824,690,667,631,649,624"/>
+<area shape="poly" title=" " alt="" coords="605,546,679,480,724,445,772,415,800,403,802,408,775,420,727,450,682,484,609,550"/>
+<area shape="poly" title=" " alt="" coords="659,603,669,605,729,607,788,603,789,608,729,612,668,610,658,609"/>
+<area shape="poly" title=" " alt="" coords="657,560,748,526,803,497,851,468,854,473,806,502,750,531,659,565"/>
+<area shape="rect" href="structtinyxml2_1_1MemPoolT_1_1Block.html" title=" " alt="" coords="231,563,380,603"/>
+<area shape="poly" title=" " alt="" coords="396,582,494,583,494,589,396,587"/>
+<area shape="rect" href="uniontinyxml2_1_1MemPoolT_1_1Item.html" title=" " alt="" coords="5,563,148,603"/>
+<area shape="poly" title=" " alt="" coords="148,607,231,634,352,668,447,690,544,704,668,711,778,711,778,716,668,716,543,709,446,696,351,673,230,639,147,612"/>
+<area shape="poly" title=" " alt="" coords="163,580,230,580,230,586,163,586"/>
+<area shape="poly" title=" " alt="" coords="56,545,63,539,76,536,89,538,97,544,100,553,99,562,94,562,95,554,92,547,86,543,77,541,66,543,59,549"/>
+<area shape="poly" title=" " alt="" coords="88,547,109,503,139,453,179,404,203,384,230,367,273,353,332,344,402,341,478,342,637,352,777,367,776,373,637,358,478,347,402,346,333,350,275,358,232,372,206,388,183,408,143,456,114,505,93,549"/>
+<area shape="poly" title=" " alt="" coords="164,601,231,612,376,629,490,635,604,630,749,611,788,605,789,610,750,616,604,635,490,641,376,634,230,618,163,606"/>
+<area shape="poly" title=" " alt="" coords="163,562,230,548,448,503,544,485,668,466,773,454,773,460,669,471,545,490,449,508,231,554,164,567"/>
+<area shape="poly" title=" " alt="" coords="1007,368,1133,354,1134,360,1008,374"/>
+<area shape="poly" title=" " alt="" coords="930,559,1014,503,1108,435,1197,360,1200,364,1111,439,1017,507,933,564"/>
+<area shape="poly" title=" " alt="" coords="988,423,1109,387,1182,359,1184,364,1111,393,989,428"/>
+<area shape="poly" title=" " alt="" coords="660,113,810,116,810,121,660,118"/>
+<area shape="poly" title=" " alt="" coords="544,84,552,77,569,74,584,76,593,83,596,92,592,102,587,99,591,92,589,86,582,81,569,79,554,82,547,88"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a07a6ce25c17aaa505933db57f2373e50" id="r_a07a6ce25c17aaa505933db57f2373e50"><td class="memItemLeft" align="right" valign="top"><a id="a07a6ce25c17aaa505933db57f2373e50" name="a07a6ce25c17aaa505933db57f2373e50"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>OPEN</b>
+<tr class="memitem:ab5f90e2493c35702175235127e2935b4" id="r_ab5f90e2493c35702175235127e2935b4"><td class="memItemLeft" align="right" valign="top"><a id="ab5f90e2493c35702175235127e2935b4" name="ab5f90e2493c35702175235127e2935b4"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>ElementClosingType</b> { <b>OPEN</b>
 , <b>CLOSED</b>
 , <b>CLOSING</b>
  }</td></tr>
-<tr class="separator:a07a6ce25c17aaa505933db57f2373e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ab5f90e2493c35702175235127e2935b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -178,39 +185,55 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>Name</b> () c
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetName</b> (const char *str, bool staticMem=false)</td></tr>
 <tr class="memdesc:a97712009a530d8cb8a63bf705f02b4f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the name of the element. <br /></td></tr>
 <tr class="separator:a97712009a530d8cb8a63bf705f02b4f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abade4c59bd6f16c85caa42d3c9eb617d" id="r_abade4c59bd6f16c85caa42d3c9eb617d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abade4c59bd6f16c85caa42d3c9eb617d">ToElement</a> ()</td></tr>
-<tr class="memdesc:abade4c59bd6f16c85caa42d3c9eb617d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Safely cast to an Element, or null.  <br /></td></tr>
-<tr class="separator:abade4c59bd6f16c85caa42d3c9eb617d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97ac0e6fd96705fd151481a8f5f67c56" id="r_a97ac0e6fd96705fd151481a8f5f67c56"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a97ac0e6fd96705fd151481a8f5f67c56">ToElement</a> () const</td></tr>
-<tr class="separator:a97ac0e6fd96705fd151481a8f5f67c56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ea8a40e788fb9ad876c28a32932c6d5" id="r_a3ea8a40e788fb9ad876c28a32932c6d5"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ea8a40e788fb9ad876c28a32932c6d5">Accept</a> (<a class="el" href="classtinyxml2_1_1XMLVisitor.html">XMLVisitor</a> *visitor) const</td></tr>
-<tr class="separator:a3ea8a40e788fb9ad876c28a32932c6d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88621376780280c0695458e30212eebe" id="r_a88621376780280c0695458e30212eebe"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88621376780280c0695458e30212eebe">ToElement</a> () override</td></tr>
+<tr class="memdesc:a88621376780280c0695458e30212eebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Safely cast to an Element, or null.  <br /></td></tr>
+<tr class="separator:a88621376780280c0695458e30212eebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d4d68378a6a8f7091a065144f771397" id="r_a1d4d68378a6a8f7091a065144f771397"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d4d68378a6a8f7091a065144f771397">ToElement</a> () const override</td></tr>
+<tr class="separator:a1d4d68378a6a8f7091a065144f771397"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acae4a763d74c13ce4a31eb70b4db9f82" id="r_acae4a763d74c13ce4a31eb70b4db9f82"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acae4a763d74c13ce4a31eb70b4db9f82">Accept</a> (<a class="el" href="classtinyxml2_1_1XMLVisitor.html">XMLVisitor</a> *visitor) const override</td></tr>
+<tr class="separator:acae4a763d74c13ce4a31eb70b4db9f82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48cf4a315cfbac7d74cd0d5ff2c5df51" id="r_a48cf4a315cfbac7d74cd0d5ff2c5df51"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a48cf4a315cfbac7d74cd0d5ff2c5df51">Attribute</a> (const char *name, const char *value=0) const</td></tr>
 <tr class="separator:a48cf4a315cfbac7d74cd0d5ff2c5df51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfaaeeadf0b0dbe56bb0f5ec12cb7736" id="r_acfaaeeadf0b0dbe56bb0f5ec12cb7736"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acfaaeeadf0b0dbe56bb0f5ec12cb7736">IntAttribute</a> (const char *name) const</td></tr>
-<tr class="separator:acfaaeeadf0b0dbe56bb0f5ec12cb7736"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a1daf6b090f53f5d34bcc71c646ea78" id="r_a2a1daf6b090f53f5d34bcc71c646ea78"><td class="memItemLeft" align="right" valign="top"><a id="a2a1daf6b090f53f5d34bcc71c646ea78" name="a2a1daf6b090f53f5d34bcc71c646ea78"></a>
-unsigned&#160;</td><td class="memItemRight" valign="bottom"><b>UnsignedAttribute</b> (const char *name) const</td></tr>
-<tr class="memdesc:a2a1daf6b090f53f5d34bcc71c646ea78"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#acfaaeeadf0b0dbe56bb0f5ec12cb7736">IntAttribute()</a> <br /></td></tr>
-<tr class="separator:a2a1daf6b090f53f5d34bcc71c646ea78"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07f6033f25eab7b246b57f4bff0758be" id="r_a07f6033f25eab7b246b57f4bff0758be"><td class="memItemLeft" align="right" valign="top"><a id="a07f6033f25eab7b246b57f4bff0758be" name="a07f6033f25eab7b246b57f4bff0758be"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>BoolAttribute</b> (const char *name) const</td></tr>
-<tr class="memdesc:a07f6033f25eab7b246b57f4bff0758be"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#acfaaeeadf0b0dbe56bb0f5ec12cb7736">IntAttribute()</a> <br /></td></tr>
-<tr class="separator:a07f6033f25eab7b246b57f4bff0758be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8948baa30b3a557d5ad84e7ab6d445fe" id="r_a8948baa30b3a557d5ad84e7ab6d445fe"><td class="memItemLeft" align="right" valign="top"><a id="a8948baa30b3a557d5ad84e7ab6d445fe" name="a8948baa30b3a557d5ad84e7ab6d445fe"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>DoubleAttribute</b> (const char *name) const</td></tr>
-<tr class="memdesc:a8948baa30b3a557d5ad84e7ab6d445fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#acfaaeeadf0b0dbe56bb0f5ec12cb7736">IntAttribute()</a> <br /></td></tr>
-<tr class="separator:a8948baa30b3a557d5ad84e7ab6d445fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69cf755f05fc76a320eb10770845ad8f" id="r_a69cf755f05fc76a320eb10770845ad8f"><td class="memItemLeft" align="right" valign="top"><a id="a69cf755f05fc76a320eb10770845ad8f" name="a69cf755f05fc76a320eb10770845ad8f"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>FloatAttribute</b> (const char *name) const</td></tr>
-<tr class="memdesc:a69cf755f05fc76a320eb10770845ad8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#acfaaeeadf0b0dbe56bb0f5ec12cb7736">IntAttribute()</a> <br /></td></tr>
-<tr class="separator:a69cf755f05fc76a320eb10770845ad8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95a89b13bb14a2d4655e2b5b406c00d4" id="r_a95a89b13bb14a2d4655e2b5b406c00d4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a95a89b13bb14a2d4655e2b5b406c00d4">IntAttribute</a> (const char *name, int defaultValue=0) const</td></tr>
+<tr class="separator:a95a89b13bb14a2d4655e2b5b406c00d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afea43a1d4aa33e3703ddee5fc9adc26c" id="r_afea43a1d4aa33e3703ddee5fc9adc26c"><td class="memItemLeft" align="right" valign="top"><a id="afea43a1d4aa33e3703ddee5fc9adc26c" name="afea43a1d4aa33e3703ddee5fc9adc26c"></a>
+unsigned&#160;</td><td class="memItemRight" valign="bottom"><b>UnsignedAttribute</b> (const char *name, unsigned defaultValue=0) const</td></tr>
+<tr class="memdesc:afea43a1d4aa33e3703ddee5fc9adc26c"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a95a89b13bb14a2d4655e2b5b406c00d4">IntAttribute()</a> <br /></td></tr>
+<tr class="separator:afea43a1d4aa33e3703ddee5fc9adc26c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66d96972adecd816194191f13cc4a0a0" id="r_a66d96972adecd816194191f13cc4a0a0"><td class="memItemLeft" align="right" valign="top"><a id="a66d96972adecd816194191f13cc4a0a0" name="a66d96972adecd816194191f13cc4a0a0"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>Int64Attribute</b> (const char *name, int64_t defaultValue=0) const</td></tr>
+<tr class="memdesc:a66d96972adecd816194191f13cc4a0a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a95a89b13bb14a2d4655e2b5b406c00d4">IntAttribute()</a> <br /></td></tr>
+<tr class="separator:a66d96972adecd816194191f13cc4a0a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a226502bab8f1be7ede1fdd255398eb85" id="r_a226502bab8f1be7ede1fdd255398eb85"><td class="memItemLeft" align="right" valign="top"><a id="a226502bab8f1be7ede1fdd255398eb85" name="a226502bab8f1be7ede1fdd255398eb85"></a>
+uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>Unsigned64Attribute</b> (const char *name, uint64_t defaultValue=0) const</td></tr>
+<tr class="memdesc:a226502bab8f1be7ede1fdd255398eb85"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a95a89b13bb14a2d4655e2b5b406c00d4">IntAttribute()</a> <br /></td></tr>
+<tr class="separator:a226502bab8f1be7ede1fdd255398eb85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53eda26131e1ad1031ef8ec8adb51bd8" id="r_a53eda26131e1ad1031ef8ec8adb51bd8"><td class="memItemLeft" align="right" valign="top"><a id="a53eda26131e1ad1031ef8ec8adb51bd8" name="a53eda26131e1ad1031ef8ec8adb51bd8"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>BoolAttribute</b> (const char *name, bool defaultValue=false) const</td></tr>
+<tr class="memdesc:a53eda26131e1ad1031ef8ec8adb51bd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a95a89b13bb14a2d4655e2b5b406c00d4">IntAttribute()</a> <br /></td></tr>
+<tr class="separator:a53eda26131e1ad1031ef8ec8adb51bd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10a90c505aea716bf073eea1c97f33b5" id="r_a10a90c505aea716bf073eea1c97f33b5"><td class="memItemLeft" align="right" valign="top"><a id="a10a90c505aea716bf073eea1c97f33b5" name="a10a90c505aea716bf073eea1c97f33b5"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>DoubleAttribute</b> (const char *name, double defaultValue=0) const</td></tr>
+<tr class="memdesc:a10a90c505aea716bf073eea1c97f33b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a95a89b13bb14a2d4655e2b5b406c00d4">IntAttribute()</a> <br /></td></tr>
+<tr class="separator:a10a90c505aea716bf073eea1c97f33b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1f4be2332e27dc640e9b6abd01d64dd" id="r_ab1f4be2332e27dc640e9b6abd01d64dd"><td class="memItemLeft" align="right" valign="top"><a id="ab1f4be2332e27dc640e9b6abd01d64dd" name="ab1f4be2332e27dc640e9b6abd01d64dd"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>FloatAttribute</b> (const char *name, float defaultValue=0) const</td></tr>
+<tr class="memdesc:ab1f4be2332e27dc640e9b6abd01d64dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a95a89b13bb14a2d4655e2b5b406c00d4">IntAttribute()</a> <br /></td></tr>
+<tr class="separator:ab1f4be2332e27dc640e9b6abd01d64dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a78bc1187c1c45ad89f2690eab567b1" id="r_a8a78bc1187c1c45ad89f2690eab567b1"><td class="memItemLeft" align="right" valign="top">XMLError&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute</a> (const char *name, int *value) const</td></tr>
 <tr class="separator:a8a78bc1187c1c45ad89f2690eab567b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26fc84cbfba6769dafcfbf256c05e22f" id="r_a26fc84cbfba6769dafcfbf256c05e22f"><td class="memItemLeft" align="right" valign="top"><a id="a26fc84cbfba6769dafcfbf256c05e22f" name="a26fc84cbfba6769dafcfbf256c05e22f"></a>
 XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryUnsignedAttribute</b> (const char *name, unsigned int *value) const</td></tr>
 <tr class="memdesc:a26fc84cbfba6769dafcfbf256c05e22f"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> <br /></td></tr>
 <tr class="separator:a26fc84cbfba6769dafcfbf256c05e22f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c0955d80b6f8d196744eacb0f6e90a8" id="r_a7c0955d80b6f8d196744eacb0f6e90a8"><td class="memItemLeft" align="right" valign="top"><a id="a7c0955d80b6f8d196744eacb0f6e90a8" name="a7c0955d80b6f8d196744eacb0f6e90a8"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryInt64Attribute</b> (const char *name, int64_t *value) const</td></tr>
+<tr class="memdesc:a7c0955d80b6f8d196744eacb0f6e90a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> <br /></td></tr>
+<tr class="separator:a7c0955d80b6f8d196744eacb0f6e90a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13dd590b5d3958ce2ed79844aacd9405" id="r_a13dd590b5d3958ce2ed79844aacd9405"><td class="memItemLeft" align="right" valign="top"><a id="a13dd590b5d3958ce2ed79844aacd9405" name="a13dd590b5d3958ce2ed79844aacd9405"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryUnsigned64Attribute</b> (const char *name, uint64_t *value) const</td></tr>
+<tr class="memdesc:a13dd590b5d3958ce2ed79844aacd9405"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> <br /></td></tr>
+<tr class="separator:a13dd590b5d3958ce2ed79844aacd9405"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14c1bb77c39689838be01838d86ca872" id="r_a14c1bb77c39689838be01838d86ca872"><td class="memItemLeft" align="right" valign="top"><a id="a14c1bb77c39689838be01838d86ca872" name="a14c1bb77c39689838be01838d86ca872"></a>
 XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryBoolAttribute</b> (const char *name, bool *value) const</td></tr>
 <tr class="memdesc:a14c1bb77c39689838be01838d86ca872"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> <br /></td></tr>
@@ -223,20 +246,33 @@ XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryDoubleAttrib
 XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryFloatAttribute</b> (const char *name, float *value) const</td></tr>
 <tr class="memdesc:acd5eeddf6002ef90806af794b9d9a5a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> <br /></td></tr>
 <tr class="separator:acd5eeddf6002ef90806af794b9d9a5a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a042fc30504347b84a56cf863ad528a4f" id="r_a042fc30504347b84a56cf863ad528a4f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a042fc30504347b84a56cf863ad528a4f">QueryAttribute</a> (const char *name, int *value) const</td></tr>
-<tr class="separator:a042fc30504347b84a56cf863ad528a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a187e8b686fbe071732aea2e2ee766f86" id="r_a187e8b686fbe071732aea2e2ee766f86"><td class="memItemLeft" align="right" valign="top"><a id="a187e8b686fbe071732aea2e2ee766f86" name="a187e8b686fbe071732aea2e2ee766f86"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, unsigned int *value) const</td></tr>
-<tr class="separator:a187e8b686fbe071732aea2e2ee766f86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9aa67feb0392ead13a66f5ea55e71f64" id="r_a9aa67feb0392ead13a66f5ea55e71f64"><td class="memItemLeft" align="right" valign="top"><a id="a9aa67feb0392ead13a66f5ea55e71f64" name="a9aa67feb0392ead13a66f5ea55e71f64"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, bool *value) const</td></tr>
-<tr class="separator:a9aa67feb0392ead13a66f5ea55e71f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f37582f3ad9f9a765e6fa349dfbdfa0" id="r_a7f37582f3ad9f9a765e6fa349dfbdfa0"><td class="memItemLeft" align="right" valign="top"><a id="a7f37582f3ad9f9a765e6fa349dfbdfa0" name="a7f37582f3ad9f9a765e6fa349dfbdfa0"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, double *value) const</td></tr>
-<tr class="separator:a7f37582f3ad9f9a765e6fa349dfbdfa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a493b6dace830e4dba7110b1e9f6bebd5" id="r_a493b6dace830e4dba7110b1e9f6bebd5"><td class="memItemLeft" align="right" valign="top"><a id="a493b6dace830e4dba7110b1e9f6bebd5" name="a493b6dace830e4dba7110b1e9f6bebd5"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, float *value) const</td></tr>
-<tr class="separator:a493b6dace830e4dba7110b1e9f6bebd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb8ae765f98d0c5037faec48deea78bc" id="r_adb8ae765f98d0c5037faec48deea78bc"><td class="memItemLeft" align="right" valign="top"><a id="adb8ae765f98d0c5037faec48deea78bc" name="adb8ae765f98d0c5037faec48deea78bc"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryStringAttribute</b> (const char *name, const char **value) const</td></tr>
+<tr class="memdesc:adb8ae765f98d0c5037faec48deea78bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> <br /></td></tr>
+<tr class="separator:adb8ae765f98d0c5037faec48deea78bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b7df3bed2b8954eabf227fa204522eb" id="r_a5b7df3bed2b8954eabf227fa204522eb"><td class="memItemLeft" align="right" valign="top">XMLError&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5b7df3bed2b8954eabf227fa204522eb">QueryAttribute</a> (const char *name, int *value) const</td></tr>
+<tr class="separator:a5b7df3bed2b8954eabf227fa204522eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a432276ea6e034cad19ad66de887ee13c" id="r_a432276ea6e034cad19ad66de887ee13c"><td class="memItemLeft" align="right" valign="top"><a id="a432276ea6e034cad19ad66de887ee13c" name="a432276ea6e034cad19ad66de887ee13c"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, unsigned int *value) const</td></tr>
+<tr class="separator:a432276ea6e034cad19ad66de887ee13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4867aea7a812acf7f00a915e4eaeaf3e" id="r_a4867aea7a812acf7f00a915e4eaeaf3e"><td class="memItemLeft" align="right" valign="top"><a id="a4867aea7a812acf7f00a915e4eaeaf3e" name="a4867aea7a812acf7f00a915e4eaeaf3e"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, int64_t *value) const</td></tr>
+<tr class="separator:a4867aea7a812acf7f00a915e4eaeaf3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2175dd6a927f7b0c5bfcde727da2b35" id="r_ad2175dd6a927f7b0c5bfcde727da2b35"><td class="memItemLeft" align="right" valign="top"><a id="ad2175dd6a927f7b0c5bfcde727da2b35" name="ad2175dd6a927f7b0c5bfcde727da2b35"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, uint64_t *value) const</td></tr>
+<tr class="separator:ad2175dd6a927f7b0c5bfcde727da2b35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17139a22f2552439a7c2780e8e901522" id="r_a17139a22f2552439a7c2780e8e901522"><td class="memItemLeft" align="right" valign="top"><a id="a17139a22f2552439a7c2780e8e901522" name="a17139a22f2552439a7c2780e8e901522"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, bool *value) const</td></tr>
+<tr class="separator:a17139a22f2552439a7c2780e8e901522"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f4da49900e82e25d163a7c0325fcc5f" id="r_a4f4da49900e82e25d163a7c0325fcc5f"><td class="memItemLeft" align="right" valign="top"><a id="a4f4da49900e82e25d163a7c0325fcc5f" name="a4f4da49900e82e25d163a7c0325fcc5f"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, double *value) const</td></tr>
+<tr class="separator:a4f4da49900e82e25d163a7c0325fcc5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac85b18ccd9ee8a79a2fd97cc593aae43" id="r_ac85b18ccd9ee8a79a2fd97cc593aae43"><td class="memItemLeft" align="right" valign="top"><a id="ac85b18ccd9ee8a79a2fd97cc593aae43" name="ac85b18ccd9ee8a79a2fd97cc593aae43"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, float *value) const</td></tr>
+<tr class="separator:ac85b18ccd9ee8a79a2fd97cc593aae43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6a3656a3af23b2c265b8fed8e888e30" id="r_ae6a3656a3af23b2c265b8fed8e888e30"><td class="memItemLeft" align="right" valign="top"><a id="ae6a3656a3af23b2c265b8fed8e888e30" name="ae6a3656a3af23b2c265b8fed8e888e30"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryAttribute</b> (const char *name, const char **value) const</td></tr>
+<tr class="separator:ae6a3656a3af23b2c265b8fed8e888e30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11943abf2d0831548c3790dd5d9f119c" id="r_a11943abf2d0831548c3790dd5d9f119c"><td class="memItemLeft" align="right" valign="top"><a id="a11943abf2d0831548c3790dd5d9f119c" name="a11943abf2d0831548c3790dd5d9f119c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (const char *name, const char *value)</td></tr>
 <tr class="memdesc:a11943abf2d0831548c3790dd5d9f119c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the named attribute to value. <br /></td></tr>
@@ -249,6 +285,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (con
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (const char *name, unsigned value)</td></tr>
 <tr class="memdesc:ae143997e90064ba82326b29a9930ea8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the named attribute to value. <br /></td></tr>
 <tr class="separator:ae143997e90064ba82326b29a9930ea8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaeefdf9171fec91b13a776b42299b0dd" id="r_aaeefdf9171fec91b13a776b42299b0dd"><td class="memItemLeft" align="right" valign="top"><a id="aaeefdf9171fec91b13a776b42299b0dd" name="aaeefdf9171fec91b13a776b42299b0dd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (const char *name, int64_t value)</td></tr>
+<tr class="memdesc:aaeefdf9171fec91b13a776b42299b0dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the named attribute to value. <br /></td></tr>
+<tr class="separator:aaeefdf9171fec91b13a776b42299b0dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad598868c0599ddc4695dab18552c308d" id="r_ad598868c0599ddc4695dab18552c308d"><td class="memItemLeft" align="right" valign="top"><a id="ad598868c0599ddc4695dab18552c308d" name="ad598868c0599ddc4695dab18552c308d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (const char *name, uint64_t value)</td></tr>
+<tr class="memdesc:ad598868c0599ddc4695dab18552c308d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the named attribute to value. <br /></td></tr>
+<tr class="separator:ad598868c0599ddc4695dab18552c308d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa848b696e6a75e4e545c6da9893b11e1" id="r_aa848b696e6a75e4e545c6da9893b11e1"><td class="memItemLeft" align="right" valign="top"><a id="aa848b696e6a75e4e545c6da9893b11e1" name="aa848b696e6a75e4e545c6da9893b11e1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (const char *name, bool value)</td></tr>
 <tr class="memdesc:aa848b696e6a75e4e545c6da9893b11e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the named attribute to value. <br /></td></tr>
@@ -257,6 +301,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (con
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (const char *name, double value)</td></tr>
 <tr class="memdesc:a233397ee81e70eb5d4b814c5f8698533"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the named attribute to value. <br /></td></tr>
 <tr class="separator:a233397ee81e70eb5d4b814c5f8698533"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a554b70d882e65b28fc084b23df9b9759" id="r_a554b70d882e65b28fc084b23df9b9759"><td class="memItemLeft" align="right" valign="top"><a id="a554b70d882e65b28fc084b23df9b9759" name="a554b70d882e65b28fc084b23df9b9759"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAttribute</b> (const char *name, float value)</td></tr>
+<tr class="memdesc:a554b70d882e65b28fc084b23df9b9759"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the named attribute to value. <br /></td></tr>
+<tr class="separator:a554b70d882e65b28fc084b23df9b9759"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebd45aa7118964c30b32fe12e944628a" id="r_aebd45aa7118964c30b32fe12e944628a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebd45aa7118964c30b32fe12e944628a">DeleteAttribute</a> (const char *name)</td></tr>
 <tr class="separator:aebd45aa7118964c30b32fe12e944628a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a7c4392658833bb8138c474d15a805a" id="r_a4a7c4392658833bb8138c474d15a805a"><td class="memItemLeft" align="right" valign="top"><a id="a4a7c4392658833bb8138c474d15a805a" name="a4a7c4392658833bb8138c474d15a805a"></a>
@@ -269,12 +317,50 @@ const <a class="el" href="classtinyxml2_1_1XMLAttribute.html">XMLAttribute</a> *
 <tr class="separator:a157750dac8037a316fd1af1a973dfa2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0fa5bea0a4daf3ddd503dcabb823eba6" id="r_a0fa5bea0a4daf3ddd503dcabb823eba6"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0fa5bea0a4daf3ddd503dcabb823eba6">GetText</a> () const</td></tr>
 <tr class="separator:a0fa5bea0a4daf3ddd503dcabb823eba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f9c2cd61b72af5ae708d37b7ad283ce" id="r_a1f9c2cd61b72af5ae708d37b7ad283ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText</a> (const char *inText)</td></tr>
+<tr class="separator:a1f9c2cd61b72af5ae708d37b7ad283ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeae8917b5ea6060b3c08d4e3d8d632d7" id="r_aeae8917b5ea6060b3c08d4e3d8d632d7"><td class="memItemLeft" align="right" valign="top"><a id="aeae8917b5ea6060b3c08d4e3d8d632d7" name="aeae8917b5ea6060b3c08d4e3d8d632d7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetText</b> (int value)</td></tr>
+<tr class="memdesc:aeae8917b5ea6060b3c08d4e3d8d632d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for setting text inside an element. See <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> for important limitations. <br /></td></tr>
+<tr class="separator:aeae8917b5ea6060b3c08d4e3d8d632d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bbfcc11d516598bc924a8fba4d08597" id="r_a7bbfcc11d516598bc924a8fba4d08597"><td class="memItemLeft" align="right" valign="top"><a id="a7bbfcc11d516598bc924a8fba4d08597" name="a7bbfcc11d516598bc924a8fba4d08597"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetText</b> (unsigned value)</td></tr>
+<tr class="memdesc:a7bbfcc11d516598bc924a8fba4d08597"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for setting text inside an element. See <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> for important limitations. <br /></td></tr>
+<tr class="separator:a7bbfcc11d516598bc924a8fba4d08597"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b62cd33acdfeff7ea2b1b330d4368e4" id="r_a7b62cd33acdfeff7ea2b1b330d4368e4"><td class="memItemLeft" align="right" valign="top"><a id="a7b62cd33acdfeff7ea2b1b330d4368e4" name="a7b62cd33acdfeff7ea2b1b330d4368e4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetText</b> (int64_t value)</td></tr>
+<tr class="memdesc:a7b62cd33acdfeff7ea2b1b330d4368e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for setting text inside an element. See <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> for important limitations. <br /></td></tr>
+<tr class="separator:a7b62cd33acdfeff7ea2b1b330d4368e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e615bc745afd1ca8ded56d7aac02657" id="r_a6e615bc745afd1ca8ded56d7aac02657"><td class="memItemLeft" align="right" valign="top"><a id="a6e615bc745afd1ca8ded56d7aac02657" name="a6e615bc745afd1ca8ded56d7aac02657"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetText</b> (uint64_t value)</td></tr>
+<tr class="memdesc:a6e615bc745afd1ca8ded56d7aac02657"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for setting text inside an element. See <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> for important limitations. <br /></td></tr>
+<tr class="separator:a6e615bc745afd1ca8ded56d7aac02657"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4b543d6770de76fb6ab68e541c192a4" id="r_ae4b543d6770de76fb6ab68e541c192a4"><td class="memItemLeft" align="right" valign="top"><a id="ae4b543d6770de76fb6ab68e541c192a4" name="ae4b543d6770de76fb6ab68e541c192a4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetText</b> (bool value)</td></tr>
+<tr class="memdesc:ae4b543d6770de76fb6ab68e541c192a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for setting text inside an element. See <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> for important limitations. <br /></td></tr>
+<tr class="separator:ae4b543d6770de76fb6ab68e541c192a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67bd77ac9aaeff58ff20b4275a65ba4e" id="r_a67bd77ac9aaeff58ff20b4275a65ba4e"><td class="memItemLeft" align="right" valign="top"><a id="a67bd77ac9aaeff58ff20b4275a65ba4e" name="a67bd77ac9aaeff58ff20b4275a65ba4e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetText</b> (double value)</td></tr>
+<tr class="memdesc:a67bd77ac9aaeff58ff20b4275a65ba4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for setting text inside an element. See <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> for important limitations. <br /></td></tr>
+<tr class="separator:a67bd77ac9aaeff58ff20b4275a65ba4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51d560da5ae3ad6b75e0ab9ffb2ae42a" id="r_a51d560da5ae3ad6b75e0ab9ffb2ae42a"><td class="memItemLeft" align="right" valign="top"><a id="a51d560da5ae3ad6b75e0ab9ffb2ae42a" name="a51d560da5ae3ad6b75e0ab9ffb2ae42a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetText</b> (float value)</td></tr>
+<tr class="memdesc:a51d560da5ae3ad6b75e0ab9ffb2ae42a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for setting text inside an element. See <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> for important limitations. <br /></td></tr>
+<tr class="separator:a51d560da5ae3ad6b75e0ab9ffb2ae42a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a926357996bef633cb736e1a558419632" id="r_a926357996bef633cb736e1a558419632"><td class="memItemLeft" align="right" valign="top">XMLError&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText</a> (int *ival) const</td></tr>
 <tr class="separator:a926357996bef633cb736e1a558419632"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14d38aa4b5e18a46274a27425188a6a1" id="r_a14d38aa4b5e18a46274a27425188a6a1"><td class="memItemLeft" align="right" valign="top"><a id="a14d38aa4b5e18a46274a27425188a6a1" name="a14d38aa4b5e18a46274a27425188a6a1"></a>
 XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryUnsignedText</b> (unsigned *uval) const</td></tr>
 <tr class="memdesc:a14d38aa4b5e18a46274a27425188a6a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
 <tr class="separator:a14d38aa4b5e18a46274a27425188a6a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a120c538c8eead169e635dbc70fb226d8" id="r_a120c538c8eead169e635dbc70fb226d8"><td class="memItemLeft" align="right" valign="top"><a id="a120c538c8eead169e635dbc70fb226d8" name="a120c538c8eead169e635dbc70fb226d8"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryInt64Text</b> (int64_t *uval) const</td></tr>
+<tr class="memdesc:a120c538c8eead169e635dbc70fb226d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
+<tr class="separator:a120c538c8eead169e635dbc70fb226d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2239b3bd172ad8f5b78d04d4236144b" id="r_ac2239b3bd172ad8f5b78d04d4236144b"><td class="memItemLeft" align="right" valign="top"><a id="ac2239b3bd172ad8f5b78d04d4236144b" name="ac2239b3bd172ad8f5b78d04d4236144b"></a>
+XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryUnsigned64Text</b> (uint64_t *uval) const</td></tr>
+<tr class="memdesc:ac2239b3bd172ad8f5b78d04d4236144b"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
+<tr class="separator:ac2239b3bd172ad8f5b78d04d4236144b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fe5417d59eb8f5c4afe924b7d332736" id="r_a3fe5417d59eb8f5c4afe924b7d332736"><td class="memItemLeft" align="right" valign="top"><a id="a3fe5417d59eb8f5c4afe924b7d332736" name="a3fe5417d59eb8f5c4afe924b7d332736"></a>
 XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryBoolText</b> (bool *bval) const</td></tr>
 <tr class="memdesc:a3fe5417d59eb8f5c4afe924b7d332736"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
@@ -287,15 +373,58 @@ XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryDoubleText</
 XMLError&#160;</td><td class="memItemRight" valign="bottom"><b>QueryFloatText</b> (float *fval) const</td></tr>
 <tr class="memdesc:afa332afedd93210daa6d44b88eb11e29"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
 <tr class="separator:afa332afedd93210daa6d44b88eb11e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac820806b6c14af6833dcbcf0957b6d61" id="r_ac820806b6c14af6833dcbcf0957b6d61"><td class="memItemLeft" align="right" valign="top"><a id="ac820806b6c14af6833dcbcf0957b6d61" name="ac820806b6c14af6833dcbcf0957b6d61"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>ClosingType</b> () const</td></tr>
-<tr class="separator:ac820806b6c14af6833dcbcf0957b6d61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaafdd2a5618abe80a2c1839ad3ccd492" id="r_aaafdd2a5618abe80a2c1839ad3ccd492"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaafdd2a5618abe80a2c1839ad3ccd492">ParseDeep</a> (char *p, <a class="el" href="classtinyxml2_1_1StrPair.html">StrPair</a> *endTag)</td></tr>
-<tr class="separator:aaafdd2a5618abe80a2c1839ad3ccd492"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1edb4f3b8e2622e65663b068bc907122" id="r_a1edb4f3b8e2622e65663b068bc907122"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1edb4f3b8e2622e65663b068bc907122">ShallowClone</a> (<a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> *document) const</td></tr>
-<tr class="separator:a1edb4f3b8e2622e65663b068bc907122"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9ea913a460b48979bd83cf9871c99f6" id="r_ad9ea913a460b48979bd83cf9871c99f6"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9ea913a460b48979bd83cf9871c99f6">ShallowEqual</a> (const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *compare) const</td></tr>
-<tr class="separator:ad9ea913a460b48979bd83cf9871c99f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37b0636adebb8a1a1bc965f60824cb3e" id="r_a37b0636adebb8a1a1bc965f60824cb3e"><td class="memItemLeft" align="right" valign="top"><a id="a37b0636adebb8a1a1bc965f60824cb3e" name="a37b0636adebb8a1a1bc965f60824cb3e"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>IntText</b> (int defaultValue=0) const</td></tr>
+<tr class="separator:a37b0636adebb8a1a1bc965f60824cb3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49bad014ffcc17b0b6119d5b2c97dfb5" id="r_a49bad014ffcc17b0b6119d5b2c97dfb5"><td class="memItemLeft" align="right" valign="top"><a id="a49bad014ffcc17b0b6119d5b2c97dfb5" name="a49bad014ffcc17b0b6119d5b2c97dfb5"></a>
+unsigned&#160;</td><td class="memItemRight" valign="bottom"><b>UnsignedText</b> (unsigned defaultValue=0) const</td></tr>
+<tr class="memdesc:a49bad014ffcc17b0b6119d5b2c97dfb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
+<tr class="separator:a49bad014ffcc17b0b6119d5b2c97dfb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab6151f7e3b4c2c0a8234e262d7b6b8a" id="r_aab6151f7e3b4c2c0a8234e262d7b6b8a"><td class="memItemLeft" align="right" valign="top"><a id="aab6151f7e3b4c2c0a8234e262d7b6b8a" name="aab6151f7e3b4c2c0a8234e262d7b6b8a"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>Int64Text</b> (int64_t defaultValue=0) const</td></tr>
+<tr class="memdesc:aab6151f7e3b4c2c0a8234e262d7b6b8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
+<tr class="separator:aab6151f7e3b4c2c0a8234e262d7b6b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af48c1023abbac1acdf4927c51c3a5f0c" id="r_af48c1023abbac1acdf4927c51c3a5f0c"><td class="memItemLeft" align="right" valign="top"><a id="af48c1023abbac1acdf4927c51c3a5f0c" name="af48c1023abbac1acdf4927c51c3a5f0c"></a>
+uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>Unsigned64Text</b> (uint64_t defaultValue=0) const</td></tr>
+<tr class="memdesc:af48c1023abbac1acdf4927c51c3a5f0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
+<tr class="separator:af48c1023abbac1acdf4927c51c3a5f0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68569f59f6382bcea7f5013ec59736d2" id="r_a68569f59f6382bcea7f5013ec59736d2"><td class="memItemLeft" align="right" valign="top"><a id="a68569f59f6382bcea7f5013ec59736d2" name="a68569f59f6382bcea7f5013ec59736d2"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>BoolText</b> (bool defaultValue=false) const</td></tr>
+<tr class="memdesc:a68569f59f6382bcea7f5013ec59736d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
+<tr class="separator:a68569f59f6382bcea7f5013ec59736d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81b1ff0cf2f2cd09be8badc08b39a2b7" id="r_a81b1ff0cf2f2cd09be8badc08b39a2b7"><td class="memItemLeft" align="right" valign="top"><a id="a81b1ff0cf2f2cd09be8badc08b39a2b7" name="a81b1ff0cf2f2cd09be8badc08b39a2b7"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>DoubleText</b> (double defaultValue=0) const</td></tr>
+<tr class="memdesc:a81b1ff0cf2f2cd09be8badc08b39a2b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
+<tr class="separator:a81b1ff0cf2f2cd09be8badc08b39a2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45444eb21f99ca46101545992dc2e927" id="r_a45444eb21f99ca46101545992dc2e927"><td class="memItemLeft" align="right" valign="top"><a id="a45444eb21f99ca46101545992dc2e927" name="a45444eb21f99ca46101545992dc2e927"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>FloatText</b> (float defaultValue=0) const</td></tr>
+<tr class="memdesc:a45444eb21f99ca46101545992dc2e927"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> <br /></td></tr>
+<tr class="separator:a45444eb21f99ca46101545992dc2e927"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf01fdeb702165fddbc97bcc8af8a1ad" id="r_abf01fdeb702165fddbc97bcc8af8a1ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abf01fdeb702165fddbc97bcc8af8a1ad">InsertNewChildElement</a> (const char *name)</td></tr>
+<tr class="separator:abf01fdeb702165fddbc97bcc8af8a1ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaed36d3a8082b083ec4f1de55ee68cc2" id="r_aaed36d3a8082b083ec4f1de55ee68cc2"><td class="memItemLeft" align="right" valign="top"><a id="aaed36d3a8082b083ec4f1de55ee68cc2" name="aaed36d3a8082b083ec4f1de55ee68cc2"></a>
+<a class="el" href="classtinyxml2_1_1XMLComment.html">XMLComment</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>InsertNewComment</b> (const char *comment)</td></tr>
+<tr class="memdesc:aaed36d3a8082b083ec4f1de55ee68cc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#abf01fdeb702165fddbc97bcc8af8a1ad">InsertNewChildElement()</a> <br /></td></tr>
+<tr class="separator:aaed36d3a8082b083ec4f1de55ee68cc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac30367a5e25ff30e178b56e0e1456d23" id="r_ac30367a5e25ff30e178b56e0e1456d23"><td class="memItemLeft" align="right" valign="top"><a id="ac30367a5e25ff30e178b56e0e1456d23" name="ac30367a5e25ff30e178b56e0e1456d23"></a>
+<a class="el" href="classtinyxml2_1_1XMLText.html">XMLText</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>InsertNewText</b> (const char *text)</td></tr>
+<tr class="memdesc:ac30367a5e25ff30e178b56e0e1456d23"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#abf01fdeb702165fddbc97bcc8af8a1ad">InsertNewChildElement()</a> <br /></td></tr>
+<tr class="separator:ac30367a5e25ff30e178b56e0e1456d23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f11671a928649add7e3e18de7adf84a" id="r_a7f11671a928649add7e3e18de7adf84a"><td class="memItemLeft" align="right" valign="top"><a id="a7f11671a928649add7e3e18de7adf84a" name="a7f11671a928649add7e3e18de7adf84a"></a>
+<a class="el" href="classtinyxml2_1_1XMLDeclaration.html">XMLDeclaration</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>InsertNewDeclaration</b> (const char *text)</td></tr>
+<tr class="memdesc:a7f11671a928649add7e3e18de7adf84a"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#abf01fdeb702165fddbc97bcc8af8a1ad">InsertNewChildElement()</a> <br /></td></tr>
+<tr class="separator:a7f11671a928649add7e3e18de7adf84a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe6cfefb48f8fbcb29a790f2042b55a4" id="r_afe6cfefb48f8fbcb29a790f2042b55a4"><td class="memItemLeft" align="right" valign="top"><a id="afe6cfefb48f8fbcb29a790f2042b55a4" name="afe6cfefb48f8fbcb29a790f2042b55a4"></a>
+<a class="el" href="classtinyxml2_1_1XMLUnknown.html">XMLUnknown</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>InsertNewUnknown</b> (const char *text)</td></tr>
+<tr class="memdesc:afe6cfefb48f8fbcb29a790f2042b55a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="#abf01fdeb702165fddbc97bcc8af8a1ad">InsertNewChildElement()</a> <br /></td></tr>
+<tr class="separator:afe6cfefb48f8fbcb29a790f2042b55a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6965ff89557f27d4082d7043d5145555" id="r_a6965ff89557f27d4082d7043d5145555"><td class="memItemLeft" align="right" valign="top"><a id="a6965ff89557f27d4082d7043d5145555" name="a6965ff89557f27d4082d7043d5145555"></a>
+ElementClosingType&#160;</td><td class="memItemRight" valign="bottom"><b>ClosingType</b> () const</td></tr>
+<tr class="separator:a6965ff89557f27d4082d7043d5145555"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dc4d8774d1e77a8c37a7b3d039d3049" id="r_a6dc4d8774d1e77a8c37a7b3d039d3049"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6dc4d8774d1e77a8c37a7b3d039d3049">ShallowClone</a> (<a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> *document) const override</td></tr>
+<tr class="separator:a6dc4d8774d1e77a8c37a7b3d039d3049"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaba88737610559755425b8a59179817e" id="r_aaba88737610559755425b8a59179817e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaba88737610559755425b8a59179817e">ShallowEqual</a> (const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *compare) const override</td></tr>
+<tr class="separator:aaba88737610559755425b8a59179817e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classtinyxml2_1_1XMLNode"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classtinyxml2_1_1XMLNode')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classtinyxml2_1_1XMLNode.html">tinyxml2::XMLNode</a></td></tr>
 <tr class="memitem:a6ce3bbe80357f5a4dc5db31a66f2bb18 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a6ce3bbe80357f5a4dc5db31a66f2bb18"><td class="memItemLeft" align="right" valign="top">
 const <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDocument</b> () const</td></tr>
@@ -335,10 +464,20 @@ virtual const <a class="el" href="classtinyxml2_1_1XMLDeclaration.html">XMLDecla
 <tr class="memitem:ab956088fd1ec09c933804000a7a984ea inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_ab956088fd1ec09c933804000a7a984ea"><td class="memItemLeft" align="right" valign="top">
 virtual const <a class="el" href="classtinyxml2_1_1XMLUnknown.html">XMLUnknown</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>ToUnknown</b> () const</td></tr>
 <tr class="separator:ab956088fd1ec09c933804000a7a984ea inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afca6116430d31cc39de9eb2f647b83bb inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_afca6116430d31cc39de9eb2f647b83bb"><td class="memItemLeft" align="right" valign="top">
+int&#160;</td><td class="memItemRight" valign="bottom"><b>ChildElementCount</b> (const char *value) const</td></tr>
+<tr class="separator:afca6116430d31cc39de9eb2f647b83bb inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4d4ed49437c715a8549be55f4566d33 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_af4d4ed49437c715a8549be55f4566d33"><td class="memItemLeft" align="right" valign="top">
+int&#160;</td><td class="memItemRight" valign="bottom"><b>ChildElementCount</b> () const</td></tr>
+<tr class="separator:af4d4ed49437c715a8549be55f4566d33 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0485e51c670e741884cfd8362274d680 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a0485e51c670e741884cfd8362274d680"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a0485e51c670e741884cfd8362274d680">Value</a> () const</td></tr>
 <tr class="separator:a0485e51c670e741884cfd8362274d680 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09dd68cf9eae137579f6e50f36487513 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a09dd68cf9eae137579f6e50f36487513"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a09dd68cf9eae137579f6e50f36487513">SetValue</a> (const char *val, bool staticMem=false)</td></tr>
 <tr class="separator:a09dd68cf9eae137579f6e50f36487513 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b5fc636646fda761d342c72e91cb286 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a9b5fc636646fda761d342c72e91cb286"><td class="memItemLeft" align="right" valign="top">
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetLineNum</b> () const</td></tr>
+<tr class="memdesc:a9b5fc636646fda761d342c72e91cb286 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the line number the node is in, if the document was parsed from a file. <br /></td></tr>
+<tr class="separator:a9b5fc636646fda761d342c72e91cb286 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d76b30d1bf4b166d3e4fa3419d51595 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a4d76b30d1bf4b166d3e4fa3419d51595"><td class="memItemLeft" align="right" valign="top">
 const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>Parent</b> () const</td></tr>
 <tr class="memdesc:a4d76b30d1bf4b166d3e4fa3419d51595 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the parent of this node on the DOM. <br /></td></tr>
@@ -357,11 +496,11 @@ const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td
 <tr class="memitem:a3cc3c85d40ce73d6f5849a35debfccfc inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a3cc3c85d40ce73d6f5849a35debfccfc"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>FirstChild</b> ()</td></tr>
 <tr class="separator:a3cc3c85d40ce73d6f5849a35debfccfc inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f9c37890cc8130313af2deabc7389cb inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a4f9c37890cc8130313af2deabc7389cb"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a4f9c37890cc8130313af2deabc7389cb">FirstChildElement</a> (const char *value=0) const</td></tr>
-<tr class="separator:a4f9c37890cc8130313af2deabc7389cb inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1169014d80aac57fafcfde59fe7f545 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_af1169014d80aac57fafcfde59fe7f545"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>FirstChildElement</b> (const char *value=0)</td></tr>
-<tr class="separator:af1169014d80aac57fafcfde59fe7f545 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bec132dcf085284e0a10755f2cf0d57 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a1bec132dcf085284e0a10755f2cf0d57"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a1bec132dcf085284e0a10755f2cf0d57">FirstChildElement</a> (const char *name=0) const</td></tr>
+<tr class="separator:a1bec132dcf085284e0a10755f2cf0d57 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46c460e1494ccc2691f515a34e78abc0 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a46c460e1494ccc2691f515a34e78abc0"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>FirstChildElement</b> (const char *name=0)</td></tr>
+<tr class="separator:a46c460e1494ccc2691f515a34e78abc0 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69a29bb8263ff5e9815be180bf27e7af inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a69a29bb8263ff5e9815be180bf27e7af"><td class="memItemLeft" align="right" valign="top">
 const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>LastChild</b> () const</td></tr>
 <tr class="memdesc:a69a29bb8263ff5e9815be180bf27e7af inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last child node, or null if none exists. <br /></td></tr>
@@ -369,11 +508,11 @@ const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td
 <tr class="memitem:a5029f38433f2c547ab2c67d20944563f inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a5029f38433f2c547ab2c67d20944563f"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>LastChild</b> ()</td></tr>
 <tr class="separator:a5029f38433f2c547ab2c67d20944563f inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cb35cd79e93f802a1506b6b517c331c inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a0cb35cd79e93f802a1506b6b517c331c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a0cb35cd79e93f802a1506b6b517c331c">LastChildElement</a> (const char *value=0) const</td></tr>
-<tr class="separator:a0cb35cd79e93f802a1506b6b517c331c inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec3e0bf9b603269c3952ceabc50a0989 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_aec3e0bf9b603269c3952ceabc50a0989"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>LastChildElement</b> (const char *value=0)</td></tr>
-<tr class="separator:aec3e0bf9b603269c3952ceabc50a0989 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a609e02f02044f39b928d1a3e0de9f532 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a609e02f02044f39b928d1a3e0de9f532"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a609e02f02044f39b928d1a3e0de9f532">LastChildElement</a> (const char *name=0) const</td></tr>
+<tr class="separator:a609e02f02044f39b928d1a3e0de9f532 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b3ee7343ed49c2054fe64ef5639b2ff inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a4b3ee7343ed49c2054fe64ef5639b2ff"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>LastChildElement</b> (const char *name=0)</td></tr>
+<tr class="separator:a4b3ee7343ed49c2054fe64ef5639b2ff inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92ee96b0d8628bc609f1d34e56d69dfa inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a92ee96b0d8628bc609f1d34e56d69dfa"><td class="memItemLeft" align="right" valign="top">
 const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>PreviousSibling</b> () const</td></tr>
 <tr class="memdesc:a92ee96b0d8628bc609f1d34e56d69dfa inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the previous (left) sibling node of this node. <br /></td></tr>
@@ -381,11 +520,13 @@ const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td
 <tr class="memitem:a5cbc1d7444770fb364a431441b81f21a inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a5cbc1d7444770fb364a431441b81f21a"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>PreviousSibling</b> ()</td></tr>
 <tr class="separator:a5cbc1d7444770fb364a431441b81f21a inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8195130fe48a176732d3d843a6b5990 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_ab8195130fe48a176732d3d843a6b5990"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#ab8195130fe48a176732d3d843a6b5990">PreviousSiblingElement</a> (const char *value=0) const</td></tr>
-<tr class="separator:ab8195130fe48a176732d3d843a6b5990 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3290e213f5ae0b0fea66bfeec25ea9d inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_aa3290e213f5ae0b0fea66bfeec25ea9d"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>PreviousSiblingElement</b> (const char *value=0)</td></tr>
-<tr class="separator:aa3290e213f5ae0b0fea66bfeec25ea9d inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9453cda5e970375a7b1b2099f8a7c40a inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a9453cda5e970375a7b1b2099f8a7c40a"><td class="memItemLeft" align="right" valign="top">
+const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>PreviousSiblingElement</b> (const char *name=0) const</td></tr>
+<tr class="memdesc:a9453cda5e970375a7b1b2099f8a7c40a inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the previous (left) sibling element of this node, with an optionally supplied name. <br /></td></tr>
+<tr class="separator:a9453cda5e970375a7b1b2099f8a7c40a inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abee2e91cc895adfb8ba24b0b6ec14f00 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_abee2e91cc895adfb8ba24b0b6ec14f00"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>PreviousSiblingElement</b> (const char *name=0)</td></tr>
+<tr class="separator:abee2e91cc895adfb8ba24b0b6ec14f00 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af986c568061b020cf6232bec091388c0 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_af986c568061b020cf6232bec091388c0"><td class="memItemLeft" align="right" valign="top">
 const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NextSibling</b> () const</td></tr>
 <tr class="memdesc:af986c568061b020cf6232bec091388c0 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next (right) sibling node of this node. <br /></td></tr>
@@ -393,11 +534,13 @@ const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td
 <tr class="memitem:a05d04a9c06dc48ff8473c77774ee94eb inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a05d04a9c06dc48ff8473c77774ee94eb"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NextSibling</b> ()</td></tr>
 <tr class="separator:a05d04a9c06dc48ff8473c77774ee94eb inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4691e8feb9cfc7dbf12a8a4e54f20d06 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a4691e8feb9cfc7dbf12a8a4e54f20d06"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a4691e8feb9cfc7dbf12a8a4e54f20d06">NextSiblingElement</a> (const char *value=0) const</td></tr>
-<tr class="separator:a4691e8feb9cfc7dbf12a8a4e54f20d06 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a257e931a1784dd1ac04162be6e8b8a92 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a257e931a1784dd1ac04162be6e8b8a92"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NextSiblingElement</b> (const char *value=0)</td></tr>
-<tr class="separator:a257e931a1784dd1ac04162be6e8b8a92 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14ea560df31110ff07a9f566171bf797 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a14ea560df31110ff07a9f566171bf797"><td class="memItemLeft" align="right" valign="top">
+const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NextSiblingElement</b> (const char *name=0) const</td></tr>
+<tr class="memdesc:a14ea560df31110ff07a9f566171bf797 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next (right) sibling element of this node, with an optionally supplied name. <br /></td></tr>
+<tr class="separator:a14ea560df31110ff07a9f566171bf797 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83f054589f5a669c0dcca72bfd6bfb09 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a83f054589f5a669c0dcca72bfd6bfb09"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NextSiblingElement</b> (const char *name=0)</td></tr>
+<tr class="separator:a83f054589f5a669c0dcca72bfd6bfb09 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3b422e98914d6002ca99bb1d2837103 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_ae3b422e98914d6002ca99bb1d2837103"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#ae3b422e98914d6002ca99bb1d2837103">InsertEndChild</a> (<a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *addThis)</td></tr>
 <tr class="separator:ae3b422e98914d6002ca99bb1d2837103 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6ab0f078ab8edba2e2c6d1d81a3661e inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_ae6ab0f078ab8edba2e2c6d1d81a3661e"><td class="memItemLeft" align="right" valign="top">
@@ -411,6 +554,27 @@ const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td
 <tr class="separator:a0360085cc54df5bff85d5c5da13afdce inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a363b6edbd6ebd55f8387d2b89f2b0921 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a363b6edbd6ebd55f8387d2b89f2b0921"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a363b6edbd6ebd55f8387d2b89f2b0921">DeleteChild</a> (<a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *node)</td></tr>
 <tr class="separator:a363b6edbd6ebd55f8387d2b89f2b0921 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bb369fd733f1989b751d99a9417adab inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a3bb369fd733f1989b751d99a9417adab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a3bb369fd733f1989b751d99a9417adab">DeepClone</a> (<a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> *target) const</td></tr>
+<tr class="separator:a3bb369fd733f1989b751d99a9417adab inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a002978fc889cc011d143185f2377eca2 inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a002978fc889cc011d143185f2377eca2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a002978fc889cc011d143185f2377eca2">SetUserData</a> (void *userData)</td></tr>
+<tr class="separator:a002978fc889cc011d143185f2377eca2 inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18cc02ebd0b06f6bf5db7ef87653e00e inherit pub_methods_classtinyxml2_1_1XMLNode" id="r_a18cc02ebd0b06f6bf5db7ef87653e00e"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtinyxml2_1_1XMLNode.html#a18cc02ebd0b06f6bf5db7ef87653e00e">GetUserData</a> () const</td></tr>
+<tr class="separator:a18cc02ebd0b06f6bf5db7ef87653e00e inherit pub_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:ab674eefd3707265d5cc550002607cd41" id="r_ab674eefd3707265d5cc550002607cd41"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab674eefd3707265d5cc550002607cd41">ParseDeep</a> (char *p, <a class="el" href="classtinyxml2_1_1StrPair.html">StrPair</a> *parentEndTag, int *curLineNumPtr) override</td></tr>
+<tr class="separator:ab674eefd3707265d5cc550002607cd41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classtinyxml2_1_1XMLNode"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_methods_classtinyxml2_1_1XMLNode')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classtinyxml2_1_1XMLNode.html">tinyxml2::XMLNode</a></td></tr>
+<tr class="memitem:a29868df6ca383d574f584dfdd15105b6 inherit pro_methods_classtinyxml2_1_1XMLNode" id="r_a29868df6ca383d574f584dfdd15105b6"><td class="memItemLeft" align="right" valign="top">
+&#160;</td><td class="memItemRight" valign="bottom"><b>XMLNode</b> (<a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> *)</td></tr>
+<tr class="separator:a29868df6ca383d574f584dfdd15105b6 inherit pro_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-types" name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr class="memitem:a45bfb6bbbf778e66b267905675e42d9c" id="r_a45bfb6bbbf778e66b267905675e42d9c"><td class="memItemLeft" align="right" valign="top"><a id="a45bfb6bbbf778e66b267905675e42d9c" name="a45bfb6bbbf778e66b267905675e42d9c"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>BUF_SIZE</b> = 200
+ }</td></tr>
+<tr class="separator:a45bfb6bbbf778e66b267905675e42d9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -423,46 +587,39 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:ae300366701a54d4b6d1c287d9b5209a7" id="r_ae300366701a54d4b6d1c287d9b5209a7"><td class="memItemLeft" align="right" valign="top"><a id="ae300366701a54d4b6d1c287d9b5209a7" name="ae300366701a54d4b6d1c287d9b5209a7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> &amp;)</td></tr>
 <tr class="separator:ae300366701a54d4b6d1c287d9b5209a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73cbfe2e24fd41c7d8544589312ef622" id="r_a73cbfe2e24fd41c7d8544589312ef622"><td class="memItemLeft" align="right" valign="top"><a id="a73cbfe2e24fd41c7d8544589312ef622" name="a73cbfe2e24fd41c7d8544589312ef622"></a>
-<a class="el" href="classtinyxml2_1_1XMLAttribute.html">XMLAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>FindAttribute</b> (const char *name)</td></tr>
-<tr class="separator:a73cbfe2e24fd41c7d8544589312ef622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9d8fc849ec8acf46678217de011e896" id="r_ac9d8fc849ec8acf46678217de011e896"><td class="memItemLeft" align="right" valign="top"><a id="ac9d8fc849ec8acf46678217de011e896" name="ac9d8fc849ec8acf46678217de011e896"></a>
 <a class="el" href="classtinyxml2_1_1XMLAttribute.html">XMLAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>FindOrCreateAttribute</b> (const char *name)</td></tr>
 <tr class="separator:ac9d8fc849ec8acf46678217de011e896"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c931bc32d6e78b84c98f736fa8aafe2" id="r_a9c931bc32d6e78b84c98f736fa8aafe2"><td class="memItemLeft" align="right" valign="top"><a id="a9c931bc32d6e78b84c98f736fa8aafe2" name="a9c931bc32d6e78b84c98f736fa8aafe2"></a>
-char *&#160;</td><td class="memItemRight" valign="bottom"><b>ParseAttributes</b> (char *p)</td></tr>
-<tr class="separator:a9c931bc32d6e78b84c98f736fa8aafe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e679b60e191ad79bfcefcd49ca66fa2" id="r_a1e679b60e191ad79bfcefcd49ca66fa2"><td class="memItemLeft" align="right" valign="top"><a id="a1e679b60e191ad79bfcefcd49ca66fa2" name="a1e679b60e191ad79bfcefcd49ca66fa2"></a>
+char *&#160;</td><td class="memItemRight" valign="bottom"><b>ParseAttributes</b> (char *p, int *curLineNumPtr)</td></tr>
+<tr class="separator:a1e679b60e191ad79bfcefcd49ca66fa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10e25b09c308a8658d2d6b464745bdc3" id="r_a10e25b09c308a8658d2d6b464745bdc3"><td class="memItemLeft" align="right" valign="top"><a id="a10e25b09c308a8658d2d6b464745bdc3" name="a10e25b09c308a8658d2d6b464745bdc3"></a>
+<a class="el" href="classtinyxml2_1_1XMLAttribute.html">XMLAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>CreateAttribute</b> ()</td></tr>
+<tr class="separator:a10e25b09c308a8658d2d6b464745bdc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-static-methods" name="pri-static-methods"></a>
+Static Private Member Functions</h2></td></tr>
+<tr class="memitem:af6af63c153c343cc71638375c4a2085d" id="r_af6af63c153c343cc71638375c4a2085d"><td class="memItemLeft" align="right" valign="top"><a id="af6af63c153c343cc71638375c4a2085d" name="af6af63c153c343cc71638375c4a2085d"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>DeleteAttribute</b> (<a class="el" href="classtinyxml2_1_1XMLAttribute.html">XMLAttribute</a> *attribute)</td></tr>
+<tr class="separator:af6af63c153c343cc71638375c4a2085d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:ad6dbc2ecd157801ddc9bba7c3572796b" id="r_ad6dbc2ecd157801ddc9bba7c3572796b"><td class="memItemLeft" align="right" valign="top"><a id="ad6dbc2ecd157801ddc9bba7c3572796b" name="ad6dbc2ecd157801ddc9bba7c3572796b"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>_closingType</b></td></tr>
-<tr class="separator:ad6dbc2ecd157801ddc9bba7c3572796b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f3f8f60bc21aae4c1bb9470d7ab0823" id="r_a3f3f8f60bc21aae4c1bb9470d7ab0823"><td class="memItemLeft" align="right" valign="top"><a id="a3f3f8f60bc21aae4c1bb9470d7ab0823" name="a3f3f8f60bc21aae4c1bb9470d7ab0823"></a>
+ElementClosingType&#160;</td><td class="memItemRight" valign="bottom"><b>_closingType</b></td></tr>
+<tr class="separator:a3f3f8f60bc21aae4c1bb9470d7ab0823"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad067115a9f42b2df1fcdf3e0355f2789" id="r_ad067115a9f42b2df1fcdf3e0355f2789"><td class="memItemLeft" align="right" valign="top"><a id="ad067115a9f42b2df1fcdf3e0355f2789" name="ad067115a9f42b2df1fcdf3e0355f2789"></a>
 <a class="el" href="classtinyxml2_1_1XMLAttribute.html">XMLAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_rootAttribute</b></td></tr>
 <tr class="separator:ad067115a9f42b2df1fcdf3e0355f2789"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a449202cfc89e7ae5c2f81995476f9ec1" id="r_a449202cfc89e7ae5c2f81995476f9ec1"><td class="memItemLeft" align="right" valign="top"><a id="a449202cfc89e7ae5c2f81995476f9ec1" name="a449202cfc89e7ae5c2f81995476f9ec1"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>XMLBase</b></td></tr>
-<tr class="separator:a449202cfc89e7ae5c2f81995476f9ec1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4eee3bda60c60a30e4e8cd4ea91c4c6e" id="r_a4eee3bda60c60a30e4e8cd4ea91c4c6e"><td class="memItemLeft" align="right" valign="top"><a id="a4eee3bda60c60a30e4e8cd4ea91c4c6e" name="a4eee3bda60c60a30e4e8cd4ea91c4c6e"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>XMLDocument</b></td></tr>
 <tr class="separator:a4eee3bda60c60a30e4e8cd4ea91c4c6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_methods_classtinyxml2_1_1XMLNode"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_methods_classtinyxml2_1_1XMLNode')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classtinyxml2_1_1XMLNode.html">tinyxml2::XMLNode</a></td></tr>
-<tr class="memitem:a29868df6ca383d574f584dfdd15105b6 inherit pro_methods_classtinyxml2_1_1XMLNode" id="r_a29868df6ca383d574f584dfdd15105b6"><td class="memItemLeft" align="right" valign="top">
-&#160;</td><td class="memItemRight" valign="bottom"><b>XMLNode</b> (<a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> *)</td></tr>
-<tr class="separator:a29868df6ca383d574f584dfdd15105b6 inherit pro_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78be01384518a969da905548f318d75b inherit pro_methods_classtinyxml2_1_1XMLNode" id="r_a78be01384518a969da905548f318d75b"><td class="memItemLeft" align="right" valign="top">
-&#160;</td><td class="memItemRight" valign="bottom"><b>XMLNode</b> (const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> &amp;)</td></tr>
-<tr class="separator:a78be01384518a969da905548f318d75b inherit pro_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51e0d8a33c7c2fdcbdf833c99a36897b inherit pro_methods_classtinyxml2_1_1XMLNode" id="r_a51e0d8a33c7c2fdcbdf833c99a36897b"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> &amp;)</td></tr>
-<tr class="separator:a51e0d8a33c7c2fdcbdf833c99a36897b inherit pro_methods_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classtinyxml2_1_1XMLNode"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_attribs_classtinyxml2_1_1XMLNode')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classtinyxml2_1_1XMLNode.html">tinyxml2::XMLNode</a></td></tr>
 <tr class="memitem:a8d2d2be0bb6797625551eb0e91f0ff62 inherit pro_attribs_classtinyxml2_1_1XMLNode" id="r_a8d2d2be0bb6797625551eb0e91f0ff62"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_document</b></td></tr>
@@ -473,6 +630,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a3ea9884098b8379de2bb5ab3fc85c0fc inherit pro_attribs_classtinyxml2_1_1XMLNode" id="r_a3ea9884098b8379de2bb5ab3fc85c0fc"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="classtinyxml2_1_1StrPair.html">StrPair</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_value</b></td></tr>
 <tr class="separator:a3ea9884098b8379de2bb5ab3fc85c0fc inherit pro_attribs_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab336ed023e15be202ff3b410be01b804 inherit pro_attribs_classtinyxml2_1_1XMLNode" id="r_ab336ed023e15be202ff3b410be01b804"><td class="memItemLeft" align="right" valign="top">
+int&#160;</td><td class="memItemRight" valign="bottom"><b>_parseLineNum</b></td></tr>
+<tr class="separator:ab336ed023e15be202ff3b410be01b804 inherit pro_attribs_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa20c91e4213dc930c5bdf420322ca342 inherit pro_attribs_classtinyxml2_1_1XMLNode" id="r_aa20c91e4213dc930c5bdf420322ca342"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_firstChild</b></td></tr>
 <tr class="separator:aa20c91e4213dc930c5bdf420322ca342 inherit pro_attribs_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -485,12 +645,15 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a27e985496b37dd00eb5b9cf59b9e3fb1 inherit pro_attribs_classtinyxml2_1_1XMLNode" id="r_a27e985496b37dd00eb5b9cf59b9e3fb1"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="classtinyxml2_1_1XMLNode.html">XMLNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_next</b></td></tr>
 <tr class="separator:a27e985496b37dd00eb5b9cf59b9e3fb1 inherit pro_attribs_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2d5cc463a6c95ec5907d57a119c56da inherit pro_attribs_classtinyxml2_1_1XMLNode" id="r_ac2d5cc463a6c95ec5907d57a119c56da"><td class="memItemLeft" align="right" valign="top">
+void *&#160;</td><td class="memItemRight" valign="bottom"><b>_userData</b></td></tr>
+<tr class="separator:ac2d5cc463a6c95ec5907d57a119c56da inherit pro_attribs_classtinyxml2_1_1XMLNode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The element is a container class. It has a value, the element name, and can contain other elements, text, comments, and unknowns. Elements also contain an arbitrary number of attributes. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a3ea8a40e788fb9ad876c28a32932c6d5" name="a3ea8a40e788fb9ad876c28a32932c6d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ea8a40e788fb9ad876c28a32932c6d5">&#9670;&#160;</a></span>Accept()</h2>
+<a id="acae4a763d74c13ce4a31eb70b4db9f82" name="acae4a763d74c13ce4a31eb70b4db9f82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acae4a763d74c13ce4a31eb70b4db9f82">&#9670;&#160;</a></span>Accept()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -507,21 +670,22 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Accept a hierarchical visit of the nodes in the TinyXML DOM. Every node in the XML tree will be conditionally visited and the host will be called back via the TiXmlVisitor interface.</p>
-<p>This is essentially a SAX interface for TinyXML. (Note however it doesn't re-parse the XML for the callbacks, so the performance of TinyXML is unchanged by using this interface versus any other.)</p>
+<p>Accept a hierarchical visit of the nodes in the TinyXML-2 DOM. Every node in the XML tree will be conditionally visited and the host will be called back via the <a class="el" href="classtinyxml2_1_1XMLVisitor.html">XMLVisitor</a> interface.</p>
+<p>This is essentially a SAX interface for TinyXML-2. (Note however it doesn't re-parse the XML for the callbacks, so the performance of TinyXML-2 is unchanged by using this interface versus any other.)</p>
 <p>The interface has been based on ideas from:</p>
 <ul>
 <li><a href="http://www.saxproject.org/">http://www.saxproject.org/</a></li>
 <li><a href="http://c2.com/cgi/wiki?HierarchicalVisitorPattern">http://c2.com/cgi/wiki?HierarchicalVisitorPattern</a></li>
 </ul>
 <p>Which are both good references for "visiting".</p>
-<p>An example of using <a class="el" href="#a3ea8a40e788fb9ad876c28a32932c6d5">Accept()</a>: </p><pre class="fragment"> TiXmlPrinter printer;
- tinyxmlDoc.Accept( &amp;printer );
- const char* xmlcstr = printer.CStr();</pre> 
+<p>An example of using <a class="el" href="#acae4a763d74c13ce4a31eb70b4db9f82">Accept()</a>: </p><pre class="fragment">XMLPrinter printer;
+tinyxmlDoc.Accept( &amp;printer );
+const char* xmlcstr = printer.CStr();
+</pre> 
 <p>Implements <a class="el" href="classtinyxml2_1_1XMLNode.html#a81e66df0a44c67a7af17f3b77a152785">tinyxml2::XMLNode</a>.</p>
 
 </div>
@@ -545,11 +709,13 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Given an attribute name, <a class="el" href="#a48cf4a315cfbac7d74cd0d5ff2c5df51">Attribute()</a> returns the value for the attribute of that name, or null if none exists. For example:</p>
-<pre class="fragment"> const char* value = ele-&gt;Attribute( "foo" );</pre><p>The 'value' parameter is normally null. However, if specified, the attribute will only be returned if the 'name' and 'value' match. This allow you to write code:</p>
-<pre class="fragment"> if ( ele-&gt;Attribute( "foo", "bar" ) ) callFooIsBar();</pre><p>rather than: </p><pre class="fragment"> if ( ele-&gt;Attribute( "foo" ) ) {
-         if ( strcmp( ele-&gt;Attribute( "foo" ), "bar" ) == 0 )
-callFooIsBar();
- }</pre> 
+<pre class="fragment">const char* value = ele-&gt;Attribute( "foo" );
+</pre><p>The 'value' parameter is normally null. However, if specified, the attribute will only be returned if the 'name' and 'value' match. This allow you to write code:</p>
+<pre class="fragment">if ( ele-&gt;Attribute( "foo", "bar" ) ) callFooIsBar();
+</pre><p>rather than: </p><pre class="fragment">if ( ele-&gt;Attribute( "foo" ) ) {
+	if ( strcmp( ele-&gt;Attribute( "foo" ), "bar" ) == 0 ) callFooIsBar();
+}
+</pre> 
 </div>
 </div>
 <a id="aebd45aa7118964c30b32fe12e944628a" name="aebd45aa7118964c30b32fe12e944628a"></a>
@@ -584,42 +750,59 @@ callFooIsBar();
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Convenience function for easy access to the text inside an element. Although easy and concise, <a class="el" href="#a0fa5bea0a4daf3ddd503dcabb823eba6">GetText()</a> is limited compared to getting the TiXmlText child and accessing it directly.</p>
-<p>If the first child of 'this' is a TiXmlText, the <a class="el" href="#a0fa5bea0a4daf3ddd503dcabb823eba6">GetText()</a> returns the character string of the Text node, else null is returned.</p>
-<p>This is a convenient method for getting the text of simple contained text: </p><pre class="fragment"> &lt;foo&gt;This is text&lt;/foo&gt;
-         const char* str = fooElement-&gt;GetText();</pre><p>'str' will be a pointer to "This is text".</p>
-<p>Note that this function can be misleading. If the element foo was created from this XML: </p><pre class="fragment">         &lt;foo&gt;&lt;b&gt;This is text&lt;/b&gt;&lt;/foo&gt;</pre><p>then the value of str would be null. The first child node isn't a text node, it is another element. From this XML: </p><pre class="fragment">         &lt;foo&gt;This is &lt;b&gt;text&lt;/b&gt;&lt;/foo&gt;</pre><p> <a class="el" href="#a0fa5bea0a4daf3ddd503dcabb823eba6">GetText()</a> will return "This is ". </p>
+<p>Convenience function for easy access to the text inside an element. Although easy and concise, <a class="el" href="#a0fa5bea0a4daf3ddd503dcabb823eba6">GetText()</a> is limited compared to getting the <a class="el" href="classtinyxml2_1_1XMLText.html">XMLText</a> child and accessing it directly.</p>
+<p>If the first child of 'this' is a <a class="el" href="classtinyxml2_1_1XMLText.html">XMLText</a>, the <a class="el" href="#a0fa5bea0a4daf3ddd503dcabb823eba6">GetText()</a> returns the character string of the Text node, else null is returned.</p>
+<p>This is a convenient method for getting the text of simple contained text: </p><pre class="fragment">&lt;foo&gt;This is text&lt;/foo&gt;
+	const char* str = fooElement-&gt;GetText();
+</pre><p>'str' will be a pointer to "This is text".</p>
+<p>Note that this function can be misleading. If the element foo was created from this XML: </p><pre class="fragment">	&lt;foo&gt;&lt;b&gt;This is text&lt;/b&gt;&lt;/foo&gt;
+</pre><p>then the value of str would be null. The first child node isn't a text node, it is another element. From this XML: </p><pre class="fragment">	&lt;foo&gt;This is &lt;b&gt;text&lt;/b&gt;&lt;/foo&gt;
+</pre><p> <a class="el" href="#a0fa5bea0a4daf3ddd503dcabb823eba6">GetText()</a> will return "This is ". </p>
 
 </div>
 </div>
-<a id="acfaaeeadf0b0dbe56bb0f5ec12cb7736" name="acfaaeeadf0b0dbe56bb0f5ec12cb7736"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acfaaeeadf0b0dbe56bb0f5ec12cb7736">&#9670;&#160;</a></span>IntAttribute()</h2>
+<a id="abf01fdeb702165fddbc97bcc8af8a1ad" name="abf01fdeb702165fddbc97bcc8af8a1ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf01fdeb702165fddbc97bcc8af8a1ad">&#9670;&#160;</a></span>InsertNewChildElement()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> * tinyxml2::XMLElement::InsertNewChildElement </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Convenience method to create a new <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> and add it as last (right) child of this node. Returns the created and inserted element. </p>
+
+</div>
+</div>
+<a id="a95a89b13bb14a2d4655e2b5b406c00d4" name="a95a89b13bb14a2d4655e2b5b406c00d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95a89b13bb14a2d4655e2b5b406c00d4">&#9670;&#160;</a></span>IntAttribute()</h2>
+
+<div class="memitem">
+<div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">int tinyxml2::XMLElement::IntAttribute </td>
           <td>(</td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>defaultValue</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;) const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>Given an attribute name, <a class="el" href="#acfaaeeadf0b0dbe56bb0f5ec12cb7736">IntAttribute()</a> returns the value of the attribute interpreted as an integer. 0 will be returned if there is an error. For a method with error checking, see <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> </p>
+<p>Given an attribute name, <a class="el" href="#a95a89b13bb14a2d4655e2b5b406c00d4">IntAttribute()</a> returns the value of the attribute interpreted as an integer. The default value will be returned if the attribute isn't present, or if there is an error. (For a method with error checking, see <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a>). </p>
 
 </div>
 </div>
-<a id="aaafdd2a5618abe80a2c1839ad3ccd492" name="aaafdd2a5618abe80a2c1839ad3ccd492"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaafdd2a5618abe80a2c1839ad3ccd492">&#9670;&#160;</a></span>ParseDeep()</h2>
+<a id="ab674eefd3707265d5cc550002607cd41" name="ab674eefd3707265d5cc550002607cd41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab674eefd3707265d5cc550002607cd41">&#9670;&#160;</a></span>ParseDeep()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -635,12 +818,17 @@ callFooIsBar();
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classtinyxml2_1_1StrPair.html">StrPair</a> *</td>          <td class="paramname"><span class="paramname"><em>endTag</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="classtinyxml2_1_1StrPair.html">StrPair</a> *</td>          <td class="paramname"><span class="paramname"><em>parentEndTag</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em>curLineNumPtr</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -649,8 +837,8 @@ callFooIsBar();
 
 </div>
 </div>
-<a id="a042fc30504347b84a56cf863ad528a4f" name="a042fc30504347b84a56cf863ad528a4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a042fc30504347b84a56cf863ad528a4f">&#9670;&#160;</a></span>QueryAttribute()</h2>
+<a id="a5b7df3bed2b8954eabf227fa204522eb" name="a5b7df3bed2b8954eabf227fa204522eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b7df3bed2b8954eabf227fa204522eb">&#9670;&#160;</a></span>QueryAttribute()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -659,7 +847,7 @@ callFooIsBar();
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int tinyxml2::XMLElement::QueryAttribute </td>
+          <td class="memname">XMLError tinyxml2::XMLElement::QueryAttribute </td>
           <td>(</td>
           <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
         </tr>
@@ -675,11 +863,11 @@ callFooIsBar();
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Given an attribute name, <a class="el" href="#a042fc30504347b84a56cf863ad528a4f">QueryAttribute()</a> returns XML_NO_ERROR, XML_WRONG_ATTRIBUTE_TYPE if the conversion can't be performed, or XML_NO_ATTRIBUTE if the attribute doesn't exist. It is overloaded for the primitive types, and is a generally more convenient replacement of <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> and related functions.</p>
+<p>Given an attribute name, <a class="el" href="#a5b7df3bed2b8954eabf227fa204522eb">QueryAttribute()</a> returns XML_SUCCESS, XML_WRONG_ATTRIBUTE_TYPE if the conversion can't be performed, or XML_NO_ATTRIBUTE if the attribute doesn't exist. It is overloaded for the primitive types, and is a generally more convenient replacement of <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> and related functions.</p>
 <p>If successful, the result of the conversion will be written to 'value'. If not successful, nothing will be written to 'value'. This allows you to provide default value:</p>
-<pre class="fragment"> int value = 10;
- QueryAttribute( "foo", &amp;value );		// if "foo" isn't found, value
-will still be 10</pre> 
+<pre class="fragment">int value = 10;
+QueryAttribute( "foo", &amp;value );		// if "foo" isn't found, value will still be 10
+</pre> 
 </div>
 </div>
 <a id="a8a78bc1187c1c45ad89f2690eab567b1" name="a8a78bc1187c1c45ad89f2690eab567b1"></a>
@@ -708,10 +896,10 @@ will still be 10</pre>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Given an attribute name, <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> returns XML_NO_ERROR, XML_WRONG_ATTRIBUTE_TYPE if the conversion can't be performed, or XML_NO_ATTRIBUTE if the attribute doesn't exist. If successful, the result of the conversion will be written to 'value'. If not successful, nothing will be written to 'value'. This allows you to provide default value:</p>
-<pre class="fragment"> int value = 10;
- QueryIntAttribute( "foo", &amp;value );		// if "foo" isn't found,
-value will still be 10</pre> 
+<p>Given an attribute name, <a class="el" href="#a8a78bc1187c1c45ad89f2690eab567b1">QueryIntAttribute()</a> returns XML_SUCCESS, XML_WRONG_ATTRIBUTE_TYPE if the conversion can't be performed, or XML_NO_ATTRIBUTE if the attribute doesn't exist. If successful, the result of the conversion will be written to 'value'. If not successful, nothing will be written to 'value'. This allows you to provide default value:</p>
+<pre class="fragment">int value = 10;
+QueryIntAttribute( "foo", &amp;value );		// if "foo" isn't found, value will still be 10
+</pre> 
 </div>
 </div>
 <a id="a926357996bef633cb736e1a558419632" name="a926357996bef633cb736e1a558419632"></a>
@@ -728,21 +916,49 @@ value will still be 10</pre>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Convenience method to query the value of a child text node. This is probably best shown by example. Given you have a document is this form: </p><pre class="fragment">         &lt;point&gt;
-                 &lt;x&gt;1&lt;/x&gt;
-                 &lt;y&gt;1.4&lt;/y&gt;
-         &lt;/point&gt;</pre><p>The <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> and similar functions provide a safe and easier way to get to the "value" of x and y.</p>
-<pre class="fragment">         int x = 0;
-         float y = 0;	// types of x and y are contrived for example
-         const XMLElement* xElement = pointElement-&gt;FirstChildElement( "x"
-); const XMLElement* yElement = pointElement-&gt;FirstChildElement( "y" );
-         xElement-&gt;QueryIntText( &amp;x );
-         yElement-&gt;QueryFloatText( &amp;y );</pre><dl class="section return"><dt>Returns</dt><dd>XML_SUCCESS (0) on success, XML_CAN_NOT_CONVERT_TEXT if the text cannot be converted to the requested type, and XML_NO_TEXT_NODE if there is no child text to query. </dd></dl>
+<p>Convenience method to query the value of a child text node. This is probably best shown by example. Given you have a document is this form: </p><pre class="fragment">	&lt;point&gt;
+		&lt;x&gt;1&lt;/x&gt;
+		&lt;y&gt;1.4&lt;/y&gt;
+	&lt;/point&gt;
+</pre><p>The <a class="el" href="#a926357996bef633cb736e1a558419632">QueryIntText()</a> and similar functions provide a safe and easier way to get to the "value" of x and y.</p>
+<pre class="fragment">	int x = 0;
+	float y = 0;	// types of x and y are contrived for example
+	const XMLElement* xElement = pointElement-&gt;FirstChildElement( "x" );
+	const XMLElement* yElement = pointElement-&gt;FirstChildElement( "y" );
+	xElement-&gt;QueryIntText( &amp;x );
+	yElement-&gt;QueryFloatText( &amp;y );
+</pre><dl class="section return"><dt>Returns</dt><dd>XML_SUCCESS (0) on success, XML_CAN_NOT_CONVERT_TEXT if the text cannot be converted to the requested type, and XML_NO_TEXT_NODE if there is no child text to query. </dd></dl>
 
 </div>
 </div>
-<a id="a1edb4f3b8e2622e65663b068bc907122" name="a1edb4f3b8e2622e65663b068bc907122"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1edb4f3b8e2622e65663b068bc907122">&#9670;&#160;</a></span>ShallowClone()</h2>
+<a id="a1f9c2cd61b72af5ae708d37b7ad283ce" name="a1f9c2cd61b72af5ae708d37b7ad283ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f9c2cd61b72af5ae708d37b7ad283ce">&#9670;&#160;</a></span>SetText()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tinyxml2::XMLElement::SetText </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>inText</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Convenience function for easy access to the text inside an element. Although easy and concise, <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> is limited compared to creating an <a class="el" href="classtinyxml2_1_1XMLText.html">XMLText</a> child and mutating it directly.</p>
+<p>If the first child of 'this' is a <a class="el" href="classtinyxml2_1_1XMLText.html">XMLText</a>, <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> sets its value to the given string, otherwise it will create a first child that is an <a class="el" href="classtinyxml2_1_1XMLText.html">XMLText</a>.</p>
+<p>This is a convenient method for setting the text of simple contained text: </p><pre class="fragment">&lt;foo&gt;This is text&lt;/foo&gt;
+	fooElement-&gt;SetText( "Hullaballoo!" );
+&lt;foo&gt;Hullaballoo!&lt;/foo&gt;
+</pre><p>Note that this function can be misleading. If the element foo was created from this XML: </p><pre class="fragment">	&lt;foo&gt;&lt;b&gt;This is text&lt;/b&gt;&lt;/foo&gt;
+</pre><p>then it will not change "This is text", but rather prefix it with a text element: </p><pre class="fragment">	&lt;foo&gt;Hullaballoo!&lt;b&gt;This is text&lt;/b&gt;&lt;/foo&gt;
+</pre><p>For this XML: </p><pre class="fragment">	&lt;foo /&gt;
+</pre><p> <a class="el" href="#a1f9c2cd61b72af5ae708d37b7ad283ce">SetText()</a> will generate </p><pre class="fragment">	&lt;foo&gt;Hullaballoo!&lt;/foo&gt;
+</pre> 
+</div>
+</div>
+<a id="a6dc4d8774d1e77a8c37a7b3d039d3049" name="a6dc4d8774d1e77a8c37a7b3d039d3049"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dc4d8774d1e77a8c37a7b3d039d3049">&#9670;&#160;</a></span>ShallowClone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -759,7 +975,7 @@ value will still be 10</pre>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -770,8 +986,8 @@ value will still be 10</pre>
 
 </div>
 </div>
-<a id="ad9ea913a460b48979bd83cf9871c99f6" name="ad9ea913a460b48979bd83cf9871c99f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad9ea913a460b48979bd83cf9871c99f6">&#9670;&#160;</a></span>ShallowEqual()</h2>
+<a id="aaba88737610559755425b8a59179817e" name="aaba88737610559755425b8a59179817e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaba88737610559755425b8a59179817e">&#9670;&#160;</a></span>ShallowEqual()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -788,7 +1004,7 @@ value will still be 10</pre>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -799,37 +1015,8 @@ value will still be 10</pre>
 
 </div>
 </div>
-<a id="abade4c59bd6f16c85caa42d3c9eb617d" name="abade4c59bd6f16c85caa42d3c9eb617d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abade4c59bd6f16c85caa42d3c9eb617d">&#9670;&#160;</a></span>ToElement() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> * tinyxml2::XMLElement::ToElement </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Safely cast to an Element, or null. </p>
-
-<p>Reimplemented from <a class="el" href="classtinyxml2_1_1XMLNode.html#a9417e1f8a9787ae27741605493514b18">tinyxml2::XMLNode</a>.</p>
-
-</div>
-</div>
-<a id="a97ac0e6fd96705fd151481a8f5f67c56" name="a97ac0e6fd96705fd151481a8f5f67c56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97ac0e6fd96705fd151481a8f5f67c56">&#9670;&#160;</a></span>ToElement() <span class="overload">[2/2]</span></h2>
+<a id="a1d4d68378a6a8f7091a065144f771397" name="a1d4d68378a6a8f7091a065144f771397"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d4d68378a6a8f7091a065144f771397">&#9670;&#160;</a></span>ToElement() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -846,12 +1033,41 @@ value will still be 10</pre>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Reimplemented from <a class="el" href="classtinyxml2_1_1XMLNode.html">tinyxml2::XMLNode</a>.</p>
+
+</div>
+</div>
+<a id="a88621376780280c0695458e30212eebe" name="a88621376780280c0695458e30212eebe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88621376780280c0695458e30212eebe">&#9670;&#160;</a></span>ToElement() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> * tinyxml2::XMLElement::ToElement </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Safely cast to an Element, or null. </p>
+
+<p>Reimplemented from <a class="el" href="classtinyxml2_1_1XMLNode.html#a9417e1f8a9787ae27741605493514b18">tinyxml2::XMLNode</a>.</p>
 
 </div>
 </div>

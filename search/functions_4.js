@@ -12,5 +12,7 @@ var searchData=
   ['equilibrate_9',['equilibrate',['../classcoupling_1_1InstanceHandling.html#a7ddf0b99e9b6fe4184079172d1915c85',1,'coupling::InstanceHandling']]],
   ['error_10',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
   ['errorestimation_11',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation']]],
-  ['errorid_12',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]]
+  ['errorid_12',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],
+  ['errorlinenum_13',['ErrorLineNum',['../classtinyxml2_1_1XMLDocument.html#a57400f816dbe7799ece33615ead9ab76',1,'tinyxml2::XMLDocument']]],
+  ['errorstr_14',['ErrorStr',['../classtinyxml2_1_1XMLDocument.html#ae97fff2402a0d01e0509c430b37996b3',1,'tinyxml2::XMLDocument']]]
 ];

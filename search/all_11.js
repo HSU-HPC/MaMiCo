@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['queryattribute_0',['QueryAttribute',['../classtinyxml2_1_1XMLElement.html#a042fc30504347b84a56cf863ad528a4f',1,'tinyxml2::XMLElement']]],
+  ['queryattribute_0',['QueryAttribute',['../classtinyxml2_1_1XMLElement.html#a5b7df3bed2b8954eabf227fa204522eb',1,'tinyxml2::XMLElement']]],
   ['queryboolattribute_1',['QueryBoolAttribute',['../classtinyxml2_1_1XMLElement.html#a14c1bb77c39689838be01838d86ca872',1,'tinyxml2::XMLElement']]],
   ['querybooltext_2',['QueryBoolText',['../classtinyxml2_1_1XMLElement.html#a3fe5417d59eb8f5c4afe924b7d332736',1,'tinyxml2::XMLElement']]],
   ['queryboolvalue_3',['QueryBoolValue',['../classtinyxml2_1_1XMLAttribute.html#a5f32e038954256f61c21ff20fd13a09c',1,'tinyxml2::XMLAttribute']]],
@@ -10,10 +10,17 @@ var searchData=
   ['queryfloatattribute_7',['QueryFloatAttribute',['../classtinyxml2_1_1XMLElement.html#acd5eeddf6002ef90806af794b9d9a5a5',1,'tinyxml2::XMLElement']]],
   ['queryfloattext_8',['QueryFloatText',['../classtinyxml2_1_1XMLElement.html#afa332afedd93210daa6d44b88eb11e29',1,'tinyxml2::XMLElement']]],
   ['queryfloatvalue_9',['QueryFloatValue',['../classtinyxml2_1_1XMLAttribute.html#a049dea6449a6259b6cfed44a9427b607',1,'tinyxml2::XMLAttribute']]],
-  ['queryintattribute_10',['QueryIntAttribute',['../classtinyxml2_1_1XMLElement.html#a8a78bc1187c1c45ad89f2690eab567b1',1,'tinyxml2::XMLElement']]],
-  ['queryinttext_11',['QueryIntText',['../classtinyxml2_1_1XMLElement.html#a926357996bef633cb736e1a558419632',1,'tinyxml2::XMLElement']]],
-  ['queryintvalue_12',['QueryIntValue',['../classtinyxml2_1_1XMLAttribute.html#a6d5176260db00ea301c01af8457cd993',1,'tinyxml2::XMLAttribute']]],
-  ['queryunsignedattribute_13',['QueryUnsignedAttribute',['../classtinyxml2_1_1XMLElement.html#a26fc84cbfba6769dafcfbf256c05e22f',1,'tinyxml2::XMLElement']]],
-  ['queryunsignedtext_14',['QueryUnsignedText',['../classtinyxml2_1_1XMLElement.html#a14d38aa4b5e18a46274a27425188a6a1',1,'tinyxml2::XMLElement']]],
-  ['queryunsignedvalue_15',['QueryUnsignedValue',['../classtinyxml2_1_1XMLAttribute.html#a48a7f3496f1415832e451bd8d09c9cb9',1,'tinyxml2::XMLAttribute']]]
+  ['queryint64attribute_10',['QueryInt64Attribute',['../classtinyxml2_1_1XMLElement.html#a7c0955d80b6f8d196744eacb0f6e90a8',1,'tinyxml2::XMLElement']]],
+  ['queryint64text_11',['QueryInt64Text',['../classtinyxml2_1_1XMLElement.html#a120c538c8eead169e635dbc70fb226d8',1,'tinyxml2::XMLElement']]],
+  ['queryint64value_12',['QueryInt64Value',['../classtinyxml2_1_1XMLAttribute.html#a4e25344d6e4159026be34dbddf1dcac2',1,'tinyxml2::XMLAttribute']]],
+  ['queryintattribute_13',['QueryIntAttribute',['../classtinyxml2_1_1XMLElement.html#a8a78bc1187c1c45ad89f2690eab567b1',1,'tinyxml2::XMLElement']]],
+  ['queryinttext_14',['QueryIntText',['../classtinyxml2_1_1XMLElement.html#a926357996bef633cb736e1a558419632',1,'tinyxml2::XMLElement']]],
+  ['queryintvalue_15',['QueryIntValue',['../classtinyxml2_1_1XMLAttribute.html#a6d5176260db00ea301c01af8457cd993',1,'tinyxml2::XMLAttribute']]],
+  ['querystringattribute_16',['QueryStringAttribute',['../classtinyxml2_1_1XMLElement.html#adb8ae765f98d0c5037faec48deea78bc',1,'tinyxml2::XMLElement']]],
+  ['queryunsigned64attribute_17',['QueryUnsigned64Attribute',['../classtinyxml2_1_1XMLElement.html#a13dd590b5d3958ce2ed79844aacd9405',1,'tinyxml2::XMLElement']]],
+  ['queryunsigned64text_18',['QueryUnsigned64Text',['../classtinyxml2_1_1XMLElement.html#ac2239b3bd172ad8f5b78d04d4236144b',1,'tinyxml2::XMLElement']]],
+  ['queryunsigned64value_19',['QueryUnsigned64Value',['../classtinyxml2_1_1XMLAttribute.html#af793c695e7ee65cf20b8010d38b1d157',1,'tinyxml2::XMLAttribute']]],
+  ['queryunsignedattribute_20',['QueryUnsignedAttribute',['../classtinyxml2_1_1XMLElement.html#a26fc84cbfba6769dafcfbf256c05e22f',1,'tinyxml2::XMLElement']]],
+  ['queryunsignedtext_21',['QueryUnsignedText',['../classtinyxml2_1_1XMLElement.html#a14d38aa4b5e18a46274a27425188a6a1',1,'tinyxml2::XMLElement']]],
+  ['queryunsignedvalue_22',['QueryUnsignedValue',['../classtinyxml2_1_1XMLAttribute.html#a48a7f3496f1415832e451bd8d09c9cb9',1,'tinyxml2::XMLAttribute']]]
 ];

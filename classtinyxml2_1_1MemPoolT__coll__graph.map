@@ -1,13 +1,13 @@
-<map id="tinyxml2::MemPoolT&lt; SIZE &gt;" name="tinyxml2::MemPoolT&lt; SIZE &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="714,49,852,89"/>
-<area shape="rect" id="Node000002" href="$classtinyxml2_1_1MemPool.html" title=" " alt="" coords="463,5,592,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="608,31,691,48,714,52,713,58,690,53,607,36"/>
-<area shape="rect" id="Node000003" href="$classtinyxml2_1_1DynArray.html" title=" " alt="" coords="453,106,601,162"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="616,117,690,100,729,87,730,92,691,105,618,122"/>
-<area shape="rect" id="Node000004" href="$structtinyxml2_1_1MemPoolT_1_1Block.html" title=" " alt="" coords="229,107,366,148"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="381,127,453,129,453,135,381,133"/>
-<area shape="rect" id="Node000005" href="$uniontinyxml2_1_1MemPoolT_1_1Chunk.html" title=" " alt="" coords="5,77,143,117"/>
-<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="158,88,167,88,472,75,714,68,714,73,472,80,167,93,158,93"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="158,106,229,115,228,121,157,111"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="54,59,61,52,74,50,86,52,94,58,97,67,96,76,91,76,92,67,90,61,84,57,74,55,63,57,57,63"/>
+<map id="tinyxml2::MemPoolT&lt; ITEM_SIZE &gt;" name="tinyxml2::MemPoolT&lt; ITEM_SIZE &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="728,48,866,89"/>
+<area shape="rect" id="Node000002" href="$classtinyxml2_1_1MemPool.html" title=" " alt="" coords="476,5,606,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="622,31,705,48,728,52,727,58,704,53,621,36"/>
+<area shape="rect" id="Node000003" href="$classtinyxml2_1_1DynArray.html" title=" " alt="" coords="467,106,615,162"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="630,117,704,100,743,87,744,92,705,105,632,122"/>
+<area shape="rect" id="Node000004" href="$structtinyxml2_1_1MemPoolT_1_1Block.html" title=" " alt="" coords="231,107,380,148"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="396,127,467,129,466,135,395,133"/>
+<area shape="rect" id="Node000005" href="$uniontinyxml2_1_1MemPoolT_1_1Item.html" title=" " alt="" coords="5,76,148,117"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="163,88,172,88,482,75,728,68,728,73,483,80,172,93,163,93"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="164,106,231,115,230,120,163,111"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="56,59,63,52,76,50,89,52,97,58,100,67,99,76,94,76,95,67,92,61,86,57,77,55,66,57,59,63"/>
 </map>

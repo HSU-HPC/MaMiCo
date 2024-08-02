@@ -90,6 +90,8 @@ $(function(){ initResizable(false); });
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-types">Private Types</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
@@ -119,19 +121,19 @@ Collaboration diagram for tinyxml2::XMLPrinter:</div>
 <area shape="poly" title=" " alt="" coords="145,33,251,59,250,65,144,38"/>
 <area shape="rect" href="classtinyxml2_1_1DynArray.html" title=" " alt="" coords="9,55,141,96"/>
 <area shape="poly" title=" " alt="" coords="157,73,234,73,234,78,157,78"/>
-<area shape="rect" href="classtinyxml2_1_1DynArray.html" title=" " alt="" coords="12,121,138,161"/>
+<area shape="rect" href="classtinyxml2_1_1DynArray.html" title=" " alt="" coords="12,120,138,161"/>
 <area shape="poly" title=" " alt="" coords="152,116,256,86,257,92,154,121"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad1eb8de568ceac1429cf04c66a349bd6" id="r_ad1eb8de568ceac1429cf04c66a349bd6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1eb8de568ceac1429cf04c66a349bd6">XMLPrinter</a> (FILE *file=0, bool compact=false)</td></tr>
-<tr class="separator:ad1eb8de568ceac1429cf04c66a349bd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6d3841c069085f5b8a27bc7103c04f7" id="r_aa6d3841c069085f5b8a27bc7103c04f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa6d3841c069085f5b8a27bc7103c04f7">XMLPrinter</a> (FILE *file=0, bool compact=false, int depth=0)</td></tr>
+<tr class="separator:aa6d3841c069085f5b8a27bc7103c04f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a178c608ce8476043d5d6513819cde903" id="r_a178c608ce8476043d5d6513819cde903"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a178c608ce8476043d5d6513819cde903">PushHeader</a> (bool writeBOM, bool writeDeclaration)</td></tr>
 <tr class="separator:a178c608ce8476043d5d6513819cde903"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa10d330818dbc31b44e9ffc27618bdfb" id="r_aa10d330818dbc31b44e9ffc27618bdfb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa10d330818dbc31b44e9ffc27618bdfb">OpenElement</a> (const char *name)</td></tr>
-<tr class="separator:aa10d330818dbc31b44e9ffc27618bdfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20fb06c83bd13e5140d7dd13af06c010" id="r_a20fb06c83bd13e5140d7dd13af06c010"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20fb06c83bd13e5140d7dd13af06c010">OpenElement</a> (const char *name, bool compactMode=false)</td></tr>
+<tr class="separator:a20fb06c83bd13e5140d7dd13af06c010"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a4e2c9348b42e147629d5a99f4af3f0" id="r_a9a4e2c9348b42e147629d5a99f4af3f0"><td class="memItemLeft" align="right" valign="top"><a id="a9a4e2c9348b42e147629d5a99f4af3f0" name="a9a4e2c9348b42e147629d5a99f4af3f0"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PushAttribute</b> (const char *name, const char *value)</td></tr>
 <tr class="memdesc:a9a4e2c9348b42e147629d5a99f4af3f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">If streaming, add an attribute to an open element. <br /></td></tr>
@@ -142,16 +144,22 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>PushAttribute</b> (co
 <tr class="memitem:aa41039e51990aaf5342f3e0575a692c4" id="r_aa41039e51990aaf5342f3e0575a692c4"><td class="memItemLeft" align="right" valign="top"><a id="aa41039e51990aaf5342f3e0575a692c4" name="aa41039e51990aaf5342f3e0575a692c4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PushAttribute</b> (const char *name, unsigned value)</td></tr>
 <tr class="separator:aa41039e51990aaf5342f3e0575a692c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bc2fe21a83a70e6aa0415f2034ecbff" id="r_a9bc2fe21a83a70e6aa0415f2034ecbff"><td class="memItemLeft" align="right" valign="top"><a id="a9bc2fe21a83a70e6aa0415f2034ecbff" name="a9bc2fe21a83a70e6aa0415f2034ecbff"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>PushAttribute</b> (const char *name, int64_t value)</td></tr>
+<tr class="separator:a9bc2fe21a83a70e6aa0415f2034ecbff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cfb03811df0873faa59a12de009bf33" id="r_a0cfb03811df0873faa59a12de009bf33"><td class="memItemLeft" align="right" valign="top"><a id="a0cfb03811df0873faa59a12de009bf33" name="a0cfb03811df0873faa59a12de009bf33"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>PushAttribute</b> (const char *name, uint64_t value)</td></tr>
+<tr class="separator:a0cfb03811df0873faa59a12de009bf33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51f7950d7b7a19f0d3a0d549a318d45f" id="r_a51f7950d7b7a19f0d3a0d549a318d45f"><td class="memItemLeft" align="right" valign="top"><a id="a51f7950d7b7a19f0d3a0d549a318d45f" name="a51f7950d7b7a19f0d3a0d549a318d45f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PushAttribute</b> (const char *name, bool value)</td></tr>
 <tr class="separator:a51f7950d7b7a19f0d3a0d549a318d45f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1714867af40e68ca404c3e84b6cac2a6" id="r_a1714867af40e68ca404c3e84b6cac2a6"><td class="memItemLeft" align="right" valign="top"><a id="a1714867af40e68ca404c3e84b6cac2a6" name="a1714867af40e68ca404c3e84b6cac2a6"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PushAttribute</b> (const char *name, double value)</td></tr>
 <tr class="separator:a1714867af40e68ca404c3e84b6cac2a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed6cce4bd414a78b3e2a824803c3ec42" id="r_aed6cce4bd414a78b3e2a824803c3ec42"><td class="memItemLeft" align="right" valign="top"><a id="aed6cce4bd414a78b3e2a824803c3ec42" name="aed6cce4bd414a78b3e2a824803c3ec42"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>CloseElement</b> ()</td></tr>
-<tr class="memdesc:aed6cce4bd414a78b3e2a824803c3ec42"><td class="mdescLeft">&#160;</td><td class="mdescRight">If streaming, close the Element. <br /></td></tr>
-<tr class="separator:aed6cce4bd414a78b3e2a824803c3ec42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad04d29562b46fcdb23ab320f8b664240" id="r_ad04d29562b46fcdb23ab320f8b664240"><td class="memItemLeft" align="right" valign="top"><a id="ad04d29562b46fcdb23ab320f8b664240" name="ad04d29562b46fcdb23ab320f8b664240"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>CloseElement</b> (bool compactMode=false)</td></tr>
+<tr class="memdesc:ad04d29562b46fcdb23ab320f8b664240"><td class="mdescLeft">&#160;</td><td class="mdescRight">If streaming, close the Element. <br /></td></tr>
+<tr class="separator:ad04d29562b46fcdb23ab320f8b664240"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cc16a9362df4332012cb13cff6441b3" id="r_a1cc16a9362df4332012cb13cff6441b3"><td class="memItemLeft" align="right" valign="top"><a id="a1cc16a9362df4332012cb13cff6441b3" name="a1cc16a9362df4332012cb13cff6441b3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PushText</b> (const char *text, bool cdata=false)</td></tr>
 <tr class="memdesc:a1cc16a9362df4332012cb13cff6441b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a text node. <br /></td></tr>
@@ -164,6 +172,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>PushText</b> (int val
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PushText</b> (unsigned value)</td></tr>
 <tr class="memdesc:a661fb50e7e0a4918d2d259cb0fae647e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a text node from an unsigned. <br /></td></tr>
 <tr class="separator:a661fb50e7e0a4918d2d259cb0fae647e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96b0a0bfe105154a0a6c37d725258f0a" id="r_a96b0a0bfe105154a0a6c37d725258f0a"><td class="memItemLeft" align="right" valign="top"><a id="a96b0a0bfe105154a0a6c37d725258f0a" name="a96b0a0bfe105154a0a6c37d725258f0a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>PushText</b> (int64_t value)</td></tr>
+<tr class="memdesc:a96b0a0bfe105154a0a6c37d725258f0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a text node from a signed 64bit integer. <br /></td></tr>
+<tr class="separator:a96b0a0bfe105154a0a6c37d725258f0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60b0a4cf57371ff8679c2c7556ccb708" id="r_a60b0a4cf57371ff8679c2c7556ccb708"><td class="memItemLeft" align="right" valign="top"><a id="a60b0a4cf57371ff8679c2c7556ccb708" name="a60b0a4cf57371ff8679c2c7556ccb708"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>PushText</b> (uint64_t value)</td></tr>
+<tr class="memdesc:a60b0a4cf57371ff8679c2c7556ccb708"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a text node from an unsigned 64bit integer. <br /></td></tr>
+<tr class="separator:a60b0a4cf57371ff8679c2c7556ccb708"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4390e5fa1ed05189a8686647345ab29f" id="r_a4390e5fa1ed05189a8686647345ab29f"><td class="memItemLeft" align="right" valign="top"><a id="a4390e5fa1ed05189a8686647345ab29f" name="a4390e5fa1ed05189a8686647345ab29f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PushText</b> (bool value)</td></tr>
 <tr class="memdesc:a4390e5fa1ed05189a8686647345ab29f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a text node from a bool. <br /></td></tr>
@@ -186,62 +202,92 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>PushDeclaration</b> (
 <tr class="memitem:ab1efc6d1548505e9984185f58f54b713" id="r_ab1efc6d1548505e9984185f58f54b713"><td class="memItemLeft" align="right" valign="top"><a id="ab1efc6d1548505e9984185f58f54b713" name="ab1efc6d1548505e9984185f58f54b713"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PushUnknown</b> (const char *value)</td></tr>
 <tr class="separator:ab1efc6d1548505e9984185f58f54b713"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae966b988a7a28c41e91c5ca17fb2054b" id="r_ae966b988a7a28c41e91c5ca17fb2054b"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae966b988a7a28c41e91c5ca17fb2054b">VisitEnter</a> (const <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> &amp;)</td></tr>
-<tr class="memdesc:ae966b988a7a28c41e91c5ca17fb2054b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a document.  <br /></td></tr>
-<tr class="separator:ae966b988a7a28c41e91c5ca17fb2054b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15fc1f2b922f540917dcf52808737b29" id="r_a15fc1f2b922f540917dcf52808737b29"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15fc1f2b922f540917dcf52808737b29">VisitExit</a> (const <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> &amp;)</td></tr>
-<tr class="memdesc:a15fc1f2b922f540917dcf52808737b29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a document.  <br /></td></tr>
-<tr class="separator:a15fc1f2b922f540917dcf52808737b29"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ce2aa508c21ac91615093ddb9c282c5" id="r_a2ce2aa508c21ac91615093ddb9c282c5"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2ce2aa508c21ac91615093ddb9c282c5">VisitEnter</a> (const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> &amp;element, const <a class="el" href="classtinyxml2_1_1XMLAttribute.html">XMLAttribute</a> *attribute)</td></tr>
-<tr class="memdesc:a2ce2aa508c21ac91615093ddb9c282c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit an element.  <br /></td></tr>
-<tr class="separator:a2ce2aa508c21ac91615093ddb9c282c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae99e0a7086543591edfb565f24689098" id="r_ae99e0a7086543591edfb565f24689098"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae99e0a7086543591edfb565f24689098">VisitExit</a> (const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> &amp;element)</td></tr>
-<tr class="memdesc:ae99e0a7086543591edfb565f24689098"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit an element.  <br /></td></tr>
-<tr class="separator:ae99e0a7086543591edfb565f24689098"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a275ae25544a12199ae40b6994ca6e4de" id="r_a275ae25544a12199ae40b6994ca6e4de"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a275ae25544a12199ae40b6994ca6e4de">Visit</a> (const <a class="el" href="classtinyxml2_1_1XMLText.html">XMLText</a> &amp;text)</td></tr>
-<tr class="memdesc:a275ae25544a12199ae40b6994ca6e4de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a text node.  <br /></td></tr>
-<tr class="separator:a275ae25544a12199ae40b6994ca6e4de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f16a30be1537ac141d9bd2db824ba9e" id="r_a3f16a30be1537ac141d9bd2db824ba9e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f16a30be1537ac141d9bd2db824ba9e">Visit</a> (const <a class="el" href="classtinyxml2_1_1XMLComment.html">XMLComment</a> &amp;comment)</td></tr>
-<tr class="memdesc:a3f16a30be1537ac141d9bd2db824ba9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a comment node.  <br /></td></tr>
-<tr class="separator:a3f16a30be1537ac141d9bd2db824ba9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ceff5cd85e5db65838962174fcdcc46" id="r_a9ceff5cd85e5db65838962174fcdcc46"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ceff5cd85e5db65838962174fcdcc46">Visit</a> (const <a class="el" href="classtinyxml2_1_1XMLDeclaration.html">XMLDeclaration</a> &amp;declaration)</td></tr>
-<tr class="memdesc:a9ceff5cd85e5db65838962174fcdcc46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a declaration.  <br /></td></tr>
-<tr class="separator:a9ceff5cd85e5db65838962174fcdcc46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa15e1da81e17dea5da6499ac5b08d9d8" id="r_aa15e1da81e17dea5da6499ac5b08d9d8"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa15e1da81e17dea5da6499ac5b08d9d8">Visit</a> (const <a class="el" href="classtinyxml2_1_1XMLUnknown.html">XMLUnknown</a> &amp;unknown)</td></tr>
-<tr class="memdesc:aa15e1da81e17dea5da6499ac5b08d9d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit an unknown node.  <br /></td></tr>
-<tr class="separator:aa15e1da81e17dea5da6499ac5b08d9d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73eba3d1aab34c4c3ac38d7d2d186671" id="r_a73eba3d1aab34c4c3ac38d7d2d186671"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73eba3d1aab34c4c3ac38d7d2d186671">VisitEnter</a> (const <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> &amp;) override</td></tr>
+<tr class="memdesc:a73eba3d1aab34c4c3ac38d7d2d186671"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a document.  <br /></td></tr>
+<tr class="separator:a73eba3d1aab34c4c3ac38d7d2d186671"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a261a24986e3507258a74405a7dc08cbf" id="r_a261a24986e3507258a74405a7dc08cbf"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a261a24986e3507258a74405a7dc08cbf">VisitExit</a> (const <a class="el" href="classtinyxml2_1_1XMLDocument.html">XMLDocument</a> &amp;) override</td></tr>
+<tr class="memdesc:a261a24986e3507258a74405a7dc08cbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a document.  <br /></td></tr>
+<tr class="separator:a261a24986e3507258a74405a7dc08cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cab997d51b0387c21e2274bd1147755" id="r_a5cab997d51b0387c21e2274bd1147755"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5cab997d51b0387c21e2274bd1147755">VisitEnter</a> (const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> &amp;element, const <a class="el" href="classtinyxml2_1_1XMLAttribute.html">XMLAttribute</a> *attribute) override</td></tr>
+<tr class="memdesc:a5cab997d51b0387c21e2274bd1147755"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit an element.  <br /></td></tr>
+<tr class="separator:a5cab997d51b0387c21e2274bd1147755"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a397f4c809a4de7ba27902b3ae1bbf7" id="r_a9a397f4c809a4de7ba27902b3ae1bbf7"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a397f4c809a4de7ba27902b3ae1bbf7">VisitExit</a> (const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> &amp;element) override</td></tr>
+<tr class="memdesc:a9a397f4c809a4de7ba27902b3ae1bbf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit an element.  <br /></td></tr>
+<tr class="separator:a9a397f4c809a4de7ba27902b3ae1bbf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad903ea1672831f797130b4cddddfa532" id="r_ad903ea1672831f797130b4cddddfa532"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad903ea1672831f797130b4cddddfa532">Visit</a> (const <a class="el" href="classtinyxml2_1_1XMLText.html">XMLText</a> &amp;text) override</td></tr>
+<tr class="memdesc:ad903ea1672831f797130b4cddddfa532"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a text node.  <br /></td></tr>
+<tr class="separator:ad903ea1672831f797130b4cddddfa532"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76fe434cdd4c39cb9963e3025e53609a" id="r_a76fe434cdd4c39cb9963e3025e53609a"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a76fe434cdd4c39cb9963e3025e53609a">Visit</a> (const <a class="el" href="classtinyxml2_1_1XMLComment.html">XMLComment</a> &amp;comment) override</td></tr>
+<tr class="memdesc:a76fe434cdd4c39cb9963e3025e53609a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a comment node.  <br /></td></tr>
+<tr class="separator:a76fe434cdd4c39cb9963e3025e53609a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63df55647c0e170e5b8702842b82008e" id="r_a63df55647c0e170e5b8702842b82008e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63df55647c0e170e5b8702842b82008e">Visit</a> (const <a class="el" href="classtinyxml2_1_1XMLDeclaration.html">XMLDeclaration</a> &amp;declaration) override</td></tr>
+<tr class="memdesc:a63df55647c0e170e5b8702842b82008e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit a declaration.  <br /></td></tr>
+<tr class="separator:a63df55647c0e170e5b8702842b82008e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31002765840bc4ea7b22332f71d83c74" id="r_a31002765840bc4ea7b22332f71d83c74"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31002765840bc4ea7b22332f71d83c74">Visit</a> (const <a class="el" href="classtinyxml2_1_1XMLUnknown.html">XMLUnknown</a> &amp;unknown) override</td></tr>
+<tr class="memdesc:a31002765840bc4ea7b22332f71d83c74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit an unknown node.  <br /></td></tr>
+<tr class="separator:a31002765840bc4ea7b22332f71d83c74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfa772366c44a17cdeb8aea294d57f78" id="r_abfa772366c44a17cdeb8aea294d57f78"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abfa772366c44a17cdeb8aea294d57f78">CStr</a> () const</td></tr>
 <tr class="separator:abfa772366c44a17cdeb8aea294d57f78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3256cf3523d4898b91abb18b924be04c" id="r_a3256cf3523d4898b91abb18b924be04c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3256cf3523d4898b91abb18b924be04c">CStrSize</a> () const</td></tr>
 <tr class="separator:a3256cf3523d4898b91abb18b924be04c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a690cb140ba98b7339734ff865f56b0b3" id="r_a690cb140ba98b7339734ff865f56b0b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a690cb140ba98b7339734ff865f56b0b3">ClearBuffer</a> (bool resetToFirstElement=true)</td></tr>
+<tr class="separator:a690cb140ba98b7339734ff865f56b0b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-types" name="pri-types"></a>
-Private Types</h2></td></tr>
-<tr class="memitem:ac9049bee10d230eb31ff7d146d538f7a" id="r_ac9049bee10d230eb31ff7d146d538f7a"><td class="memItemLeft" align="right" valign="top"><a id="ac9049bee10d230eb31ff7d146d538f7a" name="ac9049bee10d230eb31ff7d146d538f7a"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>ENTITY_RANGE</b> = 64
-, <b>BUF_SIZE</b> = 200
- }</td></tr>
-<tr class="separator:ac9049bee10d230eb31ff7d146d538f7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a38e1ed5a779bdf63eda9e808f7a6de66" id="r_a38e1ed5a779bdf63eda9e808f7a6de66"><td class="memItemLeft" align="right" valign="top"><a id="a38e1ed5a779bdf63eda9e808f7a6de66" name="a38e1ed5a779bdf63eda9e808f7a6de66"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>CompactMode</b> (const <a class="el" href="classtinyxml2_1_1XMLElement.html">XMLElement</a> &amp;)</td></tr>
+<tr class="separator:a38e1ed5a779bdf63eda9e808f7a6de66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01148e2ebe6776e38c5a3e41bc5feb74" id="r_a01148e2ebe6776e38c5a3e41bc5feb74"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a01148e2ebe6776e38c5a3e41bc5feb74">PrintSpace</a> (int depth)</td></tr>
+<tr class="separator:a01148e2ebe6776e38c5a3e41bc5feb74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fefcc4003e88f63e0dfd9f77c386078" id="r_a4fefcc4003e88f63e0dfd9f77c386078"><td class="memItemLeft" align="right" valign="top"><a id="a4fefcc4003e88f63e0dfd9f77c386078" name="a4fefcc4003e88f63e0dfd9f77c386078"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Print</b> (const char *format,...)</td></tr>
+<tr class="separator:a4fefcc4003e88f63e0dfd9f77c386078"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65824af90e503b850f076725ccc95cfc" id="r_a65824af90e503b850f076725ccc95cfc"><td class="memItemLeft" align="right" valign="top"><a id="a65824af90e503b850f076725ccc95cfc" name="a65824af90e503b850f076725ccc95cfc"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Write</b> (const char *data, size_t size)</td></tr>
+<tr class="separator:a65824af90e503b850f076725ccc95cfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03de437ca25fbcc0d7df4bc29296e7f4" id="r_a03de437ca25fbcc0d7df4bc29296e7f4"><td class="memItemLeft" align="right" valign="top"><a id="a03de437ca25fbcc0d7df4bc29296e7f4" name="a03de437ca25fbcc0d7df4bc29296e7f4"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Putc</b> (char ch)</td></tr>
+<tr class="separator:a03de437ca25fbcc0d7df4bc29296e7f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bd7f0cabca77ac95c299103fa9592f1" id="r_a4bd7f0cabca77ac95c299103fa9592f1"><td class="memItemLeft" align="right" valign="top"><a id="a4bd7f0cabca77ac95c299103fa9592f1" name="a4bd7f0cabca77ac95c299103fa9592f1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Write</b> (const char *data)</td></tr>
+<tr class="separator:a4bd7f0cabca77ac95c299103fa9592f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6e2c72c5d796f5b4de6ce81ca95e3fa" id="r_ac6e2c72c5d796f5b4de6ce81ca95e3fa"><td class="memItemLeft" align="right" valign="top"><a id="ac6e2c72c5d796f5b4de6ce81ca95e3fa" name="ac6e2c72c5d796f5b4de6ce81ca95e3fa"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SealElementIfJustOpened</b> ()</td></tr>
+<tr class="separator:ac6e2c72c5d796f5b4de6ce81ca95e3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:a70ac2010150c8551773ffb2f96fef353" id="r_a70ac2010150c8551773ffb2f96fef353"><td class="memItemLeft" align="right" valign="top"><a id="a70ac2010150c8551773ffb2f96fef353" name="a70ac2010150c8551773ffb2f96fef353"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SealElement</b> ()</td></tr>
-<tr class="separator:a70ac2010150c8551773ffb2f96fef353"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c4b2ccbe4fdb316d54f5a93f3559260" id="r_a1c4b2ccbe4fdb316d54f5a93f3559260"><td class="memItemLeft" align="right" valign="top"><a id="a1c4b2ccbe4fdb316d54f5a93f3559260" name="a1c4b2ccbe4fdb316d54f5a93f3559260"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>PrintSpace</b> (int depth)</td></tr>
-<tr class="separator:a1c4b2ccbe4fdb316d54f5a93f3559260"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5495e504053f63f2c4d603327314fa91" id="r_a5495e504053f63f2c4d603327314fa91"><td class="memItemLeft" align="right" valign="top"><a id="a5495e504053f63f2c4d603327314fa91" name="a5495e504053f63f2c4d603327314fa91"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>PrintString</b> (const char *, bool restrictedEntitySet)</td></tr>
-<tr class="separator:a5495e504053f63f2c4d603327314fa91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab30210a7f32e45634e7a45137bf6fdf6" id="r_ab30210a7f32e45634e7a45137bf6fdf6"><td class="memItemLeft" align="right" valign="top"><a id="ab30210a7f32e45634e7a45137bf6fdf6" name="ab30210a7f32e45634e7a45137bf6fdf6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Print</b> (const char *format,...)</td></tr>
-<tr class="separator:ab30210a7f32e45634e7a45137bf6fdf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
 <tr class="memitem:ac07169d58b465214a2b1fa306e617c26" id="r_ac07169d58b465214a2b1fa306e617c26"><td class="memItemLeft" align="right" valign="top"><a id="ac07169d58b465214a2b1fa306e617c26" name="ac07169d58b465214a2b1fa306e617c26"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>_elementJustOpened</b></td></tr>
 <tr class="separator:ac07169d58b465214a2b1fa306e617c26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99d59e67e084714541bee3ae43884bef" id="r_a99d59e67e084714541bee3ae43884bef"><td class="memItemLeft" align="right" valign="top"><a id="a99d59e67e084714541bee3ae43884bef" name="a99d59e67e084714541bee3ae43884bef"></a>
+<a class="el" href="classtinyxml2_1_1DynArray.html">DynArray</a>&lt; const char *, 10 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_stack</b></td></tr>
+<tr class="separator:a99d59e67e084714541bee3ae43884bef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-types" name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr class="memitem:a86c30ee9c735dc8ea7108f8f61a9b430" id="r_a86c30ee9c735dc8ea7108f8f61a9b430"><td class="memItemLeft" align="right" valign="top"><a id="a86c30ee9c735dc8ea7108f8f61a9b430" name="a86c30ee9c735dc8ea7108f8f61a9b430"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>ENTITY_RANGE</b> = 64
+, <b>BUF_SIZE</b> = 200
+ }</td></tr>
+<tr class="separator:a86c30ee9c735dc8ea7108f8f61a9b430"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a83f100894c0ed069ffbd2c5a2c9ed190" id="r_a83f100894c0ed069ffbd2c5a2c9ed190"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a83f100894c0ed069ffbd2c5a2c9ed190">PrepareForNewNode</a> (bool compactMode)</td></tr>
+<tr class="separator:a83f100894c0ed069ffbd2c5a2c9ed190"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5495e504053f63f2c4d603327314fa91" id="r_a5495e504053f63f2c4d603327314fa91"><td class="memItemLeft" align="right" valign="top"><a id="a5495e504053f63f2c4d603327314fa91" name="a5495e504053f63f2c4d603327314fa91"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>PrintString</b> (const char *, bool restrictedEntitySet)</td></tr>
+<tr class="separator:a5495e504053f63f2c4d603327314fa91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a157706836c056febc4022dc540a47982" id="r_a157706836c056febc4022dc540a47982"><td class="memItemLeft" align="right" valign="top"><a id="a157706836c056febc4022dc540a47982" name="a157706836c056febc4022dc540a47982"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>XMLPrinter</b> (const <a class="el" href="classtinyxml2_1_1XMLPrinter.html">XMLPrinter</a> &amp;)</td></tr>
+<tr class="separator:a157706836c056febc4022dc540a47982"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4da41082cbb268042b05b34fde40a6d" id="r_ad4da41082cbb268042b05b34fde40a6d"><td class="memItemLeft" align="right" valign="top"><a id="ad4da41082cbb268042b05b34fde40a6d" name="ad4da41082cbb268042b05b34fde40a6d"></a>
+<a class="el" href="classtinyxml2_1_1XMLPrinter.html">XMLPrinter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classtinyxml2_1_1XMLPrinter.html">XMLPrinter</a> &amp;)</td></tr>
+<tr class="separator:ad4da41082cbb268042b05b34fde40a6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
 <tr class="memitem:abbd7ac45d97ae5eceec12d6c058119f9" id="r_abbd7ac45d97ae5eceec12d6c058119f9"><td class="memItemLeft" align="right" valign="top"><a id="abbd7ac45d97ae5eceec12d6c058119f9" name="abbd7ac45d97ae5eceec12d6c058119f9"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>_firstElement</b></td></tr>
 <tr class="separator:abbd7ac45d97ae5eceec12d6c058119f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -266,15 +312,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>_entityFlag</b> [ENTI
 <tr class="memitem:a5df242509d42ae1c9128924121ebe093" id="r_a5df242509d42ae1c9128924121ebe093"><td class="memItemLeft" align="right" valign="top"><a id="a5df242509d42ae1c9128924121ebe093" name="a5df242509d42ae1c9128924121ebe093"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>_restrictedEntityFlag</b> [ENTITY_RANGE]</td></tr>
 <tr class="separator:a5df242509d42ae1c9128924121ebe093"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a613c11fefb95fa4ac484d76c39309cee" id="r_a613c11fefb95fa4ac484d76c39309cee"><td class="memItemLeft" align="right" valign="top"><a id="a613c11fefb95fa4ac484d76c39309cee" name="a613c11fefb95fa4ac484d76c39309cee"></a>
-<a class="el" href="classtinyxml2_1_1DynArray.html">DynArray</a>&lt; const char *, 10 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_stack</b></td></tr>
-<tr class="separator:a613c11fefb95fa4ac484d76c39309cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55a5cf6d1835248eb2fce3bcbcc3410a" id="r_a55a5cf6d1835248eb2fce3bcbcc3410a"><td class="memItemLeft" align="right" valign="top"><a id="a55a5cf6d1835248eb2fce3bcbcc3410a" name="a55a5cf6d1835248eb2fce3bcbcc3410a"></a>
+<tr class="memitem:a19fca2e934576a892fefe2f602874d59" id="r_a19fca2e934576a892fefe2f602874d59"><td class="memItemLeft" align="right" valign="top"><a id="a19fca2e934576a892fefe2f602874d59" name="a19fca2e934576a892fefe2f602874d59"></a>
 <a class="el" href="classtinyxml2_1_1DynArray.html">DynArray</a>&lt; char, 20 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_buffer</b></td></tr>
-<tr class="separator:a55a5cf6d1835248eb2fce3bcbcc3410a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a19fca2e934576a892fefe2f602874d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Printing functionality. The <a class="el" href="classtinyxml2_1_1XMLPrinter.html">XMLPrinter</a> gives you more options than the <a class="el" href="classtinyxml2_1_1XMLDocument.html#a2e57602756e197341711a4a0b84c52c5">XMLDocument::Print()</a> method.</p>
+<div class="textblock"><p>Printing functionality. The <a class="el" href="classtinyxml2_1_1XMLPrinter.html">XMLPrinter</a> gives you more options than the <a class="el" href="classtinyxml2_1_1XMLDocument.html#a867cf5fa3e3ff6ae4847a8b7ee8ec083">XMLDocument::Print()</a> method.</p>
 <p>It can:</p><ol type="1">
 <li>Print to memory.</li>
 <li>Print to a file you provide.</li>
@@ -282,7 +325,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>_restrictedEntityFlag
 </ol>
 <p>Print to Memory</p>
 <pre class="fragment">XMLPrinter printer;
-doc-&gt;Print( &amp;printer );
+doc.Print( &amp;printer );
 SomeFunction( printer.CStr() );
 </pre><p>Print to a File</p>
 <p>You provide the file pointer. </p><pre class="fragment">XMLPrinter printer( fp );
@@ -295,8 +338,8 @@ printer.OpenElement( "foo" );
 printer.PushAttribute( "foo", "bar" );
 printer.CloseElement();
 </pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad1eb8de568ceac1429cf04c66a349bd6" name="ad1eb8de568ceac1429cf04c66a349bd6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1eb8de568ceac1429cf04c66a349bd6">&#9670;&#160;</a></span>XMLPrinter()</h2>
+<a id="aa6d3841c069085f5b8a27bc7103c04f7" name="aa6d3841c069085f5b8a27bc7103c04f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6d3841c069085f5b8a27bc7103c04f7">&#9670;&#160;</a></span>XMLPrinter()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -309,7 +352,12 @@ printer.CloseElement();
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>compact</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>compact</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>depth</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -318,6 +366,32 @@ printer.CloseElement();
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a690cb140ba98b7339734ff865f56b0b3" name="a690cb140ba98b7339734ff865f56b0b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a690cb140ba98b7339734ff865f56b0b3">&#9670;&#160;</a></span>ClearBuffer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tinyxml2::XMLPrinter::ClearBuffer </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>resetToFirstElement</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>If in print to memory mode, reset the buffer to the beginning. </p>
+
+</div>
+</div>
 <a id="abfa772366c44a17cdeb8aea294d57f78" name="abfa772366c44a17cdeb8aea294d57f78"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abfa772366c44a17cdeb8aea294d57f78">&#9670;&#160;</a></span>CStr()</h2>
 
@@ -370,8 +444,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="aa10d330818dbc31b44e9ffc27618bdfb" name="aa10d330818dbc31b44e9ffc27618bdfb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa10d330818dbc31b44e9ffc27618bdfb">&#9670;&#160;</a></span>OpenElement()</h2>
+<a id="a20fb06c83bd13e5140d7dd13af06c010" name="a20fb06c83bd13e5140d7dd13af06c010"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20fb06c83bd13e5140d7dd13af06c010">&#9670;&#160;</a></span>OpenElement()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -379,12 +453,68 @@ printer.CloseElement();
         <tr>
           <td class="memname">void tinyxml2::XMLPrinter::OpenElement </td>
           <td>(</td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>compactMode</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>If streaming, start writing an element. The element must be closed with <a class="el" href="#aed6cce4bd414a78b3e2a824803c3ec42" title="If streaming, close the Element.">CloseElement()</a> </p>
+<p>If streaming, start writing an element. The element must be closed with <a class="el" href="#ad04d29562b46fcdb23ab320f8b664240" title="If streaming, close the Element.">CloseElement()</a> </p>
+
+</div>
+</div>
+<a id="a83f100894c0ed069ffbd2c5a2c9ed190" name="a83f100894c0ed069ffbd2c5a2c9ed190"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83f100894c0ed069ffbd2c5a2c9ed190">&#9670;&#160;</a></span>PrepareForNewNode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tinyxml2::XMLPrinter::PrepareForNewNode </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>compactMode</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Prepares to write a new node. This includes sealing an element that was just opened, and writing any whitespace necessary if not in compact mode. </p>
+
+</div>
+</div>
+<a id="a01148e2ebe6776e38c5a3e41bc5feb74" name="a01148e2ebe6776e38c5a3e41bc5feb74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01148e2ebe6776e38c5a3e41bc5feb74">&#9670;&#160;</a></span>PrintSpace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void tinyxml2::XMLPrinter::PrintSpace </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>depth</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Prints out the space before an element. You may override to change the space and tabs used. A <a class="el" href="#a01148e2ebe6776e38c5a3e41bc5feb74">PrintSpace()</a> override should call Print(). </p>
 
 </div>
 </div>
@@ -410,8 +540,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="a3f16a30be1537ac141d9bd2db824ba9e" name="a3f16a30be1537ac141d9bd2db824ba9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3f16a30be1537ac141d9bd2db824ba9e">&#9670;&#160;</a></span>Visit() <span class="overload">[1/4]</span></h2>
+<a id="a76fe434cdd4c39cb9963e3025e53609a" name="a76fe434cdd4c39cb9963e3025e53609a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76fe434cdd4c39cb9963e3025e53609a">&#9670;&#160;</a></span>Visit() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -428,7 +558,7 @@ printer.CloseElement();
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -439,8 +569,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="a9ceff5cd85e5db65838962174fcdcc46" name="a9ceff5cd85e5db65838962174fcdcc46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9ceff5cd85e5db65838962174fcdcc46">&#9670;&#160;</a></span>Visit() <span class="overload">[2/4]</span></h2>
+<a id="a63df55647c0e170e5b8702842b82008e" name="a63df55647c0e170e5b8702842b82008e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63df55647c0e170e5b8702842b82008e">&#9670;&#160;</a></span>Visit() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -457,7 +587,7 @@ printer.CloseElement();
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -468,8 +598,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="a275ae25544a12199ae40b6994ca6e4de" name="a275ae25544a12199ae40b6994ca6e4de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a275ae25544a12199ae40b6994ca6e4de">&#9670;&#160;</a></span>Visit() <span class="overload">[3/4]</span></h2>
+<a id="ad903ea1672831f797130b4cddddfa532" name="ad903ea1672831f797130b4cddddfa532"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad903ea1672831f797130b4cddddfa532">&#9670;&#160;</a></span>Visit() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -486,7 +616,7 @@ printer.CloseElement();
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -497,8 +627,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="aa15e1da81e17dea5da6499ac5b08d9d8" name="aa15e1da81e17dea5da6499ac5b08d9d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa15e1da81e17dea5da6499ac5b08d9d8">&#9670;&#160;</a></span>Visit() <span class="overload">[4/4]</span></h2>
+<a id="a31002765840bc4ea7b22332f71d83c74" name="a31002765840bc4ea7b22332f71d83c74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31002765840bc4ea7b22332f71d83c74">&#9670;&#160;</a></span>Visit() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -515,7 +645,7 @@ printer.CloseElement();
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -526,8 +656,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="ae966b988a7a28c41e91c5ca17fb2054b" name="ae966b988a7a28c41e91c5ca17fb2054b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae966b988a7a28c41e91c5ca17fb2054b">&#9670;&#160;</a></span>VisitEnter() <span class="overload">[1/2]</span></h2>
+<a id="a73eba3d1aab34c4c3ac38d7d2d186671" name="a73eba3d1aab34c4c3ac38d7d2d186671"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73eba3d1aab34c4c3ac38d7d2d186671">&#9670;&#160;</a></span>VisitEnter() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -544,7 +674,7 @@ printer.CloseElement();
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -555,8 +685,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="a2ce2aa508c21ac91615093ddb9c282c5" name="a2ce2aa508c21ac91615093ddb9c282c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ce2aa508c21ac91615093ddb9c282c5">&#9670;&#160;</a></span>VisitEnter() <span class="overload">[2/2]</span></h2>
+<a id="a5cab997d51b0387c21e2274bd1147755" name="a5cab997d51b0387c21e2274bd1147755"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cab997d51b0387c21e2274bd1147755">&#9670;&#160;</a></span>VisitEnter() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -577,7 +707,7 @@ printer.CloseElement();
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -588,8 +718,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="a15fc1f2b922f540917dcf52808737b29" name="a15fc1f2b922f540917dcf52808737b29"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15fc1f2b922f540917dcf52808737b29">&#9670;&#160;</a></span>VisitExit() <span class="overload">[1/2]</span></h2>
+<a id="a261a24986e3507258a74405a7dc08cbf" name="a261a24986e3507258a74405a7dc08cbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a261a24986e3507258a74405a7dc08cbf">&#9670;&#160;</a></span>VisitExit() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -606,7 +736,7 @@ printer.CloseElement();
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -617,8 +747,8 @@ printer.CloseElement();
 
 </div>
 </div>
-<a id="ae99e0a7086543591edfb565f24689098" name="ae99e0a7086543591edfb565f24689098"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae99e0a7086543591edfb565f24689098">&#9670;&#160;</a></span>VisitExit() <span class="overload">[2/2]</span></h2>
+<a id="a9a397f4c809a4de7ba27902b3ae1bbf7" name="a9a397f4c809a4de7ba27902b3ae1bbf7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a397f4c809a4de7ba27902b3ae1bbf7">&#9670;&#160;</a></span>VisitExit() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -635,7 +765,7 @@ printer.CloseElement();
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

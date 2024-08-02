@@ -1,7 +1,7 @@
 <map id="coupling::paralleltopology::ZYXTopology&lt; dim &gt;" name="coupling::paralleltopology::ZYXTopology&lt; dim &gt;">
 <area shape="rect" id="Node000001" title="The ZYXTopology orders the ranks in z&#45;y&#45;x manner." alt="" coords="425,39,589,79"/>
 <area shape="rect" id="Node000002" href="$classcoupling_1_1paralleltopology_1_1ParallelTopology.html" title="This class performs the conversion rank &lt;&#45;&gt; process coordinates." alt="" coords="5,5,171,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,31,425,50,424,55,186,36"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,27,401,42,425,44,424,50,400,47,186,32"/>
 <area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="22,71,154,111"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="170,92,279,91,400,82,429,77,430,83,401,88,280,97,170,97"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,86,279,81,400,72,424,69,425,74,401,77,279,86,170,91"/>
 </map>

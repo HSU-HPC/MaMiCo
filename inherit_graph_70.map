@@ -6,7 +6,7 @@
 <area shape="poly" id="edge50_Node000000_Node000002" title=" " alt="" coords="202,72,247,79,246,84,202,78"/>
 <area shape="rect" id="Node000003" href="$classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html" title="implements a simple one&#45;dimensional finite&#45;diffference solver for the Couette flow." alt="" coords="430,71,578,111"/>
 <area shape="poly" id="edge51_Node000002_Node000003" title=" " alt="" coords="385,88,430,88,430,94,385,94"/>
-<area shape="rect" id="Node000004" href="$classcoupling_1_1solvers_1_1LBCouetteSolver.html" title="implements a three&#45;dimensional Lattice&#45;Boltzmann Couette flow solver." alt="" coords="443,136,566,177"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1solvers_1_1LBCouetteSolver.html" title="implements a three&#45;dimensional Lattice&#45;Boltzmann Couette flow solver." alt="" coords="442,136,566,177"/>
 <area shape="poly" id="edge52_Node000002_Node000004" title=" " alt="" coords="385,114,443,133,442,138,384,119"/>
 <area shape="rect" id="Node000005" href="$classcoupling_1_1interface_1_1PintableMacroSolver.html" title=" " alt="" coords="235,136,382,177"/>
 <area shape="poly" id="edge53_Node000005_Node000004" title=" " alt="" coords="397,154,442,154,442,159,397,159"/>

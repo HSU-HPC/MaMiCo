@@ -10,9 +10,10 @@ var searchData=
   ['beginprocessoutermacroscopiccellsafterreceivingmacroscopicsolverdata_7',['beginProcessOuterMacroscopicCellsAfterReceivingMacroscopicSolverData',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#af09fb7279b028aba47fb9de0116a1e1f',1,'coupling::transferstrategies::TransferStrategy']]],
   ['beginprocessoutermacroscopiccellsbeforereceivingmacroscopicsolverdata_8',['beginProcessOuterMacroscopicCellsBeforeReceivingMacroscopicSolverData',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a58d0e0f545e7ea2ae2065c05e2f47856',1,'coupling::transferstrategies::TransferStrategy']]],
   ['beginprocessoutermacroscopiccellsbeforesendingmdsolverdata_9',['beginProcessOuterMacroscopicCellsBeforeSendingMDSolverData',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a072ca22bb93203f8d9d6509f14ee3bcf',1,'coupling::transferstrategies::TransferStrategy']]],
-  ['boolattribute_10',['BoolAttribute',['../classtinyxml2_1_1XMLElement.html#a07f6033f25eab7b246b57f4bff0758be',1,'tinyxml2::XMLElement']]],
-  ['boolvalue_11',['BoolValue',['../classtinyxml2_1_1XMLAttribute.html#a98ce5207344ad33a265b0422addae1ff',1,'tinyxml2::XMLAttribute']]],
-  ['boundary_12',['boundary',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a677344e27f8faf2644d9bef3c50a993b',1,'coupling::solvers::LBCouetteSolver']]],
-  ['boundaryforceconfiguration_13',['BoundaryForceConfiguration',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html#adbe59b414f39d6a78c87b307e4cc445c',1,'coupling::configurations::BoundaryForceConfiguration']]],
-  ['boundaryforcecontroller_14',['BoundaryForceController',['../classcoupling_1_1BoundaryForceController.html#a2b1891868681bf76e49c813eaf6075e3',1,'coupling::BoundaryForceController']]]
+  ['boolattribute_10',['BoolAttribute',['../classtinyxml2_1_1XMLElement.html#a53eda26131e1ad1031ef8ec8adb51bd8',1,'tinyxml2::XMLElement']]],
+  ['booltext_11',['BoolText',['../classtinyxml2_1_1XMLElement.html#a68569f59f6382bcea7f5013ec59736d2',1,'tinyxml2::XMLElement']]],
+  ['boolvalue_12',['BoolValue',['../classtinyxml2_1_1XMLAttribute.html#a98ce5207344ad33a265b0422addae1ff',1,'tinyxml2::XMLAttribute']]],
+  ['boundary_13',['boundary',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a677344e27f8faf2644d9bef3c50a993b',1,'coupling::solvers::LBCouetteSolver']]],
+  ['boundaryforceconfiguration_14',['BoundaryForceConfiguration',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html#adbe59b414f39d6a78c87b307e4cc445c',1,'coupling::configurations::BoundaryForceConfiguration']]],
+  ['boundaryforcecontroller_15',['BoundaryForceController',['../classcoupling_1_1BoundaryForceController.html#a2b1891868681bf76e49c813eaf6075e3',1,'coupling::BoundaryForceController']]]
 ];

@@ -101,10 +101,10 @@ $(function(){ initResizable(false); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a0301ef962e15dd94574431f1c61266c5" id="r_a0301ef962e15dd94574431f1c61266c5"><td class="memItemLeft" align="right" valign="top"><a id="a0301ef962e15dd94574431f1c61266c5" name="a0301ef962e15dd94574431f1c61266c5"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+<tr class="memitem:ac1a95416b9fef0fa61e08a329d05bd54" id="r_ac1a95416b9fef0fa61e08a329d05bd54"><td class="memItemLeft" align="right" valign="top"><a id="ac1a95416b9fef0fa61e08a329d05bd54" name="ac1a95416b9fef0fa61e08a329d05bd54"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>Mode</b> { <br />
 &#160;&#160;<b>NEEDS_ENTITY_PROCESSING</b> = 0x01
 , <b>NEEDS_NEWLINE_NORMALIZATION</b> = 0x02
-, <b>COLLAPSE_WHITESPACE</b> = 0x04
+, <b>NEEDS_WHITESPACE_COLLAPSING</b> = 0x04
 , <b>TEXT_ELEMENT</b> = NEEDS_ENTITY_PROCESSING | NEEDS_NEWLINE_NORMALIZATION
 , <br />
 &#160;&#160;<b>TEXT_ELEMENT_LEAVE_ENTITIES</b> = NEEDS_NEWLINE_NORMALIZATION
@@ -115,7 +115,7 @@ Public Types</h2></td></tr>
 &#160;&#160;<b>COMMENT</b> = NEEDS_NEWLINE_NORMALIZATION
 <br />
  }</td></tr>
-<tr class="separator:a0301ef962e15dd94574431f1c61266c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ac1a95416b9fef0fa61e08a329d05bd54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -134,28 +134,37 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetInternedStr</b> (c
 <tr class="memitem:a1f82ec6b5bee35ee7466d8565e43b1de" id="r_a1f82ec6b5bee35ee7466d8565e43b1de"><td class="memItemLeft" align="right" valign="top"><a id="a1f82ec6b5bee35ee7466d8565e43b1de" name="a1f82ec6b5bee35ee7466d8565e43b1de"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetStr</b> (const char *str, int flags=0)</td></tr>
 <tr class="separator:a1f82ec6b5bee35ee7466d8565e43b1de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad90521f188e9606a8fbafe5d86fb2246" id="r_ad90521f188e9606a8fbafe5d86fb2246"><td class="memItemLeft" align="right" valign="top"><a id="ad90521f188e9606a8fbafe5d86fb2246" name="ad90521f188e9606a8fbafe5d86fb2246"></a>
-char *&#160;</td><td class="memItemRight" valign="bottom"><b>ParseText</b> (char *in, const char *endTag, int strFlags)</td></tr>
-<tr class="separator:ad90521f188e9606a8fbafe5d86fb2246"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68e6999b7677fa711287ececb9ba317e" id="r_a68e6999b7677fa711287ececb9ba317e"><td class="memItemLeft" align="right" valign="top"><a id="a68e6999b7677fa711287ececb9ba317e" name="a68e6999b7677fa711287ececb9ba317e"></a>
+char *&#160;</td><td class="memItemRight" valign="bottom"><b>ParseText</b> (char *in, const char *endTag, int strFlags, int *curLineNumPtr)</td></tr>
+<tr class="separator:a68e6999b7677fa711287ececb9ba317e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6d8998efceba41d87ec2300c70a6085" id="r_aa6d8998efceba41d87ec2300c70a6085"><td class="memItemLeft" align="right" valign="top"><a id="aa6d8998efceba41d87ec2300c70a6085" name="aa6d8998efceba41d87ec2300c70a6085"></a>
 char *&#160;</td><td class="memItemRight" valign="bottom"><b>ParseName</b> (char *in)</td></tr>
 <tr class="separator:aa6d8998efceba41d87ec2300c70a6085"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-types" name="pri-types"></a>
-Private Types</h2></td></tr>
-<tr class="memitem:a476a92d76f24486c3ae4731916b12aae" id="r_a476a92d76f24486c3ae4731916b12aae"><td class="memItemLeft" align="right" valign="top"><a id="a476a92d76f24486c3ae4731916b12aae" name="a476a92d76f24486c3ae4731916b12aae"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>NEEDS_FLUSH</b> = 0x100
-, <b>NEEDS_DELETE</b> = 0x200
- }</td></tr>
-<tr class="separator:a476a92d76f24486c3ae4731916b12aae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
+<tr class="memitem:a35f795b1557fe5fdcbd93d3cc5d6b939" id="r_a35f795b1557fe5fdcbd93d3cc5d6b939"><td class="memItemLeft" align="right" valign="top"><a id="a35f795b1557fe5fdcbd93d3cc5d6b939" name="a35f795b1557fe5fdcbd93d3cc5d6b939"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TransferTo</b> (<a class="el" href="classtinyxml2_1_1StrPair.html">StrPair</a> *other)</td></tr>
+<tr class="separator:a35f795b1557fe5fdcbd93d3cc5d6b939"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80c1b3bd99bf62ae85c94a29ce537125" id="r_a80c1b3bd99bf62ae85c94a29ce537125"><td class="memItemLeft" align="right" valign="top"><a id="a80c1b3bd99bf62ae85c94a29ce537125" name="a80c1b3bd99bf62ae85c94a29ce537125"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Reset</b> ()</td></tr>
 <tr class="separator:a80c1b3bd99bf62ae85c94a29ce537125"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-types" name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr class="memitem:a0301ef962e15dd94574431f1c61266c5" id="r_a0301ef962e15dd94574431f1c61266c5"><td class="memItemLeft" align="right" valign="top"><a id="a0301ef962e15dd94574431f1c61266c5" name="a0301ef962e15dd94574431f1c61266c5"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>NEEDS_FLUSH</b> = 0x100
+, <b>NEEDS_DELETE</b> = 0x200
+ }</td></tr>
+<tr class="separator:a0301ef962e15dd94574431f1c61266c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
 <tr class="memitem:ade1469025e6b4cac74397a82a7429337" id="r_ade1469025e6b4cac74397a82a7429337"><td class="memItemLeft" align="right" valign="top"><a id="ade1469025e6b4cac74397a82a7429337" name="ade1469025e6b4cac74397a82a7429337"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>CollapseWhitespace</b> ()</td></tr>
 <tr class="separator:ade1469025e6b4cac74397a82a7429337"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac43c1f4a5730c5582f9cff724376d106" id="r_ac43c1f4a5730c5582f9cff724376d106"><td class="memItemLeft" align="right" valign="top"><a id="ac43c1f4a5730c5582f9cff724376d106" name="ac43c1f4a5730c5582f9cff724376d106"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>StrPair</b> (const <a class="el" href="classtinyxml2_1_1StrPair.html">StrPair</a> &amp;other)</td></tr>
+<tr class="separator:ac43c1f4a5730c5582f9cff724376d106"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abeca3b715def403efed9f725d0fb0060" id="r_abeca3b715def403efed9f725d0fb0060"><td class="memItemLeft" align="right" valign="top"><a id="abeca3b715def403efed9f725d0fb0060" name="abeca3b715def403efed9f725d0fb0060"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classtinyxml2_1_1StrPair.html">StrPair</a> &amp;other)</td></tr>
+<tr class="separator:abeca3b715def403efed9f725d0fb0060"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>

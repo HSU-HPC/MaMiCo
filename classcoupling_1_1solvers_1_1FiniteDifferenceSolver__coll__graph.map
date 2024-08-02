@@ -1,8 +1,8 @@
 <map id="coupling::solvers::FiniteDifferenceSolver" name="coupling::solvers::FiniteDifferenceSolver">
-<area shape="rect" id="Node000001" title="implements a simple one&#45;dimensional finite&#45;diffference solver for the Couette flow." alt="" coords="649,156,797,197"/>
+<area shape="rect" id="Node000001" title="implements a simple one&#45;dimensional finite&#45;diffference solver for the Couette flow." alt="" coords="649,131,797,171"/>
 <area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1NumericalSolver.html" title="is a virtual base class for the interface for a numerical fluid solver for the Couette scenario" alt="" coords="399,131,522,171"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="538,156,649,167,648,172,537,161"/>
-<area shape="poly" id="edge7_Node000001_Node000002" title=" " alt="" coords="538,159,546,160,649,169,648,175,546,166,537,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="538,157,649,157,649,162,538,162"/>
+<area shape="poly" id="edge7_Node000001_Node000002" title=" " alt="" coords="538,140,649,140,649,145,538,145"/>
 <area shape="rect" id="Node000003" href="$classcoupling_1_1solvers_1_1AbstractCouetteSolver.html" title=" " alt="" coords="5,5,187,46"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="203,26,289,39,334,51,376,69,416,97,445,128,441,132,412,101,373,73,332,56,288,44,202,31"/>
 <area shape="rect" id="Node000004" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,71,155,111"/>
@@ -10,9 +10,9 @@
 <area shape="rect" id="Node000005" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,136,155,177"/>
 <area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="170,153,398,149,398,155,171,158"/>
 <area shape="rect" id="Node000006" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,207,155,247"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="170,228,269,224,322,216,374,203,386,196,397,187,425,170,428,174,400,192,389,201,376,208,323,222,269,230,170,234"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="171,231,218,231,270,228,323,219,373,203,385,194,397,182,417,169,420,174,400,186,389,198,376,208,324,224,270,233,218,237,171,236"/>
 <area shape="rect" id="Node000007" href="$classScenario.html" title=" " alt="" coords="60,272,132,297"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="148,290,200,293,259,290,319,276,347,264,373,248,383,235,386,221,388,205,397,188,417,170,420,174,401,191,393,207,391,222,388,237,376,252,350,269,321,281,260,295,200,298,148,295"/>
-<area shape="rect" id="Node000008" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="401,201,520,242"/>
-<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="534,206,648,186,649,192,535,212"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="147,291,199,296,259,294,320,281,348,269,373,252,384,237,386,221,387,202,397,183,411,170,415,174,401,186,392,204,391,221,389,239,377,256,350,273,321,286,260,299,199,301,147,296"/>
+<area shape="rect" id="Node000008" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="401,196,520,237"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="534,195,648,167,649,172,535,201"/>
 </map>

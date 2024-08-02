@@ -7,5 +7,6 @@ var searchData=
   ['indexiterator_4',['IndexIterator',['../classcoupling_1_1indexing_1_1CellIndex_1_1IndexIterator.html',1,'coupling::indexing::CellIndex']]],
   ['instancehandling_5',['InstanceHandling',['../classcoupling_1_1InstanceHandling.html',1,'coupling']]],
   ['instancehandling_3c_20my_5flinkedcell_2c_203_20_3e_6',['InstanceHandling&lt; MY_LINKEDCELL, 3 &gt;',['../classcoupling_1_1InstanceHandling.html',1,'coupling']]],
-  ['instancehandling_3c_20my_5flinkedcell_2c_20dim_20_3e_7',['InstanceHandling&lt; MY_LINKEDCELL, dim &gt;',['../classcoupling_1_1InstanceHandling.html',1,'coupling']]]
+  ['instancehandling_3c_20my_5flinkedcell_2c_20dim_20_3e_7',['InstanceHandling&lt; MY_LINKEDCELL, dim &gt;',['../classcoupling_1_1InstanceHandling.html',1,'coupling']]],
+  ['item_8',['Item',['../uniontinyxml2_1_1MemPoolT_1_1Item.html',1,'tinyxml2::MemPoolT']]]
 ];

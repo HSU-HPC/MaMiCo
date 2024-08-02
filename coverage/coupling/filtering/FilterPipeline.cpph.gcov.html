@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-07-16 15:22:12</td>
+            <td class="headerValue">2024-08-02 12:09:49</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -83,7 +83,7 @@
 <a name="21"><span class="lineNum">      21 </span>            :   using namespace std::string_literals;</a>
 <a name="22"><span class="lineNum">      22 </span>            : </a>
 <a name="23"><span class="lineNum">      23 </span>            :   // check if provided file is written in proper XML</a>
-<a name="24"><span class="lineNum">      24 </span><span class="lineNoCov">          0 :   if (_config.error != tinyxml2::XML_NO_ERROR) {</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineNoCov">          0 :   if (_config.error != tinyxml2::XML_SUCCESS) {</span></a>
 <a name="25"><span class="lineNum">      25 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;Filter Pipeline config path: &quot; &lt;&lt; cfgpath &lt;&lt; std::endl;</span></a>
 <a name="26"><span class="lineNum">      26 </span><span class="lineNoCov">          0 :     throw std::runtime_error(&quot;Could not read config for Filter-Pipeline: XML syntax error.&quot;);</span></a>
 <a name="27"><span class="lineNum">      27 </span>            :   }</a>
