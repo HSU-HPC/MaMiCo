@@ -191,12 +191,12 @@ public:
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (type == "foam") {
-      _cfg.maSolverType = COUETTE_FOAM;
-      tarch::configuration::ParseConfiguration::readIntMandatory(_cfg.plotEveryTimestep, subtag, "plot-every-timestep");
-      tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.directory, subtag, "foam-setup-directory");
-      tarch::configuration::ParseConfiguration::readStringMandatory(_cfg.foam.folder, subtag, "foam-setup-folder");
-      tarch::configuration::ParseConfiguration::readVectorMandatory<12, unsigned int>(_cfg.foam.boundariesWithMD, subtag, "boundaries-with-MD");
-      if (!_cfg.twoWayCoupling && _cfg.foam.boundariesWithMD != tarch::la::Vector<12, unsigned int>{0}) {
+      cfg.maSolverType = COUETTE_FOAM;
+      tarch::configuration::ParseConfiguration::readIntMandatory(cfg.plotEveryTimestep, subtag, "plot-every-timestep");
+      tarch::configuration::ParseConfiguration::readStringMandatory(cfg.foam.directory, subtag, "foam-setup-directory");
+      tarch::configuration::ParseConfiguration::readStringMandatory(cfg.foam.folder, subtag, "foam-setup-folder");
+      tarch::configuration::ParseConfiguration::readVectorMandatory<12, unsigned int>(cfg.foam.boundariesWithMD, subtag, "boundaries-with-MD");
+      if (!cfg.twoWayCoupling && cfg.foam.boundariesWithMD != tarch::la::Vector<12, unsigned int>{0}) {
         std::cout << "ERROR: Two-way coupling is disabled, but boundaries with "
                      "MD for openfoam were defined"
                   << std::endl;
