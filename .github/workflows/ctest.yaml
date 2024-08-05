@@ -47,7 +47,7 @@ jobs:
     #   (b) Check that Compiletest time is < 3m (otherwise modify compiletest)
     #   (c) Check that combined CMake and Build time is < 60s (Otherwise check CMake build system)
     #   (d) Check that runtime of each unit test is < 5000 ms (Otherwise modify or disable this test)
-    #   (e) Check that average unit test runtime is < 750 ms  (Otherwise optimize long-running unit tests)
+    #   (e) Check that average unit test runtime is < 750 ms  (Otherwise optimize long-running unit tests and/or check 'mpirun' set-up time)
     # HOW NOT TO PROCEED IF YOU READ THESE LINES BECAUSE THE TIMEOUT WAS HIT:
     #   (z) increase timeout (unless total number of unit tests is > 500, then change to 20)
     ##################################################################
