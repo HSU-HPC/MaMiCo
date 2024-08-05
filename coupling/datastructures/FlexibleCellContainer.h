@@ -62,7 +62,7 @@ public:
     Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
 
     friend bool operator==(const Iterator& a, const Iterator& b) {
-      return *(a._itCouplingCells) == *(b._itCouplingCells) && a._itIdxs == b._itIdx; 
+      return *(a._itCouplingCells) == *(b._itCouplingCells) && a._itIdxs == b._itIdxs; 
     }
 
     friend bool operator!=(const Iterator& a, const Iterator& b) { 
