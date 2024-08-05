@@ -22,7 +22,14 @@ template <class CellIndexT, unsigned int dim> class CellContainer;
 template <class CellIndexT, unsigned int dim> class coupling::datastructures::CellContainer {
 
 public:
-  
+  CellContainer() { _couplingCells.reserve(CellIndexT::linearNumberCellsInDomain) };
+  CellContainer(std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells) {
+    _couplingCells.reserve(CellIndexT::linearNumberCellsInDomain);
+    for (auto cell : couplingCells) {
+      this << cell;
+    }
+  }
+
   /** returns a pointer to the coupling cell without access to linked cells. */
   const coupling::datastructures::CouplingCell<dim>* operator[](CellIndexT index) const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
