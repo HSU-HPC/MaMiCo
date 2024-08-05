@@ -34,7 +34,7 @@ public:
   /** Destructor */
   virtual ~FromMacro2MD() {}
 
-  using Local_Containter_T = coupling::datastructures::CellContainer<I10,dim>;
+  using Local_Container_T = coupling::datastructures::CellContainer<I10,dim>;
 
   /** sends information from the local coupling cells of a macroscopic solver
    * to the coupling cells of MaMico (ghost cells are also allowed). Since
@@ -49,13 +49,13 @@ public:
    * 	@param src
    */
   template <class Container_T>
-  void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Containter_T& dst,
+  void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Container_T& dst,
                         const Container_T& src);
 
-  template <class Container_T1>
+  template <class Container_T>
   void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices,
                          const Container_T1& src,
-                         std::vector<Local_Containter_T> dst);
+                         std::vector<Local_Container_T> dst);
 
   /** sends data from macro to MD. After returning, the data transfer may not be
    * completely finished, similar to a IRecv/ISend-call by MPI. Please use
@@ -74,7 +74,7 @@ public:
    * 	@param dataExchange
    * 	@param cells
    */
-  void wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Containter_T& cells);
+  void wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Container_T& cells);
 
 private:
   /** given a coupling cell container (from the macroscopic solver), the data
@@ -107,9 +107,9 @@ private:
    * 	@param dataExchange
    * 	@param cells
    */
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Containter_T& cells);
+  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Container_T& cells);
 
-  void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Containter_T& cells);
+  void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Container_T& cells);
 };
 
 #include "FromMacro2MD.cpph"

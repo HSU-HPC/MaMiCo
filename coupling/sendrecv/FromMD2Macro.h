@@ -34,6 +34,7 @@ public:
   /** Destructor */
   virtual ~FromMD2Macro() {}
 
+  using Macro_Container_T = coupling::datastructures::FlexibleCellContainer<dim>;
   using Local_Container_T = coupling::datastructures::CellContainer<I10,dim>;
 
   /** sends information from the local coupling cells of MaMiCo (only inner

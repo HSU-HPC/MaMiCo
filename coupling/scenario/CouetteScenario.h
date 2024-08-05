@@ -742,7 +742,7 @@ protected:
     for (auto idx : I12()) {
       if (tarch::utils::contains(msi.getTargetRanks(idx), (unsigned int)_rank)) {
         coupling::datastructures::CouplingCell<3>()* couplingCell = new coupling::datastructures::CouplingCell<3>();
-        _couplingBuffer.md2macroBuffer << couplingCell; 
+        _couplingBuffer.md2macroBuffer << couplingCell; // TODO FIXME: THis buffer must be a FlexibleCellContainer
           if (couplingCell == nullptr)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
       }
