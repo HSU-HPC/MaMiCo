@@ -476,13 +476,13 @@ protected:
 
       // extract data from couette solver and send them to MD (can take any
       // index-conversion object)
-      fillSendBuffer(_cfg.density, *_couetteSolver, _couplingBuffer.macro2mdBuffer);
+      fillSendBuffer(_cfg.density, *_couetteSolver, _couplingBuffer.macro2MDBuffer);
     }
     if (_cfg.macro2Md) {
 #ifdef USE_COLLECTIVE_MPI
-      _multiMDCellService->bcastFromMacro2MD(_couplingBuffer.macro2mdBuffer);
+      _multiMDCellService->bcastFromMacro2MD(_couplingBuffer.macro2MDBuffer);
 #else
-      _multiMDCellService->sendFromMacro2MD(_couplingBuffer.macro2mdBuffer);
+      _multiMDCellService->sendFromMacro2MD(_couplingBuffer.macro2MDBuffer);
 #endif
       // std::cout << "Finish _multiMDCellService->sendFromMacro2MD " <<
       // std::endl;
@@ -718,7 +718,7 @@ protected:
 
   /**
    *  @brief allocates the send buffer (with values for all coupling cells).
-   *  @param couetteSolverInterface interface for the continuum solver */
+   *  @param msi macroscopic solver interface for the continuum solver */
   void allocateMacro2mdBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
     std::vector<I01*> indices;
     std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells;
@@ -726,7 +726,7 @@ protected:
       if (!I12::contains(idx)) {
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           coupling::datastructures::CouplingCell<3>()* couplingCell = new coupling::datastructures::CouplingCell<3>();
-          _couplingBuffer.macro2mdBuffer << std::make_pair(couplingCell, &idx); 
+          _couplingBuffer.macro2MDBuffer << std::make_pair(couplingCell, &idx); 
           if (couplingCell == nullptr)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
         }
@@ -788,16 +788,16 @@ protected:
   /** @brief fills send buffer with data from macro/continuum solver
    *  @param density the general density of the fluid
    *  @param couetteSolver the continuum solver
-   *  @param macro2mdBuffer the bufffer to send data from macro to micro
+   *  @param macro2MDBuffer the bufffer to send data from macro to micro
    *  @param globalCellIndices4SendBuffer the global linearized indices of the
    * coupling cells in the buffer  */
   void fillSendBuffer(const double density, const coupling::solvers::AbstractCouetteSolver<3>& couetteSolver,
-                      coupling::datastructures::FlexibleCellContainer<3>& macro2mdBuffer) const {
+                      coupling::datastructures::FlexibleCellContainer<3>& macro2MDBuffer) const {
     using coupling::configurations::CouetteConfig;
     using namespace coupling::indexing;
     const tarch::la::Vector<3, double> dx(IndexingService<3>::getInstance().getCouplingCellSize());
     double mass = density * dx[0] * dx[1] * dx[2];
-    for (auto pair : macro2mdBuffer) {
+    for (auto pair : macro2MDBuffer) {
       I01* idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
@@ -936,7 +936,7 @@ protected:
    *  @brief holds the buffers for the data transfer */
   struct CouplingBuffer {
     /** @brief the buffer for data transfer from macro to md */
-    coupling::datastructures::FlexibleCellContainer<3> macro2mdBuffer;
+    coupling::datastructures::FlexibleCellContainer<3> macro2MDBuffer;
     /** @brief the buffer for data transfer from md to macro */
     coupling::datastructures::CellContainer<I12, 3> md2macroBuffer;
   };

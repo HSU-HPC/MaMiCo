@@ -20,7 +20,7 @@
 
 namespace coupling {
 namespace sendrecv {
-template <class CellIndexT, unsigned int dim> class SendReceiveBuffer;
+template <unsigned int dim> class SendReceiveBuffer;
 }
 } // namespace coupling
 
@@ -32,7 +32,7 @@ template <class CellIndexT, unsigned int dim> class SendReceiveBuffer;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class CellIndexT, unsigned int dim> class coupling::sendrecv::SendReceiveBuffer {
+template <unsigned int dim> class coupling::sendrecv::SendReceiveBuffer {
 public:
   /** Constructor */
   SendReceiveBuffer();
@@ -49,7 +49,7 @@ protected:
    * 	@param cell
    * 	@param idx
    */
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const CouplingCell& cell, I01 idx);
+  void writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const CouplingCell& cell, const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer);
 
   /** @brief fills all information that needs to be broadcast from a coupling cell
    * into the broadcast-buffer.
@@ -73,7 +73,7 @@ protected:
    * 	@param couplingCell
    * 	@param idx
    */
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, CouplingCell& couplingCell, I01 idx);
+  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, CouplingCell& couplingCell, const coupling::datastructures::CellContainer<dim>& couplingCellContainer);
 
   void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, CouplingCell& couplingCell, I01 idx);
 
@@ -90,7 +90,7 @@ protected:
    * 	@param dataExchange
    * 	@param idx
    */
-  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, I01 idx);
+  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::CellContainer<dim>& couplingCellContainer);
 
   /** Allocates buffer for receiving in the context of the broadcast operation
    * 	@param dataExchange

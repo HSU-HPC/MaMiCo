@@ -58,7 +58,7 @@ public:
   virtual double applyFilterPipeline() = 0;
   virtual void sendFromMacro2MDPreProcess() = 0;
   virtual void sendFromMacro2MDPostProcess() = 0;
-  virtual void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2mdCouplingCellContainer) = 0;
+  virtual void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer) = 0;
   virtual void sendFromMD2MacroPreProcess() = 0;
   virtual void sendFromMD2MacroPostProcess() = 0;
   virtual double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) = 0;
@@ -168,13 +168,12 @@ public:
   virtual ~CouplingCellServiceImpl();
 
   /** sends information from macroscopic solver to MD. The cell information from
-   * the macroscopic solver is handed over as array including corresponding
-   * global cell indices and the number of cells. The coupling tool internally
-   * triggers send/recv-operations (this also comprises the distributed memory
-   *  parallelisation via MPI) and writes the respective information to the
-   * coupling cells of the tool
+   * the macroscopic solver is handed over as a flexible cell container
+   * The coupling tool internally triggers send/recv-operations
+   * (this also comprises the distributed memory parallelisation via MPI)
+   * and writes the respective information to the coupling cells of the tool
    */
-  void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macroscopicSolverCellContainer) override;
+  void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer) override;
 
   /** sends information from MD to the macroscopic solver. After the
    * send/recv-operations (this also comprises the distributed memory

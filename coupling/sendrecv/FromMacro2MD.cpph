@@ -7,9 +7,9 @@
 
 template <class CellContainerMacroT, class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MD(const coupling::datastructures::CellContainer<dim> couplingCellContainer,
-                        const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) {
+                        const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer) {
   // send data
-  sendFromMacro2MDNonBlocking(dataExchange, couplingCellContainerFromMacroscopicSolver);
+  sendFromMacro2MDNonBlocking(dataExchange, macro2MDBuffer);
   // wait for MPI calls to be finished and fill coupling cells from Mamico
   wait4SendFromMacro2MD(dataExchange, couplingCellContainer);
 }
@@ -17,7 +17,7 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MD(const
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
                                                                                       const coupling::datastructures::CellContainer<dim> couplingCellContainer,
-                                                                                      const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) 
+                                                                                      const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer) 
 {
   // empty send and receive buffers
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffers();
@@ -25,7 +25,7 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::sendFromMacro2MDNonBlo
   // allocate the receive buffers and trigger the MPI-recv
   allocateReceiveBuffers(dataExchange, couplingCellContainer);
   // fill the send buffers
-  writeToSendBuffer(dataExchange, couplingCellContainerFromMacroscopicSolver);
+  writeToSendBuffer(dataExchange, macro2MDBuffer);
 
   // allocate all requests -> needs to be called AFTER all buffers are filled
   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateRequests();
@@ -45,11 +45,11 @@ void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::allocateReceiveBuffers
 
 template <class CouplingCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<CouplingCell, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                           const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) {
+                                                                           const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer) {
   // const unsigned int numberCells = (unsigned int)couplingCells.size();
   // for (unsigned int i = 0; i < numberCells; i++)
   //   coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, *couplingCells[i], globalCellIndices[i]);
-  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, couplingCellContainerFromMacroscopicSolver);
+  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(dataExchange, macro2MDBuffer);
 }
 
 template <class CouplingCell, unsigned int dim>

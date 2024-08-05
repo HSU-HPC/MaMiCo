@@ -43,12 +43,11 @@ public:
    * and immediately subsequently wait4SendFromMacro2MD(...). Those two methods
    * may alternatively be used, e.g., for "non-blocking" communication.
    * 	@param dataExchange
-   * 	@param couplingCellsFromMamico
-   * 	@param couplingCellsFromMacroscopicSolver
-   * 	@param globalCellIndicesFromMacroscopicSolver
+   * 	@param couplingCellContainer
+   * 	@param macro2MDBuffer
    */
   void sendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::CellContainer<CellIndexT,dim>& couplingCellContainer,
-                        const coupling::datastructures::FlexibleCellContainer<dim>& macro2mdCouplingCellContainer);
+                        const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer);
 
   void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices,
                          const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver, const I00* const globalCellIndicesFromMacroscopicSolver,
@@ -59,30 +58,29 @@ public:
    * wait4SendFromMacro2MD(...) to guarantee that the data transfer has been
    * finished.
    * 	@param dataExchange
-   * 	@param couplingCellsFromMacroscopicSolver
-   * 	@param globalCellIndicesFromMacroscopicSolver
+   * 	@param couplingCellContainer
+   * 	@param macro2MDBuffer
    */
   void sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                   const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-                                   const I00* const globalCellIndicesFromMacroscopicSolver);
+                                   const coupling::datastructures::CellContainer<CellIndexT,dim>& couplingCellContainer,
+                                   const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer);
 
   /** waits for the data transfer--instantiated by
    * sendFromMacro2MDNonBlocking(..)--to be finished and fills the information
    * into the coupling cells from Mamico.
    * 	@param dataExchange
-   * 	@param couplingCellsFromMamico
+   * 	@param couplingCellContainer
    */
-  void wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCellsFromMamico);
+  void wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::CellContainer<CellIndexT,dim>& couplingCellContainer);
 
 private:
-  /** given a list of coupling cells (from the macroscopic solver), the data
+  /** given a coupling cell container (from the macroscopic solver), the data
    * from these cells are written to the send buffer.
    * 	@param dataExchange
    * 	@param couplingCells
    * 	@param globalCellIndices
    */
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells,
-                         const I00* const globalCellIndices);
+  void writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer);
 
   void writeToSendBufferCollective(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells,
                                    const I00* const globalCellIndices);
@@ -103,9 +101,9 @@ private:
    * the coupling cells. For each cell, readFromReceiveBuffer(...) of
    * SendReceiveBuffer is called.
    * 	@param dataExchange
-   * 	@param couplingCells
+   * 	@param couplingCellContainer
    */
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells);
+  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::CellContainer<CellIndexT,dim>& couplingCellContainer);
 
   void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells);
 };
