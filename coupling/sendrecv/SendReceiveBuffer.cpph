@@ -2,7 +2,7 @@
 // This file is part of the Mamico project. For conditions of distribution
 // and use, please see the copyright notice in Mamico's main folder
 
-template <class CellContainerT, class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::SendReceiveBuffer() {
+template <class Cell_T, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::SendReceiveBuffer() {
   deleteBuffers();
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   _requestsAllocated = false;
@@ -20,7 +20,7 @@ template <class CellContainerT, class CouplingCell, unsigned int dim> coupling::
 #endif
 }
 
-template <class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::~SendReceiveBuffer<CellContainerT, CouplingCell, dim>() {
+template <class Cell_T, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::~SendReceiveBuffer<Cell_T, dim>() {
   deleteBuffers();
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   if (_requests != NULL) {
@@ -46,8 +46,8 @@ template <class CouplingCell, unsigned int dim> coupling::sendrecv::SendReceiveB
 #endif
 }
 
-template <class CellContainerT, class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffer(std::map<unsigned int, BufferWithID>& buffer) {
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::deleteBuffer(std::map<unsigned int, BufferWithID>& buffer) {
   for (typename std::map<unsigned int, BufferWithID>::iterator it = buffer.begin(); it != buffer.end(); it++) {
     if ((it->second).buffer != NULL) {
       free((it->second).buffer);
@@ -58,7 +58,7 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffer(std:
   buffer.clear();
 }
 
-template <class CellContainerT, class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffers() {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::deleteBuffers() {
   deleteBuffer(_sendBuffer);
   deleteBuffer(_receiveBuffer);
   _bcastBuffer.clear();
@@ -67,8 +67,8 @@ template <class CellContainerT, class CouplingCell, unsigned int dim> void coupl
 
 #pragma region collective operations
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToBcastBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToBcastBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
                                                                                   const CouplingCell& couplingCell, I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
@@ -119,8 +119,8 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToBcastBuffe
   }
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromCollectiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
                                                                                         CouplingCell& couplingCell, I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   const unsigned int globalIndex = I00{idx}.get();
@@ -145,9 +145,9 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromCollectiv
   }   // loop over all buffers
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateBcastBufferForReceiving(
-    coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, I01 idx) {
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateBcastBufferForReceiving(
+    coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
   // determine the ranks from which we need to receive information of this coupling cell
@@ -211,7 +211,7 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateBcastBuff
   } // rank
 }
 
-template <class CellContainerT, class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerBcasts(const unsigned int thisRank) {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::triggerBcasts(const unsigned int thisRank) {
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   int counter = 0;
@@ -231,7 +231,7 @@ template <class CellContainerT, class CouplingCell, unsigned int dim> void coupl
 #endif
 }
 
-template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerReduce(const unsigned int thisRank) {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::triggerReduce(const unsigned int thisRank) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   unsigned int counter = 0;
   for (std::pair<const unsigned int, BufferCollective>& buffer : _reduceBuffer) {
@@ -268,7 +268,7 @@ template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendRec
 #endif
 }
 
-template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::waitAllCollectiveOperations() {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::waitAllCollectiveOperations() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   // if no requests have been allocated, return immediately
   if (!_requestsAllocated && (_requests == nullptr)) {
@@ -306,9 +306,9 @@ template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendRec
 #endif
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReduceBufferForReceiving(
-    coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, I01 idx) {
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceBufferForReceiving(
+    coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
   // determine the ranks from which we need to receive information of this coupling cell
@@ -370,8 +370,8 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReduceBuf
   } // rank
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToReduceBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
                                                                                    const CouplingCell& cell, I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
@@ -430,8 +430,8 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToReduceBuff
   }
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
                                                                                     CouplingCell& couplingCell, const I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   const unsigned int globalIndex = I00{idx}.get();
@@ -458,8 +458,8 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReduceBuf
   }   // loop over all buffers
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateBcastRequests(const unsigned int thisRank) {
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateBcastRequests(const unsigned int thisRank) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 
   if (_requestsAllocated) {
@@ -533,8 +533,8 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateBcastRequ
 #endif
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReduceRequests(const unsigned int thisRank) {
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceRequests(const unsigned int thisRank) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 
   if (_requestsAllocated) {
@@ -627,14 +627,12 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReduceReq
 
 #pragma region sequential operations
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                 CellContainerT& cellContainer) {
-  for(auto pair : cellContainer) {
-    I01* idx;
-    coupling::datastructures::CouplingCell<dim>* couplingCell;
+template <class Cell_T, unsigned int dim, class Container_T>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer<Container_T>(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, Container_T& cells) {
+  I01 idx;
+  coupling::datastructures::CouplingCell<dim>* couplingCell;
+  for(auto pair : cells) {
     std::tie(couplingCell, idx) = pair;
-
     const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
     const unsigned int globalIndex = I00{*idx}.get();
 
@@ -678,12 +676,11 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::writeToSendBuffer
   }
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, 
-                                                                                     CellContainerT& cellContainer) {
-  for(auto pair : cellContainer) {
-    I01* idx;
-    coupling::datastructures::CouplingCell<dim>* couplingCell;
+template <class Cell_T, unsigned int dim, class Container_T>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer<Container_T>(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, Container_T& cells) {
+  I01 idx;
+  coupling::datastructures::CouplingCell<dim>* couplingCell;
+  cellloop:for(auto pair : cells) {
     std::tie(couplingCell, idx) = pair;
 
     const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
@@ -705,18 +702,17 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBu
         if (thisIndex == globalIndex) {
           // read receive buffer and write to coupling cell (use specialised function)
           dataExchange.writeToCell(&((it->second).buffer[i * doublesPerCell + 1]), *couplingCell);
-          return;
+          continue cellloop;
         }
       } // loop over buffer
     }   // loop over all buffers
   }
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                      CellContainerT& cellContainer) {
-  for(auto pair : cellContainer) {
-    I01* idx;
+template <class Cell_T, unsigned int dim, class Container_T>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReceiveBuffers<Container_T>(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, Container_T& cells) {
+  I01 idx;
+  for(auto pair : cells) {
     std::tie(std::ignore, idx) = pair;
     const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
@@ -758,8 +754,8 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBu
   }
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerSending(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange) {
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::triggerSending(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange) {
   const unsigned int thisRank = IDXS.getRank();
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
@@ -810,8 +806,8 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerSending(co
   }
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerReceiving(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange) {
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::triggerReceiving(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   const unsigned int thisRank = IDXS.getRank();
 
@@ -838,7 +834,7 @@ void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerReceiving(
 #endif
 }
 
-template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateRequests() {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateRequests() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   if (_requestsAllocated) {
     std::cout << "ERROR coupling::SendReceiveBuffer::allocateRequests(): allocateRequests() called although allocation already took place!" << std::endl;
@@ -874,7 +870,7 @@ template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendRec
 #endif
 }
 
-template <class CouplingCell, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::waitAllOperations() {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::waitAllOperations() {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   // if no requests have been allocated, return immediately
   if (!_requestsAllocated && (_requests == NULL)) {

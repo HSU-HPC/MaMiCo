@@ -11,7 +11,7 @@
 
 namespace coupling {
 namespace sendrecv {
-template <class CouplingCell, unsigned int dim> class FromMacro2MD;
+template <class Cell_T, unsigned int dim> class FromMacro2MD;
 }
 } // namespace coupling
 
@@ -21,16 +21,16 @@ template <class CouplingCell, unsigned int dim> class FromMacro2MD;
  *	@brief SendReceiveBuffer for transfer of quantities from a macroscopic
  *solver to the coupling cells. Derived from the class
  *coupling::sendrecv::SendReceiveBuffer
- *	@tparam CouplingCell cell type
+ *	@tparam Cell_T cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class CellIndexT, unsigned int dim> class coupling::sendrecv::FromMacro2MD : public coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim> {
+template <class Cell_T, unsigned int dim> class coupling::sendrecv::FromMacro2MD : public coupling::sendrecv::SendReceiveBuffer<Cell_T, dim> {
 
 public:
   /** Constructor, just calling the constructor of the
    * coupling::sendrecv::SendReceiveBuffer  */
-  FromMacro2MD() : coupling::sendrecv::SendReceiveBuffer<CellIndexT, dim>() {}
+  FromMacro2MD() : coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>() {}
   /** Destructor */
   virtual ~FromMacro2MD() {}
 
@@ -43,15 +43,17 @@ public:
    * and immediately subsequently wait4SendFromMacro2MD(...). Those two methods
    * may alternatively be used, e.g., for "non-blocking" communication.
    * 	@param dataExchange
-   * 	@param couplingCellContainer
-   * 	@param macro2MDBuffer
+   * 	@param out
+   * 	@param in
    */
-  void sendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::CellContainer<CellIndexT,dim>& couplingCellContainer,
-                        const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer);
+  template <class Container_T1, class Container_T2>
+  void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T1& out,
+                        const Container_T2& in);
 
+  template <class Container_T1, class Container_T2>
   void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices,
-                         const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver, const I00* const globalCellIndicesFromMacroscopicSolver,
-                         std::vector<std::vector<CouplingCell*>> allCouplingCellsFromCouplingCellServices);
+                         const Container_T1& in,
+                         std::vector<Container_T2> out);
 
   /** sends data from macro to MD. After returning, the data transfer may not be
    * completely finished, similar to a IRecv/ISend-call by MPI. Please use
@@ -59,11 +61,11 @@ public:
    * finished.
    * 	@param dataExchange
    * 	@param couplingCellContainer
-   * 	@param macro2MDBuffer
+   * 	@param cells
    */
-  void sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                   const coupling::datastructures::CellContainer<CellIndexT,dim>& couplingCellContainer,
-                                   const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer);
+  template <class Container_T>
+  void sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
+                                   const Container_T& cells);
 
   /** waits for the data transfer--instantiated by
    * sendFromMacro2MDNonBlocking(..)--to be finished and fills the information
@@ -71,19 +73,21 @@ public:
    * 	@param dataExchange
    * 	@param couplingCellContainer
    */
-  void wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::CellContainer<CellIndexT,dim>& couplingCellContainer);
+  template <class Container_T>
+  void wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& couplingCellContainer);
 
 private:
   /** given a coupling cell container (from the macroscopic solver), the data
    * from these cells are written to the send buffer.
    * 	@param dataExchange
-   * 	@param couplingCells
+   * 	@param cells
    * 	@param globalCellIndices
    */
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer);
+  template <class Container_T>
+  void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
-  void writeToSendBufferCollective(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells,
-                                   const I00* const globalCellIndices);
+  template <class Container_T>
+  void writeToSendBufferCollective(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** allocates the receive buffers for the macroscopic solver. Since we want to
    * obtain data on the side of MaMiCo, we can just loop over all local
@@ -91,9 +95,9 @@ private:
    * of the SendReceiveBuffer for each respective cell.
    * 	@param dataExchange
    */
-  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange);
+  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange);
 
-  void allocateReceiveBuffersCollective(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange);
+  void allocateReceiveBuffersCollective(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange);
 
   /** reads information from the receive buffer and stores the result in the
    * coupling cells. Since this is a receive for the coupling cells on the
@@ -103,9 +107,11 @@ private:
    * 	@param dataExchange
    * 	@param couplingCellContainer
    */
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const coupling::datastructures::CellContainer<CellIndexT,dim>& couplingCellContainer);
+  template <class Container_T>
+  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
-  void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells);
+  template <class Container_T>
+  void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 };
 
 #include "FromMacro2MD.cpph"
