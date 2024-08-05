@@ -24,10 +24,27 @@ template <class CellIndexT, unsigned int dim> class coupling::datastructures::Ce
 public:
   
   /** returns a pointer to the coupling cell without access to linked cells. */
-  const coupling::datastructures::CouplingCell<dim>* operator[](CellIndexT index) const;
+  const coupling::datastructures::CouplingCell<dim>* operator[](CellIndexT index) const {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if (_couplingCells.size() < CellIndexT::linearNumberCellsInDomain) {
+    std::cout << "CellContainer<" << CellIndexT::TNAME << "," << dim << "> accessed but not full " << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+#endif
+  return _couplingCells[indexing::convertToScalar(idx)];
+  }
 
   /** adds a new coupling cell to the datastructure at the next index (will only work if the data structure is not yet full)*/
-  void operator<<(coupling::datastructures::CouplingCell<dim>* couplingCell);
+  void operator<<(coupling::datastructures::CouplingCell<dim>* couplingCell) {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if (_couplingCells.size() >= CellIndexT::linearNumberCellsInDomain) {
+    std::cout << "CellContainer<" << CellIndexT::TNAME << "," << dim << "> can only hold " << CellIndexT::linearNumberCellsInDomain << " coupling cells!"
+              << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+#endif
+  _couplingCells.push_back(couplingCell);
+  }
 
   int size() const {return _couplingCells.size();}
 
@@ -69,5 +86,3 @@ protected:
    */
   std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;
 };
-
-#include "CellContainer.cpph"
