@@ -1,8 +1,8 @@
 #include "coupling/datastructures/FlexibleCellContainer.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include <vector>
 #include <tuple>
+#include <vector>
 
 using namespace coupling::indexing;
 
@@ -20,7 +20,6 @@ class FlexibleCellContainerTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void setUp() {
     using namespace coupling::datastructures;
     _rank = 0;
@@ -30,10 +29,11 @@ public:
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
     tarch::la::Vector<3, unsigned int> numberProcesses{1, 1, 1};
-    if (_size == 4) numberProcesses = {2, 2, 1};
+    if (_size == 4)
+      numberProcesses = {2, 2, 1};
     IndexingService<3>::getInstance().initWithCells(12, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
     int i = 0;
-    for(auto idx : I01()) {
+    for (auto idx : I01()) {
       if (i > 9)
         break;
       _idxs_10case.push_back(idx);
@@ -43,25 +43,26 @@ public:
     }
   }
 
-  void tearDown() { 
-    IndexingService<3>::getInstance().finalize(); 
+  void tearDown() {
+    IndexingService<3>::getInstance().finalize();
     for (auto cell : _couplingCells_10case) {
-      if (cell != nullptr) delete cell;
+      if (cell != nullptr)
+        delete cell;
     }
     _couplingCells_10case.clear();
     _idxs_10case.clear();
   }
-  
+
   void testInsertAndAccess() {
     using namespace coupling::datastructures;
     I01 idx;
     CouplingCell<3>* couplingCell;
     couplingCell->setMacroscopicMass(50.0);
     FlexibleCellContainer<3> container;
-    container << std::make_pair(couplingCell,idx);
-    CPPUNIT_ASSERT_EQUAL( 1, container.size() );
+    container << std::make_pair(couplingCell, idx);
+    CPPUNIT_ASSERT_EQUAL(1, container.size());
     auto extractedCell = (*container.begin()).first;
-    CPPUNIT_ASSERT_EQUAL( 50.0, extractedCell->getMacroscopicMass() );
+    CPPUNIT_ASSERT_EQUAL(50.0, extractedCell->getMacroscopicMass());
   }
 
   void testMassInsert() {
@@ -71,13 +72,13 @@ public:
     FlexibleCellContainer<3> container;
     int i = 0;
     for (; i < _couplingCells_10case.size(); i++) {
-      container << std::make_pair(_couplingCells_10case[i],_idxs_10case[i]);
+      container << std::make_pair(_couplingCells_10case[i], _idxs_10case[i]);
     }
     i = 0;
     for (auto pair : container) {
       std::tie(couplingCell, idx) = pair;
-      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass() );
-      CPPUNIT_ASSERT_EQUAL( idx, _idxs_10case[i] );
+      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_EQUAL(idx, _idxs_10case[i]);
       i++;
     }
   }
@@ -86,7 +87,7 @@ public:
     using namespace coupling::datastructures;
     FlexibleCellContainer<3> container(_couplingCells_10case, _idxs_10case);
     int size = _couplingCells_10case.size();
-    CPPUNIT_ASSERT_EQUAL( size, container.size() );
+    CPPUNIT_ASSERT_EQUAL(size, container.size());
   }
 
   void testIteration() {
@@ -97,8 +98,8 @@ public:
     int i = 0;
     for (auto pair : container) {
       std::tie(couplingCell, idx) = pair;
-      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass() );
-      CPPUNIT_ASSERT_EQUAL( idx, _idxs_10case[i] );
+      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_EQUAL(idx, _idxs_10case[i]);
       i++;
     }
   }
@@ -110,7 +111,7 @@ public:
     auto iter1 = container1.begin();
     auto iter2 = container2.begin();
     for (int i = 0; i < _couplingCells_10case.size(); ++i) {
-      CPPUNIT_ASSERT( iter1 == iter2 );
+      CPPUNIT_ASSERT(iter1 == iter2);
       iter1++;
       iter2++;
     }
@@ -124,7 +125,7 @@ public:
     auto iter2 = container2.begin();
     for (int i = 0; i < _couplingCells_10case.size(); ++i) {
       iter1++;
-      CPPUNIT_ASSERT( iter1 != iter2 );
+      CPPUNIT_ASSERT(iter1 != iter2);
       iter2++;
     }
   }
@@ -137,8 +138,8 @@ public:
     int i = 0;
     for (auto iter = container.begin(); iter != container.end();) {
       std::tie(couplingCell, idx) = *iter;
-      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass() );
-      CPPUNIT_ASSERT_EQUAL( idx, _idxs_10case[i] );
+      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_EQUAL(idx, _idxs_10case[i]);
       i++;
       ++iter;
     }
@@ -152,8 +153,8 @@ public:
     int i = 0;
     for (auto iter = container.begin(); iter != container.end();) {
       std::tie(couplingCell, idx) = *iter++;
-      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass() );
-      CPPUNIT_ASSERT_EQUAL( idx, _idxs_10case[i] );
+      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_EQUAL(idx, _idxs_10case[i]);
       i++;
     }
   }
