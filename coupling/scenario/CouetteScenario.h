@@ -726,7 +726,7 @@ protected:
       if (!I12::contains(idx)) {
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           coupling::datastructures::CouplingCell<3>()* couplingCell = new coupling::datastructures::CouplingCell<3>();
-          _couplingBuffer.macro2MDBuffer << std::make_pair(couplingCell, &idx); 
+          _couplingBuffer.macro2MDBuffer << std::make_pair(couplingCell, idx); 
           if (couplingCell == nullptr)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
         }
@@ -798,10 +798,10 @@ protected:
     const tarch::la::Vector<3, double> dx(IndexingService<3>::getInstance().getCouplingCellSize());
     double mass = density * dx[0] * dx[1] * dx[2];
     for (auto pair : macro2MDBuffer) {
-      I01* idx;
+      I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
-      auto midPoint = idx->getCellMidPoint();
+      auto midPoint = idx.getCellMidPoint();
       if (_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD)
         mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(midPoint);
       // compute momentum

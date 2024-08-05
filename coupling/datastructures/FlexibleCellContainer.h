@@ -22,8 +22,8 @@ template <unsigned int dim> class FlexibleCellContainer;
 template <unsigned int dim> class coupling::datastructures::FlexibleCellContainer {
 public:
 
-  void operator<<(std::pair<coupling::datastructures::CouplingCell<dim>*, I01*> pair) {
-    I01* idx;
+  void operator<<(std::pair<coupling::datastructures::CouplingCell<dim>*, I01> pair) {
+    I01 idx;
     coupling::datastructures::CouplingCell<dim>* couplingCell;
     std::tie(couplingCell, idx) = pair;
     _couplingCells.push_back(couplingCell);
@@ -35,22 +35,22 @@ public:
   class Iterator {
   public:
     using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::iterator;
-    using IndexIterator = std::vector<I01*>::iterator;
+    using IndexIterator = std::vector<I01>::iterator;
 
     Iterator(CouplingCellIterator itCouplingCells, IndexIterator itIdxs) : _itCouplingCells(itCouplingCells), _itIdxs(itIdxs) {}
 
-    std::pair<coupling::datastructures::CouplingCell<dim>*, I01*> operator*() const { return std::make_pair(*_itCouplingCells, *_itIdxs); }
+    std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const { return std::make_pair(*_itCouplingCells, _itIdxs); }
 
-    Iterator& operator++() { return *this; }
+    Iterator& operator++() { ++_itCouplingCells; ++_itIdxs; return *this; }
 
     Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
 
     friend bool operator==(const Iterator& a, const Iterator& b) {
-      return *(a._itCouplingCells) == *(b._itCouplingCells) && *(a._itIdxs) == *(b._itIdxs); 
+      return *(a._itCouplingCells) == *(b._itCouplingCells) && a._itIdxs == b._itIdx; 
     }
 
     friend bool operator!=(const Iterator& a, const Iterator& b) { 
-      return *(a._itCouplingCells) != *(b._itCouplingCells) || *(a._itIdxs) != *(b._itIdxs); 
+      return *(a._itCouplingCells) != *(b._itCouplingCells) || a._itIdxs != b._itIdxs; 
     }
 
   private:
@@ -64,5 +64,5 @@ public:
 
 private:
   std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;
-  std::vector<I01*> _idxs;
+  std::vector<I01> _idxs;
 };
