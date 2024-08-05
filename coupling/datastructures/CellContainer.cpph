@@ -5,6 +5,12 @@
 
 template <class CellIndexT, unsigned int dim>
 const coupling::datastructures::CouplingCell<dim>* coupling::datastructures::CellContainer<CellIndexT, dim>::operator[](CellIndexT idx) const {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+  if (_couplingCells.size() < CellIndexT::linearNumberCellsInDomain) {
+    std::cout << "CellContainer<" << CellIndexT::TNAME << "," << dim << "> accessed but not full " << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+#endif
   return _couplingCells[indexing::convertToScalar(idx)];
 }
 
