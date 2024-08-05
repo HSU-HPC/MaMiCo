@@ -11,12 +11,12 @@ class FlexibleCellContainerTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(FlexibleCellContainerTest);
   CPPUNIT_TEST(testInsertAndAccess);
   CPPUNIT_TEST(testMassInsert);
+  CPPUNIT_TEST(testSize);
   CPPUNIT_TEST(testIteration);
   CPPUNIT_TEST(testEquality);
   CPPUNIT_TEST(testInequality);
   CPPUNIT_TEST(testPreIncrement);
   CPPUNIT_TEST(testPostIncrement);
-  CPPUNIT_TEST(testSize);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -76,8 +76,17 @@ public:
     i = 0;
     for (auto pair : container) {
       std::tie(couplingCell, idx) = pair;
-      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i++]->getMacroscopicMass() );
+      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass() );
+      CPPUNIT_ASSERT_EQUAL( idx, _idxs_10case[i] );
+      i++;
     }
+  }
+
+  void testSize() {
+    using namespace coupling::datastructures;
+    FlexibleCellContainer<3> container(_couplingCells_10case, _idxs_10case);
+    int size = _couplingCells_10case.size();
+    CPPUNIT_ASSERT_EQUAL( size, container.size() );
   }
 
   void testIteration() {
@@ -89,6 +98,8 @@ public:
     for (auto pair : container) {
       std::tie(couplingCell, idx) = pair;
       CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass() );
+      CPPUNIT_ASSERT_EQUAL( idx, _idxs_10case[i] );
+      i++;
     }
   }
 
@@ -126,7 +137,9 @@ public:
     int i = 0;
     for (auto iter = container.begin(); iter != container.end();) {
       std::tie(couplingCell, idx) = *iter;
-      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i++]->getMacroscopicMass() );
+      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass() );
+      CPPUNIT_ASSERT_EQUAL( idx, _idxs_10case[i] );
+      i++;
       ++iter;
     }
   }
@@ -139,15 +152,10 @@ public:
     int i = 0;
     for (auto iter = container.begin(); iter != container.end();) {
       std::tie(couplingCell, idx) = *iter++;
-      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i++]->getMacroscopicMass() );
+      CPPUNIT_ASSERT_EQUAL( couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass() );
+      CPPUNIT_ASSERT_EQUAL( idx, _idxs_10case[i] );
+      i++;
     }
-  }
-
-  void testSize() {
-    using namespace coupling::datastructures;
-    FlexibleCellContainer<3> container(_couplingCells_10case, _idxs_10case);
-    int size = _couplingCells_10case.size();
-    CPPUNIT_ASSERT_EQUAL( size, container.size() );
   }
 
 private:
