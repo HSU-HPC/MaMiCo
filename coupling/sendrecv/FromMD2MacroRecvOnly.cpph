@@ -3,57 +3,49 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                         const I00* const globalCellIndices, unsigned int numberCells) {
+template <class Cell_T, unsigned int dim, class Container_T>
+void coupling::sendrecv::FromMD2MacroRecvOnly<Cell_T, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
   for (unsigned int i = 0; i < numberCells; i++)
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateReceiveBuffers(dataExchange, globalCellIndices[i]);
+  I01* idx;
+  Cell_T* cell;
+  for(auto pair : cells) {
+    std::tie(cell, idx) = pair;
+    coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReceiveBuffers(dataExchange, idx);
+  }
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                        const std::vector<CouplingCell*>& couplingCells,
-                                                                                        const I00* const globalCellIndices) {
-  const unsigned int numberCells = (unsigned int)couplingCells.size();
-  for (unsigned int i = 0; i < numberCells; i++)
-    coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::readFromReceiveBuffer(dataExchange, *couplingCells[i], globalCellIndices[i]);
+template <class Cell_T, unsigned int dim, class Container_T>
+void coupling::sendrecv::FromMD2MacroRecvOnly<Cell_T, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
+  coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer(dataExchange, cells);
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::sendFromMD2Macro(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                   const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-                                                                                   const I00* const globalCellIndicesFromMacroscopicSolver) {
-  sendFromMD2MacroNonBlocking(dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
-  wait4SendFromMD2Macro(dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+template <class Cell_T, unsigned int dim, class Container_T>
+void coupling::sendrecv::FromMD2MacroRecvOnly<Cell_T, dim>::sendFromMD2Macro(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
+  sendFromMD2MacroNonBlocking(dataExchange, cells);
+  wait4SendFromMD2Macro(dataExchange, cells);
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::sendFromMD2MacroNonBlocking(
-    coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-    const I00* const globalCellIndicesFromMacroscopicSolver) {
-  const unsigned int numberCellsFromMacroscopicSolver = (unsigned int)couplingCellsFromMacroscopicSolver.size();
-
+template <class Cell_T, unsigned int dim, class Container_T>
+void coupling::sendrecv::FromMD2MacroRecvOnly<Cell_T, dim>::sendFromMD2MacroNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
   // empty send and receive buffers
-  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::deleteBuffers();
+  coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::deleteBuffers();
 
   // allocate the receive buffers and trigger the MPI-recv
-  allocateReceiveBuffers(dataExchange, globalCellIndicesFromMacroscopicSolver, numberCellsFromMacroscopicSolver);
+  allocateReceiveBuffers(dataExchange, cells);
   // fill the send buffers
   // writeToSendBuffer(dataExchange,couplingCellsFromMamico); // no sending
 
-  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::allocateRequests();
+  coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateRequests();
 
-  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::triggerReceiving(dataExchange);
-  // coupling::sendrecv::SendReceiveBuffer<CouplingCell,dim>::triggerSending(dataExchange); // no sending
+  coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::triggerReceiving(dataExchange);
+  // coupling::sendrecv::SendReceiveBuffer<Cell_T,dim>::triggerSending(dataExchange); // no sending
 }
 
-template <class CouplingCell, unsigned int dim>
-void coupling::sendrecv::FromMD2MacroRecvOnly<CouplingCell, dim>::wait4SendFromMD2Macro(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                                                                                        const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-                                                                                        const I00* const globalCellIndicesFromMacroscopicSolver) {
+template <class Cell_T, unsigned int dim, class Container_T>
+void coupling::sendrecv::FromMD2MacroRecvOnly<Cell_T, dim>::wait4SendFromMD2Macro(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
   // wait for all send- and receive operations to complete
-  coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>::waitAllOperations();
+  coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::waitAllOperations();
 
   // fill information from receive buffers into the coupling cells
-  readFromReceiveBuffer(dataExchange, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+  readFromReceiveBuffer(dataExchange, cells);
 }
