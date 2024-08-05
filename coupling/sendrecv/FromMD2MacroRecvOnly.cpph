@@ -5,7 +5,6 @@
 
 template <class Cell_T, unsigned int dim, class Container_T>
 void coupling::sendrecv::FromMD2MacroRecvOnly<Cell_T, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
-  for (unsigned int i = 0; i < numberCells; i++)
   I01* idx;
   Cell_T* cell;
   for(auto pair : cells) {

@@ -8,11 +8,12 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
 #include "coupling/sendrecv/SendReceiveBuffer.h"
+#include "coupling/datastructures/CellContainer.h"
 #include <vector>
 
 namespace coupling {
 namespace sendrecv {
-template <class CouplingCell, unsigned int dim> class FromMD2Macro;
+template <class Cell_T, unsigned int dim> class FromMD2Macro;
 }
 } // namespace coupling
 
@@ -20,18 +21,20 @@ template <class CouplingCell, unsigned int dim> class FromMD2Macro;
  *from MaMiCo to the macroscopic solver.
  *	@brief sends coupling cell information from MaMiCo to the macroscopic
  *solver. Derived from the class coupling::sendrecv::SendReceiveBuffer
- *	@tparam CouplingCell cell type
+ *	@tparam Cell_T cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class CouplingCell, unsigned int dim> class coupling::sendrecv::FromMD2Macro : public coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim> {
+template <class Cell_T, unsigned int dim> class coupling::sendrecv::FromMD2Macro : public coupling::sendrecv::SendReceiveBuffer<Cell_T, dim> {
 
 public:
   /** Constructor, just calling the constructor of the
    * coupling::sendrecv::SendReceiveBuffer  */
-  FromMD2Macro() : coupling::sendrecv::SendReceiveBuffer<CouplingCell, dim>() {}
+  FromMD2Macro() : coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>() {}
   /** Destructor */
   virtual ~FromMD2Macro() {}
+
+  using Local_Container_T = coupling::datastructures::CellContainer<I10,dim>;
 
   /** sends information from the local coupling cells of MaMiCo (only inner
    * non-ghost cells of this process) to the macroscopic solver. Since the
@@ -41,61 +44,54 @@ public:
    * global cell indices. This function basically calls for these purposes
    * sendFromMD2MacroNonBlocking(...) and wait4SendFromMD2Macro(...) in a row.
    * 	@param dataExchange
-   * 	@param couplingCellsFromMamico
-   * 	@param couplingCellsFromMacroscopicSolver
-   * 	@param globalCellIndicesFromMacroscopicSolver
+   * 	@param src
+   *  @param dst
    */
-  void sendFromMD2Macro(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCellsFromMamico,
-                        const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver, const I00* const globalCellIndicesFromMacroscopicSolver);
+  template <class Container_T1, class Container_T2>
+  void sendFromMD2Macro(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T1& src, const Container_T2& dst);
 
   /** reduces information from the local coupling cells of MaMiCo (only inner
    * non-ghost cells of this process) and sends it to the macroscopic solver.
    * 	@param dataExchange
-   * 	@param couplingCellsFromMamico
-   *  @param reducedCouplingCellsFromMacroscopicSolver
-   * 	@param couplingCellsFromMacroscopicSolver
+   * 	@param src
+   *  @param dst
    */
-  void reduceFromMD2Macro(std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>*>& dataExchange,
-                          const std::vector<CouplingCell*>& couplingCellsFromMamico, const I00* const globalCellIndicesFromMacroscopicSolver,
-                          const std::vector<CouplingCell*>& reducedCouplingCellsFromMacroscopicSolver);
+  template <class Container_T1, class Container_T2>
+  void reduceFromMD2Macro(std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>*>& dataExchange, const Container_T1& src, const Container_T2& dst);
 
   /** triggers the send/recv operations for data transfer. After returning,
    * these data transfers do not necessarily need to be finished, according to
    * ISend/IRecv in MPI.
    * 	@param dataExchange
-   * 	@param couplingCellsFromMamico
-   * 	@param couplingCellsFromMacroscopicSolver
-   * 	@param globalCellIndicesFromMacroscopicSolver
+   * 	@param src
+   *  @param dst
    */
-  void sendFromMD2MacroNonBlocking(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCellsFromMamico,
-                                   const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver,
-                                   const I00* const globalCellIndicesFromMacroscopicSolver);
+  template <class Container_T1, class Container_T2>
+  void sendFromMD2MacroNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T1& src, const Container_T2& dst);
 
   /** waits for the send operation--instantiated by
    * sendFromMD2MacroNonBlocking(...)--to be finished and writes the data to
    * couplingCellsFromMacroscopicSolver.
    * 	@param dataExchange
-   * 	@param couplingCellsFromMacroscopicSolver
-   * 	@param globalCellIndicesFromMacroscopicSolver
+   * 	@param cells
    */
-  void wait4SendFromMD2Macro(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange,
-                             const std::vector<CouplingCell*>& couplingCellsFromMacroscopicSolver, const I00* const globalCellIndicesFromMacroscopicSolver);
+  void wait4SendFromMD2Macro(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
 private:
   /** loops over the whole local Cartesian grid (only non-ghost cells!) and
    * writes respective cells to send buffer. For each cell,
    * writeToSendBuffer(...) of SendReceiveBuffer is used.
    * 	@param dataExchange
-   * 	@param couplingCells
+   * 	@param cells
    */
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells);
+  void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Container_T& cells);
 
   /** loops over the whole local Cartesian grid (only non-ghost cells!) and
    * writes respective cells to reduce buffer.
    * 	@param dataExchange
-   * 	@param couplingCells
+   * 	@param cells
    */
-  void writeToReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells);
+  void writeToReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Local_Container_T& cells);
 
   /** allocates the receive buffers for the macroscopic solver. Since we do not
    * know anything about the macroscopic solver, we only have a list of global
@@ -103,10 +99,10 @@ private:
    * rank. For each global cell which is in the list,
    * allocateReceiveBuffers(...) of SendReceiveBuffer is called.
    * 	@param dataExchange
-   * 	@param globalCellIndices
-   * 	@param numberCells
+   * 	@param cells
    */
-  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const I00* const globalCellIndices, unsigned int numberCells);
+  template <class Container_T>
+  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** allocates the reduce receive buffers for the macroscopic solver. Since we do not
    * know anything about the macroscopic solver, we only have a list of global
@@ -114,11 +110,10 @@ private:
    * rank. For each global cell which is in the list,
    * allocateReduceBufferForReceiving(...) of SendReceiveBuffer is called.
    * 	@param dataExchange
-   * 	@param globalCellIndices
-   * 	@param numberCells
+   * 	@param cells
    */
-  void allocateReduceBufferForReceiving(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const I00* globalCellIndices,
-                                        unsigned int numberCells);
+  template <class Container_T>
+  void allocateReduceBufferForReceiving(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells);
 
   /** reads information from the receive buffer and stores the result in the
    * list of coupling cells. Since this is a receive for the coupling
@@ -126,11 +121,10 @@ private:
    * cell indices and corresponding coupling cell buffers. For each cell in
    * this list, readFromReceiveBuffer(...) of SendReceiveBuffer is called.
    * 	@param dataExchange
-   * 	@param couplingCells
-   * 	@param globalCellIndices
+   * 	@param cells
    */
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<CouplingCell, dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells,
-                             const I00* const globalCellIndices);
+  template <class Container_T>
+  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** reads information from the reduce buffer and stores the result in the
    * list of coupling cells. Since this is a receive for the coupling
@@ -138,11 +132,10 @@ private:
    * cell indices and corresponding coupling cell buffers. For each cell in
    * this list, readFromReduceBuffer(...) of SendReceiveBuffer is called.
    * 	@param dataExchange
-   * 	@param couplingCells
-   * 	@param globalCellIndices
+   * 	@param cells
    */
-  void readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const std::vector<CouplingCell*>& couplingCells,
-                            const I00* globalCellIndices);
+  template <class Container_T>
+  void readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells);
 };
 
 #include "FromMD2Macro.cpph"
