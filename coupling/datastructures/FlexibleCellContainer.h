@@ -22,6 +22,22 @@ template <unsigned int dim> class FlexibleCellContainer;
 template <unsigned int dim> class coupling::datastructures::FlexibleCellContainer {
 public:
 
+  FlexibleCellContainer() {}
+  FlexibleCellContainer(std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells, std::vector<I01> idxs) {
+#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+    if (couplingCells.size() != idxs.size()) {
+      std::cout << "ERROR size of index vector and coupling cell vector sent to FlexibleCellContainer constructor do not match";
+      exit(EXIT_FAILURE);
+    }
+#endif
+    _couplingCells.reserve(couplingCells.size());
+    _idxs.reserve(idxs.size());
+    for (std::size_t i = 0; i < couplingCells.size(); ++i) {
+      _couplingCells.push_back(couplingCells[i]);
+      _idxs.push_back(idxs[i]);
+    }
+  }
+
   void operator<<(std::pair<coupling::datastructures::CouplingCell<dim>*, I01> pair) {
     I01 idx;
     coupling::datastructures::CouplingCell<dim>* couplingCell;

@@ -38,11 +38,12 @@ public:
 
     Iterator(CouplingCellIterator itCouplingCells) : _itCouplingCells(itCouplingCells) {}
 
-    std::pair<coupling::datastructures::CouplingCell<dim>*, I01*> operator*() const { 
-      return std::make_pair(*_itCouplingCells, new CellIndexT(std::distance(_couplingCells.begin(), _itCouplingCells))); 
+    std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const {
+      I01 temp(std::distance(_couplingCells.begin(), _itCouplingCells));
+      return std::make_pair(*_itCouplingCells, temp); 
     }
 
-    Iterator& operator++() { return *this; }
+    Iterator& operator++() { ++_itCouplingCells; return *this; }
 
     Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
 
