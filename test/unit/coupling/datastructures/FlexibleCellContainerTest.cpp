@@ -38,7 +38,7 @@ public:
         break;
       _idxs_10case.push_back(idx);
       auto tmp = new CouplingCell<3>;
-      tmp->setMacroscopicMass(i);
+      tmp->setMacroscopicMass(i++);
       _couplingCells_10case.push_back(tmp);
     }
   }
