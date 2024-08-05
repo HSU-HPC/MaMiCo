@@ -31,7 +31,7 @@ public:
 #endif
     tarch::la::Vector<3, unsigned int> numberProcesses{1, 1, 1};
     if (_size == 4) numberProcesses = {2, 2, 1};
-    IndexingService<3>::getInstance().initWithCells(4, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+    IndexingService<3>::getInstance().initWithCells(12, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
     int i = 0;
     for(auto idx : I01()) {
       if (i > 9)
@@ -50,7 +50,7 @@ public:
     }
     _couplingCells_10case.clear();
     _idxs_10case.clear();
-    }
+  }
   
   void testInsertAndAccess() {
     using namespace coupling::datastructures;
