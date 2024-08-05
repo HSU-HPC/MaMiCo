@@ -89,7 +89,7 @@ protected:
    * 	@param dataExchange
    * 	@param idx
    */
-  template<class Container_T> void allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx);
 
   /** Allocates buffer for receiving in the context of the broadcast operation
    * 	@param dataExchange

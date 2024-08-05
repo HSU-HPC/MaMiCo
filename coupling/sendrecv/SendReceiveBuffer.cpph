@@ -709,49 +709,46 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer<C
   }
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReceiveBuffers<Container_T>(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, Container_T& cells) {
-  I01 idx;
-  for(auto pair : cells) {
-    std::tie(std::ignore, idx) = pair;
-    const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
+template <class Cell_T, unsigned int dim>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReceiveBuffers<Container_T>(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx) {
 
-    // determine the ranks from which we need to receive information of this coupling cell
-    const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(*idx);
-    const unsigned int ranksSize = (unsigned int)ranks.size();
-  #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Rank " << IDXS.getRank() << ": allocate receive buffers for cell " << idx << ";";
-    std::cout << " associated source ranks: ";
-    for (unsigned int i = 0; i < ranksSize; i++) {
-      std::cout << ranks[i] << " ";
-    }
-    std::cout << std::endl;
-  #endif
+  const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
-    // loop over ranks
-    for (unsigned int i = 0; i < ranksSize; i++) {
-
-      // get iterator to map
-      typename std::map<unsigned int, BufferWithID>::iterator thisBuffer = _receiveBuffer.find(ranks[i]);
-      if (thisBuffer == _receiveBuffer.end()) {
-        _receiveBuffer[ranks[i]] = BufferWithID();
-        thisBuffer = _receiveBuffer.find(ranks[i]);
-      }
-
-      // increment buffer size and realloc buffer
-      const unsigned int firstPos = (thisBuffer->second).bufferSize * doublesPerCell;
-      (thisBuffer->second).bufferSize++;
-      (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
-      if ((thisBuffer->second).buffer == NULL) {
-        std::cout << "ERROR coupling::SendReceiveBuffer::allocateReceiveBuffers(): realloc yields NULL ptr!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      // set all values to -1.0
-      for (unsigned int j = firstPos; j < firstPos + doublesPerCell; j++) {
-        (thisBuffer->second).buffer[j] = -1.0;
-      }
-    } // rank
+  // determine the ranks from which we need to receive information of this coupling cell
+  const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(*idx);
+  const unsigned int ranksSize = (unsigned int)ranks.size();
+#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+  std::cout << "Rank " << IDXS.getRank() << ": allocate receive buffers for cell " << idx << ";";
+  std::cout << " associated source ranks: ";
+  for (unsigned int i = 0; i < ranksSize; i++) {
+    std::cout << ranks[i] << " ";
   }
+  std::cout << std::endl;
+#endif
+
+  // loop over ranks
+  for (unsigned int i = 0; i < ranksSize; i++) {
+
+    // get iterator to map
+    typename std::map<unsigned int, BufferWithID>::iterator thisBuffer = _receiveBuffer.find(ranks[i]);
+    if (thisBuffer == _receiveBuffer.end()) {
+      _receiveBuffer[ranks[i]] = BufferWithID();
+      thisBuffer = _receiveBuffer.find(ranks[i]);
+    }
+
+    // increment buffer size and realloc buffer
+    const unsigned int firstPos = (thisBuffer->second).bufferSize * doublesPerCell;
+    (thisBuffer->second).bufferSize++;
+    (thisBuffer->second).buffer = (double*)realloc((thisBuffer->second).buffer, sizeof(double) * (thisBuffer->second).bufferSize * doublesPerCell);
+    if ((thisBuffer->second).buffer == NULL) {
+      std::cout << "ERROR coupling::SendReceiveBuffer::allocateReceiveBuffers(): realloc yields NULL ptr!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    // set all values to -1.0
+    for (unsigned int j = firstPos; j < firstPos + doublesPerCell; j++) {
+      (thisBuffer->second).buffer[j] = -1.0;
+    }
+  } // rank
 }
 
 template <class Cell_T, unsigned int dim>
