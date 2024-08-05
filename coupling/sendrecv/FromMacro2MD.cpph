@@ -66,6 +66,23 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::writeToSendBuffer(c
                                                                                const std::vector<MacroscopicCell*>& macroscopicCells,
                                                                                const unsigned int* const globalCellIndices) {
   const unsigned int numberCells = (unsigned int)macroscopicCells.size();
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  std::ofstream file;
+  file.open(std::string("comm.log") + std::to_string(rank), std::ofstream::out | std::ofstream::app);
+  file << "Macro2MD"
+       << " MPI rank " << rank << " send global cell indices: [";
+  for (unsigned int i = 0; i < numberCells; i++) {
+    if (i > 0)
+      file << ", ";
+    file << globalCellIndices[i];
+  }
+  file << "]" << std::endl;
+  file.flush();
+  file.close();
+#endif
+
   for (unsigned int i = 0; i < numberCells; i++) {
     const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
     coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(dataExchange, *macroscopicCells[i], globalVectorIndex);
@@ -92,6 +109,30 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromReceiveBuff
   const tarch::la::Vector<3, unsigned int> end =
       start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
   tarch::la::Vector<3, unsigned int> loop(0);
+
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  std::ofstream file;
+  file.open(std::string("comm.log") + std::to_string(rank), std::ofstream::out | std::ofstream::app);
+  file << "Macro2MD"
+       << " MPI rank " << rank << " recv global cell indices: [";
+  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
+    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
+      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
+        tarch::la::Vector<dim, unsigned int> globalVectorIndex = coupling::initDimVector<dim>(loop);
+        globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
+        unsigned int globalScalarIndex = indexConversion.getGlobalCellIndex(globalVectorIndex);
+        if (loop[0] > start[0] || loop[1] > start[1] || loop[2] > start[2])
+          file << ", ";
+        file << globalScalarIndex;
+      }
+    }
+  }
+  file << "]" << std::endl;
+  file.flush();
+  file.close();
+#endif
 
   for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
     for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
@@ -152,6 +193,9 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::writeToSendBufferCo
                                                                                          coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                                                                                          const std::vector<MacroscopicCell*>& macroscopicCells,
                                                                                          const unsigned int* const globalCellIndices) {
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  throw std::runtime_error("Debugging communication is not implemented for collective MPI");
+#endif
   const auto numberCells = (unsigned int)macroscopicCells.size();
   for (unsigned int i = 0; i < numberCells; i++) {
     const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
@@ -188,6 +232,10 @@ template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromCollectiveBuffer(const coupling::IndexConversion<dim>& indexConversion,
                                                                                       coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                                                                                       const std::vector<MacroscopicCell*>& macroscopicCells) {
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  throw std::runtime_error("Debugging communication is not implemented for collective MPI");
+#endif
+
   // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
   const tarch::la::Vector<3, unsigned int> start(0);
   const tarch::la::Vector<3, unsigned int> end =

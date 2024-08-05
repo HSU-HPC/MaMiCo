@@ -94,6 +94,16 @@ public:
     global_log->set_mpi_output_root(0);
 #endif
 #endif
+#if (COMM_DEBUG == COUPLING_MD_YES)
+    // Clear old trace
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    for (int i = 0; i < size; i++) {
+      std::ofstream file;
+      file.open(std::string("comm.log") + std::to_string(i), std::ofstream::out | std::ofstream::trunc);
+      file.close();
+    }
+#endif
     getRootRank();
     parseConfigurations();
     initSolvers();

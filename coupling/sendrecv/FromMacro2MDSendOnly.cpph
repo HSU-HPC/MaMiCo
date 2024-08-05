@@ -9,6 +9,22 @@ void coupling::sendrecv::FromMacro2MDSendOnly<MacroscopicCell, dim>::writeToSend
                                                                                        const std::vector<MacroscopicCell*>& macroscopicCells,
                                                                                        const unsigned int* const globalCellIndices) {
   const unsigned int numberCells = (unsigned int)macroscopicCells.size();
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  std::ofstream file;
+  file.open(std::string("comm.log") + std::to_string(rank), std::ofstream::out | std::ofstream::app);
+  file << "Macro2MDSendOnly"
+       << " MPI rank " << rank << " send global cell indices: [";
+  for (unsigned int i = 0; i < numberCells; i++) {
+    if (i > 0)
+      file << ", ";
+    file << globalCellIndices[i];
+  }
+  file << "]" << std::endl;
+  file.flush();
+  file.close();
+#endif
   for (unsigned int i = 0; i < numberCells; i++) {
     const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
     coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(dataExchange, *macroscopicCells[i], globalVectorIndex);
