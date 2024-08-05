@@ -4,24 +4,23 @@
 // www5.in.tum.de/mamico
 #pragma once
 
-#include <iterator>
-#include <cstddef>
-#include <vector>
-#include <iostream>
-#include <utility>
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/indexing/IndexingService.h"
+#include <cstddef>
+#include <iostream>
+#include <iterator>
+#include <utility>
+#include <vector>
 
 namespace coupling {
 namespace datastructures {
 template <unsigned int dim> class FlexibleCellContainer;
 }
-}
+} // namespace coupling
 
 template <unsigned int dim> class coupling::datastructures::FlexibleCellContainer {
 public:
-
   FlexibleCellContainer() {}
   FlexibleCellContainer(std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells, std::vector<I01> idxs) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -46,7 +45,7 @@ public:
     _idxs.push_back(idx);
   }
 
-  int size() const {return _couplingCells.size();}
+  int size() const { return _couplingCells.size(); }
 
   class Iterator {
   public:
@@ -57,17 +56,21 @@ public:
 
     std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const { return std::make_pair(*_itCouplingCells, _itIdxs); }
 
-    Iterator& operator++() { ++_itCouplingCells; ++_itIdxs; return *this; }
-
-    Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
-
-    friend bool operator==(const Iterator& a, const Iterator& b) {
-      return *(a._itCouplingCells) == *(b._itCouplingCells) && a._itIdxs == b._itIdxs; 
+    Iterator& operator++() {
+      ++_itCouplingCells;
+      ++_itIdxs;
+      return *this;
     }
 
-    friend bool operator!=(const Iterator& a, const Iterator& b) { 
-      return *(a._itCouplingCells) != *(b._itCouplingCells) || a._itIdxs != b._itIdxs; 
+    Iterator operator++(int) {
+      Iterator tmp = *this;
+      ++(*this);
+      return tmp;
     }
+
+    friend bool operator==(const Iterator& a, const Iterator& b) { return *(a._itCouplingCells) == *(b._itCouplingCells) && a._itIdxs == b._itIdxs; }
+
+    friend bool operator!=(const Iterator& a, const Iterator& b) { return *(a._itCouplingCells) != *(b._itCouplingCells) || a._itIdxs != b._itIdxs; }
 
   private:
     CouplingCellIterator _itCouplingCells;
@@ -75,8 +78,7 @@ public:
   };
 
   Iterator begin() { return Iterator(_couplingCells.begin(), _idxs.begin()); }
-  Iterator end()   { return Iterator(_couplingCells.end(), _idxs.end()); }
-  
+  Iterator end() { return Iterator(_couplingCells.end(), _idxs.end()); }
 
 private:
   std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;
