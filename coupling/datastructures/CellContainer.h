@@ -18,7 +18,6 @@ template <class CellIndexT, unsigned int dim> class CellContainer;
  *	@brief provides access to the coupling cells. Base class for the class
  *coupling::datastructures::LinkedCellContainer
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
- *  @author Philipp Neumann
  */
 template <class CellIndexT, unsigned int dim> class coupling::datastructures::CellContainer {
 
