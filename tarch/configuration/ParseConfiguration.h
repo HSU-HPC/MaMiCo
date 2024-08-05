@@ -64,7 +64,7 @@ public:
     XMLConfiguration xmlConfig = XMLConfiguration::load(filename);
     tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement(topleveltag.c_str());
     if (node == NULL) {
-      std::cout << "Could not read input file " << std::filesystem::absolute(filename) << " (missing or invalid)" << std::endl;
+      std::cout << "Could not read input file " << filename << " (missing or invalid)" << std::endl;
       exit(EXIT_FAILURE);
     }
     config.parseSubtag(node);
@@ -78,7 +78,7 @@ public:
    */
   static void readDoubleMandatory(double& storage, tinyxml2::XMLElement* node, std::string tag) {
     double value;
-    if (node->QueryDoubleAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR) {
+    if (node->QueryDoubleAttribute(tag.c_str(), &value) != tinyxml2::XML_SUCCESS) {
       std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
@@ -114,7 +114,7 @@ public:
    */
   static void readIntMandatory(int& storage, tinyxml2::XMLElement* node, std::string tag) {
     int value;
-    if (node->QueryIntAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR) {
+    if (node->QueryIntAttribute(tag.c_str(), &value) != tinyxml2::XML_SUCCESS) {
       std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {

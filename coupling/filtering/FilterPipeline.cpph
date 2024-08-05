@@ -20,7 +20,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
   using namespace std::string_literals;
 
   // check if provided file is written in proper XML
-  if (_config.error != tinyxml2::XML_NO_ERROR) {
+  if (_config.error != tinyxml2::XML_SUCCESS) {
     std::cout << "Filter Pipeline config path: " << cfgpath << std::endl;
     throw std::runtime_error("Could not read config for Filter-Pipeline: XML syntax error.");
   }
