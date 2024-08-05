@@ -33,7 +33,7 @@ template <unsigned int dim> class DataExchangeFromMacro2MD;
  *  @author Philipp Neumann
  */
 template <unsigned int dim>
-class coupling::sendrecv::DataExchangeFromMacro2MD : public coupling::sendrecv::DataExchange<dim> {
+class coupling::sendrecv::DataExchangeFromMacro2MD : public coupling::sendrecv::DataExchange<coupling::datastructures::CouplingCell<dim>, dim> {
 
 public:
   /** Constructor
