@@ -10,6 +10,7 @@ on:
       - '*-WIP'
       - '*_WIP'
   pull_request:
+    types: [review_requested, ready_for_review]
     branches:
       - master
 
