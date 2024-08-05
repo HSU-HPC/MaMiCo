@@ -20,12 +20,14 @@ of MPI ranks, total number of coupling cycles, total number of PinT iterations i
 """
 __author__ = "Piet"
 
-import os
 import glob
+import os
+
 import matplotlib.pyplot as plt
 import meshio
 import numpy as np
 import pandas as pd
+
 
 def get_attrs(file):
 	''' Tries to obtain solver mode, MPI rank, coupling cycle and PinT Iteration from filename '''

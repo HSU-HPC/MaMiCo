@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+import math
+
 import numpy as np
 from pandas import read_csv
-import math
 
 files = ['original_signal.105', 'NLM_junction']
 data = [read_csv(file+".csv", delimiter=";", usecols=[0,1,2,3,7], \
