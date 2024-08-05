@@ -28,7 +28,7 @@ template <class Cell_T, unsigned int dim> class SendReceiveBuffer;
  *implementations. The access to the buffers is prescribed by the DataExchange
  *object.
  *	@brief generic class for send-/ receive methodology.
- *	@tparam CouplingCell cell type
+ *	@tparam Cell_T cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */

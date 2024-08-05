@@ -34,6 +34,8 @@ public:
   /** Destructor */
   virtual ~FromMacro2MD() {}
 
+  using Local_Containter_T = coupling::datastructures::CellContainer<I10,dim>;
+
   /** sends information from the local coupling cells of a macroscopic solver
    * to the coupling cells of MaMico (ghost cells are also allowed). Since
    * the macroscopic solver can have an arbitrary distribution of cells on the
@@ -43,24 +45,23 @@ public:
    * and immediately subsequently wait4SendFromMacro2MD(...). Those two methods
    * may alternatively be used, e.g., for "non-blocking" communication.
    * 	@param dataExchange
-   * 	@param out
-   * 	@param in
+   * 	@param dst
+   * 	@param src
    */
-  template <class Container_T1, class Container_T2>
-  void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T1& out,
-                        const Container_T2& in);
+  template <class Container_T>
+  void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Containter_T& dst,
+                        const Container_T& src);
 
-  template <class Container_T1, class Container_T2>
+  template <class Container_T1>
   void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices,
-                         const Container_T1& in,
-                         std::vector<Container_T2> out);
+                         const Container_T1& src,
+                         std::vector<Local_Containter_T> dst);
 
   /** sends data from macro to MD. After returning, the data transfer may not be
    * completely finished, similar to a IRecv/ISend-call by MPI. Please use
    * wait4SendFromMacro2MD(...) to guarantee that the data transfer has been
    * finished.
    * 	@param dataExchange
-   * 	@param couplingCellContainer
    * 	@param cells
    */
   template <class Container_T>
@@ -71,10 +72,9 @@ public:
    * sendFromMacro2MDNonBlocking(..)--to be finished and fills the information
    * into the coupling cells from Mamico.
    * 	@param dataExchange
-   * 	@param couplingCellContainer
+   * 	@param cells
    */
-  template <class Container_T>
-  void wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& couplingCellContainer);
+  void wait4SendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Containter_T& cells);
 
 private:
   /** given a coupling cell container (from the macroscopic solver), the data
@@ -105,13 +105,11 @@ private:
    * the coupling cells. For each cell, readFromReceiveBuffer(...) of
    * SendReceiveBuffer is called.
    * 	@param dataExchange
-   * 	@param couplingCellContainer
+   * 	@param cells
    */
-  template <class Container_T>
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Containter_T& cells);
 
-  template <class Container_T>
-  void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Containter_T& cells);
 };
 
 #include "FromMacro2MD.cpph"
