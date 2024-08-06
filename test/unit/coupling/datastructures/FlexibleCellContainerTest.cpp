@@ -55,12 +55,12 @@ public:
 
   void testInsertAndAccess() {
     using namespace coupling::datastructures;
-    I01 idx;
-    CouplingCell<3>* couplingCell;
+    I01 idx {0};
+    CouplingCell<3>* couplingCell = new CouplingCell<3>();
     couplingCell->setMacroscopicMass(50.0);
     FlexibleCellContainer<3> container;
     container << std::make_pair(couplingCell, idx);
-    CPPUNIT_ASSERT_EQUAL(1, container.size());
+    CPPUNIT_ASSERT_EQUAL(1u, container.size());
     auto extractedCell = (*container.begin()).first;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(50.0, extractedCell->getMacroscopicMass(), 1e-16);
   }
@@ -70,7 +70,7 @@ public:
     I01 idx;
     CouplingCell<3>* couplingCell;
     FlexibleCellContainer<3> container;
-    int i = 0;
+    unsigned int i = 0;
     for (; i < _couplingCells_10case.size(); i++) {
       container << std::make_pair(_couplingCells_10case[i], _idxs_10case[i]);
     }
@@ -86,7 +86,7 @@ public:
   void testSize() {
     using namespace coupling::datastructures;
     FlexibleCellContainer<3> container(_couplingCells_10case, _idxs_10case);
-    int size = _couplingCells_10case.size();
+    unsigned int size = _couplingCells_10case.size();
     CPPUNIT_ASSERT_EQUAL(size, container.size());
   }
 
@@ -110,7 +110,7 @@ public:
     FlexibleCellContainer<3> container2(_couplingCells_10case, _idxs_10case);
     auto iter1 = container1.begin();
     auto iter2 = container2.begin();
-    for (int i = 0; i < _couplingCells_10case.size(); ++i) {
+    for (unsigned int i = 0; i < _couplingCells_10case.size(); ++i) {
       CPPUNIT_ASSERT(iter1 == iter2);
       iter1++;
       iter2++;
@@ -123,7 +123,7 @@ public:
     FlexibleCellContainer<3> container2(_couplingCells_10case, _idxs_10case);
     auto iter1 = container1.begin();
     auto iter2 = container2.begin();
-    for (int i = 0; i < _couplingCells_10case.size(); ++i) {
+    for (unsigned int i = 0; i < _couplingCells_10case.size(); ++i) {
       iter1++;
       CPPUNIT_ASSERT(iter1 != iter2);
       iter2++;
