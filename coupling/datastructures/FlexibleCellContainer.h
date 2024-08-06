@@ -59,16 +59,16 @@ public:
     _idxs.push_back(idx);
   }
 
-  int size() const { return _couplingCells.size(); }
+  unsigned int size() const { return _couplingCells.size(); }
 
   class Iterator {
   public:
-    using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::iterator;
-    using IndexIterator = std::vector<I01>::iterator;
+    using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::const_iterator;
+    using IndexIterator = std::vector<I01>::const_iterator;
 
     Iterator(CouplingCellIterator itCouplingCells, IndexIterator itIdxs) : _itCouplingCells(itCouplingCells), _itIdxs(itIdxs) {}
 
-    std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const { return std::make_pair(*_itCouplingCells, *_itIdxs); }
+    const std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const { return std::make_pair(*_itCouplingCells, *_itIdxs); }
 
     Iterator& operator++() {
       ++_itCouplingCells;
@@ -91,8 +91,8 @@ public:
     IndexIterator _itIdxs;
   };
 
-  Iterator begin() { return Iterator(_couplingCells.begin(), _idxs.begin()); }
-  Iterator end() { return Iterator(_couplingCells.end(), _idxs.end()); }
+  Iterator begin() const { return Iterator(_couplingCells.begin(), _idxs.begin()); }
+  Iterator end() const { return Iterator(_couplingCells.end(), _idxs.end()); }
 
 private:
   std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;

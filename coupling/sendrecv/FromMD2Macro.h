@@ -36,7 +36,7 @@ public:
   virtual ~FromMD2Macro() {}
 
   using Macro_Container_T = coupling::datastructures::FlexibleCellContainer<dim>;
-  using Local_Container_T = coupling::datastructures::CellContainer<I10, dim>;
+  using Local_Container_T = coupling::datastructures::CellContainer<I02, dim>;
 
   /** sends information from the local coupling cells of MaMiCo (only inner
    * non-ghost cells of this process) to the macroscopic solver. Since the

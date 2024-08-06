@@ -53,13 +53,11 @@ public:
 
   virtual ~CouplingCellServiceDummy() {}
 
-  void sendFromMacro2MD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                        const I00* const globalCellIndicesFromMacroscopicSolver) override {
-    _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+  void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer) override {
+    _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, macro2MDBuffer);
   }
-  double sendFromMD2Macro(const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver,
-                          const I00* const globalCellIndicesFromMacroscopicSolver) override {
-    _fromMD2Macro.sendFromMD2Macro(_deFromMD2Macro, couplingCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+  double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) override {
+    _fromMD2Macro.sendFromMD2Macro(_deFromMD2Macro, couplingCellContainerFromMacroscopicSolver);
     return 0;
   }
   double applyFilterPipeline() override { return 0; }

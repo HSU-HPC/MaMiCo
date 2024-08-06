@@ -34,7 +34,7 @@ public:
   /** Destructor */
   virtual ~FromMacro2MD() {}
 
-  using Local_Container_T = coupling::datastructures::CellContainer<I10, dim>;
+  using Local_Container_T = coupling::datastructures::CellContainer<I02, dim>;
 
   /** sends information from the local coupling cells of a macroscopic solver
    * to the coupling cells of MaMico (ghost cells are also allowed). Since

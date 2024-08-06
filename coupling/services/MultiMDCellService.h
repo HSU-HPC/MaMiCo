@@ -140,11 +140,12 @@ public:
     }
 
     // TODO: fix free bug/possible memory leak here
-    for (auto coupling_cell : _couplingCells) {
-      delete coupling_cell;
+    I01 idx;
+    coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : _couplingCells) {
+      std::tie(cell, idx) = pair;
+      if(cell != nullptr) delete cell;
     }
-    _couplingCells.clear();
-    // delete [] _couplingCells.data();
     if (_postMultiInstanceFilterPipeline != nullptr)
       delete _postMultiInstanceFilterPipeline;
   }
@@ -278,7 +279,7 @@ public:
     double res = 0;
     const unsigned int size = (unsigned int)couplingCellsFromMacroscopicSolver.size();
 
-    preprocessingForMD2Macro(indices, size);
+    preprocessingForMD2Macro(couplingCellsFromMacroscopicSolver);
 
     for (unsigned int i = 0; i < _totalNumberMDSimulations; ++i) {
       if (nullptr == _couplingCellServices[i] || 0 != _warmupPhase[i])
@@ -330,7 +331,7 @@ public:
     std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
 #endif
 
-    res += (*_postMultiInstanceFilterPipeline)();
+    // FIXME apply filtering to correct region res += (*_postMultiInstanceFilterPipeline)();
 
     // store data in couplingCellsFromMacroscopicSolver
     for (unsigned int i = 0; i < size; i++) {
@@ -349,15 +350,14 @@ public:
     const unsigned int size = (unsigned int)md2macroCouplingCells.size();
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if (_couplingCells.size() != size)
+    if ((unsigned int) _couplingCells.size() != size)
       throw std::runtime_error(std::string("Buffers must have the same size!"));
 #endif
 
-    preprocessingForMD2Macro(size);
+    preprocessingForMD2Macro(md2macroCouplingCells);
 
     // reset macroscopic data (only those should be used by macroscopic solver
     // anyway) in duplicate
-    int i = 0;
     I01 idx;
     coupling::datastructures::CouplingCell<3>* cellA;
     coupling::datastructures::CouplingCell<3>* cellB;
@@ -403,7 +403,7 @@ public:
     std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
 #endif
 
-    res += (*_postMultiInstanceFilterPipeline)();
+    // FIXME apply filtering to correct region res += (*_postMultiInstanceFilterPipeline)();
 
     // store data in md2macroCouplingCells
     auto itCouplingCells = _couplingCells.begin();
@@ -423,22 +423,28 @@ public:
   /**
    * preprocessing operations for reducing data from MD instances to macro
    */
-  void preprocessingForMD2Macro(const unsigned int newCouplingCellsCount) {
+  void preprocessingForMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& cells) {
 
     /*
      * If this is first coupling step, we must allocate space for the
      * coupling cells we filter and determine averages with.
      */
-    if (_couplingCells.empty()) {
+    if (_couplingCells.size() == 0) {
       // Allocate & init _couplingCells
-      for (unsigned int c = _couplingCells.size(); c < newCouplingCellsCount; c++)
-        _couplingCells.push_back(new coupling::datastructures::CouplingCell<dim>());
+      I01 idx;
+      coupling::datastructures::CouplingCell<dim>* cell;
+      for (auto pair : cells) {
+        std::tie(cell, idx) = pair;
+        auto newCell = new coupling::datastructures::CouplingCell<dim>();
+        _couplingCells << std::make_pair(newCell, idx);
+      }
     }
 
     if (_postMultiInstanceFilterPipeline == nullptr) {
       // Init filter pipeline
-      _postMultiInstanceFilterPipeline = new coupling::filtering::FilterPipeline<dim>(_couplingCells, coupling::filtering::Scope::postMultiInstance,
-                                                                                      _multiMDService, _filterPipelineConfiguration.c_str());
+      // FIXME Invalid cell container
+      // _postMultiInstanceFilterPipeline = new coupling::filtering::FilterPipeline<I14, dim>(_couplingCells, coupling::filtering::Scope::postMultiInstance,
+      //                                                                                 _multiMDService, _filterPipelineConfiguration.c_str());
     }
   }
 
@@ -704,7 +710,7 @@ private:
    * Analogon to CouplingCellService's FilterPipeline.
    * Is applied during this->sendFromMD2Macro.
    */
-  coupling::filtering::FilterPipeline<dim>* _postMultiInstanceFilterPipeline;
+  coupling::filtering::FilterPipeline<I14, dim>* _postMultiInstanceFilterPipeline;
   /* Buffer for copying data from MD to macro */
   coupling::sendrecv::FromMD2Macro<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
 };

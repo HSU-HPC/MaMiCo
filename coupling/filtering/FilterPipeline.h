@@ -19,7 +19,7 @@ using tarch::configuration::ParseConfiguration;
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class FilterPipeline;
+template <class CellIndex_T, unsigned int dim> class FilterPipeline;
 
 /*
  * Used as member of FilterPipeline. Displays where that FP is used.
@@ -41,9 +41,9 @@ enum class Scope { perInstance, postMultiInstance };
  *
  * @author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::FilterPipeline {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::FilterPipeline {
 public:
-  FilterPipeline(std::vector<coupling::datastructures::CouplingCell<dim>*> inputCells, const coupling::filtering::Scope scope,
+  FilterPipeline(const coupling::datastructures::CellContainer<CellIndex_T, dim> inputCells, const coupling::filtering::Scope scope,
                  const tarch::utils::MultiMDService<dim>& multiMDService, const char* cfgpath);
 
   ~FilterPipeline() {

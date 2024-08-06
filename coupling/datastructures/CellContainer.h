@@ -53,15 +53,15 @@ public:
     _couplingCells.push_back(couplingCell);
   }
 
-  int size() const { return _couplingCells.size(); }
+  unsigned int size() const { return _couplingCells.size(); }
 
   class Iterator {
   public:
-    using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::iterator;
+    using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::const_iterator;
 
     Iterator(CouplingCellIterator itCouplingCells) : _itCouplingCells(itCouplingCells), _itCouplingCellsBegin(itCouplingCells) {}
 
-    std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const {
+    const std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const {
       I01 temp(std::distance(_itCouplingCellsBegin, _itCouplingCells));
       return std::make_pair(*_itCouplingCells, temp);
     }
@@ -85,8 +85,8 @@ public:
     CouplingCellIterator _itCouplingCells, _itCouplingCellsBegin;
   };
 
-  Iterator begin() { return Iterator(_couplingCells.begin()); }
-  Iterator end() { return Iterator(_couplingCells.end()); }
+  Iterator begin() const { return Iterator(_couplingCells.begin()); }
+  Iterator end() const { return Iterator(_couplingCells.end()); }
 
 protected:
   /** holds pointers to all coupling cells with linked cells, but without

@@ -97,7 +97,7 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  void writeToCell(const double* const buffer, const coupling::datastructures::CouplingCell<dim>& cell) override {
+  void writeToCell(const double* const buffer, coupling::datastructures::CouplingCell<dim>& cell) override {
     tarch::la::Vector<dim, double> macroscopicMomentum(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       macroscopicMomentum[d] = buffer[1 + d];

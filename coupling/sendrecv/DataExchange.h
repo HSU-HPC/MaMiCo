@@ -62,7 +62,7 @@ public:
    * 	@param buffer
    * 	@param cell
    */
-  virtual void writeToCell(const double* const buffer, const Cell_T& cell) = 0;
+  virtual void writeToCell(const double* const buffer, Cell_T& cell) = 0;
 
   /** returns the number of doubles that are sent per coupling cell. */
   virtual unsigned int getDoublesPerCell() const = 0;
