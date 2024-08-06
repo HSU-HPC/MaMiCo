@@ -41,11 +41,28 @@ public:
 
   void testConvertToScalarOutOfDomain() {
     // Contains indices of cells outside the domain
-    std::vector<Global_IdxT> global_corners{{{-1, -1, -1}}, {{14, -1, -1}}, {{-1, 14, -1}}, {{14, 14, -1}},
-                                            {{-1, -1, 14}}, {{14, -1, 14}}, {{-1, 14, 14}}, {{14, 14, 14}}};
+    std::vector<Global_IdxT> global_corners{
+      Global_IdxT{{-1, -1, -1}}, 
+      Global_IdxT{{14, -1, -1}}, 
+      Global_IdxT{{-1, 14, -1}}, 
+      Global_IdxT{{14, 14, -1}},
+      Global_IdxT{{-1, -1, 14}}, 
+      Global_IdxT{{14, -1, 14}}, 
+      Global_IdxT{{-1, 14, 14}}, 
+      Global_IdxT{{14, 14, 14}}
+    };
     for (const auto& corner : global_corners)
       CPPUNIT_ASSERT_THROW(convertToScalar(corner), std::runtime_error);
-    std::vector<Global_IdxT> md2m_corners{{{3, 3, 3}}, {{10, 3, 3}}, {{3, 10, 3}}, {{10, 10, 3}}, {{3, 3, 10}}, {{10, 3, 10}}, {{3, 10, 10}}, {{10, 10, 10}}};
+    std::vector<Global_IdxT> md2m_corners{
+      Global_IdxT{{3, 3, 3}}, 
+      Global_IdxT{{10, 3, 3}}, 
+      Global_IdxT{{3, 10, 3}}, 
+      Global_IdxT{{10, 10, 3}}, 
+      Global_IdxT{{3, 3, 10}}, 
+      Global_IdxT{{10, 3, 10}}, 
+      Global_IdxT{{3, 10, 10}}, 
+      Global_IdxT{{10, 10, 10}}
+    };
     for (const auto& corner : md2m_corners) {
       LocalMD2M_IdxT local_index{corner};
       CPPUNIT_ASSERT_THROW(convertToScalar(local_index), std::runtime_error);
@@ -59,7 +76,16 @@ public:
   }
 
   void testConvertToScalarInDomain() {
-    std::vector<Global_IdxT> global_corners{{{0, 0, 0}}, {{13, 0, 0}}, {{0, 13, 0}}, {{13, 13, 0}}, {{0, 0, 13}}, {{13, 0, 13}}, {{0, 13, 13}}, {{13, 13, 13}}};
+    std::vector<Global_IdxT> global_corners{
+      Global_IdxT{{0, 0, 0}}, 
+      Global_IdxT{{13, 0, 0}}, 
+      Global_IdxT{{0, 13, 0}}, 
+      Global_IdxT{{13, 13, 0}}, 
+      Global_IdxT{{0, 0, 13}}, 
+      Global_IdxT{{13, 0, 13}}, 
+      Global_IdxT{{0, 13, 13}}, 
+      Global_IdxT{{13, 13, 13}}
+    };
     for (const auto& corner : global_corners)
       CPPUNIT_ASSERT_NO_THROW(convertToScalar(corner));
   }
