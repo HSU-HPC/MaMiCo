@@ -27,8 +27,7 @@ template <class Cell_T, unsigned int dim> class FromMD2MacroRecvOnly;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class Cell_T, unsigned int dim>
-class coupling::sendrecv::FromMD2MacroRecvOnly : public coupling::sendrecv::SendReceiveBuffer<Cell_T, dim> {
+template <class Cell_T, unsigned int dim> class coupling::sendrecv::FromMD2MacroRecvOnly : public coupling::sendrecv::SendReceiveBuffer<Cell_T, dim> {
 
 public:
   /** Constructor, just calling the constructor of the
@@ -47,8 +46,7 @@ public:
    * 	@param dataExchange
    * 	@param cells
    */
-  template <class Container_T>
-  void sendFromMD2Macro(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void sendFromMD2Macro(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** triggers the send/recv operations for data transfer. After returning,
    *these data transfers do not necessarily need to be finished, according to
@@ -56,8 +54,7 @@ public:
    * 	@param dataExchange
    * 	@param cells
    *	@sa  class FromMD2Macro. */
-  template <class Container_T>
-  void sendFromMD2MacroNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void sendFromMD2MacroNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** waits for the send operation--instantiated by
    *sendFromMD2MacroNonBlocking(...)--to be finished and writes the data to
@@ -65,8 +62,7 @@ public:
    * 	@param dataExchange
    * 	@param cells
    *	@sa class FromMD2Macro */
-  template <class Container_T>
-  void wait4SendFromMD2Macro(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void wait4SendFromMD2Macro(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
 private:
   /** allocates the receive buffers for the macroscopic solver. Since we do not
@@ -77,8 +73,7 @@ private:
    * 	@param dataExchange
    *  @param cells
    */
-  template <class Container_T>
-  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** reads information from the receive buffer and stores the result in the
    * list of coupling cells. Since this is a receive for the coupling
@@ -88,8 +83,7 @@ private:
    * 	@param dataExchange
    * 	@param cells
    */
-  template <class Container_T>
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 };
 
 #include "FromMD2MacroRecvOnly.cpph"

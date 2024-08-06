@@ -6,10 +6,10 @@
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_MD2MACRO_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
-#include "coupling/sendrecv/SendReceiveBuffer.h"
 #include "coupling/datastructures/CellContainer.h"
 #include "coupling/datastructures/FlexibleCellContainer.h"
+#include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
+#include "coupling/sendrecv/SendReceiveBuffer.h"
 #include <vector>
 
 namespace coupling {
@@ -36,7 +36,7 @@ public:
   virtual ~FromMD2Macro() {}
 
   using Macro_Container_T = coupling::datastructures::FlexibleCellContainer<dim>;
-  using Local_Container_T = coupling::datastructures::CellContainer<I10,dim>;
+  using Local_Container_T = coupling::datastructures::CellContainer<I10, dim>;
 
   /** sends information from the local coupling cells of MaMiCo (only inner
    * non-ghost cells of this process) to the macroscopic solver. Since the
@@ -111,8 +111,7 @@ private:
    * 	@param dataExchange
    * 	@param cells
    */
-  template <class Container_T>
-  void allocateReduceBufferForReceiving(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void allocateReduceBufferForReceiving(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells);
 
   /** reads information from the receive buffer and stores the result in the
    * list of coupling cells. Since this is a receive for the coupling
@@ -132,8 +131,7 @@ private:
    * 	@param dataExchange
    * 	@param cells
    */
-  template <class Container_T>
-  void readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells);
 };
 
 #include "FromMD2Macro.cpph"

@@ -26,8 +26,7 @@ template <class Cell_T, unsigned int dim> class FromMacro2MDSendOnly;
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class Cell_T, unsigned int dim>
-class coupling::sendrecv::FromMacro2MDSendOnly : public coupling::sendrecv::SendReceiveBuffer<Cell_T, dim> {
+template <class Cell_T, unsigned int dim> class coupling::sendrecv::FromMacro2MDSendOnly : public coupling::sendrecv::SendReceiveBuffer<Cell_T, dim> {
 
 public:
   /** Constructor, just calling the constructor of the
@@ -46,8 +45,7 @@ public:
    * 	@param dataExchange
    * 	@param cells
    */
-  template <class Container_T>
-  void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** sends data from macro to MD. After returning, the data transfer may not be
    *completely finished, similar to a IRecv/ISend-call by MPI. Please use
@@ -57,9 +55,7 @@ public:
    * 	@param cells
    *	@sa  descriptions of same function of class FromMacro2MD.
    */
-  template <class Container_T>
-  void sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
-                                   const Container_T& cells);
+  template <class Container_T> void sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** waits for the data transfer--instantiated by
    *sendFromMacro2MDNonBlocking(..)--to be finished and fills the information
@@ -74,8 +70,7 @@ protected:
    * 	@param dataExchange
    * 	@param cells
    */
-  template <class Container_T>
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 };
 
 #include "FromMacro2MDSendOnly.cpph"

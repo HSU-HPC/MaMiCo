@@ -214,11 +214,11 @@ public:
                 CPPUNIT_ASSERT_DOUBLES_EQUAL(receivedEnd[2], actualEnd[2], 1e-6);
 
               } // linkZ
-            }   // linkY
-          }     // linkX
-        }       // macZ
-      }         // macY
-    }           // macX
+            } // linkY
+          } // linkX
+        } // macZ
+      } // macY
+    } // macX
   }
 
   void testGetCellIterator() {
@@ -282,11 +282,11 @@ public:
                   CPPUNIT_ASSERT(ls1Iterator.isValid() == receivedIterator->continueIteration());
                 }
               } // linkZ
-            }   // linkY
-          }     // linkX
-        }       // macZ
-      }         // macY
-    }           // macX
+            } // linkY
+          } // linkX
+        } // macZ
+      } // macY
+    } // macX
   }
 
   void testMassSync() {

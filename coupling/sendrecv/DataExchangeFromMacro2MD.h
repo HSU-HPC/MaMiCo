@@ -71,7 +71,7 @@ public:
    *need information on MD side, otherwise empty vector
    */
   std::vector<unsigned int> getSourceRanks(I01 idx) override {
-    if (I08::contains(idx) && !I12::contains(idx)) { // Global, no ghost, no MD2Macro  
+    if (I08::contains(idx) && !I12::contains(idx)) { // Global, no ghost, no MD2Macro
       return _msi->getSourceRanks(idx);
     }
     return std::vector<unsigned int>();

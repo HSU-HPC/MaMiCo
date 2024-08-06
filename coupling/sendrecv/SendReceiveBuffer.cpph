@@ -46,8 +46,7 @@ template <class Cell_T, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<
 #endif
 }
 
-template <class Cell_T, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::deleteBuffer(std::map<unsigned int, BufferWithID>& buffer) {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::deleteBuffer(std::map<unsigned int, BufferWithID>& buffer) {
   for (typename std::map<unsigned int, BufferWithID>::iterator it = buffer.begin(); it != buffer.end(); it++) {
     if ((it->second).buffer != NULL) {
       free((it->second).buffer);
@@ -69,7 +68,7 @@ template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBu
 
 template <class Cell_T, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToBcastBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
-                                                                                  const Cell_T& couplingCell, I01 idx) {
+                                                                            const Cell_T& couplingCell, I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
   unsigned int intNumberProcesses = IDXS.getScalarNumberProcesses();
@@ -121,7 +120,7 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToBcastBuffer(coup
 
 template <class Cell_T, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
-                                                                                        Cell_T& couplingCell, I01 idx) {
+                                                                                  Cell_T& couplingCell, I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   const unsigned int globalIndex = I00{idx}.get();
 
@@ -142,12 +141,11 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromCollectiveBuffe
         return;
       }
     } // loop over buffer
-  }   // loop over all buffers
+  } // loop over all buffers
 }
 
 template <class Cell_T, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateBcastBufferForReceiving(
-    coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx) {
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateBcastBufferForReceiving(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
   // determine the ranks from which we need to receive information of this coupling cell
@@ -307,8 +305,8 @@ template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBu
 }
 
 template <class Cell_T, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceBufferForReceiving(
-    coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx) {
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceBufferForReceiving(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
+                                                                                          I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
   // determine the ranks from which we need to receive information of this coupling cell
@@ -371,8 +369,8 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceBufferFor
 }
 
 template <class Cell_T, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
-                                                                                   const Cell_T& cell, I01 idx) {
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Cell_T& cell,
+                                                                             I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
   const unsigned int globalIndex = I00{idx}.get();
@@ -432,7 +430,7 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(cou
 
 template <class Cell_T, unsigned int dim>
 void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
-                                                                                    Cell_T& couplingCell, const I01 idx) {
+                                                                              Cell_T& couplingCell, const I01 idx) {
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
   const unsigned int globalIndex = I00{idx}.get();
 
@@ -455,11 +453,10 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReduceBuffer(co
         return;
       }
     } // loop over buffer
-  }   // loop over all buffers
+  } // loop over all buffers
 }
 
-template <class Cell_T, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateBcastRequests(const unsigned int thisRank) {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateBcastRequests(const unsigned int thisRank) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 
   if (_requestsAllocated) {
@@ -533,8 +530,7 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateBcastRequests(c
 #endif
 }
 
-template <class Cell_T, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceRequests(const unsigned int thisRank) {
+template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceRequests(const unsigned int thisRank) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 
   if (_requestsAllocated) {
@@ -629,10 +625,11 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceRequests(
 
 template <class Cell_T, unsigned int dim>
 template <class Container_T>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
+                                                                           const Container_T& cells) {
   I01 idx;
   Cell_T* couplingCell;
-  for(auto pair : cells) {
+  for (auto pair : cells) {
     std::tie(couplingCell, idx) = pair;
     const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
     const unsigned int globalIndex = I00{idx}.get();
@@ -641,14 +638,14 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(coupl
     // cell
     const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(idx);
     const unsigned int ranksSize = (unsigned int)ranks.size();
-  #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Rank " << IDXS.getRank() << ": write cell " << *idx << " to send buffer;";
     std::cout << " associated target ranks: ";
     for (unsigned int i = 0; i < ranksSize; i++) {
       std::cout << ranks[i] << " ";
     }
     std::cout << std::endl;
-  #endif
+#endif
 
     // loop over ranks
     for (unsigned int i = 0; i < ranksSize; i++) {
@@ -679,10 +676,11 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(coupl
 
 template <class Cell_T, unsigned int dim>
 template <class Container_T>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
+                                                                               const Container_T& cells) {
   I01 idx;
   Cell_T* couplingCell;
-  for(auto pair : cells) {
+  for (auto pair : cells) {
     std::tie(couplingCell, idx) = pair;
 
     const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
@@ -709,7 +707,7 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer(c
           breakCellLoop = true;
         }
       } // loop over buffer
-    }   // loop over all buffers
+    } // loop over all buffers
   }
 }
 

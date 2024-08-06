@@ -5,8 +5,8 @@
 #ifndef _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGE_H_
 #define _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGE_H_
 
-#include "tarch/la/Vector.h"
 #include "coupling/datastructures/CouplingCell.h"
+#include "tarch/la/Vector.h"
 
 namespace coupling {
 namespace sendrecv {

@@ -115,7 +115,8 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer) {
+void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro2MD(
+    const coupling::datastructures::FlexibleCellContainer<dim>& macro2MDBuffer) {
 
   Wrapper4ProcessInnerCouplingCellBeforeReceivingMacroscopicSolverData wrapper1(this);
   Wrapper4ProcessOuterCouplingCellBeforeReceivingMacroscopicSolverData wrapper2(this);
@@ -153,7 +154,8 @@ template <class LinkedCell, unsigned int dim> double coupling::services::Couplin
 }
 
 template <class LinkedCell, unsigned int dim>
-double coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) {
+double coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(
+    const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) {
   sendFromMD2MacroPreProcess();
 
   double runtime = applyFilterPipeline();
@@ -365,9 +367,9 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
             }
 
           } // cellIndex(0)
-        }   // cellIndex(1)
-      }     // cellIndex(2)
-    }       // 2^dim-colour single cells (1<<dim)
+        } // cellIndex(1)
+      } // cellIndex(2)
+    } // 2^dim-colour single cells (1<<dim)
 
     // synchronize molecules between processes
     _mdSolverInterface->synchronizeMoleculesAfterMassModification();

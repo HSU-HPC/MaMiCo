@@ -34,7 +34,7 @@ public:
   /** Destructor */
   virtual ~FromMacro2MD() {}
 
-  using Local_Container_T = coupling::datastructures::CellContainer<I10,dim>;
+  using Local_Container_T = coupling::datastructures::CellContainer<I10, dim>;
 
   /** sends information from the local coupling cells of a macroscopic solver
    * to the coupling cells of MaMico (ghost cells are also allowed). Since
@@ -49,12 +49,10 @@ public:
    * 	@param src
    */
   template <class Container_T>
-  void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Container_T& dst,
-                        const Container_T& src);
+  void sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Container_T& dst, const Container_T& src);
 
   template <class Container_T>
-  void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices,
-                         const Container_T& src,
+  void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices, const Container_T& src,
                          std::vector<Local_Container_T> dst);
 
   /** sends data from macro to MD. After returning, the data transfer may not be
@@ -64,9 +62,7 @@ public:
    * 	@param dataExchange
    * 	@param cells
    */
-  template <class Container_T>
-  void sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
-                                   const Container_T& cells);
+  template <class Container_T> void sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** waits for the data transfer--instantiated by
    * sendFromMacro2MDNonBlocking(..)--to be finished and fills the information
@@ -83,11 +79,9 @@ private:
    * 	@param cells
    * 	@param globalCellIndices
    */
-  template <class Container_T>
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
-  template <class Container_T>
-  void writeToSendBufferCollective(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void writeToSendBufferCollective(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** allocates the receive buffers for the macroscopic solver. Since we want to
    * obtain data on the side of MaMiCo, we can just loop over all local

@@ -15,10 +15,10 @@
 #include <mpi.h>
 #endif
 #include "coupling/datastructures/CouplingCell.h"
+#include "coupling/datastructures/FlexibleCellContainer.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/solvers/CouetteSolver.h"
-#include "coupling/datastructures/FlexibleCellContainer.h"
 namespace coupling {
 namespace solvers {
 class NumericalSolver;

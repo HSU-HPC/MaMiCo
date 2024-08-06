@@ -726,7 +726,7 @@ protected:
       if (!I12::contains(idx)) {
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
-          _couplingBuffer.macro2MDBuffer << std::make_pair(couplingCell, idx); 
+          _couplingBuffer.macro2MDBuffer << std::make_pair(couplingCell, idx);
           if (couplingCell == nullptr)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
         }
@@ -743,8 +743,8 @@ protected:
       if (tarch::utils::contains(msi.getTargetRanks(idx), (unsigned int)_rank)) {
         coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
         _couplingBuffer.md2macroBuffer << std::make_pair(couplingCell, idx);
-          if (couplingCell == nullptr)
-            throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
+        if (couplingCell == nullptr)
+          throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
       }
     }
   }
@@ -753,8 +753,7 @@ protected:
    *  @param recvBuffer the buffer for the data, which comes from md
    *  @param recvIndices the indices for the macr cells in the buffer
    *  @param couplingCycle the current number of coupling cycle */
-  template <class Container_T>
-  void write2CSV(Container_T& md2macroBuffer, int couplingCycle) const {
+  template <class Container_T> void write2CSV(Container_T& md2macroBuffer, int couplingCycle) const {
     if (md2macroBuffer.size() == 0)
       return;
     if (_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0)

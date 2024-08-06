@@ -6,8 +6,8 @@
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/datastructures/CouplingCell.h"
-#include "coupling/indexing/IndexingService.h"
 #include "coupling/datastructures/FlexibleCellContainer.h"
+#include "coupling/indexing/IndexingService.h"
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -38,19 +38,17 @@ public:
     }
   }
 
-  template <class Container_T>
-  FlexibleCellContainer(Container_T cells) {
-      if constexpr (std::is_same_v<Container_T, FlexibleCellContainer>) {
-        _idxs = cells._idxs;
-        _couplingCells = cells._couplingCells;
-      }
-      else {
-        auto numCells = cells.size();
-        _idxs.reserve(numCells);
-        _couplingCells.reserve(numCells);
-        for (auto pair : cells)
-          this << pair;
-      }
+  template <class Container_T> FlexibleCellContainer(Container_T cells) {
+    if constexpr (std::is_same_v<Container_T, FlexibleCellContainer>) {
+      _idxs = cells._idxs;
+      _couplingCells = cells._couplingCells;
+    } else {
+      auto numCells = cells.size();
+      _idxs.reserve(numCells);
+      _couplingCells.reserve(numCells);
+      for (auto pair : cells)
+        this << pair;
+    }
   }
 
   void operator<<(std::pair<coupling::datastructures::CouplingCell<dim>*, I01> pair) {

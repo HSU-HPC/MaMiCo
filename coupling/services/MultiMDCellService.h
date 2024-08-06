@@ -348,10 +348,10 @@ public:
     double res = 0;
     const unsigned int size = (unsigned int)md2macroCouplingCells.size();
 
-  #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (_couplingCells.size() != size)
       throw std::runtime_error(std::string("Buffers must have the same size!"));
-  #endif
+#endif
 
     preprocessingForMD2Macro(size);
 
@@ -361,7 +361,7 @@ public:
     I01 idx;
     coupling::datastructures::CouplingCell<3>* cellA;
     coupling::datastructures::CouplingCell<3>* cellB;
-    for(auto pair : _couplingCells) {
+    for (auto pair : _couplingCells) {
       std::tie(cellA, idx) = pair;
       cellA->setMacroscopicMass(0.0);
       cellA->setMacroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
@@ -391,7 +391,7 @@ public:
     }
 
     // average data
-    for(auto pair : _couplingCells) {
+    for (auto pair : _couplingCells) {
       std::tie(cellA, idx) = pair;
       cellA->setMacroscopicMass(cellA->getMacroscopicMass() / (double)totalNumberEquilibratedMDSimulations);
       cellA->setMacroscopicMomentum(1.0 / (double)totalNumberEquilibratedMDSimulations * cellA->getMacroscopicMomentum());

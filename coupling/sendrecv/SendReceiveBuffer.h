@@ -48,7 +48,7 @@ protected:
    * 	@param dataExchange
    * 	@param cells
    */
-  template<class Container_T> void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   /** @brief fills all information that needs to be broadcast from a coupling cell
    * into the broadcast-buffer.
@@ -72,7 +72,7 @@ protected:
    * 	@param couplingCell
    * 	@param idx
    */
-  template<class Container_T> void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
+  template <class Container_T> void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
   void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, Cell_T& couplingCell, I01 idx);
 

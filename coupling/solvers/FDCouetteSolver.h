@@ -155,7 +155,7 @@ public:
    *  @param recvBuffer holds the data from the md solver
    *  @param recvIndice the indices to connect the data from the buffer with
    * coupling cells */
-  
+
   void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) override {
     if (skipRank()) {
       return;
