@@ -62,7 +62,7 @@ public:
     container << std::make_pair(couplingCell, idx);
     CPPUNIT_ASSERT_EQUAL(1, container.size());
     auto extractedCell = (*container.begin()).first;
-    CPPUNIT_ASSERT_EQUAL(50.0, extractedCell->getMacroscopicMass());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(50.0, extractedCell->getMacroscopicMass(), 1e-16);
   }
 
   void testMassInsert() {
@@ -77,7 +77,7 @@ public:
     i = 0;
     for (auto pair : container) {
       std::tie(couplingCell, idx) = pair;
-      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass(), 1e-16);
       CPPUNIT_ASSERT_EQUAL(idx, _idxs_10case[i]);
       i++;
     }
@@ -98,7 +98,7 @@ public:
     int i = 0;
     for (auto pair : container) {
       std::tie(couplingCell, idx) = pair;
-      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass(), 1e-16);
       CPPUNIT_ASSERT_EQUAL(idx, _idxs_10case[i]);
       i++;
     }
@@ -138,7 +138,7 @@ public:
     int i = 0;
     for (auto iter = container.begin(); iter != container.end();) {
       std::tie(couplingCell, idx) = *iter;
-      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass(), 1e-16);
       CPPUNIT_ASSERT_EQUAL(idx, _idxs_10case[i]);
       i++;
       ++iter;
@@ -153,7 +153,7 @@ public:
     int i = 0;
     for (auto iter = container.begin(); iter != container.end();) {
       std::tie(couplingCell, idx) = *iter++;
-      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_10case[i]->getMacroscopicMass(), 1e-16);
       CPPUNIT_ASSERT_EQUAL(idx, _idxs_10case[i]);
       i++;
     }

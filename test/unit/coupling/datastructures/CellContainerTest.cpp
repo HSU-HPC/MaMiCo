@@ -60,7 +60,7 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL((int)_couplingCells_fullcase.size(), container.size());
     auto extractedCell = (*container.begin()).first;
-    CPPUNIT_ASSERT_EQUAL(_couplingCells_fullcase[0]->getMacroscopicMass(), extractedCell->getMacroscopicMass());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(_couplingCells_fullcase[0]->getMacroscopicMass(), extractedCell->getMacroscopicMass(), 1e-16);
     auto extractedIdx = (*container.begin()).second;
     CPPUNIT_ASSERT_EQUAL(extractedIdx, _idxs_fullcase[0]);
   }
@@ -77,7 +77,7 @@ public:
     int i = 0;
     for (auto pair : container) {
       std::tie(couplingCell, idx) = pair;
-      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass(), 1e-16);
       CPPUNIT_ASSERT_EQUAL(idx, _idxs_fullcase[i]);
       i++;
     }
@@ -117,7 +117,7 @@ public:
     int i = 0;
     for (auto iter = container.begin(); iter != container.end();) {
       std::tie(couplingCell, idx) = *iter;
-      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass(), 1e-16);
       CPPUNIT_ASSERT_EQUAL(idx, _idxs_fullcase[i]);
       i++;
       ++iter;
@@ -132,7 +132,7 @@ public:
     int i = 0;
     for (auto iter = container.begin(); iter != container.end();) {
       std::tie(couplingCell, idx) = *iter++;
-      CPPUNIT_ASSERT_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass(), 1e-16);
       CPPUNIT_ASSERT_EQUAL(idx, _idxs_fullcase[i]);
       i++;
     }
@@ -146,7 +146,7 @@ public:
     int i = 0;
     for (; i < _couplingCells_fullcase.size(); i++) {
       auto idx = _idxs_fullcase[i];
-      CPPUNIT_ASSERT_EQUAL(container[idx]->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(container[idx]->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass(), 1e-16);
     }
   }
 
