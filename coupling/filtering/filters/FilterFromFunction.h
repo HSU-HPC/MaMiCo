@@ -42,7 +42,7 @@ public:
       // interpret position of cell in inputCellVector as linear local
       // md-to-macro index, then convert it to vector
       using coupling::indexing::IndexTrait;
-      mamicoIndex = coupling::indexing::convertToVector<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>({i});
+      mamicoIndex = coupling::indexing::convertToVector<dim>(I14{i});
 
       for (unsigned int d = 0; d < dim; d++)
         stlIndex[d] = mamicoIndex[d];

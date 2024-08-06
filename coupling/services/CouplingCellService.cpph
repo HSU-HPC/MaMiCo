@@ -73,7 +73,7 @@ coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::CouplingCellServic
   // initInnerCouplingCells(_couplingCells.getCouplingCells());
 }
 
-template <class LinkedCell, unsigned int dim> coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::~CouplingCellServiceImpl<LinkedCell, dim>() {
+template <class LinkedCell, unsigned int dim> coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::~CouplingCellServiceImpl() {
   // free memory and delete objects
   if (_particleInsertion != NULL) {
     delete _particleInsertion;

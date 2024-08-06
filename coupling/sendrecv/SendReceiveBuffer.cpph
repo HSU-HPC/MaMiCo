@@ -20,7 +20,7 @@ template <class Cell_T, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<
 #endif
 }
 
-template <class Cell_T, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::~SendReceiveBuffer<Cell_T, dim>() {
+template <class Cell_T, unsigned int dim> coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::~SendReceiveBuffer() {
   deleteBuffers();
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   if (_requests != NULL) {

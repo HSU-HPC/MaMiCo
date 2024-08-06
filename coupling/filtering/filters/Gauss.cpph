@@ -23,7 +23,7 @@ void coupling::filtering::Gauss<dim, scope...>::operator()() {
   for (unsigned int raw_index = 0; raw_index < _inputCells.size(); raw_index++) {
 
     // construct CellIndex using raw index
-    index = {raw_index};
+    index = ScalarIndex{raw_index};
 
     // make use of implicit conversion between linear <-> vector indices
     indexAbove = getIndexAbove(index, _dim);
@@ -159,11 +159,11 @@ coupling::filtering::Gauss<dim, scope...>::getIndexAbove(const coupling::filteri
   }
 
   // get raw vector index
-  auto ans = index.get();
+  tarch::la::Vector<dim,int> ans = index.get();
   // get upper index in dimension d
   ans[d] += 1;
 
-  return {ans};
+  return VectorIndex{ans};
 }
 
 template <unsigned int dim, coupling::indexing::IndexTrait... scope>
@@ -180,9 +180,9 @@ coupling::filtering::Gauss<dim, scope...>::getIndexBelow(const coupling::filteri
   }
 
   // copy input index
-  auto ans = index.get();
+  tarch::la::Vector<dim,int> ans = index.get();
   // get lower index in dimension d
   ans[d] -= 1;
 
-  return {ans};
+  return VectorIndex{ans};
 }

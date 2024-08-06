@@ -14,7 +14,7 @@ coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::LinkedCellContai
 }
 
 template <class LinkedCell, unsigned int dim>
-coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::~LinkedCellContainer<LinkedCell, dim>() {
+coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::~LinkedCellContainer() {
   // de-init all coupling cells and then free the allocated memory (C-style array)
   if (_couplingCellsWithLinkedCells != NULL) {
     auto size = coupling::datastructures::CellContainer<I02, dim>::_couplingCells.size();
