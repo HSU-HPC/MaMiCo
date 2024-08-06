@@ -116,7 +116,7 @@ public:
    */
   CellIndex() = default;
   CellIndex(const CellIndex& ci) = default;
-  CellIndex(const value_T& i) : _index(i) {}
+  explicit CellIndex(const value_T& i) : _index(i) {}
 
   /**
    * Conversion function: Convert to CellIndex of same dim but different

@@ -364,8 +364,8 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
   const auto globalNumberCouplingCellsInclGL{globalNumberCouplingCells + tarch::la::Vector<dim, unsigned int>{2}};
 
   // init boundaries of all global, non-m2m, GL including indexing types
-  CellIndex<dim>::lowerBoundary = {0};
-  CellIndex<dim>::upperBoundary = tarch::la::Vector<dim, int>{globalNumberCouplingCellsInclGL - tarch::la::Vector<dim, unsigned int>{1}};
+  CellIndex<dim>::lowerBoundary = I01{0};
+  CellIndex<dim>::upperBoundary = I01{tarch::la::Vector<dim, int>{globalNumberCouplingCellsInclGL - tarch::la::Vector<dim, unsigned int>{1}}};
   CellIndex<dim>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector>::lowerBoundary = CellIndex<dim>::lowerBoundary;
@@ -373,8 +373,8 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
   CellIndex<dim, IndexTrait::vector>::setDomainParameters();
 
   // init boundaries of all global, non-m2m, GL excluding indexing types
-  CellIndex<dim, IndexTrait::noGhost>::lowerBoundary = {1};
-  CellIndex<dim, IndexTrait::noGhost>::upperBoundary = tarch::la::Vector<dim, int>{globalNumberCouplingCellsInclGL - tarch::la::Vector<dim, unsigned int>{2}};
+  CellIndex<dim, IndexTrait::noGhost>::lowerBoundary = I01{1};
+  CellIndex<dim, IndexTrait::noGhost>::upperBoundary = I01{tarch::la::Vector<dim, int>{globalNumberCouplingCellsInclGL - tarch::la::Vector<dim, unsigned int>{2}}};
   CellIndex<dim, IndexTrait::noGhost>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::noGhost>::lowerBoundary;
@@ -401,9 +401,9 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 
   // init boundaries of all global, m2m, GL including indexing types
   CellIndex<dim, IndexTrait::md2macro>::lowerBoundary =
-      CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get() - tarch::la::Vector<dim, int>{1};
+      I01{CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get() - tarch::la::Vector<dim, int>{1}};
   CellIndex<dim, IndexTrait::md2macro>::upperBoundary =
-      CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary.get() + tarch::la::Vector<dim, int>{1};
+      I01{CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary.get() + tarch::la::Vector<dim, int>{1}};
   CellIndex<dim, IndexTrait::md2macro>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::md2macro>::lowerBoundary = CellIndex<dim, IndexTrait::md2macro>::lowerBoundary;
@@ -449,9 +449,9 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 
   // init boundaries of all local, non-m2m, GL excluding indexing types
   CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary =
-      CellIndex<dim, IndexTrait::local>::lowerBoundary.get() + tarch::la::Vector<dim, int>{1};
+      I01{CellIndex<dim, IndexTrait::local>::lowerBoundary.get() + tarch::la::Vector<dim, int>{1}};
   CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::upperBoundary =
-      CellIndex<dim, IndexTrait::local>::upperBoundary.get() - tarch::la::Vector<dim, int>{1};
+      I01{CellIndex<dim, IndexTrait::local>::upperBoundary.get() - tarch::la::Vector<dim, int>{1}};
   CellIndex<dim, IndexTrait::local, IndexTrait::noGhost>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost>::lowerBoundary =
@@ -472,8 +472,8 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
       upperBoundary[d] = std::min(LocalNoGlIndex::upperBoundary.get()[d], GlobalMD2MacroNoGlIndex::upperBoundary.get()[d]);
     }
 
-    CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = lowerBoundary;
-    CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = upperBoundary;
+    CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary = I01{lowerBoundary};
+    CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary = I01{upperBoundary};
     CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::setDomainParameters();
   }
 
@@ -485,9 +485,9 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 
   // init boundaries of all local, m2m, GL including indexing types
   CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary =
-      CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get() - tarch::la::Vector<dim, int>{1};
+      I01{CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::lowerBoundary.get() - tarch::la::Vector<dim, int>{1}};
   CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::upperBoundary =
-      CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary.get() + tarch::la::Vector<dim, int>{1};
+      I01{CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::upperBoundary.get() + tarch::la::Vector<dim, int>{1}};
   CellIndex<dim, IndexTrait::local, IndexTrait::md2macro>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro>::lowerBoundary =
