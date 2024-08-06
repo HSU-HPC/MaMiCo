@@ -26,7 +26,7 @@ public:
   CellContainer(std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells) {
     _couplingCells.reserve(CellIndexT::linearNumberCellsInDomain);
     for (auto cell : couplingCells) {
-      this << cell;
+      *this << cell;
     }
   }
 

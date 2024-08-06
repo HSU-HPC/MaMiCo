@@ -56,9 +56,10 @@ public:
     CellContainer<I01, 3> container;
     int i = 0;
     for (auto idx : I01()) {
+      (void)idx; // Avoid unused variable error
       container << _couplingCells_fullcase[i++];
     }
-    CPPUNIT_ASSERT_EQUAL((int)_couplingCells_fullcase.size(), container.size());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)_couplingCells_fullcase.size(), container.size());
     auto extractedCell = (*container.begin()).first;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(_couplingCells_fullcase[0]->getMacroscopicMass(), extractedCell->getMacroscopicMass(), 1e-16);
     auto extractedIdx = (*container.begin()).second;
@@ -70,11 +71,12 @@ public:
     CellContainer<I01, 3> container;
     int i = 0;
     for (auto idx : I01()) {
+      (void)idx; // Avoid unused variable error
       container << _couplingCells_fullcase[i++];
     }
     I01 idx;
     CouplingCell<3>* couplingCell;
-    int i = 0;
+    i = 0;
     for (auto pair : container) {
       std::tie(couplingCell, idx) = pair;
       CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass(), 1e-16);
@@ -89,7 +91,7 @@ public:
     CellContainer<I01, 3> container2(_couplingCells_fullcase);
     auto iter1 = container1.begin();
     auto iter2 = container2.begin();
-    for (int i = 0; i < _couplingCells_fullcase.size(); ++i) {
+    for (unsigned int i = 0; i < _couplingCells_fullcase.size(); ++i) {
       CPPUNIT_ASSERT(iter1 == iter2);
       iter1++;
       iter2++;
@@ -102,7 +104,7 @@ public:
     CellContainer<I01, 3> container2(_couplingCells_fullcase);
     auto iter1 = container1.begin();
     auto iter2 = container2.begin();
-    for (int i = 0; i < _couplingCells_fullcase.size(); ++i) {
+    for (unsigned int i = 0; i < _couplingCells_fullcase.size(); ++i) {
       iter1++;
       CPPUNIT_ASSERT(iter1 != iter2);
       iter2++;
@@ -142,8 +144,7 @@ public:
     using namespace coupling::datastructures;
     CellContainer<I01, 3> container(_couplingCells_fullcase);
     I01 idx;
-    CouplingCell<3>* couplingCell;
-    int i = 0;
+    unsigned int i = 0;
     for (; i < _couplingCells_fullcase.size(); i++) {
       auto idx = _idxs_fullcase[i];
       CPPUNIT_ASSERT_DOUBLES_EQUAL(container[idx]->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass(), 1e-16);

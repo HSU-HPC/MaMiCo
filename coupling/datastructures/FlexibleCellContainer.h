@@ -47,7 +47,7 @@ public:
       _idxs.reserve(numCells);
       _couplingCells.reserve(numCells);
       for (auto pair : cells)
-        this << pair;
+        *this << pair;
     }
   }
 
