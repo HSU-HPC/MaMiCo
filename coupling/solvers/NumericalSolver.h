@@ -18,7 +18,7 @@
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/solvers/CouetteSolver.h"
-
+#include "coupling/datastructures/FlexibleCellContainer.h"
 namespace coupling {
 namespace solvers {
 class NumericalSolver;
@@ -197,7 +197,7 @@ public:
    * conntinuum solver
    *  @param md2macroBuffer holds the data from the md solver
    * coupling cells*/
-  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& md2macroBuffer) = 0;
+  virtual void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) = 0;
 
   /** @brief returns the number of process, regards parallel runs
    *  @returns the number of processes */

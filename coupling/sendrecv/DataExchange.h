@@ -10,7 +10,7 @@
 
 namespace coupling {
 namespace sendrecv {
-template <unsigned int dim> class DataExchange;
+template <class Cell_T, unsigned int dim> class DataExchange;
 }
 } // namespace coupling
 

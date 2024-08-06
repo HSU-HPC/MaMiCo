@@ -54,7 +54,7 @@ public:
 
   template <class Container_T>
   void bcastFromMacro2MD(std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices,
-                         const Container_T1& src,
+                         const Container_T& src,
                          std::vector<Local_Container_T> dst);
 
   /** sends data from macro to MD. After returning, the data transfer may not be

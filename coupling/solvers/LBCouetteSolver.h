@@ -194,7 +194,7 @@ public:
    * conntinuum solver
    *  @param md2macroBuffer holds the data from the md solver
    * coupling cells */
-  void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& md2macroBuffer) override {
+  void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) override {
     if (skipRank()) {
       return;
     }
@@ -207,11 +207,11 @@ public:
 
     // loop over all received cells
     for (auto pair : md2macroBuffer) {
-      I01* idx;
-      coupling::datastructures::CouplingCell<3>* couplingCell;
+      I01 idx;
+      const coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
       // determine cell index of this cell in LB domain
-      tarch::la::Vector<3, unsigned int> globalCellCoords{idx->get()};
+      tarch::la::Vector<3, unsigned int> globalCellCoords{idx.get()};
       globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
       globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
       globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;

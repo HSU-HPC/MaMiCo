@@ -5,8 +5,9 @@
 
 #pragma region collective operations
 
-template <class Cell_T, unsigned int dim, class Container_T1, class Container_T2>
-void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::reduceFromMD2Macro(std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>*>& dataExchange, const Container_T1& src, const Container_T2& dst) {
+template <class Cell_T, unsigned int dim>
+template <class Container_T1, class Container_T2>
+void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::reduceFromMD2Macro(std::vector<coupling::sendrecv::DataExchangeFromMD2Macro<dim>*>& dataExchanges, const Container_T1& src, const Container_T2& dst) {
   const unsigned int rank = IDXS.getRank();
 
   // empty send and receive buffers
@@ -40,11 +41,12 @@ template <class Cell_T, unsigned int dim>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::writeToReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Local_Container_T& cells) {
   for (auto idx : I10()) {
     auto scalarGlobalIdx = I00{idx}.get();
-    coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(dataExchange, *couplingCells[scalarGlobalIdx], idx);
+    coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(dataExchange, cells[scalarGlobalIdx], idx);
   }
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::allocateReduceBufferForReceiving(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells) {
   I01* idx;
   Cell_T* cell;
@@ -54,7 +56,8 @@ void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::allocateReduceBufferForRecei
   }
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells) {
   I01* idx;
   Cell_T* cell;

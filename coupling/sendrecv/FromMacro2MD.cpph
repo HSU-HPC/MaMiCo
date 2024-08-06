@@ -5,7 +5,8 @@
 
 #pragma region sequential operations
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Local_Container_T& dst, const Container_T& src) {
   // send data
   sendFromMacro2MDNonBlocking(dataExchange, src);
@@ -13,7 +14,8 @@ void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::sendFromMacro2MD(coupling::s
   wait4SendFromMacro2MD(dataExchange, dst);
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::sendFromMacro2MDNonBlocking(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) 
 {
   // empty send and receive buffers
@@ -38,7 +40,8 @@ void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::allocateReceiveBuffers(coupl
     coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReceiveBuffers(dataExchange, idx);
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
   // const unsigned int numberCells = (unsigned int)cells.size();
   // for (unsigned int i = 0; i < numberCells; i++)
@@ -63,10 +66,11 @@ void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::readFromReceiveBuffer(coupli
 #pragma endregion // sequential operations
 
 #pragma region collective operations
-template <class Cell_T, unsigned int dim, class Container_T1>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::bcastFromMacro2MD(
     std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromCouplingCellServices,
-    const Container_T1& src,
+    const Container_T& src,
     std::vector<Local_Container_T> dst) {
   // empty send and receive buffers
   coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::deleteBuffers();
@@ -97,7 +101,8 @@ void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::bcastFromMacro2MD(
   }
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::writeToSendBufferCollective(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
   I01 idx;
   Cell_T* cell;

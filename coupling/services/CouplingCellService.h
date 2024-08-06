@@ -184,7 +184,7 @@ public:
    *
    * @returns The runtime of filtering related code in usec.
    */
-  double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer& macroscopicSolverCellContainer) override;
+  double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& macroscopicSolverCellContainer) override;
 
   /** applies the filter pipeline and returns the runtime of this operation */
   double applyFilterPipeline() override;
@@ -306,7 +306,7 @@ private:
   coupling::interface::MacroscopicSolverInterface<dim>* _macroscopicSolverInterface;
 
   /** for quantity transfer between solvers */
-  coupling::sendrecv::FromMacro2MD<CellIndexT, dim> _fromMacro2MD;
+  coupling::sendrecv::FromMacro2MD<coupling::datastructures::CouplingCell<dim>, dim> _fromMacro2MD;
   coupling::sendrecv::DataExchangeFromMacro2MD<dim> _deFromMacro2MD;
   coupling::sendrecv::FromMD2Macro<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;

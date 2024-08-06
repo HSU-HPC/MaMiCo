@@ -22,7 +22,7 @@ template <class CellIndexT, unsigned int dim> class CellContainer;
 template <class CellIndexT, unsigned int dim> class coupling::datastructures::CellContainer {
 
 public:
-  CellContainer(){_couplingCells.reserve(CellIndexT::linearNumberCellsInDomain)};
+  CellContainer(){_couplingCells.reserve(CellIndexT::linearNumberCellsInDomain);}
   CellContainer(std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells) {
     _couplingCells.reserve(CellIndexT::linearNumberCellsInDomain);
     for (auto cell : couplingCells) {
@@ -38,7 +38,7 @@ public:
       std::exit(EXIT_FAILURE);
     }
 #endif
-    return _couplingCells[indexing::convertToScalar(idx)];
+    return _couplingCells[indexing::convertToScalar(index)];
   }
 
   /** adds a new coupling cell to the datastructure at the next index (will only work if the data structure is not yet full)*/
@@ -59,10 +59,10 @@ public:
   public:
     using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::iterator;
 
-    Iterator(CouplingCellIterator itCouplingCells) : _itCouplingCells(itCouplingCells) {}
+    Iterator(CouplingCellIterator itCouplingCells) : _itCouplingCells(itCouplingCells), _itCouplingCellsBegin(itCouplingCells) {}
 
     std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const {
-      I01 temp(std::distance(_couplingCells.begin(), _itCouplingCells));
+      I01 temp(std::distance(_itCouplingCellsBegin, _itCouplingCells));
       return std::make_pair(*_itCouplingCells, temp);
     }
 
@@ -82,7 +82,7 @@ public:
     friend bool operator!=(const Iterator& a, const Iterator& b) { return *(a._itCouplingCells) != *(b._itCouplingCells); }
 
   private:
-    CouplingCellIterator _itCouplingCells;
+    CouplingCellIterator _itCouplingCells, _itCouplingCellsBegin;
   };
 
   Iterator begin() { return Iterator(_couplingCells.begin()); }

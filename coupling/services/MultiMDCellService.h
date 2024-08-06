@@ -344,17 +344,27 @@ public:
   /** collects data from MD simulations, averages over them (only macroscopic
    * mass/momentum is considered) and writes the result back into
    * couplingCellsFromMacroscopicSolver. */
-  double sendFromMD2Macro(const coupling::datastructures::CellContainer<I12, dim>& md2macroCouplingCells) {
+  double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& md2macroCouplingCells) {
     double res = 0;
     const unsigned int size = (unsigned int)md2macroCouplingCells.size();
 
-    preprocessingForMD2Macro(indices, size);
+  #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_couplingCells.size() != size)
+      throw std::runtime_error(std::string("Buffers must have the same size!"));
+  #endif
+
+    preprocessingForMD2Macro(size);
 
     // reset macroscopic data (only those should be used by macroscopic solver
     // anyway) in duplicate
-    for (unsigned int i = 0; i < size; i++) {
-      _couplingCells[i]->setMacroscopicMass(0.0);
-      _couplingCells[i]->setMacroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
+    int i = 0;
+    I01 idx;
+    coupling::datastructures::CouplingCell<3>* cellA;
+    coupling::datastructures::CouplingCell<3>* cellB;
+    for(auto pair : _couplingCells) {
+      std::tie(cellA, idx) = pair;
+      cellA->setMacroscopicMass(0.0);
+      cellA->setMacroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
     }
 
     // receive data from each MD simulation and accumulate information in
@@ -365,19 +375,26 @@ public:
       //_couplingCellServices[l]->getIndexConversion().getThisRank() << ":
       // Send from MD to Macro for Simulation no. " << l << std::endl;
       if (_couplingCellServices[l] != nullptr && _warmupPhase[l] == 0) {
-        res += _couplingCellServices[l]->sendFromMD2Macro(couplingCellsFromMacroscopicSolver, indices);
-        for (unsigned int i = 0; i < size; i++) {
-          _couplingCells[i]->addMacroscopicMass(couplingCellsFromMacroscopicSolver[i]->getMacroscopicMass());
-          _couplingCells[i]->addMacroscopicMomentum(couplingCellsFromMacroscopicSolver[i]->getMacroscopicMomentum());
+        res += _couplingCellServices[l]->sendFromMD2Macro(md2macroCouplingCells);
+        auto itCouplingCells = _couplingCells.begin();
+        auto itMd2macroCouplingCells = md2macroCouplingCells.begin();
+        while (itCouplingCells != _couplingCells.end()) {
+          std::tie(cellA, idx) = *itCouplingCells;
+          std::tie(cellB, idx) = *itMd2macroCouplingCells;
+          cellA->addMacroscopicMass(cellB->getMacroscopicMass());
+          cellA->addMacroscopicMomentum(cellB->getMacroscopicMomentum());
+          itCouplingCells++;
+          itMd2macroCouplingCells++;
         }
         totalNumberEquilibratedMDSimulations += 1;
       }
     }
 
     // average data
-    for (unsigned int i = 0; i < size; i++) {
-      _couplingCells[i]->setMacroscopicMass(_couplingCells[i]->getMacroscopicMass() / (double)totalNumberEquilibratedMDSimulations);
-      _couplingCells[i]->setMacroscopicMomentum(1.0 / (double)totalNumberEquilibratedMDSimulations * _couplingCells[i]->getMacroscopicMomentum());
+    for(auto pair : _couplingCells) {
+      std::tie(cellA, idx) = pair;
+      cellA->setMacroscopicMass(cellA->getMacroscopicMass() / (double)totalNumberEquilibratedMDSimulations);
+      cellA->setMacroscopicMomentum(1.0 / (double)totalNumberEquilibratedMDSimulations * cellA->getMacroscopicMomentum());
     }
 
     // apply post multi instance FilterPipeline on cell data
@@ -388,10 +405,16 @@ public:
 
     res += (*_postMultiInstanceFilterPipeline)();
 
-    // store data in couplingCellsFromMacroscopicSolver
-    for (unsigned int i = 0; i < size; i++) {
-      couplingCellsFromMacroscopicSolver[i]->setMacroscopicMass(_couplingCells[i]->getMacroscopicMass());
-      couplingCellsFromMacroscopicSolver[i]->setMacroscopicMomentum(_couplingCells[i]->getMacroscopicMomentum());
+    // store data in md2macroCouplingCells
+    auto itCouplingCells = _couplingCells.begin();
+    auto itMd2macroCouplingCells = md2macroCouplingCells.begin();
+    while (itCouplingCells != _couplingCells.end()) {
+      std::tie(cellA, idx) = *itCouplingCells;
+      std::tie(cellB, idx) = *itMd2macroCouplingCells;
+      cellB->setMacroscopicMass(cellA->getMacroscopicMass());
+      cellB->setMacroscopicMomentum(cellA->getMacroscopicMomentum());
+      itCouplingCells++;
+      itMd2macroCouplingCells++;
     }
 
     return res;
@@ -400,7 +423,7 @@ public:
   /**
    * preprocessing operations for reducing data from MD instances to macro
    */
-  void preprocessingForMD2Macro(const I00* const indices, const unsigned int size) {
+  void preprocessingForMD2Macro(const unsigned int newCouplingCellsCount) {
 
     /*
      * If this is first coupling step, we must allocate space for the
@@ -408,18 +431,8 @@ public:
      */
     if (_couplingCells.empty()) {
       // Allocate & init _couplingCells
-      for (unsigned int c = _couplingCells.size(); c < size; c++)
+      for (unsigned int c = _couplingCells.size(); c < newCouplingCellsCount; c++)
         _couplingCells.push_back(new coupling::datastructures::CouplingCell<dim>());
-    }
-
-    /*
-     * If this is the first coupling step, copy cells to be in format compatible
-     * with filtering system. Can be optimized if indices don't change
-     * dynamically.
-     */
-    if (_cellIndices.empty()) {
-      for (unsigned int i = 0; i < size; i++)
-        _cellIndices.push_back(indices[i]);
     }
 
     if (_postMultiInstanceFilterPipeline == nullptr) {
@@ -668,9 +681,8 @@ private:
   const unsigned int _intNumberProcesses;
 
   // conversions during filtering TODO after merge with dynamic-md*/
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _couplingCells;    /** used to store in MD data in sendFromMD2Macro */
-  std::vector<I00> _cellIndices;                                               /** used to store in indexing of the above */
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _sumCouplingCells; /** used to reduce all local coupling cells before sending from md 2 macro */
+  coupling::datastructures::FlexibleCellContainer<dim> _couplingCells;    /** used to store in MD data in sendFromMD2Macro */
+  coupling::datastructures::FlexibleCellContainer<dim> _sumCouplingCells; /** used to reduce all local coupling cells before sending from md 2 macro */
 
   simplemd::configurations::MolecularDynamicsConfiguration& _mdConfiguration;
   coupling::configurations::MaMiCoConfiguration<dim>& _mamicoConfiguration;

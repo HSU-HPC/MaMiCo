@@ -3,7 +3,8 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMacro2MDSendOnly<Cell_T, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
                                                                                     const Container_T& cells) {
   I01 idx;
@@ -14,14 +15,16 @@ void coupling::sendrecv::FromMacro2MDSendOnly<Cell_T, dim>::writeToSendBuffer(co
   }
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMacro2MDSendOnly<Cell_T, dim>::sendFromMacro2MD(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
                                                                                    const Container_T& cells) {
   sendFromMacro2MDNonBlocking(dataExchange, cells);
   wait4SendFromMacro2MD();
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMacro2MDSendOnly<Cell_T, dim>::sendFromMacro2MDNonBlocking(
     coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
   // empty send and receive buffers

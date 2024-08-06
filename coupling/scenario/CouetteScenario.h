@@ -504,7 +504,7 @@ protected:
       tarch::la::Vector<3, double> vel(0, 0, 0);
       double mass = 0;
       for (auto pair : _couplingBuffer.md2macroBuffer) {
-        I01* idx;
+        I01 idx;
         coupling::datastructures::CouplingCell<3>* couplingCell;
         std::tie(couplingCell, idx) = pair;
         vel += couplingCell->getMacroscopicMomentum();
@@ -604,13 +604,13 @@ protected:
       const tarch::la::Vector<3, double> dx(IndexingService<3>::getInstance().getCouplingCellSize());
       const double mass = _cfg.density * dx[0] * dx[1] * dx[2];
       unsigned int i = 0;
-      for (auto pair : md2macroBuffer) {
+      for (auto pair : _couplingBuffer.md2macroBuffer) {
         /// todo@ use more cells
         if (i == 87) {
-          I01* idx;
+          I01 idx;
           coupling::datastructures::CouplingCell<3>* couplingCell;
           std::tie(couplingCell, idx) = pair;
-          auto midPoint = idx->getCellMidPoint();
+          auto midPoint = idx.getCellMidPoint();
           double vx_macro = _couetteSolver->getVelocity(midPoint)[0];
           double vx_filter = (1 / mass * couplingCell->getMacroscopicMomentum())[0];
           _sum_noise += (vx_macro - vx_filter) * (vx_macro - vx_filter);
@@ -631,18 +631,18 @@ protected:
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle == _cfg.filterInitCycles) {
         static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
             ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _couplingBuffer.md2macroBuffer);
+                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
       }
 #if (BUILD_WITH_OPENFOAM)
       else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
         static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
             ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), _couplingBuffer.md2macroBuffer);
+                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
       }
 #endif
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
         static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_couplingBuffer.md2macroBuffer);
-      }f
+      }
 #if (BUILD_WITH_OPENFOAM)
       else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM && cycle >= _cfg.filterInitCycles && _couetteSolver != NULL) {
         static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)->setMDBoundaryValues(_couplingBuffer.md2macroBuffer);
@@ -725,7 +725,7 @@ protected:
     for (auto idx : I08()) {
       if (!I12::contains(idx)) {
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
-          coupling::datastructures::CouplingCell<3>()* couplingCell = new coupling::datastructures::CouplingCell<3>();
+          coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
           _couplingBuffer.macro2MDBuffer << std::make_pair(couplingCell, idx); 
           if (couplingCell == nullptr)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
@@ -741,8 +741,8 @@ protected:
     std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells;
     for (auto idx : I12()) {
       if (tarch::utils::contains(msi.getTargetRanks(idx), (unsigned int)_rank)) {
-        coupling::datastructures::CouplingCell<3>()* couplingCell = new coupling::datastructures::CouplingCell<3>();
-        _couplingBuffer.md2macroBuffer << couplingCell; // TODO FIXME: THis buffer must be a FlexibleCellContainer
+        coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
+        _couplingBuffer.md2macroBuffer << std::make_pair(couplingCell, idx);
           if (couplingCell == nullptr)
             throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
       }
@@ -753,7 +753,8 @@ protected:
    *  @param recvBuffer the buffer for the data, which comes from md
    *  @param recvIndices the indices for the macr cells in the buffer
    *  @param couplingCycle the current number of coupling cycle */
-  void write2CSV(coupling::datastructures::CellContainer<3>& md2macroBuffer, int couplingCycle) const {
+  template <class Container_T>
+  void write2CSV(Container_T& md2macroBuffer, int couplingCycle) const {
     if (md2macroBuffer.size() == 0)
       return;
     if (_cfg.csvEveryTimestep < 1 || couplingCycle % _cfg.csvEveryTimestep > 0)
@@ -771,14 +772,14 @@ protected:
     // write cell index, mass and velocity to one line in the csv-file
     file << "I01_x,I01_y,I01_z,vel_x,vel_y,vel_z,mass" << std::endl;
     for (auto pair : md2macroBuffer) {
-      I01* idx;
+      I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
       tarch::la::Vector<3, double> vel(couplingCell->getMacroscopicMomentum());
       if (couplingCell->getMacroscopicMass() != 0.0) {
         vel = (1.0 / couplingCell->getMacroscopicMass()) * vel;
       }
-      file << *idx << "," << vel[0] << "," << vel[1] << "," << vel[2] << "," << couplingCell->getMacroscopicMass() << std::endl;
+      file << idx << "," << vel[0] << "," << vel[1] << "," << vel[2] << "," << couplingCell->getMacroscopicMass() << std::endl;
     }
 
     // close file
@@ -938,7 +939,7 @@ protected:
     /** @brief the buffer for data transfer from macro to md */
     coupling::datastructures::FlexibleCellContainer<3> macro2MDBuffer;
     /** @brief the buffer for data transfer from md to macro */
-    coupling::datastructures::CellContainer<I12, 3> md2macroBuffer;
+    coupling::datastructures::FlexibleCellContainer<3> md2macroBuffer;
   };
 
   /** @brief holds all the variables for the time measurement of a simulation

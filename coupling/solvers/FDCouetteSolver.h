@@ -156,17 +156,17 @@ public:
    *  @param recvIndice the indices to connect the data from the buffer with
    * coupling cells */
   
-  void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& md2macroBuffer) override {
+  void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) override {
     if (skipRank()) {
       return;
     }
 #pragma omp parallel for
     for (auto pair : md2macroBuffer) {
-      I01* idx;
+      I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
       // determine cell index of this cell in continuum domain
-      tarch::la::Vector<3, unsigned int> globalCellCoords{I01{recvIndices[i]}.get()};
+      tarch::la::Vector<3, unsigned int> globalCellCoords{I01{idx}.get()};
       globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
       globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
       globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;
@@ -184,7 +184,7 @@ public:
       // set velocity value in MD boundary cell (before streaming); the boundary velocities are interpolated between the neighbouring and this cell. This
       // interpolation is valid for FLUID-MD_BOUNDARY neighbouring relations only. determine local velocity received from MaMiCo and convert it to LB units;
       // store the velocity in _vel
-      tarch::la::Vector<3, double> localVel((1.0 / recvBuffer[i]->getMacroscopicMass()) * recvBuffer[i]->getMacroscopicMomentum());
+      tarch::la::Vector<3, double> localVel((1.0 / couplingCell->getMacroscopicMass()) * couplingCell->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
       }

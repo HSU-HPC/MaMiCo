@@ -127,7 +127,7 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro
   _couplingCells.applyToLocalGhostCouplingCellsWithLinkedCells(wrapper2);
 
   // carry out send-receive steps
-  _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, _couplingCellContainer, macro2MDBuffer);
+  _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, _couplingCells, macro2MDBuffer);
 
   // post-process inner coupling cells after receiving information from
   // macroscopic solver
@@ -153,14 +153,13 @@ template <class LinkedCell, unsigned int dim> double coupling::services::Couplin
 }
 
 template <class LinkedCell, unsigned int dim>
-double coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(
-    const std::vector<coupling::datastructures::CouplingCell<dim>*>& couplingCellsFromMacroscopicSolver, const I00* const indices) {
+double coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& couplingCellContainerFromMacroscopicSolver) {
   sendFromMD2MacroPreProcess();
 
   double runtime = applyFilterPipeline();
 
   // carry out send-receive steps
-  _fromMD2Macro.sendFromMD2Macro(_deFromMD2Macro, _couplingCells.getCouplingCells(), couplingCellsFromMacroscopicSolver, indices);
+  _fromMD2Macro.sendFromMD2Macro(_deFromMD2Macro, _couplingCells, couplingCellContainerFromMacroscopicSolver);
   return runtime;
 }
 

@@ -627,18 +627,19 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceRequests(
 
 #pragma region sequential operations
 
-template <class Cell_T, unsigned int dim, class Container_T>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer<Container_T>(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, Container_T& cells) {
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
   I01 idx;
   Cell_T* couplingCell;
   for(auto pair : cells) {
     std::tie(couplingCell, idx) = pair;
     const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
-    const unsigned int globalIndex = I00{*idx}.get();
+    const unsigned int globalIndex = I00{idx}.get();
 
     // determine the ranks which need to receive information of this coupling
     // cell
-    const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(*idx);
+    const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(idx);
     const unsigned int ranksSize = (unsigned int)ranks.size();
   #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Rank " << IDXS.getRank() << ": write cell " << *idx << " to send buffer;";
@@ -676,24 +677,27 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer<Conta
   }
 }
 
-template <class Cell_T, unsigned int dim, class Container_T>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer<Container_T>(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, Container_T& cells) {
+template <class Cell_T, unsigned int dim>
+template <class Container_T>
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
   I01 idx;
   Cell_T* couplingCell;
-  cellloop:for(auto pair : cells) {
+  for(auto pair : cells) {
     std::tie(couplingCell, idx) = pair;
 
     const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
     using namespace coupling::indexing;
 
-    const unsigned int globalIndex = I00{*idx}.get();
+    const unsigned int globalIndex = I00{idx}.get();
 
     // loop over all received buffers
-    for (typename std::map<unsigned int, BufferWithID>::const_iterator it = _receiveBuffer.begin(); it != _receiveBuffer.end(); it++) {
+    bool breakCellLoop = false;
+    for (typename std::map<unsigned int, BufferWithID>::const_iterator it = _receiveBuffer.begin(); !breakCellLoop && it != _receiveBuffer.end(); it++) {
 
       // loop over all received cells of this buffer
+      // TODO use std::tie instead of it->first/second
       const unsigned int bufferSize = (it->second).bufferSize;
-      for (unsigned int i = 0; i < bufferSize; i++) {
+      for (unsigned int i = 0; !breakCellLoop && i < bufferSize; i++) {
 
         // determine global cell index for this coupling cell
         const unsigned int thisIndex = (unsigned int)(it->second).buffer[i * doublesPerCell];
@@ -702,7 +706,7 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer<C
         if (thisIndex == globalIndex) {
           // read receive buffer and write to coupling cell (use specialised function)
           dataExchange.writeToCell(&((it->second).buffer[i * doublesPerCell + 1]), *couplingCell);
-          continue cellloop;
+          breakCellLoop = true;
         }
       } // loop over buffer
     }   // loop over all buffers
@@ -710,12 +714,12 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer<C
 }
 
 template <class Cell_T, unsigned int dim>
-void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReceiveBuffers<Container_T>(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx) {
+void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx) {
 
   const unsigned int doublesPerCell = dataExchange.getDoublesPerCell() + 1;
 
   // determine the ranks from which we need to receive information of this coupling cell
-  const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(*idx);
+  const std::vector<unsigned int> ranks = dataExchange.getSourceRanks(idx);
   const unsigned int ranksSize = (unsigned int)ranks.size();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   std::cout << "Rank " << IDXS.getRank() << ": allocate receive buffers for cell " << idx << ";";
