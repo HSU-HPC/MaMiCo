@@ -30,10 +30,10 @@ coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::
     exit(EXIT_FAILURE);
 
   // differentiate between per-instance and post-multi-instance filtering
+  I01 idx;
+  coupling::datastructures::CouplingCell<3>* cell;
   switch (_scope) {
   case coupling::filtering::Scope::perInstance:
-    I01 idx;
-    coupling::datastructures::CouplingCell<3>* cell;
     // check for valid amount of input cells
     // case 1: the input vector contains the entire MD domain
     if (inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
@@ -69,7 +69,10 @@ coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::
     // check for valid amount of input cells
     // case 1: the input vector contains the entire global MD-To-Macro domain
     if (inputCells.size() == CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
-      std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
+      for(auto pair : inputCells) {
+        std::tie(cell, idx) = pair;
+        _md2MacroCells.emplace_back(cell);
+      }
       _outerCells = {};
       loadSequencesFromXML(_config.root->FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     }
