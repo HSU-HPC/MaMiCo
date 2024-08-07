@@ -216,7 +216,7 @@ public:
       globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
       globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << *idx << ": " << globalCellCoords << std::endl;
+      std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << idx << ": " << globalCellCoords << std::endl;
 #endif
       const int index = get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)

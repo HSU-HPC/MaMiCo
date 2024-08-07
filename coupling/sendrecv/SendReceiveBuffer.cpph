@@ -639,7 +639,7 @@ void coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(coupl
     const std::vector<unsigned int> ranks = dataExchange.getTargetRanks(idx);
     const unsigned int ranksSize = (unsigned int)ranks.size();
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Rank " << IDXS.getRank() << ": write cell " << *idx << " to send buffer;";
+    std::cout << "Rank " << IDXS.getRank() << ": write cell " << idx << " to send buffer;";
     std::cout << " associated target ranks: ";
     for (unsigned int i = 0; i < ranksSize; i++) {
       std::cout << ranks[i] << " ";
