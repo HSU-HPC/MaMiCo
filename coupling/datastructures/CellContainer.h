@@ -62,7 +62,7 @@ public:
     Iterator(CouplingCellIterator itCouplingCells) : _itCouplingCells(itCouplingCells), _itCouplingCellsBegin(itCouplingCells) {}
 
     const std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const {
-      I01 temp(std::distance(_itCouplingCellsBegin, _itCouplingCells));
+      I00 temp(std::distance(_itCouplingCellsBegin, _itCouplingCells));
       return std::make_pair(*_itCouplingCells, temp);
     }
 
