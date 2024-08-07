@@ -8,6 +8,12 @@
 #define COUPLING_MD_NO 0
 #define COUPLING_MD_YES 1
 
+#if defined(CommDebug)
+#define COMM_DEBUG COUPLING_MD_YES
+#else
+#define COMM_DEBUG COUPLING_MD_NO
+#endif
+
 #if defined(MDCoupledDebug)
 #define COUPLING_MD_DEBUG COUPLING_MD_YES
 #else

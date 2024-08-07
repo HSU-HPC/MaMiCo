@@ -41,6 +41,9 @@ void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::reduceFromMD2Macro(std::vect
 template <class Cell_T, unsigned int dim>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::writeToReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
                                                                         const Local_Container_T& cells) {
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  throw std::runtime_error("Debugging communication is not implemented for collective MPI");
+#endif
   for (auto idx : I10())
     coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(dataExchange, cells[idx], idx);
 }
@@ -61,6 +64,9 @@ template <class Cell_T, unsigned int dim>
 template <class Container_T>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
                                                                          const Container_T& cells) {
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  throw std::runtime_error("Debugging communication is not implemented for collective MPI");
+#endif
   I01* idx;
   Cell_T* cell;
   for (auto pair : cells) {
@@ -113,8 +119,31 @@ void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::allocateReceiveBuffers(coupl
 template <class Cell_T, unsigned int dim>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
                                                                       const Local_Container_T& cells) {
-  coupling::datastructures::CellContainer<I10,dim> container;
-  for(auto idx : I10()) container << cells[idx];
+  coupling::datastructures::CellContainer<I10, dim> container;
+  for (auto idx : I10())
+    container << cells[idx];
+
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  std::ofstream file;
+  file.open(std::string("comm.log") + std::to_string(rank), std::ofstream::out | std::ofstream::app);
+  file << "MD2Macro"
+       << " MPI rank " << rank << " send global cell indices: [";
+  I00 idx;
+  coupling::datastructures::CouplingCell<dim>* cell;
+  int i = 0;
+  for (auto pair : container) {
+    std::tie(cell, idx) = pair;
+    if (i++ > 0)
+      file << ", ";
+    file << idx;
+  }
+  file << "]" << std::endl;
+  file.flush();
+  file.close();
+#endif
+
   coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(dataExchange, container);
 }
 
@@ -131,6 +160,26 @@ void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::wait4SendFromMD2Macro(coupli
 template <class Cell_T, unsigned int dim>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
                                                                           const Macro_Container_T& cells) {
+#if (COMM_DEBUG == COUPLING_MD_YES)
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  std::ofstream file;
+  file.open(std::string("comm.log") + std::to_string(rank), std::ofstream::out | std::ofstream::app);
+  file << "Macro2MD" // Wrong, but this is also wrong on the master-debug branch
+       << " MPI rank " << rank << " recv global cell indices: [";
+  I00 idx;
+  coupling::datastructures::CouplingCell<dim>* cell;
+  int i = 0;
+  for (auto pair : cells) {
+    std::tie(cell, idx) = pair;
+    if (i++ > 0)
+      file << ", ";
+    file << idx;
+  }
+  file << "]" << std::endl;
+  file.flush();
+  file.close();
+#endif
   coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReceiveBuffer(dataExchange, cells);
 }
 
