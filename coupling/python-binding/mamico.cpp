@@ -307,8 +307,7 @@ public:
 
     I01 idx_global;
     coupling::datastructures::CouplingCell<3>* cell;
-    for (auto pair 
-      : _md2macroBuffer) {
+    for (auto pair : _md2macroBuffer) {
       std::tie(cell, idx_global) = pair;
       const tarch::la::Vector<3, unsigned int> idx{I05{idx_global}.get()};
       res_raw(idx[0], idx[1], idx[2]) = cell->getMacroscopicMass() / cellmass;
@@ -319,6 +318,7 @@ public:
 
   coupling::datastructures::FlexibleCellContainer<3> _macro2MDBuffer;
   coupling::datastructures::FlexibleCellContainer<3> _md2macroBuffer;
+
 private:
   const unsigned int _outerRegion; // defines an offset of cells which is
                                    // considered to be the outer region
@@ -358,7 +358,7 @@ private:
   void deleteBuffer(coupling::datastructures::FlexibleCellContainer<3>& buffer) {
     // delete all potential entries of buffer
     for (auto pair : buffer)
-      if(pair.first != NULL)
+      if (pair.first != NULL)
         delete pair.first;
   }
 };
@@ -637,10 +637,10 @@ PYBIND11_MODULE(mamico, mamico) {
            "mdSolverInterfaces"_a, "macroscopicSolverInterface"_a, "simpleMDConfig"_a, "rank"_a = 0, "totalNumberMDSimulations"_a = 1, "mamicoConfig"_a,
            "xmlConfigFilename"_a, "multiMDService"_a)
       .def("getCouplingCellService", &coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>::getCouplingCellService, py::return_value_policy::reference)
-      .def("sendFromMacro2MD", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service,
-                                  CouplingBuffer& buf) { service.sendFromMacro2MD(buf._macro2MDBuffer); })
-      .def("sendFromMD2Macro", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service,
-                                  CouplingBuffer& buf) { service.sendFromMD2Macro(buf._md2macroBuffer); })
+      .def("sendFromMacro2MD",
+           [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service, CouplingBuffer& buf) { service.sendFromMacro2MD(buf._macro2MDBuffer); })
+      .def("sendFromMD2Macro",
+           [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service, CouplingBuffer& buf) { service.sendFromMD2Macro(buf._md2macroBuffer); })
       .def("constructFilterPipelines", &coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>::constructFilterPipelines);
 
   py::class_<CouplingBuffer>(coupling, "Buffer")
