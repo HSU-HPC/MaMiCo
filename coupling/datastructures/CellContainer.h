@@ -31,7 +31,7 @@ public:
   }
 
   /** returns a pointer to the coupling cell without access to linked cells. */
-  const coupling::datastructures::CouplingCell<dim>* operator[](CellIndexT index) const {
+  coupling::datastructures::CouplingCell<dim>* operator[](CellIndexT index) const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (_couplingCells.size() < CellIndexT::linearNumberCellsInDomain) {
       std::cout << "CellContainer<" << CellIndexT::TNAME << "," << dim << "> accessed but not full " << std::endl;

@@ -44,9 +44,6 @@ void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::allocateReceiveBuffers(coupl
 template <class Cell_T, unsigned int dim>
 template <class Container_T>
 void coupling::sendrecv::FromMacro2MD<Cell_T, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells) {
-  // const unsigned int numberCells = (unsigned int)cells.size();
-  // for (unsigned int i = 0; i < numberCells; i++)
-  //   coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(dataExchange, *cells[i], globalCellIndices[i]);
   coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(dataExchange, cells);
 }
 

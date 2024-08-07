@@ -113,7 +113,9 @@ void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::allocateReceiveBuffers(coupl
 template <class Cell_T, unsigned int dim>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange,
                                                                       const Local_Container_T& cells) {
-  coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(dataExchange, cells);
+  coupling::datastructures::CellContainer<I10,dim> container;
+  for(auto idx : I10()) container << cells[idx];
+  coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToSendBuffer(dataExchange, container);
 }
 
 template <class Cell_T, unsigned int dim>
