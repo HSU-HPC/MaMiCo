@@ -90,7 +90,7 @@ private:
       
     coupling::error::ErrorEstimation errorControl(velocity, temperature, numberOfParticle, particleMass, soundSpeed, numberOfSamples, cellVolume);
     double errorD = errorControl.getError(coupling::error::ErrorEstimation::Density, coupling::error::ErrorEstimation::Relative);
-    CPPUNIT_ASSERT(errorD == 0.1);
+    CPPUNIT_ASSERT(std::abs(errorD-0.1) < 1e-6);
     
     errorD = errorControl.getError(coupling::error::ErrorEstimation::Density, coupling::error::ErrorEstimation::Absolute);
     CPPUNIT_ASSERT(errorD == 2.5);
