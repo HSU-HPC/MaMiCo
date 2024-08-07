@@ -349,12 +349,12 @@ public:
     double res = 0;
     const unsigned int size = (unsigned int)md2macroCouplingCells.size();
 
+    preprocessingForMD2Macro(md2macroCouplingCells);
+
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if ((unsigned int) _couplingCells.size() != size)
       throw std::runtime_error(std::string("Buffers must have the same size!"));
 #endif
-
-    preprocessingForMD2Macro(md2macroCouplingCells);
 
     // reset macroscopic data (only those should be used by macroscopic solver
     // anyway) in duplicate
