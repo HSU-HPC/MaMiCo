@@ -348,12 +348,11 @@ public:
    * couplingCellsFromMacroscopicSolver. */
   double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer<dim>& md2macroCouplingCells) {
     double res = 0;
-    const unsigned int size = (unsigned int)md2macroCouplingCells.size();
 
     preprocessingForMD2Macro(md2macroCouplingCells);
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if ((unsigned int)_couplingCells.size() != size)
+    if (_couplingCells.size() != md2macroCouplingCells.size())
       throw std::runtime_error(std::string("Buffers must have the same size!"));
 #endif
 
