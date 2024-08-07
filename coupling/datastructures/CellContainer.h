@@ -59,15 +59,15 @@ public:
   public:
     using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<dim>*>::const_iterator;
 
-    Iterator(CouplingCellIterator itCouplingCells) : _itCouplingCells(itCouplingCells), _itCouplingCellsBegin(itCouplingCells) {}
+    Iterator(CouplingCellIterator itCouplingCells, typename CellIndexT::IndexIterator itIdx) : _itCouplingCells(itCouplingCells), _itIdx(itIdx) {}
 
-    const std::pair<coupling::datastructures::CouplingCell<dim>*, I01> operator*() const {
-      I00 temp(std::distance(_itCouplingCellsBegin, _itCouplingCells));
-      return std::make_pair(*_itCouplingCells, temp);
+    const std::pair<coupling::datastructures::CouplingCell<dim>*, CellIndexT> operator*() const {
+      return std::make_pair(*_itCouplingCells, *_itIdx);
     }
 
     Iterator& operator++() {
       ++_itCouplingCells;
+      ++_itIdx;
       return *this;
     }
 
@@ -82,11 +82,12 @@ public:
     friend bool operator!=(const Iterator& a, const Iterator& b) { return *(a._itCouplingCells) != *(b._itCouplingCells); }
 
   private:
-    CouplingCellIterator _itCouplingCells, _itCouplingCellsBegin;
+    CouplingCellIterator _itCouplingCells;
+    typename CellIndexT::IndexIterator _itIdx;
   };
 
-  Iterator begin() const { return Iterator(_couplingCells.begin()); }
-  Iterator end() const { return Iterator(_couplingCells.end()); }
+  Iterator begin() const { return Iterator(_couplingCells.begin(), CellIndexT::begin()); }
+  Iterator end() const { return Iterator(_couplingCells.end(), CellIndexT::end()); }
 
 protected:
   /** holds pointers to all coupling cells with linked cells, but without

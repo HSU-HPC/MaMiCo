@@ -11,6 +11,7 @@ class CellContainerTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(CellContainerTest);
   CPPUNIT_TEST(testInsertAccessSize);
   CPPUNIT_TEST(testIteration);
+  CPPUNIT_TEST(testIterationLocal);
   CPPUNIT_TEST(testEquality);
   CPPUNIT_TEST(testInequality);
   CPPUNIT_TEST(testPreIncrement);
@@ -34,11 +35,17 @@ public:
     int i = 0;
     _couplingCells_fullcase.reserve(I01::linearNumberCellsInDomain);
     _idxs_fullcase.reserve(I01::linearNumberCellsInDomain);
+    _couplingCells_local.reserve(I03::linearNumberCellsInDomain);
+    _idxs_local.reserve(I03::linearNumberCellsInDomain);
     for (auto idx : I01()) {
       auto tmp = new CouplingCell<3>;
       tmp->setMacroscopicMass(i++);
       _couplingCells_fullcase.push_back(tmp);
       _idxs_fullcase.push_back(idx);
+    }
+    for (auto idx : I03()) {
+      _couplingCells_local.push_back(_couplingCells_fullcase[I00{idx}.get()]);
+      _idxs_local.push_back(idx);
     }
   }
 
@@ -81,6 +88,20 @@ public:
       std::tie(couplingCell, idx) = pair;
       CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_fullcase[i]->getMacroscopicMass(), 1e-16);
       CPPUNIT_ASSERT_EQUAL(idx, _idxs_fullcase[i]);
+      i++;
+    }
+  }
+
+  void testIterationLocal() {
+    using namespace coupling::datastructures;
+    CellContainer<I03, 3> container(_couplingCells_local);
+    I01 idx;
+    CouplingCell<3>* couplingCell;
+    int i = 0;
+    for (auto pair : container) {
+      std::tie(couplingCell, idx) = pair;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(couplingCell->getMacroscopicMass(), _couplingCells_local[i]->getMacroscopicMass(), 1e-16);
+      CPPUNIT_ASSERT(idx == _idxs_local[i]);
       i++;
     }
   }
@@ -155,6 +176,8 @@ private:
   int _size, _rank;
   std::vector<coupling::datastructures::CouplingCell<3>*> _couplingCells_fullcase;
   std::vector<I01> _idxs_fullcase;
+  std::vector<coupling::datastructures::CouplingCell<3>*> _couplingCells_local;
+  std::vector<I03> _idxs_local;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(CellContainerTest);

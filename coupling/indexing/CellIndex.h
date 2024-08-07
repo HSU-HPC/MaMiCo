@@ -280,8 +280,8 @@ public:
     IndexIterator(CellIndex x) : _idx(x) {}
     IndexIterator(const IndexIterator& a) : _idx(a._idx) {}
 
-    CellIndex& operator*() { return _idx; }
-    CellIndex* operator->() { return &_idx; }
+    const CellIndex& operator*() const { return _idx; }
+    const CellIndex* operator->() const { return &_idx; }
 
     // Prefix increment
     IndexIterator& operator++() {
