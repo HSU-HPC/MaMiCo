@@ -720,15 +720,13 @@ protected:
    *  @brief allocates the send buffer (with values for all coupling cells).
    *  @param msi macroscopic solver interface for the continuum solver */
   void allocateMacro2mdBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
-    std::vector<I01*> indices;
-    std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells;
     for (auto idx : I08()) {
       if (!I12::contains(idx)) {
         if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)_rank)) {
           coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
           _couplingBuffer.macro2MDBuffer << std::make_pair(couplingCell, idx);
           if (couplingCell == nullptr)
-            throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
+            throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCell==NULL!"));
         }
       }
     }
@@ -737,14 +735,12 @@ protected:
   /** allocates the recv-buffer. This buffer contains all global inner coupling cells, but only on rank 0. On all other ranks, no cells are stored and a NULL
    * ptr is returned */
   void allocateMd2macroBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi) {
-    std::vector<I01*> indices;
-    std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells;
     for (auto idx : I12()) {
       if (tarch::utils::contains(msi.getTargetRanks(idx), (unsigned int)_rank)) {
         coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
         _couplingBuffer.md2macroBuffer << std::make_pair(couplingCell, idx);
         if (couplingCell == nullptr)
-          throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCells==NULL!"));
+          throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCell==NULL!"));
       }
     }
   }
