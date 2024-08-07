@@ -84,7 +84,7 @@ public:
 
     friend bool operator==(const Iterator& a, const Iterator& b) { return a._itCouplingCells == b._itCouplingCells && a._itIdxs == b._itIdxs; }
 
-    friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a==b); }
+    friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a == b); }
 
   private:
     CouplingCellIterator _itCouplingCells;

@@ -144,7 +144,8 @@ public:
     coupling::datastructures::CouplingCell<3>* cell;
     for (auto pair : _couplingCells) {
       std::tie(cell, idx) = pair;
-      if(cell != nullptr) delete cell;
+      if (cell != nullptr)
+        delete cell;
     }
     if (_postMultiInstanceFilterPipeline != nullptr)
       delete _postMultiInstanceFilterPipeline;
@@ -352,7 +353,7 @@ public:
     preprocessingForMD2Macro(md2macroCouplingCells);
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if ((unsigned int) _couplingCells.size() != size)
+    if ((unsigned int)_couplingCells.size() != size)
       throw std::runtime_error(std::string("Buffers must have the same size!"));
 #endif
 

@@ -56,7 +56,7 @@ public:
 
   void testInsertAndAccess() {
     using namespace coupling::datastructures;
-    I01 idx {0};
+    I01 idx{0};
     CouplingCell<3>* couplingCell = new CouplingCell<3>();
     couplingCell->setMacroscopicMass(50.0);
     FlexibleCellContainer<3> container;

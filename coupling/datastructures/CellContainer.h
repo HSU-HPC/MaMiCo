@@ -61,9 +61,7 @@ public:
 
     Iterator(CouplingCellIterator itCouplingCells, typename CellIndexT::IndexIterator itIdx) : _itCouplingCells(itCouplingCells), _itIdx(itIdx) {}
 
-    const std::pair<coupling::datastructures::CouplingCell<dim>*, CellIndexT> operator*() const {
-      return std::make_pair(*_itCouplingCells, *_itIdx);
-    }
+    const std::pair<coupling::datastructures::CouplingCell<dim>*, CellIndexT> operator*() const { return std::make_pair(*_itCouplingCells, *_itIdx); }
 
     Iterator& operator++() {
       ++_itCouplingCells;
@@ -79,7 +77,7 @@ public:
 
     friend bool operator==(const Iterator& a, const Iterator& b) { return a._itCouplingCells == b._itCouplingCells; }
 
-    friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a==b); }
+    friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a == b); }
 
   private:
     CouplingCellIterator _itCouplingCells;

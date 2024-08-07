@@ -159,7 +159,7 @@ coupling::filtering::Gauss<dim, scope...>::getIndexAbove(const coupling::filteri
   }
 
   // get raw vector index
-  tarch::la::Vector<dim,int> ans = index.get();
+  tarch::la::Vector<dim, int> ans = index.get();
   // get upper index in dimension d
   ans[d] += 1;
 
@@ -180,7 +180,7 @@ coupling::filtering::Gauss<dim, scope...>::getIndexBelow(const coupling::filteri
   }
 
   // copy input index
-  tarch::la::Vector<dim,int> ans = index.get();
+  tarch::la::Vector<dim, int> ans = index.get();
   // get lower index in dimension d
   ans[d] -= 1;
 

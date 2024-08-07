@@ -244,7 +244,7 @@ public:
    */
   void initFiltering() override {
     _filterPipeline = new coupling::filtering::FilterPipeline<I02, dim>(_couplingCells, coupling::filtering::Scope::perInstance, _multiMDService,
-                                                                   _filterPipelineConfiguration);
+                                                                        _filterPipelineConfiguration);
   }
 
   const coupling::filtering::FilterPipeline<I02, dim>* getFilterPipeline() const override { return _filterPipeline; }

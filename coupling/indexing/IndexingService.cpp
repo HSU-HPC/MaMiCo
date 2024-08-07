@@ -374,7 +374,8 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 
   // init boundaries of all global, non-m2m, GL excluding indexing types
   CellIndex<dim, IndexTrait::noGhost>::lowerBoundary = I01{1};
-  CellIndex<dim, IndexTrait::noGhost>::upperBoundary = I01{tarch::la::Vector<dim, int>{globalNumberCouplingCellsInclGL - tarch::la::Vector<dim, unsigned int>{2}}};
+  CellIndex<dim, IndexTrait::noGhost>::upperBoundary =
+      I01{tarch::la::Vector<dim, int>{globalNumberCouplingCellsInclGL - tarch::la::Vector<dim, unsigned int>{2}}};
   CellIndex<dim, IndexTrait::noGhost>::setDomainParameters();
 
   CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary = CellIndex<dim, IndexTrait::noGhost>::lowerBoundary;

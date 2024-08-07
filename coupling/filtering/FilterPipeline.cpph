@@ -6,8 +6,9 @@
 
 // constructors of coupling::filtering::FilterPipeline
 template <class CellIndex_T, unsigned int dim>
-coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::datastructures::CellContainer<CellIndex_T, dim> inputCells, coupling::filtering::Scope scope,
-                                                         const tarch::utils::MultiMDService<dim>& multiMDService, const char* cfgpath)
+coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::datastructures::CellContainer<CellIndex_T, dim> inputCells,
+                                                                      coupling::filtering::Scope scope, const tarch::utils::MultiMDService<dim>& multiMDService,
+                                                                      const char* cfgpath)
     :
 
       _config(ParseConfiguration::XMLConfiguration::load(cfgpath)), _scope(scope)
@@ -38,7 +39,7 @@ coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::
     // case 1: the input vector contains the entire MD domain
     if (inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
       using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
-      for(auto pair : inputCells) {
+      for (auto pair : inputCells) {
         std::tie(cell, idx) = pair;
         if (Md2MacroIndex::contains(idx))
           _md2MacroCells.emplace_back(cell);
@@ -48,7 +49,7 @@ coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::
     }
     // case 2: the input vector contains only the MD-To-Macro domain
     else if (inputCells.size() == CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
-      for(auto pair : inputCells) {
+      for (auto pair : inputCells) {
         std::tie(cell, idx) = pair;
         _md2MacroCells.emplace_back(cell);
       }
@@ -69,7 +70,7 @@ coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::
     // check for valid amount of input cells
     // case 1: the input vector contains the entire global MD-To-Macro domain
     if (inputCells.size() == CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
-      for(auto pair : inputCells) {
+      for (auto pair : inputCells) {
         std::tie(cell, idx) = pair;
         _md2MacroCells.emplace_back(cell);
       }
@@ -153,7 +154,8 @@ coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<Ce
 }
 
 // Private functions of coupling::filtering::FilterPipeline:
-template <class CellIndex_T, unsigned int dim> bool coupling::filtering::FilterPipeline<CellIndex_T, dim>::configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig) {
+template <class CellIndex_T, unsigned int dim>
+bool coupling::filtering::FilterPipeline<CellIndex_T, dim>::configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig) {
   // Check main node
   tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement("filter-pipeline");
   if (!node) {
