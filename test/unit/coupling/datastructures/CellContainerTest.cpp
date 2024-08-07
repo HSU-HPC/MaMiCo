@@ -13,6 +13,7 @@ class CellContainerTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testIteration);
   CPPUNIT_TEST(testIterationLocal);
   CPPUNIT_TEST(testEquality);
+  CPPUNIT_TEST(testEqualityContent);
   CPPUNIT_TEST(testInequality);
   CPPUNIT_TEST(testPreIncrement);
   CPPUNIT_TEST(testPostIncrement);
@@ -109,11 +110,23 @@ public:
   void testEquality() {
     using namespace coupling::datastructures;
     CellContainer<I01, 3> container1(_couplingCells_fullcase);
+    auto iter1 = container1.begin();
+    auto iter2 = container1.begin();
+    for (unsigned int i = 0; i < _couplingCells_fullcase.size(); ++i) {
+      CPPUNIT_ASSERT(iter1 == iter2);
+      iter1++;
+      iter2++;
+    }
+  }
+
+  void testEqualityContent() {
+    using namespace coupling::datastructures;
+    CellContainer<I01, 3> container1(_couplingCells_fullcase);
     CellContainer<I01, 3> container2(_couplingCells_fullcase);
     auto iter1 = container1.begin();
     auto iter2 = container2.begin();
     for (unsigned int i = 0; i < _couplingCells_fullcase.size(); ++i) {
-      CPPUNIT_ASSERT(iter1 == iter2);
+      CPPUNIT_ASSERT(*iter1 == *iter2);
       iter1++;
       iter2++;
     }

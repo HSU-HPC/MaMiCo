@@ -77,9 +77,9 @@ public:
       return tmp;
     }
 
-    friend bool operator==(const Iterator& a, const Iterator& b) { return *(a._itCouplingCells) == *(b._itCouplingCells); }
+    friend bool operator==(const Iterator& a, const Iterator& b) { return a._itCouplingCells == b._itCouplingCells; }
 
-    friend bool operator!=(const Iterator& a, const Iterator& b) { return *(a._itCouplingCells) != *(b._itCouplingCells); }
+    friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a==b); }
 
   private:
     CouplingCellIterator _itCouplingCells;

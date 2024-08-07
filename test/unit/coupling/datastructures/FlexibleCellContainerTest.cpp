@@ -14,6 +14,7 @@ class FlexibleCellContainerTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testSize);
   CPPUNIT_TEST(testIteration);
   CPPUNIT_TEST(testEquality);
+  CPPUNIT_TEST(testEqualityContent);
   CPPUNIT_TEST(testInequality);
   CPPUNIT_TEST(testPreIncrement);
   CPPUNIT_TEST(testPostIncrement);
@@ -107,11 +108,23 @@ public:
   void testEquality() {
     using namespace coupling::datastructures;
     FlexibleCellContainer<3> container1(_couplingCells_10case, _idxs_10case);
+    auto iter1 = container1.begin();
+    auto iter2 = container1.begin();
+    for (unsigned int i = 0; i < _couplingCells_10case.size(); ++i) {
+      CPPUNIT_ASSERT(iter1 == iter2);
+      iter1++;
+      iter2++;
+    }
+  }
+
+  void testEqualityContent() {
+    using namespace coupling::datastructures;
+    FlexibleCellContainer<3> container1(_couplingCells_10case, _idxs_10case);
     FlexibleCellContainer<3> container2(_couplingCells_10case, _idxs_10case);
     auto iter1 = container1.begin();
     auto iter2 = container2.begin();
     for (unsigned int i = 0; i < _couplingCells_10case.size(); ++i) {
-      CPPUNIT_ASSERT(iter1 == iter2);
+      CPPUNIT_ASSERT(*iter1 == *iter2);
       iter1++;
       iter2++;
     }
