@@ -208,7 +208,7 @@ public:
       throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainOffset() before initalization! "));
     }
     if (!_initedWithMDSize) {
-      throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainSize() without calling initWithMDSize()! "));
+      throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainOffset() without calling initWithMDSize()! "));
     }
 #endif
     return _globalMDDomainOffset;
@@ -222,7 +222,7 @@ public:
       throw std::runtime_error(std::string("IndexingService: Called getCouplingCellSize() before initalization! "));
     }
     if (!_initedWithMDSize) {
-      throw std::runtime_error(std::string("IndexingService: Called getGlobalMDDomainSize() without calling initWithMDSize()! "));
+      throw std::runtime_error(std::string("IndexingService: Called getCouplingCellSize() without calling initWithMDSize()! "));
     }
 #endif
     return _couplingCellSize;

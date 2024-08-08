@@ -38,23 +38,19 @@ public:
    *  The index linkedCellInCouplingCell corresponds to the coordinates of the linked cell inside the
    *  given coupling cell. These coordinates thus lie in a range (0,linkedCellsPerCouplingCell-1).
    */
-  virtual ls1::LS1RegionWrapper& getLinkedCell(const tarch::la::Vector<3, unsigned int>& couplingCellIndex,
+  virtual ls1::LS1RegionWrapper& getLinkedCell(const CellIndex_T& couplingCellIndex,
                                                const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
-                                               const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell,
-                                               const coupling::IndexConversion<3>& indexConversion) {
+                                               const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell)  {
     // ghost layer not allowed to have linked cells
-    if (couplingCellIndex[0] == 0 || couplingCellIndex[1] == 0 || couplingCellIndex[2] == 0) {
-      throw std::runtime_error("ERROR in LS1MDSolverInterface::getLinkedCell(): ghost coupling cells may not have linked cells!");
-    }
-
+    if (!CellIndex_T::contains(couplingCellIndex))
+        throw std::runtime_error("ERROR in LS1MDSolverInterface::getLinkedCell(): ghost coupling cells may not have linked cells!");
+                                                
     // size of the coupling cell
-    tarch::la::Vector<3, double> macroCellSize(indexConversion.getCouplingCellSize());
+    const unsigned int dim = 3; // Used by expansion of IDXS macro
+    tarch::la::Vector<3, double> macroCellSize(IDXS.getCouplingCellSize());
 
     // conversion to global
-    using coupling::indexing::CellIndex;
-    using coupling::indexing::IndexTrait;
-    CellIndex<3, IndexTrait::vector, IndexTrait::local> localIndex({(int)couplingCellIndex[0], (int)couplingCellIndex[1], (int)couplingCellIndex[2]});
-    CellIndex<3, IndexTrait::vector, IndexTrait::noGhost> globalIndex(localIndex);
+    I09 globalIndex(couplingCellIndex);
 
     // We have unbroken MD domain, which we will divide into region iterators
     // So we split the MD into the same grid as the macro, and give the coupling cell the corresponding region
