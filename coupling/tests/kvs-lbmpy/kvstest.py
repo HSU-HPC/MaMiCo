@@ -30,6 +30,7 @@ logging.getLogger('matplotlib.font_manager').disabled = True
 
 
 BENCH_BEFORE_RUN = True
+RANK = mamico.tarch.utils.initMPI()
 
 # Versatile configurable MPI parallel Kármán vortex street flow test for noise-filtered multi-instance Nie coupling.
 # Features:
@@ -42,7 +43,7 @@ BENCH_BEFORE_RUN = True
 class KVSTest():
     def __init__(self, cfg):
         self.cfg = cfg
-        self.rank = mamico.tarch.utils.initMPI()
+        self.rank = RANK
         if self.rank==0:
             log.info("Created KVSTest ...")
 
@@ -407,8 +408,9 @@ class KVSTest():
         dx = self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
         return [math.floor(domainSize[d]/dx[d]+0.5) for d in range(3)]
 
-from lbmpy.session import *
-from lbmpy.parameterization import Scaling
+if RANK == 0:    # This fixes last_config.json-Error
+    from lbmpy.session import *
+    from lbmpy.parameterization import Scaling
 
 lb_log = logging.getLogger('LBSolver')
 
@@ -418,7 +420,7 @@ class LBSolver():
         self.cpm = cpm = cfg.getint("macroscopic-solver", "cells-per-meter")
         self.domain_size = (int(2.5*cpm), int(0.41*cpm), int(0.41*cpm))
         self.vis = 1e-3
-        self.scaling = Scaling(physical_length=0.1, physical_velocity=1, kinematic_viscosity=self.vis,
+        self.scaling = Scaling(physical_length=0.1, physical_velocity=2.25, kinematic_viscosity=self.vis,
              cells_per_length=0.1*cpm)
         self.omega = cfg.getfloat("macroscopic-solver", "omega")
         if self.omega > 1.92:
@@ -455,7 +457,7 @@ class LBSolver():
                 optTarget = Target.GPU
         except ImportError:   # for lbmpy version <= 0.3.4
             optTarget = self.cfg.get("macroscopic-solver", "optimization-target")
-        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method='srt',stencil='D3Q19',
+        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method='trt',stencil='D3Q19',
             relaxation_rate=self.omega, periodicity=(True, False, False),
             optimization={'target':optTarget, 
             'gpu_indexing':'line', 
@@ -479,7 +481,7 @@ class LBSolver():
         self.scen.boundary_handling.set_boundary(outflow, make_slice[-1, :, :])
 
     def advance(self, timesteps):
-        vtk_every_ts = 5000
+        vtk_every_ts = 10000
        	ts_goal = self.timesteps_finished + timesteps
         while self.timesteps_finished < ts_goal:
             if ts_goal - self.timesteps_finished < vtk_every_ts:
